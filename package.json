@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron .",
     "watch": "webpack-dev-server",
-    "electron-rebuild": "electron-rebuild"
+    "electron-rebuild": "electron-rebuild",
+    "lint": "standard"
   },
   "repository": {
     "type": "git",
@@ -32,9 +33,11 @@
     "css-loader": "^0.23.0",
     "electron-packager": "^5.1.1",
     "electron-rebuild": "^1.0.2",
+    "gulp": "^3.9.0",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "node-libs-browser": "^0.5.3",
+    "standard": "^5.4.1",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"

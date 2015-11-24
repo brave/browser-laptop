@@ -1,8 +1,7 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
+const React = require('react')
 
 const App = (props) => {
-  return <div>Test!</div>;
-};
+  return <div>Test!</div>
+}
 
-export default App;
+export default App

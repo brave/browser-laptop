@@ -1,12 +1,11 @@
-var webpack = require('webpack');
-var path = require('path')
+var webpack = require('webpack')
 
 module.exports = {
   contentBase: './dist/',
   cache: true,
   inline: true,
   entry: {
-    app: ['webpack/hot/dev-server', './js/entry.js'],
+    app: ['webpack/hot/dev-server', './js/entry.js']
   },
   devtool: '#source-map',
   output: {
@@ -31,8 +30,14 @@ module.exports = {
           presets: ['react', 'es2015']
         }
       },
-      { test: /\.less$/, loader: 'style-loader!css-loader!less-loader'},
-      { test: /\.css$/, loader: 'style-loader!css-loader' }
+      {
+        test: /\.less$/,
+        loader: 'style-loader!css-loader!less-loader'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+      }
     ]
   },
   resolve: {
