@@ -7,7 +7,8 @@
     "start": "electron .",
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
-    "lint": "standard"
+    "lint": "standard",
+    "test": "standard"
   },
   "repository": {
     "type": "git",
