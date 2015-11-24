@@ -1,0 +1,23 @@
+{
+  "name": "electron-sample",
+  "version": "0.0.1",
+  "description": "Electron sample app",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbondy/electron-sample.git"
+  },
+  "author": "Brian R. Bondy <netzen@gmail.com> (http://www.brianbondy.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bbondy/electron-sample/issues"
+  },
+  "homepage": "https://github.com/bbondy/electron-sample#readme",
+  "dependencies": {
+    "electron-prebuilt": "^0.35.1"
+  }
+}
