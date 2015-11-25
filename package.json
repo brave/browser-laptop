@@ -4,10 +4,12 @@
   "description": "Electron sample app",
   "main": "index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --debug=5858",
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
+    "package": "asar pack MyApp-*/MyApp.app/Contents/Resources/default_app default_app.asar && rm -Rf MyApp-*/MyApp.app/Contents/Resources/default_app && mv default_app.asar MyApp-*/MyApp.app/Contents/Resources/",
+    "build-darwin": "electron-packager . MyApp --overwrite --ignore=node_modules/electron-* --platform=darwin --arch=x64 --version=0.35.1",
     "test": "standard"
   },
   "repository": {
@@ -26,6 +28,7 @@
     "react-dom": "^0.14.3"
   },
   "devDependencies": {
+    "asar": "^0.8.3",
     "babel": "^6.1.18",
     "babel-core": "^6.2.1",
     "babel-loader": "^6.2.0",

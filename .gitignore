@@ -27,3 +27,5 @@ build/Release
 node_modules
 
 public/built
+
+*-darwin-x64
