@@ -24,6 +24,7 @@
   "homepage": "https://github.com/bbondy/electron-sample#readme",
   "dependencies": {
     "electron-prebuilt": "^0.35.1",
+    "immutable": "^3.7.5",
     "react": "^0.14.3",
     "react-dom": "^0.14.3"
   },
@@ -50,5 +51,6 @@
     "ignore": [
       "node_modules",
       "MyApp-*"
-  ]}
+    ]
+  }
 }

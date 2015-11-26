@@ -1,23 +1,27 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const AppActions = require('../actions/appActions')
+
+// Actions
+// const AppActions = require('../actions/appActions')
+
+// Components
+const NavigationBar = require('./navigationBar')
+const Frame = require('./frame')
 
 class Main extends ImmutableComponent {
-  onDecrement () {
-    AppActions.decrement()
-  }
-
-  onIncrement () {
-    AppActions.increment()
-  }
-
   render () {
-    const count = this.props.someObj.get('counter')
-    return <div>
+    return <div id='browser'>
       <div>
-        <a onClick={this.onDecrement.bind(this)}>Decrement</a> <a onClick={this.onIncrement.bind(this)}>Increment</a>
+        <NavigationBar
+          navbar={this.props.browser.getIn(['ui', 'navbar'])}
+          activeFrame={this.props.browser.get('frame')}
+        />
       </div>
-      <div>{count}</div>
+      <div className='mainContainer'>
+        <div className='tabContainer'>
+          <Frame frame={this.props.browser.get('frame')} />
+        </div>
+      </div>
     </div>
   }
 }

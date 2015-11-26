@@ -2,18 +2,17 @@ var AppDispatcher = require('../dispatcher/appDispatcher')
 var AppConstants = require('../constants/appconstants')
 
 const AppActions = {
-  increment: function (text) {
+  loadUrl: function (loc) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_INCREMENT,
-      text: 'Incrementing it!'
+      actionType: AppConstants.APP_SET_URL,
+      location: loc
     })
   },
 
-  decrement: function (id, text) {
+  setNavBarInput: function(loc) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_DECREMENT,
-      id: id,
-      text: 'Decrementing it!'
+      actionType: AppConstants.APP_SET_NAVBAR_INPUT,
+      location: loc
     })
   }
 }

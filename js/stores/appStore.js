@@ -7,30 +7,29 @@ const Immutable = require('immutable')
 // This is of course very silly, but this is just for an app template with top
 // level immutable data.
 let appState = Immutable.fromJS({
-  someObj: {
-    counter: 0
+  frame: {
+    location: 'http://www.brave.com'
+  },
+  ui: {
+    navbar: {
+      urlbar: {
+        location: ''
+      }
+    }
   }
 })
 
 var CHANGE_EVENT = 'change'
 
-const increment = () =>
-  appState = appState.setIn(['someObj', 'counter'], appState.getIn(['someObj', 'counter']) + 1)
+const updateUrl = (loc) =>
+  appState = appState.setIn(['frame', 'location'], loc)
 
-const decrement = () =>
-  appState = appState.setIn(['someObj', 'counter'], appState.getIn(['someObj', 'counter']) - 1)
+const updateNavBarInput = (loc) =>
+  appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
 
 class AppStore extends EventEmitter {
-  isAbove10 () {
-    return appState.getIn(['someObj', 'counter']) > 10
-  }
-
   getAppState () {
     return appState
-  }
-
-  getSomeObj () {
-    return appState.get('someObj')
   }
 
   emitChange () {
@@ -50,23 +49,14 @@ const appStore = new AppStore()
 
 // Register callback to handle all updates
 AppDispatcher.register((action) => {
-  // Just to show how you attach extra data from the Actions
-  console.log(action.text)
-
   switch (action.actionType) {
-    case AppConstants.APP_INCREMENT:
-      if (appState.getIn(['someObj', 'counter']) < 15) {
-        increment()
-      }
+    case AppConstants.APP_SET_URL:
+      updateUrl(action.location)
       appStore.emitChange()
       break
-
-    case AppConstants.APP_DECREMENT:
-      if (appState.getIn(['someObj', 'counter']) > 0) {
-        decrement()
-      }
+    case AppConstants.APP_SET_NAVBAR_INPUT:
+      updateNavBarInput(action.location)
       appStore.emitChange()
-      break
     default:
   }
 })

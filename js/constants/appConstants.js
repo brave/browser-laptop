@@ -1,4 +1,4 @@
 module.exports = {
-  APP_INCREMENT: Symbol('APP_INCREMENT'),
-  APP_DECREMENT: Symbol('APP_DECREMENT')
+  APP_SET_URL: Symbol('APP_SET_URL'),
+  APP_SET_NAVBAR_INPUT: Symbol('APP_SET_NAVBAR_INPUT'),
 }

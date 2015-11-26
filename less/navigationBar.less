@@ -1,0 +1,169 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Navigation layers
+ */
+
+@import "variables.less";
+
+@chromeLeftOffset: 175px;
+
+#navigator {
+  font-size: 20px;
+  height: 28px;
+  padding: 0 15px 4px @chromeLeftOffset;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+
+  /* Disable selection of button text */
+  > span {
+     -moz-user-select: none;
+  }
+
+  > * {
+    -moz-window-dragging: no-drag;
+  }
+
+  form {
+    flex: 1;
+    position: relative;
+  }
+
+  input {
+    background: #737373;
+    border: none;
+    color: #fff;
+    font-size: @defaultFontSize;
+    font-weight: normal;
+    height: 24px;
+    margin: 0 0 0 1px;
+    padding: 0 25px;
+    width: 100%;
+    border-radius: 13px;
+    box-sizing: border-box;
+
+    &:hover {
+      background: #7E7F83;
+    }
+
+    &:focus {
+      background: #fff;
+      color: #333333;
+    }
+
+    &.private {
+      background: @privateTabBackground;
+      color: #fff;
+    }
+  }
+
+  span.navButton.remove-bookmark-button {
+    color: yellow;
+  }
+
+  &:not(.bookmarked) .remove-bookmark-button,
+  &.bookmarked .bookmark-button,
+  &:not(.loading) .stop-button,
+  &.loading .reload-button {
+    display: none;
+  }
+
+  .urlbarIcon {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    font-size: 15px;
+    min-height: 16px;
+    min-width: 16px;
+
+    &.extendedValidation {
+      color: green;
+    }
+  }
+
+  ul.urlBarSuggestions {
+    background-color: @chromePrimary;
+    box-sizing: border-box;
+    color: #000;
+    font-size: @defaultFontSize;
+    padding: 10px 30px;
+    position: absolute;
+    top: @navigatorHeight;
+    text-align: left;
+    width: 100%;
+    z-index: 311;
+
+    .suggestionIcon {
+      margin-right: 10px;
+    }
+
+    .suggestionText {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: calc(~'100% - 30px');
+      vertical-align: middle;
+    }
+
+    li {
+      cursor: pointer;
+      list-style-type: none;
+      padding: 10px 0;
+      z-index: 333;
+
+      &.selected {
+        color: @hoverBlue;
+      }
+      * {
+        /* To allow for mouse listeners to work on the list items. */
+        pointer-events: none;
+      }
+    }
+
+    li + li {
+      border-top: 1px solid @chromeControlsBackground;
+    }
+  }
+}
+
+.siteInfo {
+
+  >ul {
+    background-color: @chromePrimary;
+    color: #000;
+    margin-left: -250px;
+    padding: 10px 30px;
+    position: absolute;
+    text-align: left;
+    top: @navigatorHeight;
+    width: auto;
+
+    li {
+      list-style-type: none;
+      padding: 10px 0;
+
+      .fa {
+        padding-right: 10px;
+      }
+      &.extendedValidation {
+        color: green;
+      }
+
+      ul {
+        font-size: smaller;
+        max-height: 300px;
+        overflow-y: scroll;
+        margin-top: -20px;
+        padding: 0 10px;
+        width: 350px;
+      }
+    }
+  }
+}
+

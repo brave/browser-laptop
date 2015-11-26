@@ -1,0 +1,150 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+#browser {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+#appContainer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.top {
+  -moz-window-dragging: drag;
+  padding-top: 12px;
+  background: @chromePrimary;
+
+  .backforward {
+    background: -moz-linear-gradient(to bottom, #68696C, #C4C7C8);
+    position: absolute;
+    z-index: 10;
+    top: -12px;
+    left: 94px;
+    border: 1px solid #C1C1C1;
+    border-radius: 66px;
+    width: 66px;
+    height: 66px;
+    vertical-align: center;
+
+    span {
+      position: absolute;
+      color: #3B3B3B;
+      line-height: 80px;
+      font-weight: 300;
+      opacity: 0.3;
+      cursor: default;
+
+      &:not([disabled]) {
+        opacity: 0.6;
+      }
+
+      &:not([disabled]):hover {
+        color: #3B3B3B;
+        opacity: 1.0;
+        cursor: pointer;
+      }
+    }
+
+    .back {
+      top: -11px;
+      left: 12px;
+      font-size: 60px;
+    }
+
+    .forward {
+      top: -9px;
+      right: 10px;
+      font-size: 44px;
+    }
+
+  }
+
+}
+
+.mainContainer {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  width: 100%;
+
+  .tabContainer {
+    flex-grow: 1;
+    position: relative;
+  }
+  >div.tabs {
+    width: 180px;
+    overflow-y: scroll;
+  }
+}
+
+.frameWrapper {
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  // Needed to be able to click and drag to select content in pages.
+  -moz-user-select: none;
+
+  webview {
+    background-color: #fff;
+    border: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  &:not(.isActive) {
+    z-index: 1;
+  }
+}
+
+body.fullScreen .frameWrapper.isActive {
+  z-index: 10000;
+}
+
+/* The fullscreen notice is shown above the fullscreen element */
+body.fullScreen .banner {
+  position: absolute;
+  z-index: 10001;
+  top: 0;
+  opacity: 1;
+  transition: opacity 2s ease-in-out;
+}
+
+body.fullScreen .banner.fade {
+  opacity: 0;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  cursor: move;
+ }
+
+.link {
+  color: @linkColor;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+// In React we often want to have elements but without href, so force pointer cursor
+a {
+  cursor: pointer;
+}

@@ -8,11 +8,15 @@ const Main = require('./main')
 class App extends React.Component {
   constructor () {
     super()
-    this.state = AppStore.getAppState()
+    this.state = {
+      immutableData: AppStore.getAppState()
+    }
   }
 
   render () {
-    return <div><Main someObj={AppStore.getSomeObj()}/></div>
+    return <div id='appContainer'>
+      <Main browser={this.state.immutableData}/>
+    </div>
   }
 
   componentDidMount () {
