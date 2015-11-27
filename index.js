@@ -36,16 +36,13 @@ app.on('ready', function () {
     mainWindow = null
   })
 
-  electronLocalshortcut.register('CmdOrCtrl+L', function () {
-    mainWindow.webContents.send('shortcut-focus-url', 1)
-  })
-  electronLocalshortcut.register('Escape', function () {
-    mainWindow.webContents.send('shortcut-stop', 1)
-  })
-  electronLocalshortcut.register('CmdOrCtrl+R', function () {
-    mainWindow.webContents.send('shortcut-reload', 1)
-  })
-  electronLocalshortcut.register('CmdOrCtrl+W', function () {
-    app.quit()
-  })
+  const simpleWebContentEvents = [
+    ['CmdOrCtrl+L', 'shortcut-focus-url'],
+    ['Escape', 'shortcut-stop'],
+    ['CmdOrCtrl+R', 'shortcut-reload']
+  ]
+
+  simpleWebContentEvents.forEach((shortcutEventName) =>
+    electronLocalshortcut.register(shortcutEventName[0], () =>
+      mainWindow.webContents.send(shortcutEventName[1])))
 })
