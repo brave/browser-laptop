@@ -1,6 +1,5 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const AppActions = require('../actions/appActions')
 const UrlBar = require('./urlBar')
 
 class NavigationBar extends ImmutableComponent {

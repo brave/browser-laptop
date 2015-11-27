@@ -7,4 +7,4 @@ const KeyCodes = {
   ESC: 27
 }
 
-module.exports = KeyCodes;
+module.exports = KeyCodes

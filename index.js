@@ -22,11 +22,11 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
   mainWindow = new BrowserWindow({
     width: 1360,
-    height: 800,
+    height: 800
     // Neither a frame nor a titlebar
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
-    //'title-bar-style': 'hidden'
+    // 'title-bar-style': 'hidden'
   })
   mainWindow.loadURL('file://' + __dirname + '/public/index.html')
   if (!process.env.PRODUCTION) {
@@ -37,6 +37,9 @@ app.on('ready', function () {
   })
 
   electronLocalshortcut.register('CmdOrCtrl+L', function () {
-    mainWindow.webContents.send('shortcut-focus-url', 1);
-  });
+    mainWindow.webContents.send('shortcut-focus-url', 1)
+  })
+  electronLocalshortcut.register('CmdOrCtrl+W', function () {
+    app.quit()
+  })
 })

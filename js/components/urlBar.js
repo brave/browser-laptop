@@ -7,26 +7,26 @@ const KeyCodes = require('../constants/keyCodes')
 const ipc = require('ipc')
 
 class UrlBar extends ImmutableComponent {
-  constructor() {
+  constructor () {
     super()
     ipc.on('shortcut-focus-url', () => {
       let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
       urlInput.select()
       urlInput.focus()
-    });
+    })
   }
 
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         e.preventDefault()
-        AppActions.loadUrl(this.props.urlbar.get('location'));
-        break;
+        AppActions.loadUrl(this.props.urlbar.get('location'))
+        break
     }
   }
 
-  onChange(e) {
-    AppActions.setNavBarInput(e.target.value);
+  onChange (e) {
+    AppActions.setNavBarInput(e.target.value)
   }
 
   render () {

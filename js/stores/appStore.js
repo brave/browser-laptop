@@ -57,6 +57,7 @@ AppDispatcher.register((action) => {
     case AppConstants.APP_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
       appStore.emitChange()
+      break
     default:
   }
 })
