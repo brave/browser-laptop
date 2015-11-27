@@ -16,7 +16,6 @@ class UrlBar extends ImmutableComponent {
     ipc.on('shortcut-stop', () => {
       this.blur()
     })
-
   }
 
   focus () {
@@ -44,7 +43,7 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ESC:
         e.preventDefault()
         this.blur()
-      break
+        break
     }
   }
 

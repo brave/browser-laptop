@@ -23,7 +23,11 @@ let appState = Immutable.fromJS({
 var CHANGE_EVENT = 'change'
 
 const updateUrl = (loc) =>
-  appState = appState.setIn(['frame', 'location'], loc)
+  appState = appState.mergeIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))], {
+    src: loc,
+    location: loc,
+    title: ''
+  })
 
 const updateNavBarInput = (loc) =>
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
