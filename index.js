@@ -36,9 +36,16 @@ app.on('ready', function () {
     mainWindow = null
   })
 
+  // Most of these events will simply be listened to by the app store and acted
+  // upon.  However sometimes there are no state changes, for example with focusing
+  // the URL bar.  In those cases it's acceptable for the individual components to
+  // listen to the events.
   const simpleWebContentEvents = [
     ['CmdOrCtrl+L', 'shortcut-focus-url'],
     ['Escape', 'shortcut-stop'],
+    ['CmdOrCtrl+T', 'shortcut-new-frame'],
+    ['Ctrl+Tab', 'shortcut-next-tab'],
+    ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
     ['CmdOrCtrl+R', 'shortcut-reload']
   ]
 

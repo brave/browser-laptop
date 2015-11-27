@@ -1,21 +1,32 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const AppActions = require('../actions/appActions')
+const ipc = require('ipc')
 
 // Actions
-// const AppActions = require('../actions/appActions')
+const AppActions = require('../actions/appActions')
 
 // Components
 const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
 
+// Constants
+const Config = require('../constants/config')
+
+// State handling
+const FrameStateUtil = require('../state/frameStateUtil')
+
 class Main extends ImmutableComponent {
   componentDidMount () {
     if (this.props.browser.get('frames').isEmpty()) {
       AppActions.newFrame({
-        location: 'http://brave.com'
+        location: Config.defaultUrl
       })
     }
+
+    ipc.on('shortcut-new-frame', () =>
+      AppActions.newFrame({
+        location: Config.defaultUrl
+      }))
   }
 
   render () {
@@ -36,6 +47,7 @@ class Main extends ImmutableComponent {
             <Frame
               frame={frame}
               key={frame.get('key')}
+              isActive={FrameStateUtil.isFrameKeyActive(this.props.browser, frame.get('key'))}
             />)
         }
         </div>

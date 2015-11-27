@@ -3,6 +3,7 @@ const EventEmitter = require('events').EventEmitter
 const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
+const ipc = require('ipc')
 
 // For this simple example, store immutable data object for a simple counter.
 // This is of course very silly, but this is just for an app template with top
@@ -75,5 +76,15 @@ AppDispatcher.register((action) => {
     default:
   }
 })
+
+ipc.on('shortcut-next-tab', () => {
+  appState = FrameStateUtil.makeNextFrameActive(appState)
+  appStore.emitChange()
+})
+ipc.on('shortcut-prev-tab', () => {
+  appState = FrameStateUtil.makePrevFrameActive(appState)
+  appStore.emitChange()
+})
+
 
 module.exports = appStore

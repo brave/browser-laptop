@@ -17,7 +17,7 @@ export default {
     height: 100
   },
   defaultLocale: 'en-US',
-  defaultUrl: 'about:newtab',
+  defaultUrl: 'http://www.brave.com',
   urlBarSuggestions: {
     maxTopSites: 5,
     maxSearch: 3,

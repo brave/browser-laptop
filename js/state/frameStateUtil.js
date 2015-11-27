@@ -5,6 +5,41 @@
 import Immutable from 'immutable'
 import Config from '../constants/config.js'
 
+export function isFrameKeyActive(appState, frameKey) {
+  return appState.get('activeFrameKey') === frameKey
+}
+
+export function getActiveFrameIndex(appState) {
+  return findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))
+}
+
+export function getFrameByIndex(appState, i) {
+  return appState.getIn(['frames', i])
+}
+
+export function setActiveFrameIndex(appState, i) {
+  const frame = getFrameByIndex(appState, i)
+  if (!frame) {
+    return appState
+  }
+
+  return setActiveFrameKey(appState, frame.get('key'))
+}
+
+export function setActiveFrameKey(appState, activeFrameKey) {
+  return appState.set('activeFrameKey', activeFrameKey)
+}
+
+export function makeNextFrameActive(appState) {
+  const activeFrameIndex = getActiveFrameIndex(appState)
+  return setActiveFrameIndex(appState, (activeFrameIndex + 1) % appState.get('frames').size);
+}
+
+export function makePrevFrameActive(appState) {
+  const activeFrameIndex = getActiveFrameIndex(appState)
+  return setActiveFrameIndex(appState, (appState.get('frames').size + activeFrameIndex - 1) % appState.get('frames').size);
+}
+
 /**
  * Obtains the index for the specified frame key
  */

@@ -2,6 +2,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const ipc = require('ipc')
+const cx = require('../lib/classSet.js')
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -61,7 +62,11 @@ class Frame extends ImmutableComponent {
   }
 
   render () {
-    return <div className='frameWrapper'>
+    return <div
+        className={cx({
+          frameWrapper: true,
+          isActive: this.props.isActive
+        })}>
       <webview ref='webview' src={this.props.frame.get('location')} />
     </div>
   }
