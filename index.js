@@ -2,6 +2,7 @@
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
+const electronLocalshortcut = require('electron-localshortcut')
 
 // Report crashes
 electron.crashReporter.start()
@@ -19,7 +20,14 @@ app.on('window-all-closed', function () {
   }
 })
 app.on('ready', function () {
-  mainWindow = new BrowserWindow({width: 1360, height: 800})
+  mainWindow = new BrowserWindow({
+    width: 1360,
+    height: 800,
+    // Neither a frame nor a titlebar
+    // frame: false,
+    // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
+    //'title-bar-style': 'hidden'
+  })
   mainWindow.loadURL('file://' + __dirname + '/public/index.html')
   if (!process.env.PRODUCTION) {
     mainWindow.openDevTools()
@@ -27,4 +35,8 @@ app.on('ready', function () {
   mainWindow.on('closed', function () {
     mainWindow = null
   })
+
+  electronLocalshortcut.register('CmdOrCtrl+L', function () {
+    mainWindow.webContents.send('shortcut-focus-url', 1);
+  });
 })
