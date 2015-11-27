@@ -10,10 +10,28 @@ class UrlBar extends ImmutableComponent {
   constructor () {
     super()
     ipc.on('shortcut-focus-url', () => {
-      let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
-      urlInput.select()
-      urlInput.focus()
+      this.select()
+      this.focus()
     })
+    ipc.on('shortcut-stop', () => {
+      this.blur()
+    })
+
+  }
+
+  focus () {
+    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+    urlInput.focus()
+  }
+
+  select () {
+    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+    urlInput.focus()
+  }
+
+  blur () {
+    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+    urlInput.blur()
   }
 
   onKeyDown (e) {
@@ -21,7 +39,12 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ENTER:
         e.preventDefault()
         AppActions.loadUrl(this.props.urlbar.get('location'))
+        this.blur()
         break
+      case KeyCodes.ESC:
+        e.preventDefault()
+        this.blur()
+      break
     }
   }
 
