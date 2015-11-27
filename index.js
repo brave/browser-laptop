@@ -39,6 +39,12 @@ app.on('ready', function () {
   electronLocalshortcut.register('CmdOrCtrl+L', function () {
     mainWindow.webContents.send('shortcut-focus-url', 1)
   })
+  electronLocalshortcut.register('Escape', function () {
+    mainWindow.webContents.send('shortcut-stop', 1)
+  })
+  electronLocalshortcut.register('CmdOrCtrl+R', function () {
+    mainWindow.webContents.send('shortcut-reload', 1)
+  })
   electronLocalshortcut.register('CmdOrCtrl+W', function () {
     app.quit()
   })

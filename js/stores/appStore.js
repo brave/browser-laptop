@@ -1,15 +1,16 @@
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
-const AppConstants = require('../constants/appconstants')
+const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
+const FrameStateUtil = require('../state/frameStateUtil')
 
 // For this simple example, store immutable data object for a simple counter.
 // This is of course very silly, but this is just for an app template with top
 // level immutable data.
 let appState = Immutable.fromJS({
-  frame: {
-    location: 'http://www.brave.com'
-  },
+  activeFrameKey: null,
+  frames: [],
+  closedFrames: [],
   ui: {
     navbar: {
       urlbar: {
@@ -26,6 +27,9 @@ const updateUrl = (loc) =>
 
 const updateNavBarInput = (loc) =>
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
+
+let currentKey = 0
+const incrementNextKey = () => ++currentKey
 
 class AppStore extends EventEmitter {
   getAppState () {
@@ -56,6 +60,12 @@ AppDispatcher.register((action) => {
       break
     case AppConstants.APP_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_NEW_FRAME:
+      let nextKey = incrementNextKey()
+      appState = appState.merge(FrameStateUtil.addFrame(appState.get('frames'), action.frameOpts,
+        nextKey, action.openInForeground ? nextKey : appState.get('activeFrameKey')))
       appStore.emitChange()
       break
     default:

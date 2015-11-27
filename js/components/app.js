@@ -11,16 +11,13 @@ class App extends React.Component {
     this.state = {
       immutableData: AppStore.getAppState()
     }
+    AppStore.addChangeListener(this.onChange.bind(this))
   }
 
   render () {
     return <div id='appContainer'>
       <Main browser={this.state.immutableData}/>
     </div>
-  }
-
-  componentDidMount () {
-    AppStore.addChangeListener(this.onChange.bind(this))
   }
 
   componentWillUnmount () {
