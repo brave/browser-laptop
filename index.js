@@ -1,5 +1,6 @@
 'use strict'
 const electron = require('electron')
+const ipcMain = electron.ipcMain
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
@@ -52,4 +53,8 @@ app.on('ready', function () {
   simpleWebContentEvents.forEach((shortcutEventName) =>
     electronLocalshortcut.register(shortcutEventName[0], () =>
       mainWindow.webContents.send(shortcutEventName[1])))
+
+  ipcMain.on('quit-application', () => {
+    app.quit()
+  })
 })
