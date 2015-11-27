@@ -4,6 +4,7 @@ module.exports = {
   contentBase: './dist/',
   cache: true,
   inline: true,
+  target: 'atom',
   entry: {
     app: ['webpack/hot/dev-server', './js/entry.js']
   },
@@ -48,8 +49,7 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.IgnorePlugin(new RegExp('^(fs|ipc)$'))
+    new webpack.HotModuleReplacementPlugin()
   ],
   devServer: {
     contentBase: './public',
