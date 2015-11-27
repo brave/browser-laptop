@@ -27,7 +27,8 @@
     "electron-prebuilt": "^0.35.1",
     "immutable": "^3.7.5",
     "react": "^0.14.3",
-    "react-dom": "^0.14.3"
+    "react-dom": "^0.14.3",
+    "urlutil.js": "^0.1.1"
   },
   "devDependencies": {
     "asar": "^0.8.3",
