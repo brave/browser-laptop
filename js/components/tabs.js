@@ -3,6 +3,8 @@ const ReactDOM = require('react-dom')
 
 import Immutable from 'immutable'
 const ImmutableComponent = require('./immutableComponent')
+
+const AppActions = require('../actions/appActions')
 const cx = require('../lib/classSet.js')
 
 const getFavicon = require('../lib/faviconUtil.js')
@@ -120,6 +122,10 @@ class Tab extends ImmutableComponent {
     })
   }
 
+  setActiveFrame () {
+    AppActions.setActiveFrame(this.props.frameProps)
+  }
+
   render () {
     const thumbnailWidth = 160
     const thumbnailHeight = 100
@@ -176,6 +182,12 @@ class Tab extends ImmutableComponent {
       ref='tab'
       draggable='true'
       title={this.props.frameProps.get('title')}
+      onDragStart={this.onDragStart.bind(this)}
+      onDragEnd={this.onDragEnd.bind(this)}
+      onDragLeave={this.onDragLeave.bind(this)}
+      onDragOver={this.onDragOver.bind(this)}
+      onDrop={this.onDrop.bind(this)}
+      onClick={this.setActiveFrame.bind(this)}
       style={activeTabStyle}>
       <div className='thumbnail'
         style={thumbnailStyle} />

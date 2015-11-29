@@ -73,6 +73,12 @@ AppDispatcher.register((action) => {
         nextKey, action.openInForeground ? nextKey : appState.get('activeFrameKey')))
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_ACTIVE_FRAME:
+      appState = appState.merge({
+        activeFrameKey: action.frameProps.get('key')
+      })
+      appStore.emitChange()
+      break
     default:
   }
 })

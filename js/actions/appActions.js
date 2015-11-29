@@ -26,6 +26,13 @@ const AppActions = {
       frameOpts: frameOpts,
       openInForeground
     })
+  },
+
+  setActiveFrame: function (frameProps) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_ACTIVE_FRAME,
+      frameProps: frameProps
+    })
   }
 }
 
