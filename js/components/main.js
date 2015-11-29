@@ -8,6 +8,7 @@ const AppActions = require('../actions/appActions')
 // Components
 const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
+const Tabs = require('./tabs')
 
 // Constants
 const Config = require('../constants/config')
@@ -34,9 +35,14 @@ class Main extends ImmutableComponent {
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
 
     return <div id='browser'>
-      <div>
+      <div className='top'>
         <NavigationBar
           navbar={this.props.browser.getIn(['ui', 'navbar'])}
+          activeFrame={this.props.browser.get('frame')}
+        />
+        <Tabs
+          frames={this.props.browser.get('frames')}
+          key='tab-bar'
           activeFrame={this.props.browser.get('frame')}
         />
       </div>
