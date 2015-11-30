@@ -8,8 +8,8 @@
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
-    "package": "asar pack MyApp-*/MyApp.app/Contents/Resources/default_app default_app.asar && rm -Rf MyApp-*/MyApp.app/Contents/Resources/default_app && mv default_app.asar MyApp-*/MyApp.app/Contents/Resources/",
-    "build-darwin": "electron-packager . MyApp --overwrite --ignore=node_modules/electron-* --platform=darwin --arch=x64 --version=0.35.1",
+    "package": "cp  res/app.icns Brave-*/Brave.app/Contents/Resources/atom.icns && asar pack Brave-*/Brave.app/Contents/Resources/app app.asar && rm -Rf Brave-*/Brave.app/Contents/Resources/app && mv app.asar Brave-*/Brave.app/Contents/Resources/",
+    "build-darwin": "electron-packager . Brave --overwrite --ignore='electron-packager electron-prebuilt electron-rebuild' --platform=darwin --arch=x64 --version=0.35.1",
     "test": "standard"
   },
   "repository": {
@@ -52,7 +52,7 @@
   "standard": {
     "ignore": [
       "node_modules",
-      "MyApp-*"
+      "Brave-*"
     ]
   }
 }
