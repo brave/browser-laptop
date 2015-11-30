@@ -17,6 +17,11 @@ export function getFrameByIndex (appState, i) {
   return appState.getIn(['frames', i])
 }
 
+export function getActiveFrame(appState) {
+  const activeFrameIndex = getActiveFrameIndex(appState)
+  return appState.get('frames').get(activeFrameIndex)
+}
+
 export function setActiveFrameIndex (appState, i) {
   const frame = getFrameByIndex(appState, i)
   if (!frame) {
