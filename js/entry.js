@@ -6,22 +6,10 @@ require('../less/navigationBar.less')
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-const ipc = require('ipc')
-const remote = require('remote')
-const Menu = remote.require('menu')
-
+const Menu = require('./menu.js')
 import App from './components/app'
 
+Menu.init()
 ReactDOM.render(
   <App/>,
   document.getElementById('appContainer'))
-
-const menu = Menu.buildFromTemplate([{
-  label: 'Electron',
-  submenu: [{
-    label: 'Quit',
-    click: ipc.send.bind(null, 'quit-application')
-  }]
-}])
-
-Menu.setApplicationMenu(menu)
