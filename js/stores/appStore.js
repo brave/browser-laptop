@@ -86,5 +86,4 @@ ipc.on('shortcut-prev-tab', () => {
   appStore.emitChange()
 })
 
-
 module.exports = appStore
