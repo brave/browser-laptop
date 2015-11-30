@@ -1,7 +1,6 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-import Immutable from 'immutable'
 const ImmutableComponent = require('./immutableComponent')
 
 const AppActions = require('../actions/appActions')
@@ -26,12 +25,6 @@ class DragIndicator extends ImmutableComponent {
 class Tab extends ImmutableComponent {
   constructor (props) {
     super(props)
-    this.state = Immutable.fromJS({
-      isDragging: false,
-      isDraggingOn: false,
-      isDraggingOverLeftHalf: false,
-      isDraggingOverRightHalf: false
-    })
   }
 
   get displayValue () {
@@ -43,83 +36,54 @@ class Tab extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    e.dataTransfer.setData('frameProps',
-      JSON.stringify(this.props.frameProps.toJS()))
-    this.setState('isDragging', true)
+    AppActions.tabDragStart(this.props.frameProps)
   }
 
   onDragEnd () {
-    this.setState('isDragging', false)
+    AppActions.tabDragStop(this.props.frameProps)
   }
 
   onDragOver (e) {
     e.preventDefault()
 
     // Otherise, only accept it if we have some frameProps
-    if (!e.dataTransfer.getData('frameProps')) {
-      this.mergeState({
-        isDraggingOn: true,
-        isDraggingOverLeftHalf: false,
-        isDraggingOverRightHalf: false
-      })
+    if (!this.props.activeDraggedTab) {
+      AppActions.tabDraggingOn(this.props.frameProps)
       return
     }
 
     let rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
     if (e.clientX > rect.left && e.clientX < rect.left + rect.width / 2 &&
-      !this.state.get('isDraggingOverLeftHalf')) {
-      this.mergeState({
-        isDraggingOn: false,
-        isDraggingOverLeftHalf: true,
-        isDraggingOverRightHalf: false
-      })
+      !this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
+      AppActions.tabDragDraggingOverLeftHalf(this.props.frameProps)
     } else if (e.clientX < rect.right && e.clientX >= rect.left + rect.width / 2 &&
-      !this.state.get('isDraggingOverRightHalf')) {
-      this.mergeState({
-        isDraggingOn: false,
-        isDraggingOverLeftHalf: false,
-        isDraggingOverRightHalf: true
-      })
+      !this.props.frameProps.get('tabIsDraggingOverRightHalf')) {
+      AppActions.tabDragDraggingOverRightHalf(this.props.frameProps)
     }
   }
 
   onDragLeave () {
-    if (this.state.get('isDraggingOverLeftHalf') ||
-      this.state.get('isDraggingOn') ||
-      this.state.get('isDraggingOverLeftHalf')) {
-      this.mergeState({
-        isDraggingOn: false,
-        isDraggingOverLeftHalf: false,
-        isDraggingOverRightHalf: false
-      })
-    } else if (this.state.get('isDraggingOverRightHalf')) {
-      this.setState('isDraggingOverRightHalf', false)
+    if (this.props.frameProps.get('tabIsDraggingOverLeftHalf') ||
+      this.props.frameProps.get('tabIsDraggingOn') ||
+      this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
+      AppActions.tabDragExit(this.props.frameProps)
+    } else if (this.props.frameProps.get('tabIsDraggingOverRightHalf')) {
+      AppActions.tabDragExitRightHalf(this.props.frameProps)
     }
   }
 
   onDrop (e) {
-    var dropText = e.dataTransfer.getData('text/plain')
-    if (dropText) {
-      this.props.onNavigate(dropText)
+    let sourceFrameProps = this.props.activeDraggedTab
+    if (!sourceFrameProps) {
       return
     }
 
-    let dataTransferString = e.dataTransfer.getData('frameProps')
-    if (!dataTransferString) {
-      return
-    }
-
-    let sourceFrameProps = Immutable.fromJS(JSON.parse(dataTransferString))
-    if (this.state.get('isDraggingOverLeftHalf')) {
-      this.props.onMoveFrame(sourceFrameProps, this.props.frameProps, true)
+    if (this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
+      AppActions.moveTab(sourceFrameProps, this.props.frameProps, true)
     } else {
-      this.props.onMoveFrame(sourceFrameProps, this.props.frameProps, false)
+      AppActions.moveTab(sourceFrameProps, this.props.frameProps, false)
     }
-    this.mergeState({
-      isDraggingOn: false,
-      isDraggingOverLeftHalf: false,
-      isDraggingOverRightHalf: false
-    })
+    AppActions.tabDragExit(this.props.frameProps)
   }
 
   setActiveFrame () {
@@ -169,15 +133,15 @@ class Tab extends ImmutableComponent {
         style={{
           width: `${this.props.tabWidth}%`
         }}>
-      <DragIndicator active={this.state.get('isDraggingOverLeftHalf')}/>
+      <DragIndicator active={this.props.frameProps.get('tabIsDraggingOverLeftHalf')}/>
       <div className={cx({
         tab: true,
         active: this.props.isActive,
         private: this.props.isPrivate,
-        draggingOn: this.state.get('isDraggingOn'),
-        dragging: this.state.get('isDragging'),
-        'dragging-over': this.state.get('isDraggingOverLeftHalf') ||
-          this.state.get('isDraggingOverRightHalf')
+        draggingOn: this.props.frameProps.get('tabIsDraggingOn'),
+        dragging: this.props.frameProps.get('tabIsDragging'),
+        'dragging-over': this.props.frameProps.get('tabIsDraggingOverLeftHalf') ||
+          this.props.frameProps.get('tabIsDraggingOverRightHalf')
       })}
       ref='tab'
       draggable='true'
@@ -201,7 +165,7 @@ class Tab extends ImmutableComponent {
       </div>
       <DragIndicator
         end
-        active={this.state.get('isDraggingOverRightHalf')}/>
+        active={this.props.frameProps.get('tabIsDraggingOverRightHalf')}/>
     </div>
   }
 }
@@ -218,6 +182,7 @@ class Tabs extends ImmutableComponent {
       <div className='tabRow'>
         {
         this.props.frames.map(frameProps => <Tab
+          activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
           frameProps={frameProps}
           key={'tab-' + frameProps.get('key')}
           isActive={this.props.activeFrame === frameProps}

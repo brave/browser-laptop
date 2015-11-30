@@ -41,6 +41,7 @@ class Main extends ImmutableComponent {
           activeFrame={this.props.browser.get('frame')}
         />
         <Tabs
+          tabs={this.props.browser.getIn(['ui', 'tabs'])}
           frames={this.props.browser.get('frames')}
           key='tab-bar'
           activeFrame={FrameStateUtil.getActiveFrame(this.props.browser)}
