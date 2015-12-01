@@ -8,11 +8,8 @@ require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const App = require('./components/app')
 
-const Menu = require('./menu.js')
-import App from './components/app'
-
-Menu.init()
 ReactDOM.render(
   <App/>,
   document.getElementById('appContainer'))

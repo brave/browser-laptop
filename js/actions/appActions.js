@@ -1,6 +1,9 @@
+'use strict'
+
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
-const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
+const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
+const AppStore = require('../stores/appStore')
 const ipc = require('ipc')
 
 const AppActions = {
@@ -29,11 +32,23 @@ const AppActions = {
     })
   },
 
+  newWindow: function () {
+    ipc.send('new-window')
+  },
+
   closeFrame: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLOSE_FRAME,
-      frameProps
-    })
+    if (AppStore.getFrameCount() > 1) {
+      AppDispatcher.dispatch({
+        actionType: AppConstants.APP_CLOSE_FRAME,
+        frameProps
+      })
+    } else {
+      this.closeWindow()
+    }
+  },
+
+  closeWindow: function () {
+    ipc.send('close-window')
   },
 
   quitApplication: function () {

@@ -4,13 +4,14 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
+const Menu = require('./menu')
 
 // Report crashes
 electron.crashReporter.start()
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow = null
+let windows = []
 
 require('crash-reporter').start()
 app.on('window-all-closed', function () {
@@ -20,8 +21,9 @@ app.on('window-all-closed', function () {
     app.quit()
   }
 })
-app.on('ready', function () {
-  mainWindow = new BrowserWindow({
+
+const spawnWindow = () => {
+  let mainWindow = new BrowserWindow({
     width: 1360,
     height: 800
     // Neither a frame nor a titlebar
@@ -29,13 +31,31 @@ app.on('ready', function () {
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     // 'title-bar-style': 'hidden'
   })
-  mainWindow.loadURL('file://' + __dirname + '/public/index.html')
+  mainWindow.loadURL('file://' + __dirname + '/index.html')
   if (!process.env.PRODUCTION) {
     mainWindow.openDevTools()
   }
   mainWindow.on('closed', function () {
-    mainWindow = null
+    var index = windows.indexOf(mainWindow)
+    if (index > -1) {
+      windows.splice(index, 1)
+    }
   })
+  return mainWindow
+}
+
+app.on('ready', function () {
+  windows.push(spawnWindow())
+
+  ipcMain.on('quit-application', () => {
+    app.quit()
+  })
+
+  ipcMain.on('new-window', () => windows.push(spawnWindow()))
+  process.on('new-window', () => windows.push(spawnWindow()))
+
+  ipcMain.on('close-window', () => BrowserWindow.getFocusedWindow().close())
+  process.on('close-window', () => BrowserWindow.getFocusedWindow().close())
 
   // Most of these events will simply be listened to by the app store and acted
   // upon.  However sometimes there are no state changes, for example with focusing
@@ -50,10 +70,9 @@ app.on('ready', function () {
   ]
 
   simpleWebContentEvents.forEach((shortcutEventName) =>
-    electronLocalshortcut.register(shortcutEventName[0], () =>
-      mainWindow.webContents.send(shortcutEventName[1])))
-
-  ipcMain.on('quit-application', () => {
-    app.quit()
-  })
+    electronLocalshortcut.register(shortcutEventName[0], () => {
+      BrowserWindow.getFocusedWindow().webContents.send(shortcutEventName[1])
+    }))
+  Menu.init()
 })
+

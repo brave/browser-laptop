@@ -2,7 +2,7 @@
   "name": "electron-sample",
   "version": "0.0.1",
   "description": "Electron sample app",
-  "main": "index.js",
+  "main": "./app/index.js",
   "scripts": {
     "start": "electron . --debug=5858",
     "watch": "webpack-dev-server",

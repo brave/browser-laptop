@@ -24,10 +24,16 @@ class Main extends ImmutableComponent {
       })
     }
 
-    ipc.on('shortcut-new-frame', () =>
+    ipc.on('shortcut-new-frame', () => {
+      console.log('new frame shortcut!')
+
       AppActions.newFrame({
         location: Config.defaultUrl
-      }))
+      })
+    })
+
+    ipc.on('shortcut-close-frame', () =>
+      AppActions.closeFrame())
   }
 
   render () {
