@@ -2,6 +2,7 @@
 require('../less/browser.less')
 require('../less/main.less')
 require('../less/navigationBar.less')
+require('../less/tabs.less')
 
 const React = require('react')
 const ReactDOM = require('react-dom')

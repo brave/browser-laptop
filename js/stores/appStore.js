@@ -17,6 +17,9 @@ let appState = Immutable.fromJS({
       urlbar: {
         location: ''
       }
+    },
+    tabs: {
+      activeDraggedTab: null
     }
   }
 })
@@ -71,6 +74,75 @@ AppDispatcher.register((action) => {
       let nextKey = incrementNextKey()
       appState = appState.merge(FrameStateUtil.addFrame(appState.get('frames'), action.frameOpts,
         nextKey, action.openInForeground ? nextKey : appState.get('activeFrameKey')))
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_ACTIVE_FRAME:
+      appState = appState.merge({
+        activeFrameKey: action.frameProps.get('key')
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAG_START:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDragging: true
+      })
+      appState = appState.setIn(['ui', 'tabs', 'activeDraggedTab'], action.frameProps)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAG_STOP:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDragging: false
+      })
+      appState = appState.setIn(['ui', 'tabs', 'activeDraggedTab'], null)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAGGING_OVER_LEFT:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDraggingOn: false,
+        tabIsDraggingOverLeftHalf: true,
+        tabIsDraggingOverRightHalf: false
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAGGING_OVER_RIGHT:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDraggingOn: false,
+        tabIsDraggingOverLeftHalf: false,
+        tabIsDraggingOverRightHalf: true
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAG_EXIT:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDraggingOn: false,
+        tabIsDraggingOverLeftHalf: false,
+        tabIsDraggingOverRightHalf: false
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAG_EXIT_RIGHT:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDraggingOverRightHalf: false
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_DRAGGING_ON:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        tabIsDraggingOn: true,
+        tabIsDraggingOverLeftHalf: false,
+        tabIsDraggingOverRightHalf: false
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_TAB_MOVE:
+      let sourceFramePropsIndex = FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.sourceFrameProps)
+      let newIndex = FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.destinationFrameProps) + (action.prepend ? 0 : 1)
+      let frames = appState.get('frames').splice(sourceFramePropsIndex, 1)
+      if (newIndex > sourceFramePropsIndex) {
+        newIndex--
+      }
+      frames = frames.splice(newIndex, 0, action.sourceFrameProps)
+      appState = appState.set('frames', frames)
       appStore.emitChange()
       break
     default:
