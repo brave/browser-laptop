@@ -48,6 +48,7 @@
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "node-libs-browser": "^0.5.3",
+    "pre-commit": "^1.1.2",
     "standard": "^5.4.1",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.9",
@@ -58,5 +59,8 @@
       "node_modules",
       "Brave-*"
     ]
-  }
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }
