@@ -44,6 +44,10 @@ class AppStore extends EventEmitter {
     return appState
   }
 
+  getFrameCount () {
+    return appState.get('frames').size
+  }
+
   emitChange () {
     this.emit(CHANGE_EVENT)
   }
@@ -74,6 +78,11 @@ AppDispatcher.register((action) => {
       let nextKey = incrementNextKey()
       appState = appState.merge(FrameStateUtil.addFrame(appState.get('frames'), action.frameOpts,
         nextKey, action.openInForeground ? nextKey : appState.get('activeFrameKey')))
+      appStore.emitChange()
+      break
+    case AppConstants.APP_CLOSE_FRAME:
+      appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'), appState.get('closedFrames'), FrameStateUtil.getActiveFrame(appState),
+        FrameStateUtil.getActiveFrame(appState)))
       appStore.emitChange()
       break
     case AppConstants.APP_SET_ACTIVE_FRAME:

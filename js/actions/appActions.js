@@ -1,6 +1,7 @@
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
+const ipc = require('ipc')
 
 const AppActions = {
   loadUrl: function (loc) {
@@ -26,6 +27,16 @@ const AppActions = {
       frameOpts: frameOpts,
       openInForeground
     })
+  },
+
+  closeFrame: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLOSE_FRAME
+    })
+  },
+
+  quitApplication: function () {
+    ipc.send('quit-application')
   },
 
   setActiveFrame: function (frameProps) {

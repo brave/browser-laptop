@@ -44,7 +44,6 @@ app.on('ready', function () {
   const simpleWebContentEvents = [
     ['CmdOrCtrl+L', 'shortcut-focus-url'],
     ['Escape', 'shortcut-stop'],
-    ['CmdOrCtrl+T', 'shortcut-new-frame'],
     ['Ctrl+Tab', 'shortcut-next-tab'],
     ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
     ['CmdOrCtrl+R', 'shortcut-reload']

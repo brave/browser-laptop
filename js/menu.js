@@ -2,11 +2,34 @@ const remote = require('remote')
 const Menu = remote.require('menu')
 const Shell = remote.require('shell')
 const ipc = require('ipc')
+const AppActions = require('./actions/appActions')
+const AppStore = require('./stores/appStore')
 
 module.exports = {
   init: function () {
     var template = [
       {
+        label: 'File',
+        submenu: [
+          {
+            label: 'New Tab',
+            accelerator: 'CmdOrCtrl+T',
+            click: function () {
+              AppActions.newFrame()
+            }
+          }, {
+            label: 'Close Tab',
+            accelerator: 'CmdOrCtrl+W',
+            click: function () {
+              if (AppStore.getFrameCount() > 1) {
+                AppActions.closeFrame()
+              } else {
+                AppActions.quitApplication()
+              }
+            }
+          }
+        ]
+      }, {
         label: 'Edit',
         submenu: [
           {
@@ -86,10 +109,6 @@ module.exports = {
             label: 'Minimize',
             accelerator: 'CmdOrCtrl+M',
             role: 'minimize'
-          }, {
-            label: 'Close',
-            accelerator: 'CmdOrCtrl+W',
-            role: 'close'
           }
         ]
       }, {
