@@ -90,6 +90,10 @@ class Tab extends ImmutableComponent {
     AppActions.setActiveFrame(this.props.frameProps)
   }
 
+  onCloseFrame () {
+    AppActions.closeFrame(this.props.frameProps)
+  }
+
   render () {
     const thumbnailWidth = 160
     const thumbnailHeight = 100
@@ -155,7 +159,7 @@ class Tab extends ImmutableComponent {
       style={activeTabStyle}>
       <div className='thumbnail'
         style={thumbnailStyle} />
-        <span onClick={this.props.onCloseFrame}
+        <span onClick={this.onCloseFrame.bind(this)}
           className='closeTab fa fa-times-circle'/>
         <div className='tabIcon' style={iconStyle}/>
         <div className='tabTitle'>

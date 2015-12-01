@@ -81,7 +81,9 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_CLOSE_FRAME:
-      appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'), appState.get('closedFrames'), FrameStateUtil.getActiveFrame(appState),
+      // Use the frameProps we passed in, or default to the active frame
+      let frameProps = action.frameProps || FrameStateUtil.getActiveFrame(appState)
+      appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'), appState.get('closedFrames'), frameProps,
         FrameStateUtil.getActiveFrame(appState)))
       appStore.emitChange()
       break

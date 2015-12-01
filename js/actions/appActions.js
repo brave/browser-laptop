@@ -29,9 +29,10 @@ const AppActions = {
     })
   },
 
-  closeFrame: function () {
+  closeFrame: function (frameProps) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLOSE_FRAME
+      actionType: AppConstants.APP_CLOSE_FRAME,
+      frameProps
     })
   },
 
