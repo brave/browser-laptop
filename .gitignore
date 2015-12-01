@@ -28,4 +28,6 @@ node_modules
 
 public/built
 
+# electron-packager output dirs
 *-darwin-x64
+*-win32-x64

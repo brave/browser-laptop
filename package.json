@@ -9,7 +9,8 @@
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
     "package": "cp  res/app.icns Brave-*/Brave.app/Contents/Resources/atom.icns && asar pack Brave-*/Brave.app/Contents/Resources/app app.asar && rm -Rf Brave-*/Brave.app/Contents/Resources/app && mv app.asar Brave-*/Brave.app/Contents/Resources/",
-    "build-darwin": "electron-packager . Brave --overwrite --ignore='electron-packager electron-prebuilt electron-rebuild' --platform=darwin --arch=x64 --version=0.35.1",
+    "build-darwin": "electron-packager . Brave --overwrite --ignore='electron-packager electron-prebuilt electron-rebuild' --platform=darwin --arch=x64 --version=0.35.1 --icon=res/app.icns",
+    "build-win64": "electron-packager . Brave --overwrite --ignore='electron-packager electron-prebuilt electron-rebuild' --platform=win32 --arch=x64 --version=0.35.1 --icon=res/app.ico",
     "test": "standard"
   },
   "repository": {
