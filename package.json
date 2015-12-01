@@ -25,9 +25,13 @@
   "dependencies": {
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "^0.35.1",
+    "file-loader": "^0.8.5",
+    "font-awesome": "^4.5.0",
+    "font-awesome-webpack": "0.0.4",
     "immutable": "^3.7.5",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
+    "url-loader": "^0.5.7",
     "urlutil.js": "^0.1.1"
   },
   "devDependencies": {
