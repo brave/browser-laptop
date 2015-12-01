@@ -1,7 +1,7 @@
 {
-  "name": "electron-sample",
+  "name": "Brave",
   "version": "0.0.1",
-  "description": "Electron sample app",
+  "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
     "start": "electron . --debug=5858",
