@@ -57,7 +57,10 @@
   "standard": {
     "ignore": [
       "node_modules",
-      "Brave-*"
+      "Brave-*",
+      "less-",
+      "public",
+      "res"
     ]
   },
   "pre-commit": [
