@@ -51,6 +51,8 @@ After the .app file is built you can create a dmg with:
 
 ### Windows 7,8,10 x64:
 
+Prerequisite: You must have NSIS installed.
+
 To create a folder with the app .exe and all dependencies:
 
     npm run build-win64
