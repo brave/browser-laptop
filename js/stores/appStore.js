@@ -93,6 +93,13 @@ AppDispatcher.register((action) => {
       })
       appStore.emitChange()
       break
+    case AppConstants.APP_UPDATE_BACK_FORWARD:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        canGoBack: action.canGoBack,
+        canGoForward: action.canGoForward
+      })
+      appStore.emitChange()
+      break
     case AppConstants.APP_TAB_DRAG_START:
       appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
         tabIsDragging: true

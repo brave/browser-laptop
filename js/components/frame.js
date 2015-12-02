@@ -1,5 +1,6 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
+const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const ipc = require('ipc')
 const cx = require('../lib/classSet.js')
@@ -58,7 +59,19 @@ class Frame extends ImmutableComponent {
     })
     webview.addEventListener('did-finish-load', () => {
       console.log('did finish load')
+      AppActions.updateBackForwardState(
+        this.props.frame,
+        this.refs.webview.canGoBack(),
+        this.refs.webview.canGoForward())
     })
+  }
+
+  goBack () {
+    this.refs.webview.goBack()
+  }
+
+  goForward () {
+    this.refs.webview.goForward()
   }
 
   render () {
