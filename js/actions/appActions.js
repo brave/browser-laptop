@@ -25,6 +25,14 @@ const AppActions = {
     })
   },
 
+  setFrameTitle: function (frameProps, title) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_FRAME_TITLE,
+      frameProps,
+      title
+    })
+  },
+
   onWebviewLoadStart: function (frameProps) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_WEBVIEW_LOAD_START,

@@ -83,6 +83,12 @@ AppDispatcher.register((action) => {
       updateNavBarInput(action.location)
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_FRAME_TITLE:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        title: action.title
+      })
+      appStore.emitChange()
+      break
     case AppConstants.APP_WEBVIEW_LOAD_START:
       appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
         loading: true

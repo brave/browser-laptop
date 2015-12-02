@@ -54,8 +54,9 @@ class Frame extends ImmutableComponent {
     webview.addEventListener('page-favicon-updated', () => {
       console.log('favicon updated')
     })
-    webview.addEventListener('page-title-set', () => {
-      console.log('title set')
+    webview.addEventListener('page-title-set', ({title}) => {
+      console.log('title set', title)
+      AppActions.setFrameTitle(this.props.frame, title)
     })
     webview.addEventListener('dom-ready', () => {
       console.log('dom is ready')
