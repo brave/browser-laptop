@@ -8,6 +8,11 @@ const UrlBar = require('./urlBar')
 
 class NavigationBar extends ImmutableComponent {
 
+  get loading () {
+    return this.props.activeFrame &&
+      this.props.activeFrame.get('loading')
+  }
+
   onAddSite () {
     // TODO
   }
@@ -22,6 +27,10 @@ class NavigationBar extends ImmutableComponent {
 
   onReload () {
     process.emit('reload-active-frame')
+  }
+
+  onStop () {
+    process.emit('stop-active-frame')
   }
 
   onNewFrame () {
@@ -46,7 +55,7 @@ class NavigationBar extends ImmutableComponent {
           onClick={this.onReload.bind(this)} />
         <Button iconClass='fa-times'
           className='navbutton stop-button'
-          onClick={this.props.onStop} />
+          onClick={this.onStop.bind(this)} />
       </div>
       <UrlBar ref='urlBar'
         sites={this.props.sites}

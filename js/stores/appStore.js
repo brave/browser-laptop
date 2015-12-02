@@ -83,12 +83,21 @@ AppDispatcher.register((action) => {
       updateNavBarInput(action.location)
       appStore.emitChange()
       break
-    case AppConstants.APP_SET_NAVBAR_INPUT_IF_ACTIVE:
+    case AppConstants.APP_WEBVIEW_LOAD_START:
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        loading: true
+      })
+      appStore.emitChange()
+      break
+    case AppConstants.APP_WEBVIEW_LOAD_END:
       // Only update for the active frame.
       if (action.frameProps === appState.getIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))])) {
         updateNavBarInput(action.location)
-        appStore.emitChange()
       }
+      appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
+        loading: false
+      })
+      appStore.emitChange()
       break
     case AppConstants.APP_SET_NAVBAR_FOCUSED:
       appState = appState.setIn(['ui', 'navbar', 'urlbar', 'focused'], action.focused)

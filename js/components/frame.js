@@ -26,6 +26,12 @@ class Frame extends ImmutableComponent {
         webview.reload()
       }
     })
+    process.on('stop-active-frame', () => {
+      if (this.props.isActive) {
+        let webview = ReactDOM.findDOMNode(this.refs.webview)
+        webview.stop()
+      }
+    })
   }
 
   componentDidMount () {
@@ -53,13 +59,15 @@ class Frame extends ImmutableComponent {
     })
     webview.addEventListener('did-start-loading', () => {
       console.log('spinner start loading')
+      AppActions.onWebviewLoadStart(
+        this.props.frame)
     })
     webview.addEventListener('did-stop-loading', () => {
       console.log('spinner stop loading')
     })
     webview.addEventListener('did-stop-loading', () => {
       console.log('did stop loading')
-      AppActions.setNavBarInputIfActive(
+      AppActions.onWebviewLoadEnd(
         this.props.frame,
         webview.getURL())
     })

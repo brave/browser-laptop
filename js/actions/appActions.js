@@ -25,9 +25,16 @@ const AppActions = {
     })
   },
 
-  setNavBarInputIfActive: function (frameProps, location) {
+  onWebviewLoadStart: function (frameProps) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_NAVBAR_INPUT_IF_ACTIVE,
+      actionType: AppConstants.APP_WEBVIEW_LOAD_START,
+      frameProps
+    })
+  },
+
+  onWebviewLoadEnd: function (frameProps, location) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_WEBVIEW_LOAD_END,
       frameProps,
       location
     })
