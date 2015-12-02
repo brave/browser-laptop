@@ -57,6 +57,10 @@ class Frame extends ImmutableComponent {
     webview.addEventListener('dom-ready', () => {
       console.log('dom is ready')
     })
+    webview.addEventListener('did-get-redirect-request', e => {
+      console.log('got redirect', e.newUrl)
+      AppActions.setNavBarInput(e.newUrl)
+    })
     webview.addEventListener('did-start-loading', () => {
       console.log('spinner start loading')
       AppActions.onWebviewLoadStart(
