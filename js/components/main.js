@@ -68,7 +68,7 @@ class Main extends ImmutableComponent {
         </div>
         <NavigationBar
           navbar={this.props.browser.getIn(['ui', 'navbar'])}
-          activeFrame={this.props.browser.get('frame')}
+          activeFrame={activeFrame}
         />
         <Tabs
           tabs={this.props.browser.getIn(['ui', 'tabs'])}

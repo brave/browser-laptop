@@ -20,6 +20,12 @@ class Frame extends ImmutableComponent {
         webview.reload()
       }
     })
+    process.on('reload-active-frame', () => {
+      if (this.props.isActive) {
+        let webview = ReactDOM.findDOMNode(this.refs.webview)
+        webview.reload()
+      }
+    })
   }
 
   componentDidMount () {
