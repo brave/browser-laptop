@@ -28,6 +28,10 @@ node_modules
 
 public/built
 
+# Temp files
+.DS_Store
+
 # electron-packager output dirs
 *-darwin-x64
 *-win32-x64
+dist

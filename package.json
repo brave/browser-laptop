@@ -8,9 +8,9 @@
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
-    "package": "cp  res/app.icns Brave-*/Brave.app/Contents/Resources/atom.icns && asar pack Brave-*/Brave.app/Contents/Resources/app app.asar && rm -Rf Brave-*/Brave.app/Contents/Resources/app && mv app.asar Brave-*/Brave.app/Contents/Resources/",
-    "build-darwin": "electron-packager . Brave --overwrite --ignore='electron-packager electron-prebuilt electron-rebuild' --platform=darwin --arch=x64 --version=0.35.1 --icon=res/app.icns",
-    "build-win64": "electron-packager . Brave --overwrite --ignore='electron-packager electron-prebuilt electron-rebuild' --platform=win32 --arch=x64 --version=0.35.1 --icon=res/app.ico",
+    "build-darwin": "electron-packager . Brave --overwrite --ignore='electron-packager electron-builder electron-prebuilt electron-rebuild' --platform=darwin --arch=x64 --version=0.35.1 --icon=res/app.icns",
+    "build-win64": "electron-packager . Brave --overwrite --ignore='electron-packager electron-builder electron-prebuilt electron-rebuild' --platform=win32 --arch=x64 --version=0.35.1 --icon=res/app.ico",
+    "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "test": "standard"
   },
   "repository": {
@@ -43,6 +43,7 @@
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.1.18",
     "css-loader": "^0.23.0",
+    "electron-builder": "^2.3.1",
     "electron-packager": "^5.1.1",
     "electron-rebuild": "^1.0.2",
     "gulp": "^3.9.0",

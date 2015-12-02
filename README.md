@@ -41,14 +41,27 @@ Build instructions:
 
 ### OSX:
 
-From within brave-browser you can create a .app file for distribution.
+From within brave-browser you can create a .app file for distribution:
 
     npm run build-darwin
-    npm run package
+
+After the .app file is built you can create a dmg with:
+
+    npm run installer-dwarwin
+
+### Windows 7,8,10 x64:
+
+To create a folder with the app .exe and all dependencies:
+
+    npm run build-win64
+
+After the above folder is created, you can create an NSIS based installer with:
+
+    npm run installer-win64
 
 ### Other platforms:
 
-Packaging is not implemented yet for other platforms.
+Packaging is not implemented yet for other platforms, but it would be simple for linux.
 
 
 ## Developer Tools
