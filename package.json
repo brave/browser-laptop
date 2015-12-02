@@ -63,7 +63,8 @@
       "Brave-*",
       "less-",
       "public",
-      "res"
+      "res",
+      "js/ext"
     ]
   },
   "pre-commit": [
