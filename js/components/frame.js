@@ -38,6 +38,9 @@ class Frame extends ImmutableComponent {
     let webview = ReactDOM.findDOMNode(this.refs.webview)
     webview.addEventListener('new-window', (e) => {
       console.log('new window: ' + e.url)
+      AppActions.newFrame({
+        location: e.url
+      })
     })
     webview.addEventListener('close', () => {
       console.log('close window')
@@ -57,9 +60,9 @@ class Frame extends ImmutableComponent {
     webview.addEventListener('dom-ready', () => {
       console.log('dom is ready')
     })
-    webview.addEventListener('did-get-redirect-request', e => {
-      console.log('got redirect', e.newUrl)
-      AppActions.setNavBarInput(e.newUrl)
+    webview.addEventListener('did-get-redirect-request', (oldUrl, newUrl) => {
+      console.log('got redirect', newUrl)
+      AppActions.setNavBarInput(newUrl)
     })
     webview.addEventListener('did-start-loading', () => {
       console.log('spinner start loading')
