@@ -26,6 +26,7 @@ class UrlBar extends ImmutableComponent {
   select () {
     let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
     urlInput.focus()
+    urlInput.select()
   }
 
   blur () {
