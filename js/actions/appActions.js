@@ -2,6 +2,7 @@
 
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
+const Config = require('../constants/config')
 const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
 const AppStore = require('../stores/appStore')
 const ipc = require('ipc')
@@ -32,7 +33,15 @@ const AppActions = {
     })
   },
 
+  setNavBarFocused: function (focused) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_NAVBAR_FOCUSED,
+      focused
+    })
+  },
+
   newFrame: function (frameOpts = {}, openInForeground = true) {
+    frameOpts.location = frameOpts.location || Config.defaultUrl
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_NEW_FRAME,
       frameOpts: frameOpts,

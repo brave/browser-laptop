@@ -4,13 +4,15 @@ const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const AppActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
+const cx = require('../lib/classSet.js')
 const ipc = require('ipc')
+
+const UrlBarSuggestions = require('./urlBarSuggestions.js')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
     super()
     ipc.on('shortcut-focus-url', () => {
-      this.select()
       this.focus()
     })
     ipc.on('shortcut-stop', () => {
@@ -48,23 +50,64 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
+  onBlur (e) {
+    AppActions.setNavBarFocused(false)
+  }
+
   onChange (e) {
     AppActions.setNavBarInput(e.target.value)
   }
 
+  onFocus (e) {
+    this.select()
+    AppActions.setNavBarFocused(true)
+  }
+
   render () {
     return <form
-        action='#'
-        id='urlbar'
-        ref='urlbar'>
-      <input
-        type='text'
-        id='urlInput'
-        ref='urlInput'
-        value={this.props.urlbar.get('location')}
+      action='#'
+      id='urlbar'
+      ref='urlbar'>
+        <span
+          onClick={this.props.onSiteInfo}
+          className={cx({
+            urlbarIcon: true,
+            'fa': true,
+            'fa-lock': this.secure && this.loading === false && !this.props.focused,
+            'fa-unlock': !this.secure && this.loading === false && this.aboutPage === false && !this.props.focused,
+            'fa fa-spinner fa-spin': this.loading === true,
+            'fa fa-search': this.props.searchSuggestions && this.props.focused && this.loading === false,
+            extendedValidation: this.extendedValidationSSL
+          })}/>
+      <input type='text'
+        onFocus={this.onFocus.bind(this)}
+        onBlur={this.onBlur.bind(this)}
+        onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
-        onKeyDown={this.onKeyDown.bind(this)}/>
-    </form>
+        value={this.props.urlbar.get('location')}
+        data-l10n-id='urlbar'
+        className={cx({
+          insecure: !this.secure && this.loading === false && this.aboutPage === false,
+          private: this.private,
+          testHookLoadDone: !this.loading
+        })}
+        id='urlInput'
+        ref='urlInput'/>
+        <UrlBarSuggestions
+          ref='urlBarSuggestions'
+          suggestions={this.props.suggestions}
+          sites={this.props.sites}
+          frames={this.props.frames}
+          onNavigate={this.props.onNavigate}
+          searchDetail={this.props.searchDetail}
+          searchSuggestions={this.props.searchSuggestions}
+          activeFrameProps={this.props.activeFrameProps}
+          urlValue={this.props.urlValue}
+          location={this.location}
+          urlPreview={this.props.urlPreview}
+          previewActiveIndex={this.props.previewActiveIndex || 0}
+          onSelectFrame={this.props.onSelectFrame} />
+      </form>
   }
 }
 

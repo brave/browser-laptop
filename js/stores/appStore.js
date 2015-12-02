@@ -15,7 +15,11 @@ let appState = Immutable.fromJS({
   ui: {
     navbar: {
       urlbar: {
-        location: ''
+        location: '',
+        suggestions: {
+          activeIndex: 0,
+          searchResults: []
+        }
       }
     },
     tabs: {
@@ -80,6 +84,10 @@ AppDispatcher.register((action) => {
         updateNavBarInput(action.location)
         appStore.emitChange()
       }
+      break
+    case AppConstants.APP_SET_NAVBAR_FOCUSED:
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'focused'], action.focused)
+      appStore.emitChange()
       break
     case AppConstants.APP_NEW_FRAME:
       let nextKey = incrementNextKey()

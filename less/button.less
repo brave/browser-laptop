@@ -1,0 +1,31 @@
+@import "variables.less";
+
+span.browserButton {
+  display: inline-block;
+  line-height: 28px;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  color: #626262;
+  border-radius: 30px;
+  margin: 0 3px;
+  text-align: center;
+  transition: .1s opacity, .1s background;
+
+  &:not([disabled]):hover {
+    color: #3B3B3B;
+    cursor: pointer;
+  }
+
+  &[disabled] {
+    opacity: .25;
+    pointer-events: none;
+  }
+
+  &.smallButton {
+    line-height: 18px;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+}
