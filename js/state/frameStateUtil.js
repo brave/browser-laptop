@@ -120,6 +120,8 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
   let frame = Immutable.fromJS({
     src: url,
     location: url,
+    canGoBack: false,
+    canGoForward: false,
     isPrivate: frameOpts.isPrivate || false,
     element: frameOpts.element,
     features: getFeatures(frameOpts.features),

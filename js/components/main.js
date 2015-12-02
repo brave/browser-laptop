@@ -36,12 +36,36 @@ class Main extends ImmutableComponent {
       AppActions.closeFrame())
   }
 
+  get activeFrame () {
+    return this.refs[`frame${this.props.browser.get('activeFrameKey')}`]
+  }
+
+  onBack () {
+    this.activeFrame.goBack()
+  }
+
+  onForward () {
+    this.activeFrame.goForward()
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
 
+    let activeFrame = FrameStateUtil.getActiveFrame(this.props.browser)
+
     return <div id='browser'>
       <div className='top'>
+        <div className='backforward'>
+          <span
+            className='back fa fa-angle-left'
+            disabled={!activeFrame || !activeFrame.get('canGoBack')}
+            onClick={this.onBack.bind(this)} />
+          <span
+            className='forward fa fa-angle-right'
+            disabled={!activeFrame || !activeFrame.get('canGoForward')}
+            onClick={this.onForward.bind(this)} />
+        </div>
         <NavigationBar
           navbar={this.props.browser.getIn(['ui', 'navbar'])}
           activeFrame={this.props.browser.get('frame')}
@@ -50,7 +74,7 @@ class Main extends ImmutableComponent {
           tabs={this.props.browser.getIn(['ui', 'tabs'])}
           frames={this.props.browser.get('frames')}
           key='tab-bar'
-          activeFrame={FrameStateUtil.getActiveFrame(this.props.browser)}
+          activeFrame={activeFrame}
         />
       </div>
       <div className='mainContainer'>
@@ -58,6 +82,7 @@ class Main extends ImmutableComponent {
         {
           this.props.browser.get('frames').sort(comparatorByKeyAsc).map(frame =>
             <Frame
+              ref={`frame${frame.get('key')}`}
               frame={frame}
               key={frame.get('key')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.browser, frame.get('key'))}

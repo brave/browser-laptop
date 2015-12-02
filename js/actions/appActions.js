@@ -62,6 +62,15 @@ const AppActions = {
     })
   },
 
+  updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_BACK_FORWARD,
+      frameProps,
+      canGoBack,
+      canGoForward
+    })
+  },
+
   tabDragStart: function (frameProps) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_TAB_DRAG_START,
