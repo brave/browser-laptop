@@ -17,10 +17,18 @@ const AppActions = {
     })
   },
 
-  setNavBarInput: function (loc) {
+  setNavBarInput: function (location) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SET_NAVBAR_INPUT,
-      location: loc
+      location
+    })
+  },
+
+  setNavBarInputIfActive: function (frameProps, location) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_NAVBAR_INPUT_IF_ACTIVE,
+      frameProps,
+      location
     })
   },
 

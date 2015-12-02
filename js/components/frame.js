@@ -53,6 +53,9 @@ class Frame extends ImmutableComponent {
     })
     webview.addEventListener('did-stop-loading', () => {
       console.log('did stop loading')
+      AppActions.setNavBarInputIfActive(
+        this.props.frame,
+        webview.getURL())
     })
     webview.addEventListener('did-fail-load', () => {
       console.log('did fail load')

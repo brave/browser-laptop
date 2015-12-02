@@ -74,6 +74,13 @@ AppDispatcher.register((action) => {
       updateNavBarInput(action.location)
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_NAVBAR_INPUT_IF_ACTIVE:
+      // Only update for the active frame.
+      if (action.frameProps === appState.getIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))])) {
+        updateNavBarInput(action.location)
+        appStore.emitChange()
+      }
+      break
     case AppConstants.APP_NEW_FRAME:
       let nextKey = incrementNextKey()
       appState = appState.merge(FrameStateUtil.addFrame(appState.get('frames'), action.frameOpts,
