@@ -20,6 +20,24 @@ class Frame extends ImmutableComponent {
         webview.reload()
       }
     })
+    ipc.on('shortcut-zoom-in', () => {
+      let webview = ReactDOM.findDOMNode(this.refs.webview)
+      if (webview) {
+        webview.send('zoom-in')
+      }
+    })
+    ipc.on('shortcut-zoom-out', () => {
+      let webview = ReactDOM.findDOMNode(this.refs.webview)
+      if (webview) {
+        webview.send('zoom-out')
+      }
+    })
+    ipc.on('shortcut-zoom-reset', () => {
+      let webview = ReactDOM.findDOMNode(this.refs.webview)
+      if (webview) {
+        webview.send('zoom-reset')
+      }
+    })
     process.on('reload-active-frame', () => {
       if (this.props.isActive) {
         let webview = ReactDOM.findDOMNode(this.refs.webview)
@@ -105,7 +123,10 @@ class Frame extends ImmutableComponent {
           frameWrapper: true,
           isActive: this.props.isActive
         })}>
-      <webview ref='webview' src={this.props.frame.get('location')} />
+      <webview
+        ref='webview'
+        src={this.props.frame.get('location')}
+        preload='./../lib/webviewPreload.js'/>
     </div>
   }
 }

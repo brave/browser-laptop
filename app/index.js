@@ -65,7 +65,10 @@ app.on('ready', function () {
     ['Escape', 'shortcut-stop'],
     ['Ctrl+Tab', 'shortcut-next-tab'],
     ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
-    ['CmdOrCtrl+R', 'shortcut-reload']
+    ['CmdOrCtrl+R', 'shortcut-reload'],
+    ['CmdOrCtrl+=', 'shortcut-zoom-in'],
+    ['CmdOrCtrl+-', 'shortcut-zoom-out'],
+    ['CmdOrCtrl+0', 'shortcut-zoom-reset']
   ]
 
   simpleWebContentEvents.forEach((shortcutEventName) =>
