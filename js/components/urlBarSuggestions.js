@@ -1,9 +1,10 @@
 const React = require('react')
 
+const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 
-const Config = require('../constants/config')
+import Config from '../constants/config.js'
 import top500 from './../data/top500.js'
 import {isSourceAboutUrl} from '../lib/appUrlUtil.js'
 import Immutable from 'immutable'
@@ -17,20 +18,20 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   get activeIndex () {
-    return Math.abs(this.props.previewActiveIndex % (this.props.suggestions.size + 1))
+    return Math.abs(this.props.suggestions.get('selectedIndex') % (this.props.suggestions.get('suggestionList').size + 1))
   }
 
   nextSuggestion () {
-    this.updateSuggestions(this.props.previewActiveIndex + 1)
+    this.updateSuggestions(this.props.suggestions.get('selectedIndex') + 1)
   }
 
   previousSuggestion () {
-    var suggestions = this.props.suggestions
+    var suggestions = this.props.suggestions.get('suggestionList')
     if (!suggestions) {
       return
     }
 
-    var newIndex = this.props.previewActiveIndex - 1
+    var newIndex = this.props.suggestions.get('selectedIndex') - 1
     if (newIndex < 0) {
       newIndex = suggestions.size
     }
@@ -43,17 +44,15 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   blur () {
     window.removeEventListener('click', this)
-    this.mergeState({
-      suggestions: null,
-      activeIndex: null
-    })
-    this.props.onPreviewUpdate(null)
+    AppActions.setUrlBarSuggestions(null, null)
+    AppActions.setUrlBarPreview(null)
   }
 
   render () {
-    var suggestions = this.props.suggestions
+    var suggestions = this.props.suggestions.get('suggestionList')
     window.removeEventListener('click', this)
-    if (!this.props.urlValue && !this.props.urlPreview ||
+
+    if (!this.props.urlLocation && !this.props.urlPreview ||
         !suggestions || suggestions.size === 0) {
       return null
     }
@@ -80,19 +79,21 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.urlValue === prevProps.urlValue) {
+    if (this.props.urlLocation === prevProps.urlLocation) {
       return
     }
     this.searchXHR()
   }
 
   updateSuggestions (newIndex) {
-    if (!this.props.urlValue && !this.props.urlPreview) {
+    if (!this.props.urlLocation && !this.props.urlPreview) {
       return null
     }
 
     let navigateClickHandler = formatUrl => site => {
-      this.props.onNavigate(formatUrl(site))
+      let location = formatUrl(site)
+      AppActions.setNavBarInput(location)
+      AppActions.loadUrl(location)
       this.blur()
     }
 
@@ -100,7 +101,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     let defaultme = x => x
     let mapListToElements = ({data, maxResults, classHandler, clickHandler = navigateClickHandler,
         sortHandler = defaultme, formatTitle = defaultme,
-        filterValue = site => site.toLowerCase().includes(this.props.urlValue.toLowerCase())
+        filterValue = site => site.toLowerCase().includes(this.props.urlLocation.toLowerCase())
     }) => // Filter out things which are already in our own list at a smaller index
       data.filter((site, index) => {
         return data.findIndex(x => formatTitle(x).toLowerCase() === formatTitle(site).toLowerCase()) === index
@@ -129,8 +130,8 @@ class UrlBarSuggestions extends ImmutableComponent {
       formatTitle: frame => frame.get('title') || frame.get('location'),
       filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
         frame.get('key') !== this.props.activeFrameProps.get('key') &&
-        (frame.get('title') && frame.get('title').toLowerCase().includes(this.props.urlValue.toLowerCase()) ||
-        frame.get('location') && frame.get('location').toLowerCase().includes(this.props.urlValue.toLowerCase()))}))
+        (frame.get('title') && frame.get('title').toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
+        frame.get('location') && frame.get('location').toLowerCase().includes(this.props.urlLocation.toLowerCase()))}))
 
     // history, bookmarks, reader list
     suggestions = suggestions.concat(mapListToElements({
@@ -138,7 +139,6 @@ class UrlBarSuggestions extends ImmutableComponent {
       maxResults: Config.urlBarSuggestions.maxSites,
       classHandler: getSiteIconClass,
       clickHandler: navigateClickHandler(site => {
-        console.log('Site is:', site)
         return site.get('location')
       }),
       sortHandler: (site1, site2) => {
@@ -154,7 +154,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Search suggestions
     if (this.props.searchSuggestions) {
       suggestions = suggestions.concat(mapListToElements({
-        data: this.props.searchResults,
+        data: this.props.suggestions.get('searchResults'),
         maxResults: Config.urlBarSuggestions.maxTopSites,
         classHandler: () => 'fa-search',
         clickHandler: navigateClickHandler(searchTerms => this.props.searchDetail.get('searchURL')
@@ -168,38 +168,39 @@ class UrlBarSuggestions extends ImmutableComponent {
       classHandler: () => 'fa-link',
       clickHandler: navigateClickHandler(x => x)}))
 
-    this.setState('suggestions', suggestions)
-
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
-      this.props.onPreviewUpdate(null)
+      AppActions.setUrlBarPreview(null)
+      newIndex = null
     } else {
       var currentActive = suggestions.get(newIndex - 1)
-      currentActive.previewActiveIndex = newIndex
-      this.props.onPreviewUpdate(currentActive)
+      if (currentActive && currentActive.title) {
+        AppActions.setUrlBarPreview(currentActive.title)
+      }
     }
+    AppActions.setUrlBarSuggestions(suggestions, newIndex)
   }
 
   searchXHR () {
     if (!this.props.searchSuggestions) {
-      this.updateSuggestions(this.props.previewActiveIndex)
+      this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
       return
     }
 
-    let urlValue = this.props.urlValue
-    if (!UrlUtil.isURL(urlValue) && urlValue.length > 0) {
+    let urlLocation = this.props.urlLocation
+    if (!UrlUtil.isURL(urlLocation) && urlLocation.length > 0) {
       let xhr = new window.XMLHttpRequest({mozSystem: true})
       xhr.open('GET', this.props.searchDetail.get('autocompleteURL')
-        .replace('{searchTerms}', urlValue), true)
+        .replace('{searchTerms}', urlLocation), true)
       xhr.responseType = 'json'
       xhr.send()
       xhr.onload = () => {
-        this.setState('searchResults', Immutable.fromJS(xhr.response[1]))
-        this.updateSuggestions(this.props.previewActiveIndex)
+        AppActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
+        this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
       }
     } else {
-      this.setState('searchResults', Immutable.fromJS([]))
-      this.updateSuggestions(this.props.previewActiveIndex)
+      AppActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
+      this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
     }
   }
 }
