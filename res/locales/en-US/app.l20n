@@ -1,0 +1,67 @@
+<reload "Reload">
+<addBookmark "Add bookmark">
+<removeBookmark "Remove bookmark">
+<addToReadingList "Add to reading list">
+<removeFromReadingList "Remove from reading list">
+<forward "Forward">
+<back "Back">
+<ok "OK">
+<cancel "Cancel">
+<submit "Submit">
+<settings "Settings">
+<aboutPages "About pages">
+<listOfAboutPages "List of about pages">
+<history "History">
+<settingName "Setting name">
+<settingValue "Setting value">
+<newTab "New Tab">
+<openTypeInNewTab "Open {{$type}} in a new tab">
+<openTypeInNewPrivateTab "Open {{$type}} in a new private tab">
+<copyLinkLocation "Copy Link Location">
+<closeTab "Close tab">
+<closeOtherTabs "Close other tabs">
+<reloadTab "Reload tab">
+<muteTab "Mute tab">
+<unmuteTab "Unmute tab">
+<disableProtectionForSite "Disable tracking protection">
+<enableProtectionForSite "Enable tracking protection">
+<disableAdBlockForSite "Disable Ad block">
+<enableAdBlockForSite "Enable Ad block">
+<downloadType "Download {{$type}}">
+<setDefaultSearch "Set {{$title}} as default search engine">
+<viewPageSource "View Page Source">
+
+<braveMenuTotalReplacements "Total Replacements: {{$count}}">
+
+<basicAuthRequired "Authentication Required">
+<basicAuthUsername placeholder: "Username">
+<basicAuthPassword placeholder: "Password">
+
+<crashScreenHeader "Something went wrong =(">
+<crashScreenText "An error occurred while displaying this webpage. To continue, reload or navigate to another page.">
+
+<deny "Deny">
+<grant "Grant">
+<permRequestHeader "{{$origin}} is requesting permisison">
+<geolocationPermission "Geolocation">
+<audioCapturePermission "Audio Capture">
+<videoCapturePermission "Video Capture">
+
+<urlbar placeholder: "Search or enter an address">
+
+<findResults "{{$activeMatchOrdinal}} of {{$numberofMatches}}">
+<caseSensitivity "Match case">
+
+<runtimeUpdatePending "A runtime update which requires the application to be restarted is available.">
+<appUpdatePending "An update is available.">
+<apply "Apply">
+<applyAndRestart "Apply and restart">
+
+<fullscreenNotice "{{$origin}} is now fullscreen. Press ESC to exit.">
+
+<secureConnection "This site is secure">
+<mixedConnection "Partially insecure connection">
+<insecureConnection "Using an insecure connection">
+<blockedTrackingElements "{{$blockedTrackingElementsSize}} Blocked tracking elements">
+<replacedAds "{{$replacedAdsSize}} Ads replaced">
+<blockedAds "{{$blockedAdsSize}} Ads blocked">
