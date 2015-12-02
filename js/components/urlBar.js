@@ -95,18 +95,15 @@ class UrlBar extends ImmutableComponent {
         ref='urlInput'/>
         <UrlBarSuggestions
           ref='urlBarSuggestions'
-          suggestions={this.props.suggestions}
+          suggestions={this.props.urlbar.get('suggestions')}
           sites={this.props.sites}
           frames={this.props.frames}
-          onNavigate={this.props.onNavigate}
           searchDetail={this.props.searchDetail}
           searchSuggestions={this.props.searchSuggestions}
           activeFrameProps={this.props.activeFrameProps}
-          urlValue={this.props.urlValue}
-          location={this.location}
-          urlPreview={this.props.urlPreview}
-          previewActiveIndex={this.props.previewActiveIndex || 0}
-          onSelectFrame={this.props.onSelectFrame} />
+          urlLocation={this.props.urlbar.get('location')}
+          urlPreview={this.props.urlbar.get('urlPreview')}
+          previewActiveIndex={this.props.previewActiveIndex || 0} />
       </form>
   }
 }

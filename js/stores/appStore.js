@@ -12,13 +12,16 @@ let appState = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],
   closedFrames: [],
+  sites: [],
   ui: {
     navbar: {
       urlbar: {
         location: '',
+        urlPreview: '',
         suggestions: {
           activeIndex: 0,
-          searchResults: []
+          searchResults: [],
+          suggestionList: null
         }
       }
     },
@@ -37,8 +40,10 @@ const updateUrl = (loc) =>
     title: ''
   })
 
-const updateNavBarInput = (loc) =>
+const updateNavBarInput = (loc) => {
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
+  appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], null)
+}
 
 let currentKey = 0
 const incrementNextKey = () => ++currentKey
@@ -176,6 +181,19 @@ AppDispatcher.register((action) => {
       }
       frames = frames.splice(newIndex, 0, action.sourceFrameProps)
       appState = appState.set('frames', frames)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_URL_BAR_SUGGESTIONS:
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'selectedIndex'], action.selectedIndex)
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'suggestionList'], action.suggestionList)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_URL_BAR_PREVIEW:
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], action.selectedIndex)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'searchResults'], action.searchResults)
       appStore.emitChange()
       break
     default:

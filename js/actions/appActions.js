@@ -144,6 +144,28 @@ const AppActions = {
       destinationFrameProps,
       prepend
     })
+  },
+
+  setUrlBarSuggestions: function (suggestionList, selectedIndex) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_URL_BAR_SUGGESTIONS,
+      suggestionList,
+      selectedIndex
+    })
+  },
+
+  setUrlBarPreview: function (value) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_URL_BAR_PREVIEW,
+      value
+    })
+  },
+
+  setUrlBarSuggestionSearchResults: function (searchResults) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
+      searchResults
+    })
   }
 }
 
