@@ -21,7 +21,7 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onReload () {
-    // TODO
+    process.emit('reload-active-frame')
   }
 
   onNewFrame () {
