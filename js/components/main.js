@@ -1,6 +1,7 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const ipc = global.require('electron').ipcRenderer
+const electron = global.require('electron')
+const ipc = electron.ipcRenderer
 
 // Actions
 const AppActions = require('../actions/appActions')
@@ -30,6 +31,9 @@ class Main extends ImmutableComponent {
       AppActions.newFrame({
         location: Config.defaultUrl
       })
+
+      // Focus URL bar when adding tab via shortcut
+      electron.remote.getCurrentWebContents().send('shortcut-focus-url')
     })
 
     ipc.on('shortcut-close-frame', () =>

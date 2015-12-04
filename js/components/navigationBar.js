@@ -35,6 +35,7 @@ class NavigationBar extends ImmutableComponent {
 
   onNewFrame () {
     AppActions.newFrame()
+    this.refs.urlBar.focus()
   }
 
   render () {
