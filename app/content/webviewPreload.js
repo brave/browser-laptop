@@ -1,26 +1,25 @@
-var electron = require('electron')
-var ipc = electron.ipcRenderer
-var webFrame = electron.webFrame
+var webFrame = require('electron').webFrame
+var ipc = require('electron').ipcRenderer
 
 var browserZoomLevel = 0
 var browserMaxZoom = 9
 var browserMinZoom = -8
 
-ipc.on('zoomIn', function () {
+ipc.on('zoom-in', function () {
   if (browserMaxZoom > browserZoomLevel) {
     browserZoomLevel += 1
   }
   webFrame.setZoomLevel(browserZoomLevel)
 })
 
-ipc.on('zoomOut', function () {
+ipc.on('zoom-out', function () {
   if (browserMinZoom < browserZoomLevel) {
     browserZoomLevel -= 1
   }
   webFrame.setZoomLevel(browserZoomLevel)
 })
 
-ipc.on('zoomReset', function () {
+ipc.on('zoom-reset', function () {
   browserZoomLevel = 0
   webFrame.setZoomLevel(browserZoomLevel)
 })

@@ -126,7 +126,7 @@ class Frame extends ImmutableComponent {
       <webview
         ref='webview'
         src={this.props.frame.get('location')}
-        preload='./../lib/webviewPreload.js'/>
+        preload='content/webviewPreload.js'/>
     </div>
   }
 }
