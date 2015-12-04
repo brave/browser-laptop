@@ -1,6 +1,6 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const ipc = require('ipc')
+const ipc = global.require('electron').ipcRenderer
 
 // Actions
 const AppActions = require('../actions/appActions')

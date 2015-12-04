@@ -5,7 +5,7 @@ const ImmutableComponent = require('./immutableComponent')
 const AppActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
 const cx = require('../lib/classSet.js')
-const ipc = require('ipc')
+const ipc = global.require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 

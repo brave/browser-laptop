@@ -2,7 +2,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
-const ipc = require('ipc')
+const ipc = global.require('electron').ipcRenderer
 const cx = require('../lib/classSet.js')
 
 class Frame extends ImmutableComponent {

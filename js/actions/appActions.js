@@ -5,7 +5,7 @@ const AppConstants = require('../constants/appConstants')
 const Config = require('../constants/config')
 const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
 const AppStore = require('../stores/appStore')
-const ipc = require('ipc')
+const ipc = global.require('electron').ipcRenderer
 
 const AppActions = {
   loadUrl: function (loc) {

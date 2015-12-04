@@ -3,7 +3,7 @@ const EventEmitter = require('events').EventEmitter
 const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
-const ipc = require('ipc')
+const ipc = global.require('electron').ipcRenderer
 
 // For this simple example, store immutable data object for a simple counter.
 // This is of course very silly, but this is just for an app template with top
