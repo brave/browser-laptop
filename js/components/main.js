@@ -29,9 +29,9 @@ class Main extends ImmutableComponent {
       })
     }
 
-    ipc.on('shortcut-new-frame', () => {
+    ipc.on('shortcut-new-frame', (event, url) => {
       AppActions.newFrame({
-        location: Config.defaultUrl
+        location: url || Config.defaultUrl
       })
 
       // Focus URL bar when adding tab via shortcut

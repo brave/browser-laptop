@@ -148,11 +148,23 @@ const init = () => {
   if (process.platform === 'darwin') {
     var name = 'Brave'
     template.unshift({
-      label: name,
+      label: name, // Ignored. OSX gets this from the app Info.plist file.
       submenu: [
         {
           label: 'About ' + name,
           role: 'about'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Preferences...',
+          accelerator: 'CmdOrCtrl+,'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Send us Feedback...',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send('shortcut-new-frame', 'https://brave.com')
+          }
         }, {
           type: 'separator'
         }, {
