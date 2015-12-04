@@ -47,7 +47,7 @@ From within brave-browser you can create a .app file for distribution:
 
 After the .app file is built you can create a dmg with:
 
-    npm run installer-dwarwin
+    npm run installer-darwin
 
 ### Windows 7,8,10 x64:
 
