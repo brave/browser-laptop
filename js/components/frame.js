@@ -33,9 +33,13 @@ class Frame extends ImmutableComponent {
         this.webview.send('zoom-reset')
       }
     })
-    ipc.on('shortcut-open-dev-tools', () => {
+    ipc.on('shortcut-toggle-dev-tools', () => {
       if (this.webview) {
-        this.webview.openDevTools()
+        if (this.webview.isDevToolsOpened()) {
+          this.webview.closeDevTools()
+        } else {
+          this.webview.openDevTools()
+        }
       }
     })
     process.on('reload-active-frame', () => {

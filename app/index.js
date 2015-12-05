@@ -66,7 +66,7 @@ app.on('ready', function () {
     ['CmdOrCtrl+=', 'shortcut-zoom-in'],
     ['CmdOrCtrl+-', 'shortcut-zoom-out'],
     ['CmdOrCtrl+0', 'shortcut-zoom-reset'],
-    ['CmdOrCtrl+Alt+I', 'shortcut-open-dev-tools']
+    ['CmdOrCtrl+Alt+I', 'shortcut-toggle-dev-tools']
   ]
 
   simpleWebContentEvents.forEach((shortcutEventName) =>
