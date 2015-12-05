@@ -5,6 +5,7 @@
   "main": "./app/index.js",
   "scripts": {
     "start": "electron . --debug=5858",
+    "start-brk": "electron . --debug-brk=5858",
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
