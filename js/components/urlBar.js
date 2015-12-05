@@ -63,6 +63,13 @@ class UrlBar extends ImmutableComponent {
     AppActions.setNavBarFocused(true)
   }
 
+  componentWillReceiveProps (newProps) {
+    let location = newProps.activeFrameProps.get('location') // TODO: update this during redirects
+    if (location !== this.props.activeFrameProps.get('location')) {
+      AppActions.setNavBarInput(location)
+    }
+  }
+
   render () {
     return <form
       action='#'

@@ -80,14 +80,18 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('dom-ready', () => {
       console.log('dom is ready')
     })
-    this.webview.addEventListener('did-get-redirect-request', (oldUrl, newUrl) => {
-      console.log('got redirect', newUrl)
-      AppActions.setNavBarInput(newUrl)
+    this.webview.addEventListener('did-get-redirect-request', (event) => {
+      // Update the url bar for top-level location changes
+      if (event.isMainFrame) {
+        console.log('got redirect', event.oldURL, event.newURL)
+        AppActions.setNavBarInput(event.newURL)
+      }
     })
     this.webview.addEventListener('did-start-loading', () => {
       console.log('spinner start loading')
       AppActions.onWebviewLoadStart(
         this.props.frame)
+      AppActions.setNavBarInput(this.props.frame.get('location'))
     })
     this.webview.addEventListener('did-stop-loading', () => {
       console.log('spinner stop loading')
