@@ -31,9 +31,6 @@ const spawnWindow = () => {
     // 'title-bar-style': 'hidden'
   })
   mainWindow.loadURL('file://' + __dirname + '/index.html')
-  if (!process.env.PRODUCTION) {
-    mainWindow.openDevTools()
-  }
   mainWindow.on('closed', function () {
     var index = windows.indexOf(mainWindow)
     if (index > -1) {
@@ -76,6 +73,11 @@ app.on('ready', function () {
     electronLocalshortcut.register(shortcutEventName[0], () => {
       BrowserWindow.getFocusedWindow().webContents.send(shortcutEventName[1])
     }))
+
+  electronLocalshortcut.register('CmdOrCtrl+Shift+J', () => {
+    BrowserWindow.getFocusedWindow().toggleDevTools()
+  })
+
   Menu.init()
 })
 
