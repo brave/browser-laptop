@@ -60,12 +60,13 @@
   },
   "standard": {
     "ignore": [
-      "node_modules",
-      "Brave-*",
-      "less-",
-      "public",
-      "res",
-      "app/ext"
+      "Brave-darwin-x64/**",
+      "less/**",
+      "res/**",
+      "dist/**",
+      "doc/**",
+      "public/**",
+      "app/ext/**"
     ]
   },
   "pre-commit": [
