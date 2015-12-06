@@ -23,7 +23,7 @@ To start the server and file watchers run the following on the command line:
     npm run watch
 
 
-TO run the browser:
+To run the browser:
 
     num start
 
