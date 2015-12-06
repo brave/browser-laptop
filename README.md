@@ -6,7 +6,7 @@ Laptop and Desktop browser for OS X and Windows built on top of the Electron fra
 
 1. Clone the git repository from GitHub:
 
-    git clone git@github.com:brave/browser-electron.git
+        git clone git@github.com:brave/browser-electron.git
 
 2. Open the working directory:
 
