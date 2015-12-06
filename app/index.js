@@ -30,7 +30,11 @@ const spawnWindow = () => {
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     // 'title-bar-style': 'hidden'
   })
-  mainWindow.loadURL('file://' + __dirname + '/index.html')
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.loadURL('file://' + __dirname + '/index-dev.html')
+  } else {
+    mainWindow.loadURL('file://' + __dirname + '/index.html')
+  }
   mainWindow.on('closed', function () {
     var index = windows.indexOf(mainWindow)
     if (index > -1) {

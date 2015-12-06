@@ -10,9 +10,9 @@ module.exports = {
   },
   devtool: '#source-map',
   output: {
-    path: './public/built',
+    path: './app/gen',
     filename: 'bundle.js',
-    publicPath: 'http://localhost:8080/built/',
+    publicPath: './gen/',
     sourceMapFilename: '[file].map',
     stats: { colors: true }
   },

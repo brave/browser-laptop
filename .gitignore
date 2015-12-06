@@ -35,3 +35,5 @@ public/built
 *-darwin-x64
 *-win32-x64
 dist
+
+app/gen
