@@ -18,7 +18,7 @@ const AppActions = {
     })
   },
 
-  setNavBarInput: function (location) {
+  setNavBarUserInput: function (location) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SET_NAVBAR_INPUT,
       location

@@ -55,7 +55,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onChange (e) {
-    AppActions.setNavBarInput(e.target.value)
+    AppActions.setNavBarUserInput(e.target.value)
   }
 
   onFocus (e) {
@@ -66,7 +66,7 @@ class UrlBar extends ImmutableComponent {
   componentWillReceiveProps (newProps) {
     let location = newProps.activeFrameProps.get('location') // TODO: update this during redirects
     if (location !== this.props.activeFrameProps.get('location')) {
-      AppActions.setNavBarInput(location)
+      AppActions.setNavBarUserInput(location)
     }
   }
 
