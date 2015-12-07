@@ -58,6 +58,7 @@
     "gulp": "^3.9.0",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
+    "mocha": "^2.3.4",
     "node-libs-browser": "^0.5.3",
     "pre-commit": "^1.1.2",
     "spectron": "^0.35.3",
