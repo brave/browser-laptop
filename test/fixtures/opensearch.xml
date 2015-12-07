@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>BraveBrowser</ShortName>
+  <Description>Search BraveBrowser</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <LongName>BraveBrowser Search</LongName>
+  <Image height="16" width="16">data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==</Image>
+  <Url type="text/html" method="get" template="http://localhost?q={searchTerms}"/>
+  <Url type="application/x-suggestions+json" template="http://localhost?q={searchTerms}"/>
+</OpenSearchDescription>

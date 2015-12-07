@@ -14,7 +14,7 @@
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
     "postinstall": "webpack",
-    "test": "standard"
+    "test": "mocha --compilers js:babel-register"
   },
   "repository": {
     "type": "git",
@@ -41,10 +41,16 @@
   "devDependencies": {
     "asar": "^0.8.3",
     "babel": "^6.1.18",
-    "babel-core": "^6.2.1",
+    "babel-core": "^6.3.15",
     "babel-loader": "^6.2.0",
+    "babel-polyfill": "^6.3.14",
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.1.18",
+    "babel-register": "^6.3.13",
+    "babel-runtime": "^6.3.13",
+    "chai": "^3.4.1",
+    "chai-as-promised": "^5.1.0",
+    "co-mocha": "^1.1.2",
     "css-loader": "^0.23.0",
     "electron-builder": "^2.3.1",
     "electron-packager": "^5.1.1",
@@ -52,10 +58,13 @@
     "gulp": "^3.9.0",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
+    "mocha": "^2.3.4",
     "node-libs-browser": "^0.5.3",
     "pre-commit": "^1.1.2",
+    "spectron": "^0.35.3",
     "standard": "^5.4.1",
     "style-loader": "^0.13.0",
+    "webdriverio": "^3.3.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },

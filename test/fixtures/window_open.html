@@ -1,0 +1,16 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>window.open</title>
+</head>
+<body>
+  <a href="#" id="trigger">Trigger Window Open</a>
+  <script type="text/javascript">
+    document.getElementById('trigger').addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.WINDOW_REF = window.open(`http://${window.location.host}/page1.html`);
+    });
+  </script>
+</body>
+</html>

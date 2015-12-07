@@ -1,0 +1,29 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Push State</title>
+</head>
+<body>
+  <h1>Current: <span id="current">default</span></h1>
+  <ul id="items">
+      <li><a id="link1" href="/page1/">Page 1</a></li>
+      <li><a id="link2" href="/page2/">Page 2</a></li>
+      <li><a id="link3" href="/page3/">Page 3</a></li>
+  </ul>
+  <script type="text/javascript">
+    function setData(url) {
+      var current = document.getElementById('current');
+      current.textContent = url;
+    }
+    document.getElementById('items').addEventListener('click', e => {
+      e.preventDefault();
+      var url = e.target.href;
+      window.history.pushState({url: url}, e.target.title, url);
+      setData(url);
+    });
+    window.onpopstate = function(e) {
+      setData(e.state ? e.state.url : null);
+    };
+  </script>
+</body>
+</html>
