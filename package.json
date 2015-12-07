@@ -1,5 +1,5 @@
 {
-  "name": "Brave",
+  "name": "brave",
   "version": "0.0.1",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
@@ -21,7 +21,7 @@
     "url": "git+https://github.com/bbondy/electron-sample.git"
   },
   "author": "Brian R. Bondy <netzen@gmail.com> (http://www.brianbondy.com)",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/bbondy/electron-sample/issues"
   },
