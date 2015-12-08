@@ -44,6 +44,18 @@ const updateUrl = (loc) =>
     title: ''
   })
 
+const setLocation = (loc, key) => {
+  key = key || appState.get('activeFrameKey')
+  console.log('updating location', loc, key)
+  appState = appState.mergeIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), key)], {
+    location: loc
+  })
+  // Update the displayed location in the urlbar
+  if (key === appState.get('activeFrameKey')) {
+    updateNavBarInput(loc)
+  }
+}
+
 const updateNavBarInput = (loc) => {
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], null)
@@ -83,6 +95,10 @@ AppDispatcher.register((action) => {
       updateUrl(action.location)
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_LOCATION:
+      setLocation(action.location, action.key)
+      appStore.emitChange()
+      break
     case AppConstants.APP_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
       appStore.emitChange()
@@ -100,10 +116,6 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_WEBVIEW_LOAD_END:
-      // Only update for the active frame.
-      if (action.frameProps === appState.getIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))])) {
-        updateNavBarInput(action.location)
-      }
       appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
         loading: false
       })

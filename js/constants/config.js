@@ -17,7 +17,7 @@ export default {
     height: 100
   },
   defaultLocale: 'en-US',
-  defaultUrl: 'http://www.brave.com',
+  defaultUrl: 'about:blank',
   urlBarSuggestions: {
     maxTopSites: 5,
     maxSearch: 3,

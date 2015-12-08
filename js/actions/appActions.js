@@ -22,7 +22,18 @@ const AppActions = {
     })
   },
 
-  setNavBarInput: function (location) {
+  setLocation: function (loc, key) {
+    if (UrlUtil.isURL(loc)) {
+      loc = UrlUtil.getUrlFromInput(loc)
+    }
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_LOCATION,
+      location: loc,
+      key: key
+    })
+  },
+
+  setNavBarUserInput: function (location) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SET_NAVBAR_INPUT,
       location
