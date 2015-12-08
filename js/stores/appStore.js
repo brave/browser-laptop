@@ -140,6 +140,10 @@ AppDispatcher.register((action) => {
         FrameStateUtil.getActiveFrame(appState)))
       appStore.emitChange()
       break
+    case AppConstants.APP_UNDO_CLOSED_FRAME:
+      appState = appState.merge(FrameStateUtil.undoCloseFrame(appState.get('frames'), appState.get('closedFrames'), FrameStateUtil.getActiveFrameIndex(appState)))
+      appStore.emitChange()
+      break
     case AppConstants.APP_SET_ACTIVE_FRAME:
       appState = appState.merge({
         activeFrameKey: action.frameProps.get('key')

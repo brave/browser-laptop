@@ -30,8 +30,6 @@ class Main extends ImmutableComponent {
     }
 
     ipc.on('shortcut-new-frame', () => {
-      console.log('new frame shortcut!')
-
       AppActions.newFrame({
         location: Config.defaultUrl
       })
@@ -40,8 +38,8 @@ class Main extends ImmutableComponent {
       electron.remote.getCurrentWebContents().send('shortcut-focus-url')
     })
 
-    ipc.on('shortcut-close-frame', () =>
-      AppActions.closeFrame())
+    ipc.on('shortcut-close-frame', () => AppActions.closeFrame())
+    ipc.on('shortcut-undo-closed-frame', () => AppActions.undoClosedFrame())
 
     const self = this
     ipc.on('shortcut-set-active-frame-by-index', (e, i) =>

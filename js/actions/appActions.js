@@ -98,6 +98,12 @@ const AppActions = {
     ipc.send('close-window')
   },
 
+  undoClosedFrame: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UNDO_CLOSED_FRAME
+    })
+  },
+
   quitApplication: function () {
     ipc.send('quit-application')
   },
