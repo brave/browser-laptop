@@ -9,7 +9,7 @@
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
-    "build-darwin": "electron-packager . Brave --overwrite --ignore=\"electron-download|electron-rebuild|electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel-|babel\" --platform=darwin --arch=x64 --version=0.35.1 --icon=res/app.icns",
+    "build-darwin": "rm -f dist/Brave.dmg && electron-packager . Brave --overwrite --ignore=\"electron-download|electron-rebuild|electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel-|babel\" --platform=darwin --arch=x64 --version=0.35.1 --icon=res/app.icns",
     "build-win64": "rm -Rf Brave-win32-x64 && electron-packager . Brave --overwrite --ignore=\"electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel-|babel\" --platform=win32 --arch=x64 --version=0.35.1 --icon=res/app.ico",
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
