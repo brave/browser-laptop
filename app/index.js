@@ -28,7 +28,8 @@ app.on('window-all-closed', function () {
 const spawnWindow = () => {
   let mainWindow = new BrowserWindow({
     width: 1360,
-    height: 800
+    height: 800,
+    minWidth: 400
     // Neither a frame nor a titlebar
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
