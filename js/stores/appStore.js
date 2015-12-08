@@ -41,11 +41,15 @@ const updateUrl = (loc) =>
   })
 
 const setLocation = (loc, key) => {
-  console.log('updating location', loc, key)
   key = key || appState.get('activeFrameKey')
+  console.log('updating location', loc, key)
   appState = appState.mergeIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), key)], {
     location: loc
   })
+  // Update the displayed location in the urlbar
+  if (key === appState.get('activeFrameKey')) {
+    updateNavBarInput(loc)
+  }
 }
 
 const updateNavBarInput = (loc) => {
