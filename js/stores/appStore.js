@@ -40,6 +40,14 @@ const updateUrl = (loc) =>
     title: ''
   })
 
+const setLocation = (loc, key) => {
+  console.log('updating location', loc, key)
+  key = key || appState.get('activeFrameKey')
+  appState = appState.mergeIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), key)], {
+    location: loc
+  })
+}
+
 const updateNavBarInput = (loc) => {
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], null)
@@ -77,6 +85,10 @@ AppDispatcher.register((action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_URL:
       updateUrl(action.location)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_LOCATION:
+      setLocation(action.location, action.key)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_NAVBAR_INPUT:
