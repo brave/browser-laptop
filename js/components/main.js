@@ -42,6 +42,13 @@ class Main extends ImmutableComponent {
 
     ipc.on('shortcut-close-frame', () =>
       AppActions.closeFrame())
+
+    const self = this
+    ipc.on('shortcut-set-active-frame-by-index', (e, i) =>
+      AppActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.browser, i)))
+
+    ipc.on('shortcut-set-active-frame-to-last', () =>
+      AppActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
   }
 
   get activeFrame () {
