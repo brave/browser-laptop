@@ -7,8 +7,8 @@ const electron = require('electron')
 const ipcMain = electron.ipcMain
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
-const electronLocalshortcut = require('electron-localshortcut')
 const Menu = require('./menu')
+const LocalShortcuts = require('./localShortcuts')
 
 // Report crashes
 electron.crashReporter.start()
@@ -62,30 +62,6 @@ app.on('ready', function () {
   ipcMain.on('close-window', () => BrowserWindow.getFocusedWindow().close())
   process.on('close-window', () => BrowserWindow.getFocusedWindow().close())
 
-  // Most of these events will simply be listened to by the app store and acted
-  // upon.  However sometimes there are no state changes, for example with focusing
-  // the URL bar.  In those cases it's acceptable for the individual components to
-  // listen to the events.
-  const simpleWebContentEvents = [
-    ['CmdOrCtrl+L', 'shortcut-focus-url'],
-    ['Escape', 'shortcut-stop'],
-    ['Ctrl+Tab', 'shortcut-next-tab'],
-    ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
-    ['CmdOrCtrl+R', 'shortcut-reload'],
-    ['CmdOrCtrl+=', 'shortcut-zoom-in'],
-    ['CmdOrCtrl+-', 'shortcut-zoom-out'],
-    ['CmdOrCtrl+0', 'shortcut-zoom-reset'],
-    ['CmdOrCtrl+Alt+I', 'shortcut-toggle-dev-tools']
-  ]
-
-  simpleWebContentEvents.forEach((shortcutEventName) =>
-    electronLocalshortcut.register(shortcutEventName[0], () => {
-      BrowserWindow.getFocusedWindow().webContents.send(shortcutEventName[1])
-    }))
-
-  electronLocalshortcut.register('CmdOrCtrl+Shift+J', () => {
-    BrowserWindow.getFocusedWindow().toggleDevTools()
-  })
-
   Menu.init()
+  LocalShortcuts.init()
 })

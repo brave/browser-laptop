@@ -103,6 +103,9 @@ const AppActions = {
   },
 
   setActiveFrame: function (frameProps) {
+    if (!frameProps) {
+      return
+    }
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SET_ACTIVE_FRAME,
       frameProps: frameProps
