@@ -45,12 +45,16 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ENTER:
         e.preventDefault()
         AppActions.loadUrl(this.props.urlbar.get('location'))
+        AppActions.setUrlBarActive(false)
         this.blur()
         break
       case KeyCodes.ESC:
         e.preventDefault()
+        AppActions.setUrlBarActive(false)
         this.blur()
         break
+      default:
+        AppActions.setUrlBarActive(true)
     }
   }
 
@@ -114,6 +118,7 @@ class UrlBar extends ImmutableComponent {
           activeFrameProps={this.props.activeFrameProps}
           urlLocation={this.props.urlbar.get('location')}
           urlPreview={this.props.urlbar.get('urlPreview')}
+          urlActive={this.props.urlbar.get('active')}
           previewActiveIndex={this.props.previewActiveIndex || 0} />
       </form>
   }

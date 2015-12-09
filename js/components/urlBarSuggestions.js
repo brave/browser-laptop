@@ -57,6 +57,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     window.removeEventListener('click', this)
 
     if (!this.props.urlLocation && !this.props.urlPreview ||
+        !this.props.urlActive ||
         !suggestions || suggestions.size === 0) {
       return null
     }
@@ -98,6 +99,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       let location = formatUrl(site)
       AppActions.setNavBarUserInput(location)
       AppActions.loadUrl(location)
+      AppActions.setUrlBarActive(false)
       this.blur()
     }
 
