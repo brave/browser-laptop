@@ -18,9 +18,12 @@ class UrlBar extends ImmutableComponent {
     super()
     ipc.on('shortcut-focus-url', () => {
       this.focus()
+      this.select()
     })
+    // escape key handling
     ipc.on('shortcut-stop', () => {
-      this.blur()
+      this.restore()
+      this.select()
     })
   }
 
@@ -31,13 +34,17 @@ class UrlBar extends ImmutableComponent {
 
   select () {
     let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
-    urlInput.focus()
     urlInput.select()
   }
 
   blur () {
     let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
     urlInput.blur()
+  }
+
+  restore () {
+    let location = this.props.activeFrameProps.get('location')
+    AppActions.setNavBarUserInput(location)
   }
 
   onKeyDown (e) {
@@ -48,11 +55,7 @@ class UrlBar extends ImmutableComponent {
         AppActions.setUrlBarActive(false)
         this.blur()
         break
-      case KeyCodes.ESC:
-        e.preventDefault()
-        AppActions.setUrlBarActive(false)
-        this.blur()
-        break
+      // escape is handled by ipc shortcut-stop event
       default:
         AppActions.setUrlBarActive(true)
     }
