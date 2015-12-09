@@ -19,14 +19,16 @@ let appState = Immutable.fromJS({
   sites: [],
   ui: {
     navbar: {
+      focused: false,
       urlbar: {
         location: '',
         urlPreview: '',
         suggestions: {
-          activeIndex: 0,
+          selectedIndex: 0,
           searchResults: [],
           suggestionList: null
-        }
+        },
+        active: false
       }
     },
     tabs: {
@@ -122,7 +124,7 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_SET_NAVBAR_FOCUSED:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'focused'], action.focused)
+      appState = appState.setIn(['ui', 'navbar', 'focused'], action.focused)
       appStore.emitChange()
       break
     case AppConstants.APP_NEW_FRAME:
@@ -220,12 +222,15 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_PREVIEW:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], action.selectedIndex)
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], action.value)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
       appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'searchResults'], action.searchResults)
       appStore.emitChange()
+      break
+    case AppConstants.APP_SET_URL_BAR_ACTIVE:
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'active'], action.isActive)
       break
     default:
   }

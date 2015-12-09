@@ -24,5 +24,6 @@ module.exports = {
   APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS: 19,
   APP_WEBVIEW_LOAD_START: 20,
   APP_SET_FRAME_TITLE: 21,
-  APP_SET_LOCATION: 22 // sets location of a frame
+  APP_SET_LOCATION: 22, // sets location of a frame
+  APP_SET_URL_BAR_ACTIVE: 23 // whether the URL bar is being typed in
 }

@@ -199,6 +199,13 @@ const AppActions = {
       actionType: AppConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
       searchResults
     })
+  },
+
+  setUrlBarActive: function (isActive) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_URL_BAR_ACTIVE,
+      isActive
+    })
   }
 }
 

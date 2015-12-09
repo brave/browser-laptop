@@ -43,11 +43,19 @@ Child components should not modify top level state directly, instead they should
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
     tabs: {
-      snap: string, // "left", "right"
+      activeDraggedTab: object,
     },
     navbar: {
+      focused: boolean, // whether the navbar is focused
       urlbar: {
-        location: string,
+        location: string, // the string displayed in the urlbar
+        urlPreview: string,
+        suggestions: {
+          selectedIndex: number, // index of the item in focus
+          searchResults: array,
+          suggestionList: object,
+        },
+        active: boolean, // whether the user is typing in the urlbar
       }
     }
   },
