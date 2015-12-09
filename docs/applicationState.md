@@ -43,7 +43,6 @@ Child components should not modify top level state directly, instead they should
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
     tabs: {
-      snap: string, // "left", "right"
       activeDraggedTab: object,
     },
     navbar: {
