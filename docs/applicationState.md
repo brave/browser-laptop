@@ -51,7 +51,7 @@ Child components should not modify top level state directly, instead they should
         location: string, // the string displayed in the urlbar
         urlPreview: string,
         suggestions: {
-          activeIndex: number,
+          selectedIndex: number, // index of the item in focus
           searchResults: array,
           suggestionList: object,
         },
