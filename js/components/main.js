@@ -62,11 +62,7 @@ class Main extends ImmutableComponent {
   }
 
   render () {
-    const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
-      ? 1 : b.get('key') > a.get('key') ? -1 : 0
-
     let activeFrame = FrameStateUtil.getActiveFrame(this.props.browser)
-
     return <div id='browser'>
       <div className='top'>
         <div className='backforward'>
@@ -95,7 +91,7 @@ class Main extends ImmutableComponent {
       <div className='mainContainer'>
         <div className='tabContainer'>
         {
-          this.props.browser.get('frames').sort(comparatorByKeyAsc).map(frame =>
+          this.props.browser.get('frames').map(frame =>
             <Frame
               ref={`frame${frame.get('key')}`}
               frame={frame}

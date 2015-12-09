@@ -149,17 +149,19 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
 }
 
 /**
- * Undoes a frame close and inserts it at insertIndex
+ * Undoes a frame close and inserts it at the last index
  * @return Immutable top level application state ready to merge back in
  */
-export function undoCloseFrame (frames, closedFrames, insertIndex) {
+export function undoCloseFrame (appState, closedFrames) {
   if (closedFrames.size === 0) {
     return {}
   }
   var closedFrame = closedFrames.last()
+  let insertIndex = closedFrame.get('closedAtIndex')
   return {
     closedFrames: closedFrames.pop(),
-    frames: frames.splice(insertIndex, 0, closedFrame)
+    frames: appState.get('frames').splice(insertIndex, 0, closedFrame.remove('closedAtIndex')),
+    activeFrameKey: closedFrame.get('key')
   }
 }
 

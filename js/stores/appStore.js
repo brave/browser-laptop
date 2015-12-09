@@ -136,12 +136,13 @@ AppDispatcher.register((action) => {
     case AppConstants.APP_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       let frameProps = action.frameProps || FrameStateUtil.getActiveFrame(appState)
-      appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'), appState.get('closedFrames'), frameProps,
-        FrameStateUtil.getActiveFrame(appState)))
+      const index = FrameStateUtil.getFramePropsIndex(appState.get('frames'), frameProps)
+      appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'),
+        appState.get('closedFrames'), frameProps.set('closedAtIndex', index)))
       appStore.emitChange()
       break
     case AppConstants.APP_UNDO_CLOSED_FRAME:
-      appState = appState.merge(FrameStateUtil.undoCloseFrame(appState.get('frames'), appState.get('closedFrames'), FrameStateUtil.getActiveFrameIndex(appState)))
+      appState = appState.merge(FrameStateUtil.undoCloseFrame(appState, appState.get('closedFrames')))
       appStore.emitChange()
       break
     case AppConstants.APP_SET_ACTIVE_FRAME:
