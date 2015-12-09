@@ -13,18 +13,18 @@ module.exports.init = () => {
   // listen to the events.
   const simpleWebContentEvents = [
     ['CmdOrCtrl+L', 'shortcut-focus-url'],
-    ['Escape', 'shortcut-stop'],
     ['Ctrl+Tab', 'shortcut-next-tab'],
     ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
     ['CmdOrCtrl+Shift+]', 'shortcut-next-tab'],
     ['CmdOrCtrl+Shift+[', 'shortcut-prev-tab'],
-    ['CmdOrCtrl+R', 'shortcut-reload'],
-    ['CmdOrCtrl+=', 'shortcut-zoom-in'],
-    ['CmdOrCtrl+-', 'shortcut-zoom-out'],
-    ['CmdOrCtrl+0', 'shortcut-zoom-reset'],
-    ['CmdOrCtrl+Alt+I', 'shortcut-toggle-dev-tools'],
     ['CmdOrCtrl+9', 'shortcut-set-active-frame-to-last'],
-    ['CmdOrCtrl+Shift+T', 'shortcut-undo-closed-frame']
+    ['CmdOrCtrl+Shift+T', 'shortcut-undo-closed-frame'],
+    ['Escape', 'shortcut-active-frame-stop'],
+    ['CmdOrCtrl+R', 'shortcut-active-frame-reload'],
+    ['CmdOrCtrl+=', 'shortcut-active-frame-zoom-in'],
+    ['CmdOrCtrl+-', 'shortcut-active-frame-zoom-out'],
+    ['CmdOrCtrl+0', 'shortcut-active-frame-zoom-reset'],
+    ['CmdOrCtrl+Alt+I', 'shortcut-active-frame-toggle-dev-tools']
   ]
 
   // Tab ordering shortcuts

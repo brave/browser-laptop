@@ -6,60 +6,46 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
-const ipc = global.require('electron').ipcRenderer
 const cx = require('../lib/classSet.js')
 
 class Frame extends ImmutableComponent {
   constructor () {
     super()
-    ipc.on('shortcut-stop', () => {
-      if (this.webview) {
+  }
+
+  get webview () {
+    return ReactDOM.findDOMNode(this.refs.webview)
+  }
+
+  componentDidUpdate () {
+    const activeShortcut = this.props.frame.get('activeShortcut')
+    switch (activeShortcut) {
+      case 'stop':
         this.webview.stop()
-      }
-    })
-    ipc.on('shortcut-reload', () => {
-      if (this.webview) {
+        break
+      case 'reload':
         this.webview.reload()
-      }
-    })
-    ipc.on('shortcut-zoom-in', () => {
-      if (this.webview) {
+        break
+      case 'zoom-in':
         this.webview.send('zoom-in')
-      }
-    })
-    ipc.on('shortcut-zoom-out', () => {
-      if (this.webview) {
+        break
+      case 'zoom-out':
         this.webview.send('zoom-out')
-      }
-    })
-    ipc.on('shortcut-zoom-reset', () => {
-      if (this.webview) {
+        break
+      case 'zoom-reset':
         this.webview.send('zoom-reset')
-      }
-    })
-    ipc.on('shortcut-toggle-dev-tools', () => {
-      if (this.webview) {
+        break
+      case 'toggle-dev-tools':
         if (this.webview.isDevToolsOpened()) {
           this.webview.closeDevTools()
         } else {
           this.webview.openDevTools()
         }
-      }
-    })
-    process.on('reload-active-frame', () => {
-      if (this.props.isActive && this.webview) {
-        this.webview.reload()
-      }
-    })
-    process.on('stop-active-frame', () => {
-      if (this.props.isActive && this.webview) {
-        this.webview.stop()
-      }
-    })
-  }
-
-  get webview () {
-    return ReactDOM.findDOMNode(this.refs.webview)
+        break
+    }
+    if (activeShortcut) {
+      AppActions.setActiveFrameShortcut(null)
+    }
   }
 
   componentDidMount () {

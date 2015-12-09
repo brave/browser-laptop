@@ -27,7 +27,8 @@ const appConstants = {
   APP_SET_FRAME_TITLE: _,
   APP_SET_LOCATION: _, // sets location of a frame
   APP_SET_URL_BAR_ACTIVE: _, // whether the URL bar is being typed in
-  APP_UNDO_CLOSED_FRAME: _
+  APP_UNDO_CLOSED_FRAME: _,
+  APP_SET_ACTIVE_FRAME_SHORTCUT: _
 }
 
 // Set each appConstant to an integer value

@@ -39,24 +39,8 @@ let appState = Immutable.fromJS({
 
 var CHANGE_EVENT = 'change'
 
-const updateUrl = (loc) =>
-  appState = appState.mergeIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))], {
-    src: loc,
-    location: loc,
-    title: ''
-  })
-
-const setLocation = (loc, key) => {
-  key = key || appState.get('activeFrameKey')
-  console.log('updating location', loc, key)
-  appState = appState.mergeIn(['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), key)], {
-    location: loc
-  })
-  // Update the displayed location in the urlbar
-  if (key === appState.get('activeFrameKey')) {
-    updateNavBarInput(loc)
-  }
-}
+const activeFrameStatePath = () =>
+  ['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))]
 
 const updateNavBarInput = (loc) => {
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
@@ -94,11 +78,22 @@ const appStore = new AppStore()
 AppDispatcher.register((action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_URL:
-      updateUrl(action.location)
+      appState = appState.mergeIn(activeFrameStatePath(), {
+        src: action.location,
+        location: action.location,
+        title: ''
+      })
       appStore.emitChange()
       break
     case AppConstants.APP_SET_LOCATION:
-      setLocation(action.location, action.key)
+      const key = action.key || appState.get('activeFrameKey')
+      appState = appState.mergeIn(activeFrameStatePath(), {
+        location: action.location
+      })
+      // Update the displayed location in the urlbar
+      if (key === appState.get('activeFrameKey')) {
+        updateNavBarInput(action.location)
+      }
       appStore.emitChange()
       break
     case AppConstants.APP_SET_NAVBAR_INPUT:
@@ -236,6 +231,13 @@ AppDispatcher.register((action) => {
       break
     case AppConstants.APP_SET_URL_BAR_ACTIVE:
       appState = appState.setIn(['ui', 'navbar', 'urlbar', 'active'], action.isActive)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_ACTIVE_FRAME_SHORTCUT:
+      appState = appState.mergeIn(activeFrameStatePath(), {
+        activeShortcut: action.activeShortcut
+      })
+      appStore.emitChange()
       break
     default:
   }
@@ -248,6 +250,16 @@ ipc.on('shortcut-next-tab', () => {
 ipc.on('shortcut-prev-tab', () => {
   appState = FrameStateUtil.makePrevFrameActive(appState)
   appStore.emitChange()
+})
+
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools']
+frameShortcuts.forEach(shortcut => {
+  ipc.on(`shortcut-active-frame-${shortcut}`, () => {
+    appState = appState.mergeIn(activeFrameStatePath(), {
+      activeShortcut: shortcut
+    })
+    appStore.emitChange()
+  })
 })
 
 module.exports = appStore

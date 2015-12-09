@@ -21,6 +21,7 @@ Child components should not modify top level state directly, instead they should
     loading: boolean,
     themeColor: string, // css compatible color string
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
+    activeShortcut: string, // Set by the application store when the component should react to a shortcut
     security: {
       isSecure: boolean, // is using https
       isExtendedValidation: boolean, // is using https ev
