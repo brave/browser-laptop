@@ -212,6 +212,13 @@ const AppActions = {
       actionType: AppConstants.APP_SET_URL_BAR_ACTIVE,
       isActive
     })
+  },
+
+  setActiveFrameShortcut: function (activeShortcut) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_ACTIVE_FRAME_SHORTCUT,
+      activeShortcut
+    })
   }
 }
 
