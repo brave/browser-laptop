@@ -44,10 +44,18 @@ Child components should not modify top level state directly, instead they should
   ui: {
     tabs: {
       snap: string, // "left", "right"
+      activeDraggedTab: object,
     },
     navbar: {
       urlbar: {
-        location: string,
+        location: string, // the string displayed in the urlbar
+        urlPreview: string,
+        suggestions: {
+          activeIndex: number,
+          searchResults: array,
+          suggestionList: object,
+        },
+        active: boolean, // whether the user is typing in the urlbar
       }
     }
   },
