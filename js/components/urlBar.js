@@ -69,7 +69,9 @@ class UrlBar extends ImmutableComponent {
 
  componentWillReceiveProps (newProps) {
    let location = newProps.activeFrameProps.get('location')
-   if (location !== this.props.activeFrameProps.get('location')) {
+   let key = newProps.activeFrameProps.get('key')
+   // Update the URL bar when switching tabs
+   if (key !== this.props.activeFrameProps.get('key')) {
      AppActions.setLocation(location)
    }
  }
