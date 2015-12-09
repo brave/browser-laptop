@@ -51,9 +51,15 @@ class UrlBar extends ImmutableComponent {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         e.preventDefault()
-        AppActions.loadUrl(this.props.urlbar.get('location'))
-        AppActions.setUrlBarActive(false)
-        this.blur()
+        let location = this.props.urlbar.get('location')
+        if (location === null || location.length === 0) {
+          this.restore()
+          this.select()
+        } else {
+          AppActions.loadUrl(location)
+          AppActions.setUrlBarActive(false)
+          this.blur()
+        }
         break
       // escape is handled by ipc shortcut-stop event
       default:
