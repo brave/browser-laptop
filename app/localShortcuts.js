@@ -16,6 +16,8 @@ module.exports.init = () => {
     ['Escape', 'shortcut-stop'],
     ['Ctrl+Tab', 'shortcut-next-tab'],
     ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
+    ['CmdOrCtrl+Shift+]', 'shortcut-next-tab'],
+    ['CmdOrCtrl+Shift+[', 'shortcut-prev-tab'],
     ['CmdOrCtrl+R', 'shortcut-reload'],
     ['CmdOrCtrl+=', 'shortcut-zoom-in'],
     ['CmdOrCtrl+-', 'shortcut-zoom-out'],
