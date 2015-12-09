@@ -20,6 +20,7 @@ Child components should not modify top level state directly, instead they should
     isPrivate: boolean, // private browsing tab
     loading: boolean,
     themeColor: string, // css compatible color string
+    closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     security: {
       isSecure: boolean, // is using https
       isExtendedValidation: boolean, // is using https ev

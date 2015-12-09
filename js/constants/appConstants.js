@@ -2,28 +2,35 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-module.exports = {
-  APP_SET_URL: 1,
-  APP_SET_NAVBAR_INPUT: 2,
-  APP_NEW_FRAME: 3,
-  APP_CLOSE_FRAME: 4,
-  APP_SET_ACTIVE_FRAME: 5,
-  APP_TAB_DRAG_START: 6,
-  APP_TAB_DRAG_STOP: 7,
-  APP_TAB_DRAGGING_OVER_LEFT: 8,
-  APP_TAB_DRAGGING_OVER_RIGHT: 9,
-  APP_TAB_DRAGGING_ON: 10,
-  APP_TAB_DRAG_EXIT: 11,
-  APP_TAB_DRAG_EXIT_RIGHT: 12,
-  APP_TAB_MOVE: 13,
-  APP_UPDATE_BACK_FORWARD: 14,
-  APP_WEBVIEW_LOAD_END: 15,
-  APP_SET_NAVBAR_FOCUSED: 16,
-  APP_SET_URL_BAR_SUGGESTIONS: 17,
-  APP_SET_URL_BAR_PREVIEW: 18,
-  APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS: 19,
-  APP_WEBVIEW_LOAD_START: 20,
-  APP_SET_FRAME_TITLE: 21,
-  APP_SET_LOCATION: 22, // sets location of a frame
-  APP_SET_URL_BAR_ACTIVE: 23 // whether the URL bar is being typed in
+const _ = null
+const appConstants = {
+  APP_SET_URL: _,
+  APP_SET_NAVBAR_INPUT: _,
+  APP_NEW_FRAME: _,
+  APP_CLOSE_FRAME: _,
+  APP_SET_ACTIVE_FRAME: _,
+  APP_TAB_DRAG_START: _,
+  APP_TAB_DRAG_STOP: _,
+  APP_TAB_DRAGGING_OVER_LEFT: _,
+  APP_TAB_DRAGGING_OVER_RIGHT: _,
+  APP_TAB_DRAGGING_ON: _,
+  APP_TAB_DRAG_EXIT: _,
+  APP_TAB_DRAG_EXIT_RIGHT: _,
+  APP_TAB_MOVE: _,
+  APP_UPDATE_BACK_FORWARD: _,
+  APP_WEBVIEW_LOAD_END: _,
+  APP_SET_NAVBAR_FOCUSED: _,
+  APP_SET_URL_BAR_SUGGESTIONS: _,
+  APP_SET_URL_BAR_PREVIEW: _,
+  APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS: _,
+  APP_WEBVIEW_LOAD_START: _,
+  APP_SET_FRAME_TITLE: _,
+  APP_SET_LOCATION: _, // sets location of a frame
+  APP_SET_URL_BAR_ACTIVE: _, // whether the URL bar is being typed in
+  APP_UNDO_CLOSED_FRAME: _
 }
+
+// Set each appConstant to an integer value
+Object.keys(appConstants).forEach((k, i) => appConstants[k] = i + 1)
+
+module.exports = appConstants

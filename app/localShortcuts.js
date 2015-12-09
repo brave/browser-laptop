@@ -23,7 +23,8 @@ module.exports.init = () => {
     ['CmdOrCtrl+-', 'shortcut-zoom-out'],
     ['CmdOrCtrl+0', 'shortcut-zoom-reset'],
     ['CmdOrCtrl+Alt+I', 'shortcut-toggle-dev-tools'],
-    ['CmdOrCtrl+9', 'shortcut-set-active-frame-to-last']
+    ['CmdOrCtrl+9', 'shortcut-set-active-frame-to-last'],
+    ['CmdOrCtrl+Shift+T', 'shortcut-undo-closed-frame']
   ]
 
   // Tab ordering shortcuts
