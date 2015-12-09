@@ -19,6 +19,7 @@ let appState = Immutable.fromJS({
   sites: [],
   ui: {
     navbar: {
+      focused: false,
       urlbar: {
         location: '',
         urlPreview: '',
@@ -123,7 +124,7 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_SET_NAVBAR_FOCUSED:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'focused'], action.focused)
+      appState = appState.setIn(['ui', 'navbar', 'focused'], action.focused)
       appStore.emitChange()
       break
     case AppConstants.APP_NEW_FRAME:

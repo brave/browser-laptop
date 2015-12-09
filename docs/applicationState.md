@@ -47,6 +47,7 @@ Child components should not modify top level state directly, instead they should
       activeDraggedTab: object,
     },
     navbar: {
+      focused: boolean, // whether the navbar is focused
       urlbar: {
         location: string, // the string displayed in the urlbar
         urlPreview: string,
