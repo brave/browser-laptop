@@ -78,11 +78,18 @@ const appStore = new AppStore()
 AppDispatcher.register((action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_URL:
-      appState = appState.mergeIn(activeFrameStatePath(), {
-        src: action.location,
-        location: action.location,
-        title: ''
-      })
+      // reload if the url is unchanged
+      if (FrameStateUtil.getActiveFrame(appState).get('src') === action.location) {
+        appState = appState.mergeIn(activeFrameStatePath(), {
+          activeShortcut: 'reload'
+        })
+      } else {
+        appState = appState.mergeIn(activeFrameStatePath(), {
+          src: action.location,
+          location: action.location,
+          title: ''
+        })
+      }
       appStore.emitChange()
       break
     case AppConstants.APP_SET_LOCATION:
