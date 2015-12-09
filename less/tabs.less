@@ -27,9 +27,9 @@
   left: 0;
   opacity: 1.0;
   padding: 4px 0 0;
-  height: 32px;
+  height: 20px;
+  border-radius: 9px;
   width: 100%;
-  line-height: 24px;
   -moz-window-dragging: no-drag;
   color: #3B3B3B;
 
@@ -71,6 +71,9 @@
   &.active {
     color: #fff;
     background: @hoverBlue;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 26px;
   }
 
   &.private {
@@ -152,4 +155,49 @@
       color: @hoverBlue;
     }
   }
+}
+
+.tabsToolbar {
+  height: 40px;
+}
+
+.tabPages {
+  height: 14px;
+  text-align: center;
+}
+
+.tabPage {
+  background-color: #7E7F83;
+  display: inline-block;
+  margin: 0 5px;
+  height: 6px;
+  transform: translateY(-50%);
+  width: 34px;
+
+  &.active {
+    background-color: #3B3B3B;
+  }
+}
+
+.prevTab, .nextTab {
+  background-color: #7E7F83;
+  color: #3B3B3B;
+  height: 20px;
+  line-height: 20px !important;
+  vertical-align: middle;
+  width: 50px;
+}
+
+.prevTab {
+  border-bottom-left-radius: 9px;
+  border-top-left-radius: 9px;
+  padding-left: 10px;
+  text-align: left;
+}
+
+.nextTab {
+  border-bottom-right-radius: 9px;
+  border-top-right-radius: 9px;
+  padding-right: 10px;
+  text-align: right;
 }

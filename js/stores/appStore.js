@@ -51,6 +51,18 @@ const updateNavBarInput = (loc) => {
   appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], null)
 }
 
+/**
+ * Updates the tab page index to the specified frameProps
+ * @param frameProps Any frame belonging to the page
+ */
+const updateTabPageIndex = (frameProps) => {
+  const index = FrameStateUtil.getFrameTabPageIndex(appState.get('frames'), frameProps)
+  if (index === -1) {
+    return
+  }
+  appState = appState.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+}
+
 let currentKey = 0
 const incrementNextKey = () => ++currentKey
 
@@ -138,15 +150,22 @@ AppDispatcher.register((action) => {
       let nextKey = incrementNextKey()
       appState = appState.merge(FrameStateUtil.addFrame(appState.get('frames'), action.frameOpts,
         nextKey, action.openInForeground ? nextKey : appState.get('activeFrameKey')))
+      if (action.openInForeground) {
+        updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
+      }
       appStore.emitChange()
       break
     case AppConstants.APP_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       let frameProps = action.frameProps || FrameStateUtil.getActiveFrame(appState)
+      const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(appState)
       const index = FrameStateUtil.getFramePropsIndex(appState.get('frames'), frameProps)
       appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'),
         appState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         frameProps.get('key')))
+      if (closingActive) {
+        updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
+      }
       appStore.emitChange()
       break
     case AppConstants.APP_UNDO_CLOSED_FRAME:
@@ -157,6 +176,7 @@ AppDispatcher.register((action) => {
       appState = appState.merge({
         activeFrameKey: action.frameProps.get('key')
       })
+      updateTabPageIndex(action.frameProps)
       appStore.emitChange()
       break
     case AppConstants.APP_UPDATE_BACK_FORWARD:
