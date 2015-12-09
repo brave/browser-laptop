@@ -19,7 +19,7 @@ let appState = Immutable.fromJS({
   sites: [],
   ui: {
     navbar: {
-      focused: false,
+      focused: true,
       urlbar: {
         location: '',
         urlPreview: '',
@@ -28,6 +28,8 @@ let appState = Immutable.fromJS({
           searchResults: [],
           suggestionList: null
         },
+        autoselected: true,
+        focused: true,
         active: false
       }
     },
@@ -127,6 +129,7 @@ AppDispatcher.register((action) => {
       break
     case AppConstants.APP_SET_NAVBAR_FOCUSED:
       appState = appState.setIn(['ui', 'navbar', 'focused'], action.focused)
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'focused'], action.focused)
       appStore.emitChange()
       break
     case AppConstants.APP_NEW_FRAME:
@@ -238,6 +241,10 @@ AppDispatcher.register((action) => {
       break
     case AppConstants.APP_SET_URL_BAR_ACTIVE:
       appState = appState.setIn(['ui', 'navbar', 'urlbar', 'active'], action.isActive)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_URL_BAR_AUTOSELECTED:
+      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'autoselected'], action.isAutoselected)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_ACTIVE_FRAME_SHORTCUT:

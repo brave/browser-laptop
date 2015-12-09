@@ -17,31 +17,52 @@ class UrlBar extends ImmutableComponent {
   constructor () {
     super()
     ipc.on('shortcut-focus-url', () => {
-      this.focus()
-      this.select()
+      AppActions.setNavBarFocused(true)
+      AppActions.setUrlBarAutoselected(true)
     })
     // escape key handling
-    ipc.on('shortcut-stop', () => {
+    ipc.on('shortcut-active-frame-stop', () => {
       this.restore()
-      this.select()
+      AppActions.setUrlBarAutoselected(true)
+      AppActions.setUrlBarActive(true)
     })
   }
 
-  focus () {
-    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
-    urlInput.focus()
+  isActive () {
+    return this.props.urlbar.get('active')
   }
 
-  select () {
-    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
-    urlInput.select()
+  isAutoselected () {
+    return this.props.urlbar.get('autoselected')
   }
 
-  blur () {
-    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
-    urlInput.blur()
+  isFocused () {
+    return this.props.urlbar.get('focused')
   }
 
+  // update the DOM with state that is not stored in the component
+  updateDOM () {
+    this.updateDOMInputFocus(this.isFocused())
+    this.updateDOMSelectionIfAuto(this.isAutoselected())
+  }
+
+  updateDOMInputFocus (focused) {
+    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+    if (focused) {
+      urlInput.focus()
+    } else {
+      urlInput.blur()
+    }
+  }
+
+  updateDOMSelectionIfAuto (autoselected) {
+    if (autoselected) {
+      let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+      urlInput.select()
+    }
+  }
+
+  // restores the url bar to the current location
   restore () {
     let location = this.props.activeFrameProps.get('location')
     AppActions.setNavBarUserInput(location)
@@ -54,20 +75,47 @@ class UrlBar extends ImmutableComponent {
         let location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
           this.restore()
-          this.select()
+          AppActions.setUrlBarAutoselected(true)
         } else {
+          // this can't go through AppActions for some reason
+          // or the whole window will reload on the first page request
+          this.updateDOMInputFocus(false)
           AppActions.loadUrl(location)
-          AppActions.setUrlBarActive(false)
-          this.blur()
         }
         break
-      // escape is handled by ipc shortcut-stop event
+      // escape is handled by ipc shortcut-active-frame-stop event
       default:
+        AppActions.setUrlBarAutoselected(false)
         AppActions.setUrlBarActive(true)
     }
   }
 
+  onClick (e) {
+    // if the url bar is already selected then clicking in it should make it active
+    if (this.isAutoselected()) {
+      AppActions.setUrlBarActive(true)
+      AppActions.setUrlBarAutoselected(false)
+    } else if (!this.isActive()) {
+      AppActions.setUrlBarAutoselected(true)
+    }
+  }
+
+  onMouseUp (e) {
+    // if the urlbar is not active then
+    // we want to select the text
+    // so we prevent the default mouseUp
+    // action that will deselect it
+    if (this.isAutoselected() === true && this.isActive() === false) {
+      e.preventDefault()
+    }
+  }
+
   onBlur (e) {
+    // if suggestion box is active then keep url bar active
+    if (!ReactDOM.findDOMNode(this.refs.urlBarSuggestions)) {
+      AppActions.setUrlBarActive(false)
+    }
+    AppActions.setUrlBarAutoselected(false)
     AppActions.setNavBarFocused(false)
   }
 
@@ -76,18 +124,22 @@ class UrlBar extends ImmutableComponent {
   }
 
   onFocus (e) {
-    this.select()
     AppActions.setNavBarFocused(true)
+    AppActions.setUrlBarAutoselected(false)
   }
 
- componentWillReceiveProps (newProps) {
-   let location = newProps.activeFrameProps.get('location')
-   let key = newProps.activeFrameProps.get('key')
-   // Update the URL bar when switching tabs
-   if (key !== this.props.activeFrameProps.get('key')) {
-     AppActions.setLocation(location)
-   }
- }
+  componentDidUpdate () {
+    this.updateDOM()
+  }
+
+  componentWillReceiveProps (newProps) {
+    let location = newProps.activeFrameProps.get('location')
+    let key = newProps.activeFrameProps.get('key')
+    // Update the URL bar when switching tabs
+    if (key !== this.props.activeFrameProps.get('key')) {
+      AppActions.setLocation(location)
+    }
+  }
 
   render () {
     return <form
@@ -110,6 +162,8 @@ class UrlBar extends ImmutableComponent {
         onBlur={this.onBlur.bind(this)}
         onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
+        onClick={this.onClick.bind(this)}
+        onMouseUp={this.onMouseUp.bind(this)}
         value={this.props.urlbar.get('location')}
         data-l10n-id='urlbar'
         className={cx({
