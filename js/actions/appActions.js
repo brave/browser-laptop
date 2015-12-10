@@ -346,6 +346,18 @@ const AppActions = {
   },
 
   /**
+   * Marks the URL bar text as selected or not
+   *
+   * @param isSelected Whether or not the URL bar should be autoselected
+   */
+  setUrlBarAutoselected: function (isAutoselected) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_URL_BAR_AUTOSELECTED,
+      isAutoselected
+    })
+  },
+
+  /**
    * Marks the URL bar as active or not
    *
    * @param isActive Whether or not the URL bar should be marked as active
