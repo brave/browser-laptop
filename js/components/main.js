@@ -62,6 +62,15 @@ class Main extends ImmutableComponent {
   }
 
   render () {
+    const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
+      ? 1 : b.get('key') > a.get('key') ? -1 : 0
+
+    // Sort frames by key so that the order of the frames do not change which could
+    // cause unexpected reloading when a user moves tabs.
+    // All frame operations work off of frame keys and not index though so unsorted frames
+    // can be passed everywhere other than the Frame elements.
+    const sortedFrames = this.props.browser.get('frames').sort(comparatorByKeyAsc)
+
     let activeFrame = FrameStateUtil.getActiveFrame(this.props.browser)
     return <div id='browser'>
       <div className='top'>
@@ -91,7 +100,7 @@ class Main extends ImmutableComponent {
       <div className='mainContainer'>
         <div className='tabContainer'>
         {
-          this.props.browser.get('frames').map(frame =>
+          sortedFrames.map(frame =>
             <Frame
               ref={`frame${frame.get('key')}`}
               frame={frame}
