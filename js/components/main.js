@@ -61,6 +61,11 @@ class Main extends ImmutableComponent {
     this.activeFrame.goForward()
   }
 
+  onMainFocus () {
+    // When the main container is in focus, set the URL bar to inactive.
+    AppActions.setUrlBarActive(false)
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -97,7 +102,8 @@ class Main extends ImmutableComponent {
           activeFrame={activeFrame}
         />
       </div>
-      <div className='mainContainer'>
+      <div className='mainContainer'
+        onFocus={this.onMainFocus.bind(this)}>
         <div className='tabContainer'>
         {
           sortedFrames.map(frame =>
