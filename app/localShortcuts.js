@@ -6,7 +6,7 @@ const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
 
-module.exports.init = () => {
+module.exports.register = (win) => {
   // Most of these events will simply be listened to by the app store and acted
   // upon.  However sometimes there are no state changes, for example with focusing
   // the URL bar.  In those cases it's acceptable for the individual components to
@@ -34,11 +34,15 @@ module.exports.init = () => {
   }, simpleWebContentEvents)
 
   simpleWebContentEvents.forEach((shortcutEventName) =>
-    electronLocalshortcut.register(shortcutEventName[0], () => {
+    electronLocalshortcut.register(win, shortcutEventName[0], () => {
       BrowserWindow.getFocusedWindow().webContents.send(shortcutEventName[1], shortcutEventName[2])
     }))
 
-  electronLocalshortcut.register('CmdOrCtrl+Shift+J', () => {
+  electronLocalshortcut.register(win, 'CmdOrCtrl+Shift+J', () => {
     BrowserWindow.getFocusedWindow().toggleDevTools()
   })
+}
+
+module.exports.unregister = (win) => {
+  electronLocalshortcut.unregisterAll(win)
 }
