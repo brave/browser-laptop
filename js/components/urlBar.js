@@ -68,6 +68,10 @@ class UrlBar extends ImmutableComponent {
     AppActions.setNavBarUserInput(location)
   }
 
+  getSuggestionBox () {
+    return ReactDOM.findDOMNode(this.refs.urlBarSuggestions)
+  }
+
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
@@ -79,8 +83,27 @@ class UrlBar extends ImmutableComponent {
         } else {
           // this can't go through AppActions for some reason
           // or the whole window will reload on the first page request
+          let selectedIndex = this.refs.urlBarSuggestions.activeIndex
+          let suggestionBox = this.getSuggestionBox()
+          if (suggestionBox && selectedIndex > 0) {
+            // load the selected suggestion
+            this.refs.urlBarSuggestions.clickSelected()
+          } else {
+            AppActions.loadUrl(location)
+          }
           this.updateDOMInputFocus(false)
-          AppActions.loadUrl(location)
+        }
+        break
+      case KeyCodes.UP:
+        if (this.getSuggestionBox()) {
+          this.refs.urlBarSuggestions.previousSuggestion()
+          e.preventDefault()
+        }
+        break
+      case KeyCodes.DOWN:
+        if (this.getSuggestionBox()) {
+          this.refs.urlBarSuggestions.nextSuggestion()
+          e.preventDefault()
         }
         break
       // escape is handled by ipc shortcut-active-frame-stop event
@@ -112,7 +135,7 @@ class UrlBar extends ImmutableComponent {
 
   onBlur (e) {
     // if suggestion box is active then keep url bar active
-    if (!ReactDOM.findDOMNode(this.refs.urlBarSuggestions)) {
+    if (!this.getSuggestionBox()) {
       AppActions.setUrlBarActive(false)
     }
     AppActions.setUrlBarAutoselected(false)

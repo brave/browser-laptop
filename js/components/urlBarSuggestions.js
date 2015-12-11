@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
@@ -22,6 +23,9 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   get activeIndex () {
+    if (!this.props.suggestions.get('suggestionList')) {
+      return 0
+    }
     return Math.abs(this.props.suggestions.get('selectedIndex') % (this.props.suggestions.get('suggestionList').size + 1))
   }
 
@@ -50,6 +54,10 @@ class UrlBarSuggestions extends ImmutableComponent {
     window.removeEventListener('click', this)
     AppActions.setUrlBarSuggestions(null, null)
     AppActions.setUrlBarPreview(null)
+  }
+
+  clickSelected () {
+    ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
   }
 
   render () {
