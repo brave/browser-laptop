@@ -16,7 +16,12 @@ const init = () => {
           label: 'New Tab',
           accelerator: 'CmdOrCtrl+T',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame')
+            if (focusedWindow) {
+              focusedWindow.webContents.send('shortcut-new-frame')
+            } else {
+              // no active windows
+              process.emit('new-window')
+            }
           }
         }, {
           label: 'New Window',
