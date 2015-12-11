@@ -23,7 +23,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   get activeIndex () {
-    if (!this.props.suggestions.get('suggestionList')) {
+    if (this.props.suggestions.get('suggestionList') === null) {
       return 0
     }
     return Math.abs(this.props.suggestions.get('selectedIndex') % (this.props.suggestions.get('suggestionList').size + 1))
@@ -60,13 +60,18 @@ class UrlBarSuggestions extends ImmutableComponent {
     ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
   }
 
+  // Whether the suggestions box should be rendered
+  shouldRender () {
+    let suggestions = this.props.suggestions.get('suggestionList')
+    return (this.props.urlLocation || this.props.urlPreview) &&
+      this.props.urlActive && suggestions && suggestions.size > 0
+  }
+
   render () {
     var suggestions = this.props.suggestions.get('suggestionList')
     window.removeEventListener('click', this)
 
-    if (!this.props.urlLocation && !this.props.urlPreview ||
-        !this.props.urlActive ||
-        !suggestions || suggestions.size === 0) {
+    if (!this.shouldRender()) {
       return null
     }
 
