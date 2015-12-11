@@ -41,11 +41,15 @@ const spawnWindow = () => {
     mainWindow.loadURL('file://' + __dirname + '/index.html')
   }
   mainWindow.on('closed', function () {
+    LocalShortcuts.unregister(mainWindow)
+
     var index = windows.indexOf(mainWindow)
     if (index > -1) {
       windows.splice(index, 1)
     }
   })
+
+  LocalShortcuts.register(mainWindow)
   return mainWindow
 }
 
@@ -63,5 +67,4 @@ app.on('ready', function () {
   process.on('close-window', () => BrowserWindow.getFocusedWindow().close())
 
   Menu.init()
-  LocalShortcuts.init()
 })
