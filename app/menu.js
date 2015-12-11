@@ -5,7 +5,6 @@
 const electron = require('electron')
 const app = electron.app
 const Menu = require('menu')
-const Shell = require('shell')
 
 const init = () => {
   var template = [
@@ -24,11 +23,44 @@ const init = () => {
             }
           }
         }, {
+          label: 'New Private Tab',
+          accelerator: 'CmdOrCtrl+Alt+T',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send('shortcut-new-frame')
+          }
+        }, {
           label: 'New Window',
           accelerator: 'CmdOrCtrl+N',
           click: () => process.emit('new-window')
         }, {
+          label: 'New Private Window',
+          accelerator: 'CmdOrCtrl+Alt+N',
+          click: () => process.emit('new-window')
+        }, {
           type: 'separator'
+        }, {
+          label: 'Open File...',
+          accelerator: 'CmdOrCtrl+O'
+        }, {
+          label: 'Open Location...',
+          accelerator: 'CmdOrCtrl+L'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Import from...',
+          submenu: []
+        }, {
+          type: 'separator'
+        }, {
+          // this should be disabled when
+          // no windows are active
+          label: 'Close Tab',
+          accelerator: 'CmdOrCtrl+W',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.webContents.send('shortcut-close-frame')
+            }
+          }
         }, {
           // this should be disabled when
           // no windows are active
@@ -40,15 +72,19 @@ const init = () => {
             }
           }
         }, {
-          // this should be disabled when
-          // no windows are active
-          label: 'Close Tab',
-          accelerator: 'CmdOrCtrl+W',
-          click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send('shortcut-close-frame')
-            }
-          }
+          type: 'separator'
+        }, {
+          label: 'Save Page As...',
+          accelerator: 'CmdOrCtrl+S'
+        }, {
+          label: 'Share...',
+          submenu: []
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Print...',
+          accelerator: 'CmdOrCtrl+P',
+          submenu: []
         }
       ]
     }, {
@@ -77,50 +113,217 @@ const init = () => {
           accelerator: 'CmdOrCtrl+V',
           role: 'paste'
         }, {
+          label: 'Paste without formatting',
+          accelerator: 'Shift+CmdOrCtrl+V',
+          role: 'paste'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Delete',
+          accelerator: 'Delete'
+        }, {
           label: 'Select All',
           accelerator: 'CmdOrCtrl+A',
           role: 'selectall'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Find on page...',
+          accelerator: 'CmdOrCtrl+F'
+        }, {
+          label: 'Find Next',
+          accelerator: 'CmdOrCtrl+G'
+        }, {
+          label: 'Find Previous',
+          accelerator: 'Shift+CmdOrCtrl+G'
+        }, {
+          type: 'separator'
         }
+        // OSX inserts "start dictation" and "emoji and symbols" automatically
       ]
     }, {
       label: 'View',
       submenu: [
         {
-          label: 'Reload',
+          label: 'Actual Size',
+          accelerator: 'CmdOrCtrl+0'
+        }, {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+Plus' // renders as Shift+Cmd+= on OSX?
+        }, {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Toolbars',
+          submenu: []
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Reload Page',
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
+              // TODO: reload active frame
               focusedWindow.reload()
             }
           }
         }, {
-          label: 'Toggle Full Screen',
-          accelerator: (function () {
-            if (process.platform === 'darwin') {
-              return 'Ctrl+Command+F'
-            } else {
-              return 'F11'
-            }
-          })(),
+          label: 'Clean Reload',
+          accelerator: 'CmdOrCtrl+Shift+R',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+              // TODO: reload active frame
+              focusedWindow.reloadIgnoringCache()
             }
           }
         }, {
+          type: 'separator'
+        }, {
+          label: 'Reading View',
+          accelerator: 'Alt+CmdOrCtrl+R'
+        }, {
+          label: 'Tab Manager',
+          accelerator: 'Alt+CmdOrCtrl+M'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Text Encoding',
+          submenu: []
+        }, {
+          type: 'separator'
+        }, {
           label: 'Toggle Developer Tools',
-          accelerator: (function () {
-            if (process.platform === 'darwin') {
-              return 'Alt+Command+I'
-            } else {
-              return 'Ctrl+Shift+I'
+          accelerator: 'CmdOrCtrl+Alt+I',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.webContents.send('shortcut-active-frame-toggle-dev-tools')
             }
-          })(),
+          }
+        }, {
+          label: 'Toggle Browser Console',
+          accelerator: 'CmdOrCtrl+Shift+J',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
               focusedWindow.toggleDevTools()
             }
           }
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Enter Full Screen View',
+          accelerator: 'Shift+CmdOrCtrl+F'
+        }
+        // Bring All To Front added automatically
+      ]
+    }, {
+      label: 'History',
+      submenu: [
+        {
+          label: 'Back',
+          accelerator: 'CmdOrCtrl+['
+        }, {
+          label: 'Forward',
+          accelerator: 'CmdOrCtrl+]'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Reopen Last Closed Tab',
+          accelerator: 'Shift+CmdOrCtrl+T'
+        }, {
+          label: 'Reopen Last Closed Window'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'My Mac',
+          enabled: false
+        }, {
+          type: 'separator'
+        }, {
+          label: 'My iPhone',
+          enabled: false
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Show All History',
+          accelerator: 'CmdOrCtrl+Y'
+        }
+      ]
+    }, {
+      label: 'Bookmarks',
+      submenu: [
+        {
+          label: 'Add Bookmarks',
+          accelerator: 'CmdOrCtrl+D'
+        }, {
+          label: 'Add to Favorites Bar',
+          accelerator: 'Shift+CmdOrCtrl+D'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Manage Bookmarks',
+          accelerator: 'Alt+CmdOrCtrl+B'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'My Bookmarks',
+          enabled: false
+        }, {
+          label: 'More',
+          submenu: []
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Import Bookmarks',
+          submenu: []
+        }
+      ]
+    }, {
+      label: 'Bravery',
+      submenu: [
+        {
+          label: 'Logged in as Yan (0 Points)',
+          enabled: false
+        }, {
+          label: 'Manage...'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'GiveBack to this site',
+          accelerator: 'Shift+CmdOrCtrl+Y'
+        }, {
+          label: 'Stay ad supported on this site',
+          accelerator: 'Shift+CmdOrCtrl+N'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Site Protection Settings (Changes invoke reload)',
+          enabled: false // Hack to make this look like a section header.
+        }, {
+          type: 'checkbox',
+          label: 'Block Ads',
+          checked: true
+        }, {
+          type: 'checkbox',
+          label: 'Block Cookies',
+          checked: true
+        }, {
+          type: 'checkbox',
+          label: 'Block Tracking',
+          checked: true
+        }, {
+          type: 'checkbox',
+          label: 'Block Popups',
+          checked: true
+        }, {
+          type: 'checkbox',
+          label: 'Block HTTP',
+          checked: true
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Disabled all protection on this site...'
         }
       ]
     }, {
@@ -131,6 +334,36 @@ const init = () => {
           label: 'Minimize',
           accelerator: 'CmdOrCtrl+M',
           role: 'minimize'
+          // "Minimize all" added automatically
+        }, {
+          label: 'Zoom'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Select Next Tab',
+          accelerator: 'Ctrl+Tab'
+        }, {
+          label: 'Select Previous Tab',
+          accelerator: 'Ctrl+Shift+Tab'
+        }, {
+          label: 'Move Tab to New Window'
+        }, {
+          label: 'Merge All Windows'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Downloads',
+          accelerator: 'Shift+CmdOrCtrl+J'
+        }, {
+          label: 'History',
+          // On OSX, Shift+Cmd+H cannot be overridden.
+          accelerator: 'CmdOrCtrl+Y'
+        }, {
+          label: 'Bookmarks',
+          accelerator: 'Alt+CmdOrCtrl+B'
+        }, {
+          label: 'Tab Manager',
+          accelerator: 'Alt+CmdOrCtrl+M'
         }
       ]
     }, {
@@ -138,8 +371,25 @@ const init = () => {
       role: 'help',
       submenu: [
         {
-          label: 'Learn More',
-          click: function () { Shell.openExternal('http://brave.com') }
+          label: 'Brave Help',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send('shortcut-new-frame',
+                                           'https://brave.com')
+          }
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Submit Feedback...',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send('shortcut-new-frame',
+                                           'https://brave.com')
+          }
+        }, {
+          label: 'Spread the word about Brave...',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send('shortcut-new-frame',
+                                           'https://brave.com')
+          }
         }
       ]
     }
@@ -163,7 +413,8 @@ const init = () => {
         }, {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame', 'https://brave.com')
+            focusedWindow.webContents.send('shortcut-new-frame',
+                                           'https://brave.com')
           }
         }, {
           type: 'separator'
@@ -187,7 +438,7 @@ const init = () => {
         }, {
           type: 'separator'
         }, {
-          label: 'Quit',
+          label: 'Quit ' + name,
           accelerator: 'Command+Q',
           click: app.quit
         }
