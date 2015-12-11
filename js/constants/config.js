@@ -2,7 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var vaultHost = process.env.VAULT_HOST || 'http://localhost:3000'
+// VAULT_HOST can be set to:
+// https://vault.brave.com for production
+// https://vault-staging.brave.com for a dev build
+// http://localhost:3000 for production
+var vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
 
 export default {
   zoom: {
