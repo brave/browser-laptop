@@ -30,14 +30,24 @@ const init = () => {
         }, {
           type: 'separator'
         }, {
+          // this should be disabled when
+          // no windows are active
           label: 'Close Window',
           accelerator: 'CmdOrCtrl+Shift+W',
-          click: () => process.emit('close-window')
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              process.emit('close-window')
+            }
+          }
         }, {
+          // this should be disabled when
+          // no windows are active
           label: 'Close Tab',
           accelerator: 'CmdOrCtrl+W',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-close-frame')
+            if (focusedWindow) {
+              focusedWindow.webContents.send('shortcut-close-frame')
+            }
           }
         }
       ]
