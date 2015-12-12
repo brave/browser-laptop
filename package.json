@@ -29,7 +29,7 @@
   "homepage": "https://github.com/bbondy/electron-sample#readme",
   "dependencies": {
     "electron-localshortcut": "^0.6.0",
-    "electron-prebuilt": "^0.35.1",
+    "electron-prebuilt": "git+ssh://git@github.com/brave/electron-prebuilt.git",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
