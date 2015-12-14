@@ -5,7 +5,9 @@
   "main": "./app/index.js",
   "scripts": {
     "start": "NODE_ENV=development electron . --debug=5858",
+    "start-win": "set NODE_ENV=development&& electron . --debug=5858",
     "start-brk": "NODE_ENV=development electron . --debug-brk=5858",
+    "start-win-brk": "set NODE_ENV=development&& electron . --debug-brk=5858",
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
