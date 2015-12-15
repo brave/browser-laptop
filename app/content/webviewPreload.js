@@ -85,6 +85,8 @@ function processAdNode (node, iframeData, placeholderUrl) {
   var adSize = getAdSize(node, iframeData)
   // Could not determine the ad size, so just skip this replacement
   if (!adSize) {
+    // we have a replace node node but no replacement, so just display none on it
+    node.style.display = 'none'
     return
   }
   var srcUrl = placeholderUrl + '&width=' + encodeURIComponent(adSize[0]) + '&height=' + encodeURIComponent(adSize[1])
@@ -139,7 +141,8 @@ ipc.on('set-ad-div-candidates', function (e, adDivCandidates, placeholderUrl) {
 
   // Common selectors which could be on every page
   var commonSelectors = [
-    '[id^="google_ads_iframe_"][id$="__container__"]'
+    '[id^="google_ads_iframe_"][id$="__container__"]',
+    '[id^="ad-slot-banner-"]'
   ]
   commonSelectors.forEach(commonSelector => {
     var nodes = document.querySelectorAll(commonSelector)
