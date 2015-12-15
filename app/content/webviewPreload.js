@@ -64,7 +64,7 @@ function getAdSize (node, iframeData) {
   }
 
   if (iframeData) {
-    return [iframeData.width, iframeData.height]
+    return [iframeData.width || iframeData.w, iframeData.height || iframeData.h]
   }
 
   return null
@@ -119,15 +119,16 @@ ipc.on('set-ad-div-candidates', function (e, adDivCandidates, placeholderUrl) {
 
   // Process all of the specific ad information for this page
   adDivCandidates.forEach(function (iframeData) {
-    var selector = '[id="' + iframeData.replaceId + '"]'
+    var replaceId = iframeData.replapceId || iframeData.rid
+    var selector = '[id="' + replaceId + '"]'
     var node = document.querySelector(selector)
     if (!node) {
       return
     }
 
     // Skip over known common elements
-    if (iframeData.replaceId.startsWith('google_ads_iframe_') ||
-        iframeData.replaceId.endsWith('__container__')) {
+    if (replaceId.startsWith('google_ads_iframe_') ||
+        replaceId.endsWith('__container__')) {
       fallbackNodeDataForCommon[node.id] = iframeData
       return
     }
