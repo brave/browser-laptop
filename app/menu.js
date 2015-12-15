@@ -48,7 +48,11 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Import from...',
-          submenu: []
+          submenu: [
+            {label: 'Google Chrome...'},
+            {label: 'Firefox...'},
+            {label: 'Safari...'}
+          ]
         }, {
           type: 'separator'
         }, {
@@ -78,13 +82,18 @@ const init = () => {
           accelerator: 'CmdOrCtrl+S'
         }, {
           label: 'Share...',
-          submenu: []
+          submenu: [
+            {label: 'Email Page Link...'},
+            {type: 'separator'},
+            {label: 'Tweet Page...'},
+            {label: 'Share on Facebook...'},
+            {label: 'More...'}
+          ]
         }, {
           type: 'separator'
         }, {
           label: 'Print...',
-          accelerator: 'CmdOrCtrl+P',
-          submenu: []
+          accelerator: 'CmdOrCtrl+P'
         }
       ]
     }, {
@@ -157,7 +166,12 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Toolbars',
-          submenu: []
+          submenu: [
+            {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
+            {label: 'Tab Bar', accelerator: 'Alt+CmdOrCtrl+T'},
+            {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
+            {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
+          ]
         }, {
           type: 'separator'
         }, {
@@ -190,7 +204,14 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Text Encoding',
-          submenu: []
+          submenu: [
+            {label: 'Autodetect', submenu: []},
+            {type: 'separator'},
+            {label: 'Unicode'},
+            {label: 'Western'},
+            {type: 'separator'},
+            {label: 'etc...'}
+          ]
         }, {
           type: 'separator'
         }, {
@@ -276,7 +297,11 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Import Bookmarks',
-          submenu: []
+          submenu: [
+            {label: 'Google Chrome...'},
+            {label: 'Firefox...'},
+            {label: 'Safari...'}
+          ]
         }
       ]
     }, {
@@ -319,11 +344,11 @@ const init = () => {
         }, {
           type: 'checkbox',
           label: 'Block HTTP',
-          checked: true
+          checked: false
         }, {
           type: 'separator'
         }, {
-          label: 'Disabled all protection on this site...'
+          label: 'Disable all protection on this site...'
         }
       ]
     }, {
