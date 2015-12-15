@@ -143,7 +143,8 @@ AppDispatcher.register((action) => {
       let frameProps = action.frameProps || FrameStateUtil.getActiveFrame(appState)
       const index = FrameStateUtil.getFramePropsIndex(appState.get('frames'), frameProps)
       appState = appState.merge(FrameStateUtil.removeFrame(appState.get('frames'),
-        appState.get('closedFrames'), frameProps.set('closedAtIndex', index)))
+        appState.get('closedFrames'), frameProps.set('closedAtIndex', index),
+        frameProps.get('key')))
       appStore.emitChange()
       break
     case AppConstants.APP_UNDO_CLOSED_FRAME:
