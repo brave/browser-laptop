@@ -15,9 +15,14 @@ All [React](https://facebook.github.io/react/) components (with the exception of
       - UrlBar
         - html:input
         - UrlBarSuggestions
-    - Tabs
-      - [Tab]
-        - DragIndicator
+    - TabPages
+      - [TabPage]
+    - TabsToolbar
+      - Tabs
+        - [Tab]
+          - DragIndicator
+      - TabsToolbarButtons
+        - [Button]
     - [Frame]
       - electron:webview
 
@@ -44,6 +49,16 @@ An individual tab thumbnail
 
 **Tabs:**
 Tab controls
+
+**TabPage:**
+An individual tab page.
+
+**TabPages:**
+Tab page indicators. There are 6 tabs at most per tab page.
+This set of indicators shows you which page you are on and allows you to switch pages.
+
+**TabsToolbarButtons:**
+Collection of Buttons for the tab bar.
 
 **UrlBar:**
 The URL bar part of the navigation bar.
