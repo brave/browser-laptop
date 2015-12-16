@@ -14,7 +14,8 @@ const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 // Components
 const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
-const Tabs = require('./tabs')
+const TabPages = require('./tabPages')
+const TabsToolbar = require('./tabsToolbar')
 
 // Constants
 const Config = require('../constants/config')
@@ -100,7 +101,10 @@ class Main extends ImmutableComponent {
           searchSuggestions={this.props.browser.getIn(['ui', 'navbar', 'searchSuggestions'])}
           searchDetail={this.props.browser.get('searchDetail')}
         />
-        <Tabs
+        <TabPages frames={this.props.browser.get('frames')}
+          tabPageIndex={this.props.browser.getIn(['ui', 'tabs', 'tabPageIndex'])}
+        />
+        <TabsToolbar
           tabs={this.props.browser.getIn(['ui', 'tabs'])}
           frames={this.props.browser.get('frames')}
           key='tab-bar'

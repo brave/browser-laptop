@@ -277,3 +277,11 @@ export function computeThemeColor (frameProps) {
   */
   })
 }
+
+export function getFrameTabPageIndex (frames, frameProps) {
+  const index = getFramePropsIndex(frames, frameProps)
+  if (index === -1) {
+    return -1
+  }
+  return Math.floor(index / Config.tabs.tabsPerPage)
+}

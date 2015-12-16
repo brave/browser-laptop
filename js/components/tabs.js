@@ -11,6 +11,9 @@ const AppActions = require('../actions/appActions')
 const cx = require('../lib/classSet.js')
 
 const getFavicon = require('../lib/faviconUtil.js')
+const FrameStateUtil = require('../state/frameStateUtil')
+
+import Config from '../constants/config.js'
 
 class DragIndicator extends ImmutableComponent {
   constructor (props) {
@@ -164,7 +167,7 @@ class Tab extends ImmutableComponent {
       <div className='thumbnail'
         style={thumbnailStyle} />
         <span onClick={this.onCloseFrame.bind(this)}
-          className='closeTab fa fa-times-circle'/>
+          className='closeTab fa fa-times'/>
         <div className='tabIcon' style={iconStyle}/>
         <div className='tabTitle'>
           {playIcon}
@@ -179,25 +182,50 @@ class Tab extends ImmutableComponent {
 }
 
 class Tabs extends ImmutableComponent {
-  constructor () {
-    super()
+  get activeFrameIndex () {
+    return FrameStateUtil.getFramePropsIndex(this.props.frames, this.props.activeFrame)
+  }
+
+  onPrevFrame () {
+    if (this.activeFrameIndex === 0) {
+      return
+    }
+    AppActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex - 1))
+  }
+
+  onNextFrame () {
+    if (this.activeFrameIndex >= this.props.frames.size) {
+      return
+    }
+    AppActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex + 1))
   }
 
   render () {
-    var tabWidth = 100 / this.props.frames.size
+    const tabPageIndex = this.props.tabs.get('tabPageIndex')
+    const startingFrameIndex = tabPageIndex * Config.tabs.tabsPerPage
+    const frames = this.props.frames.slice(startingFrameIndex, startingFrameIndex + Config.tabs.tabsPerPage)
+    var tabWidth = 100 / frames.size
 
     return <div className='tabs'>
-      <div className='tabRow'>
+      <span
+        className='prevTab fa fa-angle-left'
+        disabled={this.activeFrameIndex === 0}
+        onClick={this.onPrevFrame.bind(this)} />
+        <span className='tabContainer'>
         {
-        this.props.frames.map(frameProps => <Tab
-          activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
-          frameProps={frameProps}
-          key={'tab-' + frameProps.get('key')}
-          isActive={this.props.activeFrame === frameProps}
-          isPrivate={frameProps.get('isPrivate')}
-          tabWidth={tabWidth} />)
+          frames.map(frameProps => <Tab
+            activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
+            frameProps={frameProps}
+            key={'tab-' + frameProps.get('key')}
+            isActive={this.props.activeFrame === frameProps}
+            isPrivate={frameProps.get('isPrivate')}
+            tabWidth={tabWidth} />)
         }
-      </div>
+        </span>
+      <span
+        className='nextTab fa fa-angle-right'
+        disabled={this.activeFrameIndex + 1 >= this.props.frames.size}
+        onClick={this.onNextFrame.bind(this)} />
     </div>
   }
 }

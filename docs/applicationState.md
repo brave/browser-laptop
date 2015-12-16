@@ -46,6 +46,7 @@ Child components should not modify top level state directly, instead they should
   ui: {
     tabs: {
       activeDraggedTab: object,
+      tabPageIndex: number, // Index of the current tab page
     },
     navbar: {
       focused: boolean, // whether the navbar is focused

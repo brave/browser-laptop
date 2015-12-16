@@ -27,6 +27,9 @@ class UrlBar extends ImmutableComponent {
       AppActions.setUrlBarAutoselected(true)
       AppActions.setUrlBarActive(true)
     })
+    process.on('focus-urlbar', () => {
+      this.updateDOMInputFocus(true)
+    })
   }
 
   isActive () {
