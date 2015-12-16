@@ -29,7 +29,10 @@ class TabPages extends ImmutableComponent {
     return <div className='tabPages'>
     {
       Array.from(new Array(this.tabCount)).map((x, i) =>
-        <TabPage index={i} active={this.props.tabPageIndex === i}/>)
+        <TabPage
+          key={`tabPage-${i}`}
+          index={i}
+          active={this.props.tabPageIndex === i}/>)
     }
     </div>
   }

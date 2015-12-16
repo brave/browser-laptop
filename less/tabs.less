@@ -5,13 +5,20 @@
 @import "variables.less";
 
 .tabs {
-  position: relative;
-  z-index: 310;
-  padding: 8px 4px 0 6px;
-  height: 40px;
-  white-space: nowrap;
   background: @chromeSecondary;
   box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  padding: 0 4px 0 6px;
+  height: 26px;
+  position: relative;
+  white-space: nowrap;
+  z-index: 310;
+}
+
+.tabContainer {
+  flex: 1;
+  z-index: 2;
 }
 
 .tab {
@@ -26,7 +33,7 @@
   border-width: 1px 1px 0;
   left: 0;
   opacity: 1.0;
-  padding: 4px 0 0;
+  padding: 0;
   height: 20px;
   border-radius: 9px;
   width: 100%;
@@ -44,12 +51,13 @@
     width: calc(~'100% - 26px');
   }
   .tabIcon {
+    background-position: center;
+    background-repeat: no-repeat;
     display: inline-block;
     margin: 0 4px;
     position: relative;
-    top: -5px;
-    background-position: center;
-    background-repeat: no-repeat;
+    top: -3px;
+    vertical-align: middle;
   }
   .playIcon {
     cursor: default;
@@ -74,6 +82,7 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     height: 26px;
+    padding-top: 4px;
   }
 
   &.private {
@@ -104,22 +113,18 @@
   }
 
   .closeTab {
-    color: white;
     cursor: pointer;
-    font-size: 24px;
-    height: 24px;
     opacity: 0;
     position: absolute;
-    right: -4px;
+    right: 0px;
     text-align: center;
-    top: -8px;
+    top: 2px;
     width: 24px;
 
     &:hover {
-      color: @hoverBlue;
+      opacity: 1;
     }
 
-    background-color: black;
     border: 0px solid white;
     border-radius: 50%;
     z-index: 3;
@@ -129,10 +134,10 @@
 .tabArea {
   position: relative;
   display: inline-block;
-  height: 100%;
   max-width: 184px;
   box-sizing: border-box;
   padding: 0 2px 0 0;
+  vertical-align: top;
 
   hr.dragIndicator {
     position: absolute;
@@ -158,12 +163,26 @@
 }
 
 .tabsToolbar {
-  height: 40px;
+  display: flex;
+  height: 26px;
+}
+
+.tabsToolbarButtons {
+  background: @chromeSecondary;
+  padding-right: 5px;
+  .browserButton {
+    display: inline-block;
+    line-height: initial;
+  }
 }
 
 .tabPages {
+  background: @chromeSecondary;
+  border-top: 1px solid gray;
   height: 14px;
+  position: relative;
   text-align: center;
+  z-index: 12;
 }
 
 .tabPage {
@@ -186,7 +205,7 @@
   color: #3B3B3B;
   height: 20px;
   line-height: 20px !important;
-  vertical-align: middle;
+  vertical-align: top;
   width: 50px;
 }
 
@@ -195,11 +214,14 @@
   border-top-left-radius: 9px;
   padding-left: 10px;
   text-align: left;
+  transform: translateX(10px);
 }
 
 .nextTab {
   border-bottom-right-radius: 9px;
   border-top-right-radius: 9px;
+  float: right;
   padding-right: 10px;
   text-align: right;
+  transform: translateX(-20px);
 }

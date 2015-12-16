@@ -167,7 +167,7 @@ class Tab extends ImmutableComponent {
       <div className='thumbnail'
         style={thumbnailStyle} />
         <span onClick={this.onCloseFrame.bind(this)}
-          className='closeTab fa fa-times-circle'/>
+          className='closeTab fa fa-times'/>
         <div className='tabIcon' style={iconStyle}/>
         <div className='tabTitle'>
           {playIcon}
@@ -207,26 +207,25 @@ class Tabs extends ImmutableComponent {
     var tabWidth = 100 / frames.size
 
     return <div className='tabs'>
-      <div className='tabRow'>
-       <span
-          className='prevTab fa fa-angle-left'
-          disabled={this.activeFrameIndex === 0}
-          onClick={this.onPrevFrame.bind(this)} />
-
+      <span
+        className='prevTab fa fa-angle-left'
+        disabled={this.activeFrameIndex === 0}
+        onClick={this.onPrevFrame.bind(this)} />
+        <span className='tabContainer'>
         {
-        frames.map(frameProps => <Tab
-          activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
-          frameProps={frameProps}
-          key={'tab-' + frameProps.get('key')}
-          isActive={this.props.activeFrame === frameProps}
-          isPrivate={frameProps.get('isPrivate')}
-          tabWidth={tabWidth} />)
+          frames.map(frameProps => <Tab
+            activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
+            frameProps={frameProps}
+            key={'tab-' + frameProps.get('key')}
+            isActive={this.props.activeFrame === frameProps}
+            isPrivate={frameProps.get('isPrivate')}
+            tabWidth={tabWidth} />)
         }
-        <span
-          className='nextTab fa fa-angle-right'
-          disabled={this.activeFrameIndex >= this.props.frames.size}
-          onClick={this.onNextFrame.bind(this)} />
-      </div>
+        </span>
+      <span
+        className='nextTab fa fa-angle-right'
+        disabled={this.activeFrameIndex >= this.props.frames.size}
+        onClick={this.onNextFrame.bind(this)} />
     </div>
   }
 }

@@ -5,7 +5,6 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 
-const AppActions = require('../actions/appActions')
 const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
@@ -35,11 +34,6 @@ class NavigationBar extends ImmutableComponent {
 
   onStop () {
     process.emit('stop-active-frame')
-  }
-
-  onNewFrame () {
-    AppActions.newFrame()
-    this.refs.urlBar.focus()
   }
 
   render () {
@@ -79,9 +73,6 @@ class NavigationBar extends ImmutableComponent {
         <Button iconClass='fa-star'
           className='navbutton remove-bookmark-button'
           onClick={this.onRemoveSite.bind(this, 'bookmark')} />
-        <Button iconClass='fa-plus'
-          className='navbutton new-frame-button'
-          onClick={this.onNewFrame.bind(this)} />
         <Button iconClass='fa-shield'
           className='navbutton brave-menu'
           onClick={this.onBraveMenu.bind(this)} />
