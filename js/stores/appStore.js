@@ -179,6 +179,10 @@ AppDispatcher.register((action) => {
       updateTabPageIndex(action.frameProps)
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_TAB_PAGE_INDEX:
+      appState = appState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
+      appStore.emitChange()
+      break
     case AppConstants.APP_UPDATE_BACK_FORWARD:
       appState = appState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps)], {
         canGoBack: action.canGoBack,

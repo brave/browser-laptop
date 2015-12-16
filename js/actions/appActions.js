@@ -189,6 +189,18 @@ const AppActions = {
   },
 
   /**
+   * Dispatches a message to the store to set the tab page index.
+   *
+   * @param index the tab page index to change to
+   */
+  setTabPageIndex: function (index) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_TAB_PAGE_INDEX,
+      index
+    })
+  },
+
+  /**
    * Dispatches a message to the store to update the back-forward information.
    *
    * @param frameProps the frame properties for the webview in question.

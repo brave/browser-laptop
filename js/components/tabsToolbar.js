@@ -10,7 +10,9 @@ const TabPages = require('./tabPages')
 class TabsToolbar extends ImmutableComponent {
   render () {
     return <div className='tabsToolbar'>
-      <TabPages frames={this.props.frames}/>
+      <TabPages frames={this.props.frames}
+        tabPageIndex={this.props.tabs.get('tabPageIndex')}
+      />
       <Tabs tabs={this.props.tabs}
         frames={this.props.frames}
         activeFrame={this.props.activeFrame}

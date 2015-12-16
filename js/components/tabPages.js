@@ -4,12 +4,18 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
+const cx = require('../lib/classSet.js')
+const AppActions = require('../actions/appActions')
 
 import Config from '../constants/config.js'
 
 class TabPage extends ImmutableComponent {
   render () {
-    return <span className='tabPage'>
+    return <span className={cx({
+      tabPage: true,
+      active: this.props.active})}
+      onClick={AppActions.setTabPageIndex.bind(this, this.props.index)
+    }>
     </span>
   }
 }
@@ -22,7 +28,8 @@ class TabPages extends ImmutableComponent {
   render () {
     return <div className='tabPages'>
     {
-      Array.from(new Array(this.tabCount)).map(() => <TabPage/>)
+      Array.from(new Array(this.tabCount)).map((x, i) =>
+        <TabPage index={i} active={this.props.tabPageIndex === i}/>)
     }
     </div>
   }
