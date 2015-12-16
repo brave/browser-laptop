@@ -79,9 +79,9 @@ function getAdSize (node, iframeData) {
  *
  * @param node The node of the ad to process
  * @param iframeData The iframe data of the node to process from the slimerJS bot
- * @param placeholderUrl The vault URL with encoded user ID and session ID to use
+ * @param replacementUrl The vault replacement url
  */
-function processAdNode (node, iframeData, placeholderUrl) {
+function processAdNode (node, iframeData, replacementUrl) {
   if (!node) {
     return
   }
@@ -93,9 +93,20 @@ function processAdNode (node, iframeData, placeholderUrl) {
     node.style.display = 'none'
     return
   }
-  var srcUrl = placeholderUrl + '&width=' + encodeURIComponent(adSize[0]) + '&height=' + encodeURIComponent(adSize[1])
+
+  // generate a random segment
+  // @todo - replace with renko targeting
+  var segments = ['IAB2', 'IAB17', 'IAB14', 'IAB21', 'IAB20']
+  var segment = segments[Math.floor(Math.random() * 4)]
+  var time_in_segment = new Date().getSeconds()
+  var segment_expiration_time = 0 // no expiration
+
+  // ref param for referrer when possible
+  var srcUrl = replacementUrl + '?width=' + adSize[0] + '&height=' + adSize[1] + '&seg=' + segment + ':' + time_in_segment + ':' + segment_expiration_time
+  var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] + '; padding: 0; margin: 0;"><script src="' + srcUrl + '"></script></body></html>'
+
   if (node.tagName === 'IFRAME') {
-    node.src = srcUrl
+    node.srcdoc = src
   } else {
     while (node.firstChild) {
       node.removeChild(node.firstChild)
@@ -106,7 +117,7 @@ function processAdNode (node, iframeData, placeholderUrl) {
     iframe.style.margin = 0
     iframe.style.width = adSize[0] + 'px'
     iframe.style.height = adSize[1] + 'px'
-    iframe.src = srcUrl
+    iframe.srcdoc = src
     node.appendChild(iframe)
     ensureNodeVisible(node)
     if (node.parentNode) {

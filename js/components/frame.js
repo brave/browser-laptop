@@ -7,7 +7,6 @@ const ReactDOM = require('react-dom')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
-const uuid = require('node-uuid')
 
 import adInfo from '../data/adInfo.js'
 import Config from '../constants/config.js'
@@ -112,15 +111,7 @@ class Frame extends ImmutableComponent {
     let host = new window.URL(currentLocation).hostname.replace('www.', '')
     let adDivCandidates = adInfo[host]
     if (adDivCandidates) {
-      // TODO: Use a real user ID and sessionID
-      const userId = uuid.v4()
-      const sessionId = uuid.v4()
-
-      const placeholderUrl = Config.vault.replacementUrl(userId) + '?' + [
-        `sessionId=${sessionId}`,
-        `tagName=IFRAME`
-      ].join('&')
-      this.webview.send('set-ad-div-candidates', adDivCandidates, placeholderUrl)
+      this.webview.send('set-ad-div-candidates', adDivCandidates, Config.vault.replacementUrl)
     }
   }
 

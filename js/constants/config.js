@@ -7,6 +7,7 @@
 // https://vault-staging.brave.com for a dev build
 // http://localhost:3000 for production
 var vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
+var adHost = process.env.AD_HOST || '//cdn.brave.com'
 
 export default {
   zoom: {
@@ -36,9 +37,9 @@ export default {
   },
   defaultOpenSearchPath: './content/search/duckduckgo.xml',
   vault: {
-    replacementUrl: (userId) => `${vaultHost}/v1/users/${userId}/replacement`,
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
-    intentUrl: (userId) => `${vaultHost}/v1/users/${userId}/intents`
+    intentUrl: (userId) => `${vaultHost}/v1/users/${userId}/intents`,
+    replacementUrl: adHost
   }
 }
