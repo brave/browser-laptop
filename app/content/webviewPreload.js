@@ -50,9 +50,13 @@ function ensureNodeVisible (node) {
  */
 function getAdSize (node, iframeData) {
   var acceptableAdSizes = [
+    [970, 250],
+    [970, 90],
     [728, 90],
     [300, 250],
+    [300, 600],
     [160, 600],
+    [120, 600],
     [320, 50]
   ]
   for (var i = 0; i < acceptableAdSizes.length; i++) {
