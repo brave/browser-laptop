@@ -17,8 +17,10 @@ let appState = Immutable.fromJS({
   frames: [],
   closedFrames: [],
   sites: [],
+  searchDetail: null,
   ui: {
     navbar: {
+      searchSuggestions: true,
       focused: true,
       urlbar: {
         location: '',
@@ -253,6 +255,11 @@ AppDispatcher.register((action) => {
         activeShortcut: action.activeShortcut
       })
       appStore.emitChange()
+      break
+    case AppConstants.APP_SET_SEARCH_DETAIL:
+      appState = appState.merge({
+        searchDetail: action.searchDetail
+      })
       break
     default:
   }
