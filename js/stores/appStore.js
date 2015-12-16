@@ -291,10 +291,12 @@ AppDispatcher.register((action) => {
 
 ipc.on('shortcut-next-tab', () => {
   appState = FrameStateUtil.makeNextFrameActive(appState)
+  updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
   appStore.emitChange()
 })
 ipc.on('shortcut-prev-tab', () => {
   appState = FrameStateUtil.makePrevFrameActive(appState)
+  updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
   appStore.emitChange()
 })
 
