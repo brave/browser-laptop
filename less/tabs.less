@@ -201,15 +201,21 @@
 }
 
 .prevTab, .nextTab {
-  background-color: #7E7F83;
   color: #3B3B3B;
   height: 20px;
   line-height: 20px !important;
+  opacity: 0.5;
   vertical-align: top;
   width: 50px;
+  &:not([disabled]) {
+    background: #7E7F83;
+    cursor: pointer;
+    opacity: 1;
+  }
 }
 
 .prevTab {
+  background: linear-gradient(to right, #7E7F83, @chromeSecondary);
   border-bottom-left-radius: 9px;
   border-top-left-radius: 9px;
   padding-left: 10px;
@@ -218,6 +224,7 @@
 }
 
 .nextTab {
+  background: linear-gradient(to left, #7E7F83, @chromeSecondary);
   border-bottom-right-radius: 9px;
   border-top-right-radius: 9px;
   float: right;

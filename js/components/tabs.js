@@ -224,7 +224,7 @@ class Tabs extends ImmutableComponent {
         </span>
       <span
         className='nextTab fa fa-angle-right'
-        disabled={this.activeFrameIndex >= this.props.frames.size}
+        disabled={this.activeFrameIndex + 1 >= this.props.frames.size}
         onClick={this.onNextFrame.bind(this)} />
     </div>
   }
