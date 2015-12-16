@@ -31,7 +31,7 @@ export default {
   navigationBar: {
     defaultSearchSuggestions: false
   },
-  defaultOpenSearchPath: './search/duckduckgo.xml',
+  defaultOpenSearchPath: './content/search/duckduckgo.xml',
   vault: {
     replacementUrl: (userId) => `${vaultHost}/v1/users/${userId}/replacement`,
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,

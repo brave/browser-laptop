@@ -380,6 +380,17 @@ const AppActions = {
       actionType: AppConstants.APP_SET_ACTIVE_FRAME_SHORTCUT,
       activeShortcut
     })
+  },
+
+  /**
+   * Dispatches a message to set the search engine details.
+   * @param searchDetail the search details
+   */
+  setSearchDetail: function (searchDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_SEARCH_DETAIL,
+      searchDetail
+    })
   }
 }
 

@@ -9,6 +9,7 @@ const ipc = electron.ipcRenderer
 
 // Actions
 const AppActions = require('../actions/appActions')
+const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -47,6 +48,8 @@ class Main extends ImmutableComponent {
 
     ipc.on('shortcut-set-active-frame-to-last', () =>
       AppActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
+
+    loadOpenSearch().then(searchDetail => AppActions.setSearchDetail(searchDetail))
   }
 
   get activeFrame () {
@@ -94,6 +97,8 @@ class Main extends ImmutableComponent {
           frames={this.props.browser.get('frames')}
           sites={this.props.browser.get('sites')}
           activeFrame={activeFrame}
+          searchSuggestions={this.props.browser.getIn(['ui', 'navbar', 'searchSuggestions'])}
+          searchDetail={this.props.browser.get('searchDetail')}
         />
         <Tabs
           tabs={this.props.browser.getIn(['ui', 'tabs'])}
