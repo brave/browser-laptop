@@ -7,11 +7,10 @@ const ReactDOM = require('react-dom')
 
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
-const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 
 import Config from '../constants/config.js'
 import top500 from './../data/top500.js'
-import {isSourceAboutUrl} from '../lib/appUrlUtil.js'
+import {isSourceAboutUrl, isUrl} from '../lib/appUrlUtil.js'
 import Immutable from 'immutable'
 import debounce from '../lib/debounce.js'
 import {getSiteIconClass} from '../lib/siteUtil.js'
@@ -207,7 +206,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     let urlLocation = this.props.urlLocation
-    if (!UrlUtil.isURL(urlLocation) && urlLocation.length > 0) {
+    if (!isUrl(urlLocation) && urlLocation.length > 0) {
       let xhr = new window.XMLHttpRequest({mozSystem: true})
       xhr.open('GET', this.props.searchDetail.get('autocompleteURL')
         .replace('{searchTerms}', urlLocation), true)

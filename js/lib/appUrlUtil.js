@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
+const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 
 /**
  * Determines the path of a relative URL from the hosted app
@@ -75,4 +76,12 @@ export function isTargetAboutUrl (input) {
  */
 export function isPrivilegedUrl (input) {
   return isSourceAboutUrl(input)
+}
+
+/**
+ * Determines whether a string is a valid URL. Based on node-urlutil.js.
+ * @param {string} input
+ */
+export function isUrl (input) {
+  return (UrlUtil.isURL(input) && !input.includes(' '))
 }
