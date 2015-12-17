@@ -12,7 +12,8 @@ const cx = require('../lib/classSet.js')
 const ipc = global.require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
-const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
+
+import {isUrl} from '../lib/appUrlUtil.js'
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -92,8 +93,7 @@ class UrlBar extends ImmutableComponent {
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
             this.refs.urlBarSuggestions.clickSelected()
-          } else if (this.props.searchSuggestions &&
-                     (!UrlUtil.isURL(location) || location.includes(' '))) {
+          } else if (this.props.searchSuggestions && !isUrl(location)) {
             // do search.
             AppActions.loadUrl(this.props.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
