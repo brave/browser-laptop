@@ -87,8 +87,14 @@ The built dmg binary requires its components to be digitally signed before the u
 
      `npm run installer-darwin`
 
-  6. Install dmg by mounting dmg and moving browser to the Applications folder
+  6. Build update zip file
 
-  7. Browser will check for updates on startup
+     `npm run zip-darwin`
+
+     Creates a Brave-0.0.2.zip file in the Brave-darwin-x64 directory. This file should be moved to the update server and added to the update meta data file in that repo.
+
+  7. Install dmg by mounting dmg and moving browser to the Applications folder
+
+  8. Browser will check for updates on startup
 
 # Windows x64

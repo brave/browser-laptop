@@ -12,6 +12,12 @@ const init = () => {
       label: 'File',
       submenu: [
         {
+          label: 'Check for updates ...',
+          click: function (item, focusedWindow) {
+            process.emit('check-for-update')
+          }
+        },
+        {
           label: 'New Tab',
           accelerator: 'CmdOrCtrl+T',
           click: function (item, focusedWindow) {
