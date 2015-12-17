@@ -152,10 +152,14 @@ class Tab extends ImmutableComponent {
       onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
     }
 
-    return <div className='tabArea'
-        style={{
-          width: `${this.props.tabWidth}%`
-        }}>
+    return <div
+      className={cx({
+        tabArea: true,
+        partOfFullPageSet: this.props.partOfFullPageSet
+      })}
+      style={{
+        width: `${this.props.tabWidth}%`
+      }}>
       <DragIndicator active={this.props.frameProps.get('tabIsDraggingOverLeftHalf')}/>
       <div className={cx({
         tab: true,
@@ -237,6 +241,7 @@ class Tabs extends ImmutableComponent {
             key={'tab-' + frameProps.get('key')}
             isActive={this.props.activeFrame === frameProps}
             isPrivate={frameProps.get('isPrivate')}
+            partOfFullPageSet={frames.size === Config.tabs.tabsPerPage}
             tabWidth={tabWidth} />)
         }
         </span>
