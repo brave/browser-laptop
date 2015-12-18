@@ -7,6 +7,7 @@ const ReactDOM = require('react-dom')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
+const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 
 import adInfo from '../data/adInfo.js'
 import Config from '../constants/config.js'
@@ -50,9 +51,7 @@ class Frame extends ImmutableComponent {
         }
         break
       case 'view-source':
-        console.log('in view source')
-        // TODO: Make sure this is a valid page to view source for
-        let src = 'view-source:' + this.webview.getURL()
+        let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         AppActions.loadUrl(src)
         // TODO: Make the URL bar show the view-source: prefix
         break
