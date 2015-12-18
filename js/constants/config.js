@@ -40,14 +40,5 @@ export default {
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
     intentUrl: (userId) => `${vaultHost}/v1/users/${userId}/intents`
-  },
-  updates: {
-    // Check for front end updates every hour
-    appUpdateCheckFrequency: 1000 * 60 * 60,
-    // Check after 2 minutes, near startup
-    runtimeUpdateCheckDelay: 1000 * 60 * 2,
-    // If true user will not be notified before updates are reloaded
-    autoAppUpdate: false,
-    autoRuntimeUpdate: false
   }
 }

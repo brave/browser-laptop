@@ -9,6 +9,7 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const Menu = require('./menu')
 const LocalShortcuts = require('./localShortcuts')
+const Updater = require('./updater')
 
 // Report crashes
 electron.crashReporter.start()
@@ -71,4 +72,18 @@ app.on('ready', function () {
   process.on('close-window', () => BrowserWindow.getFocusedWindow().close())
 
   Menu.init()
+
+  ipcMain.on('update-requested', () => {
+    Updater.update()
+  })
+
+  // this only works on prod
+  if (process.env.NODE_ENV !== 'development') {
+    Updater.init(process.platform)
+
+    // this is fired by the menu entry
+    process.on('check-for-update', () => Updater.checkForUpdate())
+  } else {
+    process.on('check-for-update', () => Updater.fakeCheckForUpdate())
+  }
 })

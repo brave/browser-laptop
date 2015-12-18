@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "build-win64": "set NODE_ENV=production&&webpack && rm -Rf Brave-win32-x64 && electron-packager . Brave --overwrite --ignore=\"electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel-|babel\" --platform=win32 --arch=x64 --version=0.35.1 --icon=res/app.ico",
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
+    "zip-darwin": "node build-darwin-update.js",
     "postinstall": "webpack",
     "test": "mocha --compilers js:babel-register"
   },

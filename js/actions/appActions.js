@@ -157,6 +157,14 @@ const AppActions = {
   },
 
   /**
+   * Dispatches an event to the main process to update the browser
+   */
+  updateRequested: function () {
+    console.log('appActions updateRequested')
+    ipc.send('update-requested')
+  },
+
+  /**
    * Dispatches a message to the store to undo a closed frame
    * The new frame is expected to appear at the index it was last closed at
    */
