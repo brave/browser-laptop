@@ -60,6 +60,10 @@ app.on('ready', function () {
     app.quit()
   })
 
+  ipcMain.on('context-menu-opened', (e, nodeName) => {
+    BrowserWindow.getFocusedWindow().webContents.send('context-menu-opened', nodeName)
+  })
+
   ipcMain.on('new-window', () => windows.push(spawnWindow()))
   process.on('new-window', () => windows.push(spawnWindow()))
 

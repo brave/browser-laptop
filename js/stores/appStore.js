@@ -300,7 +300,7 @@ ipc.on('shortcut-prev-tab', () => {
   appStore.emitChange()
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'view-source', 'mute']
 frameShortcuts.forEach(shortcut => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {
@@ -310,13 +310,15 @@ frameShortcuts.forEach(shortcut => {
     appStore.emitChange()
   })
   // Listen for actions on frame N
-  ipc.on(`shortcut-frame-${shortcut}`, (e, i) => {
-    let path = ['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), i)]
-    appState = appState.mergeIn(path, {
-      activeShortcut: shortcut
+  if (['reload', 'mute'].includes(shortcut)) {
+    ipc.on(`shortcut-frame-${shortcut}`, (e, i) => {
+      let path = ['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), i)]
+      appState = appState.mergeIn(path, {
+        activeShortcut: shortcut
+      })
+      appStore.emitChange()
     })
-    appStore.emitChange()
-  })
+  }
 })
 
 module.exports = appStore

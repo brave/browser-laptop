@@ -50,6 +50,13 @@ class Frame extends ImmutableComponent {
           this.webview.openDevTools()
         }
         break
+      case 'view-source':
+        console.log('in view source')
+        // TODO: Make sure this is a valid page to view source for
+        let src = 'view-source:' + this.webview.getURL()
+        AppActions.loadUrl(src)
+        // TODO: Make the URL bar show the view-source: prefix
+        break
     }
     if (activeShortcut) {
       AppActions.setActiveFrameShortcut(null)

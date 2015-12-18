@@ -37,8 +37,8 @@ function tabTemplateInit (tabKey) {
   ]
 }
 
-function mainTemplateInit (element) {
-  return [
+function mainTemplateInit (nodeName) {
+  let template = [
     {
       label: 'Reload',
       click: (item, focusedWindow) => {
@@ -50,16 +50,38 @@ function mainTemplateInit (element) {
       label: 'View Page Source',
       click: (item, focusedWindow) => {
         if (focusedWindow) {
-          console.log('got source', element)
+          focusedWindow.webContents.send('shortcut-active-frame-view-source')
         }
       }
+    }, {
+      label: 'Add bookmark',
+      enabled: false
+    }, {
+      label: 'Add to reading list',
+      enabled: false
     }
   ]
+  nodeName = nodeName.toUpperCase()
+  switch (nodeName) {
+    case 'A':
+      template.push({
+        label: 'Open in new tab'
+      })
+      break
+    case 'IMG':
+      template.push({
+        label: 'Download image'
+      })
+      template.push({
+        label: 'Open image in new tab'
+      })
+      break
+  }
+  return template
 }
 
-export function onMainContextMenu (e) {
-  e.preventDefault()
-  const mainMenu = Menu.buildFromTemplate(mainTemplateInit(e))
+export function onMainContextMenu (nodeName) {
+  const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeName))
   mainMenu.popup(remote.getCurrentWindow())
 }
 

@@ -32,6 +32,10 @@ class Main extends ImmutableComponent {
       })
     }
 
+    ipc.on('context-menu-opened', (e, nodeName) => {
+      console.log('got context menu open', nodeName)
+      contextMenus.onMainContextMenu(nodeName)
+    })
     ipc.on('shortcut-new-frame', (event, url) => {
       AppActions.newFrame({
         location: url || Config.defaultUrl
@@ -115,7 +119,6 @@ class Main extends ImmutableComponent {
         />
       </div>
       <div className='mainContainer'
-        onContextMenu={contextMenus.onMainContextMenu.bind(this)}
         onFocus={this.onMainFocus.bind(this)}>
         <div className='tabContainer'>
         {
