@@ -17,6 +17,11 @@ export function getFrameByIndex (appState, i) {
   return appState.getIn(['frames', i])
 }
 
+export function getFrameByKey (appState, key) {
+  let i = findIndexForFrameKey(appState.get('frames'), key)
+  return appState.getIn(['frames', i])
+}
+
 export function getActiveFrame (appState) {
   const activeFrameIndex = getActiveFrameIndex(appState)
   return appState.get('frames').get(activeFrameIndex)
