@@ -18,6 +18,7 @@ let appState = Immutable.fromJS({
   closedFrames: [],
   sites: [],
   searchDetail: null,
+  updateAvailable: false,
   ui: {
     navbar: {
       searchSuggestions: true,
@@ -289,11 +290,20 @@ AppDispatcher.register((action) => {
   }
 })
 
+ipc.on('update-available', () => {
+  console.log('appStore update-available')
+  appState = appState.merge({
+    updateAvailable: true
+  })
+  appStore.emitChange()
+})
+
 ipc.on('shortcut-next-tab', () => {
   appState = FrameStateUtil.makeNextFrameActive(appState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
   appStore.emitChange()
 })
+
 ipc.on('shortcut-prev-tab', () => {
   appState = FrameStateUtil.makePrevFrameActive(appState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))

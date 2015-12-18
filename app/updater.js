@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const electron = require('electron')
+const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const fs = require('fs')
 const autoUpdater = require('auto-updater')
@@ -22,7 +24,6 @@ var buildUpdateUrl = function (baseUrl, platform) {
 // set the feed url for the auto-update system
 exports.init = (platform) => {
   var updateUrl = buildUpdateUrl(config.updates.baseUrl, platform)
-  console.log(updateUrl)
   try {
     autoUpdater.setFeedURL(updateUrl)
   } catch (err) {
@@ -34,12 +35,22 @@ exports.checkForUpdate = () => {
   autoUpdater.checkForUpdates()
 }
 
-autoUpdater.on('update-downloaded', (evt) => {
+// development version only
+exports.fakeCheckForUpdate = () => {
+  BrowserWindow.getFocusedWindow().webContents.send('update-available')
+}
+
+exports.update = () => {
+  console.log('update requested in updater')
   autoUpdater.quitAndInstall()
+}
+
+autoUpdater.on('update-downloaded', (evt) => {
+  BrowserWindow.getFocusedWindow().webContents.send('update-available')
 })
 
 autoUpdater.on('update-available', (evt) => {
-  console.log('update is available')
+  console.log('update downloading')
 })
 
 autoUpdater.on('update-not-available', (evt) => {

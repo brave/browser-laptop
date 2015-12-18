@@ -16,6 +16,7 @@ const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
+const UpdateBar = require('./updateBar')
 
 // Constants
 const Config = require('../constants/config')
@@ -110,6 +111,7 @@ class Main extends ImmutableComponent {
           key='tab-bar'
           activeFrame={activeFrame}
         />
+      {this.props.browser.get('updateAvailable') ? <UpdateBar/> : null}
       </div>
       <div className='mainContainer'
         onFocus={this.onMainFocus.bind(this)}>
