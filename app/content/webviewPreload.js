@@ -158,3 +158,8 @@ ipc.on('set-ad-div-candidates', function (e, adDivCandidates, placeholderUrl) {
     })
   })
 })
+
+document.addEventListener('contextmenu', (e) => {
+  ipc.send('context-menu-opened', e.target.nodeName)
+  e.preventDefault()
+}, false)

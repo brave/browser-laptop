@@ -10,6 +10,7 @@ const ipc = electron.ipcRenderer
 // Actions
 const AppActions = require('../actions/appActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
+const contextMenus = require('../contextMenus')
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -31,6 +32,10 @@ class Main extends ImmutableComponent {
       })
     }
 
+    ipc.on('context-menu-opened', (e, nodeName) => {
+      console.log('got context menu open', nodeName)
+      contextMenus.onMainContextMenu(nodeName)
+    })
     ipc.on('shortcut-new-frame', (event, url) => {
       AppActions.newFrame({
         location: url || Config.defaultUrl
@@ -40,7 +45,9 @@ class Main extends ImmutableComponent {
       electron.remote.getCurrentWebContents().send('shortcut-focus-url')
     })
 
-    ipc.on('shortcut-close-frame', () => AppActions.closeFrame())
+    ipc.on('shortcut-close-frame', (e, i) => typeof i !== 'undefined'
+      ? AppActions.closeFrame(FrameStateUtil.getFrameByKey(self.props.browser, i))
+      : AppActions.closeFrame())
     ipc.on('shortcut-undo-closed-frame', () => AppActions.undoClosedFrame())
 
     const self = this

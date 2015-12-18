@@ -13,6 +13,8 @@ const cx = require('../lib/classSet.js')
 const getFavicon = require('../lib/faviconUtil.js')
 const FrameStateUtil = require('../state/frameStateUtil')
 
+const contextMenus = require('../contextMenus')
+
 import Config from '../constants/config.js'
 
 class DragIndicator extends ImmutableComponent {
@@ -163,6 +165,7 @@ class Tab extends ImmutableComponent {
       onDragOver={this.onDragOver.bind(this)}
       onDrop={this.onDrop.bind(this)}
       onClick={this.setActiveFrame.bind(this)}
+      onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps.get('key'))}
       style={activeTabStyle}>
       <div className='thumbnail'
         style={thumbnailStyle} />
