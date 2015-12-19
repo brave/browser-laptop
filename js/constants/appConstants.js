@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
+
 const _ = null
 const appConstants = {
   APP_SET_URL: _,
@@ -31,10 +33,9 @@ const appConstants = {
   APP_UNDO_CLOSED_FRAME: _,
   APP_SET_ACTIVE_FRAME_SHORTCUT: _,
   APP_SET_URL_BAR_AUTOSELECTED: _,
-  APP_SET_SEARCH_DETAIL: _
+  APP_SET_SEARCH_DETAIL: _,
+  APP_ADD_SITE: _,
+  APP_REMOVE_SITE: _
 }
 
-// Set each appConstant to an integer value
-Object.keys(appConstants).forEach((k, i) => appConstants[k] = i + 1)
-
-module.exports = appConstants
+module.exports = mapValuesByKeys(appConstants)

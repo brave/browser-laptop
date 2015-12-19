@@ -8,6 +8,9 @@ const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
+const AppActions = require('../actions/appActions')
+const {isSiteInList} = require('../state/siteUtil')
+const SiteTags = require('../constants/siteTags')
 
 class NavigationBar extends ImmutableComponent {
 
@@ -16,12 +19,12 @@ class NavigationBar extends ImmutableComponent {
       this.props.activeFrame.get('loading')
   }
 
-  onAddSite () {
-    // TODO
+  onAddBookmark () {
+    AppActions.addSite(this.props.activeFrame, SiteTags.BOOKMARK)
   }
 
-  onRemoveSite () {
-    // TODO
+  onRemoveBookmark () {
+    AppActions.removeSite(this.props.activeFrame, SiteTags.BOOKMARK)
   }
 
   onBraveMenu () {
@@ -34,6 +37,11 @@ class NavigationBar extends ImmutableComponent {
 
   onStop () {
     process.emit('stop-active-frame')
+  }
+
+  get bookmarked () {
+    return this.props.activeFrame &&
+      isSiteInList(this.props.sites, this.props.activeFrame.get('location'), SiteTags.BOOKMARK)
   }
 
   render () {
@@ -69,10 +77,10 @@ class NavigationBar extends ImmutableComponent {
       <div className='endButtons'>
         <Button iconClass='fa-star'
           className='navbutton bookmark-button'
-          onClick={this.onAddSite.bind(this, 'bookmark')} />
+          onClick={this.onAddBookmark.bind(this)} />
         <Button iconClass='fa-star'
           className='navbutton remove-bookmark-button'
-          onClick={this.onRemoveSite.bind(this, 'bookmark')} />
+          onClick={this.onRemoveBookmark.bind(this)} />
         <Button iconClass='fa-shield'
           className='navbutton brave-menu'
           onClick={this.onBraveMenu.bind(this)} />

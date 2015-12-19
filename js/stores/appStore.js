@@ -7,6 +7,7 @@ const EventEmitter = require('events').EventEmitter
 const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
+const SiteUtil = require('../state/siteUtil')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
@@ -286,6 +287,14 @@ AppDispatcher.register((action) => {
       appState = appState.merge({
         searchDetail: action.searchDetail
       })
+      break
+    case AppConstants.APP_ADD_SITE:
+      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag))
+      appStore.emitChange()
+      break
+    case AppConstants.APP_REMOVE_SITE:
+      appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))
+      appStore.emitChange()
       break
     default:
   }

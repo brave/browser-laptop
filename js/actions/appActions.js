@@ -412,6 +412,32 @@ const AppActions = {
       actionType: AppConstants.APP_SET_SEARCH_DETAIL,
       searchDetail
     })
+  },
+
+  /**
+   * Adds a site to the site list
+   * @param frameProps the frameProps for the frame in to bookmark
+   * @param tag A tag to associate with the site. e.g. bookmarks.
+   */
+  addSite: function (frameProps, tag) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_SITE,
+      frameProps,
+      tag
+    })
+  },
+
+  /**
+   * Removes a site from the site list
+   * @param frameProps the frameProps for the frame in to bookmark
+   * @param tag A tag to associate with the site. e.g. bookmarks.
+   */
+  removeSite: function (frameProps, tag) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_SITE,
+      frameProps,
+      tag
+    })
   }
 }
 
