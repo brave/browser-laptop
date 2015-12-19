@@ -5,6 +5,7 @@
 const electron = require('electron')
 const app = electron.app
 const Menu = require('menu')
+const messages = require('../js/constants/messages')
 
 const init = () => {
   var template = [
@@ -14,7 +15,7 @@ const init = () => {
         {
           label: 'Check for updates ...',
           click: function (item, focusedWindow) {
-            process.emit('check-for-update')
+            process.emit(messages.CHECK_FOR_UPDATE)
           }
         },
         {
@@ -22,26 +23,26 @@ const init = () => {
           accelerator: 'CmdOrCtrl+T',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              focusedWindow.webContents.send('shortcut-new-frame')
+              focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME)
             } else {
               // no active windows
-              process.emit('new-window')
+              process.emit(messages.NEW_WINDOW)
             }
           }
         }, {
           label: 'New Private Tab',
           accelerator: 'CmdOrCtrl+Alt+T',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame')
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME)
           }
         }, {
           label: 'New Window',
           accelerator: 'CmdOrCtrl+N',
-          click: () => process.emit('new-window')
+          click: () => process.emit(messages.NEW_WINDOW)
         }, {
           label: 'New Private Window',
           accelerator: 'CmdOrCtrl+Alt+N',
-          click: () => process.emit('new-window')
+          click: () => process.emit(messages.NEW_WINDOW)
         }, {
           type: 'separator'
         }, {
@@ -68,7 +69,7 @@ const init = () => {
           accelerator: 'CmdOrCtrl+W',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              focusedWindow.webContents.send('shortcut-close-frame')
+              focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME)
             }
           }
         }, {
@@ -78,7 +79,7 @@ const init = () => {
           accelerator: 'CmdOrCtrl+Shift+W',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              process.emit('close-window')
+              process.emit(messages.CLOSE_WINDOW)
             }
           }
         }, {
@@ -225,7 +226,7 @@ const init = () => {
           accelerator: 'CmdOrCtrl+Alt+I',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              focusedWindow.webContents.send('shortcut-active-frame-toggle-dev-tools')
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
             }
           }
         }, {
@@ -404,7 +405,7 @@ const init = () => {
         {
           label: 'Brave Help',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame',
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
                                            'https://brave.com')
           }
         }, {
@@ -412,13 +413,13 @@ const init = () => {
         }, {
           label: 'Submit Feedback...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame',
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
                                            'https://brave.com')
           }
         }, {
           label: 'Spread the word about Brave...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame',
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
                                            'https://brave.com')
           }
         }
@@ -444,7 +445,7 @@ const init = () => {
         }, {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send('shortcut-new-frame',
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
                                            'https://brave.com')
           }
         }, {

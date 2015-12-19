@@ -8,6 +8,7 @@ const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
 const ipc = global.require('electron').ipcRenderer
+const messages = require('../constants/messages')
 
 // For this simple example, store immutable data object for a simple counter.
 // This is of course very silly, but this is just for an app template with top
@@ -290,7 +291,7 @@ AppDispatcher.register((action) => {
   }
 })
 
-ipc.on('update-available', () => {
+ipc.on(messages.UPDATE_AVAILABLE, () => {
   console.log('appStore update-available')
   appState = appState.merge({
     updateAvailable: true
@@ -298,13 +299,13 @@ ipc.on('update-available', () => {
   appStore.emitChange()
 })
 
-ipc.on('shortcut-next-tab', () => {
+ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   appState = FrameStateUtil.makeNextFrameActive(appState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
   appStore.emitChange()
 })
 
-ipc.on('shortcut-prev-tab', () => {
+ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   appState = FrameStateUtil.makePrevFrameActive(appState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(appState))
   appStore.emitChange()

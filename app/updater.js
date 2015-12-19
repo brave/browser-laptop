@@ -8,6 +8,7 @@ const path = require('path')
 const fs = require('fs')
 const autoUpdater = require('auto-updater')
 const config = require('./appConfig')
+const messages = require('../js/constants/messages')
 
 // this maps the result of a call to process.platform to an update API identifier
 var platforms = {
@@ -37,7 +38,7 @@ exports.checkForUpdate = () => {
 
 // development version only
 exports.fakeCheckForUpdate = () => {
-  BrowserWindow.getFocusedWindow().webContents.send('update-available')
+  BrowserWindow.getFocusedWindow().webContents.send(messages.UPDATE_AVAILABLE)
 }
 
 exports.update = () => {
@@ -45,14 +46,14 @@ exports.update = () => {
   autoUpdater.quitAndInstall()
 }
 
-autoUpdater.on('update-downloaded', (evt) => {
-  BrowserWindow.getFocusedWindow().webContents.send('update-available')
+autoUpdater.on(messages.UPDATE_DOWNLOADED, (evt) => {
+  BrowserWindow.getFocusedWindow().webContents.send(messages.UPDATE_AVAILABLE)
 })
 
-autoUpdater.on('update-available', (evt) => {
+autoUpdater.on(messages.UPDATE_AVAILABLE, (evt) => {
   console.log('update downloading')
 })
 
-autoUpdater.on('update-not-available', (evt) => {
+autoUpdater.on(messages.UPDATE_NOT_AVAILABLE, (evt) => {
   console.log('update is not available')
 })

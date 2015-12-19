@@ -10,6 +10,7 @@ const Config = require('../constants/config')
 const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
 const AppStore = require('../stores/appStore')
 const ipc = global.require('electron').ipcRenderer
+const messages = require('../constants/messages')
 
 const AppActions = {
   /**
@@ -135,7 +136,7 @@ const AppActions = {
    * Dispatches an event to the main process to create a new window
    */
   newWindow: function () {
-    ipc.send('new-window')
+    ipc.send(messages.NEW_WINDOW)
   },
 
   closeFrame: function (frameProps) {
@@ -153,7 +154,7 @@ const AppActions = {
    * Dispatches an event to the main process to close the current window
    */
   closeWindow: function () {
-    ipc.send('close-window')
+    ipc.send(messages.CLOSE_WINDOW)
   },
 
   /**
@@ -161,7 +162,7 @@ const AppActions = {
    */
   updateRequested: function () {
     console.log('appActions updateRequested')
-    ipc.send('update-requested')
+    ipc.send(messages.UPDATE_REQUESTED)
   },
 
   /**
@@ -178,7 +179,7 @@ const AppActions = {
    * Dispatches an event to the main process to quit the entire application
    */
   quitApplication: function () {
-    ipc.send('quit-application')
+    ipc.send(messages.QUIT_APPLICATION)
   },
 
   /**
