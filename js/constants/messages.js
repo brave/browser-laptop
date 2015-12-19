@@ -19,7 +19,7 @@ const messages = {
   SHORTCUT_SET_ACTIVE_FRAME_TO_LAST: _,
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
-  SHORTCUT_CLOSE_FRAME: _,
+  SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
   SHORTCUT_UNDO_CLOSED_FRAME: _,
   SHORTCUT_FRAME_MUTE: _,
   SHORTCUT_FRAME_RELOAD: _, /** @arg {number} key of frame */
@@ -29,7 +29,7 @@ const messages = {
   CLOSE_WINDOW: _,
   NEW_WINDOW: _,
   // Misc
-  CONTEXT_MENU_OPENED: _,
+  CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
   QUIT_APPLICATION: _,
   // Updates
   UPDATE_REQUESTED: _,
