@@ -5,6 +5,7 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
+const messages = require('../js/constants/messages')
 
 module.exports.register = (win) => {
   // Most of these events will simply be listened to by the app store and acted
@@ -12,24 +13,24 @@ module.exports.register = (win) => {
   // the URL bar.  In those cases it's acceptable for the individual components to
   // listen to the events.
   const simpleWebContentEvents = [
-    ['CmdOrCtrl+L', 'shortcut-focus-url'],
-    ['Ctrl+Tab', 'shortcut-next-tab'],
-    ['Ctrl+Shift+Tab', 'shortcut-prev-tab'],
-    ['CmdOrCtrl+Shift+]', 'shortcut-next-tab'],
-    ['CmdOrCtrl+Shift+[', 'shortcut-prev-tab'],
-    ['CmdOrCtrl+9', 'shortcut-set-active-frame-to-last'],
-    ['CmdOrCtrl+Shift+T', 'shortcut-undo-closed-frame'],
-    ['Escape', 'shortcut-active-frame-stop'],
-    ['CmdOrCtrl+R', 'shortcut-active-frame-reload'],
-    ['CmdOrCtrl+=', 'shortcut-active-frame-zoom-in'],
-    ['CmdOrCtrl+-', 'shortcut-active-frame-zoom-out'],
-    ['CmdOrCtrl+0', 'shortcut-active-frame-zoom-reset'],
-    ['CmdOrCtrl+Alt+I', 'shortcut-active-frame-toggle-dev-tools']
+    ['CmdOrCtrl+L', messages.SHORTCUT_FOCUS_URL],
+    ['Ctrl+Tab', messages.SHORTCUT_NEXT_TAB],
+    ['Ctrl+Shift+Tab', messages.SHORTCUT_PREV_TAB],
+    ['CmdOrCtrl+Shift+]', messages.SHORTCUT_NEXT_TAB],
+    ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
+    ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
+    ['CmdOrCtrl+Shift+T', messages.SHORTCUT_UNDO_CLOSED_FRAME],
+    ['Escape', messages.SHORTCUT_ACTIVE_FRAME_STOP],
+    ['CmdOrCtrl+R', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
+    ['CmdOrCtrl+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN],
+    ['CmdOrCtrl+-', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT],
+    ['CmdOrCtrl+0', messages.SHORTCUT_ACTIVE_FRAME_RESET],
+    ['CmdOrCtrl+Alt+I', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS]
   ]
 
   // Tab ordering shortcuts
   Array.from(new Array(8), (x, i) => i).reduce((list, i) => {
-    list.push(['CmdOrCtrl+' + String(i + 1), 'shortcut-set-active-frame-by-index', i])
+    list.push(['CmdOrCtrl+' + String(i + 1), messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, i])
     return list
   }, simpleWebContentEvents)
 

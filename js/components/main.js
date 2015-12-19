@@ -21,6 +21,7 @@ const UpdateBar = require('./updateBar')
 
 // Constants
 const Config = require('../constants/config')
+const messages = require('../constants/messages')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -33,29 +34,29 @@ class Main extends ImmutableComponent {
       })
     }
 
-    ipc.on('context-menu-opened', (e, nodeName) => {
+    ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
       console.log('got context menu open', nodeName)
       contextMenus.onMainContextMenu(nodeName)
     })
-    ipc.on('shortcut-new-frame', (event, url) => {
+    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url) => {
       AppActions.newFrame({
         location: url || Config.defaultUrl
       })
 
       // Focus URL bar when adding tab via shortcut
-      electron.remote.getCurrentWebContents().send('shortcut-focus-url')
+      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_FOCUS_URL)
     })
 
-    ipc.on('shortcut-close-frame', (e, i) => typeof i !== 'undefined'
+    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
       ? AppActions.closeFrame(FrameStateUtil.getFrameByKey(self.props.browser, i))
       : AppActions.closeFrame())
-    ipc.on('shortcut-undo-closed-frame', () => AppActions.undoClosedFrame())
+    ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => AppActions.undoClosedFrame())
 
     const self = this
-    ipc.on('shortcut-set-active-frame-by-index', (e, i) =>
+    ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
       AppActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.browser, i)))
 
-    ipc.on('shortcut-set-active-frame-to-last', () =>
+    ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
       AppActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
 
     loadOpenSearch().then(searchDetail => AppActions.setSearchDetail(searchDetail))

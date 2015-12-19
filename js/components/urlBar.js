@@ -12,23 +12,24 @@ const cx = require('../lib/classSet.js')
 const ipc = global.require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
+const messages = require('../constants/messages')
 
 import {isUrl} from '../lib/appUrlUtil.js'
 
 class UrlBar extends ImmutableComponent {
   constructor () {
     super()
-    ipc.on('shortcut-focus-url', () => {
+    ipc.on(messages.SHORTCUT_FOCUS_URL, () => {
       AppActions.setNavBarFocused(true)
       AppActions.setUrlBarAutoselected(true)
     })
     // escape key handling
-    ipc.on('shortcut-active-frame-stop', () => {
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, () => {
       this.restore()
       AppActions.setUrlBarAutoselected(true)
       AppActions.setUrlBarActive(true)
     })
-    process.on('focus-urlbar', () => {
+    process.on(messages.FOCUS_URLBAR, () => {
       this.updateDOMInputFocus(true)
     })
   }

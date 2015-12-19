@@ -4,6 +4,7 @@
 
 const remote = require('remote')
 const Menu = remote.require('menu')
+const messages = require('./constants/messages')
 
 function tabTemplateInit (tabKey) {
   return [
@@ -11,7 +12,7 @@ function tabTemplateInit (tabKey) {
       label: 'Reload tab',
       click: (item, focusedWindow) => {
         if (focusedWindow) {
-          focusedWindow.webContents.send('shortcut-frame-reload', tabKey)
+          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
         }
       }
     }, {
@@ -30,7 +31,7 @@ function tabTemplateInit (tabKey) {
       click: (item, focusedWindow) => {
         if (focusedWindow) {
           // TODO: Don't switch active tabs when this is called
-          focusedWindow.webContents.send('shortcut-close-frame', tabKey)
+          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabKey)
         }
       }
     }
@@ -43,14 +44,14 @@ function mainTemplateInit (nodeName) {
       label: 'Reload',
       click: (item, focusedWindow) => {
         if (focusedWindow) {
-          focusedWindow.webContents.send('shortcut-active-frame-reload')
+          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
         }
       }
     }, {
       label: 'View Page Source',
       click: (item, focusedWindow) => {
         if (focusedWindow) {
-          focusedWindow.webContents.send('shortcut-active-frame-view-source')
+          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
         }
       }
     }, {

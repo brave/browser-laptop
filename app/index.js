@@ -10,6 +10,7 @@ const BrowserWindow = electron.BrowserWindow
 const Menu = require('./menu')
 const LocalShortcuts = require('./localShortcuts')
 const Updater = require('./updater')
+const messages = require('../js/constants/messages')
 
 // Report crashes
 electron.crashReporter.start()
@@ -57,23 +58,23 @@ const spawnWindow = () => {
 app.on('ready', function () {
   windows.push(spawnWindow())
 
-  ipcMain.on('quit-application', () => {
+  ipcMain.on(messages.QUIT_APPLICATION, () => {
     app.quit()
   })
 
-  ipcMain.on('context-menu-opened', (e, nodeName) => {
-    BrowserWindow.getFocusedWindow().webContents.send('context-menu-opened', nodeName)
+  ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
+    BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
   })
 
-  ipcMain.on('new-window', () => windows.push(spawnWindow()))
-  process.on('new-window', () => windows.push(spawnWindow()))
+  ipcMain.on(messages.NEW_WINDOW, () => windows.push(spawnWindow()))
+  process.on(messages.NEW_WINDOW, () => windows.push(spawnWindow()))
 
-  ipcMain.on('close-window', () => BrowserWindow.getFocusedWindow().close())
-  process.on('close-window', () => BrowserWindow.getFocusedWindow().close())
+  ipcMain.on(messages.CLOSE_WINDOW, () => BrowserWindow.getFocusedWindow().close())
+  process.on(messages.CLOSE_WINDOW, () => BrowserWindow.getFocusedWindow().close())
 
   Menu.init()
 
-  ipcMain.on('update-requested', () => {
+  ipcMain.on(messages.UPDATE_REQUESTED, () => {
     Updater.update()
   })
 
@@ -82,8 +83,8 @@ app.on('ready', function () {
     Updater.init(process.platform)
 
     // this is fired by the menu entry
-    process.on('check-for-update', () => Updater.checkForUpdate())
+    process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
   } else {
-    process.on('check-for-update', () => Updater.fakeCheckForUpdate())
+    process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
   }
 })
