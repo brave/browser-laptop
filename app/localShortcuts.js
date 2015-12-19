@@ -20,12 +20,7 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
     ['CmdOrCtrl+Shift+T', messages.SHORTCUT_UNDO_CLOSED_FRAME],
-    ['Escape', messages.SHORTCUT_ACTIVE_FRAME_STOP],
-    ['CmdOrCtrl+R', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
-    ['CmdOrCtrl+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN],
-    ['CmdOrCtrl+-', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT],
-    ['CmdOrCtrl+0', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET],
-    ['CmdOrCtrl+Alt+I', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS]
+    ['Escape', messages.SHORTCUT_ACTIVE_FRAME_STOP]
   ]
 
   // Tab ordering shortcuts
@@ -38,10 +33,6 @@ module.exports.register = (win) => {
     electronLocalshortcut.register(win, shortcutEventName[0], () => {
       BrowserWindow.getFocusedWindow().webContents.send(shortcutEventName[1], shortcutEventName[2])
     }))
-
-  electronLocalshortcut.register(win, 'CmdOrCtrl+Shift+J', () => {
-    BrowserWindow.getFocusedWindow().toggleDevTools()
-  })
 }
 
 module.exports.unregister = (win) => {

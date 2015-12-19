@@ -34,6 +34,9 @@ class Frame extends ImmutableComponent {
       case 'reload':
         this.webview.reload()
         break
+      case 'clean-reload':
+        this.webview.reloadIgnoringCache()
+        break
       case 'zoom-in':
         this.webview.send('zoom-in')
         break
