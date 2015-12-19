@@ -6,7 +6,6 @@ describe('application launch', function () {
   const brave = new Brave(this) // eslint-disable-line
   it('opens a window and loads the UI', function *() {
     yield this.app.client.waitUntilWindowLoaded()
-      .getWindowCount().should.eventually.equal(2)
       .isWindowMinimized().should.eventually.be.false
       .isWindowDevToolsOpened().should.eventually.be.false
       .isWindowVisible().should.eventually.be.true

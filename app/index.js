@@ -79,7 +79,7 @@ app.on('ready', function () {
   })
 
   // this only works on prod
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
     Updater.init(process.platform)
 
     // this is fired by the menu entry
