@@ -24,7 +24,7 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+R', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
     ['CmdOrCtrl+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN],
     ['CmdOrCtrl+-', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT],
-    ['CmdOrCtrl+0', messages.SHORTCUT_ACTIVE_FRAME_RESET],
+    ['CmdOrCtrl+0', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET],
     ['CmdOrCtrl+Alt+I', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS]
   ]
 
