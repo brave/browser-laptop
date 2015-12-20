@@ -3,7 +3,8 @@
 const Brave = require('./lib/brave')
 
 describe('application launch', function () {
-  const brave = new Brave(this) // eslint-disable-line
+  Brave.beforeAll(this)
+
   it('opens a window and loads the UI', function *() {
     yield this.app.client.waitUntilWindowLoaded()
       .isWindowMinimized().should.eventually.be.false

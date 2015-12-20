@@ -8,7 +8,6 @@ const _ = null
 const messages = {
   // URL bar shortcuts
   SHORTCUT_FOCUS_URL: _,
-  FOCUS_URLBAR: _,
   // Active frame shortcuts
   SHORTCUT_ACTIVE_FRAME_STOP: _,
   SHORTCUT_ACTIVE_FRAME_RELOAD: _,

@@ -31,6 +31,11 @@ To run the browser in Windows:
 
     num run start-win
 
+To run the tests:
+
+    npm run watch-test  or  npm run watch-all
+
+    npm test
 
 ### Running inside of a development version of Brave's Electron fork
 

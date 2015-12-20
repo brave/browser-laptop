@@ -8,6 +8,8 @@
     "start-win": "set NODE_ENV=development&& electron . --debug=5858",
     "start-brk": "NODE_ENV=development electron . --debug-brk=5858",
     "start-win-brk": "set NODE_ENV=development&& electron . --debug-brk=5858",
+    "watch-all": "npm run watch & npm run watch-test",
+    "watch-test": "NODE_ENV=test webpack --watch",
     "watch": "webpack-dev-server",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
@@ -18,7 +20,7 @@
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
     "zip-darwin": "node build-darwin-update.js",
     "postinstall": "webpack",
-    "test": "NODE_ENV=test mocha --compilers js:babel-register"
+    "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
   "repository": {
     "type": "git",

@@ -11,7 +11,6 @@ const AppActions = require('../actions/appActions')
 class TabsToolbarButtons extends ImmutableComponent {
   onNewFrame () {
     AppActions.newFrame()
-    process.emit('focus-urlbar')
   }
 
   onMenu () {

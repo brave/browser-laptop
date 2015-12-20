@@ -17,22 +17,6 @@ const messages = require('../constants/messages')
 import {isUrl} from '../lib/appUrlUtil.js'
 
 class UrlBar extends ImmutableComponent {
-  constructor () {
-    super()
-    ipc.on(messages.SHORTCUT_FOCUS_URL, () => {
-      AppActions.setNavBarFocused(true)
-      AppActions.setUrlBarAutoselected(true)
-    })
-    // escape key handling
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, () => {
-      this.restore()
-      AppActions.setUrlBarAutoselected(true)
-      AppActions.setUrlBarActive(true)
-    })
-    process.on(messages.FOCUS_URLBAR, () => {
-      this.updateDOMInputFocus(true)
-    })
-  }
 
   isActive () {
     return this.props.urlbar.get('active')
@@ -88,8 +72,6 @@ class UrlBar extends ImmutableComponent {
           this.restore()
           AppActions.setUrlBarAutoselected(true)
         } else {
-          // this can't go through AppActions for some reason
-          // or the whole window will reload on the first page request
           let selectedIndex = this.refs.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
@@ -100,6 +82,8 @@ class UrlBar extends ImmutableComponent {
           } else {
             AppActions.loadUrl(location)
           }
+          // this can't go through AppActions for some reason
+          // or the whole window will reload on the first page request
           this.updateDOMInputFocus(false)
         }
         break
@@ -157,7 +141,22 @@ class UrlBar extends ImmutableComponent {
 
   onFocus (e) {
     AppActions.setNavBarFocused(true)
-    AppActions.setUrlBarAutoselected(false)
+  }
+
+  onActiveFrameStop () {
+    this.restore()
+    AppActions.setUrlBarAutoselected(true)
+    AppActions.setUrlBarActive(false)
+  }
+
+  componentWillMount () {
+    ipc.on(messages.SHORTCUT_FOCUS_URL, this.onFocus.bind(this))
+    // escape key handling
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop.bind(this))
+  }
+
+  componentDidMount () {
+    this.updateDOM()
   }
 
   componentDidUpdate () {
