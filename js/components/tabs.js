@@ -100,7 +100,7 @@ class Tab extends ImmutableComponent {
   }
 
   onCloseFrame () {
-    AppActions.closeFrame(this.props.frameProps)
+    AppActions.closeFrame(this.props.frames, this.props.frameProps)
   }
 
   onMuteFrame (muted) {
@@ -223,6 +223,7 @@ class Tabs extends ImmutableComponent {
           frames.map(frameProps => <Tab
             activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
             frameProps={frameProps}
+            frames={this.props.frames}
             key={'tab-' + frameProps.get('key')}
             isActive={this.props.activeFrame === frameProps}
             isPrivate={frameProps.get('isPrivate')}
