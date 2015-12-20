@@ -107,6 +107,17 @@ class Frame extends ImmutableComponent {
         this.webview.canGoBack(),
         this.webview.canGoForward())
     })
+    this.webview.addEventListener('media-started-playing', ({title}) => {
+      AppActions.setAudioPlaybackActive(this.props.frame, true)
+    })
+    this.webview.addEventListener('media-paused', ({title}) => {
+      AppActions.setAudioPlaybackActive(this.props.frame, false)
+    })
+    // Ensure we mute appropriately, the initial value could be set
+    // from persisted state.
+    if (this.props.frame.get('audioMuted')) {
+      this.webview.setAudioMuted(true)
+    }
   }
 
   insertAds (currentLocation) {
@@ -123,6 +134,16 @@ class Frame extends ImmutableComponent {
 
   goForward () {
     this.webview.goForward()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.frame.get('audioMuted') &&
+      this.props.frame.get('audioMuted') !== true) {
+      this.webview.setAudioMuted(true)
+    } else if (!nextProps.frame.get('audioMuted') &&
+      this.props.frame.get('audioMuted') === true) {
+      this.webview.setAudioMuted(false)
+    }
   }
 
   render () {

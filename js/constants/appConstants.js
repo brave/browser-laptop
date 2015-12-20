@@ -35,7 +35,9 @@ const appConstants = {
   APP_SET_URL_BAR_AUTOSELECTED: _,
   APP_SET_SEARCH_DETAIL: _,
   APP_ADD_SITE: _,
-  APP_REMOVE_SITE: _
+  APP_REMOVE_SITE: _,
+  APP_SET_AUDIO_MUTED: _,
+  APP_SET_AUDIO_PLAYBACK_ACTIVE: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

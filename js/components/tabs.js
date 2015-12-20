@@ -103,6 +103,10 @@ class Tab extends ImmutableComponent {
     AppActions.closeFrame(this.props.frameProps)
   }
 
+  onMuteFrame (muted) {
+    AppActions.setAudioMuted(this.props.frameProps, muted)
+  }
+
   render () {
     const thumbnailWidth = 160
     const thumbnailHeight = 100
@@ -139,7 +143,7 @@ class Tab extends ImmutableComponent {
           !this.props.frameProps.get('audioMuted'),
         'fa-volume-off': this.props.frameProps.get('audioMuted')
       })}
-      onClick={this.props.frameProps.get('audioMuted') ? this.props.onUnmuteFrame : this.props.onMuteFrame} />
+      onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
     }
 
     return <div className='tabArea'

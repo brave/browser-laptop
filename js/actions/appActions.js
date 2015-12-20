@@ -438,6 +438,32 @@ const AppActions = {
       frameProps,
       tag
     })
+  },
+
+  /**
+   * Dispatches a message to indicate that the frame should be muted
+   *
+   * @param muted true if the frame is muted
+   */
+  setAudioMuted: function (frameProps, muted) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_AUDIO_MUTED,
+      frameProps,
+      muted
+    })
+  },
+
+  /**
+   * Dispatches a message to indicate that audio is playing
+   *
+   * @param true if the frame is playing audio
+   */
+  setAudioPlaybackActive: function (frameProps, audioPlaybackActive) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_AUDIO_PLAYBACK_ACTIVE,
+      frameProps,
+      audioPlaybackActive
+    })
   }
 }
 
