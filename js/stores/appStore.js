@@ -296,6 +296,14 @@ AppDispatcher.register((action) => {
       appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_AUDIO_MUTED:
+      appState = appState.setIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_AUDIO_PLAYBACK_ACTIVE:
+      appState = appState.setIn(['frames', FrameStateUtil.getFramePropsIndex(appState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
+      appStore.emitChange()
+      break
     default:
   }
 })

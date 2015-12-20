@@ -20,7 +20,7 @@ const AppActions = {
    * In general, an iframe's src should not be updated when navigating within the frame to a new page,
    * but the location should. For user entered new URLs, both should be updated.
    *
-   * @param location The URL of the page to load
+   * @param {string} location - The URL of the page to load
    */
   loadUrl: function (location) {
     if (UrlUtil.isURL(location)) {
@@ -37,8 +37,8 @@ const AppActions = {
    * This differs from the above in that it will not change the webview's (iframe's) src.
    * This should be used for inter-page navigation but not user initiated loads.
    *
-   * @param location The URL of the page to load
-   * @param key The frame key to modify, it is checked against the active frame and if
+   * @param {string} location - The URL of the page to load
+   * @param {string} key - The frame key to modify, it is checked against the active frame and if
    * it is active the URL text will also be changed.
    */
   setLocation: function (location, key) {
@@ -56,7 +56,7 @@ const AppActions = {
    * Dispatches a message to the store to set the user entered text for the URL bar.
    * Unlike setLocation and loadUrl, this does not modify the state of src and location.
    *
-   * @param location The text to set as the new navbar URL input
+   * @param {string} location - The text to set as the new navbar URL input
    */
   setNavBarUserInput: function (location) {
     AppDispatcher.dispatch({
@@ -69,8 +69,8 @@ const AppActions = {
    * Dispatches a message to the store to set the current frame's title.
    * This should be called in response to the webview encountering a <title> tag.
    *
-   * @param frameProps The frame properties to modify
-   * @param title The title to set for the frame
+   * @param {Object} frameProps - The frame properties to modify
+   * @param {string} title - The title to set for the frame
    */
   setFrameTitle: function (frameProps, title) {
     AppDispatcher.dispatch({
@@ -83,7 +83,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that the webview is loading.
    *
-   * @param frameProps The frame properties for the webview in question.
+   * @param {Object} frameProps - The frame properties for the webview in question.
    */
   onWebviewLoadStart: function (frameProps) {
     AppDispatcher.dispatch({
@@ -95,7 +95,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that the webview is done loading.
    *
-   * @param frameProps The frame properties for the webview in question.
+   * @param {Object} frameProps - The frame properties for the webview in question.
    */
   onWebviewLoadEnd: function (frameProps) {
     AppDispatcher.dispatch({
@@ -107,7 +107,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate if the navigation bar is focused.
    *
-   * @param focused true if the navigation bar should be considered as focused
+   * @param {boolean} focused - true if the navigation bar should be considered as focused
    */
   setNavBarFocused: function (focused) {
     AppDispatcher.dispatch({
@@ -119,9 +119,9 @@ const AppActions = {
   /**
    * Dispatches a message to the store to create a new frame
    *
-   * @param frameOpts An object of frame options such as isPrivate, element, and tab features.
+   * @param {Object} frameOpts - An object of frame options such as isPrivate, element, and tab features.
    *                  These may not all be hooked up in Electron yet.
-   * @param openInForeground true if the new frame should become the new active frame
+   * @param {boolean} openInForeground - true if the new frame should become the new active frame
    */
   newFrame: function (frameOpts = {}, openInForeground = true) {
     frameOpts.location = frameOpts.location || Config.defaultUrl
@@ -185,7 +185,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to set a new frame as the active frame.
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   setActiveFrame: function (frameProps) {
     if (!frameProps) {
@@ -200,7 +200,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to set the tab page index.
    *
-   * @param index the tab page index to change to
+   * @param {number} index - the tab page index to change to
    */
   setTabPageIndex: function (index) {
     AppDispatcher.dispatch({
@@ -212,9 +212,9 @@ const AppActions = {
   /**
    * Dispatches a message to the store to update the back-forward information.
    *
-   * @param frameProps the frame properties for the webview in question.
-   * @param canGoBack Specifies if the active frame has previous entries in its history
-   * @param canGoForward Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {boolean} canGoBack - Specifies if the active frame has previous entries in its history
+   * @param {boolean} canGoForward - Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
    */
   updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
     AppDispatcher.dispatch({
@@ -228,7 +228,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that tab dragging has started for that frame.
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragStart: function (frameProps) {
     AppDispatcher.dispatch({
@@ -240,7 +240,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that tab dragging has stopped for that frame.
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragStop: function (frameProps) {
     AppDispatcher.dispatch({
@@ -252,7 +252,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that something is dragging over the left half of this tab.
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragDraggingOverLeftHalf: function (frameProps) {
     AppDispatcher.dispatch({
@@ -264,7 +264,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that something is dragging over the right half of this tab.
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragDraggingOverRightHalf: function (frameProps) {
     AppDispatcher.dispatch({
@@ -276,7 +276,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that tab dragging has exited the frame
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragExit: function (frameProps) {
     AppDispatcher.dispatch({
@@ -288,7 +288,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that tab dragging has exited the right half of the frame
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragExitRightHalf: function (frameProps) {
     AppDispatcher.dispatch({
@@ -300,7 +300,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that tab dragging started on the tab
    *
-   * @param frameProps the frame properties for the webview in question.
+   * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDraggingOn: function (frameProps) {
     AppDispatcher.dispatch({
@@ -312,9 +312,9 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that the specified frame should move locations.
    *
-   * @param sourceFrameProps the frame properties for the webview to move.
-   * @param destinationFrameProps the frame properties for the webview to move to.
-   * @param prepend Whether or not to prepend to the destinationFrameProps
+   * @param {Object} sourceFrameProps - the frame properties for the webview to move.
+   * @param {Object} destinationFrameProps - the frame properties for the webview to move to.
+   * @param {boolean} prepend - Whether or not to prepend to the destinationFrameProps
    */
   moveTab: function (sourceFrameProps, destinationFrameProps, prepend) {
     AppDispatcher.dispatch({
@@ -325,11 +325,11 @@ const AppActions = {
     })
   },
 
-  /*
+  /**
    * Sets the URL bar suggestions and selected index.
    *
-   * @param suggestionList The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
-   * @param selectedIndex The index for the selected item (users can select items with down arrow on their keyboard)
+   * @param {Object[]} suggestionList - The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
+   * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
    */
   setUrlBarSuggestions: function (suggestionList, selectedIndex) {
     AppDispatcher.dispatch({
@@ -369,7 +369,7 @@ const AppActions = {
   /**
    * Marks the URL bar text as selected or not
    *
-   * @param isSelected Whether or not the URL bar should be autoselected
+   * @param {boolean} isSelected - Whether or not the URL bar should be autoselected
    */
   setUrlBarAutoselected: function (isAutoselected) {
     AppDispatcher.dispatch({
@@ -381,7 +381,7 @@ const AppActions = {
   /**
    * Marks the URL bar as active or not
    *
-   * @param isActive Whether or not the URL bar should be marked as active
+   * @param {boolean} isActive - Whether or not the URL bar should be marked as active
    */
   setUrlBarActive: function (isActive) {
     AppDispatcher.dispatch({
@@ -393,7 +393,7 @@ const AppActions = {
   /**
    * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
    *
-   * @param activeShortcut The text for the new shortcut. Usually this is null to clear info which was previously
+   * @param {string} activeShortcut - The text for the new shortcut. Usually this is null to clear info which was previously
    * set from an IPC call.
    */
   setActiveFrameShortcut: function (activeShortcut) {
@@ -405,7 +405,7 @@ const AppActions = {
 
   /**
    * Dispatches a message to set the search engine details.
-   * @param searchDetail the search details
+   * @param {Object} searchDetail - the search details
    */
   setSearchDetail: function (searchDetail) {
     AppDispatcher.dispatch({
@@ -416,8 +416,8 @@ const AppActions = {
 
   /**
    * Adds a site to the site list
-   * @param frameProps the frameProps for the frame in to bookmark
-   * @param tag A tag to associate with the site. e.g. bookmarks.
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    */
   addSite: function (frameProps, tag) {
     AppDispatcher.dispatch({
@@ -429,14 +429,42 @@ const AppActions = {
 
   /**
    * Removes a site from the site list
-   * @param frameProps the frameProps for the frame in to bookmark
-   * @param tag A tag to associate with the site. e.g. bookmarks.
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    */
   removeSite: function (frameProps, tag) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_SITE,
       frameProps,
       tag
+    })
+  },
+
+  /**
+   * Dispatches a message to indicate that the frame should be muted
+   *
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {boolean} muted - true if the frame is muted
+   */
+  setAudioMuted: function (frameProps, muted) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_AUDIO_MUTED,
+      frameProps,
+      muted
+    })
+  },
+
+  /**
+   * Dispatches a message to indicate that audio is playing
+   *
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {boolean} audioPlaybackActive - true if audio is playing in the frame
+   */
+  setAudioPlaybackActive: function (frameProps, audioPlaybackActive) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_AUDIO_PLAYBACK_ACTIVE,
+      frameProps,
+      audioPlaybackActive
     })
   }
 }
