@@ -48,8 +48,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
-      ? AppActions.closeFrame(FrameStateUtil.getFrameByKey(self.props.browser, i))
-      : AppActions.closeFrame())
+      ? AppActions.closeFrame(self.props.browser.get('frames'), FrameStateUtil.getFrameByKey(self.props.browser, i))
+      : AppActions.closeFrame(self.props.browser.get('frames')))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => AppActions.undoClosedFrame())
 
     const self = this

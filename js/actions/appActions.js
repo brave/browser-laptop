@@ -8,7 +8,6 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
 const Config = require('../constants/config')
 const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
-const AppStore = require('../stores/appStore')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
@@ -139,8 +138,14 @@ const AppActions = {
     ipc.send(messages.NEW_WINDOW)
   },
 
-  closeFrame: function (frameProps) {
-    if (AppStore.getFrameCount() > 1) {
+  /**
+   * Dispatches a message to close a frame
+   *
+   * @param {Object[]} frames - Immutable list of of all the frames
+   * @param {Object} frameProps - The properties of the frame to close
+   */
+  closeFrame: function (frames, frameProps) {
+    if (frames.size > 1) {
       AppDispatcher.dispatch({
         actionType: AppConstants.APP_CLOSE_FRAME,
         frameProps
