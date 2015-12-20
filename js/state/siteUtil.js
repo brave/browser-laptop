@@ -45,7 +45,6 @@ export function isSiteInList (sites, location, tag) {
 export function addSite (sites, frameProps, tag) {
   let index = getSiteUrlIndex(sites, frameProps.get('location'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
-  let visitCount = (sites.getIn([index, 'visitCount']) || 0) + 1
   if (tag) {
     tags = tags.toSet().add(tag).toList()
   } else {
@@ -60,8 +59,7 @@ export function addSite (sites, frameProps, tag) {
     lastAccessed: new Date(),
     tags,
     location: frameProps.get('location'),
-    title: frameProps.get('title'),
-    visitCount
+    title: frameProps.get('title')
   })
 
   if (index === -1) {
