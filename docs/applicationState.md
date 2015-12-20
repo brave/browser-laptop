@@ -36,7 +36,7 @@ Child components should not modify top level state directly, instead they should
   sites: [{
     location: string,
     title: string,
-    tags: [string], // empty, 'bookmark', or 'reader'
+    tags: [string], // empty, 'bookmark', 'pinned', or 'reader'
     lastAccessed: datetime,
   }],
   visits: [{
