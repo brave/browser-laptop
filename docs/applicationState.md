@@ -9,6 +9,8 @@ Child components should not modify top level state directly, instead they should
 {
   activeFrameKey: number,
   frames: [{
+    audioMuted: boolean, // frame is muted
+    audioPlaybackActive: boolean, // frame is playing audio
     canGoBack: boolean,
     canGoForward: boolean,
     icon: string, // url to favicon
