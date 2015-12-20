@@ -162,13 +162,28 @@ const init = () => {
       submenu: [
         {
           label: 'Actual Size',
-          accelerator: 'CmdOrCtrl+0'
+          accelerator: 'CmdOrCtrl+0',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET)
+            }
+          }
         }, {
           label: 'Zoom In',
-          accelerator: 'CmdOrCtrl+Plus' // renders as Shift+Cmd+= on OSX?
+          accelerator: 'CmdOrCtrl+=',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
+            }
+          }
         }, {
           label: 'Zoom Out',
-          accelerator: 'CmdOrCtrl+-'
+          accelerator: 'CmdOrCtrl+-',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
+            }
+          }
         }, {
           type: 'separator'
         }, {
@@ -186,8 +201,7 @@ const init = () => {
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              // TODO: reload active frame
-              focusedWindow.reload()
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
             }
           }
         }, {
@@ -195,8 +209,7 @@ const init = () => {
           accelerator: 'CmdOrCtrl+Shift+R',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              // TODO: reload active frame
-              focusedWindow.reloadIgnoringCache()
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD)
             }
           }
         }, {
@@ -231,7 +244,7 @@ const init = () => {
           }
         }, {
           label: 'Toggle Browser Console',
-          accelerator: 'CmdOrCtrl+Shift+J',
+          accelerator: 'CmdOrCtrl+Alt+J',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
               focusedWindow.toggleDevTools()
