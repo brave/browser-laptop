@@ -30,14 +30,18 @@ const messages = {
   // Window management
   CLOSE_WINDOW: _,
   NEW_WINDOW: _,
-  // Misc
-  CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
   QUIT_APPLICATION: _,
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
-  CHECK_FOR_UPDATE: _
+  CHECK_FOR_UPDATE: _,
+  // Webview page messages
+  ZOOM_IN: _,
+  ZOOM_OUT: _,
+  ZOOM_RESET: _,
+  SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
+  CONTEXT_MENU_OPENED: _ /** @arg {string} nodeName of node being clicked */
 }
 
 module.exports = mapValuesByKeys(messages)

@@ -4,26 +4,27 @@
 
 var webFrame = require('electron').webFrame
 var ipc = require('electron').ipcRenderer
+var messages = require('../../js/constants/messages')
 
 var browserZoomLevel = 0
 var browserMaxZoom = 9
 var browserMinZoom = -8
 
-ipc.on('zoom-in', function () {
+ipc.on(messages.ZOOM_IN, function () {
   if (browserMaxZoom > browserZoomLevel) {
     browserZoomLevel += 1
   }
   webFrame.setZoomLevel(browserZoomLevel)
 })
 
-ipc.on('zoom-out', function () {
+ipc.on(messages.ZOOM_OUT, function () {
   if (browserMinZoom < browserZoomLevel) {
     browserZoomLevel -= 1
   }
   webFrame.setZoomLevel(browserZoomLevel)
 })
 
-ipc.on('zoom-reset', function () {
+ipc.on(messages.ZOOM_RESET, function () {
   browserZoomLevel = 0
   webFrame.setZoomLevel(browserZoomLevel)
 })
@@ -130,7 +131,7 @@ function processAdNode (node, iframeData, replacementUrl) {
 }
 
 // Fires when the browser has ad replacement information to give
-ipc.on('set-ad-div-candidates', function (e, adDivCandidates, placeholderUrl) {
+ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholderUrl) {
   // Keep a lookup for skipped common elements
   var fallbackNodeDataForCommon = {}
 
@@ -171,6 +172,6 @@ ipc.on('set-ad-div-candidates', function (e, adDivCandidates, placeholderUrl) {
 })
 
 document.addEventListener('contextmenu', (e) => {
-  ipc.send('context-menu-opened', e.target.nodeName)
+  ipc.send(messages.CONTEXT_MENU_OPENED, e.target.nodeName)
   e.preventDefault()
 }, false)
