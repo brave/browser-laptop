@@ -15,7 +15,7 @@
     "lint": "standard",
     "sign-darwin": "./sign-darwin.sh",
     "build-darwin": "node ./build-darwin.js",
-    "build-win64": "set NODE_ENV=production&&webpack && rm -Rf Brave-win32-x64 && electron-packager . Brave --overwrite --ignore=\"electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel$|babel-(?!polyfill|regenerator-runtime)\" --platform=win32 --arch=x64 --version=0.35.1 --icon=res/app.ico",
+    "build-win64": "node ./build-win64.js",
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
     "zip-darwin": "node build-darwin-update.js",
