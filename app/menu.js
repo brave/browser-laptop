@@ -7,6 +7,21 @@ const app = electron.app
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 
+/**
+ * Sends a message to the web contents of the focused window.
+ * @param {Object} focusedWindow the focusedWindow if any
+ * @param {Array} message message and arguments to send
+ * @return {boolean} whether the message was sent
+ */
+const sendToFocusedWindow = (focusedWindow, message) => {
+  if (focusedWindow) {
+    focusedWindow.webContents.send.apply(focusedWindow.webContents, message)
+    return true
+  } else {
+    return false
+  }
+}
+
 const init = () => {
   var template = [
     {
@@ -22,9 +37,7 @@ const init = () => {
           label: 'New Tab',
           accelerator: 'CmdOrCtrl+T',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME)
-            } else {
+            if (!sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
               // no active windows
               process.emit(messages.NEW_WINDOW)
             }
@@ -33,7 +46,7 @@ const init = () => {
           label: 'New Private Tab',
           accelerator: 'CmdOrCtrl+Alt+T',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME)
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])
           }
         }, {
           label: 'New Window',
@@ -50,7 +63,10 @@ const init = () => {
           accelerator: 'CmdOrCtrl+O'
         }, {
           label: 'Open Location...',
-          accelerator: 'CmdOrCtrl+L'
+          accelerator: 'CmdOrCtrl+L',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL])
+          }
         }, {
           type: 'separator'
         }, {
@@ -68,9 +84,7 @@ const init = () => {
           label: 'Close Tab',
           accelerator: 'CmdOrCtrl+W',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
           }
         }, {
           // this should be disabled when
@@ -164,25 +178,19 @@ const init = () => {
           label: 'Actual Size',
           accelerator: 'CmdOrCtrl+0',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET])
           }
         }, {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN])
           }
         }, {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT])
           }
         }, {
           type: 'separator'
@@ -200,17 +208,13 @@ const init = () => {
           label: 'Reload Page',
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
           }
         }, {
           label: 'Clean Reload',
           accelerator: 'CmdOrCtrl+Shift+R',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
           }
         }, {
           type: 'separator'
@@ -238,9 +242,7 @@ const init = () => {
           label: 'Toggle Developer Tools',
           accelerator: 'CmdOrCtrl+Alt+I',
           click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
-            }
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
           }
         }, {
           label: 'Toggle Browser Console',
@@ -418,22 +420,22 @@ const init = () => {
         {
           label: 'Brave Help',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
-                                           'https://brave.com')
+            sendToFocusedWindow(focusedWindow,
+                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
           }
         }, {
           type: 'separator'
         }, {
           label: 'Submit Feedback...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
-                                           'https://brave.com')
+            sendToFocusedWindow(focusedWindow,
+                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
           }
         }, {
           label: 'Spread the word about Brave...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
-                                           'https://brave.com')
+            sendToFocusedWindow(focusedWindow,
+                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
           }
         }
       ]
@@ -458,8 +460,8 @@ const init = () => {
         }, {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME,
-                                           'https://brave.com')
+            sendToFocusedWindow(focusedWindow,
+                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
           }
         }, {
           type: 'separator'
