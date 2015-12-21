@@ -37,7 +37,7 @@ const AppActions = {
    * This should be used for inter-page navigation but not user initiated loads.
    *
    * @param {string} location - The URL of the page to load
-   * @param {string} key - The frame key to modify, it is checked against the active frame and if
+   * @param {number} key - The frame key to modify, it is checked against the active frame and if
    * it is active the URL text will also be changed.
    */
   setLocation: function (location, key) {
