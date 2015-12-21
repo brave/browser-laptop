@@ -300,7 +300,7 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowStore.emitChange()
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print']
 frameShortcuts.forEach(shortcut => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {

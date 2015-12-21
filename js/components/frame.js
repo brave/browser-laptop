@@ -9,6 +9,7 @@ const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 const messages = require('../constants/messages.js')
+const remote = global.require('electron').remote
 
 import adInfo from '../data/adInfo.js'
 import Config from '../constants/config.js'
@@ -58,6 +59,13 @@ class Frame extends ImmutableComponent {
         let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         WindowActions.loadUrl(src)
         // TODO: Make the URL bar show the view-source: prefix
+        break
+      case 'save':
+        // TODO: Sometimes this tries to save in a non-existent directory
+        remote.getCurrentWebContents().downloadURL(this.webview.getURL())
+        break
+      case 'print':
+        this.webview.send(messages.PRINT_PAGE)
         break
     }
     if (activeShortcut) {

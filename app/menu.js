@@ -6,6 +6,7 @@ const electron = require('electron')
 const app = electron.app
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
+const dialog = electron.dialog
 
 /**
  * Sends a message to the web contents of the focused window.
@@ -60,7 +61,18 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Open File...',
-          accelerator: 'CmdOrCtrl+O'
+          accelerator: 'CmdOrCtrl+O',
+          click: (item, focusedWindow) => {
+            dialog.showOpenDialog(focusedWindow, {
+              properties: ['openFile', 'multiSelections']
+            }, function (paths) {
+              if (paths) {
+                paths.forEach((path) => {
+                  sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
+                })
+              }
+            })
+          }
         }, {
           label: 'Open Location...',
           accelerator: 'CmdOrCtrl+L',
@@ -100,7 +112,10 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Save Page As...',
-          accelerator: 'CmdOrCtrl+S'
+          accelerator: 'CmdOrCtrl+S',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
+          }
         }, {
           label: 'Share...',
           submenu: [
@@ -114,7 +129,10 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Print...',
-          accelerator: 'CmdOrCtrl+P'
+          accelerator: 'CmdOrCtrl+P',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_PRINT])
+          }
         }
       ]
     }, {

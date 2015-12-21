@@ -29,6 +29,10 @@ ipc.on(messages.ZOOM_RESET, function () {
   webFrame.setZoomLevel(browserZoomLevel)
 })
 
+ipc.on(messages.PRINT_PAGE, function () {
+  window.print()
+})
+
 /**
  * Ensures a node replacement div is visible and has a proper zIndex
  */
