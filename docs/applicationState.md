@@ -32,6 +32,25 @@ Child components should not modify top level state directly, instead they should
     modalPromptDetail: {...},
     basicAuthDetail: {...}
     unloaded: boolean, // true if the tab is unloaded
+    navbar: {
+      focused: boolean, // whether the navbar is focused
+      urlbar: {
+        location: string, // the string displayed in the urlbar
+        urlPreview: string,
+        suggestions: {
+          selectedIndex: number, // index of the item in focus
+          searchResults: array,
+          suggestionList: object,
+        },
+        focused: boolean, // whether the urlbar is focused
+        active: boolean, // whether the user is typing in the urlbar
+        autoselected: boolean, // is the urlbar text autoselected
+      }
+    },
+    searchDetail: {
+      searchURL: string, // with replacement var in string: {searchTerms}
+      autocompleteURL: string, // ditto re: {searchTerms}
+    }
   }],
   sites: [{
     location: string,
@@ -49,26 +68,7 @@ Child components should not modify top level state directly, instead they should
     tabs: {
       activeDraggedTab: object,
       tabPageIndex: number, // Index of the current tab page
-    },
-    navbar: {
-      focused: boolean, // whether the navbar is focused
-      urlbar: {
-        location: string, // the string displayed in the urlbar
-        urlPreview: string,
-        suggestions: {
-          selectedIndex: number, // index of the item in focus
-          searchResults: array,
-          suggestionList: object,
-        },
-        focused: boolean, // whether the urlbar is focused
-        active: boolean, // whether the user is typing in the urlbar
-        autoselected: boolean, // is the urlbar text autoselected
-      }
     }
-  },
-  searchDetail: {
-    searchURL: string, // with replacement var in string: {searchTerms}
-    autocompleteURL: string, // ditto re: {searchTerms}
   }
 }
 ```

@@ -103,12 +103,12 @@ class Main extends ImmutableComponent {
             onClick={this.onForward.bind(this)} />
         </div>
         <NavigationBar
-          navbar={this.props.browser.getIn(['ui', 'navbar'])}
+          navbar={activeFrame && activeFrame.get('navbar')}
           frames={this.props.browser.get('frames')}
           sites={this.props.browser.get('sites')}
           activeFrame={activeFrame}
-          searchSuggestions={this.props.browser.getIn(['ui', 'navbar', 'searchSuggestions'])}
-          searchDetail={this.props.browser.get('searchDetail')}
+          searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
+          searchDetail={activeFrame && activeFrame.get('searchDetail')}
         />
         <TabPages frames={this.props.browser.get('frames')}
           tabPageIndex={this.props.browser.getIn(['ui', 'tabs', 'tabPageIndex'])}
