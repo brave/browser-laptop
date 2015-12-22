@@ -7,7 +7,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const WindowStore = require('../stores/windowStore')
-const AppStore = require('../stores/AppStore')
+const AppStore = require('../stores/appStore')
 const Main = require('./main')
 
 class Window extends React.Component {
