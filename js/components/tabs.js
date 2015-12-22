@@ -7,7 +7,7 @@ const ReactDOM = require('react-dom')
 
 const ImmutableComponent = require('./immutableComponent')
 
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet.js')
 
 const getFavicon = require('../lib/faviconUtil.js')
@@ -45,11 +45,11 @@ class Tab extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    AppActions.tabDragStart(this.props.frameProps)
+    WindowActions.tabDragStart(this.props.frameProps)
   }
 
   onDragEnd () {
-    AppActions.tabDragStop(this.props.frameProps)
+    WindowActions.tabDragStop(this.props.frameProps)
   }
 
   onDragOver (e) {
@@ -57,17 +57,17 @@ class Tab extends ImmutableComponent {
 
     // Otherise, only accept it if we have some frameProps
     if (!this.props.activeDraggedTab) {
-      AppActions.tabDraggingOn(this.props.frameProps)
+      WindowActions.tabDraggingOn(this.props.frameProps)
       return
     }
 
     let rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
     if (e.clientX > rect.left && e.clientX < rect.left + rect.width / 2 &&
       !this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
-      AppActions.tabDragDraggingOverLeftHalf(this.props.frameProps)
+      WindowActions.tabDragDraggingOverLeftHalf(this.props.frameProps)
     } else if (e.clientX < rect.right && e.clientX >= rect.left + rect.width / 2 &&
       !this.props.frameProps.get('tabIsDraggingOverRightHalf')) {
-      AppActions.tabDragDraggingOverRightHalf(this.props.frameProps)
+      WindowActions.tabDragDraggingOverRightHalf(this.props.frameProps)
     }
   }
 
@@ -75,9 +75,9 @@ class Tab extends ImmutableComponent {
     if (this.props.frameProps.get('tabIsDraggingOverLeftHalf') ||
       this.props.frameProps.get('tabIsDraggingOn') ||
       this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
-      AppActions.tabDragExit(this.props.frameProps)
+      WindowActions.tabDragExit(this.props.frameProps)
     } else if (this.props.frameProps.get('tabIsDraggingOverRightHalf')) {
-      AppActions.tabDragExitRightHalf(this.props.frameProps)
+      WindowActions.tabDragExitRightHalf(this.props.frameProps)
     }
   }
 
@@ -88,23 +88,23 @@ class Tab extends ImmutableComponent {
     }
 
     if (this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
-      AppActions.moveTab(sourceFrameProps, this.props.frameProps, true)
+      WindowActions.moveTab(sourceFrameProps, this.props.frameProps, true)
     } else {
-      AppActions.moveTab(sourceFrameProps, this.props.frameProps, false)
+      WindowActions.moveTab(sourceFrameProps, this.props.frameProps, false)
     }
-    AppActions.tabDragExit(this.props.frameProps)
+    WindowActions.tabDragExit(this.props.frameProps)
   }
 
   setActiveFrame () {
-    AppActions.setActiveFrame(this.props.frameProps)
+    WindowActions.setActiveFrame(this.props.frameProps)
   }
 
   onCloseFrame () {
-    AppActions.closeFrame(this.props.frames, this.props.frameProps)
+    WindowActions.closeFrame(this.props.frames, this.props.frameProps)
   }
 
   onMuteFrame (muted) {
-    AppActions.setAudioMuted(this.props.frameProps, muted)
+    WindowActions.setAudioMuted(this.props.frameProps, muted)
   }
 
   render () {
@@ -197,14 +197,14 @@ class Tabs extends ImmutableComponent {
     if (this.activeFrameIndex === 0) {
       return
     }
-    AppActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex - 1))
+    WindowActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex - 1))
   }
 
   onNextFrame () {
     if (this.activeFrameIndex >= this.props.frames.size) {
       return
     }
-    AppActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex + 1))
+    WindowActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex + 1))
   }
 
   render () {

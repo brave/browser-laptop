@@ -5,7 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 
 import Config from '../constants/config.js'
 
@@ -17,7 +17,7 @@ class TabPage extends ImmutableComponent {
       tabPage: true,
       audioPlaybackActive,
       active: this.props.active})}
-      onClick={AppActions.setTabPageIndex.bind(this, this.props.index)
+      onClick={WindowActions.setTabPageIndex.bind(this, this.props.index)
     }>
     </span>
   }

@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
@@ -55,18 +55,18 @@ class Frame extends ImmutableComponent {
         break
       case 'view-source':
         let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        AppActions.loadUrl(src)
+        WindowActions.loadUrl(src)
         // TODO: Make the URL bar show the view-source: prefix
         break
     }
     if (activeShortcut) {
-      AppActions.setActiveFrameShortcut(null)
+      WindowActions.setActiveFrameShortcut(null)
     }
   }
 
   addEventListeners () {
     this.webview.addEventListener('new-window', (e) => {
-      AppActions.newFrame({
+      WindowActions.newFrame({
         location: e.url
       })
     })
@@ -79,7 +79,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-favicon-updated', () => {
     })
     this.webview.addEventListener('page-title-set', ({title}) => {
-      AppActions.setFrameTitle(this.props.frame, title)
+      WindowActions.setFrameTitle(this.props.frame, title)
     })
     this.webview.addEventListener('dom-ready', (event) => {
       this.insertAds(event.target.src)
@@ -87,19 +87,19 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {
         let key = this.props.frame.get('key')
-        AppActions.setLocation(event.url, key)
+        WindowActions.setLocation(event.url, key)
       }
-      AppActions.updateBackForwardState(
+      WindowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
     })
     this.webview.addEventListener('did-start-loading', () => {
-      AppActions.onWebviewLoadStart(
+      WindowActions.onWebviewLoadStart(
         this.props.frame)
     })
     this.webview.addEventListener('did-stop-loading', () => {
-      AppActions.onWebviewLoadEnd(
+      WindowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
     })
@@ -108,10 +108,10 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-finish-load', () => {
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
-      AppActions.setAudioPlaybackActive(this.props.frame, true)
+      WindowActions.setAudioPlaybackActive(this.props.frame, true)
     })
     this.webview.addEventListener('media-paused', ({title}) => {
-      AppActions.setAudioPlaybackActive(this.props.frame, false)
+      WindowActions.setAudioPlaybackActive(this.props.frame, false)
     })
     // Ensure we mute appropriately, the initial value could be set
     // from persisted state.

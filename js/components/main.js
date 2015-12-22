@@ -8,7 +8,7 @@ const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 
 // Actions
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 
@@ -29,7 +29,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 class Main extends ImmutableComponent {
   componentDidMount () {
     if (this.props.browser.get('frames').isEmpty()) {
-      AppActions.newFrame({
+      WindowActions.newFrame({
         location: Config.defaultUrl
       })
     }
@@ -39,7 +39,7 @@ class Main extends ImmutableComponent {
       contextMenus.onMainContextMenu(nodeName)
     })
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url) => {
-      AppActions.newFrame({
+      WindowActions.newFrame({
         location: url || Config.defaultUrl
       })
 
@@ -48,18 +48,18 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
-      ? AppActions.closeFrame(self.props.browser.get('frames'), FrameStateUtil.getFrameByKey(self.props.browser, i))
-      : AppActions.closeFrame(self.props.browser.get('frames')))
-    ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => AppActions.undoClosedFrame())
+      ? WindowActions.closeFrame(self.props.browser.get('frames'), FrameStateUtil.getFrameByKey(self.props.browser, i))
+      : WindowActions.closeFrame(self.props.browser.get('frames')))
+    ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => WindowActions.undoClosedFrame())
 
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
-      AppActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.browser, i)))
+      WindowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.browser, i)))
 
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
-      AppActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
+      WindowActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
 
-    loadOpenSearch().then(searchDetail => AppActions.setSearchDetail(searchDetail))
+    loadOpenSearch().then(searchDetail => WindowActions.setSearchDetail(searchDetail))
   }
 
   get activeFrame () {
@@ -76,7 +76,7 @@ class Main extends ImmutableComponent {
 
   onMainFocus () {
     // When the main container is in focus, set the URL bar to inactive.
-    AppActions.setUrlBarActive(false)
+    WindowActions.setUrlBarActive(false)
   }
 
   render () {
