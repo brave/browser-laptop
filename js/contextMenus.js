@@ -7,6 +7,29 @@ const Menu = remote.require('menu')
 const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 
+function tabPageTemplateInit (framePropsList) {
+  const muteAll = (framePropsList, mute) => {
+    framePropsList.forEach(frameProps => {
+      if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
+        WindowActions.setAudioMuted(frameProps, true)
+      } else if (!mute && frameProps.get('audioMuted')) {
+        WindowActions.setAudioMuted(frameProps, false)
+      }
+    })
+  }
+  return [{
+    label: 'Unmute tabs',
+    click: (item, focusedWindow) => {
+      muteAll(framePropsList, false)
+    }
+  }, {
+    label: 'Mute tabs',
+    click: (item, focusedWindow) => {
+      muteAll(framePropsList, true)
+    }
+  }]
+}
+
 function tabTemplateInit (frameProps) {
   const tabKey = frameProps.get('key')
   const items = []
@@ -108,4 +131,10 @@ export function onTabContextMenu (frameProps, e) {
   e.preventDefault()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(remote.getCurrentWindow())
+}
+
+export function onTabPageContextMenu (framePropsList, e) {
+  e.preventDefault()
+  const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
+  tabPageMenu.popup(remote.getCurrentWindow())
 }

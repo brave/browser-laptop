@@ -6,6 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const WindowActions = require('../actions/windowActions')
+const {onTabPageContextMenu} = require('../contextMenus')
 
 import Config from '../constants/config.js'
 
@@ -17,6 +18,7 @@ class TabPage extends ImmutableComponent {
       tabPage: true,
       audioPlaybackActive,
       active: this.props.active})}
+      onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
       onClick={WindowActions.setTabPageIndex.bind(this, this.props.index)
     }>
     </span>
