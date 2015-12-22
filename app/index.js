@@ -4,20 +4,17 @@
 
 'use strict'
 const electron = require('electron')
+const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
 const app = electron.app
-const BrowserWindow = electron.BrowserWindow
 const Menu = require('./menu')
-const LocalShortcuts = require('./localShortcuts')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
+const AppActions = require('../js/actions/appActions')
+require('../js/stores/appStore')
 
 // Report crashes
 electron.crashReporter.start()
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let windows = []
 
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -27,36 +24,8 @@ app.on('window-all-closed', function () {
   }
 })
 
-const spawnWindow = () => {
-  let mainWindow = new BrowserWindow({
-    width: 1360,
-    height: 800,
-    minWidth: 400,
-    // A frame but no title bar and windows buttons in titlebar.
-    // This only currently has an effect on 10.10 OSX and up and is
-    // ignore on other platforms.
-    'title-bar-style': 'hidden'
-  })
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('file://' + __dirname + '/index-dev.html')
-  } else {
-    mainWindow.loadURL('file://' + __dirname + '/index.html')
-  }
-  mainWindow.on('closed', function () {
-    LocalShortcuts.unregister(mainWindow)
-
-    var index = windows.indexOf(mainWindow)
-    if (index > -1) {
-      windows.splice(index, 1)
-    }
-  })
-
-  LocalShortcuts.register(mainWindow)
-  return mainWindow
-}
-
 app.on('ready', function () {
-  windows.push(spawnWindow())
+  AppActions.newWindow()
 
   ipcMain.on(messages.QUIT_APPLICATION, () => {
     app.quit()
@@ -65,12 +34,6 @@ app.on('ready', function () {
   ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
     BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
   })
-
-  ipcMain.on(messages.NEW_WINDOW, () => windows.push(spawnWindow()))
-  process.on(messages.NEW_WINDOW, () => windows.push(spawnWindow()))
-
-  ipcMain.on(messages.CLOSE_WINDOW, () => BrowserWindow.getFocusedWindow().close())
-  process.on(messages.CLOSE_WINDOW, () => BrowserWindow.getFocusedWindow().close())
 
   Menu.init()
 

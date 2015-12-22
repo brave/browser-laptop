@@ -29,9 +29,6 @@ const messages = {
   SHORTCUT_FRAME_RELOAD: _, /** @arg {number} key of frame */
   SHORTCUT_NEXT_TAB: _,
   SHORTCUT_PREV_TAB: _,
-  // Window management
-  CLOSE_WINDOW: _,
-  NEW_WINDOW: _,
   QUIT_APPLICATION: _,
   // Updates
   UPDATE_REQUESTED: _,
@@ -44,7 +41,9 @@ const messages = {
   ZOOM_RESET: _,
   PRINT_PAGE: _,
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
-  CONTEXT_MENU_OPENED: _ /** @arg {string} nodeName of node being clicked */
+  CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
+  APP_STATE_CHANGE: _,
+  APP_ACTION: _
 }
 
 module.exports = mapValuesByKeys(messages)

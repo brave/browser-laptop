@@ -6,6 +6,8 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const AppConstants = {
+  APP_NEW_WINDOW: _,
+  APP_CLOSE_WINDOW: _,
   APP_ADD_SITE: _,
   APP_REMOVE_SITE: _
 }

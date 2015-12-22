@@ -8,10 +8,13 @@ const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const WindowConstants = require('../constants/windowConstants')
 const Config = require('../constants/config')
 const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
-const ipc = global.require('electron').ipcRenderer
+const electron = global.require('electron')
+const ipc = electron.ipcRenderer
+const remote = electron.remote
 const messages = require('../constants/messages')
+const AppActions = require('./appActions')
 
-const AppActions = {
+const WindowActions = {
   /**
    * Dispatches a message to the store to load a new URL for the active frame.
    * Both the frame's src and location properties will be updated accordingly.
@@ -144,15 +147,8 @@ const AppActions = {
         frameProps
       })
     } else {
-      this.closeWindow()
+      AppActions.closeWindow(remote.getCurrentWindow().id)
     }
-  },
-
-  /**
-   * Dispatches an event to the main process to close the current window
-   */
-  closeWindow: function () {
-    ipc.send(messages.CLOSE_WINDOW)
   },
 
   /**
@@ -447,4 +443,4 @@ const AppActions = {
   }
 }
 
-module.exports = AppActions
+module.exports = WindowActions

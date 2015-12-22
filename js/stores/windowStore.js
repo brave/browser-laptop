@@ -10,9 +10,6 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
-// For this simple example, store immutable data object for a simple counter.
-// This is of course very silly, but this is just for an app template with top
-// level immutable data.
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],

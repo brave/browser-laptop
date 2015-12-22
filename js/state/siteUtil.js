@@ -2,7 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Immutable from 'immutable'
+'use strict'
+const Immutable = require('immutable')
+
+var exports = {}
 
 /**
  * Obtains the index of the location in sites
@@ -11,7 +14,7 @@ import Immutable from 'immutable'
  * @param location The frameProps of the page in question
  * @return index of the location or -1 if not found.
  */
-function getSiteUrlIndex (sites, location) {
+exports.getSiteUrlIndex = function (sites, location) {
   return sites.findIndex(site => site.get('location') === location)
 }
 
@@ -23,8 +26,8 @@ function getSiteUrlIndex (sites, location) {
  * @param tag The tag of the site to check
  * @return true if the location is already bookmarked
  */
-export function isSiteInList (sites, location, tag) {
-  let index = getSiteUrlIndex(sites, location)
+exports.isSiteInList = function (sites, location, tag) {
+  let index = exports.getSiteUrlIndex(sites, location)
   if (index === -1) {
     return false
   }
@@ -42,8 +45,8 @@ export function isSiteInList (sites, location, tag) {
  * Otherwise it's only considered to be a history item
  * @return The new sites Immutable object
  */
-export function addSite (sites, frameProps, tag) {
-  let index = getSiteUrlIndex(sites, frameProps.get('location'))
+exports.addSite = function (sites, frameProps, tag) {
+  let index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -76,8 +79,8 @@ export function addSite (sites, frameProps, tag) {
  * @param frameProps The frameProps of the page in question
  * @return The new sites Immutable object
  */
-export function removeSite (sites, frameProps, tag) {
-  let index = getSiteUrlIndex(sites, frameProps.get('location'))
+exports.removeSite = function (sites, frameProps, tag) {
+  let index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
   if (index === -1) {
     return sites
   }
@@ -85,3 +88,5 @@ export function removeSite (sites, frameProps, tag) {
   let tags = sites.getIn([index, 'tags'])
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
+
+module.exports = exports
