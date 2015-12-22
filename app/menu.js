@@ -164,7 +164,9 @@ const init = () => {
         }, {
           label: 'Paste without formatting',
           accelerator: 'Shift+CmdOrCtrl+V',
-          role: 'paste'
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.pasteAndMatchStyle()
+          }
         }, {
           type: 'separator'
         }, {
