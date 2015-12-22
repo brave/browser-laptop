@@ -89,6 +89,10 @@ class Frame extends ImmutableComponent {
         let key = this.props.frame.get('key')
         AppActions.setLocation(event.url, key)
       }
+      AppActions.updateBackForwardState(
+        this.props.frame,
+        this.webview.canGoBack(),
+        this.webview.canGoForward())
     })
     this.webview.addEventListener('did-start-loading', () => {
       AppActions.onWebviewLoadStart(
@@ -102,10 +106,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-load', () => {
     })
     this.webview.addEventListener('did-finish-load', () => {
-      AppActions.updateBackForwardState(
-        this.props.frame,
-        this.webview.canGoBack(),
-        this.webview.canGoForward())
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
       AppActions.setAudioPlaybackActive(this.props.frame, true)
