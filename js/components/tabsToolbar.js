@@ -6,11 +6,11 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Tabs = require('./tabs')
 const Button = require('./button')
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 
 class TabsToolbarButtons extends ImmutableComponent {
   onNewFrame () {
-    AppActions.newFrame()
+    WindowActions.newFrame()
   }
 
   onMenu () {

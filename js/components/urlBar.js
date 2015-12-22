@@ -6,7 +6,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 
 const ImmutableComponent = require('./immutableComponent')
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 const KeyCodes = require('../constants/keyCodes')
 const cx = require('../lib/classSet.js')
 const ipc = global.require('electron').ipcRenderer
@@ -59,7 +59,7 @@ class UrlBar extends ImmutableComponent {
   // restores the url bar to the current location
   restore () {
     let location = this.props.activeFrameProps.get('location')
-    AppActions.setNavBarUserInput(location)
+    WindowActions.setNavBarUserInput(location)
   }
 
   // Whether the suggestions box is visible
@@ -74,7 +74,7 @@ class UrlBar extends ImmutableComponent {
         let location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
           this.restore()
-          AppActions.setUrlBarAutoselected(true)
+          WindowActions.setUrlBarAutoselected(true)
         } else {
           let selectedIndex = this.refs.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
@@ -82,9 +82,9 @@ class UrlBar extends ImmutableComponent {
             this.refs.urlBarSuggestions.clickSelected()
           } else if (this.props.searchSuggestions && !isUrl(location)) {
             // do search.
-            AppActions.loadUrl(this.searchDetail.get('searchURL').replace('{searchTerms}', location))
+            WindowActions.loadUrl(this.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
-            AppActions.loadUrl(location)
+            WindowActions.loadUrl(location)
           }
           // this can't go through AppActions for some reason
           // or the whole window will reload on the first page request
@@ -105,43 +105,43 @@ class UrlBar extends ImmutableComponent {
         break
       // escape is handled by ipc shortcut-active-frame-stop event
       default:
-        AppActions.setUrlBarAutoselected(false)
-        AppActions.setUrlBarActive(true)
+        WindowActions.setUrlBarAutoselected(false)
+        WindowActions.setUrlBarActive(true)
     }
   }
 
   onClick (e) {
     // if the url bar is already selected then clicking in it should make it active
     if (this.isAutoselected()) {
-      AppActions.setUrlBarAutoselected(false)
-      AppActions.setUrlBarActive(true)
+      WindowActions.setUrlBarAutoselected(false)
+      WindowActions.setUrlBarActive(true)
       e.preventDefault()
     } else if (!this.isActive()) {
-      AppActions.setUrlBarAutoselected(true)
+      WindowActions.setUrlBarAutoselected(true)
     }
   }
 
   onBlur (e) {
     // if suggestion box is active then keep url bar active
     if (!this.suggestionsShown) {
-      AppActions.setUrlBarActive(false)
+      WindowActions.setUrlBarActive(false)
     }
-    AppActions.setUrlBarAutoselected(false)
-    AppActions.setNavBarFocused(false)
+    WindowActions.setUrlBarAutoselected(false)
+    WindowActions.setNavBarFocused(false)
   }
 
   onChange (e) {
-    AppActions.setNavBarUserInput(e.target.value)
+    WindowActions.setNavBarUserInput(e.target.value)
   }
 
   onFocus (e) {
-    AppActions.setNavBarFocused(true)
+    WindowActions.setNavBarFocused(true)
   }
 
   onActiveFrameStop () {
     this.restore()
-    AppActions.setUrlBarAutoselected(true)
-    AppActions.setUrlBarActive(false)
+    WindowActions.setUrlBarAutoselected(true)
+    WindowActions.setUrlBarActive(false)
   }
 
   componentWillMount () {

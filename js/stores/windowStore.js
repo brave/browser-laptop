@@ -77,7 +77,7 @@ const windowStore = new WindowStore()
 // Register callback to handle all updates
 WindowDispatcher.register((action) => {
   switch (action.actionType) {
-    case WindowConstants.APP_SET_URL:
+    case WindowConstants.WINDOW_SET_URL:
       // reload if the url is unchanged
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
         windowState = windowState.mergeIn(activeFrameStatePath(), {
@@ -94,7 +94,7 @@ WindowDispatcher.register((action) => {
       }
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_LOCATION:
+    case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(activeFrameStatePath(), {
         audioPlaybackActive: false,
@@ -106,34 +106,34 @@ WindowDispatcher.register((action) => {
       }
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_NAVBAR_INPUT:
+    case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_FRAME_TITLE:
+    case WindowConstants.WINDOW_SET_FRAME_TITLE:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         title: action.title
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_WEBVIEW_LOAD_START:
+    case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_WEBVIEW_LOAD_END:
+    case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_NAVBAR_FOCUSED:
+    case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.focused)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_NEW_FRAME:
+    case WindowConstants.WINDOW_NEW_FRAME:
       let nextKey = incrementNextKey()
       windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
         nextKey, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
@@ -142,7 +142,7 @@ WindowDispatcher.register((action) => {
       }
       windowStore.emitChange()
       break
-    case WindowConstants.APP_CLOSE_FRAME:
+    case WindowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       let frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
       const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(windowState)
@@ -155,43 +155,43 @@ WindowDispatcher.register((action) => {
       }
       windowStore.emitChange()
       break
-    case WindowConstants.APP_UNDO_CLOSED_FRAME:
+    case WindowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(FrameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_ACTIVE_FRAME:
+    case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
       windowState = windowState.merge({
         activeFrameKey: action.frameProps.get('key')
       })
       updateTabPageIndex(action.frameProps)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_TAB_PAGE_INDEX:
+    case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:
       windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_UPDATE_BACK_FORWARD:
+    case WindowConstants.WINDOW_UPDATE_BACK_FORWARD:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         canGoBack: action.canGoBack,
         canGoForward: action.canGoForward
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAG_START:
+    case WindowConstants.WINDOW_TAB_DRAG_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDragging: true
       })
       windowState = windowState.setIn(['ui', 'tabs', 'activeDraggedTab'], action.frameProps)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAG_STOP:
+    case WindowConstants.WINDOW_TAB_DRAG_STOP:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDragging: false
       })
       windowState = windowState.setIn(['ui', 'tabs', 'activeDraggedTab'], null)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAGGING_OVER_LEFT:
+    case WindowConstants.WINDOW_TAB_DRAGGING_OVER_LEFT:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDraggingOn: false,
         tabIsDraggingOverLeftHalf: true,
@@ -199,7 +199,7 @@ WindowDispatcher.register((action) => {
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAGGING_OVER_RIGHT:
+    case WindowConstants.WINDOW_TAB_DRAGGING_OVER_RIGHT:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDraggingOn: false,
         tabIsDraggingOverLeftHalf: false,
@@ -207,7 +207,7 @@ WindowDispatcher.register((action) => {
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAG_EXIT:
+    case WindowConstants.WINDOW_TAB_DRAG_EXIT:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDraggingOn: false,
         tabIsDraggingOverLeftHalf: false,
@@ -215,13 +215,13 @@ WindowDispatcher.register((action) => {
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAG_EXIT_RIGHT:
+    case WindowConstants.WINDOW_TAB_DRAG_EXIT_RIGHT:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDraggingOverRightHalf: false
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_DRAGGING_ON:
+    case WindowConstants.WINDOW_TAB_DRAGGING_ON:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         tabIsDraggingOn: true,
         tabIsDraggingOverLeftHalf: false,
@@ -229,7 +229,7 @@ WindowDispatcher.register((action) => {
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_TAB_MOVE:
+    case WindowConstants.WINDOW_TAB_MOVE:
       let sourceFramePropsIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.sourceFrameProps)
       let newIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.destinationFrameProps) + (action.prepend ? 0 : 1)
       let frames = windowState.get('frames').splice(sourceFramePropsIndex, 1)
@@ -240,43 +240,43 @@ WindowDispatcher.register((action) => {
       windowState = windowState.set('frames', frames)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_URL_BAR_SUGGESTIONS:
+    case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_URL_BAR_PREVIEW:
+    case WindowConstants.WINDOW_SET_URL_BAR_PREVIEW:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), action.value)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
+    case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionResults']), action.searchResults)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_URL_BAR_ACTIVE:
+    case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_URL_BAR_AUTOSELECTED:
+    case WindowConstants.WINDOW_SET_URL_BAR_AUTOSELECTED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'autoselected']), action.isAutoselected)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_ACTIVE_FRAME_SHORTCUT:
+    case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
       windowState = windowState.mergeIn(activeFrameStatePath(), {
         activeShortcut: action.activeShortcut
       })
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_SEARCH_DETAIL:
+    case WindowConstants.WINDOW_SET_SEARCH_DETAIL:
       windowState = windowState.merge({
         searchDetail: action.searchDetail
       })
       break
-    case WindowConstants.APP_SET_AUDIO_MUTED:
+    case WindowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       windowStore.emitChange()
       break
-    case WindowConstants.APP_SET_AUDIO_PLAYBACK_ACTIVE:
+    case WindowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       windowStore.emitChange()
       break

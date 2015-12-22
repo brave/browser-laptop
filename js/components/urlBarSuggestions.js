@@ -5,7 +5,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 
 import Config from '../constants/config.js'
@@ -51,8 +51,8 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   blur () {
     window.removeEventListener('click', this)
-    AppActions.setUrlBarSuggestions(null, null)
-    AppActions.setUrlBarPreview(null)
+    WindowActions.setUrlBarSuggestions(null, null)
+    WindowActions.setUrlBarPreview(null)
   }
 
   clickSelected () {
@@ -109,9 +109,9 @@ class UrlBarSuggestions extends ImmutableComponent {
 
     let navigateClickHandler = formatUrl => site => {
       let location = formatUrl(site)
-      AppActions.setNavBarUserInput(location)
-      AppActions.loadUrl(location)
-      AppActions.setUrlBarActive(false)
+      WindowActions.setNavBarUserInput(location)
+      WindowActions.loadUrl(location)
+      WindowActions.setUrlBarActive(false)
       this.blur()
     }
 
@@ -187,15 +187,15 @@ class UrlBarSuggestions extends ImmutableComponent {
 
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
-      AppActions.setUrlBarPreview(null)
+      WindowActions.setUrlBarPreview(null)
       newIndex = null
     } else {
       var currentActive = suggestions.get(newIndex - 1)
       if (currentActive && currentActive.title) {
-        AppActions.setUrlBarPreview(currentActive.title)
+        WindowActions.setUrlBarPreview(currentActive.title)
       }
     }
-    AppActions.setUrlBarSuggestions(suggestions, newIndex)
+    WindowActions.setUrlBarSuggestions(suggestions, newIndex)
   }
 
   searchXHR () {
@@ -212,11 +212,11 @@ class UrlBarSuggestions extends ImmutableComponent {
       xhr.responseType = 'json'
       xhr.send()
       xhr.onload = () => {
-        AppActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
+        WindowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
         this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
       }
     } else {
-      AppActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
+      WindowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
       this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
     }
   }
