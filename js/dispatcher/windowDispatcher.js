@@ -4,7 +4,7 @@
 
 var Dispatcher = require('./dispatcher')
 
-class AppDispatcher extends Dispatcher {
+class WindowDispatcher extends Dispatcher {
   /**
    * A bridge function between the views and the dispatcher, marking the action
    * as a view action.  Another variant here could be handleServerAction.
@@ -18,5 +18,5 @@ class AppDispatcher extends Dispatcher {
   }
 }
 
-const appDispatcher = new AppDispatcher()
-module.exports = appDispatcher
+const windowDispatcher = new WindowDispatcher()
+module.exports = windowDispatcher

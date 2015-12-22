@@ -4,8 +4,8 @@
 
 'use strict'
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
-const AppConstants = require('../constants/appConstants')
+const WindowDispatcher = require('../dispatcher/windowDispatcher')
+const WindowConstants = require('../constants/windowConstants')
 const Config = require('../constants/config')
 const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
 const ipc = global.require('electron').ipcRenderer
@@ -25,8 +25,8 @@ const AppActions = {
     if (UrlUtil.isURL(location)) {
       location = UrlUtil.getUrlFromInput(location)
     }
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_URL,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_URL,
       location
     })
   },
@@ -44,8 +44,8 @@ const AppActions = {
     if (UrlUtil.isURL(location)) {
       location = UrlUtil.getUrlFromInput(location)
     }
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_LOCATION,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_LOCATION,
       location,
       key: key
     })
@@ -58,8 +58,8 @@ const AppActions = {
    * @param {string} location - The text to set as the new navbar URL input
    */
   setNavBarUserInput: function (location) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_NAVBAR_INPUT,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_NAVBAR_INPUT,
       location
     })
   },
@@ -72,8 +72,8 @@ const AppActions = {
    * @param {string} title - The title to set for the frame
    */
   setFrameTitle: function (frameProps, title) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_FRAME_TITLE,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_FRAME_TITLE,
       frameProps,
       title
     })
@@ -85,8 +85,8 @@ const AppActions = {
    * @param {Object} frameProps - The frame properties for the webview in question.
    */
   onWebviewLoadStart: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_WEBVIEW_LOAD_START,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_WEBVIEW_LOAD_START,
       frameProps
     })
   },
@@ -97,8 +97,8 @@ const AppActions = {
    * @param {Object} frameProps - The frame properties for the webview in question.
    */
   onWebviewLoadEnd: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_WEBVIEW_LOAD_END,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_WEBVIEW_LOAD_END,
       frameProps
     })
   },
@@ -109,8 +109,8 @@ const AppActions = {
    * @param {boolean} focused - true if the navigation bar should be considered as focused
    */
   setNavBarFocused: function (focused) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_NAVBAR_FOCUSED,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_NAVBAR_FOCUSED,
       focused
     })
   },
@@ -124,8 +124,8 @@ const AppActions = {
    */
   newFrame: function (frameOpts = {}, openInForeground = true) {
     frameOpts.location = frameOpts.location || Config.defaultUrl
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_NEW_FRAME,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_NEW_FRAME,
       frameOpts: frameOpts,
       openInForeground
     })
@@ -146,8 +146,8 @@ const AppActions = {
    */
   closeFrame: function (frames, frameProps) {
     if (frames.size > 1) {
-      AppDispatcher.dispatch({
-        actionType: AppConstants.APP_CLOSE_FRAME,
+      WindowDispatcher.dispatch({
+        actionType: WindowConstants.APP_CLOSE_FRAME,
         frameProps
       })
     } else {
@@ -175,8 +175,8 @@ const AppActions = {
    * The new frame is expected to appear at the index it was last closed at
    */
   undoClosedFrame: function () {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_UNDO_CLOSED_FRAME
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_UNDO_CLOSED_FRAME
     })
   },
 
@@ -196,8 +196,8 @@ const AppActions = {
     if (!frameProps) {
       return
     }
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_ACTIVE_FRAME,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_ACTIVE_FRAME,
       frameProps: frameProps
     })
   },
@@ -208,8 +208,8 @@ const AppActions = {
    * @param {number} index - the tab page index to change to
    */
   setTabPageIndex: function (index) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_TAB_PAGE_INDEX,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_TAB_PAGE_INDEX,
       index
     })
   },
@@ -222,8 +222,8 @@ const AppActions = {
    * @param {boolean} canGoForward - Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
    */
   updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_UPDATE_BACK_FORWARD,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_UPDATE_BACK_FORWARD,
       frameProps,
       canGoBack,
       canGoForward
@@ -236,8 +236,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragStart: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAG_START,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAG_START,
       frameProps
     })
   },
@@ -248,8 +248,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragStop: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAG_STOP,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAG_STOP,
       frameProps
     })
   },
@@ -260,8 +260,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragDraggingOverLeftHalf: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAGGING_OVER_LEFT,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAGGING_OVER_LEFT,
       frameProps
     })
   },
@@ -272,8 +272,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragDraggingOverRightHalf: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAGGING_OVER_RIGHT,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAGGING_OVER_RIGHT,
       frameProps
     })
   },
@@ -284,8 +284,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragExit: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAG_EXIT,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAG_EXIT,
       frameProps
     })
   },
@@ -296,8 +296,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragExitRightHalf: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAG_EXIT_RIGHT,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAG_EXIT_RIGHT,
       frameProps
     })
   },
@@ -308,8 +308,8 @@ const AppActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDraggingOn: function (frameProps) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_DRAGGING_ON,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_DRAGGING_ON,
       frameProps
     })
   },
@@ -322,8 +322,8 @@ const AppActions = {
    * @param {boolean} prepend - Whether or not to prepend to the destinationFrameProps
    */
   moveTab: function (sourceFrameProps, destinationFrameProps, prepend) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_TAB_MOVE,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_TAB_MOVE,
       sourceFrameProps,
       destinationFrameProps,
       prepend
@@ -337,8 +337,8 @@ const AppActions = {
    * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
    */
   setUrlBarSuggestions: function (suggestionList, selectedIndex) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_URL_BAR_SUGGESTIONS,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_URL_BAR_SUGGESTIONS,
       suggestionList,
       selectedIndex
     })
@@ -351,8 +351,8 @@ const AppActions = {
    * @param value If false URL bar previews will not be set.
    */
   setUrlBarPreview: function (value) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_URL_BAR_PREVIEW,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_URL_BAR_PREVIEW,
       value
     })
   },
@@ -365,8 +365,8 @@ const AppActions = {
    * @param searchResults The search results to set for the currently entered URL bar text.
    */
   setUrlBarSuggestionSearchResults: function (searchResults) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
       searchResults
     })
   },
@@ -377,8 +377,8 @@ const AppActions = {
    * @param {boolean} isSelected - Whether or not the URL bar should be autoselected
    */
   setUrlBarAutoselected: function (isAutoselected) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_URL_BAR_AUTOSELECTED,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_URL_BAR_AUTOSELECTED,
       isAutoselected
     })
   },
@@ -389,8 +389,8 @@ const AppActions = {
    * @param {boolean} isActive - Whether or not the URL bar should be marked as active
    */
   setUrlBarActive: function (isActive) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_URL_BAR_ACTIVE,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_URL_BAR_ACTIVE,
       isActive
     })
   },
@@ -402,8 +402,8 @@ const AppActions = {
    * set from an IPC call.
    */
   setActiveFrameShortcut: function (activeShortcut) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_ACTIVE_FRAME_SHORTCUT,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_ACTIVE_FRAME_SHORTCUT,
       activeShortcut
     })
   },
@@ -413,8 +413,8 @@ const AppActions = {
    * @param {Object} searchDetail - the search details
    */
   setSearchDetail: function (searchDetail) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_SEARCH_DETAIL,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_SEARCH_DETAIL,
       searchDetail
     })
   },
@@ -425,8 +425,8 @@ const AppActions = {
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    */
   addSite: function (frameProps, tag) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_ADD_SITE,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_ADD_SITE,
       frameProps,
       tag
     })
@@ -438,8 +438,8 @@ const AppActions = {
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    */
   removeSite: function (frameProps, tag) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_REMOVE_SITE,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_REMOVE_SITE,
       frameProps,
       tag
     })
@@ -452,8 +452,8 @@ const AppActions = {
    * @param {boolean} muted - true if the frame is muted
    */
   setAudioMuted: function (frameProps, muted) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_AUDIO_MUTED,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_AUDIO_MUTED,
       frameProps,
       muted
     })
@@ -466,8 +466,8 @@ const AppActions = {
    * @param {boolean} audioPlaybackActive - true if audio is playing in the frame
    */
   setAudioPlaybackActive: function (frameProps, audioPlaybackActive) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_AUDIO_PLAYBACK_ACTIVE,
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.APP_SET_AUDIO_PLAYBACK_ACTIVE,
       frameProps,
       audioPlaybackActive
     })

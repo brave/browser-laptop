@@ -5,49 +5,49 @@
 import Immutable from 'immutable'
 import Config from '../constants/config.js'
 
-export function isFrameKeyActive (appState, frameKey) {
-  return appState.get('activeFrameKey') === frameKey
+export function isFrameKeyActive (windowState, frameKey) {
+  return windowState.get('activeFrameKey') === frameKey
 }
 
-export function getActiveFrameIndex (appState) {
-  return findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))
+export function getActiveFrameIndex (windowState) {
+  return findIndexForFrameKey(windowState.get('frames'), windowState.get('activeFrameKey'))
 }
 
-export function getFrameByIndex (appState, i) {
-  return appState.getIn(['frames', i])
+export function getFrameByIndex (windowState, i) {
+  return windowState.getIn(['frames', i])
 }
 
-export function getFrameByKey (appState, key) {
-  let i = findIndexForFrameKey(appState.get('frames'), key)
-  return appState.getIn(['frames', i])
+export function getFrameByKey (windowState, key) {
+  let i = findIndexForFrameKey(windowState.get('frames'), key)
+  return windowState.getIn(['frames', i])
 }
 
-export function getActiveFrame (appState) {
-  const activeFrameIndex = getActiveFrameIndex(appState)
-  return appState.get('frames').get(activeFrameIndex)
+export function getActiveFrame (windowState) {
+  const activeFrameIndex = getActiveFrameIndex(windowState)
+  return windowState.get('frames').get(activeFrameIndex)
 }
 
-export function setActiveFrameIndex (appState, i) {
-  const frame = getFrameByIndex(appState, i)
+export function setActiveFrameIndex (windowState, i) {
+  const frame = getFrameByIndex(windowState, i)
   if (!frame) {
-    return appState
+    return windowState
   }
 
-  return setActiveFrameKey(appState, frame.get('key'))
+  return setActiveFrameKey(windowState, frame.get('key'))
 }
 
-export function setActiveFrameKey (appState, activeFrameKey) {
-  return appState.set('activeFrameKey', activeFrameKey)
+export function setActiveFrameKey (windowState, activeFrameKey) {
+  return windowState.set('activeFrameKey', activeFrameKey)
 }
 
-export function makeNextFrameActive (appState) {
-  const activeFrameIndex = getActiveFrameIndex(appState)
-  return setActiveFrameIndex(appState, (activeFrameIndex + 1) % appState.get('frames').size)
+export function makeNextFrameActive (windowState) {
+  const activeFrameIndex = getActiveFrameIndex(windowState)
+  return setActiveFrameIndex(windowState, (activeFrameIndex + 1) % windowState.get('frames').size)
 }
 
-export function makePrevFrameActive (appState) {
-  const activeFrameIndex = getActiveFrameIndex(appState)
-  return setActiveFrameIndex(appState, (appState.get('frames').size + activeFrameIndex - 1) % appState.get('frames').size)
+export function makePrevFrameActive (windowState) {
+  const activeFrameIndex = getActiveFrameIndex(windowState)
+  return setActiveFrameIndex(windowState, (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size)
 }
 
 /**
@@ -175,7 +175,7 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
  * Undoes a frame close and inserts it at the last index
  * @return Immutable top level application state ready to merge back in
  */
-export function undoCloseFrame (appState, closedFrames) {
+export function undoCloseFrame (windowState, closedFrames) {
   if (closedFrames.size === 0) {
     return {}
   }
@@ -183,7 +183,7 @@ export function undoCloseFrame (appState, closedFrames) {
   let insertIndex = closedFrame.get('closedAtIndex')
   return {
     closedFrames: closedFrames.pop(),
-    frames: appState.get('frames').splice(insertIndex, 0, closedFrame.remove('closedAtIndex')),
+    frames: windowState.get('frames').splice(insertIndex, 0, closedFrame.remove('closedAtIndex')),
     activeFrameKey: closedFrame.get('key')
   }
 }
