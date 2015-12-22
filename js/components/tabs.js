@@ -137,7 +137,7 @@ class Tab extends ImmutableComponent {
     if (this.props.frameProps.get('audioPlaybackActive') ||
       this.props.frameProps.get('audioMuted')) {
       playIcon = <span className={cx({
-        playIcon: true,
+        audioPlaybackActive: true,
         fa: true,
         'fa-volume-up': this.props.frameProps.get('audioPlaybackActive') &&
           !this.props.frameProps.get('audioMuted'),

@@ -59,9 +59,11 @@
     top: -3px;
     vertical-align: middle;
   }
-  .playIcon {
+
+  .audioPlaybackActive {
     cursor: pointer;
     margin-right: 4px;
+    color: @audioColor;
   }
 
   .thumbnail {
@@ -77,8 +79,7 @@
   }
 
   &.active {
-    color: #fff;
-    background: @hoverBlue;
+    background: @activeTabDefaultColor;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     height: 26px;
@@ -188,12 +189,17 @@
 .tabPage {
   background-color: #7E7F83;
   border-radius: 9px;
+  box-sizing: border-box;
   cursor: pointer;
   display: inline-block;
   margin: 0 5px;
   height: 6px;
   transform: translateY(-50%);
   width: 34px;
+
+  &.audioPlaybackActive {
+    border: 1px solid @audioColor;
+  }
 
   &.active {
     background-color: #3B3B3B;
