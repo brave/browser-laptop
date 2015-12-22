@@ -31,11 +31,11 @@ const spawnWindow = () => {
   let mainWindow = new BrowserWindow({
     width: 1360,
     height: 800,
-    minWidth: 400
-    // Neither a frame nor a titlebar
-    // frame: false,
-    // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
-    // 'title-bar-style': 'hidden'
+    minWidth: 400,
+    // A frame but no title bar and windows buttons in titlebar.
+    // This only currently has an effect on 10.10 OSX and up and is
+    // ignore on other platforms.
+    'title-bar-style': 'hidden'
   })
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('file://' + __dirname + '/index-dev.html')

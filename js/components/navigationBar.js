@@ -80,9 +80,6 @@ class NavigationBar extends ImmutableComponent {
         <Button iconClass='fa-star'
           className='navbutton remove-bookmark-button'
           onClick={this.onRemoveBookmark.bind(this)} />
-        <Button iconClass='fa-shield'
-          className='navbutton brave-menu'
-          onClick={this.onBraveMenu.bind(this)} />
       </div>
     </div>
   }

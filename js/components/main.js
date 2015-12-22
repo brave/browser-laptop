@@ -18,6 +18,7 @@ const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
 const UpdateBar = require('./updateBar')
+const Button = require('./button')
 
 // Constants
 const Config = require('../constants/config')
@@ -74,6 +75,10 @@ class Main extends ImmutableComponent {
     this.activeFrame.goForward()
   }
 
+  onBraveMenu () {
+    // TODO
+  }
+
   onMainFocus () {
     // When the main container is in focus, set the URL bar to inactive.
     WindowActions.setUrlBarActive(false)
@@ -110,6 +115,11 @@ class Main extends ImmutableComponent {
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
           searchDetail={activeFrame && activeFrame.get('searchDetail')}
         />
+        <div className='topLevelEndButtons'>
+          <Button iconClass='fa-shield'
+            className='navbutton brave-menu'
+            onClick={this.onBraveMenu.bind(this)} />
+        </div>
         <TabPages frames={this.props.browser.get('frames')}
           tabPageIndex={this.props.browser.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
