@@ -5,6 +5,27 @@ Child components should not modify top level state directly, instead they should
 
 # Hierarchy
 
+AppStore
+
+```javascript
+{
+  sites: [{
+    location: string,
+    title: string,
+    tags: [string], // empty, 'bookmark', 'pinned', or 'reader'
+    lastAccessed: datetime,
+  }],
+  visits: [{
+    location: string,
+    startTime: datetime
+    endTime: datetime
+  }],
+  updateAvailable: false,
+}
+```
+
+WindowStore
+
 ```javascript
 {
   activeFrameKey: number,
@@ -51,17 +72,6 @@ Child components should not modify top level state directly, instead they should
       searchURL: string, // with replacement var in string: {searchTerms}
       autocompleteURL: string, // ditto re: {searchTerms}
     }
-  }],
-  sites: [{
-    location: string,
-    title: string,
-    tags: [string], // empty, 'bookmark', 'pinned', or 'reader'
-    lastAccessed: datetime,
-  }],
-  visits: [{
-    location: string,
-    startTime: datetime
-    endTime: datetime
   }],
   closedFrames: [], // holds the same type of frame objects as above
   ui: {

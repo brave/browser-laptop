@@ -105,7 +105,7 @@ class Main extends ImmutableComponent {
         <NavigationBar
           navbar={activeFrame && activeFrame.get('navbar')}
           frames={this.props.browser.get('frames')}
-          sites={this.props.browser.get('sites')}
+          sites={this.props.app.get('sites')}
           activeFrame={activeFrame}
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
           searchDetail={activeFrame && activeFrame.get('searchDetail')}
@@ -119,7 +119,7 @@ class Main extends ImmutableComponent {
           key='tab-bar'
           activeFrame={activeFrame}
         />
-      {this.props.browser.get('updateAvailable') ? <UpdateBar/> : null}
+      {this.props.app.get('updateAvailable') ? <UpdateBar/> : null}
       </div>
       <div className='mainContainer'
         onFocus={this.onMainFocus.bind(this)}>

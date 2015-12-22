@@ -7,20 +7,25 @@
 const React = require('react')
 const Immutable = require('immutable')
 const WindowStore = require('../stores/windowStore')
+const AppStore = require('../stores/AppStore')
 const Main = require('./main')
 
 class Window extends React.Component {
   constructor () {
     super()
     this.state = {
-      immutableData: WindowStore.getState()
+      immutableData: {
+        windowState: WindowStore.getState(),
+        appState: AppStore.getState()
+      }
     }
     WindowStore.addChangeListener(this.onChange.bind(this))
+    AppStore.addChangeListener(this.onChange.bind(this))
   }
 
   render () {
     return <div id='windowContainer'>
-      <Main browser={this.state.immutableData}/>
+      <Main browser={this.state.immutableData.windowState} app={this.state.immutableData.appState} />
     </div>
   }
 
@@ -34,9 +39,13 @@ class Window extends React.Component {
 
   onChange () {
     this.setState({
-      immutableData: WindowStore.getState()
+      immutableData: {
+        windowState: WindowStore.getState(),
+        appState: AppStore.getState()
+      }
     })
   }
+
 }
 
 module.exports = Window
