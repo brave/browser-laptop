@@ -169,7 +169,7 @@ class Tab extends ImmutableComponent {
       onDragOver={this.onDragOver.bind(this)}
       onDrop={this.onDrop.bind(this)}
       onClick={this.setActiveFrame.bind(this)}
-      onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps.get('key'))}
+      onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
       <div className='thumbnail'
         style={thumbnailStyle} />

@@ -5,37 +5,55 @@
 const remote = require('remote')
 const Menu = remote.require('menu')
 const messages = require('./constants/messages')
+const WindowActions = require('./actions/windowActions')
 
-function tabTemplateInit (tabKey) {
-  return [
-    {
-      label: 'Reload tab',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
-        }
-      }
-    }, {
-      label: 'Mute tab',
-      click: (item, focusedWindow) => {
-        console.log('got mute tab click')
-      }
-    }, {
-      label: 'Disable tracking protection',
-      enabled: false
-    }, {
-      label: 'Disable ad block',
-      enabled: false
-    }, {
-      label: 'Close tab',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          // TODO: Don't switch active tabs when this is called
-          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabKey)
-        }
+function tabTemplateInit (frameProps) {
+  const tabKey = frameProps.get('key')
+  const items = []
+  items.push({
+    label: 'Reload tab',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
       }
     }
-  ]
+  })
+
+  if (frameProps.get('audioPlaybackActive')) {
+    if (frameProps.get('audioMuted')) {
+      items.push({
+        label: 'Unmute tab',
+        click: (item, focusedWindow) => {
+          WindowActions.setAudioMuted(frameProps, false)
+        }
+      })
+    } else {
+      items.push({
+        label: 'Mute tab',
+        click: (item, focusedWindow) => {
+          WindowActions.setAudioMuted(frameProps, true)
+        }
+      })
+    }
+  }
+
+  Array.prototype.push.apply(items, [{
+    label: 'Disable tracking protection',
+    enabled: false
+  }, {
+    label: 'Disable ad block',
+    enabled: false
+  }, {
+    label: 'Close tab',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        // TODO: Don't switch active tabs when this is called
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabKey)
+      }
+    }
+  }])
+
+  return items
 }
 
 function mainTemplateInit (nodeName) {
@@ -86,8 +104,8 @@ export function onMainContextMenu (nodeName) {
   mainMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabContextMenu (tabKey, e) {
+export function onTabContextMenu (frameProps, e) {
   e.preventDefault()
-  const tabMenu = Menu.buildFromTemplate(tabTemplateInit(tabKey))
+  const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(remote.getCurrentWindow())
 }
