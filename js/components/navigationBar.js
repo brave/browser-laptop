@@ -72,7 +72,6 @@ class NavigationBar extends ImmutableComponent {
         frames={this.props.frames}
         focused={this.props.focused}
         urlbar={this.props.navbar.get('urlbar')}
-        activeFrame={this.props.activeFrame}
         />
       <div className='endButtons'>
         <Button iconClass='fa-star'

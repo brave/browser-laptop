@@ -52,6 +52,10 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
+  get searchDetail () {
+    return this.props.activeFrameProps.get('searchDetail')
+  }
+
   // restores the url bar to the current location
   restore () {
     let location = this.props.activeFrameProps.get('location')
@@ -78,7 +82,7 @@ class UrlBar extends ImmutableComponent {
             this.refs.urlBarSuggestions.clickSelected()
           } else if (this.props.searchSuggestions && !isUrl(location)) {
             // do search.
-            AppActions.loadUrl(this.props.searchDetail.get('searchURL').replace('{searchTerms}', location))
+            AppActions.loadUrl(this.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
             AppActions.loadUrl(location)
           }
@@ -109,20 +113,11 @@ class UrlBar extends ImmutableComponent {
   onClick (e) {
     // if the url bar is already selected then clicking in it should make it active
     if (this.isAutoselected()) {
-      AppActions.setUrlBarActive(true)
       AppActions.setUrlBarAutoselected(false)
+      AppActions.setUrlBarActive(true)
+      e.preventDefault()
     } else if (!this.isActive()) {
       AppActions.setUrlBarAutoselected(true)
-    }
-  }
-
-  onMouseUp (e) {
-    // if the urlbar is not active then
-    // we want to select the text
-    // so we prevent the default mouseUp
-    // action that will deselect it
-    if (this.isAutoselected() === true && this.isActive() === false) {
-      e.preventDefault()
     }
   }
 
@@ -163,15 +158,6 @@ class UrlBar extends ImmutableComponent {
     this.updateDOM()
   }
 
-  componentWillReceiveProps (newProps) {
-    let location = newProps.activeFrameProps.get('location')
-    let key = newProps.activeFrameProps.get('key')
-    // Update the URL bar when switching tabs
-    if (key !== this.props.activeFrameProps.get('key')) {
-      AppActions.setLocation(location)
-    }
-  }
-
   render () {
     return <form
       action='#'
@@ -194,7 +180,6 @@ class UrlBar extends ImmutableComponent {
         onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
         onClick={this.onClick.bind(this)}
-        onMouseUp={this.onMouseUp.bind(this)}
         value={this.props.urlbar.get('location')}
         data-l10n-id='urlbar'
         className={cx({
@@ -209,8 +194,8 @@ class UrlBar extends ImmutableComponent {
           suggestions={this.props.urlbar.get('suggestions')}
           sites={this.props.sites}
           frames={this.props.frames}
-          searchDetail={this.props.searchDetail}
-          searchSuggestions={this.props.searchSuggestions}
+          searchDetail={this.searchDetail}
+          searchSuggestions={this.props.activeFrameProps.get('searchSuggestions')}
           activeFrameProps={this.props.activeFrameProps}
           urlLocation={this.props.urlbar.get('location')}
           urlPreview={this.props.urlbar.get('urlPreview')}

@@ -123,15 +123,33 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
 export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
   var url = frameOpts.location || Config.defaultUrl
   let frame = Immutable.fromJS({
-    src: url,
-    location: url,
+    audioMuted: false, // frame is muted
     canGoBack: false,
     canGoForward: false,
+    location: url, // page url
+    src: url, // what the iframe src should be
     isPrivate: frameOpts.isPrivate || false,
     element: frameOpts.element,
     features: getFeatures(frameOpts.features),
     key: newKey,
-    parentFrameKey: frameOpts.parentFrameKey
+    parentFrameKey: frameOpts.parentFrameKey,
+    navbar: {
+      searchSuggestions: true,
+      focused: true,
+      urlbar: {
+        location: url,
+        urlPreview: '',
+        suggestions: {
+          selectedIndex: 0,
+          searchResults: [],
+          suggestionList: null
+        },
+        autoselected: true,
+        focused: true,
+        active: false
+      }
+    },
+    searchDetail: null
   })
 
   // Find the closest index to the current frame's index which has

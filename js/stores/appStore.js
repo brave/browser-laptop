@@ -22,22 +22,6 @@ let appState = Immutable.fromJS({
   searchDetail: null,
   updateAvailable: false,
   ui: {
-    navbar: {
-      searchSuggestions: true,
-      focused: true,
-      urlbar: {
-        location: '',
-        urlPreview: '',
-        suggestions: {
-          selectedIndex: 0,
-          searchResults: [],
-          suggestionList: null
-        },
-        autoselected: true,
-        focused: true,
-        active: false
-      }
-    },
     tabs: {
       activeDraggedTab: null
     }
@@ -50,8 +34,8 @@ const activeFrameStatePath = () =>
   ['frames', FrameStateUtil.findIndexForFrameKey(appState.get('frames'), appState.get('activeFrameKey'))]
 
 const updateNavBarInput = (loc) => {
-  appState = appState.setIn(['ui', 'navbar', 'urlbar', 'location'], loc)
-  appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], null)
+  appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']), loc)
+  appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), null)
 }
 
 /**
@@ -145,8 +129,8 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_SET_NAVBAR_FOCUSED:
-      appState = appState.setIn(['ui', 'navbar', 'focused'], action.focused)
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'focused'], action.focused)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.focused)
       appStore.emitChange()
       break
     case AppConstants.APP_NEW_FRAME:
@@ -257,24 +241,24 @@ AppDispatcher.register((action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_SUGGESTIONS:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'selectedIndex'], action.selectedIndex)
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'suggestionList'], action.suggestionList)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_PREVIEW:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'urlPreview'], action.value)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), action.value)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'suggestions', 'searchResults'], action.searchResults)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionResults']), action.searchResults)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_ACTIVE:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'active'], action.isActive)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_URL_BAR_AUTOSELECTED:
-      appState = appState.setIn(['ui', 'navbar', 'urlbar', 'autoselected'], action.isAutoselected)
+      appState = appState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'autoselected']), action.isAutoselected)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_ACTIVE_FRAME_SHORTCUT:
