@@ -113,6 +113,10 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('media-paused', ({title}) => {
       WindowActions.setAudioPlaybackActive(this.props.frame, false)
     })
+    this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
+      WindowActions.setThemeColor(this.props.frame, themeColor)
+    })
+
     // Ensure we mute appropriately, the initial value could be set
     // from persisted state.
     if (this.props.frame.get('audioMuted')) {

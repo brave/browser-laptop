@@ -430,6 +430,20 @@ const AppActions = {
       frameProps,
       audioPlaybackActive
     })
+  },
+
+  /**
+   * Dispatches a message to indicate that the theme color has changed for a page
+   *
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {string} themeColor - Theme color of the frame
+   */
+  setThemeColor: function (frameProps, themeColor) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_THEME_COLOR,
+      frameProps,
+      themeColor
+    })
   }
 }
 

@@ -9,6 +9,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const WindowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet.js')
+const {getTextColorForBackground} = require('../lib/color')
 
 const getFavicon = require('../lib/faviconUtil.js')
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -122,8 +123,13 @@ class Tab extends ImmutableComponent {
 
     // Style based on theme-color
     var activeTabStyle = {}
-    if (this.props.isActive && (this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor'))) {
-      activeTabStyle.backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
+    const backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
+    if (this.props.isActive && backgroundColor) {
+      activeTabStyle.backgroundColor = backgroundColor
+      const textColor = getTextColorForBackground(backgroundColor)
+      if (textColor) {
+        activeTabStyle.color = getTextColorForBackground(backgroundColor)
+      }
     }
 
     const iconStyle = {

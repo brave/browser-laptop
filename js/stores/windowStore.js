@@ -253,6 +253,10 @@ WindowDispatcher.register((action) => {
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionResults']), action.searchResults)
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_THEME_COLOR:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['themeColor']), action.themeColor)
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       windowStore.emitChange()
