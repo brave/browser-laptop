@@ -7,7 +7,6 @@ const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
-const SiteUtil = require('../state/siteUtil')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
@@ -18,14 +17,12 @@ let windowState = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],
   closedFrames: [],
-  sites: [],
-  searchDetail: null,
-  updateAvailable: false,
   ui: {
     tabs: {
       activeDraggedTab: null
     }
-  }
+  },
+  searchDetail: null
 })
 
 var CHANGE_EVENT = 'change'
@@ -275,14 +272,6 @@ WindowDispatcher.register((action) => {
         searchDetail: action.searchDetail
       })
       break
-    case WindowConstants.APP_ADD_SITE:
-      windowState = windowState.set('sites', SiteUtil.addSite(windowState.get('sites'), action.frameProps, action.tag))
-      windowStore.emitChange()
-      break
-    case WindowConstants.APP_REMOVE_SITE:
-      windowState = windowState.set('sites', SiteUtil.removeSite(windowState.get('sites'), action.frameProps, action.tag))
-      windowStore.emitChange()
-      break
     case WindowConstants.APP_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       windowStore.emitChange()
@@ -293,14 +282,6 @@ WindowDispatcher.register((action) => {
       break
     default:
   }
-})
-
-ipc.on(messages.UPDATE_AVAILABLE, () => {
-  console.log('windowStore update-available')
-  windowState = windowState.merge({
-    updateAvailable: true
-  })
-  windowStore.emitChange()
 })
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
