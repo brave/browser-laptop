@@ -11,8 +11,11 @@ import Config from '../constants/config.js'
 
 class TabPage extends ImmutableComponent {
   render () {
+    const audioPlaybackActive = this.props.frames.find(frame =>
+        frame.get('audioPlaybackActive') && !frame.get('audioMuted'))
     return <span className={cx({
       tabPage: true,
+      audioPlaybackActive,
       active: this.props.active})}
       onClick={AppActions.setTabPageIndex.bind(this, this.props.index)
     }>
@@ -31,6 +34,7 @@ class TabPages extends ImmutableComponent {
       Array.from(new Array(this.tabCount)).map((x, i) =>
         <TabPage
           key={`tabPage-${i}`}
+          frames={this.props.frames.slice(i * Config.tabs.tabsPerPage, i * Config.tabs.tabsPerPage + Config.tabs.tabsPerPage)}
           index={i}
           active={this.props.tabPageIndex === i}/>)
     }

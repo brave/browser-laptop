@@ -84,12 +84,14 @@ WindowDispatcher.register((action) => {
       // reload if the url is unchanged
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
         windowState = windowState.mergeIn(activeFrameStatePath(), {
+          audioPlaybackActive: false,
           activeShortcut: 'reload'
         })
       } else {
         windowState = windowState.mergeIn(activeFrameStatePath(), {
           src: action.location,
           location: action.location,
+          audioPlaybackActive: false,
           title: ''
         })
       }
@@ -98,6 +100,7 @@ WindowDispatcher.register((action) => {
     case WindowConstants.APP_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(activeFrameStatePath(), {
+        audioPlaybackActive: false,
         location: action.location
       })
       // Update the displayed location in the urlbar
