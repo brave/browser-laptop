@@ -146,7 +146,7 @@ class UrlBar extends ImmutableComponent {
 
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, () => {
-      this.onFocus.bind(this)
+      this.onFocus()
       WindowActions.setUrlBarAutoselected(true)
     })
     // escape key handling
