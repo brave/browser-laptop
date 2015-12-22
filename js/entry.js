@@ -12,8 +12,8 @@ require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const App = require('./components/app')
+const Window = require('./components/window')
 
 ReactDOM.render(
-  <App/>,
-  document.getElementById('appContainer'))
+  <Window/>,
+  document.getElementById('windowContainer'))

@@ -6,26 +6,26 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const AppStore = require('../stores/appStore')
+const WindowStore = require('../stores/windowStore')
 const Main = require('./main')
 
-class App extends React.Component {
+class Window extends React.Component {
   constructor () {
     super()
     this.state = {
-      immutableData: AppStore.getAppState()
+      immutableData: WindowStore.getState()
     }
-    AppStore.addChangeListener(this.onChange.bind(this))
+    WindowStore.addChangeListener(this.onChange.bind(this))
   }
 
   render () {
-    return <div id='appContainer'>
+    return <div id='windowContainer'>
       <Main browser={this.state.immutableData}/>
     </div>
   }
 
   componentWillUnmount () {
-    AppStore.removeChangeListener(this.onChange.bind(this))
+    WindowStore.removeChangeListener(this.onChange.bind(this))
   }
 
   shouldComponentUpdate (nextProps, nextState) {
@@ -34,9 +34,9 @@ class App extends React.Component {
 
   onChange () {
     this.setState({
-      immutableData: AppStore.getAppState()
+      immutableData: WindowStore.getState()
     })
   }
 }
 
-module.exports = App
+module.exports = Window

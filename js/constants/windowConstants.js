@@ -5,7 +5,7 @@
 const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
-const appConstants = {
+const windowConstants = {
   APP_SET_URL: _,
   APP_SET_NAVBAR_INPUT: _,
   APP_NEW_FRAME: _,
@@ -40,4 +40,4 @@ const appConstants = {
   APP_SET_AUDIO_PLAYBACK_ACTIVE: _
 }
 
-module.exports = mapValuesByKeys(appConstants)
+module.exports = mapValuesByKeys(windowConstants)
