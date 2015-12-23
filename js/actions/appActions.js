@@ -3,10 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
-
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
-const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 
 const AppActions = {
@@ -14,15 +12,25 @@ const AppActions = {
    * Dispatches an event to the main process to create a new window
    */
   newWindow: function () {
-    ipc.send(messages.NEW_WINDOW)
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_NEW_WINDOW
+    })
+  },
+
+  closeWindow: function (appWindowId) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLOSE_WINDOW,
+      appWindowId
+    })
   },
 
   /**
    * Dispatches an event to the main process to update the browser
    */
   updateRequested: function () {
+    // TODO - change to dispatcher
     console.log('appActions updateRequested')
-    ipc.send(messages.UPDATE_REQUESTED)
+    global.require('electron').ipcRenderer.send(messages.UPDATE_REQUESTED)
   },
 
   /**

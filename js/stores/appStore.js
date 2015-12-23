@@ -2,48 +2,79 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
-const EventEmitter = require('events').EventEmitter
+'use strict'
 const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
 const SiteUtil = require('../state/siteUtil')
-const ipc = global.require('electron').ipcRenderer
+const electron = require('electron')
+const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
+const BrowserWindow = electron.BrowserWindow
+const LocalShortcuts = require('../../app/localShortcuts')
 
-// For this simple example, store immutable data object for a simple counter.
-// This is of course very silly, but this is just for an app template with top
-// level immutable data.
 let appState = Immutable.fromJS({
+  windows: [],
   sites: [],
   visits: [],
   updateAvailable: false
 })
 
-var CHANGE_EVENT = 'change'
+const spawnWindow = () => {
+  let mainWindow = new BrowserWindow({
+    width: 1360,
+    height: 800,
+    minWidth: 400,
+    // Neither a frame nor a titlebar
+    // frame: false,
+    // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
+    'title-bar-style': 'hidden'
+  })
 
-class AppStore extends EventEmitter {
+  // pass the appState into the query string for initialization
+  // This seems kind of hacky, maybe there is a better way to make
+  // sure that the window has the app state before it opens?
+  let queryString = 'appState=' + encodeURIComponent(JSON.stringify(appState))
+
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.loadURL('file://' + __dirname + '/../../app/index-dev.html?' + queryString)
+  } else {
+    mainWindow.loadURL('file://' + __dirname + '/../../app/index.html?' + queryString)
+  }
+  mainWindow.on('closed', function () {
+    LocalShortcuts.unregister(mainWindow)
+    mainWindow = null
+  })
+
+  LocalShortcuts.register(mainWindow)
+  return mainWindow
+}
+
+class AppStore {
   getState () {
     return appState
   }
 
   emitChange () {
-    this.emit(CHANGE_EVENT)
-  }
-
-  addChangeListener (callback) {
-    this.on(CHANGE_EVENT, callback)
-  }
-
-  removeChangeListener (callback) {
-    this.removeListener(CHANGE_EVENT, callback)
+    ipcMain.emit(messages.APP_STATE_CHANGE, this.getState())
   }
 }
 
 const appStore = new AppStore()
 
-// Register callback to handle all updates
-AppDispatcher.register((action) => {
+const handleAppAction = (action) => {
   switch (action.actionType) {
+    case AppConstants.APP_NEW_WINDOW:
+      appState = appState.set('windows', appState.get('windows').push(spawnWindow()))
+      appStore.emitChange()
+      break
+    case AppConstants.APP_CLOSE_WINDOW:
+      let appWindow = BrowserWindow.fromId(action.appWindowId)
+      appWindow.close()
+
+      let windows = appState.get('windows')
+      appState = appState.set('windows', windows.delete(windows.indexOf(appWindow)))
+      appStore.emitChange()
+      break
     case AppConstants.APP_ADD_SITE:
       appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag))
       appStore.emitChange()
@@ -54,9 +85,13 @@ AppDispatcher.register((action) => {
       break
     default:
   }
-})
+}
 
-ipc.on(messages.UPDATE_AVAILABLE, () => {
+// Register callback to handle all updates
+ipcMain.on(messages.APP_ACTION, (event, action) => handleAppAction(action))
+process.on(messages.APP_ACTION, handleAppAction)
+
+process.on(messages.UPDATE_AVAILABLE, () => {
   console.log('appStore update-available')
   appState = appState.merge({
     updateAvailable: true

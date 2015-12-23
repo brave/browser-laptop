@@ -10,10 +10,15 @@ require('../less/navigationBar.less')
 require('../less/tabs.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
+const URL = require('url')
+const Immutable = require('immutable')
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
 
+// get appStore from url
+var appState = Immutable.fromJS(JSON.parse(URL.parse(window.location.href, true).query.appState))
+
 ReactDOM.render(
-  <Window/>,
+  <Window appState={appState}/>,
   document.getElementById('windowContainer'))

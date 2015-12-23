@@ -7,20 +7,25 @@
 const React = require('react')
 const Immutable = require('immutable')
 const WindowStore = require('../stores/windowStore')
-const AppStore = require('../stores/appStore')
 const Main = require('./main')
+const ipc = global.require('electron').ipcRenderer
+const messages = require('../constants/messages')
 
 class Window extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
+
+    // initialize appState from props
+    // and then listen for updates
+    this.appState = this.props.appState
     this.state = {
       immutableData: {
         windowState: WindowStore.getState(),
-        appState: AppStore.getState()
+        appState: this.appState
       }
     }
+    ipc.on(messages.APP_STATE_CHANGE, this.onAppStateChange.bind(this))
     WindowStore.addChangeListener(this.onChange.bind(this))
-    AppStore.addChangeListener(this.onChange.bind(this))
   }
 
   render () {
@@ -31,6 +36,7 @@ class Window extends React.Component {
 
   componentWillUnmount () {
     WindowStore.removeChangeListener(this.onChange.bind(this))
+    ipc.removeListener(this.onAppStateChange)
   }
 
   shouldComponentUpdate (nextProps, nextState) {
@@ -41,11 +47,16 @@ class Window extends React.Component {
     this.setState({
       immutableData: {
         windowState: WindowStore.getState(),
-        appState: AppStore.getState()
+        appState: this.appState
       }
     })
   }
 
+  onAppStateChange (appState) {
+    this.appState = appState
+    this.onChange()
+  }
 }
+Window.propTypes = { appState: React.PropTypes.object }
 
 module.exports = Window

@@ -7,6 +7,7 @@ const app = electron.app
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
+const AppActions = require('../js/actions/appActions')
 
 /**
  * Sends a message to the web contents of the focused window.
@@ -40,7 +41,7 @@ const init = () => {
           click: function (item, focusedWindow) {
             if (!sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
               // no active windows
-              process.emit(messages.NEW_WINDOW)
+              AppActions.newWindow()
             }
           }
         }, {
@@ -52,11 +53,11 @@ const init = () => {
         }, {
           label: 'New Window',
           accelerator: 'CmdOrCtrl+N',
-          click: () => process.emit(messages.NEW_WINDOW)
+          click: () => AppActions.newWindow()
         }, {
           label: 'New Private Window',
           accelerator: 'CmdOrCtrl+Alt+N',
-          click: () => process.emit(messages.NEW_WINDOW)
+          click: () => AppActions.newWindow()
         }, {
           type: 'separator'
         }, {
@@ -105,7 +106,7 @@ const init = () => {
           accelerator: 'CmdOrCtrl+Shift+W',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
-              process.emit(messages.CLOSE_WINDOW)
+              AppActions.closeWindow(focusedWindow.id)
             }
           }
         }, {
