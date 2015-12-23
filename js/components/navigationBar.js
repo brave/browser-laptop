@@ -52,6 +52,7 @@ class NavigationBar extends ImmutableComponent {
 
     return <div id='navigator'
         ref='navigator'
+        data-frame-key={frameProps.get('key')}
         className={cx({
           loading: this.loading,
           bookmarked: this.bookmarked

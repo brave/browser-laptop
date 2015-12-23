@@ -65,7 +65,7 @@ WindowStore
         },
         focused: boolean, // whether the urlbar is focused
         active: boolean, // whether the user is typing in the urlbar
-        autoselected: boolean, // is the urlbar text autoselected
+        selected: boolean, // is the urlbar text selected
       }
     }
   }],
