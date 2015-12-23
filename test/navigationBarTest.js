@@ -100,6 +100,22 @@ describe('urlbar', function () {
       yield selectsText(this.app.client, '')
     })
 
+    describe('shortcut-focus-url', function () {
+      before(function *() {
+        yield this.app.client
+          .ipcSend('shortcut-focus-url')
+          .waitForVisible(urlInput)
+      })
+
+      it('has focus', function *() {
+        yield hasFocus(this.app.client)
+      })
+
+      it('selects the text', function *() {
+        yield selectsText(this.app.client, 'a')
+      })
+    })
+
     describe('escape', function *() {
       before(function *() {
         yield this.app.client.ipcSend('shortcut-active-frame-stop')

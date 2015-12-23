@@ -67,10 +67,6 @@ WindowStore
         active: boolean, // whether the user is typing in the urlbar
         autoselected: boolean, // is the urlbar text autoselected
       }
-    },
-    searchDetail: {
-      searchURL: string, // with replacement var in string: {searchTerms}
-      autocompleteURL: string, // ditto re: {searchTerms}
     }
   }],
   closedFrames: [], // holds the same type of frame objects as above
@@ -79,6 +75,10 @@ WindowStore
       activeDraggedTab: object,
       tabPageIndex: number, // Index of the current tab page
     }
+  },
+  searchDetail: {
+    searchURL: string, // with replacement var in string: {searchTerms}
+    autocompleteURL: string, // ditto re: {searchTerms}
   }
 }
 ```

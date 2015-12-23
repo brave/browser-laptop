@@ -113,7 +113,7 @@ class Main extends ImmutableComponent {
           sites={this.props.app.get('sites')}
           activeFrame={activeFrame}
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
-          searchDetail={activeFrame && activeFrame.get('searchDetail')}
+          searchDetail={this.props.browser.get('searchDetail')}
         />
         <div className='topLevelEndButtons'>
           <Button iconClass='fa-shield'

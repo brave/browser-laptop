@@ -272,6 +272,7 @@ WindowDispatcher.register((action) => {
       windowState = windowState.merge({
         searchDetail: action.searchDetail
       })
+      windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
