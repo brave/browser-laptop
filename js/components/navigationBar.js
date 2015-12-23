@@ -11,6 +11,8 @@ const UrlBar = require('./urlBar')
 const AppActions = require('../actions/appActions')
 const {isSiteInList} = require('../state/siteUtil')
 const SiteTags = require('../constants/siteTags')
+const remote = global.require('electron').remote
+const messages = require('../constants/messages')
 
 class NavigationBar extends ImmutableComponent {
 
@@ -32,11 +34,11 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onReload () {
-    process.emit('reload-active-frame')
+    remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
   }
 
   onStop () {
-    process.emit('stop-active-frame')
+    remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
   }
 
   get bookmarked () {
