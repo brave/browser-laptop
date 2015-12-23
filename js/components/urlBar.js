@@ -53,7 +53,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   get searchDetail () {
-    return this.props.activeFrameProps.get('searchDetail')
+    return this.props.searchDetail
   }
 
   // restores the url bar to the current location
