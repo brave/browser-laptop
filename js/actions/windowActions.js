@@ -355,12 +355,12 @@ const WindowActions = {
   /**
    * Marks the URL bar text as selected or not
    *
-   * @param {boolean} isSelected - Whether or not the URL bar should be autoselected
+   * @param {boolean} isSelected - Whether or not the URL bar text input should be selected
    */
-  setUrlBarAutoselected: function (isAutoselected) {
+  setUrlBarSelected: function (selected) {
     WindowDispatcher.dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_AUTOSELECTED,
-      isAutoselected
+      actionType: WindowConstants.WINDOW_SET_URL_BAR_SELECTED,
+      selected
     })
   },
 

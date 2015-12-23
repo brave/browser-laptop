@@ -144,7 +144,7 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
           searchResults: [],
           suggestionList: null
         },
-        autoselected: true,
+        selected: true,
         focused: true,
         active: false
       }

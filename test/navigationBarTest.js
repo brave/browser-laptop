@@ -6,41 +6,48 @@ const Config = require('../js/constants/config').default
 describe('urlbar', function () {
   const urlInput = '#urlInput'
 
-  function setup (client) {
-    return client
+  function * setup (client) {
+    yield client
       .waitUntilWindowLoaded()
       .waitForVisible('#browser')
       .waitForVisible(urlInput)
-      .waitForValue(urlInput, Config.defaultUrl)
+  }
+
+  function * newFrame (client, frameKey = 2) {
+    yield client
+      .ipcSend('shortcut-new-frame')
+      // wait for correct urlInput based on frameKey
+      .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
+      // wait for selection
+      .waitUntil(function () {
+        return this.getAttribute('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput, 'selectionEnd').then(function (value) { return value > 0 })
+      })
+    // wait for focus
+    yield hasFocus(client)
   }
 
   function blur (client, text = Config.defaultUrl) {
     return client
       .keys('\uE007') // clear focus
-      .waitForVisible(urlInput)
-  }
-
-  function blurred (client, text = Config.defaultUrl) {
-    return client
-      .getValue(urlInput).should.eventually.be.equal(text)
-      .getSelectedText().should.eventually.be.equal('')
-        // TODO: no focus test
+      .waitUntil(function () {
+        return this.getSelectedText().then(function (value) { return value === '' })
+      })
   }
 
   function hasFocus (client) {
-    return client.getAttribute(':focus', 'id').should.eventually.be.equal('urlInput')
+    return client.waitUntil(function () {
+      return this.getAttribute(':focus', 'id').then(function (value) { return value === 'urlInput' })
+    })
   }
 
   function defaultUrl (client) {
-    return client.getValue(urlInput).should.eventually.be.equal(Config.defaultUrl)
+    return client.waitForValue(urlInput, Config.defaultUrl)
   }
 
   function selectsText (client, text = Config.defaultUrl) {
-    return client.getSelectedText().should.eventually.be.equal(text)
-  }
-
-  function newFrame (client) {
-    return client.ipcSend('shortcut-new-frame')
+    return client.waitUntil(function () {
+      return this.getSelectedText().then(function (value) { return value === text })
+    })
   }
 
   describe('new window', function () {
@@ -59,7 +66,7 @@ describe('urlbar', function () {
     })
 
     it('selects the text', function *() {
-      yield selectsText(this.app.client)
+      this.app.client
     })
   })
 
@@ -84,16 +91,45 @@ describe('urlbar', function () {
     })
   })
 
+  describe('submit', function () {
+    Brave.beforeAll(this)
+
+    before(function *() {
+      yield setup(this.app.client)
+      // wait for the urlInput to be fully initialized
+      yield selectsText(this.app.client)
+      // hit enter
+      yield this.app.client.keys('\uE007')
+    })
+
+    it('clears the selected text', function *() {
+      yield selectsText(this.app.client, '')
+    })
+
+    it('gives focus to the webview')
+
+    describe('url input value', function () {
+
+    })
+
+    describe('non-url input value', function () {
+
+    })
+  })
+
   describe('typing', function () {
     Brave.beforeAll(this)
 
     before(function *() {
       yield setup(this.app.client)
+      // wait for the urlInput to be fully initialized
+      yield selectsText(this.app.client)
+      // now type something
       yield this.app.client.keys('a')
     })
 
     it('sets the value', function *() {
-      yield this.app.client.getValue(urlInput).should.eventually.be.equal('a')
+      yield this.app.client.waitForValue(urlInput, 'a')
     })
 
     it('clears the selected text', function *() {
@@ -104,7 +140,6 @@ describe('urlbar', function () {
       before(function *() {
         yield this.app.client
           .ipcSend('shortcut-focus-url')
-          .waitForVisible(urlInput)
       })
 
       it('has focus', function *() {
@@ -132,57 +167,20 @@ describe('urlbar', function () {
   describe('change tabs', function () {
     Brave.beforeAll(this)
 
-    describe('default state tab', function () {
-      before(function *() {
-        yield newFrame(this.app.client)
-      })
-
-      it('displays the default url', function *() {
-        yield defaultUrl(this.app.client)
-      })
-
-      it('has focus', function *() {
-        yield hasFocus(this.app.client)
-      })
-
-      it('selects the text', function *() {
-        yield selectsText(this.app.client)
-      })
-    })
-
-    describe('blurred tab', function () {
-      before(function *() {
-        yield setup(this.app.client)
-        yield blur(this.app.client)
-      })
-
-      it('blurs the urlInput', function *() {
-        yield blurred(this.app.client)
-      })
-    })
-
-    describe('tab with typing', function () {
-      before(function *() {
-        yield newFrame(this.app.client)
-        yield this.app.client.keys('a')
-      })
-
-      it('sets the value', function *() {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal('a')
-      })
-
-      it('clears the selected text', function *() {
-        yield selectsText(this.app.client, '')
-      })
+    before(function *() {
+      // default tab
+      yield setup(this.app.client)
+      // tab with typing
+      yield newFrame(this.app.client)
+      yield this.app.client.keys('a').waitForValue(urlInput, 'a')
     })
 
     describe('switch to default state tab', function () {
       before(function *() {
         yield this.app.client
           .ipcSend('shortcut-set-active-frame-by-index', 0)
-          .waitUntil(function () {
-            return this.getAttribute('.tabArea:first-of-type .tab', 'class').then(function (value) { return value.indexOf('active') !== -1 })
-          })
+          .waitForVisible('div[id="navigator"][data-frame-key="1"] ' + urlInput)
+          // wait for selection??
       })
 
       it('preserves focused state', function *() {
@@ -192,27 +190,11 @@ describe('urlbar', function () {
       })
     })
 
-    describe('switch to blurred tab', function () {
-      before(function *() {
-        yield this.app.client
-          .ipcSend('shortcut-set-active-frame-by-index', 1)
-          .waitUntil(function () {
-            return this.getAttribute('.tabArea:nth-of-type(2) .tab', 'class').then(function (value) { return value.indexOf('active') !== -1 })
-          })
-      })
-
-      it('preserves blurred state', function *() {
-        yield blurred(this.app.client)
-      })
-    })
-
     describe('switch to typing tab', function () {
       before(function *() {
         yield this.app.client
-          .ipcSend('shortcut-set-active-frame-by-index', 2)
-          .waitUntil(function () {
-            return this.getAttribute('.tabArea:nth-of-type(3) .tab', 'class').then(function (value) { return value.indexOf('active') !== -1 })
-          })
+          .ipcSend('shortcut-set-active-frame-by-index', 1)
+          .waitForVisible('div[id="navigator"][data-frame-key="2"] ' + urlInput)
       })
 
       it('preserves typing state', function *() {
@@ -231,7 +213,6 @@ describe('urlbar', function () {
         yield blur(this.app.client)
         yield this.app.client
           .leftClick(urlInput)
-          .waitForVisible(urlInput)
       })
 
       it('displays the default url', function *() {
@@ -254,7 +235,6 @@ describe('urlbar', function () {
         yield setup(this.app.client)
         yield this.app.client
           .leftClick(urlInput)
-          .waitForVisible(urlInput)
       })
 
       it('displays the default url', function *() {
@@ -277,9 +257,7 @@ describe('urlbar', function () {
     before(function *() {
       yield setup(this.app.client)
       yield blur(this.app.client)
-      yield this.app.client
-        .ipcSend('shortcut-focus-url')
-        .waitForVisible(urlInput)
+      yield this.app.client.ipcSend('shortcut-focus-url')
     })
 
     it('displays the default url', function *() {

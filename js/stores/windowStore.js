@@ -128,6 +128,10 @@ WindowDispatcher.register((action) => {
     case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.focused)
+      // selection should be cleared on blur
+      if (!action.focused) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'selected']), action.false)
+      }
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_NEW_FRAME:
@@ -258,8 +262,12 @@ WindowDispatcher.register((action) => {
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       windowStore.emitChange()
       break
-    case WindowConstants.WINDOW_SET_URL_BAR_AUTOSELECTED:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'autoselected']), action.isAutoselected)
+    case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'selected']), action.selected)
+      // selection implies focus
+      if (action.selected) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), true)
+      }
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:

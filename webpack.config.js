@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var webpack = require('webpack')
+var WebpackNotifierPlugin = require('webpack-notifier')
 
 module.exports = {
   contentBase: './dist/',
@@ -62,6 +63,7 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   plugins: [
+    new WebpackNotifierPlugin({title: 'Brave'}),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       'process.env': {

@@ -22,8 +22,8 @@ class UrlBar extends ImmutableComponent {
     return this.props.urlbar.get('active')
   }
 
-  isAutoselected () {
-    return this.props.urlbar.get('autoselected')
+  isSelected () {
+    return this.props.urlbar.get('selected')
   }
 
   isFocused () {
@@ -33,7 +33,7 @@ class UrlBar extends ImmutableComponent {
   // update the DOM with state that is not stored in the component
   updateDOM () {
     this.updateDOMInputFocus(this.isFocused())
-    this.updateDOMSelectionIfAuto(this.isAutoselected())
+    this.updateDOMInputSelected(this.isSelected())
   }
 
   updateDOMInputFocus (focused) {
@@ -45,8 +45,8 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
-  updateDOMSelectionIfAuto (autoselected) {
-    if (autoselected) {
+  updateDOMInputSelected (selected) {
+    if (selected) {
       let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
       urlInput.select()
     }
@@ -74,7 +74,7 @@ class UrlBar extends ImmutableComponent {
         let location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
           this.restore()
-          WindowActions.setUrlBarAutoselected(true)
+          WindowActions.setUrlBarSelected(true)
         } else {
           let selectedIndex = this.refs.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
@@ -105,19 +105,14 @@ class UrlBar extends ImmutableComponent {
         break
       // escape is handled by ipc shortcut-active-frame-stop event
       default:
-        WindowActions.setUrlBarAutoselected(false)
-        WindowActions.setUrlBarActive(true)
     }
   }
 
   onClick (e) {
     // if the url bar is already selected then clicking in it should make it active
-    if (this.isAutoselected()) {
-      WindowActions.setUrlBarAutoselected(false)
+    if (this.isSelected()) {
+      WindowActions.setUrlBarSelected(false)
       WindowActions.setUrlBarActive(true)
-      e.preventDefault()
-    } else if (!this.isActive()) {
-      WindowActions.setUrlBarAutoselected(true)
     }
   }
 
@@ -126,28 +121,29 @@ class UrlBar extends ImmutableComponent {
     if (!this.suggestionsShown) {
       WindowActions.setUrlBarActive(false)
     }
-    WindowActions.setUrlBarAutoselected(false)
+    WindowActions.setUrlBarSelected(false)
     WindowActions.setNavBarFocused(false)
   }
 
   onChange (e) {
+    WindowActions.setUrlBarSelected(false)
+    WindowActions.setUrlBarActive(true)
     WindowActions.setNavBarUserInput(e.target.value)
   }
 
   onFocus (e) {
-    WindowActions.setNavBarFocused(true)
+    WindowActions.setUrlBarSelected(true)
   }
 
   onActiveFrameStop () {
     this.restore()
-    WindowActions.setUrlBarAutoselected(true)
+    WindowActions.setUrlBarSelected(true)
     WindowActions.setUrlBarActive(false)
   }
 
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, () => {
-      this.onFocus()
-      WindowActions.setUrlBarAutoselected(true)
+      WindowActions.setUrlBarSelected(true)
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop.bind(this))

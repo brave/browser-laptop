@@ -73,6 +73,7 @@
     "style-loader": "^0.13.0",
     "webdriverio": "^3.3.0",
     "webpack": "^1.12.9",
+    "webpack-notifier": "^1.2.1",
     "webpack-dev-server": "^1.14.0"
   },
   "standard": {
