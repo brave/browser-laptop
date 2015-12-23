@@ -83,6 +83,19 @@ const WindowActions = {
   },
 
   /**
+   * Shows/hides the find-in-page bar.
+   * @param {Object} frameProps - The frame properties to modify
+   * @param {boolean} shown - Whether to show the findbar
+   */
+  setFindbarShown: function (frameProps, shown) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_FINDBAR_SHOWN,
+      frameProps,
+      shown
+    })
+  },
+
+  /**
    * Dispatches a message to the store to indicate that the webview is loading.
    *
    * @param {Object} frameProps - The frame properties for the webview in question.
@@ -409,6 +422,19 @@ const WindowActions = {
     WindowDispatcher.dispatch({
       actionType: WindowConstants.WINDOW_SET_SEARCH_DETAIL,
       searchDetail
+    })
+  },
+
+  /**
+   * Dispatches a message to set the find-in-page details.
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {Object} findDetail - the find details
+   */
+  setFindDetail: function (frameProps, findDetail) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_FIND_DETAIL,
+      frameProps,
+      findDetail
     })
   },
 

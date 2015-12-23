@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+.findBar {
+  background: @chromeControlsBackground;
+  opacity: 0.9;
+  padding: 5px 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  .findButton {
+    margin: 0 2px;
+
+    &.hideButton:not([disabled]):hover {
+      background: @chromeControlsWarningBackground;
+    }
+  }
+
+  .searchStringContainer {
+    position: relative;
+
+    input {
+      width: 200px;
+      margin-right: 5px;
+      padding-right: 28px;
+    }
+
+    span {
+      color: black;
+      font-size: 10px;
+      margin-right: 8px;
+      position: absolute;
+      right: 0;
+      top: 5px;
+    }
+  }
+
+  .caseSensitivityContainer {
+    input {
+      margin-right: 6px;
+    }
+    color: white;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+}

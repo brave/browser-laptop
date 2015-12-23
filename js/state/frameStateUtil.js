@@ -151,7 +151,11 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
         active: false
       }
     },
-    searchDetail: null
+    searchDetail: null,
+    findDetail: {
+      searchString: '',
+      caseSensitivity: false
+    }
   })
 
   // Find the closest index to the current frame's index which has

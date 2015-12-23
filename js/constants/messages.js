@@ -21,6 +21,7 @@ const messages = {
   SHORTCUT_SET_ACTIVE_FRAME_TO_LAST: _,
   SHORTCUT_ACTIVE_FRAME_SAVE: _,
   SHORTCUT_ACTIVE_FRAME_PRINT: _,
+  SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR: _,
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */

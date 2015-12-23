@@ -114,6 +114,12 @@ WindowDispatcher.register((action) => {
       })
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_FINDBAR_SHOWN:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        findbarShown: action.shown
+      })
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
@@ -302,6 +308,10 @@ WindowDispatcher.register((action) => {
       })
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_FIND_DETAIL:
+      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       windowStore.emitChange()
@@ -334,7 +344,7 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowStore.emitChange()
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar']
 frameShortcuts.forEach(shortcut => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {
