@@ -152,10 +152,14 @@ class Tab extends ImmutableComponent {
       onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
     }
 
-    return <div className='tabArea'
-        style={{
-          width: `${this.props.tabWidth}%`
-        }}>
+    return <div
+      className={cx({
+        tabArea: true,
+        partOfFullPageSet: this.props.partOfFullPageSet
+      })}
+      style={{
+        width: `${this.props.tabWidth}%`
+      }}>
       <DragIndicator active={this.props.frameProps.get('tabIsDraggingOverLeftHalf')}/>
       <div className={cx({
         tab: true,
@@ -199,18 +203,22 @@ class Tabs extends ImmutableComponent {
     return FrameStateUtil.getFramePropsIndex(this.props.frames, this.props.activeFrame)
   }
 
-  onPrevFrame () {
-    if (this.activeFrameIndex === 0) {
+  onPrevPage () {
+    if (this.props.tabs.get('tabPageIndex') === 0) {
       return
     }
-    WindowActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex - 1))
+    Windowctions.setTabPageIndex(this.props.tabs.get('tabPageIndex') - 1)
   }
 
-  onNextFrame () {
-    if (this.activeFrameIndex >= this.props.frames.size) {
+  onNextPage () {
+    if (this.props.tabs.get('tabPageIndex') + 1 === this.totalPages) {
       return
     }
-    WindowActions.setActiveFrame(this.props.frames.get(this.activeFrameIndex + 1))
+    WindowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') + 1)
+  }
+
+  get totalPages () {
+    return Math.ceil(this.props.frames.size / Config.tabs.tabsPerPage)
   }
 
   render () {
@@ -222,8 +230,8 @@ class Tabs extends ImmutableComponent {
     return <div className='tabs'>
       <span
         className='prevTab fa fa-angle-left'
-        disabled={this.activeFrameIndex === 0}
-        onClick={this.onPrevFrame.bind(this)} />
+        disabled={tabPageIndex === 0}
+        onClick={this.onPrevPage.bind(this)} />
         <span className='tabContainer'>
         {
           frames.map(frameProps => <Tab
@@ -233,13 +241,14 @@ class Tabs extends ImmutableComponent {
             key={'tab-' + frameProps.get('key')}
             isActive={this.props.activeFrame === frameProps}
             isPrivate={frameProps.get('isPrivate')}
+            partOfFullPageSet={frames.size === Config.tabs.tabsPerPage}
             tabWidth={tabWidth} />)
         }
         </span>
       <span
         className='nextTab fa fa-angle-right'
-        disabled={this.activeFrameIndex + 1 >= this.props.frames.size}
-        onClick={this.onNextFrame.bind(this)} />
+        disabled={tabPageIndex + 1 === this.totalPages}
+        onClick={this.onNextPage.bind(this)} />
     </div>
   }
 }

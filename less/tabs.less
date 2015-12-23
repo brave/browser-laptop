@@ -29,7 +29,6 @@
   margin: 0;
   position: relative;
   transition: transform 200ms ease;
-  border: 1px solid @chromeBorderColor;
   border-width: 1px 1px 0;
   left: 0;
   opacity: 1.0;
@@ -135,7 +134,11 @@
 .tabArea {
   position: relative;
   display: inline-block;
-  max-width: 184px;
+  // There's a special case that tabs should span the full width
+  // if there are a full set of them.
+  &:not(.partOfFullPageSet) {
+    max-width: 184px;
+  }
   box-sizing: border-box;
   padding: 0 2px 0 0;
   vertical-align: top;
