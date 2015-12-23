@@ -207,7 +207,7 @@ class Tabs extends ImmutableComponent {
     if (this.props.tabs.get('tabPageIndex') === 0) {
       return
     }
-    Windowctions.setTabPageIndex(this.props.tabs.get('tabPageIndex') - 1)
+    WindowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') - 1)
   }
 
   onNextPage () {
