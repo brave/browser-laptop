@@ -19,6 +19,8 @@ const messages = {
   SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX: _, /** @arg {number} index of frame */
   SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE: _,
   SHORTCUT_SET_ACTIVE_FRAME_TO_LAST: _,
+  SHORTCUT_ACTIVE_FRAME_SAVE: _,
+  SHORTCUT_ACTIVE_FRAME_PRINT: _,
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
@@ -30,14 +32,19 @@ const messages = {
   // Window management
   CLOSE_WINDOW: _,
   NEW_WINDOW: _,
-  // Misc
-  CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
   QUIT_APPLICATION: _,
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
-  CHECK_FOR_UPDATE: _
+  CHECK_FOR_UPDATE: _,
+  // Webview page messages
+  ZOOM_IN: _,
+  ZOOM_OUT: _,
+  ZOOM_RESET: _,
+  PRINT_PAGE: _,
+  SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
+  CONTEXT_MENU_OPENED: _ /** @arg {string} nodeName of node being clicked */
 }
 
 module.exports = mapValuesByKeys(messages)

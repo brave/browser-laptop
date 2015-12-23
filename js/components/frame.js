@@ -8,6 +8,8 @@ const WindowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
+const messages = require('../constants/messages.js')
+const remote = global.require('electron').remote
 
 import adInfo from '../data/adInfo.js'
 import Config from '../constants/config.js'
@@ -38,13 +40,13 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'zoom-in':
-        this.webview.send('zoom-in')
+        this.webview.send(messages.ZOOM_IN)
         break
       case 'zoom-out':
-        this.webview.send('zoom-out')
+        this.webview.send(messages.ZOOM_OUT)
         break
       case 'zoom-reset':
-        this.webview.send('zoom-reset')
+        this.webview.send(messages.ZOOM_RESET)
         break
       case 'toggle-dev-tools':
         if (this.webview.isDevToolsOpened()) {
@@ -57,6 +59,13 @@ class Frame extends ImmutableComponent {
         let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         WindowActions.loadUrl(src)
         // TODO: Make the URL bar show the view-source: prefix
+        break
+      case 'save':
+        // TODO: Sometimes this tries to save in a non-existent directory
+        remote.getCurrentWebContents().downloadURL(this.webview.getURL())
+        break
+      case 'print':
+        this.webview.send(messages.PRINT_PAGE)
         break
     }
     if (activeShortcut) {
@@ -128,7 +137,8 @@ class Frame extends ImmutableComponent {
     let host = new window.URL(currentLocation).hostname.replace('www.', '')
     let adDivCandidates = adInfo[host]
     if (adDivCandidates) {
-      this.webview.send('set-ad-div-candidates', adDivCandidates, Config.vault.replacementUrl)
+      this.webview.send(messages.SET_AD_DIV_CANDIDATES,
+                        adDivCandidates, Config.vault.replacementUrl)
     }
   }
 
