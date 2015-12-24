@@ -147,7 +147,8 @@ class Tab extends ImmutableComponent {
         fa: true,
         'fa-volume-up': this.props.frameProps.get('audioPlaybackActive') &&
           !this.props.frameProps.get('audioMuted'),
-        'fa-volume-off': this.props.frameProps.get('audioMuted')
+        'fa-volume-off': this.props.frameProps.get('audioPlaybackActive') &&
+          this.props.frameProps.get('audioMuted')
       })}
       onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
     }
