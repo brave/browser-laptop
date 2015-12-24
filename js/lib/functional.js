@@ -13,3 +13,8 @@ module.exports.mapValuesByKeys = (o) =>
     newObject[k] = k.toLowerCase().replace(/_/g, '-')
     return newObject
   }, {})
+
+module.exports.firstDefinedValue = (...arr) => {
+  // use + value to convert booleans back to numbers
+  return arr.filter((value) => !isNaN(+ value))[0] // eslint-disable-line
+}

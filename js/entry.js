@@ -11,14 +11,15 @@ require('../less/tabs.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
 const URL = require('url')
-const Immutable = require('immutable')
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
 
 // get appStore from url
-var appState = Immutable.fromJS(JSON.parse(URL.parse(window.location.href, true).query.appState))
+var queryString = URL.parse(window.location.href, true).query
+var appState = JSON.parse(queryString.appState)
+var frames = JSON.parse(queryString.frames)
 
 ReactDOM.render(
-  <Window appState={appState}/>,
+  <Window appState={appState} frames={frames}/>,
   document.getElementById('windowContainer'))

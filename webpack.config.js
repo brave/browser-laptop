@@ -63,7 +63,7 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   plugins: [
-    new WebpackNotifierPlugin({title: 'Brave'}),
+    new WebpackNotifierPlugin({title: 'Brave-' + process.env.NODE_ENV}),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       'process.env': {

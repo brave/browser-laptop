@@ -5,6 +5,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const WindowActions = require('../actions/windowActions')
+const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
@@ -74,12 +75,33 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
+    // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
-      WindowActions.newFrame({
-        location: e.url
-      })
+      // TODO handle _top, _parent and named frames
+      // also popup blocking and security restrictions!!
+
+      // @see <a href="http://www.w3.org/TR/html5/browsers.html#dom-open">dom open</a>
+      // @see <a href="http://www.w3.org/TR/html-markup/datatypes.html#common.data.browsing-context-name-or-keyword">browsing context name or keyword</a>
+      if (e.frameName.toLowerCase() === '_self') {
+        WindowActions.loadUrl(e.url)
+      } else if (e.disposition === 'new-window' || e.frameName.toLowerCase() === '_blank') {
+        AppActions.newWindow({
+          location: e.url,
+          parentFrameKey: this.props.frame.get('key'),
+          parentWindowKey: remote.getCurrentWindow().id
+        }, e.options)
+      } else {
+        WindowActions.newFrame({
+          location: e.url,
+          parentFrameKey: this.props.frame.get('key'),
+          parentWindowKey: remote.getCurrentWindow().id,
+          openInForeground: e.disposition !== 'background-tab'
+        })
+      }
     })
     this.webview.addEventListener('close', () => {
+      // security restrictions here?
+      AppActions.closeWindow(remote.getCurrentWindow().id)
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
     })

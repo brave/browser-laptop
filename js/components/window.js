@@ -7,6 +7,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const WindowStore = require('../stores/windowStore')
+const WindowActions = require('../actions/windowActions')
 const Main = require('./main')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
@@ -17,7 +18,7 @@ class Window extends React.Component {
 
     // initialize appState from props
     // and then listen for updates
-    this.appState = this.props.appState
+    this.appState = Immutable.fromJS(this.props.appState)
     this.state = {
       immutableData: {
         windowState: WindowStore.getState(),
@@ -26,6 +27,12 @@ class Window extends React.Component {
     }
     ipc.on(messages.APP_STATE_CHANGE, this.onAppStateChange.bind(this))
     WindowStore.addChangeListener(this.onChange.bind(this))
+  }
+
+  componentWillMount () {
+    this.props.frames.forEach((frame) => {
+      WindowActions.newFrame(frame)
+    })
   }
 
   render () {
@@ -58,6 +65,6 @@ class Window extends React.Component {
     this.onChange()
   }
 }
-Window.propTypes = { appState: React.PropTypes.object }
+Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array }
 
 module.exports = Window

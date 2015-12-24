@@ -134,6 +134,7 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
     features: getFeatures(frameOpts.features),
     key: newKey,
     parentFrameKey: frameOpts.parentFrameKey,
+    parentWindowKey: frameOpts.parentWindowKey,
     navbar: {
       searchSuggestions: true,
       focused: true,
