@@ -5,6 +5,7 @@ const Config = require('../js/constants/config').default
 
 describe('urlbar', function () {
   const urlInput = '#urlInput'
+  const activeWebview = '.frameWrapper.isActive webview'
 
   function * setup (client) {
     yield client
@@ -44,11 +45,56 @@ describe('urlbar', function () {
     return client.waitForValue(urlInput, Config.defaultUrl)
   }
 
+  function * navigate (client, url) {
+    yield client.ipcSend('shortcut-focus-url')
+      .setValue(urlInput, url)
+      // hit enter
+      .keys('\uE007')
+      .waitUntil(function () {
+        return this.getAttribute(activeWebview, 'src').then(src => src === url)
+      })
+  }
+
   function selectsText (client, text = Config.defaultUrl) {
     return client.waitUntil(function () {
       return this.getSelectedText().then(function (value) { return value === text })
     })
   }
+
+  describe('navigation', function () {
+    Brave.beforeAll(this)
+
+    before(function *() {
+      yield setup(this.app.client)
+    })
+
+    it('loads a page with a title', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield navigate(this.app.client, page1Url)
+      return yield this.app.client.waitForValue(urlInput)
+        .getValue(urlInput)
+        .should.eventually.be.equal('Page 1')
+        .moveToObject(urlInput)
+        .getValue(urlInput)
+        .should.eventually.be.equal(page1Url)
+    })
+
+    it('exits title mode when focused', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield navigate(this.app.client, page1Url)
+      return yield this.app.client.ipcSend('shortcut-focus-url')
+        .getValue(urlInput)
+        .should.eventually.be.equal(page1Url)
+    })
+
+    it('loads a page with no title', function *() {
+      const page1Url = Brave.server.url('page_no_title.html')
+      yield navigate(this.app.client, page1Url)
+      return yield this.app.client.waitForValue(urlInput)
+        .getValue(urlInput)
+        .should.eventually.be.equal(page1Url)
+    })
+  })
 
   describe('new window', function () {
     Brave.beforeAll(this)
