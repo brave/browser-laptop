@@ -2,7 +2,7 @@
 
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
-const {urlInput, activeWebview, activeTabFavicon} = require('./lib/selectors')
+const {urlInput, activeWebview, activeTabFavicon, activeTab} = require('./lib/selectors')
 const assert = require('assert')
 
 describe('urlbar', function () {
@@ -114,6 +114,30 @@ describe('urlbar', function () {
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTabFavicon, 'background-image').then(backgroundImage =>
           backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`
+      ))
+    })
+  })
+
+  describe('themeColor', function () {
+    Brave.beforeAll(this)
+
+    before(function *() {
+      yield setup(this.app.client)
+    })
+
+    it('Uses the default tab color when one is not specified', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield navigate(this.app.client, page1Url)
+      let backgroundColor = yield this.app.client.getCssProperty(activeTab, 'background-color')
+      assert.equal(backgroundColor.parsed.hex, '#ffffff')
+    })
+
+    it('Parses theme-color meta tag when one is present', function *() {
+      const pageWithFavicon = Brave.server.url('theme_color.html')
+      yield navigate(this.app.client, pageWithFavicon)
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
+          backgroundColor.parsed.hex === '#4d90fe'
       ))
     })
   })
