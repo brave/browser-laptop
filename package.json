@@ -61,11 +61,13 @@
     "electron-builder": "^2.3.1",
     "electron-packager": "^5.1.1",
     "electron-rebuild": "^1.0.2",
+    "empty-port": "0.0.1",
     "gulp": "^3.9.0",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "mocha": "^2.3.4",
     "node-libs-browser": "^0.5.3",
+    "node-static": "^0.7.7",
     "node-uuid": "^1.4.7",
     "pre-commit": "^1.1.2",
     "spectron": "^0.35.3",
@@ -73,8 +75,8 @@
     "style-loader": "^0.13.0",
     "webdriverio": "^3.3.0",
     "webpack": "^1.12.9",
-    "webpack-notifier": "^1.2.1",
-    "webpack-dev-server": "^1.14.0"
+    "webpack-dev-server": "^1.14.0",
+    "webpack-notifier": "^1.2.1"
   },
   "standard": {
     "ignore": [

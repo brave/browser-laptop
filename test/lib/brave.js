@@ -7,6 +7,8 @@ var chaiAsPromised = require('chai-as-promised')
 chai.should()
 chai.use(chaiAsPromised)
 
+const Server = require('./server')
+
 var exports = {
   beforeAll: function (context) {
     context.timeout(10000)
@@ -20,11 +22,22 @@ var exports = {
       exports.addCommands.call(this)
     })
 
+    context.beforeAll(function (done) {
+      Server.create(`${__dirname}/../fixtures/`, (err, _server) => {
+        if (err) {
+          console.log(err.stack)
+        }
+        exports.server = _server
+        done()
+      })
+    })
+
     context.beforeEach(function () {
       chaiAsPromised.transferPromiseness = this.app.client.transferPromiseness
     })
 
     context.afterAll(function () {
+      exports.server.stop()
       return exports.stopApp.call(this)
     })
   },
