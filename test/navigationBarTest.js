@@ -2,11 +2,9 @@
 
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
+const {urlInput, activeWebview} = require('./lib/selectors')
 
 describe('urlbar', function () {
-  const urlInput = '#urlInput'
-  const activeWebview = '.frameWrapper.isActive webview'
-
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
