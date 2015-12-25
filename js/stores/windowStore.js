@@ -291,6 +291,10 @@ WindowDispatcher.register((action) => {
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_FAVICON:
+      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       windowStore.emitChange()

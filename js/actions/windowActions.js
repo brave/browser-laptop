@@ -443,6 +443,20 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to indicate that the favicon has changed
+   *
+   * @param {Object} frameProps - Properties of the frame in question
+   * @param {string} favicon - A url to the favicon to use
+   */
+  setFavicon: function (frameProps, favicon) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_FAVICON,
+      frameProps,
+      favicon
+    })
+  },
+
+  /**
    * Dispatches a message to indicate if the mouse is in the titlebar
    *
    * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar

@@ -85,7 +85,10 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('leave-html-full-screen', () => {
     })
-    this.webview.addEventListener('page-favicon-updated', () => {
+    this.webview.addEventListener('page-favicon-updated', (e) => {
+      if (e.favicons && e.favicons.length > 0) {
+        WindowActions.setFavicon(this.props.frame, e.favicons[0])
+      }
     })
     this.webview.addEventListener('page-title-set', ({title}) => {
       WindowActions.setFrameTitle(this.props.frame, title)

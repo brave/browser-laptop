@@ -2,7 +2,8 @@
 
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
-const {urlInput, activeWebview} = require('./lib/selectors')
+const {urlInput, activeWebview, activeTabFavicon} = require('./lib/selectors')
+const assert = require('assert')
 
 describe('urlbar', function () {
   function * setup (client) {
@@ -91,6 +92,29 @@ describe('urlbar', function () {
       return yield this.app.client.waitForValue(urlInput)
         .getValue(urlInput)
         .should.eventually.be.equal(page1Url)
+    })
+  })
+
+  describe('favicon', function () {
+    Brave.beforeAll(this)
+
+    before(function *() {
+      yield setup(this.app.client)
+    })
+
+    it('Uses the default favicon when one is not specified', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield navigate(this.app.client, page1Url)
+      let backgroundImage = yield this.app.client.getCssProperty(activeTabFavicon, 'background-image')
+      assert.equal(backgroundImage.value, `url("${Brave.server.url('favicon.ico')}")`)
+    })
+    it('Parses favicon when one is present', function *() {
+      const pageWithFavicon = Brave.server.url('favicon.html')
+      yield navigate(this.app.client, pageWithFavicon)
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getCssProperty(activeTabFavicon, 'background-image').then(backgroundImage =>
+          backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`
+      ))
     })
   })
 
