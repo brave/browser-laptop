@@ -17,7 +17,8 @@ let windowState = Immutable.fromJS({
   ui: {
     tabs: {
       activeDraggedTab: null
-    }
+    },
+    mouseInTitlebar: false
   },
   searchDetail: null
 })
@@ -288,6 +289,10 @@ WindowDispatcher.register((action) => {
       break
     case WindowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
+      windowStore.emitChange()
+      break
+    case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
+      windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       windowStore.emitChange()
       break
     default:

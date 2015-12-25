@@ -61,6 +61,19 @@ class Main extends ImmutableComponent {
       WindowActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
 
     loadOpenSearch().then(searchDetail => WindowActions.setSearchDetail(searchDetail))
+
+    window.addEventListener('mousemove', (e) => {
+      self.checkForTitleMode(e.pageY)
+    })
+  }
+
+  checkForTitleMode (pageY) {
+    const height = document.querySelector('#navigator').getBoundingClientRect().bottom
+    if (pageY <= height && this.props.browser.getIn(['ui', 'mouseInTitlebar']) !== true) {
+      WindowActions.setMouseInTitlebar(true)
+    } else if (pageY === undefined || pageY > height && this.props.browser.getIn(['ui', 'mouseInTitlebar']) !== false) {
+      WindowActions.setMouseInTitlebar(false)
+    }
   }
 
   get activeFrame () {
@@ -112,6 +125,7 @@ class Main extends ImmutableComponent {
           frames={this.props.browser.get('frames')}
           sites={this.props.app.get('sites')}
           activeFrame={activeFrame}
+          mouseInTitlebar={this.props.browser.getIn(['ui', 'mouseInTitlebar'])}
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
           searchDetail={this.props.browser.get('searchDetail')}
         />

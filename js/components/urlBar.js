@@ -157,6 +157,11 @@ class UrlBar extends ImmutableComponent {
     this.updateDOM()
   }
 
+  get inputValue () {
+    return this.props.titleMode
+      ? this.props.activeFrameProps.get('title') : this.props.urlbar.get('location')
+  }
+
   render () {
     return <form
       action='#'
@@ -179,7 +184,7 @@ class UrlBar extends ImmutableComponent {
         onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
         onClick={this.onClick.bind(this)}
-        value={this.props.urlbar.get('location')}
+        value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
           insecure: !this.secure && this.loading === false && this.aboutPage === false,
@@ -187,6 +192,7 @@ class UrlBar extends ImmutableComponent {
           testHookLoadDone: !this.loading
         })}
         id='urlInput'
+        readOnly={this.props.titleMode}
         ref='urlInput'/>
         <UrlBarSuggestions
           ref='urlBarSuggestions'

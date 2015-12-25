@@ -46,6 +46,12 @@ class NavigationBar extends ImmutableComponent {
       isSiteInList(this.props.sites, this.props.activeFrame.get('location'), SiteTags.BOOKMARK)
   }
 
+  get titleMode () {
+    return this.props.mouseInTitlebar === false &&
+      this.props.activeFrame.get('title') &&
+      !this.props.navbar.getIn(['urlbar', 'focused'])
+  }
+
   render () {
     let frameProps = this.props.activeFrame
     if (!frameProps) {
@@ -57,7 +63,8 @@ class NavigationBar extends ImmutableComponent {
         data-frame-key={frameProps.get('key')}
         className={cx({
           loading: this.loading,
-          bookmarked: this.bookmarked
+          bookmarked: this.bookmarked,
+          titleMode: this.titleMode
         })}>
       <div className='startButtons'>
         <Button iconClass='fa-repeat'
@@ -74,6 +81,7 @@ class NavigationBar extends ImmutableComponent {
         searchSuggestions={this.props.searchSuggestions}
         frames={this.props.frames}
         focused={this.props.focused}
+        titleMode={this.titleMode}
         urlbar={this.props.navbar.get('urlbar')}
         />
       <div className='endButtons'>

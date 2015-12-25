@@ -440,6 +440,18 @@ const WindowActions = {
       frameProps,
       themeColor
     })
+  },
+
+  /**
+   * Dispatches a message to indicate if the mouse is in the titlebar
+   *
+   * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar
+   */
+  setMouseInTitlebar: function (mouseInTitlebar) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR,
+      mouseInTitlebar
+    })
   }
 }
 

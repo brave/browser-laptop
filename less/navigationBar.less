@@ -21,6 +21,24 @@
   flex-direction: row;
   -webkit-user-select: none;
 
+  &.titleMode {
+    input {
+      background: @chromePrimary;
+      color: white;
+      text-align: center;
+      /*
+      &:focus {
+        -webkit-user-select: none;
+        background: @chromePrimary;
+        color: white;
+      }
+      */
+    }
+    .startButtons, .endButtons {
+      visibility: hidden;
+    }
+  }
+
   /* Disable selection of button text */
   > span {
      -webkit-user-select: none;
