@@ -108,7 +108,7 @@ function processAdNode (node, iframeData, replacementUrl) {
 
   // ref param for referrer when possible
   var srcUrl = replacementUrl + '?width=' + adSize[0] + '&height=' + adSize[1] + '&seg=' + segment + ':' + time_in_segment + ':' + segment_expiration_time
-  var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] + '; padding: 0; margin: 0;"><script src="' + srcUrl + '"></script></body></html>'
+  var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] + '; padding: 0; margin: 0; overflow: hidden;"><script src="' + srcUrl + '"></script></body></html>'
 
   if (node.tagName === 'IFRAME') {
     node.srcdoc = src
