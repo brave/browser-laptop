@@ -30,7 +30,8 @@ class Window extends React.Component {
 
   render () {
     return <div id='windowContainer'>
-      <Main browser={this.state.immutableData.windowState} app={this.state.immutableData.appState} />
+      <Main windowState={this.state.immutableData.windowState}
+        appState={this.state.immutableData.appState} />
     </div>
   }
 

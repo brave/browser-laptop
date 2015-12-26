@@ -29,7 +29,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 
 class Main extends ImmutableComponent {
   componentDidMount () {
-    if (this.props.browser.get('frames').isEmpty()) {
+    if (this.props.windowState.get('frames').isEmpty()) {
       WindowActions.newFrame({
         location: Config.defaultUrl
       })
@@ -49,16 +49,16 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
-      ? WindowActions.closeFrame(self.props.browser.get('frames'), FrameStateUtil.getFrameByKey(self.props.browser, i))
-      : WindowActions.closeFrame(self.props.browser.get('frames')))
+      ? WindowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
+      : WindowActions.closeFrame(self.props.windowState.get('frames')))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => WindowActions.undoClosedFrame())
 
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
-      WindowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.browser, i)))
+      WindowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
 
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
-      WindowActions.setActiveFrame(self.props.browser.getIn(['frames', self.props.browser.get('frames').size - 1])))
+      WindowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     loadOpenSearch().then(searchDetail => WindowActions.setSearchDetail(searchDetail))
 
@@ -69,15 +69,15 @@ class Main extends ImmutableComponent {
 
   checkForTitleMode (pageY) {
     const height = document.querySelector('#navigator').getBoundingClientRect().bottom
-    if (pageY <= height && this.props.browser.getIn(['ui', 'mouseInTitlebar']) !== true) {
+    if (pageY <= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
       WindowActions.setMouseInTitlebar(true)
-    } else if (pageY === undefined || pageY > height && this.props.browser.getIn(['ui', 'mouseInTitlebar']) !== false) {
+    } else if (pageY === undefined || pageY > height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
       WindowActions.setMouseInTitlebar(false)
     }
   }
 
   get activeFrame () {
-    return this.refs[`frame${this.props.browser.get('activeFrameKey')}`]
+    return this.refs[`frame${this.props.windowState.get('activeFrameKey')}`]
   }
 
   onBack () {
@@ -105,9 +105,9 @@ class Main extends ImmutableComponent {
     // cause unexpected reloading when a user moves tabs.
     // All frame operations work off of frame keys and not index though so unsorted frames
     // can be passed everywhere other than the Frame elements.
-    const sortedFrames = this.props.browser.get('frames').sort(comparatorByKeyAsc)
+    const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
 
-    let activeFrame = FrameStateUtil.getActiveFrame(this.props.browser)
+    let activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     return <div id='browser'>
       <div className='top'>
         <div className='backforward'>
@@ -122,28 +122,28 @@ class Main extends ImmutableComponent {
         </div>
         <NavigationBar
           navbar={activeFrame && activeFrame.get('navbar')}
-          frames={this.props.browser.get('frames')}
-          sites={this.props.app.get('sites')}
+          frames={this.props.windowState.get('frames')}
+          sites={this.props.appState.get('sites')}
           activeFrame={activeFrame}
-          mouseInTitlebar={this.props.browser.getIn(['ui', 'mouseInTitlebar'])}
+          mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
-          searchDetail={this.props.browser.get('searchDetail')}
+          searchDetail={this.props.windowState.get('searchDetail')}
         />
         <div className='topLevelEndButtons'>
           <Button iconClass='fa-shield'
             className='navbutton brave-menu'
             onClick={this.onBraveMenu.bind(this)} />
         </div>
-        <TabPages frames={this.props.browser.get('frames')}
-          tabPageIndex={this.props.browser.getIn(['ui', 'tabs', 'tabPageIndex'])}
+        <TabPages frames={this.props.windowState.get('frames')}
+          tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
-          tabs={this.props.browser.getIn(['ui', 'tabs'])}
-          frames={this.props.browser.get('frames')}
+          tabs={this.props.windowState.getIn(['ui', 'tabs'])}
+          frames={this.props.windowState.get('frames')}
           key='tab-bar'
           activeFrame={activeFrame}
         />
-      {this.props.app.get('updateAvailable') ? <UpdateBar/> : null}
+      {this.props.appState.get('updateAvailable') ? <UpdateBar/> : null}
       </div>
       <div className='mainContainer'
         onFocus={this.onMainFocus.bind(this)}>
@@ -154,7 +154,7 @@ class Main extends ImmutableComponent {
               ref={`frame${frame.get('key')}`}
               frame={frame}
               key={frame.get('key')}
-              isActive={FrameStateUtil.isFrameKeyActive(this.props.browser, frame.get('key'))}
+              isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)
         }
         </div>
