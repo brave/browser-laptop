@@ -132,9 +132,8 @@ describe('urlbar', function () {
       assert.equal(backgroundColor.parsed.hex, '#ffffff')
     })
 
-    /*
     // We need a newer electron build first
-    it('Parses theme-color meta tag when one is present', function *() {
+    it.skip('Parses theme-color meta tag when one is present', function *() {
       const pageWithFavicon = Brave.server.url('theme_color.html')
       yield navigate(this.app.client, pageWithFavicon)
       yield this.app.client.waitUntil(() =>
@@ -142,7 +141,6 @@ describe('urlbar', function () {
           backgroundColor.parsed.hex === '#4d90fe'
       ))
     })
-    */
   })
 
   describe('new window', function () {
