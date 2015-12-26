@@ -5,7 +5,10 @@
     <meta name="availableLanguages" content="en-US">
     <meta name="defaultLanguage" content="en-US">
     <title>Brave</title>
-    <script>require("babel-polyfill")</script>
+    <script>
+      require("babel-polyfill")
+      require("vibrant/dist/Vibrant.min.js")
+    </script>
     <script src="./ext/l20n.min.js" defer></script>
     <link rel="localization" href="locales/{locale}/app.l20n">
   </head>

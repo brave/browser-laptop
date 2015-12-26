@@ -42,7 +42,8 @@
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
     "url-loader": "^0.5.7",
-    "urlutil.js": "^0.1.1"
+    "urlutil.js": "^0.1.1",
+    "vibrant": "git+ssh://git@github.com/jariz/vibrant.js.git#1.0"
   },
   "devDependencies": {
     "asar": "^0.8.3",

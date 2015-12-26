@@ -124,7 +124,19 @@ WindowDispatcher.register((action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false
       })
-      windowStore.emitChange()
+      FrameStateUtil.computeThemeColor(action.frameProps).then(
+        color => {
+          windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+            computedThemeColor: color
+          })
+          windowStore.emitChange()
+        },
+        () => {
+          windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+            computedThemeColor: null
+          })
+          windowStore.emitChange()
+        })
       break
     case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)

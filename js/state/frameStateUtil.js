@@ -4,6 +4,7 @@
 
 import Immutable from 'immutable'
 import Config from '../constants/config.js'
+const getFavicon = require('../lib/faviconUtil.js')
 
 export function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
@@ -245,13 +246,9 @@ export function removeOtherFrames (frames, closedFrames, frameProps) {
  */
 export function computeThemeColor (frameProps) {
   return new Promise((resolve, reject) => {
-    /*
     var icon = getFavicon(frameProps)
 
-    var xhr = new window.XMLHttpRequest({
-      mozAnon: true,
-      mozSystem: true
-    })
+    var xhr = new window.XMLHttpRequest()
 
     xhr.open('GET', icon, true)
     xhr.responseType = 'blob'
@@ -297,7 +294,6 @@ export function computeThemeColor (frameProps) {
         reject(new Error('Could not render image from blob.'))
       }
     }
-  */
   })
 }
 

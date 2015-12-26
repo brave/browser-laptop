@@ -43,6 +43,7 @@ WindowStore
     isPrivate: boolean, // private browsing tab
     loading: boolean,
     themeColor: string, // css compatible color string
+    computedThemeColor: string, // css computed theme color from the favicon
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
     security: {
