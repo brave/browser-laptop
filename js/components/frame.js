@@ -28,7 +28,12 @@ class Frame extends ImmutableComponent {
     this.addEventListeners()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps, prevState) {
+    if ((this.props.isActive && !prevProps.isActive && !this.props.frame.getIn(['navbar', 'urlbar', 'focused'])) ||
+        (this.props.isActive && this.props.frame.get('src') !== prevProps.frame.get('src'))) {
+      this.webview.focus()
+    }
+
     const activeShortcut = this.props.frame.get('activeShortcut')
     switch (activeShortcut) {
       case 'stop':
