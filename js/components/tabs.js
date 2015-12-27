@@ -14,6 +14,7 @@ const {getTextColorForBackground} = require('../lib/color')
 const getFavicon = require('../lib/faviconUtil.js')
 const FrameStateUtil = require('../state/frameStateUtil')
 
+const Button = require('./button')
 const contextMenus = require('../contextMenus')
 
 import Config from '../constants/config.js'
@@ -223,32 +224,30 @@ class Tabs extends ImmutableComponent {
   }
 
   render () {
-    const tabPageIndex = this.props.tabs.get('tabPageIndex')
-    const startingFrameIndex = tabPageIndex * Config.tabs.tabsPerPage
-    const frames = this.props.frames.slice(startingFrameIndex, startingFrameIndex + Config.tabs.tabsPerPage)
-    var tabWidth = 100 / frames.size
-
     return <div className='tabs'>
       <span
         className='prevTab fa fa-angle-left'
-        disabled={tabPageIndex === 0}
+        disabled={this.props.tabPageIndex === 0}
         onClick={this.onPrevPage.bind(this)} />
         <span className='tabContainer'>
         {
-          frames.map(frameProps => <Tab
+          this.props.currentFrames.map(frameProps => <Tab
             activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
             frameProps={frameProps}
             frames={this.props.frames}
             key={'tab-' + frameProps.get('key')}
             isActive={this.props.activeFrame === frameProps}
             isPrivate={frameProps.get('isPrivate')}
-            partOfFullPageSet={frames.size === Config.tabs.tabsPerPage}
-            tabWidth={tabWidth} />)
+            partOfFullPageSet={this.props.partOfFullPageSet}/>)
         }
+        { !this.props.partOfFullPageSet
+        ? <Button iconClass='fa-plus'
+          className='navbutton new-frame-button'
+          onClick={WindowActions.newFrame} /> : null }
         </span>
       <span
         className='nextTab fa fa-angle-right'
-        disabled={tabPageIndex + 1 === this.totalPages}
+        disabled={this.props.tabPageIndex + 1 === this.totalPages}
         onClick={this.onNextPage.bind(this)} />
     </div>
   }

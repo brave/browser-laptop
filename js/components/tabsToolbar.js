@@ -7,20 +7,17 @@ const ImmutableComponent = require('./immutableComponent')
 const Tabs = require('./tabs')
 const Button = require('./button')
 const WindowActions = require('../actions/windowActions')
+import Config from '../constants/config.js'
 
 class TabsToolbarButtons extends ImmutableComponent {
-  onNewFrame () {
-    WindowActions.newFrame()
-  }
-
   onMenu () {
   }
 
   render () {
     return <div className='tabsToolbarButtons'>
-      <Button iconClass='fa-plus'
-        className='navbutton new-frame-button'
-        onClick={this.onNewFrame.bind(this)} />
+      { this.props.partOfFullPageSet
+          ? <Button iconClass='fa-plus'
+              className='navbutton new-frame-button' onClick={WindowActions.newFrame} /> : null }
       <Button iconClass='fa-bars'
         className='navbutton menu-button'
         onClick={this.onMenu.bind(this)} />
@@ -30,12 +27,20 @@ class TabsToolbarButtons extends ImmutableComponent {
 
 class TabsToolbar extends ImmutableComponent {
   render () {
+    const tabPageIndex = this.props.tabs.get('tabPageIndex')
+    const startingFrameIndex = tabPageIndex * Config.tabs.tabsPerPage
+    const currentFrames = this.props.frames.slice(startingFrameIndex, startingFrameIndex + Config.tabs.tabsPerPage)
+
     return <div className='tabsToolbar'>
       <Tabs tabs={this.props.tabs}
         frames={this.props.frames}
         activeFrame={this.props.activeFrame}
+        tabPageIndex={tabPageIndex}
+        currentFrames={currentFrames}
+        startingFrameIndex={startingFrameIndex}
+        partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
       />
-      <TabsToolbarButtons/>
+      <TabsToolbarButtons partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}/>
     </div>
   }
 }
