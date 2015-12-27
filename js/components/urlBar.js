@@ -162,6 +162,20 @@ class UrlBar extends ImmutableComponent {
       ? this.props.activeFrameProps.get('title') : this.props.urlbar.get('location')
   }
 
+  get loadTime () {
+    let loadTime = ''
+    if (this.props.activeFrameProps.get('startLoadTime') &&
+        this.props.activeFrameProps.get('endLoadTime')) {
+      const loadMilliseconds = this.props.activeFrameProps.get('endLoadTime').getTime() -
+        this.props.activeFrameProps.get('startLoadTime').getTime()
+      if (loadMilliseconds > 1000) {
+        loadTime = (loadMilliseconds / 1000 | 0) + 's '
+      }
+      loadTime += (loadMilliseconds % 1000 | 0) + 'ms'
+    }
+    return loadTime
+  }
+
   render () {
     return <form
       action='#'
@@ -194,6 +208,8 @@ class UrlBar extends ImmutableComponent {
         id='urlInput'
         readOnly={this.props.titleMode}
         ref='urlInput'/>
+        { !this.props.titleMode
+          ? <span className='loadTime'>{this.loadTime}</span> : null }
         <UrlBarSuggestions
           ref='urlBarSuggestions'
           suggestions={this.props.urlbar.get('suggestions')}

@@ -39,6 +39,15 @@
     }
   }
 
+  .loadTime {
+    color: #0056FF;
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    text-align: right;
+    top: 7px;
+  }
+
   /* Disable selection of button text */
   > span {
      -webkit-user-select: none;
@@ -56,15 +65,16 @@
   input {
     background: #737373;
     border: none;
+    border-radius: 13px;
+    box-sizing: border-box;
     color: #fff;
     font-size: @defaultFontSize;
     font-weight: normal;
     height: 24px;
     margin: 0 0 0 1px;
-    padding: 0 25px;
+    padding: 0 70px 0 25px;
+    text-overflow: ellipsis;
     width: 100%;
-    border-radius: 13px;
-    box-sizing: border-box;
 
     &:hover {
       background: #7E7F83;

@@ -81,7 +81,7 @@ describe('application window', function () {
           .getWindowBounds().then((res) => res.y).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
-      it('has the widht and height of the last window resize', function *() {
+      it('has the width and height of the last window resize', function *() {
         yield this.app.client
           .getWindowWidth().should.eventually.be.equal(1000)
         yield this.app.client

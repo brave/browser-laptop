@@ -116,13 +116,16 @@ WindowDispatcher.register((action) => {
       break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        loading: true
+        loading: true,
+        startLoadTime: new Date(),
+        endLoadTime: null
       })
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        loading: false
+        loading: false,
+        endLoadTime: new Date()
       })
       FrameStateUtil.computeThemeColor(action.frameProps).then(
         color => {
