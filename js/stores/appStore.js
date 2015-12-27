@@ -5,12 +5,14 @@
 'use strict'
 const AppConstants = require('../constants/appConstants')
 const Immutable = require('immutable')
+const URL = require('url')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
+const siteHacks = require('../data/siteHacks')
 
 let appState = Immutable.fromJS({
   windows: [],
@@ -40,6 +42,17 @@ const spawnWindow = () => {
   } else {
     mainWindow.loadURL('file://' + __dirname + '/../../app/index.html?' + queryString)
   }
+
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
+    let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
+    let hack = siteHacks[domain]
+    if (hack) {
+      cb({ requestHeaders: hack.call(this, details) })
+    } else {
+      cb({})
+    }
+  })
+
   mainWindow.on('closed', function () {
     LocalShortcuts.unregister(mainWindow)
     mainWindow = null
