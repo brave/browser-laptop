@@ -20,6 +20,8 @@ AppStore
     startTime: datetime
     endTime: datetime
   }],
+  defaultWindowHeight: number,
+  defaultWindowWidth: number,
   updateAvailable: false,
 }
 ```
@@ -50,6 +52,8 @@ WindowStore
       isSecure: boolean, // is using https
       isExtendedValidation: boolean, // is using https ev
     },
+    parentWindowKey: number, // the key of the window this frame was opened from
+    parentFrameKey: number, // the key of the frame this frame was opened from
     contextMenuDetail: {...},
     modalPromptDetail: {...},
     basicAuthDetail: {...}

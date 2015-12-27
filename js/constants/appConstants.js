@@ -9,7 +9,8 @@ const AppConstants = {
   APP_NEW_WINDOW: _,
   APP_CLOSE_WINDOW: _,
   APP_ADD_SITE: _,
-  APP_REMOVE_SITE: _
+  APP_REMOVE_SITE: _,
+  APP_SET_DEFAULT_WINDOW_SIZE: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)

@@ -11,9 +11,11 @@ const AppActions = {
   /**
    * Dispatches an event to the main process to create a new window
    */
-  newWindow: function () {
+  newWindow: function (frameOpts, browserOpts) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_NEW_WINDOW
+      actionType: AppConstants.APP_NEW_WINDOW,
+      frameOpts,
+      browserOpts
     })
   },
 
@@ -56,6 +58,17 @@ const AppActions = {
       actionType: AppConstants.APP_REMOVE_SITE,
       frameProps,
       tag
+    })
+  },
+
+  /**
+   * Sets the default window size
+   * @param {Array} size - [width, height]
+   */
+  setDefaultWindowSize: function (size) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_DEFAULT_WINDOW_SIZE,
+      size
     })
   }
 }

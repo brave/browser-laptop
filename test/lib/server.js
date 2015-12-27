@@ -99,7 +99,7 @@ Server.prototype = {
  */
 Server.create = function (root, callback) {
   var fork = require('child_process').fork
-  var child = fork(`${__dirname}/server_child.js`, [root])
+  var child = fork(`${__dirname}/serverChild.js`, [root])
 
   // wait for start message ['start', PORT_NUMBER].
   child.on('message', function (data) {

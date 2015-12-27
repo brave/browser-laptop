@@ -3,13 +3,20 @@ var chai = require('chai')
 require('./coMocha')
 
 var chaiAsPromised = require('chai-as-promised')
-
 chai.should()
 chai.use(chaiAsPromised)
 
 const Server = require('./server')
 
 var exports = {
+
+  keys: {
+    CONTROL: '\ue009',
+    ESCAPE: '\ue00c',
+    RETURN: '\ue006',
+    SHIFT: '\ue008'
+  },
+
   beforeAll: function (context) {
     context.timeout(10000)
 
@@ -38,6 +45,9 @@ var exports = {
 
     context.afterAll(function () {
       exports.server.stop()
+    })
+
+    context.afterAll(function () {
       return exports.stopApp.call(this)
     })
   },
@@ -70,10 +80,52 @@ var exports = {
       }, message, param).then((response) => response.value)
     })
 
-    this.app.client.addCommand('ipcOn', function (message) {
-      return this.execute(function (message) {
-        return require('electron').remote.getCurrentWindow().webContents.on(message)
-      }, message).then((response) => response.value)
+    this.app.client.addCommand('ipcOn', function (message, fn) {
+      return this.execute(function (message, fn) {
+        return require('electron').remote.getCurrentWindow().webContents.on(message, fn)
+      }, message, fn).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('newWindowAction', function (frameOpts, browserOpts) {
+      return this.execute(function () {
+        return require('../js/actions/appActions').newWindow()
+      }, frameOpts, browserOpts).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('getDefaultWindowHeight', function () {
+      return this.execute(function () {
+        let screen = require('electron').screen
+        let primaryDisplay = screen.getPrimaryDisplay()
+        return Math.floor(primaryDisplay.bounds.height / 2)
+      }).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('getDefaultWindowWidth', function () {
+      return this.execute(function () {
+        let screen = require('electron').screen
+        let primaryDisplay = screen.getPrimaryDisplay()
+        return Math.floor(primaryDisplay.bounds.width / 2)
+      }).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('getPrimaryDisplayHeight', function () {
+      return this.execute(function () {
+        let screen = require('electron').screen
+        return screen.getPrimaryDisplay().bounds.height
+      }).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('getPrimaryDisplayWidth', function () {
+      return this.execute(function () {
+        let screen = require('electron').screen
+        return screen.getPrimaryDisplay().bounds.width
+      }).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('resizeWindow', function (width, height) {
+      return this.execute(function (width, height) {
+        return require('electron').remote.getCurrentWindow().setSize(width, height)
+      }, width, height).then((response) => response.value)
     })
   },
 
