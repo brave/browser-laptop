@@ -141,6 +141,14 @@ describe('urlbar', function () {
           backgroundColor.parsed.hex === '#4d90fe'
       ))
     })
+    it('Obtains theme color from favicon', function *() {
+      const pageWithFavicon = Brave.server.url('favicon.html')
+      yield navigate(this.app.client, pageWithFavicon)
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
+          backgroundColor.parsed.hex === '#320f07'
+      ))
+    })
   })
 
   describe('new window', function () {
