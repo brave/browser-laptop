@@ -199,7 +199,11 @@ describe('urlbar', function () {
       yield selectsText(this.app.client, '')
     })
 
-    it('gives focus to the webview')
+    it('gives focus to the webview', function () {
+      this.app.client.waitUntil(function () {
+        return this.getAttribute(':focus', 'src').then(src => src === Config.defaultUrl)
+      })
+    })
 
     describe('url input value', function () {
 
@@ -264,8 +268,11 @@ describe('urlbar', function () {
       // default tab
       yield setup(this.app.client)
       // tab with typing
-      yield newFrame(this.app.client)
+      yield newFrame(this.app.client, 2)
       yield this.app.client.keys('a').waitForValue(urlInput, 'a')
+      // tab with loaded url
+      yield newFrame(this.app.client, 3)
+      yield navigate(this.app.client, Brave.server.url('page1.html'))
     })
 
     describe('switch to default state tab', function () {
@@ -293,6 +300,19 @@ describe('urlbar', function () {
       it('preserves typing state', function *() {
         yield this.app.client.getValue(urlInput).should.eventually.be.equal('a')
         yield selectsText(this.app.client, '')
+      })
+    })
+
+    describe('switch to url loaded tab', function () {
+      before(function *() {
+        yield this.app.client
+          .ipcSend('shortcut-set-active-frame-by-index', 2)
+      })
+
+      it('preserves focus on the webview', function *() {
+        this.app.client.waitUntil(function () {
+          return this.getAttribute(':focus', 'src').then(src => src === Brave.server.url('page1.html'))
+        })
       })
     })
   })
