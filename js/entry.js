@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // Stylesheets are included here for webpack live reloading
-require('../less/browser.less')
+require('../less/window.less')
 require('../less/button.less')
 require('../less/main.less')
 require('../less/navigationBar.less')

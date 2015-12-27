@@ -9,7 +9,7 @@ describe('urlbar', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
-      .waitForVisible('#browser')
+      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 

@@ -13,6 +13,6 @@ describe('application launch', function () {
       .isWindowFocused().should.eventually.be.true
       .getWindowWidth().should.eventually.be.above(0)
       .getWindowHeight().should.eventually.be.above(0)
-      .waitForVisible('#browser')
+      .waitForVisible('#window')
   })
 })

@@ -108,7 +108,7 @@ class Main extends ImmutableComponent {
     const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
 
     let activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    return <div id='browser'>
+    return <div id='window'>
       <div className='top'>
         <div className='backforward'>
           <span
