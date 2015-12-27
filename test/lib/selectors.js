@@ -4,5 +4,7 @@ module.exports = {
   activeTab: '.tab.active',
   activeTabFavicon: '.tab.active .tabIcon',
   navigator: '#navigator',
-  navigatorLoadTime: '#navigator .loadTime'
+  navigatorLoadTime: '#navigator .loadTime',
+  newFrameButtonInsideTabs: '.tabs .newFrameButton',
+  newFrameButtonOutsideTabs: '.tabsToolbarButtons .newFrameButton'
 }
