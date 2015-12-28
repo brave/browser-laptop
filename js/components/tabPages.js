@@ -14,13 +14,14 @@ class TabPage extends ImmutableComponent {
   render () {
     const audioPlaybackActive = this.props.frames.find(frame =>
         frame.get('audioPlaybackActive') && !frame.get('audioMuted'))
-    return <span className={cx({
-      tabPage: true,
-      audioPlaybackActive,
-      active: this.props.active})}
-      onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
-      onClick={WindowActions.setTabPageIndex.bind(this, this.props.index)
-    }>
+    return <span data-tab-page={this.props.index}
+      className={cx({
+        tabPage: true,
+        audioPlaybackActive,
+        active: this.props.active})}
+        onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
+        onClick={WindowActions.setTabPageIndex.bind(this, this.props.index)
+      }>
     </span>
   }
 }

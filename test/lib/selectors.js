@@ -6,5 +6,9 @@ module.exports = {
   navigator: '#navigator',
   navigatorLoadTime: '#navigator .loadTime',
   newFrameButtonInsideTabs: '.tabs .newFrameButton',
-  newFrameButtonOutsideTabs: '.tabsToolbarButtons .newFrameButton'
+  newFrameButtonOutsideTabs: '.tabsToolbarButtons .newFrameButton',
+  tabPage: '.tabPage',
+  tabPage1: '[data-tab-page="0"]',
+  tabPage2: '[data-tab-page="1"]',
+  closeTab: '.closeTab'
 }
