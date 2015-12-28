@@ -180,6 +180,10 @@ class Frame extends ImmutableComponent {
     this.webview.goForward()
   }
 
+  onFocus () {
+    WindowActions.setTabPageIndexByFrame(this.props.frame)
+  }
+
   componentWillReceiveProps (nextProps) {
     if (nextProps.frame.get('audioMuted') &&
       this.props.frame.get('audioMuted') !== true) {
@@ -198,6 +202,7 @@ class Frame extends ImmutableComponent {
         })}>
       <webview
         ref='webview'
+        onFocus={this.onFocus.bind(this)}
         src={this.props.frame.get('src')}
         preload='content/webviewPreload.js'/>
     </div>

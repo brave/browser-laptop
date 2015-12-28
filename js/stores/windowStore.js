@@ -184,7 +184,11 @@ WindowDispatcher.register((action) => {
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:
-      windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
+      if (action.index !== undefined) {
+        windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
+      } else {
+        updateTabPageIndex(action.frameProps)
+      }
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_UPDATE_BACK_FORWARD:

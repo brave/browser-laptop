@@ -196,6 +196,18 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to the store to set the tab page index.
+   *
+   * @param {number} frameProps - The frame props to center around
+   */
+  setTabPageIndexByFrame: function (frameProps) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
+      frameProps
+    })
+  },
+
+  /**
    * Dispatches a message to the store to update the back-forward information.
    *
    * @param {Object} frameProps - the frame properties for the webview in question.
