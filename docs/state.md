@@ -40,6 +40,7 @@ WindowStore
     location: string, // page url
     src: string, // what the iframe src should be
     title: string, // page title
+    findbarShown: boolean, // whether the findbar is shown
     thumbnail: string, // url to thumbnail
     key: number,
     isPrivate: boolean, // private browsing tab
@@ -58,7 +59,11 @@ WindowStore
     parentFrameKey: number, // the key of the frame this frame was opened from
     contextMenuDetail: {...},
     modalPromptDetail: {...},
-    basicAuthDetail: {...}
+    basicAuthDetail: {...},
+    findDetail: {
+      searchString: string, // the string being searched
+      caseSensitivity: boolean // whether we are doing a case sensitive search
+    }
     unloaded: boolean, // true if the tab is unloaded
     navbar: {
       focused: boolean, // whether the navbar is focused

@@ -14,6 +14,7 @@ const remote = global.require('electron').remote
 
 import adInfo from '../data/adInfo.js'
 import Config from '../constants/config.js'
+import FindBar from './findbar.js'
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -72,6 +73,9 @@ class Frame extends ImmutableComponent {
         break
       case 'print':
         this.webview.send(messages.PRINT_PAGE)
+        break
+      case 'show-findbar':
+        WindowActions.setFindbarShown(this.props.frame, true)
         break
     }
     if (activeShortcut) {
@@ -184,6 +188,37 @@ class Frame extends ImmutableComponent {
     WindowActions.setTabPageIndexByFrame(this.props.frame)
   }
 
+  onFindHide () {
+    WindowActions.setFindbarShown(this.props.frame, false)
+    this.onClearMatch()
+  }
+
+  onFindAll (searchString, caseSensitivity) {
+    if (searchString) {
+      this.webview.findInPage(searchString,
+                              {matchCase: caseSensitivity,
+                               forward: true,
+                               findNext: false})
+    } else {
+      this.onClearMatch()
+    }
+  }
+
+  onFindAgain (searchString, caseSensitivity, forward) {
+    if (searchString) {
+      this.webview.findInPage(searchString,
+                              {matchCase: caseSensitivity,
+                               forward: forward,
+                               findNext: true})
+    } else {
+      this.onClearMatch()
+    }
+  }
+
+  onClearMatch () {
+    this.webview.stopFindInPage('clearSelection')
+  }
+
   componentWillReceiveProps (nextProps) {
     if (nextProps.frame.get('audioMuted') &&
       this.props.frame.get('audioMuted') !== true) {
@@ -200,6 +235,16 @@ class Frame extends ImmutableComponent {
           frameWrapper: true,
           isActive: this.props.isActive
         })}>
+      <FindBar
+        ref='findbar'
+        findInPageDetail={null}
+        onFindAll={this.onFindAll.bind(this)}
+        onFindAgain={this.onFindAgain.bind(this)}
+        onHide={this.onFindHide.bind(this)}
+        active={this.props.frame.get('findbarShown')}
+        frame={this.props.frame}
+        findDetail={this.props.frame.get('findDetail')}
+      />
       <webview
         ref='webview'
         onFocus={this.onFocus.bind(this)}

@@ -180,7 +180,10 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Find on page...',
-          accelerator: 'CmdOrCtrl+F'
+          accelerator: 'CmdOrCtrl+F',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
+          }
         }, {
           label: 'Find Next',
           accelerator: 'CmdOrCtrl+G'
