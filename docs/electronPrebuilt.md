@@ -9,5 +9,7 @@ Releases of `brave/electron` get added to the `gh-pages` branch of [brave/browse
 To create a new release of `brave/electron` for use in `brave/electron-prebuilt`:
 
 - Rebase `brave/electron`'s commits to the upstream tag you'd like to create a release for.
-- Run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> ATOM_SHELL_./script/cibuild`.  Replace `<your-github-token>` with a token generated from https://github.com/settings/tokens
+- For Linux and OSX builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> ATOM_SHELL_./script/cibuild`.  Replace `<your-github-token>` with a token generated from https://github.com/settings/tokens
+- For Windows builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> npm run cibuild-windows`.
 - Manually download the release zip to a subfolder of `brave/browser-electron-releases`.
+- Mark the release draft as completed in the `brave/electron` repository.
