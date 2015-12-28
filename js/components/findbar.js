@@ -56,8 +56,16 @@ export default class FindBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.active && !prevProps.active) {
+    if (!this.props.active) {
+      return null
+    }
+    if (!prevProps.active) {
+      // Focus and select the find input
       this.focus()
+    }
+    if (this.props.findDetail !== prevProps.findDetail) {
+      // Redo search if details have changed
+      this.onFind()
     }
   }
 

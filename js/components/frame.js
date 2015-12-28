@@ -199,6 +199,8 @@ class Frame extends ImmutableComponent {
                               {matchCase: caseSensitivity,
                                forward: true,
                                findNext: false})
+    } else {
+      this.onClearMatch()
     }
   }
 
@@ -208,6 +210,8 @@ class Frame extends ImmutableComponent {
                               {matchCase: caseSensitivity,
                                forward: forward,
                                findNext: true})
+    } else {
+      this.onClearMatch()
     }
   }
 
