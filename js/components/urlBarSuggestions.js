@@ -13,7 +13,7 @@ import top500 from './../data/top500.js'
 import {isSourceAboutUrl, isUrl} from '../lib/appUrlUtil.js'
 import Immutable from 'immutable'
 import debounce from '../lib/debounce.js'
-import {getSiteIconClass} from '../lib/siteUtil.js'
+const {getSiteIconClass} = require('../state/siteUtil.js')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {

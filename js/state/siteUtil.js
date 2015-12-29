@@ -89,4 +89,20 @@ exports.removeSite = function (sites, frameProps, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
+/**
+ * Detemrines the icon class to use for the site
+ *
+ * @param site The site in question
+ * @return the class of the fontawesome icon to use
+ */
+exports.getSiteIconClass = function (site) {
+  if (site.get('tags').includes('bookmark')) {
+    return 'fa-star'
+  }
+  if (site.get('tags').includes('reader')) {
+    return 'fa-book'
+  }
+  return 'fa-file-o'
+}
+
 module.exports = exports
