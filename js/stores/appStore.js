@@ -187,18 +187,20 @@ const appStore = new AppStore()
 const handleAppAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_NEW_WINDOW:
-      let mainWindow = createWindow(action.browserOpts, windowDefaults(), action.frameOpts && action.frameOpts.parentWindowKey)
+      const frameOpts = action.frameOpts && action.frameOpts.toJS() || undefined
+      const browserOpts = action.browserOpts && action.browserOpts.toJS() || undefined
+      let mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts && frameOpts.parentWindowKey)
 
       let currentWindows = appState.get('windows')
       appState = appState.set('windows', currentWindows.push(mainWindow.id))
 
       // initialize frames state
       let frames = []
-      if (action.frameOpts) {
-        if (action.frameOpts.forEach) {
-          frames = action.frameOpts
+      if (frameOpts) {
+        if (frameOpts.forEach) {
+          frames = frameOpts
         } else {
-          frames.push(action.frameOpts)
+          frames.push(frameOpts)
         }
       }
 
