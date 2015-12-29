@@ -188,8 +188,8 @@ class Tab extends ImmutableComponent {
         <span onClick={this.onCloseFrame.bind(this)}
           className='closeTab fa fa-times'/>
         <div className='tabIcon' style={iconStyle}/>
+        {playIcon}
         <div className='tabTitle'>
-          {playIcon}
           {this.displayValue}
         </div>
       </div>
