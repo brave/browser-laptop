@@ -25,7 +25,9 @@ class Window extends React.Component {
         appState: this.appState
       }
     }
-    ipc.on(messages.APP_STATE_CHANGE, this.onAppStateChange.bind(this))
+    ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
+      this.onAppStateChange(Immutable.fromJS(action))
+    })
     WindowStore.addChangeListener(this.onChange.bind(this))
   }
 

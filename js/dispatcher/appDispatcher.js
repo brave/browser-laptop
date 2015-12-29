@@ -4,17 +4,18 @@
 
 'use strict'
 const messages = require('../constants/messages')
+const Serializer = require('../dispatcher/serializer')
 
 class AppDispatcher {
   /**
    * dispatch
-   * @param  {object} payload The data from the action.
+   * @param  {object} action The action to dispatch
    */
-  dispatch (payload) {
+  dispatch (action) {
     if (process.type === 'renderer') {
-      global.require('electron').ipcRenderer.send(messages.APP_ACTION, payload)
+      global.require('electron').ipcRenderer.send(messages.APP_ACTION, Serializer.serialize(action))
     } else {
-      process.emit(messages.APP_ACTION, payload)
+      process.emit(messages.APP_ACTION, action)
     }
   }
 }

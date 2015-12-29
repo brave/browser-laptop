@@ -15,6 +15,7 @@ const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const siteHacks = require('../data/siteHacks')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
+const Serializer = require('../dispatcher/serializer')
 
 let appState = Immutable.fromJS({
   windows: [],
@@ -145,7 +146,9 @@ class AppStore {
   }
 
   emitChange () {
-    ipcMain.emit(messages.APP_STATE_CHANGE, this.getState())
+    const stateJS = this.getState().toJS()
+    BrowserWindow.getAllWindows().forEach(wnd =>
+      wnd.webContents.send(messages.APP_STATE_CHANGE, stateJS))
   }
 }
 
@@ -239,7 +242,9 @@ const handleAppAction = (action) => {
 }
 
 // Register callback to handle all updates
-ipcMain.on(messages.APP_ACTION, (event, action) => handleAppAction(action))
+ipcMain.on(messages.APP_ACTION, (event, action) => {
+  handleAppAction(Serializer.deserialize(action))
+})
 
 process.on(messages.APP_ACTION, handleAppAction)
 
