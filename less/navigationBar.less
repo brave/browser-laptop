@@ -40,7 +40,7 @@
   }
 
   .loadTime {
-    color: #0056FF;
+    color: @loadTimeColor;
     font-size: 12px;
     position: absolute;
     right: 10px;
@@ -63,7 +63,7 @@
   }
 
   input {
-    background: #737373;
+    background: @navigationBarBackground;
     border: none;
     border-radius: 13px;
     box-sizing: border-box;
@@ -77,12 +77,14 @@
     width: 100%;
 
     &:hover {
-      background: #7E7F83;
+      background: @chromeControlsBackground2;
     }
 
     &:focus {
       background: #fff;
+      border: 1px solid @focusUrlbarOutline;
       color: #333333;
+      outline: none;
     }
 
     &.private {
@@ -147,7 +149,7 @@
       z-index: 333;
 
       &.selected {
-        color: @hoverBlue;
+        color: @highlightBlue;
       }
       * {
         /* To allow for mouse listeners to work on the list items. */
@@ -194,4 +196,10 @@
       }
     }
   }
+}
+
+.topLevelEndButtons .braveMenu {
+  background-image: -webkit-image-set(url(../app/img/braveBtn.png) 1x, url(../app/img/braveBtn2x.png) 2x, url(../app/img/braveBtn3x.png) 3x);
+  width: 23px;
+  height: 27px;
 }

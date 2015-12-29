@@ -130,8 +130,8 @@ class Main extends ImmutableComponent {
           searchDetail={this.props.windowState.get('searchDetail')}
         />
         <div className='topLevelEndButtons'>
-          <Button iconClass='fa-shield'
-            className='navbutton brave-menu'
+          <Button iconClass='braveMenu'
+            className='navbutton'
             onClick={this.onBraveMenu.bind(this)} />
         </div>
         <TabPages frames={this.props.windowState.get('frames')}

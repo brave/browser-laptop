@@ -37,7 +37,7 @@ html,
     z-index: 10;
     top: -12px;
     left: 70px;
-    border: 1px solid #C1C1C1;
+    border: 1px solid @tabsBackground;
     border-radius: 66px;
     width: 66px;
     height: 66px;
@@ -63,15 +63,17 @@ html,
     }
 
     .back {
-      top: -11px;
-      left: 12px;
+      border-right: 1px solid @chromeControlsBackground2;
       font-size: 60px;
+      left: 12px;
+      padding-right: 4px;
+      top: -11px;
     }
 
     .forward {
       top: -9px;
       right: 10px;
-      font-size: 44px;
+      font-size: 35px;
     }
 
   }

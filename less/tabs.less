@@ -5,7 +5,7 @@
 @import "variables.less";
 
 .tabs {
-  background: @chromeSecondary;
+  background: @tabsBackground;
   box-sizing: border-box;
   display: flex;
   flex: 1;
@@ -53,13 +53,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    vertical-align: middle;
     width: calc(~'100% - 26px');
   }
   .tabIcon {
     background-position: center;
     background-repeat: no-repeat;
     display: inline-block;
-    margin: 0 4px;
+    margin: 0 4px 0 9px;
     position: relative;
     top: -3px;
     vertical-align: middle;
@@ -168,7 +169,7 @@
     display: none;
     &.dragActive {
       display: block;
-      color: @hoverBlue;
+      color: @highlightBlue;
     }
   }
 }
@@ -179,7 +180,7 @@
 }
 
 .tabsToolbarButtons {
-  background: @chromeSecondary;
+  background: @tabsBackground;
   padding-right: 5px;
   .browserButton {
     display: inline-block;
@@ -188,7 +189,7 @@
 }
 
 .tabPages {
-  background: @chromeSecondary;
+  background: @tabsBackground;
   border-top: 1px solid gray;
   height: 14px;
   position: relative;
@@ -197,12 +198,12 @@
 }
 
 .tabPage {
-  background-color: #7E7F83;
+  background-color: @chromeControlsBackground2;
   border-radius: 9px;
   box-sizing: border-box;
   cursor: pointer;
   display: inline-block;
-  margin: 0 5px;
+  margin: 0 2.5px;
   height: 6px;
   transform: translateY(-50%);
   width: 34px;
@@ -218,20 +219,21 @@
 
 .prevTab, .nextTab {
   color: #3B3B3B;
+  font-size: 24px !important;
   height: 20px;
   line-height: 20px !important;
   opacity: 0.5;
   vertical-align: top;
   width: 50px;
   &:not([disabled]) {
-    background: #7E7F83;
+    background: @chromeControlsBackground2;
     cursor: pointer;
     opacity: 1;
   }
 }
 
 .prevTab {
-  background: linear-gradient(to right, #7E7F83, @chromeSecondary);
+  background: linear-gradient(to right, @chromeControlsBackground2, @tabsBackground);
   border-bottom-left-radius: 9px;
   border-top-left-radius: 9px;
   padding-left: 10px;
@@ -240,7 +242,7 @@
 }
 
 .nextTab {
-  background: linear-gradient(to left, #7E7F83, @chromeSecondary);
+  background: linear-gradient(to left, @chromeControlsBackground2, @tabsBackground);
   border-bottom-right-radius: 9px;
   border-top-right-radius: 9px;
   float: right;

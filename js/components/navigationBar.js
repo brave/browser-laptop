@@ -85,10 +85,10 @@ class NavigationBar extends ImmutableComponent {
         urlbar={this.props.navbar.get('urlbar')}
         />
       <div className='endButtons'>
-        <Button iconClass='fa-star'
+        <Button iconClass='fa-star-o'
           className='navbutton bookmark-button'
           onClick={this.onAddBookmark.bind(this)} />
-        <Button iconClass='fa-star'
+        <Button iconClass='fa-star-o'
           className='navbutton remove-bookmark-button'
           onClick={this.onRemoveBookmark.bind(this)} />
       </div>

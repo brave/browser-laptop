@@ -97,7 +97,7 @@ exports.removeSite = function (sites, frameProps, tag) {
  */
 exports.getSiteIconClass = function (site) {
   if (site.get('tags').includes('bookmark')) {
-    return 'fa-star'
+    return 'fa-star-o'
   }
   if (site.get('tags').includes('reader')) {
     return 'fa-book'
