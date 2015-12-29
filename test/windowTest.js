@@ -63,7 +63,7 @@ describe('application window', function () {
       before(function *() {
         yield this.app.client
           .waitUntilWindowLoaded()
-          .resizeWindow(1000, 1000)
+          .resizeWindow(600, 700)
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
@@ -83,9 +83,9 @@ describe('application window', function () {
 
       it('has the width and height of the last window resize', function *() {
         yield this.app.client
-          .getWindowWidth().should.eventually.be.equal(1000)
+          .getWindowWidth().should.eventually.be.equal(600)
         yield this.app.client
-          .getWindowHeight().should.eventually.be.equal(1000)
+          .getWindowHeight().should.eventually.be.equal(700)
       })
     })
 
