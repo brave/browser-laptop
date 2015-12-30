@@ -34,6 +34,9 @@ app.on('ready', function () {
   ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
     BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
   })
+  ipcMain.on(messages.STOP_LOAD, () => {
+    BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
+  })
 
   Menu.init()
 

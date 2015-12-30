@@ -44,7 +44,8 @@ const messages = {
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
   CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
   APP_STATE_CHANGE: _,
-  APP_ACTION: _
+  APP_ACTION: _,
+  STOP_LOAD: _
 }
 
 module.exports = mapValuesByKeys(messages)

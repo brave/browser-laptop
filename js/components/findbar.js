@@ -72,16 +72,15 @@ export default class FindBar extends ImmutableComponent {
   onKeyDown (e) {
     switch (e.keyCode) {
       case keyCodes.ESC:
-        // ESC is handled by a local shortcut, so use shift+ESC
-        if (e.shiftKey) {
-          this.props.onHide()
-        }
+        e.preventDefault()
+        this.props.onHide()
         break
       case keyCodes.ENTER:
+        e.preventDefault()
         if (e.shiftKey) {
           this.onFindPrev()
         } else {
-          this.onFind()
+          this.onFindNext()
         }
         break
     }
