@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // UPDATE_HOST should be set to the host name for the auto-updater server
-var updateHost = process.env.UPDATE_HOST || 'https://dev.mysite.com'
+var updateHost = process.env.UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 
 module.exports = {
   updates: {

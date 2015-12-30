@@ -95,6 +95,32 @@ The built dmg binary requires its components to be digitally signed before the u
 
   7. Install dmg by mounting dmg and moving browser to the Applications folder
 
-  8. Browser will check for updates on startup
+  8. Browser will check for updates via menu entry
 
 # Windows x64
+
+# Deploying Updates
+
+  1. Bump version number in package.json (0.0.3 in this example)
+
+  2. Run zip file packager `npm run zip-darwin`. This will create a packaged update zip file ./Brave-darwin-x64/Brave-0.0.3.zip
+
+  3. Update vault-updater repo /data/osx.json with update meta data
+
+     {
+        "version": "0.0.3",
+        "notes": "Release notes for v0.0.3",
+        "name": "Brave 0.0.3",
+        "pub_date": "2015-12-30T12:29:53+04:00",
+        "url": "https://brave-download.global.ssl.fastly.net/releases/0.0.3/osx/Brave-0.0.3.zip"
+     }
+
+     Commit to master and push to Heroku
+
+     `git push heroku master -f`
+
+   4. Create folder in brave-download S3 bucket releases/0.0.3/osx
+
+   5. Upload Brave-0.0.3.zip to new folder
+
+   6. Navigate to the releases folder, select it and mark it as public

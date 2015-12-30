@@ -48,7 +48,7 @@ app.on('ready', function () {
   if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
     Updater.init(process.platform)
 
-    // this is fired by the menu entry
+    // this is fired by a menu entry
     process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
   } else {
     process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())

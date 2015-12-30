@@ -8,4 +8,4 @@ var version = pack.version
 console.log(version)
 process.chdir(path.join(__dirname, 'Brave-darwin-x64'))
 
-exec('zip -qr Brave-' + version + '.zip Brave.app/')
+exec('ditto -c -k --sequesterRsrc --keepParent Brave.app Brave-' + version + '.zip')
