@@ -14,7 +14,7 @@ const messages = require('../js/constants/messages')
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
-  fs.appendFileSync(path.join(os.homedir(), 'output.txt'), contents + '\n')
+  //fs.appendFileSync(path.join(os.homedir(), 'output.txt'), contents + '\n')
 }
 
 // this maps the result of a call to process.platform to an update API identifier
