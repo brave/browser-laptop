@@ -5,10 +5,17 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
+const os = require('os')
 const fs = require('fs')
 const autoUpdater = require('auto-updater')
 const config = require('./appConfig')
 const messages = require('../js/constants/messages')
+
+// in built mode console.log output is not emitted to the terminal
+// in prod mode we pipe to a file
+var debug = function (contents) {
+  fs.appendFileSync(path.join(os.homedir(), 'output.txt'), contents + '\n')
+}
 
 // this maps the result of a call to process.platform to an update API identifier
 var platforms = {
@@ -16,7 +23,7 @@ var platforms = {
 }
 
 // build the complete update url from the base, platform and version
-var buildUpdateUrl = function (baseUrl, platform) {
+exports.updateUrl = function (baseUrl, platform) {
   var pack = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')))
   var version = pack.version
   return `${baseUrl}/${platforms[platform]}/${version}`
@@ -24,7 +31,8 @@ var buildUpdateUrl = function (baseUrl, platform) {
 
 // set the feed url for the auto-update system
 exports.init = (platform) => {
-  var updateUrl = buildUpdateUrl(config.updates.baseUrl, platform)
+  var updateUrl = exports.updateUrl(config.updates.baseUrl, platform)
+  debug('updateUrl = ' + updateUrl)
   try {
     autoUpdater.setFeedURL(updateUrl)
   } catch (err) {
@@ -32,28 +40,47 @@ exports.init = (platform) => {
   }
 }
 
+// make a network request to check for an available update
 exports.checkForUpdate = () => {
-  autoUpdater.checkForUpdates()
+  debug('checkForUpdates')
+  try {
+    autoUpdater.checkForUpdates()
+  } catch (err) {
+    debug(err)
+  }
 }
 
 // development version only
 exports.fakeCheckForUpdate = () => {
-  BrowserWindow.getFocusedWindow().webContents.send(messages.UPDATE_AVAILABLE)
+  debug('fakeCheckForUpdate')
+  BrowserWindow.webContents.send(messages.UPDATE_AVAILABLE)
 }
 
+// The UI indicates that we should update the software
 exports.update = () => {
-  console.log('update requested in updater')
+  debug('update requested in updater')
   autoUpdater.quitAndInstall()
 }
 
-autoUpdater.on(messages.UPDATE_DOWNLOADED, (evt) => {
-  BrowserWindow.getFocusedWindow().webContents.send(messages.UPDATE_AVAILABLE)
+// The download is complete, we send a signal and await UI
+autoUpdater.on('update-downloaded', (evt, extra, extra2) => {
+  debug('update downloaded')
+  process.emit(messages.UPDATE_AVAILABLE)
 })
 
+// Download has started
 autoUpdater.on(messages.UPDATE_AVAILABLE, (evt) => {
-  console.log('update downloading')
+  // TODO add ui notification
+  debug('update downloading')
 })
 
+// The current version of the software is current
 autoUpdater.on(messages.UPDATE_NOT_AVAILABLE, (evt) => {
-  console.log('update is not available')
+  // TODO add ui notification
+  debug('update not available')
+})
+
+// Handle autoUpdater errors (Network, permissions etc...)
+autoUpdater.on('error', (err) => {
+  debug(err)
 })
