@@ -5,6 +5,7 @@
 var webFrame = require('electron').webFrame
 var ipc = require('electron').ipcRenderer
 var messages = require('../../js/constants/messages')
+var KeyCodes = require('../../js/constants/keyCodes')
 
 var browserZoomLevel = 0
 var browserMaxZoom = 9
@@ -179,3 +180,12 @@ document.addEventListener('contextmenu', (e) => {
   ipc.send(messages.CONTEXT_MENU_OPENED, e.target.nodeName)
   e.preventDefault()
 }, false)
+
+document.onkeydown = (e) => {
+  switch (e.keyCode) {
+    case KeyCodes.ESC:
+      e.preventDefault()
+      ipc.send(messages.STOP_LOAD)
+      break
+  }
+}

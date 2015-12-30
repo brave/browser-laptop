@@ -35,6 +35,9 @@ class Main extends ImmutableComponent {
       })
     }
 
+    ipc.on(messages.STOP_LOAD, () => {
+      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+    })
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
       console.log('got context menu open', nodeName)
       contextMenus.onMainContextMenu(nodeName)

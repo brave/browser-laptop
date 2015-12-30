@@ -18,8 +18,7 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+Shift+]', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
-    ['CmdOrCtrl+Shift+T', messages.SHORTCUT_UNDO_CLOSED_FRAME],
-    ['Escape', messages.SHORTCUT_ACTIVE_FRAME_STOP]
+    ['CmdOrCtrl+Shift+T', messages.SHORTCUT_UNDO_CLOSED_FRAME]
   ]
 
   // Tab ordering shortcuts
