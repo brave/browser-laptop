@@ -1,15 +1,15 @@
 #Debugging
 
-##Debugging the Render processes
+## Debugging the Render processes
 
 Most of the time you'll be debugging the render process and this can be done with the built in developer tools.
-To open the dev tools use `Command+Shift+J` on OS X or `Control+Shift+J` on Windows.
+To open the dev tools use `Command+Alt+J` on OS X or `Control+Alt+J` on Windows.
 
 If you've ever used the built in Chrome developer tools you'll be right at home with a DOM inspector, Network monitor, Sources debugging, Timeline, Resources, Audits, and Console.
 
 The code which runs in render processes is inside of the `js` directory.
 
-##Debugging the Main process
+## Debugging the Main process
 
 The main process can be debugged with remote developer tools.
 
@@ -21,3 +21,7 @@ The left hand side of Visual Studio Code has a Debug button.  It allows you to a
 To pause the application before any code runs you can use `npm run start-brk`.
 
 The code which runs in the main process is inside of the `app` directory.
+
+## Debugging Content
+
+Content is the web page which is loaded.  You can open the loaded content dev tools using `Command+Shift+I` on OS X or `Control+Shift+I` on Windows.
