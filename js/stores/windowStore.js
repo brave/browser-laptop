@@ -25,8 +25,9 @@ let windowState = Immutable.fromJS({
 
 var CHANGE_EVENT = 'change'
 
-const activeFrameStatePath = () =>
-  ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), windowState.get('activeFrameKey'))]
+const frameStatePath = (key) =>
+  ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
+const activeFrameStatePath = () => frameStatePath(windowState.get('activeFrameKey'))
 
 const updateNavBarInput = (loc) => {
   windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']), loc)
@@ -94,7 +95,7 @@ WindowDispatcher.register((action) => {
       break
     case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
-      windowState = windowState.mergeIn(activeFrameStatePath(), {
+      windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
         location: action.location
       })
