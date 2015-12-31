@@ -110,7 +110,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     let navigateClickHandler = formatUrl => site => {
       let location = formatUrl(site)
       WindowActions.setNavBarUserInput(location)
-      WindowActions.loadUrl(location)
+      WindowActions.loadUrl(this.props.activeFrameProps, location)
       WindowActions.setUrlBarActive(false)
       this.blur()
     }
