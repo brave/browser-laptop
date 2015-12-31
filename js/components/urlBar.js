@@ -83,9 +83,9 @@ class UrlBar extends ImmutableComponent {
             this.refs.urlBarSuggestions.clickSelected()
           } else if (this.props.searchSuggestions && !isUrl(location)) {
             // do search.
-            WindowActions.loadUrl(this.searchDetail.get('searchURL').replace('{searchTerms}', location))
+            WindowActions.loadUrl(this.props.activeFrameProps, this.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
-            WindowActions.loadUrl(location)
+            WindowActions.loadUrl(this.props.activeFrameProps, location)
           }
           // this can't go through AppActions for some reason
           // or the whole window will reload on the first page request

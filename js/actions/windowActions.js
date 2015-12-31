@@ -19,19 +19,45 @@ const WindowActions = {
    * Dispatches a message to the store to load a new URL for the active frame.
    * Both the frame's src and location properties will be updated accordingly.
    *
+   * If the activeFrame is a pinned site and the origin of the pinned site does
+   * not match the origin of the passed in location, then a new frame will be
+   * created for the load.
+   *
    * In general, an iframe's src should not be updated when navigating within the frame to a new page,
    * but the location should. For user entered new URLs, both should be updated.
    *
+   * @param {object} activeFrame - The frame props for the active frame
    * @param {string} location - The URL of the page to load
    */
-  loadUrl: function (location) {
+  loadUrl: function (activeFrame, location) {
+    let newFrame = false
+    if (activeFrame.get('isPinned')) {
+      try {
+        let origin1 = new window.URL(activeFrame.get('location')).origin
+        let origin2 = new window.URL(location).origin
+        if (origin1 !== origin2) {
+          newFrame = true
+        }
+      } catch (e) {
+        newFrame = true
+      }
+    }
+
     if (UrlUtil.isURL(location)) {
       location = UrlUtil.getUrlFromInput(location)
     }
-    WindowDispatcher.dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL,
-      location
-    })
+
+    if (newFrame) {
+      WindowActions.newFrame({
+        location
+      }, true)
+      return
+    } else {
+      WindowDispatcher.dispatch({
+        actionType: WindowConstants.WINDOW_SET_URL,
+        location
+      })
+    }
   },
 
   /**

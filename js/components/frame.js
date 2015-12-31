@@ -64,7 +64,7 @@ class Frame extends ImmutableComponent {
         break
       case 'view-source':
         let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        WindowActions.loadUrl(src)
+        WindowActions.loadUrl(this.props.frame, src)
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':
@@ -92,7 +92,7 @@ class Frame extends ImmutableComponent {
       // @see <a href="http://www.w3.org/TR/html5/browsers.html#dom-open">dom open</a>
       // @see <a href="http://www.w3.org/TR/html-markup/datatypes.html#common.data.browsing-context-name-or-keyword">browsing context name or keyword</a>
       if (e.frameName.toLowerCase() === '_self') {
-        WindowActions.loadUrl(e.url)
+        WindowActions.loadUrl(this.props.frame, e.url)
       } else if (e.disposition === 'new-window' || e.frameName.toLowerCase() === '_blank') {
         AppActions.newWindow({
           location: e.url,
