@@ -6,6 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Tabs = require('./tabs')
 const Button = require('./button')
+const PinnedTabs = require('./pinnedTabs')
 const WindowActions = require('../actions/windowActions')
 import Config from '../constants/config.js'
 
@@ -15,7 +16,7 @@ class TabsToolbarButtons extends ImmutableComponent {
 
   render () {
     return <div className='tabsToolbarButtons'>
-      { this.props.partOfFullPageSet
+      { this.props.partOfFullPageSet || this.props.noFrames
           ? <Button iconClass='fa-plus'
               className='navbutton newFrameButton' onClick={WindowActions.newFrame} /> : null }
       <Button iconClass='fa-bars'
@@ -29,9 +30,18 @@ class TabsToolbar extends ImmutableComponent {
   render () {
     const tabPageIndex = this.props.tabs.get('tabPageIndex')
     const startingFrameIndex = tabPageIndex * Config.tabs.tabsPerPage
-    const currentFrames = this.props.frames.slice(startingFrameIndex, startingFrameIndex + Config.tabs.tabsPerPage)
+    const pinnedFrames = this.props.frames
+      .filter(frame => frame.get('isPinned'))
+    const currentFrames = this.props.frames
+      .filter(frame => !frame.get('isPinned'))
+      .slice(startingFrameIndex, startingFrameIndex + Config.tabs.tabsPerPage)
 
     return <div className='tabsToolbar'>
+      { pinnedFrames.size > 0
+        ? <PinnedTabs sites={this.props.sites}
+        frames={this.props.frames}
+        activeFrame={this.props.activeFrame}
+        tabs={this.props.tabs}/> : null }
       <Tabs tabs={this.props.tabs}
         frames={this.props.frames}
         activeFrame={this.props.activeFrame}
@@ -40,7 +50,8 @@ class TabsToolbar extends ImmutableComponent {
         startingFrameIndex={startingFrameIndex}
         partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
       />
-      <TabsToolbarButtons partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}/>
+      <TabsToolbarButtons partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
+        noFrames={currentFrames.size === 0}/>
     </div>
   }
 }

@@ -40,7 +40,8 @@ const windowConstants = {
   WINDOW_SET_AUDIO_PLAYBACK_ACTIVE: _,
   WINDOW_SET_FAVICON: _,
   WINDOW_SET_MOUSE_IN_TITLEBAR: _,
-  WINDOW_SET_FINDBAR_SHOWN: _ // whether the findbar is shown
+  WINDOW_SET_FINDBAR_SHOWN: _, // whether the findbar is shown
+  WINDOW_SET_PINNED: _ // Whehter the current tab is pinned or not
 }
 
 module.exports = mapValuesByKeys(windowConstants)

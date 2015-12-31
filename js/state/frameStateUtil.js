@@ -132,6 +132,7 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
     isPrivate: frameOpts.isPrivate || false,
     element: frameOpts.element,
     features: getFeatures(frameOpts.features),
+    isPinned: frameOpts.isPinned,
     key: newKey,
     parentFrameKey: frameOpts.parentFrameKey,
     parentWindowKey: frameOpts.parentWindowKey,

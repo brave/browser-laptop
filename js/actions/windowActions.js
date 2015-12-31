@@ -96,6 +96,19 @@ const WindowActions = {
   },
 
   /**
+   * Sets a frame as pinned
+   * @param {Object} frameProps - The frame properties to modify
+   * @param {boolean} isPinned - Whether to pin or not
+   */
+  setPinned: function (frameProps, isPinned) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_PINNED,
+      frameProps,
+      isPinned
+    })
+  },
+
+  /**
    * Dispatches a message to the store to indicate that the webview is loading.
    *
    * @param {Object} frameProps - The frame properties for the webview in question.
@@ -153,8 +166,29 @@ const WindowActions = {
    * @param {Object[]} frames - Immutable list of of all the frames
    * @param {Object} frameProps - The properties of the frame to close
    */
-  closeFrame: function (frames, frameProps) {
-    if (frames.size > 1) {
+  closeFrame: function (frames, frameProps, forceClosePinned) {
+    // Unless a caller explicitly specifies to close a pinned frame, then
+    // ignore the call.
+    let nonPinnedFrames = frames.filter(frame => !frame.get('isPinned'))
+    if (frameProps && frameProps.get('isPinned')) {
+      // Check for no frames at all, and if that's the case the user
+      // only has pinned frames and tried to close, so close the
+      // whole app.
+      if (nonPinnedFrames.size === 0) {
+        AppActions.closeWindow(remote.getCurrentWindow().id)
+        return
+      }
+
+      if (!forceClosePinned) {
+        return
+      }
+    }
+
+    let pinnedFrames = frames.filter(frame => frame.get('isPinned'))
+
+    // If there is at least 1 pinned frame don't close the window until subsequent
+    // close attempts
+    if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
       WindowDispatcher.dispatch({
         actionType: WindowConstants.WINDOW_CLOSE_FRAME,
         frameProps

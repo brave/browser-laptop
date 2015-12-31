@@ -53,7 +53,7 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
       ? WindowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
-      : WindowActions.closeFrame(self.props.windowState.get('frames')))
+      : WindowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => WindowActions.undoClosedFrame())
 
     const self = this
@@ -143,6 +143,7 @@ class Main extends ImmutableComponent {
         <TabsToolbar
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
+          sites={this.props.appState.get('sites')}
           key='tab-bar'
           activeFrame={activeFrame}
         />

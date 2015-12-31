@@ -36,6 +36,7 @@ WindowStore
     audioPlaybackActive: boolean, // frame is playing audio
     canGoBack: boolean,
     canGoForward: boolean,
+    isPinned: boolean, // true when the tab is pinned
     icon: string, // url to favicon
     location: string, // page url
     src: string, // what the iframe src should be

@@ -11,6 +11,7 @@ const WindowActions = require('../actions/windowActions')
 const Main = require('./main')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
+const SiteTags = require('../constants/siteTags')
 
 class Window extends React.Component {
   constructor (props) {
@@ -19,15 +20,24 @@ class Window extends React.Component {
     // initialize appState from props
     // and then listen for updates
     this.appState = Immutable.fromJS(this.props.appState)
+    this.windowState = WindowStore.getState()
     this.state = {
       immutableData: {
-        windowState: WindowStore.getState(),
+        windowState: this.windowState,
         appState: this.appState
       }
     }
     ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
-      this.onAppStateChange(Immutable.fromJS(action))
+      this.appState = Immutable.fromJS(action)
+      this.setState({
+        immutableData: {
+          windowState: this.windowState,
+          appState: this.appState
+        }
+      })
+      this.onAppStateChanged()
     })
+    this.onAppStateChanged()
     WindowStore.addChangeListener(this.onChange.bind(this))
   }
 
@@ -54,17 +64,35 @@ class Window extends React.Component {
   }
 
   onChange () {
+    this.windowState = WindowStore.getState()
     this.setState({
       immutableData: {
-        windowState: WindowStore.getState(),
+        windowState: this.windowState,
         appState: this.appState
       }
     })
   }
 
-  onAppStateChange (appState) {
-    this.appState = appState
-    this.onChange()
+  onAppStateChanged () {
+    const sites = this.appState.get('sites')
+    const frames = this.windowState.get('frames')
+
+    // Check for new pinned sites which we don't already know about
+    const sitesToAdd = sites
+      .filter(site => site.get('tags').includes(SiteTags.PINNED) &&
+          !frames.find(frame => frame.get('isPinned') &&
+            frame.get('location') === site.get('location')))
+    sitesToAdd.forEach(site => {
+      WindowActions.newFrame({
+        location: site.get('location'),
+        isPinned: true
+      }, false)
+    })
+
+    // Check for unpinned sites which should be closed
+    const framesToClose = frames.filter(frame =>
+      frame.get('isPinned') && !sites.find(site => frame.get('location') === site.get('location') && site.get('tags').includes(SiteTags.PINNED)))
+    framesToClose.forEach(frameProps => WindowActions.closeFrame(frames, frameProps, true))
   }
 }
 Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array }
