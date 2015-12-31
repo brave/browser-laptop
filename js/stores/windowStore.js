@@ -38,7 +38,13 @@ const updateNavBarInput = (loc) => {
  * @param frameProps Any frame belonging to the page
  */
 const updateTabPageIndex = (frameProps) => {
-  const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames'), frameProps)
+  // No need to update tab page index if we are given a pinned frame
+  if (frameProps.get('isPinned')) {
+    return
+  }
+
+  const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
+      .filter(frame => !frame.get('isPinned')), frameProps)
   if (index === -1) {
     return
   }
@@ -73,7 +79,7 @@ class WindowStore extends EventEmitter {
 const windowStore = new WindowStore()
 
 // Register callback to handle all updates
-WindowDispatcher.register((action) => {
+const doAction = (action) => {
   switch (action.actionType) {
     case WindowConstants.WINDOW_SET_URL:
       // reload if the url is unchanged
@@ -312,6 +318,20 @@ WindowDispatcher.register((action) => {
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_PINNED:
+      // Check if there's already a frame which is pinned.
+      // If so we just want to set it as active.
+      let alreadyPinnedFrameProps = windowState.get('frames').find(frame => frame.get('isPinned') && frame.get('location') === action.frameProps.get('location'))
+      if (alreadyPinnedFrameProps && action.isPinned) {
+        action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
+        doAction(action)
+        action.actionType = WindowConstants.WINDOW_SET_ACTIVE_FRAME
+        doAction(action)
+      } else {
+        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'isPinned'], action.isPinned)
+      }
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       windowStore.emitChange()
@@ -330,7 +350,9 @@ WindowDispatcher.register((action) => {
       break
     default:
   }
-})
+}
+
+WindowDispatcher.register(doAction)
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   windowState = FrameStateUtil.makeNextFrameActive(windowState)

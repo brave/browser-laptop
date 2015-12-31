@@ -6,6 +6,8 @@ const remote = require('remote')
 const Menu = remote.require('menu')
 const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
+const AppActions = require('./actions/appActions')
+const SiteTags = require('./constants/siteTags')
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
@@ -42,18 +44,40 @@ function tabTemplateInit (frameProps) {
     }
   })
 
+  if (frameProps.get('isPinned')) {
+    items.push({
+      label: 'Unpin tab',
+      click: (item) => {
+        // Handle converting the current tab window into a pinned site
+        WindowActions.setPinned(frameProps, false)
+        // Handle setting it in app storage for the other windows
+        AppActions.removeSite(frameProps, SiteTags.PINNED)
+      }
+    })
+  } else {
+    items.push({
+      label: 'Pin tab',
+      click: (item) => {
+        // Handle converting the current tab window into a pinned site
+        WindowActions.setPinned(frameProps, true)
+        // Handle setting it in app storage for the other windows
+        AppActions.addSite(frameProps, SiteTags.PINNED)
+      }
+    })
+  }
+
   if (frameProps.get('audioPlaybackActive')) {
     if (frameProps.get('audioMuted')) {
       items.push({
         label: 'Unmute tab',
-        click: (item, focusedWindow) => {
+        click: item => {
           WindowActions.setAudioMuted(frameProps, false)
         }
       })
     } else {
       items.push({
         label: 'Mute tab',
-        click: (item, focusedWindow) => {
+        click: item => {
           WindowActions.setAudioMuted(frameProps, true)
         }
       })
@@ -66,15 +90,19 @@ function tabTemplateInit (frameProps) {
   }, {
     label: 'Disable ad block',
     enabled: false
-  }, {
-    label: 'Close tab',
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        // TODO: Don't switch active tabs when this is called
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabKey)
-      }
-    }
   }])
+
+  if (!frameProps.get('isPinned')) {
+    items.push({
+      label: 'Close tab',
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          // TODO: Don't switch active tabs when this is called
+          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabKey)
+        }
+      }
+    })
+  }
 
   return items
 }
