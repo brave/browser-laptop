@@ -163,9 +163,12 @@ class UrlBarSuggestions extends ImmutableComponent {
         return site2.get('tags').size - site1.get('tags').size
       },
       formatTitle: site => site.get('title') || site.get('location'),
-      filterValue: site =>
-          site.get('title').toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-          site.get('location').toLowerCase().includes(this.props.urlLocation.toLowerCase())
+      filterValue: site => {
+        let title = site.get('title') || ''
+        let location = site.get('location') || ''
+        return title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
+          location.toLowerCase().includes(this.props.urlLocation.toLowerCase())
+      }
     }))
 
     // Search suggestions
