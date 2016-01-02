@@ -29,7 +29,7 @@
 
 .tab {
   background: linear-gradient(to bottom, #BEBFC2, #AFB0B4);
-  border-radius: 9px;
+  border-radius: 10px;
   border-top-left-radius: @tabBorderRadius;
   border-top-right-radius: @tabBorderRadius;
   border-width: 1px 1px 0;
@@ -56,7 +56,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: middle;
-    width: calc(~'100% - 26px');
+    width: calc(~'89% - 26px');
   }
   .tabIcon {
     background-position: center;
@@ -214,12 +214,12 @@
   }
 
   &.active {
-    background-color: #3B3B3B;
+    background-color: #eeeeee;
   }
 }
 
 .prevTab, .nextTab {
-  color: #3B3B3B;
+  color: #848484;
   font-size: 24px !important;
   height: 20px;
   line-height: 20px !important;
@@ -227,23 +227,23 @@
   vertical-align: top;
   width: 50px;
   &:not([disabled]) {
-    background: @chromeControlsBackground2;
+    background: #eeeeee;
     cursor: pointer;
     opacity: 1;
   }
 }
 
 .prevTab {
-  background: linear-gradient(to right, @chromeControlsBackground2, @tabsBackground);
-  border-bottom-left-radius: 9px;
-  border-top-left-radius: 9px;
+  background: linear-gradient(to right, #afb0b4, @tabsBackground);
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
   padding-left: 10px;
   text-align: left;
   transform: translateX(10px);
 }
 
 .nextTab {
-  background: linear-gradient(to left, @chromeControlsBackground2, @tabsBackground);
+  background: linear-gradient(to left, #afb0b4, @tabsBackground);
   border-bottom-right-radius: 9px;
   border-top-right-radius: 9px;
   float: right;
