@@ -4,25 +4,20 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
-const Immutable = require('immutable')
 const URL = require('url')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const BrowserWindow = electron.BrowserWindow
+const app = electron.app
 const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const siteHacks = require('../data/siteHacks')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 
-let appState = Immutable.fromJS({
-  windows: [],
-  sites: [],
-  visits: [],
-  updateAvailable: false
-})
+let appState
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -186,6 +181,10 @@ const appStore = new AppStore()
 
 const handleAppAction = (action) => {
   switch (action.actionType) {
+    case AppConstants.APP_SET_STATE:
+      appState = action.appState
+      appStore.emitChange()
+      break
     case AppConstants.APP_NEW_WINDOW:
       const frameOpts = action.frameOpts && action.frameOpts.toJS() || undefined
       const browserOpts = action.browserOpts && action.browserOpts.toJS() || undefined

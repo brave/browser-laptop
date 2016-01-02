@@ -11,7 +11,8 @@ const Menu = require('./menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
 const AppActions = require('../js/actions/appActions')
-require('../js/stores/appStore')
+const SessionStore = require('./sessionStore')
+const AppStore = require('../js/stores/appStore')
 
 // Report crashes
 electron.crashReporter.start()
@@ -24,33 +25,45 @@ app.on('window-all-closed', function () {
   }
 })
 
+let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
+  return SessionStore.defaultAppState()
+})
+
+app.on('before-quit', function () {
+  SessionStore.saveAppState(AppStore.getState())
+})
+
 app.on('ready', function () {
-  AppActions.newWindow()
+  loadAppStatePromise.then(initialState => {
+    AppActions.setState(initialState)
+  }).then(() => {
+    AppActions.newWindow()
 
-  ipcMain.on(messages.QUIT_APPLICATION, () => {
-    app.quit()
+    ipcMain.on(messages.QUIT_APPLICATION, () => {
+      app.quit()
+    })
+
+    ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
+    })
+    ipcMain.on(messages.STOP_LOAD, () => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
+    })
+
+    Menu.init()
+
+    ipcMain.on(messages.UPDATE_REQUESTED, () => {
+      Updater.update()
+    })
+
+    // this only works on prod
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      Updater.init(process.platform)
+
+      // this is fired by a menu entry
+      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
+    } else {
+      process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
+    }
   })
-
-  ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
-    BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
-  })
-  ipcMain.on(messages.STOP_LOAD, () => {
-    BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
-  })
-
-  Menu.init()
-
-  ipcMain.on(messages.UPDATE_REQUESTED, () => {
-    Updater.update()
-  })
-
-  // this only works on prod
-  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-    Updater.init(process.platform)
-
-    // this is fired by a menu entry
-    process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
-  } else {
-    process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
-  }
 })

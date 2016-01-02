@@ -9,6 +9,19 @@ const messages = require('../constants/messages')
 
 const AppActions = {
   /**
+   * Dispatches an event to the main process to replace the app state
+   * This is called from the main process on startup before anything else
+   *
+   * @param {object} appState - Initial app state object (not yet converted to ImmutableJS)
+   */
+  setState: function (appState) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_STATE,
+      appState
+    })
+  },
+
+  /**
    * Dispatches an event to the main process to create a new window
    */
   newWindow: function (frameOpts, browserOpts) {
