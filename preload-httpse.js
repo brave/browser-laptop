@@ -1,7 +1,9 @@
 var fs = require('fs')
 var sqlite3 = require('sqlite3')
 
-// Preload mapping of HTTPS-E hosts to ruleset IDs for performance reasons
+// Preload mapping of HTTPS Everywhere hosts to ruleset IDs for performance
+// Run this whenever rulesets.sqlite is updated from the HTTPS Everywhere
+// stable branch. TODO: Automate this with a git hook.
 var db = new sqlite3.Database('./js/data/rulesets.sqlite', sqlite3.OPEN_READONLY, function (dbErr) {
   if (dbErr) {
     console.log('got db open error', dbErr)

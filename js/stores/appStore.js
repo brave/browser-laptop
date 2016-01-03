@@ -17,6 +17,7 @@ const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const AdBlock = require('../../app/adBlock')
 const TrackingProtection = require('../../app/trackingProtection')
+const loadHttpsEverywhere = require('../lib/httpsEverywhere').loadHttpsEverywhere
 
 let appState
 
@@ -107,6 +108,9 @@ const createWindow = (browserOpts, defaults) => {
     autoHideMenuBar: true,
     webPreferences: defaults.webPreferences
   }, browserOpts))
+
+  // Load HTTPS Everywhere browser "extension"
+  loadHttpsEverywhere(mainWindow)
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
