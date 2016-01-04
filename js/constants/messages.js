@@ -45,7 +45,10 @@ const messages = {
   CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
   APP_STATE_CHANGE: _,
   APP_ACTION: _,
-  STOP_LOAD: _
+  STOP_LOAD: _,
+  // Session restore
+  REQUEST_WINDOW_STATE: _,
+  RESPONSE_WINDOW_STATE: _
 }
 
 module.exports = mapValuesByKeys(messages)

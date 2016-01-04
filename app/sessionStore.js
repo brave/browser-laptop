@@ -6,8 +6,8 @@
 
 // Session store in Brave works as follows:
 // - Electron sends a ‘before-quit’ event
-// - Brave sends request-window-state to each renderer process
-// - Each renderer responds with its window state with a ‘response-window-state’ IPC message
+// - Brave sends REQUEST_WINDOW_STATE to each renderer process
+// - Each renderer responds with its window state with a RESPONSE_WINDOW_STATE IPC message
 // - When all state is collected save it to a JSON file and close the app
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 

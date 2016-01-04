@@ -40,10 +40,10 @@ app.on('before-quit', function (e) {
   }
 
   e.preventDefault()
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send('request-window-state'))
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 })
 
-ipcMain.on('response-window-state', (wnd, data) => {
+ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
   perWindowState.push(data)
   if (perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
