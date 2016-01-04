@@ -170,8 +170,8 @@ class UrlBar extends ImmutableComponent {
     let loadTime = ''
     if (this.props.activeFrameProps.get('startLoadTime') &&
         this.props.activeFrameProps.get('endLoadTime')) {
-      const loadMilliseconds = this.props.activeFrameProps.get('endLoadTime').getTime() -
-        this.props.activeFrameProps.get('startLoadTime').getTime()
+      const loadMilliseconds = this.props.activeFrameProps.get('endLoadTime') -
+        this.props.activeFrameProps.get('startLoadTime')
       if (loadMilliseconds > 1000) {
         loadTime = (loadMilliseconds / 1000 | 0) + 's '
       }

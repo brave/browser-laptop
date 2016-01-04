@@ -135,7 +135,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
-        startLoadTime: new Date(),
+        startLoadTime: new Date().getTime(),
         endLoadTime: null
       })
       windowStore.emitChange()
@@ -143,7 +143,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
-        endLoadTime: new Date()
+        endLoadTime: new Date().getTime()
       })
       FrameStateUtil.computeThemeColor(action.frameProps).then(
         color => {
