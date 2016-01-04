@@ -9,6 +9,10 @@ If you've ever used the built in Chrome developer tools you'll be right at home 
 
 The code which runs in render processes is inside of the `js` directory.
 
+Calls to `console.log` and related functions go into the dev tools console mentioned above.
+
+If you're running `npm run watch`, then webpack dev server will ensure that changes to source code will reload the app.
+
 ## Debugging the Main process
 
 The main process can be debugged with remote developer tools.
@@ -22,6 +26,14 @@ To pause the application before any code runs you can use `npm run start-brk`.
 
 The code which runs in the main process is inside of the `app` directory.
 
+Calls to `console.log` and related functions go into the terminal you did `npm start` from.
+
+Unlike with the renderer process, since the main process isn't using webpack dev server, you will need to manually restart the app to see your changes.
+
 ## Debugging Content
 
 Content is the web page which is loaded.  You can open the loaded content dev tools using `Command+Shift+I` on OS X or `Control+Shift+I` on Windows.
+
+If you'd like to see code run on each page load, you can edit `app/content/webviewPreload.js`.
+
+Calls to `console.log` and related functions go into the per page dev tools console mentioned above.
