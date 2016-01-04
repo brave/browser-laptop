@@ -2,8 +2,9 @@ var fs = require('fs')
 var sqlite3 = require('sqlite3')
 var parseString = require('xml2js').parseString
 
-// Preload mapping of HTTPS Everywhere hosts to ruleset IDs for performance
-// Run this whenever rulesets.sqlite is updated from the HTTPS Everywhere
+// Preload mapping of HTTPS Everywhere hosts to ruleset IDs and convert
+// XML to JSON for performance reasons.
+// Run this ONCE whenever rulesets.sqlite is updated from the HTTPS Everywhere
 // stable branch. TODO: Automate this with a git hook.
 var db = new sqlite3.Database('./js/data/rulesets.sqlite', sqlite3.OPEN_READWRITE, function (dbErr) {
   if (dbErr) {
