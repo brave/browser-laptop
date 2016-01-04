@@ -5,8 +5,11 @@
 'use strict'
 
 const fs = require('fs')
+const path = require('path')
+const app = require('app')
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
+const storagePath = path.join(app.getPath('userData'), sessionStorageName)
 
 /**
  * Saves the specified immutable browser state to storage.
@@ -21,7 +24,7 @@ module.exports.saveAppState = (payload) => {
     // Don't persist private frames
     // TODO when we have per window state as well:
     // payload.frames = payload.frames.filter(frame => !frame.isPrivate)
-    fs.writeFile(sessionStorageName, JSON.stringify(payload), (err) => {
+    fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
       if (err) {
         reject(err)
       } else {
@@ -103,7 +106,7 @@ module.exports.cleanSessionData = (sessionData) => {
  */
 module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
-    fs.readFile(sessionStorageName, (err, data) => {
+    fs.readFile(storagePath, (err, data) => {
       if (err || !data) {
         reject(err)
         return

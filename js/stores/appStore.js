@@ -106,7 +106,6 @@ const createWindow = (browserOpts, defaults, parentWindowKey) => {
     'title-bar-style': 'hidden-inset',
     webPreferences: defaults.webPreferences
   }, browserOpts))
-  mainWindow.toggleDevTools()
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
