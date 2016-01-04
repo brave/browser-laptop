@@ -27,7 +27,13 @@
     "type": "git",
     "url": "git+https://github.com/bbondy/electron-sample.git"
   },
-  "author": "Brian R. Bondy <netzen@gmail.com> (http://www.brianbondy.com)",
+  "author": "Brave Developers <support@brave.com>",
+  "contributors": [
+    {
+      "name": "Brian R. Bondy",
+      "email": "brian@brave.com"
+    }
+  ],
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/bbondy/electron-sample/issues"
