@@ -16,7 +16,6 @@ const SiteTags = require('../constants/siteTags')
 class Window extends React.Component {
   constructor (props) {
     super(props)
-
     // initialize appState from props
     // and then listen for updates
     this.appState = Immutable.fromJS(this.props.appState)
@@ -37,6 +36,11 @@ class Window extends React.Component {
       })
       this.onAppStateChanged()
     })
+
+    ipc.on('restore-state', (e, windowState) => {
+      WindowActions.setState(Immutable.fromJS(windowState))
+    })
+
     this.onAppStateChanged()
     WindowStore.addChangeListener(this.onChange.bind(this))
   }

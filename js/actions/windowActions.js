@@ -16,6 +16,18 @@ const AppActions = require('./appActions')
 
 const WindowActions = {
   /**
+   * Dispatches an event to the main process to replace the window state
+   *
+   * @param {object} windowState - Initial window state object
+   */
+  setState: function (windowState) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_STATE,
+      windowState
+    })
+  },
+
+  /**
    * Dispatches a message to the store to load a new URL for the active frame.
    * Both the frame's src and location properties will be updated accordingly.
    *

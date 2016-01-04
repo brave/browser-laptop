@@ -17,8 +17,8 @@ AppStore
   }],
   visits: [{
     location: string,
-    startTime: datetime
-    endTime: datetime
+    startTime: number, // datetime.getTime()
+    endTime: number // datetime.getTime()
   }],
   defaultWindowHeight: number,
   defaultWindowWidth: number,

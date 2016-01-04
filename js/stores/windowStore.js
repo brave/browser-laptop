@@ -82,6 +82,11 @@ const windowStore = new WindowStore()
 // Register callback to handle all updates
 const doAction = (action) => {
   switch (action.actionType) {
+    case WindowConstants.WINDOW_SET_STATE:
+      windowState = action.windowState
+      currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_URL:
       // reload if the url is unchanged
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
@@ -130,7 +135,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
-        startLoadTime: new Date(),
+        startLoadTime: new Date().getTime(),
         endLoadTime: null
       })
       windowStore.emitChange()
@@ -138,7 +143,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
-        endLoadTime: new Date()
+        endLoadTime: new Date().getTime()
       })
       FrameStateUtil.computeThemeColor(action.frameProps).then(
         color => {

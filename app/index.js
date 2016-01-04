@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
+const Immutable = require('immutable')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
@@ -11,7 +12,8 @@ const Menu = require('./menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
 const AppActions = require('../js/actions/appActions')
-require('../js/stores/appStore')
+const SessionStore = require('./sessionStore')
+const AppStore = require('../js/stores/appStore')
 
 // Report crashes
 electron.crashReporter.start()
@@ -24,33 +26,88 @@ app.on('window-all-closed', function () {
   }
 })
 
-app.on('ready', function () {
-  AppActions.newWindow()
+let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
+  return SessionStore.defaultAppState()
+})
 
-  ipcMain.on(messages.QUIT_APPLICATION, () => {
-    app.quit()
-  })
+// Used to collect the per window state when shutting down the application
+let perWindowState = []
+let sessionStateStoreAttempted = false
 
-  ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
-    BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
-  })
-  ipcMain.on(messages.STOP_LOAD, () => {
-    BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
-  })
-
-  Menu.init()
-
-  ipcMain.on(messages.UPDATE_REQUESTED, () => {
-    Updater.update()
-  })
-
-  // this only works on prod
-  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-    Updater.init(process.platform)
-
-    // this is fired by a menu entry
-    process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
-  } else {
-    process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
+app.on('before-quit', function (e) {
+  if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
+    return
   }
+
+  e.preventDefault()
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+})
+
+ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
+  perWindowState.push(data)
+  if (perWindowState.length === BrowserWindow.getAllWindows().length) {
+    const appState = AppStore.getState().toJS()
+    appState.perWindowState = perWindowState
+    const ignoreCatch = () => {}
+
+    if (process.env.NODE_ENV !== 'test') {
+      SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
+        sessionStateStoreAttempted = true
+        app.quit()
+      })
+    } else {
+      sessionStateStoreAttempted = true
+      app.quit()
+    }
+  }
+})
+
+app.on('ready', function () {
+  loadAppStatePromise.then(initialState => {
+    // For tests we always want to load default app state
+    if (process.env.NODE_ENV === 'test') {
+      initialState = SessionStore.defaultAppState()
+    }
+
+    const perWindowState = initialState.perWindowState
+
+    delete initialState.perWindowState
+    AppActions.setState(Immutable.fromJS(initialState))
+    return perWindowState
+  }).then(perWindowState => {
+    if (!perWindowState || perWindowState.length === 0) {
+      AppActions.newWindow()
+    } else {
+      perWindowState.forEach(wndState => {
+        AppActions.newWindow(undefined, undefined, wndState)
+      })
+    }
+
+    ipcMain.on(messages.QUIT_APPLICATION, () => {
+      app.quit()
+    })
+
+    ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
+    })
+    ipcMain.on(messages.STOP_LOAD, () => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
+    })
+
+    Menu.init()
+
+    ipcMain.on(messages.UPDATE_REQUESTED, () => {
+      Updater.update()
+    })
+
+    // this only works on prod
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      Updater.init(process.platform)
+
+      // this is fired by a menu entry
+      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
+    } else {
+      process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
+    }
+  })
 })
