@@ -10,7 +10,6 @@ const electron = require('electron')
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const BrowserWindow = electron.BrowserWindow
-const app = electron.app
 const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const siteHacks = require('../data/siteHacks')
@@ -107,6 +106,7 @@ const createWindow = (browserOpts, defaults, parentWindowKey) => {
     'title-bar-style': 'hidden-inset',
     webPreferences: defaults.webPreferences
   }, browserOpts))
+  mainWindow.toggleDevTools()
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
@@ -189,6 +189,11 @@ const handleAppAction = (action) => {
       const frameOpts = action.frameOpts && action.frameOpts.toJS() || undefined
       const browserOpts = action.browserOpts && action.browserOpts.toJS() || undefined
       let mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts && frameOpts.parentWindowKey)
+      if (action.restoredState) {
+        mainWindow.webContents.once('dom-ready', () => {
+          mainWindow.webContents.send('restore-state', action.restoredState)
+        })
+      }
 
       let currentWindows = appState.get('windows')
       appState = appState.set('windows', currentWindows.push(mainWindow.id))

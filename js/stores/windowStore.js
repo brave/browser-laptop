@@ -82,6 +82,11 @@ const windowStore = new WindowStore()
 // Register callback to handle all updates
 const doAction = (action) => {
   switch (action.actionType) {
+    case WindowConstants.WINDOW_SET_STATE:
+      windowState = action.windowState
+      currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_URL:
       // reload if the url is unchanged
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {

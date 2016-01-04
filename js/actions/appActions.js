@@ -24,11 +24,12 @@ const AppActions = {
   /**
    * Dispatches an event to the main process to create a new window
    */
-  newWindow: function (frameOpts, browserOpts) {
+  newWindow: function (frameOpts, browserOpts, restoredState) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_NEW_WINDOW,
       frameOpts,
-      browserOpts
+      browserOpts,
+      restoredState
     })
   },
 

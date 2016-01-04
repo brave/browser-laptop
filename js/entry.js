@@ -15,11 +15,17 @@ const URL = require('url')
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
+const ipc = global.require('electron').ipcRenderer
+const WindowStore = require('./stores/windowStore')
 
 // get appStore from url
 var queryString = URL.parse(window.location.href, true).query
 var appState = JSON.parse(queryString.appState)
 var frames = JSON.parse(queryString.frames)
+
+ipc.on('request-window-state', () => {
+  ipc.send('response-window-state', WindowStore.getState().toJS())
+})
 
 ReactDOM.render(
   <Window appState={appState} frames={frames}/>,

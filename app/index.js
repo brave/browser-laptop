@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
+const Immutable = require('immutable')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const ipcMain = electron.ipcMain
@@ -29,15 +30,58 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
 })
 
-app.on('before-quit', function () {
-  SessionStore.saveAppState(AppStore.getState())
+// Used to collect the per window state when shutting down the application
+let perWindowState = []
+let sessionStateStoreAttempted = false
+
+app.on('before-quit', function (e) {
+  if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
+    return
+  }
+
+  e.preventDefault()
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send('request-window-state'))
+})
+
+ipcMain.on('response-window-state', (wnd, data) => {
+  perWindowState.push(data)
+  if (perWindowState.length === BrowserWindow.getAllWindows().length) {
+    const appState = AppStore.getState().toJS()
+    appState.perWindowState = perWindowState
+    const ignoreCatch = () => {}
+
+    if (process.env.NODE_ENV !== 'test') {
+      SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
+        sessionStateStoreAttempted = true
+        app.quit()
+      })
+    } else {
+      sessionStateStoreAttempted = true
+      app.quit()
+    }
+  }
 })
 
 app.on('ready', function () {
   loadAppStatePromise.then(initialState => {
-    AppActions.setState(initialState)
-  }).then(() => {
-    AppActions.newWindow()
+    // For tests we always want to load default app state
+    if (process.env.NODE_ENV === 'test') {
+      initialState = SessionStore.defaultAppState()
+    }
+
+    const perWindowState = initialState.perWindowState
+
+    delete initialState.perWindowState
+    AppActions.setState(Immutable.fromJS(initialState))
+    return perWindowState
+  }).then(perWindowState => {
+    if (!perWindowState || perWindowState.length === 0) {
+      AppActions.newWindow()
+    } else {
+      perWindowState.forEach(wndState => {
+        AppActions.newWindow(undefined, undefined, wndState)
+      })
+    }
 
     ipcMain.on(messages.QUIT_APPLICATION, () => {
       app.quit()
