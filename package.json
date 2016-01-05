@@ -19,7 +19,8 @@
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
     "zip-darwin": "node build-darwin-update.js",
-    "clean-session-store": "rm -Rf ~/Library/Application\\ Support/Brave/sessionStorage",
+    "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
+    "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adBlock-*",
     "postinstall": "webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
@@ -40,6 +41,7 @@
   },
   "homepage": "https://github.com/bbondy/electron-sample#readme",
   "dependencies": {
+    "abp-filter-parser-cpp": "^1.0.12",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "git+ssh://git@github.com/brave/electron-prebuilt.git",
     "file-loader": "^0.8.5",

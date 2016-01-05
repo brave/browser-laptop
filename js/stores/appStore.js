@@ -15,6 +15,7 @@ const AppActions = require('../actions/appActions')
 const siteHacks = require('../data/siteHacks')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
+const AdBlock = require('../../app/adBlock')
 
 let appState
 
@@ -116,6 +117,8 @@ const createWindow = (browserOpts, defaults, parentWindowKey) => {
       cb({})
     }
   })
+
+  AdBlock.init(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
