@@ -6,6 +6,7 @@
 var updateHost = process.env.UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 
 module.exports = {
+  enableAdBlockDefault: true,
   adBlockUrl: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
   // TODO: When this version changes we need to add cleanup
   // code to adBlock.js to remove the old file

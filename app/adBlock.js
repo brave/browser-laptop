@@ -103,6 +103,10 @@ const readAdBlockData = () => {
 
 let windowsToStartAdblockFor = []
 module.exports.init = (win) => {
+  if (!AppConfig.enableAdBlockDefault) {
+    return
+  }
+
   // Use the same parser for all BrowserWindows
   if (parser) {
     // AdBlock data is not available yet, add it to a list to notify
