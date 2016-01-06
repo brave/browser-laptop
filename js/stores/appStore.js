@@ -245,6 +245,17 @@ const handleAppAction = (action) => {
       appState = appState.set('defaultWindowHeight', action.size[1])
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_DATA_FILE_ETAG:
+      appState = appState.setIn([action.resourceName, 'etag'], action.etag)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
+      appState = appState.mergeIn([action.resourceName], {
+        lastCheckVersion: action.lastCheckVersion,
+        lastCheckDate: action.lastCheckDate
+      })
+      appStore.emitChange()
+      break
     default:
   }
 }

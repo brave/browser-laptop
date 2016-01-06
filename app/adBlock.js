@@ -9,9 +9,11 @@ const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
 const FilterOptions = ABPFilterParserLib.FilterOptions
 const app = require('electron').app
 const AppConfig = require('./appConfig')
+const AppActions = require('../js/actions/appActions')
 
-const adBlockFilename = `adBlock-${AppConfig.adBlockVersion}`
+const adBlockFilename = 'adBlock.dat'
 const storagePath = path.join(app.getPath('userData'), adBlockFilename)
+const downloadPath = `${storagePath}.temp`
 
 let parser
 
@@ -36,11 +38,41 @@ const debug = (details) => {
 */
 
 const downloadAdBlockData = () => {
-  return new Promise((resolve, reject) =>
-    request(AppConfig.adBlockUrl.replace('{version}', AppConfig.adBlockVersion))
-      .pipe(fs.createWriteStream(storagePath))
-      .on('close', resolve)
-      .on('error', reject))
+  return new Promise((resolve, reject) => {
+    let headers = {}
+    const resourceName = 'adblock'
+    const AppStore = require('../js/stores/appStore')
+    const etag = AppStore.getState().getIn([resourceName, 'etag'])
+    if (etag) {
+      headers = {
+        'If-None-Match': etag
+      }
+    }
+
+    var req = request.get({
+      url: AppConfig.adBlockUrl.replace('{version}', AppConfig.adBlockVersion),
+      headers
+    }).on('response', function (response) {
+      AppActions.setResourceLastCheck(resourceName, AppConfig.adBlockVersion, new Date().getTime())
+      if (response.statusCode !== 200) {
+        readAdBlockData().then(resolve).catch(reject)
+        return
+      }
+      const etag = response.headers['etag']
+      AppActions.setResourceETag(resourceName, etag)
+
+      req.pipe(fs.createWriteStream(downloadPath).on('close', function () {
+        fs.rename(downloadPath, storagePath, function (err) {
+          if (err) {
+            reject('could not rename downloaded file')
+          } else {
+            resolve()
+          }
+        })
+      }))
+      .on('error', reject)
+    })
+  })
 }
 
 const startAdBlocking = (win) => {
@@ -84,11 +116,22 @@ module.exports.init = (win) => {
 
   parser = new ABPFilterParser()
 
-  readAdBlockData().catch(() => {
+  const AppStore = require('../js/stores/appStore')
+  const resourceName = 'adblock'
+  const lastCheckDate = AppStore.getState().getIn([resourceName, 'lastCheckDate'])
+  const lastCheckVersion = AppStore.getState().getIn([resourceName, 'lastCheckVersion'])
+
+  let redownloadFirst
+  if (lastCheckVersion !== AppConfig.adBlockVersion ||
+      lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig.msBetweenDataFileRechecks) {
+    redownloadFirst = downloadAdBlockData().then(readAdBlockData)
+  }
+
+  (redownloadFirst || readAdBlockData().catch(() => {
     return new Promise((resolve, reject) => {
       downloadAdBlockData().then(readAdBlockData).then(resolve).catch(reject)
     })
-  }).then(data => {
+  })).then(data => {
     // Make sure we keep a reference to the data since
     // it's used directly
     module.exports.adBlockData = data
@@ -96,7 +139,7 @@ module.exports.init = (win) => {
     windowsToStartAdblockFor.push(win)
     windowsToStartAdblockFor.forEach(startAdBlocking)
     windowsToStartAdblockFor = null
-  }).catch(() => {
-    console.error('Could not start adblock!')
+  }).catch((e) => {
+    console.error('Could not start adblock!', e)
   })
 }
