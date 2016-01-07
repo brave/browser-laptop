@@ -186,7 +186,7 @@ class Tab extends ImmutableComponent {
         style={thumbnailStyle} />
         { !this.isPinned
           ? <span onClick={this.onCloseFrame.bind(this)}
-          className='closeTab fa fa-times'/> : null }
+          className='closeTab fa fa-times-circle'/> : null }
         <div className='tabIcon' style={iconStyle}/>
         {playIcon}
         { !this.isPinned

@@ -17,7 +17,7 @@ class TabsToolbarButtons extends ImmutableComponent {
   render () {
     return <div className='tabsToolbarButtons'>
       { this.props.partOfFullPageSet || this.props.noFrames
-          ? <Button iconClass='fa-plus'
+          ? <Button label='+'
               className='navbutton newFrameButton' onClick={WindowActions.newFrame} /> : null }
       <Button iconClass='fa-bars'
         className='navbutton menu-button'

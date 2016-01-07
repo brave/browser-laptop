@@ -60,7 +60,7 @@ class Tabs extends ImmutableComponent {
                   partOfFullPageSet={this.props.partOfFullPageSet}/>)
         }
         { !this.props.partOfFullPageSet && this.props.currentFrames.size !== 0
-        ? <Button iconClass='fa-plus'
+        ? <Button label='+'
           className='navbutton newFrameButton'
           onClick={WindowActions.newFrame} /> : null }
         </span>

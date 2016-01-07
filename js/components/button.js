@@ -19,7 +19,11 @@ class Button extends ImmutableComponent {
         onClick={this.props.onClick}>
       </span>
     }
-    return <span disabled={this.props.disabled} className='browserButton' onClick={this.props.onClick}>
+    return <span disabled={this.props.disabled}
+      className={cx({
+        browserButton: true,
+        [this.props.className]: true
+      })} onClick={this.props.onClick}>
       {this.props.label}
     </span>
   }

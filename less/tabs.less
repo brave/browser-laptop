@@ -28,7 +28,7 @@
 }
 
 .tab {
-  border-radius: 9px;
+  border-radius: 10px;
   border-top-left-radius: @tabBorderRadius;
   border-top-right-radius: @tabBorderRadius;
   border-width: 1px 1px 0;
@@ -199,29 +199,32 @@
 .tabPages {
   background: @tabsBackground;
   border-top: 1px solid gray;
+  display: flex;
   height: 14px;
+  justify-content: center;
   position: relative;
   text-align: center;
   z-index: 12;
 }
 
 .tabPage {
+  align-items: center;
   background-color: @chromeControlsBackground2;
   border-radius: 9px;
   box-sizing: border-box;
   cursor: pointer;
   display: inline-block;
-  margin: 0 2.5px;
+  margin: auto 2.5px;
   height: 6px;
-  transform: translateY(-50%);
   width: 34px;
+  vertical-align: middle;
 
   &.audioPlaybackActive {
     border: 1px solid @audioColor;
   }
 
   &.active {
-    background-color: #3B3B3B;
+    background-color: #eeeeee;
   }
 }
 
@@ -234,7 +237,7 @@
   vertical-align: top;
   width: 50px;
   &:not([disabled]) {
-    background: @chromeControlsBackground2;
+    background: #eeeeee;
     cursor: pointer;
     opacity: 1;
   }
@@ -250,7 +253,7 @@
 }
 
 .nextTab {
-  background: linear-gradient(to left, @chromeControlsBackground2, @tabsBackground);
+  background: linear-gradient(to left, #afb0b4, #cccccc);
   border-bottom-right-radius: 9px;
   border-top-right-radius: 9px;
   float: right;
