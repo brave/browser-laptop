@@ -1,19 +1,15 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 'use strict'
 
 const URL = require('url')
-const request = require('request')
-const fs = require('fs')
-const path = require('path')
 const ABPFilterParserLib = require('abp-filter-parser-cpp')
 const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
 const FilterOptions = ABPFilterParserLib.FilterOptions
-const app = require('electron').app
 const AppConfig = require('./appConfig')
-const AppActions = require('../js/actions/appActions')
-
-const adBlockFilename = 'adBlock.dat'
-const storagePath = path.join(app.getPath('userData'), adBlockFilename)
-const downloadPath = `${storagePath}.temp`
+const DataFile = require('./dataFile')
 
 let parser
 
@@ -28,76 +24,34 @@ let mapFilterType = {
   other: FilterOptions.other
 }
 
-/*
-const debug = (details) => {
+const debug = (details, shouldBlock) => {
+  if (!shouldBlock) {
+    return
+  }
+  /*
   console.log('-----')
+  console.log('Should block: ', shouldBlock)
   console.log(details.url)
   console.log(details.firstPartyUrl)
   console.log(details.resourceType)
-}
-*/
-
-const downloadAdBlockData = () => {
-  return new Promise((resolve, reject) => {
-    let headers = {}
-    const resourceName = 'adblock'
-    const AppStore = require('../js/stores/appStore')
-    const etag = AppStore.getState().getIn([resourceName, 'etag'])
-    if (etag) {
-      headers = {
-        'If-None-Match': etag
-      }
-    }
-
-    var req = request.get({
-      url: AppConfig.adBlockUrl.replace('{version}', AppConfig.adBlockVersion),
-      headers
-    }).on('response', function (response) {
-      AppActions.setResourceLastCheck(resourceName, AppConfig.adBlockVersion, new Date().getTime())
-      if (response.statusCode !== 200) {
-        readAdBlockData().then(resolve).catch(reject)
-        return
-      }
-      const etag = response.headers['etag']
-      AppActions.setResourceETag(resourceName, etag)
-
-      req.pipe(fs.createWriteStream(downloadPath).on('close', function () {
-        fs.rename(downloadPath, storagePath, function (err) {
-          if (err) {
-            reject('could not rename downloaded file')
-          } else {
-            resolve()
-          }
-        })
-      }))
-      .on('error', reject)
-    })
-  })
+  */
 }
 
 const startAdBlocking = (win) => {
   win.webContents.session.webRequest.onBeforeRequest(function (details, cb) {
-    // debug(details)
+    const firstPartyUrl = URL.parse(details.firstPartyUrl)
+    const shouldBlock = firstPartyUrl.protocol &&
+      firstPartyUrl.protocol.startsWith('http') &&
+      mapFilterType[details.resourceType] !== undefined &&
+      parser.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.hostname)
+    debug(details, shouldBlock)
     try {
       cb({
-        cancel: mapFilterType[details.resourceType] !== undefined &&
-          parser.matches(details.url, mapFilterType[details.resourceType], URL.parse(details.firstPartyUrl).firstPartyUrl)
+        cancel: shouldBlock
       })
     } catch (e) {
       cb({})
     }
-  })
-}
-
-const readAdBlockData = () => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(storagePath, function (err, data) {
-      if (err) {
-        reject()
-      } else {
-        resolve(data)
-      }
-    })
   })
 }
 
@@ -120,22 +74,8 @@ module.exports.init = (win) => {
 
   parser = new ABPFilterParser()
 
-  const AppStore = require('../js/stores/appStore')
-  const resourceName = 'adblock'
-  const lastCheckDate = AppStore.getState().getIn([resourceName, 'lastCheckDate'])
-  const lastCheckVersion = AppStore.getState().getIn([resourceName, 'lastCheckVersion'])
-
-  let redownloadFirst
-  if (lastCheckVersion !== AppConfig.adBlockVersion ||
-      lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig.msBetweenDataFileRechecks) {
-    redownloadFirst = downloadAdBlockData().then(readAdBlockData)
-  }
-
-  (redownloadFirst || readAdBlockData().catch(() => {
-    return new Promise((resolve, reject) => {
-      downloadAdBlockData().then(readAdBlockData).then(resolve).catch(reject)
-    })
-  })).then(data => {
+  const init = data => {
+    // console.log('init data file')
     // Make sure we keep a reference to the data since
     // it's used directly
     module.exports.adBlockData = data
@@ -143,7 +83,26 @@ module.exports.init = (win) => {
     windowsToStartAdblockFor.push(win)
     windowsToStartAdblockFor.forEach(startAdBlocking)
     windowsToStartAdblockFor = null
-  }).catch((e) => {
-    console.error('Could not start adblock!', e)
-  })
+  }
+
+  const readData = () => DataFile.readDataFile(resourceName)
+    .then(init)
+    .catch((resolve, reject) => {
+      DataFile.downloadDataFile(resourceName, url, AppConfig.adBlockVersion, true)
+      .then(DataFile.readDataFile.bind(null, resourceName))
+      .then(init)
+      .catch((err) => {
+        console.log('Could not init adblock', err || '')
+        reject()
+      })
+    })
+
+  const resourceName = 'adblock'
+  const url = AppConfig.adBlockUrl.replace('{version}', AppConfig.adBlockVersion)
+  if (DataFile.shouldRedownloadFirst(resourceName, AppConfig.adBlockVersion)) {
+    DataFile.downloadDataFile(resourceName, url, AppConfig.adBlockVersion, false)
+      .then(readData)
+  } else {
+    readData()
+  }
 }
