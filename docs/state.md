@@ -20,6 +20,16 @@ AppStore
     startTime: number, // datetime.getTime()
     endTime: number // datetime.getTime()
   }],
+  adblock: {
+    etag: string, // last downloaded data file etag
+    lastCheckVersion: number, // last checked data file version
+    lastCheckDate: number // last checked data file date.getTime()
+  },
+  trackingProtection: {
+    etag: string, // last downloaded data file etag
+    lastCheckVersion: number, // last checked data file version
+    lastCheckDate: number // last checked data file date.getTime()
+  },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updateAvailable: false,
