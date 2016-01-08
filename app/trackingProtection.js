@@ -47,8 +47,9 @@ const startTrackingProtection = (wnd) => {
       firstPartyUrl.protocol.startsWith('http') &&
       cachedFirstParty[firstPartyUrl.host] &&
       trackingProtection.matchesTracker(urlHost) &&
+      urlHost !== firstPartyUrl.host &&
       !cachedFirstParty[firstPartyUrl.host].find((baseHost) =>
-        isThirdPartyHost(baseHost, urlHost))
+        !isThirdPartyHost(baseHost, urlHost))
 
     DataFile.debug(resourceName, details, shouldBlock)
     return shouldBlock
