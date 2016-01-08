@@ -20,7 +20,8 @@
     "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
     "zip-darwin": "node build-darwin-update.js",
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
-    "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adBlock.dat",
+    "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adblock.dat",
+    "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/trackingprotection.dat",
     "postinstall": "webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
