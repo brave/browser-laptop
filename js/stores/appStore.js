@@ -15,6 +15,8 @@ const AppActions = require('../actions/appActions')
 const siteHacks = require('../data/siteHacks')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
+const AdBlock = require('../../app/adBlock')
+const TrackingProtection = require('../../app/trackingProtection')
 
 let appState
 
@@ -117,6 +119,9 @@ const createWindow = (browserOpts, defaults, parentWindowKey) => {
       cb({})
     }
   })
+
+  TrackingProtection.init(mainWindow)
+  AdBlock.init(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
@@ -241,6 +246,17 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
       appState = appState.set('defaultWindowHeight', action.size[1])
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_DATA_FILE_ETAG:
+      appState = appState.setIn([action.resourceName, 'etag'], action.etag)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
+      appState = appState.mergeIn([action.resourceName], {
+        lastCheckVersion: action.lastCheckVersion,
+        lastCheckDate: action.lastCheckDate
+      })
       appStore.emitChange()
       break
     default:

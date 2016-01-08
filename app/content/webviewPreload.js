@@ -189,3 +189,12 @@ document.onkeydown = (e) => {
       break
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Hide broken images
+  Array.from(document.querySelectorAll('img')).forEach(function (img) {
+    img.addEventListener('error', function () {
+      this.style.visibility = 'hidden'
+    })
+  })
+})

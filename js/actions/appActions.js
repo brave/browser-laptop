@@ -84,6 +84,35 @@ const AppActions = {
       actionType: AppConstants.APP_SET_DEFAULT_WINDOW_SIZE,
       size
     })
+  },
+
+  /**
+   * Sets the etag value for a downloaded data file.
+   * This is used for keeping track of when to re-download adblock and tracking
+   * protection data.
+   * @param {string} resourceName - 'adblock' or 'trackingProtection'
+   * @param {string} etag - The etag of the reosurce from the http response
+   */
+  setResourceETag: function (resourceName, etag) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_DATA_FILE_ETAG,
+      resourceName,
+      etag
+    })
+  },
+
+  /**
+   * Sets the lastCheck date.getTime() value for the data file
+   * @param {string} resourceName - 'adblock' or 'trackingProtection'
+   * @param {number} lastCheck - The last check date of the reosurce from the http response
+   */
+  setResourceLastCheck: function (resourceName, lastCheckVersion, lastCheckDate) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_DATA_FILE_LAST_CHECK,
+      resourceName,
+      lastCheckVersion,
+      lastCheckDate
+    })
   }
 }
 
