@@ -9,6 +9,7 @@ const ABPFilterParserLib = require('abp-filter-parser-cpp')
 const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
 const FilterOptions = ABPFilterParserLib.FilterOptions
 const DataFile = require('./dataFile')
+const Filtering = require('./filtering')
 const resourceName = 'adblock'
 
 let adblock
@@ -23,32 +24,21 @@ let mapFilterType = {
   other: FilterOptions.other
 }
 
-const startAdBlocking = (win) => {
-  win.webContents.session.webRequest.onBeforeRequest(function (details, cb) {
-    // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl) {
-      cb({})
-      return
-    }
+const startAdBlocking = (wnd) => {
+  Filtering.register(wnd, (details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const shouldBlock = firstPartyUrl.protocol &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.hostname)
     DataFile.debug(details, shouldBlock)
-    try {
-      cb({
-        cancel: shouldBlock
-      })
-    } catch (e) {
-      cb({})
-    }
+    return shouldBlock
   })
 }
 
-module.exports.init = (win) => {
+module.exports.init = (wnd) => {
   const first = !adblock
   const wnds = []
   adblock = new ABPFilterParser()
-  DataFile.init(win, resourceName, startAdBlocking, adblock, first, wnds)
+  DataFile.init(wnd, resourceName, startAdBlocking, adblock, first, wnds)
 }

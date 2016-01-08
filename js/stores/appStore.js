@@ -119,8 +119,8 @@ const createWindow = (browserOpts, defaults, parentWindowKey) => {
     }
   })
 
-  AdBlock.init(mainWindow)
   TrackingProtection.init(mainWindow)
+  AdBlock.init(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was

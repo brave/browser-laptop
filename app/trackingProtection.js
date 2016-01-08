@@ -7,6 +7,7 @@
 const URL = require('url')
 const TrackingProtection = require('tracking-protection').CTPParser
 const DataFile = require('./dataFile')
+const Filtering = require('./filtering')
 const resourceName = 'trackingProtection'
 
 let trackingProtection
@@ -23,7 +24,7 @@ const isThirdPartyHost = (baseContextHost, testHost) => {
   return c !== '.' && c !== undefined
 }
 
-const startTrackingProtection = (win) => {
+const startTrackingProtection = (wnd) => {
   // Aftre every 50 first party hosts, just
   // re-get the first party host list
   if (cachedFirstPartyCount > 50) {
@@ -31,12 +32,7 @@ const startTrackingProtection = (win) => {
     cachedFirstParty = {}
   }
 
-  win.webContents.session.webRequest.onBeforeRequest(function (details, cb) {
-    // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl) {
-      cb({})
-      return
-    }
+  Filtering.register(wnd, (details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     if (firstPartyUrl.protocol && firstPartyUrl.protocol.startsWith('http')) {
       if (!cachedFirstParty[firstPartyUrl.host]) {
@@ -55,19 +51,13 @@ const startTrackingProtection = (win) => {
         isThirdPartyHost(baseHost, urlHost))
 
     DataFile.debug(resourceName, details, shouldBlock)
-    try {
-      cb({
-        cancel: shouldBlock
-      })
-    } catch (e) {
-      cb({})
-    }
+    return shouldBlock
   })
 }
 
-module.exports.init = (win) => {
+module.exports.init = (wnd) => {
   const first = !trackingProtection
   const wnds = []
   trackingProtection = new TrackingProtection()
-  DataFile.init(win, resourceName, startTrackingProtection, trackingProtection, first, wnds)
+  DataFile.init(wnd, resourceName, startTrackingProtection, trackingProtection, first, wnds)
 }
