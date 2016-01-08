@@ -14,7 +14,7 @@ module.exports = {
   },
   trackingProtection: {
     url: 'https://s3.amazonaws.com/tracking-protection-data/{version}/TrackingProtection.dat',
-    version: 0,
+    version: 1,
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },

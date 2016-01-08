@@ -16,6 +16,7 @@ const siteHacks = require('../data/siteHacks')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const AdBlock = require('../../app/adBlock')
+const TrackingProtection = require('../../app/trackingProtection')
 
 let appState
 
@@ -119,6 +120,7 @@ const createWindow = (browserOpts, defaults, parentWindowKey) => {
   })
 
   AdBlock.init(mainWindow)
+  TrackingProtection.init(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was

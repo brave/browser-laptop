@@ -25,6 +25,11 @@ let mapFilterType = {
 
 const startAdBlocking = (win) => {
   win.webContents.session.webRequest.onBeforeRequest(function (details, cb) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl) {
+      cb({})
+      return
+    }
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const shouldBlock = firstPartyUrl.protocol &&
       firstPartyUrl.protocol.startsWith('http') &&
