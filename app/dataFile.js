@@ -10,6 +10,7 @@ const path = require('path')
 const app = require('electron').app
 const AppConfig = require('./appConfig')
 const AppActions = require('../js/actions/appActions')
+const cachedDataFiles = {}
 
 const storagePath = (resourceName) =>
   path.join(app.getPath('userData'), `${resourceName}.dat`)
@@ -73,5 +74,71 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
   const lastCheckDate = AppStore.getState().getIn([resourceName, 'lastCheckDate'])
   const lastCheckVersion = AppStore.getState().getIn([resourceName, 'lastCheckVersion'])
   return lastCheckVersion !== version ||
-    lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig.msBetweenDataFileRechecks
+    lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig[resourceName].msBetweenRechecks
+}
+
+module.exports.init = (win, resourceName,
+    startFiltering, filteringWorker, first, windowsToStartFor) => {
+  const version = AppConfig[resourceName].version
+  const url = AppConfig[resourceName].url.replace('{version}', version)
+
+  if (!AppConfig[resourceName].enabled) {
+    return
+  }
+
+  // We use the same instance for all BrowserWindows
+  // So just go directly to start when it's non first
+  if (!first) {
+    // Data is not available yet, add it to a list to notify
+    if (!cachedDataFiles[resourceName]) {
+      windowsToStartFor.push(win)
+      return
+    }
+    startFiltering(win)
+    return
+  }
+
+  const loadProcess = (resourceName, version, doneInit) =>
+    module.exports.readDataFile(resourceName)
+    .then(doneInit)
+    .catch((resolve, reject) => {
+      module.exports.downloadDataFile(resourceName, url, version, true)
+      .then(module.exports.readDataFile.bind(null, resourceName))
+      .then(doneInit)
+      .catch((err) => {
+        console.log(`Could not init ${resourceName}`, err || '')
+        reject()
+      })
+    })
+
+  const doneInit = data => {
+    // console.log('init data file')
+    // Make sure we keep a reference to the data since
+    // it's used directly
+    cachedDataFiles[resourceName] = data
+    filteringWorker.deserialize(data)
+    windowsToStartFor.push(win)
+    windowsToStartFor.forEach(startFiltering)
+    windowsToStartFor = null
+  }
+
+  if (module.exports.shouldRedownloadFirst(resourceName, version)) {
+    module.exports.downloadDataFile(resourceName, url, version, false)
+      .then(loadProcess.bind(null, resourceName, version, doneInit))
+  } else {
+    loadProcess(resourceName, version, doneInit)
+  }
+}
+
+module.exports.debug = (resourceName, details, shouldBlock) => {
+  if (!shouldBlock) {
+    return
+  }
+  /*
+  console.log('-----')
+  console.log(`${resourceName} should block: `, shouldBlock)
+  console.log(details.url)
+  console.log(details.firstPartyUrl)
+  console.log(details.resourceType)
+  */
 }
