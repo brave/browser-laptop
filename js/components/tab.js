@@ -109,6 +109,11 @@ class Tab extends ImmutableComponent {
     WindowActions.setAudioMuted(this.props.frameProps, muted)
   }
 
+  get loading () {
+    return this.props.frameProps &&
+    this.props.frameProps.get('loading')
+  }
+
   render () {
     const thumbnailWidth = 160
     const thumbnailHeight = 100
@@ -123,21 +128,25 @@ class Tab extends ImmutableComponent {
     }
 
     // Style based on theme-color
+    let iconStyle = {}
     var activeTabStyle = {}
     const backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
     if (this.props.isActive && backgroundColor) {
       activeTabStyle.backgroundColor = backgroundColor
       const textColor = getTextColorForBackground(backgroundColor)
+      iconStyle.color = textColor
       if (textColor) {
         activeTabStyle.color = getTextColorForBackground(backgroundColor)
       }
     }
 
-    const iconStyle = {
-      backgroundImage: `url(${getFavicon(this.props.frameProps)})`,
-      backgroundSize: 16,
-      width: 16,
-      height: 16
+    if (!this.loading) {
+        iconStyle = {
+        backgroundImage: `url(${getFavicon(this.props.frameProps)})`,
+        backgroundSize: 16,
+        width: 16,
+        height: 16
+      }
     }
 
     let playIcon = null
@@ -187,7 +196,11 @@ class Tab extends ImmutableComponent {
         { !this.isPinned
           ? <span onClick={this.onCloseFrame.bind(this)}
           className='closeTab fa fa-times-circle'/> : null }
-        <div className='tabIcon' style={iconStyle}/>
+        <div className={cx({
+            tabIcon: true,
+            'fa fa-circle-o-notch fa-spin': this.loading
+          })}
+          style={iconStyle}/>
         {playIcon}
         { !this.isPinned
           ? <div className='tabTitle'>
