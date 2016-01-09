@@ -12,6 +12,7 @@ const Main = require('./main')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const SiteTags = require('../constants/siteTags')
+const Config = require('../constants/config')
 
 class Window extends React.Component {
   constructor (props) {
@@ -46,9 +47,17 @@ class Window extends React.Component {
   }
 
   componentWillMount () {
-    this.props.frames.forEach((frame) => {
-      WindowActions.newFrame(frame)
-    })
+    if (this.props.frames.length === 0) {
+      WindowActions.newFrame({
+        location: Config.defaultUrl
+      })
+    } else {
+      WindowStore.suspend()
+      this.props.frames.forEach(frame => {
+        WindowActions.newFrame(frame)
+      })
+      WindowStore.resume()
+    }
   }
 
   render () {

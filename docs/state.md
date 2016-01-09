@@ -74,7 +74,6 @@ WindowStore
       activeMixedContent: boolean, // has active mixed content
       passiveMixedContent: boolean, // has passive mixed content
     },
-    parentWindowKey: number, // the key of the window this frame was opened from
     parentFrameKey: number, // the key of the frame this frame was opened from
     contextMenuDetail: {...},
     modalPromptDetail: {...},

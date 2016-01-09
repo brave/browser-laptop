@@ -8,6 +8,19 @@ chai.use(chaiAsPromised)
 
 const Server = require('./server')
 
+var promiseMapSeries = function (array, iterator) {
+  var length = array.length
+  var current = Promise.resolve()
+  var results = new Array(length)
+
+  for (var i = 0; i < length; ++i) {
+    current = results[i] = current.then(function (i) {
+      return iterator(array[i])
+    }.bind(undefined, i))
+  }
+  return Promise.all(results)
+}
+
 var exports = {
 
   keys: {
@@ -126,6 +139,38 @@ var exports = {
       return this.execute(function (width, height) {
         return require('electron').remote.getCurrentWindow().setSize(width, height)
       }, width, height).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('windowParentByUrl', function (url, childSelector = 'webview') {
+      var context = this
+      return this.windowHandles().then(response => response.value).then(function (handles) {
+        return promiseMapSeries(handles, function (handle) {
+          return context.window(handle).getAttribute(childSelector, 'src').catch(() => '')
+        })
+      }).then(function (response) {
+        let index = response.indexOf(url)
+        if (index !== -1) {
+          return context.windowByIndex(index)
+        } else {
+          return undefined
+        }
+      })
+    })
+
+    this.app.client.addCommand('windowByUrl', function (url) {
+      var context = this
+      return this.windowHandles().then(response => response.value).then(function (handles) {
+        return promiseMapSeries(handles, function (handle) {
+          return context.window(handle).getUrl()
+        })
+      }).then(function (response) {
+        let index = response.indexOf(url)
+        if (index !== -1) {
+          return context.windowByIndex(index)
+        } else {
+          return undefined
+        }
+      })
     })
   },
 

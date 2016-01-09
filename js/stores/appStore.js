@@ -31,10 +31,8 @@ function navbarHeight () {
   return 75
 }
 
-const createWindow = (browserOpts, defaults, parentWindowKey) => {
-  browserOpts = browserOpts || {}
-  // clean up properties
-  delete browserOpts.webPreferences
+const createWindow = (browserOpts, defaults) => {
+  let parentWindowKey = browserOpts.parentWindowKey
 
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
   // height and innerHeight are the frame webview size
@@ -156,6 +154,7 @@ function windowDefaults () {
   setDefaultWindowSize()
 
   return {
+    show: false,
     width: appState.get('defaultWindowWidth'),
     height: appState.get('defaultWindowHeight'),
     minWidth: 500,
@@ -191,9 +190,10 @@ const handleAppAction = (action) => {
       appStore.emitChange()
       break
     case AppConstants.APP_NEW_WINDOW:
-      const frameOpts = action.frameOpts && action.frameOpts.toJS() || undefined
-      const browserOpts = action.browserOpts && action.browserOpts.toJS() || undefined
-      let mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts && frameOpts.parentWindowKey)
+      const frameOpts = action.frameOpts && action.frameOpts.toJS()
+      const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
+
+      let mainWindow = createWindow(browserOpts, windowDefaults())
       if (action.restoredState) {
         mainWindow.webContents.once('dom-ready', () => {
           mainWindow.webContents.send('restore-state', action.restoredState)
@@ -226,6 +226,8 @@ const handleAppAction = (action) => {
         mainWindow.loadURL('file://' + __dirname + '/../../app/index.html?' + queryString)
       }
       appStore.emitChange()
+
+      mainWindow.show()
       break
     case AppConstants.APP_CLOSE_WINDOW:
       let appWindow = BrowserWindow.fromId(action.appWindowId)

@@ -58,6 +58,7 @@ let currentKey = 0
 const incrementNextKey = () => ++currentKey
 
 class WindowStore extends EventEmitter {
+
   getState () {
     return windowState
   }
@@ -67,7 +68,11 @@ class WindowStore extends EventEmitter {
   }
 
   emitChange () {
-    this.emit(CHANGE_EVENT)
+    if (!this.suspended) {
+      this.emit(CHANGE_EVENT)
+    } else {
+      this.emitOnResume = true
+    }
   }
 
   addChangeListener (callback) {
@@ -76,6 +81,26 @@ class WindowStore extends EventEmitter {
 
   removeChangeListener (callback) {
     this.removeListener(CHANGE_EVENT, callback)
+  }
+
+  /**
+   * Temporarily suspend the emitting of change events for this store
+   * You can use this when you have multiple actions that can/should be accomplished in a single render
+   */
+  suspend () {
+    this.suspended = true
+  }
+
+  /**
+   * Resume the emitting of change events
+   * A change event will be emitted if any updates were made while the store was suspended
+   */
+  resume () {
+    this.suspended = false
+    if (this.emitOnResume) {
+      this.emitOnResume = false
+      this.emitChange()
+    }
   }
 }
 
