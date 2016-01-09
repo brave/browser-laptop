@@ -15,15 +15,6 @@ let trackingProtection
 let cachedFirstPartyCount = 0
 let cachedFirstParty = {}
 
-const isThirdPartyHost = (baseContextHost, testHost) => {
-  if (!testHost.endsWith(baseContextHost)) {
-    return true
-  }
-
-  let c = testHost[testHost.length - baseContextHost.length - 1]
-  return c !== '.' && c !== undefined
-}
-
 const startTrackingProtection = (wnd) => {
   // Aftre every 50 first party hosts, just
   // re-get the first party host list
@@ -53,7 +44,7 @@ const startTrackingProtection = (wnd) => {
       trackingProtection.matchesTracker(urlHost) &&
       urlHost !== firstPartyUrlHost &&
       !cachedFirstParty[firstPartyUrlHost].find((baseHost) =>
-        !isThirdPartyHost(baseHost, urlHost))
+        !Filtering.isThirdPartyHost(baseHost, urlHost))
 
     DataFile.debug(resourceName, details, shouldBlock)
     return shouldBlock
