@@ -7,8 +7,8 @@ const sqlite3 = require('sqlite3')
 const path = require('path')
 const urlParse = require('url').parse
 
-const sqlFile = path.join(__dirname, '../data', 'rulesets.sqlite')
-const targetsFile = path.join(__dirname, '../data', 'httpse-targets.json')
+const sqlFile = path.join(__dirname, '../js/data', 'rulesets.sqlite')
+const targetsFile = path.join(__dirname, '../js/data', 'httpse-targets.json')
 var dbLoaded = false
 
 // Load the rulesets database
@@ -164,7 +164,7 @@ function onBeforeHTTPRequest (details, cb) {
   } else {
     getRewrittenUrl(details.url, (url) => {
       if (url) {
-        console.log('rewrote', details.url, url)
+        console.log('should rewrite', details.url, url)
         cb({ cancel: false, redirectUrl: url })
       } else {
         cb({ cancel: false })
@@ -202,7 +202,7 @@ function canonicalizeUrl (url) {
  * Loads HTTPS Everywhere into a new BrowserWindow
  * @param {BrowserWindow} win The browser window
  */
-module.exports.loadHttpsEverywhere = (win) => {
+module.exports.init = (win) => {
   if (!dbLoaded) {
     console.log('httpse db not loaded yet; aborting')
     return null

@@ -17,7 +17,7 @@ const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const AdBlock = require('../../app/adBlock')
 const TrackingProtection = require('../../app/trackingProtection')
-const loadHttpsEverywhere = require('../lib/httpsEverywhere').loadHttpsEverywhere
+const HttpsEverywhere = require('../../app/httpsEverywhere')
 
 let appState
 
@@ -110,7 +110,7 @@ const createWindow = (browserOpts, defaults) => {
   }, browserOpts))
 
   // Load HTTPS Everywhere browser "extension"
-  loadHttpsEverywhere(mainWindow)
+  HttpsEverywhere.init(mainWindow)
 
   TrackingProtection.init(mainWindow)
   AdBlock.init(mainWindow)
