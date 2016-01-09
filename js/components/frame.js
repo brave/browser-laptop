@@ -233,6 +233,7 @@ class Frame extends ImmutableComponent {
     return <div
         className={cx({
           frameWrapper: true,
+          isPreview: this.props.isPreview,
           isActive: this.props.isActive
         })}>
       <FindBar
@@ -245,11 +246,16 @@ class Frame extends ImmutableComponent {
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}
       />
-      <webview
-        ref='webview'
-        onFocus={this.onFocus.bind(this)}
-        src={this.props.frame.get('src')}
-        preload='content/webviewPreload.js'/>
+      <div className={cx({
+        webviewContainer: true,
+        isPreview: this.props.isPreview
+      })}>
+        <webview
+          ref='webview'
+          onFocus={this.onFocus.bind(this)}
+          src={this.props.frame.get('src')}
+          preload='content/webviewPreload.js'/>
+      </div>
     </div>
   }
 }

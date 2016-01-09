@@ -196,9 +196,17 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
       windowState = windowState.merge({
-        activeFrameKey: action.frameProps.get('key')
+        activeFrameKey: action.frameProps.get('key'),
+        previewFrameKey: null
       })
       updateTabPageIndex(action.frameProps)
+      windowStore.emitChange()
+      break
+    case WindowConstants.WINDOW_SET_PREVIEW_FRAME:
+      windowState = windowState.merge({
+        previewFrameKey: action.frameProps && action.frameProps.get('key') !== windowState.get('activeFrameKey')
+          ? action.frameProps.get('key') : null
+      })
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:

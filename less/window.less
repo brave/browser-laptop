@@ -114,8 +114,20 @@ html,
     width: 100%;
   }
 
+  .webviewContainer {
+    height: 100%;
+    width: 100%;
+    &.isPreview {
+      opacity: 0.5;
+    }
+  }
+
   &:not(.isActive) {
     z-index: 1;
+    &.isPreview {
+      background: gray;
+      z-index: 3;
+    }
   }
 }
 

@@ -114,19 +114,23 @@ class Tab extends ImmutableComponent {
     this.props.frameProps.get('loading')
   }
 
+  onMouseLeave () {
+    window.clearTimeout(this.hoverTimeout)
+    this.lastPreviewClearTime = new Date().getTime()
+    WindowActions.setPreviewFrame(null)
+  }
+
+  onMouseEnter () {
+    // If a user has recently seen a preview they likely are scrolling through
+    // previews.  If we're not in preview mode we add a bit of hover time
+    // before doing a preview
+    const previewMode = new Date().getTime() - this.lastPreviewClearTime < 1500
+    window.clearTimeout(this.hoverClearTimeout)
+    this.hoverTimeout =
+      window.setTimeout(WindowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 400)
+  }
+
   render () {
-    const thumbnailWidth = 160
-    const thumbnailHeight = 100
-
-    let thumbnailStyle = {
-      backgroundSize: `${thumbnailWidth} ${thumbnailHeight}`,
-      width: thumbnailWidth,
-      height: thumbnailHeight
-    }
-    if (this.props.frameProps.get('thumbnailUrl')) {
-      thumbnailStyle.backgroundImage = `url(${this.props.frameProps.get('thumbnailUrl')})`
-    }
-
     // Style based on theme-color
     let iconStyle = {}
     var activeTabStyle = {}
@@ -141,7 +145,7 @@ class Tab extends ImmutableComponent {
     }
 
     if (!this.loading) {
-        iconStyle = {
+      iconStyle = {
         backgroundImage: `url(${getFavicon(this.props.frameProps)})`,
         backgroundSize: 16,
         width: 16,
@@ -183,6 +187,8 @@ class Tab extends ImmutableComponent {
       ref='tab'
       draggable='true'
       title={this.props.frameProps.get('title')}
+      onMouseEnter={this.onMouseEnter.bind(this)}
+      onMouseLeave={this.onMouseLeave.bind(this)}
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}
       onDragLeave={this.onDragLeave.bind(this)}
@@ -191,16 +197,14 @@ class Tab extends ImmutableComponent {
       onClick={this.setActiveFrame.bind(this)}
       onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
-      <div className='thumbnail'
-        style={thumbnailStyle} />
-        { !this.isPinned
-          ? <span onClick={this.onCloseFrame.bind(this)}
-          className='closeTab fa fa-times-circle'/> : null }
+      { !this.isPinned
+        ? <span onClick={this.onCloseFrame.bind(this)}
+             className='closeTab fa fa-times-circle'/> : null }
         <div className={cx({
-            tabIcon: true,
-            'fa fa-circle-o-notch fa-spin': this.loading
-          })}
-          style={iconStyle}/>
+          tabIcon: true,
+          'fa fa-circle-o-notch fa-spin': this.loading
+        })}
+        style={iconStyle}/>
         {playIcon}
         { !this.isPinned
           ? <div className='tabTitle'>

@@ -41,6 +41,7 @@ WindowStore
 ```javascript
 {
   activeFrameKey: number,
+  previewFrameKey: number,
   frames: [{
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
@@ -52,7 +53,6 @@ WindowStore
     src: string, // what the iframe src should be
     title: string, // page title
     findbarShown: boolean, // whether the findbar is shown
-    thumbnail: string, // url to thumbnail
     key: number,
     isPrivate: boolean, // private browsing tab
     loading: boolean,

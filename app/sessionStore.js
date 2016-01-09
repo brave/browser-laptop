@@ -51,6 +51,8 @@ module.exports.cleanSessionData = (sessionData) => {
   // Hide the context menu when we restore.
   sessionData.contextMenuDetail = null
 
+  // Don't save preview frame since they are only related to hovering on a tab
+  delete sessionData.previewFrameKey
   sessionData.frames = sessionData.frames || []
   sessionData.frames.forEach((frame, i) => {
     // Reset the ids back to sequential numbers

@@ -269,6 +269,19 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to the store to set a preview frame.
+   * This is done when hovering over a tab.
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   */
+  setPreviewFrame: function (frameProps) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_PREVIEW_FRAME,
+      frameProps: frameProps
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the tab page index.
    *
    * @param {number} index - the tab page index to change to

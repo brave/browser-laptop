@@ -158,6 +158,7 @@ class Main extends ImmutableComponent {
               ref={`frame${frame.get('key')}`}
               frame={frame}
               key={frame.get('key')}
+              isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)
         }
