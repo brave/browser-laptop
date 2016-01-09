@@ -112,6 +112,9 @@ const createWindow = (browserOpts, defaults) => {
   // Load HTTPS Everywhere browser "extension"
   loadHttpsEverywhere(mainWindow)
 
+  TrackingProtection.init(mainWindow)
+  AdBlock.init(mainWindow)
+
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
@@ -121,9 +124,6 @@ const createWindow = (browserOpts, defaults) => {
       cb({})
     }
   })
-
-  TrackingProtection.init(mainWindow)
-  AdBlock.init(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
