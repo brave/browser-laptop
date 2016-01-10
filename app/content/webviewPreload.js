@@ -163,7 +163,8 @@ ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholder
   // Common selectors which could be on every page
   var commonSelectors = [
     '[id^="google_ads_iframe_"][id$="__container__"]',
-    '[id^="ad-slot-banner-"]'
+    '[id^="ad-slot-banner-"]',
+    '[data-ad-slot]'
   ]
   commonSelectors.forEach(commonSelector => {
     var nodes = document.querySelectorAll(commonSelector)

@@ -169,11 +169,11 @@ class Frame extends ImmutableComponent {
 
   insertAds (currentLocation) {
     let host = new window.URL(currentLocation).hostname.replace('www.', '')
-    let adDivCandidates = adInfo[host]
-    if (adDivCandidates) {
-      this.webview.send(messages.SET_AD_DIV_CANDIDATES,
-                        adDivCandidates, Config.vault.replacementUrl)
-    }
+    let adDivCandidates = adInfo[host] || []
+    // Call this even when there are no matches because we have some logic
+    // to replace common divs.
+    this.webview.send(messages.SET_AD_DIV_CANDIDATES,
+                      adDivCandidates, Config.vault.replacementUrl)
   }
 
   goBack () {
