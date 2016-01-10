@@ -297,7 +297,7 @@ const doAction = (action) => {
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionResults']), action.searchResults)
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'searchResults']), action.searchResults)
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_THEME_COLOR:
@@ -309,10 +309,16 @@ const doAction = (action) => {
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'selected']), action.selected)
+      const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
+      windowState = windowState.mergeIn(urlBarPath, {
+        selected: action.selected
+      })
       // selection implies focus
       if (action.selected) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), true)
+      }
+      if (action.forSearchMode !== undefined) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'searchSuggestions']), action.forSearchMode)
       }
       windowStore.emitChange()
       break

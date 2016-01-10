@@ -86,7 +86,15 @@ describe('urlbar', function () {
     it('exits title mode when focused', function *() {
       const page1Url = Brave.server.url('page1.html')
       yield navigate(this.app.client, page1Url)
-      return yield this.app.client.ipcSend('shortcut-focus-url')
+      return yield this.app.client.ipcSend('shortcut-focus-url', false)
+        .getValue(urlInput)
+        .should.eventually.be.equal(page1Url)
+    })
+
+    it('exits title mode when focused for search hmode', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield navigate(this.app.client, page1Url)
+      return yield this.app.client.ipcSend('shortcut-focus-url', true)
         .getValue(urlInput)
         .should.eventually.be.equal(page1Url)
     })
@@ -110,8 +118,10 @@ describe('urlbar', function () {
     it('Uses the default favicon when one is not specified', function *() {
       const page1Url = Brave.server.url('page1.html')
       yield navigate(this.app.client, page1Url)
-      let backgroundImage = yield this.app.client.getCssProperty(activeTabFavicon, 'background-image')
-      assert.equal(backgroundImage.value, `url("${Brave.server.url('favicon.ico')}")`)
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getCssProperty(activeTabFavicon, 'background-image').then(backgroundImage =>
+          backgroundImage.value === `url("${Brave.server.url('favicon.ico')}")`
+        ))
     })
     it('Parses favicon when one is present', function *() {
       const pageWithFavicon = Brave.server.url('favicon.html')
@@ -249,7 +259,7 @@ describe('urlbar', function () {
     describe('shortcut-focus-url', function () {
       before(function *() {
         yield this.app.client
-          .ipcSend('shortcut-focus-url')
+          .ipcSend('shortcut-focus-url', false)
       })
 
       it('has focus', function *() {
@@ -258,6 +268,28 @@ describe('urlbar', function () {
 
       it('selects the text', function *() {
         yield selectsText(this.app.client, 'a')
+      })
+      it('has the file icon', function *() {
+        yield this.app.client.waitForExist('.urlbarIcon.fa-file-o')
+      })
+    })
+
+    describe('shortcut-focus-url for search', function () {
+      before(function *() {
+        yield this.app.client
+          .ipcSend('shortcut-focus-url', true)
+      })
+
+      it('has focus', function *() {
+        yield hasFocus(this.app.client)
+      })
+
+      it('selects the text', function *() {
+        yield selectsText(this.app.client, 'a')
+      })
+
+      it('has the search icon', function *() {
+        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
       })
     })
 

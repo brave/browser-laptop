@@ -466,11 +466,13 @@ const WindowActions = {
    * Marks the URL bar text as selected or not
    *
    * @param {boolean} isSelected - Whether or not the URL bar text input should be selected
+   * @param {boolean} forSearchMode - Whether or not to enable auto-complete search suggestions
    */
-  setUrlBarSelected: function (selected) {
+  setUrlBarSelected: function (selected, forSearchMode) {
     WindowDispatcher.dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_SELECTED,
-      selected
+      selected,
+      forSearchMode
     })
   },
 

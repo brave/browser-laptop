@@ -129,7 +129,7 @@ class Main extends ImmutableComponent {
           sites={this.props.appState.get('sites')}
           activeFrame={activeFrame}
           mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-          searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'searchSuggestions'])}
+          searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
           searchDetail={this.props.windowState.get('searchDetail')}
         />
         <div className='topLevelEndButtons'>

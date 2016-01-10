@@ -78,7 +78,13 @@ const init = () => {
           label: 'Open Location...',
           accelerator: 'CmdOrCtrl+L',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL])
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
+          }
+        }, {
+          label: 'Open Search...',
+          accelerator: 'CmdOrCtrl+K',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
           }
         }, {
           type: 'separator'

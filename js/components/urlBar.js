@@ -81,7 +81,7 @@ class UrlBar extends ImmutableComponent {
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
             this.refs.urlBarSuggestions.clickSelected()
-          } else if (this.props.searchSuggestions && !isUrl(location)) {
+          } else if (!isUrl(location)) {
             // do search.
             WindowActions.loadUrl(this.props.activeFrameProps, this.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
@@ -146,8 +146,8 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentWillMount () {
-    ipc.on(messages.SHORTCUT_FOCUS_URL, () => {
-      WindowActions.setUrlBarSelected(true)
+    ipc.on(messages.SHORTCUT_FOCUS_URL, (e, forSearchMode) => {
+      WindowActions.setUrlBarSelected(true, forSearchMode)
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop.bind(this))
@@ -190,10 +190,10 @@ class UrlBar extends ImmutableComponent {
           className={cx({
             urlbarIcon: true,
             'fa': true,
-            'fa-lock': this.secure && this.loading === false && !this.props.focused,
-            'fa-unlock': !this.secure && this.loading === false && this.aboutPage === false && !this.props.focused,
-            'fa fa-spinner fa-spin': this.loading === true,
-            'fa fa-search': this.props.searchSuggestions && this.props.focused && this.loading === false,
+            'fa-lock': this.secure && this.props.loading === false && !this.props.urlbar.get('focused'),
+            'fa-unlock': this.secure === false && this.props.loading === false && this.aboutPage === false && !this.props.urlbar.get('focused'),
+            'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
+            'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             extendedValidation: this.extendedValidationSSL
           })}/>
       <input type='text'
@@ -205,9 +205,9 @@ class UrlBar extends ImmutableComponent {
         value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
-          insecure: !this.secure && this.loading === false && this.aboutPage === false,
+          insecure: !this.secure && this.props.loading === false && this.aboutPage === false,
           private: this.private,
-          testHookLoadDone: !this.loading
+          testHookLoadDone: !this.props.loading
         })}
         id='urlInput'
         readOnly={this.props.titleMode}
@@ -220,7 +220,7 @@ class UrlBar extends ImmutableComponent {
           sites={this.props.sites}
           frames={this.props.frames}
           searchDetail={this.searchDetail}
-          searchSuggestions={this.props.activeFrameProps.get('searchSuggestions')}
+          searchSuggestions={this.props.searchSuggestions}
           activeFrameProps={this.props.activeFrameProps}
           urlLocation={this.props.urlbar.get('location')}
           urlPreview={this.props.urlbar.get('urlPreview')}

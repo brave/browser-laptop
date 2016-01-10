@@ -81,6 +81,7 @@ WindowStore
       urlbar: {
         location: string, // the string displayed in the urlbar
         urlPreview: string,
+        searchSuggestions: boolean, // true if search suggestions are enabled
         suggestions: {
           selectedIndex: number, // index of the item in focus
           searchResults: array,
