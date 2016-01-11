@@ -144,7 +144,8 @@ class UrlBarSuggestions extends ImmutableComponent {
       data: this.props.frames,
       maxResults: Config.urlBarSuggestions.maxOpenedFrames,
       classHandler: () => 'fa-file',
-      clickHandler: this.props.onSelectFrame,
+      clickHandler: (frameProps) =>
+        WindowActions.setActiveFrame(frameProps),
       formatTitle: frame => frame.get('title') || frame.get('location'),
       filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
         frame.get('key') !== this.props.activeFrameProps.get('key') &&
