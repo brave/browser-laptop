@@ -65,7 +65,6 @@ class Main extends ImmutableComponent {
       WindowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      console.log('resource: ', blockType, details)
       const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
       filteredFrameProps.forEach(frameProps =>
         WindowActions.setBlockedBy(frameProps, blockType, details.url))
