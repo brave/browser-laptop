@@ -160,8 +160,10 @@ describe('urlbar', function () {
       const pageWithFavicon = Brave.server.url('favicon.html')
       yield navigate(this.app.client, pageWithFavicon)
       yield this.app.client.waitUntil(() =>
-        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
+        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor => {
+          console.log(backgroundColor.parsed.hex)
           backgroundColor.parsed.hex === '#320f07'
+        }
       ))
     })
   })

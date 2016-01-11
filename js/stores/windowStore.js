@@ -101,6 +101,13 @@ const doAction = (action) => {
           src: action.location,
           location: action.location,
           audioPlaybackActive: false,
+          // We want theme colors reset here instead of in WINDOW_SET_LOCATION
+          // because inter page navigation would make the tab color
+          // blink otherwise.  The theme color will be reset eventually
+          // once the page loads anyway though for the case of navigation change
+          // without src change.
+          themeColor: undefined,
+          computedThemeColor: undefined,
           title: ''
         })
       }
