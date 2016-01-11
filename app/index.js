@@ -34,17 +34,7 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
 let perWindowState = []
 let sessionStateStoreAttempted = false
 
-app.on('before-quit', function (e) {
-  if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
-    return
-  }
-
-  e.preventDefault()
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
-})
-
-ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
-  perWindowState.push(data)
+const saveIfAllCollected = () => {
   if (perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
     appState.perWindowState = perWindowState
@@ -60,6 +50,23 @@ ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
       app.quit()
     }
   }
+}
+
+app.on('before-quit', function (e) {
+  if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
+    saveIfAllCollected()
+    return
+  }
+
+  e.preventDefault()
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+})
+
+ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
+  if (data) {
+    perWindowState.push(data)
+  }
+  saveIfAllCollected()
 })
 
 app.on('ready', function () {
