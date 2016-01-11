@@ -108,6 +108,8 @@ const doAction = (action) => {
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
+        adblock: {},
+        trackingProtection: {},
         location: action.location
       })
       // Update the displayed location in the urlbar
@@ -367,6 +369,22 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       windowStore.emitChange()
+      break
+    case WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
+      windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)
+      if (action.expandTrackingProtection !== undefined) {
+        windowState = windowState.setIn(['ui', 'siteInfo', 'expandTrackingProtection'], action.expandTrackingProtection)
+      }
+      if (action.expandAdblock !== undefined) {
+        windowState = windowState.setIn(['ui', 'siteInfo', 'expandAdblock'], action.expandAdblock)
+      }
+      windowStore.emitChange()
+      break
+    case WindowConstants.SET_BLOCKED_BY:
+      let blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
+      let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
+      blockedBy = blockedBy.toSet().add(action.location).toList()
+      windowState = windowState.setIn(blockedByPath, blockedBy)
       break
     default:
   }

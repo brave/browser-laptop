@@ -180,13 +180,17 @@ class UrlBar extends ImmutableComponent {
     return loadTime
   }
 
+  onSiteInfo () {
+    WindowActions.setSiteInfoVisible(true)
+  }
+
   render () {
     return <form
       action='#'
       id='urlbar'
       ref='urlbar'>
         <span
-          onClick={this.props.onSiteInfo}
+          onClick={this.onSiteInfo}
           className={cx({
             urlbarIcon: true,
             'fa': true,

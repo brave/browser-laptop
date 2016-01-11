@@ -48,7 +48,9 @@ const messages = {
   STOP_LOAD: _,
   // Session restore
   REQUEST_WINDOW_STATE: _,
-  RESPONSE_WINDOW_STATE: _
+  RESPONSE_WINDOW_STATE: _,
+  // Ad block and tracking protection
+  BLOCKED_RESOURCE: _
 }
 
 module.exports = mapValuesByKeys(messages)

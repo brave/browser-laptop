@@ -4,10 +4,12 @@
 
 'use strict'
 
+const messages = require('../js/constants/messages')
+
 const filteringFns = []
 var wnds = new WeakSet()
 
-module.exports.register = (wnd, filteringFn) => {
+module.exports.register = (wnd, resourceName, filteringFn) => {
   filteringFns.push(filteringFn)
   if (!wnds.has(wnd)) {
     wnds.add(wnd)
@@ -17,8 +19,21 @@ module.exports.register = (wnd, filteringFn) => {
         cb({})
         return
       }
+
+      let results
+      for (let i = 0; i < filteringFns.length; i++) {
+        results = filteringFns[i](details)
+        if (results.shouldBlock) {
+          break
+        }
+      }
+
+      if (results.shouldBlock) {
+        wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details)
+      }
+
       cb({
-        cancel: filteringFns.some((fn) => fn(details))
+        cancel: results.shouldBlock
       })
     })
   }

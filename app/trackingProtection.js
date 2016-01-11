@@ -23,7 +23,7 @@ const startTrackingProtection = (wnd) => {
     cachedFirstParty = {}
   }
 
-  Filtering.register(wnd, (details) => {
+  Filtering.register(wnd, resourceName, (details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     let firstPartyUrlHost = firstPartyUrl.host || ''
     if (firstPartyUrlHost.startsWith('www.')) {
@@ -47,7 +47,10 @@ const startTrackingProtection = (wnd) => {
         !Filtering.isThirdPartyHost(baseHost, urlHost))
 
     DataFile.debug(resourceName, details, shouldBlock)
-    return shouldBlock
+    return {
+      shouldBlock,
+      resourceName
+    }
   })
 }
 

@@ -19,6 +19,7 @@ const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
 const UpdateBar = require('./updateBar')
 const Button = require('./button')
+const SiteInfo = require('./siteInfo')
 
 // Constants
 const Config = require('../constants/config')
@@ -63,6 +64,13 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
       WindowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
+    ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
+      console.log('resource: ', blockType, details)
+      const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach(frameProps =>
+        WindowActions.setBlockedBy(frameProps, blockType, details.url))
+    })
+
     loadOpenSearch().then(searchDetail => WindowActions.setSearchDetail(searchDetail))
 
     window.addEventListener('mousemove', (e) => {
@@ -100,6 +108,10 @@ class Main extends ImmutableComponent {
     WindowActions.setUrlBarActive(false)
   }
 
+  onHideSiteInfo () {
+    WindowActions.setSiteInfoVisible(false)
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -132,6 +144,11 @@ class Main extends ImmutableComponent {
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
           searchDetail={this.props.windowState.get('searchDetail')}
         />
+        { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+          ? <SiteInfo frameProps={activeFrame}
+              siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
+              onHide={this.onHideSiteInfo.bind(this)} /> : null
+        }
         <div className='topLevelEndButtons'>
           <Button iconClass='braveMenu'
             className='navbutton'

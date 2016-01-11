@@ -43,6 +43,8 @@ const windowConstants = {
   WINDOW_SET_MOUSE_IN_TITLEBAR: _,
   WINDOW_SET_FINDBAR_SHOWN: _, // whether the findbar is shown
   WINDOW_SET_PINNED: _, // Whehter the current tab is pinned or not
+  WINDOW_SET_SITE_INFO_VISIBLE: _, // Whether or not to show site info like # of blocked ads
+  WINDOW_SET_BLOCKED_BY: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_STATE: _
 }
 

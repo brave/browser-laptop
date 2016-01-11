@@ -591,6 +591,37 @@ const WindowActions = {
       actionType: WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR,
       mouseInTitlebar
     })
+  },
+
+  /**
+   * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
+   *
+   * @param {boolean} isVisible - true if the site info should be shown
+   * @param {boolean} expandTrackingProtection - If specified, indicates if the TP section should be expanded
+   * @param {boolean} expandAdblock - If specified, indicates if the adblock section should be expanded
+   */
+  setSiteInfoVisible: function (isVisible, expandTrackingProtection, expandAdblock) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE,
+      isVisible,
+      expandTrackingProtection,
+      expandAdblock
+    })
+  },
+
+  /**
+   * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
+   *
+   * @param {object} frameProps - The frame to set blocked info on
+   * @param {string} blockType - either 'adblock' or 'trackingProtection'
+   */
+  setBlockedBy: function (frameProps, blockType, location) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.SET_BLOCKED_BY,
+      frameProps,
+      blockType,
+      location
+    })
   }
 }
 

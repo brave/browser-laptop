@@ -25,7 +25,7 @@ let mapFilterType = {
 }
 
 const startAdBlocking = (wnd) => {
-  Filtering.register(wnd, (details) => {
+  Filtering.register(wnd, resourceName, (details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const urlHost = URL.parse(details.url).host
     const shouldBlock = firstPartyUrl.protocol &&
@@ -34,7 +34,10 @@ const startAdBlocking = (wnd) => {
       Filtering.isThirdPartyHost(firstPartyUrl.host, urlHost) &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
     DataFile.debug(details, shouldBlock)
-    return shouldBlock
+    return {
+      shouldBlock,
+      resourceName
+    }
   })
 }
 

@@ -62,6 +62,12 @@ WindowStore
     endtLoadTime: datetime,
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
+    adblock: {
+      blocked: Array<string>
+    },
+    trackingProtection: {
+      blocked: Array<string>
+    },
     security: {
       isSecure: boolean, // is using https
       isExtendedValidation: boolean, // is using https ev
@@ -76,6 +82,7 @@ WindowStore
       caseSensitivity: boolean // whether we are doing a case sensitive search
     }
     unloaded: boolean, // true if the tab is unloaded
+
     navbar: {
       focused: boolean, // whether the navbar is focused
       urlbar: {
@@ -99,6 +106,9 @@ WindowStore
     tabs: {
       activeDraggedTab: object,
       tabPageIndex: number, // Index of the current tab page
+    },
+    siteInfo: {
+      isVisible: boolean, // Whether or not to show site info like # of blocked ads
     }
   },
   searchDetail: {
