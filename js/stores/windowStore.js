@@ -28,6 +28,8 @@ var CHANGE_EVENT = 'change'
 const frameStatePath = (key) =>
   ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
 const activeFrameStatePath = () => frameStatePath(windowState.get('activeFrameKey'))
+const frameStatePathForFrame = (frameProps) =>
+  ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
 
 const updateNavBarInput = (loc) => {
   windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']), loc)
@@ -303,7 +305,7 @@ const doAction = (action) => {
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_THEME_COLOR:
-      windowState = windowState.setIn(activeFrameStatePath().concat(['themeColor']), action.themeColor)
+      windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
