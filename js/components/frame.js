@@ -21,20 +21,39 @@ class Frame extends ImmutableComponent {
     super()
   }
 
-  get webview () {
-    return ReactDOM.findDOMNode(this.refs.webview)
+  get webviewContainer () {
+    return ReactDOM.findDOMNode(this.refs.webviewContainer)
   }
 
-  componentDidMount () {
+  createWebview () {
+    while (this.webviewContainer.firstChild) {
+      this.webviewContainer.removeChild(this.webviewContainer.firstChild)
+    }
+    // Create the webview dynamically because React doesn't whitelist all
+    // of the attributes we need.
+    this.webview = document.createElement('webview')
+    this.webview.setAttribute('preload', 'content/webviewPreload.js')
+    if (this.props.frame.get('isPrivate')) {
+      this.webview.setAttribute('partition', 'private-1')
+    }
+    this.webview.setAttribute('src', this.props.frame.get('src'))
+    this.webviewContainer.appendChild(this.webview)
     this.addEventListeners()
   }
 
+  componentDidMount () {
+    this.createWebview()
+  }
+
   componentDidUpdate (prevProps, prevState) {
+    const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
+    if (didSrcChange) {
+      this.createWebview()
+    }
     if ((this.props.isActive && !prevProps.isActive && !this.props.frame.getIn(['navbar', 'urlbar', 'focused'])) ||
-        (this.props.isActive && this.props.frame.get('src') !== prevProps.frame.get('src'))) {
+        (this.props.isActive && didSrcChange)) {
       this.webview.focus()
     }
-
     const activeShortcut = this.props.frame.get('activeShortcut')
     switch (activeShortcut) {
       case 'stop':
@@ -85,6 +104,7 @@ class Frame extends ImmutableComponent {
 
   addEventListeners () {
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
+    this.webview.addEventListener('focus', this.onFocus.bind(this))
     this.webview.addEventListener('new-window', (e) => {
       // TODO handle _top, _parent and named frames
       // also popup blocking and security restrictions!!
@@ -246,16 +266,11 @@ class Frame extends ImmutableComponent {
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}
       />
-      <div className={cx({
-        webviewContainer: true,
-        isPreview: this.props.isPreview
-      })}>
-        <webview
-          ref='webview'
-          onFocus={this.onFocus.bind(this)}
-          src={this.props.frame.get('src')}
-          preload='content/webviewPreload.js'/>
-      </div>
+      <div ref='webviewContainer'
+        className={cx({
+          webviewContainer: true,
+          isPreview: this.props.isPreview
+        })}/>
     </div>
   }
 }

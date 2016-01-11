@@ -48,7 +48,7 @@ const init = () => {
           label: 'New Private Tab',
           accelerator: 'CmdOrCtrl+Alt+T',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, true])
           }
         }, {
           label: 'New Window',
@@ -228,7 +228,7 @@ const init = () => {
           label: 'Toolbars',
           submenu: [
             {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
-            {label: 'Tab Bar', accelerator: 'Alt+CmdOrCtrl+T'},
+            {label: 'Tab Bar'},
             {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
             {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
           ]

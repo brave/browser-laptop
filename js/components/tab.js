@@ -43,7 +43,7 @@ class Tab extends ImmutableComponent {
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
     return (this.props.frameProps.get('title') ||
-    this.props.frameProps.get('location')).replace('▶ ', '')
+      this.props.frameProps.get('location')).replace('▶ ', '')
   }
 
   onDragStart (e) {
@@ -149,6 +149,7 @@ class Tab extends ImmutableComponent {
         backgroundImage: `url(${getFavicon(this.props.frameProps)})`,
         backgroundSize: 16,
         width: 16,
+        minWidth: 16,
         height: 16
       }
     }
@@ -184,6 +185,7 @@ class Tab extends ImmutableComponent {
         'dragging-over': this.props.frameProps.get('tabIsDraggingOverLeftHalf') ||
           this.props.frameProps.get('tabIsDraggingOverRightHalf')
       })}
+      data-frame-key={this.props.frameProps.get('key')}
       ref='tab'
       draggable='true'
       title={this.props.frameProps.get('title')}
@@ -200,6 +202,8 @@ class Tab extends ImmutableComponent {
       { !this.isPinned
         ? <span onClick={this.onCloseFrame.bind(this)}
              className='closeTab fa fa-times-circle'/> : null }
+        { this.props.frameProps.get('isPrivate')
+          ? <div className='privateIcon fa fa-eye'/> : null }
         <div className={cx({
           tabIcon: true,
           'fa fa-circle-o-notch fa-spin': this.loading

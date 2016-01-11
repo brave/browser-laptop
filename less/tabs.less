@@ -71,6 +71,17 @@
     vertical-align: middle;
   }
 
+  .privateIcon {
+    background-position: center;
+    background-repeat: no-repeat;
+    display: inline-block;
+    font-size: 14px;
+    margin: auto 0px auto 9px;
+    position: relative;
+    vertical-align: middle;
+  }
+
+
   .audioPlaybackActive {
     cursor: pointer;
     margin: auto 4px auto 0;
@@ -99,6 +110,9 @@
   &.private {
     background: @privateTabBackground;
     color: #fff;
+    &:not(.active) {
+      background: lighten(@privateTabBackground, 40%);
+    }
   }
 
   &:hover {
@@ -113,6 +127,9 @@
 
   &:not(.active):hover {
     background: linear-gradient(to bottom, #DFDFDF, #AFB0B4);
+    &.private {
+      background: lighten(@privateTabBackground, 20%);
+    }
   }
 
   &.dragging {

@@ -29,7 +29,11 @@ const storagePath = path.join(app.getPath('userData'), sessionStorageName)
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    // TODO when we have per window state as well:
+    if (payload.perWindowState) {
+      payload.perWindowState.forEach(wndPayload =>
+        wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
+    }
+
     // payload.frames = payload.frames.filter(frame => !frame.isPrivate)
     fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
       if (err) {

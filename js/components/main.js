@@ -43,9 +43,10 @@ class Main extends ImmutableComponent {
       console.log('got context menu open', nodeName)
       contextMenus.onMainContextMenu(nodeName)
     })
-    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url) => {
+    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, isPrivate = false) => {
       WindowActions.newFrame({
-        location: url || Config.defaultUrl
+        location: url || Config.defaultUrl,
+        isPrivate
       })
 
       // Focus URL bar when adding tab via shortcut
