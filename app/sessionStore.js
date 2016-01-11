@@ -68,6 +68,10 @@ module.exports.cleanSessionData = (sessionData) => {
     frame.canGoBack = false
     frame.canGoForward = false
 
+    // Set the frame src to the last visited location
+    // or else users will see the first visited URL.
+    frame.src = frame.location
+
     // If a blob is present for the thumbnail, create the object URL
     if (frame.thumbnailBlob) {
       try {
