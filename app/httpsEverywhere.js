@@ -16,7 +16,6 @@ var db = new sqlite3.Database(sqlFile, sqlite3.OPEN_READONLY, function (dbErr) {
   if (dbErr) {
     console.log('error loading httpse rulesets.sqlite')
   } else {
-    console.log('loaded httpse ruleset db')
     dbLoaded = true
   }
 })
@@ -80,7 +79,7 @@ function getHostnamePatterns (url) {
     // copy the original array
     var tmp = segmented.slice()
     if (label.length === 0) {
-      console.log('malformed host in httpse', host)
+      console.log('got host with 0-length label', host)
     } else {
       tmp[index] = '*'
       hostPatterns.push(tmp.join('*'))
@@ -164,8 +163,7 @@ function onBeforeHTTPRequest (details, cb) {
   } else {
     getRewrittenUrl(details.url, (url) => {
       if (url) {
-        console.log('should rewrite', details.url, url)
-        cb({ cancel: false, redirectUrl: url })
+        cb({ cancel: false, redirectURL: url })
       } else {
         cb({ cancel: false })
       }
@@ -207,7 +205,6 @@ module.exports.init = (win) => {
     console.log('httpse db not loaded yet; aborting')
     return null
   }
-  console.log('loading https everywhere in a new window')
   var session = win.webContents ? win.webContents.session : null
   if (!session) {
     console.log('could not get window session')
