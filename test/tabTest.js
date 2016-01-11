@@ -2,6 +2,7 @@
 
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
+const messages = require('../js/constants/messages')
 const {urlInput, newFrameButtonInsideTabs, newFrameButtonOutsideTabs} = require('./lib/selectors')
 const assert = require('assert')
 
@@ -15,7 +16,27 @@ describe('tabs', function () {
 
   describe('new tab', function () {
     Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
 
+    it('creates a new tab when signaled', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForVisible('webview:not([partition])')
+    })
+
+    it('creates a private new tab when signaled', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brianbondy.com', true)
+        .waitForExist('.tab[data-frame-key="3"]')
+        .waitForVisible('webview[partition]')
+    })
+  })
+
+  describe('new tab button', function () {
+    Brave.beforeAll(this)
     before(function *() {
       yield setup(this.app.client)
     })

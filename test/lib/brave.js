@@ -74,10 +74,10 @@ var exports = {
   },
 
   addCommands: function () {
-    this.app.client.addCommand('ipcSend', function (message, param) {
-      return this.execute(function (message, param) {
-        return require('electron').remote.getCurrentWindow().webContents.send(message, param)
-      }, message, param).then((response) => response.value)
+    this.app.client.addCommand('ipcSend', function (message, ...param) {
+      return this.execute(function (message, ...param) {
+        return require('electron').remote.getCurrentWindow().webContents.send(message, ...param)
+      }, message, ...param).then((response) => response.value)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
