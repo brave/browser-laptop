@@ -15,7 +15,7 @@ var cmds = [
   'rm -rf Brave-darwin-x64',
   'NODE_ENV=production ./node_modules/webpack/bin/webpack.js',
   'rm -f dist/Brave.dmg',
-  './node_modules/electron-packager/cli.js . Brave --overwrite --ignore="electron-download|electron-rebuild|electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel$|babel-(?!polyfill|regenerator-runtime)" --platform=darwin --arch=x64 --version=' + electronVersion + ' --icon=res/app.icns --app-version=' + version + ' --build-version=' + electronVersion
+  './node_modules/electron-packager/cli.js . Brave --overwrite --ignore="electron-download|electron-rebuild|electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel$|babel-(?!polyfill|regenerator-runtime)" --platform=darwin --arch=x64 --version=' + electronVersion + ' --icon=res/app.icns --app-version=' + version + ' --build-version=' + electronVersion + ' --protocol="http" --protocol-name="Web site Helper" --protocol="https" --protocol-name="Web site Helper"'
 ]
 
 var cmd = cmds.join(' && ')
