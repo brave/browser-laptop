@@ -120,16 +120,8 @@
   }
 
   ul.urlBarSuggestions {
-    background-color: #eeeeee ;
-    border-radius: 9px;
-    box-shadow: 2px 2px 8px #3b3b3b;
+    .flyoutDialog;
     box-sizing: border-box;
-    color: #000;
-    font-size: 13px;
-    padding: 10px 30px;
-    position: absolute;
-    text-align: left;
-    top: 48px;
     width: 100%;
     z-index: 311;
 
@@ -166,16 +158,23 @@
   }
 }
 
-.siteInfo {
+.flyoutDialog {
+  background-color: #eeeeee;
+  border-radius: 9px;
+  box-shadow: 2px 2px 8px #3b3b3b;
+  color: #000;
+  font-size: 13px;
+  padding: 10px 30px;
+  position: absolute;
+  text-align: left;
+  top: 48px;
+}
 
+.siteInfo {
   >ul {
-    background-color: @chromePrimary;
-    color: #000;
+    .flyoutDialog;
     margin-left: -250px;
-    padding: 10px 30px;
-    position: absolute;
     text-align: left;
-    top: @navigatorHeight;
     width: auto;
 
     li {
