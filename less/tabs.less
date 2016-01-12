@@ -83,7 +83,6 @@
 
 
   .audioPlaybackActive {
-    cursor: pointer;
     margin: auto 4px auto 0;
     color: @audioColor;
   }
@@ -141,7 +140,6 @@
   }
 
   .closeTab {
-    cursor: pointer;
     opacity: 0;
     margin: auto 0;
     position: absolute;
@@ -230,12 +228,15 @@
   background-color: @chromeControlsBackground2;
   border-radius: 9px;
   box-sizing: border-box;
-  cursor: pointer;
   display: inline-block;
   margin: auto 2.5px;
   height: 6px;
   width: 34px;
   vertical-align: middle;
+
+  &:hover {
+    background-color: lighten(@chromeControlsBackground2, 10%);
+  }
 
   &.audioPlaybackActive {
     border: 1px solid @audioColor;
@@ -256,8 +257,10 @@
   width: 50px;
   &:not([disabled]) {
     background: #eeeeee;
-    cursor: pointer;
     opacity: 1;
+    &:hover {
+      background: lighten(#eeeeee, 10%);
+    }
   }
 }
 
