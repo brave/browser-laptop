@@ -83,7 +83,7 @@ function getHostnamePatterns (url) {
     // copy the original array
     var tmp = segmented.slice()
     if (label.length === 0) {
-      console.log('got host with 0-length label', host)
+      console.log('got host with 0-length label', url)
     } else {
       tmp[index] = '*'
       hostPatterns.push(tmp.join('*'))
@@ -106,6 +106,12 @@ function getHostnamePatterns (url) {
 function loadRulesetsById (rulesetIds, cb, errback) {
   var ids = JSON.stringify(rulesetIds).replace('[', '(').replace(']', ')')
   var queryForRuleset = 'select contents from rulesets where id in ' + ids
+  if (!dbLoaded || db === null) {
+    // This request occurred before the db finished loading
+    console.log('got request that occurred before HTTPS Everywhere loaded')
+    errback()
+    return
+  }
   db.all(queryForRuleset, function (err, rows) {
     var applicableRules
     try {
@@ -210,10 +216,6 @@ module.exports.init = (win) => {
 }
 
 function startHttpsEverywhere (win) {
-  if (!dbLoaded) {
-    console.log('httpse db not loaded yet; aborting')
-    return null
-  }
   var session = win.webContents ? win.webContents.session : null
   if (!session) {
     console.log('could not get window session')

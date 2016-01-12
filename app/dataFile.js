@@ -42,12 +42,10 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
     AppActions.setResourceETag(resourceName, etag)
 
     req.pipe(fs.createWriteStream(downloadPath(url)).on('close', function () {
-      console.log('wrote', storagePath(url))
       fs.rename(downloadPath(url), storagePath(url), function (err) {
         if (err) {
           reject('could not rename downloaded file')
         } else {
-          console.log('renamed', storagePath(url))
           resolve()
         }
       })
