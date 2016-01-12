@@ -1,32 +1,36 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+'use strict'
 
 const fs = require('fs')
 const sqlite3 = require('sqlite3')
 const path = require('path')
 const urlParse = require('url').parse
+const DataFile = require('./dataFile')
 
-const sqlFile = path.join(__dirname, '../js/data', 'rulesets.sqlite')
-const targetsFile = path.join(__dirname, '../js/data', 'httpse-targets.json')
 var dbLoaded = false
-
-// Load the rulesets database
-var db = new sqlite3.Database(sqlFile, sqlite3.OPEN_READONLY, function (dbErr) {
-  if (dbErr) {
-    console.log('error loading httpse rulesets.sqlite')
-  } else {
-    dbLoaded = true
-  }
-})
-
-// Load the preloaded mapping of hostname to ruleset IDs
-var targets = JSON.parse(fs.readFileSync(targetsFile, 'utf8'))
-
+var db = null
+var targets = null
 // Counter for detecting infinite redirect loops
 var redirectCounter = {}
 // Blacklist of canonicalized hosts (host+pathname) that lead to redirect loops
 var redirectBlacklist = []
+
+function loadRulesets (dirname) {
+  const sqlFile = path.join(dirname, 'rulesets.sqlite')
+  const targetsFile = path.join(dirname, 'httpse-targets.json')
+  db = new sqlite3.Database(sqlFile, sqlite3.OPEN_READONLY, function (dbErr) {
+    if (dbErr) {
+      console.log('error loading httpse rulesets.sqlite')
+    } else {
+      dbLoaded = true
+    }
+  })
+
+  // Load the preloaded mapping of hostname to ruleset IDs
+  targets = JSON.parse(fs.readFileSync(targetsFile, 'utf8'))
+}
 
 /**
  * Rewrites a URL from HTTP to HTTPS if an HTTPS Everywhere rule is applicable.
@@ -201,6 +205,11 @@ function canonicalizeUrl (url) {
  * @param {BrowserWindow} win The browser window
  */
 module.exports.init = (win) => {
+  DataFile.init(win, 'httpsEverywhere', startHttpsEverywhere, !dbLoaded,
+                [], loadRulesets)
+}
+
+function startHttpsEverywhere (win) {
   if (!dbLoaded) {
     console.log('httpse db not loaded yet; aborting')
     return null
