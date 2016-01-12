@@ -77,8 +77,18 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
     lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig[resourceName].msBetweenRechecks
 }
 
+/**
+ * @param {BrowserWindow} win Window to start in.
+ * @param {string} resourceName Name of the "extension".
+ * @param {function(BrowserWindow)} startExtension Function that starts the
+ *   extension listeners.
+ * @param {boolean} first Whether this is the first window
+ * @param {Array.<BrowserWindow>} windowsToStartFor Additional windows to start
+ *   the extension in.
+ * @param {function(Buffer)} onInitDone function to call with the downloaded data
+ */
 module.exports.init = (win, resourceName,
-    startFiltering, filteringWorker, first, windowsToStartFor) => {
+    startExtension, first, windowsToStartFor, onInitDone) => {
   const version = AppConfig[resourceName].version
   const url = AppConfig[resourceName].url.replace('{version}', version)
 
@@ -94,7 +104,7 @@ module.exports.init = (win, resourceName,
       windowsToStartFor.push(win)
       return
     }
-    startFiltering(win)
+    startExtension(win)
     return
   }
 
@@ -112,13 +122,12 @@ module.exports.init = (win, resourceName,
     })
 
   const doneInit = data => {
-    // console.log('init data file')
     // Make sure we keep a reference to the data since
     // it's used directly
     cachedDataFiles[resourceName] = data
-    filteringWorker.deserialize(data)
+    onInitDone(data)
     windowsToStartFor.push(win)
-    windowsToStartFor.forEach(startFiltering)
+    windowsToStartFor.forEach(startExtension)
     windowsToStartFor = null
   }
 
