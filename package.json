@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adblock.dat",
     "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/trackingprotection.dat",
-    "postinstall": "webpack",
+    "postinstall": "node ./tools/rebuildNativeModules.js",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
   "repository": {
@@ -42,7 +42,7 @@
   },
   "homepage": "https://github.com/bbondy/electron-sample#readme",
   "dependencies": {
-    "abp-filter-parser-cpp": "^1.0.15",
+    "abp-filter-parser-cpp": "^1.0.22",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "git+ssh://git@github.com/brave/electron-prebuilt.git",
     "file-loader": "^0.8.5",
@@ -51,7 +51,7 @@
     "immutable": "^3.7.5",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
-    "tracking-protection": "^1.0.6",
+    "tracking-protection": "^1.0.7",
     "url-loader": "^0.5.7",
     "urlutil.js": "^0.1.1",
     "vibrant": "git+ssh://git@github.com/jariz/vibrant.js.git#1.0"
@@ -72,12 +72,13 @@
     "css-loader": "^0.23.0",
     "electron-builder": "^2.3.1",
     "electron-packager": "^5.1.1",
-    "electron-rebuild": "^1.0.2",
+    "electron-rebuild": "^1.1.1",
     "empty-port": "0.0.1",
     "gulp": "^3.9.0",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "mocha": "^2.3.4",
+    "node-gyp": "^3.2.1",
     "node-libs-browser": "^0.5.3",
     "node-static": "^0.7.7",
     "node-uuid": "^1.4.7",
