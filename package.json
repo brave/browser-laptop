@@ -4,9 +4,8 @@
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
-    "start": "node ./tools/start.js",
-    "start-brk": "NODE_ENV=development electron . --debug-brk=5858",
-    "start-win-brk": "set NODE_ENV=development&& electron . --debug-brk=5858",
+    "start": "node ./tools/start.js --debug=5858",
+    "start-brk": "node ./tools/start.js --debug-brk=5858",
     "watch-all": "npm run watch & npm run watch-test",
     "watch-test": "NODE_ENV=test webpack --watch",
     "watch": "webpack-dev-server",
