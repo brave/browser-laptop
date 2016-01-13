@@ -5,6 +5,7 @@
 // UPDATE_HOST should be set to the host name for the auto-updater server
 var updateHost = process.env.UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 var winUpdateHost = process.env.WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
+var crashURL = process.env.CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
 
 module.exports = {
   adblock: {
@@ -25,6 +26,9 @@ module.exports = {
     version: '5.1.2', // latest stable release from https://eff.org/https-everywhere
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
+  },
+  crashes: {
+    crashSubmitUrl: crashURL
   },
   updates: {
     // Check for front end updates every hour
