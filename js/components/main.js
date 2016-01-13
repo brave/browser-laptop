@@ -30,12 +30,6 @@ const FrameStateUtil = require('../state/frameStateUtil')
 
 class Main extends ImmutableComponent {
   componentDidMount () {
-    if (this.props.windowState.get('frames').isEmpty()) {
-      WindowActions.newFrame({
-        location: Config.defaultUrl
-      })
-    }
-
     ipc.on(messages.STOP_LOAD, () => {
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     })
@@ -173,6 +167,7 @@ class Main extends ImmutableComponent {
           sortedFrames.map(frame =>
             <Frame
               ref={`frame${frame.get('key')}`}
+              frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

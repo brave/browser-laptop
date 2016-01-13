@@ -135,7 +135,7 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
     isPinned: frameOpts.isPinned,
     key: newKey,
     parentFrameKey: frameOpts.parentFrameKey,
-    parentWindowKey: frameOpts.parentWindowKey,
+    guestInstanceId: frameOpts.guestInstanceId,
     navbar: {
       searchSuggestions: true,
       focused: true,

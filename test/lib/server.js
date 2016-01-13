@@ -15,6 +15,14 @@ Server.prototype = {
     return 'http://localhost:' + this.port + '/' + path
   },
 
+  urlWithIpAddress: function (path) {
+    return 'http://127.0.0.1:' + this.port + '/' + path
+  },
+
+  urlOrigin: function () {
+    return 'http://localhost:' + this.port
+  },
+
   /**
    * Sends signal to stop child process and stop server.
    */

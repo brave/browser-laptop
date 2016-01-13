@@ -4,8 +4,8 @@
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
-    "start": "node ./tools/start.js --debug=5858",
-    "start-brk": "node ./tools/start.js --debug-brk=5858",
+    "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-dcheck",
+    "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "watch-all": "npm run watch & npm run watch-test",
     "watch-test": "NODE_ENV=test webpack --watch",
     "watch": "webpack-dev-server",
@@ -38,6 +38,10 @@
     {
       "name": "Aubrey Keus",
       "email": "aubrey@brave.com"
+    },
+    {
+      "name": "Brian Johnson",
+      "email": "bjohnson@brave.com"
     }
   ],
   "license": "MPL-2.0",
@@ -89,7 +93,7 @@
     "node-static": "^0.7.7",
     "node-uuid": "^1.4.7",
     "pre-commit": "^1.1.2",
-    "spectron": "^0.35.3",
+    "spectron": "^0.36.0",
     "standard": "^5.4.1",
     "style-loader": "^0.13.0",
     "webdriverio": "^3.3.0",

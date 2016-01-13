@@ -27,19 +27,22 @@ class Frame extends ImmutableComponent {
   }
 
   createWebview () {
-    while (this.webviewContainer.firstChild) {
-      this.webviewContainer.removeChild(this.webviewContainer.firstChild)
-    }
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.
-    this.webview = document.createElement('webview')
+    this.webview = this.webview || document.createElement('webview')
     this.webview.setAttribute('preload', 'content/webviewPreload.js')
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     }
+    if (this.props.frame.get('guestInstanceId')) {
+      this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
+    }
     this.webview.setAttribute('src', this.props.frame.get('src'))
-    this.webviewContainer.appendChild(this.webview)
-    this.addEventListeners()
+
+    if (!this.webviewContainer.firstChild) {
+      this.webviewContainer.appendChild(this.webview)
+      this.addEventListeners()
+    }
   }
 
   componentDidMount () {
@@ -51,8 +54,7 @@ class Frame extends ImmutableComponent {
     if (didSrcChange) {
       this.createWebview()
     }
-    if ((this.props.isActive && !prevProps.isActive && !this.props.frame.getIn(['navbar', 'urlbar', 'focused'])) ||
-        (this.props.isActive && didSrcChange)) {
+    if (this.props.isActive && !prevProps.isActive) {
       this.webview.focus()
     }
     const activeShortcut = this.props.frame.get('activeShortcut')
@@ -104,33 +106,35 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
-    // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('focus', this.onFocus.bind(this))
-    this.webview.addEventListener('new-window', (e) => {
-      // TODO handle _top, _parent and named frames
-      // also popup blocking and security restrictions!!
+    // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
+    this.webview.addEventListener('new-window', (e, url, frameName, disposition, options) => {
+      e.preventDefault()
 
-      // @see <a href="http://www.w3.org/TR/html5/browsers.html#dom-open">dom open</a>
-      // @see <a href="http://www.w3.org/TR/html-markup/datatypes.html#common.data.browsing-context-name-or-keyword">browsing context name or keyword</a>
-      if (e.frameName.toLowerCase() === '_self') {
-        WindowActions.loadUrl(this.props.frame, e.url)
-      } else if (e.disposition === 'new-window' || e.frameName.toLowerCase() === '_blank') {
+      let guestInstanceId = e.options.webPreferences && e.options.webPreferences.guestInstanceId
+      let windowOptions = e.options.windowOptions || {}
+      windowOptions.parentWindowKey = remote.getCurrentWindow().id
+      windowOptions.disposition = e.disposition
+
+      if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
         AppActions.newWindow({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
-          parentWindowKey: remote.getCurrentWindow().id
-        }, e.options)
+          guestInstanceId
+        }, windowOptions)
       } else {
         WindowActions.newFrame({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
-          parentWindowKey: remote.getCurrentWindow().id,
-          openInForeground: e.disposition !== 'background-tab'
+          openInForeground: e.disposition !== 'background-tab',
+          guestInstanceId
         })
       }
     })
+    this.webview.addEventListener('destroyed', (e) => {
+      WindowActions.closeFrame(this.props.frames, this.props.frame)
+    })
     this.webview.addEventListener('close', () => {
-      // security restrictions here?
       AppActions.closeWindow(remote.getCurrentWindow().id)
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
@@ -161,6 +165,11 @@ class Frame extends ImmutableComponent {
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
+    })
+    this.webview.addEventListener('did-navigate', (e) => {
+      if (this.props.isActive && this.webview.getURL() !== Config.defaultUrl) {
+        this.webview.focus()
+      }
     })
     this.webview.addEventListener('did-start-loading', () => {
       WindowActions.onWebviewLoadStart(

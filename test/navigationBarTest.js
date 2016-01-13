@@ -72,8 +72,9 @@ describe('urlbar', function () {
       yield navigate(this.app.client, page1Url)
       return yield this.app.client.waitForValue(urlInput)
         // Should have title mode
-        .getValue(urlInput)
-        .should.eventually.be.equal('Page 1')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === 'Page 1')
+        })
         // Check for exiting title mode
         .isExisting(navigatorLoadTime).then(isExisting =>
             assert(!isExisting))
@@ -87,24 +88,27 @@ describe('urlbar', function () {
       const page1Url = Brave.server.url('page1.html')
       yield navigate(this.app.client, page1Url)
       return yield this.app.client.ipcSend('shortcut-focus-url', false)
-        .getValue(urlInput)
-        .should.eventually.be.equal(page1Url)
+        .waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === page1Url)
+        })
     })
 
     it('exits title mode when focused for search hmode', function *() {
       const page1Url = Brave.server.url('page1.html')
       yield navigate(this.app.client, page1Url)
       return yield this.app.client.ipcSend('shortcut-focus-url', true)
-        .getValue(urlInput)
-        .should.eventually.be.equal(page1Url)
+        .waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === page1Url)
+        })
     })
 
     it('loads a page with no title', function *() {
-      const page1Url = Brave.server.url('page_no_title.html')
-      yield navigate(this.app.client, page1Url)
-      return yield this.app.client.waitForValue(urlInput)
-        .getValue(urlInput)
-        .should.eventually.be.equal(page1Url)
+      const pageNoTitleUrl = Brave.server.url('page_no_title.html')
+      yield navigate(this.app.client, pageNoTitleUrl)
+      return yield this.app.client
+        .waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === pageNoTitleUrl)
+        })
     })
   })
 
@@ -123,6 +127,7 @@ describe('urlbar', function () {
           backgroundImage.value === `url("${Brave.server.url('favicon.ico')}")`
         ))
     })
+
     it('Parses favicon when one is present', function *() {
       const pageWithFavicon = Brave.server.url('favicon.html')
       yield navigate(this.app.client, pageWithFavicon)
@@ -266,6 +271,10 @@ describe('urlbar', function () {
     describe('non-url input value', function () {
 
     })
+
+    describe('page with focused form input', function () {
+      it('loads the url without submitting the form')
+    })
   })
 
   describe('typing', function () {
@@ -300,6 +309,7 @@ describe('urlbar', function () {
       it('selects the text', function *() {
         yield selectsText(this.app.client, 'a')
       })
+
       it('has the file icon', function *() {
         yield this.app.client.waitForExist('.urlbarIcon.fa-file-o')
       })
@@ -345,7 +355,14 @@ describe('urlbar', function () {
       yield setup(this.app.client)
       // tab with typing
       yield newFrame(this.app.client, 2)
-      yield this.app.client.keys('a').waitForValue(urlInput, 'a')
+      yield defaultUrl(this.app.client)
+      yield hasFocus(this.app.client)
+      yield selectsText(this.app.client)
+      yield this.app.client
+        .keys('a')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === 'a')
+        })
       // tab with loaded url
       yield newFrame(this.app.client, 3)
       yield navigate(this.app.client, Brave.server.url('page1.html'))
@@ -356,13 +373,10 @@ describe('urlbar', function () {
         yield this.app.client
           .ipcSend('shortcut-set-active-frame-by-index', 0)
           .waitForVisible('div[id="navigator"][data-frame-key="1"] ' + urlInput)
-          // wait for selection??
       })
 
       it('preserves focused state', function *() {
         yield defaultUrl(this.app.client)
-        yield hasFocus(this.app.client)
-        yield selectsText(this.app.client)
       })
     })
 
@@ -374,7 +388,10 @@ describe('urlbar', function () {
       })
 
       it('preserves typing state', function *() {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal('a')
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then(val => val === 'a')
+          })
         yield selectsText(this.app.client, '')
       })
     })
