@@ -144,17 +144,21 @@ describe('urlbar', function () {
       const page1Url = Brave.server.url('page1.html')
       yield navigate(this.app.client, page1Url)
       yield this.app.client.waitUntil(() =>
-        this.app.client.getAttribute(urlbarIcon, 'class').then(classes =>
-          classes.includes('fa-unlock')
+        this.app.client
+          .moveToObject(urlInput)
+          .getAttribute(urlbarIcon, 'class').then(classes =>
+            classes.includes('fa-unlock')
         ))
     })
     it('Shows secure URL icon', function *() {
       const page1Url = Brave.server.url('page1.html').replace('http', 'https')
       yield navigate(this.app.client, page1Url)
-      yield this.app.client.waitUntil(() =>
-        this.app.client.getAttribute(urlbarIcon, 'class').then(classes =>
-          classes.includes('fa-lock')
-        ))
+      yield this.app.client
+        .moveToObject(urlInput)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then(classes =>
+            classes.includes('fa-lock')
+          ))
     })
   })
 
