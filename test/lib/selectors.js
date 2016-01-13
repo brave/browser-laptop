@@ -10,5 +10,6 @@ module.exports = {
   tabPage: '.tabPage',
   tabPage1: '[data-tab-page="0"]',
   tabPage2: '[data-tab-page="1"]',
-  closeTab: '.closeTab'
+  closeTab: '.closeTab',
+  urlbarIcon: '.urlbarIcon'
 }

@@ -389,6 +389,12 @@ const doAction = (action) => {
       }
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_SECURITY_STATE:
+      if (action.securityState.secure !== undefined) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['security', 'isSecure']),
+                                        action.securityState.secure)
+      }
+      break
     case WindowConstants.SET_BLOCKED_BY:
       let blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()

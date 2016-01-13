@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const urlParse = require('url').parse
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
@@ -151,6 +152,10 @@ class Frame extends ImmutableComponent {
       if (event.isMainFrame) {
         let key = this.props.frame.get('key')
         WindowActions.setLocation(event.url, key)
+        WindowActions.setSecurityState({
+          secure: urlParse(event.url).protocol === 'https:'
+          // TODO: Set extended validation once Electron exposes this
+        })
       }
       WindowActions.updateBackForwardState(
         this.props.frame,
