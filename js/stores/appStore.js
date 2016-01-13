@@ -17,6 +17,7 @@ const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const AdBlock = require('../../app/adBlock')
 const TrackingProtection = require('../../app/trackingProtection')
+const HttpsEverywhere = require('../../app/httpsEverywhere')
 
 let appState
 
@@ -108,6 +109,12 @@ const createWindow = (browserOpts, defaults) => {
     webPreferences: defaults.webPreferences
   }, browserOpts))
 
+  // Load HTTPS Everywhere browser "extension"
+  HttpsEverywhere.init(mainWindow)
+
+  TrackingProtection.init(mainWindow)
+  AdBlock.init(mainWindow)
+
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
@@ -117,9 +124,6 @@ const createWindow = (browserOpts, defaults) => {
       cb({})
     }
   })
-
-  TrackingProtection.init(mainWindow)
-  AdBlock.init(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was

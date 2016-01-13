@@ -7,66 +7,92 @@
 const request = require('request')
 const fs = require('fs')
 const path = require('path')
+const urlParse = require('url').parse
 const app = require('electron').app
 const AppConfig = require('./appConfig')
 const AppActions = require('../js/actions/appActions')
 const cachedDataFiles = {}
 
-const storagePath = (resourceName) =>
-  path.join(app.getPath('userData'), `${resourceName}.dat`)
-const downloadPath = (resourceName) => `${storagePath(resourceName)}.temp`
+const storagePath = (url) =>
+  path.join(app.getPath('userData'), path.basename(urlParse(url).pathname))
+const downloadPath = (url) => `${storagePath(url)}.temp`
 
-module.exports.downloadDataFile = (resourceName, url, version, force) => {
-  return new Promise((resolve, reject) => {
-    // console.log('downloadDataFile', resourceName)
-    let headers = {}
-    const AppStore = require('../js/stores/appStore')
-    const etag = AppStore.getState().getIn([resourceName, 'etag'])
-    if (!force && etag) {
-      headers = {
-        'If-None-Match': etag
-      }
+function downloadSingleFile (resourceName, url, version, force, resolve, reject) {
+  console.log('downloading', url)
+  let headers = {}
+  const AppStore = require('../js/stores/appStore')
+  const etag = AppStore.getState().getIn([resourceName, 'etag'])
+  if (!force && etag) {
+    headers = {
+      'If-None-Match': etag
     }
+  }
 
-    var req = request.get({
-      url,
-      headers
-    }).on('response', function (response) {
-      AppActions.setResourceLastCheck(resourceName, version, new Date().getTime())
-      if (response.statusCode !== 200) {
-        // console.log(resourceName, 'status code: ', response.statusCode)
-        resolve()
-        return
-      }
-      const etag = response.headers['etag']
-      AppActions.setResourceETag(resourceName, etag)
+  var req = request.get({
+    url,
+    headers
+  }).on('response', function (response) {
+    AppActions.setResourceLastCheck(resourceName, version, new Date().getTime())
+    if (response.statusCode !== 200) {
+      // console.log(resourceName, 'status code: ', response.statusCode)
+      reject('Got HTTP status code ' + response.statusCode)
+      return
+    }
+    const etag = response.headers['etag']
+    AppActions.setResourceETag(resourceName, etag)
 
-      req.pipe(fs.createWriteStream(downloadPath(resourceName)).on('close', function () {
-        fs.rename(downloadPath(resourceName), storagePath(resourceName), function (err) {
-          if (err) {
-            reject('could not rename downloaded file')
-          } else {
-            resolve()
-          }
-        })
-      })).on('error', reject)
-    }).on('error', () => {
-      reject()
-    })
+    req.pipe(fs.createWriteStream(downloadPath(url)).on('close', function () {
+      fs.rename(downloadPath(url), storagePath(url), function (err) {
+        if (err) {
+          reject('could not rename downloaded file')
+        } else {
+          resolve()
+        }
+      })
+    })).on('error', reject)
+  }).on('error', () => {
+    reject()
   })
 }
 
-module.exports.readDataFile = (resourceName) => {
-  return new Promise((resolve, reject) => {
-    // console.log('readDataFile', resourceName)
-    fs.readFile(storagePath(resourceName), function (err, data) {
-      if (err || !data || data.length === 0) {
-        reject()
-      } else {
-        resolve(data)
-      }
+module.exports.downloadDataFile = (resourceName, url, version, force) => {
+  if (resourceName === 'httpsEverywhere') {
+    return new Promise((resolve, reject) => {
+      downloadSingleFile(resourceName, url, version, force, () => {
+        var targets = AppConfig[resourceName].targetsUrl.replace('{version}', version)
+        downloadSingleFile(resourceName, targets, version, force, resolve, reject)
+      }, reject)
     })
-  })
+  } else {
+    return new Promise((resolve, reject) => {
+      downloadSingleFile(resourceName, url, version, force, resolve, reject)
+    })
+  }
+}
+
+module.exports.readDataFile = (resourceName, url) => {
+  if (resourceName === 'httpsEverywhere') {
+    // If https everywhere, just return the path to the files on disk
+    return new Promise((resolve, reject) => {
+      fs.stat(storagePath(url), function (err, stats) {
+        if (err || !stats.isFile()) {
+          reject()
+        } else {
+          resolve(app.getPath('userData'))
+        }
+      })
+    })
+  } else {
+    return new Promise((resolve, reject) => {
+      fs.readFile(storagePath(url), function (err, data) {
+        if (err || !data || data.length === 0) {
+          reject()
+        } else {
+          resolve(data)
+        }
+      })
+    })
+  }
 }
 
 module.exports.shouldRedownloadFirst = (resourceName, version) => {
@@ -77,8 +103,20 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
     lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig[resourceName].msBetweenRechecks
 }
 
+/**
+ * @param {BrowserWindow} win Window to start in.
+ * @param {string} resourceName Name of the "extension".
+ * @param {function(BrowserWindow)} startExtension Function that starts the
+ *   extension listeners.
+ * @param {boolean} first Whether this is the first window
+ * @param {Array.<BrowserWindow>} windowsToStartFor Additional windows to start
+ *   the extension in.
+ * @param {function(Buffer|string)} onInitDone function to call when data is downloaded.
+ *   Takes either the data itself as an argument or the pathname on disk of the
+ *   directory where the data was downloaded.
+ */
 module.exports.init = (win, resourceName,
-    startFiltering, filteringWorker, first, windowsToStartFor) => {
+    startExtension, first, windowsToStartFor, onInitDone) => {
   const version = AppConfig[resourceName].version
   const url = AppConfig[resourceName].url.replace('{version}', version)
 
@@ -94,16 +132,26 @@ module.exports.init = (win, resourceName,
       windowsToStartFor.push(win)
       return
     }
-    startFiltering(win)
+    startExtension(win)
     return
   }
 
-  const loadProcess = (resourceName, version, doneInit) =>
-    module.exports.readDataFile(resourceName)
+  const doneInit = data => {
+    // Make sure we keep a reference to the data since
+    // it's used directly
+    cachedDataFiles[resourceName] = data
+    onInitDone(data)
+    windowsToStartFor.push(win)
+    windowsToStartFor.forEach(startExtension)
+    windowsToStartFor = null
+  }
+
+  const loadProcess = (resourceName, version) =>
+    module.exports.readDataFile(resourceName, url)
     .then(doneInit)
     .catch((resolve, reject) => {
       module.exports.downloadDataFile(resourceName, url, version, true)
-      .then(module.exports.readDataFile.bind(null, resourceName))
+      .then(module.exports.readDataFile.bind(null, resourceName, url))
       .then(doneInit)
       .catch((err) => {
         console.log(`Could not init ${resourceName}`, err || '')
@@ -111,22 +159,11 @@ module.exports.init = (win, resourceName,
       })
     })
 
-  const doneInit = data => {
-    // console.log('init data file')
-    // Make sure we keep a reference to the data since
-    // it's used directly
-    cachedDataFiles[resourceName] = data
-    filteringWorker.deserialize(data)
-    windowsToStartFor.push(win)
-    windowsToStartFor.forEach(startFiltering)
-    windowsToStartFor = null
-  }
-
   if (module.exports.shouldRedownloadFirst(resourceName, version)) {
     module.exports.downloadDataFile(resourceName, url, version, false)
-      .then(loadProcess.bind(null, resourceName, version, doneInit))
+      .then(loadProcess.bind(null, resourceName, version))
   } else {
-    loadProcess(resourceName, version, doneInit)
+    loadProcess(resourceName, version)
   }
 }
 

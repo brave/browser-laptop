@@ -45,5 +45,6 @@ module.exports.init = (wnd) => {
   const first = !adblock
   const wnds = []
   adblock = new ABPFilterParser()
-  DataFile.init(wnd, resourceName, startAdBlocking, adblock, first, wnds)
+  DataFile.init(wnd, resourceName, startAdBlocking, first, wnds,
+                data => adblock.deserialize(data))
 }
