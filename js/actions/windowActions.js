@@ -93,6 +93,18 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to set the security state.
+   * @param {Object} securityState - The security state properties that have
+   * changed.
+   */
+  setSecurityState: function (securityState) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_SECURITY_STATE,
+      securityState
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the user entered text for the URL bar.
    * Unlike setLocation and loadUrl, this does not modify the state of src and location.
    *

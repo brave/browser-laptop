@@ -180,6 +180,10 @@ class UrlBar extends ImmutableComponent {
     return loadTime
   }
 
+  get secure () {
+    return this.props.activeFrameProps.getIn(['security', 'isSecure'])
+  }
+
   onSiteInfo () {
     WindowActions.setSiteInfoVisible(true)
   }
