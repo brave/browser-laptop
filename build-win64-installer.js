@@ -11,7 +11,7 @@ console.log('Building installer for version ' + version + ' in win64-dist')
 // a password MUST be passed as the CERT_PASSWORD environment variable
 var cert = process.env.CERT || 'brave-authenticode.pfx'
 var cert_password = process.env.CERT_PASSWORD
-if (!cert_password) throw "Certificate password required. Set environment variable CERT_PASSWORD."
+if (!cert_password) throw new Error('Certificate password required. Set environment variable CERT_PASSWORD.')
 
 var cmds = [
   'electron-installer-squirrel-windows "Brave-win32-x64" --platform=win --out="win64-dist" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --setup_icon=res/app.ico --cert_path=' + cert + ' --cert_password=' + cert_password
