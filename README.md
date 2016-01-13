@@ -22,20 +22,17 @@ To start the server and file watchers run the following on the command line:
 
     npm run watch
 
-
-To run the browser in OS X:
+To run the browser:
 
     num start
-
-To run the browser in Windows:
-
-    num run start-win
 
 To run the tests:
 
     npm run watch-test  or  npm run watch-all
 
     npm test
+
+See [docs/debugging.md](docs/debugging.md) for information on debugging.
 
 ### Running inside of a development version of Brave's Electron fork
 
