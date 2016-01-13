@@ -4,9 +4,14 @@ var parseString = require('xml2js').parseString
 
 // Preload mapping of HTTPS Everywhere hosts to ruleset IDs and convert
 // XML to JSON for performance reasons.
-// Run this ONCE whenever rulesets.sqlite is updated from the HTTPS Everywhere
-// stable branch. TODO: Automate this with a git hook.
-var db = new sqlite3.Database('./js/data/rulesets.sqlite', sqlite3.OPEN_READWRITE, function (dbErr) {
+// 1. Download https://www.eff.org/files/https-everywhere-latest.xpi
+// 2. unzip https-everywhere-latest.xpi
+// 3. cp /path/to/https-everywhere/defaults/rulesets.sqlite .
+// 4. npm run preload-httpse
+// 5. Push rulesets.sqlite and httpse-targets.json to AWS
+// 6. rm rulesets.sqlite httpse-targets.json
+// TODO: Automate this with a git hook.
+var db = new sqlite3.Database('./rulesets.sqlite', sqlite3.OPEN_READWRITE, function (dbErr) {
   if (dbErr) {
     console.log('got db open error', dbErr)
     return null
@@ -28,7 +33,7 @@ var db = new sqlite3.Database('./js/data/rulesets.sqlite', sqlite3.OPEN_READWRIT
       targets[row.host].push(row.ruleset_id)
     }
   }, function () {
-    fs.writeFileSync('./js/data/httpse-targets.json', JSON.stringify(targets))
+    fs.writeFileSync('./httpse-targets.json', JSON.stringify(targets))
     console.log('successfully wrote httpse-targets.json')
   }).each(contentQuery, function (err, row) {
     if (err) {
