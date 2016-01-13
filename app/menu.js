@@ -35,6 +35,13 @@ const init = () => {
             process.emit(messages.CHECK_FOR_UPDATE)
           }
         },
+// Note: we are keeping this here for testing. Calling process.crash() from the inspector does not create a crash report.
+//        {
+//          label: 'Crash!!!!!',
+//          click: function (item, focusedWindow) {
+//            process.crash()
+//          }
+//        },
         {
           label: 'New Tab',
           accelerator: 'CmdOrCtrl+T',

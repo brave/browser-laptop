@@ -23,9 +23,7 @@ const messages = require('../js/constants/messages')
 const AppActions = require('../js/actions/appActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
-
-// Report crashes
-electron.crashReporter.start()
+const CrashHerald = require('./crash-herald.js')
 
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -115,6 +113,9 @@ app.on('ready', function () {
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.update()
     })
+
+    // Setup the crash handling
+    CrashHerald.init()
 
     // this only works on prod
     if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
