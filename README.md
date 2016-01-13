@@ -1,16 +1,16 @@
 # Brave Browser
 
-Laptop and Desktop browser for OS X and Windows built on top of the Electron framework (Node + Chromium content module).
+Laptop and Desktop browser for OS X and Windows.
 
 ## Installation
 
 1. Clone the git repository from GitHub:
 
-        git clone git@github.com:brave/browser-electron.git
+        git clone git@github.com:brave/browser-laptop.git
 
 2. Open the working directory:
 
-        cd browser-electron
+        cd browser-laptop
 
 3. Install the Node dependencies:
 
