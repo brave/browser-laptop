@@ -1,5 +1,5 @@
-var VersionInfo = require('./versionInfo')
-var execute = require('./execute')
+var VersionInfo = require('./lib/versionInfo')
+var execute = require('./lib/execute')
 
 console.log('Installing native modules, please wait...')
 var env = {

@@ -1,5 +1,5 @@
 var path = require('path')
-var execute = require('./execute')
+var execute = require('./lib/execute')
 
 var env = {
   NODE_ENV: 'development'
