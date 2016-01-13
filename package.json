@@ -20,7 +20,7 @@
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adblock.dat",
     "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/trackingprotection.dat",
-    "postinstall": "node ./tools/rebuildNativeModules.js",
+    "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
   "repository": {
