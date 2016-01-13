@@ -2,7 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict'
+ 'use strict'
+
+ // windows installation events etc...
+if (process.platform === 'win32') {
+  // TODO - register browser as HTTP handler (maybe need to fork)
+  if (require('electron-squirrel-startup')) {
+    return
+  }
+}
+
 const Immutable = require('immutable')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow

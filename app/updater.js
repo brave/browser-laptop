@@ -5,7 +5,7 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
-// const os = require('os')
+const os = require('os')
 const fs = require('fs')
 const autoUpdater = require('auto-updater')
 const config = require('./appConfig')
@@ -14,7 +14,8 @@ const messages = require('../js/constants/messages')
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
-  // fs.appendFileSync(path.join(os.homedir(), 'output.txt'), contents + '\n')
+  console.log(contents)
+  fs.appendFileSync(path.join(os.homedir(), 'output.txt'), contents + '\n')
 }
 
 // this maps the result of a call to process.platform to an update API identifier
@@ -23,15 +24,19 @@ var platforms = {
 }
 
 // build the complete update url from the base, platform and version
-exports.updateUrl = function (baseUrl, platform) {
-  var pack = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')))
-  var version = pack.version
-  return `${baseUrl}/${platforms[platform]}/${version}`
+exports.updateUrl = function (updates, platform) {
+  if (platform === 'darwin') {
+    var pack = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')))
+    var version = pack.version
+    return `${updates.baseUrl}/${platforms[platform]}/${version}`
+  } else {
+    return updates.winBaseUrl
+  }
 }
 
 // set the feed url for the auto-update system
 exports.init = (platform) => {
-  var updateUrl = exports.updateUrl(config.updates.baseUrl, platform)
+  var updateUrl = exports.updateUrl(config.updates, platform)
   debug('updateUrl = ' + updateUrl)
   try {
     autoUpdater.setFeedURL(updateUrl)
@@ -44,6 +49,7 @@ exports.init = (platform) => {
 exports.checkForUpdate = () => {
   debug('checkForUpdates')
   try {
+    // TODO call baseUrl on windows for version info
     autoUpdater.checkForUpdates()
   } catch (err) {
     debug(err)
