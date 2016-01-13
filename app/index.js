@@ -3,6 +3,15 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
+
+ // windows installation events etc...
+if (process.platform === 'win32') {
+  // TODO - register browser as HTTP handler in Windows (maybe need to fork)
+  if (require('electron-squirrel-startup')) {
+    process.exit(0)
+  }
+}
+
 const Immutable = require('immutable')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow

@@ -4,6 +4,7 @@
 
 // UPDATE_HOST should be set to the host name for the auto-updater server
 var updateHost = process.env.UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
+var winUpdateHost = process.env.WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
 
 module.exports = {
   adblock: {
@@ -27,6 +28,7 @@ module.exports = {
     autoAppUpdate: false,
     autoRuntimeUpdate: false,
     // url to check for updates
-    baseUrl: `${updateHost}/1/releases`
+    baseUrl: `${updateHost}/1/releases`,
+    winBaseUrl: `${winUpdateHost}/releases/win64`
   }
 }

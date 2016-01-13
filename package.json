@@ -15,7 +15,7 @@
     "build-darwin": "node ./build-darwin.js",
     "build-win64": "node ./build-win64.js",
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
-    "installer-win64": "rm -f dist/BraveSetup.exe && electron-builder \"Brave-win32-x64\" --platform=win --out=\"dist\" --config=builderConfig.json --overwrite",
+    "installer-win64": "node ./build-win64-installer.js",
     "zip-darwin": "node build-darwin-update.js",
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adblock.dat",
@@ -27,11 +27,17 @@
     "type": "git",
     "url": "git+https://github.com/bbondy/electron-sample.git"
   },
-  "author": "Brave Developers <support@brave.com>",
+  "author": {
+    "name": "Brave Developers <support@brave.com>"
+  },
   "contributors": [
     {
       "name": "Brian R. Bondy",
       "email": "brian@brave.com"
+    },
+    {
+      "name": "Aubrey Keus",
+      "email": "aubrey@brave.com"
     }
   ],
   "license": "MPL-2.0",
@@ -43,6 +49,7 @@
     "abp-filter-parser-cpp": "^1.0.22",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "git+ssh://git@github.com/brave/electron-prebuilt.git",
+    "electron-squirrel-startup": "^0.1.4",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
@@ -69,6 +76,7 @@
     "co-mocha": "^1.1.2",
     "css-loader": "^0.23.0",
     "electron-builder": "^2.3.1",
+    "electron-installer-squirrel-windows": "^1.2.2",
     "electron-packager": "^5.1.1",
     "electron-rebuild": "^1.1.1",
     "empty-port": "0.0.1",
@@ -87,7 +95,8 @@
     "webdriverio": "^3.3.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0",
-    "webpack-notifier": "^1.2.1"
+    "webpack-notifier": "^1.2.1",
+    "npm": "3.4.1"
   },
   "standard": {
     "ignore": [
