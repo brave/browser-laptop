@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
+const urlParse = require('url').parse
 
 const ImmutableComponent = require('./immutableComponent')
 const WindowActions = require('../actions/windowActions')
@@ -184,6 +185,11 @@ class UrlBar extends ImmutableComponent {
     return this.props.activeFrameProps.getIn(['security', 'isSecure'])
   }
 
+  get aboutPage () {
+    var protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
+    return ['about:', 'file:', 'chrome:'].includes(protocol)
+  }
+
   onSiteInfo () {
     WindowActions.setSiteInfoVisible(true)
   }
@@ -199,7 +205,7 @@ class UrlBar extends ImmutableComponent {
             urlbarIcon: true,
             'fa': true,
             'fa-lock': this.secure && this.props.loading === false && !this.props.urlbar.get('focused'),
-            'fa-unlock': this.secure === false && this.props.loading === false && this.aboutPage === false && !this.props.urlbar.get('focused'),
+            'fa-unlock': !this.secure && this.props.loading === false && !this.aboutPage && !this.props.urlbar.get('focused'),
             'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             extendedValidation: this.extendedValidationSSL
@@ -213,7 +219,7 @@ class UrlBar extends ImmutableComponent {
         value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
-          insecure: !this.secure && this.props.loading === false && this.aboutPage === false,
+          insecure: !this.secure && this.props.loading === false && !this.aboutPage,
           private: this.private,
           testHookLoadDone: !this.props.loading
         })}
