@@ -113,6 +113,36 @@ const AppActions = {
       lastCheckVersion,
       lastCheckDate
     })
+  },
+
+  /**
+   * Sets the update.updateAvailable flag to true
+   */
+  setUpdateAvailable: function () {
+    console.log('setUpdateAvailable')
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_UPDATE_AVAILABLE
+    })
+  },
+
+  /**
+   * Sets the update.updateAvailable flag to false
+   */
+  clearUpdateAvailable: function () {
+    console.log('clearUpdateAvailable')
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_UPDATE_AVAILABLE
+    })
+  },
+
+  /**
+   * Sets the update.lastCheckTimestamp to the current
+   * epoch timestamp (milliseconds)
+   */
+  setUpdateLastCheck: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_LAST_CHECK
+    })
   }
 }
 

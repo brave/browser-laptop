@@ -117,14 +117,17 @@ app.on('ready', function () {
     // Setup the crash handling
     CrashHerald.init()
 
+    // Setup the auto updater
+    Updater.init(process.platform)
+
     // this only works on prod
     if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-      Updater.init(process.platform)
-
       // this is fired from a auto-update metadata call - TODO setting state to trigger update UI
-      process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => { console.log(metadata) } )
+      process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
+        console.log(metadata)
+      })
 
-      // this is fired by a menu entry
+      // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
     } else {
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
