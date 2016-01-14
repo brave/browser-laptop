@@ -121,6 +121,9 @@ app.on('ready', function () {
     if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
       Updater.init(process.platform)
 
+      // this is fired from a auto-update metadata call - TODO setting state to trigger update UI
+      process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => { console.log(metadata) } )
+
       // this is fired by a menu entry
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
     } else {

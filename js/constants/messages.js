@@ -36,6 +36,7 @@ const messages = {
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
   CHECK_FOR_UPDATE: _,
+  UPDATE_META_DATA_RETRIEVED: _,
   // Webview page messages
   ZOOM_IN: _,
   ZOOM_OUT: _,

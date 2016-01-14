@@ -60,6 +60,7 @@
     "immutable": "^3.7.5",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
+    "request": "^2.67.0",
     "tracking-protection": "^1.0.7",
     "url-loader": "^0.5.7",
     "urlutil.js": "^0.1.1",
