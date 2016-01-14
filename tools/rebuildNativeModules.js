@@ -4,7 +4,7 @@ var fs = require('fs')
 
 console.log('Patching sqlite3 binding.gyp...')
 ;(function patchSqliteBindingGYP (gypPath, moduleName, modulePath) {
-  var gypFileContents =  fs.readFileSync(gypPath, 'UTF8')
+  var gypFileContents = fs.readFileSync(gypPath, 'UTF8')
   // Backup the old file
   fs.writeFileSync(gypPath + '.old', gypFileContents)
   // Replace some variables which aren't supported by the npm dist version
