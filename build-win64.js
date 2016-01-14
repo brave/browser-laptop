@@ -13,7 +13,7 @@ console.log('Building version ' + version + ' in Brave-win32-x64 with Electron '
 
 var cmds = [
   'rm -rf Brave-win32-x64',
-  'set NODE_ENV=production node_modules/webpack/bin/webpack.js',
+  'set NODE_ENV=production&&"./node_modules/.bin/webpack"',
   'node node_modules/electron-packager/cli.js . Brave --ignore=\"electron-packager|electron-builder|electron-prebuilt|electron-rebuild|win64-dist|babel$|babel-(?!polyfill|regenerator-runtime)\" --platform=win32 --arch=x64 --version=' + electronVersion + ' --icon=res/app.ico --asar=true --app-version=' + version + ' --version-string.CompanyName=\"Brave Inc.\" --version-string.ProductName=\"Brave\" --version-string.Copyright=\"Copyright 2016, Brave Inc.\" --version-string.FileDescription=\"Brave\"'
 ]
 
