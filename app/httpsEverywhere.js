@@ -136,10 +136,14 @@ function loadRulesetsById (rulesetIds, cb, errback) {
  * @return {string}
  */
 function applyRulesets (url, cb, applicableRules) {
-  // TODO: Ignore rules for the wrong platform and default_off rules
   var i, j, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
   for (j = 0; j < applicableRules.length; ++j) {
     ruleset = applicableRules[j].ruleset
+    // If the rule is default_off or has a specified platform, ignore it.
+    if (ruleset.$.default_off || ruleset.$.platform) {
+      cb()
+      return
+    }
     exclusion = ruleset.exclusion
     rule = ruleset.rule
     // If covered by an exclusion, abort.
