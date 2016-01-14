@@ -13,7 +13,7 @@ module.exports.register = (wnd, resourceName, filteringFn) => {
   filteringFns.push(filteringFn)
   if (!wnds.has(wnd)) {
     wnds.add(wnd)
-    wnd.webContents.session.webRequest.onBeforeRequest((details, cb) => {
+    wnd.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
       // Using an electron binary which isn't from Brave
       if (!details.firstPartyUrl) {
         cb({})

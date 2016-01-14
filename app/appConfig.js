@@ -20,6 +20,13 @@ module.exports = {
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
+  httpsEverywhere: {
+    url: 'https://s3.amazonaws.com/https-everywhere-data/{version}/rulesets.sqlite',
+    targetsUrl: 'https://s3.amazonaws.com/https-everywhere-data/{version}/httpse-targets.json',
+    version: '5.1.2', // latest stable release from https://eff.org/https-everywhere
+    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    enabled: true
+  },
   crashes: {
     crashSubmitUrl: crashURL
   },

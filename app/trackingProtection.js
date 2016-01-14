@@ -58,5 +58,6 @@ module.exports.init = (wnd) => {
   const first = !trackingProtection
   const wnds = []
   trackingProtection = new TrackingProtection()
-  DataFile.init(wnd, resourceName, startTrackingProtection, trackingProtection, first, wnds)
+  DataFile.init(wnd, resourceName, startTrackingProtection, first, wnds,
+                data => trackingProtection.deserialize(data))
 }
