@@ -327,59 +327,6 @@ describe('application window', function () {
             }).then(response => response.value).should.eventually.be.deep.equal(['any origin', 'target origin'])
         })
 
-        it('focuses the opener', function *() {
-          yield this.app.client
-            // make sure the child window has focus
-            .windowByUrl(this.page1)
-            .waitUntil(function () {
-              return this.execute(function () {
-                return document.hasFocus() === true
-              })
-            })
-            .execute(function () {
-              window.opener.focus()
-            })
-            // wait for focus
-            .windowParentByUrl(this.window_open_page)
-            .waitUntil(function () {
-              return this.execute(function () {
-                return (document.hasFocus() === true)
-              })
-            })
-            .windowParentByUrl(this.window_open_page)
-            .execute(function () {
-              return document.hasFocus()
-            }).then(response => response.value).should.eventually.be.equal(true, 'expected opener to be focused, but was blurred')
-        })
-
-        it('blurs the opener', function *() {
-          yield this.app.client
-            // make sure parent window has focus
-            .windowByUrl(this.page1)
-            .execute(function () {
-              window.opener.focus()
-            })
-            .waitUntil(function () {
-              return this.execute(function () {
-                return document.hasFocus() === false
-              })
-            })
-            // blur parent window
-            .windowByUrl(this.page1)
-            .execute(function () {
-              window.opener.blur()
-            })
-            .windowParentByUrl(this.window_open_page)
-            .waitUntil(function () {
-              return this.execute(function () {
-                return document.hasFocus() === false
-              })
-            })
-            .execute(function () {
-              return document.hasFocus()
-            }).then(response => response.value).should.eventually.be.equal(false, 'expected opener to be blurred, but was focused')
-        })
-
         it('has restricted access in parent to child window', function *() {
           yield this.app.client
             .windowByUrl(this.window_open_page)
@@ -395,9 +342,6 @@ describe('application window', function () {
               return window.opener.eval('1+2')
             }).should.be.rejectedWith(Error)
         })
-
-        // https://github.com/brave/browser-laptop/issues/137
-        it('can be focused/blurred/closed by the opener')
       })
 
       describe('same document.domain', function () {
@@ -448,8 +392,7 @@ describe('application window', function () {
             }).then(response => response.value).should.eventually.be.equal('localhost')
         })
 
-        // https://github.com/brave/browser-laptop/issues/137
-        it.skip('has urestricted access in parent to child window', function *() {
+        it('has urestricted access in parent to child window', function *() {
           yield this.app.client
             .windowByUrl(this.window_open_page)
             .execute(function () {
@@ -457,8 +400,7 @@ describe('application window', function () {
             }).then(response => response.value).should.eventually.be.equal(3)
         })
 
-        // https://github.com/brave/browser-laptop/issues/137
-        it.skip('has urestricted access to parent window through the opener', function *() {
+        it('has urestricted access to parent window through the opener', function *() {
           yield this.app.client
             .windowByUrl(this.page1)
             .execute(function () {
@@ -467,6 +409,61 @@ describe('application window', function () {
             .then(response => response.value)
             .should.eventually.be.equal(3)
         })
+
+        it.skip('focuses the opener', function *() {
+          yield this.app.client
+            // make sure the child window has focus
+            .windowByUrl(this.page1)
+            .waitUntil(function () {
+              return this.execute(function () {
+                return document.hasFocus() === true
+              })
+            })
+            .execute(function () {
+              window.opener.focus()
+            })
+            // wait for focus
+            .windowParentByUrl(this.window_open_page)
+            .waitUntil(function () {
+              return this.execute(function () {
+                return (document.hasFocus() === true)
+              })
+            })
+            .windowParentByUrl(this.window_open_page)
+            .execute(function () {
+              return document.hasFocus()
+            }).then(response => response.value).should.eventually.be.equal(true, 'expected opener to be focused, but was blurred')
+        })
+
+        it.skip('blurs the opener', function *() {
+          yield this.app.client
+            // make sure parent window has focus
+            .windowByUrl(this.page1)
+            .execute(function () {
+              window.opener.focus()
+            })
+            .waitUntil(function () {
+              return this.execute(function () {
+                return document.hasFocus() === false
+              })
+            })
+            // blur parent window
+            .windowByUrl(this.page1)
+            .execute(function () {
+              window.opener.blur()
+            })
+            .windowParentByUrl(this.window_open_page)
+            .waitUntil(function () {
+              return this.execute(function () {
+                return document.hasFocus() === false
+              })
+            })
+            .execute(function () {
+              return document.hasFocus()
+            }).then(response => response.value).should.eventually.be.equal(false, 'expected opener to be blurred, but was focused')
+        })
+
+        it('can be focused/blurred/closed by the opener')
       })
     })
   })
@@ -583,7 +580,7 @@ describe('application window', function () {
       })
 
       // https://github.com/brave/browser-laptop/issues/143
-      it.skip('loads in the tab with the target name', function *() {
+      it('loads in the tab with the target name', function *() {
         let click_with_target_page = this.click_with_target_page
         let page2 = this.page2
 
