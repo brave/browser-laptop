@@ -43,6 +43,23 @@ exports.updateUrl = function (updates, platform) {
   }
 }
 
+// Setup schedule for periodic and startup update checks
+var scheduleUpdates = () => {
+  // Periodic check
+  if (config.updates.appUpdateCheckFrequency) {
+    setInterval(() => {
+      exports.checkForUpdate()
+    }, config.updates.appUpdateCheckFrequency)
+  }
+
+  // Startup check
+  if (config.updates.runtimeUpdateCheckDelay) {
+    setTimeout(() => {
+      exports.checkForUpdate()
+    }, config.updates.runtimeUpdateCheckDelay)
+  }
+}
+
 // set the feed url for the auto-update system
 exports.init = (platform, ver) => {
   // When starting up we should not expect an update to be available
@@ -53,6 +70,8 @@ exports.init = (platform, ver) => {
 
   var baseUrl = exports.updateUrl(config.updates, platform)
   debug('updateUrl = ' + baseUrl)
+
+  scheduleUpdates()
 
   // This will fail if we are in dev
   try {
