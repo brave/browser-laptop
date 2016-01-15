@@ -13,6 +13,7 @@ const {isSiteInList} = require('../state/siteUtil')
 const SiteTags = require('../constants/siteTags')
 const remote = global.require('electron').remote
 const messages = require('../constants/messages')
+const ipc = global.require('electron').ipcRenderer
 
 class NavigationBar extends ImmutableComponent {
 
@@ -51,6 +52,10 @@ class NavigationBar extends ImmutableComponent {
       this.props.activeFrame.get('title') &&
       !this.loading &&
       !this.props.navbar.getIn(['urlbar', 'focused'])
+  }
+
+  componentDidMount () {
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, this.onAddBookmark.bind(this))
   }
 
   render () {

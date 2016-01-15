@@ -13,12 +13,9 @@ module.exports.register = (win) => {
   // the URL bar.  In those cases it's acceptable for the individual components to
   // listen to the events.
   const simpleWebContentEvents = [
-    ['Ctrl+Tab', messages.SHORTCUT_NEXT_TAB],
-    ['Ctrl+Shift+Tab', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+Shift+]', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
-    ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
-    ['CmdOrCtrl+Shift+T', messages.SHORTCUT_UNDO_CLOSED_FRAME]
+    ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST]
   ]
 
   // Tab ordering shortcuts
