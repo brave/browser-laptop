@@ -157,15 +157,20 @@ function mainTemplateInit (nodeProps) {
       break
     case 'IMG':
       template.push({
-        label: 'Download image',
+        label: 'Save image...',
         click: (item, focusedWindow) => {
-          // TODO
+          if (focusedWindow && nodeProps.src) {
+            focusedWindow.webContents.downloadURL(nodeProps.src)
+          }
         }
       })
       template.push({
         label: 'Open image in new tab',
         click: (item, focusedWindow) => {
-          // TODO
+          if (focusedWindow && nodeProps.src) {
+            // TODO: open this in the next tab instead of last tab
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
+          }
         }
       })
       break
