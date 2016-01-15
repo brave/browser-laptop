@@ -149,7 +149,9 @@ var requestVersionInfo = (done) => {
   request(queryString, (err, response, body) => {
     AppActions.setUpdateLastCheck()
     if (!err) {
-      if (body) body = JSON.parse(body)
+      if (body) {
+        body = JSON.parse(body)
+      }
       // This should be handled by a UI component for the update toolbar
       process.emit(messages.UPDATE_META_DATA_RETRIEVED, body)
       done(null, body)
@@ -164,7 +166,6 @@ var downloadHandler = (err, metaData) => {
   assert.equal(err, null)
   if (process.platform === 'win32') {
     // check versions to see if an update is required
-    console.log(`metaData = ${metaData}`)
     if (metaData) {
       autoUpdater.checkForUpdates()
     }
@@ -172,6 +173,7 @@ var downloadHandler = (err, metaData) => {
     autoUpdater.checkForUpdates()
   }
 }
+
 // Make network request to check for an available update
 exports.checkForUpdate = () => {
   debug('checkForUpdates')
