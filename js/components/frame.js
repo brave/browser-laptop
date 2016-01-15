@@ -30,6 +30,7 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.
     this.webview = this.webview || document.createElement('webview')
+    this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('preload', 'content/webviewPreload.js')
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
