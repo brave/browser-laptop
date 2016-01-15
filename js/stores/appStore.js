@@ -262,12 +262,8 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['updates', 'lastCheckTimestamp'], (new Date()).getTime())
       appStore.emitChange()
       break
-    case AppConstants.APP_CLEAR_UPDATE_AVAILABLE:
-      appState = appState.setIn(['updates', 'updateAvailable'], false)
-      appStore.emitChange()
-      break
     case AppConstants.APP_SET_UPDATE_AVAILABLE:
-      appState = appState.setIn(['updates', 'updateAvailable'], true)
+      appState = appState.setIn(['updates', 'updateAvailable'], action.available)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:

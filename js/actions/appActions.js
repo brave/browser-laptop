@@ -119,7 +119,6 @@ const AppActions = {
    * Sets the update.updateAvailable flag
    */
   setUpdateAvailable: function (available) {
-    console.log('setUpdateAvailable ' + available)
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SET_UPDATE_AVAILABLE,
       available
