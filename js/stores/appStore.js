@@ -258,6 +258,18 @@ const handleAppAction = (action) => {
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
       appStore.emitChange()
       break
+    case AppConstants.APP_UPDATE_LAST_CHECK:
+      appState = appState.setIn(['updates', 'lastCheckTimestamp'], (new Date()).getTime())
+      appStore.emitChange()
+      break
+    case AppConstants.APP_CLEAR_UPDATE_AVAILABLE:
+      appState = appState.setIn(['updates', 'updateAvailable'], false)
+      appStore.emitChange()
+      break
+    case AppConstants.APP_SET_UPDATE_AVAILABLE:
+      appState = appState.setIn(['updates', 'updateAvailable'], true)
+      appStore.emitChange()
+      break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,
@@ -275,13 +287,5 @@ ipcMain.on(messages.APP_ACTION, (event, action) => {
 })
 
 process.on(messages.APP_ACTION, handleAppAction)
-
-process.on(messages.UPDATE_AVAILABLE, () => {
-  console.log('appStore update-available')
-  appState = appState.merge({
-    updateAvailable: true
-  })
-  appStore.emitChange()
-})
 
 module.exports = appStore

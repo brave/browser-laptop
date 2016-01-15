@@ -113,6 +113,27 @@ const AppActions = {
       lastCheckVersion,
       lastCheckDate
     })
+  },
+
+  /**
+   * Sets the update.updateAvailable flag
+   */
+  setUpdateAvailable: function (available) {
+    console.log('setUpdateAvailable ' + available)
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_UPDATE_AVAILABLE,
+      available
+    })
+  },
+
+  /**
+   * Sets the update.lastCheckTimestamp to the current
+   * epoch timestamp (milliseconds)
+   */
+  setUpdateLastCheck: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_LAST_CHECK
+    })
   }
 }
 
