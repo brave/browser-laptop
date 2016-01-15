@@ -93,11 +93,14 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Import from...',
+          enabled: false
+          /*
           submenu: [
             {label: 'Google Chrome...'},
             {label: 'Firefox...'},
             {label: 'Safari...'}
           ]
+          */
         }, {
           type: 'separator'
         }, {
@@ -128,6 +131,8 @@ const init = () => {
           }
         }, {
           label: 'Share...',
+          enabled: false
+          /*
           submenu: [
             {label: 'Email Page Link...'},
             {type: 'separator'},
@@ -135,6 +140,7 @@ const init = () => {
             {label: 'Share on Facebook...'},
             {label: 'More...'}
           ]
+          */
         }, {
           type: 'separator'
         }, {
@@ -197,9 +203,11 @@ const init = () => {
           // TODO: hook up find next/prev shortcut. low-priority since this is
           // probably not used much.
           label: 'Find Next',
+          enabled: false,
           accelerator: 'CmdOrCtrl+G'
         }, {
           label: 'Find Previous',
+          enabled: false,
           accelerator: 'Shift+CmdOrCtrl+G'
         }, {
           type: 'separator'
@@ -231,12 +239,15 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Toolbars',
+          enabled: false
+          /*
           submenu: [
             {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
             {label: 'Tab Bar'},
             {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
             {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
           ]
+          */
         }, {
           type: 'separator'
         }, {
@@ -265,6 +276,8 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Text Encoding',
+          enabled: false
+          /*
           submenu: [
             {label: 'Autodetect', submenu: []},
             {type: 'separator'},
@@ -273,6 +286,7 @@ const init = () => {
             {type: 'separator'},
             {label: 'etc...'}
           ]
+          */
         }, {
           type: 'separator'
         }, {
@@ -373,16 +387,19 @@ const init = () => {
           enabled: false
         }, {
           label: 'More',
-          submenu: []
+          enabled: false
         }, {
           type: 'separator'
         }, {
           label: 'Import Bookmarks',
+          enabled: false
+          /*
           submenu: [
             {label: 'Google Chrome...'},
             {label: 'Firefox...'},
             {label: 'Safari...'}
           ]
+          */
         }
       ]
     }, {
@@ -392,14 +409,17 @@ const init = () => {
           label: 'Logged in as Yan (0 Points)',
           enabled: false
         }, {
-          label: 'Manage...'
+          label: 'Manage...',
+          enabled: false
         }, {
           type: 'separator'
         }, {
           label: 'GiveBack to this site',
+          enabled: false,
           accelerator: 'Shift+CmdOrCtrl+Y'
         }, {
           label: 'Stay ad supported on this site',
+          enabled: false,
           accelerator: 'Shift+CmdOrCtrl+N'
         }, {
           type: 'separator'
@@ -409,27 +429,33 @@ const init = () => {
         }, {
           type: 'checkbox',
           label: 'Block Ads',
+          enabled: false,
           checked: true
         }, {
           type: 'checkbox',
           label: 'Block Cookies',
+          enabled: false,
           checked: true
         }, {
           type: 'checkbox',
           label: 'Block Tracking',
+          enabled: false,
           checked: true
         }, {
           type: 'checkbox',
           label: 'Block Popups',
+          enabled: false,
           checked: true
         }, {
           type: 'checkbox',
           label: 'Block HTTP',
+          enabled: false,
           checked: false
         }, {
           type: 'separator'
         }, {
-          label: 'Disable all protection on this site...'
+          label: 'Disable all protection on this site...',
+          enabled: false
         }
       ]
     }, {
@@ -442,7 +468,8 @@ const init = () => {
           role: 'minimize'
           // "Minimize all" added automatically
         }, {
-          label: 'Zoom'
+          label: 'Zoom',
+          enabled: false
         }, {
           type: 'separator'
         }, {
