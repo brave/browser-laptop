@@ -107,7 +107,7 @@ function tabTemplateInit (frameProps) {
   return items
 }
 
-function mainTemplateInit (nodeName) {
+function mainTemplateInit (nodeProps) {
   let template = [
     {
       label: 'Reload',
@@ -131,27 +131,50 @@ function mainTemplateInit (nodeName) {
       enabled: false
     }
   ]
-  nodeName = nodeName.toUpperCase()
+  let nodeName = nodeProps.name
   switch (nodeName) {
     case 'A':
       template.push({
-        label: 'Open in new tab'
+        label: 'Open in new tab',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            // TODO: open this in the next tab instead of last tab
+            // TODO: If the tab is private, this should probably be private.
+            // Depends on #139
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
+          }
+        }
+      })
+      template.push({
+        label: 'Open in new private tab',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            // TODO: open this in the next tab instead of last tab
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, true)
+          }
+        }
       })
       break
     case 'IMG':
       template.push({
-        label: 'Download image'
+        label: 'Download image',
+        click: (item, focusedWindow) => {
+          // TODO
+        }
       })
       template.push({
-        label: 'Open image in new tab'
+        label: 'Open image in new tab',
+        click: (item, focusedWindow) => {
+          // TODO
+        }
       })
       break
   }
   return template
 }
 
-export function onMainContextMenu (nodeName) {
-  const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeName))
+export function onMainContextMenu (nodeProps) {
+  const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps))
   mainMenu.popup(remote.getCurrentWindow())
 }
 

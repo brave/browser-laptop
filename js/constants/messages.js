@@ -42,7 +42,7 @@ const messages = {
   ZOOM_RESET: _,
   PRINT_PAGE: _,
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
-  CONTEXT_MENU_OPENED: _, /** @arg {string} nodeName of node being clicked */
+  CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
   APP_STATE_CHANGE: _,
   APP_ACTION: _,
   STOP_LOAD: _,
