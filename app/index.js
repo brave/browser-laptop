@@ -34,6 +34,13 @@ app.on('window-all-closed', function () {
   }
 })
 
+app.on('activate', function () {
+  // (OS X) open a new window when the user clicks on the app icon if there aren't any open
+  if (BrowserWindow.getAllWindows().length === 0) {
+    AppActions.newWindow()
+  }
+})
+
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
 })
