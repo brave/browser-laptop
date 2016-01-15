@@ -39,3 +39,7 @@ win64-dist
 
 app/gen
 *.pfx
+
+# HTTPS Everywhere files
+httpse-targets.json
+rulesets.sqlite

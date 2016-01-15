@@ -2,6 +2,12 @@ var fs = require('fs')
 var sqlite3 = require('sqlite3')
 var parseString = require('xml2js').parseString
 
+// Manually exclude sites that are broken until they are fixed in the next
+// HTTPS Everywhere release.
+var exclusions = {
+  'Nike.com.xml': 'breaks nikeplus.com'
+}
+
 // Preload mapping of HTTPS Everywhere hosts to ruleset IDs and convert
 // XML to JSON for performance reasons.
 // 1. Download https://www.eff.org/files/https-everywhere-latest.xpi
@@ -13,7 +19,7 @@ var parseString = require('xml2js').parseString
 // TODO: Automate this with a git hook.
 var db = new sqlite3.Database('./rulesets.sqlite', sqlite3.OPEN_READWRITE, function (dbErr) {
   if (dbErr) {
-    console.log('got db open error', dbErr)
+    console.log('FATAL: got db open error', dbErr)
     return null
   }
 
@@ -24,7 +30,7 @@ var db = new sqlite3.Database('./rulesets.sqlite', sqlite3.OPEN_READWRITE, funct
 
   db.each(query, function (err, row) {
     if (err) {
-      console.log('error preloading rulesets', err)
+      console.log('FATAL: error preloading rulesets', err)
       return null
     }
     if (!targets[row.host]) {
@@ -34,17 +40,23 @@ var db = new sqlite3.Database('./rulesets.sqlite', sqlite3.OPEN_READWRITE, funct
     }
   }, function () {
     fs.writeFileSync('./httpse-targets.json', JSON.stringify(targets))
-    console.log('successfully wrote httpse-targets.json')
+    console.log('NOTE: successfully wrote httpse-targets.json')
   }).each(contentQuery, function (err, row) {
     if (err) {
-      console.log('error transforming rulesets to JSON')
+      console.log('FATAL: error transforming rulesets to JSON')
       return null
     }
     // Transform XML to JSON
     parseString(row.contents, function (err, result) {
       if (err) {
-        console.log('error parsing XML', row.contents)
+        console.log('FATAL: error parsing XML', row.contents)
         return null
+      }
+      // Exclude broken rules from the db
+      var ruleset = result.ruleset
+      if (ruleset.$.f in exclusions) {
+        console.log('NOTE: Excluding rule', JSON.stringify(result))
+        ruleset.$.default_off = exclusions[ruleset.$.f]
       }
       db.run(updateQuery, {
         $contents: JSON.stringify(result),
