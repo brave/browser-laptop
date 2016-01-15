@@ -32,7 +32,10 @@ AppStore
   },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
-  updateAvailable: false,
+  updates: {
+    updateAvailable: false,
+    lastCheckTimestamp: false
+  }
 }
 ```
 

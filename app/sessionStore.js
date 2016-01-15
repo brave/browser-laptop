@@ -153,7 +153,6 @@ module.exports.defaultAppState = () => {
   return {
     windows: [],
     sites: [],
-    visits: [],
-    updateAvailable: false
+    visits: []
   }
 }
