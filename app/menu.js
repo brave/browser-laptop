@@ -316,7 +316,10 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Reopen Last Closed Tab',
-          accelerator: 'Shift+CmdOrCtrl+T'
+          accelerator: 'Shift+CmdOrCtrl+T',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
+          }
         }, {
           label: 'Reopen Last Closed Window',
           enabled: false
@@ -434,10 +437,16 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Select Next Tab',
-          accelerator: 'Ctrl+Tab'
+          accelerator: 'Ctrl+Tab',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEXT_TAB])
+          }
         }, {
           label: 'Select Previous Tab',
-          accelerator: 'Ctrl+Shift+Tab'
+          accelerator: 'Ctrl+Shift+Tab',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_PREV_TAB])
+          }
         }, {
           label: 'Move Tab to New Window',
           enabled: false
