@@ -65,6 +65,9 @@ class Main extends ImmutableComponent {
         WindowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward.bind(this))
+
     loadOpenSearch().then(searchDetail => WindowActions.setSearchDetail(searchDetail))
 
     window.addEventListener('mousemove', (e) => {

@@ -308,10 +308,16 @@ const init = () => {
       submenu: [
         {
           label: 'Back',
-          accelerator: 'CmdOrCtrl+['
+          accelerator: 'CmdOrCtrl+[',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
+          }
         }, {
           label: 'Forward',
-          accelerator: 'CmdOrCtrl+]'
+          accelerator: 'CmdOrCtrl+]',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+          }
         }, {
           type: 'separator'
         }, {
@@ -345,10 +351,14 @@ const init = () => {
       label: 'Bookmarks',
       submenu: [
         {
-          label: 'Add Bookmarks',
-          accelerator: 'CmdOrCtrl+D'
+          label: 'Add Bookmark',
+          accelerator: 'CmdOrCtrl+D',
+          click: function (item, focusedWindow) {
+            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK])
+          }
         }, {
           label: 'Add to Favorites Bar',
+          enabled: false,
           accelerator: 'Shift+CmdOrCtrl+D'
         }, {
           type: 'separator'
