@@ -116,22 +116,13 @@ const AppActions = {
   },
 
   /**
-   * Sets the update.updateAvailable flag to true
+   * Sets the update.updateAvailable flag
    */
-  setUpdateAvailable: function () {
-    console.log('setUpdateAvailable')
+  setUpdateAvailable: function (available) {
+    console.log('setUpdateAvailable ' + available)
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_UPDATE_AVAILABLE
-    })
-  },
-
-  /**
-   * Sets the update.updateAvailable flag to false
-   */
-  clearUpdateAvailable: function () {
-    console.log('clearUpdateAvailable')
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_UPDATE_AVAILABLE
+      actionType: AppConstants.APP_SET_UPDATE_AVAILABLE,
+      available
     })
   },
 

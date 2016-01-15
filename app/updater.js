@@ -4,12 +4,10 @@
 
 'strict mode'
 
-const path = require('path')
-const fs = require('fs')
+const request = require('request')
 const autoUpdater = require('auto-updater')
 const config = require('./appConfig')
 const messages = require('../js/constants/messages')
-const request = require('request')
 const querystring = require('querystring')
 const AppStore = require('../js/stores/appStore')
 const AppActions = require('../js/actions/appActions')
@@ -32,11 +30,10 @@ var platforms = {
 // We are storing this as a package variable because a number of functions need access
 // It is set in the init function
 var platformBaseUrl = null
+var version = null
 
 // build the complete update url from the base, platform and version
 exports.updateUrl = function (updates, platform) {
-  var pack = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')))
-  var version = pack.version
   platformBaseUrl = `${updates.baseUrl}/${platforms[platform]}/${version}`
   debug(`platformBaseUrl = ${platformBaseUrl}`)
   if (platform === 'darwin') {
@@ -47,9 +44,12 @@ exports.updateUrl = function (updates, platform) {
 }
 
 // set the feed url for the auto-update system
-exports.init = (platform) => {
+exports.init = (platform, ver) => {
   // When starting up we should not expect an update to be available
-  AppActions.clearUpdateAvailable()
+  AppActions.setUpdateAvailable(false)
+
+  // Browser version X.X.X
+  version = ver
 
   var baseUrl = exports.updateUrl(config.updates, platform)
   debug('updateUrl = ' + baseUrl)
@@ -153,7 +153,7 @@ exports.checkForUpdate = () => {
 exports.fakeCheckForUpdate = () => {
   debug('fakeCheckForUpdate')
   requestVersionInfo()
-  AppActions.setUpdateAvailable()
+  AppActions.setUpdateAvailable(true)
 }
 
 // The UI indicates that we should update the software
@@ -165,7 +165,7 @@ exports.update = () => {
 // The download is complete, we send a signal and await UI
 autoUpdater.on('update-downloaded', (evt, extra, extra2) => {
   debug('update downloaded')
-  AppActions.setUpdateAvailable()
+  AppActions.setUpdateAvailable(true)
 })
 
 // Download has started

@@ -23,7 +23,8 @@ const messages = require('../js/constants/messages')
 const AppActions = require('../js/actions/appActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
-const CrashHerald = require('./crash-herald.js')
+const CrashHerald = require('./crash-herald')
+const PackageLoader = require('./package-loader')
 
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -117,20 +118,26 @@ app.on('ready', function () {
     // Setup the crash handling
     CrashHerald.init()
 
-    // Setup the auto updater
-    Updater.init(process.platform)
+    // This loads package.json into an object
+    PackageLoader.load((err, pack) => {
+      if (err) throw new Error('package.json could not be accessed')
 
-    // this only works on prod
-    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-      // this is fired from a auto-update metadata call - TODO setting state to trigger update UI
-      process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
-        console.log(metadata)
-      })
+      // Setup the auto updater
+      Updater.init(process.platform, pack.version)
 
-      // This is fired by a menu entry (for now - will be scheduled)
-      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
-    } else {
-      process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
-    }
+      // This only works on prod
+      if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+        // This is fired from a auto-update metadata call
+        // TODO setting state to trigger update UI
+        process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
+          console.log(metadata)
+        })
+
+        // This is fired by a menu entry (for now - will be scheduled)
+        process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
+      } else {
+        process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
+      }
+    })
   })
 })
