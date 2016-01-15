@@ -4,6 +4,7 @@
 
 'strict mode'
 
+const assert = require('assert')
 const request = require('request')
 const autoUpdater = require('auto-updater')
 const config = require('./appConfig')
@@ -126,7 +127,7 @@ var paramsFromLastCheckDelta = (seconds) => {
 }
 
 // Make a request to the update server to retrieve meta data
-var requestVersionInfo = () => {
+var requestVersionInfo = (done) => {
   if (!platformBaseUrl) throw new Error('platformBaseUrl not set')
 
   // Get the timestamp of the last update request
@@ -148,8 +149,10 @@ var requestVersionInfo = () => {
   request(queryString, (err, response, body) => {
     AppActions.setUpdateLastCheck()
     if (!err) {
+      if (body) body = JSON.parse(body)
       // This should be handled by a UI component for the update toolbar
       process.emit(messages.UPDATE_META_DATA_RETRIEVED, body)
+      done(null, body)
     } else {
       // Network error or mis-configuration
       debug(err.toString())
@@ -157,12 +160,23 @@ var requestVersionInfo = () => {
   })
 }
 
+var downloadHandler = (err, metaData) => {
+  assert.equal(err, null)
+  if (process.platform === 'win32') {
+    // check versions to see if an update is required
+    console.log(`metaData = ${metaData}`)
+    if (metaData) {
+      autoUpdater.checkForUpdates()
+    }
+  } else {
+    autoUpdater.checkForUpdates()
+  }
+}
 // Make network request to check for an available update
 exports.checkForUpdate = () => {
   debug('checkForUpdates')
   try {
-    requestVersionInfo()
-    autoUpdater.checkForUpdates()
+    requestVersionInfo(downloadHandler)
   } catch (err) {
     debug(err)
   }
@@ -171,7 +185,7 @@ exports.checkForUpdate = () => {
 // Development version only
 exports.fakeCheckForUpdate = () => {
   debug('fakeCheckForUpdate')
-  requestVersionInfo()
+  requestVersionInfo(downloadHandler)
   AppActions.setUpdateAvailable(true)
 }
 
