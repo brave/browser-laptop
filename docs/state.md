@@ -33,8 +33,9 @@ AppStore
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {
-    updateAvailable: false,
-    lastCheckTimestamp: false
+    updateAvailable: boolean,
+    lastCheckTimestamp: boolean,
+    updateLater: boolean // Update later was clicked.
   }
 }
 ```

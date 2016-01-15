@@ -65,3 +65,9 @@
 <blockedTrackingElements "{{$blockedTrackingElementsSize}} Blocked tracking elements">
 <replacedAds "{{$replacedAdsSize}} Ads replaced">
 <blockedAds "{{$blockedAdsSize}} Ads blocked">
+
+<updateNow "update now">
+<updateLater "update later">
+<updateHello "Hello!">
+<updateAvail "A Brave update was just released. Ready to update?">
+<updateRequiresRelaunch "Requires a quick relaunch...">

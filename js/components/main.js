@@ -160,7 +160,8 @@ class Main extends ImmutableComponent {
           key='tab-bar'
           activeFrame={activeFrame}
         />
-      {this.props.appState.getIn(['updates', 'updateAvailable']) ? <UpdateBar/> : null}
+      {!this.props.appState.getIn(['updates', 'updateLater']) &&
+        this.props.appState.getIn(['updates', 'updateAvailable']) ? <UpdateBar/> : null}
       </div>
       <div className='mainContainer'
         onFocus={this.onMainFocus.bind(this)}>

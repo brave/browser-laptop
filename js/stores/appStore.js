@@ -266,6 +266,10 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['updates', 'updateAvailable'], action.available)
       appStore.emitChange()
       break
+    case AppConstants.APP_UPDATE_LATER:
+      appState = appState.setIn(['updates', 'updateLater'], true)
+      appStore.emitChange()
+      break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,

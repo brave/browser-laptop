@@ -34,6 +34,12 @@ module.exports.saveAppState = (payload) => {
         wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
     }
 
+    // Always recalculate the update later and update available info
+    if (payload.updates) {
+      delete payload.updates.updateLater
+      delete payload.updates.updateAvailable
+    }
+
     // payload.frames = payload.frames.filter(frame => !frame.isPrivate)
     fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
       if (err) {

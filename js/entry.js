@@ -10,6 +10,7 @@ require('../less/navigationBar.less')
 require('../less/tabs.less')
 require('../less/findbar.less')
 require('../less/dialogs.less')
+require('../less/updateBar.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
 const URL = require('url')

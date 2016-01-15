@@ -10,14 +10,23 @@ const AppActions = require('../actions/appActions')
 
 class UpdateBar extends ImmutableComponent {
 
-  onUpdate () {
-    AppActions.updateRequested(this.props.frameProps)
+  onUpdateNow () {
+    AppActions.updateRequested()
+  }
+  onUpdateLater () {
+    AppActions.updateLater()
   }
 
   render () {
-    return <div id='updateBar'>
-        <Button label='Update'
-          onClick={this.onUpdate.bind(this)} />
+    return <div className='updateBar'>
+        <span className='updateHello' data-l10n-id='updateHello'/>
+        <span className='updateMessage' data-l10n-id='updateAvail'/>
+        <span className='updateRequiresRelaunch' data-l10n-id='updateRequiresRelaunch'/>
+        <span className='updateSpacer'/>
+        <Button className='updateButton updateLaterButton' l10nId='updateLater'
+          onClick={this.onUpdateLater.bind(this)} />
+        <Button className='updateButton updateNowButton' l10nId='updateNow'
+          onClick={this.onUpdateNow.bind(this)} />
       </div>
   }
 

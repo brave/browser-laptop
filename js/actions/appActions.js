@@ -133,6 +133,16 @@ const AppActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_UPDATE_LAST_CHECK
     })
+  },
+
+  /**
+   * Indicates that a user clicked on the update later button
+   * and they shouldn't be prompted until the next startup.
+   */
+  updateLater: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_LATER
+    })
   }
 }
 
