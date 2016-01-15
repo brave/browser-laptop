@@ -62,10 +62,6 @@ const init = () => {
           accelerator: 'CmdOrCtrl+N',
           click: () => AppActions.newWindow()
         }, {
-          label: 'New Private Window',
-          accelerator: 'CmdOrCtrl+Alt+N',
-          click: () => AppActions.newWindow()
-        }, {
           type: 'separator'
         }, {
           label: 'Open File...',
@@ -198,6 +194,8 @@ const init = () => {
             sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
           }
         }, {
+          // TODO: hook up find next/prev shortcut. low-priority since this is
+          // probably not used much.
           label: 'Find Next',
           accelerator: 'CmdOrCtrl+G'
         }, {
@@ -257,9 +255,11 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Reading View',
+          enabled: false,
           accelerator: 'Alt+CmdOrCtrl+R'
         }, {
           label: 'Tab Manager',
+          enabled: false,
           accelerator: 'Alt+CmdOrCtrl+M'
         }, {
           type: 'separator'
@@ -292,8 +292,14 @@ const init = () => {
         }, {
           type: 'separator'
         }, {
-          label: 'Enter Full Screen View',
-          accelerator: 'Shift+CmdOrCtrl+F'
+          label: 'Toggle Full Screen View',
+          accelerator: 'Shift+CmdOrCtrl+F',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              // This doesn't seem to work but also doesn't throw errors...
+              focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+            }
+          }
         }
         // Bring All To Front added automatically
       ]
@@ -312,7 +318,8 @@ const init = () => {
           label: 'Reopen Last Closed Tab',
           accelerator: 'Shift+CmdOrCtrl+T'
         }, {
-          label: 'Reopen Last Closed Window'
+          label: 'Reopen Last Closed Window',
+          enabled: false
         }, {
           type: 'separator'
         }, {
@@ -327,7 +334,8 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Show All History',
-          accelerator: 'CmdOrCtrl+Y'
+          accelerator: 'CmdOrCtrl+Y',
+          enabled: false
         }
       ]
     }, {
@@ -343,6 +351,7 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Manage Bookmarks',
+          enabled: false,
           accelerator: 'Alt+CmdOrCtrl+B'
         }, {
           type: 'separator'
@@ -430,24 +439,30 @@ const init = () => {
           label: 'Select Previous Tab',
           accelerator: 'Ctrl+Shift+Tab'
         }, {
-          label: 'Move Tab to New Window'
+          label: 'Move Tab to New Window',
+          enabled: false
         }, {
-          label: 'Merge All Windows'
+          label: 'Merge All Windows',
+          enabled: false
         }, {
           type: 'separator'
         }, {
           label: 'Downloads',
-          accelerator: 'Shift+CmdOrCtrl+J'
+          accelerator: 'Shift+CmdOrCtrl+J',
+          enabled: false
         }, {
           label: 'History',
           // On OSX, Shift+Cmd+H cannot be overridden.
-          accelerator: 'CmdOrCtrl+Y'
+          accelerator: 'CmdOrCtrl+Y',
+          enabled: false
         }, {
           label: 'Bookmarks',
-          accelerator: 'Alt+CmdOrCtrl+B'
+          accelerator: 'Alt+CmdOrCtrl+B',
+          enabled: false
         }, {
           label: 'Tab Manager',
-          accelerator: 'Alt+CmdOrCtrl+M'
+          accelerator: 'Alt+CmdOrCtrl+M',
+          enabled: false
         }
       ]
     }, {
