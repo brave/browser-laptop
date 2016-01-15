@@ -80,11 +80,21 @@ exports.addSite = function (sites, frameProps, tag) {
  * @return The new sites Immutable object
  */
 exports.removeSite = function (sites, frameProps, tag) {
-  let index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
+  let index = -1
+  if (frameProps.get('isPinned')) {
+    index = exports.getSiteUrlIndex(sites, frameProps.get('src'))
+  }
+  // When pinning a tab from the current window the src might not be
+  // set to the current site on that first window.
+  // So only if it's not found with the src and it's a pinned tab,
+  // then check the src then location.  This also fixes pinned sites
+  // with HTTPS Everywhere.
+  if (index === -1) {
+    index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
+  }
   if (index === -1) {
     return sites
   }
-
   let tags = sites.getIn([index, 'tags'])
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
