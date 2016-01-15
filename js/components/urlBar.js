@@ -187,7 +187,7 @@ class UrlBar extends ImmutableComponent {
 
   get aboutPage () {
     var protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
-    return ['about:', 'file:', 'chrome:'].includes(protocol)
+    return ['about:', 'file:', 'chrome:', 'view-source:'].includes(protocol)
   }
 
   onSiteInfo () {

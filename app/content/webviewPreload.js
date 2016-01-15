@@ -178,7 +178,13 @@ ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholder
 })
 
 document.addEventListener('contextmenu', (e) => {
-  ipc.send(messages.CONTEXT_MENU_OPENED, e.target.nodeName)
+  var name = e.target.nodeName.toUpperCase()
+  var nodeProps = {
+    name: name,
+    src: name === 'A' ? e.target.href : e.target.src
+  }
+  console.log('sending', nodeProps)
+  ipc.send(messages.CONTEXT_MENU_OPENED, nodeProps)
   e.preventDefault()
 }, false)
 
