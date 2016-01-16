@@ -64,9 +64,10 @@ module.exports.cleanSessionData = (sessionData) => {
   // Don't save preview frame since they are only related to hovering on a tab
   delete sessionData.previewFrameKey
   sessionData.frames = sessionData.frames || []
-  sessionData.frames.forEach((frame, i) => {
+  let newKey = 0
+  const cleanFrame = (frame) => {
+    newKey++
     // Reset the ids back to sequential numbers
-    let newKey = i + 1
     if (frame.key === sessionData.activeFrameKey) {
       sessionData.activeFrameKey = newKey
     } else {
@@ -118,7 +119,17 @@ module.exports.cleanSessionData = (sessionData) => {
     // restored.  We will be able to keep this once we
     // don't regenerate new frame keys when opening storage.
     delete frame.parentFrameKey
-  })
+  }
+
+  // Clean closed frame data before frames because the keys are re-ordered
+  // and the new next key is calculated in windowStore.js based on
+  // the max frame key ID.
+  if (sessionData.closedFrames) {
+    sessionData.closedFrames.forEach(cleanFrame)
+  }
+  if (sessionData.frames) {
+    sessionData.frames.forEach(cleanFrame)
+  }
 }
 
 /**
