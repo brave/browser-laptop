@@ -7,36 +7,38 @@
 const messages = require('../js/constants/messages')
 
 const filteringFns = []
-var wnds = new WeakSet()
 
-module.exports.register = (wnd, resourceName, filteringFn) => {
+module.exports.registerFilteringCB = filteringFn => {
   filteringFns.push(filteringFn)
-  if (!wnds.has(wnd)) {
-    wnds.add(wnd)
-    wnd.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
-      // Using an electron binary which isn't from Brave
-      if (!details.firstPartyUrl) {
-        cb({})
-        return
-      }
+}
 
-      let results
-      for (let i = 0; i < filteringFns.length; i++) {
-        results = filteringFns[i](details)
-        if (results.shouldBlock) {
-          break
-        }
-      }
+module.exports.registerWindow = wnd => {
+  wnd.webContents.session.webRequest.onBeforeSendHeaders(function (wnd, details, cb) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl) {
+      cb({})
+      return
+    }
 
+    let results
+    for (let i = 0; i < filteringFns.length; i++) {
+      results = filteringFns[i](details)
+      if (results.shouldBlock) {
+        break
+      }
+    }
+
+    if (results.cbArgs) {
+      cb(results.cbArgs)
+    } else {
       if (results.shouldBlock) {
         wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details)
       }
-
       cb({
         cancel: results.shouldBlock
       })
-    })
-  }
+    }
+  }.bind(null, wnd))
 }
 
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {

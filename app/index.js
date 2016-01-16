@@ -25,6 +25,10 @@ const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const CrashHerald = require('./crash-herald')
 const PackageLoader = require('./package-loader')
+const TrackingProtection = require('./trackingProtection')
+const AdBlock = require('./adBlock')
+const HttpsEverywhere = require('./httpsEverywhere')
+const SiteHacks = require('./siteHacks')
 
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -117,6 +121,13 @@ app.on('ready', function () {
     })
 
     Menu.init()
+
+    // Load HTTPS Everywhere browser "extension"
+    HttpsEverywhere.init()
+
+    TrackingProtection.init()
+    AdBlock.init()
+    SiteHacks.init()
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.update()

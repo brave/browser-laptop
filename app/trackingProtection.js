@@ -16,14 +16,13 @@ let cachedFirstPartyCount = 0
 let cachedFirstParty = {}
 
 const startTrackingProtection = (wnd) => {
-  // Aftre every 50 first party hosts, just
-  // re-get the first party host list
-  if (cachedFirstPartyCount > 50) {
-    cachedFirstPartyCount = 0
-    cachedFirstParty = {}
-  }
-
-  Filtering.register(wnd, resourceName, (details) => {
+  Filtering.registerFilteringCB((details) => {
+    // After every 50 first party hosts, just
+    // re-get the first party host list
+    if (cachedFirstPartyCount > 50) {
+      cachedFirstPartyCount = 0
+      cachedFirstParty = {}
+    }
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     let firstPartyUrlHost = firstPartyUrl.host || ''
     if (firstPartyUrlHost.startsWith('www.')) {
@@ -54,10 +53,8 @@ const startTrackingProtection = (wnd) => {
   })
 }
 
-module.exports.init = (wnd) => {
-  const first = !trackingProtection
-  const wnds = []
+module.exports.init = () => {
   trackingProtection = new TrackingProtection()
-  DataFile.init(wnd, resourceName, startTrackingProtection, first, wnds,
+  DataFile.init(resourceName, startTrackingProtection,
                 data => trackingProtection.deserialize(data))
 }

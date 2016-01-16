@@ -104,35 +104,18 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
 }
 
 /**
- * @param {BrowserWindow} win Window to start in.
  * @param {string} resourceName Name of the "extension".
  * @param {function(BrowserWindow)} startExtension Function that starts the
  *   extension listeners.
- * @param {boolean} first Whether this is the first window
- * @param {Array.<BrowserWindow>} windowsToStartFor Additional windows to start
- *   the extension in.
  * @param {function(Buffer|string)} onInitDone function to call when data is downloaded.
  *   Takes either the data itself as an argument or the pathname on disk of the
  *   directory where the data was downloaded.
  */
-module.exports.init = (win, resourceName,
-    startExtension, first, windowsToStartFor, onInitDone) => {
+module.exports.init = (resourceName, startExtension, onInitDone) => {
   const version = AppConfig[resourceName].version
   const url = AppConfig[resourceName].url.replace('{version}', version)
 
   if (!AppConfig[resourceName].enabled) {
-    return
-  }
-
-  // We use the same instance for all BrowserWindows
-  // So just go directly to start when it's non first
-  if (!first) {
-    // Data is not available yet, add it to a list to notify
-    if (!cachedDataFiles[resourceName]) {
-      windowsToStartFor.push(win)
-      return
-    }
-    startExtension(win)
     return
   }
 
@@ -141,21 +124,18 @@ module.exports.init = (win, resourceName,
     // it's used directly
     cachedDataFiles[resourceName] = data
     onInitDone(data)
-    windowsToStartFor.push(win)
-    windowsToStartFor.forEach(startExtension)
-    windowsToStartFor = null
+    startExtension()
   }
 
   const loadProcess = (resourceName, version) =>
     module.exports.readDataFile(resourceName, url)
     .then(doneInit)
-    .catch((resolve, reject) => {
+    .catch(() => {
       module.exports.downloadDataFile(resourceName, url, version, true)
       .then(module.exports.readDataFile.bind(null, resourceName, url))
       .then(doneInit)
       .catch((err) => {
         console.log(`Could not init ${resourceName}`, err || '')
-        reject()
       })
     })
 

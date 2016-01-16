@@ -24,8 +24,8 @@ let mapFilterType = {
   other: FilterOptions.other
 }
 
-const startAdBlocking = (wnd) => {
-  Filtering.register(wnd, resourceName, (details) => {
+const startAdBlocking = () => {
+  Filtering.registerFilteringCB(details => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const urlHost = URL.parse(details.url).host
     const shouldBlock = firstPartyUrl.protocol &&
@@ -41,10 +41,8 @@ const startAdBlocking = (wnd) => {
   })
 }
 
-module.exports.init = (wnd) => {
-  const first = !adblock
-  const wnds = []
+module.exports.init = () => {
   adblock = new ABPFilterParser()
-  DataFile.init(wnd, resourceName, startAdBlocking, first, wnds,
+  DataFile.init(resourceName, startAdBlocking,
                 data => adblock.deserialize(data))
 }

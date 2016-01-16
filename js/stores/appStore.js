@@ -4,7 +4,6 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
-const URL = require('url')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const ipcMain = electron.ipcMain
@@ -12,11 +11,9 @@ const messages = require('../constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
-const siteHacks = require('../data/siteHacks')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
-const AdBlock = require('../../app/adBlock')
-const TrackingProtection = require('../../app/trackingProtection')
+const Filtering = require('../../app/filtering')
 const HttpsEverywhere = require('../../app/httpsEverywhere')
 
 let appState
@@ -110,20 +107,8 @@ const createWindow = (browserOpts, defaults) => {
   }, browserOpts))
 
   // Load HTTPS Everywhere browser "extension"
-  HttpsEverywhere.init(mainWindow)
-
-  TrackingProtection.init(mainWindow)
-  AdBlock.init(mainWindow)
-
-  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(function (details, cb) {
-    let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
-    let hack = siteHacks[domain]
-    if (hack) {
-      cb({ requestHeaders: hack.call(this, details) })
-    } else {
-      cb({})
-    }
-  })
+  HttpsEverywhere.registerWindow(mainWindow)
+  Filtering.registerWindow(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was

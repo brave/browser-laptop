@@ -9,6 +9,7 @@ const path = require('path')
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
 
+let httpsEverywhereInitialized = false
 var dbLoaded = false
 var db = null
 var targets = null
@@ -170,22 +171,39 @@ function applyRulesets (url, cb, applicableRules) {
   cb()
 }
 
+/**
+ * Called when the HTTPS EVerywhere data file
+ * is downloaded and ready.
+ */
+function startHttpsEverywhere () {
+  httpsEverywhereInitialized = true
+}
+
 function onBeforeHTTPRequest (details, cb) {
+  if (!httpsEverywhereInitialized) {
+    cb({})
+    return
+  }
+
   if (canonicalizeUrl(details.url) in redirectBlacklist) {
     // Don't try to rewrite this request, it'll probably just redirect again.
-    cb({cancel: false})
+    cb({})
   } else {
     getRewrittenUrl(details.url, (url) => {
       if (url) {
-        cb({ cancel: false, redirectURL: url })
+        cb({ redirectURL: url })
       } else {
-        cb({ cancel: false })
+        cb({})
       }
     })
   }
 }
 
 function onBeforeRedirect (details) {
+  if (!httpsEverywhereInitialized) {
+    return
+  }
+
   var canonicalUrl = canonicalizeUrl(details.url)
   if (details.id in redirectCounter) {
     canonicalUrl = canonicalizeUrl(details.url)
@@ -211,16 +229,14 @@ function canonicalizeUrl (url) {
 }
 
 /**
- * Loads HTTPS Everywhere into a new BrowserWindow
- * @param {BrowserWindow} win The browser window
+ * Loads HTTPS Everywhere
  */
-module.exports.init = (win) => {
-  DataFile.init(win, 'httpsEverywhere', startHttpsEverywhere, !dbLoaded,
-                [], loadRulesets)
+module.exports.init = () => {
+  DataFile.init('httpsEverywhere', startHttpsEverywhere, loadRulesets)
 }
 
-function startHttpsEverywhere (win) {
-  var session = win.webContents ? win.webContents.session : null
+module.exports.registerWindow = wnd => {
+  var session = wnd.webContents ? wnd.webContents.session : null
   if (!session) {
     console.log('could not get window session')
     return null

@@ -27,6 +27,9 @@ module.exports = {
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
+  siteHacks: {
+    enabled: true
+  },
   crashes: {
     crashSubmitUrl: crashURL
   },
