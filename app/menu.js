@@ -345,16 +345,6 @@ const init = () => {
         }, {
           type: 'separator'
         }, {
-          label: 'My Mac',
-          enabled: false
-        }, {
-          type: 'separator'
-        }, {
-          label: 'My iPhone',
-          enabled: false
-        }, {
-          type: 'separator'
-        }, {
           label: 'Show All History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
@@ -405,9 +395,6 @@ const init = () => {
       label: 'Bravery',
       submenu: [
         {
-          label: 'Logged in as Yan (0 Points)',
-          enabled: false
-        }, {
           label: 'Manage...',
           enabled: false
         }, {
