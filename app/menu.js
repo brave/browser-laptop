@@ -315,7 +315,6 @@ const init = () => {
             }
           }
         }
-        // Bring All To Front added automatically
       ]
     }, {
       label: 'History',
@@ -509,6 +508,11 @@ const init = () => {
           label: 'Tab Manager',
           accelerator: 'Alt+CmdOrCtrl+M',
           enabled: false
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Bring All to Front',
+          role: 'front'
         }
       ]
     }, {
@@ -590,15 +594,6 @@ const init = () => {
         }
       ]
     })
-    // Window menu.
-    template[3].submenu.push(
-      {
-        type: 'separator'
-      }, {
-        label: 'Bring All to Front',
-        role: 'front'
-      }
-    )
   }
 
   const menu = Menu.buildFromTemplate(template)
