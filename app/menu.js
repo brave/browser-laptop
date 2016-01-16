@@ -544,57 +544,54 @@ const init = () => {
     }
   ]
 
-  if (process.platform === 'darwin') {
-    var name = 'Brave'
-    template.unshift({
-      label: name, // Ignored. OSX gets this from the app Info.plist file.
-      submenu: [
-        {
-          label: 'About ' + name,
-          role: 'about'
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Preferences...',
-          enabled: false,
-          accelerator: 'CmdOrCtrl+,'
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Send us Feedback...',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow,
-                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
-          }
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Services',
-          role: 'services',
-          submenu: []
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Hide ' + name,
-          accelerator: 'Command+H',
-          role: 'hide'
-        }, {
-          label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
-          role: 'hideothers'
-        }, {
-          label: 'Show All',
-          role: 'unhide'
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Quit ' + name,
-          accelerator: 'Command+Q',
-          click: app.quit
+  var name = 'Brave'
+  template.unshift({
+    label: name, // Ignored on OSX, which gets this from the app Info.plist file.
+    submenu: [
+      {
+        label: 'About ' + name,
+        role: 'about'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Preferences...',
+        enabled: false,
+        accelerator: 'CmdOrCtrl+,'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Send us Feedback...',
+        click: function (item, focusedWindow) {
+          sendToFocusedWindow(focusedWindow,
+                              [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
         }
-      ]
-    })
-  }
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Services',
+        role: 'services'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Hide ' + name,
+        accelerator: 'Command+H',
+        role: 'hide'
+      }, {
+        label: 'Hide Others',
+        accelerator: 'Command+Shift+H',
+        role: 'hideothers'
+      }, {
+        label: 'Show All',
+        role: 'unhide'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Quit ' + name,
+        accelerator: 'Command+Q',
+        click: app.quit
+      }
+    ]
+  })
 
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
