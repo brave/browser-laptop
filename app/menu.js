@@ -552,6 +552,7 @@ const init = () => {
           type: 'separator'
         }, {
           label: 'Preferences...',
+          enabled: false,
           accelerator: 'CmdOrCtrl+,'
         }, {
           type: 'separator'
