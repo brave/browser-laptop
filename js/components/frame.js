@@ -26,7 +26,7 @@ class Frame extends ImmutableComponent {
     return ReactDOM.findDOMNode(this.refs.webviewContainer)
   }
 
-  createWebview () {
+  updateWebview () {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.
     this.webview = this.webview || document.createElement('webview')
@@ -47,14 +47,15 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidMount () {
-    this.createWebview()
+    this.updateWebview()
   }
 
   componentDidUpdate (prevProps, prevState) {
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
     if (didSrcChange) {
-      this.createWebview()
+      this.updateWebview()
     }
+    // give focus when switching tabs
     if (this.props.isActive && !prevProps.isActive) {
       this.webview.focus()
     }
@@ -173,7 +174,8 @@ class Frame extends ImmutableComponent {
         this.webview.canGoForward())
     })
     this.webview.addEventListener('did-navigate', (e) => {
-      if (this.props.isActive && this.webview.getURL() !== Config.defaultUrl) {
+      // only give focus focus is this is not the initial default page load
+      if (this.props.isActive && this.webview.canGoBack()) {
         this.webview.focus()
       }
     })
