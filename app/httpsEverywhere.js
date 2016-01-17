@@ -8,6 +8,8 @@ const sqlite3 = require('sqlite3')
 const path = require('path')
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
+const electron = require('electron')
+const session = electron.session
 
 let httpsEverywhereInitialized = false
 var dbLoaded = false
@@ -229,14 +231,11 @@ function canonicalizeUrl (url) {
 }
 
 /**
- * Loads HTTPS Everywhere
+ * Register for notifications for webRequest notifications for
+ * a particular session.
+ * @param {object} The session to add webRequest filtering on
  */
-module.exports.init = () => {
-  DataFile.init('httpsEverywhere', startHttpsEverywhere, loadRulesets)
-}
-
-module.exports.registerWindow = wnd => {
-  var session = wnd.webContents ? wnd.webContents.session : null
+function registerForSession (session) {
   if (!session) {
     console.log('could not get window session')
     return null
@@ -255,3 +254,13 @@ module.exports.registerWindow = wnd => {
     urls: ['https://*/*']
   }, onBeforeRedirect)
 }
+
+/**
+ * Loads HTTPS Everywhere
+ */
+module.exports.init = () => {
+  DataFile.init('httpsEverywhere', startHttpsEverywhere, loadRulesets)
+  registerForSession(session.fromPartition(''))
+  registerForSession(session.fromPartition('private-1'))
+}
+
