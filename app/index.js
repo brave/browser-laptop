@@ -25,6 +25,7 @@ const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const CrashHerald = require('./crash-herald')
 const PackageLoader = require('./package-loader')
+const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
 const HttpsEverywhere = require('./httpsEverywhere')
@@ -125,6 +126,7 @@ app.on('ready', function () {
     // Load HTTPS Everywhere browser "extension"
     HttpsEverywhere.init()
 
+    Filtering.init()
     TrackingProtection.init()
     AdBlock.init()
     SiteHacks.init()

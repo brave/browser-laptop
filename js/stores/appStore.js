@@ -13,8 +13,6 @@ const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
-const Filtering = require('../../app/filtering')
-const HttpsEverywhere = require('../../app/httpsEverywhere')
 
 let appState
 
@@ -105,10 +103,6 @@ const createWindow = (browserOpts, defaults) => {
     autoHideMenuBar: true,
     webPreferences: defaults.webPreferences
   }, browserOpts))
-
-  // Load HTTPS Everywhere browser "extension"
-  HttpsEverywhere.registerWindow(mainWindow)
-  Filtering.registerWindow(mainWindow)
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
