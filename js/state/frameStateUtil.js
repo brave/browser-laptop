@@ -213,6 +213,7 @@ export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
   const framePropsIndex = getFramePropsIndex(frames, frameProps)
   frames = frames.splice(framePropsIndex, 1)
   return {
+    previewFrameKey: undefined,
     activeFrameKey: frameProps.get('key') === activeFrameKey && frames.size > 0
       ? Math.max(
         frames.get(activeFrameIndex)
