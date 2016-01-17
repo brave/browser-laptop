@@ -28,7 +28,9 @@ module.exports.registerWindow = wnd => {
       }
     }
 
-    if (results.cbArgs) {
+    if (!results) {
+      cb({})
+    } else if (results.cbArgs) {
       cb(results.cbArgs)
     } else {
       if (results.shouldBlock) {
