@@ -30,6 +30,7 @@ const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
 const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
+const CmdLine = require('./cmdLine')
 
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -102,13 +103,26 @@ app.on('ready', function () {
     AppActions.setState(Immutable.fromJS(initialState))
     return perWindowState
   }).then(perWindowState => {
+    const openFromCmdLine = () => {
+      AppActions.newWindow(Immutable.fromJS({
+        location: CmdLine.newWindowURL
+      }))
+    }
     if (!perWindowState || perWindowState.length === 0) {
-      AppActions.newWindow()
+      if (CmdLine.newWindowURL) {
+        openFromCmdLine()
+      } else {
+        AppActions.newWindow()
+      }
     } else {
       perWindowState.forEach(wndState => {
         AppActions.newWindow(undefined, undefined, wndState)
       })
+      if (CmdLine.newWindowURL) {
+        openFromCmdLine()
+      }
     }
+    process.emit(messages.APP_INITIALIZED)
 
     ipcMain.on(messages.QUIT_APPLICATION, () => {
       app.quit()
