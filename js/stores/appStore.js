@@ -241,12 +241,17 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['updates', 'lastCheckTimestamp'], (new Date()).getTime())
       appStore.emitChange()
       break
-    case AppConstants.APP_SET_UPDATE_AVAILABLE:
-      appState = appState.setIn(['updates', 'updateAvailable'], action.available)
-      appStore.emitChange()
-      break
-    case AppConstants.APP_UPDATE_LATER:
-      appState = appState.setIn(['updates', 'updateLater'], true)
+    case AppConstants.APP_SET_UPDATE_STATUS:
+      if (action.status !== undefined) {
+        appState = appState.setIn(['updates', 'status'], action.status)
+      }
+      // Auto reset back to false because it'll be set to true on each new check
+      if (action.verbose !== undefined) {
+        appState = appState.setIn(['updates', 'verbose'], action.verbose)
+      }
+      if (action.metadata !== undefined) {
+        appState = appState.setIn(['updates', 'metadata'], action.metadata)
+      }
       appStore.emitChange()
       break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:

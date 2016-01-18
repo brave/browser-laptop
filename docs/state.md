@@ -33,9 +33,13 @@ AppStore
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {
-    updateAvailable: boolean,
-    lastCheckTimestamp: boolean,
-    updateLater: boolean // Update later was clicked.
+    status: string, // UpdateStatus from js/constants/updateStatus.js
+    metadata: {
+      name: string, // Name of the update
+      notes: string, // Release notes for the active update
+    },
+    verbose: boolean, // Whether to show update UI for checking, downloading, and errors
+    lastCheckTimestamp: boolean
   }
 }
 ```
@@ -114,6 +118,9 @@ WindowStore
     },
     siteInfo: {
       isVisible: boolean, // Whether or not to show site info like # of blocked ads
+    },
+    releaseNotes: {
+      isVisible: boolean, // Whether or not to show release notes
     }
   },
   searchDetail: {

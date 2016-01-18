@@ -116,16 +116,6 @@ const AppActions = {
   },
 
   /**
-   * Sets the update.updateAvailable flag
-   */
-  setUpdateAvailable: function (available) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_UPDATE_AVAILABLE,
-      available
-    })
-  },
-
-  /**
    * Sets the update.lastCheckTimestamp to the current
    * epoch timestamp (milliseconds)
    */
@@ -136,12 +126,17 @@ const AppActions = {
   },
 
   /**
-   * Indicates that a user clicked on the update later button
-   * and they shouldn't be prompted until the next startup.
+   * Sets the update status
+   * @param {string} status - update status from js/constants/updateStatus.js.
+   * @param {boolean} verbose - Whether to show UI for all the update steps.
+   * @param {object} metadata - Metadata from the pdate server, with info like release notes.
    */
-  updateLater: function () {
+  setUpdateStatus: function (status, verbose, metadata) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_UPDATE_LATER
+      actionType: AppConstants.APP_SET_UPDATE_STATUS,
+      status,
+      verbose,
+      metadata
     })
   }
 }

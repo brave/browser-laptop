@@ -34,10 +34,9 @@ module.exports.saveAppState = (payload) => {
         wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
     }
 
-    // Always recalculate the update later and update available info
+    // Always recalculate the update status
     if (payload.updates) {
-      delete payload.updates.updateLater
-      delete payload.updates.updateAvailable
+      delete payload.updates.status
     }
 
     // payload.frames = payload.frames.filter(frame => !frame.isPrivate)

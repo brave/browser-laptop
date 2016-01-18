@@ -166,12 +166,9 @@ app.on('ready', function () {
         process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
           console.log(metadata)
         })
-
-        // This is fired by a menu entry (for now - will be scheduled)
-        process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate())
-      } else {
-        process.on(messages.CHECK_FOR_UPDATE, () => Updater.fakeCheckForUpdate())
       }
+      // This is fired by a menu entry (for now - will be scheduled)
+      process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
     })
   })
 })

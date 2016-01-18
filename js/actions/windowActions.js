@@ -622,6 +622,18 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to indicate the release notes should be visible
+   *
+   * @param {boolean} isVisible - true if the site info should be shown
+   */
+  setReleaseNotesVisible: function (isVisible) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE,
+      isVisible
+    })
+  },
+
+  /**
    * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
    *
    * @param {object} frameProps - The frame to set blocked info on

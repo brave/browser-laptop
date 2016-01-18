@@ -15,8 +15,7 @@ const AppConstants = {
   APP_SET_DATA_FILE_ETAG: _,
   APP_SET_DATA_FILE_LAST_CHECK: _,
   APP_UPDATE_LAST_CHECK: _,
-  APP_SET_UPDATE_AVAILABLE: _,
-  APP_UPDATE_LATER: _
+  APP_SET_UPDATE_STATUS: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)

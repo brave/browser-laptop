@@ -414,6 +414,10 @@ const doAction = (action) => {
       }
       windowStore.emitChange()
       break
+    case WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
+      windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
+      windowStore.emitChange()
+      break
     case WindowConstants.WINDOW_SET_SECURITY_STATE:
       if (action.securityState.secure !== undefined) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['security', 'isSecure']),

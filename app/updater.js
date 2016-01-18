@@ -9,19 +9,21 @@ const request = require('request')
 const autoUpdater = require('auto-updater')
 const config = require('./appConfig')
 const messages = require('../js/constants/messages')
+const UpdateStatus = require('../js/constants/updateStatus')
 const querystring = require('querystring')
 const AppStore = require('../js/stores/appStore')
 const AppActions = require('../js/actions/appActions')
+const Immutable = require('immutable')
 
 const fs = require('fs')
-const os = require('os')
 const path = require('path')
+const app = require('app')
+const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
 
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
-  console.log(contents)
-  fs.appendFile(path.join(os.homedir(), 'updater.log'), (new Date()).toISOString() + ' - ' + contents + '\n')
+  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + '\n')
 }
 
 // this maps the result of a call to process.platform to an update API identifier
@@ -66,7 +68,7 @@ var scheduleUpdates = () => {
 // set the feed url for the auto-update system
 exports.init = (platform, ver) => {
   // When starting up we should not expect an update to be available
-  AppActions.setUpdateAvailable(false)
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_NONE)
 
   // Browser version X.X.X
   version = ver
@@ -164,11 +166,12 @@ var requestVersionInfo = (done) => {
   })
 }
 
-var downloadHandler = (err, metaData) => {
+var downloadHandler = (err, metadata) => {
   assert.equal(err, null)
+  AppActions.setUpdateStatus(undefined, undefined, Immutable.fromJS(metadata))
   if (process.platform === 'win32') {
     // check versions to see if an update is required
-    if (metaData) {
+    if (metadata) {
       autoUpdater.checkForUpdates()
     }
   } else {
@@ -177,20 +180,22 @@ var downloadHandler = (err, metaData) => {
 }
 
 // Make network request to check for an available update
-exports.checkForUpdate = () => {
+exports.checkForUpdate = (verbose) => {
+  const updateStatus = AppStore.getState().getIn(['updates', 'status'])
+  if (updateStatus !== UpdateStatus.UPDATE_ERROR &&
+      updateStatus !== UpdateStatus.UPDATE_NOT_AVAILABLE &&
+      updateStatus !== UpdateStatus.UPDATE_NONE) {
+    debug('Already checking for updates...')
+    AppActions.setUpdateStatus(undefined, verbose)
+    return
+  }
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_CHECKING, verbose)
   debug('checkForUpdates')
   try {
     requestVersionInfo(downloadHandler)
   } catch (err) {
     debug(err)
   }
-}
-
-// Development version only
-exports.fakeCheckForUpdate = () => {
-  debug('fakeCheckForUpdate')
-  requestVersionInfo(downloadHandler)
-  AppActions.setUpdateAvailable(true)
 }
 
 // The UI indicates that we should update the software
@@ -200,24 +205,34 @@ exports.update = () => {
 }
 
 // The download is complete, we send a signal and await UI
-autoUpdater.on('update-downloaded', (evt, extra, extra2) => {
+autoUpdater.on('update-downloaded', (evt, releaseNotes, releaseDate, updateURL) => {
   debug('update downloaded')
-  AppActions.setUpdateAvailable(true)
+  if (releaseNotes) {
+    debug('Release notes :' + releaseNotes)
+  }
+  if (releaseDate) {
+    debug('Release date: ' + releaseDate)
+  }
+  if (updateURL) {
+    debug('Update URL: ' + updateURL)
+  }
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_AVAILABLE)
 })
 
 // Download has started
 autoUpdater.on(messages.UPDATE_AVAILABLE, (evt) => {
-  // TODO add ui notification
   debug('update downloading')
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_DOWNLOADING)
 })
 
 // The current version of the software is up to date
 autoUpdater.on(messages.UPDATE_NOT_AVAILABLE, (evt) => {
-  // TODO add ui notification
   debug('update not available')
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_NOT_AVAILABLE)
 })
 
 // Handle autoUpdater errors (Network, permissions etc...)
 autoUpdater.on('error', (err) => {
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_ERROR)
   debug(err)
 })

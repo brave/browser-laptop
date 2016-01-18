@@ -20,6 +20,7 @@ const TabsToolbar = require('./tabsToolbar')
 const UpdateBar = require('./updateBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
+const ReleaseNotes = require('./releaseNotes')
 
 // Constants
 const Config = require('../constants/config')
@@ -108,6 +109,10 @@ class Main extends ImmutableComponent {
     WindowActions.setSiteInfoVisible(false)
   }
 
+  onHideReleaseNotes () {
+    WindowActions.setReleaseNotesVisible(false)
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -145,6 +150,11 @@ class Main extends ImmutableComponent {
               siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
               onHide={this.onHideSiteInfo.bind(this)} /> : null
         }
+        { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+          ? <ReleaseNotes
+              metadata={this.props.appState.getIn(['updates', 'metadata'])}
+              onHide={this.onHideReleaseNotes.bind(this)} /> : null
+        }
         <div className='topLevelEndButtons'>
           <Button iconClass='braveMenu'
             className='navbutton'
@@ -160,8 +170,7 @@ class Main extends ImmutableComponent {
           key='tab-bar'
           activeFrame={activeFrame}
         />
-      {!this.props.appState.getIn(['updates', 'updateLater']) &&
-        this.props.appState.getIn(['updates', 'updateAvailable']) ? <UpdateBar/> : null}
+        <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
       <div className='mainContainer'
         onFocus={this.onMainFocus.bind(this)}>

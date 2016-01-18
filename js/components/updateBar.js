@@ -7,29 +7,174 @@ const ImmutableComponent = require('./immutableComponent')
 
 const Button = require('./button')
 const AppActions = require('../actions/appActions')
+const WindowActions = require('../actions/windowActions')
+const UpdateStatus = require('../constants/updateStatus')
+const remote = global.require('electron').remote
+const path = require('path')
+const cx = require('../lib/classSet.js')
 
-class UpdateBar extends ImmutableComponent {
-
-  onUpdateNow () {
-    AppActions.updateRequested()
+class UpdateHello extends ImmutableComponent {
+  onSpinnerClick () {
+    // To make testing of updates easier in dev mode,
+    // clicking on the spinner toggles the UI
+    if (process.env.NODE_ENV === 'development') {
+      let nextStatus = UpdateStatus.UPDATE_NONE
+      switch (this.props.updateStatus) {
+        case UpdateStatus.UPDATE_CHECKING:
+          nextStatus = UpdateStatus.UPDATE_DOWNLOADING
+          break
+        case UpdateStatus.UPDATE_DOWNLOADING:
+          nextStatus = UpdateStatus.UPDATE_NOT_AVAILABLE
+          break
+        case UpdateStatus.UPDATE_NOT_AVAILABLE:
+          nextStatus = UpdateStatus.UPDATE_AVAILABLE
+          break
+        case UpdateStatus.UPDATE_AVAILABLE:
+          nextStatus = UpdateStatus.UPDATE_ERROR
+          break
+        case UpdateStatus.UPDATE_ERROR:
+          break
+      }
+      AppActions.setUpdateStatus(nextStatus)
+    }
   }
-  onUpdateLater () {
-    AppActions.updateLater()
+
+  get loading () {
+    return this.props.updateStatus === UpdateStatus.UPDATE_CHECKING ||
+      this.props.updateStatus === UpdateStatus.UPDATE_DOWNLOADING
   }
 
   render () {
-    return <div className='updateBar'>
-        <span className='updateHello' data-l10n-id='updateHello'/>
-        <span className='updateMessage' data-l10n-id='updateAvail'/>
-        <span className='updateRequiresRelaunch' data-l10n-id='updateRequiresRelaunch'/>
-        <span className='updateSpacer'/>
-        <Button className='updateButton updateLaterButton' l10nId='updateLater'
-          onClick={this.onUpdateLater.bind(this)} />
-        <Button className='updateButton updateNowButton' l10nId='updateNow'
-          onClick={this.onUpdateNow.bind(this)} />
-      </div>
+    return <span className='updateHello'>
+      <span onClick={this.onSpinnerClick.bind(this)}
+        className={cx({
+          fa: this.loading,
+          'fa-spinner': this.loading,
+          'fa-spin': this.loading
+        })}
+        data-l10n-id={this.props.l10nId}/>
+    </span>
   }
+}
 
+class UpdateHide extends ImmutableComponent {
+  render () {
+    return <Button className='updateButton updateSecondaryButton'
+      l10nId='updateHide'
+      onClick={AppActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false)} />
+  }
+}
+
+class UpdateLog extends ImmutableComponent {
+  onViewLog () {
+    remote.shell.openItem(path.join(remote.app.getPath('userData'), 'updateLog.log'))
+  }
+  render () {
+    return <Button className='updateButton updateViewLogButton updateSecondaryButton'
+      l10nId='updateViewLog'
+      onClick={this.onViewLog.bind(this)} />
+  }
+}
+
+class UpdateAvailable extends ImmutableComponent {
+  render () {
+    return <div>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello'/>
+      <span className='updateMessage' data-l10n-id='updateAvail'/>
+      <span className='updateRequiresRelaunch' data-l10n-id='updateRequiresRelaunch'/>
+      <span className='updateSpacer'/>
+      { this.props.metadata && this.props.metadata.get('notes')
+        ? <Button className='updateButton updateDetails updateSecondaryButton'
+            l10nId='updateDetails'
+            onClick={WindowActions.setReleaseNotesVisible.bind(null, true)} /> : null }
+      <Button className='updateButton updateLaterButton updateSecondaryButton'
+        l10nId='updateLater'
+        onClick={AppActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false)} />
+      <Button className='updateButton updateNowButton'
+        l10nId='updateNow'
+        onClick={AppActions.updateRequested} />
+    </div>
+  }
+}
+
+class UpdateChecking extends ImmutableComponent {
+  render () {
+    return <div>
+      <UpdateHello updateStatus={this.props.updateStatus}/>
+      <span className='updateMessage' data-l10n-id='updateChecking'/>
+      <span className='updateSpacer'/>
+      <UpdateLog/>
+      <UpdateHide/>
+    </div>
+  }
+}
+
+class UpdateDownloading extends ImmutableComponent {
+  render () {
+    return <div>
+      <UpdateHello updateStatus={this.props.updateStatus}/>
+      <span className='updateMessage' data-l10n-id='updateDownloading'/>
+      <span className='updateSpacer'/>
+      <UpdateLog/>
+      <UpdateHide/>
+    </div>
+  }
+}
+
+class UpdateError extends ImmutableComponent {
+  render () {
+    return <div>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops'/>
+      <span className='updateMessage' data-l10n-id='updateError'/>
+      <span className='updateSpacer'/>
+      <UpdateLog/>
+      <UpdateHide reset/>
+    </div>
+  }
+}
+
+class UpdateNotAvailable extends ImmutableComponent {
+  render () {
+    return <div>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet'/>
+      <span className='updateMessage' data-l10n-id='updateNotAvail'/>
+      <span className='updateSpacer'/>
+      <UpdateHide reset/>
+    </div>
+  }
+}
+
+class UpdateBar extends ImmutableComponent {
+  render () {
+    if (!this.props.updates) {
+      return null
+    }
+
+    // When verbose is not set we only want to show update available
+    // prompts, because otherwise the check is a background check and
+    // the user shouldn't be bothered.
+    const verbose = this.props.updates.get('verbose')
+    let updateStatus = this.props.updates.get('status')
+    if (!updateStatus ||
+        !verbose && updateStatus !== UpdateStatus.UPDATE_AVAILABLE ||
+        updateStatus === UpdateStatus.UPDATE_NONE) {
+      return null
+    }
+
+    // The only difference between the deferred and non deferred variant is that
+    // the deferred allows hiding.  Otherwise you couldn't hide available prompts.
+    if (updateStatus === UpdateStatus.UPDATE_AVAILABLE_DEFERRED) {
+      updateStatus = UpdateStatus.UPDATE_AVAILABLE
+    }
+
+    return <div className='updateBar'>
+      { updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null }
+      { updateStatus === UpdateStatus.UPDATE_CHECKING ? <UpdateChecking updateStatus={updateStatus}/> : null }
+      { updateStatus === UpdateStatus.UPDATE_DOWNLOADING ? <UpdateDownloading updateStatus={updateStatus}/> : null }
+      { updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE ? <UpdateNotAvailable updateStatus={updateStatus}/> : null }
+      { updateStatus === UpdateStatus.UPDATE_ERROR ? <UpdateError updateStatus={updateStatus}/> : null }
+    </div>
+  }
 }
 
 module.exports = UpdateBar

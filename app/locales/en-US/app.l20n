@@ -67,7 +67,18 @@
 <blockedAds "{{$blockedAdsSize}} Ads blocked">
 
 <updateNow "update now">
+<updateChecking "We're checking for updates...">
+<updateDownloading "Update found, we're downloading it...">
 <updateLater "update later">
+<updateDetails "details">
+<updateError "We were not able to update.">
 <updateHello "Hello!">
+<updateOops "Oops!">
+<updateNotYet "Not yet!">
 <updateAvail "A Brave update was just released. Ready to update?">
+<updateNotAvail "Sorry there are no updates yet, please check back soon.">
 <updateRequiresRelaunch "Requires a quick relaunch...">
+<updateViewLog "View log">
+<updateHide "Hide">
+<updateHide "">
+
