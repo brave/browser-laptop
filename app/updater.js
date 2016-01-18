@@ -189,7 +189,9 @@ exports.checkForUpdate = (verbose) => {
     AppActions.setUpdateStatus(undefined, verbose)
     return
   }
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_CHECKING, verbose)
+  // Force falsy or truthy here so session store will write out a value
+  // and it won't auto make updater UI appear periodically.
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_CHECKING, !!verbose)
   debug('checkForUpdates')
   try {
     requestVersionInfo(downloadHandler)
