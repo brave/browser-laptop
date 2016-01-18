@@ -16,6 +16,9 @@ let trackingProtection
 let cachedFirstPartyCount = 0
 let cachedFirstParty = {}
 
+// Temporary whitelist until we find a better solution
+const whitelistHosts = ['connect.facebook.net']
+
 const startTrackingProtection = (wnd) => {
   Filtering.registerFilteringCB((details) => {
     // After every 50 first party hosts, just
@@ -40,6 +43,7 @@ const startTrackingProtection = (wnd) => {
     const urlHost = URL.parse(details.url).host
     const shouldBlock = firstPartyUrl.protocol &&
       firstPartyUrl.protocol.startsWith('http') &&
+      !whitelistHosts.includes(urlHost) &&
       cachedFirstParty[firstPartyUrlHost] &&
       trackingProtection.matchesTracker(urlHost) &&
       urlHost !== firstPartyUrlHost &&
