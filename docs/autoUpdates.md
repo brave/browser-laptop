@@ -20,7 +20,7 @@ The built dmg binary requires its components to be digitally signed before the u
 
      The certificate will be in the form of a .cer file. The cerficate will need to be added to the keychain via the Keychain Access program. Add the certificate in the login section. Note: The Keychain Access program is included in OSX and will by default handle issued .cert files.
 
-  2. Ensure that a private keys exists and is associated with the certificate installed in step 1. A sub section of the certificate will be shown and tagged as a private key. Generating the private key (.p12 file) is a multi-stop process that requires access to the developer.apple.com portal and access to your development machine. It is described in detail at [generating a p12 file](http://appfurnace.com/2015/01/how-do-i-make-a-p12-file/).
+  2. Ensure that a private keys exists and is associated with the certificate installed in step 1. A sub section of the certificate will be shown and tagged as a private key. Generating the private key (.p12 file) is a multi-stop process that requires access to the developer.apple.com portal and access to your development machine. It is described in detail at [generating a p12 file](http://appfurnace.com/2015/01/how-do-i-make-a-p12-file/). If you already have access to the private, import it into Keychain Access ensuring it is associated with the Developer certificate.
 
   3. Build uncompressed application assets to be signed
 
