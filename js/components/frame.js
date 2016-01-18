@@ -112,8 +112,8 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('new-window', (e, url, frameName, disposition, options) => {
       e.preventDefault()
 
-      let guestInstanceId = e.options.webPreferences && e.options.webPreferences.guestInstanceId
-      let windowOptions = e.options.windowOptions || {}
+      let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
+      let windowOptions = e.options && e.options.windowOptions || {}
       windowOptions.parentWindowKey = remote.getCurrentWindow().id
       windowOptions.disposition = e.disposition
 
