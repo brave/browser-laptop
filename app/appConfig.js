@@ -43,6 +43,6 @@ module.exports = {
     autoRuntimeUpdate: false,
     // url to check for updates
     baseUrl: `${updateHost}/1/releases`,
-    winBaseUrl: `${winUpdateHost}/releases/win64`
+    winBaseUrl: `${winUpdateHost}/releases/winx64`
   }
 }
