@@ -426,7 +426,7 @@ const init = () => {
           }
         }, {
           type: 'checkbox',
-          label: 'Block Cookies',
+          label: 'Block 3rd party cookies',
           enabled: false,
           checked: true
         }, {

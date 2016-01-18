@@ -22,19 +22,19 @@ AppStore
   }],
   adblock: {
     etag: string, // last downloaded data file etag
-    lastCheckVersion: number, // last checked data file version
+    lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable adblocking
   },
   trackingProtection: {
     etag: string, // last downloaded data file etag
-    lastCheckVersion: number, // last checked data file version
+    lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable tracking protection
   },
   httpsEverywhere: {
     etag: string, // last downloaded data file etag
-    lastCheckVersion: number, // last checked data file version
+    lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable HTTPS Everywhere
   },
