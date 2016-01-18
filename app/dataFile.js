@@ -18,7 +18,7 @@ const storagePath = (url) =>
 const downloadPath = (url) => `${storagePath(url)}.temp`
 
 function downloadSingleFile (resourceName, url, version, force, resolve, reject) {
-  console.log('downloading', url)
+  // console.log('downloading', url)
   let headers = {}
   const AppStore = require('../js/stores/appStore')
   const etag = AppStore.getState().getIn([resourceName, 'etag'])
@@ -28,10 +28,12 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
     }
   }
 
+  // console.log('doing a request.get', resourceName)
   var req = request.get({
     url,
     headers
   }).on('response', function (response) {
+    // console.log('response...', resourceName)
     AppActions.setResourceLastCheck(resourceName, version, new Date().getTime())
     if (response.statusCode !== 200) {
       // console.log(resourceName, 'status code: ', response.statusCode)
@@ -41,11 +43,14 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
     const etag = response.headers['etag']
     AppActions.setResourceETag(resourceName, etag)
 
+    // console.log('setting dwonloadPath...', resourceName)
     req.pipe(fs.createWriteStream(downloadPath(url)).on('close', function () {
       fs.rename(downloadPath(url), storagePath(url), function (err) {
         if (err) {
+          // console.log('rjecting for download:', resourceName)
           reject('could not rename downloaded file')
         } else {
+          // console.log('resolving for download:', resourceName)
           resolve()
         }
       })
@@ -86,8 +91,10 @@ module.exports.readDataFile = (resourceName, url) => {
     return new Promise((resolve, reject) => {
       fs.readFile(storagePath(url), function (err, data) {
         if (err || !data || data.length === 0) {
+          // console.log('rejecting for read for resource:', resourceName)
           reject()
         } else {
+          // console.log('resolving for read for resource:', resourceName)
           resolve(data)
         }
       })
@@ -122,6 +129,7 @@ module.exports.init = (resourceName, startExtension, onInitDone) => {
   const doneInit = data => {
     // Make sure we keep a reference to the data since
     // it's used directly
+    // console.log('done init:', resourceName)
     cachedDataFiles[resourceName] = data
     onInitDone(data)
     startExtension()
@@ -142,6 +150,7 @@ module.exports.init = (resourceName, startExtension, onInitDone) => {
   if (module.exports.shouldRedownloadFirst(resourceName, version)) {
     module.exports.downloadDataFile(resourceName, url, version, false)
       .then(loadProcess.bind(null, resourceName, version))
+      .catch(loadProcess.bind(null, resourceName, version))
   } else {
     loadProcess(resourceName, version)
   }
