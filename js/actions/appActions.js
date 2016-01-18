@@ -103,7 +103,7 @@ const AppActions = {
 
   /**
    * Sets the lastCheck date.getTime() value for the data file
-   * @param {string} resourceName - 'adblock' or 'trackingProtection'
+   * @param {string} resourceName - 'adblock', 'trackingProtection', or 'httpsEverywhere'
    * @param {number} lastCheck - The last check date of the reosurce from the http response
    */
   setResourceLastCheck: function (resourceName, lastCheckVersion, lastCheckDate) {
@@ -112,6 +112,19 @@ const AppActions = {
       resourceName,
       lastCheckVersion,
       lastCheckDate
+    })
+  },
+
+  /**
+   * Sets whether the resource is enabled or not.
+   * @param {string} resourceName - 'adblock', 'trackingProtection', or 'httpsEverywhere'
+   * @param {boolean} enabled - true if the resource is enabled.
+   */
+  setResourceEnabled: function (resourceName, enabled) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
+      resourceName,
+      enabled
     })
   },
 

@@ -254,6 +254,10 @@ const handleAppAction = (action) => {
       }
       appStore.emitChange()
       break
+    case AppConstants.APP_SET_RESOURCE_ENABLED:
+      appState = appState.setIn([action.resourceName, 'enabled'], action.enabled)
+      appStore.emitChange()
+      break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,

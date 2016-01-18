@@ -8,7 +8,8 @@ const URL = require('url')
 const TrackingProtection = require('tracking-protection').CTPParser
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const resourceName = 'trackingProtection'
+
+module.exports.resourceName = 'trackingProtection'
 
 let trackingProtection
 
@@ -45,16 +46,16 @@ const startTrackingProtection = (wnd) => {
       !cachedFirstParty[firstPartyUrlHost].find((baseHost) =>
         !Filtering.isThirdPartyHost(baseHost, urlHost))
 
-    DataFile.debug(resourceName, details, shouldBlock)
+    DataFile.debug(module.exports.resourceName, details, shouldBlock)
     return {
       shouldBlock,
-      resourceName
+      resourceName: module.exports.resourceName
     }
   })
 }
 
 module.exports.init = () => {
   trackingProtection = new TrackingProtection()
-  DataFile.init(resourceName, startTrackingProtection,
+  DataFile.init(module.exports.resourceName, startTrackingProtection,
                 data => trackingProtection.deserialize(data))
 }

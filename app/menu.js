@@ -8,6 +8,10 @@ const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
 const AppActions = require('../js/actions/appActions')
+const HttpsEverywhere = require('./httpsEverywhere')
+const AdBlock = require('./adBlock')
+const TrackingProtection = require('./trackingProtection')
+const Filtering = require('./filtering')
 
 /**
  * Sends a message to the web contents of the focused window.
@@ -415,8 +419,11 @@ const init = () => {
         }, {
           type: 'checkbox',
           label: 'Block Ads',
-          enabled: false,
-          checked: true
+          checked: Filtering.isResourceEnabled(AdBlock.resourceName),
+          click: function (item, focusedWindow) {
+            AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
+            init()
+          }
         }, {
           type: 'checkbox',
           label: 'Block Cookies',
@@ -425,8 +432,11 @@ const init = () => {
         }, {
           type: 'checkbox',
           label: 'Block Tracking',
-          enabled: false,
-          checked: true
+          checked: Filtering.isResourceEnabled(TrackingProtection.resourceName),
+          click: function (item, focusedWindow) {
+            AppActions.setResourceEnabled(TrackingProtection.resourceName, !Filtering.isResourceEnabled(TrackingProtection.resourceName))
+            init()
+          }
         }, {
           type: 'checkbox',
           label: 'Block Popups',
@@ -434,9 +444,12 @@ const init = () => {
           checked: true
         }, {
           type: 'checkbox',
-          label: 'Block HTTP',
-          enabled: false,
-          checked: false
+          label: 'HTTPS everywhere',
+          checked: Filtering.isResourceEnabled(HttpsEverywhere.resourceName),
+          click: function (item, focusedWindow) {
+            AppActions.setResourceEnabled(HttpsEverywhere.resourceName, !Filtering.isResourceEnabled(HttpsEverywhere.resourceName))
+            init()
+          }
         }, {
           type: 'separator'
         }, {

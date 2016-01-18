@@ -10,7 +10,7 @@ const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
 const FilterOptions = ABPFilterParserLib.FilterOptions
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const resourceName = 'adblock'
+module.exports.resourceName = 'adblock'
 
 let adblock
 let mapFilterType = {
@@ -36,13 +36,13 @@ const startAdBlocking = () => {
     DataFile.debug(details, shouldBlock)
     return {
       shouldBlock,
-      resourceName
+      resourceName: module.exports.resourceName
     }
   })
 }
 
 module.exports.init = () => {
   adblock = new ABPFilterParser()
-  DataFile.init(resourceName, startAdBlocking,
+  DataFile.init(module.exports.resourceName, startAdBlocking,
                 data => adblock.deserialize(data))
 }

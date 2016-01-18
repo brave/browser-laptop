@@ -8,6 +8,8 @@ const messages = require('../js/constants/messages')
 const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
+const AppStore = require('../js/stores/appStore')
+const AppConfig = require('./appConfig')
 
 const filteringFns = []
 
@@ -31,7 +33,11 @@ function registerForSession (session) {
     let results
     let cbArgs
     for (let i = 0; i < filteringFns.length; i++) {
-      results = filteringFns[i](details)
+      let currentResults = filteringFns[i](details)
+      if (currentResults && !module.exports.isResourceEnabled(currentResults.resourceName)) {
+        continue
+      }
+      results = currentResults
       cbArgs = cbArgs || results.cbArgs
       if (results.shouldBlock) {
         break
@@ -66,4 +72,12 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
 module.exports.init = () => {
   registerForSession(session.fromPartition(''))
   registerForSession(session.fromPartition('private-1'))
+}
+
+module.exports.isResourceEnabled = (resourceName) => {
+  const enabledFromState = AppStore.getState().getIn([resourceName, 'enabled'])
+  if (enabledFromState === undefined) {
+    return AppConfig[resourceName].enabled
+  }
+  return enabledFromState
 }

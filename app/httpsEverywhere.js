@@ -8,6 +8,7 @@ const sqlite3 = require('sqlite3')
 const path = require('path')
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
+const Filtering = require('./filtering')
 const electron = require('electron')
 const session = electron.session
 
@@ -19,6 +20,8 @@ var targets = null
 var redirectCounter = {}
 // Blacklist of canonicalized hosts (host+pathname) that lead to redirect loops
 var redirectBlacklist = []
+
+module.exports.resourceName = 'httpsEverywhere'
 
 function loadRulesets (dirname) {
   const sqlFile = path.join(dirname, 'rulesets.sqlite')
@@ -182,7 +185,8 @@ function startHttpsEverywhere () {
 }
 
 function onBeforeHTTPRequest (details, cb) {
-  if (!httpsEverywhereInitialized) {
+  if (!httpsEverywhereInitialized ||
+      !Filtering.isResourceEnabled(module.exports.resourceName)) {
     cb({})
     return
   }
@@ -202,7 +206,8 @@ function onBeforeHTTPRequest (details, cb) {
 }
 
 function onBeforeRedirect (details) {
-  if (!httpsEverywhereInitialized) {
+  if (!httpsEverywhereInitialized ||
+      !Filtering.isResourceEnabled(module.exports.resourceName)) {
     return
   }
 
@@ -259,7 +264,7 @@ function registerForSession (session) {
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
-  DataFile.init('httpsEverywhere', startHttpsEverywhere, loadRulesets)
+  DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
   registerForSession(session.fromPartition(''))
   registerForSession(session.fromPartition('private-1'))
 }
