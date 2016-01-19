@@ -438,7 +438,7 @@ const init = (args) => {
           checked: Filtering.isResourceEnabled(AdBlock.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
-            init()
+            init({bookmarked: bookmarkPageMenu.checked})
           }
         }, {
           type: 'checkbox',
@@ -451,7 +451,7 @@ const init = (args) => {
           checked: Filtering.isResourceEnabled(TrackingProtection.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(TrackingProtection.resourceName, !Filtering.isResourceEnabled(TrackingProtection.resourceName))
-            init()
+            init({bookmarked: bookmarkPageMenu.checked})
           }
         }, {
           type: 'checkbox',
@@ -464,7 +464,7 @@ const init = (args) => {
           checked: Filtering.isResourceEnabled(HttpsEverywhere.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(HttpsEverywhere.resourceName, !Filtering.isResourceEnabled(HttpsEverywhere.resourceName))
-            init()
+            init({bookmarked: bookmarkPageMenu.checked})
           }
         }, {
           type: 'separator'
