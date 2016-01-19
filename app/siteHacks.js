@@ -7,7 +7,7 @@
 const URL = require('url')
 const Filtering = require('./filtering')
 const siteHacks = require('../js/data/siteHacks')
-const AppConfig = require('./appConfig')
+const AppConfig = require('../js/constants/appConfig')
 
 const resourceName = 'siteHacks'
 

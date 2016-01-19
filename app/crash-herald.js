@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const config = require('./appConfig')
+const AppConfig = require('../js/constants/appConfig')
 const crashReporter = require('electron').crashReporter
 
 exports.init = () => {
   const options = {
     productName: 'Brave Developers',
     companyName: 'Brave.com',
-    submitURL: config.crashes.crashSubmitUrl,
+    submitURL: AppConfig.crashes.crashSubmitUrl,
     autoSubmit: true,
     ignoreSystemCrashHandler: true
   }

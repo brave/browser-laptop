@@ -10,13 +10,13 @@ var crashURL = process.env.CRASH_URL || 'https://laptop-updates.brave.com/1/cras
 module.exports = {
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
-    version: 1,
+    version: '1',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
   trackingProtection: {
     url: 'https://s3.amazonaws.com/tracking-protection-data/{version}/TrackingProtection.dat',
-    version: 1,
+    version: '1',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },

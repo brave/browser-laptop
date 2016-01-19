@@ -24,6 +24,7 @@ const ReleaseNotes = require('./releaseNotes')
 
 // Constants
 const Config = require('../constants/config')
+const AppConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 
 // State handling
@@ -113,6 +114,14 @@ class Main extends ImmutableComponent {
     WindowActions.setReleaseNotesVisible(false)
   }
 
+  get enableAds () {
+    let enabled = this.props.appState.getIn(['adblock', 'enabled'])
+    if (enabled === undefined) {
+      enabled = AppConfig.adblock.enabled
+    }
+    return enabled
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -182,6 +191,7 @@ class Main extends ImmutableComponent {
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}
+              enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

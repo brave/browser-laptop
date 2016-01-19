@@ -9,7 +9,7 @@ const fs = require('fs')
 const path = require('path')
 const urlParse = require('url').parse
 const app = require('electron').app
-const AppConfig = require('./appConfig')
+const AppConfig = require('../js/constants/appConfig')
 const AppActions = require('../js/actions/appActions')
 const cachedDataFiles = {}
 

@@ -7,7 +7,7 @@
 const assert = require('assert')
 const request = require('request')
 const autoUpdater = require('auto-updater')
-const config = require('./appConfig')
+const AppConfig = require('../js/constants/appConfig')
 const messages = require('../js/constants/messages')
 const UpdateStatus = require('../js/constants/updateStatus')
 const querystring = require('querystring')
@@ -51,17 +51,17 @@ exports.updateUrl = function (updates, platform) {
 // Setup schedule for periodic and startup update checks
 var scheduleUpdates = () => {
   // Periodic check
-  if (config.updates.appUpdateCheckFrequency) {
+  if (AppConfig.updates.appUpdateCheckFrequency) {
     setInterval(() => {
       exports.checkForUpdate()
-    }, config.updates.appUpdateCheckFrequency)
+    }, AppConfig.updates.appUpdateCheckFrequency)
   }
 
   // Startup check
-  if (config.updates.runtimeUpdateCheckDelay) {
+  if (AppConfig.updates.runtimeUpdateCheckDelay) {
     setTimeout(() => {
       exports.checkForUpdate()
-    }, config.updates.runtimeUpdateCheckDelay)
+    }, AppConfig.updates.runtimeUpdateCheckDelay)
   }
 }
 
@@ -73,7 +73,7 @@ exports.init = (platform, ver) => {
   // Browser version X.X.X
   version = ver
 
-  var baseUrl = exports.updateUrl(config.updates, platform)
+  var baseUrl = exports.updateUrl(AppConfig.updates, platform)
   debug('updateUrl = ' + baseUrl)
 
   scheduleUpdates()

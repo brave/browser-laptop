@@ -151,7 +151,9 @@ class Frame extends ImmutableComponent {
       WindowActions.setFrameTitle(this.props.frame, title)
     })
     this.webview.addEventListener('dom-ready', (event) => {
-      this.insertAds(event.target.src)
+      if (this.props.enableAds) {
+        this.insertAds(event.target.src)
+      }
     })
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {

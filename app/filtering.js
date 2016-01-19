@@ -9,7 +9,7 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
-const AppConfig = require('./appConfig')
+const AppConfig = require('../js/constants/appConfig')
 
 const filteringFns = []
 
