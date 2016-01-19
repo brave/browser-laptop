@@ -220,6 +220,9 @@ const init = (args) => {
   ]
 
   if (isWindows) {
+    fileMenu.push({
+      type: 'separator'
+    })
     fileMenu.push(quitMenuItem)
     helpMenu.push(aboutBraveMenuItem)
   }
