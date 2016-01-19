@@ -168,6 +168,7 @@ var requestVersionInfo = (done) => {
 
 var downloadHandler = (err, metadata) => {
   assert.equal(err, null)
+  debug('Metadata: ' + JSON.stringify(metadata))
   AppActions.setUpdateStatus(undefined, undefined, Immutable.fromJS(metadata))
   if (process.platform === 'win32') {
     // check versions to see if an update is required
