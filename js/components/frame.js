@@ -157,6 +157,9 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {
+        // TODO: These 3 events should be combined into one
+        WindowActions.onWebviewLoadStart(
+          this.props.frame)
         let key = this.props.frame.get('key')
         WindowActions.setLocation(event.url, key)
         WindowActions.setSecurityState({
@@ -175,17 +178,19 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-start-loading', () => {
-      WindowActions.onWebviewLoadStart(
-        this.props.frame)
     })
     this.webview.addEventListener('did-stop-loading', () => {
-      WindowActions.onWebviewLoadEnd(
-        this.props.frame,
-        this.webview.getURL())
     })
     this.webview.addEventListener('did-fail-load', () => {
     })
     this.webview.addEventListener('did-finish-load', () => {
+    })
+    this.webview.addEventListener('did-frame-finish-load', (event) => {
+      if (event.isMainFrame) {
+        WindowActions.onWebviewLoadEnd(
+          this.props.frame,
+          this.webview.getURL())
+      }
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
       WindowActions.setAudioPlaybackActive(this.props.frame, true)
