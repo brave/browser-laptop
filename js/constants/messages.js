@@ -25,6 +25,7 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_BACK: _,
   SHORTCUT_ACTIVE_FRAME_FORWARD: _,
   SHORTCUT_ACTIVE_FRAME_BOOKMARK: _,
+  SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK: _,
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
@@ -33,7 +34,9 @@ const messages = {
   SHORTCUT_FRAME_RELOAD: _, /** @arg {number} key of frame */
   SHORTCUT_NEXT_TAB: _,
   SHORTCUT_PREV_TAB: _,
+  // Misc application events
   QUIT_APPLICATION: _,
+  UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,

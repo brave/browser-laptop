@@ -28,7 +28,28 @@ const sendToFocusedWindow = (focusedWindow, message) => {
   }
 }
 
-const init = () => {
+/**
+ * Sets up the menu.
+ * @param {Object} args - Arguments to initialize the menu with if any
+ * @param {boolean} state.bookmarked - Whether the current active page is
+ *   bookmarked
+ */
+const init = (args) => {
+  args = args || {}
+  // Create references to menu items that need to be updated dynamically
+  var bookmarkPageMenu = {
+    label: 'Bookmark this page',
+    type: 'checkbox',
+    accelerator: 'CmdOrCtrl+D',
+    checked: args.bookmarked || false,
+    click: function (item, focusedWindow) {
+      var msg = bookmarkPageMenu.checked
+        ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
+        : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
+      sendToFocusedWindow(focusedWindow, [msg])
+    }
+  }
+
   var template = [
     {
       label: 'File',
@@ -357,13 +378,8 @@ const init = () => {
     }, {
       label: 'Bookmarks',
       submenu: [
+        bookmarkPageMenu,
         {
-          label: 'Add Bookmark',
-          accelerator: 'CmdOrCtrl+D',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK])
-          }
-        }, {
           label: 'Add to Favorites Bar',
           enabled: false,
           accelerator: 'Shift+CmdOrCtrl+D'

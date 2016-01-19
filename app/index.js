@@ -128,6 +128,10 @@ app.on('ready', function () {
       app.quit()
     })
 
+    ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
+      Menu.init(args)
+    })
+
     ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
       BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
     })

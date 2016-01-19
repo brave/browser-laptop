@@ -56,6 +56,16 @@ class NavigationBar extends ImmutableComponent {
 
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, this.onAddBookmark.bind(this))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, this.onRemoveBookmark.bind(this))
+  }
+
+  componentDidUpdate (prevProps) {
+    // Update the app menu to reflect whether the current page is bookmarked
+    var prevBookmarked = prevProps.activeFrame &&
+      isSiteInList(prevProps.sites, prevProps.activeFrame.get('location'), SiteTags.BOOKMARK)
+    if (this.bookmarked !== prevBookmarked) {
+      ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
+    }
   }
 
   render () {
