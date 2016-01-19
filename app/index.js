@@ -159,16 +159,13 @@ app.on('ready', function () {
       // Setup the auto updater
       Updater.init(process.platform, pack.version)
 
-      // This only works on prod
-      if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-        // This is fired from a auto-update metadata call
-        // TODO setting state to trigger update UI
-        process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
-          console.log(metadata)
-        })
-      }
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+
+      // This is fired from a auto-update metadata call
+      process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
+        console.log(metadata)
+      })
     })
   })
 })

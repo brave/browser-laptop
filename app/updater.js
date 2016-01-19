@@ -173,6 +173,8 @@ var downloadHandler = (err, metadata) => {
     // check versions to see if an update is required
     if (metadata) {
       autoUpdater.checkForUpdates()
+    } else {
+      autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
     }
   } else {
     autoUpdater.checkForUpdates()
