@@ -13,6 +13,10 @@ const AdBlock = require('./adBlock')
 const TrackingProtection = require('./trackingProtection')
 const Filtering = require('./filtering')
 
+const name = 'Brave'
+const isWindows = process.platform === 'win32'
+const isDarwin = process.platform === 'darwin'
+
 /**
  * Sends a message to the web contents of the focused window.
  * @param {Object} focusedWindow the focusedWindow if any
@@ -37,29 +41,43 @@ const sendToFocusedWindow = (focusedWindow, message) => {
 const init = (args) => {
   args = args || {}
   // Create references to menu items that need to be updated dynamically
-  var bookmarkPageMenu = {
+  const bookmarkPageMenuItem = {
     label: 'Bookmark this page',
     type: 'checkbox',
     accelerator: 'CmdOrCtrl+D',
     checked: args.bookmarked || false,
     click: function (item, focusedWindow) {
-      var msg = bookmarkPageMenu.checked
+      var msg = bookmarkPageMenuItem.checked
         ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
         : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
       sendToFocusedWindow(focusedWindow, [msg])
     }
   }
 
-  var template = [
+  const quitMenuItem = {
+    label: 'Quit ' + name,
+    accelerator: 'Command+Q',
+    click: app.quit
+  }
+
+  const aboutBraveMenuItem = {
+    label: 'About ' + name,
+    role: 'about'
+  }
+
+  const preferencesMenuItem = {
+    label: 'Preferences...',
+    enabled: false,
+    accelerator: 'CmdOrCtrl+,'
+  }
+
+  const fileMenu = [
     {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Check for updates ...',
-          click: function (item, focusedWindow) {
-            process.emit(messages.CHECK_FOR_UPDATE)
-          }
-        },
+      label: 'Check for updates ...',
+      click: function (item, focusedWindow) {
+        process.emit(messages.CHECK_FOR_UPDATE)
+      }
+    },
 // Note: we are keeping this here for testing. Calling process.crash() from the inspector does not create a crash report.
 //        {
 //          label: 'Crash!!!!!',
@@ -67,115 +85,149 @@ const init = (args) => {
 //            process.crash()
 //          }
 //        },
-        {
-          label: 'New Tab',
-          accelerator: 'CmdOrCtrl+T',
-          click: function (item, focusedWindow) {
-            if (!sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
-              // no active windows
-              AppActions.newWindow()
-            }
-          }
-        }, {
-          label: 'New Private Tab',
-          accelerator: 'CmdOrCtrl+Alt+T',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, true])
-          }
-        }, {
-          label: 'New Window',
-          accelerator: 'CmdOrCtrl+N',
-          click: () => AppActions.newWindow()
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Open File...',
-          accelerator: 'CmdOrCtrl+O',
-          click: (item, focusedWindow) => {
-            dialog.showOpenDialog(focusedWindow, {
-              properties: ['openFile', 'multiSelections']
-            }, function (paths) {
-              if (paths) {
-                paths.forEach((path) => {
-                  sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
-                })
-              }
+    {
+      label: 'New Tab',
+      accelerator: 'CmdOrCtrl+T',
+      click: function (item, focusedWindow) {
+        if (!sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
+          // no active windows
+          AppActions.newWindow()
+        }
+      }
+    }, {
+      label: 'New Private Tab',
+      accelerator: 'CmdOrCtrl+Alt+T',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, true])
+      }
+    }, {
+      label: 'New Window',
+      accelerator: 'CmdOrCtrl+N',
+      click: () => AppActions.newWindow()
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Open File...',
+      accelerator: 'CmdOrCtrl+O',
+      click: (item, focusedWindow) => {
+        dialog.showOpenDialog(focusedWindow, {
+          properties: ['openFile', 'multiSelections']
+        }, function (paths) {
+          if (paths) {
+            paths.forEach((path) => {
+              sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
             })
           }
-        }, {
-          label: 'Open Location...',
-          accelerator: 'CmdOrCtrl+L',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
-          }
-        }, {
-          label: 'Open Search...',
-          accelerator: 'CmdOrCtrl+K',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
-          }
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Import from...',
-          enabled: false
-          /*
-          submenu: [
-            {label: 'Google Chrome...'},
-            {label: 'Firefox...'},
-            {label: 'Safari...'}
-          ]
-          */
-        }, {
-          type: 'separator'
-        }, {
-          // this should be disabled when
-          // no windows are active
-          label: 'Close Tab',
-          accelerator: 'CmdOrCtrl+W',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
-          }
-        }, {
-          // this should be disabled when
-          // no windows are active
-          label: 'Close Window',
-          accelerator: 'CmdOrCtrl+Shift+W',
-          click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              AppActions.closeWindow(focusedWindow.id)
-            }
-          }
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Save Page As...',
-          accelerator: 'CmdOrCtrl+S',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
-          }
-        }, {
-          label: 'Share...',
-          enabled: false
-          /*
-          submenu: [
-            {label: 'Email Page Link...'},
-            {type: 'separator'},
-            {label: 'Tweet Page...'},
-            {label: 'Share on Facebook...'},
-            {label: 'More...'}
-          ]
-          */
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Print...',
-          accelerator: 'CmdOrCtrl+P',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_PRINT])
-          }
-        }
+        })
+      }
+    }, {
+      label: 'Open Location...',
+      accelerator: 'CmdOrCtrl+L',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
+      }
+    }, {
+      label: 'Open Search...',
+      accelerator: 'CmdOrCtrl+K',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
+      }
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Import from...',
+      enabled: false
+      /*
+      submenu: [
+        {label: 'Google Chrome...'},
+        {label: 'Firefox...'},
+        {label: 'Safari...'}
       ]
+      */
+    }, {
+      type: 'separator'
+    }, {
+      // this should be disabled when
+      // no windows are active
+      label: 'Close Tab',
+      accelerator: 'CmdOrCtrl+W',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
+      }
+    }, {
+      // this should be disabled when
+      // no windows are active
+      label: 'Close Window',
+      accelerator: 'CmdOrCtrl+Shift+W',
+      click: function (item, focusedWindow) {
+        if (focusedWindow) {
+          AppActions.closeWindow(focusedWindow.id)
+        }
+      }
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Save Page As...',
+      accelerator: 'CmdOrCtrl+S',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
+      }
+    }, {
+      label: 'Share...',
+      enabled: false
+      /*
+      submenu: [
+        {label: 'Email Page Link...'},
+        {type: 'separator'},
+        {label: 'Tweet Page...'},
+        {label: 'Share on Facebook...'},
+        {label: 'More...'}
+      ]
+      */
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Print...',
+      accelerator: 'CmdOrCtrl+P',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_PRINT])
+      }
+    }
+  ]
+
+  const helpMenu = [
+    {
+      label: 'Brave Help',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow,
+          [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+      }
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Submit Feedback...',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow,
+                            [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+      }
+    }, {
+      label: 'Spread the word about Brave...',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow,
+                            [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+      }
+    }
+  ]
+
+  if (isWindows) {
+    fileMenu.push(quitMenuItem)
+    helpMenu.push(aboutBraveMenuItem)
+  }
+
+  var template = [
+    {
+      label: 'File',
+      submenu: fileMenu
     }, {
       label: 'Edit',
       submenu: [
@@ -378,7 +430,7 @@ const init = (args) => {
     }, {
       label: 'Bookmarks',
       submenu: [
-        bookmarkPageMenu,
+        bookmarkPageMenuItem,
         {
           label: 'Add to Favorites Bar',
           enabled: false,
@@ -438,7 +490,7 @@ const init = (args) => {
           checked: Filtering.isResourceEnabled(AdBlock.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
-            init({bookmarked: bookmarkPageMenu.checked})
+            init({bookmarked: bookmarkPageMenuItem.checked})
           }
         }, {
           type: 'checkbox',
@@ -451,7 +503,7 @@ const init = (args) => {
           checked: Filtering.isResourceEnabled(TrackingProtection.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(TrackingProtection.resourceName, !Filtering.isResourceEnabled(TrackingProtection.resourceName))
-            init({bookmarked: bookmarkPageMenu.checked})
+            init({bookmarked: bookmarkPageMenuItem.checked})
           }
         }, {
           type: 'checkbox',
@@ -464,7 +516,7 @@ const init = (args) => {
           checked: Filtering.isResourceEnabled(HttpsEverywhere.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(HttpsEverywhere.resourceName, !Filtering.isResourceEnabled(HttpsEverywhere.resourceName))
-            init({bookmarked: bookmarkPageMenu.checked})
+            init({bookmarked: bookmarkPageMenuItem.checked})
           }
         }, {
           type: 'separator'
@@ -534,80 +586,49 @@ const init = (args) => {
     }, {
       label: 'Help',
       role: 'help',
+      submenu: helpMenu
+    }
+  ]
+
+  if (isDarwin) {
+    template.unshift({
+      label: name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
-        {
-          label: 'Brave Help',
+        aboutBraveMenuItem, {
+          type: 'separator'
+        }, preferencesMenuItem, {
+          type: 'separator'
+        }, {
+          label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             sendToFocusedWindow(focusedWindow,
-                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+              [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
           }
         }, {
           type: 'separator'
         }, {
-          label: 'Submit Feedback...',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow,
-                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
-          }
+          label: 'Services',
+          role: 'services'
         }, {
-          label: 'Spread the word about Brave...',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow,
-                                [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
-          }
-        }
+          type: 'separator'
+        }, {
+          label: 'Hide ' + name,
+          accelerator: 'Command+H',
+          role: 'hide'
+        }, {
+          label: 'Hide Others',
+          accelerator: 'Command+Shift+H',
+          role: 'hideothers'
+        }, {
+          label: 'Show All',
+          role: 'unhide'
+        }, {
+          type: 'separator'
+        },
+        quitMenuItem
       ]
-    }
-  ]
-
-  var name = 'Brave'
-  template.unshift({
-    label: name, // Ignored on OSX, which gets this from the app Info.plist file.
-    submenu: [
-      {
-        label: 'About ' + name,
-        role: 'about'
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Preferences...',
-        enabled: false,
-        accelerator: 'CmdOrCtrl+,'
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Send us Feedback...',
-        click: function (item, focusedWindow) {
-          sendToFocusedWindow(focusedWindow,
-                              [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
-        }
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Services',
-        role: 'services'
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Hide ' + name,
-        accelerator: 'Command+H',
-        role: 'hide'
-      }, {
-        label: 'Hide Others',
-        accelerator: 'Command+Shift+H',
-        role: 'hideothers'
-      }, {
-        label: 'Show All',
-        role: 'unhide'
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Quit ' + name,
-        accelerator: 'Command+Q',
-        click: app.quit
-      }
-    ]
-  })
+    })
+  }
 
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
