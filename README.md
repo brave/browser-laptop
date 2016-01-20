@@ -43,7 +43,11 @@ See [docs/debugging.md](docs/debugging.md) for information on debugging.
 
 ### Running inside of a development version of Brave's Electron fork
 
-We are currently using a fork of Electron with some minor modifications here: https://github.com/brave/electron
+We are using a fork of Electron with some minor modifications here: https://github.com/brave/electron
+
+Most of the time you will not need to use that repository, we provide pre-built binaries when you `npm install` with our own fork of [electron-prebuilt](https://github.com/brave/electron-prebuilt).
+
+If you want to add code to Electron itself, then you may want to build it.  An example would be exposing a new event to the webview from Electron.   We try to upstream everything to [atom/electron](https://github.com/atom/electron) but we can take things in our fork early before upstreaming.
 
 Build instructions:
 - [OSX build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
