@@ -6,10 +6,13 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 
 1. Shallow clone the git repository from GitHub:
         
-        # for beta testers
-        git clone --depth 1 git@github.com:brave/browser-laptop.git
+        # For beta testers:
+        git clone --depth 1 https://github.com/brave/browser-laptop
         
-        # for dev
+        # For devs over HTTPS:
+        git clone https://github.com/brave/browser-laptop
+
+        # For devs over SSH:
         git clone git@github.com:brave/browser-laptop.git
 
 2. Open the working directory:
