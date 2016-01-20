@@ -24,7 +24,7 @@ To start the server and file watchers run the following on the command line:
 
 To run the browser:
 
-    num start
+    npm start
 
 To run the tests:
 
