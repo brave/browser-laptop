@@ -211,8 +211,8 @@ class UrlBar extends ImmutableComponent {
           className={cx({
             urlbarIcon: true,
             'fa': true,
-            'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('focused') && !this.props.titleMode,
-            'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('focused') && !this.props.titleMode,
+            'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
+            'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
             'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             extendedValidation: this.extendedValidationSSL
