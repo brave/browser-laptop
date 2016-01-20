@@ -4,6 +4,7 @@
 
 const electron = require('electron')
 const app = electron.app
+const BrowserWindow = electron.BrowserWindow
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
@@ -79,6 +80,9 @@ const init = (args) => {
     {
       label: 'Check for updates ...',
       click: function (item, focusedWindow) {
+        if (BrowserWindow.getAllWindows().length === 0) {
+          AppActions.newWindow()
+        }
         process.emit(messages.CHECK_FOR_UPDATE)
       }
     },
