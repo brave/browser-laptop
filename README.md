@@ -1,6 +1,6 @@
 # Brave Browser
 
-Laptop and Desktop browser for OS X and Windows.
+Laptop and Desktop browser for OS X, Windows and Linux.
 
 ## Installation
 
