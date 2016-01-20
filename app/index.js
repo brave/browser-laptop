@@ -32,21 +32,6 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 
-app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    setTimeout(app.quit, 0)
-  }
-})
-
-app.on('activate', function () {
-  // (OS X) open a new window when the user clicks on the app icon if there aren't any open
-  if (BrowserWindow.getAllWindows().length === 0) {
-    AppActions.newWindow()
-  }
-})
-
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
 })
@@ -73,24 +58,39 @@ const saveIfAllCollected = () => {
   }
 }
 
-app.on('before-quit', function (e) {
-  if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
-    saveIfAllCollected()
-    return
-  }
-
-  e.preventDefault()
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
-})
-
-ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
-  if (data) {
-    perWindowState.push(data)
-  }
-  saveIfAllCollected()
-})
-
 app.on('ready', function () {
+  app.on('window-all-closed', function () {
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+      setTimeout(app.quit, 0)
+    }
+  })
+
+  app.on('activate', function () {
+    // (OS X) open a new window when the user clicks on the app icon if there aren't any open
+    if (BrowserWindow.getAllWindows().length === 0) {
+      AppActions.newWindow()
+    }
+  })
+
+  app.on('before-quit', function (e) {
+    if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
+      saveIfAllCollected()
+      return
+    }
+
+    e.preventDefault()
+    BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+  })
+
+  ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
+    if (data) {
+      perWindowState.push(data)
+    }
+    saveIfAllCollected()
+  })
+
   loadAppStatePromise.then(initialState => {
     // For tests we always want to load default app state
     if (process.env.NODE_ENV === 'test') {
