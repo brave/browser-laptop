@@ -190,6 +190,13 @@ class UrlBar extends ImmutableComponent {
     return ['about:', 'file:', 'chrome:', 'view-source:'].includes(protocol)
   }
 
+  get isHTTPPage () {
+    // Whether this page is HTTP or HTTPS. We don't show security indicators
+    // for other protocols like mailto: and about:.
+    var protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
+    return protocol === 'http:' || protocol === 'https:'
+  }
+
   onSiteInfo () {
     WindowActions.setSiteInfoVisible(true)
   }
@@ -204,8 +211,8 @@ class UrlBar extends ImmutableComponent {
           className={cx({
             urlbarIcon: true,
             'fa': true,
-            'fa-lock': this.secure && this.props.loading === false && !this.props.urlbar.get('focused') && !this.props.titleMode,
-            'fa-unlock': !this.secure && this.props.loading === false && !this.aboutPage && !this.props.urlbar.get('focused') && !this.props.titleMode,
+            'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('focused') && !this.props.titleMode,
+            'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('focused') && !this.props.titleMode,
             'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             extendedValidation: this.extendedValidationSSL
@@ -219,7 +226,7 @@ class UrlBar extends ImmutableComponent {
         value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
-          insecure: !this.secure && this.props.loading === false && !this.aboutPage,
+          insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
           private: this.private,
           testHookLoadDone: !this.props.loading
         })}
