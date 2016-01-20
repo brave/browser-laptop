@@ -103,26 +103,22 @@ app.on('ready', function () {
     AppActions.setState(Immutable.fromJS(initialState))
     return perWindowState
   }).then(perWindowState => {
-    const openFromCmdLine = () => {
-      AppActions.newWindow(Immutable.fromJS({
-        location: CmdLine.newWindowURL
-      }))
-    }
     if (!perWindowState || perWindowState.length === 0) {
-      if (CmdLine.newWindowURL) {
-        openFromCmdLine()
-      } else {
+      if (!CmdLine.newWindowURL) {
         AppActions.newWindow()
       }
     } else {
       perWindowState.forEach(wndState => {
         AppActions.newWindow(undefined, undefined, wndState)
       })
-      if (CmdLine.newWindowURL) {
-        openFromCmdLine()
-      }
     }
     process.emit(messages.APP_INITIALIZED)
+
+    if (CmdLine.newWindowURL) {
+      AppActions.newWindow(Immutable.fromJS({
+        location: CmdLine.newWindowURL
+      }))
+    }
 
     ipcMain.on(messages.QUIT_APPLICATION, () => {
       app.quit()

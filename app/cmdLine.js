@@ -18,9 +18,7 @@ app.on('will-finish-launching', function () {
   app.on('open-url', function (event, path) {
     event.preventDefault()
 
-    // make sure that we don't call BrowserWindow.getFocusedWindow() before 'ready'
-    // has fired or we'll get "Cannot initialize screen module before app is ready"
-    app.on('ready', function () {
+    if (appInitialized) {
       let wnd = BrowserWindow.getFocusedWindow()
       if (!wnd) {
         const wnds = BrowserWindow.getAllWindows()
@@ -30,14 +28,14 @@ app.on('will-finish-launching', function () {
       }
       if (wnd) {
         wnd.webContents.send(messages.SHORTCUT_NEW_FRAME, path)
-      } else if (appInitialized) {
+      } else {
         AppActions.newWindow(Immutable.fromJS({
           location: path
         }))
-      } else {
-        module.exports.newWindowURL = path
       }
-    })
+    } else {
+      module.exports.newWindowURL = path
+    }
   })
 })
 
