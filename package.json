@@ -4,6 +4,8 @@
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
+    "checks": "npm run check-security",
+    "check-security": "nsp check",
     "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "watch-all": "npm run watch & npm run watch-test",
@@ -91,6 +93,8 @@
     "node-libs-browser": "^0.5.3",
     "node-static": "^0.7.7",
     "node-uuid": "^1.4.7",
+    "npm": "3.4.1",
+    "nsp": "^2.2.0",
     "pre-commit": "^1.1.2",
     "spectron": "^0.36.0",
     "standard": "^5.4.1",
@@ -99,7 +103,6 @@
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0",
     "webpack-notifier": "^1.2.1",
-    "npm": "3.4.1",
     "xml2js": "^0.4.15"
   },
   "standard": {
