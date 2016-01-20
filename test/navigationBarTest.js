@@ -18,17 +18,14 @@ describe('urlbar', function () {
       .ipcSend('shortcut-new-frame')
       // wait for correct urlInput based on frameKey
       .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
-      // wait for selection
       .waitUntil(function () {
-        return this.getAttribute('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput, 'selectionEnd').then(function (value) { return value > 0 })
+        return this.getAttribute(':focus', 'id').then(value => value === 'urlInput')
       })
-    // wait for focus
-    yield hasFocus(client)
   }
 
-  function blur (client, text = Config.defaultUrl) {
+  function blur (client) {
     return client
-      .keys('\uE007') // clear focus
+      .leftClick(activeWebview) // clear focus from urlbar
       .waitUntil(function () {
         return this.getSelectedText().then(function (value) { return value === '' })
       })
@@ -40,8 +37,11 @@ describe('urlbar', function () {
     })
   }
 
-  function defaultUrl (client) {
-    return client.waitForValue(urlInput, Config.defaultUrl)
+  function defaultUrlInputValue (client) {
+    return client.waitUntil(function () {
+      return this.getAttribute(urlInput, 'value').then(value => value === '')
+    })
+    .getAttribute(urlInput, 'placeholder').should.eventually.equal('Search or enter an address')
   }
 
   function * navigate (client, url) {
@@ -61,54 +61,59 @@ describe('urlbar', function () {
   }
 
   describe('navigation', function () {
-    Brave.beforeAll(this)
+    describe('page with a title', function () {
+      Brave.beforeAll(this)
 
-    before(function *() {
-      yield setup(this.app.client)
-    })
+      before(function *() {
+        this.page1Url = Brave.server.url('page1.html')
+        yield setup(this.app.client)
+        yield navigate(this.app.client, this.page1Url)
+        yield this.app.client.waitForValue(urlInput)
+      })
 
-    it('loads a page with a title', function *() {
-      const page1Url = Brave.server.url('page1.html')
-      yield navigate(this.app.client, page1Url)
-      return yield this.app.client.waitForValue(urlInput)
-        // Should have title mode
-        .waitUntil(function () {
+      it('has title mode', function *() {
+        yield this.app.client.waitUntil(function () {
           return this.getValue(urlInput).then(val => val === 'Page 1')
         })
-        // Check for exiting title mode
-        .isExisting(navigatorLoadTime).then(isExisting =>
-            assert(!isExisting))
-        .moveToObject(urlInput)
-        .waitForExist(navigatorLoadTime)
-        .getValue(urlInput)
-        .should.eventually.be.equal(page1Url)
+        .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
+      })
+
+      it('shows the url on mouseover', function *() {
+        yield this.app.client
+          .moveToObject(urlInput)
+          .waitForExist(navigatorLoadTime)
+          .getValue(urlInput)
+          .should.eventually.be.equal(this.page1Url)
+      })
+
+      it('exits title mode when focused', function *() {
+        let page1Url = this.page1Url
+        yield this.app.client
+          .ipcSend('shortcut-focus-url', false)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then(val => val === page1Url)
+          })
+        yield selectsText(this.app.client, page1Url)
+      })
     })
 
-    it('exits title mode when focused', function *() {
-      const page1Url = Brave.server.url('page1.html')
-      yield navigate(this.app.client, page1Url)
-      return yield this.app.client.ipcSend('shortcut-focus-url', false)
-        .waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === page1Url)
-        })
-    })
+    describe('page without a title', function () {
+      Brave.beforeAll(this)
 
-    it('exits title mode when focused for search hmode', function *() {
-      const page1Url = Brave.server.url('page1.html')
-      yield navigate(this.app.client, page1Url)
-      return yield this.app.client.ipcSend('shortcut-focus-url', true)
-        .waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === page1Url)
-        })
-    })
+      before(function *() {
+        this.page_no_title = Brave.server.url('page_no_title.html')
+        yield setup(this.app.client)
+        yield navigate(this.app.client, this.page_no_title)
+      })
 
-    it('loads a page with no title', function *() {
-      const pageNoTitleUrl = Brave.server.url('page_no_title.html')
-      yield navigate(this.app.client, pageNoTitleUrl)
-      return yield this.app.client
-        .waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === pageNoTitleUrl)
-        })
+      it('does not have title mode', function *() {
+        let page_no_title = this.page_no_title
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then(val => val === page_no_title)
+          })
+          .waitForExist(navigatorLoadTime)
+      })
     })
   })
 
@@ -209,8 +214,9 @@ describe('urlbar', function () {
       yield setup(this.app.client)
     })
 
-    it('displays the default url', function *() {
-      yield defaultUrl(this.app.client)
+    it('has an empty url with placeholder', function *() {
+      yield defaultUrlInputValue(this.app.client)
+      yield selectsText(this.app.client, '')
     })
 
     it('has focus', function *() {
@@ -230,45 +236,39 @@ describe('urlbar', function () {
       yield newFrame(this.app.client)
     })
 
-    it('displays the default url', function *() {
-      yield defaultUrl(this.app.client)
+    it('has an empty url with placeholder', function *() {
+      yield defaultUrlInputValue(this.app.client)
+      yield selectsText(this.app.client, '')
     })
 
     it('has focus', function *() {
       yield hasFocus(this.app.client)
     })
-
-    it('selects the text', function *() {
-      yield selectsText(this.app.client)
-    })
   })
 
   describe('submit', function () {
-    Brave.beforeAll(this)
+    describe('with url input value', function () {
+      Brave.beforeAll(this)
 
-    before(function *() {
-      yield setup(this.app.client)
-      // wait for the urlInput to be fully initialized
-      yield selectsText(this.app.client)
-      // hit enter
-      yield this.app.client.keys('\uE007')
-    })
+      before(function *() {
+        this.page1 = Brave.server.url('page1.html')
 
-    it('clears the selected text', function *() {
-      yield selectsText(this.app.client, '')
-    })
+        yield setup(this.app.client)
+        // wait for the urlInput to be fully initialized
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client.keys(this.page1)
+        // hit enter
+        yield this.app.client.keys('\uE007')
+      })
 
-    it('gives focus to the webview', function () {
-      this.app.client.waitUntil(function () {
-        return this.getAttribute(':focus', 'src').then(src => src === Config.defaultUrl)
+      it('gives focus to the webview', function () {
+        this.app.client.waitUntil(function () {
+          return this.getAttribute(':focus', 'src').then(src => src === this.page1)
+        })
       })
     })
 
-    describe('url input value', function () {
-
-    })
-
-    describe('non-url input value', function () {
+    describe('with non-url input value', function () {
 
     })
 
@@ -282,8 +282,7 @@ describe('urlbar', function () {
 
     before(function *() {
       yield setup(this.app.client)
-      // wait for the urlInput to be fully initialized
-      yield selectsText(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
       // now type something
       yield this.app.client.keys('a')
     })
@@ -355,13 +354,9 @@ describe('urlbar', function () {
       yield setup(this.app.client)
       // tab with typing
       yield newFrame(this.app.client, 2)
-      yield defaultUrl(this.app.client)
-      yield hasFocus(this.app.client)
-      yield selectsText(this.app.client)
       yield this.app.client
-        .keys('a')
         .waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === 'a')
+          return this.keys('a').getValue(urlInput).then(val => val === 'a')
         })
       // tab with loaded url
       yield newFrame(this.app.client, 3)
@@ -375,8 +370,15 @@ describe('urlbar', function () {
           .waitForVisible('div[id="navigator"][data-frame-key="1"] ' + urlInput)
       })
 
-      it('preserves focused state', function *() {
-        yield defaultUrl(this.app.client)
+      it('shows the default location', function *() {
+        yield defaultUrlInputValue(this.app.client)
+        yield selectsText(this.app.client, '')
+      })
+
+      it('focuses on the webview', function *() {
+        this.app.client.waitUntil(function () {
+          return this.getAttribute(':focus', 'src').then(src => src === Config.defaultUrl)
+        })
       })
     })
 
@@ -402,7 +404,7 @@ describe('urlbar', function () {
           .ipcSend('shortcut-set-active-frame-by-index', 2)
       })
 
-      it('preserves focus on the webview', function *() {
+      it('focuses on the webview', function *() {
         this.app.client.waitUntil(function () {
           return this.getAttribute(':focus', 'src').then(src => src === Brave.server.url('page1.html'))
         })
@@ -416,13 +418,11 @@ describe('urlbar', function () {
 
       before(function *() {
         yield setup(this.app.client)
+        // type anything
+        yield this.app.client.keys('a')
         yield blur(this.app.client)
         yield this.app.client
           .leftClick(urlInput)
-      })
-
-      it('displays the default url', function *() {
-        yield defaultUrl(this.app.client)
       })
 
       it('has focus', function *() {
@@ -430,7 +430,7 @@ describe('urlbar', function () {
       })
 
       it('selects the text', function *() {
-        yield selectsText(this.app.client)
+        yield selectsText(this.app.client, 'a')
       })
     })
 
@@ -439,12 +439,13 @@ describe('urlbar', function () {
 
       before(function *() {
         yield setup(this.app.client)
+        // type anything
+        yield this.app.client.keys('a')
         yield this.app.client
           .leftClick(urlInput)
-      })
-
-      it('displays the default url', function *() {
-        yield defaultUrl(this.app.client)
+        // click when already focused
+        yield this.app.client
+          .leftClick(urlInput)
       })
 
       it('has focus', function *() {
@@ -457,6 +458,12 @@ describe('urlbar', function () {
     })
   })
 
+  describe('escape', function () {
+    it('sets the urlbar text to the webview src')
+
+    it('selects the urlbar text')
+  })
+
   describe('shortcut-focus-url', function () {
     Brave.beforeAll(this)
 
@@ -466,16 +473,12 @@ describe('urlbar', function () {
       yield this.app.client.ipcSend('shortcut-focus-url')
     })
 
-    it('displays the default url', function *() {
-      yield defaultUrl(this.app.client)
+    it('has an empty url with placeholder', function *() {
+      yield defaultUrlInputValue(this.app.client)
     })
 
     it('has focus', function *() {
       yield hasFocus(this.app.client)
-    })
-
-    it('selects the text', function *() {
-      yield selectsText(this.app.client)
     })
   })
 })

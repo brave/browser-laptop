@@ -163,8 +163,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   get inputValue () {
+    let loc = this.props.urlbar.get('location') === 'about:blank' ? '' : this.props.urlbar.get('location')
     return this.props.titleMode
-      ? this.props.activeFrameProps.get('title') : this.props.urlbar.get('location')
+      ? this.props.activeFrameProps.get('title') : loc
   }
 
   get loadTime () {
