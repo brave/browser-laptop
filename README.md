@@ -5,8 +5,12 @@ Laptop and Desktop browser for OS X and Windows.
 ## Installation
 
 1. Shallow clone the git repository from GitHub:
-
-        git clone depth 1 git@github.com:brave/browser-laptop.git
+        
+        # for beta testers
+        git clone --depth 1 git@github.com:brave/browser-laptop.git
+        
+        # for dev
+        git clone git@github.com:brave/browser-laptop.git
 
 2. Open the working directory:
 
