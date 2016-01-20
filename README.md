@@ -4,9 +4,9 @@ Laptop and Desktop browser for OS X and Windows.
 
 ## Installation
 
-1. Clone the git repository from GitHub:
+1. Shallow clone the git repository from GitHub:
 
-        git clone git@github.com:brave/browser-laptop.git
+        git clone depth 1 git@github.com:brave/browser-laptop.git
 
 2. Open the working directory:
 
