@@ -493,7 +493,7 @@ const init = (args) => {
           enabled: false // Hack to make this look like a section header.
         }, {
           type: 'checkbox',
-          label: 'Block and insert safe ads',
+          label: 'Replace ads',
           checked: Filtering.isResourceEnabled(AdBlock.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
