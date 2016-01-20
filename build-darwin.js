@@ -15,6 +15,7 @@ var cmds = [
   'rm -rf Brave-darwin-x64',
   'NODE_ENV=production ./node_modules/.bin/webpack',
   'rm -f dist/Brave.dmg',
+  'npm run checks',
   './node_modules/electron-packager/cli.js . Brave --overwrite --ignore="electron-download|electron-rebuild|electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel$|babel-(?!polyfill|regenerator-runtime)" --platform=darwin --arch=x64 --version=' + electronVersion + ' --icon=res/app.icns --app-version=' + version + ' --build-version=' + electronVersion + ' --protocol="http" --protocol-name="HTTP Handler" --protocol="https" --protocol-name="HTTPS Handler"'
 ]
 
