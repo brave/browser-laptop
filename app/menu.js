@@ -17,6 +17,10 @@ const name = 'Brave'
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 
+const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
+const contactUrl = 'mailto:support@brave.com'
+const aboutUrl = 'https://brave.com/'
+
 /**
  * Sends a message to the web contents of the focused window.
  * @param {Object} focusedWindow the focusedWindow if any
@@ -197,10 +201,10 @@ const init = (args) => {
 
   const helpMenu = [
     {
-      label: 'Brave Help',
+      label: 'Report an issue',
       click: function (item, focusedWindow) {
         sendToFocusedWindow(focusedWindow,
-          [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+          [messages.SHORTCUT_NEW_FRAME, issuesUrl])
       }
     }, {
       type: 'separator'
@@ -208,13 +212,13 @@ const init = (args) => {
       label: 'Submit Feedback...',
       click: function (item, focusedWindow) {
         sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+                            [messages.SHORTCUT_NEW_FRAME, contactUrl])
       }
     }, {
       label: 'Spread the word about Brave...',
       click: function (item, focusedWindow) {
         sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+                            [messages.SHORTCUT_NEW_FRAME, aboutUrl])
       }
     }
   ]
@@ -605,7 +609,7 @@ const init = (args) => {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+              [messages.SHORTCUT_NEW_FRAME, contactUrl])
           }
         }, {
           type: 'separator'
