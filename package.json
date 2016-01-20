@@ -24,10 +24,7 @@
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bbondy/electron-sample.git"
-  },
+  "repository": "brave/browser-laptop",
   "author": {
     "name": "Brave Developers <support@brave.com>"
   },
