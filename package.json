@@ -52,7 +52,7 @@
   "dependencies": {
     "abp-filter-parser-cpp": "^1.0.22",
     "electron-localshortcut": "^0.6.0",
-    "electron-prebuilt": "https://github.com/brave/electron-prebuilt",
+    "electron-prebuilt": "brave/electron-prebuilt",
     "electron-squirrel-startup": "^0.1.4",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
@@ -64,7 +64,7 @@
     "tracking-protection": "^1.0.7",
     "url-loader": "^0.5.7",
     "urlutil.js": "^0.1.1",
-    "vibrant": "https://github.com/jariz/vibrant.js#1.0"
+    "vibrant": "jariz/vibrant.js#1.0"
   },
   "devDependencies": {
     "asar": "^0.8.3",
