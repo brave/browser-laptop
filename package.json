@@ -120,5 +120,9 @@
   },
   "pre-commit": [
     "lint"
-  ]
+  ],
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 5.0.0"
+  }
 }
