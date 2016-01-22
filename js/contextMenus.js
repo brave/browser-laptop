@@ -4,6 +4,7 @@
 
 const remote = require('remote')
 const Menu = remote.require('menu')
+const Clipboard = require('clipboard')
 const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
@@ -154,6 +155,14 @@ function mainTemplateInit (nodeProps) {
           }
         }
       })
+      template.push({
+        label: 'Copy link address',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            Clipboard.writeText(nodeProps.src)
+          }
+        }
+      })
       break
     case 'IMG':
       template.push({
@@ -170,6 +179,14 @@ function mainTemplateInit (nodeProps) {
           if (focusedWindow && nodeProps.src) {
             // TODO: open this in the next tab instead of last tab
             focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
+          }
+        }
+      })
+      template.push({
+        label: 'Copy image address',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            Clipboard.writeText(nodeProps.src)
           }
         }
       })
