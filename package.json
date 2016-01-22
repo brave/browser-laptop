@@ -17,6 +17,7 @@
     "sign-darwin": "./sign-darwin.sh",
     "build-darwin": "node ./build-darwin.js",
     "build-win64": "node ./build-win64.js",
+    "build-linux64": "node ./build-linux.js",
     "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
     "installer-win64": "node ./build-win64-installer.js",
     "zip-darwin": "node build-darwin-update.js",
