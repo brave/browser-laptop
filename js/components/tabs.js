@@ -69,7 +69,7 @@ class Tabs extends ImmutableComponent {
           onClick={WindowActions.newFrame} /> : null }
         </span>
         {(() => {
-          if (this.props.tabPageIndex > 0) {
+          if (this.props.currentFrames.length >= Config.tabs.tabsPerPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
               className='nextTab fa fa-angle-right'
               disabled={this.props.tabPageIndex + 1 === this.totalPages || this.totalPages === 0}
