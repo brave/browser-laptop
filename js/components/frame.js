@@ -122,6 +122,7 @@ class Frame extends ImmutableComponent {
         AppActions.newWindow({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
+          isPrivate: this.props.frame.get('isPrivate'),
           guestInstanceId
         }, windowOptions)
       } else {
@@ -129,6 +130,7 @@ class Frame extends ImmutableComponent {
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
           openInForeground: e.disposition !== 'background-tab',
+          isPrivate: this.props.frame.get('isPrivate'),
           guestInstanceId
         })
       }
