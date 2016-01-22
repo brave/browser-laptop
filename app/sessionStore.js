@@ -113,6 +113,7 @@ module.exports.cleanSessionData = (sessionData) => {
     delete frame.searchDetail
     // Remove find in page details
     delete frame.findDetail
+    delete frame.findbarShown
     // Don't store child tab open ordering since keys
     // currently get re-generated when session store is
     // restored.  We will be able to keep this once we
