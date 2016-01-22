@@ -106,7 +106,13 @@ const init = (args) => {
       label: 'New Private Tab',
       accelerator: 'CmdOrCtrl+Alt+T',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, true])
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
+      }
+    }, {
+      label: 'New Partitioned Session',
+      accelerator: 'CmdOrCtrl+Alt+S',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
       }
     }, {
       label: 'New Window',

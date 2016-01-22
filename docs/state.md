@@ -71,6 +71,7 @@ WindowStore
     findbarShown: boolean, // whether the findbar is shown
     key: number,
     isPrivate: boolean, // private browsing tab
+    partitionNumber: number, // the session partition to use
     loading: boolean,
     themeColor: string, // css compatible color string
     computedThemeColor: string, // css computed theme color from the favicon

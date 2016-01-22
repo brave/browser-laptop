@@ -121,7 +121,7 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
+export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   var url = frameOpts.location || Config.defaultUrl
   let frame = Immutable.fromJS({
     audioMuted: false, // frame is muted
@@ -130,6 +130,7 @@ export function addFrame (frames, frameOpts, newKey, activeFrameKey) {
     location: url, // page url
     src: url, // what the iframe src should be
     isPrivate: frameOpts.isPrivate || false,
+    partitionNumber,
     element: frameOpts.element,
     features: getFeatures(frameOpts.features),
     isPinned: frameOpts.isPinned,

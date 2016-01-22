@@ -34,6 +34,8 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('preload', 'content/webviewPreload.js')
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
+    } else if (this.props.frame.get('partitionNumber')) {
+      this.webview.setAttribute('partition', `persist:partition-${this.props.frame.get('partitionNumber')}`)
     }
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
@@ -123,6 +125,7 @@ class Frame extends ImmutableComponent {
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
           isPrivate: this.props.frame.get('isPrivate'),
+          partitionNumber: this.props.frame.get('partitionNumber'),
           guestInstanceId
         }, windowOptions)
       } else {
@@ -131,6 +134,7 @@ class Frame extends ImmutableComponent {
           parentFrameKey: this.props.frame.get('key'),
           openInForeground: e.disposition !== 'background-tab',
           isPrivate: this.props.frame.get('isPrivate'),
+          partitionNumber: this.props.frame.get('partitionNumber'),
           guestInstanceId
         })
       }

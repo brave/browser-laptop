@@ -80,5 +80,6 @@
 <updateRequiresRelaunch "Requires a quick relaunch...">
 <updateViewLog "View log">
 <updateHide "Hide">
-<updateHide "">
 
+<defaultSession "This tab uses the default partition">
+<sessionInfo "This tab uses partition {{$partitionNumber}}">
