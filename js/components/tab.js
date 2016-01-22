@@ -101,7 +101,8 @@ class Tab extends ImmutableComponent {
     WindowActions.setActiveFrame(this.props.frameProps)
   }
 
-  onCloseFrame () {
+  onCloseFrame (event) {
+    event.stopPropagation()
     WindowActions.closeFrame(this.props.frames, this.props.frameProps)
   }
 
