@@ -63,7 +63,7 @@ class Tab extends ImmutableComponent {
       return
     }
 
-    let rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
+    const rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
     if (e.clientX > rect.left && e.clientX < rect.left + rect.width / 2 &&
       !this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
       WindowActions.tabDragDraggingOverLeftHalf(this.props.frameProps)
@@ -84,7 +84,7 @@ class Tab extends ImmutableComponent {
   }
 
   onDrop (e) {
-    let sourceFrameProps = this.props.activeDraggedTab
+    const sourceFrameProps = this.props.activeDraggedTab
     if (!sourceFrameProps) {
       return
     }
@@ -134,7 +134,7 @@ class Tab extends ImmutableComponent {
   render () {
     // Style based on theme-color
     let iconStyle = {}
-    var activeTabStyle = {}
+    const activeTabStyle = {}
     const backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
     if (this.props.isActive && backgroundColor) {
       activeTabStyle.backgroundColor = backgroundColor

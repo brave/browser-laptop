@@ -133,7 +133,7 @@ class Main extends ImmutableComponent {
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
 
-    let activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     return <div id='window'>
       <div className='top'>
         <div className='backforward'>
