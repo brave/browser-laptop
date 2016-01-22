@@ -46,7 +46,6 @@ class Tabs extends ImmutableComponent {
           if (this.props.tabPageIndex > 0) {
             return <span
                 className='prevTab fa fa-angle-left'
-                disabled={this.props.tabPageIndex > 0}
                 onClick={this.onPrevPage.bind(this)} />
           }
         })()}
@@ -72,7 +71,6 @@ class Tabs extends ImmutableComponent {
           if (this.props.currentFrames.length >= Config.tabs.tabsPerPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
               className='nextTab fa fa-angle-right'
-              disabled={this.props.tabPageIndex + 1 === this.totalPages || this.totalPages === 0}
               onClick={this.onNextPage.bind(this)} />
           }
         })()}
