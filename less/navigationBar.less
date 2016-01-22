@@ -24,14 +24,14 @@
   &.titleMode {
     input {
       background: @chromePrimary;
-      color: white;
+      color: @chromeText;
       text-align: center;
       font-size: 15px;
       /*
       &:focus {
         -webkit-user-select: none;
         background: @chromePrimary;
-        color: white;
+        color: @chromeText;
       }
       */
     }
@@ -66,9 +66,9 @@
   input {
     background: @navigationBarBackground;
     border: none;
-    border-radius: 13px;
+    border-radius: @borderRadius;
     box-sizing: border-box;
-    color: #fff;
+    color: @chromeText;
     font-size: @defaultFontSize;
     font-weight: normal;
     height: 24px;
@@ -91,7 +91,7 @@
 
     &.private {
       background: @privateTabBackground;
-      color: #fff;
+      color: @chromeText;
     }
   }
 
@@ -161,14 +161,14 @@
 
 .flyoutDialog {
   background-color: #eeeeee;
-  border-radius: 9px;
+  border-radius: @borderRadius;
   box-shadow: 2px 2px 8px #3b3b3b;
   color: #000;
   font-size: 13px;
   padding: 10px 30px;
   position: absolute;
   text-align: left;
-  top: 48px;
+  top: 30px;
 }
 
 .releaseNotes {

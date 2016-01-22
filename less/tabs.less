@@ -28,47 +28,45 @@
 }
 
 .tab {
-  border-radius: 10px;
-  border-top-left-radius: @tabBorderRadius;
-  border-top-right-radius: @tabBorderRadius;
+  border-radius: @borderRadius @borderRadius 0px 0px;
   border-width: 1px 1px 0;
   box-sizing: border-box;
   color: #3B3B3B;
   display: flex;
-  height: 20px;
+  height: 26px;
   margin: 0;
-  position: relative;
   transition: transform 200ms ease;
   left: 0;
   opacity: 1.0;
   padding: 0;
   width: 100%;
   -moz-window-dragging: no-drag;
+  align-items: center;
+  justify-content: center;
 
   &:not(.isPinned) {
-    background: linear-gradient(to bottom, #BEBFC2, #AFB0B4);
+    background: @chromeTertiary;
   }
 
   .tabTitle {
     -webkit-user-select: none;
     box-sizing: border-box;
     display: inline-block;
-    font-size: 11px;
-    margin: auto 0;
+    font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: middle;
-    width: calc(~'100% - 26px');
+    width: calc(~'100% - 40px');
+    height: 16px;
   }
   .tabIcon {
     background-position: center;
     background-repeat: no-repeat;
     display: inline-block;
     font-size: 12px;
-    margin: auto 9px;
-    position: relative;
-    vertical-align: middle;
+    margin-left: 4px;
+    margin-right: 4px;
   }
 
   .privateIcon {
@@ -101,9 +99,6 @@
 
   &.active {
     background: @activeTabDefaultColor;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    height: 26px;
   }
 
   &.private {
@@ -125,7 +120,7 @@
   }
 
   &:not(.active):hover {
-    background: linear-gradient(to bottom, #DFDFDF, #AFB0B4);
+    background: linear-gradient(to bottom, @chromeTertiary, @chromeSecondary);
     &.private {
       background: lighten(@privateTabBackground, 20%);
     }
@@ -141,12 +136,11 @@
 
   .closeTab {
     opacity: 0;
-    margin: auto 0;
-    position: absolute;
-    right: 0px;
     text-align: center;
-    top: 2px;
-    width: 24px;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    margin-right: 4px;
 
     &:hover {
       opacity: 1;
@@ -201,6 +195,7 @@
   background: @tabsBackground;
   display: flex;
   height: 26px;
+  border-bottom: 1px solid @chromeTertiary;
 }
 
 .tabsToolbarButtons {
@@ -214,7 +209,7 @@
 
 .tabPages {
   background: @tabsBackground;
-  border-top: 1px solid gray;
+  border-top: 1px solid @chromeTertiary;
   display: flex;
   height: 14px;
   justify-content: center;
@@ -225,8 +220,8 @@
 
 .tabPage {
   align-items: center;
-  background-color: @chromeControlsBackground2;
-  border-radius: 9px;
+  background-color: @chromeTertiary;
+  border-radius: @borderRadius;
   box-sizing: border-box;
   display: inline-block;
   margin: auto 2.5px;
@@ -243,21 +238,22 @@
   }
 
   &.active {
-    background-color: #eeeeee;
+    background-color: @chromePrimary;
   }
 }
 
 .prevTab, .nextTab {
+  display: none !important;
   color: #3B3B3B;
   font-size: 24px !important;
   height: 20px;
   line-height: 20px !important;
-  opacity: 0.5;
   vertical-align: top;
   width: 50px;
+
   &:not([disabled]) {
+    display: inline-block !important;
     background: #eeeeee;
-    opacity: 1;
     &:hover {
       background: lighten(#eeeeee, 10%);
     }
@@ -266,8 +262,8 @@
 
 .prevTab {
   background: linear-gradient(to right, @chromeControlsBackground2, @tabsBackground);
-  border-bottom-left-radius: 9px;
-  border-top-left-radius: 9px;
+  border-bottom-left-radius: @borderRadius;
+  border-top-left-radius: @borderRadius;
   padding-left: 10px;
   text-align: left;
   transform: translateX(10px);
@@ -275,8 +271,8 @@
 
 .nextTab {
   background: linear-gradient(to left, #afb0b4, #cccccc);
-  border-bottom-right-radius: 9px;
-  border-top-right-radius: 9px;
+  border-bottom-right-radius: @borderRadius;
+  border-top-right-radius: @borderRadius;
   float: right;
   padding-right: 10px;
   text-align: right;
