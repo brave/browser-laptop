@@ -19,7 +19,7 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 
         cd browser-laptop
 
-3. Install the Node dependencies:
+3. Install the Node (v5+) dependencies:
 
         npm install
 
