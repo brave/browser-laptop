@@ -14,7 +14,7 @@ var cert_password = process.env.CERT_PASSWORD
 if (!cert_password) throw new Error('Certificate password required. Set environment variable CERT_PASSWORD.')
 
 var cmds = [
-  'electron-installer-squirrel-windows "Brave-win32-x64" --platform=win --out="win64-dist" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --cert_path=' + cert + ' --cert_password=' + cert_password
+  'electron-installer-squirrel-windows "Brave-win32-x64" --platform=win --out="dist" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --cert_path=' + cert + ' --cert_password=' + cert_password
 ]
 
 var cmd = cmds.join(' && ')
