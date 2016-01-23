@@ -27,14 +27,19 @@ class TabPage extends ImmutableComponent {
 }
 
 class TabPages extends ImmutableComponent {
-  get tabCount () {
+  get tabPageCount () {
     return Math.ceil(this.props.frames.size / Config.tabs.tabsPerPage)
   }
 
   render () {
-    return <div className='tabPages'>
+    return <div
+      className={cx({
+        tabPages: true,
+        singlePage: this.tabPageCount === 1
+      })}>
     {
-      Array.from(new Array(this.tabCount)).map((x, i) =>
+      this.tabPageCount !== 1 &&
+      Array.from(new Array(this.tabPageCount)).map((x, i) =>
         <TabPage
           key={`tabPage-${i}`}
           frames={this.props.frames.slice(i * Config.tabs.tabsPerPage, i * Config.tabs.tabsPerPage + Config.tabs.tabsPerPage)}

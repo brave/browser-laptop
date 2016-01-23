@@ -22,7 +22,7 @@ describe('tab pages', function () {
 
     it('creates a new tab page when full', function * () {
       yield this.app.client.elements(tabPage, function (e, res) {
-        assert.equal(1, res.value.length)
+        assert.equal(0, res.value.length)
       })
 
       for (let i = 0; i < Config.tabs.tabsPerPage - 1; i++) {
@@ -38,7 +38,7 @@ describe('tab pages', function () {
     it('removes a new tab page when closing excess tabs', function * () {
       yield this.app.client.click(closeTab)
         .elements(tabPage, function (e, res) {
-          assert.equal(1, res.value.length)
+          assert.equal(0, res.value.length)
         })
     })
 
