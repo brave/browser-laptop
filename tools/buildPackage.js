@@ -23,7 +23,7 @@ console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir +
 
 var cmds = [
   'rm -rf ' + buildDir,
-  'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES',
+  'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES dist/*.zip',
   './node_modules/.bin/webpack',
   'npm run checks',
   'node ./node_modules/electron-packager/cli.js . Brave' +
