@@ -113,6 +113,7 @@ function processAdNode (node, iframeData, replacementUrl) {
 
   if (node.tagName === 'IFRAME') {
     node.srcdoc = src
+    node.sandbox = ''
   } else {
     while (node.firstChild) {
       node.removeChild(node.firstChild)
@@ -124,6 +125,7 @@ function processAdNode (node, iframeData, replacementUrl) {
     iframe.style.width = adSize[0] + 'px'
     iframe.style.height = adSize[1] + 'px'
     iframe.srcdoc = src
+    iframe.sandbox = ''
     node.appendChild(iframe)
     ensureNodeVisible(node)
     if (node.parentNode) {
