@@ -200,9 +200,6 @@ class Tab extends ImmutableComponent {
       onClick={this.setActiveFrame.bind(this)}
       onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
-      { !this.isPinned
-        ? <span onClick={this.onCloseFrame.bind(this)}
-             className='closeTab fa fa-times-circle'/> : null }
         { this.props.frameProps.get('isPrivate')
           ? <div className='privateIcon fa fa-eye'/> : null }
         <div className={cx({
@@ -215,6 +212,9 @@ class Tab extends ImmutableComponent {
           ? <div className='tabTitle'>
           {this.displayValue}
         </div> : null }
+      { !this.isPinned
+        ? <span onClick={this.onCloseFrame.bind(this)}
+             className='closeTab fa fa-times-circle'/> : null }
       </div>
       <DragIndicator
         end
