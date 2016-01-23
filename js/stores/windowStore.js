@@ -209,7 +209,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_NEW_FRAME:
       let nextKey = incrementNextKey()
-      let nextPartitionNumber = currentPartitionNumber
+      let nextPartitionNumber = 0
       if (action.frameOpts.isPartitioned) {
         nextPartitionNumber = incrementPartitionNumber()
       }
