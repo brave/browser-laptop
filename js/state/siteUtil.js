@@ -5,7 +5,7 @@
 'use strict'
 const Immutable = require('immutable')
 
-var exports = {}
+const exports = {}
 
 /**
  * Obtains the index of the location in sites
@@ -27,7 +27,7 @@ exports.getSiteUrlIndex = function (sites, location) {
  * @return true if the location is already bookmarked
  */
 exports.isSiteInList = function (sites, location, tag) {
-  let index = exports.getSiteUrlIndex(sites, location)
+  const index = exports.getSiteUrlIndex(sites, location)
   if (index === -1) {
     return false
   }
@@ -46,7 +46,7 @@ exports.isSiteInList = function (sites, location, tag) {
  * @return The new sites Immutable object
  */
 exports.addSite = function (sites, frameProps, tag) {
-  let index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
+  const index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -58,7 +58,7 @@ exports.addSite = function (sites, frameProps, tag) {
     }
   }
 
-  let site = Immutable.fromJS({
+  const site = Immutable.fromJS({
     lastAccessed: new Date(),
     tags,
     location: frameProps.get('location'),
@@ -95,7 +95,7 @@ exports.removeSite = function (sites, frameProps, tag) {
   if (index === -1) {
     return sites
   }
-  let tags = sites.getIn([index, 'tags'])
+  const tags = sites.getIn([index, 'tags'])
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 

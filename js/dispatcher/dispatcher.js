@@ -25,8 +25,8 @@ class Dispatcher {
    */
   dispatch (payload) {
     // First create array of promises for callbacks to reference.
-    var resolves = []
-    var rejects = []
+    const resolves = []
+    const rejects = []
     this.promises = this.callbacks.map(function (_, i) {
       return new Promise(function (resolve, reject) {
         resolves[i] = resolve

@@ -89,7 +89,7 @@ class Frame extends ImmutableComponent {
         }
         break
       case 'view-source':
-        let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        const src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         WindowActions.loadUrl(this.props.frame, src)
         // TODO: Make the URL bar show the view-source: prefix
         break
@@ -115,8 +115,8 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('new-window', (e, url, frameName, disposition, options) => {
       e.preventDefault()
 
-      let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
-      let windowOptions = e.options && e.options.windowOptions || {}
+      const guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
+      const windowOptions = e.options && e.options.windowOptions || {}
       windowOptions.parentWindowKey = remote.getCurrentWindow().id
       windowOptions.disposition = e.disposition
 
@@ -167,7 +167,7 @@ class Frame extends ImmutableComponent {
         // TODO: These 3 events should be combined into one
         WindowActions.onWebviewLoadStart(
           this.props.frame)
-        let key = this.props.frame.get('key')
+        const key = this.props.frame.get('key')
         WindowActions.setLocation(event.url, key)
         WindowActions.setSecurityState({
           secure: urlParse(event.url).protocol === 'https:'
@@ -218,8 +218,8 @@ class Frame extends ImmutableComponent {
   }
 
   insertAds (currentLocation) {
-    let host = new window.URL(currentLocation).hostname.replace('www.', '')
-    let adDivCandidates = adInfo[host] || []
+    const host = new window.URL(currentLocation).hostname.replace('www.', '')
+    const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES,

@@ -10,13 +10,13 @@ module.exports = function getFavicon (frameProps) {
     return null
   }
 
-  var size = window.devicePixelRatio * 16
-  var resolution = '#-moz-resolution=' + size + ',' + size
-  var iconHref = frameProps.get('icon')
+  const size = window.devicePixelRatio * 16
+  const resolution = '#-moz-resolution=' + size + ',' + size
+  let iconHref = frameProps.get('icon')
 
   // Default to favicon.ico if we can't find an icon.
   if (!iconHref) {
-    var loc = frameProps.get('location')
+    let loc = frameProps.get('location')
     if (UrlUtil.isViewSourceUrl(loc)) {
       loc = loc.substring('view-source:'.length)
     } else if (UrlUtil.isImageDataUrl(loc)) {
@@ -26,7 +26,7 @@ module.exports = function getFavicon (frameProps) {
     }
 
     try {
-      var defaultIcon = new window.URL('/favicon.ico' + resolution, loc)
+      const defaultIcon = new window.URL('/favicon.ico' + resolution, loc)
       iconHref = defaultIcon.toString()
     } catch (e) {
       return ''

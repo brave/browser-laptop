@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export default function debounce (fn, bufferInterval, ...args) {
-  var timeout
+  let timeout
   return () => {
     clearTimeout(timeout)
     timeout = setTimeout(fn.apply.bind(fn, this, args), bufferInterval)

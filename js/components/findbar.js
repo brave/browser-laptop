@@ -50,7 +50,7 @@ export default class FindBar extends ImmutableComponent {
    * Focus the find in page input and select the text
    */
   focus () {
-    let input = ReactDOM.findDOMNode(this.refs.searchString)
+    const input = ReactDOM.findDOMNode(this.refs.searchString)
     input.focus()
     input.select()
   }
@@ -112,7 +112,7 @@ export default class FindBar extends ImmutableComponent {
 
     let findMatchText
     if (this.numberofMatches !== -1 && this.props.findDetail.get('searchString')) {
-      let l10nArgs = {
+      const l10nArgs = {
         activeMatchOrdinal: this.activeMatchOrdinal,
         numberofMatches: this.numberofMatches
       }

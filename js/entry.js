@@ -22,9 +22,9 @@ const WindowStore = require('./stores/windowStore')
 const messages = require('./constants/messages')
 
 // get appStore from url
-var queryString = URL.parse(window.location.href, true).query
-var appState = JSON.parse(queryString.appState)
-var frames = JSON.parse(queryString.frames)
+const queryString = URL.parse(window.location.href, true).query
+const appState = JSON.parse(queryString.appState)
+const frames = JSON.parse(queryString.frames)
 
 ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, WindowStore.getState().toJS())

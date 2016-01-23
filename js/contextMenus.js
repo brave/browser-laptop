@@ -109,7 +109,7 @@ function tabTemplateInit (frameProps) {
 }
 
 function mainTemplateInit (nodeProps) {
-  let template = [
+  const template = [
     {
       label: 'Reload',
       click: (item, focusedWindow) => {
@@ -132,7 +132,7 @@ function mainTemplateInit (nodeProps) {
       enabled: false
     }
   ]
-  let nodeName = nodeProps.name
+  const nodeName = nodeProps.name
   switch (nodeName) {
     case 'A':
       template.push({

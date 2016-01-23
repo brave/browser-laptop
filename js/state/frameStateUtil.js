@@ -19,7 +19,7 @@ export function getFrameByIndex (windowState, i) {
 }
 
 export function getFrameByKey (windowState, key) {
-  let i = findIndexForFrameKey(windowState.get('frames'), key)
+  const i = findIndexForFrameKey(windowState.get('frames'), key)
   return windowState.getIn(['frames', i])
 }
 
@@ -109,8 +109,8 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
   // So there is a parentFrameKey but it isn't the specified one.
   // Check recursively for each of the parentFrame's ancestors to see
   // if we have a match.
-  let parentFrameIndex = findIndexForFrameKey(frames, frame.get('parentFrameKey'))
-  let parentFrame = frames.get(parentFrameIndex)
+  const parentFrameIndex = findIndexForFrameKey(frames, frame.get('parentFrameKey'))
+  const parentFrame = frames.get(parentFrameIndex)
   if (parentFrameIndex === -1 || !parentFrame.get('parentFrameKey')) {
     return false
   }
@@ -122,8 +122,8 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
  * @return Immutable top level application state ready to merge back in
  */
 export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
-  var url = frameOpts.location || Config.defaultUrl
-  let frame = Immutable.fromJS({
+  const url = frameOpts.location || Config.defaultUrl
+  const frame = Immutable.fromJS({
     audioMuted: false, // frame is muted
     canGoBack: false,
     canGoForward: false,
@@ -187,8 +187,8 @@ export function undoCloseFrame (windowState, closedFrames) {
   if (closedFrames.size === 0) {
     return {}
   }
-  var closedFrame = closedFrames.last()
-  let insertIndex = closedFrame.get('closedAtIndex')
+  const closedFrame = closedFrames.last()
+  const insertIndex = closedFrame.get('closedAtIndex')
   return {
     closedFrames: closedFrames.pop(),
     frames: windowState.get('frames').splice(insertIndex, 0, closedFrame.remove('closedAtIndex')),
@@ -254,16 +254,16 @@ export function removeOtherFrames (frames, closedFrames, frameProps) {
  */
 export function computeThemeColor (frameProps) {
   return new Promise((resolve, reject) => {
-    var icon = getFavicon(frameProps)
+    const icon = getFavicon(frameProps)
 
-    var xhr = new window.XMLHttpRequest()
+    const xhr = new window.XMLHttpRequest()
 
     xhr.open('GET', icon, true)
     xhr.responseType = 'blob'
     xhr.send()
 
     xhr.onload = function () {
-      var status = xhr.status
+      const status = xhr.status
       if (status !== 0 && status !== 200) {
         reject(
           new Error('Got HTTP status ' + status + ' trying to load ' + icon)
@@ -278,19 +278,19 @@ export function computeThemeColor (frameProps) {
     }
 
     function renderFromBlob (blob) {
-      var img = new window.Image()
+      const img = new window.Image()
       img.src = window.URL.createObjectURL(blob)
 
       img.onload = () => {
-        var vibrant = new window.Vibrant(img)
-        var swatches = vibrant.swatches()
+        const vibrant = new window.Vibrant(img)
+        const swatches = vibrant.swatches()
 
         window.URL.revokeObjectURL(img.src)
 
         // Arbitrary selection ordering, which appears to give decent results.
         const swatchOrder = ['Muted', 'LightMuted', 'DarkMuted', 'DarkVibrant', 'Vibrant', 'LightVibrant']
-        for (var i = 0; i < swatchOrder.length; i++) {
-          var swatch = swatchOrder[i]
+        for (let i = 0; i < swatchOrder.length; i++) {
+          const swatch = swatchOrder[i]
           if (swatches[swatch]) {
             resolve(swatches[swatch].getHex())
             break

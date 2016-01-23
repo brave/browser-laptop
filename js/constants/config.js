@@ -6,8 +6,8 @@
 // https://vault.brave.com for production
 // https://vault-staging.brave.com for a dev build
 // http://localhost:3000 for production
-var vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
-var adHost = process.env.AD_HOST || '//cdn.brave.com'
+const vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
+const adHost = process.env.AD_HOST || '//cdn.brave.com'
 
 export default {
   zoom: {
