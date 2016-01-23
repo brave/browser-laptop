@@ -38,10 +38,11 @@ class Main extends ImmutableComponent {
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
       contextMenus.onMainContextMenu(nodeProps)
     })
-    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, isPrivate = false) => {
+    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
-        isPrivate
+        isPrivate: !!options.isPrivate,
+        isPartitioned: !!options.isPartitioned
       })
 
       // Focus URL bar when adding tab via shortcut

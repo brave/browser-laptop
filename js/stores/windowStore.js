@@ -55,7 +55,9 @@ const updateTabPageIndex = (frameProps) => {
 }
 
 let currentKey = 0
+let currentPartitionNumber = 0
 const incrementNextKey = () => ++currentKey
+const incrementPartitionNumber = () => ++currentPartitionNumber
 
 class WindowStore extends EventEmitter {
 
@@ -112,6 +114,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
       currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
+      currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_URL:
@@ -206,8 +209,12 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_NEW_FRAME:
       let nextKey = incrementNextKey()
+      let nextPartitionNumber = 0
+      if (action.frameOpts.isPartitioned) {
+        nextPartitionNumber = incrementPartitionNumber()
+      }
       windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
-        nextKey, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
+        nextKey, nextPartitionNumber, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
       if (action.openInForeground) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }

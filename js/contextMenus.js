@@ -151,7 +151,16 @@ function mainTemplateInit (nodeProps) {
         click: (item, focusedWindow) => {
           if (focusedWindow && nodeProps.src) {
             // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, true)
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { isPrivate: true })
+          }
+        }
+      })
+      template.push({
+        label: 'Open in new partitioned session',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            // TODO: open this in the next tab instead of last tab
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { isPartitioned: true })
           }
         }
       })

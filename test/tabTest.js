@@ -29,9 +29,19 @@ describe('tabs', function () {
 
     it('creates a private new tab when signaled', function *() {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brianbondy.com', true)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPrivate: true })
         .waitForExist('.tab[data-frame-key="3"]')
-        .waitForVisible('webview[partition]')
+        .waitForVisible('webview[partition="private-1"]')
+    })
+
+    it('creates a partitioned new tab when signaled', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
+        .waitForExist('.tab[data-frame-key="4"]')
+        .waitForVisible('webview[partition="persist:partition-1"]')
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
+        .waitForExist('.tab[data-frame-key="5"]')
+        .waitForVisible('webview[partition="persist:partition-2"]')
     })
   })
 

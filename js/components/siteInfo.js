@@ -39,6 +39,9 @@ class SiteInfo extends ImmutableComponent {
   get isBlockedAdsShown () {
     return this.props.siteInfo.get('expandAdblock')
   }
+  get partitionNumber () {
+    return this.props.frameProps.getIn(['partitionNumber'])
+  }
   onToggleTPList (e) {
     WindowActions.setSiteInfoVisible(true, !this.isTPListShown)
     e.stopPropagation()
@@ -58,12 +61,21 @@ class SiteInfo extends ImmutableComponent {
     } else if (this.isMixedContent) {
       secureIcon = <li><span className='fa fa-unlock-alt'/><span data-l10n-id='mixedConnection'/></li>
     } else {
-      secureIcon = <li><span className='fa fa-unlock'/><span data-l10n-id='insecureConnection'/></li>
+      secureIcon = <li><span className='fa fa-unlock'/><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)}/></li>
     }
+
+    // Figure out the partition info display
+    let l10nArgs = {
+      partitionNumber: this.partitionNumber
+    }
+    const l10nId = this.partitionNumber ? 'sessionInfo' : 'defaultSession'
+    let partitionInfo = <li><span className='fa fa-user'/>
+      <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id={l10nId}/></li>
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
       <ul>
       { secureIcon }
+      { partitionInfo }
       { this.isBlockingTrackedContent
         ? <li>
             <a onClick={this.onToggleTPList.bind(this)}><span className='fa fa-shield'/>
