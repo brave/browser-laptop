@@ -78,11 +78,6 @@ After the above folder is created, you can create an NSIS based installer with:
 
     npm run installer-win64
 
-### Other platforms:
-
-Packaging is not implemented yet for other platforms, but it would be simple for linux.
-
-
 ## Developer Tools
 
 Development builds will automatically open developer tools within the browser.
