@@ -39,6 +39,9 @@ To run the tests:
 
     npm test
 
+
+### Debugging
+
 See [docs/debugging.md](docs/debugging.md) for information on debugging.
 
 ### Running inside of a development version of Brave's Electron fork
@@ -54,30 +57,34 @@ Build instructions:
 - [Windows build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-windows.md)
 - [Linux build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-linux.md)
 
-## Packaging
+## Packaging for bundles, installers, and updates
 
 ### OSX:
 
 From within brave-browser you can create a .app file for distribution:
 
-    npm run build-darwin
+    npm run build-package
 
-After the .app file is built you can create a dmg with:
+After the .app file is built you can create a dmg and update zip with:
 
-    npm run installer-darwin
+    IDENTIFIER=XYZ npm run build-installer
+
+Where XYZ is your signing identifier.
 
 ### Windows 7,8,10 x64:
 
-Prerequisite: You must have NSIS installed.
-
 To create a folder with the app .exe and all dependencies:
 
-    npm run build-win64
+    npm run build-package
 
-After the above folder is created, you can create an NSIS based installer with:
+After the above folder is created, you can create a setup (exe, msi, RELEASES file and update nupkg) with:
 
-    npm run installer-win64
+    CERT_PASSWORD=‘XYZ’ npm run build-installer
 
-## Developer Tools
+  Where XYZ is your authenticode signing password.
 
-Development builds will automatically open developer tools within the browser.
+### Linux:
+
+To create a package:
+
+    npm run build-package

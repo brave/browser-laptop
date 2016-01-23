@@ -10,8 +10,7 @@ var cmds
 
 console.log('Building install and update for version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
-if (isWindows) {
-} else if (isDarwin) {
+if (isDarwin) {
   const identifier = process.env.IDENTIFIER
   if (!identifier) {
     console.error('IDENTIFIER needs to be set to the certificate organization')

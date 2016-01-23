@@ -38,7 +38,7 @@ The built dmg binary requires its components to be digitally signed before the u
 
      Alternative: The preceeding steps will be executed via an included shell script with the following. Note: The identifier must be set as an environment variable.
 
-       `IDENTIFIER=12345ABCDE npm run sign-darwin`
+       `IDENTIFIER=12345ABCDE npm run build-installer`
 
   4b. Check that the signing process succeeded (not all output lines included below)
 
@@ -83,44 +83,12 @@ The built dmg binary requires its components to be digitally signed before the u
         Brave.app/: valid on disk
         Brave.app/: satisfies its Designated Requirement
 
-  5. Build dmg
-
-     `npm run installer-darwin`
-
-  6. Build update zip file
-
-     `npm run zip-darwin`
-
-     Creates a Brave-0.0.2.zip file in the Brave-darwin-x64 directory. This file should be moved to the update server and added to the update meta data file in that repo.
-
-  7. Install dmg by mounting dmg and moving browser to the Applications folder
-
-  8. Browser will check for updates via menu entry
+  5. Browser will check for updates via menu entry
 
 # Windows x64
 
+TODO
+
 # Deploying Updates
 
-  1. Bump version number in package.json (0.0.3 in this example)
-
-  2. Run zip file packager `npm run zip-darwin`. This will create a packaged update zip file ./Brave-darwin-x64/Brave-0.0.3.zip
-
-  3. Update vault-updater repo /data/osx.json with update meta data
-
-     {
-        "version": "0.0.3",
-        "notes": "Release notes for v0.0.3",
-        "name": "Brave 0.0.3",
-        "pub_date": "2015-12-30T12:29:53+04:00",
-        "url": "https://brave-download.global.ssl.fastly.net/releases/0.0.3/osx/Brave-0.0.3.zip"
-     }
-
-     Commit to master and push to Heroku
-
-     `git push heroku master -f`
-
-   4. Create folder in brave-download S3 bucket releases/0.0.3/osx
-
-   5. Upload Brave-0.0.3.zip to new folder
-
-   6. Navigate to the releases folder, select it and mark it as public
+See [brave/vault-updater](https://github.com/brave/vault-updater) for deployment.
