@@ -42,10 +42,13 @@ class Tabs extends ImmutableComponent {
 
   render () {
     return <div className='tabs'>
-      <span
-        className='prevTab fa fa-angle-left'
-        disabled={this.props.tabPageIndex === 0}
-        onClick={this.onPrevPage.bind(this)} />
+        {(() => {
+          if (this.props.tabPageIndex > 0) {
+            return <span
+                className='prevTab fa fa-angle-left'
+                onClick={this.onPrevPage.bind(this)} />
+          }
+        })()}
         <span className='tabContainer'>
         {
           this.props.currentFrames
@@ -64,10 +67,13 @@ class Tabs extends ImmutableComponent {
           className='navbutton newFrameButton'
           onClick={WindowActions.newFrame} /> : null }
         </span>
-      <span
-        className='nextTab fa fa-angle-right'
-        disabled={this.props.tabPageIndex + 1 === this.totalPages || this.totalPages === 0}
-        onClick={this.onNextPage.bind(this)} />
+        {(() => {
+          if (this.props.currentFrames.length >= Config.tabs.tabsPerPage && this.totalPages > this.props.tabPageIndex + 1) {
+            return <span
+              className='nextTab fa fa-angle-right'
+              onClick={this.onNextPage.bind(this)} />
+          }
+        })()}
     </div>
   }
 }
