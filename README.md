@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/brave/browser-laptop.svg?branch=master)](https://travis-ci.org/brave/browser-laptop)
+
 # Brave Browser
 
 Laptop and Desktop browser for OS X, Windows and Linux.
