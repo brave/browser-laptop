@@ -32,6 +32,7 @@ class Frame extends ImmutableComponent {
     // of the attributes we need.
     this.webview = this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
+    this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('preload', 'content/webviewPreload.js')
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
@@ -130,14 +131,14 @@ class Frame extends ImmutableComponent {
           guestInstanceId
         }, windowOptions)
       } else {
+        const openInForeground = e.disposition !== 'background-tab'
         WindowActions.newFrame({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
-          openInForeground: e.disposition !== 'background-tab',
           isPrivate: this.props.frame.get('isPrivate'),
           partitionNumber: this.props.frame.get('partitionNumber'),
           guestInstanceId
-        })
+        }, openInForeground)
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
