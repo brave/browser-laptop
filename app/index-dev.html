@@ -8,6 +8,7 @@
     <script>
       require("babel-polyfill")
       require("vibrant/dist/Vibrant.min.js")
+      const bravePort = require("./env-echo.js").getEnv("BRAVE_PORT");
     </script>
     <script src="./ext/l20n.min.js" defer></script>
     <link rel="localization" href="locales/{locale}/app.l20n">
@@ -22,12 +23,26 @@
 
         <p>
           <span>Please consult the repository's README for more information:</span><br>
-          <a href='https://github.com/brave/browser-electron/blob/master/README.md'>https://github.com/brave/browser-electron/blob/master/README.md</a>
+          <a href="https://github.com/brave/browser-electron/blob/master/README.md">https://github.com/brave/browser-electron/blob/master/README.md</a>
         </p>
       </div>
     </div>
   </body>
-  <script src="http://localhost:8080/webpack-dev-server.js"
-          onerror="document.querySelector('#setupError').style.display ='block'"></script>
-  <script src="http://localhost:8080/built/bundle.js"></script>
+  <script>
+    const createScript = function (scriptPath) {
+      return new Promise(function (resolve, reject) {
+        var script = document.createElement("script")
+        script.type = "text/javascript"
+        script.src = scriptPath.replace(/\{port\}/, bravePort || 8080)
+        script.async = true
+        script.onload = resolve
+        script.onerror = reject
+        document.body.appendChild(script)
+      });
+    };
+    createScript("http://localhost:{port}/webpack-dev-server.js").catch(function () {
+      document.querySelector('#setupError').style.display ="block"
+    })
+    createScript("http://localhost:{port}/built/bundle.js")
+  </script>
 </html>
