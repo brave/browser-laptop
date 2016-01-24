@@ -6,6 +6,8 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 
 ## Installation
 
+Make sure you have all of the pre-requisite compilers/applications [Installed](https://github.com/brave/browser-laptop/docs/prerequisites.md)
+
 1. Shallow clone the git repository from GitHub:
         
         # For beta testers:
