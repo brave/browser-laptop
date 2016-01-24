@@ -15,6 +15,7 @@ const remote = global.require('electron').remote
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
+const contextMenus = require('../contextMenus')
 
 import {isUrl} from '../lib/appUrlUtil.js'
 
@@ -224,6 +225,7 @@ class UrlBar extends ImmutableComponent {
         onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
         onClick={this.onClick.bind(this)}
+        onContextMenu={contextMenus.onURLBarContextMenu.bind(this)}
         value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
