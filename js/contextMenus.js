@@ -235,6 +235,14 @@ function mainTemplateInit (nodeProps) {
     const editableItems = getEditableItems(nodeProps.hasSelection)
     editableItems.push({ type: 'separator' })
     template.unshift(...editableItems)
+  } else if (nodeProps.hasSelection) {
+    template.unshift({
+      label: 'Copy',
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    }, {
+      type: 'separator'
+    })
   }
 
   return template

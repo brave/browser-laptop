@@ -179,15 +179,32 @@ ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholder
   })
 })
 
+function hasSelection (node) {
+  if (node && node.selectionStart !== undefined &&
+      node.selectionEnd !== undefined &&
+      node.selectionStart !== node.selectionEnd) {
+    return true
+  }
+
+  var selection = window.getSelection()
+  for (var i = 0; i < selection.rangeCount; i++) {
+    var range = window.getSelection().getRangeAt(i)
+    if (range.endOffset !== undefined &&
+        range.startOffset !== undefined &&
+        range.endOffset !== range.startOffset) {
+      return true
+    }
+  }
+  return false
+}
+
 document.addEventListener('contextmenu', (e) => {
   var name = e.target.nodeName.toUpperCase()
   var nodeProps = {
     name: name,
     src: name === 'A' ? e.target.href : e.target.src,
     isContentEditable: e.target.isContentEditable,
-    hasSelection: e.target.selectionStart !== undefined &&
-      e.target.selectionEnd !== undefined &&
-      e.target.selectionStart !== e.target.selectionEnd
+    hasSelection: hasSelection(e.target)
   }
   ipc.send(messages.CONTEXT_MENU_OPENED, nodeProps)
   e.preventDefault()
