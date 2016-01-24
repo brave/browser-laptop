@@ -19,11 +19,24 @@ var env = {
   NODE_ENV: 'production'
 }
 
+console.log('Cleaning build target')
+
+if (isWindows) {
+  var cmds = [
+    'if exist ' + buildDir + ' rmdir /s /q ' + buildDir,
+  ]
+  execute(cmds, env, console.log.bind(null, 'done'))
+} else {
+  var cmds = [
+    'rm -rf ' + buildDir,
+    'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES dist/*.zip',
+  ]
+  execute(cmds, env, console.log.bind(null, 'done'))
+}
+
 console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
 var cmds = [
-  'rm -rf ' + buildDir,
-  'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES dist/*.zip',
   '"./node_modules/.bin/webpack"',
   'npm run checks',
   'node ./node_modules/electron-packager/cli.js . Brave' +
