@@ -378,7 +378,7 @@ const doAction = (action) => {
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_FIND_DETAIL:
-      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_PINNED:

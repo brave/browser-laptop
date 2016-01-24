@@ -97,7 +97,8 @@ WindowStore
     basicAuthDetail: {...},
     findDetail: {
       searchString: string, // the string being searched
-      caseSensitivity: boolean // whether we are doing a case sensitive search
+      caseSensitivity: boolean, // whether we are doing a case sensitive search
+      numberOfMatches: number // Total number of matches on the page
     }
     unloaded: boolean, // true if the tab is unloaded
 

@@ -8,6 +8,7 @@ const urlParse = require('url').parse
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
+const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 const messages = require('../constants/messages.js')
@@ -209,6 +210,13 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       WindowActions.setThemeColor(this.props.frame, themeColor)
     })
+    this.webview.addEventListener('found-in-page', (e) => {
+      if (e.result !== undefined && e.result.matches !== undefined) {
+        WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+          numberOfMatches: e.result.matches
+        }))
+      }
+    })
 
     // Ensure we mute appropriately, the initial value could be set
     // from persisted state.
@@ -243,23 +251,13 @@ class Frame extends ImmutableComponent {
     this.onClearMatch()
   }
 
-  onFindAll (searchString, caseSensitivity) {
+  onFind (searchString, caseSensitivity, forward) {
     if (searchString) {
-      this.webview.findInPage(searchString,
-                              {matchCase: caseSensitivity,
-                               forward: true,
-                               findNext: false})
-    } else {
-      this.onClearMatch()
-    }
-  }
-
-  onFindAgain (searchString, caseSensitivity, forward) {
-    if (searchString) {
-      this.webview.findInPage(searchString,
-                              {matchCase: caseSensitivity,
-                               forward: forward,
-                               findNext: true})
+      this.webview.findInPage(searchString, {
+        matchCase: caseSensitivity,
+        forward: forward !== undefined ? forward : true,
+        findNext: forward !== undefined
+      })
     } else {
       this.onClearMatch()
     }
@@ -288,10 +286,8 @@ class Frame extends ImmutableComponent {
         })}>
       <FindBar
         ref='findbar'
-        findInPageDetail={null}
-        onFindAll={this.onFindAll.bind(this)}
-        onFindAgain={this.onFindAgain.bind(this)}
-        onHide={this.onFindHide.bind(this)}
+        onFind={this.onFind.bind(this)}
+        onFindHide={this.onFindHide.bind(this)}
         active={this.props.frame.get('findbarShown')}
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}

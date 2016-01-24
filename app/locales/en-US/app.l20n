@@ -49,9 +49,6 @@
 
 <urlbar placeholder: "Search or enter an address">
 
-<findResults "{{$activeMatchOrdinal}} of {{$numberofMatches}}">
-<caseSensitivity "Match case">
-
 <runtimeUpdatePending "A runtime update which requires the application to be restarted is available.">
 <appUpdatePending "An update is available.">
 <apply "Apply">
@@ -83,3 +80,7 @@
 
 <defaultSession "This tab uses the default partition">
 <sessionInfo "This tab uses partition {{$partitionNumber}}">
+
+<findResults "{{$activeMatchOrdinal}} of {{$numberOfMatches}}">
+<findResultsTotalOnly "{{$numberOfMatches}} matches">
+<caseSensitivity "Match case">

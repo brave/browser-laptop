@@ -18,39 +18,34 @@ export default class FindBar extends ImmutableComponent {
   onChange (e) {
     WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
       searchString: e.target.value,
-      caseSensitivity: this.props.findDetail.get('caseSensitivity')
+      caseSensitivity: this.isCaseSensitive
     }))
   }
 
   onCaseSensitivityChange (e) {
     WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
-      searchString: this.props.findDetail.get('searchString'),
+      searchString: this.searchString,
       caseSensitivity: e.target.checked
     }))
   }
 
-  onFind () {
-    this.props.onFindAll(this.props.findDetail.get('searchString'),
-                         this.props.findDetail.get('caseSensitivity'))
+  onFindFirst () {
+    this.props.onFind(this.searchString, this.isCaseSensitive)
   }
 
   onFindNext () {
-    this.props.onFindAll(this.props.findDetail.get('searchString'),
-                         this.props.findDetail.get('caseSensitivity'),
-                         true)
+    this.props.onFind(this.searchString, this.isCaseSensitive, true)
   }
 
   onFindPrev () {
-    this.props.onFindAgain(this.props.findDetail.get('searchString'),
-                           this.props.findDetail.get('caseSensitivity'),
-                           false)
+    this.props.onFind(this.searchString, this.isCaseSensitive, false)
   }
 
   /**
    * Focus the find in page input and select the text
    */
   focus () {
-    const input = ReactDOM.findDOMNode(this.refs.searchString)
+    const input = ReactDOM.findDOMNode(this.refs.searchInput)
     input.focus()
     input.select()
   }
@@ -63,9 +58,11 @@ export default class FindBar extends ImmutableComponent {
       // Focus and select the find input
       this.focus()
     }
-    if (this.props.findDetail !== prevProps.findDetail) {
+    if (this.props.findDetail && !prevProps.findDetail ||
+        this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
+        this.props.findDetail.get('caseSensitivity') !== prevProps.findDetail.get('caseSensitivity')) {
       // Redo search if details have changed
-      this.onFind()
+      this.onFindFirst()
     }
   }
 
@@ -73,7 +70,7 @@ export default class FindBar extends ImmutableComponent {
     switch (e.keyCode) {
       case keyCodes.ESC:
         e.preventDefault()
-        this.props.onHide()
+        this.props.onFindHide()
         break
       case keyCodes.ENTER:
         e.preventDefault()
@@ -86,23 +83,32 @@ export default class FindBar extends ImmutableComponent {
     }
   }
 
-  get numberofMatches () {
-    // TODO: Hook this up when found-in-page event fires
-    if (!this.props.findInPageDetail) {
+  get numberOfMatches () {
+    if (!this.props.findDetail || this.props.findDetail.get('numberOfMatches') === undefined) {
       return -1
     }
-    return this.props.findInPageDetail.get('numberOfMatches')
+    return this.props.findDetail.get('numberOfMatches')
   }
 
   get activeMatchOrdinal () {
-    if (!this.props.findInPageDetail) {
+    if (!this.props.findDetail || this.props.findDetail.get('activeMatchOrdinal') === undefined) {
       return -1
     }
-    return this.props.findInPageDetail.get('activeMatchOrdinal')
+    return this.props.findDetail.get('activeMatchOrdinal') || -1
   }
 
   get isCaseSensitive () {
-    this.props.findDetail.get('caseSensitivity')
+    if (!this.props.findDetail) {
+      return false
+    }
+    return this.props.findDetail.get('caseSensitivity')
+  }
+
+  get searchString () {
+    if (!this.props.findDetail) {
+      return ''
+    }
+    return this.props.findDetail.get('searchString')
   }
 
   render () {
@@ -111,35 +117,43 @@ export default class FindBar extends ImmutableComponent {
     }
 
     let findMatchText
-    if (this.numberofMatches !== -1 && this.props.findDetail.get('searchString')) {
+    if (this.numberOfMatches !== -1 && this.activeMatchOrdinal !== -1 && this.searchString) {
       const l10nArgs = {
         activeMatchOrdinal: this.activeMatchOrdinal,
-        numberofMatches: this.numberofMatches
+        numberOfMatches: this.numberOfMatches
       }
-      findMatchText = <span data-l10n-id='findResults'
-      data-l10n-args={JSON.stringify(l10nArgs)}>{JSON.stringify(l10nArgs)}</span>
+      findMatchText = <div className='foundResults'
+        data-l10n-args={JSON.stringify(l10nArgs)}
+        data-l10n-id='findResults'/>
+    } else if (this.numberOfMatches !== -1 && this.searchString) {
+      const l10nArgs = {
+        numberOfMatches: this.numberOfMatches
+      }
+      findMatchText = <div className='foundResults'
+        data-l10n-args={JSON.stringify(l10nArgs)}
+        data-l10n-id='findResultsTotalOnly'/>
     }
 
     return <div className='findBar'>
       <span className='searchStringContainer'>
         <input type='text'
-          ref='searchString'
+          ref='searchInput'
           onKeyDown={this.onKeyDown.bind(this)}
           onChange={this.onChange.bind(this)}
-          value={this.props.findDetail.get('searchString')}/>
+          value={this.searchString}/>
           {findMatchText}
       </span>
       <Button iconClass='findButton fa-chevron-up'
         className='findButton smallButton findPrev'
-        disabled={this.numberofMatches === 0}
+        disabled={this.numberOfMatches === 0}
         onClick={this.onFindPrev.bind(this)} />
       <Button iconClass='findButton fa-chevron-down'
         className='findButton smallButton findNext'
-        disabled={this.numberofMatches === 0}
+        disabled={this.numberOfMatches === 0}
         onClick={this.onFindNext.bind(this)} />
       <Button iconClass='fa-times'
         className='findButton smallButton hideButton'
-        onClick={this.props.onHide} />
+        onClick={this.props.onFindHide} />
       <div className='caseSensitivityContainer'>
         <input
           id='caseSensitivityCheckbox'
