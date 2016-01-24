@@ -201,6 +201,29 @@ function mainTemplateInit (nodeProps) {
       })
       break
   }
+
+  if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
+    template.unshift({
+      label: 'Cut',
+      enabled: nodeProps.hasSelection,
+      accelerator: 'CmdOrCtrl+X',
+      // Enabled doesn't work when a role is used
+      role: nodeProps.hasSelection && 'cut' || undefined
+    }, {
+      label: 'Copy',
+      enabled: nodeProps.hasSelection,
+      accelerator: 'CmdOrCtrl+C',
+      // Enabled doesn't work when a role is used
+      role: nodeProps.hasSelection && 'copy' || undefined
+    }, {
+      label: 'Paste',
+      accelerator: 'CmdOrCtrl+V',
+      role: 'paste'
+    }, {
+      type: 'separator'
+    })
+  }
+
   return template
 }
 
