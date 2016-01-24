@@ -4,7 +4,13 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 
 ## Installation
 
-1. Shallow clone the git repository from GitHub:
+1. Ensure you have the following installed (For Compiling and Running):   
+[Node.js x64](https://nodejs.org/en/)  
+[Python 2.7](https://www.python.org/downloads/)  
+[Visual Studio](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)  
+If you want to build an installer, you will also need [NSIS Installer Creator](http://nsis.sourceforge.net/Download)
+
+2. Shallow clone the git repository from GitHub:
         
         # For beta testers:
         git clone --depth 1 https://github.com/brave/browser-laptop
@@ -15,15 +21,13 @@ Laptop and Desktop browser for OS X, Windows and Linux.
         # For devs over SSH:
         git clone git@github.com:brave/browser-laptop.git
 
-2. Open the working directory:
+3. Open the working directory:
 
         cd browser-laptop
 
-3. Install the Node (v5+) dependencies:
+4. Install the Node (v5+) dependencies:
 
         npm install
-
-If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
 ## Development
 
