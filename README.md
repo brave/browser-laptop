@@ -23,6 +23,8 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 
         npm install
 
+If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 (see discussion at https://github.com/brave/browser-laptop/issues/214)
+
 ## Development
 
 To start the server and file watchers run the following on the command line:
