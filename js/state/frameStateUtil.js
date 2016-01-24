@@ -191,7 +191,10 @@ export function undoCloseFrame (windowState, closedFrames) {
   const insertIndex = closedFrame.get('closedAtIndex')
   return {
     closedFrames: closedFrames.pop(),
-    frames: windowState.get('frames').splice(insertIndex, 0, closedFrame.remove('closedAtIndex')),
+    frames: windowState.get('frames').splice(insertIndex, 0,
+          closedFrame
+          .delete('guestInstanceId')
+          .set('src', closedFrame.get('location'))),
     activeFrameKey: closedFrame.get('key')
   }
 }
