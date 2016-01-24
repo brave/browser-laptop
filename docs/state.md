@@ -77,6 +77,7 @@ WindowStore
     computedThemeColor: string, // css computed theme color from the favicon
     startLoadTime: datetime,
     endtLoadTime: datetime,
+    guestInstanceId: string, // not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
     adblock: {

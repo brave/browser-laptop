@@ -96,6 +96,10 @@ module.exports.cleanSessionData = (sessionData) => {
     delete frame.blockedAds
     delete frame.blockedByTracking
 
+    // Guest instance ID's are not valid after restarting.
+    // Electron won't know about them.
+    delete frame.guestInstanceId
+
     // Do not show the audio indicator until audio starts playing
     delete frame.audioMuted
     delete frame.audioPlaybackActive
