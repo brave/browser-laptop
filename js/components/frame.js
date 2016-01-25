@@ -94,6 +94,7 @@ class Frame extends ImmutableComponent {
         const src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         WindowActions.loadUrl(this.props.frame, src)
         // TODO: Make the URL bar show the view-source: prefix
+        WindowActions.setFrameTitle(this.props.frame, src)
         break
       case 'save':
         // TODO: Sometimes this tries to save in a non-existent directory
