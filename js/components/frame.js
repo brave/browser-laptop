@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const urlParse = require('url').parse
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
@@ -24,7 +23,7 @@ class Frame extends ImmutableComponent {
   }
 
   get webviewContainer () {
-    return ReactDOM.findDOMNode(this.refs.webviewContainer)
+    return this.refs.webviewContainer
   }
 
   updateWebview () {

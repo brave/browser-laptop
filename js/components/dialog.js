@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const KeyCodes = require('../constants/keyCodes')
 
@@ -13,7 +12,7 @@ const KeyCodes = require('../constants/keyCodes')
 export default class Dialog extends ImmutableComponent {
   componentDidMount () {
     window.addEventListener('keydown', this.onKeyDown.bind(this))
-    ReactDOM.findDOMNode(this.refs.dialog).focus()
+    this.refs.dialog.focus()
   }
 
   onClick () {

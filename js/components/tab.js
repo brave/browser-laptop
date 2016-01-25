@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 
 const ImmutableComponent = require('./immutableComponent')
 
@@ -63,7 +62,7 @@ class Tab extends ImmutableComponent {
       return
     }
 
-    const rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
+    const rect = this.refs.tab.getBoundingClientRect()
     if (e.clientX > rect.left && e.clientX < rect.left + rect.width / 2 &&
       !this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
       WindowActions.tabDragDraggingOverLeftHalf(this.props.frameProps)

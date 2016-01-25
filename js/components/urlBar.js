@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const urlParse = require('url').parse
 
 const ImmutableComponent = require('./immutableComponent')
@@ -40,7 +39,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   updateDOMInputFocus (focused) {
-    const urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+    const urlInput = this.refs.urlInput
     if (focused) {
       urlInput.focus()
     } else {
@@ -50,8 +49,7 @@ class UrlBar extends ImmutableComponent {
 
   updateDOMInputSelected (selected) {
     if (selected) {
-      const urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
-      urlInput.select()
+      this.refs.urlInput.select()
     }
   }
 
