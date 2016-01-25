@@ -157,11 +157,6 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('page-title-set', ({title}) => {
-      // TODO: Temporary fix until a better event can be used that
-      // works for inter-page navigation that uses history API
-      WindowActions.onWebviewLoadEnd(
-        this.props.frame,
-        this.webview.getURL())
       WindowActions.setFrameTitle(this.props.frame, title)
     })
     this.webview.addEventListener('dom-ready', (event) => {
@@ -199,6 +194,11 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-load', () => {
     })
     this.webview.addEventListener('did-finish-load', () => {
+    })
+    this.webview.addEventListener('did-navigate-in-page', () => {
+      WindowActions.onWebviewLoadEnd(
+        this.props.frame,
+        this.webview.getURL())
     })
     this.webview.addEventListener('did-frame-finish-load', (event) => {
       if (event.isMainFrame) {
