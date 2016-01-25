@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/bbondy/electron-sample#readme",
   "dependencies": {
-    "abp-filter-parser-cpp": "^1.1.1",
+    "abp-filter-parser-cpp": "^1.1.2",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
     "electron-squirrel-startup": "^0.1.4",
