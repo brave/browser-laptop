@@ -520,9 +520,9 @@ const init = (args) => {
           }
         }, {
           type: 'checkbox',
-          label: 'Block 3rd party cookies',
+          label: 'Block 3rd party cookies (coming soon)',
           enabled: false,
-          checked: true
+          checked: false
         }, {
           type: 'checkbox',
           label: 'Block Tracking',
