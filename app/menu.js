@@ -484,6 +484,7 @@ const init = (args) => {
     }, {
       label: 'Bravery',
       submenu: [
+        /*
         {
           label: 'Manage...',
           enabled: false
@@ -502,9 +503,11 @@ const init = (args) => {
         }, {
           label: 'Site Protection Settings',
           enabled: false // Hack to make this look like a section header.
-        }, {
+        },
+        */
+        {
           type: 'checkbox',
-          label: 'Brave ad replacement',
+          label: 'Ad Replacement Engine',
           checked: Filtering.isResourceEnabled(AdInsertion.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(AdInsertion.resourceName, !Filtering.isResourceEnabled(AdInsertion.resourceName))
