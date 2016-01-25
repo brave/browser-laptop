@@ -500,7 +500,7 @@ const init = (args) => {
         }, {
           type: 'separator'
         }, {
-          label: 'Site Protection Settings (Changes invoke reload)',
+          label: 'Site Protection Settings',
           enabled: false // Hack to make this look like a section header.
         }, {
           type: 'checkbox',
