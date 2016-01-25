@@ -22,10 +22,6 @@ class Frame extends ImmutableComponent {
     super()
   }
 
-  get webviewContainer () {
-    return this.refs.webviewContainer
-  }
-
   updateWebview () {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.
@@ -292,7 +288,7 @@ class Frame extends ImmutableComponent {
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}
       />
-      <div ref='webviewContainer'
+      <div ref={node => this.webviewContainer = node}
         className={cx({
           webviewContainer: true,
           isPreview: this.props.isPreview

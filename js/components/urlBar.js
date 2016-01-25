@@ -39,7 +39,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   updateDOMInputFocus (focused) {
-    const urlInput = this.refs.urlInput
+    const urlInput = this.urlInput
     if (focused) {
       urlInput.focus()
     } else {
@@ -49,7 +49,7 @@ class UrlBar extends ImmutableComponent {
 
   updateDOMInputSelected (selected) {
     if (selected) {
-      this.refs.urlInput.select()
+      this.urlInput.select()
     }
   }
 
@@ -65,7 +65,7 @@ class UrlBar extends ImmutableComponent {
 
   // Whether the suggestions box is visible
   get suggestionsShown () {
-    return this.refs.urlBarSuggestions.shouldRender()
+    return this.urlBarSuggestions.shouldRender()
   }
 
   onKeyDown (e) {
@@ -77,10 +77,10 @@ class UrlBar extends ImmutableComponent {
           this.restore()
           WindowActions.setUrlBarSelected(true)
         } else {
-          const selectedIndex = this.refs.urlBarSuggestions.activeIndex
+          const selectedIndex = this.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
-            this.refs.urlBarSuggestions.clickSelected()
+            this.urlBarSuggestions.clickSelected()
           } else if (!isUrl(location)) {
             // do search.
             WindowActions.loadUrl(this.props.activeFrameProps, this.searchDetail.get('searchURL').replace('{searchTerms}', location))
@@ -94,13 +94,13 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.UP:
         if (this.suggestionsShown) {
-          this.refs.urlBarSuggestions.previousSuggestion()
+          this.urlBarSuggestions.previousSuggestion()
           e.preventDefault()
         }
         break
       case KeyCodes.DOWN:
         if (this.suggestionsShown) {
-          this.refs.urlBarSuggestions.nextSuggestion()
+          this.urlBarSuggestions.nextSuggestion()
           e.preventDefault()
         }
         break
@@ -233,11 +233,11 @@ class UrlBar extends ImmutableComponent {
         })}
         id='urlInput'
         readOnly={this.props.titleMode}
-        ref='urlInput'/>
+        ref={node => this.urlInput = node}/>
         { !this.props.titleMode
           ? <span className='loadTime'>{this.loadTime}</span> : null }
         <UrlBarSuggestions
-          ref='urlBarSuggestions'
+          ref={node => this.urlBarSuggestions = node}
           suggestions={this.props.urlbar.get('suggestions')}
           sites={this.props.sites}
           frames={this.props.frames}

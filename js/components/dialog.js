@@ -12,7 +12,7 @@ const KeyCodes = require('../constants/keyCodes')
 export default class Dialog extends ImmutableComponent {
   componentDidMount () {
     window.addEventListener('keydown', this.onKeyDown.bind(this))
-    this.refs.dialog.focus()
+    this.dialog.focus()
   }
 
   onClick () {
@@ -32,7 +32,7 @@ export default class Dialog extends ImmutableComponent {
   render () {
     return <div className={'dialog ' + (this.props.className || '')}
       tabIndex='-1'
-      ref='dialog'
+      ref={node => this.dialog = node}
       onKeyDown={this.onKeyDown.bind(this)}
       onClick={this.onClick.bind(this)}>
         {this.props.children}
