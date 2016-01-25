@@ -230,6 +230,8 @@ const WindowActions = {
       }
 
       if (!forceClosePinned) {
+        // Go to next frame if the user tries to close a pinned tab
+        ipc.emit(messages.SHORTCUT_NEXT_TAB)
         return
       }
     }
