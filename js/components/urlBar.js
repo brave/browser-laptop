@@ -15,6 +15,7 @@ const remote = global.require('electron').remote
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
+const contextMenus = require('../contextMenus')
 
 import {isUrl} from '../lib/appUrlUtil.js'
 
@@ -39,7 +40,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   updateDOMInputFocus (focused) {
-    let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+    const urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
     if (focused) {
       urlInput.focus()
     } else {
@@ -49,7 +50,7 @@ class UrlBar extends ImmutableComponent {
 
   updateDOMInputSelected (selected) {
     if (selected) {
-      let urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
+      const urlInput = ReactDOM.findDOMNode(this.refs.urlInput)
       urlInput.select()
     }
   }
@@ -60,7 +61,7 @@ class UrlBar extends ImmutableComponent {
 
   // restores the url bar to the current location
   restore () {
-    let location = this.props.activeFrameProps.get('location')
+    const location = this.props.activeFrameProps.get('location')
     WindowActions.setNavBarUserInput(location)
   }
 
@@ -73,12 +74,12 @@ class UrlBar extends ImmutableComponent {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         e.preventDefault()
-        let location = this.props.urlbar.get('location')
+        const location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
           this.restore()
           WindowActions.setUrlBarSelected(true)
         } else {
-          let selectedIndex = this.refs.urlBarSuggestions.activeIndex
+          const selectedIndex = this.refs.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
             this.refs.urlBarSuggestions.clickSelected()
@@ -163,8 +164,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   get inputValue () {
+    const loc = this.props.urlbar.get('location') === 'about:blank' ? '' : this.props.urlbar.get('location')
     return this.props.titleMode
-      ? this.props.activeFrameProps.get('title') : this.props.urlbar.get('location')
+      ? this.props.activeFrameProps.get('title') : loc
   }
 
   get loadTime () {
@@ -186,8 +188,15 @@ class UrlBar extends ImmutableComponent {
   }
 
   get aboutPage () {
-    var protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
+    const protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
     return ['about:', 'file:', 'chrome:', 'view-source:'].includes(protocol)
+  }
+
+  get isHTTPPage () {
+    // Whether this page is HTTP or HTTPS. We don't show security indicators
+    // for other protocols like mailto: and about:.
+    const protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
+    return protocol === 'http:' || protocol === 'https:'
   }
 
   onSiteInfo () {
@@ -204,8 +213,8 @@ class UrlBar extends ImmutableComponent {
           className={cx({
             urlbarIcon: true,
             'fa': true,
-            'fa-lock': this.secure && this.props.loading === false && !this.props.urlbar.get('focused') && !this.props.titleMode,
-            'fa-unlock': !this.secure && this.props.loading === false && !this.aboutPage && !this.props.urlbar.get('focused') && !this.props.titleMode,
+            'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
+            'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
             'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
             extendedValidation: this.extendedValidationSSL
@@ -216,10 +225,11 @@ class UrlBar extends ImmutableComponent {
         onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
         onClick={this.onClick.bind(this)}
+        onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
         value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
-          insecure: !this.secure && this.props.loading === false && !this.aboutPage,
+          insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
           private: this.private,
           testHookLoadDone: !this.props.loading
         })}

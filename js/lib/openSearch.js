@@ -10,12 +10,12 @@ import Immutable from 'immutable'
  */
 export function loadOpenSearch (path) {
   return new Promise(resolve => {
-    let xhr = new window.XMLHttpRequest()
+    const xhr = new window.XMLHttpRequest()
     xhr.open('GET', path || Config.defaultOpenSearchPath, true)
     xhr.send()
     xhr.onload = () => {
-      let parser = new window.DOMParser()
-      let doc = parser.parseFromString(xhr.responseText, 'text/xml')
+      const parser = new window.DOMParser()
+      const doc = parser.parseFromString(xhr.responseText, 'text/xml')
       window.doc = doc
       let searchURL
       let autocompleteURL

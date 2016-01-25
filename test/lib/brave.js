@@ -172,6 +172,19 @@ var exports = {
         }
       })
     })
+
+    this.app.client.addCommand('sendWebviewEvent', function (frameKey, eventName, ...params) {
+      return this.execute(function (frameKey, eventName, ...params) {
+        const webview = document.querySelector('webview[data-frame-key="' + frameKey + '"]')
+        // Get the internal view instance ID from the selected webview
+        var v8Util = process.atomBinding('v8_util')
+        var internal = v8Util.getHiddenValue(webview, 'internal')
+        internal.viewInstanceId
+        // This allows you to send more args than just the event itself like would only
+        // be possible with dispatchEvent.
+        require('electron').ipcRenderer.emit('ATOM_SHELL_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
+      }, frameKey, eventName, ...params).then((response) => response.value)
+    })
   },
 
   startApp: function () {

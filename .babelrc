@@ -1,3 +1,7 @@
 {
-  "presets": ["react", "es2015"]
+  "presets": ["react", "es2015"],
+  "plugins": [
+    "transform-react-inline-elements",
+    "transform-react-constant-elements"
+  ]
 }

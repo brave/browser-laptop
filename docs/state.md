@@ -38,6 +38,9 @@ AppStore
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable HTTPS Everywhere
   },
+  adInsertion: {
+    enabled: boolean // Enable ad insertion
+  },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {
@@ -71,11 +74,13 @@ WindowStore
     findbarShown: boolean, // whether the findbar is shown
     key: number,
     isPrivate: boolean, // private browsing tab
+    partitionNumber: number, // the session partition to use
     loading: boolean,
     themeColor: string, // css compatible color string
     computedThemeColor: string, // css computed theme color from the favicon
     startLoadTime: datetime,
     endtLoadTime: datetime,
+    guestInstanceId: string, // not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
     adblock: {
@@ -96,7 +101,8 @@ WindowStore
     basicAuthDetail: {...},
     findDetail: {
       searchString: string, // the string being searched
-      caseSensitivity: boolean // whether we are doing a case sensitive search
+      caseSensitivity: boolean, // whether we are doing a case sensitive search
+      numberOfMatches: number // Total number of matches on the page
     }
     unloaded: boolean, // true if the tab is unloaded
 

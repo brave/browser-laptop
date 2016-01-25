@@ -5,8 +5,6 @@
 'use strict'
 const Immutable = require('immutable')
 
-var exports = {}
-
 /**
  * Obtains the index of the location in sites
  *
@@ -14,7 +12,7 @@ var exports = {}
  * @param location The frameProps of the page in question
  * @return index of the location or -1 if not found.
  */
-exports.getSiteUrlIndex = function (sites, location) {
+module.exports.getSiteUrlIndex = function (sites, location) {
   return sites.findIndex(site => site.get('location') === location)
 }
 
@@ -26,8 +24,8 @@ exports.getSiteUrlIndex = function (sites, location) {
  * @param tag The tag of the site to check
  * @return true if the location is already bookmarked
  */
-exports.isSiteInList = function (sites, location, tag) {
-  let index = exports.getSiteUrlIndex(sites, location)
+module.exports.isSiteInList = function (sites, location, tag) {
+  const index = module.exports.getSiteUrlIndex(sites, location)
   if (index === -1) {
     return false
   }
@@ -45,8 +43,8 @@ exports.isSiteInList = function (sites, location, tag) {
  * Otherwise it's only considered to be a history item
  * @return The new sites Immutable object
  */
-exports.addSite = function (sites, frameProps, tag) {
-  let index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
+module.exports.addSite = function (sites, frameProps, tag) {
+  const index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -58,7 +56,7 @@ exports.addSite = function (sites, frameProps, tag) {
     }
   }
 
-  let site = Immutable.fromJS({
+  const site = Immutable.fromJS({
     lastAccessed: new Date(),
     tags,
     location: frameProps.get('location'),
@@ -79,10 +77,10 @@ exports.addSite = function (sites, frameProps, tag) {
  * @param frameProps The frameProps of the page in question
  * @return The new sites Immutable object
  */
-exports.removeSite = function (sites, frameProps, tag) {
+module.exports.removeSite = function (sites, frameProps, tag) {
   let index = -1
   if (frameProps.get('isPinned')) {
-    index = exports.getSiteUrlIndex(sites, frameProps.get('src'))
+    index = module.exports.getSiteUrlIndex(sites, frameProps.get('src'))
   }
   // When pinning a tab from the current window the src might not be
   // set to the current site on that first window.
@@ -90,12 +88,12 @@ exports.removeSite = function (sites, frameProps, tag) {
   // then check the src then location.  This also fixes pinned sites
   // with HTTPS Everywhere.
   if (index === -1) {
-    index = exports.getSiteUrlIndex(sites, frameProps.get('location'))
+    index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'))
   }
   if (index === -1) {
     return sites
   }
-  let tags = sites.getIn([index, 'tags'])
+  const tags = sites.getIn([index, 'tags'])
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
@@ -105,7 +103,7 @@ exports.removeSite = function (sites, frameProps, tag) {
  * @param site The site in question
  * @return the class of the fontawesome icon to use
  */
-exports.getSiteIconClass = function (site) {
+module.exports.getSiteIconClass = function (site) {
   if (site.get('tags').includes('bookmark')) {
     return 'fa-star-o'
   }
@@ -114,5 +112,3 @@ exports.getSiteIconClass = function (site) {
   }
   return 'fa-file-o'
 }
-
-module.exports = exports

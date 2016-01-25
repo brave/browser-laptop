@@ -113,6 +113,7 @@ function processAdNode (node, iframeData, replacementUrl) {
 
   if (node.tagName === 'IFRAME') {
     node.srcdoc = src
+    node.sandbox = 'allow-scripts'
   } else {
     while (node.firstChild) {
       node.removeChild(node.firstChild)
@@ -124,6 +125,7 @@ function processAdNode (node, iframeData, replacementUrl) {
     iframe.style.width = adSize[0] + 'px'
     iframe.style.height = adSize[1] + 'px'
     iframe.srcdoc = src
+    iframe.sandbox = 'allow-scripts'
     node.appendChild(iframe)
     ensureNodeVisible(node)
     if (node.parentNode) {
@@ -177,13 +179,33 @@ ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholder
   })
 })
 
+function hasSelection (node) {
+  if (node && node.selectionStart !== undefined &&
+      node.selectionEnd !== undefined &&
+      node.selectionStart !== node.selectionEnd) {
+    return true
+  }
+
+  var selection = window.getSelection()
+  for (var i = 0; i < selection.rangeCount; i++) {
+    var range = window.getSelection().getRangeAt(i)
+    if (range.endOffset !== undefined &&
+        range.startOffset !== undefined &&
+        range.endOffset !== range.startOffset) {
+      return true
+    }
+  }
+  return false
+}
+
 document.addEventListener('contextmenu', (e) => {
   var name = e.target.nodeName.toUpperCase()
   var nodeProps = {
     name: name,
-    src: name === 'A' ? e.target.href : e.target.src
+    src: name === 'A' ? e.target.href : e.target.src,
+    isContentEditable: e.target.isContentEditable,
+    hasSelection: hasSelection(e.target)
   }
-  console.log('sending', nodeProps)
   ipc.send(messages.CONTEXT_MENU_OPENED, nodeProps)
   e.preventDefault()
 }, false)

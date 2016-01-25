@@ -4,6 +4,7 @@
 
 var webpack = require('webpack')
 var WebpackNotifierPlugin = require('webpack-notifier')
+var port = process.env.BRAVE_PORT ? process.env.BRAVE_PORT : 8080
 
 module.exports = {
   contentBase: './dist/',
@@ -73,6 +74,7 @@ module.exports = {
   ],
   devServer: {
     contentBase: './public',
-    publicPath: 'http://localhost:8080/built/'
+    port: port,
+    publicPath: 'http://localhost:' + port + '/built/'
   }
 }

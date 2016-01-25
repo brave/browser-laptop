@@ -63,7 +63,7 @@ class Tab extends ImmutableComponent {
       return
     }
 
-    let rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
+    const rect = ReactDOM.findDOMNode(this.refs.tab).getBoundingClientRect()
     if (e.clientX > rect.left && e.clientX < rect.left + rect.width / 2 &&
       !this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
       WindowActions.tabDragDraggingOverLeftHalf(this.props.frameProps)
@@ -84,7 +84,7 @@ class Tab extends ImmutableComponent {
   }
 
   onDrop (e) {
-    let sourceFrameProps = this.props.activeDraggedTab
+    const sourceFrameProps = this.props.activeDraggedTab
     if (!sourceFrameProps) {
       return
     }
@@ -101,7 +101,8 @@ class Tab extends ImmutableComponent {
     WindowActions.setActiveFrame(this.props.frameProps)
   }
 
-  onCloseFrame () {
+  onCloseFrame (event) {
+    event.stopPropagation()
     WindowActions.closeFrame(this.props.frames, this.props.frameProps)
   }
 
@@ -133,7 +134,7 @@ class Tab extends ImmutableComponent {
   render () {
     // Style based on theme-color
     let iconStyle = {}
-    var activeTabStyle = {}
+    const activeTabStyle = {}
     const backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
     if (this.props.isActive && backgroundColor) {
       activeTabStyle.backgroundColor = backgroundColor
@@ -199,9 +200,6 @@ class Tab extends ImmutableComponent {
       onClick={this.setActiveFrame.bind(this)}
       onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
-      { !this.isPinned
-        ? <span onClick={this.onCloseFrame.bind(this)}
-             className='closeTab fa fa-times-circle'/> : null }
         { this.props.frameProps.get('isPrivate')
           ? <div className='privateIcon fa fa-eye'/> : null }
         <div className={cx({
@@ -214,6 +212,9 @@ class Tab extends ImmutableComponent {
           ? <div className='tabTitle'>
           {this.displayValue}
         </div> : null }
+      { !this.isPinned
+        ? <span onClick={this.onCloseFrame.bind(this)}
+             className='closeTab fa fa-times-circle'/> : null }
       </div>
       <DragIndicator
         end

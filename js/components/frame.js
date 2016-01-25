@@ -8,6 +8,7 @@ const urlParse = require('url').parse
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
+const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 const messages = require('../constants/messages.js')
@@ -26,14 +27,17 @@ class Frame extends ImmutableComponent {
     return ReactDOM.findDOMNode(this.refs.webviewContainer)
   }
 
-  createWebview () {
+  updateWebview () {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.
     this.webview = this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
+    this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('preload', 'content/webviewPreload.js')
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
+    } else if (this.props.frame.get('partitionNumber')) {
+      this.webview.setAttribute('partition', `persist:partition-${this.props.frame.get('partitionNumber')}`)
     }
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
@@ -47,14 +51,15 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidMount () {
-    this.createWebview()
+    this.updateWebview()
   }
 
   componentDidUpdate (prevProps, prevState) {
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
     if (didSrcChange) {
-      this.createWebview()
+      this.updateWebview()
     }
+    // give focus when switching tabs
     if (this.props.isActive && !prevProps.isActive) {
       this.webview.focus()
     }
@@ -86,7 +91,7 @@ class Frame extends ImmutableComponent {
         }
         break
       case 'view-source':
-        let src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        const src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         WindowActions.loadUrl(this.props.frame, src)
         // TODO: Make the URL bar show the view-source: prefix
         break
@@ -112,8 +117,8 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('new-window', (e, url, frameName, disposition, options) => {
       e.preventDefault()
 
-      let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
-      let windowOptions = e.options && e.options.windowOptions || {}
+      const guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
+      const windowOptions = e.options && e.options.windowOptions || {}
       windowOptions.parentWindowKey = remote.getCurrentWindow().id
       windowOptions.disposition = e.disposition
 
@@ -121,15 +126,19 @@ class Frame extends ImmutableComponent {
         AppActions.newWindow({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
+          isPrivate: this.props.frame.get('isPrivate'),
+          partitionNumber: this.props.frame.get('partitionNumber'),
           guestInstanceId
         }, windowOptions)
       } else {
+        const openInForeground = e.disposition !== 'background-tab'
         WindowActions.newFrame({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
-          openInForeground: e.disposition !== 'background-tab',
+          isPrivate: this.props.frame.get('isPrivate'),
+          partitionNumber: this.props.frame.get('partitionNumber'),
           guestInstanceId
-        })
+        }, openInForeground)
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
@@ -160,7 +169,7 @@ class Frame extends ImmutableComponent {
         // TODO: These 3 events should be combined into one
         WindowActions.onWebviewLoadStart(
           this.props.frame)
-        let key = this.props.frame.get('key')
+        const key = this.props.frame.get('key')
         WindowActions.setLocation(event.url, key)
         WindowActions.setSecurityState({
           secure: urlParse(event.url).protocol === 'https:'
@@ -173,7 +182,8 @@ class Frame extends ImmutableComponent {
         this.webview.canGoForward())
     })
     this.webview.addEventListener('did-navigate', (e) => {
-      if (this.props.isActive && this.webview.getURL() !== Config.defaultUrl) {
+      // only give focus focus is this is not the initial default page load
+      if (this.props.isActive && this.webview.canGoBack()) {
         this.webview.focus()
       }
     })
@@ -184,6 +194,11 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-load', () => {
     })
     this.webview.addEventListener('did-finish-load', () => {
+    })
+    this.webview.addEventListener('did-navigate-in-page', () => {
+      WindowActions.onWebviewLoadEnd(
+        this.props.frame,
+        this.webview.getURL())
     })
     this.webview.addEventListener('did-frame-finish-load', (event) => {
       if (event.isMainFrame) {
@@ -201,6 +216,13 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       WindowActions.setThemeColor(this.props.frame, themeColor)
     })
+    this.webview.addEventListener('found-in-page', (e) => {
+      if (e.result !== undefined && e.result.matches !== undefined) {
+        WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+          numberOfMatches: e.result.matches
+        }))
+      }
+    })
 
     // Ensure we mute appropriately, the initial value could be set
     // from persisted state.
@@ -210,8 +232,8 @@ class Frame extends ImmutableComponent {
   }
 
   insertAds (currentLocation) {
-    let host = new window.URL(currentLocation).hostname.replace('www.', '')
-    let adDivCandidates = adInfo[host] || []
+    const host = new window.URL(currentLocation).hostname.replace('www.', '')
+    const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES,
@@ -235,23 +257,13 @@ class Frame extends ImmutableComponent {
     this.onClearMatch()
   }
 
-  onFindAll (searchString, caseSensitivity) {
+  onFind (searchString, caseSensitivity, forward) {
     if (searchString) {
-      this.webview.findInPage(searchString,
-                              {matchCase: caseSensitivity,
-                               forward: true,
-                               findNext: false})
-    } else {
-      this.onClearMatch()
-    }
-  }
-
-  onFindAgain (searchString, caseSensitivity, forward) {
-    if (searchString) {
-      this.webview.findInPage(searchString,
-                              {matchCase: caseSensitivity,
-                               forward: forward,
-                               findNext: true})
+      this.webview.findInPage(searchString, {
+        matchCase: caseSensitivity,
+        forward: forward !== undefined ? forward : true,
+        findNext: forward !== undefined
+      })
     } else {
       this.onClearMatch()
     }
@@ -280,10 +292,8 @@ class Frame extends ImmutableComponent {
         })}>
       <FindBar
         ref='findbar'
-        findInPageDetail={null}
-        onFindAll={this.onFindAll.bind(this)}
-        onFindAgain={this.onFindAgain.bind(this)}
-        onHide={this.onFindHide.bind(this)}
+        onFind={this.onFind.bind(this)}
+        onFindHide={this.onFindHide.bind(this)}
         active={this.props.frame.get('findbarShown')}
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}

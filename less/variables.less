@@ -3,16 +3,22 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @linkColor: #0099CC;
-@highlightBlue: #0076FF;
-@tabBorderRadius: 10px;
+@highlightBlue: #5182B9;
+@borderRadius: 4px;
 @privateTabBackground: #392e54;
-@chromePrimary: #A0A2A4;
-@tabsBackground: #CCCCCC;
-@navigationBarBackground: #919295;
+
+@chromePrimary: #EEEEEE;
+@chromeSecondary: #DFDFDF;
+@chromeTertiary: #CCCCCC;
+@chromeText: #555555;
+
+@tabsBackground: @chromeSecondary;
+@navigationBarBackground: @chromeSecondary;
 @chromeBorderColor: @chromePrimary;
 @chromeControlsBackground: #bbb;
 @chromeControlsWarningBackground: @chromePrimary;
-@chromeControlsBackground2: #7E7F83;
+@chromeControlsBackground2: @chromeSecondary;
+
 @navigatorHeight: 48px;
 @defaultSpacing: 12px;
 @progressBarColor: #3498DB;
@@ -20,6 +26,6 @@
 @audioColor: @highlightBlue;
 @focusUrlbarOutline: @highlightBlue;
 @loadTimeColor: @highlightBlue;
-@activeTabDefaultColor: white;
+@activeTabDefaultColor: @chromePrimary;
 @buttonColor: #3B3B3B;
 @braveOrange: #EB431C;

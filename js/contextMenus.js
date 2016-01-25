@@ -4,6 +4,7 @@
 
 const remote = require('remote')
 const Menu = remote.require('menu')
+const Clipboard = require('clipboard')
 const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
@@ -32,6 +33,13 @@ function tabPageTemplateInit (framePropsList) {
   }]
 }
 
+function inputTemplateInit (e) {
+  const hasSelection = e.target.selectionStart !== undefined &&
+      e.target.selectionEnd !== undefined &&
+      e.target.selectionStart !== e.target.selectionEnd
+  return getEditableItems(hasSelection)
+}
+
 function tabTemplateInit (frameProps) {
   const tabKey = frameProps.get('key')
   const items = []
@@ -44,26 +52,28 @@ function tabTemplateInit (frameProps) {
     }
   })
 
-  if (frameProps.get('isPinned')) {
-    items.push({
-      label: 'Unpin tab',
-      click: (item) => {
-        // Handle converting the current tab window into a pinned site
-        WindowActions.setPinned(frameProps, false)
-        // Handle setting it in app storage for the other windows
-        AppActions.removeSite(frameProps, SiteTags.PINNED)
-      }
-    })
-  } else {
-    items.push({
-      label: 'Pin tab',
-      click: (item) => {
-        // Handle converting the current tab window into a pinned site
-        WindowActions.setPinned(frameProps, true)
-        // Handle setting it in app storage for the other windows
-        AppActions.addSite(frameProps, SiteTags.PINNED)
-      }
-    })
+  if (!frameProps.get('isPrivate')) {
+    if (frameProps.get('isPinned')) {
+      items.push({
+        label: 'Unpin tab',
+        click: (item) => {
+          // Handle converting the current tab window into a pinned site
+          WindowActions.setPinned(frameProps, false)
+          // Handle setting it in app storage for the other windows
+          AppActions.removeSite(frameProps, SiteTags.PINNED)
+        }
+      })
+    } else {
+      items.push({
+        label: 'Pin tab',
+        click: (item) => {
+          // Handle converting the current tab window into a pinned site
+          WindowActions.setPinned(frameProps, true)
+          // Handle setting it in app storage for the other windows
+          AppActions.addSite(frameProps, SiteTags.PINNED)
+        }
+      })
+    }
   }
 
   if (frameProps.get('audioPlaybackActive')) {
@@ -107,8 +117,30 @@ function tabTemplateInit (frameProps) {
   return items
 }
 
+function getEditableItems (hasSelection) {
+  return [{
+    label: 'Cut',
+    enabled: hasSelection,
+    accelerator: 'CmdOrCtrl+X',
+    // Enabled doesn't work when a role is used
+    role: hasSelection && 'cut' || undefined
+  }, {
+    label: 'Copy',
+    enabled: hasSelection,
+    accelerator: 'CmdOrCtrl+C',
+    // Enabled doesn't work when a role is used
+    role: hasSelection && 'copy' || undefined
+  }, {
+    label: 'Paste',
+    accelerator: 'CmdOrCtrl+V',
+    role: 'paste'
+  }, {
+    type: 'separator'
+  }]
+}
+
 function mainTemplateInit (nodeProps) {
-  let template = [
+  const template = [
     {
       label: 'Reload',
       click: (item, focusedWindow) => {
@@ -131,7 +163,7 @@ function mainTemplateInit (nodeProps) {
       enabled: false
     }
   ]
-  let nodeName = nodeProps.name
+  const nodeName = nodeProps.name
   switch (nodeName) {
     case 'A':
       template.push({
@@ -150,7 +182,24 @@ function mainTemplateInit (nodeProps) {
         click: (item, focusedWindow) => {
           if (focusedWindow && nodeProps.src) {
             // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, true)
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { isPrivate: true })
+          }
+        }
+      })
+      template.push({
+        label: 'Open in new partitioned session',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            // TODO: open this in the next tab instead of last tab
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { isPartitioned: true })
+          }
+        }
+      })
+      template.push({
+        label: 'Copy link address',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            Clipboard.writeText(nodeProps.src)
           }
         }
       })
@@ -173,8 +222,31 @@ function mainTemplateInit (nodeProps) {
           }
         }
       })
+      template.push({
+        label: 'Copy image address',
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.src) {
+            Clipboard.writeText(nodeProps.src)
+          }
+        }
+      })
       break
   }
+
+  if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
+    const editableItems = getEditableItems(nodeProps.hasSelection)
+    editableItems.push({ type: 'separator' })
+    template.unshift(...editableItems)
+  } else if (nodeProps.hasSelection) {
+    template.unshift({
+      label: 'Copy',
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    }, {
+      type: 'separator'
+    })
+  }
+
   return template
 }
 
@@ -193,4 +265,9 @@ export function onTabPageContextMenu (framePropsList, e) {
   e.preventDefault()
   const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
   tabPageMenu.popup(remote.getCurrentWindow())
+}
+
+export function onUrlBarContextMenu (e) {
+  const inputMenu = Menu.buildFromTemplate(inputTemplateInit(e))
+  inputMenu.popup(remote.getCurrentWindow())
 }

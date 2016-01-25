@@ -17,19 +17,22 @@ app.on('will-finish-launching', function () {
   // open -a Brave http://www.brave.com
   app.on('open-url', function (event, path) {
     event.preventDefault()
-    let wnd = BrowserWindow.getFocusedWindow()
-    if (!wnd) {
-      const wnds = BrowserWindow.getAllWindows()
-      if (wnds.length > 0) {
-        wnd = wnds[0]
+
+    if (appInitialized) {
+      let wnd = BrowserWindow.getFocusedWindow()
+      if (!wnd) {
+        const wnds = BrowserWindow.getAllWindows()
+        if (wnds.length > 0) {
+          wnd = wnds[0]
+        }
       }
-    }
-    if (wnd) {
-      wnd.webContents.send(messages.SHORTCUT_NEW_FRAME, path)
-    } else if (appInitialized) {
-      AppActions.newWindow(Immutable.fromJS({
-        location: path
-      }))
+      if (wnd) {
+        wnd.webContents.send(messages.SHORTCUT_NEW_FRAME, path)
+      } else {
+        AppActions.newWindow(Immutable.fromJS({
+          location: path
+        }))
+      }
     } else {
       module.exports.newWindowURL = path
     }

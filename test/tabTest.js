@@ -29,9 +29,19 @@ describe('tabs', function () {
 
     it('creates a private new tab when signaled', function *() {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brianbondy.com', true)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPrivate: true })
         .waitForExist('.tab[data-frame-key="3"]')
-        .waitForVisible('webview[partition]')
+        .waitForVisible('webview[partition="private-1"]')
+    })
+
+    it('creates a partitioned new tab when signaled', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
+        .waitForExist('.tab[data-frame-key="4"]')
+        .waitForVisible('webview[partition="persist:partition-1"]')
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
+        .waitForExist('.tab[data-frame-key="5"]')
+        .waitForVisible('webview[partition="persist:partition-2"]')
     })
   })
 
@@ -55,6 +65,34 @@ describe('tabs', function () {
           assert(!isExisting))
         .click(newFrameButtonOutsideTabs)
         .waitForExist(newFrameButtonInsideTabs)
+    })
+  })
+
+  describe('webview background-tab events', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('opens background tab', function *() {
+      yield this.app.client
+        .sendWebviewEvent(1, 'new-window', {}, 'new-window', 'http://www.brave.com', 'some-frame', 'background-tab')
+    })
+    it('opens in a new active tab', function *() {
+      yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
+    })
+  })
+
+  describe('webview foreground-tab events', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('opens foreground tab', function *() {
+      yield this.app.client
+        .sendWebviewEvent(1, 'new-window', {}, 'new-window', 'http://www.brave.com', 'some-frame', 'foreground-tab')
+    })
+    it('opens in a new, but not active tab', function *() {
+      yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="2"]')
     })
   })
 })

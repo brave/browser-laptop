@@ -4,18 +4,24 @@
 
 const electron = require('electron')
 const app = electron.app
+const BrowserWindow = electron.BrowserWindow
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
 const AppActions = require('../js/actions/appActions')
 const HttpsEverywhere = require('./httpsEverywhere')
 const AdBlock = require('./adBlock')
+const AdInsertion = require('./adInsertion')
 const TrackingProtection = require('./trackingProtection')
 const Filtering = require('./filtering')
 
 const name = 'Brave'
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
+
+const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
+const contactUrl = 'mailto:support@brave.com'
+const aboutUrl = 'https://brave.com/'
 
 /**
  * Sends a message to the web contents of the focused window.
@@ -75,6 +81,9 @@ const init = (args) => {
     {
       label: 'Check for updates ...',
       click: function (item, focusedWindow) {
+        if (BrowserWindow.getAllWindows().length === 0) {
+          AppActions.newWindow()
+        }
         process.emit(messages.CHECK_FOR_UPDATE)
       }
     },
@@ -98,7 +107,13 @@ const init = (args) => {
       label: 'New Private Tab',
       accelerator: 'CmdOrCtrl+Alt+T',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, true])
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
+      }
+    }, {
+      label: 'New Partitioned Session',
+      accelerator: 'CmdOrCtrl+Alt+S',
+      click: function (item, focusedWindow) {
+        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
       }
     }, {
       label: 'New Window',
@@ -197,10 +212,10 @@ const init = (args) => {
 
   const helpMenu = [
     {
-      label: 'Brave Help',
+      label: 'Report an issue',
       click: function (item, focusedWindow) {
         sendToFocusedWindow(focusedWindow,
-          [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+          [messages.SHORTCUT_NEW_FRAME, issuesUrl])
       }
     }, {
       type: 'separator'
@@ -208,13 +223,13 @@ const init = (args) => {
       label: 'Submit Feedback...',
       click: function (item, focusedWindow) {
         sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+                            [messages.SHORTCUT_NEW_FRAME, contactUrl])
       }
     }, {
       label: 'Spread the word about Brave...',
       click: function (item, focusedWindow) {
         sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+                            [messages.SHORTCUT_NEW_FRAME, aboutUrl])
       }
     }
   ]
@@ -469,6 +484,7 @@ const init = (args) => {
     }, {
       label: 'Bravery',
       submenu: [
+        /*
         {
           label: 'Manage...',
           enabled: false
@@ -485,11 +501,21 @@ const init = (args) => {
         }, {
           type: 'separator'
         }, {
-          label: 'Site Protection Settings (Changes invoke reload)',
+          label: 'Site Protection Settings',
           enabled: false // Hack to make this look like a section header.
+        },
+        */
+        {
+          type: 'checkbox',
+          label: 'Ad Replacement Engine',
+          checked: Filtering.isResourceEnabled(AdInsertion.resourceName),
+          click: function (item, focusedWindow) {
+            AppActions.setResourceEnabled(AdInsertion.resourceName, !Filtering.isResourceEnabled(AdInsertion.resourceName))
+            init({bookmarked: bookmarkPageMenuItem.checked})
+          }
         }, {
           type: 'checkbox',
-          label: 'Block and insert safe ads',
+          label: 'Block ads',
           checked: Filtering.isResourceEnabled(AdBlock.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
@@ -497,9 +523,9 @@ const init = (args) => {
           }
         }, {
           type: 'checkbox',
-          label: 'Block 3rd party cookies',
+          label: 'Block 3rd party cookies (coming soon)',
           enabled: false,
-          checked: true
+          checked: false
         }, {
           type: 'checkbox',
           label: 'Block Tracking',
@@ -605,7 +631,7 @@ const init = (args) => {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, 'https://brave.com/'])
+              [messages.SHORTCUT_NEW_FRAME, contactUrl])
           }
         }, {
           type: 'separator'

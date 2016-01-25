@@ -45,8 +45,8 @@ const WindowActions = {
     let newFrame = false
     if (activeFrame.get('isPinned')) {
       try {
-        let origin1 = new window.URL(activeFrame.get('location')).origin
-        let origin2 = new window.URL(location).origin
+        const origin1 = new window.URL(activeFrame.get('location')).origin
+        const origin2 = new window.URL(location).origin
         if (origin1 !== origin2) {
           newFrame = true
         }
@@ -219,7 +219,7 @@ const WindowActions = {
   closeFrame: function (frames, frameProps, forceClosePinned) {
     // Unless a caller explicitly specifies to close a pinned frame, then
     // ignore the call.
-    let nonPinnedFrames = frames.filter(frame => !frame.get('isPinned'))
+    const nonPinnedFrames = frames.filter(frame => !frame.get('isPinned'))
     if (frameProps && frameProps.get('isPinned')) {
       // Check for no frames at all, and if that's the case the user
       // only has pinned frames and tried to close, so close the
@@ -230,11 +230,13 @@ const WindowActions = {
       }
 
       if (!forceClosePinned) {
+        // Go to next frame if the user tries to close a pinned tab
+        ipc.emit(messages.SHORTCUT_NEXT_TAB)
         return
       }
     }
 
-    let pinnedFrames = frames.filter(frame => frame.get('isPinned'))
+    const pinnedFrames = frames.filter(frame => frame.get('isPinned'))
 
     // If there is at least 1 pinned frame don't close the window until subsequent
     // close attempts

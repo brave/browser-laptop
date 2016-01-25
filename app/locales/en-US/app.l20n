@@ -49,9 +49,6 @@
 
 <urlbar placeholder: "Search or enter an address">
 
-<findResults "{{$activeMatchOrdinal}} of {{$numberofMatches}}">
-<caseSensitivity "Match case">
-
 <runtimeUpdatePending "A runtime update which requires the application to be restarted is available.">
 <appUpdatePending "An update is available.">
 <apply "Apply">
@@ -80,5 +77,14 @@
 <updateRequiresRelaunch "Requires a quick relaunch...">
 <updateViewLog "View log">
 <updateHide "Hide">
-<updateHide "">
 
+<defaultSession "This tab uses the default partition">
+<sessionInfo "This tab uses partition {{$partitionNumber}}">
+
+<findResults "{{$activeMatchOrdinal}} of {{$numberOfMatches}}">
+
+<findResultMatches[@cldr.plural($numberOfMatches)] {
+  one: "{{$numberOfMatches}} match",
+  *many: "{{$numberOfMatches}} matches"
+}>
+<caseSensitivity "Match case">

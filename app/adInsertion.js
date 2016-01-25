@@ -2,10 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-export default function debounce (fn, bufferInterval, ...args) {
-  let timeout
-  return () => {
-    clearTimeout(timeout)
-    timeout = setTimeout(fn.apply.bind(fn, this, args), bufferInterval)
-  }
-}
+'use strict'
+
+module.exports.resourceName = 'adInsertion'

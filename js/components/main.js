@@ -38,10 +38,11 @@ class Main extends ImmutableComponent {
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
       contextMenus.onMainContextMenu(nodeProps)
     })
-    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, isPrivate = false) => {
+    ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
-        isPrivate
+        isPrivate: !!options.isPrivate,
+        isPartitioned: !!options.isPartitioned
       })
 
       // Focus URL bar when adding tab via shortcut
@@ -115,9 +116,9 @@ class Main extends ImmutableComponent {
   }
 
   get enableAds () {
-    let enabled = this.props.appState.getIn(['adblock', 'enabled'])
+    let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
-      enabled = AppConfig.adblock.enabled
+      enabled = AppConfig.adInsertion.enabled
     }
     return enabled
   }
@@ -132,7 +133,7 @@ class Main extends ImmutableComponent {
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
 
-    let activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     return <div id='window'>
       <div className='top'>
         <div className='backforward'>

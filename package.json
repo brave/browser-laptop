@@ -4,6 +4,8 @@
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
+    "checks": "npm run check-security",
+    "check-security": "nsp check",
     "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "watch-all": "npm run watch & npm run watch-test",
@@ -12,22 +14,15 @@
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
     "preload-httpse": "node ./preload-httpse.js",
-    "sign-darwin": "./sign-darwin.sh",
-    "build-darwin": "node ./build-darwin.js",
-    "build-win64": "node ./build-win64.js",
-    "installer-darwin": "rm -f dist/Brave.dmg && electron-builder \"Brave-darwin-x64/Brave.app\" --platform=osx --out=\"dist\" --config=builderConfig.json --overwrite",
-    "installer-win64": "node ./build-win64-installer.js",
-    "zip-darwin": "node build-darwin-update.js",
+    "build-package": "node ./tools/buildPackage.js",
+    "build-installer": "node ./tools/buildInstaller.js",
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
-    "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/adblock.dat",
-    "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/trackingprotection.dat",
+    "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/ABPFilterParserData.dat",
+    "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/TrackingProtection.dat",
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bbondy/electron-sample.git"
-  },
+  "repository": "brave/browser-laptop",
   "author": {
     "name": "Brave Developers <support@brave.com>"
   },
@@ -51,9 +46,9 @@
   },
   "homepage": "https://github.com/bbondy/electron-sample#readme",
   "dependencies": {
-    "abp-filter-parser-cpp": "^1.0.22",
+    "abp-filter-parser-cpp": "^1.1.2",
     "electron-localshortcut": "^0.6.0",
-    "electron-prebuilt": "git+ssh://git@github.com/brave/electron-prebuilt.git",
+    "electron-prebuilt": "brave/electron-prebuilt",
     "electron-squirrel-startup": "^0.1.4",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
@@ -65,13 +60,15 @@
     "tracking-protection": "^1.0.7",
     "url-loader": "^0.5.7",
     "urlutil.js": "^0.1.1",
-    "vibrant": "git+ssh://git@github.com/jariz/vibrant.js.git#1.0"
+    "vibrant": "jariz/vibrant.js#1.0"
   },
   "devDependencies": {
     "asar": "^0.8.3",
     "babel": "^6.1.18",
     "babel-core": "^6.3.15",
     "babel-loader": "^6.2.0",
+    "babel-plugin-transform-react-constant-elements": "^6.4.0",
+    "babel-plugin-transform-react-inline-elements": "^6.4.0",
     "babel-polyfill": "^6.3.14",
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.1.18",
@@ -94,6 +91,8 @@
     "node-libs-browser": "^0.5.3",
     "node-static": "^0.7.7",
     "node-uuid": "^1.4.7",
+    "npm": "3.4.1",
+    "nsp": "^2.2.0",
     "pre-commit": "^1.1.2",
     "spectron": "^0.36.0",
     "standard": "^5.4.1",
@@ -102,7 +101,6 @@
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0",
     "webpack-notifier": "^1.2.1",
-    "npm": "3.4.1",
     "xml2js": "^0.4.15"
   },
   "standard": {
@@ -120,5 +118,9 @@
   },
   "pre-commit": [
     "lint"
-  ]
+  ],
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 5.0.0"
+  }
 }
