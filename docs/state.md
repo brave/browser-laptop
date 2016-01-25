@@ -38,6 +38,9 @@ AppStore
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable HTTPS Everywhere
   },
+  adInsertion: {
+    enabled: boolean // Enable ad insertion
+  },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {

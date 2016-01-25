@@ -116,9 +116,9 @@ class Main extends ImmutableComponent {
   }
 
   get enableAds () {
-    let enabled = this.props.appState.getIn(['adblock', 'enabled'])
+    let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
-      enabled = AppConfig.adblock.enabled
+      enabled = AppConfig.adInsertion.enabled
     }
     return enabled
   }

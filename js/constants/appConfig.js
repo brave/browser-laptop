@@ -30,6 +30,9 @@ module.exports = {
   siteHacks: {
     enabled: true
   },
+  adInsertion: {
+    enabled: true
+  },
   crashes: {
     crashSubmitUrl: crashURL
   },

@@ -11,6 +11,7 @@ const dialog = electron.dialog
 const AppActions = require('../js/actions/appActions')
 const HttpsEverywhere = require('./httpsEverywhere')
 const AdBlock = require('./adBlock')
+const AdInsertion = require('./adInsertion')
 const TrackingProtection = require('./trackingProtection')
 const Filtering = require('./filtering')
 
@@ -503,7 +504,15 @@ const init = (args) => {
           enabled: false // Hack to make this look like a section header.
         }, {
           type: 'checkbox',
-          label: 'Replace ads',
+          label: 'Brave ad replacement',
+          checked: Filtering.isResourceEnabled(AdInsertion.resourceName),
+          click: function (item, focusedWindow) {
+            AppActions.setResourceEnabled(AdInsertion.resourceName, !Filtering.isResourceEnabled(AdInsertion.resourceName))
+            init({bookmarked: bookmarkPageMenuItem.checked})
+          }
+        }, {
+          type: 'checkbox',
+          label: 'Block ads',
           checked: Filtering.isResourceEnabled(AdBlock.resourceName),
           click: function (item, focusedWindow) {
             AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
