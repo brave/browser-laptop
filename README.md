@@ -4,15 +4,28 @@
 
 Laptop and Desktop browser for OS X, Windows and Linux.
 
+## Requirements
+
+1. nodejs >= 5.0
+
+    Install from your package manager or download from https://nodejs.org
+
+2. node-gyp 3.2.1
+
+    sudo npm install -g node-gyp@3.2.1
+
+[Prerequisites](https://github.com/brave/browser-laptop/blob/master/docs/prerequisites.md) for Windows
+
+
 ## Installation
 
 Make sure you have all of the pre-requisite compilers/applications [Installed](https://github.com/brave/browser-laptop/blob/master/docs/prerequisites.md)
 
-1. Shallow clone the git repository from GitHub:
-        
+1. Clone the git repository from GitHub:
+
         # For beta testers:
         git clone --depth 1 https://github.com/brave/browser-laptop
-        
+
         # For devs over HTTPS:
         git clone https://github.com/brave/browser-laptop
 
