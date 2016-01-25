@@ -52,26 +52,28 @@ function tabTemplateInit (frameProps) {
     }
   })
 
-  if (frameProps.get('isPinned')) {
-    items.push({
-      label: 'Unpin tab',
-      click: (item) => {
-        // Handle converting the current tab window into a pinned site
-        WindowActions.setPinned(frameProps, false)
-        // Handle setting it in app storage for the other windows
-        AppActions.removeSite(frameProps, SiteTags.PINNED)
-      }
-    })
-  } else {
-    items.push({
-      label: 'Pin tab',
-      click: (item) => {
-        // Handle converting the current tab window into a pinned site
-        WindowActions.setPinned(frameProps, true)
-        // Handle setting it in app storage for the other windows
-        AppActions.addSite(frameProps, SiteTags.PINNED)
-      }
-    })
+  if (!frameProps.get('isPrivate')) {
+    if (frameProps.get('isPinned')) {
+      items.push({
+        label: 'Unpin tab',
+        click: (item) => {
+          // Handle converting the current tab window into a pinned site
+          WindowActions.setPinned(frameProps, false)
+          // Handle setting it in app storage for the other windows
+          AppActions.removeSite(frameProps, SiteTags.PINNED)
+        }
+      })
+    } else {
+      items.push({
+        label: 'Pin tab',
+        click: (item) => {
+          // Handle converting the current tab window into a pinned site
+          WindowActions.setPinned(frameProps, true)
+          // Handle setting it in app storage for the other windows
+          AppActions.addSite(frameProps, SiteTags.PINNED)
+        }
+      })
+    }
   }
 
   if (frameProps.get('audioPlaybackActive')) {
