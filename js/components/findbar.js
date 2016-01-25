@@ -134,7 +134,7 @@ export default class FindBar extends ImmutableComponent {
       }
       findMatchText = <div className='foundResults'
         data-l10n-args={JSON.stringify(l10nArgs)}
-        data-l10n-id='findResultsTotalOnly'/>
+        data-l10n-id='findResultMatches'/>
     }
 
     return <div className='findBar'>

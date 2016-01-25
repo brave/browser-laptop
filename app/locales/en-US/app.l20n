@@ -82,5 +82,9 @@
 <sessionInfo "This tab uses partition {{$partitionNumber}}">
 
 <findResults "{{$activeMatchOrdinal}} of {{$numberOfMatches}}">
-<findResultsTotalOnly "{{$numberOfMatches}} matches">
+
+<findResultMatches[@cldr.plural($numberOfMatches)] {
+  one: "{{$numberOfMatches}} match",
+  *many: "{{$numberOfMatches}} matches"
+}>
 <caseSensitivity "Match case">
