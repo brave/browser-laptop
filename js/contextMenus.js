@@ -267,7 +267,7 @@ export function onTabPageContextMenu (framePropsList, e) {
   tabPageMenu.popup(remote.getCurrentWindow())
 }
 
-export function onURLBarContextMenu (e) {
+export function onUrlBarContextMenu (e) {
   const inputMenu = Menu.buildFromTemplate(inputTemplateInit(e))
   inputMenu.popup(remote.getCurrentWindow())
 }

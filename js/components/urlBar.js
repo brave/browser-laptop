@@ -225,7 +225,7 @@ class UrlBar extends ImmutableComponent {
         onKeyDown={this.onKeyDown.bind(this)}
         onChange={this.onChange.bind(this)}
         onClick={this.onClick.bind(this)}
-        onContextMenu={contextMenus.onURLBarContextMenu.bind(this)}
+        onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
         value={this.inputValue}
         data-l10n-id='urlbar'
         className={cx({
