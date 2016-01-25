@@ -19,11 +19,33 @@ var env = {
   NODE_ENV: 'production'
 }
 
+var cmds = ['echo cleaning up target...']
+
+if (isWindows) {
+  cmds = cmds.concat([
+    '(if exist ' + buildDir + ' rmdir /s /q ' + buildDir + ')',
+    '(if exist dist\*.dmg del /q dist\*.dmg)',
+    '(if exist dist\*.nupkg del /q dist\*.nupkg)',
+    '(if exist dist\*.exe del /q dist\*.exe)',
+    '(if exist dist\*.msi del /q dist\*.msi)',
+    '(if exist dist\RELEASES del /q dist\RELEASES)',
+    '(if exist dist\*.zip del /q dist\*.zip)'
+  ])
+} else {
+  cmds = cmds.concat([
+    'rm -rf ' + buildDir,
+    'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES dist/*.zip'
+  ])
+}
+
+cmds = cmds.concat([
+  'echo done',
+  'echo starting build...'
+])
+
 console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
-var cmds = [
-  'rm -rf ' + buildDir,
-  'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES dist/*.zip',
+cmds = cmds.concat([
   '"./node_modules/.bin/webpack"',
   'npm run checks',
   'node ./node_modules/electron-packager/cli.js . Brave' +
@@ -42,6 +64,6 @@ var cmds = [
     ' --version-string.ProductName=\"Brave\"' +
     ' --version-string.Copyright=\"Copyright 2016, Brave Inc.\"' +
     ' --version-string.FileDescription=\"Brave\"'
-]
+])
 
 execute(cmds, env, console.log.bind(null, 'done'))
