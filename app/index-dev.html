@@ -42,7 +42,8 @@
     };
     createScript('http://localhost:{port}/webpack-dev-server.js').catch(function () {
       document.querySelector('#setupError').style.display = 'block'
+    }).then(function () {
+      createScript('http://localhost:{port}/built/bundle.js')
     })
-    createScript('http://localhost:{port}/built/bundle.js')
   </script>
 </html>
