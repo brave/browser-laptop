@@ -183,7 +183,7 @@ describe('urlbar', function () {
       const page1Url = Brave.server.url('page1.html')
       yield navigate(this.app.client, page1Url)
       let backgroundColor = yield this.app.client.getCssProperty(activeTab, 'background-color')
-      assert.equal(backgroundColor.parsed.hex, '#eeeeee')
+      assert.equal(backgroundColor.parsed.hex, '#f3f3f3')
     })
 
     // We need a newer electron build first
