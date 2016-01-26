@@ -9,6 +9,7 @@
   box-sizing: border-box;
   display: flex;
   flex: 1;
+  align-items: center;
   padding: 0 4px 0 6px;
   height: 26px;
   position: relative;
@@ -155,7 +156,6 @@
 .tabArea {
   box-sizing: border-box;
   display: inline-block;
-  padding: 0 2px 0 0;
   position: relative;
   vertical-align: top;
   // There's a special case that tabs should span the full width
@@ -166,6 +166,10 @@
 
   &:not(.isPinned) {
     flex: 1;
+  }
+
+  &:not(:last-child) {
+    padding: 0 2px 0 0;
   }
 
   hr.dragIndicator {
@@ -253,7 +257,7 @@
   height: 20px;
   line-height: 20px !important;
   vertical-align: top;
-  width: 50px;
+  width: 40px;
 
   &:not([disabled]) {
     display: inline-block !important;
@@ -270,7 +274,6 @@
   border-top-left-radius: @borderRadius;
   padding-left: 10px;
   text-align: left;
-  transform: translateX(10px);
 }
 
 .nextTab {
@@ -280,7 +283,6 @@
   float: right;
   padding-right: 10px;
   text-align: right;
-  transform: translateX(-20px);
 }
 
 .pinnedTabs {
