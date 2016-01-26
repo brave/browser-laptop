@@ -179,7 +179,7 @@ const handleAppAction = (action) => {
 
       const mainWindow = createWindow(browserOpts, windowDefaults())
       if (action.restoredState) {
-        mainWindow.webContents.once('dom-ready', () => {
+        mainWindow.webContents.once('did-finish-load', () => {
           mainWindow.webContents.send('restore-state', action.restoredState)
         })
       }
