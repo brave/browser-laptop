@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.7.9](releases/tag/v0.7.9)
+## [0.7.9](https://github.com/brave/browser-laptop/releases/v0.7.9dev)
 
 - UI tweaks.
 - Fixed bug in adblock causing some sites not to work.
@@ -8,7 +8,7 @@
 - Left / right arrow navigation shortcuts.
 - Privacy: Browser level web requests loaded into a segmented in memory only partition.
 
-## [0.7.8](releases/tag/v0.7.8)
+## [0.7.8](https://github.com/brave/browser-laptop/releases/v0.7.8dev)
 
 - New lighter themed UI.
 - Partitioned tabs support for multiple sessions per user.
@@ -22,3 +22,7 @@
 - Find in page result count indicator.
 - Show security icon while HTTP/HTTPS page loads.
 - Various bug fixes.
+
+## [0.7.7](https://github.com/brave/browser-laptop/releases/v0.7.7dev)
+
+- Fixed load time indicator and Windows menus
