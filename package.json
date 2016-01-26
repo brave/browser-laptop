@@ -6,6 +6,7 @@
   "scripts": {
     "checks": "npm run check-security",
     "check-security": "nsp check",
+    "docs": "jsdox js/actions/appActions.js --output docs",
     "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "watch-all": "npm run watch & npm run watch-test",
@@ -84,6 +85,7 @@
     "electron-rebuild": "^1.1.1",
     "empty-port": "0.0.1",
     "gulp": "^3.9.0",
+    "jsdox": "^0.4.9",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "mocha": "^2.3.4",
