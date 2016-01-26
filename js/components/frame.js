@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const urlParse = require('url').parse
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
@@ -21,10 +20,6 @@ import FindBar from './findbar.js'
 class Frame extends ImmutableComponent {
   constructor () {
     super()
-  }
-
-  get webviewContainer () {
-    return ReactDOM.findDOMNode(this.refs.webviewContainer)
   }
 
   updateWebview () {
@@ -299,7 +294,7 @@ class Frame extends ImmutableComponent {
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}
       />
-      <div ref='webviewContainer'
+      <div ref={node => this.webviewContainer = node}
         className={cx({
           webviewContainer: true,
           isPreview: this.props.isPreview
