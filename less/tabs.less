@@ -33,7 +33,7 @@
   box-sizing: border-box;
   color: #3B3B3B;
   display: flex;
-  height: 26px;
+  height: 27px;
   margin: 0;
   transition: transform 200ms ease;
   left: 0;
@@ -249,15 +249,14 @@
 .prevTab, .nextTab {
   display: none !important;
   color: #3B3B3B;
-  font-size: 24px !important;
-  height: 20px;
-  line-height: 20px !important;
+  font-size: 19px !important;
+  height: 26px;
+  line-height: 25px !important;
   vertical-align: top;
-  width: 50px;
-
+  width: 34px;
   &:not([disabled]) {
     display: inline-block !important;
-    background: #eeeeee;
+    background: #dfdfdf;
     &:hover {
       background: lighten(#eeeeee, 10%);
     }
@@ -266,21 +265,21 @@
 
 .prevTab {
   background: linear-gradient(to right, @chromeControlsBackground2, @tabsBackground);
-  border-bottom-left-radius: @borderRadius;
+  border-bottom-left-radius: 0;
   border-top-left-radius: @borderRadius;
-  padding-left: 10px;
+  padding-left: 36px;
   text-align: left;
-  transform: translateX(10px);
+  transform: translateX(13px);
 }
 
 .nextTab {
   background: linear-gradient(to left, #afb0b4, #cccccc);
-  border-bottom-right-radius: @borderRadius;
+  border-bottom-right-radius: 0;
   border-top-right-radius: @borderRadius;
   float: right;
-  padding-right: 10px;
+  padding-right: 36px;
   text-align: right;
-  transform: translateX(-20px);
+  transform: translateX(-15px);
 }
 
 .pinnedTabs {
