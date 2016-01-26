@@ -72,6 +72,7 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
 module.exports.init = () => {
   registerForSession(session.fromPartition(''))
   registerForSession(session.fromPartition('private-1'))
+  registerForSession(session.fromPartition('main-1'))
 }
 
 module.exports.isResourceEnabled = (resourceName) => {

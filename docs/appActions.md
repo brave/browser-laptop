@@ -1,0 +1,136 @@
+# Global
+
+
+
+
+
+* * *
+
+### setState(appState) 
+
+Dispatches an event to the main process to replace the app state
+This is called from the main process on startup before anything else
+
+**Parameters**
+
+**appState**: `object`, Initial app state object (not yet converted to ImmutableJS)
+
+
+
+### newWindow() 
+
+Dispatches an event to the main process to create a new window
+
+
+
+### updateRequested() 
+
+Dispatches an event to the main process to update the browser
+
+
+
+### addSite(frameProps, tag) 
+
+Adds a site to the site list
+
+**Parameters**
+
+**frameProps**: `Object`, Properties of the frame in question
+
+**tag**: `string`, A tag to associate with the site. e.g. bookmarks.
+
+
+
+### removeSite(frameProps, tag) 
+
+Removes a site from the site list
+
+**Parameters**
+
+**frameProps**: `Object`, Properties of the frame in question
+
+**tag**: `string`, A tag to associate with the site. e.g. bookmarks.
+
+
+
+### setDefaultWindowSize(size) 
+
+Sets the default window size
+
+**Parameters**
+
+**size**: `Array`, [width, height]
+
+
+
+### setResourceETag(resourceName, etag) 
+
+Sets the etag value for a downloaded data file.
+This is used for keeping track of when to re-download adblock and tracking
+protection data.
+
+**Parameters**
+
+**resourceName**: `string`, 'adblock' or 'trackingProtection'
+
+**etag**: `string`, The etag of the reosurce from the http response
+
+
+
+### setResourceLastCheck(resourceName, lastCheck) 
+
+Sets the lastCheck date.getTime() value for the data file
+
+**Parameters**
+
+**resourceName**: `string`, 'adblock', 'trackingProtection', or 'httpsEverywhere'
+
+**lastCheck**: `number`, The last check date of the reosurce from the http response
+
+
+
+### setResourceEnabled(resourceName, enabled) 
+
+Sets whether the resource is enabled or not.
+
+**Parameters**
+
+**resourceName**: `string`, 'adblock', 'trackingProtection', or 'httpsEverywhere'
+
+**enabled**: `boolean`, true if the resource is enabled.
+
+
+
+### setUpdateLastCheck() 
+
+Sets the update.lastCheckTimestamp to the current
+epoch timestamp (milliseconds)
+
+
+
+### setUpdateStatus(status, verbose, metadata) 
+
+Sets the update status
+
+**Parameters**
+
+**status**: `string`, update status from js/constants/updateStatus.js.
+
+**verbose**: `boolean`, Whether to show UI for all the update steps.
+
+**metadata**: `object`, Metadata from the pdate server, with info like release notes.
+
+
+
+
+* * *
+
+
+
+
+
+
+
+
+
+

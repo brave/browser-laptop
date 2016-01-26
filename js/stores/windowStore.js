@@ -393,6 +393,11 @@ const doAction = (action) => {
       } else {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'isPinned'], action.isPinned)
       }
+      // Remove preview frame key when unpinning / pinning
+      // becuase it can get messed up.
+      windowState = windowState.merge({
+        previewFrameKey: null
+      })
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_AUDIO_MUTED:

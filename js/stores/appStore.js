@@ -146,7 +146,8 @@ function windowDefaults () {
     minModalWidth: 100,
     windowOffset: 20,
     webPreferences: {
-      sharedWorker: true
+      sharedWorker: true,
+      partition: 'main-1'
     }
   }
 }
@@ -178,7 +179,7 @@ const handleAppAction = (action) => {
 
       const mainWindow = createWindow(browserOpts, windowDefaults())
       if (action.restoredState) {
-        mainWindow.webContents.once('dom-ready', () => {
+        mainWindow.webContents.once('did-finish-load', () => {
           mainWindow.webContents.send('restore-state', action.restoredState)
         })
       }

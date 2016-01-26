@@ -45,7 +45,7 @@ class Tabs extends ImmutableComponent {
         {(() => {
           if (this.props.tabPageIndex > 0) {
             return <span
-                className='prevTab fa fa-angle-left'
+                className='prevTab fa fa-angle-double-left'
                 onClick={this.onPrevPage.bind(this)} />
           }
         })()}
@@ -70,7 +70,7 @@ class Tabs extends ImmutableComponent {
         {(() => {
           if (this.props.currentFrames.size >= Config.tabs.tabsPerPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
-              className='nextTab fa fa-angle-right'
+              className='nextTab fa fa-angle-double-right'
               onClick={this.onNextPage.bind(this)} />
           }
         })()}

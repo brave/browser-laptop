@@ -87,7 +87,7 @@ class Main extends ImmutableComponent {
   }
 
   get activeFrame () {
-    return this.refs[`frame${this.props.windowState.get('activeFrameKey')}`]
+    return this.frames[this.props.windowState.get('activeFrameKey')]
   }
 
   onBack () {
@@ -134,6 +134,9 @@ class Main extends ImmutableComponent {
     const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
 
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+
+    this.frames = {}
+
     return <div id='window'>
       <div className='top'>
         <div className='backforward'>
@@ -188,7 +191,7 @@ class Main extends ImmutableComponent {
         {
           sortedFrames.map(frame =>
             <Frame
-              ref={`frame${frame.get('key')}`}
+              ref={node => this.frames[frame.get('key')] = node}
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}

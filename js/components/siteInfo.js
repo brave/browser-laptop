@@ -68,9 +68,12 @@ class SiteInfo extends ImmutableComponent {
     let l10nArgs = {
       partitionNumber: this.partitionNumber
     }
-    const l10nId = this.partitionNumber ? 'sessionInfo' : 'defaultSession'
-    let partitionInfo = <li><span className='fa fa-user'/>
-      <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id={l10nId}/></li>
+
+    let partitionInfo
+    if (this.partitionNumber) {
+      partitionInfo = <li><span className='fa fa-user'/>
+        <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id='sessionInfo'/></li>
+    }
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
       <ul>

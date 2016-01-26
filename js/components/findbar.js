@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const keyCodes = require('../constants/keyCodes')
@@ -45,7 +44,7 @@ export default class FindBar extends ImmutableComponent {
    * Focus the find in page input and select the text
    */
   focus () {
-    const input = ReactDOM.findDOMNode(this.refs.searchInput)
+    const input = this.searchInput
     input.focus()
     input.select()
   }
@@ -140,7 +139,7 @@ export default class FindBar extends ImmutableComponent {
     return <div className='findBar'>
       <span className='searchStringContainer'>
         <input type='text'
-          ref='searchInput'
+          ref={node => this.searchInput = node}
           onKeyDown={this.onKeyDown.bind(this)}
           onChange={this.onChange.bind(this)}
           value={this.searchString}/>
