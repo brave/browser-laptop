@@ -267,5 +267,6 @@ module.exports.init = () => {
   DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
   registerForSession(session.fromPartition(''))
   registerForSession(session.fromPartition('private-1'))
+  registerForSession(session.fromPartition('main-1'))
 }
 

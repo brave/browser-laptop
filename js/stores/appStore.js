@@ -146,7 +146,8 @@ function windowDefaults () {
     minModalWidth: 100,
     windowOffset: 20,
     webPreferences: {
-      sharedWorker: true
+      sharedWorker: true,
+      partition: 'main-1'
     }
   }
 }

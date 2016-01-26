@@ -38,6 +38,10 @@
     {
       "name": "Brian Johnson",
       "email": "bjohnson@brave.com"
+    },
+    {
+      "name": "Yan Zhu",
+      "email": "yan@brave.com"
     }
   ],
   "license": "MPL-2.0",
