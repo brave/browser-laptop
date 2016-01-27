@@ -30,10 +30,6 @@ class NavigationBar extends ImmutableComponent {
     AppActions.removeSite(this.props.activeFrame, SiteTags.BOOKMARK)
   }
 
-  onBraveMenu () {
-    // TODO
-  }
-
   onReload () {
     remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
   }
