@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.10](https://github.com/brave/browser-laptop/releases/v0.7.10dev)
+
+- Added the hamburger menu (top right menu).
+- Fixed Windows packaging issues.
+- Fixed issues with rendering on some Windows systems causing a black window.
+
 ## [0.7.9](https://github.com/brave/browser-laptop/releases/v0.7.9dev)
 
 - UI tweaks.
