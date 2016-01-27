@@ -14,7 +14,7 @@ const AdBlock = require('./adBlock')
 const AdInsertion = require('./adInsertion')
 const TrackingProtection = require('./trackingProtection')
 const Filtering = require('./filtering')
-const CommonMenu = require('../js/commonmenu')
+const CommonMenu = require('../js/commonMenu')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
