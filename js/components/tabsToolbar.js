@@ -9,9 +9,11 @@ const Button = require('./button')
 const PinnedTabs = require('./pinnedTabs')
 const WindowActions = require('../actions/windowActions')
 import Config from '../constants/config.js'
+const contextMenus = require('../contextMenus')
 
 class TabsToolbarButtons extends ImmutableComponent {
   onMenu () {
+    contextMenus.onHamburgerMenu()
   }
 
   render () {

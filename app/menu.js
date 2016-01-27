@@ -3,8 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const electron = require('electron')
-const app = electron.app
 const BrowserWindow = electron.BrowserWindow
+const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
@@ -14,29 +14,14 @@ const AdBlock = require('./adBlock')
 const AdInsertion = require('./adInsertion')
 const TrackingProtection = require('./trackingProtection')
 const Filtering = require('./filtering')
+const CommonMenu = require('../js/commonmenu')
 
-const name = 'Brave'
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const contactUrl = 'mailto:support@brave.com'
 const aboutUrl = 'https://brave.com/'
-
-/**
- * Sends a message to the web contents of the focused window.
- * @param {Object} focusedWindow the focusedWindow if any
- * @param {Array} message message and arguments to send
- * @return {boolean} whether the message was sent
- */
-const sendToFocusedWindow = (focusedWindow, message) => {
-  if (focusedWindow) {
-    focusedWindow.webContents.send.apply(focusedWindow.webContents, message)
-    return true
-  } else {
-    return false
-  }
-}
 
 /**
  * Sets up the menu.
@@ -56,18 +41,12 @@ const init = (args) => {
       var msg = bookmarkPageMenuItem.checked
         ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
         : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
-      sendToFocusedWindow(focusedWindow, [msg])
+      CommonMenu.sendToFocusedWindow(focusedWindow, [msg])
     }
   }
 
-  const quitMenuItem = {
-    label: 'Quit ' + name,
-    accelerator: 'Command+Q',
-    click: app.quit
-  }
-
   const aboutBraveMenuItem = {
-    label: 'About ' + name,
+    label: 'About ' + AppConfig.name,
     role: 'about'
   }
 
@@ -94,34 +73,12 @@ const init = (args) => {
 //            process.crash()
 //          }
 //        },
+    CommonMenu.newTabMenuItem,
+    CommonMenu.newPrivateTabMenuItem,
+    CommonMenu.newPartitionedTabMenuItem,
+    CommonMenu.newWindowMenuItem,
+    CommonMenu.separatorMenuItem,
     {
-      label: 'New Tab',
-      accelerator: 'CmdOrCtrl+T',
-      click: function (item, focusedWindow) {
-        if (!sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
-          // no active windows
-          AppActions.newWindow()
-        }
-      }
-    }, {
-      label: 'New Private Tab',
-      accelerator: 'CmdOrCtrl+Alt+T',
-      click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
-      }
-    }, {
-      label: 'New Partitioned Session',
-      accelerator: 'CmdOrCtrl+Alt+S',
-      click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
-      }
-    }, {
-      label: 'New Window',
-      accelerator: 'CmdOrCtrl+N',
-      click: () => AppActions.newWindow()
-    }, {
-      type: 'separator'
-    }, {
       label: 'Open File...',
       accelerator: 'CmdOrCtrl+O',
       click: (item, focusedWindow) => {
@@ -130,7 +87,7 @@ const init = (args) => {
         }, function (paths) {
           if (paths) {
             paths.forEach((path) => {
-              sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
+              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
             })
           }
         })
@@ -139,17 +96,17 @@ const init = (args) => {
       label: 'Open Location...',
       accelerator: 'CmdOrCtrl+L',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
       }
     }, {
       label: 'Open Search...',
       accelerator: 'CmdOrCtrl+K',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
       }
-    }, {
-      type: 'separator'
-    }, {
+    },
+    CommonMenu.separatorMenuItem,
+    {
       label: 'Import from...',
       enabled: false
       /*
@@ -159,15 +116,15 @@ const init = (args) => {
         {label: 'Safari...'}
       ]
       */
-    }, {
-      type: 'separator'
-    }, {
+    },
+    CommonMenu.separatorMenuItem,
+    {
       // this should be disabled when
       // no windows are active
       label: 'Close Tab',
       accelerator: 'CmdOrCtrl+W',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
       }
     }, {
       // this should be disabled when
@@ -179,13 +136,13 @@ const init = (args) => {
           AppActions.closeWindow(focusedWindow.id)
         }
       }
-    }, {
-      type: 'separator'
-    }, {
+    },
+    CommonMenu.separatorMenuItem,
+    {
       label: 'Save Page As...',
       accelerator: 'CmdOrCtrl+S',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
       }
     }, {
       label: 'Share...',
@@ -193,52 +150,44 @@ const init = (args) => {
       /*
       submenu: [
         {label: 'Email Page Link...'},
-        {type: 'separator'},
+        CommonMenu.separatorMenuItem,
         {label: 'Tweet Page...'},
         {label: 'Share on Facebook...'},
         {label: 'More...'}
       ]
       */
-    }, {
-      type: 'separator'
-    }, {
-      label: 'Print...',
-      accelerator: 'CmdOrCtrl+P',
-      click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_PRINT])
-      }
-    }
+    },
+    CommonMenu.separatorMenuItem,
+    CommonMenu.printMenuItem
   ]
 
   const helpMenu = [
     {
       label: 'Report an issue',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow,
+        CommonMenu.sendToFocusedWindow(focusedWindow,
           [messages.SHORTCUT_NEW_FRAME, issuesUrl])
       }
-    }, {
-      type: 'separator'
-    }, {
+    },
+    CommonMenu.separatorMenuItem,
+    {
       label: 'Submit Feedback...',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow,
+        CommonMenu.sendToFocusedWindow(focusedWindow,
                             [messages.SHORTCUT_NEW_FRAME, contactUrl])
       }
     }, {
       label: 'Spread the word about Brave...',
       click: function (item, focusedWindow) {
-        sendToFocusedWindow(focusedWindow,
+        CommonMenu.sendToFocusedWindow(focusedWindow,
                             [messages.SHORTCUT_NEW_FRAME, aboutUrl])
       }
     }
   ]
 
   if (isWindows) {
-    fileMenu.push({
-      type: 'separator'
-    })
-    fileMenu.push(quitMenuItem)
+    fileMenu.push(CommonMenu.separatorMenuItem)
+    fileMenu.push(CommonMenu.quitMenuItem)
     helpMenu.push(aboutBraveMenuItem)
   }
 
@@ -257,9 +206,9 @@ const init = (args) => {
           label: 'Redo',
           accelerator: 'Shift+CmdOrCtrl+Z',
           role: 'redo'
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Cut',
           accelerator: 'CmdOrCtrl+X',
           role: 'cut'
@@ -277,24 +226,19 @@ const init = (args) => {
           click: function (item, focusedWindow) {
             focusedWindow.webContents.pasteAndMatchStyle()
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Delete',
           accelerator: 'Delete'
         }, {
           label: 'Select All',
           accelerator: 'CmdOrCtrl+A',
           role: 'selectall'
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Find on page...',
-          accelerator: 'CmdOrCtrl+F',
-          click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
-          }
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        CommonMenu.findOnPageMenuItem,
+        {
           // TODO: hook up find next/prev shortcut. low-priority since this is
           // probably not used much.
           label: 'Find Next',
@@ -304,9 +248,8 @@ const init = (args) => {
           label: 'Find Previous',
           enabled: false,
           accelerator: 'Shift+CmdOrCtrl+G'
-        }, {
-          type: 'separator'
-        }
+        },
+        CommonMenu.separatorMenuItem
         // OSX inserts "start dictation" and "emoji and symbols" automatically
       ]
     }, {
@@ -316,23 +259,23 @@ const init = (args) => {
           label: 'Actual Size',
           accelerator: 'CmdOrCtrl+0',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET])
           }
         }, {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN])
           }
         }, {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT])
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Toolbars',
           enabled: false
           /*
@@ -343,23 +286,23 @@ const init = (args) => {
             {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
           ]
           */
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Reload Page',
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
           }
         }, {
           label: 'Clean Reload',
           accelerator: 'CmdOrCtrl+Shift+R',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Reading View',
           enabled: false,
           accelerator: 'Alt+CmdOrCtrl+R'
@@ -367,28 +310,28 @@ const init = (args) => {
           label: 'Tab Manager',
           enabled: false,
           accelerator: 'Alt+CmdOrCtrl+M'
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Text Encoding',
           enabled: false
           /*
           submenu: [
             {label: 'Autodetect', submenu: []},
-            {type: 'separator'},
+            CommonMenu.separatorMenuItem,
             {label: 'Unicode'},
             {label: 'Western'},
-            {type: 'separator'},
+            CommonMenu.separatorMenuItem,
             {label: 'etc...'}
           ]
           */
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Toggle Developer Tools',
           accelerator: 'CmdOrCtrl+Alt+I',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
           }
         }, {
           label: 'Toggle Browser Console',
@@ -398,9 +341,9 @@ const init = (args) => {
               focusedWindow.toggleDevTools()
             }
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Toggle Full Screen View',
           accelerator: 'Shift+CmdOrCtrl+F',
           click: function (item, focusedWindow) {
@@ -418,28 +361,28 @@ const init = (args) => {
           label: 'Back',
           accelerator: 'CmdOrCtrl+[',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
           }
         }, {
           label: 'Forward',
           accelerator: 'CmdOrCtrl+]',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Reopen Last Closed Tab',
           accelerator: 'Shift+CmdOrCtrl+T',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
           }
         }, {
           label: 'Reopen Last Closed Window',
           enabled: false
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Show All History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
@@ -453,23 +396,23 @@ const init = (args) => {
           label: 'Add to Favorites Bar',
           enabled: false,
           accelerator: 'Shift+CmdOrCtrl+D'
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Manage Bookmarks',
           enabled: false,
           accelerator: 'Alt+CmdOrCtrl+B'
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'My Bookmarks',
           enabled: false
         }, {
           label: 'More',
           enabled: false
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Import Bookmarks',
           enabled: false
           /*
@@ -488,9 +431,9 @@ const init = (args) => {
         {
           label: 'Manage...',
           enabled: false
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'GiveBack to this site',
           enabled: false,
           accelerator: 'Shift+CmdOrCtrl+Y'
@@ -498,9 +441,9 @@ const init = (args) => {
           label: 'Stay ad supported on this site',
           enabled: false,
           accelerator: 'Shift+CmdOrCtrl+N'
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Site Protection Settings',
           enabled: false // Hack to make this look like a section header.
         },
@@ -547,9 +490,9 @@ const init = (args) => {
             AppActions.setResourceEnabled(HttpsEverywhere.resourceName, !Filtering.isResourceEnabled(HttpsEverywhere.resourceName))
             init({bookmarked: bookmarkPageMenuItem.checked})
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Disable all protection on this site...',
           enabled: false
         }
@@ -566,19 +509,19 @@ const init = (args) => {
         }, {
           label: 'Zoom',
           enabled: false
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Select Next Tab',
           accelerator: 'Ctrl+Tab',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEXT_TAB])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEXT_TAB])
           }
         }, {
           label: 'Select Previous Tab',
           accelerator: 'Ctrl+Shift+Tab',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_PREV_TAB])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_PREV_TAB])
           }
         }, {
           label: 'Move Tab to New Window',
@@ -586,9 +529,9 @@ const init = (args) => {
         }, {
           label: 'Merge All Windows',
           enabled: false
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Downloads',
           accelerator: 'Shift+CmdOrCtrl+J',
           enabled: false
@@ -605,9 +548,9 @@ const init = (args) => {
           label: 'Tab Manager',
           accelerator: 'Alt+CmdOrCtrl+M',
           enabled: false
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Bring All to Front',
           role: 'front'
         }
@@ -621,27 +564,27 @@ const init = (args) => {
 
   if (isDarwin) {
     template.unshift({
-      label: name, // Ignored on OSX, which gets this from the app Info.plist file.
+      label: AppConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
-        aboutBraveMenuItem, {
-          type: 'separator'
-        }, preferencesMenuItem, {
-          type: 'separator'
-        }, {
+        aboutBraveMenuItem,
+        CommonMenu.separatorMenuItem,
+        preferencesMenuItem,
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
-            sendToFocusedWindow(focusedWindow,
+            CommonMenu.sendToFocusedWindow(focusedWindow,
               [messages.SHORTCUT_NEW_FRAME, contactUrl])
           }
-        }, {
-          type: 'separator'
-        }, {
+        },
+        CommonMenu.separatorMenuItem,
+        {
           label: 'Services',
           role: 'services'
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Hide ' + name,
+        },
+        CommonMenu.separatorMenuItem,
+        {
+          label: 'Hide ' + AppConfig.name,
           accelerator: 'Command+H',
           role: 'hide'
         }, {
@@ -651,10 +594,9 @@ const init = (args) => {
         }, {
           label: 'Show All',
           role: 'unhide'
-        }, {
-          type: 'separator'
         },
-        quitMenuItem
+        CommonMenu.separatorMenuItem,
+        CommonMenu.quitMenuItem
       ]
     })
   }

@@ -8,6 +8,7 @@ const winUpdateHost = process.env.WIN_UPDATE_HOST || 'https://brave-download.glo
 const crashURL = process.env.CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
 
 module.exports = {
+  name: 'Brave',
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
     version: '1',

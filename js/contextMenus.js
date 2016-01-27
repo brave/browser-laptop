@@ -9,6 +9,7 @@ const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
 const SiteTags = require('./constants/siteTags')
+const CommonMenu = require('./commonMenu')
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
@@ -139,6 +140,21 @@ function getEditableItems (hasSelection) {
   }]
 }
 
+function hamburgerTemplateInit () {
+  const template = [
+    CommonMenu.newTabMenuItem,
+    CommonMenu.newPrivateTabMenuItem,
+    CommonMenu.newPartitionedTabMenuItem,
+    CommonMenu.newWindowMenuItem,
+    CommonMenu.separatorMenuItem,
+    CommonMenu.findOnPageMenuItem,
+    CommonMenu.printMenuItem,
+    CommonMenu.separatorMenuItem,
+    CommonMenu.quitMenuItem
+  ]
+  return template
+}
+
 function mainTemplateInit (nodeProps) {
   const template = [
     {
@@ -248,6 +264,11 @@ function mainTemplateInit (nodeProps) {
   }
 
   return template
+}
+
+export function onHamburgerMenu () {
+  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit())
+  hamburgerMenu.popup(remote.getCurrentWindow())
 }
 
 export function onMainContextMenu (nodeProps) {
