@@ -6,7 +6,7 @@
   "scripts": {
     "checks": "npm run check-security",
     "check-security": "nsp check",
-    "docs": "jsdox js/actions/appActions.js --output docs",
+    "docs": "jsdox js/actions/appActions.js js/actions/windowActions.js --output docs",
     "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "watch-all": "npm run watch & npm run watch-test",
@@ -123,7 +123,8 @@
     ]
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "docs"
   ],
   "engineStrict": true,
   "engines": {
