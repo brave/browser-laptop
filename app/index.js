@@ -134,6 +134,12 @@ app.on('ready', function () {
     ipcMain.on(messages.STOP_LOAD, () => {
       BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
     })
+    ipcMain.on(messages.GO_BACK, () => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.GO_BACK)
+    })
+    ipcMain.on(messages.GO_FORWARD, () => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.GO_FORWARD)
+    })
 
     // Load HTTPS Everywhere browser "extension"
     HttpsEverywhere.init()
