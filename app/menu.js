@@ -23,6 +23,8 @@ const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const contactUrl = 'mailto:support@brave.com'
 const aboutUrl = 'https://brave.com/'
 
+const path = require('path')
+
 /**
  * Sets up the menu.
  * @param {Object} args - Arguments to initialize the menu with if any
@@ -47,7 +49,16 @@ const init = (args) => {
 
   const aboutBraveMenuItem = {
     label: 'About ' + AppConfig.name,
-    role: 'about'
+    click: (item, focusedWindow) => {
+      dialog.showMessageBox({
+        title: 'Brave',
+        message: 'Version: ' + args.version + '\n' +
+          'Electron: ' + process.versions['atom-shell'] + '\n' +
+          'Chromium: ' + process.versions['chrome'],
+        icon: path.join(__dirname, 'img', 'braveBtn.png'),
+        buttons: ['Ok']
+      })
+    }
   }
 
   const preferencesMenuItem = {
