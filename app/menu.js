@@ -54,7 +54,7 @@ const init = (args) => {
         title: 'Brave',
         message: 'Version: ' + args.version + '\n' +
           'Electron: ' + process.versions['atom-shell'] + '\n' +
-          'Chromium: ' + process.versions['chrome'],
+          'libchromiumcontent: ' + process.versions['chrome'],
         icon: path.join(__dirname, 'img', 'braveBtn.png'),
         buttons: ['Ok']
       })
