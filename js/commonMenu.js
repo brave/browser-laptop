@@ -7,7 +7,14 @@
 const AppConfig = require('./constants/appConfig')
 const AppActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
-const electron = require('electron')
+
+let electron
+try {
+  electron = require('electron')
+} catch (e) {
+  electron = global.require('electron')
+}
+
 let app
 if (process.type === 'browser') {
   app = electron.app
