@@ -9,12 +9,8 @@ const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
 const AppActions = require('../js/actions/appActions')
-const HttpsEverywhere = require('./httpsEverywhere')
-const AdBlock = require('./adBlock')
-const AdInsertion = require('./adInsertion')
-const TrackingProtection = require('./trackingProtection')
-const Filtering = require('./filtering')
 const CommonMenu = require('../js/commonMenu')
+const Filtering = require('./filtering')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -24,6 +20,11 @@ const contactUrl = 'mailto:support@brave.com'
 const aboutUrl = 'https://brave.com/'
 
 const path = require('path')
+
+const httpsEverywhere = 'httpsEverywhere'
+const adblock = 'adblock'
+const adInsertion = 'adInsertion'
+const trackingProtection = 'trackingProtection'
 
 /**
  * Sets up the menu.
@@ -435,80 +436,14 @@ const init = (args) => {
           */
         }
       ]
-    }, {
-      label: 'Bravery',
-      submenu: [
-        /*
-        {
-          label: 'Manage...',
-          enabled: false
-        },
-        CommonMenu.separatorMenuItem,
-        {
-          label: 'GiveBack to this site',
-          enabled: false,
-          accelerator: 'Shift+CmdOrCtrl+Y'
-        }, {
-          label: 'Stay ad supported on this site',
-          enabled: false,
-          accelerator: 'Shift+CmdOrCtrl+N'
-        },
-        CommonMenu.separatorMenuItem,
-        {
-          label: 'Site Protection Settings',
-          enabled: false // Hack to make this look like a section header.
-        },
-        */
-        {
-          type: 'checkbox',
-          label: 'Ad Replacement Engine',
-          checked: Filtering.isResourceEnabled(AdInsertion.resourceName),
-          click: function (item, focusedWindow) {
-            AppActions.setResourceEnabled(AdInsertion.resourceName, !Filtering.isResourceEnabled(AdInsertion.resourceName))
-            init({bookmarked: bookmarkPageMenuItem.checked})
-          }
-        }, {
-          type: 'checkbox',
-          label: 'Block ads',
-          checked: Filtering.isResourceEnabled(AdBlock.resourceName),
-          click: function (item, focusedWindow) {
-            AppActions.setResourceEnabled(AdBlock.resourceName, !Filtering.isResourceEnabled(AdBlock.resourceName))
-            init({bookmarked: bookmarkPageMenuItem.checked})
-          }
-        }, {
-          type: 'checkbox',
-          label: 'Block 3rd party cookies (coming soon)',
-          enabled: false,
-          checked: false
-        }, {
-          type: 'checkbox',
-          label: 'Block Tracking',
-          checked: Filtering.isResourceEnabled(TrackingProtection.resourceName),
-          click: function (item, focusedWindow) {
-            AppActions.setResourceEnabled(TrackingProtection.resourceName, !Filtering.isResourceEnabled(TrackingProtection.resourceName))
-            init({bookmarked: bookmarkPageMenuItem.checked})
-          }
-        }, {
-          type: 'checkbox',
-          label: 'Block Popups',
-          enabled: false,
-          checked: true
-        }, {
-          type: 'checkbox',
-          label: 'HTTPS everywhere',
-          checked: Filtering.isResourceEnabled(HttpsEverywhere.resourceName),
-          click: function (item, focusedWindow) {
-            AppActions.setResourceEnabled(HttpsEverywhere.resourceName, !Filtering.isResourceEnabled(HttpsEverywhere.resourceName))
-            init({bookmarked: bookmarkPageMenuItem.checked})
-          }
-        },
-        CommonMenu.separatorMenuItem,
-        {
-          label: 'Disable all protection on this site...',
-          enabled: false
-        }
-      ]
-    }, {
+    },
+    CommonMenu.buildBraveryMenu({
+      adblock: Filtering.isResourceEnabled(adblock),
+      adInsertion: Filtering.isResourceEnabled(adInsertion),
+      trackingProtection: Filtering.isResourceEnabled(trackingProtection),
+      httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere)
+    }, init.bind(this, {bookmarked: bookmarkPageMenuItem.checked})),
+    {
       label: 'Window',
       role: 'window',
       submenu: [
