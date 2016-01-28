@@ -156,8 +156,9 @@ app.on('ready', function () {
     PackageLoader.load((err, pack) => {
       if (err) throw new Error('package.json could not be accessed')
 
-      // Setup the auto updater
-      Updater.init(process.platform, pack.version)
+      // Setup the auto updater, check the env variable first because it's
+      // used to cehck the update channel before releases.
+      Updater.init(process.platform, process.env.BRAVE_UPDATE_VERSION || pack.version)
 
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
