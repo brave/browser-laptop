@@ -49,16 +49,15 @@ const init = (args) => {
 
   const aboutBraveMenuItem = {
     label: 'About ' + AppConfig.name,
-    role: 'about',
     click: (item, focusedWindow) => {
-      if (isWindows) {
-        dialog.showMessageBox({
-          title: 'Brave',
-          message: 'Version: ' + args.version,
-          icon: path.join(__dirname, 'img', 'braveBtn.png'),
-          buttons: ['Ok']
-        })
-      }
+      dialog.showMessageBox({
+        title: 'Brave',
+        message: 'Version: ' + args.version + '\n' +
+          'Electron: ' + process.versions['atom-shell'] + '\n' +
+          'Chromium: ' + process.versions['chrome'],
+        icon: path.join(__dirname, 'img', 'braveBtn.png'),
+        buttons: ['Ok']
+      })
     }
   }
 
