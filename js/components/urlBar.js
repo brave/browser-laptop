@@ -16,6 +16,7 @@ const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
 
+import Config from '../constants/config.js'
 import {isUrl} from '../lib/appUrlUtil.js'
 
 class UrlBar extends ImmutableComponent {
@@ -162,7 +163,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   get inputValue () {
-    const loc = this.props.urlbar.get('location') === 'about:blank' ? '' : this.props.urlbar.get('location')
+    const loc = this.props.urlbar.get('location') === Config.defaultUrl ? '' : this.props.urlbar.get('location')
     return this.props.titleMode
       ? this.props.activeFrameProps.get('title') : loc
   }
@@ -218,6 +219,7 @@ class UrlBar extends ImmutableComponent {
             extendedValidation: this.extendedValidationSSL
           })}/>
       <input type='text'
+        disabled={this.props.activeFrameProps.get('location') === Config.defaultUrl && this.loadTime === ''}
         onFocus={this.onFocus.bind(this)}
         onBlur={this.onBlur.bind(this)}
         onKeyDown={this.onKeyDown.bind(this)}
