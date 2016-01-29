@@ -104,10 +104,10 @@ class Main extends ImmutableComponent {
 
   onHamburgerMenu () {
     let settings = {}
-    const resourceNames = ['httpsEverywhere', 'adblock', 'trackingProtection', 'adInsertion']
-    resourceNames.forEach((name) => {
-      let enabled = this.props.appState.getIn([name, 'enabled'])
-      settings[name] = enabled === undefined ? AppConfig[name].enabled : enabled
+    Object.keys(AppConfig.resourceNames).forEach((name) => {
+      let value = AppConfig.resourceNames[name]
+      let enabled = this.props.appState.getIn([value, 'enabled'])
+      settings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
     })
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
