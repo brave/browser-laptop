@@ -23,7 +23,8 @@ module.exports.register = (win) => {
   if (process.platform === 'win32') {
     simpleWebContentEvents.push(
       ['F5', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
-      ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
+      ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD],
+      ['F12', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
   }
 
   // Tab ordering shortcuts
