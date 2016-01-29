@@ -14,6 +14,7 @@ const querystring = require('querystring')
 const AppStore = require('../js/stores/appStore')
 const AppActions = require('../js/actions/appActions')
 const Immutable = require('immutable')
+const dates = require('./dates')
 
 const fs = require('fs')
 const path = require('path')
@@ -86,47 +87,34 @@ exports.init = (platform, ver) => {
   }
 }
 
-const secondsPerDay = 24 * 60 * 60
-const secondsPerWeek = secondsPerDay * 7
-const secondsPerMonth = secondsPerDay * 30
-
 // Build a set of three params providing flags determining when the last update occurred
 // This is a privacy preserving policy. Instead of passing personally identifying
 // information, the browser will pass the three boolean values indicating when the last
 // update check occurred.
-var paramsFromLastCheckDelta = (seconds) => {
+var paramsFromLastCheckDelta = (lastCheckYMD, firstCheckMade) => {
   // Default params
   var params = {
     daily: false,
     weekly: false,
-    monthly: false
+    monthly: false,
+    first: false
   }
 
-  // First ever check
-  if (seconds === 0) {
+  // If the first flag has NOT been set then we will send it
+  // with the update params to help with daily new users
+  if (!firstCheckMade || !lastCheckYMD) {
+    params.first = true
     params.daily = true
     return params
   }
 
-  // More than one today
-  if (seconds < secondsPerDay) {
-    return params
-  }
-
-  // If we have not checked today, but we have since last week (first check as well)
-  if (seconds === 0 || (seconds > secondsPerDay && seconds < secondsPerWeek)) {
+  // If we have not checked today
+  if (dates.todayYMD() > lastCheckYMD) {
     params.daily = true
     return params
   }
 
-  // If we have not checked this week, but have this month
-  if (seconds >= secondsPerWeek && seconds < secondsPerMonth) {
-    params.weekly = true
-    return params
-  }
-
-  params.monthly = true
-
+  // Safety return (in case code above changes)
   return params
 }
 
@@ -134,19 +122,19 @@ var paramsFromLastCheckDelta = (seconds) => {
 var requestVersionInfo = (done) => {
   if (!platformBaseUrl) throw new Error('platformBaseUrl not set')
 
-  // Get the timestamp of the last update request
-  var lastCheckTimestamp = AppStore.getState().toJS().updates['lastCheckTimestamp'] || 0
-  debug(`lastCheckTimestamp = ${lastCheckTimestamp}`)
+  // Get the YMD of the last update request
+  var lastCheckYMD = AppStore.getState().toJS().updates['lastCheckYMD'] || null
+  debug(`lastCheckYMD = ${lastCheckYMD}`)
 
-  // Calculate the number of seconds since the last update
-  var secondsSinceLastCheck = 0
-  if (lastCheckTimestamp) {
-    secondsSinceLastCheck = Math.round(((new Date()).getTime() - lastCheckTimestamp) / 1000)
-  }
-  debug(`secondsSinceLastCheck = ${secondsSinceLastCheck}`)
+  // Has the browser ever asked for an update
+  var firstCheckMade = AppStore.getState().toJS().updates['firstCheckMade'] || false
+  debug(`firstCheckMade = ${firstCheckMade}`)
 
-  // Build query string based on the number of seconds since last check
-  var query = paramsFromLastCheckDelta(secondsSinceLastCheck)
+  // Build query string based on the last date an update request was made
+  var query = paramsFromLastCheckDelta(
+    lastCheckYMD,
+    firstCheckMade
+  )
   var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
   debug(queryString)
 

@@ -13,6 +13,7 @@ const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
+const dates = require('../../app/dates')
 
 let appState
 
@@ -240,6 +241,8 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_UPDATE_LAST_CHECK:
       appState = appState.setIn(['updates', 'lastCheckTimestamp'], (new Date()).getTime())
+      appState = appState.setIn(['updates', 'lastCheckYMD'], dates.todayYMD())
+      appState = appState.setIn(['updates', 'firstCheckMade'], true)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_UPDATE_STATUS:
