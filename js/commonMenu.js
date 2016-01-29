@@ -8,6 +8,11 @@ const AppConfig = require('./constants/appConfig')
 const AppActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 
+const httpsEverywhere = 'httpsEverywhere'
+const adblock = 'adblock'
+const adInsertion = 'adInsertion'
+const trackingProtection = 'trackingProtection'
+
 let electron
 try {
   electron = require('electron')
@@ -93,5 +98,68 @@ module.exports.findOnPageMenuItem = {
   accelerator: 'CmdOrCtrl+F',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
+  }
+}
+
+module.exports.buildBraveryMenu = function (settings, init) {
+  const replaceAds = settings[adInsertion] || false
+  const blockAds = settings[adblock] || false
+  const blockTracking = settings[trackingProtection] || false
+  const useHttps = settings[httpsEverywhere] || false
+  return {
+    label: 'Bravery',
+    submenu: [
+      {
+        type: 'radio',
+        label: 'Replace ads',
+        checked: blockAds && replaceAds && blockTracking,
+        click: function (item, focusedWindow) {
+          AppActions.setResourceEnabled(adblock, true)
+          AppActions.setResourceEnabled(adInsertion, true)
+          AppActions.setResourceEnabled(trackingProtection, true)
+          init()
+        }
+      }, {
+        type: 'radio',
+        label: 'Block ads',
+        checked: blockAds && !replaceAds && blockTracking,
+        click: function (item, focusedWindow) {
+          AppActions.setResourceEnabled(adblock, true)
+          AppActions.setResourceEnabled(adInsertion, false)
+          AppActions.setResourceEnabled(trackingProtection, true)
+          init()
+        }
+      }, {
+        type: 'radio',
+        label: 'Allow ads and tracking',
+        checked: !blockAds && !replaceAds && !blockTracking,
+        click: function (item, focusedWindow) {
+          AppActions.setResourceEnabled(adblock, false)
+          AppActions.setResourceEnabled(adInsertion, false)
+          AppActions.setResourceEnabled(trackingProtection, false)
+          init()
+        }
+      },
+      module.exports.separatorMenuItem,
+      {
+        type: 'checkbox',
+        label: 'Block 3rd party cookies (coming soon)',
+        enabled: false,
+        checked: false
+      }, {
+        type: 'checkbox',
+        label: 'Block Popups',
+        enabled: false,
+        checked: true
+      }, {
+        type: 'checkbox',
+        label: 'HTTPS Everywhere',
+        checked: useHttps,
+        click: function (item, focusedWindow) {
+          AppActions.setResourceEnabled(httpsEverywhere, !useHttps)
+          init()
+        }
+      }
+    ]
   }
 }
