@@ -130,6 +130,15 @@ class Tab extends ImmutableComponent {
       window.setTimeout(WindowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 400)
   }
 
+  onClickTab (e) {
+    // Middle click should close tab
+    if (e.button === 1) {
+      this.onCloseFrame(e)
+    } else {
+      this.setActiveFrame(e)
+    }
+  }
+
   render () {
     // Style based on theme-color
     let iconStyle = {}
@@ -196,7 +205,7 @@ class Tab extends ImmutableComponent {
       onDragLeave={this.onDragLeave.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
       onDrop={this.onDrop.bind(this)}
-      onClick={this.setActiveFrame.bind(this)}
+      onClick={this.onClickTab.bind(this)}
       onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
         { this.props.frameProps.get('isPrivate')
