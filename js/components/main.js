@@ -111,7 +111,7 @@ class Main extends ImmutableComponent {
     })
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
-    settings.bookmarked = this.refs.navBar.bookmarked
+    settings.bookmarked = this.navBar.bookmarked
     contextMenus.onHamburgerMenu(settings)
   }
 
@@ -163,7 +163,7 @@ class Main extends ImmutableComponent {
             onClick={this.onForward.bind(this)} />
         </div>
         <NavigationBar
-          ref='navBar'
+          ref={node => this.navBar = node}
           navbar={activeFrame && activeFrame.get('navbar')}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
