@@ -10,6 +10,7 @@ const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
 const SiteTags = require('./constants/siteTags')
 const CommonMenu = require('./commonMenu')
+const ipc = global.require('electron').ipcRenderer
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
@@ -138,7 +139,7 @@ function getEditableItems (hasSelection) {
   }]
 }
 
-function hamburgerTemplateInit () {
+function hamburgerTemplateInit (settings) {
   const template = [
     CommonMenu.newTabMenuItem,
     CommonMenu.newPrivateTabMenuItem,
@@ -147,6 +148,10 @@ function hamburgerTemplateInit () {
     CommonMenu.separatorMenuItem,
     CommonMenu.findOnPageMenuItem,
     CommonMenu.printMenuItem,
+    CommonMenu.separatorMenuItem,
+    CommonMenu.buildBraveryMenu(settings, function () {
+      ipc.send(messages.UPDATE_APP_MENU, {bookmarked: settings.bookmarked})
+    }),
     CommonMenu.separatorMenuItem,
     CommonMenu.quitMenuItem
   ]
@@ -269,8 +274,8 @@ function mainTemplateInit (nodeProps) {
   return template
 }
 
-export function onHamburgerMenu () {
-  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit())
+export function onHamburgerMenu (settings) {
+  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(settings))
   hamburgerMenu.popup(remote.getCurrentWindow())
 }
 

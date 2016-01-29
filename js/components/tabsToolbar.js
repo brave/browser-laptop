@@ -9,13 +9,8 @@ const Button = require('./button')
 const PinnedTabs = require('./pinnedTabs')
 const WindowActions = require('../actions/windowActions')
 import Config from '../constants/config.js'
-const contextMenus = require('../contextMenus')
 
 class TabsToolbarButtons extends ImmutableComponent {
-  onMenu () {
-    contextMenus.onHamburgerMenu()
-  }
-
   render () {
     return <div className='tabsToolbarButtons'>
       { this.props.partOfFullPageSet || this.props.noFrames
@@ -23,7 +18,7 @@ class TabsToolbarButtons extends ImmutableComponent {
               className='navbutton newFrameButton' onClick={WindowActions.newFrame} /> : null }
       <Button iconClass='fa-bars'
         className='navbutton menu-button'
-        onClick={this.onMenu.bind(this)} />
+        onClick={this.props.onMenu} />
     </div>
   }
 }
@@ -53,7 +48,8 @@ class TabsToolbar extends ImmutableComponent {
         partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
       />
       <TabsToolbarButtons partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
-        noFrames={currentFrames.size === 0}/>
+        noFrames={currentFrames.size === 0}
+        onMenu={this.props.onMenu}/>
     </div>
   }
 }

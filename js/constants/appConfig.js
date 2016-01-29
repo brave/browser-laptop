@@ -9,6 +9,12 @@ const crashURL = process.env.CRASH_URL || 'https://laptop-updates.brave.com/1/cr
 
 module.exports = {
   name: 'Brave',
+  resourceNames: {
+    ADBLOCK: 'adblock',
+    HTTPS_EVERYWHERE: 'httpsEverywhere',
+    TRACKING_PROTECTION: 'trackingProtection',
+    AD_INSERTION: 'adInsertion'
+  },
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
     version: '1',

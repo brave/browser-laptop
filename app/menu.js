@@ -21,10 +21,10 @@ const aboutUrl = 'https://brave.com/'
 
 const path = require('path')
 
-const httpsEverywhere = 'httpsEverywhere'
-const adblock = 'adblock'
-const adInsertion = 'adInsertion'
-const trackingProtection = 'trackingProtection'
+const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = AppConfig.resourceNames.ADBLOCK
+const adInsertion = AppConfig.resourceNames.AD_INSERTION
+const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 
 /**
  * Sets up the menu.

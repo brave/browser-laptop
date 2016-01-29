@@ -8,10 +8,10 @@ const AppConfig = require('./constants/appConfig')
 const AppActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 
-const httpsEverywhere = 'httpsEverywhere'
-const adblock = 'adblock'
-const adInsertion = 'adInsertion'
-const trackingProtection = 'trackingProtection'
+const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = AppConfig.resourceNames.ADBLOCK
+const adInsertion = AppConfig.resourceNames.AD_INSERTION
+const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 
 let electron
 try {

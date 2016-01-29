@@ -102,6 +102,19 @@ class Main extends ImmutableComponent {
     // TODO
   }
 
+  onHamburgerMenu () {
+    let settings = {}
+    Object.keys(AppConfig.resourceNames).forEach((name) => {
+      let value = AppConfig.resourceNames[name]
+      let enabled = this.props.appState.getIn([value, 'enabled'])
+      settings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
+    })
+    // whether the current page is bookmarked. needed to re-initialize the
+    // application menu.
+    settings.bookmarked = this.navBar.bookmarked
+    contextMenus.onHamburgerMenu(settings)
+  }
+
   onMainFocus () {
     // When the main container is in focus, set the URL bar to inactive.
     WindowActions.setUrlBarActive(false)
@@ -150,6 +163,7 @@ class Main extends ImmutableComponent {
             onClick={this.onForward.bind(this)} />
         </div>
         <NavigationBar
+          ref={node => this.navBar = node}
           navbar={activeFrame && activeFrame.get('navbar')}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
@@ -182,6 +196,7 @@ class Main extends ImmutableComponent {
           sites={this.props.appState.get('sites')}
           key='tab-bar'
           activeFrame={activeFrame}
+          onMenu={this.onHamburgerMenu.bind(this)}
         />
         <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
