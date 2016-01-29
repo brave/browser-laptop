@@ -20,6 +20,12 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST]
   ]
 
+  if (process.platform === 'win32') {
+    simpleWebContentEvents.push(
+      ['F5', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
+      ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
+  }
+
   // Tab ordering shortcuts
   Array.from(new Array(8), (x, i) => i).reduce((list, i) => {
     list.push(['CmdOrCtrl+' + String(i + 1), messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, i])
