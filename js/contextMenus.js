@@ -135,8 +135,6 @@ function getEditableItems (hasSelection) {
     label: 'Paste',
     accelerator: 'CmdOrCtrl+V',
     role: 'paste'
-  }, {
-    type: 'separator'
   }]
 }
 
@@ -156,29 +154,7 @@ function hamburgerTemplateInit () {
 }
 
 function mainTemplateInit (nodeProps) {
-  const template = [
-    {
-      label: 'Reload',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-        }
-      }
-    }, {
-      label: 'View Page Source',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
-        }
-      }
-    }, {
-      label: 'Add bookmark',
-      enabled: false
-    }, {
-      label: 'Add to reading list',
-      enabled: false
-    }
-  ]
+  const template = []
   const nodeName = nodeProps.name
   switch (nodeName) {
     case 'A':
@@ -249,19 +225,46 @@ function mainTemplateInit (nodeProps) {
       break
   }
 
+  if (template.length > 0) {
+    template.push(CommonMenu.separatorMenuItem)
+  }
+
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
     const editableItems = getEditableItems(nodeProps.hasSelection)
-    editableItems.push({ type: 'separator' })
-    template.unshift(...editableItems)
+    template.push(...editableItems)
   } else if (nodeProps.hasSelection) {
-    template.unshift({
+    template.push({
       label: 'Copy',
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
-    }, {
-      type: 'separator'
     })
   }
+
+  if (template.length > 0) {
+    template.push(CommonMenu.separatorMenuItem)
+  }
+
+  template.push({
+    label: 'Reload',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+      }
+    }
+  }, {
+    label: 'View Page Source',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      }
+    }
+  }, {
+    label: 'Add bookmark',
+    enabled: false
+  }, {
+    label: 'Add to reading list',
+    enabled: false
+  })
 
   return template
 }
