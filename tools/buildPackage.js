@@ -24,7 +24,7 @@ var cmds = ['echo cleaning up target...']
 if (isWindows) {
   cmds = cmds.concat([
     '(if exist ' + buildDir + ' rmdir /s /q ' + buildDir + ')',
-    '(if exist dist rmdir /s /q dist)',
+    '(if exist dist rmdir /s /q dist)'
   ])
 } else {
   cmds = cmds.concat([
