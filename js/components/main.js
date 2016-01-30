@@ -35,6 +35,14 @@ class Main extends ImmutableComponent {
     ipc.on(messages.STOP_LOAD, () => {
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     })
+    ipc.on(messages.GO_BACK, () => {
+      console.log('going back')
+      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+    })
+    ipc.on(messages.GO_FORWARD, () => {
+      console.log('going forward')
+      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+    })
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
       contextMenus.onMainContextMenu(nodeProps)
     })

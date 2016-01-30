@@ -210,11 +210,32 @@ document.addEventListener('contextmenu', (e) => {
   e.preventDefault()
 }, false)
 
+var shiftDown = false
 document.onkeydown = (e) => {
   switch (e.keyCode) {
     case KeyCodes.ESC:
       e.preventDefault()
       ipc.send(messages.STOP_LOAD)
+      break
+    case KeyCodes.BACKSPACE:
+      const msg = shiftDown ? messages.GO_FORWARD : messages.GO_BACK
+      const elem = document.activeElement
+      if (elem.contentEditable !== 'true' &&
+          elem.nodeName !== 'INPUT' &&
+          elem.nodeName !== 'TEXTAREA') {
+        // TODO: find other node types where this shortcut should be disabled
+        ipc.send(msg)
+      }
+      break
+    case KeyCodes.SHIFT:
+      shiftDown = true
+      break
+  }
+}
+document.onkeyup = (e) => {
+  switch (e.keyCode) {
+    case KeyCodes.SHIFT:
+      shiftDown = false
       break
   }
 }

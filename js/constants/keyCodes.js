@@ -6,7 +6,9 @@ const KeyCodes = {
   ENTER: 13,
   ESC: 27,
   UP: 38,
-  DOWN: 40
+  DOWN: 40,
+  SHIFT: 16,
+  BACKSPACE: 8
 }
 
 module.exports = KeyCodes
