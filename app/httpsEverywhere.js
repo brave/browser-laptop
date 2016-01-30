@@ -232,7 +232,7 @@ function onBeforeRedirect (details) {
  */
 function canonicalizeUrl (url) {
   var parsed = urlParse(url)
-  return [parsed.host, parsed.pathname].join('/')
+  return [parsed.host, parsed.pathname].join('')
 }
 
 /**
