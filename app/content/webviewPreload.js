@@ -198,6 +198,18 @@ function hasSelection (node) {
   return false
 }
 
+/**
+ * Whether an element is editable or can be typed into.
+ * @param {Element} elem
+ * @return {boolean}
+ */
+function isEditable (elem) {
+  // TODO: find other node types that are editable
+  return (elem.contentEditable === 'true' ||
+          elem.nodeName === 'INPUT' ||
+          elem.nodeName === 'TEXTAREA')
+}
+
 document.addEventListener('contextmenu', (e) => {
   var name = e.target.nodeName.toUpperCase()
   var nodeProps = {
@@ -211,6 +223,7 @@ document.addEventListener('contextmenu', (e) => {
 }, false)
 
 var shiftDown = false
+var cmdDown = false
 document.onkeydown = (e) => {
   switch (e.keyCode) {
     case KeyCodes.ESC:
@@ -219,16 +232,28 @@ document.onkeydown = (e) => {
       break
     case KeyCodes.BACKSPACE:
       const msg = shiftDown ? messages.GO_FORWARD : messages.GO_BACK
-      const elem = document.activeElement
-      if (elem.contentEditable !== 'true' &&
-          elem.nodeName !== 'INPUT' &&
-          elem.nodeName !== 'TEXTAREA') {
-        // TODO: find other node types where this shortcut should be disabled
+      if (!isEditable(document.activeElement)) {
         ipc.send(msg)
       }
       break
     case KeyCodes.SHIFT:
       shiftDown = true
+      break
+    case KeyCodes.CMD1:
+      cmdDown = true
+      break
+    case KeyCodes.CMD2:
+      cmdDown = true
+      break
+    case KeyCodes.LEFT:
+      if (cmdDown && !isEditable(document.activeElement)) {
+        ipc.send(messages.GO_BACK)
+      }
+      break
+    case KeyCodes.RIGHT:
+      if (cmdDown && !isEditable(document.activeElement)) {
+        ipc.send(messages.GO_FORWARD)
+      }
       break
   }
 }
@@ -236,6 +261,12 @@ document.onkeyup = (e) => {
   switch (e.keyCode) {
     case KeyCodes.SHIFT:
       shiftDown = false
+      break
+    case KeyCodes.CMD1:
+      cmdDown = false
+      break
+    case KeyCodes.CMD2:
+      cmdDown = false
       break
   }
 }
