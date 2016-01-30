@@ -135,6 +135,8 @@ app.on('ready', function () {
       BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
     })
 
+    Menu.init()
+
     // Load HTTPS Everywhere browser "extension"
     HttpsEverywhere.init()
 
@@ -151,11 +153,8 @@ app.on('ready', function () {
     CrashHerald.init()
 
     // This loads package.json into an object
+    // TODO: Seems like this can be done with app.getVersion() insteand?
     PackageLoader.load((err, pack) => {
-      Menu.init({
-        version: pack.version
-      })
-
       if (err) throw new Error('package.json could not be accessed')
 
       // Setup the auto updater, check the env variable first because it's

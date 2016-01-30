@@ -8,6 +8,7 @@ const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
+const app = electron.app
 const AppActions = require('../js/actions/appActions')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
@@ -53,7 +54,7 @@ const init = (args) => {
     click: (item, focusedWindow) => {
       dialog.showMessageBox({
         title: 'Brave',
-        message: 'Version: ' + args.version + '\n' +
+        message: 'Version: ' + app.getVersion() + '\n' +
           'Electron: ' + process.versions['atom-shell'] + '\n' +
           'libchromiumcontent: ' + process.versions['chrome'],
         icon: path.join(__dirname, 'img', 'braveBtn.png'),
