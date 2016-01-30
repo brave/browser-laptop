@@ -210,6 +210,15 @@ function isEditable (elem) {
           elem.nodeName === 'TEXTAREA')
 }
 
+/**
+ * Whether we are on OS X
+ * @return {boolean}
+ */
+function isPlatformOSX () {
+  // TODO: navigator.platform is getting deprecated
+  return window.navigator.platform.includes('Mac')
+}
+
 document.addEventListener('contextmenu', (e) => {
   var name = e.target.nodeName.toUpperCase()
   var nodeProps = {
@@ -240,13 +249,11 @@ document.onkeydown = (e) => {
       shiftDown = true
       break
     case KeyCodes.CMD1:
-      cmdDown = true
-      break
     case KeyCodes.CMD2:
       cmdDown = true
       break
     case KeyCodes.LEFT:
-      if (cmdDown && !isEditable(document.activeElement)) {
+      if (cmdDown && !isEditable(document.activeElement) && isPlatformOSX()) {
         ipc.send(messages.GO_BACK)
       }
       break
@@ -263,8 +270,6 @@ document.onkeyup = (e) => {
       shiftDown = false
       break
     case KeyCodes.CMD1:
-      cmdDown = false
-      break
     case KeyCodes.CMD2:
       cmdDown = false
       break
