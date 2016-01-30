@@ -24,12 +24,7 @@ var cmds = ['echo cleaning up target...']
 if (isWindows) {
   cmds = cmds.concat([
     '(if exist ' + buildDir + ' rmdir /s /q ' + buildDir + ')',
-    '(if exist dist\*.dmg del /q dist\*.dmg)',
-    '(if exist dist\*.nupkg del /q dist\*.nupkg)',
-    '(if exist dist\*.exe del /q dist\*.exe)',
-    '(if exist dist\*.msi del /q dist\*.msi)',
-    '(if exist dist\RELEASES del /q dist\RELEASES)',
-    '(if exist dist\*.zip del /q dist\*.zip)'
+    '(if exist dist rmdir /s /q dist)',
   ])
 } else {
   cmds = cmds.concat([
