@@ -204,25 +204,18 @@ const handleAppAction = (action) => {
         'appState=' + encodeURIComponent(JSON.stringify(appState.toJS())) +
         '&frames=' + encodeURIComponent(JSON.stringify(frames))
 
-      const devUrl = 'file://' + __dirname + '/../../app/index-dev.html?' + queryString
-      const prodUrl = 'file://' + __dirname + '/../../app/index.html?' + queryString
-      if (process.env.NODE_ENV === 'development') {
-        mainWindow.loadURL(devUrl)
-        // Prevent this window from loading non-whitelisted content
-        mainWindow.webContents.on('will-navigate', (e, url) => {
-          if (url !== devUrl) {
-            e.preventDefault()
-          }
-        })
-      } else {
-        mainWindow.loadURL(prodUrl)
-        // Prevent this window from loading non-whitelisted content
-        mainWindow.webContents.on('will-navigate', (e, url) => {
-          if (url !== prodUrl) {
-            e.preventDefault()
-          }
-        })
+      const willNavigateHandler = (whitelistedUrl, e, url) => {
+        if (url !== whitelistedUrl) {
+          e.preventDefault()
+        }
+        mainWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
       }
+
+      const whitelistedUrl = process.env.NODE_ENV === 'development'
+        ? 'file://' + __dirname + '/../../app/index-dev.html?' + queryString
+        : 'file://' + __dirname + '/../../app/index.html?' + queryString
+      mainWindow.loadURL(whitelistedUrl)
+      mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       appStore.emitChange()
 
       mainWindow.show()
