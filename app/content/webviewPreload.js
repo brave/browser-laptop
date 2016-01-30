@@ -258,7 +258,7 @@ document.onkeydown = (e) => {
       }
       break
     case KeyCodes.RIGHT:
-      if (cmdDown && !isEditable(document.activeElement)) {
+      if (cmdDown && !isEditable(document.activeElement) && isPlatformOSX()) {
         ipc.send(messages.GO_FORWARD)
       }
       break
