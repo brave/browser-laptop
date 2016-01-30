@@ -10,6 +10,7 @@
 - Various Windows shortcuts added.
 - Mouse middle click on a tab now closes the tab.
 - About menu dialog now works in Windows.
+- Release notes viewer will allow mouse activity for copy/pasting.
 
 ## [0.7.10](https://github.com/brave/browser-laptop/releases/v0.7.10dev)
 
