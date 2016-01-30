@@ -207,8 +207,8 @@ const handleAppAction = (action) => {
       const willNavigateHandler = (whitelistedUrl, e, url) => {
         if (url !== whitelistedUrl) {
           e.preventDefault()
+          mainWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
         }
-        mainWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
       }
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
