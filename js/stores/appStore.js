@@ -204,10 +204,24 @@ const handleAppAction = (action) => {
         'appState=' + encodeURIComponent(JSON.stringify(appState.toJS())) +
         '&frames=' + encodeURIComponent(JSON.stringify(frames))
 
+      const devUrl = 'file://' + __dirname + '/../../app/index-dev.html?' + queryString
+      const prodUrl = 'file://' + __dirname + '/../../app/index.html?' + queryString
       if (process.env.NODE_ENV === 'development') {
-        mainWindow.loadURL('file://' + __dirname + '/../../app/index-dev.html?' + queryString)
+        mainWindow.loadURL(devUrl)
+        // Prevent this window from loading non-whitelisted content
+        mainWindow.webContents.on('will-navigate', (e, url) => {
+          if (url !== devUrl) {
+            e.preventDefault()
+          }
+        })
       } else {
-        mainWindow.loadURL('file://' + __dirname + '/../../app/index.html?' + queryString)
+        mainWindow.loadURL(prodUrl)
+        // Prevent this window from loading non-whitelisted content
+        mainWindow.webContents.on('will-navigate', (e, url) => {
+          if (url !== prodUrl) {
+            e.preventDefault()
+          }
+        })
       }
       appStore.emitChange()
 
