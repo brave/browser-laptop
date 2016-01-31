@@ -13,6 +13,7 @@ const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
+const path = require('path')
 
 let appState
 
@@ -212,8 +213,8 @@ const handleAppAction = (action) => {
       }
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
-        ? 'file://' + __dirname + '/../../app/index-dev.html?' + queryString
-        : 'file://' + __dirname + '/../../app/index.html?' + queryString
+        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html?' + queryString
+        : 'file://' + path.resolve(__dirname + '..', '..') + '/app/index.html?' + queryString
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       appStore.emitChange()
