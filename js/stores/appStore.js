@@ -214,7 +214,7 @@ const handleAppAction = (action) => {
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
         ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html?' + queryString
-        : 'file://' + path.resolve(__dirname + '..', '..') + '/app/index.html?' + queryString
+        : 'file://' + path.resolve(__dirname + '..', '..', '..') + '/app/index.html?' + queryString
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       appStore.emitChange()
