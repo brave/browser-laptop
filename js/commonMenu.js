@@ -68,7 +68,7 @@ module.exports.newPrivateTabMenuItem = {
 }
 
 module.exports.newPartitionedTabMenuItem = {
-  label: 'New Partitioned Session',
+  label: 'New Session Tab',
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
