@@ -109,7 +109,7 @@ var exports = {
       return this.execute(function () {
         let screen = require('electron').screen
         let primaryDisplay = screen.getPrimaryDisplay()
-        return Math.floor(primaryDisplay.bounds.height / 2)
+        return primaryDisplay.workAreaSize.height
       }).then((response) => response.value)
     })
 
@@ -117,7 +117,7 @@ var exports = {
       return this.execute(function () {
         let screen = require('electron').screen
         let primaryDisplay = screen.getPrimaryDisplay()
-        return Math.floor(primaryDisplay.bounds.width / 2)
+        return primaryDisplay.workAreaSize.width
       }).then((response) => response.value)
     })
 
