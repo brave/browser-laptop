@@ -78,7 +78,10 @@
 <updateViewLog "View log">
 <updateHide "Hide">
 
-<sessionInfo "This tab uses session {{$partitionNumber}}">
+<sessionInfoCommon "This tab uses session {{$partitionNumber}}">
+<sessionInfo "{{sessionInfoCommon}}">
+<sessionInfoTab
+  title: "{{sessionInfoCommon}}">
 
 <findResults "{{$activeMatchOrdinal}} of {{$numberOfMatches}}">
 
