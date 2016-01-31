@@ -160,8 +160,8 @@ function setDefaultWindowSize () {
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
   if (!appState.get('defaultWindowWidth') && !appState.get('defaultWindowHeight')) {
-    appState = appState.set('defaultWindowWidth', Math.floor(primaryDisplay.bounds.width / 2))
-    appState = appState.set('defaultWindowHeight', Math.floor(primaryDisplay.bounds.height / 2))
+    appState = appState.set('defaultWindowWidth', primaryDisplay.workAreaSize.width)
+    appState = appState.set('defaultWindowHeight', primaryDisplay.workAreaSize.height)
   }
 }
 
