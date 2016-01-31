@@ -18,9 +18,7 @@ describe('urlbar', function () {
       .ipcSend('shortcut-new-frame')
       // wait for correct urlInput based on frameKey
       .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
-      .waitUntil(function () {
-        return this.getAttribute(':focus', 'id').then(value => value === 'urlInput')
-      })
+      .waitForElementFocus(urlInput)
   }
 
   function blur (client) {
@@ -29,12 +27,6 @@ describe('urlbar', function () {
       .waitUntil(function () {
         return this.getSelectedText().then(function (value) { return value === '' })
       })
-  }
-
-  function hasFocus (client) {
-    return client.waitUntil(function () {
-      return this.getAttribute(':focus', 'id').then(function (value) { return value === 'urlInput' })
-    })
   }
 
   function defaultUrlInputValue (client) {
@@ -220,7 +212,7 @@ describe('urlbar', function () {
     })
 
     it('has focus', function *() {
-      yield hasFocus(this.app.client)
+      yield this.app.client.waitForElementFocus(urlInput)
     })
 
     it('selects the text', function *() {
@@ -228,7 +220,7 @@ describe('urlbar', function () {
     })
   })
 
-  describe('new tab', function () {
+  describe('new tab from ipc', function () {
     Brave.beforeAll(this)
 
     before(function *() {
@@ -242,7 +234,7 @@ describe('urlbar', function () {
     })
 
     it('has focus', function *() {
-      yield hasFocus(this.app.client)
+      yield this.app.client.waitForElementFocus(urlInput)
     })
   })
 
@@ -302,7 +294,7 @@ describe('urlbar', function () {
       })
 
       it('has focus', function *() {
-        yield hasFocus(this.app.client)
+        yield this.app.client.waitForElementFocus(urlInput)
       })
 
       it('selects the text', function *() {
@@ -321,7 +313,7 @@ describe('urlbar', function () {
       })
 
       it('has focus', function *() {
-        yield hasFocus(this.app.client)
+        yield this.app.client.waitForElementFocus(urlInput)
       })
 
       it('selects the text', function *() {
@@ -426,7 +418,7 @@ describe('urlbar', function () {
       })
 
       it('has focus', function *() {
-        yield hasFocus(this.app.client)
+        yield this.app.client.waitForElementFocus(urlInput)
       })
 
       it('selects the text', function *() {
@@ -449,7 +441,7 @@ describe('urlbar', function () {
       })
 
       it('has focus', function *() {
-        yield hasFocus(this.app.client)
+        yield this.app.client.waitForElementFocus(urlInput)
       })
 
       it('unselects the text', function *() {
@@ -478,7 +470,7 @@ describe('urlbar', function () {
     })
 
     it('has focus', function *() {
-      yield hasFocus(this.app.client)
+      yield this.app.client.waitForElementFocus(urlInput)
     })
   })
 })

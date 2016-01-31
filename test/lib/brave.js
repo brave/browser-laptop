@@ -185,6 +185,18 @@ var exports = {
         require('electron').ipcRenderer.emit('ATOM_SHELL_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
       }, frameKey, eventName, ...params).then((response) => response.value)
     })
+
+    this.app.client.addCommand('waitForElementFocus', function (selector) {
+      let activeElement
+      return this.waitUntil(function () {
+        return this.elementActive()
+          .then(function (el) {
+            activeElement = el
+            return this.element(selector)
+          })
+          .then(queryElement => queryElement.value.ELEMENT === activeElement.value.ELEMENT)
+      })
+    })
   },
 
   startApp: function () {
