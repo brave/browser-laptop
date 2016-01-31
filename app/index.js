@@ -4,12 +4,8 @@
 
 'use strict'
 
- // windows installation events etc...
 if (process.platform === 'win32') {
-  // TODO - register browser as HTTP handler in Windows (maybe need to fork)
-  if (require('electron-squirrel-startup')) {
-    process.exit(0)
-  }
+  require('./windowsInit')
 }
 
 const Immutable = require('immutable')
