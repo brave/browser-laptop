@@ -68,7 +68,7 @@ module.exports.newPrivateTabMenuItem = {
 }
 
 module.exports.newPartitionedTabMenuItem = {
-  label: 'New Partitioned Session',
+  label: 'New Session Tab',
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
@@ -98,6 +98,16 @@ module.exports.findOnPageMenuItem = {
   accelerator: 'CmdOrCtrl+F',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
+  }
+}
+
+module.exports.checkForUpdateMenuItem = {
+  label: 'Check for updates ...',
+  click: function (item, focusedWindow) {
+    if (electron.BrowserWindow.getAllWindows().length === 0) {
+      AppActions.newWindow()
+    }
+    process.emit(messages.CHECK_FOR_UPDATE)
   }
 }
 

@@ -15,8 +15,6 @@ module.exports.register = (win) => {
   const simpleWebContentEvents = [
     ['CmdOrCtrl+Shift+]', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
-    ['CmdOrCtrl+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD],
-    ['CmdOrCtrl+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST]
   ]
 

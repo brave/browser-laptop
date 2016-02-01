@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.7.11",
+  "version": "0.7.12",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "scripts": {
@@ -20,6 +20,7 @@
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/ABPFilterParserData.dat",
     "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/TrackingProtection.dat",
+    "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse-targets.json  ~/Library/Application\\ Support/Brave/rulesets.sqlite*",
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
   },
@@ -59,6 +60,7 @@
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
     "immutable": "^3.7.5",
+    "moment": "^2.11.1",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
     "sqlite3": "^3.1.0",

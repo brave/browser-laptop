@@ -5,7 +5,10 @@ var parseString = require('xml2js').parseString
 // Manually exclude sites that are broken until they are fixed in the next
 // HTTPS Everywhere release.
 var exclusions = {
-  'Nike.com.xml': 'breaks nikeplus.com'
+  'Nike.com.xml': 'breaks nikeplus.com',
+  'PJ_Media.xml': 'mixed content on https://pjmedia.com/instapundit/',
+  'Slashdot.xml': 'redirect loop on mobile slashdot.org',
+  'Vox.com.xml': 'redirect loop on vox.com'
 }
 
 // Preload mapping of HTTPS Everywhere hosts to ruleset IDs and convert

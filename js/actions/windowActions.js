@@ -42,6 +42,7 @@ const WindowActions = {
    * @param {string} location - The URL of the page to load
    */
   loadUrl: function (activeFrame, location) {
+    location = location.trim()
     let newFrame = false
     if (activeFrame.get('isPinned')) {
       try {
@@ -82,6 +83,7 @@ const WindowActions = {
    * it is active the URL text will also be changed.
    */
   setLocation: function (location, key) {
+    location = location.trim()
     if (UrlUtil.isURL(location)) {
       location = UrlUtil.getUrlFromInput(location)
     }

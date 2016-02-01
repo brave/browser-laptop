@@ -83,5 +83,6 @@ export function isPrivilegedUrl (input) {
  * @param {string} input
  */
 export function isUrl (input) {
+  input = input.trim()
   return (UrlUtil.isURL(input) && !input.includes(' '))
 }

@@ -6,13 +6,17 @@
 const AppConstants = require('../constants/appConstants')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
+const app = electron.app
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
+const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
+const dates = require('../../app/dates')
+const path = require('path')
 
 let appState
 
@@ -160,8 +164,8 @@ function setDefaultWindowSize () {
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
   if (!appState.get('defaultWindowWidth') && !appState.get('defaultWindowHeight')) {
-    appState = appState.set('defaultWindowWidth', Math.floor(primaryDisplay.bounds.width / 2))
-    appState = appState.set('defaultWindowHeight', Math.floor(primaryDisplay.bounds.height / 2))
+    appState = appState.set('defaultWindowWidth', primaryDisplay.workAreaSize.width)
+    appState = appState.set('defaultWindowHeight', primaryDisplay.workAreaSize.height)
   }
 }
 
@@ -212,8 +216,8 @@ const handleAppAction = (action) => {
       }
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
-        ? 'file://' + __dirname + '/../../app/index-dev.html?' + queryString
-        : 'file://' + __dirname + '/../../app/index.html?' + queryString
+        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html?' + queryString
+        : 'file://' + path.resolve(__dirname + '..', '..', '..') + '/app/index.html?' + queryString
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       appStore.emitChange()
@@ -247,6 +251,10 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_UPDATE_LAST_CHECK:
       appState = appState.setIn(['updates', 'lastCheckTimestamp'], (new Date()).getTime())
+      appState = appState.setIn(['updates', 'lastCheckYMD'], dates.todayYMD())
+      appState = appState.setIn(['updates', 'lastCheckWOY'], dates.todayWOY())
+      appState = appState.setIn(['updates', 'lastCheckMonth'], dates.todayMonth())
+      appState = appState.setIn(['updates', 'firstCheckMade'], true)
       appStore.emitChange()
       break
     case AppConstants.APP_SET_UPDATE_STATUS:
@@ -259,6 +267,9 @@ const handleAppAction = (action) => {
       }
       if (action.metadata !== undefined) {
         appState = appState.setIn(['updates', 'metadata'], action.metadata)
+      }
+      if (action.status === UpdateStatus.UPDATE_APPLYING_RESTART) {
+        app.quit()
       }
       appStore.emitChange()
       break

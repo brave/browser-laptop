@@ -210,6 +210,10 @@ class Tab extends ImmutableComponent {
       style={activeTabStyle}>
         { this.props.frameProps.get('isPrivate')
           ? <div className='privateIcon fa fa-eye'/> : null }
+        { this.props.frameProps.get('partitionNumber')
+          ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.frameProps.get('partitionNumber') })}
+              data-l10n-id='sessionInfoTab'
+              className='privateIcon fa fa-user'/> : null }
         <div className={cx({
           tabIcon: true,
           'fa fa-circle-o-notch fa-spin': this.loading

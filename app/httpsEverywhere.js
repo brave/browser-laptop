@@ -191,8 +191,9 @@ function onBeforeHTTPRequest (details, cb) {
     return
   }
 
-  if (canonicalizeUrl(details.url) in redirectBlacklist) {
+  if (redirectBlacklist.includes(canonicalizeUrl(details.url))) {
     // Don't try to rewrite this request, it'll probably just redirect again.
+    console.log('https everywhere ignoring blacklisted url', details.url)
     cb({})
   } else {
     getRewrittenUrl(details.url, (url) => {
@@ -232,7 +233,7 @@ function onBeforeRedirect (details) {
  */
 function canonicalizeUrl (url) {
   var parsed = urlParse(url)
-  return [parsed.host, parsed.pathname].join('/')
+  return [parsed.host, parsed.pathname].join('')
 }
 
 /**
