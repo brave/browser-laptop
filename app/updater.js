@@ -161,7 +161,7 @@ var requestVersionInfo = (done) => {
       done(null, body)
     } else {
       // Network error or mis-configuration
-      debug(err.toString())
+      autoUpdater.emit('error', err)
     }
   })
 }
