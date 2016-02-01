@@ -645,7 +645,7 @@ const WindowActions = {
    */
   setBlockedBy: function (frameProps, blockType, location) {
     WindowDispatcher.dispatch({
-      actionType: WindowConstants.SET_BLOCKED_BY,
+      actionType: WindowConstants.WINDOW_SET_BLOCKED_BY,
       frameProps,
       blockType,
       location

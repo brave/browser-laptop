@@ -184,7 +184,7 @@ function mainTemplateInit (nodeProps) {
         }
       })
       template.push({
-        label: 'Open in new partitioned session',
+        label: 'Open in new session tab',
         click: (item, focusedWindow) => {
           if (focusedWindow && nodeProps.src) {
             // TODO: open this in the next tab instead of last tab

@@ -436,7 +436,7 @@ const doAction = (action) => {
                                         action.securityState.secure)
       }
       break
-    case WindowConstants.SET_BLOCKED_BY:
+    case WindowConstants.WINDOW_SET_BLOCKED_BY:
       const blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
