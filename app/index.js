@@ -27,6 +27,7 @@ const AdBlock = require('./adBlock')
 const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
+const UpdateStatus = require('../js/constants/updateStatus')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -43,9 +44,23 @@ const saveIfAllCollected = () => {
     const ignoreCatch = () => {}
 
     if (process.env.NODE_ENV !== 'test') {
+      // If the status is still UPDATE_AVAILABLE then the user wants to quit
+      // and not restart
+      if (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
+          appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED) {
+        appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+      }
+
       SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
         sessionStateStoreAttempted = true
-        app.quit()
+        // If there's an update to apply, then do it here.
+        // Otherwise just quit.
+        if (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
+            appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART) {
+          Updater.quitAndInstall()
+        } else {
+          app.quit()
+        }
       })
     } else {
       sessionStateStoreAttempted = true
@@ -146,7 +161,7 @@ app.on('ready', function () {
     SiteHacks.init()
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
-      Updater.update()
+      Updater.updateNowRequested()
     })
 
     // Setup the crash handling

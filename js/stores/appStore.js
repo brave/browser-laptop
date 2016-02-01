@@ -6,8 +6,10 @@
 const AppConstants = require('../constants/appConstants')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
+const app = electron.app
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
+const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const AppActions = require('../actions/appActions')
@@ -260,6 +262,9 @@ const handleAppAction = (action) => {
       }
       if (action.metadata !== undefined) {
         appState = appState.setIn(['updates', 'metadata'], action.metadata)
+      }
+      if (action.status === UpdateStatus.UPDATE_APPLYING_RESTART) {
+        app.quit()
       }
       appStore.emitChange()
       break

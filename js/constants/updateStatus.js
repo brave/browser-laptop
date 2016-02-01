@@ -12,7 +12,13 @@ const updateStatus = {
   UPDATE_AVAILABLE_DEFERRED: _,
   UPDATE_DOWNLOADING: _,
   UPDATE_NOT_AVAILABLE: _,
-  UPDATE_ERROR: _
+  UPDATE_ERROR: _,
+  // Used only when closing from the update UI.
+  // indicate the app should close and allow restart.
+  // A restart always happens after an update but will
+  // re-close unless this is set.
+  UPDATE_APPLYING_RESTART: _,
+  UPDATE_APPLYING_NO_RESTART: _
 }
 
 module.exports = mapValuesByKeys(updateStatus)

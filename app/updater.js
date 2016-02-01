@@ -204,8 +204,13 @@ exports.checkForUpdate = (verbose) => {
 }
 
 // The UI indicates that we should update the software
-exports.update = () => {
+exports.updateNowRequested = () => {
   debug('update requested in updater')
+  // App shutdown process will save state and then call autoUpdater.quitAndInstall
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_APPLYING_RESTART)
+}
+
+exports.quitAndInstall = () => {
   autoUpdater.quitAndInstall()
 }
 
