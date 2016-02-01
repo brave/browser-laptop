@@ -101,6 +101,16 @@ module.exports.findOnPageMenuItem = {
   }
 }
 
+module.exports.checkForUpdateMenuItem = {
+  label: 'Check for updates ...',
+  click: function (item, focusedWindow) {
+    if (electron.BrowserWindow.getAllWindows().length === 0) {
+      AppActions.newWindow()
+    }
+    process.emit(messages.CHECK_FOR_UPDATE)
+  }
+}
+
 module.exports.buildBraveryMenu = function (settings, init) {
   const replaceAds = settings[adInsertion] || false
   const blockAds = settings[adblock] || false
