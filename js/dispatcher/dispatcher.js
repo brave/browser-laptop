@@ -24,6 +24,9 @@ class Dispatcher {
    * @param  {object} payload The data from the action.
    */
   dispatch (payload) {
+    if (payload.actionType === undefined) {
+      throw new Error('Dispatcher: Undefined action for payload', payload)
+    }
     // First create array of promises for callbacks to reference.
     const resolves = []
     const rejects = []
