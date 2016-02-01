@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const electron = require('electron')
-const BrowserWindow = electron.BrowserWindow
 const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
@@ -21,10 +20,10 @@ const aboutUrl = 'https://brave.com/'
 
 const path = require('path')
 
-const httpsEverywhere = 'httpsEverywhere'
-const adblock = 'adblock'
-const adInsertion = 'adInsertion'
-const trackingProtection = 'trackingProtection'
+const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = AppConfig.resourceNames.ADBLOCK
+const adInsertion = AppConfig.resourceNames.AD_INSERTION
+const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 
 /**
  * Sets up the menu.
@@ -69,15 +68,6 @@ const init = (args) => {
   }
 
   const fileMenu = [
-    {
-      label: 'Check for updates ...',
-      click: function (item, focusedWindow) {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          AppActions.newWindow()
-        }
-        process.emit(messages.CHECK_FOR_UPDATE)
-      }
-    },
 // Note: we are keeping this here for testing. Calling process.crash() from the inspector does not create a crash report.
 //        {
 //          label: 'Crash!!!!!',
@@ -200,6 +190,9 @@ const init = (args) => {
   if (isWindows) {
     fileMenu.push(CommonMenu.separatorMenuItem)
     fileMenu.push(CommonMenu.quitMenuItem)
+    helpMenu.push(CommonMenu.separatorMenuItem)
+    helpMenu.push(CommonMenu.checkForUpdateMenuItem)
+    helpMenu.push(CommonMenu.separatorMenuItem)
     helpMenu.push(aboutBraveMenuItem)
   }
 
@@ -513,6 +506,8 @@ const init = (args) => {
       label: AppConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
         aboutBraveMenuItem,
+        CommonMenu.separatorMenuItem,
+        CommonMenu.checkForUpdateMenuItem,
         CommonMenu.separatorMenuItem,
         preferencesMenuItem,
         CommonMenu.separatorMenuItem,

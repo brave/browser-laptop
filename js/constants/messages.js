@@ -55,6 +55,8 @@ const messages = {
   APP_STATE_CHANGE: _,
   APP_ACTION: _,
   STOP_LOAD: _,
+  GO_FORWARD: _,
+  GO_BACK: _,
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,

@@ -14,6 +14,7 @@
 const fs = require('fs')
 const path = require('path')
 const app = require('app')
+const UpdateStatus = require('../js/constants/updateStatus')
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 const storagePath = path.join(app.getPath('userData'), sessionStorageName)
@@ -32,11 +33,6 @@ module.exports.saveAppState = (payload) => {
     if (payload.perWindowState) {
       payload.perWindowState.forEach(wndPayload =>
         wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
-    }
-
-    // Always recalculate the update status
-    if (payload.updates) {
-      delete payload.updates.status
     }
 
     // payload.frames = payload.frames.filter(frame => !frame.isPrivate)
@@ -158,6 +154,19 @@ module.exports.loadAppState = () => {
         console.log('could not parse data: ', data)
         reject(e)
         return
+      }
+      // Always recalculate the update status
+      if (data.updates) {
+        const updateStatus = data.updates.status
+        delete data.updates.status
+        // The process always restarts after an update so if the state
+        // indicates that a restart isn't wanted, close right away.
+        if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
+          module.exports.saveAppState(data)
+          // Exit immediately without doing the session store saving stuff
+          // since we want the same state saved except for the update status
+          app.exit(0)
+        }
       }
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)

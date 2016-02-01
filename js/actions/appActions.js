@@ -44,8 +44,6 @@ const AppActions = {
    * Dispatches an event to the main process to update the browser
    */
   updateRequested: function () {
-    // TODO - change to dispatcher
-    console.log('appActions updateRequested')
     global.require('electron').ipcRenderer.send(messages.UPDATE_REQUESTED)
   },
 

@@ -1,5 +1,10 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 var VersionInfo = require('./lib/versionInfo')
 var execute = require('./lib/execute')
+const ignoredPaths = require('./lib/ignoredPaths')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -24,12 +29,7 @@ var cmds = ['echo cleaning up target...']
 if (isWindows) {
   cmds = cmds.concat([
     '(if exist ' + buildDir + ' rmdir /s /q ' + buildDir + ')',
-    '(if exist dist\*.dmg del /q dist\*.dmg)',
-    '(if exist dist\*.nupkg del /q dist\*.nupkg)',
-    '(if exist dist\*.exe del /q dist\*.exe)',
-    '(if exist dist\*.msi del /q dist\*.msi)',
-    '(if exist dist\RELEASES del /q dist\RELEASES)',
-    '(if exist dist\*.zip del /q dist\*.zip)'
+    '(if exist dist rmdir /s /q dist)'
   ])
 } else {
   cmds = cmds.concat([
@@ -50,7 +50,7 @@ cmds = cmds.concat([
   'npm run checks',
   'node ./node_modules/electron-packager/cli.js . Brave' +
     ' --overwrite' +
-    ' --ignore="electron-download|electron-rebuild|electron-packager|electron-builder|electron-prebuilt|electron-rebuild|babel$|babel-(?!polyfill|regenerator-runtime)"' +
+    ' --ignore="' + ignoredPaths.join('|') + '"' +
     ' --platform=' + process.platform +
     ' --arch=' + arch +
     ' --version=' + VersionInfo.electronVersion +

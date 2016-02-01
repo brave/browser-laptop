@@ -15,8 +15,6 @@ module.exports.register = (win) => {
   const simpleWebContentEvents = [
     ['CmdOrCtrl+Shift+]', messages.SHORTCUT_NEXT_TAB],
     ['CmdOrCtrl+Shift+[', messages.SHORTCUT_PREV_TAB],
-    ['CmdOrCtrl+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD],
-    ['CmdOrCtrl+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST]
   ]
 
@@ -24,7 +22,8 @@ module.exports.register = (win) => {
     simpleWebContentEvents.push(
       ['F5', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
       ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD],
-      ['F12', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
+      ['F12', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS],
+      ['Alt+D', messages.SHORTCUT_FOCUS_URL, false])
   }
 
   // Tab ordering shortcuts

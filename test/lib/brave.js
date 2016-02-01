@@ -109,7 +109,7 @@ var exports = {
       return this.execute(function () {
         let screen = require('electron').screen
         let primaryDisplay = screen.getPrimaryDisplay()
-        return Math.floor(primaryDisplay.bounds.height / 2)
+        return primaryDisplay.workAreaSize.height
       }).then((response) => response.value)
     })
 
@@ -117,7 +117,7 @@ var exports = {
       return this.execute(function () {
         let screen = require('electron').screen
         let primaryDisplay = screen.getPrimaryDisplay()
-        return Math.floor(primaryDisplay.bounds.width / 2)
+        return primaryDisplay.workAreaSize.width
       }).then((response) => response.value)
     })
 
@@ -184,6 +184,18 @@ var exports = {
         // be possible with dispatchEvent.
         require('electron').ipcRenderer.emit('ATOM_SHELL_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
       }, frameKey, eventName, ...params).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('waitForElementFocus', function (selector) {
+      let activeElement
+      return this.waitUntil(function () {
+        return this.elementActive()
+          .then(function (el) {
+            activeElement = el
+            return this.element(selector)
+          })
+          .then(queryElement => queryElement.value.ELEMENT === activeElement.value.ELEMENT)
+      })
     })
   },
 

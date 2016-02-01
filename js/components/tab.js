@@ -130,6 +130,15 @@ class Tab extends ImmutableComponent {
       window.setTimeout(WindowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 400)
   }
 
+  onClickTab (e) {
+    // Middle click should close tab
+    if (e.button === 1) {
+      this.onCloseFrame(e)
+    } else {
+      this.setActiveFrame(e)
+    }
+  }
+
   render () {
     // Style based on theme-color
     let iconStyle = {}
@@ -196,11 +205,15 @@ class Tab extends ImmutableComponent {
       onDragLeave={this.onDragLeave.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
       onDrop={this.onDrop.bind(this)}
-      onClick={this.setActiveFrame.bind(this)}
+      onClick={this.onClickTab.bind(this)}
       onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
         { this.props.frameProps.get('isPrivate')
           ? <div className='privateIcon fa fa-eye'/> : null }
+        { this.props.frameProps.get('partitionNumber')
+          ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.frameProps.get('partitionNumber') })}
+              data-l10n-id='sessionInfoTab'
+              className='privateIcon fa fa-user'/> : null }
         <div className={cx({
           tabIcon: true,
           'fa fa-circle-o-notch fa-spin': this.loading

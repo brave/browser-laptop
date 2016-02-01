@@ -35,6 +35,14 @@ class Main extends ImmutableComponent {
     ipc.on(messages.STOP_LOAD, () => {
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     })
+    ipc.on(messages.GO_BACK, () => {
+      console.log('going back')
+      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+    })
+    ipc.on(messages.GO_FORWARD, () => {
+      console.log('going forward')
+      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+    })
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
       contextMenus.onMainContextMenu(nodeProps)
     })
@@ -102,6 +110,19 @@ class Main extends ImmutableComponent {
     // TODO
   }
 
+  onHamburgerMenu () {
+    let settings = {}
+    Object.keys(AppConfig.resourceNames).forEach((name) => {
+      let value = AppConfig.resourceNames[name]
+      let enabled = this.props.appState.getIn([value, 'enabled'])
+      settings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
+    })
+    // whether the current page is bookmarked. needed to re-initialize the
+    // application menu.
+    settings.bookmarked = this.navBar.bookmarked
+    contextMenus.onHamburgerMenu(settings)
+  }
+
   onMainFocus () {
     // When the main container is in focus, set the URL bar to inactive.
     WindowActions.setUrlBarActive(false)
@@ -150,6 +171,7 @@ class Main extends ImmutableComponent {
             onClick={this.onForward.bind(this)} />
         </div>
         <NavigationBar
+          ref={node => this.navBar = node}
           navbar={activeFrame && activeFrame.get('navbar')}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
@@ -182,6 +204,7 @@ class Main extends ImmutableComponent {
           sites={this.props.appState.get('sites')}
           key='tab-bar'
           activeFrame={activeFrame}
+          onMenu={this.onHamburgerMenu.bind(this)}
         />
         <UpdateBar updates={this.props.appState.get('updates')} />
       </div>

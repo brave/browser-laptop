@@ -198,6 +198,27 @@ function hasSelection (node) {
   return false
 }
 
+/**
+ * Whether an element is editable or can be typed into.
+ * @param {Element} elem
+ * @return {boolean}
+ */
+function isEditable (elem) {
+  // TODO: find other node types that are editable
+  return (elem.contentEditable === 'true' ||
+          elem.nodeName === 'INPUT' ||
+          elem.nodeName === 'TEXTAREA')
+}
+
+/**
+ * Whether we are on OS X
+ * @return {boolean}
+ */
+function isPlatformOSX () {
+  // TODO: navigator.platform is getting deprecated
+  return window.navigator.platform.includes('Mac')
+}
+
 document.addEventListener('contextmenu', (e) => {
   var name = e.target.nodeName.toUpperCase()
   var nodeProps = {
@@ -210,11 +231,47 @@ document.addEventListener('contextmenu', (e) => {
   e.preventDefault()
 }, false)
 
+var shiftDown = false
+var cmdDown = false
 document.onkeydown = (e) => {
   switch (e.keyCode) {
     case KeyCodes.ESC:
       e.preventDefault()
       ipc.send(messages.STOP_LOAD)
+      break
+    case KeyCodes.BACKSPACE:
+      const msg = shiftDown ? messages.GO_FORWARD : messages.GO_BACK
+      if (!isEditable(document.activeElement)) {
+        ipc.send(msg)
+      }
+      break
+    case KeyCodes.SHIFT:
+      shiftDown = true
+      break
+    case KeyCodes.CMD1:
+    case KeyCodes.CMD2:
+      cmdDown = true
+      break
+    case KeyCodes.LEFT:
+      if (cmdDown && !isEditable(document.activeElement) && isPlatformOSX()) {
+        ipc.send(messages.GO_BACK)
+      }
+      break
+    case KeyCodes.RIGHT:
+      if (cmdDown && !isEditable(document.activeElement) && isPlatformOSX()) {
+        ipc.send(messages.GO_FORWARD)
+      }
+      break
+  }
+}
+document.onkeyup = (e) => {
+  switch (e.keyCode) {
+    case KeyCodes.SHIFT:
+      shiftDown = false
+      break
+    case KeyCodes.CMD1:
+    case KeyCodes.CMD2:
+      cmdDown = false
       break
   }
 }

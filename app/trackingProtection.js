@@ -42,6 +42,7 @@ const startTrackingProtection = (wnd) => {
     }
     const urlHost = URL.parse(details.url).host
     const shouldBlock = firstPartyUrl.protocol &&
+      details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&
       !whitelistHosts.includes(urlHost) &&
       cachedFirstParty[firstPartyUrlHost] &&

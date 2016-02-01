@@ -24,6 +24,7 @@ const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
+  console.log(contents)
   fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + '\n')
 }
 
@@ -89,42 +90,30 @@ exports.init = (platform, ver) => {
 
 // Build a set of three params providing flags determining when the last update occurred
 // This is a privacy preserving policy. Instead of passing personally identifying
-// information, the browser will pass the three boolean values indicating when the last
+// information, the browser will pass thefour boolean values indicating when the last
 // update check occurred.
-var paramsFromLastCheckDelta = (lastCheckYMD, firstCheckMade) => {
-  // Default params
-  var params = {
-    daily: false,
-    weekly: false,
-    monthly: false,
-    first: false
+var paramsFromLastCheckDelta = (lastCheckYMD, lastCheckWOY, lastCheckMonth, firstCheckMade) => {
+  return {
+    daily: !lastCheckYMD || (dates.todayYMD() > lastCheckYMD),
+    weekly: !lastCheckWOY || (dates.todayWOY() !== lastCheckWOY),
+    monthly: !lastCheckMonth || (dates.todayMonth() !== lastCheckMonth),
+    first: !firstCheckMade
   }
-
-  // If the first flag has NOT been set then we will send it
-  // with the update params to help with daily new users
-  if (!firstCheckMade || !lastCheckYMD) {
-    params.first = true
-    params.daily = true
-    return params
-  }
-
-  // If we have not checked today
-  if (dates.todayYMD() > lastCheckYMD) {
-    params.daily = true
-    return params
-  }
-
-  // Safety return (in case code above changes)
-  return params
 }
 
 // Make a request to the update server to retrieve meta data
 var requestVersionInfo = (done) => {
   if (!platformBaseUrl) throw new Error('platformBaseUrl not set')
 
-  // Get the YMD of the last update request
+  // Get the daily, week of year and month update checks
   var lastCheckYMD = AppStore.getState().toJS().updates['lastCheckYMD'] || null
   debug(`lastCheckYMD = ${lastCheckYMD}`)
+
+  var lastCheckWOY = AppStore.getState().toJS().updates['lastCheckWOY'] || null
+  debug(`lastCheckWOY = ${lastCheckWOY}`)
+
+  var lastCheckMonth = AppStore.getState().toJS().updates['lastCheckMonth'] || null
+  debug(`lastCheckMonth = ${lastCheckMonth}`)
 
   // Has the browser ever asked for an update
   var firstCheckMade = AppStore.getState().toJS().updates['firstCheckMade'] || false
@@ -133,6 +122,8 @@ var requestVersionInfo = (done) => {
   // Build query string based on the last date an update request was made
   var query = paramsFromLastCheckDelta(
     lastCheckYMD,
+    lastCheckWOY,
+    lastCheckMonth,
     firstCheckMade
   )
   var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
@@ -149,7 +140,7 @@ var requestVersionInfo = (done) => {
       done(null, body)
     } else {
       // Network error or mis-configuration
-      debug(err.toString())
+      autoUpdater.emit('error', err)
     }
   })
 }
@@ -192,8 +183,13 @@ exports.checkForUpdate = (verbose) => {
 }
 
 // The UI indicates that we should update the software
-exports.update = () => {
+exports.updateNowRequested = () => {
   debug('update requested in updater')
+  // App shutdown process will save state and then call autoUpdater.quitAndInstall
+  AppActions.setUpdateStatus(UpdateStatus.UPDATE_APPLYING_RESTART)
+}
+
+exports.quitAndInstall = () => {
   autoUpdater.quitAndInstall()
 }
 
