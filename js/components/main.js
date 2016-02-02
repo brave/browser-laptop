@@ -31,16 +31,43 @@ const messages = require('../constants/messages')
 const FrameStateUtil = require('../state/frameStateUtil')
 
 class Main extends ImmutableComponent {
+  registerSwipeListener () {
+    // Navigates back/forward on OS X two-finger swipe
+    var trackingFingers = false
+    var deltaX = 0
+    var deltaY = 0
+
+    this.mainWindow.addEventListener('wheel', (e) => {
+      deltaX = deltaX + e.deltaX
+      deltaY = deltaY + e.deltaY
+    })
+
+    ipc.on('scroll-touch-begin', function () {
+      trackingFingers = true
+    })
+    ipc.on('scroll-touch-end', function () {
+      if (trackingFingers && Math.abs(deltaX) > 1000 && Math.abs(deltaY) < 200) {
+        if (deltaX > 0) {
+          electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+        } else {
+          electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+        }
+      }
+      trackingFingers = false
+      deltaX = 0
+      deltaY = 0
+    })
+  }
+
   componentDidMount () {
+    this.registerSwipeListener()
     ipc.on(messages.STOP_LOAD, () => {
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     })
     ipc.on(messages.GO_BACK, () => {
-      console.log('going back')
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
     })
     ipc.on(messages.GO_FORWARD, () => {
-      console.log('going forward')
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
     })
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
@@ -158,7 +185,7 @@ class Main extends ImmutableComponent {
 
     this.frames = {}
 
-    return <div id='window'>
+    return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
         <div className='backforward'>
           <span

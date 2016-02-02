@@ -121,6 +121,14 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow = null
   })
 
+  mainWindow.on('scroll-touch-begin', function (e) {
+    mainWindow.webContents.send('scroll-touch-begin')
+  })
+
+  mainWindow.on('scroll-touch-end', function (e) {
+    mainWindow.webContents.send('scroll-touch-end')
+  })
+
   LocalShortcuts.register(mainWindow)
   return mainWindow
 }
