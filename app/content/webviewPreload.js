@@ -156,7 +156,8 @@ ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholder
 })
 
 function hasSelection (node) {
-  if (node && node.selectionStart !== undefined &&
+  if (node && /password|search|tel|text|url/.test(node.type) &&
+      node.selectionStart !== undefined &&
       node.selectionEnd !== undefined &&
       node.selectionStart !== node.selectionEnd) {
     return true
