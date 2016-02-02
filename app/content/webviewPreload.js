@@ -6,10 +6,6 @@ var ipc = require('electron').ipcRenderer
 var messages = require('../../js/constants/messages')
 var KeyCodes = require('../../js/constants/keyCodes')
 
-ipc.on(messages.PRINT_PAGE, function () {
-  window.print()
-})
-
 /**
  * Ensures a node replacement div is visible and has a proper zIndex
  */
