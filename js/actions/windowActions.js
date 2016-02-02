@@ -657,6 +657,27 @@ const WindowActions = {
       blockType,
       location
     })
+  },
+
+  zoomIn: function (frameProps) {
+    WindowDispatcher.dispatch({
+      frameProps,
+      actionType: WindowConstants.WINDOW_ZOOM_IN
+    })
+  },
+
+  zoomOut: function (frameProps) {
+    WindowDispatcher.dispatch({
+      frameProps,
+      actionType: WindowConstants.WINDOW_ZOOM_OUT
+    })
+  },
+
+  zoomReset: function (frameProps) {
+    WindowDispatcher.dispatch({
+      frameProps,
+      actionType: WindowConstants.WINDOW_ZOOM_RESET
+    })
   }
 }
 

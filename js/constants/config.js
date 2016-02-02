@@ -11,10 +11,10 @@ const adHost = process.env.AD_HOST || '//cdn.brave.com'
 
 export default {
   zoom: {
-    min: 0.2,
-    max: 3,
-    step: 0.1,
-    defaultValue: 1
+    defaultValue: 0,
+    min: -8,
+    max: 9,
+    step: 1
   },
   tabs: {
     tabsPerPage: 6
