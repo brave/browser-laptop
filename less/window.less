@@ -35,35 +35,40 @@ html,
     position: absolute;
     z-index: 10;
     top: -12px;
-    left: 80px;
+    left: 70px;
     width: 66px;
     vertical-align: center;
 
     span {
       position: absolute;
       color: @buttonColor;
+            border-radius: 50%;
       font-weight: 300;
       opacity: 0.2;
 
       &:not([disabled]) {
-        opacity: 0.6;
+        opacity: 0.85;
       }
 
       &:not([disabled]):hover {
         color: @buttonColor;
         opacity: 1.0;
+        background-color:  white;
       }
     }
 
     .back {
       top: 14px;
       font-size: 35px;
+                                        padding: 0 13px 0 9.5px;
     }
 
     .forward {
       top: 14px;
-      right: 10px;
+//      right: 10px;
+                                        left: 40px;
       font-size: 35px;
+                                        padding: 0 10px 0 12.5px;
     }
 
   }

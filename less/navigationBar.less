@@ -66,14 +66,14 @@
   input {
     background: @navigationBarBackground;
     border: none;
-    border-radius: @borderRadius;
+    border-radius: @borderRadiusURL;
     box-sizing: border-box;
     color: @chromeText;
     font-size: @defaultFontSize;
     font-weight: normal;
     height: 24px;
     margin: 0 0 0 1px;
-    padding: 0 70px 0 25px;
+    padding: 0 70px 0 33px;
     text-overflow: ellipsis;
     width: 100%;
 
@@ -84,7 +84,7 @@
     &:focus {
       background: #fff;
       border: 1px solid @focusUrlbarOutline;
-      box-shadow: 0 0 4px @focusUrlbarOutline, inset 0 0 4px @focusUrlbarOutline;
+      box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
       color: #333333;
       outline: none;
     }
@@ -96,7 +96,7 @@
   }
 
   span.navbutton.remove-bookmark-button {
-    color: yellow;
+    color: @braveOrange;
   }
 
   &:not(.bookmarked) .remove-bookmark-button,
@@ -110,7 +110,7 @@
     color: @buttonColor;
     position: absolute;
     top: 6px;
-    left: 9px;
+    left: 14px;
     font-size: 15px;
     min-height: 16px;
     min-width: 16px;
