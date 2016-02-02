@@ -23,12 +23,12 @@
 
   .browserButton {
     height: 26px;
-    line-height: 26px;
+    line-height: 22px;
   }
 }
 
 .tab {
-  border-radius: @borderRadius @borderRadius 0px 0px;
+  border-radius: @borderRadiusTabs @borderRadiusTabs 0px 0px;
   border-width: 1px 1px 0;
   box-sizing: border-box;
   color: #3B3B3B;
@@ -58,7 +58,7 @@
     white-space: nowrap;
     vertical-align: middle;
     width: calc(~'100% - 40px');
-    height: 16px;
+    height: 14px;
   }
   .tabIcon {
     background-position: center;
@@ -99,6 +99,9 @@
 
   &.active {
     background: @activeTabDefaultColor;
+              height: 28px;
+      border: 1px solid #bbb;
+      border-bottom: 1px;
   }
 
   &.private {
@@ -111,7 +114,7 @@
 
   &:hover {
     .closeTab {
-      opacity: 1;
+      opacity: 0.5;
     }
 
     .thumbnail {
@@ -120,7 +123,7 @@
   }
 
   &:not(.active):hover {
-    background: linear-gradient(to bottom, @chromeTertiary, @chromeSecondary);
+    background: linear-gradient(to bottom, white, @chromePrimary);
     &.private {
       background: lighten(@privateTabBackground, 20%);
     }
@@ -194,8 +197,8 @@
 .tabsToolbar {
   background: @tabsBackground;
   display: flex;
-  height: 26px;
-  border-bottom: 1px solid @chromeTertiary;
+  height: 27px;
+  border-bottom: 1px solid #bbb;
 }
 
 .tabsToolbarButtons {
@@ -203,7 +206,7 @@
   padding-right: 5px;
   .browserButton {
     display: inline-block;
-    line-height: initial;
+    line-height: 26px;
   }
 }
 
@@ -224,13 +227,13 @@
 
 .tabPage {
   align-items: center;
-  background-color: @chromeTertiary;
+  background-color: #aaaaaa;
   border-radius: @borderRadius;
   box-sizing: border-box;
   display: inline-block;
   margin: auto 2.5px;
   height: 6px;
-  width: 34px;
+  width: 36px;
   vertical-align: middle;
 
   &:hover {
@@ -243,6 +246,7 @@
 
   &.active {
     background-color: @chromePrimary;
+
   }
 }
 
@@ -250,13 +254,13 @@
   display: none !important;
   color: #3B3B3B;
   font-size: 19px !important;
-  height: 26px;
+  height: 27px;
   line-height: 25px !important;
   vertical-align: top;
   width: 34px;
   &:not([disabled]) {
     display: inline-block !important;
-    background: #dfdfdf;
+    background: @chromeSecondary;
     &:hover {
       background: lighten(#eeeeee, 10%);
     }
