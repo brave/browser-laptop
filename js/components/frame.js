@@ -184,12 +184,13 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {
         // TODO: These 3 events should be combined into one
-        WindowActions.onWebviewLoadStart(
-          this.props.frame)
+        const protocol = urlParse(event.url).protocol
+        const indicateLoading = protocol !== 'about:'
+        WindowActions.onWebviewLoadStart(this.props.frame, indicateLoading)
         const key = this.props.frame.get('key')
         WindowActions.setLocation(event.url, key)
         WindowActions.setSecurityState({
-          secure: urlParse(event.url).protocol === 'https:'
+          secure: protocol === 'https:'
           // TODO: Set extended validation once Electron exposes this
         })
       }
