@@ -26,21 +26,10 @@ class Frame extends ImmutableComponent {
   updateWebview () {
     let src = this.props.frame.get('src')
     const isAboutURL = isSourceAboutUrl(src)
-    const isPrivileged = isAboutURL
     if (isAboutURL) {
       src = getTargetAboutUrl(src)
     }
 
-    // Check if the privileged state has changed for the tab
-    // If so we re-create the whole webview
-    if (this.webview &&
-        (isPrivileged && !this.webview.hasAttribute('nodeintegration') ||
-         !isPrivileged && this.webview.hasAttribute('nodeintegration'))) {
-      while (this.webviewContainer.firstChild) {
-        this.webviewContainer.removeChild(this.webviewContainer.firstChild)
-      }
-      this.webview = null
-    }
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.
     this.webview = this.webview || document.createElement('webview')
@@ -56,9 +45,6 @@ class Frame extends ImmutableComponent {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
 
-    if (isPrivileged) {
-      this.webview.setAttribute('nodeintegration', '')
-    }
     this.webview.setAttribute('src', src)
     if (!this.webviewContainer.firstChild) {
       this.webviewContainer.appendChild(this.webview)
@@ -255,6 +241,10 @@ class Frame extends ImmutableComponent {
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES,
                       adDivCandidates, Config.vault.replacementUrl)
+  }
+
+  get isPrivileged () {
+    return isSourceAboutUrl(this.props.frame.get('src'))
   }
 
   goBack () {
