@@ -173,7 +173,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        loading: true,
+        loading: action.indicateLoading,
         startLoadTime: new Date().getTime(),
         endLoadTime: null
       })

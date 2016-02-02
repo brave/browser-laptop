@@ -164,11 +164,13 @@ const WindowActions = {
    * Dispatches a message to the store to indicate that the webview is loading.
    *
    * @param {Object} frameProps - The frame properties for the webview in question.
+   * @param {boolean} indicateLoading - should a loading spinner be shown
    */
-  onWebviewLoadStart: function (frameProps) {
+  onWebviewLoadStart: function (frameProps, indicateLoading = true) {
     WindowDispatcher.dispatch({
       actionType: WindowConstants.WINDOW_WEBVIEW_LOAD_START,
-      frameProps
+      frameProps,
+      indicateLoading
     })
   },
 
