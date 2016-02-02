@@ -3,11 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const ImmutableComponent = require('../components/immutableComponent')
 import { aboutUrls } from '../lib/appUrlUtil.js'
 
-export default class AboutAbout extends ImmutableComponent {
+class AboutAbout extends ImmutableComponent {
   render () {
     return <div>
       <h1 data-l10n-id='listOfAboutPages'/>
@@ -15,7 +14,7 @@ export default class AboutAbout extends ImmutableComponent {
       {
     aboutUrls.keySeq().sort().map(aboutSourceUrl =>
         <li>
-          <a href={aboutUrls.get(aboutSourceUrl)} target="_blank">
+          <a href={aboutUrls.get(aboutSourceUrl)} target='_blank'>
             {aboutSourceUrl}
           </a>
         </li>)
@@ -25,4 +24,4 @@ export default class AboutAbout extends ImmutableComponent {
   }
 }
 
-ReactDOM.render(<AboutAbout/>, document.querySelector('#appContainer'))
+module.exports = <AboutAbout/>

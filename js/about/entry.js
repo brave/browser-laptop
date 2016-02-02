@@ -1,10 +1,16 @@
+const ReactDOM = require('react-dom')
 import { getSourceAboutUrl } from '../lib/appUrlUtil.js'
 
-switch(getSourceAboutUrl(window.location.href)) {
+let rootComponent
+switch (getSourceAboutUrl(window.location.href)) {
   case 'about:newtab':
-    require('./newtab')
+    rootComponent = require('./newtab')
     break
   case 'about:about':
-    require('./about')
+    rootComponent = require('./about')
     break
+}
+
+if (rootComponent) {
+  ReactDOM.render(rootComponent, document.querySelector('#appContainer'))
 }
