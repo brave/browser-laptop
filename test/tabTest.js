@@ -14,7 +14,7 @@ describe('tabs', function () {
       .waitForVisible(urlInput)
   }
 
-  describe('new tab', function () {
+  describe('new tab signal', function () {
     Brave.beforeAll(this)
     before(function *() {
       yield setup(this.app.client)
@@ -24,24 +24,43 @@ describe('tabs', function () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitForExist('.tab[data-frame-key="2"]')
+    })
+
+    it('makes the non partitioned webview visible', function *() {
+      yield this.app.client
         .waitForVisible('webview:not([partition])')
     })
+  })
 
-    it('creates a private new tab when signaled', function *() {
+  describe('new private tab signal', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('creates a new private tab when signaled', function *() {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPrivate: true })
-        .waitForExist('.tab[data-frame-key="3"]')
+        .waitForExist('.tab[data-frame-key="2"]')
+    })
+    it('makes the private webview visible', function *() {
+      yield this.app.client
         .waitForVisible('webview[partition="private-1"]')
     })
+  })
 
-    it('creates a partitioned new tab when signaled', function *() {
+  describe('new session tab signal', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('creates a new session tab when signaled', function *() {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
-        .waitForExist('.tab[data-frame-key="4"]')
+        .waitForExist('.tab[data-frame-key="2"]')
+    })
+    it('makes the new session webview visible', function *() {
+      yield this.app.client
         .waitForVisible('webview[partition="persist:partition-1"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
-        .waitForExist('.tab[data-frame-key="5"]')
-        .waitForVisible('webview[partition="persist:partition-2"]')
     })
   })
 
