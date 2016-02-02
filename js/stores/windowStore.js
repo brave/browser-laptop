@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Config = require('../constants/config').default
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
@@ -441,6 +442,35 @@ const doAction = (action) => {
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
+      break
+    // Zoom state
+    case WindowConstants.WINDOW_ZOOM_IN:
+      let zoomInLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
+      // for backwards compatibility with previous stored window state
+      if (zoomInLevel === undefined) {
+        zoomInLevel = 1
+      }
+      if (Config.zoom.max > zoomInLevel) {
+        zoomInLevel += 1
+      }
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomInLevel)
+      windowStore.emitChange()
+      break
+    case WindowConstants.WINDOW_ZOOM_OUT:
+      let zoomOutLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
+      // for backwards compatibility with previous stored window state
+      if (zoomOutLevel === undefined) {
+        zoomOutLevel = 1
+      }
+      if (Config.zoom.min < zoomOutLevel) {
+        zoomOutLevel -= 1
+      }
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomOutLevel)
+      windowStore.emitChange()
+      break
+    case WindowConstants.WINDOW_ZOOM_RESET:
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), Config.zoom.defaultValue)
+      windowStore.emitChange()
       break
     default:
   }

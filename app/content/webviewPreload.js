@@ -2,33 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var webFrame = require('electron').webFrame
 var ipc = require('electron').ipcRenderer
 var messages = require('../../js/constants/messages')
 var KeyCodes = require('../../js/constants/keyCodes')
-
-var browserZoomLevel = 0
-var browserMaxZoom = 9
-var browserMinZoom = -8
-
-ipc.on(messages.ZOOM_IN, function () {
-  if (browserMaxZoom > browserZoomLevel) {
-    browserZoomLevel += 1
-  }
-  webFrame.setZoomLevel(browserZoomLevel)
-})
-
-ipc.on(messages.ZOOM_OUT, function () {
-  if (browserMinZoom < browserZoomLevel) {
-    browserZoomLevel -= 1
-  }
-  webFrame.setZoomLevel(browserZoomLevel)
-})
-
-ipc.on(messages.ZOOM_RESET, function () {
-  browserZoomLevel = 0
-  webFrame.setZoomLevel(browserZoomLevel)
-})
 
 ipc.on(messages.PRINT_PAGE, function () {
   window.print()

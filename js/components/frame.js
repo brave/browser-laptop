@@ -70,13 +70,13 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'zoom-in':
-        this.webview.send(messages.ZOOM_IN)
+        WindowActions.zoomIn(this.props.frame)
         break
       case 'zoom-out':
-        this.webview.send(messages.ZOOM_OUT)
+        WindowActions.zoomOut(this.props.frame)
         break
       case 'zoom-reset':
-        this.webview.send(messages.ZOOM_RESET)
+        WindowActions.zoomReset(this.props.frame)
         break
       case 'toggle-dev-tools':
         if (this.webview.isDevToolsOpened()) {
@@ -276,6 +276,11 @@ class Frame extends ImmutableComponent {
     } else if (!nextProps.frame.get('audioMuted') &&
       this.props.frame.get('audioMuted') === true) {
       this.webview.setAudioMuted(false)
+    }
+
+    let zoomLevel = nextProps.frame.get('zoomLevel')
+    if (zoomLevel !== this.props.frame.get('zoomLevel')) {
+      this.webview.setZoomLevel(zoomLevel)
     }
   }
 

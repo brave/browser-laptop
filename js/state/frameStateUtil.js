@@ -52,6 +52,26 @@ export function makePrevFrameActive (windowState) {
 }
 
 /**
+ * @param {Object} windowState
+ * @param {Object} frameProps
+ * @param {String} propName
+ * @return {Object} the value of the propName associated with frameProps
+ */
+export function getFramePropValue (windowState, frameProps, propName) {
+  return windowState.getIn(getFramePropPath(windowState, frameProps, propName))
+}
+
+/**
+ * @param {Object} windowState
+ * @param {Object} frameProps
+ * @param {String} propName
+ * @return {Object} the path of the propName in windowState
+ */
+export function getFramePropPath (windowState, frameProps, propName) {
+  return ['frames', getFramePropsIndex(windowState.get('frames'), frameProps), propName]
+}
+
+/**
  * Obtains the index for the specified frame key
  */
 export function findIndexForFrameKey (frames, key) {
@@ -124,6 +144,7 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
 export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   const url = frameOpts.location || Config.defaultUrl
   const frame = Immutable.fromJS({
+    zoomLevel: Config.zoom.defaultValue,
     audioMuted: false, // frame is muted
     canGoBack: false,
     canGoForward: false,
