@@ -205,7 +205,7 @@ function hasSelection (node) {
  */
 function isEditable (elem) {
   // TODO: find other node types that are editable
-  return (elem.contentEditable === 'true' ||
+  return ((elem.contentEditable && elem.contentEditable !== 'false' && elem.contentEditable !== 'inherit') ||
           elem.nodeName === 'INPUT' ||
           elem.nodeName === 'TEXTAREA')
 }
