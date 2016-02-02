@@ -197,9 +197,21 @@ function isPlatformOSX () {
 
 document.addEventListener('contextmenu', (e) => {
   var name = e.target.nodeName.toUpperCase()
+
+  var href
+  var maybeLink = e.target
+  while (maybeLink.parentNode) {
+    if (maybeLink.nodeName.toUpperCase() === 'A') {
+      href = maybeLink.href
+      break
+    }
+    maybeLink = maybeLink.parentNode
+  }
+
   var nodeProps = {
     name: name,
-    src: name === 'A' ? e.target.href : e.target.src,
+    href: href,
+    src: e.target.src,
     isContentEditable: e.target.isContentEditable,
     hasSelection: hasSelection(e.target)
   }
