@@ -13,7 +13,7 @@ const ipc = electron.ipcRenderer
 const remote = electron.remote
 const messages = require('../constants/messages')
 const AppActions = require('./appActions')
-import { isTargetAboutUrl, getSourceAboutUrl } from '../lib/appUrlUtil'
+import { getSourceAboutUrl } from '../lib/appUrlUtil'
 
 const WindowActions = {
   /**
@@ -87,9 +87,7 @@ const WindowActions = {
     location = location.trim()
     // For about: URLs, make sure we store the URL as about:something
     // and not what we map to.
-    if (isTargetAboutUrl(location)) {
-      location = getSourceAboutUrl(location)
-    }
+    location = getSourceAboutUrl(location) || location
 
     if (UrlUtil.isURL(location)) {
       location = UrlUtil.getUrlFromInput(location)
