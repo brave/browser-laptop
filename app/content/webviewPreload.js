@@ -2,9 +2,28 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var ipc = require('electron').ipcRenderer
 var messages = require('../../js/constants/messages')
 var KeyCodes = require('../../js/constants/keyCodes')
+
+var ipc = {
+  events: {},
+  embedder: null,
+  processMessage: function (event) {
+    if (event.origin === 'file://') {
+      this.embedder = event.source
+      var cb = this.events[event.data[0]]
+      cb && cb.apply(null, event.data)
+    }
+  },
+  on: function (name, cb) {
+    this.events[name] = cb
+  },
+  send: function () {
+    var args = Array.prototype.slice.call(arguments)
+    this.embedder && this.embedder.postMessage(args, 'file://')
+  }
+}
+addEventListener('message', ipc.processMessage.bind(ipc)) // eslint-disable-line
 
 /**
  * Ensures a node replacement div is visible and has a proper zIndex
@@ -203,8 +222,6 @@ document.addEventListener('contextmenu', (e) => {
   e.preventDefault()
 }, false)
 
-var shiftDown = false
-var cmdDown = false
 document.onkeydown = (e) => {
   switch (e.keyCode) {
     case KeyCodes.ESC:
@@ -212,38 +229,19 @@ document.onkeydown = (e) => {
       ipc.send(messages.STOP_LOAD)
       break
     case KeyCodes.BACKSPACE:
-      const msg = shiftDown ? messages.GO_FORWARD : messages.GO_BACK
       if (!isEditable(document.activeElement)) {
-        ipc.send(msg)
+        e.shiftKey ? history.forward() : history.back() // eslint-disable-line
       }
       break
-    case KeyCodes.SHIFT:
-      shiftDown = true
-      break
-    case KeyCodes.CMD1:
-    case KeyCodes.CMD2:
-      cmdDown = true
-      break
     case KeyCodes.LEFT:
-      if (cmdDown && !isEditable(document.activeElement) && isPlatformOSX()) {
-        ipc.send(messages.GO_BACK)
+      if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
+        history.back() // eslint-disable-line
       }
       break
     case KeyCodes.RIGHT:
-      if (cmdDown && !isEditable(document.activeElement) && isPlatformOSX()) {
-        ipc.send(messages.GO_FORWARD)
+      if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
+        history.forward() // eslint-disable-line
       }
-      break
-  }
-}
-document.onkeyup = (e) => {
-  switch (e.keyCode) {
-    case KeyCodes.SHIFT:
-      shiftDown = false
-      break
-    case KeyCodes.CMD1:
-    case KeyCodes.CMD2:
-      cmdDown = false
       break
   }
 }
