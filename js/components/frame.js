@@ -103,7 +103,7 @@ class Frame extends ImmutableComponent {
         remote.getCurrentWebContents().downloadURL(this.webview.getURL())
         break
       case 'print':
-        this.webview.send(messages.PRINT_PAGE)
+        this.webview.print()
         break
       case 'show-findbar':
         WindowActions.setFindbarShown(this.props.frame, true)
