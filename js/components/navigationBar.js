@@ -14,6 +14,7 @@ const SiteTags = require('../constants/siteTags')
 const remote = global.require('electron').remote
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
+import { isSourceAboutUrl } from '../lib/appUrlUtil.js'
 
 class NavigationBar extends ImmutableComponent {
 
@@ -78,7 +79,9 @@ class NavigationBar extends ImmutableComponent {
           bookmarked: this.bookmarked,
           titleMode: this.titleMode
         })}>
-      <div className='startButtons'>
+
+      { isSourceAboutUrl(frameProps.get('location')) ? null
+        : <div className='startButtons'>
         <Button iconClass='fa-repeat'
           className='navbutton reload-button'
           onClick={this.onReload.bind(this)} />
@@ -86,6 +89,7 @@ class NavigationBar extends ImmutableComponent {
           className='navbutton stop-button'
           onClick={this.onStop.bind(this)} />
       </div>
+      }
       <UrlBar ref='urlBar'
         sites={this.props.sites}
         activeFrameProps={frameProps}

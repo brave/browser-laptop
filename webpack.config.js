@@ -12,12 +12,13 @@ module.exports = {
   inline: true,
   target: 'atom',
   entry: {
-    app: ['webpack/hot/dev-server', './js/entry.js']
+    app: ['webpack/hot/dev-server', './js/entry.js'],
+    newtab: ['webpack/hot/dev-server', './js/about/newtab.js']
   },
   devtool: '#source-map',
   output: {
     path: './app/gen',
-    filename: 'bundle.js',
+    filename: '[name].entry.js',
     publicPath: './gen/',
     sourceMapFilename: '[file].map',
     stats: { colors: true }

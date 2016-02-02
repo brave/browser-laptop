@@ -25,7 +25,7 @@ export default {
     height: 100
   },
   defaultLocale: 'en-US',
-  defaultUrl: 'about:blank',
+  defaultUrl: 'about:newtab',
   urlBarSuggestions: {
     maxTopSites: 5,
     maxSearch: 3,
