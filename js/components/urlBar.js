@@ -15,7 +15,6 @@ const remote = global.require('electron').remote
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
-const AppConfig = require('../constants/appConfig')
 const Config = require('../constants/config')
 
 import {isUrl} from '../lib/appUrlUtil.js'
@@ -167,7 +166,7 @@ class UrlBar extends ImmutableComponent {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
     return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
-      ? AppConfig.name : this.props.activeFrameProps.get('title')
+      ? '' : this.props.activeFrameProps.get('title')
   }
 
   get locationValue () {
