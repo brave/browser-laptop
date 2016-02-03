@@ -156,11 +156,14 @@ ipc.on(messages.SET_AD_DIV_CANDIDATES, function (e, adDivCandidates, placeholder
 })
 
 function hasSelection (node) {
-  if (node && /password|search|tel|text|url/.test(node.type) &&
-      node.selectionStart !== undefined &&
-      node.selectionEnd !== undefined &&
-      node.selectionStart !== node.selectionEnd) {
-    return true
+  try {
+    if (node && node.selectionStart !== undefined &&
+        node.selectionEnd !== undefined &&
+        node.selectionStart !== node.selectionEnd) {
+      return true
+    }
+  } catch (e) {
+    return false
   }
 
   var selection = window.getSelection()
