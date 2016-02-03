@@ -287,7 +287,7 @@ export function computeThemeColor (frameProps) {
       const swatches = vibrant.swatches()
 
       // Arbitrary selection ordering, which appears to give decent results.
-      const swatchOrder = ['Muted', 'LightMuted', 'DarkMuted', 'DarkVibrant', 'Vibrant', 'LightVibrant']
+      const swatchOrder = ['Vibrant', 'DarkVibrant', 'LightVibrant', 'Muted', 'LightMuted', 'DarkMuted']
       for (let i = 0; i < swatchOrder.length; i++) {
         const swatch = swatchOrder[i]
         if (swatches[swatch]) {
