@@ -116,7 +116,7 @@ function processAdNode (node, iframeData, replacementUrl) {
     iframe.style.width = adSize[0] + 'px'
     iframe.style.height = adSize[1] + 'px'
     iframe.srcdoc = src
-    iframe.sandbox = 'allow-scripts'
+    iframe.sandbox = 'allow-scripts allow-popups'
     node.appendChild(iframe)
     ensureNodeVisible(node)
     if (node.parentNode) {
