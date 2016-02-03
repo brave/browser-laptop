@@ -131,7 +131,7 @@ if (typeof KeyEvent === 'undefined') {
     embedder: null,
     processMessage: function (event) {
       if (event.origin === 'file://') {
-        this.embedder = event.source
+        this.embedder = this.embedder || event.source
         var cb = this.events[event.data[0]]
         cb && cb.apply(null, event.data)
       }
