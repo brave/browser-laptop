@@ -54,6 +54,10 @@ class Frame extends ImmutableComponent {
 
   componentDidMount () {
     this.updateWebview()
+    // forward postMessage events from webview to webContents
+    window.addEventListener('message', function (event) {
+      remote.getCurrentWebContents().send.apply(null, event.data)
+    })
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -239,8 +243,8 @@ class Frame extends ImmutableComponent {
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
-    this.webview.send(messages.SET_AD_DIV_CANDIDATES,
-                      adDivCandidates, Config.vault.replacementUrl)
+    this.webview.contentWindow.postMessage([messages.SET_AD_DIV_CANDIDATES,
+      adDivCandidates, Config.vault.replacementUrl], currentLocation)
   }
 
   get isPrivileged () {

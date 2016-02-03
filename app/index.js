@@ -139,19 +139,6 @@ app.on('ready', function () {
       Menu.init(args)
     })
 
-    ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
-    })
-    ipcMain.on(messages.STOP_LOAD, () => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
-    })
-    ipcMain.on(messages.GO_BACK, () => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.GO_BACK)
-    })
-    ipcMain.on(messages.GO_FORWARD, () => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.GO_FORWARD)
-    })
-
     Menu.init()
 
     // Load HTTPS Everywhere browser "extension"
