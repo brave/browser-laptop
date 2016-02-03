@@ -5,14 +5,11 @@
     <!-- TODO: Don't allow img-src *, needed for favicons -->
     <!-- TODO: Refactor away all unsafe-inline content -->
     <!-- TODO: Replace suggestqueries.google.com with config search engine -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self' 'unsafe-inline'; img-src *; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://suggestqueries.google.com; object-src 'self'; plugin-types application/browser-plugin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self'; img-src *; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://suggestqueries.google.com; object-src 'self'; plugin-types application/browser-plugin">
     <meta name="availableLanguages" content="en-US">
     <meta name="defaultLanguage" content="en-US">
     <title>Brave</title>
-    <script>
-      require("babel-polyfill")
-      require("vibrant/dist/Vibrant.min.js")
-    </script>
+    <script src="./index-require.js"></script>
     <script src="./ext/l20n.min.js" defer></script>
     <link rel="localization" href="locales/{locale}/app.l20n">
   </head>
