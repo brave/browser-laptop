@@ -86,7 +86,7 @@ class Main extends ImmutableComponent {
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
-      })
+      }, options.openInForeground)
 
       // Focus URL bar when adding tab via shortcut
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_FOCUS_URL)
