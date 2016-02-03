@@ -2,6 +2,9 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <!-- TODO: Don't allow img-src *, needed for favicons -->
+    <!-- TODO: Refactor away all unsafe-inline content -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self' 'unsafe-inline'; img-src *; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; object-src 'self'; plugin-types application/browser-plugin">
     <meta name="availableLanguages" content="en-US">
     <meta name="defaultLanguage" content="en-US">
     <title>Brave</title>

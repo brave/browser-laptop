@@ -7,7 +7,7 @@
     <!-- TODO: Replace 8080 with env port -->
     <!-- TODO: Don't allow img-src *, needed for favicons -->
     <!-- TODO: Refactor away all unsafe-inline content -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self' 'unsafe-inline' http://localhost:8080; connect-src 'self' http://localhost:8080 ws://localhost:8080; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' *; object-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self' 'unsafe-inline' http://localhost:8080; connect-src 'self' http://localhost:8080 ws://localhost:8080; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' *; object-src 'self'; plugin-types application/browser-plugin">
     <title>Brave</title>
     <script>
       require('babel-polyfill')
