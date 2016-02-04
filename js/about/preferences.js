@@ -12,6 +12,7 @@ const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = require('./ipc')
+const aboutActions = require('./aboutActions')
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -22,8 +23,9 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class GeneralTab extends ImmutableComponent {
   changeSetting (key, e) {
-    ipc.send(messages.CHANGE_SETTING, key, e.target.value)
+    aboutActions.changeSetting(key, e.target.value)
   }
+
   render () {
     return <div className='settingsList'>
       <div className='settingItem'>
@@ -35,6 +37,12 @@ class GeneralTab extends ImmutableComponent {
            <option data-l10n-id='startsWithOptionNewWindow' value='newWindow'/>
         </select>
         </div>
+      <div className='settingItem'>
+        <span data-l10n-id='myHomepage'/>
+        <input data-l10n-id='homepageInput'
+          value={this.props.settings.get(settings.HOMEPAGE)}
+          onChange={this.changeSetting.bind(this, settings.HOMEPAGE)} />
+      </div>
     </div>
   }
 }
@@ -90,7 +98,8 @@ class BraveryTab extends ImmutableComponent {
 class TopBarButton extends ImmutableComponent {
   render () {
     return <div className={cx({
-      selected: this.props.selected
+      selected: this.props.selected,
+      [this.props.className]: !!this.props.className
     })}>
       <div onClick={this.props.onClick}
         className={cx({
@@ -144,6 +153,7 @@ class TopBar extends ImmutableComponent {
       />
       <TopBarButton onClick={this.props.changeTab.bind(null, preferenceTabs.BRAVERY)}
         dataL10nId='bravery'
+        className='braveryButton'
         selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
       />
     </div>
@@ -152,7 +162,7 @@ class TopBar extends ImmutableComponent {
 
 class HelpfulHints extends ImmutableComponent {
   sendUsFeedback () {
-    ipc.send(messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl)
+    aboutActions.newFrame(AppConfig.contactUrl)
   }
 
   render () {

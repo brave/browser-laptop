@@ -53,7 +53,8 @@ AppStore
     lastCheckTimestamp: boolean
   },
   settings: [{
-    startup-mode: string // One of: lastTime, homePage, newWindow
+    startup-mode: string, // One of: lastTime, homePage, newWindow
+    homepage: string // URL of the user's homepage
   }]
 }
 ```

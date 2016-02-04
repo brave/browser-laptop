@@ -38,6 +38,10 @@ html, body, #appContainer, #appContainer > div {
         border-top-color: @prefTopBgButtonSelected;
       }
     }
+
+    &.braveryButton {
+      display: none;
+    }
   }
 }
 
@@ -132,9 +136,18 @@ a {
   width: 400px;
   .settingItem {
     display: table-row;
+    margin-bottom: 10px;
     >* {
       display: table-cell;
       margin-right: 10px;
+      margin-bottom: 10px;
     }
   }
+}
+
+input, select {
+  box-sizing: border-box;
+  height: 17px;
+  padding-left: 2px;
+  width: 250px;
 }
