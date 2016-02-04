@@ -279,52 +279,25 @@ export function removeOtherFrames (frames, closedFrames, frameProps) {
 export function computeThemeColor (frameProps) {
   return new Promise((resolve, reject) => {
     const icon = getFavicon(frameProps)
+    const img = new window.Image()
+    img.src = icon
 
-    const xhr = new window.XMLHttpRequest()
+    img.onload = () => {
+      const vibrant = new window.Vibrant(img)
+      const swatches = vibrant.swatches()
 
-    xhr.open('GET', icon, true)
-    xhr.responseType = 'blob'
-    xhr.send()
-
-    xhr.onload = function () {
-      const status = xhr.status
-      if (status !== 0 && status !== 200) {
-        reject(
-          new Error('Got HTTP status ' + status + ' trying to load ' + icon)
-        )
-        return
-      }
-      renderFromBlob(xhr.response)
-    }
-
-    xhr.onerror = xhr.ontimeout = function () {
-      reject(new Error('Error while fetching icon: ', icon))
-    }
-
-    function renderFromBlob (blob) {
-      const img = new window.Image()
-      img.src = window.URL.createObjectURL(blob)
-
-      img.onload = () => {
-        const vibrant = new window.Vibrant(img)
-        const swatches = vibrant.swatches()
-
-        window.URL.revokeObjectURL(img.src)
-
-        // Arbitrary selection ordering, which appears to give decent results.
-        const swatchOrder = ['Muted', 'LightMuted', 'DarkMuted', 'DarkVibrant', 'Vibrant', 'LightVibrant']
-        for (let i = 0; i < swatchOrder.length; i++) {
-          const swatch = swatchOrder[i]
-          if (swatches[swatch]) {
-            resolve(swatches[swatch].getHex())
-            break
-          }
+      // Arbitrary selection ordering, which appears to give decent results.
+      const swatchOrder = ['Vibrant', 'DarkVibrant', 'LightVibrant', 'Muted', 'LightMuted', 'DarkMuted']
+      for (let i = 0; i < swatchOrder.length; i++) {
+        const swatch = swatchOrder[i]
+        if (swatches[swatch]) {
+          resolve(swatches[swatch].getHex())
+          break
         }
       }
-      img.onerror = () => {
-        window.URL.revokeObjectURL(img.src)
-        reject(new Error('Could not render image from blob.'))
-      }
+    }
+    img.onerror = () => {
+      reject(new Error('Could not render image from blob.'))
     }
   })
 }

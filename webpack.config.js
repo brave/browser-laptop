@@ -13,7 +13,7 @@ module.exports = {
   target: 'atom',
   entry: {
     app: ['webpack/hot/dev-server', './js/entry.js'],
-    newtab: ['webpack/hot/dev-server', './js/about/newtab.js']
+    aboutPages: ['webpack/hot/dev-server', './js/about/entry.js']
   },
   devtool: '#source-map',
   output: {

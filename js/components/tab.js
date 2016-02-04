@@ -142,7 +142,11 @@ class Tab extends ImmutableComponent {
 
   render () {
     // Style based on theme-color
-    let iconStyle = {}
+    const iconSize = 16
+    let iconStyle = {
+      minWidth: iconSize,
+      width: iconSize
+    }
     const activeTabStyle = {}
     const backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
     if (this.props.isActive && backgroundColor) {
@@ -155,13 +159,11 @@ class Tab extends ImmutableComponent {
     }
 
     if (!this.loading) {
-      iconStyle = {
+      iconStyle = Object.assign(iconStyle, {
         backgroundImage: `url(${getFavicon(this.props.frameProps)})`,
-        backgroundSize: 16,
-        width: 16,
-        minWidth: 16,
-        height: 16
-      }
+        backgroundSize: iconSize,
+        height: iconSize
+      })
     }
 
     let playIcon = null

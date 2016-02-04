@@ -46,7 +46,6 @@ const messages = {
   // App state
   APP_INITIALIZED: _,
   // Webview page messages
-  PRINT_PAGE: _,
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
   APP_STATE_CHANGE: _,

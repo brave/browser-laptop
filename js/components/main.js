@@ -36,26 +36,34 @@ class Main extends ImmutableComponent {
     var trackingFingers = false
     var deltaX = 0
     var deltaY = 0
+    var startTime = 0
 
     this.mainWindow.addEventListener('wheel', (e) => {
-      deltaX = deltaX + e.deltaX
-      deltaY = deltaY + e.deltaY
+      if (trackingFingers) {
+        deltaX = deltaX + e.deltaX
+        deltaY = deltaY + e.deltaY
+      }
     })
 
     ipc.on('scroll-touch-begin', function () {
       trackingFingers = true
+      startTime = (new Date()).getTime()
     })
     ipc.on('scroll-touch-end', function () {
-      if (trackingFingers && Math.abs(deltaX) > 1000 && Math.abs(deltaY) < 200) {
-        if (deltaX > 0) {
+      var time = (new Date()).getTime() - startTime
+      var xVelocity = deltaX / time
+      var yVelocity = deltaY / time
+      if (trackingFingers && Math.abs(yVelocity) < 1) {
+        if (xVelocity > 4) {
           electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else {
+        } else if (xVelocity < -4) {
           electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
       trackingFingers = false
       deltaX = 0
       deltaY = 0
+      startTime = 0
     })
   }
 
@@ -63,12 +71,6 @@ class Main extends ImmutableComponent {
     this.registerSwipeListener()
     ipc.on(messages.STOP_LOAD, () => {
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-    })
-    ipc.on(messages.GO_BACK, () => {
-      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
-    })
-    ipc.on(messages.GO_FORWARD, () => {
-      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
     })
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
       contextMenus.onMainContextMenu(nodeProps)
@@ -78,7 +80,7 @@ class Main extends ImmutableComponent {
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
-      })
+      }, options.openInForeground)
 
       // Focus URL bar when adding tab via shortcut
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_FOCUS_URL)

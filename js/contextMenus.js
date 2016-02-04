@@ -170,7 +170,7 @@ function mainTemplateInit (nodeProps) {
           // TODO: open this in the next tab instead of last tab
           // TODO: If the tab is private, this should probably be private.
           // Depends on #139
-          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href)
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { openInForeground: false })
         }
       }
     })

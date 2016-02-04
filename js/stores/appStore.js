@@ -4,6 +4,7 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
+const AppConfig = require('../constants/appConfig')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const app = electron.app
@@ -105,6 +106,7 @@ const createWindow = (browserOpts, defaults) => {
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden',
     autoHideMenuBar: true,
+    title: AppConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))
 
