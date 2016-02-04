@@ -7,7 +7,8 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 const _ = null
 const settings = {
   STARTUP_MODE: _,
-  HOMEPAGE: _
+  HOMEPAGE: _,
+  DEFAULT_SEARCH_ENGINE: _
 }
 
 module.exports = mapValuesByKeys(settings)

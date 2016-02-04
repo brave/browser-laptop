@@ -15,10 +15,13 @@
 <sendUsFeedback "Send us feedback...">
 <loveToHear "We'd love to hear from you.">
 
+/* General settings page */
 <startsWith "Brave starts with">
 <startsWithOptionLastTime "Show my windows / tabs from last time">
 <startsWithOptionHomePage "Show my home page">
 <startsWithOptionNewWindow "A new window">
-
 <myHomepage "My homepage is">
 <homepageInput placeholder: "Enter your homepage URL">
+
+/* Search settings page */
+<defaultSearchEngine "Default search engine">

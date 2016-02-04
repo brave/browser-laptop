@@ -21,37 +21,56 @@ const hintCount = 3
 require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-class GeneralTab extends ImmutableComponent {
-  changeSetting (key, e) {
-    aboutActions.changeSetting(key, e.target.value)
-  }
+const changeSetting = (key, e) => aboutActions.changeSetting(key, e.target.value)
 
+class SettingsList extends ImmutableComponent {
   render () {
     return <div className='settingsList'>
-      <div className='settingItem'>
-        <span data-l10n-id='startsWith'/>
+      {this.props.children}
+    </div>
+  }
+}
+
+class SettingItem extends ImmutableComponent {
+  render () {
+    return <div className='settingItem'>
+      <span data-l10n-id={this.props.dataL10nId}/>
+      {this.props.children}
+    </div>
+  }
+}
+
+class GeneralTab extends ImmutableComponent {
+  render () {
+    return <SettingsList>
+      <SettingItem dataL10nId='startsWith'>
         <select value={this.props.settings.get(settings.STARTUP_MODE)}
-           onChange={this.changeSetting.bind(this, settings.STARTUP_MODE)} >
-           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
-           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
-           <option data-l10n-id='startsWithOptionNewWindow' value='newWindow'/>
+          onChange={changeSetting.bind(null, settings.STARTUP_MODE)} >
+          <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
+          <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
+          <option data-l10n-id='startsWithOptionNewWindow' value='newWindow'/>
         </select>
-        </div>
-      <div className='settingItem'>
-        <span data-l10n-id='myHomepage'/>
+      </SettingItem>
+      <SettingItem dataL10nId='myHomepage'>
         <input data-l10n-id='homepageInput'
           value={this.props.settings.get(settings.HOMEPAGE)}
-          onChange={this.changeSetting.bind(this, settings.HOMEPAGE)} />
-      </div>
-    </div>
+          onChange={changeSetting.bind(null, settings.HOMEPAGE)} />
+      </SettingItem>
+    </SettingsList>
   }
 }
 
 class SearchTab extends ImmutableComponent {
   render () {
-    return <div>
-      Search tab settings coming soon
-    </div>
+    return <SettingsList>
+      <SettingItem dataL10nId='defaultSearchEngine'>
+        <select value={this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE)}
+          onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)} >
+          <option value='google'>Google</option>
+          <option value='duckduckgo'>DuckDuckGo</option>
+        </select>
+      </SettingItem>
+    </SettingsList>
   }
 }
 

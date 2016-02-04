@@ -54,7 +54,8 @@ AppStore
   },
   settings: [{
     startup-mode: string, // One of: lastTime, homePage, newWindow
-    homepage: string // URL of the user's homepage
+    homepage: string, // URL of the user's homepage
+    default-search-engine: string // google, duckduckgo
   }]
 }
 ```
