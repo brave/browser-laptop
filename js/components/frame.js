@@ -77,6 +77,9 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
         break
       case 'reload':
+        if (this.props.frame.get('location') === 'about:preferences') {
+          break
+        }
         this.webview.reload()
         break
       case 'clean-reload':

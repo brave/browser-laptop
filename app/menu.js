@@ -16,7 +16,6 @@ const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
-const contactUrl = 'mailto:support@brave.com'
 const aboutUrl = 'https://brave.com/'
 
 const path = require('path')
@@ -177,7 +176,7 @@ const init = (args) => {
       label: 'Submit Feedback...',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, contactUrl])
+                            [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
       }
     }, {
       label: 'Spread the word about Brave...',
@@ -516,7 +515,7 @@ const init = (args) => {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, contactUrl])
+              [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
           }
         },
         CommonMenu.separatorMenuItem,
