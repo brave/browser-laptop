@@ -23,9 +23,12 @@
 
   &.titleMode {
     input {
+      display: none;
+    }
+    #titleBar {
+      display: inline-block;
       background: @chromePrimary;
       color: @chromeText;
-      text-align: center;
       font-size: 15px;
       /*
       &:focus {
@@ -38,6 +41,17 @@
     .startButtons, .endButtons {
       visibility: hidden;
     }
+    .urlbarIcon {
+      opacity: 0.6;
+      position: relative;
+      left: 0px;
+      top: 0px;
+      margin-right: 5px;
+    }
+  }
+
+  #titleBar {
+    display: none;
   }
 
   .loadTime {
@@ -61,6 +75,7 @@
   form {
     flex: 1;
     position: relative;
+    text-align: center;
   }
 
   input {
