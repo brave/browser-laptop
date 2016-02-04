@@ -102,11 +102,18 @@ class Main extends ImmutableComponent {
           return
         }
       }
+
+      const prefOpenInForeground = self.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS])
+      let openInForeground = options.openInForeground
+      if (prefOpenInForeground !== undefined) {
+        openInForeground = prefOpenInForeground
+      }
+
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
-      }, options.openInForeground)
+      }, openInForeground)
 
       // Focus URL bar when adding tab via shortcut
       electron.remote.getCurrentWebContents().send(messages.SHORTCUT_FOCUS_URL)
@@ -271,6 +278,7 @@ class Main extends ImmutableComponent {
           sortedFrames.map(frame =>
             <Frame
               ref={node => this.frames[frame.get('key')] = node}
+              prefOpenInForeground={this.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS])}
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}
