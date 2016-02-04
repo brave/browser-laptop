@@ -84,7 +84,10 @@ class TopBarButton extends ImmutableComponent {
           topBarButton: true,
           fa: true,
           [this.props.icon]: true
-        })}/>
+        })}>
+        <div className='tabMarkerText'
+          data-l10n-id={this.props.dataL10nId}/>
+      </div>
       { this.props.selected
       ? <div className='tabMarkerContainer'>
           <div className='tabMarker'/>
@@ -97,30 +100,37 @@ class TopBar extends ImmutableComponent {
   render () {
     return <div className='preferencesTopBar'>
       <TopBarButton icon='fa-list-alt'
+        dataL10nId='general'
         onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}
         selected={this.props.preferenceTab === preferenceTabs.GENERAL}
       />
       <TopBarButton icon='fa-search'
+        dataL10nId='search'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SEARCH)}
         selected={this.props.preferenceTab === preferenceTabs.SEARCH}
       />
       <TopBarButton icon='fa-bookmark-o'
+        dataL10nId='tabs'
         onClick={this.props.changeTab.bind(null, preferenceTabs.TABS)}
         selected={this.props.preferenceTab === preferenceTabs.TABS}
       />
       <TopBarButton icon='fa-refresh'
+        dataL10nId='sync'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
         selected={this.props.preferenceTab === preferenceTabs.SYNC}
       />
       <TopBarButton icon='fa-user'
+        dataL10nId='privacy'
         onClick={this.props.changeTab.bind(null, preferenceTabs.PRIVACY)}
         selected={this.props.preferenceTab === preferenceTabs.PRIVACY}
       />
       <TopBarButton icon='fa-lock'
+        dataL10nId='security'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SECURITY)}
         selected={this.props.preferenceTab === preferenceTabs.SECURITY}
       />
       <TopBarButton onClick={this.props.changeTab.bind(null, preferenceTabs.BRAVERY)}
+        dataL10nId='bravery'
         selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
       />
     </div>
