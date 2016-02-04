@@ -60,7 +60,8 @@ AppStore
     history-suggestions: boolean, // Auto suggest for history enabled
     bookmark-suggestions: boolean, // Auto suggest for bookmarks enabled
     opened-tab-suggestions: boolean, // Auto suggest for opened tabs enabled
-    block-reported-sites: boolean // true to block reported web forgery sites
+    block-reported-sites: boolean, // true to block reported web forgery sites
+    paint-tabs: boolean // true if the page theme color and favicon color should be used for tabs
   }]
 }
 ```

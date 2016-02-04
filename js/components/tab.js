@@ -148,7 +148,8 @@ class Tab extends ImmutableComponent {
       width: iconSize
     }
     const activeTabStyle = {}
-    const backgroundColor = this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor')
+    const backgroundColor = this.props.paintTabs &&
+      (this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor'))
     if (this.props.isActive && backgroundColor) {
       activeTabStyle.backgroundColor = backgroundColor
       const textColor = getTextColorForBackground(backgroundColor)

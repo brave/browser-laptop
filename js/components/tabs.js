@@ -58,6 +58,7 @@ class Tabs extends ImmutableComponent {
                   frameProps={frameProps}
                   frames={this.props.frames}
                   key={'tab-' + frameProps.get('key')}
+                  paintTabs={this.props.paintTabs}
                   isActive={this.props.activeFrame === frameProps}
                   isPrivate={frameProps.get('isPrivate')}
                   partOfFullPageSet={this.props.partOfFullPageSet}/>)

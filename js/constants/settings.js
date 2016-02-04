@@ -13,6 +13,7 @@ const settings = {
   DEFAULT_SEARCH_ENGINE: _,
   // Tabs tab
   SWITCH_TO_NEW_TABS: _,
+  PAINT_TABS: _,
   // Privacy Tab
   HISTORY_SUGGESTIONS: _,
   BOOKMARK_SUGGESTIONS: _,

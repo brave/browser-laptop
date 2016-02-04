@@ -28,6 +28,7 @@ const ReleaseNotes = require('./releaseNotes')
 const Config = require('../constants/config')
 const AppConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
+const settings = require('../constants/settings')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -241,6 +242,7 @@ class Main extends ImmutableComponent {
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
+          paintTabs={this.props.appState.getIn(['settings', settings.PAINT_TABS])}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}

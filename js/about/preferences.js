@@ -101,6 +101,7 @@ class TabsTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings}/>
+      <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings}/>
     </SettingsList>
   }
 }
