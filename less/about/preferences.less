@@ -141,6 +141,15 @@ a {
       text-align: right;
       padding-right: 10px;
     }
+    label {
+      text-align: left;
+    }
+    .checkboxContainer {
+      width: 100px;
+      input {
+        text-align: right;
+      }
+    }
     >* {
       display: table-cell;
       margin-bottom: 10px;
@@ -148,7 +157,7 @@ a {
   }
 }
 
-input, select {
+input:not([type="checkbox"]), select {
   box-sizing: border-box;
   height: 17px;
   padding-left: 2px;

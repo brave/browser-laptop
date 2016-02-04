@@ -55,7 +55,8 @@ AppStore
   settings: [{
     startup-mode: string, // One of: lastTime, homePage, newWindow
     homepage: string, // URL of the user's homepage
-    default-search-engine: string // google, duckduckgo
+    default-search-engine: string, // google, duckduckgo
+    switch-to-new-tabs: boolean // true if newly opened tabs should be focused immediately
   }]
 }
 ```

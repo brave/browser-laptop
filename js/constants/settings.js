@@ -8,7 +8,8 @@ const _ = null
 const settings = {
   STARTUP_MODE: _,
   HOMEPAGE: _,
-  DEFAULT_SEARCH_ENGINE: _
+  DEFAULT_SEARCH_ENGINE: _,
+  SWITCH_TO_NEW_TABS: _
 }
 
 module.exports = mapValuesByKeys(settings)

@@ -25,3 +25,6 @@
 
 /* Search settings page */
 <defaultSearchEngine "Default search engine">
+
+/* Tabs settings page */
+<switchToNewTabs "Switch to new tabs immediately">

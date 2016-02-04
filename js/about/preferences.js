@@ -21,7 +21,13 @@ const hintCount = 3
 require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const changeSetting = (key, e) => aboutActions.changeSetting(key, e.target.value)
+const changeSetting = (key, e) => {
+  if (e.target.type === 'checkbox') {
+    aboutActions.changeSetting(key, e.target.checked)
+  } else {
+    aboutActions.changeSetting(key, e.target.value)
+  }
+}
 
 class SettingsList extends ImmutableComponent {
   render () {
@@ -36,6 +42,19 @@ class SettingItem extends ImmutableComponent {
     return <div className='settingItem'>
       <span data-l10n-id={this.props.dataL10nId}/>
       {this.props.children}
+    </div>
+  }
+}
+
+class SettingCheckbox extends ImmutableComponent {
+  render () {
+    return <div className='settingItem'>
+      <span className='checkboxContainer'>
+        <input type='checkbox' id={this.props.prefKey}
+          onChange={changeSetting.bind(null, this.props.prefKey)}
+          checked={this.props.settings.get(this.props.prefKey)}/>
+      </span>
+      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
     </div>
   }
 }
@@ -65,7 +84,7 @@ class SearchTab extends ImmutableComponent {
     return <SettingsList>
       <SettingItem dataL10nId='defaultSearchEngine'>
         <select value={this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE)}
-          onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)} >
+          onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)}>
           <option value='google'>Google</option>
           <option value='duckduckgo'>DuckDuckGo</option>
         </select>
@@ -76,9 +95,9 @@ class SearchTab extends ImmutableComponent {
 
 class TabsTab extends ImmutableComponent {
   render () {
-    return <div>
-      Tabs settings coming soon
-    </div>
+    return <SettingsList>
+      <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings}/>
+    </SettingsList>
   }
 }
 
