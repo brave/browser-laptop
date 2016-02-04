@@ -6,10 +6,17 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const settings = {
+  // General tab
   STARTUP_MODE: _,
   HOMEPAGE: _,
+  // Search tab
   DEFAULT_SEARCH_ENGINE: _,
-  SWITCH_TO_NEW_TABS: _
+  // Tabs tab
+  SWITCH_TO_NEW_TABS: _,
+  // Privacy Tab
+  HISTORY_SUGGESTIONS: _,
+  BOOKMARK_SUGGESTIONS: _,
+  OPENED_TAB_SUGGESTIONS: _
 }
 
 module.exports = mapValuesByKeys(settings)

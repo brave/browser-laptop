@@ -28,3 +28,9 @@
 
 /* Tabs settings page */
 <switchToNewTabs "Switch to new tabs immediately">
+
+/* Prviacy settings page */
+<suggestionTypes "When using the location bar, suggest:">
+<history "History">
+<bookmarks "Bookmarks">
+<openedTabs "Open tabs">

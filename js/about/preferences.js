@@ -31,8 +31,12 @@ const changeSetting = (key, e) => {
 
 class SettingsList extends ImmutableComponent {
   render () {
-    return <div className='settingsList'>
-      {this.props.children}
+    return <div>
+      { this.props.dataL10nId
+        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId}/> : null }
+      <div className='settingsList'>
+        {this.props.children}
+      </div>
     </div>
   }
 }
@@ -112,7 +116,11 @@ class SyncTab extends ImmutableComponent {
 class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
-      Privacy settings coming soon
+      <SettingsList dataL10nId='suggestionTypes'>
+        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
+        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings}/>
+        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings}/>
+      </SettingsList>
     </div>
   }
 }
