@@ -25,11 +25,18 @@
     input {
       display: none;
     }
+    #titleBarWrapper {
+      white-space: nowrap;
+    }
     #titleBar {
       display: inline-block;
       background: @chromePrimary;
       color: @chromeText;
       font-size: 15px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      margin-top: 5px;
       /*
       &:focus {
         -webkit-user-select: none;
@@ -42,10 +49,11 @@
       visibility: hidden;
     }
     .urlbarIcon {
+    display: inline-block;
       opacity: 0.6;
       position: relative;
       left: 0px;
-      top: 0px;
+      top: -3px;
       margin-right: 5px;
     }
   }

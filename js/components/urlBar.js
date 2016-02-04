@@ -218,6 +218,7 @@ class UrlBar extends ImmutableComponent {
       action='#'
       id='urlbar'
       ref='urlbar'>
+        <div id='titleBarWrapper'>
         <span
           onClick={this.onSiteInfo}
           className={cx({
@@ -231,6 +232,7 @@ class UrlBar extends ImmutableComponent {
           })}/>
         <div id='titleBar'>
           {this.titleValue}
+        </div>
         </div>
       <input type='text'
         disabled={this.props.activeFrameProps.get('location') === Config.defaultUrl && this.loadTime === ''}
