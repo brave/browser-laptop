@@ -208,10 +208,6 @@ class TopBar extends ImmutableComponent {
 }
 
 class HelpfulHints extends ImmutableComponent {
-  sendUsFeedback () {
-    aboutActions.newFrame(AppConfig.contactUrl)
-  }
-
   render () {
     return <div className='helpfulHints'>
       <span className='hintsTitleContainer'>
@@ -221,7 +217,7 @@ class HelpfulHints extends ImmutableComponent {
       </span>
       <div data-l10n-id={`hint${this.props.hintNumber}`}/>
       <div className='helpfulHintsBottom'>
-        <a data-l10n-id='sendUsFeedback' onClick={this.sendUsFeedback.bind(this)} />
+        <a data-l10n-id='sendUsFeedback' href={AppConfig.contactUrl} />
         <div className='loveToHear' data-l10n-id='loveToHear'/>
       </div>
     </div>

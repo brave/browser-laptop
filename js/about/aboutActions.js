@@ -14,10 +14,6 @@ const AboutActions = {
    */
   changeSetting: function (key, value) {
     ipc.send(messages.CHANGE_SETTING, key, value)
-  },
-
-  newFrame: function (url) {
-    ipc.send(messages.SHORTCUT_NEW_FRAME, url)
   }
 }
 module.exports = AboutActions
