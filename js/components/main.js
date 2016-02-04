@@ -74,6 +74,18 @@ class Main extends ImmutableComponent {
     })
   }
 
+  loadOpenSearch () {
+    let engine = this.props.appState.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE])
+    if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
+      loadOpenSearch(engine).then(searchDetail => WindowActions.setSearchDetail(searchDetail))
+      this.lastLoadedOpenSearch = engine
+    }
+  }
+
+  componentDidUpdate () {
+    this.loadOpenSearch()
+  }
+
   componentDidMount () {
     this.registerSwipeListener()
     ipc.on(messages.STOP_LOAD, () => {
@@ -121,7 +133,7 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward.bind(this))
 
-    loadOpenSearch().then(searchDetail => WindowActions.setSearchDetail(searchDetail))
+    this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {
       self.checkForTitleMode(e.pageY)
