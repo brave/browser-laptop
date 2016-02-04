@@ -111,6 +111,14 @@ module.exports.checkForUpdateMenuItem = {
   }
 }
 
+module.exports.preferencesMenuItem = {
+  label: 'Preferences...',
+  accelerator: 'CmdOrCtrl+,',
+  click: (item, focusedWindow) => {
+    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
+  }
+}
+
 module.exports.buildBraveryMenu = function (settings, init) {
   const replaceAds = settings[adInsertion] || false
   const blockAds = settings[adblock] || false

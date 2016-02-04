@@ -61,14 +61,6 @@ const init = (args) => {
     }
   }
 
-  const preferencesMenuItem = {
-    label: 'Preferences...',
-    accelerator: 'CmdOrCtrl+,',
-    click: (item, focusedWindow) => {
-      CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
-    }
-  }
-
   const fileMenu = [
 // Note: we are keeping this here for testing. Calling process.crash() from the inspector does not create a crash report.
 //        {
@@ -511,7 +503,7 @@ const init = (args) => {
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem,
         CommonMenu.separatorMenuItem,
-        preferencesMenuItem,
+        CommonMenu.preferencesMenuItem,
         CommonMenu.separatorMenuItem,
         {
           label: 'Send us Feedback...',

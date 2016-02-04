@@ -153,6 +153,8 @@ function hamburgerTemplateInit (settings) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: settings.bookmarked})
     }),
     CommonMenu.separatorMenuItem,
+    CommonMenu.preferencesMenuItem,
+    CommonMenu.separatorMenuItem,
     CommonMenu.quitMenuItem
   ]
   return template
