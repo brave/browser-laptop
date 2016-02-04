@@ -127,9 +127,9 @@ class PrivacyTab extends ImmutableComponent {
 
 class SecurityTab extends ImmutableComponent {
   render () {
-    return <div>
-      Security settings coming soon
-    </div>
+    return <SettingsList>
+      <SettingCheckbox dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings}/>
+    </SettingsList>
   }
 }
 
@@ -184,6 +184,7 @@ class TopBar extends ImmutableComponent {
       />
       <TopBarButton icon='fa-refresh'
         dataL10nId='sync'
+        className='notImplemented'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
         selected={this.props.preferenceTab === preferenceTabs.SYNC}
       />
@@ -199,7 +200,7 @@ class TopBar extends ImmutableComponent {
       />
       <TopBarButton onClick={this.props.changeTab.bind(null, preferenceTabs.BRAVERY)}
         dataL10nId='bravery'
-        className='braveryButton'
+        className='notImplemented'
         selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
       />
     </div>

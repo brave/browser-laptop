@@ -34,3 +34,6 @@
 <history "History">
 <bookmarks "Bookmarks">
 <openedTabs "Open tabs">
+
+/* Security settings page */
+<blockAttackSites "Block reported attack sites (not implemented yet)">

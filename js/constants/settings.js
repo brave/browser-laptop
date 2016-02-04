@@ -16,7 +16,9 @@ const settings = {
   // Privacy Tab
   HISTORY_SUGGESTIONS: _,
   BOOKMARK_SUGGESTIONS: _,
-  OPENED_TAB_SUGGESTIONS: _
+  OPENED_TAB_SUGGESTIONS: _,
+  // Security Tab
+  BLOCK_REPORTED_SITES: _
 }
 
 module.exports = mapValuesByKeys(settings)

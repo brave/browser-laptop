@@ -56,10 +56,11 @@ AppStore
     startup-mode: string, // One of: lastTime, homePage, newWindow
     homepage: string, // URL of the user's homepage
     default-search-engine: string, // google, duckduckgo
-    switch-to-new-tabs: boolean // true if newly opened tabs should be focused immediately
+    switch-to-new-tabs: boolean, // true if newly opened tabs should be focused immediately
     history-suggestions: boolean, // Auto suggest for history enabled
-    bookmark-suggestions: _, // Auto suggest for bookmarks enabled
-    opened-tab-suggestions: _ // Auto suggest for opened tabs enabled
+    bookmark-suggestions: boolean, // Auto suggest for bookmarks enabled
+    opened-tab-suggestions: boolean, // Auto suggest for opened tabs enabled
+    block-reported-sites: boolean // true to block reported web forgery sites
   }]
 }
 ```
