@@ -51,7 +51,10 @@ AppStore
     },
     verbose: boolean, // Whether to show update UI for checking, downloading, and errors
     lastCheckTimestamp: boolean
-  }
+  },
+  settings: [{
+    startup-mode: string // One of: lastTime, homePage, newWindow
+  }]
 }
 ```
 

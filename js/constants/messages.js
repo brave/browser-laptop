@@ -57,7 +57,10 @@ const messages = {
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,
   // Ad block and tracking protection
-  BLOCKED_RESOURCE: _
+  BLOCKED_RESOURCE: _,
+  // SETTINGS
+  SETTINGS_UPDATED: _,
+  CHANGE_SETTING: _
 }
 
 module.exports = mapValuesByKeys(messages)

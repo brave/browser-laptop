@@ -294,6 +294,10 @@ const handleAppAction = (action) => {
       })
       appStore.emitChange()
       break
+    case AppConstants.APP_CHANGE_SETTING:
+      appState = appState.setIn(['settings', action.key], action.value)
+      appStore.emitChange()
+      break
     default:
   }
 }

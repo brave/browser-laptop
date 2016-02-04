@@ -5,10 +5,12 @@
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
+const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const AppConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
+const settings = require('../constants/settings')
 const ipc = require('./ipc')
 
 // TODO: Determine this from the l20n file automatically
@@ -19,9 +21,20 @@ require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class GeneralTab extends ImmutableComponent {
+  changeSetting (key, e) {
+    ipc.send(messages.CHANGE_SETTING, key, e.target.value)
+  }
   render () {
-    return <div>
-      General tab settings coming soon
+    return <div className='settingsList'>
+      <div className='settingItem'>
+        <span data-l10n-id='startsWith'/>
+        <select value={this.props.settings.get(settings.STARTUP_MODE)}
+           onChange={this.changeSetting.bind(this, settings.STARTUP_MODE)} >
+           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
+           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
+           <option data-l10n-id='startsWithOptionNewWindow' value='newWindow'/>
+        </select>
+        </div>
     </div>
   }
 }
@@ -165,6 +178,11 @@ class AboutPreferences extends React.Component {
       preferenceTab: preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber()
     }
+    ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
+      this.setState({
+        settings
+      })
+    })
   }
 
   changeTab (preferenceTab) {
@@ -196,27 +214,28 @@ class AboutPreferences extends React.Component {
 
   render () {
     let tab
+    const settings = Immutable.fromJS(this.state.settings || {})
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
-        tab = <GeneralTab/>
+        tab = <GeneralTab settings={settings}/>
         break
       case preferenceTabs.SEARCH:
-        tab = <SearchTab/>
+        tab = <SearchTab settings={settings}/>
         break
       case preferenceTabs.TABS:
-        tab = <TabsTab/>
+        tab = <TabsTab settings={settings}/>
         break
       case preferenceTabs.SYNC:
-        tab = <SyncTab/>
+        tab = <SyncTab settings={settings}/>
         break
       case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab/>
+        tab = <PrivacyTab settings={settings}/>
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab/>
+        tab = <SecurityTab settings={settings}/>
         break
       case preferenceTabs.BRAVERY:
-        tab = <BraveryTab/>
+        tab = <BraveryTab settings={settings}/>
         break
     }
     return <div>
@@ -231,10 +250,5 @@ class AboutPreferences extends React.Component {
     </div>
   }
 }
-
-// TODO: Do something like this
-ipc.on('app-state-updated', function () {
-  console.log('app state updated', arguments)
-})
 
 module.exports = <AboutPreferences/>

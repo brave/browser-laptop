@@ -149,6 +149,19 @@ const AppActions = {
       verbose,
       metadata
     })
+  },
+
+  /**
+   * Changes an application level setting
+   * @param {string} key - The key name for the setting
+   * @param {string} value - The value of the setting
+   */
+  changeSetting: function (key, value) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CHANGE_SETTING,
+      key,
+      value
+    })
   }
 }
 

@@ -4,11 +4,13 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
+const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 
 // Actions
 const WindowActions = require('../actions/windowActions')
+const AppActions = require('../actions/appActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 
@@ -64,6 +66,10 @@ class Main extends ImmutableComponent {
       deltaX = 0
       deltaY = 0
       startTime = 0
+    })
+
+    ipc.on(messages.CHANGE_SETTING, function (e, key, value) {
+      AppActions.changeSetting(key, value)
     })
   }
 
@@ -254,6 +260,7 @@ class Main extends ImmutableComponent {
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}
+              settings={this.props.appState.get('settings') || new Immutable.Map()}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}

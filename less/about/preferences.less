@@ -126,3 +126,15 @@ a {
   cursor: pointer;
   text-decoration: underline;
 }
+
+.settingsList {
+  display: table;
+  width: 400px;
+  .settingItem {
+    display: table-row;
+    >* {
+      display: table-cell;
+      margin-right: 10px;
+    }
+  }
+}

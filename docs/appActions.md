@@ -122,6 +122,18 @@ Sets the update status
 
 
 
+### changeSetting(key, value) 
+
+Changes an application level setting
+
+**Parameters**
+
+**key**: `string`, The key name for the setting
+
+**value**: `string`, The value of the setting
+
+
+
 
 * * *
 

@@ -121,6 +121,11 @@ class Frame extends ImmutableComponent {
     if (activeShortcut) {
       WindowActions.setActiveFrameShortcut(null)
     }
+
+    if (this.props.frame.get('location') === 'about:preferences') {
+      this.webview.contentWindow.postMessage([messages.SETTINGS_UPDATED,
+        this.props.settings.toJS()], getTargetAboutUrl(this.props.frame.get('location')))
+    }
   }
 
   addEventListeners () {
