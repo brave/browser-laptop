@@ -63,8 +63,10 @@ const init = (args) => {
 
   const preferencesMenuItem = {
     label: 'Preferences...',
-    enabled: false,
-    accelerator: 'CmdOrCtrl+,'
+    accelerator: 'CmdOrCtrl+,',
+    click: (item, focusedWindow) => {
+      CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
+    }
   }
 
   const fileMenu = [

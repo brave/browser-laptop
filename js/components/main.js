@@ -76,6 +76,13 @@ class Main extends ImmutableComponent {
       contextMenus.onMainContextMenu(nodeProps)
     })
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
+      if (options.singleFrame) {
+        const frameProps = self.props.windowState.get('frames').find(frame => frame.get('location') === url)
+        if (frameProps) {
+          WindowActions.setActiveFrame(frameProps)
+          return
+        }
+      }
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
