@@ -201,7 +201,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-navigate', (e) => {
       // only give focus focus is this is not the initial default page load
-      if (this.props.isActive && this.webview.canGoBack()) {
+      if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
         this.webview.focus()
       }
     })
