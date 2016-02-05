@@ -234,19 +234,21 @@ export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
       closedFrames = closedFrames.shift()
     }
   }
-  const activeFrameIndex = findIndexForFrameKey(frames, activeFrameKey)
+  const activeFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey')) ||
+    findIndexForFrameKey(frames, activeFrameKey)
   const framePropsIndex = getFramePropsIndex(frames, frameProps)
+  const newActiveFrameKey = frameProps.get('key') === activeFrameKey && frames.size > 0
+    ? Math.max(
+      frames.get(activeFrameIndex)
+      // Go to the next frame if it exists.
+      ? frames.get(activeFrameIndex).get('key')
+      // Otherwise go to the frame right before the active tab.
+      : frames.get(activeFrameIndex - 1).get('key'),
+    0) : activeFrameKey
   frames = frames.splice(framePropsIndex, 1)
   return {
     previewFrameKey: undefined,
-    activeFrameKey: frameProps.get('key') === activeFrameKey && frames.size > 0
-      ? Math.max(
-        frames.get(activeFrameIndex)
-          // Go to the next frame if it exists.
-          ? frames.get(activeFrameIndex).get('key')
-          // Otherwise go to the frame right before the active tab.
-          : frames.get(activeFrameIndex - 1).get('key'),
-        0) : activeFrameKey,
+    activeFrameKey: newActiveFrameKey,
     closedFrames,
     frames
   }
