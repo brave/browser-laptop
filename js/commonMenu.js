@@ -12,6 +12,7 @@ const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = AppConfig.resourceNames.ADBLOCK
 const adInsertion = AppConfig.resourceNames.AD_INSERTION
 const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
+const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
 
 let electron
 try {
@@ -123,6 +124,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
   const replaceAds = settings[adInsertion] || false
   const blockAds = settings[adblock] || false
   const blockTracking = settings[trackingProtection] || false
+  const blockCookies = settings[cookieblock] || false
   const useHttps = settings[httpsEverywhere] || false
   return {
     label: 'Bravery',
@@ -161,9 +163,12 @@ module.exports.buildBraveryMenu = function (settings, init) {
       module.exports.separatorMenuItem,
       {
         type: 'checkbox',
-        label: 'Block 3rd party cookies (coming soon)',
-        checked: true,
-        enabled: false
+        label: 'Block 3rd party cookies',
+        checked: blockCookies,
+        click: function (item, focusedWindow) {
+          AppActions.setResourceEnabled(cookieblock, !blockCookies)
+          init()
+        }
       }, {
         type: 'checkbox',
         label: 'Block Popups',

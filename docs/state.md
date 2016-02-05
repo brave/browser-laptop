@@ -41,6 +41,9 @@ AppStore
   adInsertion: {
     enabled: boolean // Enable ad insertion
   },
+  cookieblock: {
+    enabled: boolean // Enable 3p cookie/referer blocking
+  },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {

@@ -14,7 +14,11 @@ module.exports = {
     ADBLOCK: 'adblock',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
-    AD_INSERTION: 'adInsertion'
+    AD_INSERTION: 'adInsertion',
+    COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
+  },
+  cookieblock: {
+    enabled: true
   },
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',

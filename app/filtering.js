@@ -44,7 +44,8 @@ function registerForSession (session) {
     }
 
     let requestHeaders = details.requestHeaders
-    if (module.exports.isThirdPartyHost(urlParse(details.url || '').host,
+    if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
+        module.exports.isThirdPartyHost(urlParse(details.url || '').host,
                                         urlParse(details.firstPartyUrl || '').host)) {
       // Clear cookie and referer on third-party requests
       requestHeaders['Cookie'] = ''
