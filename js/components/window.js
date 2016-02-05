@@ -20,12 +20,15 @@ class Window extends React.Component {
     // initialize appState from props
     // and then listen for updates
     this.appState = Immutable.fromJS(this.props.appState)
-    this.windowState = WindowStore.getState()
+    this.windowState = Immutable.fromJS(this.props.initWindowState) || WindowStore.getState()
     this.state = {
       immutableData: {
         windowState: this.windowState,
         appState: this.appState
       }
+    }
+    if (this.props.initWindowState) {
+      WindowActions.setState(this.windowState)
     }
     ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
       this.appState = Immutable.fromJS(action)
@@ -38,25 +41,23 @@ class Window extends React.Component {
       this.onAppStateChanged()
     })
 
-    ipc.on('restore-state', (e, windowState) => {
-      WindowActions.setState(Immutable.fromJS(windowState))
-    })
-
     this.onAppStateChanged()
     WindowStore.addChangeListener(this.onChange.bind(this))
   }
 
   componentWillMount () {
-    if (this.props.frames.length === 0) {
-      WindowActions.newFrame({
-        location: Config.defaultUrl
-      })
-    } else {
-      WindowStore.suspend()
-      this.props.frames.forEach(frame => {
-        WindowActions.newFrame(frame)
-      })
-      WindowStore.resume()
+    if (!this.props.initWindowState || this.props.initWindowState.frames.length === 0) {
+      if (this.props.frames.length === 0) {
+        WindowActions.newFrame({
+          location: Config.defaultUrl
+        })
+      } else {
+        WindowStore.suspend()
+        this.props.frames.forEach(frame => {
+          WindowActions.newFrame(frame)
+        })
+        WindowStore.resume()
+      }
     }
   }
 
@@ -108,6 +109,6 @@ class Window extends React.Component {
     framesToClose.forEach(frameProps => WindowActions.closeFrame(frames, frameProps, true))
   }
 }
-Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array }
+Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }
 
 module.exports = Window

@@ -15,6 +15,7 @@ const fs = require('fs')
 const path = require('path')
 const app = require('app')
 const UpdateStatus = require('../js/constants/updateStatus')
+const settings = require('../js/constants/settings')
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 const storagePath = path.join(app.getPath('userData'), sessionStorageName)
@@ -30,12 +31,15 @@ const storagePath = path.join(app.getPath('userData'), sessionStorageName)
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    if (payload.perWindowState) {
+    const savePerWindowState = payload.settings[settings.STARTUP_MODE] === undefined ||
+      payload.settings[settings.STARTUP_MODE] === 'lastTime'
+    if (payload.perWindowState && savePerWindowState) {
       payload.perWindowState.forEach(wndPayload =>
         wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
+    } else {
+      delete payload.perWindowState
     }
 
-    // payload.frames = payload.frames.filter(frame => !frame.isPrivate)
     fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
       if (err) {
         reject(err)
@@ -168,6 +172,9 @@ module.exports.loadAppState = () => {
           app.exit(0)
         }
       }
+      // We used to store a huge list of IDs but we didn't use them.
+      // Get rid of them here.
+      delete data.windows
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }
@@ -181,7 +188,6 @@ module.exports.loadAppState = () => {
  */
 module.exports.defaultAppState = () => {
   return {
-    windows: [],
     sites: [],
     visits: []
   }

@@ -71,7 +71,7 @@ class GeneralTab extends ImmutableComponent {
           onChange={changeSetting.bind(null, settings.STARTUP_MODE)} >
           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
-          <option data-l10n-id='startsWithOptionNewWindow' value='newWindow'/>
+          <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage'/>
         </select>
       </SettingItem>
       <SettingItem dataL10nId='myHomepage'>

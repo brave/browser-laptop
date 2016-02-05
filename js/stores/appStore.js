@@ -5,6 +5,7 @@
 'use strict'
 const AppConstants = require('../constants/appConstants')
 const AppConfig = require('../constants/appConfig')
+const settings = require('../constants/settings')
 const SiteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const app = electron.app
@@ -109,6 +110,7 @@ const createWindow = (browserOpts, defaults) => {
     title: AppConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))
+  mainWindow.toggleDevTools()
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
@@ -192,14 +194,6 @@ const handleAppAction = (action) => {
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
 
       const mainWindow = createWindow(browserOpts, windowDefaults())
-      if (action.restoredState) {
-        mainWindow.webContents.once('did-finish-load', () => {
-          mainWindow.webContents.send('restore-state', action.restoredState)
-        })
-      }
-
-      const currentWindows = appState.get('windows')
-      appState = appState.set('windows', currentWindows.push(mainWindow.id))
 
       // initialize frames state
       let frames = []
@@ -209,14 +203,13 @@ const handleAppAction = (action) => {
         } else {
           frames.push(frameOpts)
         }
+      } else if (appState.getIn(['settings', settings.STARTUP_MODE]) === 'homePage' && appState.getIn(['settings', settings.HOMEPAGE])) {
+        frames = appState.getIn(['settings', settings.HOMEPAGE]).split('|').map(homepage => {
+          return {
+            location: homepage
+          }
+        })
       }
-
-      // pass the appState and frames into the query string for initialization
-      // This seems kind of hacky, maybe there is a better way to make
-      // sure that the Window has the app state before it renders?
-      const queryString =
-        'appState=' + encodeURIComponent(JSON.stringify(appState.toJS())) +
-        '&frames=' + encodeURIComponent(JSON.stringify(frames))
 
       const willNavigateHandler = (whitelistedUrl, e, url) => {
         if (url !== whitelistedUrl) {
@@ -226,10 +219,15 @@ const handleAppAction = (action) => {
       }
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
-        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html?' + queryString
-        : 'file://' + path.resolve(__dirname + '..', '..', '..') + '/app/index.html?' + queryString
+        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html'
+        : 'file://' + path.resolve(__dirname + '..', '..', '..') + '/app/index.html'
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
+      mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
+        if (isMainFrame) {
+          mainWindow.webContents.send(messages.INIT_WINODW, appState.toJS(), frames, action.restoredState)
+        }
+      })
       appStore.emitChange()
 
       mainWindow.show()
@@ -238,8 +236,6 @@ const handleAppAction = (action) => {
       const appWindow = BrowserWindow.fromId(action.appWindowId)
       appWindow.close()
 
-      const windows = appState.get('windows')
-      appState = appState.set('windows', windows.delete(action.appWindowId))
       appStore.emitChange()
       break
     case AppConstants.APP_ADD_SITE:

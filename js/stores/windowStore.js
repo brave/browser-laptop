@@ -111,12 +111,13 @@ const windowStore = new WindowStore()
 
 // Register callback to handle all updates
 const doAction = (action) => {
+  // console.log(action.actionType, windowState.toJS())
   switch (action.actionType) {
     case WindowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
       currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
       currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
-      windowStore.emitChange()
+      // We should not emit here because the Window already know about the change on startup.
       break
     case WindowConstants.WINDOW_SET_URL:
       // reload if the url is unchanged

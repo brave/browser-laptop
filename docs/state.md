@@ -53,7 +53,7 @@ AppStore
     lastCheckTimestamp: boolean
   },
   settings: [{
-    startup-mode: string, // One of: lastTime, homePage, newWindow
+    startup-mode: string, // One of: lastTime, homePage, newTabPage
     homepage: string, // URL of the user's homepage
     default-search-engine: string, // path to the open search XML
     switch-to-new-tabs: boolean, // true if newly opened tabs should be focused immediately
