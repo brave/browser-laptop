@@ -65,7 +65,8 @@ class SettingCheckbox extends ImmutableComponent {
     return <div className='settingItem'>
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
-          onChange={this.props.disabled ? null : changeSetting.bind(null, this.props.prefKey)}
+          disabled={this.props.disabled}
+          onChange={changeSetting.bind(null, this.props.prefKey)}
           checked={getSetting(this.props.settings, this.props.prefKey)}/>
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
