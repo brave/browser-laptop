@@ -210,7 +210,7 @@ const WindowActions = {
    */
   newFrame: function (frameOpts = {}, openInForeground = true) {
     frameOpts.location = frameOpts.location || Config.defaultUrl
-    if (UrlUtil.isURL(frameOpts.location)) {
+    if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
       frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
     }
     WindowDispatcher.dispatch({
