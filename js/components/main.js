@@ -13,6 +13,7 @@ const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
+const getSetting = require('../settings').getSetting
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -75,7 +76,7 @@ class Main extends ImmutableComponent {
   }
 
   loadOpenSearch () {
-    let engine = this.props.appState.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE])
+    let engine = getSetting(this.props.appState.get('settings'), settings.DEFAULT_SEARCH_ENGINE)
     if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
       loadOpenSearch(engine).then(searchDetail => WindowActions.setSearchDetail(searchDetail))
       this.lastLoadedOpenSearch = engine
@@ -103,7 +104,7 @@ class Main extends ImmutableComponent {
         }
       }
 
-      let openInForeground = self.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS]) === true || options.openInForeground
+      let openInForeground = getSetting(self.props.appState.get('settings'), settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
@@ -256,7 +257,7 @@ class Main extends ImmutableComponent {
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
-          paintTabs={this.props.appState.getIn(['settings', settings.PAINT_TABS])}
+          paintTabs={getSetting(this.props.appState.get('settings'), settings.PAINT_TABS)}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
@@ -273,7 +274,7 @@ class Main extends ImmutableComponent {
           sortedFrames.map(frame =>
             <Frame
               ref={node => this.frames[frame.get('key')] = node}
-              prefOpenInForeground={this.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS])}
+              prefOpenInForeground={getSetting(this.props.appState.get('settings'), settings.SWITCH_TO_NEW_TABS)}
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}

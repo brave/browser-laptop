@@ -19,6 +19,7 @@ const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
 const path = require('path')
+const getSetting = require('../settings').getSetting
 
 let appState
 
@@ -194,6 +195,8 @@ const handleAppAction = (action) => {
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
 
       const mainWindow = createWindow(browserOpts, windowDefaults())
+      const settingsState = appState.get('settings')
+      const homepageSetting = getSetting(settingsState, settings.HOMEPAGE)
 
       // initialize frames state
       let frames = []
@@ -203,8 +206,8 @@ const handleAppAction = (action) => {
         } else {
           frames.push(frameOpts)
         }
-      } else if (appState.getIn(['settings', settings.STARTUP_MODE]) === 'homePage' && appState.getIn(['settings', settings.HOMEPAGE])) {
-        frames = appState.getIn(['settings', settings.HOMEPAGE]).split('|').map(homepage => {
+      } else if (getSetting(settingsState, settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
+        frames = homepageSetting.split('|').map(homepage => {
           return {
             location: homepage
           }

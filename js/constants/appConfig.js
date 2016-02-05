@@ -55,5 +55,16 @@ module.exports = {
     // url to check for updates
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/releases/winx64`
+  },
+  defaultSettings: {
+    'startup-mode': 'lastTime',
+    homepage: 'http://www.brave.com',
+    'default-search-engine': './content/search/google.xml',
+    'switch-to-new-tabs': false,
+    'history-suggestions': true,
+    'bookmark-suggestions': true,
+    'opened-tab-suggestions': true,
+    'block-reported-sites': true,
+    'paint-tabs': true
   }
 }

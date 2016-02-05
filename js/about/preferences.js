@@ -7,12 +7,13 @@ const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
-const AppConfig = require('../constants/appConfig')
+const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = require('./ipc')
 const aboutActions = require('./aboutActions')
+const getSetting = require('../settings').getSetting
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -56,7 +57,7 @@ class SettingCheckbox extends ImmutableComponent {
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
           onChange={changeSetting.bind(null, this.props.prefKey)}
-          checked={this.props.settings.get(this.props.prefKey)}/>
+          checked={getSetting(this.props.settings, this.props.prefKey)}/>
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
     </div>
@@ -67,7 +68,7 @@ class GeneralTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='startsWith'>
-        <select value={this.props.settings.get(settings.STARTUP_MODE)}
+        <select value={getSetting(this.props.settings, settings.STARTUP_MODE)}
           onChange={changeSetting.bind(null, settings.STARTUP_MODE)} >
           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
@@ -76,7 +77,7 @@ class GeneralTab extends ImmutableComponent {
       </SettingItem>
       <SettingItem dataL10nId='myHomepage'>
         <input data-l10n-id='homepageInput'
-          value={this.props.settings.get(settings.HOMEPAGE)}
+          value={getSetting(this.props.settings, settings.HOMEPAGE)}
           onChange={changeSetting.bind(null, settings.HOMEPAGE)} />
       </SettingItem>
     </SettingsList>
@@ -87,7 +88,7 @@ class SearchTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='defaultSearchEngine'>
-        <select value={this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE)}
+        <select value={getSetting(this.props.settings, settings.DEFAULT_SEARCH_ENGINE)}
           onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)}>
           <option value='./content/search/google.xml'>Google</option>
           <option value='./content/search/duckduckgo.xml'>DuckDuckGo</option>
@@ -218,7 +219,7 @@ class HelpfulHints extends ImmutableComponent {
       </span>
       <div data-l10n-id={`hint${this.props.hintNumber}`}/>
       <div className='helpfulHintsBottom'>
-        <a data-l10n-id='sendUsFeedback' href={AppConfig.contactUrl} />
+        <a data-l10n-id='sendUsFeedback' href={appConfig.contactUrl} />
         <div className='loveToHear' data-l10n-id='loveToHear'/>
       </div>
     </div>

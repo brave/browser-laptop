@@ -19,6 +19,7 @@ const settings = require('../js/constants/settings')
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
 const storagePath = path.join(app.getPath('userData'), sessionStorageName)
+const getSetting = require('../js/settings').getSetting
 
 /**
  * Saves the specified immutable browser state to storage.
@@ -31,8 +32,9 @@ const storagePath = path.join(app.getPath('userData'), sessionStorageName)
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    const savePerWindowState = payload.settings[settings.STARTUP_MODE] === undefined ||
-      payload.settings[settings.STARTUP_MODE] === 'lastTime'
+    const startupModeSettingValue = getSetting(payload.settings, settings.STARTUP_MODE)
+    const savePerWindowState = startupModeSettingValue === undefined ||
+      startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
       payload.perWindowState.forEach(wndPayload =>
         wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
@@ -178,6 +180,7 @@ module.exports.loadAppState = () => {
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }
+      data.settings = data.settings || {}
       resolve(data)
     })
   })
@@ -189,6 +192,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     sites: [],
-    visits: []
+    visits: [],
+    settings: {}
   }
 }
