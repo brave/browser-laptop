@@ -10,6 +10,7 @@ const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
 const AppConfig = require('../js/constants/appConfig')
+const urlParse = require('url').parse
 
 const filteringFns = []
 
@@ -31,36 +32,44 @@ function registerForSession (session) {
     }
 
     let results
-    let cbArgs
     for (let i = 0; i < filteringFns.length; i++) {
       let currentResults = filteringFns[i](details)
       if (currentResults && !module.exports.isResourceEnabled(currentResults.resourceName)) {
         continue
       }
       results = currentResults
-      cbArgs = cbArgs || results.cbArgs
       if (results.shouldBlock) {
         break
       }
     }
 
-    if (!results) {
-      cb({})
+    let requestHeaders = details.requestHeaders
+    if (module.exports.isThirdPartyHost(urlParse(details.url || '').host,
+                                        urlParse(details.firstPartyUrl || '').host)) {
+      // Clear cookie and referer on third-party requests
+      requestHeaders['Cookie'] = ''
+      requestHeaders['Referer'] = ''
+    }
+
+    if (!results || !results.shouldBlock) {
+      cb({requestHeaders: requestHeaders})
     } else if (results.shouldBlock) {
       // We have no good way of knowing which BrowserWindow the blocking is for
       // yet so send it everywhere and let listeners decide how to respond.
       BrowserWindow.getAllWindows().forEach(wnd =>
         wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
       cb({
-        cancel: results.shouldBlock
+        requestHeaders: requestHeaders,
+        cancel: true
       })
-    } else {
-      cb(cbArgs || {})
     }
   })
 }
 
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
+  if (!testHost || !baseContextHost) {
+    return true
+  }
   if (!testHost.endsWith(baseContextHost)) {
     return true
   }
