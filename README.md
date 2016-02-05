@@ -42,6 +42,13 @@ Make sure you have all of the pre-requisite compilers/applications [Installed](h
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
+During installation you will likely see lines like the following which may be safely ignored
+
+    npm WARN deprecated css-list@0.1.3: Deprecated.
+    npm WARN install Couldn't install optional dependency: Unsupported
+
+If installing on a new machine with little or no node.js previously installed this can take a long time, especially if you are outside the USA and/or have limited bandwidth. In such cases you may also get github timeouts which result in failures due to ECONNRESET messages or similar. If this happens. you should simply rerun the `npm install` command until these stop
+
 ## Development
 
 To start the server and file watchers run the following on the command line:
@@ -57,6 +64,14 @@ To run the tests:
     npm run watch-test  or  npm run watch-all
 
     npm test
+
+Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the environment variable `BRAVE_PORT` to make it use a different one.
+
+e.g.
+`BRAVE_PORT=9001 npm run watch`
+
+`BRAVE_PORT=9001 npm run start`
+
 
 
 ### Debugging
