@@ -26,7 +26,16 @@ const changeSetting = (key, e) => {
   if (e.target.type === 'checkbox') {
     aboutActions.changeSetting(key, e.target.checked)
   } else {
-    aboutActions.changeSetting(key, e.target.value)
+    let value = e.target.value
+    if (e.target.type === 'number') {
+      value = value.replace(/\D/g, '')
+      value = parseInt(value, 10)
+      if (Number.isNaN(value)) {
+        return
+      }
+      value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
+    }
+    aboutActions.changeSetting(key, value)
   }
 }
 
@@ -101,6 +110,14 @@ class SearchTab extends ImmutableComponent {
 class TabsTab extends ImmutableComponent {
   render () {
     return <SettingsList>
+      <SettingItem dataL10nId='tabsPerTabPage'>
+        <input
+          type='number'
+          min='3'
+          max='20'
+          value={getSetting(this.props.settings, settings.TABS_PER_TAB_PAGE)}
+          onChange={changeSetting.bind(null, settings.TABS_PER_TAB_PAGE)} />
+      </SettingItem>
       <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings}/>
       <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings}/>
     </SettingsList>

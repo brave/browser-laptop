@@ -8,7 +8,6 @@ const Tabs = require('./tabs')
 const Button = require('./button')
 const PinnedTabs = require('./pinnedTabs')
 const WindowActions = require('../actions/windowActions')
-import Config from '../constants/config.js'
 
 class TabsToolbarButtons extends ImmutableComponent {
   render () {
@@ -26,12 +25,12 @@ class TabsToolbarButtons extends ImmutableComponent {
 class TabsToolbar extends ImmutableComponent {
   render () {
     const tabPageIndex = this.props.tabs.get('tabPageIndex')
-    const startingFrameIndex = tabPageIndex * Config.tabs.tabsPerPage
+    const startingFrameIndex = tabPageIndex * this.props.tabsPerTabPage
     const pinnedFrames = this.props.frames
       .filter(frame => frame.get('isPinned'))
     const currentFrames = this.props.frames
       .filter(frame => !frame.get('isPinned'))
-      .slice(startingFrameIndex, startingFrameIndex + Config.tabs.tabsPerPage)
+      .slice(startingFrameIndex, startingFrameIndex + this.props.tabsPerTabPage)
 
     return <div className='tabsToolbar'>
       { pinnedFrames.size > 0
@@ -41,14 +40,15 @@ class TabsToolbar extends ImmutableComponent {
         tabs={this.props.tabs}/> : null }
       <Tabs tabs={this.props.tabs}
         paintTabs={this.props.paintTabs}
+        tabsPerTabPage={this.props.tabsPerTabPage}
         frames={this.props.frames}
         activeFrame={this.props.activeFrame}
         tabPageIndex={tabPageIndex}
         currentFrames={currentFrames}
         startingFrameIndex={startingFrameIndex}
-        partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
+        partOfFullPageSet={currentFrames.size === this.props.tabsPerTabPage}
       />
-      <TabsToolbarButtons partOfFullPageSet={currentFrames.size === Config.tabs.tabsPerPage}
+      <TabsToolbarButtons partOfFullPageSet={currentFrames.size === this.props.tabsPerTabPage}
         noFrames={currentFrames.size === 0}
         onMenu={this.props.onMenu}/>
     </div>

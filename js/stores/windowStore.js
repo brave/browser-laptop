@@ -6,6 +6,7 @@ const Config = require('../constants/config').default
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
+const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
 const ipc = global.require('electron').ipcRenderer
@@ -48,7 +49,7 @@ const updateTabPageIndex = (frameProps) => {
   }
 
   const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter(frame => !frame.get('isPinned')), frameProps)
+      .filter(frame => !frame.get('isPinned')), frameProps, windowStore.cachedSettings[settings.TABS_PER_TAB_PAGE])
   if (index === -1) {
     return
   }
@@ -61,7 +62,10 @@ const incrementNextKey = () => ++currentKey
 const incrementPartitionNumber = () => ++currentPartitionNumber
 
 class WindowStore extends EventEmitter {
-
+  constructor () {
+    super()
+    this.cachedSettings = {}
+  }
   getState () {
     return windowState
   }
@@ -104,6 +108,16 @@ class WindowStore extends EventEmitter {
       this.emitOnResume = false
       this.emitChange()
     }
+  }
+
+  /**
+   * Used to stash commonly used settings for auto inclusion in the needed
+   * dispatched events.
+   * @param {string} key - The name of the pref to cache
+   * @param {string} value - The value of the pref to cache
+   */
+  cacheSetting (key, value) {
+    this.cachedSettings[key] = value
   }
 }
 

@@ -65,6 +65,7 @@ module.exports = {
     'bookmark-suggestions': true,
     'opened-tab-suggestions': true,
     'block-reported-sites': true,
-    'paint-tabs': true
+    'paint-tabs': true,
+    'tabs-per-tab-page': 6
   }
 }

@@ -256,10 +256,12 @@ class Main extends ImmutableComponent {
             onClick={this.onBraveMenu.bind(this)} />
         </div>
         <TabPages frames={nonPinnedFrames}
+          tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
           paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
+          tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}

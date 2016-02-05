@@ -53,15 +53,16 @@ AppStore
     lastCheckTimestamp: boolean
   },
   settings: [{
-    startup-mode: string, // One of: lastTime, homePage, newTabPage
+    'startup-mode': string, // One of: lastTime, homePage, newTabPage
     homepage: string, // URL of the user's homepage
-    default-search-engine: string, // path to the open search XML
-    switch-to-new-tabs: boolean, // true if newly opened tabs should be focused immediately
-    history-suggestions: boolean, // Auto suggest for history enabled
-    bookmark-suggestions: boolean, // Auto suggest for bookmarks enabled
-    opened-tab-suggestions: boolean, // Auto suggest for opened tabs enabled
-    block-reported-sites: boolean, // true to block reported web forgery sites
-    paint-tabs: boolean // true if the page theme color and favicon color should be used for tabs
+    'default-search-engine': string, // path to the open search XML
+    'switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
+    'history-suggestions': boolean, // Auto suggest for history enabled
+    'bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
+    'opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
+    'block-reported-sites': boolean, // true to block reported web forgery sites
+    'paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
+    'tabs-per-tab-page': number // Number of tabs per tab page
   }]
 }
 ```

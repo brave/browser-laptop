@@ -13,6 +13,8 @@ const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const SiteTags = require('../constants/siteTags')
 const Config = require('../constants/config')
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 class Window extends React.Component {
   constructor (props) {
@@ -88,6 +90,7 @@ class Window extends React.Component {
   }
 
   onAppStateChanged () {
+    WindowStore.cacheSetting(settings.TABS_PER_TAB_PAGE, getSetting(this.appState.get('settings'), settings.TABS_PER_TAB_PAGE))
     const sites = this.appState.get('sites')
     const frames = this.windowState.get('frames')
 

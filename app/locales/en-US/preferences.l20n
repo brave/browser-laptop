@@ -29,6 +29,7 @@
 /* Tabs settings page */
 <switchToNewTabs "Switch to new tabs immediately">
 <paintTabs "Show tabs in page theme color">
+<tabsPerTabPage "Tabs per tab page">
 
 /* Prviacy settings page */
 <suggestionTypes "When using the location bar, suggest:">

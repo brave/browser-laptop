@@ -8,8 +8,6 @@ const cx = require('../lib/classSet.js')
 const WindowActions = require('../actions/windowActions')
 const {onTabPageContextMenu} = require('../contextMenus')
 
-import Config from '../constants/config.js'
-
 class TabPage extends ImmutableComponent {
   render () {
     const audioPlaybackActive = this.props.frames.find(frame =>
@@ -28,7 +26,7 @@ class TabPage extends ImmutableComponent {
 
 class TabPages extends ImmutableComponent {
   get tabPageCount () {
-    return Math.ceil(this.props.frames.size / Config.tabs.tabsPerPage)
+    return Math.ceil(this.props.frames.size / this.props.tabsPerTabPage)
   }
 
   render () {
@@ -42,7 +40,7 @@ class TabPages extends ImmutableComponent {
       Array.from(new Array(this.tabPageCount)).map((x, i) =>
         <TabPage
           key={`tabPage-${i}`}
-          frames={this.props.frames.slice(i * Config.tabs.tabsPerPage, i * Config.tabs.tabsPerPage + Config.tabs.tabsPerPage)}
+          frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
           index={i}
           active={this.props.tabPageIndex === i}/>)
     }
