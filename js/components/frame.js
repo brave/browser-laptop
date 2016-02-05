@@ -330,6 +330,11 @@ class Frame extends ImmutableComponent {
           webviewContainer: true,
           isPreview: this.props.isPreview
         })}/>
+      { this.props.frame.get('hrefPreview')
+        ? <div className={cx({hrefPreview: true})}>
+            {this.props.frame.get('hrefPreview')}
+          </div> : null
+      }
     </div>
   }
 }

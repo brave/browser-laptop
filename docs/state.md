@@ -84,6 +84,7 @@ WindowStore
     src: string, // what the iframe src should be
     title: string, // page title
     findbarShown: boolean, // whether the findbar is shown
+    hrefPreview: string, // show hovered link preview
     key: number,
     isPrivate: boolean, // private browsing tab
     partitionNumber: number, // the session partition to use

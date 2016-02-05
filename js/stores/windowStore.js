@@ -479,6 +479,13 @@ const doAction = (action) => {
 
 WindowDispatcher.register(doAction)
 
+ipc.on(messages.LINK_HOVERED, (e, href) => {
+  windowState = windowState.mergeIn(activeFrameStatePath(), {
+    hrefPreview: href
+  })
+  windowStore.emitChange()
+})
+
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   windowState = FrameStateUtil.makeNextFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))

@@ -381,6 +381,48 @@ if (typeof KeyEvent === 'undefined') {
     }
   }
 
+  // shamelessly taken from https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
+  function delegate (event, selector) {
+    var target = event.target
+    var related = event.relatedTarget
+    var match
+
+    // search for a parent node matching the delegation selector
+    while (target && target !== document && !(match = target.matches(selector))) {
+      target = target.parentNode
+    }
+
+    // exit if no matching node has been found
+    if (!match) {
+      return
+    }
+
+    // loop through the parent of the related target to make sure that it's not a child of the target
+    while (related && related !== target && related !== document) {
+      related = related.parentNode
+    }
+
+    // exit if this is the case
+    if (related === target) {
+      return
+    }
+
+    return target
+  }
+
+  document.addEventListener('mouseover', (event) => {
+    var target = delegate(event, 'a')
+    if (target) {
+      ipc.send('link-hovered', target.href)
+    }
+  })
+
+  document.addEventListener('mouseout', (event) => {
+    if (delegate(event, 'a')) {
+      ipc.send('link-hovered', null)
+    }
+  })
+
   document.addEventListener('DOMContentLoaded', () => {
     // Hide broken images
     Array.from(document.querySelectorAll('img')).forEach(function (img) {

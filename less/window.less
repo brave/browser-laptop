@@ -129,6 +129,24 @@ html,
   }
 }
 
+.hrefPreview {
+  background: @chromePrimary;
+  border-color: @chromeSecondary;
+  border-style: solid;
+  border-width: 1px 1px 0 0;
+  border-top-right-radius: @borderRadius;
+  bottom: 0;
+  color: @chromeText;
+  font-size: @defaultFontSize;
+  left: 0;
+  max-width: 40em;
+  overflow-x: hidden;
+  padding: 0.2em 0.5em;
+  position: fixed;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 body.fullScreen .frameWrapper.isActive {
   z-index: 10000;
 }
