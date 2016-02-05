@@ -162,8 +162,8 @@ module.exports.buildBraveryMenu = function (settings, init) {
       {
         type: 'checkbox',
         label: 'Block 3rd party cookies (coming soon)',
-        enabled: false,
-        checked: false
+        checked: true,
+        enabled: false
       }, {
         type: 'checkbox',
         label: 'Block Popups',
