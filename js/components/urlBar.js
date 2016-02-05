@@ -78,11 +78,16 @@ class UrlBar extends ImmutableComponent {
           this.restore()
           WindowActions.setUrlBarSelected(true)
         } else {
+          const isLocationUrl = isUrl(location)
           const selectedIndex = this.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected()
-          } else if (!isUrl(location)) {
+          // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
+          // For whitepsace we want a search no matter what.
+          } else if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
+            WindowActions.loadUrl(this.props.activeFrameProps, `www.${location}.com`)
+          } else if (!isLocationUrl) {
             // do search.
             WindowActions.loadUrl(this.props.activeFrameProps, this.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
