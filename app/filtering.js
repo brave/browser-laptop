@@ -32,30 +32,26 @@ function registerForSession (session) {
     }
 
     let results
-    let cbArgs = {}
     for (let i = 0; i < filteringFns.length; i++) {
       let currentResults = filteringFns[i](details)
       if (currentResults && !module.exports.isResourceEnabled(currentResults.resourceName)) {
         continue
       }
       results = currentResults
-      cbArgs = cbArgs || results.cbArgs
       if (results.shouldBlock) {
         break
       }
     }
 
-    console.log('cbargs', cbArgs)
-    let requestHeaders = cbArgs.requestHeaders || details.requestHeaders
+    let requestHeaders = details.requestHeaders
     if (module.exports.isThirdPartyHost(urlParse(details.url || '').host,
                                         urlParse(details.firstPartyUrl || '').host)) {
-      console.log('clearing cookies', details.url, details.host)
       // Clear cookie and referer on third-party requests
       requestHeaders['Cookie'] = ''
       requestHeaders['Referer'] = ''
     }
 
-    if (!results) {
+    if (!results || !results.shouldBlock) {
       cb({requestHeaders: requestHeaders})
     } else if (results.shouldBlock) {
       // We have no good way of knowing which BrowserWindow the blocking is for
@@ -64,12 +60,7 @@ function registerForSession (session) {
         wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
       cb({
         requestHeaders: requestHeaders,
-        cancel: results.shouldBlock
-      })
-    } else {
-      cb({
-        requestHeaders: requestHeaders,
-        cancel: cbArgs.shouldBlock || false
+        cancel: true
       })
     }
   })
