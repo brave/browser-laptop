@@ -45,11 +45,15 @@ function registerForSession (session) {
 
     let requestHeaders = details.requestHeaders
     if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
-        module.exports.isThirdPartyHost(urlParse(details.url || '').host,
-                                        urlParse(details.firstPartyUrl || '').host)) {
+        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').host,
+                                        urlParse(details.url || '').host)) {
       // Clear cookie and referer on third-party requests
-      requestHeaders['Cookie'] = ''
-      requestHeaders['Referer'] = ''
+      if (requestHeaders['Cookie']) {
+        requestHeaders['Cookie'] = undefined
+      }
+      if (requestHeaders['Referer']) {
+        requestHeaders['Referer'] = undefined
+      }
     }
 
     if (!results || !results.shouldBlock) {
@@ -68,6 +72,9 @@ function registerForSession (session) {
 }
 
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
+  // TODO: This should check public suffix list?
+  // NOTE: This considers upload.wikimedia.org third party to en.wikimedia.org.
+  // perhaps too strict.
   if (!testHost || !baseContextHost) {
     return true
   }
