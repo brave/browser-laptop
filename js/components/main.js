@@ -216,7 +216,7 @@ class Main extends ImmutableComponent {
 
     this.frames = {}
     const settingsState = this.props.appState.get('settings') || new Immutable.Map()
-
+    const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('isPinned'))
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
         <div className='backforward'>
@@ -255,7 +255,7 @@ class Main extends ImmutableComponent {
             className='navbutton'
             onClick={this.onBraveMenu.bind(this)} />
         </div>
-        <TabPages frames={this.props.windowState.get('frames')}
+        <TabPages frames={nonPinnedFrames}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
