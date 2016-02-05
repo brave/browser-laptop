@@ -103,12 +103,7 @@ class Main extends ImmutableComponent {
         }
       }
 
-      const prefOpenInForeground = self.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS])
-      let openInForeground = options.openInForeground
-      if (prefOpenInForeground !== undefined) {
-        openInForeground = prefOpenInForeground
-      }
-
+      let openInForeground = self.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS]) === true || options.openInForeground
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,

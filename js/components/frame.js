@@ -148,10 +148,8 @@ class Frame extends ImmutableComponent {
           guestInstanceId
         }, windowOptions)
       } else {
-        let openInForeground = e.disposition !== 'background-tab'
-        if (this.props.prefOpenInForeground !== undefined) {
-          openInForeground = this.props.prefOpenInForeground
-        }
+        const openInForeground = this.props.prefOpenInForeground === true ||
+          e.disposition !== 'background-tab'
         WindowActions.newFrame({
           location: e.url,
           parentFrameKey: this.props.frame.get('key'),
