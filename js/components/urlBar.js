@@ -257,6 +257,7 @@ class UrlBar extends ImmutableComponent {
         <UrlBarSuggestions
           ref={node => this.urlBarSuggestions = node}
           suggestions={this.props.urlbar.get('suggestions')}
+          settings={this.props.settings}
           sites={this.props.sites}
           frames={this.props.frames}
           searchDetail={this.searchDetail}

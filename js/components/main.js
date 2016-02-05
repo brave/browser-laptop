@@ -215,6 +215,7 @@ class Main extends ImmutableComponent {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
 
     this.frames = {}
+    const settingsState = this.props.appState.get('settings') || new Immutable.Map()
 
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
@@ -236,6 +237,7 @@ class Main extends ImmutableComponent {
           activeFrame={activeFrame}
           mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
+          settings={settingsState}
           searchDetail={this.props.windowState.get('searchDetail')}
         />
         { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
@@ -257,7 +259,7 @@ class Main extends ImmutableComponent {
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
-          paintTabs={getSetting(this.props.appState.get('settings'), settings.PAINT_TABS)}
+          paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
@@ -274,11 +276,11 @@ class Main extends ImmutableComponent {
           sortedFrames.map(frame =>
             <Frame
               ref={node => this.frames[frame.get('key')] = node}
-              prefOpenInForeground={getSetting(this.props.appState.get('settings'), settings.SWITCH_TO_NEW_TABS)}
+              prefOpenInForeground={getSetting(settingsState, settings.SWITCH_TO_NEW_TABS)}
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}
-              settings={this.props.appState.get('settings') || new Immutable.Map()}
+              settings={settingsState || new Immutable.Map()}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
