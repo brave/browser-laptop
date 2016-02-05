@@ -163,76 +163,74 @@ function hamburgerTemplateInit (settings) {
 function mainTemplateInit (nodeProps) {
   const template = []
   const nodeName = nodeProps.name
-  switch (nodeName) {
-    case 'A':
-      template.push({
-        label: 'Open in new tab',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            // TODO: open this in the next tab instead of last tab
-            // TODO: If the tab is private, this should probably be private.
-            // Depends on #139
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { openInForeground: false })
-          }
+
+  if (nodeProps.href) {
+    template.push({
+      label: 'Open in new tab',
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          // TODO: open this in the next tab instead of last tab
+          // TODO: If the tab is private, this should probably be private.
+          // Depends on #139
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { openInForeground: false })
         }
-      })
-      template.push({
-        label: 'Open in new private tab',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { isPrivate: true })
-          }
+      }
+    })
+    template.push({
+      label: 'Open in new private tab',
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          // TODO: open this in the next tab instead of last tab
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { isPrivate: true })
         }
-      })
-      template.push({
-        label: 'Open in new session tab',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src, { isPartitioned: true })
-          }
+      }
+    })
+    template.push({
+      label: 'Open in new session tab',
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          // TODO: open this in the next tab instead of last tab
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { isPartitioned: true })
         }
-      })
-      template.push({
-        label: 'Copy link address',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            Clipboard.writeText(nodeProps.src)
-          }
+      }
+    })
+    template.push({
+      label: 'Copy link address',
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          Clipboard.writeText(nodeProps.href)
         }
-      })
-      break
-    case 'IMG':
-      template.push({
-        label: 'Save image...',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            focusedWindow.webContents.downloadURL(nodeProps.src)
-          }
-        }
-      })
-      template.push({
-        label: 'Open image in new tab',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
-          }
-        }
-      })
-      template.push({
-        label: 'Copy image address',
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.src) {
-            Clipboard.writeText(nodeProps.src)
-          }
-        }
-      })
-      break
+      }
+    })
+    template.push(CommonMenu.separatorMenuItem)
   }
 
-  if (template.length > 0) {
+  if (nodeName === 'IMG') {
+    template.push({
+      label: 'Save image...',
+      click: (item, focusedWindow) => {
+        if (focusedWindow && nodeProps.src) {
+          focusedWindow.webContents.downloadURL(nodeProps.src)
+        }
+      }
+    })
+    template.push({
+      label: 'Open image in new tab',
+      click: (item, focusedWindow) => {
+        if (focusedWindow && nodeProps.src) {
+          // TODO: open this in the next tab instead of last tab
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
+        }
+      }
+    })
+    template.push({
+      label: 'Copy image address',
+      click: (item, focusedWindow) => {
+        if (focusedWindow && nodeProps.src) {
+          Clipboard.writeText(nodeProps.src)
+        }
+      }
+    })
     template.push(CommonMenu.separatorMenuItem)
   }
 
