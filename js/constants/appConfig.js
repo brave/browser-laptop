@@ -58,13 +58,13 @@ module.exports = {
   },
   defaultSettings: {
     'startup-mode': 'lastTime',
-    homepage: 'http://www.brave.com',
+    homepage: 'https://www.brave.com',
     'default-search-engine': './content/search/google.xml',
     'switch-to-new-tabs': false,
-    'history-suggestions': true,
+    'history-suggestions': false,
     'bookmark-suggestions': true,
     'opened-tab-suggestions': true,
-    'block-reported-sites': true,
+    'block-reported-sites': false,
     'paint-tabs': true,
     'tabs-per-tab-page': 6
   }

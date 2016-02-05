@@ -65,7 +65,7 @@ class SettingCheckbox extends ImmutableComponent {
     return <div className='settingItem'>
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
-          onChange={changeSetting.bind(null, this.props.prefKey)}
+          onChange={this.props.disabled ? null : changeSetting.bind(null, this.props.prefKey)}
           checked={getSetting(this.props.settings, this.props.prefKey)}/>
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
@@ -136,7 +136,7 @@ class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
+        <SettingCheckbox disabled dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings}/>
       </SettingsList>
@@ -147,7 +147,7 @@ class PrivacyTab extends ImmutableComponent {
 class SecurityTab extends ImmutableComponent {
   render () {
     return <SettingsList>
-      <SettingCheckbox dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings}/>
+      <SettingCheckbox disabled dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings}/>
     </SettingsList>
   }
 }
