@@ -73,12 +73,13 @@ class UrlBar extends ImmutableComponent {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         e.preventDefault()
-        const location = this.props.urlbar.get('location')
+        let location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
           this.restore()
           WindowActions.setUrlBarSelected(true)
         } else {
           const isLocationUrl = isUrl(location)
+          const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', location)
           const selectedIndex = this.urlBarSuggestions.activeIndex
           if (this.suggestionsShown && selectedIndex > 0) {
             // load the selected suggestion
@@ -87,11 +88,16 @@ class UrlBar extends ImmutableComponent {
           // For whitepsace we want a search no matter what.
           } else if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
             WindowActions.loadUrl(this.props.activeFrameProps, `www.${location}.com`)
-          } else if (!isLocationUrl) {
-            // do search.
-            WindowActions.loadUrl(this.props.activeFrameProps, this.searchDetail.get('searchURL').replace('{searchTerms}', location))
           } else {
-            WindowActions.loadUrl(this.props.activeFrameProps, location)
+            location = isLocationUrl ? location : searchUrl
+            // do search.
+            if (e.altKey) {
+              WindowActions.newFrame({ location }, true)
+            } else if (e.metaKey) {
+              WindowActions.newFrame({ location }, false)
+            } else {
+              WindowActions.loadUrl(this.props.activeFrameProps, location)
+            }
           }
           // this can't go through AppActions for some reason
           // or the whole window will reload on the first page request
