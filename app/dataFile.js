@@ -115,10 +115,11 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
  * @param {function(BrowserWindow)} startExtension Function that starts the
  *   extension listeners.
  * @param {function(Buffer|string)} onInitDone function to call when data is downloaded.
+ * @param {boolean} forceDownload Whether to force the data file to be downloaded. Defaults to false.
  *   Takes either the data itself as an argument or the pathname on disk of the
  *   directory where the data was downloaded.
  */
-module.exports.init = (resourceName, startExtension, onInitDone) => {
+module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) => {
   const version = AppConfig[resourceName].version
   const url = AppConfig[resourceName].url.replace('{version}', version)
 
@@ -147,7 +148,7 @@ module.exports.init = (resourceName, startExtension, onInitDone) => {
       })
     })
 
-  if (module.exports.shouldRedownloadFirst(resourceName, version)) {
+  if (forceDownload || module.exports.shouldRedownloadFirst(resourceName, version)) {
     module.exports.downloadDataFile(resourceName, url, version, false)
       .then(loadProcess.bind(null, resourceName, version))
       .catch(loadProcess.bind(null, resourceName, version))
