@@ -37,11 +37,9 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     const preloadScripts = ['content/webviewPreload.js']
     if (this.props.frame.get('location') === 'about:preferences') {
-      // TOOD: Remove this line when multiple preload scripts is supported
-      preloadScripts.length = 0
       preloadScripts.push('content/aboutPreload.js')
     }
-    this.webview.setAttribute('contentScripts', preloadScripts.join(' '))
+    this.webview.setAttribute('contentScripts', preloadScripts.join(','))
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
