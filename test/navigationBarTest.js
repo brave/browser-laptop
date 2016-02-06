@@ -207,8 +207,9 @@ describe('urlbar', function () {
     })
 
     it('has an empty url with placeholder', function *() {
+      // var placeholder = 'Search or enter an address'
       yield defaultUrlInputValue(this.app.client)
-      yield selectsText(this.app.client, '')
+      // assert.equal(this.getValue(urlInput), placeholder)
     })
 
     it('has focus', function *() {
@@ -216,7 +217,7 @@ describe('urlbar', function () {
     })
 
     it('selects the text', function *() {
-      this.app.client
+      yield selectsText(this.app.client, '')
     })
   })
 
