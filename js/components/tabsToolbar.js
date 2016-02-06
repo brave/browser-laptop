@@ -40,6 +40,7 @@ class TabsToolbar extends ImmutableComponent {
         tabs={this.props.tabs}/> : null }
       <Tabs tabs={this.props.tabs}
         paintTabs={this.props.paintTabs}
+        previewTabs={this.props.previewTabs}
         tabsPerTabPage={this.props.tabsPerTabPage}
         frames={this.props.frames}
         activeFrame={this.props.activeFrame}

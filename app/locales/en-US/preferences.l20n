@@ -30,6 +30,7 @@
 <switchToNewTabs "Switch to new tabs immediately">
 <paintTabs "Show tabs in page theme color">
 <tabsPerTabPage "Tabs per tab page">
+<showTabPreviews "Show tab previews on hover">
 
 /* Prviacy settings page */
 <suggestionTypes "When using the location bar, suggest:">

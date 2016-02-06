@@ -70,6 +70,7 @@ module.exports = {
     'opened-tab-suggestions': true,
     'block-reported-sites': false,
     'paint-tabs': true,
-    'tabs-per-tab-page': 6
+    'tabs-per-tab-page': 6,
+    'show-tab-previews': true
   }
 }

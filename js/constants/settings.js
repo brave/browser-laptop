@@ -15,6 +15,7 @@ const settings = {
   SWITCH_TO_NEW_TABS: _,
   PAINT_TABS: _,
   TABS_PER_TAB_PAGE: _,
+  SHOW_TAB_PREVIEWS: _,
   // Privacy Tab
   HISTORY_SUGGESTIONS: _,
   BOOKMARK_SUGGESTIONS: _,

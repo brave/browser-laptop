@@ -261,6 +261,7 @@ class Main extends ImmutableComponent {
         />
         <TabsToolbar
           paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
+          previewTabs={getSetting(settingsState, settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
