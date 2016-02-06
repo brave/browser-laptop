@@ -10,7 +10,6 @@ const ipc = electron.ipcRenderer
 
 // Actions
 const WindowActions = require('../actions/windowActions')
-const AppActions = require('../actions/appActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
@@ -48,7 +47,6 @@ class Main extends ImmutableComponent {
         deltaY = deltaY + e.deltaY
       }
     })
-
     ipc.on('scroll-touch-begin', function () {
       trackingFingers = true
       startTime = (new Date()).getTime()
@@ -68,10 +66,6 @@ class Main extends ImmutableComponent {
       deltaX = 0
       deltaY = 0
       startTime = 0
-    })
-
-    ipc.on(messages.CHANGE_SETTING, function (e, key, value) {
-      AppActions.changeSetting(key, value)
     })
   }
 

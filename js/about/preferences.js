@@ -11,7 +11,6 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
-const ipc = require('./ipc')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 
@@ -252,15 +251,14 @@ class AboutPreferences extends React.Component {
       preferenceTab: preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber()
     }
-    ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
+    window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
       this.setState({
-        settings
+        settings: e.detail
       })
     })
   }
 
   changeTab (preferenceTab) {
-    ipc.send('set-about-state', preferenceTab)
     this.setState({
       preferenceTab
     })

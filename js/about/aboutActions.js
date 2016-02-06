@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const ipc = require('./ipc')
 const messages = require('../constants/messages')
 
 const AboutActions = {
@@ -13,7 +12,13 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSetting: function (key, value) {
-    ipc.send(messages.CHANGE_SETTING, key, value)
+    const event = new window.CustomEvent(messages.CHANGE_SETTING, {
+      detail: {
+        key,
+        value
+      }
+    })
+    window.dispatchEvent(event)
   }
 }
 module.exports = AboutActions

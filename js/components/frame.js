@@ -35,7 +35,13 @@ class Frame extends ImmutableComponent {
     this.webview = this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    this.webview.setAttribute('contentScripts', 'content/webviewPreload.js')
+    const preloadScripts = ['content/webviewPreload.js']
+    if (this.props.frame.get('location') === 'about:preferences') {
+      // TOOD: Remove this line when multiple preload scripts is supported
+      preloadScripts.length = 0
+      preloadScripts.push('content/aboutPreload.js')
+    }
+    this.webview.setAttribute('contentScripts', preloadScripts.join(' '))
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
@@ -117,8 +123,7 @@ class Frame extends ImmutableComponent {
     }
 
     if (this.props.frame.get('location') === 'about:preferences') {
-      this.webview.contentWindow.postMessage([messages.SETTINGS_UPDATED,
-        this.props.settings.toJS()], getTargetAboutUrl(this.props.frame.get('location')))
+      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
     }
   }
 
