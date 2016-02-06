@@ -61,16 +61,16 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/releases/winx64`
   },
   defaultSettings: {
-    'startup-mode': 'lastTime',
-    homepage: 'https://www.brave.com',
-    'default-search-engine': './content/search/google.xml',
-    'switch-to-new-tabs': false,
-    'history-suggestions': false,
-    'bookmark-suggestions': true,
-    'opened-tab-suggestions': true,
-    'block-reported-sites': false,
-    'paint-tabs': true,
-    'tabs-per-tab-page': 6,
-    'show-tab-previews': true
+    'general.startup-mode': 'lastTime',
+    'general.homepage': 'https://www.brave.com',
+    'search.default-search-engine': './content/search/google.xml',
+    'tabs.switch-to-new-tabs': false,
+    'tabs.paint-tabs': true,
+    'tabs.tabs-per-tab-page': 6,
+    'tabs.show-tab-previews': true,
+    'privacy.history-suggestions': false,
+    'privacy.bookmark-suggestions': true,
+    'privacy.opened-tab-suggestions': true,
+    'security.block-reported-sites': false
   }
 }
