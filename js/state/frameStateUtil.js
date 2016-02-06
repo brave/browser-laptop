@@ -38,7 +38,10 @@ export function setActiveFrameIndex (windowState, i) {
 }
 
 export function setActiveFrameKey (windowState, activeFrameKey) {
-  return windowState.set('activeFrameKey', activeFrameKey)
+  return windowState.merge({
+    activeFrameKey: activeFrameKey,
+    previewFrameKey: null
+  })
 }
 
 export function makeNextFrameActive (windowState) {
