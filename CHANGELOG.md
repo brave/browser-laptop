@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.7.13](https://github.com/brave/browser-laptop/releases/v0.7.13dev)
+- Preferences: startup mode, homepage, default search engine, various tab preferences, and privacy settings.  More to come.
+- Varioius UI enhnacements.
+- Security: Third party cookie blocking option (enabled by default).
+- Security: Third party HTTP Referer header blocking option (enabled by default).
+- Security: Precautionary only, removed node from ever loading in web views.
+- Security: Precautionary Added CSP to UI pages.
+- Security: Secure sites now display a lock in title mode.
+- Various keyboard shortcuts added, various focus issues fixed, various bugs fixed.
+- Context menus copy link location works in more cases now.
+- about:newtab, about:about pages implemented.
+- Placeholder ads link to a page explaining what they are.
+- 2 finger navigation on OS X.
+- Cleaned up UI to remove unneeded elements for about: pages.
+
 ## [0.7.12](https://github.com/brave/browser-laptop/releases/v0.7.12dev)
 - Various crash fixes and window.opener fixes.
 - Fix for state saving when an update is applied.
