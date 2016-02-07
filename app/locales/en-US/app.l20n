@@ -73,7 +73,7 @@
 <updateOops "Oops!">
 <updateNotYet "Not yet!">
 <updateAvail "A Brave update was just released.">
-<updateNotAvail "Sorry there are no updates yet, please check back soon.">
+<updateNotAvail "Sorry, there are no updates yet. Please check back soon.">
 <updateRequiresRelaunch "Requires a quick relaunch...">
 <updateViewLog "View log">
 <updateHide "Hide">
