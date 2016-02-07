@@ -35,7 +35,11 @@ class Frame extends ImmutableComponent {
     this.webview = this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    this.webview.setAttribute('preload', 'content/webviewPreload.js')
+    const preloadScripts = ['content/webviewPreload.js']
+    if (this.props.frame.get('location') === 'about:preferences') {
+      preloadScripts.push('content/aboutPreload.js')
+    }
+    this.webview.setAttribute('contentScripts', preloadScripts.join(','))
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
@@ -54,12 +58,6 @@ class Frame extends ImmutableComponent {
 
   componentDidMount () {
     this.updateWebview()
-    // forward postMessage events from webview to webContents
-    window.addEventListener('message', function (event) {
-      if (this.webview.getAttribute('src').match(event.origin)) {
-        remote.getCurrentWebContents().send.apply(null, event.data)
-      }
-    }.bind(this))
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -123,8 +121,7 @@ class Frame extends ImmutableComponent {
     }
 
     if (this.props.frame.get('location') === 'about:preferences') {
-      this.webview.contentWindow.postMessage([messages.SETTINGS_UPDATED,
-        this.props.settings.toJS()], getTargetAboutUrl(this.props.frame.get('location')))
+      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
     }
   }
 
@@ -201,7 +198,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-navigate', (e) => {
       // only give focus focus is this is not the initial default page load
-      if (this.props.isActive && this.webview.canGoBack()) {
+      if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
         this.webview.focus()
       }
     })
@@ -254,8 +251,7 @@ class Frame extends ImmutableComponent {
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
-    this.webview.contentWindow.postMessage([messages.SET_AD_DIV_CANDIDATES,
-      adDivCandidates, Config.vault.replacementUrl], currentLocation)
+    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
   }
 
   get isPrivileged () {

@@ -111,7 +111,6 @@ const createWindow = (browserOpts, defaults) => {
     title: AppConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))
-  mainWindow.toggleDevTools()
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was

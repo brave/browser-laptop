@@ -16,7 +16,7 @@ const app = electron.app
 const Menu = require('./menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const CrashHerald = require('./crash-herald')
@@ -81,7 +81,7 @@ app.on('ready', function () {
   app.on('activate', function () {
     // (OS X) open a new window when the user clicks on the app icon if there aren't any open
     if (BrowserWindow.getAllWindows().length === 0) {
-      AppActions.newWindow()
+      appActions.newWindow()
     }
   })
 
@@ -111,22 +111,22 @@ app.on('ready', function () {
     const perWindowState = initialState.perWindowState
 
     delete initialState.perWindowState
-    AppActions.setState(Immutable.fromJS(initialState))
+    appActions.setState(Immutable.fromJS(initialState))
     return perWindowState
   }).then(perWindowState => {
     if (!perWindowState || perWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {
-        AppActions.newWindow()
+        appActions.newWindow()
       }
     } else {
       perWindowState.forEach(wndState => {
-        AppActions.newWindow(undefined, undefined, wndState)
+        appActions.newWindow(undefined, undefined, wndState)
       })
     }
     process.emit(messages.APP_INITIALIZED)
 
     if (CmdLine.newWindowURL) {
-      AppActions.newWindow(Immutable.fromJS({
+      appActions.newWindow(Immutable.fromJS({
         location: CmdLine.newWindowURL
       }))
     }
@@ -137,6 +137,18 @@ app.on('ready', function () {
 
     ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
       Menu.init(args)
+    })
+
+    ipcMain.on(messages.CONTEXT_MENU_OPENED, (e, nodeName) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
+    })
+
+    ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
+      appActions.changeSetting(key, value)
+    })
+
+    ipcMain.on(messages.STOP_LOAD, () => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.STOP_LOAD)
     })
 
     Menu.init()
