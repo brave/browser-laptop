@@ -22,7 +22,7 @@ describe('pinnedTabs', function () {
     it('creates a new pinned tab when signaled', function *() {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPinned: true })
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('.tab.isPinned[data-frame-key="2"]')
     })
   })
 })
