@@ -65,8 +65,7 @@
     "sqlite3": "^3.1.0",
     "tracking-protection": "1.0.x",
     "url-loader": "^0.5.7",
-    "urlutil.js": "^0.1.1",
-    "vibrant": "jariz/vibrant.js#1.0"
+    "urlutil.js": "^0.1.1"
   },
   "devDependencies": {
     "asar": "^0.8.3",

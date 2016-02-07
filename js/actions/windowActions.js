@@ -582,12 +582,15 @@ const WindowActions = {
    *
    * @param {Object} frameProps - Properties of the frame in question
    * @param {string} themeColor - Theme color of the frame
+   * @param {string} computedThemeColor - Computed theme color of the
+   *   frame which is used if no frame color is present
    */
-  setThemeColor: function (frameProps, themeColor) {
+  setThemeColor: function (frameProps, themeColor, computedThemeColor) {
     WindowDispatcher.dispatch({
       actionType: WindowConstants.WINDOW_SET_THEME_COLOR,
       frameProps,
-      themeColor
+      themeColor,
+      computedThemeColor
     })
   },
 
