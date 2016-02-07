@@ -138,6 +138,7 @@ const doAction = (action) => {
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
         windowState = windowState.mergeIn(activeFrameStatePath(), {
           audioPlaybackActive: false,
+          icon: undefined,
           activeShortcut: 'reload'
         })
       } else {
@@ -145,6 +146,7 @@ const doAction = (action) => {
           src: action.location,
           location: action.location,
           audioPlaybackActive: false,
+          icon: undefined,
           // We want theme colors reset here instead of in WINDOW_SET_LOCATION
           // because inter page navigation would make the tab color
           // blink otherwise.  The theme color will be reset eventually
@@ -161,6 +163,7 @@ const doAction = (action) => {
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
+        icon: undefined,
         adblock: {},
         trackingProtection: {},
         location: action.location
