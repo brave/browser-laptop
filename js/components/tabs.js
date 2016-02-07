@@ -40,6 +40,7 @@ class Tabs extends ImmutableComponent {
 
   render () {
     return <div className='tabs'>
+        <span className='tabContainer'>
         {(() => {
           if (this.props.tabPageIndex > 0) {
             return <span
@@ -47,7 +48,6 @@ class Tabs extends ImmutableComponent {
                 onClick={this.onPrevPage.bind(this)} />
           }
         })()}
-        <span className='tabContainer'>
         {
           this.props.currentFrames
             .filter(frameProps => !frameProps.get('isPinned'))
@@ -62,11 +62,6 @@ class Tabs extends ImmutableComponent {
                   isPrivate={frameProps.get('isPrivate')}
                   partOfFullPageSet={this.props.partOfFullPageSet}/>)
         }
-        { !this.props.partOfFullPageSet && this.props.currentFrames.size !== 0
-        ? <Button label='+'
-          className='navbutton newFrameButton'
-          onClick={WindowActions.newFrame} /> : null }
-        </span>
         {(() => {
           if (this.props.currentFrames.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
@@ -74,6 +69,10 @@ class Tabs extends ImmutableComponent {
               onClick={this.onNextPage.bind(this)} />
           }
         })()}
+        <Button label='+'
+          className='navbutton newFrameButton'
+          onClick={WindowActions.newFrame} />
+        </span>
     </div>
   }
 }
