@@ -10,8 +10,7 @@ const createScript = function (scriptPath) {
     document.body.appendChild(script)
   })
 }
+createScript('http://localhost:{port}/built/app.entry.js')
 createScript('http://localhost:{port}/webpack-dev-server.js').catch(function () {
   document.querySelector('#setupError').style.display = 'block'
-}).then(function () {
-  createScript('http://localhost:{port}/built/app.entry.js')
 })
