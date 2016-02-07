@@ -197,6 +197,7 @@ class Frame extends ImmutableComponent {
         this.webview.canGoForward())
     })
     this.webview.addEventListener('did-navigate', (e) => {
+      WindowActions.setFavicon(this.props.frame, null)
       // only give focus focus is this is not the initial default page load
       if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
         this.webview.focus()
