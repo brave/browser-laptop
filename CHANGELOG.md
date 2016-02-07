@@ -2,7 +2,7 @@
 
 ## [0.7.13](https://github.com/brave/browser-laptop/releases/v0.7.13dev)
 - Preferences: startup mode, homepage, default search engine, various tab preferences, and privacy settings.  More to come.
-- Varioius UI enhnacements.
+- Various UI enhancements.
 - Security: Third party cookie blocking option (enabled by default).
 - Security: Third party HTTP Referer header blocking option (enabled by default).
 - Security: Precautionary only, removed node from ever loading in web views.
