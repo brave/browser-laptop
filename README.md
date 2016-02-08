@@ -42,12 +42,7 @@ Make sure you have all of the pre-requisite compilers/applications [Installed](h
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
-During installation you will likely see lines like the following which may be safely ignored
-
-    npm WARN deprecated css-list@0.1.3: Deprecated.
-    npm WARN install Couldn't install optional dependency: Unsupported
-
-If installing on a new machine with little or no node.js previously installed this can take a long time, especially if you are outside the USA and/or have limited bandwidth. In such cases you may also get github timeouts which result in failures due to ECONNRESET messages or similar. If this happens. you should simply rerun the `npm install` command until these stop
+Additional notes on troubleshooting installation issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
 
 ## Development
 
@@ -72,6 +67,7 @@ e.g.
 
 `BRAVE_PORT=9001 npm run start`
 
+Additional notes on troubleshooting development issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
 
 
 ### Debugging
