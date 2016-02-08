@@ -28,6 +28,7 @@ const startAdBlocking = () => {
   Filtering.registerFilteringCB(details => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const shouldBlock = firstPartyUrl.protocol &&
+      details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
