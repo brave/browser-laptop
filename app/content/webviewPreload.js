@@ -82,33 +82,45 @@
     var segment_expiration_time = 0 // no expiration
 
     // ref param for referrer when possible
-    var srcUrl = replacementUrl + '?width=' + adSize[0] + '&height=' + adSize[1] + '&seg=' + segment + ':' + time_in_segment + ':' + segment_expiration_time
-    var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] + '; padding: 0; margin: 0; overflow: hidden;"><script src="' + srcUrl + '"></script></body></html>'
+    var srcUrl = replacementUrl +
+                  '?width=' + adSize[0] +
+                  '&height=' + adSize[1] +
+                  '&seg=' + segment + ':' + time_in_segment + ':' + segment_expiration_time
 
-    if (node.tagName === 'IFRAME') {
-      node.srcdoc = src
-      node.sandbox = 'allow-scripts'
-    } else {
-      while (node.firstChild) {
-        node.removeChild(node.firstChild)
-      }
-      var iframe = document.createElement('iframe')
-      iframe.style.padding = 0
-      iframe.style.border = 0
-      iframe.style.margin = 0
-      iframe.style.width = adSize[0] + 'px'
-      iframe.style.height = adSize[1] + 'px'
-      iframe.srcdoc = src
-      iframe.sandbox = 'allow-scripts allow-popups'
-      node.appendChild(iframe)
-      ensureNodeVisible(node)
-      if (node.parentNode) {
-        ensureNodeVisible(node.parentNode)
-        if (node.parentNode) {
-          ensureNodeVisible(node.parentNode.parentNode)
+    var xhttp = new window.XMLHttpRequest()
+    xhttp.onreadystatechange = function () {
+      if (xhttp.readyState === 4 && xhttp.status === 200) {
+        var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] +
+                            '; padding: 0; margin: 0; overflow: hidden;">' + xhttp.responseText + '</body></html>'
+        var sandbox = 'allow-scripts allow-popups allow-popups-to-escape-sandbox'
+        if (node.tagName === 'IFRAME') {
+          node.srcdoc = src
+          node.sandbox = sandbox
+        } else {
+          while (node.firstChild) {
+            node.removeChild(node.firstChild)
+          }
+          var iframe = document.createElement('iframe')
+          iframe.style.padding = 0
+          iframe.style.border = 0
+          iframe.style.margin = 0
+          iframe.style.width = adSize[0] + 'px'
+          iframe.style.height = adSize[1] + 'px'
+          iframe.srcdoc = src
+          iframe.sandbox = sandbox
+          node.appendChild(iframe)
+          ensureNodeVisible(node)
+          if (node.parentNode) {
+            ensureNodeVisible(node.parentNode)
+            if (node.parentNode) {
+              ensureNodeVisible(node.parentNode.parentNode)
+            }
+          }
         }
       }
     }
+    xhttp.open('GET', srcUrl, true)
+    xhttp.send()
   }
 
   // Fires when the browser has ad replacement information to give
