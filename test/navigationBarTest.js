@@ -2,7 +2,7 @@
 
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
-const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, urlbarIcon} = require('./lib/selectors')
+const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('./lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 
@@ -68,7 +68,7 @@ describe('urlbar', function () {
       it('has title mode', function *() {
         const host = this.host
         yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === host + ' | Page 1')
+          return this.getText(titleBar).then(val => val === host + ' | Page 1')
         })
         .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
       })
@@ -86,7 +86,7 @@ describe('urlbar', function () {
         yield this.app.client
           .ipcSend('shortcut-focus-url', false)
           .waitUntil(function () {
-            return this.getValue(urlInput).then(val => val === page1Url)
+            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
           })
         yield selectsText(this.app.client, page1Url)
       })
@@ -102,10 +102,9 @@ describe('urlbar', function () {
       })
 
       it('does not have title mode', function *() {
-        let page_no_title = this.page_no_title
         yield this.app.client
           .waitUntil(function () {
-            return this.getValue(urlInput).then(val => val === page_no_title)
+            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
           })
           .waitForExist(navigatorLoadTime)
       })
