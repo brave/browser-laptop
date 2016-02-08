@@ -327,9 +327,12 @@ class Frame extends ImmutableComponent {
           isPreview: this.props.isPreview
         })}/>
       { this.props.frame.get('hrefPreview')
-        ? <div className={cx({hrefPreview: true})}>
-            {this.props.frame.get('hrefPreview')}
-          </div> : null
+        ? <div className={cx({
+          hrefPreview: true,
+          right: this.props.frame.get('showOnRight')
+        })}>
+          {this.props.frame.get('hrefPreview')}
+        </div> : null
       }
     </div>
   }

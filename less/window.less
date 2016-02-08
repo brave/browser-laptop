@@ -139,12 +139,20 @@ html,
   color: @chromeText;
   font-size: @defaultFontSize;
   left: 0;
-  max-width: 40em;
+  max-width: 40%;
   overflow-x: hidden;
   padding: 0.2em 0.5em;
   position: fixed;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &.right {
+    left: auto;
+    right: 0;
+    border-width: 1px 0 0 1px;
+    border-top-left-radius: @borderRadius;
+    border-top-right-radius: 0;
+  }
 }
 
 body.fullScreen .frameWrapper.isActive {

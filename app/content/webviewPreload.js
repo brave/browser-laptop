@@ -273,13 +273,13 @@
   document.addEventListener('mouseover', (event) => {
     var target = delegate(event, 'a')
     if (target) {
-      ipc.send('link-hovered', target.href)
+      ipcRenderer.send('link-hovered', target.href)
     }
   })
 
   document.addEventListener('mouseout', (event) => {
     if (delegate(event, 'a')) {
-      ipc.send('link-hovered', null)
+      ipcRenderer.send('link-hovered', null)
     }
   })
 

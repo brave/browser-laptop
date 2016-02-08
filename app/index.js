@@ -143,6 +143,10 @@ app.on('ready', function () {
       BrowserWindow.getFocusedWindow().webContents.send(messages.CONTEXT_MENU_OPENED, nodeName)
     })
 
+    ipcMain.on(messages.LINK_HOVERED, (e, href) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.LINK_HOVERED, href)
+    })
+
     ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
       appActions.changeSetting(key, value)
     })

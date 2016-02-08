@@ -494,8 +494,10 @@ const doAction = (action) => {
 WindowDispatcher.register(doAction)
 
 ipc.on(messages.LINK_HOVERED, (e, href) => {
+  const showOnRight = false // todo: add this
   windowState = windowState.mergeIn(activeFrameStatePath(), {
-    hrefPreview: href
+    hrefPreview: href,
+    showOnRight
   })
   windowStore.emitChange()
 })
