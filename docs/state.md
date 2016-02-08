@@ -41,6 +41,9 @@ AppStore
   adInsertion: {
     enabled: boolean // Enable ad insertion
   },
+  cookieblock: {
+    enabled: boolean // Enable 3p cookie/referer blocking
+  },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {
@@ -53,15 +56,18 @@ AppStore
     lastCheckTimestamp: boolean
   },
   settings: [{
-    startup-mode: string, // One of: lastTime, homePage, newTabPage
-    homepage: string, // URL of the user's homepage
-    default-search-engine: string, // path to the open search XML
-    switch-to-new-tabs: boolean, // true if newly opened tabs should be focused immediately
-    history-suggestions: boolean, // Auto suggest for history enabled
-    bookmark-suggestions: boolean, // Auto suggest for bookmarks enabled
-    opened-tab-suggestions: boolean, // Auto suggest for opened tabs enabled
-    block-reported-sites: boolean, // true to block reported web forgery sites
-    paint-tabs: boolean // true if the page theme color and favicon color should be used for tabs
+    // See defaults in js/constants/appConfig.js
+    'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
+    'general.homepage': string, // URL of the user's homepage
+    'search.default-search-engine': string, // path to the open search XML
+    'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
+    'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
+    'tabs.tabs-per-tab-page': number, // Number of tabs per tab page
+    'tabs.show-tab-previews': boolean, // True to show tab previews
+    'privacy.history-suggestions': boolean, // Auto suggest for history enabled
+    'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
+    'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
+    'security.block-reported-sites': boolean // true to block reported web forgery sites
   }]
 }
 ```

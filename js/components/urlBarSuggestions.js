@@ -14,6 +14,8 @@ import {isSourceAboutUrl, isUrl} from '../lib/appUrlUtil.js'
 import Immutable from 'immutable'
 import debounce from '../lib/debounce.js'
 const {getSiteIconClass} = require('../state/siteUtil.js')
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
@@ -140,37 +142,41 @@ class UrlBarSuggestions extends ImmutableComponent {
       })
 
     // opened frames
-    suggestions = suggestions.concat(mapListToElements({
-      data: this.props.frames,
-      maxResults: Config.urlBarSuggestions.maxOpenedFrames,
-      classHandler: () => 'fa-file',
-      clickHandler: (frameProps) =>
-        WindowActions.setActiveFrame(frameProps),
-      formatTitle: frame => frame.get('title') || frame.get('location'),
-      filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
-        frame.get('key') !== this.props.activeFrameProps.get('key') &&
-        (frame.get('title') && frame.get('title').toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-        frame.get('location') && frame.get('location').toLowerCase().includes(this.props.urlLocation.toLowerCase()))}))
+    if (getSetting(this.props.settings, settings.OPENED_TAB_SUGGESTIONS)) {
+      suggestions = suggestions.concat(mapListToElements({
+        data: this.props.frames,
+        maxResults: Config.urlBarSuggestions.maxOpenedFrames,
+        classHandler: () => 'fa-file',
+        clickHandler: (frameProps) =>
+          WindowActions.setActiveFrame(frameProps),
+        formatTitle: frame => frame.get('title') || frame.get('location'),
+        filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
+          frame.get('key') !== this.props.activeFrameProps.get('key') &&
+          (frame.get('title') && frame.get('title').toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
+          frame.get('location') && frame.get('location').toLowerCase().includes(this.props.urlLocation.toLowerCase()))}))
+    }
 
-    // history, bookmarks, reader list
-    suggestions = suggestions.concat(mapListToElements({
-      data: this.props.sites,
-      maxResults: Config.urlBarSuggestions.maxSites,
-      classHandler: getSiteIconClass,
-      clickHandler: navigateClickHandler(site => {
-        return site.get('location')
-      }),
-      sortHandler: (site1, site2) => {
-        return site2.get('tags').size - site1.get('tags').size
-      },
-      formatTitle: site => site.get('title') || site.get('location'),
-      filterValue: site => {
-        const title = site.get('title') || ''
-        const location = site.get('location') || ''
-        return title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-          location.toLowerCase().includes(this.props.urlLocation.toLowerCase())
-      }
-    }))
+    // bookmarks, reader list
+    if (getSetting(this.props.settings, settings.BOOKMARK_SUGGESTIONS)) {
+      suggestions = suggestions.concat(mapListToElements({
+        data: this.props.sites,
+        maxResults: Config.urlBarSuggestions.maxSites,
+        classHandler: getSiteIconClass,
+        clickHandler: navigateClickHandler(site => {
+          return site.get('location')
+        }),
+        sortHandler: (site1, site2) => {
+          return site2.get('tags').size - site1.get('tags').size
+        },
+        formatTitle: site => site.get('title') || site.get('location'),
+        filterValue: site => {
+          const title = site.get('title') || ''
+          const location = site.get('location') || ''
+          return title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
+            location.toLowerCase().includes(this.props.urlLocation.toLowerCase())
+        }
+      }))
+    }
 
     // Search suggestions
     if (this.props.searchSuggestions) {

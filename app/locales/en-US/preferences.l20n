@@ -29,12 +29,14 @@
 /* Tabs settings page */
 <switchToNewTabs "Switch to new tabs immediately">
 <paintTabs "Show tabs in page theme color">
+<tabsPerTabPage "Tabs per tab page">
+<showTabPreviews "Show tab previews on hover">
 
 /* Prviacy settings page */
 <suggestionTypes "When using the location bar, suggest:">
-<history "History">
+<history "History (not available yet)">
 <bookmarks "Bookmarks">
 <openedTabs "Open tabs">
 
 /* Security settings page */
-<blockAttackSites "Block reported attack sites (not implemented yet)">
+<blockAttackSites "Block reported attack sites (not available yet)">

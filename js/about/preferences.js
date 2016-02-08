@@ -7,12 +7,12 @@ const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
-const AppConfig = require('../constants/appConfig')
+const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
-const ipc = require('./ipc')
 const aboutActions = require('./aboutActions')
+const getSetting = require('../settings').getSetting
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -25,7 +25,16 @@ const changeSetting = (key, e) => {
   if (e.target.type === 'checkbox') {
     aboutActions.changeSetting(key, e.target.checked)
   } else {
-    aboutActions.changeSetting(key, e.target.value)
+    let value = e.target.value
+    if (e.target.type === 'number') {
+      value = value.replace(/\D/g, '')
+      value = parseInt(value, 10)
+      if (Number.isNaN(value)) {
+        return
+      }
+      value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
+    }
+    aboutActions.changeSetting(key, value)
   }
 }
 
@@ -55,8 +64,9 @@ class SettingCheckbox extends ImmutableComponent {
     return <div className='settingItem'>
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
+          disabled={this.props.disabled}
           onChange={changeSetting.bind(null, this.props.prefKey)}
-          checked={this.props.settings.get(this.props.prefKey)}/>
+          checked={getSetting(this.props.settings, this.props.prefKey)}/>
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
     </div>
@@ -67,7 +77,7 @@ class GeneralTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='startsWith'>
-        <select value={this.props.settings.get(settings.STARTUP_MODE)}
+        <select value={getSetting(this.props.settings, settings.STARTUP_MODE)}
           onChange={changeSetting.bind(null, settings.STARTUP_MODE)} >
           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
@@ -76,7 +86,7 @@ class GeneralTab extends ImmutableComponent {
       </SettingItem>
       <SettingItem dataL10nId='myHomepage'>
         <input data-l10n-id='homepageInput'
-          value={this.props.settings.get(settings.HOMEPAGE)}
+          value={getSetting(this.props.settings, settings.HOMEPAGE)}
           onChange={changeSetting.bind(null, settings.HOMEPAGE)} />
       </SettingItem>
     </SettingsList>
@@ -87,7 +97,7 @@ class SearchTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='defaultSearchEngine'>
-        <select value={this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE)}
+        <select value={getSetting(this.props.settings, settings.DEFAULT_SEARCH_ENGINE)}
           onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)}>
           <option value='./content/search/google.xml'>Google</option>
           <option value='./content/search/duckduckgo.xml'>DuckDuckGo</option>
@@ -100,8 +110,17 @@ class SearchTab extends ImmutableComponent {
 class TabsTab extends ImmutableComponent {
   render () {
     return <SettingsList>
+      <SettingItem dataL10nId='tabsPerTabPage'>
+        <input
+          type='number'
+          min='3'
+          max='20'
+          value={getSetting(this.props.settings, settings.TABS_PER_TAB_PAGE)}
+          onChange={changeSetting.bind(null, settings.TABS_PER_TAB_PAGE)} />
+      </SettingItem>
       <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings}/>
       <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings}/>
+      <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings}/>
     </SettingsList>
   }
 }
@@ -118,7 +137,7 @@ class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
+        <SettingCheckbox disabled dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings}/>
       </SettingsList>
@@ -129,7 +148,7 @@ class PrivacyTab extends ImmutableComponent {
 class SecurityTab extends ImmutableComponent {
   render () {
     return <SettingsList>
-      <SettingCheckbox dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings}/>
+      <SettingCheckbox disabled dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings}/>
     </SettingsList>
   }
 }
@@ -218,7 +237,7 @@ class HelpfulHints extends ImmutableComponent {
       </span>
       <div data-l10n-id={`hint${this.props.hintNumber}`}/>
       <div className='helpfulHintsBottom'>
-        <a data-l10n-id='sendUsFeedback' href={AppConfig.contactUrl} />
+        <a data-l10n-id='sendUsFeedback' href={appConfig.contactUrl} />
         <div className='loveToHear' data-l10n-id='loveToHear'/>
       </div>
     </div>
@@ -232,15 +251,14 @@ class AboutPreferences extends React.Component {
       preferenceTab: preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber()
     }
-    ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
+    window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
       this.setState({
-        settings
+        settings: e.detail
       })
     })
   }
 
   changeTab (preferenceTab) {
-    ipc.send('set-about-state', preferenceTab)
     this.setState({
       preferenceTab
     })

@@ -16,9 +16,6 @@ export default {
     max: 9,
     step: 1
   },
-  tabs: {
-    tabsPerPage: 6
-  },
   maxClosedFrames: 100,
   thumbnail: {
     width: 160,

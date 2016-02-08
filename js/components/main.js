@@ -10,9 +10,9 @@ const ipc = electron.ipcRenderer
 
 // Actions
 const WindowActions = require('../actions/windowActions')
-const AppActions = require('../actions/appActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
+const getSetting = require('../settings').getSetting
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -47,7 +47,6 @@ class Main extends ImmutableComponent {
         deltaY = deltaY + e.deltaY
       }
     })
-
     ipc.on('scroll-touch-begin', function () {
       trackingFingers = true
       startTime = (new Date()).getTime()
@@ -68,14 +67,10 @@ class Main extends ImmutableComponent {
       deltaY = 0
       startTime = 0
     })
-
-    ipc.on(messages.CHANGE_SETTING, function (e, key, value) {
-      AppActions.changeSetting(key, value)
-    })
   }
 
   loadOpenSearch () {
-    let engine = this.props.appState.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE])
+    let engine = getSetting(this.props.appState.get('settings'), settings.DEFAULT_SEARCH_ENGINE)
     if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
       loadOpenSearch(engine).then(searchDetail => WindowActions.setSearchDetail(searchDetail))
       this.lastLoadedOpenSearch = engine
@@ -103,7 +98,7 @@ class Main extends ImmutableComponent {
         }
       }
 
-      let openInForeground = self.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS]) === true || options.openInForeground
+      let openInForeground = getSetting(self.props.appState.get('settings'), settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
       WindowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
@@ -214,7 +209,8 @@ class Main extends ImmutableComponent {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
 
     this.frames = {}
-
+    const settingsState = this.props.appState.get('settings') || new Immutable.Map()
+    const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('isPinned'))
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
         <div className='backforward'>
@@ -235,6 +231,7 @@ class Main extends ImmutableComponent {
           activeFrame={activeFrame}
           mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
           searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
+          settings={settingsState}
           searchDetail={this.props.windowState.get('searchDetail')}
         />
         { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
@@ -252,11 +249,14 @@ class Main extends ImmutableComponent {
             className='navbutton'
             onClick={this.onBraveMenu.bind(this)} />
         </div>
-        <TabPages frames={this.props.windowState.get('frames')}
+        <TabPages frames={nonPinnedFrames}
+          tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
         />
         <TabsToolbar
-          paintTabs={this.props.appState.getIn(['settings', settings.PAINT_TABS])}
+          paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
+          previewTabs={getSetting(settingsState, settings.SHOW_TAB_PREVIEWS)}
+          tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
@@ -273,11 +273,11 @@ class Main extends ImmutableComponent {
           sortedFrames.map(frame =>
             <Frame
               ref={node => this.frames[frame.get('key')] = node}
-              prefOpenInForeground={this.props.appState.getIn(['settings', settings.SWITCH_TO_NEW_TABS])}
+              prefOpenInForeground={getSetting(settingsState, settings.SWITCH_TO_NEW_TABS)}
               frames={this.props.windowState.get('frames')}
               frame={frame}
               key={frame.get('key')}
-              settings={this.props.appState.get('settings') || new Immutable.Map()}
+              settings={settingsState || new Immutable.Map()}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}

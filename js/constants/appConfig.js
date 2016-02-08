@@ -14,7 +14,11 @@ module.exports = {
     ADBLOCK: 'adblock',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
-    AD_INSERTION: 'adInsertion'
+    AD_INSERTION: 'adInsertion',
+    COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
+  },
+  cookieblock: {
+    enabled: true
   },
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
@@ -55,5 +59,18 @@ module.exports = {
     // url to check for updates
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/releases/winx64`
+  },
+  defaultSettings: {
+    'general.startup-mode': 'lastTime',
+    'general.homepage': 'https://www.brave.com',
+    'search.default-search-engine': './content/search/google.xml',
+    'tabs.switch-to-new-tabs': false,
+    'tabs.paint-tabs': true,
+    'tabs.tabs-per-tab-page': 6,
+    'tabs.show-tab-previews': true,
+    'privacy.history-suggestions': false,
+    'privacy.bookmark-suggestions': true,
+    'privacy.opened-tab-suggestions': true,
+    'security.block-reported-sites': false
   }
 }

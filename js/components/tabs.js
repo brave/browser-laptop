@@ -13,8 +13,6 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const Button = require('./button')
 const Tab = require('./tab')
 
-import Config from '../constants/config.js'
-
 class Tabs extends ImmutableComponent {
   get activeFrameIndex () {
     return FrameStateUtil.getFramePropsIndex(this.props.frames, this.props.activeFrame)
@@ -37,11 +35,12 @@ class Tabs extends ImmutableComponent {
   get totalPages () {
     return Math.ceil(this.props.frames
         .filter(frame => !frame.get('isPinned'))
-        .size / Config.tabs.tabsPerPage)
+        .size / this.props.tabsPerTabPage)
   }
 
   render () {
     return <div className='tabs'>
+        <span className='tabContainer'>
         {(() => {
           if (this.props.tabPageIndex > 0) {
             return <span
@@ -49,7 +48,6 @@ class Tabs extends ImmutableComponent {
                 onClick={this.onPrevPage.bind(this)} />
           }
         })()}
-        <span className='tabContainer'>
         {
           this.props.currentFrames
             .filter(frameProps => !frameProps.get('isPinned'))
@@ -59,22 +57,22 @@ class Tabs extends ImmutableComponent {
                   frames={this.props.frames}
                   key={'tab-' + frameProps.get('key')}
                   paintTabs={this.props.paintTabs}
+                  previewTabs={this.props.previewTabs}
                   isActive={this.props.activeFrame === frameProps}
                   isPrivate={frameProps.get('isPrivate')}
                   partOfFullPageSet={this.props.partOfFullPageSet}/>)
         }
-        { !this.props.partOfFullPageSet && this.props.currentFrames.size !== 0
-        ? <Button label='+'
-          className='navbutton newFrameButton'
-          onClick={WindowActions.newFrame} /> : null }
-        </span>
         {(() => {
-          if (this.props.currentFrames.size >= Config.tabs.tabsPerPage && this.totalPages > this.props.tabPageIndex + 1) {
+          if (this.props.currentFrames.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
               className='nextTab fa fa-angle-double-right'
               onClick={this.onNextPage.bind(this)} />
           }
         })()}
+        <Button label='+'
+          className='navbutton newFrameButton'
+          onClick={WindowActions.newFrame} />
+        </span>
     </div>
   }
 }

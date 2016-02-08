@@ -22,6 +22,7 @@ const path = require('path')
 
 const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = AppConfig.resourceNames.ADBLOCK
+const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
 const adInsertion = AppConfig.resourceNames.AD_INSERTION
 const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 
@@ -426,6 +427,7 @@ const init = (args) => {
     },
     CommonMenu.buildBraveryMenu({
       adblock: Filtering.isResourceEnabled(adblock),
+      cookieblock: Filtering.isResourceEnabled(cookieblock),
       adInsertion: Filtering.isResourceEnabled(adInsertion),
       trackingProtection: Filtering.isResourceEnabled(trackingProtection),
       httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere)

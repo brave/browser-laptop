@@ -17,7 +17,7 @@ html, body, #appContainer, #appContainer > div {
 
 .prefTabContainer {
   flex-grow: 1;
-  padding: 30px;
+  padding: 60px 30px 30px 30px;
 }
 
 .preferencesTopBar {
@@ -154,9 +154,14 @@ a {
         text-align: right;
       }
     }
+    >input[type="number"] {
+      width: 50px;
+      min-width: 50px;
+    }
     >* {
       display: table-cell;
       margin-bottom: 10px;
+      min-width: 150px;
     }
   }
 }
@@ -166,4 +171,9 @@ input:not([type="checkbox"]), select {
   height: 17px;
   padding-left: 2px;
   width: 250px;
+}
+
+input[type="checkbox"][disabled] {
+  opacity: 0.8;
+  pointer-events: none;
 }

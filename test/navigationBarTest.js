@@ -208,7 +208,6 @@ describe('urlbar', function () {
 
     it('has an empty url with placeholder', function *() {
       yield defaultUrlInputValue(this.app.client)
-      yield selectsText(this.app.client, '')
     })
 
     it('has focus', function *() {
@@ -216,7 +215,7 @@ describe('urlbar', function () {
     })
 
     it('selects the text', function *() {
-      this.app.client
+      yield selectsText(this.app.client, '')
     })
   })
 

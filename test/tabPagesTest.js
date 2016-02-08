@@ -1,7 +1,8 @@
 /* global describe, it, before */
 
 const Brave = require('./lib/brave')
-const Config = require('../js/constants/config').default
+const appConfig = require('../js/constants/appConfig')
+const settings = require('../js/constants/settings')
 const {urlInput, newFrameButtonInsideTabs, newFrameButtonOutsideTabs, tabPage, tabPage1, tabPage2, closeTab, activeWebview} = require('./lib/selectors')
 const assert = require('assert')
 
@@ -25,7 +26,7 @@ describe('tab pages', function () {
         assert.equal(0, res.value.length)
       })
 
-      for (let i = 0; i < Config.tabs.tabsPerPage - 1; i++) {
+      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE] - 1; i++) {
         yield this.app.client.click(newFrameButtonInsideTabs)
       }
       yield this.app.client.click(newFrameButtonOutsideTabs)

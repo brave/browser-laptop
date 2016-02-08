@@ -20,10 +20,13 @@ var targets = null
 var redirectCounter = {}
 // Blacklist of canonicalized hosts (host+pathname) that lead to redirect loops
 var redirectBlacklist = []
+// Whether a download of new rulesets is in progress
+var downloadInProgress = false
 
 module.exports.resourceName = 'httpsEverywhere'
 
 function loadRulesets (dirname) {
+  downloadInProgress = false
   const sqlFile = path.join(dirname, 'rulesets.sqlite')
   const targetsFile = path.join(dirname, 'httpse-targets.json')
   db = new sqlite3.Database(sqlFile, sqlite3.OPEN_READONLY, function (dbErr) {
@@ -67,6 +70,11 @@ function getRewrittenUrl (url, cb) {
     }, (err) => {
       console.log('error loading rulesets', err, url)
       cb()
+      if (err && err.message && err.message.includes('SQLITE_CORRUPT') && !downloadInProgress) {
+        console.log('Redownloading corrupted https everywhere files')
+        downloadInProgress = true
+        DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets, true)
+      }
     })
   }
 }
@@ -121,7 +129,7 @@ function loadRulesetsById (rulesetIds, cb, errback) {
   db.all(queryForRuleset, function (err, rows) {
     var applicableRules
     try {
-      applicableRules = rows.map(item => { return JSON.parse(item.contents) })
+      applicableRules = rows ? rows.map(item => { return JSON.parse(item.contents) }) : []
     } catch (e) {
       err = e
     }
@@ -265,6 +273,7 @@ function registerForSession (session) {
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
+  downloadInProgress = true
   DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
   registerForSession(session.fromPartition(''))
   registerForSession(session.fromPartition('private-1'))
