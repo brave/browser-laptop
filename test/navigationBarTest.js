@@ -3,6 +3,7 @@
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, urlbarIcon} = require('./lib/selectors')
+const urlParse = require('url').parse
 const assert = require('assert')
 
 describe('urlbar', function () {
@@ -58,14 +59,16 @@ describe('urlbar', function () {
 
       before(function *() {
         this.page1Url = Brave.server.url('page1.html')
+        this.host = urlParse(this.page1Url).host
         yield setup(this.app.client)
         yield navigate(this.app.client, this.page1Url)
         yield this.app.client.waitForValue(urlInput)
       })
 
       it('has title mode', function *() {
+        const host = this.host
         yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === 'Page 1')
+          return this.getValue(urlInput).then(val => val === host + ' | Page 1')
         })
         .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
       })
