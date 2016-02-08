@@ -3,7 +3,6 @@
 const Brave = require('./lib/brave')
 const messages = require('../js/constants/messages')
 const {urlInput} = require('./lib/selectors')
-const assert = require('assert')
 
 describe('tabs', function () {
   function * setup (client) {
