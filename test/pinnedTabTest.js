@@ -16,12 +16,13 @@ describe('pinnedTabs', function () {
   describe('new tab signal', function () {
     Brave.beforeAll(this)
     before(function *() {
+      this.page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
     })
 
-    it('creates a new pinned tab when signaled', function *() {
+    it.skip('creates a new pinned tab when signaled', function *() {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPinned: true })
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url, { isPinned: true })
         .waitForExist('.tab.isPinned[data-frame-key="2"]')
     })
   })
