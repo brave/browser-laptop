@@ -4,7 +4,6 @@
 
 import Immutable from 'immutable'
 import Config from '../constants/config.js'
-const getFavicon = require('../lib/faviconUtil.js')
 
 export function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
@@ -276,35 +275,6 @@ export function removeOtherFrames (frames, closedFrames, frameProps) {
     closedFrames,
     frames
   }
-}
-
-/**
- * Extracts theme-color from a favicon using vibrant.js.
- */
-export function computeThemeColor (frameProps) {
-  return new Promise((resolve, reject) => {
-    const icon = getFavicon(frameProps)
-    const img = new window.Image()
-    img.src = icon
-
-    img.onload = () => {
-      const vibrant = new window.Vibrant(img)
-      const swatches = vibrant.swatches()
-
-      // Arbitrary selection ordering, which appears to give decent results.
-      const swatchOrder = ['Vibrant', 'DarkVibrant', 'LightVibrant', 'Muted', 'LightMuted', 'DarkMuted']
-      for (let i = 0; i < swatchOrder.length; i++) {
-        const swatch = swatchOrder[i]
-        if (swatches[swatch]) {
-          resolve(swatches[swatch].getHex())
-          break
-        }
-      }
-    }
-    img.onerror = () => {
-      reject(new Error('Could not render image from blob.'))
-    }
-  })
 }
 
 export function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {

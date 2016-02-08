@@ -4,6 +4,8 @@
 
 // hide this from the rest of the page
 (function () {
+  'use strict'
+
   var ipcRenderer = process.binding.v8_util.getHiddenValue(this, 'ipc')
 
   /**
@@ -241,12 +243,66 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  const rgbaFromStr = function (rgba) {
+    if (!rgba) {
+      return undefined
+    }
+    return rgba.split('(')[1].split(')')[0].split(',')
+  }
+  const distance = function (v1, v2) {
+    let d = 0
+    for (let i = 0; i < v2.length; i++) {
+      d += (v1[i] - v2[i]) * (v1[i] - v2[i])
+    }
+    return Math.sqrt(d)
+  }
+  const getElementColor = function (el) {
+    const currentColorRGBA = window.getComputedStyle(el).backgroundColor
+    const currentColor = rgbaFromStr(currentColorRGBA)
+    // Ensure that the selected color is not too similar to an inactive tab color
+    const threshold = 50
+    if (currentColor !== undefined &&
+        Number(currentColor[3]) !== 0 &&
+        distance(currentColor, [199, 199, 199]) > threshold) {
+      return currentColorRGBA
+    }
+    return undefined
+  }
+  // Determines a good tab color
+  const computeThemeColor = function () {
+    // Use y = 3 to avoid hitting a border which are often gray
+    const samplePoints = [[3, 3], [window.innerWidth / 2, 3], [window.innerWidth - 3, 3]]
+    const els = []
+    for (const point of samplePoints) {
+      const el = document.elementFromPoint(point[0], point[1])
+      if (el) {
+        els.push(el)
+        if (el.parentElement) {
+          els.push(el.parentElement)
+        }
+      }
+    }
+    els.push(document.body)
+    for (const el of els) {
+      if (el !== document.documentElement) {
+        const themeColor = getElementColor(el)
+        if (themeColor) {
+          return themeColor
+        }
+      }
+    }
+    return undefined
+  }
+  ipcRenderer.on('post-page-load-run', function () {
     // Hide broken images
     Array.from(document.querySelectorAll('img')).forEach(function (img) {
       img.addEventListener('error', function () {
         this.style.visibility = 'hidden'
       })
+    })
+    ipcRenderer.sendToHost({
+      actionType: 'theme-color-computed',
+      themeColor: computeThemeColor()
     })
   })
 }).apply(this)

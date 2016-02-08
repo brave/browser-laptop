@@ -1,11 +1,8 @@
 /* global describe, it, before */
 
 const Brave = require('./lib/brave')
-const appConfig = require('../js/constants/appConfig')
-const settings = require('../js/constants/settings')
 const messages = require('../js/constants/messages')
-const {urlInput, newFrameButtonInsideTabs, newFrameButtonOutsideTabs} = require('./lib/selectors')
-const assert = require('assert')
+const {urlInput} = require('./lib/selectors')
 
 describe('tabs', function () {
   function * setup (client) {
@@ -62,29 +59,6 @@ describe('tabs', function () {
     it('makes the new session webview visible', function *() {
       yield this.app.client
         .waitForVisible('webview[partition="persist:partition-1"]')
-    })
-  })
-
-  describe('new tab button', function () {
-    Brave.beforeAll(this)
-    before(function *() {
-      yield setup(this.app.client)
-    })
-
-    it('tab button is located at the correct position', function *() {
-      // The first 5 tabs per page should show up with the new tab button next to the tabs
-      // and upon clicking it should jump back next to the tabs.
-      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE] - 1; i++) {
-        yield this.app.client.waitForExist(newFrameButtonInsideTabs)
-          .isExisting(newFrameButtonOutsideTabs).then(isExisting =>
-            assert(!isExisting))
-          .click(newFrameButtonInsideTabs)
-      }
-      yield this.app.client.waitForExist(newFrameButtonOutsideTabs)
-        .isExisting(newFrameButtonInsideTabs).then(isExisting =>
-          assert(!isExisting))
-        .click(newFrameButtonOutsideTabs)
-        .waitForExist(newFrameButtonInsideTabs)
     })
   })
 

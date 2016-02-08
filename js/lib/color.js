@@ -1,12 +1,7 @@
 module.exports.parseColor = (color) => {
   const div = document.createElement('div')
   div.style.color = color
-  const m = div.style.color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i)
-  if (m) {
-    return [m[1], m[2], m[3]]
-  } else {
-    return null
-  }
+  return div.style.color.split('(')[1].split(')')[0].split(',')
 }
 
 module.exports.getTextColorForBackground = (color) => {
