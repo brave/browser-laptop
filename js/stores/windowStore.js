@@ -166,6 +166,7 @@ const doAction = (action) => {
         icon: undefined,
         adblock: {},
         trackingProtection: {},
+        title: '',
         location: action.location
       })
       // Update the displayed location in the urlbar
