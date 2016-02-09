@@ -38,6 +38,11 @@ let perWindowState = []
 let sessionStateStoreAttempted = false
 
 const saveIfAllCollected = () => {
+  // If we're shutting down early and can't access the state, it's better
+  // to not try to save anything at all and just quit.
+  if (!AppStore.getState()) {
+    app.exit(0)
+  }
   if (perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
     appState.perWindowState = perWindowState
