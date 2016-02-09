@@ -13,7 +13,7 @@
   height: 34px;
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 135px 4px 145px;
+  padding: 0 135px 4px;
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -48,13 +48,19 @@
     .startButtons, .endButtons {
       visibility: hidden;
     }
+
     .urlbarIcon {
-    display: inline-block;
+      display: inline-block;
       opacity: 0.6;
       position: relative;
       left: 0px;
       top: -3px;
-      margin-right: 5px;
+      min-width: 0;
+
+      &[class*=" fa-"] {
+        margin-right: 5px;
+        min-width: 16px;
+      }
     }
   }
 
