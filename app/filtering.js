@@ -11,6 +11,7 @@ const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
 const AppConfig = require('../js/constants/appConfig')
 const urlParse = require('url').parse
+const psl = require('psl')
 
 const filteringFns = []
 
@@ -72,18 +73,12 @@ function registerForSession (session) {
 }
 
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
-  // TODO: This should check public suffix list?
-  // NOTE: This considers upload.wikimedia.org third party to en.wikimedia.org.
-  // perhaps too strict.
   if (!testHost || !baseContextHost) {
     return true
   }
-  if (!testHost.endsWith(baseContextHost)) {
-    return true
-  }
-
-  let c = testHost[testHost.length - baseContextHost.length - 1]
-  return c !== '.' && c !== undefined
+  const testSuffix = psl.parse(testHost).domain
+  const baseContextSuffix = psl.parse(baseContextHost).domain
+  return testSuffix !== baseContextSuffix || !testSuffix || !baseContextSuffix
 }
 
 module.exports.init = () => {
