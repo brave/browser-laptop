@@ -284,7 +284,7 @@
     }
     els.push(document.body)
     for (const el of els) {
-      if (el !== document.documentElement && el instanceof Element) {
+      if (el !== document.documentElement && el instanceof window.Element) {
         const themeColor = getElementColor(el)
         if (themeColor) {
           return themeColor

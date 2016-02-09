@@ -4,6 +4,7 @@
 
 'use strict'
 const Immutable = require('immutable')
+const siteTags = require('../constants/siteTags')
 
 /**
  * Obtains the index of the location in sites
@@ -79,7 +80,7 @@ module.exports.addSite = function (sites, frameProps, tag) {
  */
 module.exports.removeSite = function (sites, frameProps, tag) {
   let index = -1
-  if (frameProps.get('isPinned')) {
+  if (frameProps.get('isPinned') && tag === siteTags.PINNED) {
     index = module.exports.getSiteUrlIndex(sites, frameProps.get('src'))
   }
   // When pinning a tab from the current window the src might not be
