@@ -34,13 +34,14 @@ describe('pinnedTabs', function () {
     })
     it.skip('should focus on next tab', function *() {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com')
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', {isPinned: true})
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.google.com', {isPinned: true})
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.facebook.com', {isPinned: true})
         .rightClick('.tab.isPinned[data-frame-key="2"]').then(function () {
           // need to implement close button on pinned tabs
           this.click('#close')
         })
-        .elementActive('.tab[data-frame-key="1"]').should.eventually.be(true)
+        .waitForElementFocus('.tab.isPinned[data-frame-key="3"]')
     })
   })
 
@@ -53,9 +54,10 @@ describe('pinnedTabs', function () {
 
     it.skip('should close the window if there are no other tabs', function *() {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', {isPinned: true})
-        .rightClick('.tab[data-frame-key="2"]').then(function () {
-          // need to implement close button on pinned tabs
+        .rightClick('.tab[data-frame-key="1"]').then(function () {
+          this.click('#pinTab')
+        })
+        .rightClick('.tab.isPinned[data-frame-key="1"]').then(function () {
           this.click('#close')
         })
         .isExisting('#window').should.eventually.equal(false)
