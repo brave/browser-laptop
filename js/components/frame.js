@@ -29,17 +29,27 @@ class Frame extends ImmutableComponent {
     if (isAboutURL) {
       src = getTargetAboutUrl(src)
     }
+    let contentScripts = ['content/webviewPreload.js']
+    if (this.props.frame.get('location') === 'about:preferences') {
+      contentScripts.push('content/aboutPreload.js')
+    }
+    contentScripts = contentScripts.join(',')
+
+    const contentScriptsChanged =
+      this.webview && contentScripts !== this.webview.getAttribute('contentScripts')
 
     // Create the webview dynamically because React doesn't whitelist all
-    // of the attributes we need.
-    this.webview = this.webview || document.createElement('webview')
+    // of the attributes we need.  Clear out old webviews if the contentScripts
+    // change because they cannot change after being added to the DOM.
+    if (contentScriptsChanged) {
+      while (this.webviewContainer.firstChild) {
+        this.webviewContainer.removeChild(this.webviewContainer.firstChild)
+      }
+    }
+    this.webview = !contentScriptsChanged && this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    const preloadScripts = ['content/webviewPreload.js']
-    if (this.props.frame.get('location') === 'about:preferences') {
-      preloadScripts.push('content/aboutPreload.js')
-    }
-    this.webview.setAttribute('contentScripts', preloadScripts.join(','))
+    this.webview.setAttribute('contentScripts', contentScripts)
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
@@ -48,7 +58,6 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
-
     this.webview.setAttribute('src', src)
     if (!this.webviewContainer.firstChild) {
       this.webviewContainer.appendChild(this.webview)
@@ -267,10 +276,6 @@ class Frame extends ImmutableComponent {
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
-  }
-
-  get isPrivileged () {
-    return isSourceAboutUrl(this.props.frame.get('src'))
   }
 
   goBack () {
