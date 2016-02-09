@@ -52,6 +52,8 @@ const messages = {
   APP_STATE_CHANGE: _,
   APP_ACTION: _,
   STOP_LOAD: _,
+  POST_PAGE_LOAD_RUN: _,
+  THEME_COLOR_COMPUTED: _,
   // Init
   INIT_WINODW: _,
   // Session restore

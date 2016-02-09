@@ -173,6 +173,11 @@ class UrlBar extends ImmutableComponent {
     this.updateDOM()
   }
 
+  get hostValue () {
+    const parsed = urlParse(this.props.activeFrameProps.get('location'))
+    return parsed.host && parsed.protocol !== 'about:' ? parsed.host : ''
+  }
+
   get titleValue () {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
@@ -183,11 +188,6 @@ class UrlBar extends ImmutableComponent {
   get locationValue () {
     return ['about:newtab'].includes(this.props.urlbar.get('location'))
       ? '' : this.props.urlbar.get('location')
-  }
-
-  get inputValue () {
-    return this.props.titleMode
-      ? this.titleValue : this.locationValue
   }
 
   get loadTime () {
@@ -242,7 +242,9 @@ class UrlBar extends ImmutableComponent {
             extendedValidation: this.extendedValidationSSL
           })}/>
         <div id='titleBar'>
-          {this.titleValue}
+          <span><strong>{this.hostValue}</strong></span>
+          <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
+          <span>{this.titleValue}</span>
         </div>
         </div>
       <input type='text'
@@ -253,7 +255,7 @@ class UrlBar extends ImmutableComponent {
         onChange={this.onChange.bind(this)}
         onClick={this.onClick.bind(this)}
         onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
-        value={this.inputValue}
+        value={this.locationValue}
         data-l10n-id='urlbar'
         className={cx({
           insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,

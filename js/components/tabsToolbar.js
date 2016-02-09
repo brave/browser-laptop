@@ -7,14 +7,10 @@ const ImmutableComponent = require('./immutableComponent')
 const Tabs = require('./tabs')
 const Button = require('./button')
 const PinnedTabs = require('./pinnedTabs')
-const WindowActions = require('../actions/windowActions')
 
 class TabsToolbarButtons extends ImmutableComponent {
   render () {
     return <div className='tabsToolbarButtons'>
-      { this.props.partOfFullPageSet || this.props.noFrames
-          ? <Button label='+'
-              className='navbutton newFrameButton' onClick={WindowActions.newFrame} /> : null }
       <Button iconClass='fa-bars'
         className='navbutton menu-button'
         onClick={this.props.onMenu} />
@@ -49,7 +45,7 @@ class TabsToolbar extends ImmutableComponent {
         startingFrameIndex={startingFrameIndex}
         partOfFullPageSet={currentFrames.size === this.props.tabsPerTabPage}
       />
-      <TabsToolbarButtons partOfFullPageSet={currentFrames.size === this.props.tabsPerTabPage}
+      <TabsToolbarButtons
         noFrames={currentFrames.size === 0}
         onMenu={this.props.onMenu}/>
     </div>

@@ -42,6 +42,8 @@ Make sure you have all of the pre-requisite compilers/applications [Installed](h
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
+Additional notes on troubleshooting installation issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
+
 ## Development
 
 To start the server and file watchers run the following on the command line:
@@ -57,6 +59,15 @@ To run the tests:
     npm run watch-test  or  npm run watch-all
 
     npm test
+
+Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the environment variable `BRAVE_PORT` to make it use a different one.
+
+e.g.
+`BRAVE_PORT=9001 npm run watch`
+
+`BRAVE_PORT=9001 npm run start`
+
+Additional notes on troubleshooting development issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
 
 
 ### Debugging

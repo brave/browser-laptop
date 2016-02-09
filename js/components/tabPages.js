@@ -33,10 +33,10 @@ class TabPages extends ImmutableComponent {
     return <div
       className={cx({
         tabPages: true,
-        singlePage: this.tabPageCount === 1
+        singlePage: this.tabPageCount <= 1
       })}>
     {
-      this.tabPageCount !== 1 &&
+      this.tabPageCount > 1 &&
       Array.from(new Array(this.tabPageCount)).map((x, i) =>
         <TabPage
           key={`tabPage-${i}`}

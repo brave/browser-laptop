@@ -55,6 +55,7 @@
     font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 16px;
     white-space: nowrap;
     vertical-align: middle;
     width: calc(~'100% - 40px');
@@ -252,16 +253,18 @@
   }
 }
 
-.prevTab, .nextTab {
-  display: none !important;
+.prevTab,
+.nextTab {
+  display: none;
   color: #3B3B3B;
   font-size: 19px !important;
   height: 27px;
   line-height: 25px !important;
+  text-align: center;
   vertical-align: top;
   width: 34px;
   &:not([disabled]) {
-    display: inline-block !important;
+    display: block;
     background: @chromeSecondary;
     &:hover {
       background: lighten(#eeeeee, 10%);
@@ -273,19 +276,12 @@
   background: linear-gradient(to right, @chromeControlsBackground2, @tabsBackground);
   border-bottom-left-radius: 0;
   border-top-left-radius: @borderRadius;
-  padding-left: 36px;
-  text-align: left;
-  transform: translateX(13px);
 }
 
 .nextTab {
   background: linear-gradient(to left, #afb0b4, #cccccc);
   border-bottom-right-radius: 0;
   border-top-right-radius: @borderRadius;
-  float: right;
-  padding-right: 36px;
-  text-align: right;
-  transform: translateX(-15px);
 }
 
 .pinnedTabs {

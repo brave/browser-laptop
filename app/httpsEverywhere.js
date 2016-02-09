@@ -70,7 +70,7 @@ function getRewrittenUrl (url, cb) {
     }, (err) => {
       console.log('error loading rulesets', err, url)
       cb()
-      if (err.message.includes('SQLITE_CORRUPT') && !downloadInProgress) {
+      if (err && err.message && err.message.includes('SQLITE_CORRUPT') && !downloadInProgress) {
         console.log('Redownloading corrupted https everywhere files')
         downloadInProgress = true
         DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets, true)

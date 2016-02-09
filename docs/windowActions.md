@@ -420,7 +420,7 @@ Dispatches a message to indicate that audio is playing
 
 
 
-### setThemeColor(frameProps, themeColor) 
+### setThemeColor(frameProps, themeColor, computedThemeColor) 
 
 Dispatches a message to indicate that the theme color has changed for a page
 
@@ -429,6 +429,9 @@ Dispatches a message to indicate that the theme color has changed for a page
 **frameProps**: `Object`, Properties of the frame in question
 
 **themeColor**: `string`, Theme color of the frame
+
+**computedThemeColor**: `string`, Computed theme color of the
+  frame which is used if no frame color is present
 
 
 

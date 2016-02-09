@@ -125,7 +125,7 @@ const windowStore = new WindowStore()
 
 // Register callback to handle all updates
 const doAction = (action) => {
-  // console.log(action.actionType, windowState.toJS())
+  // console.log(action.actionType, action, windowState.toJS())
   switch (action.actionType) {
     case WindowConstants.WINDOW_SET_STATE:
       windowState = action.windowState
@@ -138,6 +138,7 @@ const doAction = (action) => {
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
         windowState = windowState.mergeIn(activeFrameStatePath(), {
           audioPlaybackActive: false,
+          icon: undefined,
           activeShortcut: 'reload'
         })
       } else {
@@ -145,6 +146,7 @@ const doAction = (action) => {
           src: action.location,
           location: action.location,
           audioPlaybackActive: false,
+          icon: undefined,
           // We want theme colors reset here instead of in WINDOW_SET_LOCATION
           // because inter page navigation would make the tab color
           // blink otherwise.  The theme color will be reset eventually
@@ -161,6 +163,7 @@ const doAction = (action) => {
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
+        icon: undefined,
         adblock: {},
         trackingProtection: {},
         location: action.location
@@ -200,19 +203,7 @@ const doAction = (action) => {
         loading: false,
         endLoadTime: new Date().getTime()
       })
-      FrameStateUtil.computeThemeColor(action.frameProps).then(
-        color => {
-          windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-            computedThemeColor: color
-          })
-          windowStore.emitChange()
-        },
-        () => {
-          windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-            computedThemeColor: null
-          })
-          windowStore.emitChange()
-        })
+      windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
@@ -360,7 +351,12 @@ const doAction = (action) => {
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_THEME_COLOR:
-      windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
+      if (action.themeColor !== undefined) {
+        windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['themeColor']), action.themeColor)
+      }
+      if (action.computedThemeColor !== undefined) {
+        windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['computedThemeColor']), action.computedThemeColor)
+      }
       windowStore.emitChange()
       break
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:

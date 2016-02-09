@@ -2,7 +2,8 @@
 
 const Brave = require('./lib/brave')
 const Config = require('../js/constants/config').default
-const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, urlbarIcon} = require('./lib/selectors')
+const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('./lib/selectors')
+const urlParse = require('url').parse
 const assert = require('assert')
 
 describe('urlbar', function () {
@@ -58,14 +59,16 @@ describe('urlbar', function () {
 
       before(function *() {
         this.page1Url = Brave.server.url('page1.html')
+        this.host = urlParse(this.page1Url).host
         yield setup(this.app.client)
         yield navigate(this.app.client, this.page1Url)
         yield this.app.client.waitForValue(urlInput)
       })
 
       it('has title mode', function *() {
+        const host = this.host
         yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then(val => val === 'Page 1')
+          return this.getText(titleBar).then(val => val === host + ' | Page 1')
         })
         .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
       })
@@ -83,7 +86,7 @@ describe('urlbar', function () {
         yield this.app.client
           .ipcSend('shortcut-focus-url', false)
           .waitUntil(function () {
-            return this.getValue(urlInput).then(val => val === page1Url)
+            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
           })
         yield selectsText(this.app.client, page1Url)
       })
@@ -99,10 +102,9 @@ describe('urlbar', function () {
       })
 
       it('does not have title mode', function *() {
-        let page_no_title = this.page_no_title
         yield this.app.client
           .waitUntil(function () {
-            return this.getValue(urlInput).then(val => val === page_no_title)
+            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
           })
           .waitForExist(navigatorLoadTime)
       })
@@ -179,7 +181,7 @@ describe('urlbar', function () {
     })
 
     // We need a newer electron build first
-    it.skip('Parses theme-color meta tag when one is present', function *() {
+    it('Parses theme-color meta tag when one is present', function *() {
       const pageWithFavicon = Brave.server.url('theme_color.html')
       yield navigate(this.app.client, pageWithFavicon)
       yield this.app.client.waitUntil(() =>
@@ -187,15 +189,19 @@ describe('urlbar', function () {
           backgroundColor.parsed.hex === '#4d90fe'
       ))
     })
-    it.skip('Obtains theme color from favicon', function *() {
-      const pageWithFavicon = Brave.server.url('favicon.html')
-      yield navigate(this.app.client, pageWithFavicon)
+    it('Obtains theme color from the background', function *() {
+      const redPage = Brave.server.url('red_bg.html')
+      yield navigate(this.app.client, redPage)
       yield this.app.client.waitUntil(() =>
-        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor => {
-          console.log(backgroundColor.parsed.hex)
-          backgroundColor.parsed.hex === '#320f07'
-        }
-      ))
+        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
+          backgroundColor.parsed.hex === '#ff0000'))
+    })
+    it('Obtains theme color from a top header and not background', function *() {
+      const redPage = Brave.server.url('yellow_header.html')
+      yield navigate(this.app.client, redPage)
+      yield this.app.client.waitUntil(() =>
+        this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
+          backgroundColor.parsed.hex === '#ffff66'))
     })
   })
 

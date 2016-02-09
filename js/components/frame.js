@@ -29,17 +29,27 @@ class Frame extends ImmutableComponent {
     if (isAboutURL) {
       src = getTargetAboutUrl(src)
     }
+    let contentScripts = ['content/webviewPreload.js']
+    if (this.props.frame.get('location') === 'about:preferences') {
+      contentScripts.push('content/aboutPreload.js')
+    }
+    contentScripts = contentScripts.join(',')
+
+    const contentScriptsChanged =
+      this.webview && contentScripts !== this.webview.getAttribute('contentScripts')
 
     // Create the webview dynamically because React doesn't whitelist all
-    // of the attributes we need.
-    this.webview = this.webview || document.createElement('webview')
+    // of the attributes we need.  Clear out old webviews if the contentScripts
+    // change because they cannot change after being added to the DOM.
+    if (contentScriptsChanged) {
+      while (this.webviewContainer.firstChild) {
+        this.webviewContainer.removeChild(this.webviewContainer.firstChild)
+      }
+    }
+    this.webview = !contentScriptsChanged && this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    const preloadScripts = ['content/webviewPreload.js']
-    if (this.props.frame.get('location') === 'about:preferences') {
-      preloadScripts.push('content/aboutPreload.js')
-    }
-    this.webview.setAttribute('contentScripts', preloadScripts.join(','))
+    this.webview.setAttribute('contentScripts', contentScripts)
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
@@ -48,7 +58,6 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
-
     this.webview.setAttribute('src', src)
     if (!this.webviewContainer.firstChild) {
       this.webviewContainer.appendChild(this.webview)
@@ -179,6 +188,15 @@ class Frame extends ImmutableComponent {
         this.insertAds(event.target.src)
       }
     })
+    const frame = this.props.frame
+    this.webview.addEventListener('ipc-message', (e) => {
+      let action = e.channel
+      switch (action.actionType) {
+        case messages.THEME_COLOR_COMPUTED:
+          WindowActions.setThemeColor(frame, undefined, action.themeColor || null)
+          break
+      }
+    })
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {
         // TODO: These 3 events should be combined into one
@@ -214,12 +232,14 @@ class Frame extends ImmutableComponent {
       WindowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
+      this.webview.send(messages.POST_PAGE_LOAD_RUN)
     })
     this.webview.addEventListener('did-frame-finish-load', (event) => {
       if (event.isMainFrame) {
         WindowActions.onWebviewLoadEnd(
           this.props.frame,
           this.webview.getURL())
+        this.webview.send(messages.POST_PAGE_LOAD_RUN)
       }
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
@@ -229,7 +249,11 @@ class Frame extends ImmutableComponent {
       WindowActions.setAudioPlaybackActive(this.props.frame, false)
     })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
-      WindowActions.setThemeColor(this.props.frame, themeColor)
+      // Due to a bug in Electron, after navigating to a page with a theme color
+      // to a page without a theme color, the background is sent to us as black
+      // even know there is no background. To work around this we just ignore
+      // the theme color in that case and let the computed theme color take over.
+      WindowActions.setThemeColor(this.props.frame, themeColor !== '#000000' ? themeColor : null)
     })
     this.webview.addEventListener('found-in-page', (e) => {
       if (e.result !== undefined && e.result.matches !== undefined) {
@@ -252,10 +276,6 @@ class Frame extends ImmutableComponent {
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
-  }
-
-  get isPrivileged () {
-    return isSourceAboutUrl(this.props.frame.get('src'))
   }
 
   goBack () {
