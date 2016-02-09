@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var webpack = require('webpack')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
 var WebpackNotifierPlugin = require('webpack-notifier')
 var port = process.env.BRAVE_PORT ? process.env.BRAVE_PORT : 8080
 
@@ -71,6 +72,11 @@ module.exports = {
       'process.env': {
         NODE_ENV: process.env.NODE_ENV === 'production' ? JSON.stringify('production') : JSON.stringify('development')
       }
+    }),
+    new HtmlWebpackPlugin({
+      template: 'ejs-loader!./js/index-dev.ejs',
+      inject: false,
+      filename: '../index-dev.html'
     })
   ],
   devServer: {
