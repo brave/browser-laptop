@@ -32,7 +32,7 @@ const getSetting = require('../js/settings').getSetting
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    const startupModeSettingValue = getSetting(payload.settings, settings.STARTUP_MODE)
+    const startupModeSettingValue = getSetting(payload.settings || {}, settings.STARTUP_MODE)
     const savePerWindowState = startupModeSettingValue === undefined ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
@@ -168,10 +168,12 @@ module.exports.loadAppState = () => {
         // The process always restarts after an update so if the state
         // indicates that a restart isn't wanted, close right away.
         if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-          module.exports.saveAppState(data)
-          // Exit immediately without doing the session store saving stuff
-          // since we want the same state saved except for the update status
-          app.exit(0)
+          module.exports.saveAppState(data).then(() => {
+            // Exit immediately without doing the session store saving stuff
+            // since we want the same state saved except for the update status
+            app.exit(0)
+          })
+          return
         }
       }
       // We used to store a huge list of IDs but we didn't use them.
