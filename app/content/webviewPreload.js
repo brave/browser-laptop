@@ -273,7 +273,11 @@
   document.addEventListener('mouseover', (event) => {
     var target = delegate(event, 'a')
     if (target) {
-      ipcRenderer.send('link-hovered', target.href)
+      const pos = {
+        x: event.clientX,
+        y: event.clientY
+      }
+      ipcRenderer.send('link-hovered', target.href, pos)
     }
   })
 
