@@ -63,11 +63,6 @@ class UrlBar extends ImmutableComponent {
     WindowActions.setNavBarUserInput(location)
   }
 
-  // Whether the suggestions box is visible
-  get suggestionsShown () {
-    return this.urlBarSuggestions.shouldRender()
-  }
-
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
@@ -79,8 +74,8 @@ class UrlBar extends ImmutableComponent {
         } else {
           const isLocationUrl = isUrl(location)
           const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', location)
-          const selectedIndex = this.urlBarSuggestions.activeIndex
-          if (this.suggestionsShown && selectedIndex > 0) {
+          // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
+          if (this.shouldRenderUrlBarSuggestions && this.urlBarSuggestions.activeIndex > 0) {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected()
           // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
@@ -104,13 +99,15 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.UP:
-        if (this.suggestionsShown) {
+        if (this.shouldRenderUrlBarSuggestions) {
+          // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
           this.urlBarSuggestions.previousSuggestion()
           e.preventDefault()
         }
         break
       case KeyCodes.DOWN:
-        if (this.suggestionsShown) {
+        if (this.shouldRenderUrlBarSuggestions) {
+          // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
           this.urlBarSuggestions.nextSuggestion()
           e.preventDefault()
         }
@@ -133,7 +130,7 @@ class UrlBar extends ImmutableComponent {
 
   onBlur (e) {
     // if suggestion box is active then keep url bar active
-    if (!this.suggestionsShown) {
+    if (!this.shouldRenderUrlBarSuggestions) {
       WindowActions.setUrlBarActive(false)
     }
     WindowActions.setUrlBarSelected(false)
@@ -223,6 +220,11 @@ class UrlBar extends ImmutableComponent {
     WindowActions.setSiteInfoVisible(true)
   }
 
+  get shouldRenderUrlBarSuggestions () {
+    return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
+      this.props.urlbar.get('active')
+  }
+
   render () {
     return <form
       action='#'
@@ -266,7 +268,8 @@ class UrlBar extends ImmutableComponent {
         ref={node => this.urlInput = node}/>
         { !this.props.titleMode
           ? <span className='loadTime'>{this.loadTime}</span> : null }
-        <UrlBarSuggestions
+        { this.shouldRenderUrlBarSuggestions
+        ? <UrlBarSuggestions
           ref={node => this.urlBarSuggestions = node}
           suggestions={this.props.urlbar.get('suggestions')}
           settings={this.props.settings}
@@ -277,8 +280,7 @@ class UrlBar extends ImmutableComponent {
           activeFrameProps={this.props.activeFrameProps}
           urlLocation={this.props.urlbar.get('location')}
           urlPreview={this.props.urlbar.get('urlPreview')}
-          urlActive={this.props.urlbar.get('active')}
-          previewActiveIndex={this.props.previewActiveIndex || 0} />
+          previewActiveIndex={this.props.previewActiveIndex || 0} /> : null }
       </form>
   }
 }

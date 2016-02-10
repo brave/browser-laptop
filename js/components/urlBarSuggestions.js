@@ -64,8 +64,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   // Whether the suggestions box should be rendered
   shouldRender () {
     const suggestions = this.props.suggestions.get('suggestionList')
-    return (this.props.urlLocation || this.props.urlPreview) &&
-      this.props.urlActive && suggestions && suggestions.size > 0
+    return suggestions && suggestions.size > 0
   }
 
   render () {
