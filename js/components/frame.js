@@ -142,6 +142,7 @@ class Frame extends ImmutableComponent {
 
       const guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
       const windowOptions = e.options && e.options.windowOptions || {}
+      windowOptions.parentWindowKey = remote.getCurrentWindow().id
       windowOptions.disposition = e.disposition
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
