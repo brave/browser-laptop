@@ -37,6 +37,10 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const cx = require('../lib/classSet.js')
 
 class Main extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onCloseFrame = this.onCloseFrame.bind(this)
+  }
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
     var trackingFingers = false
@@ -197,6 +201,10 @@ class Main extends ImmutableComponent {
     return enabled
   }
 
+  onCloseFrame (activeFrameProps) {
+    WindowActions.closeFrame(this.props.windowState.get('frames'), this.props.frame)
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -282,7 +290,7 @@ class Main extends ImmutableComponent {
             <Frame
               ref={node => this.frames[frame.get('key')] = node}
               prefOpenInForeground={getSetting(settingsState, settings.SWITCH_TO_NEW_TABS)}
-              frames={this.props.windowState.get('frames')}
+              onCloseFrame={this.onCloseFrame}
               frame={frame}
               key={frame.get('key')}
               settings={settingsState || new Immutable.Map()}

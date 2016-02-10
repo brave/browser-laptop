@@ -166,7 +166,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
-      WindowActions.closeFrame(this.props.frames, this.props.frame)
+      this.props.onCloseFrame(this.props.frame)
     })
     this.webview.addEventListener('close', () => {
       AppActions.closeWindow(remote.getCurrentWindow().id)
