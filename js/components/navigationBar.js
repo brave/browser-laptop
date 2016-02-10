@@ -11,7 +11,6 @@ const UrlBar = require('./urlBar')
 const AppActions = require('../actions/appActions')
 const {isSiteInList} = require('../state/siteUtil')
 const SiteTags = require('../constants/siteTags')
-const remote = global.require('electron').remote
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
 import { isSourceAboutUrl } from '../lib/appUrlUtil.js'
@@ -32,11 +31,11 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onReload () {
-    remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
   }
 
   onStop () {
-    remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
   }
 
   get bookmarked () {
