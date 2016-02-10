@@ -255,6 +255,52 @@
     }
   }
 
+  // shamelessly taken from https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
+  function delegate (event, selector) {
+    var target = event.target
+    var related = event.relatedTarget
+    var match
+
+    // search for a parent node matching the delegation selector
+    while (target && target !== document && !(match = target.matches(selector))) {
+      target = target.parentNode
+    }
+
+    // exit if no matching node has been found
+    if (!match) {
+      return
+    }
+
+    // loop through the parent of the related target to make sure that it's not a child of the target
+    while (related && related !== target && related !== document) {
+      related = related.parentNode
+    }
+
+    // exit if this is the case
+    if (related === target) {
+      return
+    }
+
+    return target
+  }
+
+  document.addEventListener('mouseover', (event) => {
+    var target = delegate(event, 'a')
+    if (target) {
+      const pos = {
+        x: event.clientX,
+        y: event.clientY
+      }
+      ipcRenderer.send('link-hovered', target.href, pos)
+    }
+  })
+
+  document.addEventListener('mouseout', (event) => {
+    if (delegate(event, 'a')) {
+      ipcRenderer.send('link-hovered', null)
+    }
+  })
+
   const rgbaFromStr = function (rgba) {
     if (!rgba) {
       return undefined

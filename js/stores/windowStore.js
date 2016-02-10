@@ -460,6 +460,19 @@ const doAction = (action) => {
 
 WindowDispatcher.register(doAction)
 
+ipc.on(messages.LINK_HOVERED, (e, href, position) => {
+  position = position || {}
+  const nearBottom = position.y > (window.innerHeight - 150) // todo: magic number
+  const mouseOnLeft = position.x < (window.innerWidth / 2)
+  const showOnRight = nearBottom && mouseOnLeft
+
+  windowState = windowState.mergeIn(activeFrameStatePath(), {
+    hrefPreview: href,
+    showOnRight
+  })
+  windowStore.emitChange()
+})
+
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   windowState = FrameStateUtil.makeNextFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))

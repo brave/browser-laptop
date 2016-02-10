@@ -48,6 +48,7 @@ const messages = {
   // Webview page messages
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
+  LINK_HOVERED: _, /** @arg {string} href of hovered link */
   APP_STATE_CHANGE: _,
   APP_ACTION: _,
   STOP_LOAD: _,
