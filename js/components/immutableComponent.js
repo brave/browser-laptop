@@ -5,8 +5,8 @@
 const React = require('react')
 
 class ImmutableComponent extends React.Component {
-  shouldComponentUpdate (nextProps, nextState) {
-    return Object.keys(nextProps).some(prop => nextState !== this.props[prop])
+  shouldComponentUpdate (nextProps) {
+    return Object.keys(nextProps).some(prop => nextProps[prop] !== this.props[prop])
   }
 }
 
