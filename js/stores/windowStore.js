@@ -446,7 +446,7 @@ ipc.on(messages.LINK_HOVERED, (e, href, position) => {
     hrefPreview: href,
     showOnRight
   })
-  windowStore.emitChange()
+  windowStore.emitChanges()
 })
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
