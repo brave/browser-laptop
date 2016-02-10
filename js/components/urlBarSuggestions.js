@@ -12,7 +12,7 @@ import Config from '../constants/config.js'
 import top500 from './../data/top500.js'
 import {isSourceAboutUrl, isUrl} from '../lib/appUrlUtil.js'
 import Immutable from 'immutable'
-import debounce from '../lib/debounce.js'
+const debounce = require('../lib/debounce.js')
 const {getSiteIconClass} = require('../state/siteUtil.js')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting

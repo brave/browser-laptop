@@ -20,8 +20,10 @@ const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
 const path = require('path')
 const getSetting = require('../settings').getSetting
+const debounce = require('../lib/debounce.js')
 
 let appState
+let lastEmittedState
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -142,10 +144,14 @@ class AppStore {
     return appState
   }
 
-  emitChange () {
-    const stateJS = this.getState().toJS()
-    BrowserWindow.getAllWindows().forEach(wnd =>
-      wnd.webContents.send(messages.APP_STATE_CHANGE, stateJS))
+  emitChanges () {
+    if (lastEmittedState !== appState) {
+      lastEmittedState = appState
+      // TODO: Break this apart and only send what's needed
+      const stateJS = this.getState().toJS()
+      BrowserWindow.getAllWindows().forEach(wnd =>
+        wnd.webContents.send(messages.APP_STATE_CHANGE, stateJS))
+    }
   }
 }
 
@@ -182,12 +188,12 @@ function setDefaultWindowSize () {
 }
 
 const appStore = new AppStore()
+const emitChanges = debounce(appStore.emitChanges.bind(appStore), 10)
 
 const handleAppAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
       appState = action.appState
-      appStore.emitChange()
       break
     case AppConstants.APP_NEW_WINDOW:
       const frameOpts = action.frameOpts && action.frameOpts.toJS()
@@ -230,32 +236,24 @@ const handleAppAction = (action) => {
           mainWindow.webContents.send(messages.INIT_WINODW, appState.toJS(), frames, action.restoredState)
         }
       })
-      appStore.emitChange()
-
       mainWindow.show()
       break
     case AppConstants.APP_CLOSE_WINDOW:
       const appWindow = BrowserWindow.fromId(action.appWindowId)
       appWindow.close()
-
-      appStore.emitChange()
       break
     case AppConstants.APP_ADD_SITE:
       appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag))
-      appStore.emitChange()
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))
-      appStore.emitChange()
       break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
       appState = appState.set('defaultWindowHeight', action.size[1])
-      appStore.emitChange()
       break
     case AppConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
-      appStore.emitChange()
       break
     case AppConstants.APP_UPDATE_LAST_CHECK:
       appState = appState.setIn(['updates', 'lastCheckTimestamp'], (new Date()).getTime())
@@ -263,7 +261,6 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['updates', 'lastCheckWOY'], dates.todayWOY())
       appState = appState.setIn(['updates', 'lastCheckMonth'], dates.todayMonth())
       appState = appState.setIn(['updates', 'firstCheckMade'], true)
-      appStore.emitChange()
       break
     case AppConstants.APP_SET_UPDATE_STATUS:
       if (action.status !== undefined) {
@@ -279,25 +276,23 @@ const handleAppAction = (action) => {
       if (action.status === UpdateStatus.UPDATE_APPLYING_RESTART) {
         app.quit()
       }
-      appStore.emitChange()
       break
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       appState = appState.setIn([action.resourceName, 'enabled'], action.enabled)
-      appStore.emitChange()
       break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,
         lastCheckDate: action.lastCheckDate
       })
-      appStore.emitChange()
       break
     case AppConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
-      appStore.emitChange()
       break
     default:
   }
+
+  emitChanges()
 }
 
 // Register callback to handle all updates
