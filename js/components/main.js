@@ -33,6 +33,9 @@ const settings = require('../constants/settings')
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
 
+// Util
+const cx = require('../lib/classSet.js')
+
 class Main extends ImmutableComponent {
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
@@ -209,6 +212,7 @@ class Main extends ImmutableComponent {
     this.frames = {}
     const settingsState = this.props.appState.get('settings') || new Immutable.Map()
     const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('isPinned'))
+    const tabsPerPage = getSetting(settingsState, settings.TABS_PER_TAB_PAGE)
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
         <div className='backforward'>
@@ -247,14 +251,20 @@ class Main extends ImmutableComponent {
             className='navbutton'
             onClick={this.onBraveMenu.bind(this)} />
         </div>
-        <TabPages frames={nonPinnedFrames}
-          tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
-          tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
-        />
+        <div className={cx({
+          tabPages: true,
+          singlePage: nonPinnedFrames.size < tabsPerPage
+        })}>
+          { nonPinnedFrames.size > tabsPerPage
+            ? <TabPages frames={nonPinnedFrames}
+                tabsPerTabPage={tabsPerPage}
+                tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
+              /> : null }
+        </div>
         <TabsToolbar
           paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
           previewTabs={getSetting(settingsState, settings.SHOW_TAB_PREVIEWS)}
-          tabsPerTabPage={getSetting(settingsState, settings.TABS_PER_TAB_PAGE)}
+          tabsPerTabPage={tabsPerPage}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
