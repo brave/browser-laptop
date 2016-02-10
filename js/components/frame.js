@@ -142,7 +142,6 @@ class Frame extends ImmutableComponent {
 
       const guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
       const windowOptions = e.options && e.options.windowOptions || {}
-      windowOptions.parentWindowKey = remote.getCurrentWindow().id
       windowOptions.disposition = e.disposition
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
@@ -169,7 +168,7 @@ class Frame extends ImmutableComponent {
       this.props.onCloseFrame(this.props.frame)
     })
     this.webview.addEventListener('close', () => {
-      AppActions.closeWindow(remote.getCurrentWindow().id)
+      WindowActions.closeFrame(this.props.frames, this.props.frame)
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
     })
