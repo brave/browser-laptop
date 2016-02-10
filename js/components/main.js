@@ -223,41 +223,43 @@ class Main extends ImmutableComponent {
     const tabsPerPage = getSetting(settingsState, settings.TABS_PER_TAB_PAGE)
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
-        <div className='backforward'>
-          <span
-            className='back fa fa-angle-left'
-            disabled={!activeFrame || !activeFrame.get('canGoBack')}
-            onClick={this.onBack.bind(this)} />
-          <span
-            className='forward fa fa-angle-right'
-            disabled={!activeFrame || !activeFrame.get('canGoForward')}
-            onClick={this.onForward.bind(this)} />
-        </div>
-        <NavigationBar
-          ref={node => this.navBar = node}
-          navbar={activeFrame && activeFrame.get('navbar')}
-          frames={this.props.windowState.get('frames')}
-          sites={this.props.appState.get('sites')}
-          activeFrame={activeFrame}
-          mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-          searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
-          settings={settingsState}
-          searchDetail={this.props.windowState.get('searchDetail')}
-        />
-        { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
-          ? <SiteInfo frameProps={activeFrame}
-              siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
-              onHide={this.onHideSiteInfo.bind(this)} /> : null
-        }
-        { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
-          ? <ReleaseNotes
-              metadata={this.props.appState.getIn(['updates', 'metadata'])}
-              onHide={this.onHideReleaseNotes.bind(this)} /> : null
-        }
-        <div className='topLevelEndButtons'>
-          <Button iconClass='braveMenu'
-            className='navbutton'
-            onClick={this.onBraveMenu.bind(this)} />
+        <div className='navigator-wrapper'>
+          <div className='backforward'>
+            <span
+              className='back fa fa-angle-left'
+              disabled={!activeFrame || !activeFrame.get('canGoBack')}
+              onClick={this.onBack.bind(this)} />
+            <span
+              className='forward fa fa-angle-right'
+              disabled={!activeFrame || !activeFrame.get('canGoForward')}
+              onClick={this.onForward.bind(this)} />
+          </div>
+          <NavigationBar
+            ref={node => this.navBar = node}
+            navbar={activeFrame && activeFrame.get('navbar')}
+            frames={this.props.windowState.get('frames')}
+            sites={this.props.appState.get('sites')}
+            activeFrame={activeFrame}
+            mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
+            searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
+            settings={settingsState}
+            searchDetail={this.props.windowState.get('searchDetail')}
+          />
+          { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+            ? <SiteInfo frameProps={activeFrame}
+                siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
+                onHide={this.onHideSiteInfo.bind(this)} /> : null
+          }
+          { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+            ? <ReleaseNotes
+                metadata={this.props.appState.getIn(['updates', 'metadata'])}
+                onHide={this.onHideReleaseNotes.bind(this)} /> : null
+          }
+          <div className='topLevelEndButtons'>
+            <Button iconClass='braveMenu'
+              className='navbutton'
+              onClick={this.onBraveMenu.bind(this)} />
+          </div>
         </div>
         <div className={cx({
           tabPages: true,
