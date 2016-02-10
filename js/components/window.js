@@ -76,7 +76,7 @@ class Window extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return !Immutable.is(nextState.immutableData, this.state.immutableData)
+    return nextState.immutableData !== this.state.immutableData
   }
 
   onChange () {

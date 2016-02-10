@@ -3,11 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 
 class ImmutableComponent extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
-    return !Immutable.is(Immutable.fromJS(this.props), Immutable.fromJS(nextProps))
+    return Object.keys(nextProps).some(prop => nextState !== this.props[prop])
   }
 }
 
