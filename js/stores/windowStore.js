@@ -142,12 +142,14 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
+      const lastLocation = windowState.getIn(frameStatePath(key).concat(['location']))
+      const lastTitle = windowState.getIn(frameStatePath(key).concat(['title']))
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
         icon: undefined,
         adblock: {},
         trackingProtection: {},
-        title: '',
+        title: action.location === lastLocation ? lastTitle : '',
         location: action.location
       })
       // Update the displayed location in the urlbar
