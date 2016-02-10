@@ -54,11 +54,9 @@ class Window extends React.Component {
           location: Config.defaultUrl
         })
       } else {
-        WindowStore.suspend()
         this.props.frames.forEach(frame => {
           WindowActions.newFrame(frame)
         })
-        WindowStore.resume()
       }
     }
   }
