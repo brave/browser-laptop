@@ -96,9 +96,14 @@ describe('urlbar', function () {
       Brave.beforeAll(this)
 
       before(function *() {
-        this.page_no_title = Brave.server.url('page_no_title.html')
+        this.page1Url = Brave.server.url('page1.html')
+        this.pageNoTitle = Brave.server.url('page_no_title.html')
         yield setup(this.app.client)
-        yield navigate(this.app.client, this.page_no_title)
+        // Navigate to a page with a title first to ensure it gets reset
+        yield navigate(this.app.client, this.page1Url)
+        yield this.app.client.waitForValue(urlInput)
+        yield navigate(this.app.client, this.pageNoTitle)
+        yield this.app.client.waitForValue(urlInput)
       })
 
       it('does not have title mode', function *() {

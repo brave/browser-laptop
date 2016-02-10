@@ -57,9 +57,9 @@ class Main extends ImmutableComponent {
       var yVelocity = deltaY / time
       if (trackingFingers && Math.abs(yVelocity) < 1) {
         if (xVelocity > 4) {
-          electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
         } else if (xVelocity < -4) {
-          electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
       trackingFingers = false
@@ -84,7 +84,7 @@ class Main extends ImmutableComponent {
   componentDidMount () {
     this.registerSwipeListener()
     ipc.on(messages.STOP_LOAD, () => {
-      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
     })
     ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
       contextMenus.onMainContextMenu(nodeProps)
@@ -104,9 +104,7 @@ class Main extends ImmutableComponent {
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
       }, openInForeground)
-
-      // Focus URL bar when adding tab via shortcut
-      electron.remote.getCurrentWebContents().send(messages.SHORTCUT_FOCUS_URL)
+      ipc.emit(messages.SHORTCUT_FOCUS_URL)
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'

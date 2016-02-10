@@ -28,7 +28,7 @@ const startTrackingProtection = (wnd) => {
       cachedFirstParty = {}
     }
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
-    let firstPartyUrlHost = firstPartyUrl.host || ''
+    let firstPartyUrlHost = firstPartyUrl.hostname || ''
     if (firstPartyUrlHost.startsWith('www.')) {
       firstPartyUrlHost = firstPartyUrlHost.substring(4)
     }
@@ -40,7 +40,7 @@ const startTrackingProtection = (wnd) => {
         ++cachedFirstPartyCount
       }
     }
-    const urlHost = URL.parse(details.url).host
+    const urlHost = URL.parse(details.url).hostname
     const shouldBlock = firstPartyUrl.protocol &&
       details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&

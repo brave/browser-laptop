@@ -10,7 +10,6 @@ const WindowActions = require('../actions/windowActions')
 const KeyCodes = require('../constants/keyCodes')
 const cx = require('../lib/classSet.js')
 const ipc = global.require('electron').ipcRenderer
-const remote = global.require('electron').remote
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
@@ -118,7 +117,7 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.ESC:
         e.preventDefault()
-        remote.getCurrentWebContents().send(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+        ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
         break
       default:
     }

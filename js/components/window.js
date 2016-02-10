@@ -76,7 +76,7 @@ class Window extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return !Immutable.is(nextState.immutableData, this.state.immutableData)
+    return nextState.immutableData !== this.state.immutableData
   }
 
   onChange () {
@@ -97,8 +97,9 @@ class Window extends React.Component {
     // Check for new pinned sites which we don't already know about
     const sitesToAdd = sites
       .filter(site => site.get('tags').includes(SiteTags.PINNED) &&
-          !frames.find(frame => frame.get('isPinned') &&
-            frame.get('location') === site.get('location')))
+        !frames.find(frame => frame.get('isPinned') &&
+        // Compare to the original src of the pinned frame
+        frame.get('src') === site.get('location')))
     sitesToAdd.forEach(site => {
       WindowActions.newFrame({
         location: site.get('location'),
@@ -108,7 +109,9 @@ class Window extends React.Component {
 
     // Check for unpinned sites which should be closed
     const framesToClose = frames.filter(frame =>
-      frame.get('isPinned') && !sites.find(site => frame.get('location') === site.get('location') && site.get('tags').includes(SiteTags.PINNED)))
+      frame.get('isPinned') &&
+      // Compare to the original src of the pinned frame
+      !sites.find(site => frame.get('src') === site.get('location') && site.get('tags').includes(SiteTags.PINNED)))
     framesToClose.forEach(frameProps => WindowActions.closeFrame(frames, frameProps, true))
   }
 }

@@ -11,6 +11,7 @@ const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
 const AppConfig = require('../js/constants/appConfig')
 const urlParse = require('url').parse
+const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 
 const filteringFns = []
 
@@ -45,8 +46,8 @@ function registerForSession (session) {
 
     let requestHeaders = details.requestHeaders
     if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
-        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').host,
-                                        urlParse(details.url || '').host)) {
+        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
+                                        urlParse(details.url || '').hostname)) {
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie']) {
         requestHeaders['Cookie'] = undefined
@@ -72,18 +73,16 @@ function registerForSession (session) {
 }
 
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
-  // TODO: This should check public suffix list?
-  // NOTE: This considers upload.wikimedia.org third party to en.wikimedia.org.
-  // perhaps too strict.
+  // TODO: Always return true if these are IP addresses that aren't the same
   if (!testHost || !baseContextHost) {
     return true
   }
-  if (!testHost.endsWith(baseContextHost)) {
-    return true
+  const documentDomain = getBaseDomain(baseContextHost)
+  if (testHost.length > documentDomain.length) {
+    return (testHost.substr(testHost.length - documentDomain.length - 1) !== '.' + documentDomain)
+  } else {
+    return (testHost !== documentDomain)
   }
-
-  let c = testHost[testHost.length - baseContextHost.length - 1]
-  return c !== '.' && c !== undefined
 }
 
 module.exports.init = () => {

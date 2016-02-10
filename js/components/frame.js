@@ -116,7 +116,7 @@ class Frame extends ImmutableComponent {
         break
       case 'save':
         // TODO: Sometimes this tries to save in a non-existent directory
-        remote.getCurrentWebContents().downloadURL(this.webview.getURL())
+        this.webview.downloadURL(this.webview.getURL())
         break
       case 'print':
         this.webview.print()
