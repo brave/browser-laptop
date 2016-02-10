@@ -11,7 +11,7 @@ const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
 const AppConfig = require('../js/constants/appConfig')
 const urlParse = require('url').parse
-const psl = require('psl')
+const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 
 const filteringFns = []
 
@@ -46,8 +46,8 @@ function registerForSession (session) {
 
     let requestHeaders = details.requestHeaders
     if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
-        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').host,
-                                        urlParse(details.url || '').host)) {
+        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
+                                        urlParse(details.url || '').hostname)) {
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie']) {
         requestHeaders['Cookie'] = undefined
@@ -73,12 +73,16 @@ function registerForSession (session) {
 }
 
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
+  // TODO: Always return true if these are IP addresses that aren't the same
   if (!testHost || !baseContextHost) {
     return true
   }
-  const testSuffix = psl.parse(testHost).domain
-  const baseContextSuffix = psl.parse(baseContextHost).domain
-  return testSuffix !== baseContextSuffix || !testSuffix || !baseContextSuffix
+  const documentDomain = getBaseDomain(baseContextHost)
+  if (testHost.length > documentDomain.length) {
+    return (testHost.substr(testHost.length - documentDomain.length - 1) !== '.' + documentDomain)
+  } else {
+    return (testHost !== documentDomain)
+  }
 }
 
 module.exports.init = () => {
