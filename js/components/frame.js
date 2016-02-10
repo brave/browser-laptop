@@ -333,14 +333,13 @@ class Frame extends ImmutableComponent {
           isPreview: this.props.isPreview,
           isActive: this.props.isActive
         })}>
-      <FindBar
-        ref='findbar'
+      { this.props.frame.get('findbarShown')
+      ? <FindBar
         onFind={this.onFind.bind(this)}
         onFindHide={this.onFindHide.bind(this)}
-        active={this.props.frame.get('findbarShown')}
         frame={this.props.frame}
         findDetail={this.props.frame.get('findDetail')}
-      />
+      /> : null }
       <div ref={node => this.webviewContainer = node}
         className={cx({
           webviewContainer: true,

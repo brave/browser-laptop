@@ -49,14 +49,11 @@ export default class FindBar extends ImmutableComponent {
     input.select()
   }
 
+  componentDidMount () {
+    this.focus()
+  }
+
   componentDidUpdate (prevProps) {
-    if (!this.props.active) {
-      return null
-    }
-    if (!prevProps.active) {
-      // Focus and select the find input
-      this.focus()
-    }
     if (this.props.findDetail && !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
         this.props.findDetail.get('caseSensitivity') !== prevProps.findDetail.get('caseSensitivity')) {
@@ -114,10 +111,6 @@ export default class FindBar extends ImmutableComponent {
   }
 
   render () {
-    if (!this.props.active) {
-      return null
-    }
-
     let findMatchText
     if (this.numberOfMatches !== -1 && this.activeMatchOrdinal !== -1 && this.searchString) {
       const l10nArgs = {
