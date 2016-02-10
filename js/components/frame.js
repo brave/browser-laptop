@@ -169,7 +169,7 @@ class Frame extends ImmutableComponent {
       this.props.onCloseFrame(this.props.frame)
     })
     this.webview.addEventListener('close', () => {
-      WindowActions.closeFrame(this.props.frames, this.props.frame)
+      this.props.onCloseFrame(this.props.frame)
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
     })
