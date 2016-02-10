@@ -1,5 +1,15 @@
 # Changelog
 
+
+## [0.7.14](https://github.com/brave/browser-laptop/releases/v0.7.14dev)
+- Security (Severity: High): Added process sandboxing for content processes ([c794907](https://github.com/brave/electron/commit/c794907d043ca5c498d1f07f5fdf6e866606ebaf)).
+- Various UI rendering performance optimization.
+- Fix loading videos on CNN and other page loading problems.
+- Security (Severity: Low): Hostname is always displayed in title mode in bold.
+- Security (Severity: High): Preferences page script context is now reloaded when navigating in the same tab away from preferences ([446dfe8](https://github.com/brave/browser-laptop/commit/446dfe8c1c39203e5f41f9bb6341a2103df1248c)).
+- Theme color detection changes.
+- Various bug fixes.
+
 ## [0.7.13](https://github.com/brave/browser-laptop/releases/v0.7.13dev)
 - Preferences: startup mode, homepage, default search engine, various tab preferences, and privacy settings.  More to come.
 - Various UI enhancements.
