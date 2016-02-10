@@ -127,7 +127,7 @@ class WindowStore extends EventEmitter {
 }
 
 const windowStore = new WindowStore()
-const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 10)
+const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
 // Register callback to handle all updates
 const doAction = (action) => {
@@ -181,7 +181,9 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
-      break
+      // Since this value is bound we need to notify the control sync
+      windowStore.emitChanges()
+      return
     case WindowConstants.WINDOW_SET_FRAME_TITLE:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         title: action.title
@@ -367,7 +369,9 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FIND_DETAIL:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
-      break
+      // Since the input value is bound we need to notify the control sync
+      windowStore.emitChanges()
+      return
     case WindowConstants.WINDOW_SET_PINNED:
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.

@@ -261,7 +261,7 @@ class Main extends ImmutableComponent {
         </div>
         <div className={cx({
           tabPages: true,
-          singlePage: nonPinnedFrames.size < tabsPerPage
+          singlePage: nonPinnedFrames.size <= tabsPerPage
         })}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}

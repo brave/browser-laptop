@@ -188,7 +188,7 @@ function setDefaultWindowSize () {
 }
 
 const appStore = new AppStore()
-const emitChanges = debounce(appStore.emitChanges.bind(appStore), 10)
+const emitChanges = debounce(appStore.emitChanges.bind(appStore), 5)
 
 const handleAppAction = (action) => {
   switch (action.actionType) {

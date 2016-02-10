@@ -19,40 +19,47 @@ describe('tab pages', function () {
 
     before(function *() {
       yield setup(this.app.client)
-    })
-
-    it('creates a new tab page when full', function * () {
       yield this.app.client.elements(tabPage, function (e, res) {
         assert.equal(0, res.value.length)
       })
-
-      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE]; i++) {
+      // Create a full tab set, but not a second page
+      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE] - 1; i++) {
         yield this.app.client.click(newFrameButton)
       }
-
-      yield this.app.client.elements(tabPage, function (e, res) {
-        assert.equal(2, res.value.length)
-      })
     })
 
-    it('removes a new tab page when closing excess tabs', function * () {
-      yield this.app.client.click(closeTab)
-        .elements(tabPage, function (e, res) {
-          assert.equal(0, res.value.length)
+    it('shows 2 tab pages when there are more than 1 page worth of tabs', function * () {
+      yield this.app.client.click(newFrameButton)
+        .waitUntil(function () {
+          return this.elements(tabPage).then((res) => res.value.length === 2)
         })
     })
 
-    it('can change active tab pages', function *() {
-      yield this.app.client.click(newFrameButton)
-        .click(tabPage1)
-        .waitForExist(tabPage1 + '.active')
+    it('shows no tab pages when you have only 1 page', function * () {
+      yield this.app.client.click(closeTab)
+        .waitUntil(function () {
+          return this.elements(tabPage).then((res) => res.value.length === 0)
+        })
     })
 
-    it('clicking on webview resets tab page selection', function * () {
-      yield this.app.client.click(newFrameButton)
-        .click(activeWebview)
-        .waitForExist(tabPage2 + '.active')
+    describe('allows changing to tab pages', function () {
+      before(function *() {
+        // Make sure there are 2 tab pages
+        yield this.app.client.click(newFrameButton)
+          .waitUntil(function () {
+            return this.elements(tabPage).then((res) => res.value.length === 2)
+          })
+      })
+
+      it('clicking tab page changes', function *() {
+        yield this.app.client.click(tabPage1)
+          .waitForExist(tabPage1 + '.active')
+      })
+
+      it('clicking on webview resets tab page selection', function * () {
+        yield this.app.client.click(activeWebview)
+          .waitForExist(tabPage2 + '.active')
+      })
     })
   })
 })
-
