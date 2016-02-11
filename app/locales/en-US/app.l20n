@@ -15,6 +15,8 @@
 <settingName "Setting name">
 <settingValue "Setting value">
 <newTab "New Tab">
+<certError "HTTPS Certificate Error">
+<certErrorText "This site cannot be loaded due to a certificate error: ">
 <openTypeInNewTab "Open {{$type}} in a new tab">
 <openTypeInNewPrivateTab "Open {{$type}} in a new private tab">
 <copyLinkLocation "Copy Link Location">

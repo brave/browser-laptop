@@ -25,16 +25,13 @@ class Frame extends ImmutableComponent {
 
   updateWebview () {
     let src = this.props.frame.get('src')
-    const isAboutURL = isSourceAboutUrl(src)
-    if (isAboutURL) {
-      src = getTargetAboutUrl(src)
-    }
+    let location = this.props.frame.get('location')
     let contentScripts = ['content/webviewPreload.js']
-    if (this.props.frame.get('location') === 'about:preferences') {
+    if (location === 'about:preferences' || location === 'about:certerror') {
       contentScripts.push('content/aboutPreload.js')
     }
-    contentScripts = contentScripts.join(',')
 
+    contentScripts = contentScripts.join(',')
     const contentScriptsChanged =
       this.webview && contentScripts !== this.webview.getAttribute('contentScripts')
 
@@ -58,7 +55,8 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
-    this.webview.setAttribute('src', src)
+    this.webview.setAttribute('src',
+                              isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
     if (!this.webviewContainer.firstChild) {
       this.webviewContainer.appendChild(this.webview)
       this.addEventListeners()
@@ -206,7 +204,6 @@ class Frame extends ImmutableComponent {
         WindowActions.setLocation(event.url, key)
         WindowActions.setSecurityState({
           secure: urlParse(event.url).protocol === 'https:'
-          // TODO: Set extended validation once Electron exposes this
         })
       }
       WindowActions.updateBackForwardState(
@@ -240,6 +237,15 @@ class Frame extends ImmutableComponent {
           this.props.frame,
           this.webview.getURL())
         this.webview.send(messages.POST_PAGE_LOAD_RUN)
+        let security = this.props.frame.get('security')
+        if (this.props.frame.get('location') === 'about:certerror' &&
+            security && security.get('certDetails')) {
+          // Don't send certDetails.cert since it is big and crashes the page
+          this.webview.send(messages.CERT_DETAILS_UPDATED, {
+            url: security.get('certDetails').url,
+            error: security.get('certDetails').error
+          })
+        }
       }
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {

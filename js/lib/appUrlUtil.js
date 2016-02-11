@@ -26,7 +26,8 @@ export const aboutUrls = new Immutable.Map({
   'about:history': getAppUrl('./about-history.html'),
   'about:newtab': getAppUrl('./about-newtab.html'),
   'about:preferences': getAppUrl('./about-preferences.html'),
-  'about:config': getAppUrl('./about-config.html')
+  'about:config': getAppUrl('./about-config.html'),
+  'about:certerror': getAppUrl('./about-certerror.html')
 })
 
 // Map of target URLs mapped to source about: URLs

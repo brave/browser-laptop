@@ -75,6 +75,17 @@ const saveIfAllCollected = () => {
 }
 
 app.on('ready', function () {
+  app.on('certificate-error', function (e, webContents, url, error, cert, cb) {
+    // Tell the page to show an unlocked icon. Note this is sent to the main
+    // window webcontents, not the webview webcontents
+    BrowserWindow.getAllWindows().map((win) => {
+      win.webContents.send(messages.CERT_ERROR, {
+        url,
+        error,
+        cert
+      })
+    })
+  })
   app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q

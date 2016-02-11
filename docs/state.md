@@ -110,6 +110,14 @@ WindowStore
     },
     security: {
       isSecure: boolean, // is using https
+      certDetails: {
+        url: string,
+        error: string,
+        cert: {
+            data: Uint8Array,
+            issuer: string
+        }
+      }, // the certificate details if any
       isExtendedValidation: boolean, // is using https ev
       activeMixedContent: boolean, // has active mixed content
       passiveMixedContent: boolean, // has passive mixed content
