@@ -130,9 +130,13 @@ var requestVersionInfo = (done) => {
 
   request(queryString, (err, response, body) => {
     AppActions.setUpdateLastCheck()
-    if (!err) {
+    if (!err && response.statusCode === 200) {
       if (body) {
-        body = JSON.parse(body)
+        try {
+          body = JSON.parse(body)
+        } catch (error) {
+          autoUpdater.emit('error', error)
+        }
       }
       // This should be handled by a UI component for the update toolbar
       process.emit(messages.UPDATE_META_DATA_RETRIEVED, body)
