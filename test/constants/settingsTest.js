@@ -1,7 +1,7 @@
 /* global describe, it */
 
-const settings = require('../js/constants/settings')
-const appConfig = require('../js/constants/appConfig')
+const settings = require('../../js/constants/settings')
+const appConfig = require('../../js/constants/appConfig')
 const assert = require('assert')
 
 describe('settings', function () {
