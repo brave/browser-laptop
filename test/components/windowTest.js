@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
-const Brave = require('./lib/brave')
-const Selectors = require('./lib/selectors')
+const Brave = require('../lib/brave')
+const Selectors = require('../lib/selectors')
 
 describe('application window', function () {
   describe('application launch', function () {

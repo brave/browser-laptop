@@ -1,9 +1,9 @@
 /* global describe, it, before */
 
-const Brave = require('./lib/brave')
-const appConfig = require('../js/constants/appConfig')
-const settings = require('../js/constants/settings')
-const {urlInput, newFrameButton, tabPage, tabPage1, tabPage2, closeTab, activeWebview} = require('./lib/selectors')
+const Brave = require('../lib/brave')
+const appConfig = require('../../js/constants/appConfig')
+const settings = require('../../js/constants/settings')
+const {urlInput, newFrameButton, tabPage, tabPage1, tabPage2, closeTab, activeWebview} = require('../lib/selectors')
 const assert = require('assert')
 
 describe('tab pages', function () {

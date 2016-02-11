@@ -1,8 +1,8 @@
 /* global describe, it, before */
 
-const Brave = require('./lib/brave')
-const messages = require('../js/constants/messages')
-const {urlInput} = require('./lib/selectors')
+const Brave = require('../lib/brave')
+const messages = require('../../js/constants/messages')
+const {urlInput} = require('../lib/selectors')
 
 describe('tabs', function () {
   function * setup (client) {
