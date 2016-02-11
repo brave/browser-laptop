@@ -8,18 +8,26 @@
 
 @import "variables.less";
 
+.navigator-wrapper {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 70px;
+}
+
 #navigator {
   font-size: 20px;
   height: 34px;
+  justify-content: center;
   max-width: 900px;
-  margin: 0 auto;
-  padding: 0 135px 4px;
-  width: 100%;
   box-sizing: border-box;
+  margin: 6px 0 0 -114px;
+  padding: 0 0 4px 0;
   position: relative;
   display: flex;
   flex-direction: row;
   -webkit-user-select: none;
+  width: calc(~'100% - 215px');
 
   &.titleMode {
     input {
@@ -88,6 +96,7 @@
 
   form {
     flex: 1;
+    max-width: calc(~'100% - 72px');
     position: relative;
     text-align: center;
   }
@@ -149,7 +158,7 @@
     }
   }
 
-  ul.urlBarSuggestions {
+  .urlBarSuggestions {
     .flyoutDialog;
     box-sizing: border-box;
     width: 100%;

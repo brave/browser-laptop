@@ -31,21 +31,15 @@ html,
 }
 
 .top {
-  padding-top: 6px;
   background: @chromePrimary;
 
   .backforward {
-    position: absolute;
+    display: flex;
     z-index: 10;
-    top: -12px;
-    left: 70px;
-    width: 66px;
-    vertical-align: center;
 
     span {
-      position: absolute;
       color: @buttonColor;
-            border-radius: 50%;
+      border-radius: 50%;
       font-weight: 300;
       opacity: 0.2;
 
@@ -56,22 +50,24 @@ html,
       &:not([disabled]):hover {
         color: @buttonColor;
         opacity: 1.0;
-        background-color:  white;
+        background-color: white;
       }
     }
 
-    .back {
-      top: 14px;
+    .back,
+    .forward {
       font-size: 35px;
-                                        padding: 0 13px 0 9.5px;
+      min-width: 35px;
+      text-align: center;
+      width: 35px;
+    }
+
+    .back {
+      padding-right: 4px;
     }
 
     .forward {
-      top: 14px;
-//      right: 10px;
-                                        left: 40px;
-      font-size: 35px;
-                                        padding: 0 10px 0 12.5px;
+      padding-left: 4px;
     }
 
   }
@@ -185,10 +181,4 @@ body.fullScreen .banner.fade {
 // In React we often want to have elements but without href, so force pointer cursor
 a {
   cursor: pointer;
-}
-
-.topLevelEndButtons {
-  position: absolute;
-  top: 5px;
-  right: 0;
 }
