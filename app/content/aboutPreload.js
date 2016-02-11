@@ -10,6 +10,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('cert-details-updated', (e, details) => {
+    const event = new window.CustomEvent('cert-details-updated', {
+      detail: details
+    })
+    window.dispatchEvent(event)
+  })
 
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)

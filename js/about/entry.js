@@ -12,6 +12,9 @@ switch (getSourceAboutUrl(window.location.href)) {
   case 'about:preferences':
     rootComponent = require('./preferences')
     break
+  case 'about:certerror':
+    rootComponent = require('./certerror')
+    break
 }
 
 if (rootComponent) {

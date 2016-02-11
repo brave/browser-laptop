@@ -19,6 +19,15 @@ const AboutActions = {
       }
     })
     window.dispatchEvent(event)
+  },
+
+  /**
+   * Click through a certificate error.
+   *
+   * @param {string} url - The URL with the cert error
+   */
+  acceptCertError: function (url) {
+    // TODO
   }
 }
 module.exports = AboutActions
