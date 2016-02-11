@@ -11,6 +11,7 @@ const aboutActions = require('./aboutActions')
 const ipc = window.chrome.ipcRenderer
 
 require('../../less/about/history.less')
+require('../../less/about/brave.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
