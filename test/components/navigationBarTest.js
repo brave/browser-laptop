@@ -414,12 +414,13 @@ describe('urlbar', function () {
     })
   })
 
-  describe('click', function () {
+  describe('clicking on navbar', function () {
     describe('blurred', function () {
       Brave.beforeAll(this)
 
       before(function *() {
         yield setup(this.app.client)
+        yield this.app.client.waitForExist(urlInput)
         // type anything
         yield this.app.client.keys('a')
         yield blur(this.app.client)
@@ -443,10 +444,8 @@ describe('urlbar', function () {
         yield setup(this.app.client)
         // type anything
         yield this.app.client.keys('a')
-        yield this.app.client
           .leftClick(urlInput)
-        // click when already focused
-        yield this.app.client
+          // click when already focused
           .leftClick(urlInput)
       })
 
