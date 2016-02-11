@@ -46,7 +46,7 @@ class NavigationBar extends ImmutableComponent {
   get titleMode () {
     return this.props.mouseInTitlebar === false &&
       this.props.activeFrame.get('title') &&
-      !['about:blank', 'about:newtab'].includes(this.props.activeFrame.get('location')) &&
+      !['about:newtab'].includes(this.props.activeFrame.get('location')) &&
       !this.loading &&
       !this.props.navbar.getIn(['urlbar', 'focused'])
   }

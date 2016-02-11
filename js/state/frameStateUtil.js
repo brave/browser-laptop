@@ -150,7 +150,7 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
     audioMuted: false, // frame is muted
     canGoBack: false,
     canGoForward: false,
-    location: url, // page url
+    location: frameOpts.delayedLoadUrl || url, // page url
     src: url, // what the iframe src should be
     isPrivate: frameOpts.isPrivate || false,
     partitionNumber,

@@ -140,29 +140,28 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('new-window', (e, url, frameName, disposition, options) => {
       e.preventDefault()
 
-      const guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
-      const windowOptions = e.options && e.options.windowOptions || {}
-      windowOptions.parentWindowKey = remote.getCurrentWindow().id
-      windowOptions.disposition = e.disposition
+      let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
+      let windowOpts = e.options && e.options.windowOptions || {}
+      windowOpts.parentWindowKey = remote.getCurrentWindow().id
+      windowOpts.disposition = e.disposition
+      let delayedLoadUrl = e.options && e.options.delayedLoadUrl
+
+      let frameOpts = {
+        location: e.url,
+        parentFrameKey: this.props.frame.get('key'),
+        isPrivate: this.props.frame.get('isPrivate'),
+        partitionNumber: this.props.frame.get('partitionNumber'),
+        // use the delayed load url for the temporary title
+        delayedLoadUrl,
+        guestInstanceId
+      }
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
-        AppActions.newWindow({
-          location: e.url,
-          parentFrameKey: this.props.frame.get('key'),
-          isPrivate: this.props.frame.get('isPrivate'),
-          partitionNumber: this.props.frame.get('partitionNumber'),
-          guestInstanceId
-        }, windowOptions)
+        AppActions.newWindow(frameOpts, windowOpts)
       } else {
-        const openInForeground = this.props.prefOpenInForeground === true ||
+        let openInForeground = this.props.prefOpenInForeground === true ||
           e.disposition !== 'background-tab'
-        WindowActions.newFrame({
-          location: e.url,
-          parentFrameKey: this.props.frame.get('key'),
-          isPrivate: this.props.frame.get('isPrivate'),
-          partitionNumber: this.props.frame.get('partitionNumber'),
-          guestInstanceId
-        }, openInForeground)
+        WindowActions.newFrame(frameOpts, openInForeground)
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
@@ -180,7 +179,7 @@ class Frame extends ImmutableComponent {
         WindowActions.setFavicon(this.props.frame, e.favicons[0])
       }
     })
-    this.webview.addEventListener('page-title-set', ({title}) => {
+    this.webview.addEventListener('page-title-updated', ({title}) => {
       WindowActions.setFrameTitle(this.props.frame, title)
     })
     this.webview.addEventListener('dom-ready', (event) => {
