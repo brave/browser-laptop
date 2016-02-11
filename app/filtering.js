@@ -15,6 +15,9 @@ const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 
 const filteringFns = []
 
+// Third party domains that require a valid referer to work
+const refererExceptions = ['use.typekit.net']
+
 module.exports.registerFilteringCB = filteringFn => {
   filteringFns.push(filteringFn)
 }
@@ -45,15 +48,16 @@ function registerForSession (session) {
     }
 
     let requestHeaders = details.requestHeaders
+    let hostname = urlParse(details.url || '').hostname
     if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
         module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
-                                        urlParse(details.url || '').hostname)) {
+                                        hostname)) {
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie']) {
         requestHeaders['Cookie'] = undefined
       }
       if (requestHeaders['Referer']) {
-        requestHeaders['Referer'] = undefined
+        requestHeaders['Referer'] = refererExceptions.includes(hostname) ? 'http://localhost' : undefined
       }
     }
 
