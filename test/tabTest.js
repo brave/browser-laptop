@@ -38,7 +38,7 @@ describe('tabs', function () {
     it('creates a new private tab when signaled', function *() {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPrivate: true })
-        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForExist('.tab.private[data-frame-key="2"]')
     })
     it('makes the private webview visible', function *() {
       yield this.app.client
