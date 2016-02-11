@@ -12,7 +12,6 @@ const AppActions = require('../js/actions/appActions')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
 
-const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
@@ -182,7 +181,7 @@ const init = (args) => {
     }
   ]
 
-  if (isWindows) {
+  if (!isDarwin) {
     fileMenu.push(CommonMenu.separatorMenuItem)
     fileMenu.push(CommonMenu.quitMenuItem)
     helpMenu.push(CommonMenu.separatorMenuItem)
