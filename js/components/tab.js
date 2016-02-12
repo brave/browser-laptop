@@ -10,8 +10,6 @@ const WindowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet.js')
 const {getTextColorForBackground} = require('../lib/color')
 
-const getFavicon = require('../lib/faviconUtil.js')
-
 const contextMenus = require('../contextMenus')
 
 class DragIndicator extends ImmutableComponent {
@@ -159,9 +157,10 @@ class Tab extends ImmutableComponent {
       }
     }
 
-    if (!this.loading) {
+    const icon = this.props.frameProps.get('icon')
+    if (!this.loading && icon) {
       iconStyle = Object.assign(iconStyle, {
-        backgroundImage: `url(${getFavicon(this.props.frameProps)})`,
+        backgroundImage: `url(${icon})`,
         backgroundSize: iconSize,
         height: iconSize
       })
