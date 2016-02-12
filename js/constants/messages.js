@@ -37,6 +37,7 @@ const messages = {
   // Misc application events
   QUIT_APPLICATION: _,
   UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
+  CERT_ERROR: _, /** @arg {Object} details of certificate error */
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,
@@ -63,7 +64,9 @@ const messages = {
   BLOCKED_RESOURCE: _,
   // SETTINGS
   SETTINGS_UPDATED: _,
-  CHANGE_SETTING: _
+  CHANGE_SETTING: _,
+  // HTTPS
+  CERT_DETAILS_UPDATED: _ /** @arg {Object} security state of the active frame */
 }
 
 module.exports = mapValuesByKeys(messages)

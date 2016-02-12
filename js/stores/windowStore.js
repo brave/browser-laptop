@@ -397,6 +397,10 @@ const doAction = (action) => {
         windowState = windowState.setIn(activeFrameStatePath().concat(['security', 'isSecure']),
                                         action.securityState.secure)
       }
+      if (action.securityState.certDetails) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['security', 'certDetails']),
+                                        action.securityState.certDetails)
+      }
       break
     case WindowConstants.WINDOW_SET_BLOCKED_BY:
       const blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']

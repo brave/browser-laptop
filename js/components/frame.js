@@ -25,16 +25,14 @@ class Frame extends ImmutableComponent {
 
   updateWebview () {
     let src = this.props.frame.get('src')
-    const isAboutURL = isSourceAboutUrl(src)
-    if (isAboutURL) {
-      src = getTargetAboutUrl(src)
-    }
     let contentScripts = ['content/webviewPreload.js']
-    if (this.props.frame.get('location') === 'about:preferences') {
+    // NOTE: use src instead of location here because location is sometimes
+    // not updated when redirecting to about:certerror
+    if (src === 'about:preferences' || src === 'about:certerror') {
       contentScripts.push('content/aboutPreload.js')
     }
-    contentScripts = contentScripts.join(',')
 
+    contentScripts = contentScripts.join(',')
     const contentScriptsChanged =
       this.webview && contentScripts !== this.webview.getAttribute('contentScripts')
 
@@ -58,7 +56,8 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
-    this.webview.setAttribute('src', src)
+    this.webview.setAttribute('src',
+                              isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
     if (!this.webviewContainer.firstChild) {
       this.webviewContainer.appendChild(this.webview)
       this.addEventListeners()
@@ -206,7 +205,6 @@ class Frame extends ImmutableComponent {
         WindowActions.setLocation(event.url, key)
         WindowActions.setSecurityState({
           secure: urlParse(event.url).protocol === 'https:'
-          // TODO: Set extended validation once Electron exposes this
         })
       }
       WindowActions.updateBackForwardState(
@@ -240,6 +238,9 @@ class Frame extends ImmutableComponent {
           this.props.frame,
           this.webview.getURL())
         this.webview.send(messages.POST_PAGE_LOAD_RUN)
+        if (this.props.frame.get('location') === 'about:certerror') {
+          this.webview.send(messages.CERT_DETAILS_UPDATED, this.props.frame.get('security').toJS())
+        }
       }
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
