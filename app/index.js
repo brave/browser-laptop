@@ -80,9 +80,9 @@ app.on('ready', function () {
     // window webcontents, not the webview webcontents
     BrowserWindow.getAllWindows().map((win) => {
       win.webContents.send(messages.CERT_ERROR, {
-        url: url,
+        url,
         certError: error,
-        cert: cert
+        cert
       })
     })
   })
