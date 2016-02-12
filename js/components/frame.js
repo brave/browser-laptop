@@ -12,6 +12,7 @@ const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
+const path = require('path')
 const contextMenus = require('../contextMenus')
 
 import adInfo from '../data/adInfo.js'
@@ -27,9 +28,11 @@ class Frame extends ImmutableComponent {
   updateWebview () {
     let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
-    let contentScripts = ['content/webviewPreload.js']
+    let appRoot = 'file://' + path.resolve(__dirname, '..', '..', 'app') + '/'
+
+    let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
     if (location === 'about:preferences' || location === 'about:certerror') {
-      contentScripts.push('content/aboutPreload.js')
+      contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
     }
 
     contentScripts = contentScripts.join(',')
@@ -244,29 +247,23 @@ class Frame extends ImmutableComponent {
         this.webview.getURL())
     })
     this.webview.addEventListener('did-finish-load', () => {
-    })
-    this.webview.addEventListener('did-navigate-in-page', () => {
       WindowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
+      let security = this.props.frame.get('security')
+      if (this.props.frame.get('location') === 'about:certerror' &&
+          security && security.get('certDetails')) {
+        // Don't send certDetails.cert since it is big and crashes the page
+        this.webview.send(messages.CERT_DETAILS_UPDATED, {
+          url: security.get('certDetails').url,
+          error: security.get('certDetails').error
+        })
+      }
+    })
+    this.webview.addEventListener('did-navigate-in-page', () => {
     })
     this.webview.addEventListener('did-frame-finish-load', (event) => {
-      if (event.isMainFrame) {
-        WindowActions.onWebviewLoadEnd(
-          this.props.frame,
-          this.webview.getURL())
-        this.webview.send(messages.POST_PAGE_LOAD_RUN)
-        let security = this.props.frame.get('security')
-        if (this.props.frame.get('location') === 'about:certerror' &&
-            security && security.get('certDetails')) {
-          // Don't send certDetails.cert since it is big and crashes the page
-          this.webview.send(messages.CERT_DETAILS_UPDATED, {
-            url: security.get('certDetails').url,
-            error: security.get('certDetails').error
-          })
-        }
-      }
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
       WindowActions.setAudioPlaybackActive(this.props.frame, true)

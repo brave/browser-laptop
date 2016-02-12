@@ -8,8 +8,8 @@ const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 /**
  * Determines the path of a relative URL from the hosted app
  */
-export function getAppUrl (relativeUrl = './') {
-  return new window.URL(relativeUrl, window.location).href
+export function getAppUrl (relativeUrl = '/') {
+  return new window.URL(relativeUrl, window.baseHref || window.location).href
 }
 
 /**

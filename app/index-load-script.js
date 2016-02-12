@@ -1,16 +1,22 @@
-const bravePort = process.env.BRAVE_PORT || 8080
+var baseHref = 'http://localhost:' + process.env.npm_package_config_port
+var appEntry = baseHref + '/gen/app.entry.js'
+
+var baseNode = document.createElement('base')
+baseNode.href = baseHref
+document.getElementsByTagName('head')[0].appendChild(baseNode)
+
 const createScript = function (scriptPath) {
   return new Promise(function (resolve, reject) {
     var script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = scriptPath.replace(/\{port\}/, bravePort)
+    script.src = scriptPath
     script.async = true
     script.onload = resolve
     script.onerror = reject
     document.body.appendChild(script)
   })
 }
-createScript('http://localhost:{port}/built/app.entry.js')
-createScript('http://localhost:{port}/webpack-dev-server.js').catch(function () {
+
+createScript(appEntry).catch(function () {
   document.querySelector('#setupError').style.display = 'block'
 })
