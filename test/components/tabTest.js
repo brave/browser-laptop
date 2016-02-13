@@ -2,6 +2,7 @@
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
+const settings = require('../../js/constants/settings')
 const {urlInput} = require('../lib/selectors')
 
 describe('tabs', function () {
@@ -87,6 +88,37 @@ describe('tabs', function () {
     })
     it('opens in a new, but not active tab', function *() {
       yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="2"]')
+    })
+  })
+
+  describe('webview previews when tab is hovered', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForExist('.tab[data-frame-key="2"]')
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForExist('.tab[data-frame-key="3"]')
+    })
+    it('shows a tab preview', function *() {
+      yield this.app.client
+        .moveToObject('.tab[data-frame-key="2"]')
+        .moveToObject('.tab[data-frame-key="2"]', 3, 3)
+        .waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]')
+        .moveToObject(urlInput)
+    })
+    it('does not show tab previews when setting is off', function *() {
+      yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
+      yield this.app.client
+        .moveToObject('.tab[data-frame-key="2"]')
+        .moveToObject('.tab[data-frame-key="2"]', 3, 3)
+      try {
+        yield this.app.client.waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]', 1000)
+      } catch (e) {
+        return
+      }
+      throw new Error('Preview should never become active when previews are off')
     })
   })
 })
