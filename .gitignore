@@ -38,6 +38,7 @@ dist
 win64-dist
 
 app/gen
+app/index-dev.html
 *.pfx
 
 # HTTPS Everywhere files
