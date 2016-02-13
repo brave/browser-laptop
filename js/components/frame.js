@@ -12,6 +12,7 @@ const cx = require('../lib/classSet.js')
 const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
+const contextMenus = require('../contextMenus')
 
 import adInfo from '../data/adInfo.js'
 import Config from '../constants/config.js'
@@ -185,14 +186,31 @@ class Frame extends ImmutableComponent {
         this.insertAds(event.target.src)
       }
     })
-    const frame = this.props.frame
     this.webview.addEventListener('ipc-message', (e) => {
-      let action = e.channel
-      switch (action.actionType) {
+      let method = () => {}
+      switch (e.channel) {
         case messages.THEME_COLOR_COMPUTED:
-          WindowActions.setThemeColor(frame, undefined, action.themeColor || null)
+          method = (computedThemeColor) =>
+            WindowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
+          break
+        case messages.CONTEXT_MENU_OPENED:
+          method = (nodeProps) =>
+            contextMenus.onMainContextMenu(nodeProps)
+          break
+        case messages.STOP_LOAD:
+          method = () => this.webview.stop()
+          break
+        case messages.LINK_HOVERED:
+          method = (href, position) => {
+            position = position || {}
+            let nearBottom = position.y > (window.innerHeight - 150) // todo: magic number
+            let mouseOnLeft = position.x < (window.innerWidth / 2)
+            let showOnRight = nearBottom && mouseOnLeft
+            WindowActions.setLinkHoverPreview(href, showOnRight)
+          }
           break
       }
+      method.apply(this, e.args)
     })
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {
@@ -221,6 +239,9 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-stop-loading', () => {
     })
     this.webview.addEventListener('did-fail-load', () => {
+      WindowActions.onWebviewLoadEnd(
+        this.props.frame,
+        this.webview.getURL())
     })
     this.webview.addEventListener('did-finish-load', () => {
     })
