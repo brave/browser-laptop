@@ -189,12 +189,12 @@ class UrlBar extends ImmutableComponent {
   get titleValue () {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
-    return ['about:newtab'].includes(this.props.urlbar.get('location'))
+    return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
       ? '' : this.props.activeFrameProps.get('title')
   }
 
   get locationValue () {
-    return ['about:newtab'].includes(this.props.urlbar.get('location'))
+    return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
       ? '' : this.props.urlbar.get('location')
   }
 
