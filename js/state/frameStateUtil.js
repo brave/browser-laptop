@@ -145,6 +145,9 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
  */
 export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   const url = frameOpts.location || Config.defaultUrl
+  const navbarFocus = activeFrameKey === newKey &&
+                      url === Config.defaultUrl &&
+                      frameOpts.delayedLoadUrl === undefined
   const frame = Immutable.fromJS({
     zoomLevel: Config.zoom.defaultValue,
     audioMuted: false, // frame is muted
@@ -162,7 +165,7 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
     guestInstanceId: frameOpts.guestInstanceId,
     navbar: {
       searchSuggestions: true,
-      focused: true,
+      focused: navbarFocus,
       urlbar: {
         location: url,
         urlPreview: '',
@@ -171,8 +174,8 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
           searchResults: [],
           suggestionList: null
         },
-        selected: true,
-        focused: true,
+        selected: navbarFocus,
+        focused: navbarFocus,
         active: false
       }
     },

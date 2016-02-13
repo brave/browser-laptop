@@ -105,7 +105,6 @@ class Main extends ImmutableComponent {
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
       }, openInForeground)
-      ipc.emit(messages.SHORTCUT_FOCUS_URL)
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
