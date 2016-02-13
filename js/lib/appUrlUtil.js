@@ -87,3 +87,12 @@ export function isUrl (input) {
   input = input.trim()
   return (UrlUtil.isURL(input) && !input.includes(' '))
 }
+
+/**
+ * Gets the current page (host + path) without search or hash
+ * @param {string} path
+ */
+export function currentPage (path) {
+  const parsed = new window.URL(path)
+  return parsed.origin + parsed.pathname
+}

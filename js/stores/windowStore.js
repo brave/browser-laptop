@@ -13,6 +13,8 @@ const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 
+import { currentPage } from '../lib/appUrlUtil'
+
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],
@@ -142,14 +144,15 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
-      const lastLocation = windowState.getIn(frameStatePath(key).concat(['location']))
+      const lastLocation = currentPage(windowState.getIn(frameStatePath(key).concat(['location'])))
+      const nextLocation = currentPage(action.location)
       const lastTitle = windowState.getIn(frameStatePath(key).concat(['title']))
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
         icon: undefined,
         adblock: {},
         trackingProtection: {},
-        title: action.location === lastLocation ? lastTitle : '',
+        title: nextLocation === lastLocation ? lastTitle : '',
         location: action.location
       })
       updateNavBarInput(action.location, frameStatePath(key))
