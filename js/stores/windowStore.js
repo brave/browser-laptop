@@ -35,9 +35,9 @@ const activeFrameStatePath = () => frameStatePath(windowState.get('activeFrameKe
 const frameStatePathForFrame = (frameProps) =>
   ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)]
 
-const updateNavBarInput = (loc) => {
-  windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']), loc)
-  windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), null)
+const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
+  windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'location']), loc)
+  windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'urlPreview']), null)
 }
 
 /**
@@ -152,10 +152,7 @@ const doAction = (action) => {
         title: action.location === lastLocation ? lastTitle : '',
         location: action.location
       })
-      // Update the displayed location in the urlbar
-      if (key === windowState.get('activeFrameKey')) {
-        updateNavBarInput(action.location)
-      }
+      updateNavBarInput(action.location, frameStatePath(key))
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
