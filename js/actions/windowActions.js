@@ -45,6 +45,7 @@ const WindowActions = {
   loadUrl: function (activeFrame, location) {
     location = location.trim()
     let newFrame = false
+    // todo: https://github.com/brave/browser-laptop/issues/569
     if (activeFrame.get('isPinned')) {
       try {
         const origin1 = new window.URL(activeFrame.get('location')).origin

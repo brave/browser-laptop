@@ -53,7 +53,7 @@ module.exports.newTabMenuItem = {
   label: 'New Tab',
   accelerator: 'CmdOrCtrl+T',
   click: function (item, focusedWindow) {
-    if (!module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
+    if (!module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, '', { focusUrlbar: true }])) {
       // no active windows
       AppActions.newWindow()
     }
@@ -64,7 +64,7 @@ module.exports.newPrivateTabMenuItem = {
   label: 'New Private Tab',
   accelerator: 'CmdOrCtrl+Alt+T',
   click: function (item, focusedWindow) {
-    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
+    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true, focusUrlbar: true }])
   }
 }
 
@@ -72,7 +72,7 @@ module.exports.newPartitionedTabMenuItem = {
   label: 'New Session Tab',
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
-    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
+    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true, focusUrlbar: true }])
   }
 }
 
