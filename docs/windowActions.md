@@ -481,6 +481,19 @@ Dispatches a message to indicate the release notes should be visible
 
 
 
+### setLinkHoverPreview(href, showOnRight) 
+
+Dispatches a message to indicate the href preview should be shown
+for a hovered link
+
+**Parameters**
+
+**href**: `string`, the href of the link
+
+**showOnRight**: `boolean`, display in the right corner
+
+
+
 ### setBlockedBy(frameProps, blockType) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown

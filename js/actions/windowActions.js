@@ -649,6 +649,20 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to indicate the href preview should be shown
+   * for a hovered link
+   * @param {string} href - the href of the link
+   * @param {boolean} showOnRight - display in the right corner
+   */
+  setLinkHoverPreview: function (href, showOnRight) {
+    WindowDispatcher.dispatch({
+      actionType: WindowConstants.WINDOW_SET_LINK_HOVER_PREVIEW,
+      href,
+      showOnRight
+    })
+  },
+
+  /**
    * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
    *
    * @param {object} frameProps - The frame to set blocked info on

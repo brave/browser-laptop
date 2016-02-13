@@ -227,7 +227,7 @@
       isContentEditable: e.target.isContentEditable,
       hasSelection: hasSelection(e.target)
     }
-    ipcRenderer.send('context-menu-opened', nodeProps)
+    ipcRenderer.sendToHost('context-menu-opened', nodeProps)
     e.preventDefault()
   }, false)
 
@@ -235,7 +235,7 @@
     switch (e.keyCode) {
       case this.KeyEvent.DOM_VK_ESCAPE:
         e.preventDefault()
-        ipcRenderer.send('stop-load')
+        ipcRenderer.sendToHost('stop-load')
         break
       case this.KeyEvent.DOM_VK_BACK_SPACE:
         if (!isEditable(document.activeElement)) {
@@ -291,13 +291,13 @@
         x: event.clientX,
         y: event.clientY
       }
-      ipcRenderer.send('link-hovered', target.href, pos)
+      ipcRenderer.sendToHost('link-hovered', target.href, pos)
     }
   })
 
   document.addEventListener('mouseout', (event) => {
     if (delegate(event, 'a')) {
-      ipcRenderer.send('link-hovered', null)
+      ipcRenderer.sendToHost('link-hovered', null)
     }
   })
 
@@ -358,9 +358,6 @@
         this.style.visibility = 'hidden'
       })
     })
-    ipcRenderer.sendToHost({
-      actionType: 'theme-color-computed',
-      themeColor: computeThemeColor()
-    })
+    ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
   })
 }).apply(this)

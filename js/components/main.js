@@ -90,12 +90,6 @@ class Main extends ImmutableComponent {
 
   componentDidMount () {
     this.registerSwipeListener()
-    ipc.on(messages.STOP_LOAD, () => {
-      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-    })
-    ipc.on(messages.CONTEXT_MENU_OPENED, (e, nodeProps) => {
-      contextMenus.onMainContextMenu(nodeProps)
-    })
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find(frame => frame.get('location') === url)

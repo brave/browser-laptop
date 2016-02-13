@@ -298,6 +298,12 @@ const doAction = (action) => {
       frames = frames.splice(newIndex, 0, action.sourceFrameProps)
       windowState = windowState.set('frames', frames)
       break
+    case WindowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
+      windowState = windowState.mergeIn(activeFrameStatePath(), {
+        hrefPreview: action.href,
+        showOnRight: action.showOnRight
+      })
+      break
     case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
@@ -438,19 +444,6 @@ const doAction = (action) => {
 }
 
 WindowDispatcher.register(doAction)
-
-ipc.on(messages.LINK_HOVERED, (e, href, position) => {
-  position = position || {}
-  const nearBottom = position.y > (window.innerHeight - 150) // todo: magic number
-  const mouseOnLeft = position.x < (window.innerWidth / 2)
-  const showOnRight = nearBottom && mouseOnLeft
-
-  windowState = windowState.mergeIn(activeFrameStatePath(), {
-    hrefPreview: href,
-    showOnRight
-  })
-  windowStore.emitChanges()
-})
 
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   windowState = FrameStateUtil.makeNextFrameActive(windowState)
