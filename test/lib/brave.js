@@ -132,6 +132,18 @@ var exports = {
       }, frameProps, siteTag).then((response) => response.value)
     })
 
+    /**
+     * Changes a setting
+     *
+     * @param {string} key - the setting key to change
+     * @param value - The setting value to change to
+     */
+    this.app.client.addCommand('changeSetting', function (key, value) {
+      return this.execute(function (key, value) {
+        return require('../js/actions/appActions').changeSetting(key, value)
+      }, key, value).then((response) => response.value)
+    })
+
     this.app.client.addCommand('getDefaultWindowHeight', function () {
       return this.execute(function () {
         let screen = require('electron').screen

@@ -61,5 +61,14 @@ describe('tab pages', function () {
           .waitForExist(tabPage2 + '.active')
       })
     })
+
+    describe('tabs per page setting', function () {
+      it('takes effect immediately', function *() {
+        yield this.app.client.changeSetting(settings.TABS_PER_TAB_PAGE, 1)
+        yield this.app.client.waitUntil(function () {
+          return this.elements(tabPage).then((res) => res.value.length === 7)
+        })
+      })
+    })
   })
 })
