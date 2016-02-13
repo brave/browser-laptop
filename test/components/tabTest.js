@@ -121,4 +121,24 @@ describe('tabs', function () {
       throw new Error('Preview should never become active when previews are off')
     })
   })
+
+  describe('new tabs open per the switch to new tabs setting', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('new tab opens in background by default', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', {openInForeground: false})
+        .waitForExist('.tab[data-frame-key="2"]')
+      yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
+    })
+    it('changing new tab default makes new tabs open in background by default', function *() {
+      yield this.app.client.changeSetting(settings.SWITCH_TO_NEW_TABS, true)
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', {openInForeground: false})
+        .waitForExist('.tab[data-frame-key="3"]')
+      yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
+    })
+  })
 })
