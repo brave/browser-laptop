@@ -68,7 +68,7 @@
 <updateNow "update now">
 <updateChecking "We're checking for updates...">
 <updateDownloading "Update found, we're downloading it...">
-<updateLater "update later">
+<updateLater "later">
 <updateDetails "details">
 <updateError "We were not able to update.">
 <updateHello "Hello!">
