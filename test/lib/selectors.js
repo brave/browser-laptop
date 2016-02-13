@@ -11,5 +11,7 @@ module.exports = {
   tabPage2: '[data-tab-page="1"]',
   closeTab: '.closeTab',
   urlbarIcon: '.urlbarIcon',
-  titleBar: '#titleBar'
+  titleBar: '#titleBar',
+  navigatorBookmarked: '#navigator.bookmarked',
+  navigatorNotBookmarked: '#navigator:not(.bookmarked)'
 }

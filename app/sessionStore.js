@@ -18,7 +18,9 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
-const storagePath = path.join(app.getPath('userData'), sessionStorageName)
+const storagePath = process.env.NODE_ENV !== 'test'
+  ? path.join(app.getPath('userData'), sessionStorageName)
+  : path.join(process.env.HOME, '.brave-test-session-store-1')
 const getSetting = require('../js/settings').getSetting
 
 /**
