@@ -137,7 +137,13 @@ class Main extends ImmutableComponent {
   }
 
   checkForTitleMode (pageY) {
-    const height = document.querySelector('#navigator').getBoundingClientRect().bottom
+    const navigator = document.querySelector('#navigator')
+    // Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
+    if (!navigator) {
+      return
+    }
+
+    const height = navigator.getBoundingClientRect().bottom
     if (pageY <= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
       WindowActions.setMouseInTitlebar(true)
     } else if (pageY === undefined || pageY > height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
