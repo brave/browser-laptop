@@ -228,7 +228,7 @@ const handleAppAction = (action) => {
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
         ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html'
-        : 'file://' + path.resolve(__dirname + '..', '..', '..') + '/app/index.html'
+        : 'file://' + path.resolve(__dirname, '..', '..') + '/app/index.html'
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {

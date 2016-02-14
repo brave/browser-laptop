@@ -60,12 +60,10 @@ To run the tests:
 
     npm test
 
-Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the environment variable `BRAVE_PORT` to make it use a different one.
+Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
 
 e.g.
-`BRAVE_PORT=9001 npm run watch`
-
-`BRAVE_PORT=9001 npm run start`
+npm config set brave:port 9001
 
 Additional notes on troubleshooting development issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
 
