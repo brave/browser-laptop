@@ -17,6 +17,8 @@ const createScript = function (scriptPath) {
   })
 }
 
+document.querySelector('#webpackLoading').style.display = 'block'
 createScript(appEntry).catch(function () {
+  document.querySelector('#webpackLoading').style.display = 'none'
   document.querySelector('#setupError').style.display = 'block'
 })
