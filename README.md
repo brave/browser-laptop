@@ -87,6 +87,16 @@ Build instructions:
 
 ## Packaging for bundles, installers, and updates
 
+#### Electron Prebuilt
+
+By default [electron-packager](https://github.com/brave/electron-packager) will download electron using the mirror and version specified in the packages.json config section and cache the downloaded file in ~/.electron. If you would like to use a different mirror or version you can specify the following environment variables when running npm run build-package
+
+    ELECTRON_MIRROR=your_mirror.com
+    ELECTRON_VERSION=XYZ
+
+e.g.
+ELECTRON_MIRROR=https://github.com/atom/electron/releases/download/v ELECTRON_VERSION=0.36.7 npm run build-package
+
 ### OSX:
 
 From within brave-browser you can create a .app file for distribution:

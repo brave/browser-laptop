@@ -21,8 +21,14 @@ if (isWindows) {
 }
 
 var env = {
-  NODE_ENV: 'production'
+  NODE_ENV: 'production',
+  ELECTRON_MIRROR: process.env.ELECTRON_MIRROR ||
+                   process.env.npm_package_config_electron_mirror
 }
+
+var electron_version = process.env.ELECTRON_VERSION ||
+                       process.env.npm_package_config_electron_version ||
+                       VersionInfo.electronVersion
 
 var cmds = ['echo cleaning up target...']
 
@@ -43,7 +49,7 @@ cmds = cmds.concat([
   'echo starting build...'
 ])
 
-console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
+console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + electron_version)
 
 cmds = cmds.concat([
   '"./node_modules/.bin/webpack"',
@@ -53,11 +59,11 @@ cmds = cmds.concat([
     ' --ignore="' + ignoredPaths.join('|') + '"' +
     ' --platform=' + process.platform +
     ' --arch=' + arch +
-    ' --version=' + VersionInfo.electronVersion +
+    ' --version=' + electron_version +
     ' --icon=' + appIcon +
     ' --asar=true' +
     ' --app-version=' + VersionInfo.braveVersion +
-    ' --build-version=' + VersionInfo.electronVersion +
+    ' --build-version=' + electron_version +
     ' --protocol="http" --protocol-name="HTTP Handler"' +
     ' --protocol="https" --protocol-name="HTTPS Handler"' +
     ' --version-string.CompanyName=\"Brave Inc.\"' +
