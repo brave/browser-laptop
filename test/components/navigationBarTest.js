@@ -5,6 +5,7 @@ const Config = require('../../js/constants/config').default
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
+const timeoutForWaitUntil = 50000
 
 describe('urlbar', function () {
   function * setup (client) {
@@ -182,21 +183,21 @@ describe('urlbar', function () {
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
           backgroundColor.parsed.hex === '#4d90fe'
-      ))
+      ), timeoutForWaitUntil)
     })
     it('Obtains theme color from the background', function *() {
       const redPage = Brave.server.url('red_bg.html')
       yield this.app.client.loadUrl(redPage)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
-          backgroundColor.parsed.hex === '#ff0000'))
+          backgroundColor.parsed.hex === '#ff0000'), timeoutForWaitUntil)
     })
     it('Obtains theme color from a top header and not background', function *() {
       const redPage = Brave.server.url('yellow_header.html')
       yield this.app.client.loadUrl(redPage)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
-          backgroundColor.parsed.hex === '#ffff66'))
+          backgroundColor.parsed.hex === '#ffff66'), timeoutForWaitUntil)
     })
   })
 

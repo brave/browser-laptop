@@ -69,8 +69,9 @@ var exports = {
     })
   },
 
-  beforeEach: function (context) {
+  beforeEach: function *(context) {
     context.timeout(30000)
+    yield this.app.client.timeouts('implicit', 5000)
 
     context.beforeEach(function () {
       return exports.startApp.call(this)
