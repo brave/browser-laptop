@@ -28,7 +28,9 @@ class Frame extends ImmutableComponent {
   updateWebview () {
     let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
-    let appRoot = 'file://' + path.resolve(__dirname, '..', '..', 'app') + '/'
+    let appRoot = window.baseHref
+      ? 'file://' + path.resolve(__dirname, '..', '..', 'app') + '/'
+      : ''
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
     if (location === 'about:preferences' || location === 'about:certerror') {
