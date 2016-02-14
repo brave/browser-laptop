@@ -236,7 +236,15 @@ function mainTemplateInit (nodeProps) {
 
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
     const editableItems = getEditableItems(nodeProps.hasSelection)
-    template.push(...editableItems)
+    template.push({
+      label: 'Undo',
+      accelerator: 'CmdOrCtrl+Z',
+      role: 'undo'
+    }, {
+      label: 'Redo',
+      accelerator: 'Shift+CmdOrCtrl+Z',
+      role: 'redo'
+    }, CommonMenu.separatorMenuItem, ...editableItems)
   } else if (nodeProps.hasSelection) {
     template.push({
       label: 'Copy',
