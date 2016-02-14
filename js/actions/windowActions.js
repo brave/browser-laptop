@@ -7,22 +7,35 @@
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const WindowConstants = require('../constants/windowConstants')
 const Config = require('../constants/config')
-const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
+const UrlUtil = require('../lib/urlutil')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 const remote = electron.remote
 const messages = require('../constants/messages')
 const AppActions = require('./appActions')
-import { getSourceAboutUrl } from '../lib/appUrlUtil'
+const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
+
+function dispatch (action) {
+  if (WindowActions.dispatchToIPC) {
+    remote.getCurrentWindow().webContents.send('handle-action', action)
+    WindowActions.dispatchToIPC = false
+  } else {
+    WindowDispatcher.dispatch(action)
+  }
+}
 
 const WindowActions = {
+  dispatchViaIPC: function () {
+    this.dispatchToIPC = true
+  },
+
   /**
    * Dispatches an event to the main process to replace the window state
    *
    * @param {object} windowState - Initial window state object
    */
   setState: function (windowState) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_STATE,
       windowState
     })
@@ -67,7 +80,7 @@ const WindowActions = {
       }, true)
       return
     } else {
-      WindowDispatcher.dispatch({
+      dispatch({
         actionType: WindowConstants.WINDOW_SET_URL,
         location
       })
@@ -92,7 +105,7 @@ const WindowActions = {
     if (UrlUtil.isURL(location)) {
       location = UrlUtil.getUrlFromInput(location)
     }
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_LOCATION,
       location,
       key: key
@@ -105,7 +118,7 @@ const WindowActions = {
    * changed.
    */
   setSecurityState: function (securityState) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_SECURITY_STATE,
       securityState
     })
@@ -118,7 +131,7 @@ const WindowActions = {
    * @param {string} location - The text to set as the new navbar URL input
    */
   setNavBarUserInput: function (location) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_NAVBAR_INPUT,
       location
     })
@@ -132,7 +145,7 @@ const WindowActions = {
    * @param {string} title - The title to set for the frame
    */
   setFrameTitle: function (frameProps, title) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_FRAME_TITLE,
       frameProps,
       title
@@ -145,7 +158,7 @@ const WindowActions = {
    * @param {boolean} shown - Whether to show the findbar
    */
   setFindbarShown: function (frameProps, shown) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_FINDBAR_SHOWN,
       frameProps,
       shown
@@ -158,7 +171,7 @@ const WindowActions = {
    * @param {boolean} isPinned - Whether to pin or not
    */
   setPinned: function (frameProps, isPinned) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_PINNED,
       frameProps,
       isPinned
@@ -171,7 +184,7 @@ const WindowActions = {
    * @param {Object} frameProps - The frame properties for the webview in question.
    */
   onWebviewLoadStart: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_WEBVIEW_LOAD_START,
       frameProps
     })
@@ -183,7 +196,7 @@ const WindowActions = {
    * @param {Object} frameProps - The frame properties for the webview in question.
    */
   onWebviewLoadEnd: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_WEBVIEW_LOAD_END,
       frameProps
     })
@@ -195,7 +208,7 @@ const WindowActions = {
    * @param {boolean} focused - true if the navigation bar should be considered as focused
    */
   setNavBarFocused: function (focused) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_NAVBAR_FOCUSED,
       focused
     })
@@ -208,12 +221,18 @@ const WindowActions = {
    *                  These may not all be hooked up in Electron yet.
    * @param {boolean} openInForeground - true if the new frame should become the new active frame
    */
-  newFrame: function (frameOpts = {}, openInForeground = true) {
+  newFrame: function (frameOpts, openInForeground) {
+    if (frameOpts === undefined) {
+      frameOpts = {}
+    }
+    if (openInForeground === undefined) {
+      openInForeground = true
+    }
     frameOpts.location = frameOpts.location || Config.defaultUrl
     if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
       frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
     }
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_NEW_FRAME,
       frameOpts: frameOpts,
       openInForeground
@@ -251,7 +270,7 @@ const WindowActions = {
     // If there is at least 1 pinned frame don't close the window until subsequent
     // close attempts
     if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
-      WindowDispatcher.dispatch({
+      dispatch({
         actionType: WindowConstants.WINDOW_CLOSE_FRAME,
         frameProps
       })
@@ -265,7 +284,7 @@ const WindowActions = {
    * The new frame is expected to appear at the index it was last closed at
    */
   undoClosedFrame: function () {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_UNDO_CLOSED_FRAME
     })
   },
@@ -286,7 +305,7 @@ const WindowActions = {
     if (!frameProps) {
       return
     }
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME,
       frameProps: frameProps
     })
@@ -299,7 +318,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   setPreviewFrame: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_PREVIEW_FRAME,
       frameProps: frameProps
     })
@@ -311,7 +330,7 @@ const WindowActions = {
    * @param {number} index - the tab page index to change to
    */
   setTabPageIndex: function (index) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       index
     })
@@ -323,7 +342,7 @@ const WindowActions = {
    * @param {number} frameProps - The frame props to center around
    */
   setTabPageIndexByFrame: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       frameProps
     })
@@ -337,7 +356,7 @@ const WindowActions = {
    * @param {boolean} canGoForward - Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
    */
   updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_UPDATE_BACK_FORWARD,
       frameProps,
       canGoBack,
@@ -351,7 +370,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragStart: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAG_START,
       frameProps
     })
@@ -363,7 +382,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragStop: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAG_STOP,
       frameProps
     })
@@ -375,7 +394,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragDraggingOverLeftHalf: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAGGING_OVER_LEFT,
       frameProps
     })
@@ -387,7 +406,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragDraggingOverRightHalf: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAGGING_OVER_RIGHT,
       frameProps
     })
@@ -399,7 +418,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragExit: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAG_EXIT,
       frameProps
     })
@@ -411,7 +430,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDragExitRightHalf: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAG_EXIT_RIGHT,
       frameProps
     })
@@ -423,7 +442,7 @@ const WindowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   tabDraggingOn: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_DRAGGING_ON,
       frameProps
     })
@@ -437,7 +456,7 @@ const WindowActions = {
    * @param {boolean} prepend - Whether or not to prepend to the destinationFrameProps
    */
   moveTab: function (sourceFrameProps, destinationFrameProps, prepend) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_TAB_MOVE,
       sourceFrameProps,
       destinationFrameProps,
@@ -452,7 +471,7 @@ const WindowActions = {
    * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
    */
   setUrlBarSuggestions: function (suggestionList, selectedIndex) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS,
       suggestionList,
       selectedIndex
@@ -466,7 +485,7 @@ const WindowActions = {
    * @param value If false URL bar previews will not be set.
    */
   setUrlBarPreview: function (value) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_PREVIEW,
       value
     })
@@ -480,7 +499,7 @@ const WindowActions = {
    * @param searchResults The search results to set for the currently entered URL bar text.
    */
   setUrlBarSuggestionSearchResults: function (searchResults) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
       searchResults
     })
@@ -493,7 +512,7 @@ const WindowActions = {
    * @param {boolean} forSearchMode - Whether or not to enable auto-complete search suggestions
    */
   setUrlBarSelected: function (selected, forSearchMode) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_SELECTED,
       selected,
       forSearchMode
@@ -506,7 +525,7 @@ const WindowActions = {
    * @param {boolean} isActive - Whether or not the URL bar should be marked as active
    */
   setUrlBarActive: function (isActive) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_ACTIVE,
       isActive
     })
@@ -519,7 +538,7 @@ const WindowActions = {
    * set from an IPC call.
    */
   setActiveFrameShortcut: function (activeShortcut) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT,
       activeShortcut
     })
@@ -530,7 +549,7 @@ const WindowActions = {
    * @param {Object} searchDetail - the search details
    */
   setSearchDetail: function (searchDetail) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_SEARCH_DETAIL,
       searchDetail
     })
@@ -542,7 +561,7 @@ const WindowActions = {
    * @param {Object} findDetail - the find details
    */
   setFindDetail: function (frameProps, findDetail) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_FIND_DETAIL,
       frameProps,
       findDetail
@@ -556,7 +575,7 @@ const WindowActions = {
    * @param {boolean} muted - true if the frame is muted
    */
   setAudioMuted: function (frameProps, muted) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_AUDIO_MUTED,
       frameProps,
       muted
@@ -570,7 +589,7 @@ const WindowActions = {
    * @param {boolean} audioPlaybackActive - true if audio is playing in the frame
    */
   setAudioPlaybackActive: function (frameProps, audioPlaybackActive) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE,
       frameProps,
       audioPlaybackActive
@@ -586,7 +605,7 @@ const WindowActions = {
    *   frame which is used if no frame color is present
    */
   setThemeColor: function (frameProps, themeColor, computedThemeColor) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_THEME_COLOR,
       frameProps,
       themeColor,
@@ -601,7 +620,7 @@ const WindowActions = {
    * @param {string} favicon - A url to the favicon to use
    */
   setFavicon: function (frameProps, favicon) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_FAVICON,
       frameProps,
       favicon
@@ -614,7 +633,7 @@ const WindowActions = {
    * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar
    */
   setMouseInTitlebar: function (mouseInTitlebar) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR,
       mouseInTitlebar
     })
@@ -628,7 +647,7 @@ const WindowActions = {
    * @param {boolean} expandAdblock - If specified, indicates if the adblock section should be expanded
    */
   setSiteInfoVisible: function (isVisible, expandTrackingProtection, expandAdblock) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE,
       isVisible,
       expandTrackingProtection,
@@ -642,7 +661,7 @@ const WindowActions = {
    * @param {boolean} isVisible - true if the site info should be shown
    */
   setReleaseNotesVisible: function (isVisible) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE,
       isVisible
     })
@@ -655,7 +674,7 @@ const WindowActions = {
    * @param {boolean} showOnRight - display in the right corner
    */
   setLinkHoverPreview: function (href, showOnRight) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_LINK_HOVER_PREVIEW,
       href,
       showOnRight
@@ -669,7 +688,7 @@ const WindowActions = {
    * @param {string} blockType - either 'adblock' or 'trackingProtection'
    */
   setBlockedBy: function (frameProps, blockType, location) {
-    WindowDispatcher.dispatch({
+    dispatch({
       actionType: WindowConstants.WINDOW_SET_BLOCKED_BY,
       frameProps,
       blockType,
@@ -678,21 +697,21 @@ const WindowActions = {
   },
 
   zoomIn: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       frameProps,
       actionType: WindowConstants.WINDOW_ZOOM_IN
     })
   },
 
   zoomOut: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       frameProps,
       actionType: WindowConstants.WINDOW_ZOOM_OUT
     })
   },
 
   zoomReset: function (frameProps) {
-    WindowDispatcher.dispatch({
+    dispatch({
       frameProps,
       actionType: WindowConstants.WINDOW_ZOOM_RESET
     })

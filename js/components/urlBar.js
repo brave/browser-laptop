@@ -14,9 +14,8 @@ const ipc = global.require('electron').ipcRenderer
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
-const Config = require('../constants/config')
 
-import {isUrl} from '../lib/appUrlUtil.js'
+const {isUrl} = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
 
@@ -261,7 +260,7 @@ class UrlBar extends ImmutableComponent {
         </div>
         </div>
       <input type='text'
-        disabled={this.props.activeFrameProps.get('location') === Config.defaultUrl && this.loadTime === ''}
+        disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
         onFocus={this.onFocus.bind(this)}
         onBlur={this.onBlur.bind(this)}
         onKeyDown={this.onKeyDown.bind(this)}

@@ -9,7 +9,7 @@
 const vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
-export default {
+module.exports = {
   zoom: {
     defaultValue: 0,
     min: -8,
@@ -36,7 +36,6 @@ export default {
   vault: {
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
-    intentUrl: (userId) => `${vaultHost}/v1/users/${userId}/intents`,
     replacementUrl: adHost
   }
 }

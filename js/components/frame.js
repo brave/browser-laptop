@@ -9,16 +9,16 @@ const AppActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
-const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
+const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
+const Config = require('../constants/config.js')
 
 import adInfo from '../data/adInfo.js'
-import Config from '../constants/config.js'
 import FindBar from './findbar.js'
-import { isSourceAboutUrl, getTargetAboutUrl } from '../lib/appUrlUtil.js'
+const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 
 class Frame extends ImmutableComponent {
   constructor () {

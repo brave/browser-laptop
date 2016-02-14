@@ -3,7 +3,6 @@ var chai = require('chai')
 require('./coMocha')
 const path = require('path')
 const fs = require('fs')
-const {urlInput, activeWebview} = require('../lib/selectors')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -25,13 +24,6 @@ var promiseMapSeries = function (array, iterator) {
 }
 
 var exports = {
-  newApplication: function () {
-    return new Application({
-      path: './node_modules/.bin/electron',
-      args: ['./', 'debug=5858']
-    })
-  },
-
   keys: {
     CONTROL: '\ue009',
     ESCAPE: '\ue00c',
@@ -103,6 +95,17 @@ var exports = {
       return this.execute(function (message, ...param) {
         return require('electron').remote.getCurrentWindow().webContents.send(message, ...param)
       }, message, ...param).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('loadUrl', function (url) {
+      return this.execute(function (url) {
+        var Immutable = require('immutable')
+        var windowActions = require('../js/actions/windowActions')
+        windowActions.dispatchViaIPC()
+        windowActions.loadUrl(Immutable.fromJS({
+          isPinned: false
+        }), url)
+      }, url).then((response) => response.value)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
@@ -247,6 +250,9 @@ var exports = {
     }
     this.app = new Application({
       path: './node_modules/.bin/electron',
+      env: {
+        NODE_ENV: 'test'
+      },
       args: ['./', 'debug=5858']
     })
     return this.app.start()
@@ -254,16 +260,6 @@ var exports = {
 
   stopApp: function () {
     return this.app.stop()
-  },
-
-  navigate: function *(client, url) {
-    return yield client.ipcSend('shortcut-focus-url')
-      .setValue(urlInput, url)
-      // hit enter
-      .keys('\uE007')
-      .waitUntil(function () {
-        return this.getAttribute(activeWebview, 'src').then(src => src === url)
-      })
   }
 }
 

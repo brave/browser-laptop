@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Immutable from 'immutable'
-import Config from '../constants/config.js'
+const Config = require('../constants/config.js')
 
 export function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey

@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { isSourceAboutUrl } from './appUrlUtil.js'
-const UrlUtil = require('../../node_modules/urlutil.js/dist/node-urlutil.js')
+const { isSourceAboutUrl } = require('./appUrlUtil')
+const UrlUtil = require('./urlutil')
 
 module.exports = function getFavicon (frameProps) {
   if (!frameProps.get('location')) {

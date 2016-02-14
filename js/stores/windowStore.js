@@ -478,4 +478,11 @@ frameShortcuts.forEach(shortcut => {
   }
 })
 
+// Allows the parent process to send window level actions
+if (process.env.NODE_ENV === 'test') {
+  ipc.on('handle-action', (e, action) => {
+    doAction(action)
+  })
+}
+
 module.exports = windowStore

@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
-import { aboutUrls } from '../lib/appUrlUtil.js'
+const { aboutUrls } = require('../lib/appUrlUtil')
 
 class AboutAbout extends ImmutableComponent {
   render () {

@@ -1,5 +1,5 @@
 const ReactDOM = require('react-dom')
-import { getSourceAboutUrl } from '../lib/appUrlUtil.js'
+const { getSourceAboutUrl } = require('../lib/appUrlUtil')
 
 let rootComponent
 switch (getSourceAboutUrl(window.location.href)) {

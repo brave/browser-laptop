@@ -13,7 +13,7 @@ const {isSiteInList} = require('../state/siteUtil')
 const SiteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
-import { isSourceAboutUrl } from '../lib/appUrlUtil.js'
+const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 
 class NavigationBar extends ImmutableComponent {
 

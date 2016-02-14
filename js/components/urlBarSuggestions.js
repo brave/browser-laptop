@@ -8,9 +8,9 @@ const ReactDOM = require('react-dom')
 const WindowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 
-import Config from '../constants/config.js'
+const Config = require('../constants/config.js')
 import top500 from './../data/top500.js'
-import {isSourceAboutUrl, isUrl} from '../lib/appUrlUtil.js'
+const {isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 import Immutable from 'immutable'
 const debounce = require('../lib/debounce.js')
 const {getSiteIconClass} = require('../state/siteUtil.js')

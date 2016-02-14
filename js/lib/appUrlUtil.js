@@ -3,35 +3,38 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const UrlUtil = require('./../../node_modules/urlutil.js/dist/node-urlutil.js')
+const UrlUtil = require('./urlutil')
 
 /**
  * Determines the path of a relative URL from the hosted app
  */
-export function getAppUrl (relativeUrl = '/') {
+module.exports.getAppUrl = function (relativeUrl) {
+  if (relativeUrl === undefined) {
+    relativeUrl = '/'
+  }
   return new window.URL(relativeUrl, window.baseHref || window.location).href
 }
 
 /**
  * Returns the URL to the application's manifest
  */
-export function getManifestUrl () {
-  return getAppUrl('./manifest.webapp')
+module.exports.getManifestUrl = function () {
+  return module.exports.getAppUrl('./manifest.webapp')
 }
 
 // Map of source about: URLs mapped to target URLs
-export const aboutUrls = new Immutable.Map({
-  'about:about': getAppUrl('./about-about.html'),
-  'about:blank': getAppUrl('./about-blank.html'),
-  'about:history': getAppUrl('./about-history.html'),
-  'about:newtab': getAppUrl('./about-newtab.html'),
-  'about:preferences': getAppUrl('./about-preferences.html'),
-  'about:config': getAppUrl('./about-config.html'),
-  'about:certerror': getAppUrl('./about-certerror.html')
+module.exports.aboutUrls = new Immutable.Map({
+  'about:about': module.exports.getAppUrl('./about-about.html'),
+  'about:blank': module.exports.getAppUrl('./about-blank.html'),
+  'about:history': module.exports.getAppUrl('./about-history.html'),
+  'about:newtab': module.exports.getAppUrl('./about-newtab.html'),
+  'about:preferences': module.exports.getAppUrl('./about-preferences.html'),
+  'about:config': module.exports.getAppUrl('./about-config.html'),
+  'about:certerror': module.exports.getAppUrl('./about-certerror.html')
 })
 
 // Map of target URLs mapped to source about: URLs
-const aboutUrlsReverse = new Immutable.Map(aboutUrls.reduce((obj, v, k) => {
+const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj, v, k) => {
   obj[v] = k
   return obj
 }, {}))
@@ -41,8 +44,8 @@ const aboutUrlsReverse = new Immutable.Map(aboutUrls.reduce((obj, v, k) => {
  * Example:
  * about:blank -> http://localhost:8000/about-blank/index.html
  */
-export function getTargetAboutUrl (input) {
-  return aboutUrls.get(input)
+module.exports.getTargetAboutUrl = function (input) {
+  return module.exports.aboutUrls.get(input)
 }
 
 /**
@@ -50,7 +53,7 @@ export function getTargetAboutUrl (input) {
  * Example:
  * http://localhost:8000/about-blank.html -> about:blank
  */
-export function getSourceAboutUrl (input) {
+module.exports.getSourceAboutUrl = function (input) {
   return aboutUrlsReverse.get(input)
 }
 
@@ -58,32 +61,23 @@ export function getSourceAboutUrl (input) {
  * Determines if the passed in string is a source about: URL
  * Example: isSourceAboutUrl('about:blank') -> true
  */
-export function isSourceAboutUrl (input) {
-  return !!getTargetAboutUrl(input)
+module.exports.isSourceAboutUrl = function (input) {
+  return !!module.exports.getTargetAboutUrl(input)
 }
 
 /**
  * Determines if the passed in string is the target of a source about: URL
  * Example: isTargetAboutUrl('http://localhost:8000/about-blank/index.html') -> true
  */
-export function isTargetAboutUrl (input) {
-  return !!getSourceAboutUrl(input)
-}
-
-/**
- * Determines whether the passed in string is pointing to a URL that
- * should be privileged (mozapp attribute on the iframe)
- * For now this is the same as an about URL.
- */
-export function isPrivilegedUrl (input) {
-  return isSourceAboutUrl(input)
+module.exports.isTargetAboutUrl = function (input) {
+  return !!module.exports.getSourceAboutUrl(input)
 }
 
 /**
  * Determines whether a string is a valid URL. Based on node-urlutil.js.
  * @param {string} input
  */
-export function isUrl (input) {
+module.exports.isUrl = function (input) {
   input = input.trim()
-  return (UrlUtil.isURL(input) && !input.includes(' '))
+  return UrlUtil.isURL(input) && !input.includes(' ')
 }

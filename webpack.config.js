@@ -6,7 +6,8 @@ var webpack = require('webpack')
 var WebpackNotifierPlugin = require('webpack-notifier')
 var port = process.env.npm_package_config_port
 var path = require('path')
-var env = process.env.NODE_ENV === 'production' ? 'production' : 'development'
+var env = process.env.NODE_ENV === 'production' ? 'production'
+  : (process.env.NODE_ENV === 'test' ? 'test' : 'development')
 
 function config () {
   return {
@@ -119,6 +120,10 @@ module.exports = {
     merge(aboutPages, development())
   ],
   production: [
+    merge(app, production()),
+    merge(aboutPages, production())
+  ],
+  test: [
     merge(app, production()),
     merge(aboutPages, production())
   ]
