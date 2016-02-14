@@ -184,14 +184,14 @@ describe('urlbar', function () {
           backgroundColor.parsed.hex === '#4d90fe'
       ))
     })
-    it('Obtains theme color from the background', function *() {
+    it.skip('Obtains theme color from the background', function *() {
       const redPage = Brave.server.url('red_bg.html')
       yield this.app.client.loadUrl(redPage)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then(backgroundColor =>
           backgroundColor.parsed.hex === '#ff0000'))
     })
-    it('Obtains theme color from a top header and not background', function *() {
+    it.skip('Obtains theme color from a top header and not background', function *() {
       const redPage = Brave.server.url('yellow_header.html')
       yield this.app.client.loadUrl(redPage)
       yield this.app.client.waitUntil(() =>
