@@ -176,7 +176,7 @@ describe('urlbar', function () {
     })
 
     // We need a newer electron build first
-    it('Parses theme-color meta tag when one is present', function *() {
+    it.skip('Parses theme-color meta tag when one is present', function *() {
       const pageWithFavicon = Brave.server.url('theme_color.html')
       yield this.app.client.loadUrl(pageWithFavicon)
       yield this.app.client.waitUntil(() =>
