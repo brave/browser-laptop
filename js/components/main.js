@@ -276,7 +276,8 @@ class Main extends ImmutableComponent {
         <div className={cx({
           tabPages: true,
           singlePage: nonPinnedFrames.size <= tabsPerPage
-        })}>
+        })}
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, settingsState)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
                 tabsPerTabPage={tabsPerPage}
