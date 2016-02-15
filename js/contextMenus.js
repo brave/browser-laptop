@@ -9,8 +9,10 @@ const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
 const SiteTags = require('./constants/siteTags')
+const settings = require('./constants/settings')
 const CommonMenu = require('./commonMenu')
 const ipc = global.require('electron').ipcRenderer
+const getSetting = require('./settings').getSetting
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
@@ -40,6 +42,18 @@ function inputTemplateInit (e) {
       e.target.selectionEnd !== undefined &&
       e.target.selectionStart !== e.target.selectionEnd
   return getEditableItems(hasSelection)
+}
+
+function tabsToolbarTemplateInit (settingsState) {
+  const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+  return [{
+    label: 'Bookmarks Toolbar',
+    type: 'checkbox',
+    checked: showBookmarksToolbar,
+    click: (item, focusedWindow) => {
+      AppActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
+    }
+  }]
 }
 
 function tabTemplateInit (frameProps) {
@@ -297,6 +311,12 @@ export function onTabContextMenu (frameProps, e) {
   e.preventDefault()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(remote.getCurrentWindow())
+}
+
+export function onTabsToolbarContextMenu (settings, e) {
+  e.preventDefault()
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(settings))
+  tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
 export function onTabPageContextMenu (framePropsList, e) {

@@ -11,6 +11,7 @@ require('../less/tabs.less')
 require('../less/findbar.less')
 require('../less/dialogs.less')
 require('../less/updateBar.less')
+require('../less/bookmarksToolbar.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')

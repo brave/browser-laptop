@@ -18,7 +18,9 @@ const settings = {
   BOOKMARK_SUGGESTIONS: 'privacy.bookmark-suggestions',
   OPENED_TAB_SUGGESTIONS: 'privacy.opened-tab-suggestions',
   // Security Tab
-  BLOCK_REPORTED_SITES: 'security.block-reported-sites'
+  BLOCK_REPORTED_SITES: 'security.block-reported-sites',
+  // Other settings
+  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show'
 }
 
 module.exports = settings

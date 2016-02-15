@@ -71,6 +71,7 @@ module.exports = {
     'privacy.history-suggestions': false,
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
-    'security.block-reported-sites': false
+    'security.block-reported-sites': false,
+    'bookmarks.toolbar.show': false
   }
 }
