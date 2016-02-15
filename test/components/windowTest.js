@@ -206,7 +206,7 @@ describe('application window', function () {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(Selectors.activeWebview, 10000)
       })
 
       it('has a min width of 500 and height of 300', function *() {
