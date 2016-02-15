@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Config = require('../constants/config').default
+const Config = require('../constants/config')
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
