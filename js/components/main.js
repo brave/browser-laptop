@@ -30,6 +30,7 @@ const Config = require('../constants/config')
 const AppConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const siteTags = require('../constants/siteTags')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -265,7 +266,13 @@ class Main extends ImmutableComponent {
           </div>
         </div>
 
-        { showBookmarksToolbar ? <BookmarksToolbar settings={settingsState}/> : null }
+        { showBookmarksToolbar
+          ? <BookmarksToolbar settings={settingsState}
+              activeFrame={activeFrame}
+              bookmarks={this.props.appState.get('sites')
+                .filter(site => site.get('tags').includes(siteTags.BOOKMARK))
+              }/>
+          : null }
         <div className={cx({
           tabPages: true,
           singlePage: nonPinnedFrames.size <= tabsPerPage

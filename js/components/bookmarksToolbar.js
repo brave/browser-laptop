@@ -5,20 +5,31 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const contextMenus = require('../contextMenus')
+const WindowActions = require('../actions/windowActions')
 
-/*
 class BookmarkToolbarButton extends ImmutableComponent {
+  navigate () {
+    WindowActions.loadUrl(this.props.activeFrame, this.props.location)
+  }
   render () {
-    return <div className='bookmarkToolbarButton'>
-    </div>
+    return <spin className='bookmarkToolbarButton'
+      onClick={this.navigate.bind(this)}>
+    { this.props.title }
+    </spin>
   }
 }
-*/
 
 class BookmarksToolbar extends ImmutableComponent {
   render () {
     return <div className='bookmarksToolbar'
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings)}>
+    {
+        this.props.bookmarks.map(bookmark =>
+          <BookmarkToolbarButton
+            activeFrame={this.props.activeFrame}
+            location={bookmark.get('location')}
+            title={bookmark.get('title')}/>)
+    }
     </div>
   }
 }
