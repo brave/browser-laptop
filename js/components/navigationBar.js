@@ -83,9 +83,11 @@ class NavigationBar extends ImmutableComponent {
       { isSourceAboutUrl(frameProps.get('location')) ? null
         : <div className='startButtons'>
         <Button iconClass='fa-repeat'
+          l10nId='reloadButton'
           className='navbutton reload-button'
           onClick={this.onReload.bind(this)} />
         <Button iconClass='fa-times'
+          l10nId='stopButton'
           className='navbutton stop-button'
           onClick={this.onStop.bind(this)} />
       </div>
@@ -104,9 +106,11 @@ class NavigationBar extends ImmutableComponent {
       { isSourceAboutUrl(frameProps.get('location')) ? null
       : <div className='endButtons'>
           <Button iconClass='fa-star-o'
+            l10nId='addBookmarkButton'
             className='navbutton bookmark-button'
             onClick={this.onAddBookmark.bind(this)} />
           <Button iconClass='fa-star-o'
+            l10nId='removeBookmarkButton'
             className='navbutton remove-bookmark-button'
             onClick={this.onRemoveBookmark.bind(this)} />
         </div>

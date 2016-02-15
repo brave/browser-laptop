@@ -70,6 +70,7 @@ class Tabs extends ImmutableComponent {
           }
         })()}
         <Button label='+'
+          l10nId='newTabButton'
           className='navbutton newFrameButton'
           onClick={WindowActions.newFrame} />
         </span>

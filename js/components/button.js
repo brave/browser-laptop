@@ -10,6 +10,7 @@ class Button extends ImmutableComponent {
   render () {
     if (this.props.iconClass) {
       return <span disabled={this.props.disabled}
+        data-l10n-id={this.props.l10nId}
         className={cx({
           browserButton: true,
           fa: true,

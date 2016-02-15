@@ -227,11 +227,11 @@ class Main extends ImmutableComponent {
         <div className='navigatorOuterWrapper'>
           <div className='navigatorWrapper'>
             <div className='backforward'>
-              <span
+              <span data-l10n-id='backButton'
                 className='back fa fa-angle-left'
                 disabled={!activeFrame || !activeFrame.get('canGoBack')}
                 onClick={this.onBack.bind(this)} />
-              <span
+              <span data-l10n-id='forwardButton'
                 className='forward fa fa-angle-right'
                 disabled={!activeFrame || !activeFrame.get('canGoForward')}
                 onClick={this.onForward.bind(this)} />

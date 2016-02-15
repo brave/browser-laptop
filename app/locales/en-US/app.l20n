@@ -1,10 +1,14 @@
 <reload "Reload">
 <addBookmark "Add bookmark">
+<addBookmarkButton title: "Bookmark page">
 <removeBookmark "Remove bookmark">
+<removeBookmarkButton title: "Remove bookmark">
 <addToReadingList "Add to reading list">
 <removeFromReadingList "Remove from reading list">
 <forward "Forward">
+<forwardButton title: "Go forward">
 <back "Back">
+<backButton title: "Go back">
 <ok "OK">
 <cancel "Cancel">
 <submit "Submit">
@@ -15,14 +19,18 @@
 <settingName "Setting name">
 <settingValue "Setting value">
 <newTab "New Tab">
+<newTabButton title: "Add new tab">
 <certError "HTTPS Certificate Error">
 <certErrorText "This site cannot be loaded due to a certificate error: ">
 <openTypeInNewTab "Open {{$type}} in a new tab">
 <openTypeInNewPrivateTab "Open {{$type}} in a new private tab">
 <copyLinkLocation "Copy Link Location">
 <closeTab "Close tab">
+<closeTabButton title: "Close tab">
 <closeOtherTabs "Close other tabs">
 <reloadTab "Reload tab">
+<reloadButton title: "Reload page">
+<stopButton title: "Stop loading">
 <muteTab "Mute tab">
 <unmuteTab "Unmute tab">
 <disableProtectionForSite "Disable tracking protection">
@@ -32,6 +40,7 @@
 <downloadType "Download {{$type}}">
 <setDefaultSearch "Set {{$title}} as default search engine">
 <viewPageSource "View Page Source">
+<menuButton title: "Menu">
 
 <braveMenuTotalReplacements "Total Replacements: {{$count}}">
 
