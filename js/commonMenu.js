@@ -120,6 +120,14 @@ module.exports.preferencesMenuItem = {
   }
 }
 
+module.exports.bookmarksMenuItem = {
+  label: 'Bookmarks...',
+  accelerator: 'CmdOrCtrl+Alt+b',
+  click: (item, focusedWindow) => {
+    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
+  }
+}
+
 module.exports.buildBraveryMenu = function (settings, init) {
   const replaceAds = settings[adInsertion] || false
   const blockAds = settings[adblock] || false

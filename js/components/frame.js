@@ -33,7 +33,7 @@ class Frame extends ImmutableComponent {
       : ''
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
-    if (location === 'about:preferences' || location === 'about:certerror') {
+    if (['about:preferences', 'about:bookmarks', 'about:certerror'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
     }
 

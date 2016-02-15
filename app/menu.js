@@ -505,6 +505,7 @@ const init = (args) => {
         CommonMenu.checkForUpdateMenuItem,
         CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem,
+        CommonMenu.bookmarksMenuItem,
         CommonMenu.separatorMenuItem,
         {
           label: 'Send us Feedback...',

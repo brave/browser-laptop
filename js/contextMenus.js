@@ -154,6 +154,7 @@ function hamburgerTemplateInit (settings) {
     }),
     CommonMenu.separatorMenuItem,
     CommonMenu.preferencesMenuItem,
+    CommonMenu.bookmarksMenuItem,
     CommonMenu.separatorMenuItem,
     CommonMenu.quitMenuItem
   ]
