@@ -12,6 +12,12 @@ const WindowActions = require('../actions/windowActions')
 export default class FindBar extends ImmutableComponent {
   constructor () {
     super()
+    this.onBlur = this.onBlur.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onChange = this.onChange.bind(this)
+    this.onFindPrev = this.onFindPrev.bind(this)
+    this.onFindNext = this.onFindNext.bind(this)
+    this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
   }
 
   onChange (e) {
@@ -54,6 +60,9 @@ export default class FindBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
+    if (this.props.selected) {
+      this.focus()
+    }
     if (this.props.findDetail && !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
         this.props.findDetail.get('caseSensitivity') !== prevProps.findDetail.get('caseSensitivity')) {
@@ -80,6 +89,10 @@ export default class FindBar extends ImmutableComponent {
         }
         break
     }
+  }
+
+  onBlur (e) {
+    WindowActions.setFindbarSelected(this.props.frame, false)
   }
 
   get numberOfMatches () {
@@ -129,23 +142,24 @@ export default class FindBar extends ImmutableComponent {
         data-l10n-id='findResultMatches'/>
     }
 
-    return <div className='findBar'>
+    return <div className='findBar' onBlur={this.onBlur}>
       <span className='searchStringContainer'>
         <input type='text'
           ref={node => this.searchInput = node}
-          onKeyDown={this.onKeyDown.bind(this)}
-          onChange={this.onChange.bind(this)}
+          onKeyDown={this.onKeyDown}
+          onChange={this.onChange}
           value={this.searchString}/>
           {findMatchText}
       </span>
       <Button iconClass='findButton fa-chevron-up'
         className='findButton smallButton findPrev'
         disabled={this.numberOfMatches === 0}
-        onClick={this.onFindPrev.bind(this)} />
+
+        onClick={this.onFindPrev} />
       <Button iconClass='findButton fa-chevron-down'
         className='findButton smallButton findNext'
         disabled={this.numberOfMatches === 0}
-        onClick={this.onFindNext.bind(this)} />
+        onClick={this.onFindNext} />
       <Button iconClass='fa-times'
         className='findButton smallButton hideButton'
         onClick={this.props.onFindHide} />
@@ -155,7 +169,7 @@ export default class FindBar extends ImmutableComponent {
           type='checkbox'
           className='caseSensitivityCheckbox'
           checked={this.isCaseSensitive}
-          onChange={this.onCaseSensitivityChange.bind(this)} />
+          onChange={this.onCaseSensitivityChange} />
         <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity'>
           {'Match case'}
         </label>

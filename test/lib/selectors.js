@@ -13,5 +13,12 @@ module.exports = {
   urlbarIcon: '.urlbarIcon',
   titleBar: '#titleBar',
   navigatorBookmarked: '#navigator.bookmarked',
-  navigatorNotBookmarked: '#navigator:not(.bookmarked)'
+  navigatorNotBookmarked: '#navigator:not(.bookmarked)',
+  findBar: '.findBar',
+  findBarInput: '.searchStringContainer input',
+  findBarMatches: '.foundResults',
+  findBarMatchCase: '#caseSensitivityCheckbox',
+  findBarNextButton: '.findButton.findNext',
+  findBarPrevButton: '.findButton.findPrev',
+  findBarHideButton: '.findButton.hideButton'
 }

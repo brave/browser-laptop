@@ -91,6 +91,7 @@ WindowStore
     src: string, // what the iframe src should be
     title: string, // page title
     findbarShown: boolean, // whether the findbar is shown
+    findbarSelected: boolean,  // findbar text input is selected
     hrefPreview: string, // show hovered link preview
     key: number,
     isPrivate: boolean, // private browsing tab

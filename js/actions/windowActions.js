@@ -17,6 +17,10 @@ const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
 
 function dispatch (action) {
   if (WindowActions.dispatchToIPC) {
+    // serialize immutable
+    if (action.frameProps && action.frameProps.toJS) {
+      action.frameProps = action.frameProps.toJS()
+    }
     remote.getCurrentWindow().webContents.send('handle-action', action)
     WindowActions.dispatchToIPC = false
   } else {
@@ -162,6 +166,19 @@ const WindowActions = {
       actionType: WindowConstants.WINDOW_SET_FINDBAR_SHOWN,
       frameProps,
       shown
+    })
+  },
+
+  /**
+   * Highlight text in the findbar
+   * @param {Object} frameProps - The frame properties to modify
+   * @param {boolean} selected - Whether to select the findbar search text
+   */
+  setFindbarSelected: function (frameProps, selected) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FINDBAR_SELECTED,
+      frameProps,
+      selected
     })
   },
 

@@ -370,6 +370,7 @@ class Frame extends ImmutableComponent {
         onFind={this.onFind.bind(this)}
         onFindHide={this.onFindHide.bind(this)}
         frame={this.props.frame}
+        selected={this.props.frame.get('findbarSelected')}
         findDetail={this.props.frame.get('findDetail')}
       /> : null }
       <div ref={node => this.webviewContainer = node}
