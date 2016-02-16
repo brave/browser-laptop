@@ -10,10 +10,8 @@ const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
-const settings = require('./constants/settings')
 const CommonMenu = require('./commonMenu')
 const ipc = global.require('electron').ipcRenderer
-const getSetting = require('./settings').getSetting
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
@@ -46,15 +44,7 @@ function inputTemplateInit (e) {
 }
 
 function tabsToolbarTemplateInit (settingsState) {
-  const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
-  return [{
-    label: 'Bookmarks Toolbar',
-    type: 'checkbox',
-    checked: showBookmarksToolbar,
-    click: (item, focusedWindow) => {
-      AppActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
-    }
-  }]
+  return [CommonMenu.bookmarksMenuItem, CommonMenu.bookmarksToolbarMenuItem(settingsState)]
 }
 
 function bookmarkTemplateInit (location) {
@@ -167,7 +157,7 @@ function getEditableItems (hasSelection) {
   }]
 }
 
-function hamburgerTemplateInit (settings) {
+function hamburgerTemplateInit (braverySettings, settingsState) {
   const template = [
     CommonMenu.newTabMenuItem,
     CommonMenu.newPrivateTabMenuItem,
@@ -177,12 +167,18 @@ function hamburgerTemplateInit (settings) {
     CommonMenu.findOnPageMenuItem,
     CommonMenu.printMenuItem,
     CommonMenu.separatorMenuItem,
-    CommonMenu.buildBraveryMenu(settings, function () {
-      ipc.send(messages.UPDATE_APP_MENU, {bookmarked: settings.bookmarked})
+    CommonMenu.buildBraveryMenu(braverySettings, function () {
+      ipc.send(messages.UPDATE_APP_MENU, {bookmarked: braverySettings.bookmarked})
     }),
     CommonMenu.separatorMenuItem,
     CommonMenu.preferencesMenuItem,
-    CommonMenu.bookmarksMenuItem,
+    {
+      label: 'Bookmarks',
+      submenu: [
+        CommonMenu.bookmarksMenuItem,
+        CommonMenu.bookmarksToolbarMenuItem(settingsState)
+      ]
+    },
     CommonMenu.separatorMenuItem,
     CommonMenu.quitMenuItem
   ]
@@ -320,8 +316,8 @@ function mainTemplateInit (nodeProps) {
   return template
 }
 
-export function onHamburgerMenu (settings) {
-  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(settings))
+export function onHamburgerMenu (braverySettings, settingsState) {
+  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings, settingsState))
   hamburgerMenu.popup(remote.getCurrentWindow())
 }
 

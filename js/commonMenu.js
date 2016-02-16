@@ -13,6 +13,8 @@ const adblock = AppConfig.resourceNames.ADBLOCK
 const adInsertion = AppConfig.resourceNames.AD_INSERTION
 const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
+const settings = require('./constants/settings')
+const getSetting = require('./settings').getSetting
 
 let electron
 try {
@@ -121,10 +123,22 @@ module.exports.preferencesMenuItem = {
 }
 
 module.exports.bookmarksMenuItem = {
-  label: 'Bookmarks...',
+  label: 'Bookmarks manager...',
   accelerator: 'CmdOrCtrl+Alt+b',
   click: (item, focusedWindow) => {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
+  }
+}
+
+module.exports.bookmarksToolbarMenuItem = (settingsState) => {
+  const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+  return {
+    label: 'Bookmarks Toolbar',
+    type: 'checkbox',
+    checked: showBookmarksToolbar,
+    click: (item, focusedWindow) => {
+      AppActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
+    }
   }
 }
 

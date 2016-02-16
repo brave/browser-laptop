@@ -169,16 +169,16 @@ class Main extends ImmutableComponent {
   }
 
   onHamburgerMenu () {
-    let settings = {}
+    let braverySettings = {}
     Object.keys(AppConfig.resourceNames).forEach((name) => {
       let value = AppConfig.resourceNames[name]
       let enabled = this.props.appState.getIn([value, 'enabled'])
-      settings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
+      braverySettings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
     })
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
-    settings.bookmarked = this.navBar.bookmarked
-    contextMenus.onHamburgerMenu(settings)
+    braverySettings.bookmarked = this.navBar.bookmarked
+    contextMenus.onHamburgerMenu(braverySettings, this.props.appState.get('settings'))
   }
 
   onMainFocus () {
