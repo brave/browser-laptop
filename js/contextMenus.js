@@ -56,6 +56,13 @@ function tabsToolbarTemplateInit (settingsState) {
   }]
 }
 
+function bookmarkTemplateInit (location) {
+  return [openInNewTabMenuItem(location),
+    openInNewPrivateTabMenuItem(location),
+    openInNewSessionTabMenuItem(location),
+    copyLinkLocationMenuItem(location)]
+}
+
 function tabTemplateInit (frameProps) {
   const tabKey = frameProps.get('key')
   const items = []
@@ -175,49 +182,58 @@ function hamburgerTemplateInit (settings) {
   return template
 }
 
+const openInNewTabMenuItem = location => {
+  return {
+    label: 'Open in new tab',
+    click: () => {
+      WindowActions.newFrame({ location }, false)
+    }
+  }
+}
+
+const openInNewPrivateTabMenuItem = location => {
+  return {
+    label: 'Open in new private tab',
+    click: () => {
+      WindowActions.newFrame({
+        location,
+        isPrivate: true
+      }, false)
+    }
+  }
+}
+
+const openInNewSessionTabMenuItem = location => {
+  return {
+    label: 'Open in new session tab',
+    click: (item, focusedWindow) => {
+      WindowActions.newFrame({
+        location,
+        isPartitioned: true
+      }, false)
+    }
+  }
+}
+
+const copyLinkLocationMenuItem = location => {
+  return {
+    label: 'Copy link address',
+    click: () => {
+      Clipboard.writeText(location)
+    }
+  }
+}
+
 function mainTemplateInit (nodeProps) {
   const template = []
   const nodeName = nodeProps.name
 
   if (nodeProps.href) {
-    template.push({
-      label: 'Open in new tab',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          // TODO: open this in the next tab instead of last tab
-          // TODO: If the tab is private, this should probably be private.
-          // Depends on #139
-          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { openInForeground: false })
-        }
-      }
-    })
-    template.push({
-      label: 'Open in new private tab',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          // TODO: open this in the next tab instead of last tab
-          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { isPrivate: true })
-        }
-      }
-    })
-    template.push({
-      label: 'Open in new session tab',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          // TODO: open this in the next tab instead of last tab
-          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.href, { isPartitioned: true })
-        }
-      }
-    })
-    template.push({
-      label: 'Copy link address',
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          Clipboard.writeText(nodeProps.href)
-        }
-      }
-    })
-    template.push(CommonMenu.separatorMenuItem)
+    template.push(openInNewTabMenuItem(nodeProps.href),
+      openInNewPrivateTabMenuItem(nodeProps.href),
+      openInNewSessionTabMenuItem(nodeProps.href),
+      copyLinkLocationMenuItem(nodeProps.href),
+      CommonMenu.separatorMenuItem)
   }
 
   if (nodeName === 'IMG') {
@@ -326,6 +342,14 @@ export function onTabPageContextMenu (framePropsList, e) {
 }
 
 export function onUrlBarContextMenu (e) {
+  e.preventDefault()
   const inputMenu = Menu.buildFromTemplate(inputTemplateInit(e))
   inputMenu.popup(remote.getCurrentWindow())
+}
+
+export function onBookmarkContextMenu (location, title, e) {
+  e.preventDefault()
+  e.stopPropagation()
+  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(location, title))
+  menu.popup(remote.getCurrentWindow())
 }
