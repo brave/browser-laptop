@@ -136,7 +136,7 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('location') === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
     } else if (this.props.frame.get('location') === 'about:bookmarks') {
-      this.webview.send(messages.BOOKMARKS_UPDATED, this.props.boomarks.toJS())
+      this.webview.send(messages.BOOKMARKS_UPDATED, this.props.bookmarks.toJS())
     }
   }
 

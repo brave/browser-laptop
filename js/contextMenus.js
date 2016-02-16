@@ -9,7 +9,7 @@ const clipboard = electron.clipboard
 const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
-const SiteTags = require('./constants/siteTags')
+const siteTags = require('./constants/siteTags')
 const settings = require('./constants/settings')
 const CommonMenu = require('./commonMenu')
 const ipc = global.require('electron').ipcRenderer
@@ -61,7 +61,13 @@ function bookmarkTemplateInit (location) {
   return [openInNewTabMenuItem(location),
     openInNewPrivateTabMenuItem(location),
     openInNewSessionTabMenuItem(location),
-    copyLinkLocationMenuItem(location)]
+    copyLinkLocationMenuItem(location),
+    CommonMenu.separatorMenuItem, {
+      label: 'Delete',
+      click: () => {
+        AppActions.removeSite({ location }, siteTags.BOOKMARK)
+      }
+    }]
 }
 
 function tabTemplateInit (frameProps) {
@@ -84,7 +90,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           WindowActions.setPinned(frameProps, false)
           // Handle setting it in app storage for the other windows
-          AppActions.removeSite(frameProps, SiteTags.PINNED)
+          AppActions.removeSite(frameProps, siteTags.PINNED)
         }
       })
     } else {
@@ -94,7 +100,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           WindowActions.setPinned(frameProps, true)
           // Handle setting it in app storage for the other windows
-          AppActions.addSite(frameProps, SiteTags.PINNED)
+          AppActions.addSite(frameProps, siteTags.PINNED)
         }
       })
     }
