@@ -14,17 +14,22 @@
   height: 20px;
 
   .bookmarkToolbarButton {
+    border-radius: @borderRadius;
     color: black;
     cursor: default;
     font-size: 11px;
     line-height: 11px;
     margin: auto 0;
-    padding: 0px 5px;
+    padding: 2px 5px;
     text-overflow: ellipsis;
     overflow: hidden;
     user-select: none;
     white-space: nowrap;
     width: 100px;
+    box-sizing: border-box;
     -webkit-user-select: none;
+    &:hover {
+      background: lighten(@tabsBackground, 5%);
+    }
   }
 }

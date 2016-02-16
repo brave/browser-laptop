@@ -15,7 +15,11 @@ html, body, #appContainer, #appContainer > div {
 }
 
 list >* {
+  padding: 5px;
   margin-bottom: 5px;
+  &:hover {
+    background-color: lighten(@highlightBlue, 30%);
+  }
 }
 
 .bookmarkLocation {
