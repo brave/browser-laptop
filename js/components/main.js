@@ -309,7 +309,12 @@ class Main extends ImmutableComponent {
               onCloseFrame={this.onCloseFrame}
               frame={frame}
               key={frame.get('key')}
-              settings={settingsState || new Immutable.Map()}
+              settings={frame.get('location') === 'about:preferences' ? settingsState || new Immutable.Map() : null}
+              boomarks={frame.get('location') === 'about:bookmarks'
+                ? this.props.appState.get('sites')
+                    .filter(site => site.get('tags')
+                      .includes(siteTags.BOOKMARK) || new Immutable.Map())
+                : null}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}

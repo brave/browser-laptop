@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const Config = require('../../js/constants/config').default
+const Config = require('../../js/constants/config')
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')

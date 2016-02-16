@@ -135,6 +135,9 @@ class Frame extends ImmutableComponent {
 
     if (this.props.frame.get('location') === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
+    } else if (this.props.frame.get('location') === 'about:bookmarks') {
+      console.log('sending bookmarks updated')
+      this.webview.send(messages.BOOKMARKS_UPDATED, this.props.boomarks.toJS())
     }
   }
 
@@ -214,6 +217,10 @@ class Frame extends ImmutableComponent {
             WindowActions.setLinkHoverPreview(href, showOnRight)
           }
           break
+        case messages.NEW_FRAME:
+          method = (location, openInForeground) => {
+            WindowActions.newFrame({ location }, openInForeground)
+          }
       }
       method.apply(this, e.args)
     })

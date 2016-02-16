@@ -249,11 +249,12 @@ class AboutPreferences extends React.Component {
     super()
     this.state = {
       preferenceTab: preferenceTabs.GENERAL,
-      hintNumber: this.getNextHintNumber()
+      hintNumber: this.getNextHintNumber(),
+      settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map()
     }
     window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
       this.setState({
-        settings: e.detail
+        settings: Immutable.fromJS(e.detail || {})
       })
     })
   }
@@ -286,7 +287,7 @@ class AboutPreferences extends React.Component {
 
   render () {
     let tab
-    const settings = Immutable.fromJS(this.state.settings || {})
+    const settings = this.state.settings
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings}/>

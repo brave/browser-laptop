@@ -4,16 +4,54 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
+const Immutable = require('immutable')
 const ImmutableComponent = require('../components/immutableComponent')
+const messages = require('../constants/messages')
+const aboutActions = require('./aboutActions')
 
 // Stylesheets
 require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-class AboutBookmarks extends ImmutableComponent {
+class BookmarkItem extends ImmutableComponent {
+  navigate () {
+    aboutActions.newFrame(this.props.location)
+  }
   render () {
-    return <div>
-      <h1>Bookmarks TODO</h1>
+    return <div role='listitem' draggable='true' onDoubleClick={this.navigate.bind(this)}>
+      <span>{this.props.title}</span>
+      <span className='bookmarkLocation'> - {this.props.location}</span>
+    </div>
+  }
+}
+
+class BookmarksList extends ImmutableComponent {
+  render () {
+    return <list>
+    {
+      this.props.bookmarks.map(bookmark =>
+          <BookmarkItem location={bookmark.get('location')}
+            title={bookmark.get('title')}/>)
+    }
+    </list>
+  }
+}
+
+class AboutBookmarks extends React.Component {
+  constructor () {
+    super()
+    this.state = {
+      bookmarks: window.initBookmarks ? Immutable.fromJS(window.initBookmarks) : Immutable.Map()
+    }
+    window.addEventListener(messages.BOOKMARKS_UPDATED, (e) => {
+      this.setState({
+        bookmarks: Immutable.fromJS(e.detail || {})
+      })
+    })
+  }
+  render () {
+    return <div className='bookmarksPage'>
+      <BookmarksList bookmarks={this.state.bookmarks}/>
     </div>
   }
 }

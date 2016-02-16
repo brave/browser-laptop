@@ -62,9 +62,12 @@ const messages = {
   RESPONSE_WINDOW_STATE: _,
   // Ad block and tracking protection
   BLOCKED_RESOURCE: _,
-  // SETTINGS
+  // About pages to contentScripts
   SETTINGS_UPDATED: _,
+  BOOKMARKS_UPDATED: _,
+  // About pages from contentScript
   CHANGE_SETTING: _,
+  NEW_FRAME: _,
   // HTTPS
   CERT_DETAILS_UPDATED: _ /** @arg {Object} security state of the active frame */
 }
