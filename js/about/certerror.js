@@ -4,15 +4,19 @@
 
 const React = require('react')
 const messages = require('../constants/messages')
+const Immutable = require('immutable')
+const ImmutableComponent = require('../components/immutableComponent')
 
-class CertErrorPage extends React.Component {
+class CertErrorPage extends ImmutableComponent {
   constructor () {
     super()
-    this.state = {certDetails: {}}
+    this.state = {
+      certDetails: window.initCertDetails ? Immutable.fromJS(window.initCertDetails) : Immutable.Map()
+    }
     window.addEventListener(messages.CERT_DETAILS_UPDATED, (e) => {
       if (e.detail) {
         this.setState({
-          certDetails: e.detail
+          certDetails: Immutable.fromJS(e.detail)
         })
       }
     })
@@ -20,8 +24,8 @@ class CertErrorPage extends React.Component {
   render () {
     return <div>
       <span data-l10n-id='certErrorText'></span>
-      <span>{this.state.certDetails.url || ''}</span>
-      <div>{this.state.certDetails.error || ''}</div>
+      <span>{this.state.certDetails.get('url') || ''}</span>
+      <div>{this.state.certDetails.get('error') || ''}</div>
     </div>
   }
 }
