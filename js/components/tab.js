@@ -230,7 +230,8 @@ class Tab extends ImmutableComponent {
         </div> : null }
       { !this.isPinned
         ? <span onClick={this.onCloseFrame.bind(this)}
-             className='closeTab fa fa-times-circle'/> : null }
+            data-l10n-id='closeTabButton'
+            className='closeTab fa fa-times-circle'/> : null }
       </div>
       <DragIndicator
         end
