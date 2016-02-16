@@ -191,22 +191,18 @@ describe('application window', function () {
             }
           }, this.page1)
           .click('#trigger')
-      })
-
-      it('opens in a new window with 4 views', function *() {
-        yield this.app.client
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
               return count === 4 // two windows with two views each
             })
-          }, 10000)
+          })
       })
 
       it('loads and is visible', function *() {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview, 10000)
+          .waitForVisible(Selectors.activeWebview)
       })
 
       it('has a min width of 500 and height of 300', function *() {
