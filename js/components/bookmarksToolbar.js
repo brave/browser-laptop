@@ -12,11 +12,11 @@ class BookmarkToolbarButton extends ImmutableComponent {
     WindowActions.loadUrl(this.props.activeFrame, this.props.location)
   }
   render () {
-    return <spin className='bookmarkToolbarButton'
+    return <span className='bookmarkToolbarButton'
       onClick={this.navigate.bind(this)}
       onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.location, this.props.title)}>
     { this.props.title || this.props.location }
-    </spin>
+    </span>
   }
 }
 

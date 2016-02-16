@@ -331,32 +331,31 @@ export function onMainContextMenu (nodeProps, contextMenuType) {
 }
 
 export function onTabContextMenu (frameProps, e) {
-  e.preventDefault()
+  e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(remote.getCurrentWindow())
 }
 
 export function onTabsToolbarContextMenu (settings, e) {
-  e.preventDefault()
+  e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(settings))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
 export function onTabPageContextMenu (framePropsList, e) {
-  e.preventDefault()
+  e.stopPropagation()
   const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
   tabPageMenu.popup(remote.getCurrentWindow())
 }
 
 export function onUrlBarContextMenu (e) {
-  e.preventDefault()
+  e.stopPropagation()
   const inputMenu = Menu.buildFromTemplate(inputTemplateInit(e))
   inputMenu.popup(remote.getCurrentWindow())
 }
 
 export function onBookmarkContextMenu (location, title, e) {
   if (e) {
-    e.preventDefault()
     e.stopPropagation()
   }
   const menu = Menu.buildFromTemplate(bookmarkTemplateInit(location, title))
