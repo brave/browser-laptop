@@ -29,4 +29,7 @@
   window.addEventListener('new-frame', (e) => {
     ipcRenderer.sendToHost('new-frame', e.detail.location, e.detail.openInForeground)
   })
+  window.addEventListener('context-menu-opened', (e) => {
+    ipcRenderer.sendToHost('context-menu-opened', e.detail.nodeProps, e.detail.contextMenuType)
+  })
 }).apply(this)

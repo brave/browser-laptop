@@ -214,6 +214,10 @@
     var href
     var maybeLink = e.target
     while (maybeLink.parentNode) {
+      // Override for about: pages
+      if (maybeLink.getAttribute('data-context-menu-disable')) {
+        return
+      }
       if (maybeLink.nodeName.toUpperCase() === 'A') {
         href = maybeLink.href
         break

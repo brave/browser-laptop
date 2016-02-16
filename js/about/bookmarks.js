@@ -18,9 +18,18 @@ class BookmarkItem extends ImmutableComponent {
     aboutActions.newFrame(this.props.location)
   }
   render () {
-    return <div role='listitem' draggable='true' onDoubleClick={this.navigate.bind(this)}>
-      <span>{this.props.title}</span>
-      <span className='bookmarkLocation'> - {this.props.location}</span>
+    return <div role='listitem'
+      onContextMenu={aboutActions.contextMenu.bind(this, this.props, 'bookmark')}
+      data-context-menu-disable
+      draggable='true'
+      onDoubleClick={this.navigate.bind(this)}>
+    { this.props.title
+      ? <span>
+        <span>{this.props.title}</span>
+        <span className='bookmarkLocation'> - {this.props.location}</span>
+      </span>
+      : <span> {this.props.location}</span>
+    }
     </div>
   }
 }

@@ -136,7 +136,6 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('location') === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
     } else if (this.props.frame.get('location') === 'about:bookmarks') {
-      console.log('sending bookmarks updated')
       this.webview.send(messages.BOOKMARKS_UPDATED, this.props.boomarks.toJS())
     }
   }
@@ -202,8 +201,9 @@ class Frame extends ImmutableComponent {
             WindowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
           break
         case messages.CONTEXT_MENU_OPENED:
-          method = (nodeProps) =>
-            contextMenus.onMainContextMenu(nodeProps)
+          method = (nodeProps, contextMenuType) => {
+            contextMenus.onMainContextMenu(nodeProps, contextMenuType)
+          }
           break
         case messages.STOP_LOAD:
           method = () => this.webview.stop()

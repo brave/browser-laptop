@@ -43,6 +43,21 @@ const AboutActions = {
    */
   acceptCertError: function (url) {
     // TODO
+  },
+
+  /**
+   * Opens a context menu
+   */
+  contextMenu: function (nodeProps, contextMenuType, e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const event = new window.CustomEvent(messages.CONTEXT_MENU_OPENED, {
+      detail: {
+        nodeProps,
+        contextMenuType
+      }
+    })
+    window.dispatchEvent(event)
   }
 }
 module.exports = AboutActions

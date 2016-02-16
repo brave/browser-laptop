@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const remote = require('remote')
+const electron = global.require('electron')
+const remote = electron.remote
 const Menu = remote.require('menu')
-const Clipboard = require('clipboard')
+const clipboard = electron.clipboard
 const messages = require('./constants/messages')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
@@ -219,7 +220,7 @@ const copyLinkLocationMenuItem = location => {
   return {
     label: 'Copy link address',
     click: () => {
-      Clipboard.writeText(location)
+      clipboard.writeText(location)
     }
   }
 }
@@ -258,7 +259,7 @@ function mainTemplateInit (nodeProps) {
       label: 'Copy image address',
       click: (item, focusedWindow) => {
         if (focusedWindow && nodeProps.src) {
-          Clipboard.writeText(nodeProps.src)
+          clipboard.writeText(nodeProps.src)
         }
       }
     })
@@ -318,9 +319,13 @@ export function onHamburgerMenu (settings) {
   hamburgerMenu.popup(remote.getCurrentWindow())
 }
 
-export function onMainContextMenu (nodeProps) {
-  const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps))
-  mainMenu.popup(remote.getCurrentWindow())
+export function onMainContextMenu (nodeProps, contextMenuType) {
+  if (contextMenuType === 'bookmark') {
+    onBookmarkContextMenu(nodeProps.location, nodeProps.title)
+  } else {
+    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps))
+    mainMenu.popup(remote.getCurrentWindow())
+  }
 }
 
 export function onTabContextMenu (frameProps, e) {
@@ -348,8 +353,10 @@ export function onUrlBarContextMenu (e) {
 }
 
 export function onBookmarkContextMenu (location, title, e) {
-  e.preventDefault()
-  e.stopPropagation()
+  if (e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
   const menu = Menu.buildFromTemplate(bookmarkTemplateInit(location, title))
   menu.popup(remote.getCurrentWindow())
 }
