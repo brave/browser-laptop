@@ -11,11 +11,11 @@
     <meta name='theme-color' content='#035500'>
     <title data-l10n-id="bookmarks"></title>
     <script>
-      function initBookmarks (e) {
+      function initBookmarksListener (e) {
         window.initBookmarks = e.detail
-        window.removeEventListener(initBookmarks)
+        window.removeEventListener(initBookmarksListener)
       }
-      window.addEventListener('bookmarks-updated', initBookmarks)
+      window.addEventListener('bookmarks-updated', initBookmarksListener)
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
         po.src = 'gen/aboutPages.entry.js';

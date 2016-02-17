@@ -11,11 +11,11 @@
     <meta name='theme-color' content='#ff5000'>
     <title data-l10n-id="preferences"></title>
     <script>
-      function initSettings (e) {
+      function initSettingsListener (e) {
         window.initSettings = e.detail
-        window.removeEventListener(initSettings)
+        window.removeEventListener(initSettingsListener)
       }
-      window.addEventListener('settings-updated', initSettings)
+      window.addEventListener('settings-updated', initSettingsListener)
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
         po.src = 'gen/aboutPages.entry.js';
