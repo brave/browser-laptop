@@ -226,6 +226,9 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('load-commit', (event) => {
       if (event.isMainFrame) {
+        // Temporary workaround for https://github.com/brave/browser-laptop/issues/787
+        this.webview.insertCSS('input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }')
+
         // TODO: These 3 events should be combined into one
         WindowActions.onWebviewLoadStart(
           this.props.frame)
