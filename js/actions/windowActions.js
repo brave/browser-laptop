@@ -114,13 +114,15 @@ const WindowActions = {
 
   /**
    * Dispatches a message to set the security state.
+   * @param {Object} frameProps - The frame properties to modify.
    * @param {Object} securityState - The security state properties that have
-   * changed.
+   *   changed.
    */
-  setSecurityState: function (securityState) {
+  setSecurityState: function (frameProps, securityState) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_SECURITY_STATE,
-      securityState
+      securityState,
+      frameProps
     })
   },
 

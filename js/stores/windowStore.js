@@ -398,12 +398,13 @@ const doAction = (action) => {
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break
     case WindowConstants.WINDOW_SET_SECURITY_STATE:
+      let path = frameStatePathForFrame(action.frameProps)
       if (action.securityState.secure !== undefined) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['security', 'isSecure']),
+        windowState = windowState.setIn(path.concat(['security', 'isSecure']),
                                         action.securityState.secure)
       }
       if (action.securityState.certDetails) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['security', 'certDetails']),
+        windowState = windowState.setIn(path.concat(['security', 'certDetails']),
                                         action.securityState.certDetails)
       }
       break

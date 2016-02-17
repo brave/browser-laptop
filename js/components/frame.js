@@ -234,7 +234,7 @@ class Frame extends ImmutableComponent {
           this.props.frame)
         const key = this.props.frame.get('key')
         WindowActions.setLocation(event.url, key)
-        WindowActions.setSecurityState({
+        WindowActions.setSecurityState(this.props.frame, {
           secure: urlParse(event.url).protocol === 'https:'
         })
       }

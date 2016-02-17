@@ -51,14 +51,16 @@ it is active the URL text will also be changed.
 
 
 
-### setSecurityState(securityState) 
+### setSecurityState(frameProps, securityState) 
 
 Dispatches a message to set the security state.
 
 **Parameters**
 
+**frameProps**: `Object`, The frame properties to modify.
+
 **securityState**: `Object`, The security state properties that have
-changed.
+  changed.
 
 
 

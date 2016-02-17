@@ -163,7 +163,7 @@ class UrlBar extends ImmutableComponent {
       // has been updated, so wait 100ms.
       window.setTimeout(() => {
         if (details.url === this.props.activeFrameProps.get('location')) {
-          WindowActions.setSecurityState({
+          WindowActions.setSecurityState(this.props.activeFrameProps, {
             certDetails: details
           })
           WindowActions.loadUrl(this.props.activeFrameProps, 'about:certerror')
