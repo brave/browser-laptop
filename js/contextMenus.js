@@ -7,6 +7,7 @@ const remote = electron.remote
 const Menu = remote.require('menu')
 const clipboard = electron.clipboard
 const messages = require('./constants/messages')
+const WindowStore = require('./stores/windowStore')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
@@ -133,6 +134,11 @@ function tabTemplateInit (frameProps) {
       }
     })
   }
+
+  items.push(Object.assign({},
+    CommonMenu.reopenLastClosedTabItem,
+    { enabled: WindowStore.getState().get('closedFrames').size > 0 }
+  ))
 
   return items
 }
