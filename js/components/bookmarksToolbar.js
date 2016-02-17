@@ -24,6 +24,20 @@ class BookmarkToolbarButton extends ImmutableComponent {
 
 class BookmarksToolbar extends ImmutableComponent {
   onDrop (e) {
+    const droppedHTML = e.dataTransfer.getData('text/html')
+    if (droppedHTML) {
+      var parser = new window.DOMParser()
+      var doc = parser.parseFromString(droppedHTML, 'text/html')
+      var a = doc.querySelector('a')
+      if (a && a.href) {
+        AppActions.addSite({
+          title: a.innerText,
+          location: a.href
+        }, siteTags.BOOKMARK)
+        return
+      }
+    }
+
     let urls = e.dataTransfer.getData('text/uri-list') ||
       e.dataTransfer.getData('text/plain')
     urls = urls.split('\n')
@@ -34,14 +48,15 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   onDragEnter (e) {
     let intersection = e.dataTransfer.types.filter(x =>
-      ['text/plain', 'text/uri-list'].includes(x))
+      ['text/plain', 'text/uri-list', 'text/html'].includes(x))
     if (intersection.length > 0) {
       e.preventDefault()
     }
   }
   onDragOver (e) {
+    // console.log(e.dataTransfer.types, e.dataTransfer.getData('text/plain'), e.dataTransfer.getData('text/uri-list'), e.dataTransfer.getData('text/html'))
     let intersection = e.dataTransfer.types.filter(x =>
-      ['text/plain', 'text/uri-list'].includes(x))
+      ['text/plain', 'text/uri-list', 'text/html'].includes(x))
     if (intersection.length > 0) {
       e.preventDefault()
     }
