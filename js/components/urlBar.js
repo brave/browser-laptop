@@ -236,6 +236,14 @@ class UrlBar extends ImmutableComponent {
       this.props.urlbar.get('active')
   }
 
+  onDragStart (e) {
+    const location = this.props.activeFrameProps.get('location')
+    const title = this.props.activeFrameProps.get('title')
+    e.dataTransfer.setData('text/plain', location)
+    e.dataTransfer.setData('text/uri-list', location)
+    e.dataTransfer.setData('text/html', `<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body><A HREF="${location}">${title}</A></body></html>`)
+  }
+
   render () {
     return <form
       action='#'
@@ -243,6 +251,8 @@ class UrlBar extends ImmutableComponent {
       ref='urlbar'>
         <div id='titleBarWrapper'>
         <span
+          onDragStart={this.onDragStart.bind(this)}
+          draggable
           onClick={this.onSiteInfo}
           className={cx({
             urlbarIcon: true,

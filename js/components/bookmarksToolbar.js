@@ -24,6 +24,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
 
 class BookmarksToolbar extends ImmutableComponent {
   onDrop (e) {
+    e.preventDefault()
     const droppedHTML = e.dataTransfer.getData('text/html')
     if (droppedHTML) {
       var parser = new window.DOMParser()
