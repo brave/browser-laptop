@@ -370,13 +370,7 @@ const init = (args) => {
           }
         },
         CommonMenu.separatorMenuItem,
-        {
-          label: 'Reopen Last Closed Tab',
-          accelerator: 'Shift+CmdOrCtrl+T',
-          click: function (item, focusedWindow) {
-            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
-          }
-        }, {
+        CommonMenu.reopenLastClosedTabItem, {
           label: 'Reopen Last Closed Window',
           enabled: false
         },

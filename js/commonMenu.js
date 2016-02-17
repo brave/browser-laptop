@@ -84,6 +84,14 @@ module.exports.newWindowMenuItem = {
   click: () => AppActions.newWindow()
 }
 
+module.exports.reopenLastClosedTabItem = {
+  label: 'Reopen Last Closed Tab',
+  accelerator: 'Shift+CmdOrCtrl+T',
+  click: function (item, focusedWindow) {
+    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
+  }
+}
+
 module.exports.separatorMenuItem = {
   type: 'separator'
 }
