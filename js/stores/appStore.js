@@ -21,6 +21,10 @@ const dates = require('../../app/dates')
 const path = require('path')
 const getSetting = require('../settings').getSetting
 const debounce = require('../lib/debounce.js')
+const EventEmitter = require('events').EventEmitter
+
+// Only used internally
+const CHANGE_EVENT = 'app-state-change'
 
 let appState
 let lastEmittedState
@@ -139,7 +143,7 @@ const createWindow = (browserOpts, defaults) => {
   return mainWindow
 }
 
-class AppStore {
+class AppStore extends EventEmitter {
   getState () {
     return appState
   }
@@ -152,6 +156,15 @@ class AppStore {
       BrowserWindow.getAllWindows().forEach(wnd =>
         wnd.webContents.send(messages.APP_STATE_CHANGE, stateJS))
     }
+    this.emit(CHANGE_EVENT)
+  }
+
+  addChangeListener (callback) {
+    this.on(CHANGE_EVENT, callback)
+  }
+
+  removeChangeListener (callback) {
+    this.removeListener(CHANGE_EVENT, callback)
   }
 }
 

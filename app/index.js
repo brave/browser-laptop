@@ -142,14 +142,16 @@ app.on('ready', function () {
     })
 
     ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
-      Menu.init(args)
+      Menu.init(AppStore.getState().get('settings'), args)
     })
 
     ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
       appActions.changeSetting(key, value)
     })
 
-    Menu.init()
+    AppStore.addChangeListener(() => {
+      Menu.init(AppStore.getState().get('settings'))
+    })
 
     // Load HTTPS Everywhere browser "extension"
     HttpsEverywhere.init()

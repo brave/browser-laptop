@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+'use strict'
+
 const electron = require('electron')
 const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
@@ -25,20 +27,23 @@ const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
 const adInsertion = AppConfig.resourceNames.AD_INSERTION
 const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 
+let menuArgs = {}
+
 /**
  * Sets up the menu.
+ * @param {Object} settingsState - Application settings state
  * @param {Object} args - Arguments to initialize the menu with if any
  * @param {boolean} state.bookmarked - Whether the current active page is
  *   bookmarked
  */
-const init = (args) => {
-  args = args || {}
+const init = (settingsState, args) => {
+  menuArgs = Object.assign(menuArgs, args || {})
   // Create references to menu items that need to be updated dynamically
   const bookmarkPageMenuItem = {
     label: 'Bookmark this page',
     type: 'checkbox',
     accelerator: 'CmdOrCtrl+D',
-    checked: args.bookmarked || false,
+    checked: menuArgs.bookmarked || false,
     click: function (item, focusedWindow) {
       var msg = bookmarkPageMenuItem.checked
         ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
@@ -391,19 +396,8 @@ const init = (args) => {
           accelerator: 'Shift+CmdOrCtrl+D'
         },
         CommonMenu.separatorMenuItem,
-        {
-          label: 'Manage Bookmarks',
-          enabled: false,
-          accelerator: 'Alt+CmdOrCtrl+B'
-        },
-        CommonMenu.separatorMenuItem,
-        {
-          label: 'My Bookmarks',
-          enabled: false
-        }, {
-          label: 'More',
-          enabled: false
-        },
+        CommonMenu.bookmarksMenuItem,
+        CommonMenu.bookmarksToolbarMenuItem(settingsState),
         CommonMenu.separatorMenuItem,
         {
           label: 'Import Bookmarks',
@@ -424,7 +418,7 @@ const init = (args) => {
       adInsertion: Filtering.isResourceEnabled(adInsertion),
       trackingProtection: Filtering.isResourceEnabled(trackingProtection),
       httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere)
-    }, init.bind(this, {bookmarked: bookmarkPageMenuItem.checked})),
+    }, init.bind(this, settingsState, {bookmarked: bookmarkPageMenuItem.checked})),
     {
       label: 'Window',
       role: 'window',
