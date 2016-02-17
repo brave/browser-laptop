@@ -2,9 +2,10 @@
 
 const Brave = require('../lib/brave')
 const { activeWebview, findBarInput, findBarMatches, urlInput } = require('../lib/selectors')
+const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
-describe('findbar', function () {
+describe.only('findbar', function () {
   Brave.beforeAll(this)
 
   before(function *() {
@@ -51,6 +52,38 @@ describe('findbar', function () {
       .click('#navigator')
       .click(urlInput)
       .waitForElementFocus(urlInput)
+  })
+})
+
+describe('view source', function () {
+  Brave.beforeAll(this)
+
+  before(function *() {
+    this.url = Brave.server.url('find_in_page.html')
+    // todo: move to selectors
+    this.webview1 = '.frameWrapper:nth-child(1) webview'
+    this.webview2 = '.frameWrapper:nth-child(2) webview'
+
+    yield setup(this.app.client)
+    yield this.app.client
+      .waitUntilWindowLoaded()
+      .waitForVisible(activeWebview)
+      .loadUrl(this.url)
+      .waitForExist('.tab[data-frame-key="1"]')
+      .waitForExist(this.webview1)
+  })
+
+  it('should open in new tab', function *() {
+    yield this.app.client
+      .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .waitForExist(this.webview2)
+  })
+
+  it('open from pinned tab', function *() {
+    yield this.app.client
+      .pinTab(2)
+      .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .waitForExist(this.webview2)
   })
 })
 

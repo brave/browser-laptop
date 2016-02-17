@@ -120,6 +120,17 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('pinTab', function (key) {
+      return this.execute(function (key) {
+        var Immutable = require('immutable')
+        var windowActions = require('../js/actions/windowActions')
+        windowActions.dispatchViaIPC()
+        windowActions.setPinned(Immutable.fromJS({
+          key
+        }), true)
+      }, key)
+    })
+
     this.app.client.addCommand('ipcOn', function (message, fn) {
       return this.execute(function (message, fn) {
         return require('electron').remote.getCurrentWindow().webContents.on(message, fn)
