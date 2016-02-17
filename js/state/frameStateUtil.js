@@ -4,6 +4,7 @@
 
 import Immutable from 'immutable'
 const Config = require('../constants/config.js')
+const urlParse = require('url').parse
 
 export function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
@@ -183,6 +184,10 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
     findDetail: {
       searchString: '',
       caseSensitivity: false
+    },
+    security: {
+      isSecure: urlParse(url).protocol === 'https:',
+      certDetails: null
     }
   })
 
