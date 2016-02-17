@@ -9,6 +9,7 @@ const WindowConstants = require('../constants/windowConstants')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
+const getFavicon = require('../lib/faviconUtil.js')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
@@ -120,7 +121,6 @@ const doAction = (action) => {
       if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
         windowState = windowState.mergeIn(activeFrameStatePath(), {
           audioPlaybackActive: false,
-          icon: undefined,
           activeShortcut: 'reload'
         })
       } else {
@@ -146,7 +146,6 @@ const doAction = (action) => {
       const lastTitle = windowState.getIn(frameStatePath(key).concat(['title']))
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
-        icon: undefined,
         adblock: {},
         trackingProtection: {},
         title: action.location === lastLocation ? lastTitle : '',
@@ -378,7 +377,10 @@ const doAction = (action) => {
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       break
     case WindowConstants.WINDOW_SET_FAVICON:
-      windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
+      getFavicon(action.frameProps, action.favicon).then(icon => {
+        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], icon)
+        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'iconUrl'], action.favicon)
+      })
       break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
