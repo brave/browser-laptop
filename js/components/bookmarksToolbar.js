@@ -6,6 +6,8 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const contextMenus = require('../contextMenus')
 const WindowActions = require('../actions/windowActions')
+const AppActions = require('../actions/appActions')
+const siteTags = require('../constants/siteTags')
 
 class BookmarkToolbarButton extends ImmutableComponent {
   navigate () {
@@ -21,8 +23,34 @@ class BookmarkToolbarButton extends ImmutableComponent {
 }
 
 class BookmarksToolbar extends ImmutableComponent {
+  onDrop (e) {
+    let urls = e.dataTransfer.getData('text/uri-list') ||
+      e.dataTransfer.getData('text/plain')
+    urls = urls.split('\n')
+      .map(x => x.trim())
+      .filter(x => !x.startsWith('#'))
+      .forEach(url =>
+        AppActions.addSite({ location: url }, siteTags.BOOKMARK))
+  }
+  onDragEnter (e) {
+    let intersection = e.dataTransfer.types.filter(x =>
+      ['text/plain', 'text/uri-list'].includes(x))
+    if (intersection.length > 0) {
+      e.preventDefault()
+    }
+  }
+  onDragOver (e) {
+    let intersection = e.dataTransfer.types.filter(x =>
+      ['text/plain', 'text/uri-list'].includes(x))
+    if (intersection.length > 0) {
+      e.preventDefault()
+    }
+  }
   render () {
     return <div className='bookmarksToolbar'
+      onDrop={this.onDrop.bind(this)}
+      onDragEnter={this.onDragOver.bind(this)}
+      onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings)}>
     {
         this.props.bookmarks.map(bookmark =>
