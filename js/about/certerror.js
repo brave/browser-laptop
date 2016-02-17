@@ -5,9 +5,8 @@
 const React = require('react')
 const messages = require('../constants/messages')
 const Immutable = require('immutable')
-const ImmutableComponent = require('../components/immutableComponent')
 
-class CertErrorPage extends ImmutableComponent {
+class CertErrorPage extends React.Component {
   constructor () {
     super()
     this.state = {
