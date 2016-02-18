@@ -202,7 +202,7 @@ class Frame extends ImmutableComponent {
           break
         case messages.CONTEXT_MENU_OPENED:
           method = (nodeProps, contextMenuType) => {
-            contextMenus.onMainContextMenu(nodeProps, contextMenuType)
+            contextMenus.onMainContextMenu(nodeProps, this.props.frame, contextMenuType)
           }
           break
         case messages.STOP_LOAD:

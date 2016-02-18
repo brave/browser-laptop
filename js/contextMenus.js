@@ -5,6 +5,7 @@
 const electron = global.require('electron')
 const remote = electron.remote
 const Menu = remote.require('menu')
+const Immutable = require('immutable')
 const clipboard = electron.clipboard
 const messages = require('./constants/messages')
 const WindowStore = require('./stores/windowStore')
@@ -13,6 +14,19 @@ const AppActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
 const CommonMenu = require('./commonMenu')
 const ipc = global.require('electron').ipcRenderer
+
+/**
+ * @param {string} location The location to initialize with
+ * @param {string} title The title to initialize with
+ */
+const addBookmarkMenuItem = (location, title) => {
+  return {
+    label: 'Add Bookmark...',
+    click: () => {
+      WindowActions.setBookmarkDetail({ location, title })
+    }
+  }
+}
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
@@ -44,27 +58,36 @@ function inputTemplateInit (e) {
   return getEditableItems(hasSelection)
 }
 
-function tabsToolbarTemplateInit (settingsState) {
-  return [CommonMenu.bookmarksMenuItem, CommonMenu.bookmarksToolbarMenuItem(settingsState)]
+function tabsToolbarTemplateInit (settingsState, activeFrame) {
+  return [
+    CommonMenu.bookmarksMenuItem,
+    CommonMenu.bookmarksToolbarMenuItem(settingsState),
+    CommonMenu.separatorMenuItem,
+    addBookmarkMenuItem(activeFrame.get('location'), activeFrame.get('title'))
+  ]
 }
 
-function bookmarkTemplateInit (location, title) {
+function bookmarkTemplateInit (location, title, activeFrame) {
   return [openInNewTabMenuItem(location),
     openInNewPrivateTabMenuItem(location),
     openInNewSessionTabMenuItem(location),
     copyLinkLocationMenuItem(location),
     CommonMenu.separatorMenuItem, {
-      label: 'Edit...',
+      label: 'Edit Bookmark...',
       click: () => {
+        // originalLocation is undefined signifies add mode
         WindowActions.setBookmarkDetail({ originalLocation: location, location, title })
       }
     },
     CommonMenu.separatorMenuItem, {
-      label: 'Delete',
+      label: 'Delete Bookmark',
       click: () => {
         AppActions.removeSite({ location }, siteTags.BOOKMARK)
       }
-    }]
+    },
+    CommonMenu.separatorMenuItem,
+    addBookmarkMenuItem(activeFrame.get('location'), activeFrame.get('title'))
+  ]
 }
 
 function tabTemplateInit (frameProps) {
@@ -239,7 +262,7 @@ const copyLinkLocationMenuItem = location => {
   }
 }
 
-function mainTemplateInit (nodeProps) {
+function mainTemplateInit (nodeProps, frame) {
   const template = []
   const nodeName = nodeProps.name
 
@@ -317,10 +340,8 @@ function mainTemplateInit (nodeProps) {
         focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
       }
     }
-  }, {
-    label: 'Add bookmark',
-    enabled: false
-  }, {
+  },
+  addBookmarkMenuItem(frame.get('location'), frame.get('title')), {
     label: 'Add to reading list',
     enabled: false
   })
@@ -333,11 +354,11 @@ export function onHamburgerMenu (braverySettings, settingsState) {
   hamburgerMenu.popup(remote.getCurrentWindow())
 }
 
-export function onMainContextMenu (nodeProps, contextMenuType) {
+export function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark') {
-    onBookmarkContextMenu(nodeProps.location, nodeProps.title)
+    onBookmarkContextMenu(nodeProps.location, nodeProps.title, Immutable.fromJS({ location: '', title: '' }))
   } else {
-    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps))
+    const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
     mainMenu.popup(remote.getCurrentWindow())
   }
 }
@@ -348,9 +369,9 @@ export function onTabContextMenu (frameProps, e) {
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (settings, e) {
+export function onTabsToolbarContextMenu (settings, activeFrame, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(settings))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(settings, activeFrame))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
@@ -366,10 +387,10 @@ export function onUrlBarContextMenu (e) {
   inputMenu.popup(remote.getCurrentWindow())
 }
 
-export function onBookmarkContextMenu (location, title, e) {
+export function onBookmarkContextMenu (editLocation, editTitle, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
-  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(location, title))
+  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(editLocation, editTitle, activeFrame))
   menu.popup(remote.getCurrentWindow())
 }

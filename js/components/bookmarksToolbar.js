@@ -16,7 +16,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   render () {
     return <span className='bookmarkToolbarButton'
       onClick={this.navigate.bind(this)}
-      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.location, this.props.title)}>
+      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.location, this.props.title, this.props.activeFrame)}>
     { this.props.title || this.props.location }
     </span>
   }
@@ -67,7 +67,7 @@ class BookmarksToolbar extends ImmutableComponent {
       onDrop={this.onDrop.bind(this)}
       onDragEnter={this.onDragOver.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings)}>
+      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
     {
         this.props.bookmarks.map(bookmark =>
           <BookmarkToolbarButton

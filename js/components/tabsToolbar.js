@@ -31,7 +31,7 @@ class TabsToolbar extends ImmutableComponent {
       .slice(startingFrameIndex, startingFrameIndex + this.props.tabsPerTabPage)
 
     return <div className='tabsToolbar'
-      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings)}>
+      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
       { pinnedFrames.size > 0
         ? <PinnedTabs sites={this.props.sites}
         frames={this.props.frames}

@@ -20,6 +20,25 @@ class AddEditBookmark extends ImmutableComponent {
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onClose = this.onClose.bind(this)
   }
+  get isBlankTab () {
+    return ['about:blank', 'about:newtab'].includes(this.props.bookmarkDetail.get('location'))
+  }
+  get location () {
+    if (this.isblankTab) {
+      return ''
+    }
+    return this.props.bookmarkDetail.get('location')
+  }
+  get title () {
+    if (this.isblankTab) {
+      return ''
+    }
+    return this.props.bookmarkDetail.get('title')
+  }
+  componentDidMount () {
+    this.bookmarkName.select()
+    this.bookmarkName.focus()
+  }
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
@@ -39,7 +58,7 @@ class AddEditBookmark extends ImmutableComponent {
   onNameChange (e) {
     windowActions.setBookmarkDetail(Immutable.fromJS({
       originalLocation: this.props.bookmarkDetail.get('originalLocation'),
-      location: this.props.bookmarkDetail.get('location'),
+      location: this.location,
       title: e.target.value
     }))
   }
@@ -47,14 +66,16 @@ class AddEditBookmark extends ImmutableComponent {
     windowActions.setBookmarkDetail(Immutable.fromJS({
       originalLocation: this.props.bookmarkDetail.get('originalLocation'),
       location: e.target.value,
-      title: this.props.bookmarkDetail.get('title')
+      title: this.title
     }))
   }
   onSave () {
-    appActions.removeSite({ location: this.props.bookmarkDetail.get('originalLocation') }, siteTags.BOOKMARK)
+    if (this.props.bookmarkDetail.get('originalLocation')) {
+      appActions.removeSite({ location: this.props.bookmarkDetail.get('originalLocation') }, siteTags.BOOKMARK)
+    }
     appActions.addSite({
-      location: this.props.bookmarkDetail.get('location'),
-      title: this.props.bookmarkDetail.get('title')
+      location: this.location,
+      title: this.title
     }, siteTags.BOOKMARK)
     this.onClose()
   }
@@ -63,11 +84,11 @@ class AddEditBookmark extends ImmutableComponent {
       <div className='addEditBookmark' onClick={this.onClick.bind(this)}>
         <div id='bookmarkName' className='bookmarkFormRow'>
           <label data-l10n-id='nameField' htmlFor='bookmarkName'/>
-          <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.bookmarkDetail.get('title')} />
+          <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.bookmarkDetail.get('title')} ref={bookmarkName => this.bookmarkName = bookmarkName }/>
         </div>
         <div id='bookmarkLocation' className='bookmarkFormRow'>
           <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
-          <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.bookmarkDetail.get('location')} />
+          <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.location} />
         </div>
         <div className='bookmarkFormRow'>
           <span/>
