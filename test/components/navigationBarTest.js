@@ -214,10 +214,6 @@ describe('urlbar', function () {
     it('has focus', function *() {
       yield this.app.client.waitForElementFocus(urlInput)
     })
-
-    it('selects the text', function *() {
-      yield selectsText(this.app.client, '')
-    })
   })
 
   describe('new tab from ipc', function () {
@@ -275,12 +271,18 @@ describe('urlbar', function () {
     before(function *() {
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client.waitUntil(function () {
+        return this.getValue(urlInput).then(val => val === '')
+      })
       // now type something
       yield this.app.client.keys('a')
     })
 
-    it('sets the value', function *() {
-      yield this.app.client.waitForValue(urlInput, 'a')
+    it('sets the value to "a"', function *() {
+      yield this.app.client.waitUntil(function () {
+        return this.getValue(urlInput).then(val => val === 'a')
+      })
     })
 
     it('clears the selected text', function *() {
@@ -428,8 +430,15 @@ describe('urlbar', function () {
       before(function *() {
         yield setup(this.app.client)
         yield this.app.client.waitForExist(urlInput)
-        // type anything
+        yield this.app.client.waitForElementFocus(urlInput)
+        yield this.app.client.waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === '')
+        })
+        // now type something
         yield this.app.client.keys('a')
+        yield this.app.client.waitUntil(function () {
+          return this.getValue(urlInput).then(val => val === 'a')
+        })
         yield blur(this.app.client)
         yield this.app.client
           .leftClick(urlInput)
