@@ -128,10 +128,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onBlur (e) {
-    // if suggestion box is active then keep url bar active
-    if (!this.shouldRenderUrlBarSuggestions) {
-      WindowActions.setUrlBarActive(false)
-    }
+    WindowActions.setUrlBarActive(false)
     WindowActions.setUrlBarSelected(false)
     WindowActions.setNavBarFocused(false)
   }
