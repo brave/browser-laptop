@@ -17,6 +17,7 @@ const settings = {
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
   BOOKMARK_SUGGESTIONS: 'privacy.bookmark-suggestions',
   OPENED_TAB_SUGGESTIONS: 'privacy.opened-tab-suggestions',
+  DO_NOT_TRACK: 'privacy.do-not-track',
   // Security Tab
   BLOCK_REPORTED_SITES: 'security.block-reported-sites',
   // Other settings

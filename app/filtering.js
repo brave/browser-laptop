@@ -12,6 +12,8 @@ const AppStore = require('../js/stores/appStore')
 const AppConfig = require('../js/constants/appConfig')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
+const getSetting = require('../js/settings').getSetting
+const settings = require('../js/constants/settings')
 
 const filteringFns = []
 
@@ -28,6 +30,9 @@ module.exports.registerFilteringCB = filteringFn => {
  * @param {object} The session to add webRequest filtering on
  */
 function registerForSession (session) {
+  // For efficiency, avoid calculating sendDNT on every request. This means the
+  // browser must be restarted for changes to take effect.
+  const sendDNT = getSetting(AppStore.getState().get('settings'), settings.DO_NOT_TRACK)
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl) {
@@ -59,6 +64,9 @@ function registerForSession (session) {
       if (requestHeaders['Referer']) {
         requestHeaders['Referer'] = refererExceptions.includes(hostname) ? 'http://localhost' : undefined
       }
+    }
+    if (sendDNT) {
+      requestHeaders['DNT'] = '1'
     }
 
     if (!results || !results.shouldBlock) {

@@ -37,6 +37,8 @@
 <history "History (not available yet)">
 <bookmarks "Bookmarks">
 <openedTabs "Open tabs">
+<doNotTrack "Send a 'Do Not Track' header with browsing requests (requires browser restart)">
+<advancedPrivacySettings "Advanced privacy settings:">
 
 /* Security settings page */
 <blockAttackSites "Block reported attack sites (not available yet)">

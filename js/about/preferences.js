@@ -141,6 +141,9 @@ class PrivacyTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings}/>
       </SettingsList>
+      <SettingsList dataL10nId='advancedPrivacySettings'>
+        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings}/>
+      </SettingsList>
     </div>
   }
 }

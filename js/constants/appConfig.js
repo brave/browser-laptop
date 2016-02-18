@@ -72,6 +72,7 @@ module.exports = {
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
     'security.block-reported-sites': false,
-    'bookmarks.toolbar.show': false
+    'bookmarks.toolbar.show': false,
+    'privacy.do-not-track': false
   }
 }
