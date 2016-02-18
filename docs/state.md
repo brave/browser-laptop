@@ -168,6 +168,11 @@ WindowStore
   searchDetail: {
     searchURL: string, // with replacement var in string: {searchTerms}
     autocompleteURL: string, // ditto re: {searchTerms}
-  }
+  },
+  bookmarkDetail: {
+    originalLocation: string, // Location of the bookmark being edited
+    location: string, // Current value for the location
+    title: string // Current value for the title
+  },
 }
 ```

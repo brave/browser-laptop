@@ -22,6 +22,7 @@ const TabsToolbar = require('./tabsToolbar')
 const UpdateBar = require('./updateBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
+const AddEditBookmark = require('./addEditBookmark')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 
@@ -252,6 +253,10 @@ class Main extends ImmutableComponent {
               ? <SiteInfo frameProps={activeFrame}
                   siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
                   onHide={this.onHideSiteInfo.bind(this)} /> : null
+            }
+            { this.props.windowState.get('bookmarkDetail')
+              ? <AddEditBookmark bookmarkDetail={this.props.windowState.get('bookmarkDetail')}/>
+              : null
             }
             { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
               ? <ReleaseNotes

@@ -349,7 +349,14 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FIND_DETAIL:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
-      // Since the input value is bound we need to notify the control sync
+      // Since the input value is bound, we need to notify the control sync.
+      windowStore.emitChanges()
+      return
+    case WindowConstants.WINDOW_SET_BOOKMARK_DETAIL:
+      windowState = windowState.merge({
+        bookmarkDetail: action.bookmarkDetail
+      })
+      // Since the input values of bookmarks are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_PINNED:

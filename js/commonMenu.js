@@ -138,7 +138,7 @@ module.exports.bookmarksMenuItem = {
   }
 }
 
-module.exports.bookmarksToolbarMenuItem = (settingsState, initCB) => {
+module.exports.bookmarksToolbarMenuItem = (settingsState) => {
   const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
     label: 'Bookmarks Toolbar',

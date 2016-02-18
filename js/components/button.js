@@ -14,8 +14,8 @@ class Button extends ImmutableComponent {
         className={cx({
           browserButton: true,
           fa: true,
-          [this.props.iconClass]: true,
-          [this.props.className]: true
+          [this.props.iconClass]: !!this.props.iconClass,
+          [this.props.className]: !!this.props.className
         })}
         onClick={this.props.onClick}>
       </span>
@@ -24,7 +24,7 @@ class Button extends ImmutableComponent {
       data-l10n-id={this.props.l10nId}
       className={cx({
         browserButton: true,
-        [this.props.className]: true
+        [this.props.className]: !!this.props.className
       })} onClick={this.props.onClick}>
       {this.props.label}
     </span>

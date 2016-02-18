@@ -571,6 +571,18 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to set add/edit bookmark details
+   * If set, also indicates that add/edit is shown
+   * @param {Object} bookmarkDetail - Properties of the bookmark to edit
+   */
+  setBookmarkDetail: function (bookmarkDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+      bookmarkDetail
+    })
+  },
+
+  /**
    * Dispatches a message to indicate that the frame should be muted
    *
    * @param {Object} frameProps - Properties of the frame in question

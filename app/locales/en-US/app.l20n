@@ -101,3 +101,7 @@
   *many: "{{$numberOfMatches}} matches"
 }>
 <caseSensitivity "Match case">
+
+<nameField "Title:">
+<locationField "Location:">
+<save "Save">

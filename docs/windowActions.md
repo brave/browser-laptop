@@ -398,6 +398,17 @@ Dispatches a message to set the find-in-page details.
 
 
 
+### setBookmarkDetail(bookmarkDetail) 
+
+Dispatches a message to set add/edit bookmark details
+If set, also indicates that add/edit is shown
+
+**Parameters**
+
+**bookmarkDetail**: `Object`, Properties of the bookmark to edit
+
+
+
 ### setAudioMuted(frameProps, muted) 
 
 Dispatches a message to indicate that the frame should be muted

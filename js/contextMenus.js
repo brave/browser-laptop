@@ -48,11 +48,17 @@ function tabsToolbarTemplateInit (settingsState) {
   return [CommonMenu.bookmarksMenuItem, CommonMenu.bookmarksToolbarMenuItem(settingsState)]
 }
 
-function bookmarkTemplateInit (location) {
+function bookmarkTemplateInit (location, title) {
   return [openInNewTabMenuItem(location),
     openInNewPrivateTabMenuItem(location),
     openInNewSessionTabMenuItem(location),
     copyLinkLocationMenuItem(location),
+    CommonMenu.separatorMenuItem, {
+      label: 'Edit...',
+      click: () => {
+        WindowActions.setBookmarkDetail({ originalLocation: location, location, title })
+      }
+    },
     CommonMenu.separatorMenuItem, {
       label: 'Delete',
       click: () => {

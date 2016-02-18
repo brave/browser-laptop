@@ -16,6 +16,8 @@ span.browserButton {
   margin: 0 3px;
   text-align: center;
   transition: .1s opacity, .1s background;
+  user-select: none;
+  -webkit-user-select: none;
 
   &:not([disabled]):hover {
     color: black;
@@ -47,4 +49,25 @@ span.browserButton.reload-button,
 span.browserButton.stop-button {
   font-size: 16px;
   line-height: 30px;
+}
+
+.buttonCommon {
+  color: #fff;
+  font-size: inherit;
+  height: 22px;
+  line-height: 22px;
+  margin-right: 0px;
+  margin-top: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+span.browserButton.primaryButton {
+  background-color: @braveOrange;
+  .buttonCommon;
+}
+
+span.browserButton.secondaryButton {
+  background-color: #eee;
+  .buttonCommon;
 }
