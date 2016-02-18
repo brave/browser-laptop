@@ -66,6 +66,8 @@ module.exports.cleanSessionData = (sessionData) => {
 
   // Don't save preview frame since they are only related to hovering on a tab
   delete sessionData.previewFrameKey
+  // Don't restore add/edit dialog
+  delete sessionData.bookmarkDetail
   sessionData.frames = sessionData.frames || []
   let newKey = 0
   const cleanFrame = (frame) => {
