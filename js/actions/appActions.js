@@ -51,8 +51,9 @@ const AppActions = {
    * Adds a site to the site list
    * @param {Object} frameProps - Properties of the frame in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
+   * @param {string} originalLocation - If specified, the original location to edit / overwrite
    */
-  addSite: function (frameProps, tag) {
+  addSite: function (frameProps, tag, originalLocation) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_ADD_SITE,
       frameProps,

@@ -44,8 +44,8 @@ module.exports.isSiteInList = function (sites, location, tag) {
  * Otherwise it's only considered to be a history item
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, frameProps, tag) {
-  const index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'))
+module.exports.addSite = function (sites, frameProps, tag, originalLocation) {
+  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()

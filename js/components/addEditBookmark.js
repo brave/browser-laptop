@@ -70,13 +70,10 @@ class AddEditBookmark extends ImmutableComponent {
     }))
   }
   onSave () {
-    if (this.props.bookmarkDetail.get('originalLocation')) {
-      appActions.removeSite({ location: this.props.bookmarkDetail.get('originalLocation') }, siteTags.BOOKMARK)
-    }
     appActions.addSite({
       location: this.location,
       title: this.title
-    }, siteTags.BOOKMARK)
+    }, siteTags.BOOKMARK, this.props.bookmarkDetail.get('originalLocation'))
     this.onClose()
   }
   render () {
