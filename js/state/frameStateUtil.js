@@ -156,6 +156,10 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
     canGoForward: false,
     location: frameOpts.delayedLoadUrl || url, // page url
     src: url, // what the iframe src should be
+    // if this is a delayed load then go ahead and start the loading indicator
+    loading: !!frameOpts.delayedLoadUrl,
+    startLoadTime: frameOpts.delayedLoadUrl ? new Date().getTime() : null,
+    endLoadTime: null,
     isPrivate: frameOpts.isPrivate || false,
     partitionNumber,
     element: frameOpts.element,
