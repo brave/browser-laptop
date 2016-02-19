@@ -51,7 +51,7 @@
       background: @chromePrimary;
       color: @chromeText;
       font-size: 15px;
-      max-width: calc(~'100% - 16px'); // space for icon
+      max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
       margin-top: 5px;
@@ -64,7 +64,11 @@
       */
     }
     .startButtons {
-      visibility: hidden;
+      display: none;
+    }
+
+    .endButtons {
+      position: absolute;
     }
 
     .urlbarIcon {
@@ -84,6 +88,10 @@
     .bookmark-button {
       transform: scale(0.6);
       opacity: 0.6;
+
+      &:not(.remove-bookmark-button) {
+        display: none;
+      }
     }
   }
 
