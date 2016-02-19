@@ -223,7 +223,8 @@ class Frame extends ImmutableComponent {
       }
       method.apply(this, e.args)
     })
-    this.webview.addEventListener('load-start', (event) => {
+
+    const loadStart = (event) => {
       if (event.isMainFrame && !event.isErrorPage && !event.isFrameSrcDoc) {
         // Temporary workaround for https://github.com/brave/browser-laptop/issues/787
         this.webview.insertCSS('input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }')
@@ -240,23 +241,8 @@ class Frame extends ImmutableComponent {
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
-    })
-    this.webview.addEventListener('did-navigate', (e) => {
-      // only give focus focus is this is not the initial default page load
-      if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
-        this.webview.focus()
-      }
-    })
-    this.webview.addEventListener('did-start-loading', () => {
-    })
-    this.webview.addEventListener('did-stop-loading', () => {
-    })
-    this.webview.addEventListener('did-fail-load', () => {
-      WindowActions.onWebviewLoadEnd(
-        this.props.frame,
-        this.webview.getURL())
-    })
-    this.webview.addEventListener('did-finish-load', () => {
+    }
+    const loadEnd = () => {
       WindowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
@@ -270,10 +256,29 @@ class Frame extends ImmutableComponent {
           error: security.get('certDetails').error
         })
       }
+    }
+    this.webview.addEventListener('load-commit', (event) => {
+      loadStart(event)
+    })
+    this.webview.addEventListener('load-start', (event) => {
+      loadStart(event)
+    })
+    this.webview.addEventListener('did-navigate', (e) => {
+      // only give focus focus is this is not the initial default page load
+      if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
+        this.webview.focus()
+      }
+    })
+    this.webview.addEventListener('did-fail-load', () => {
+      WindowActions.onWebviewLoadEnd(
+        this.props.frame,
+        this.webview.getURL())
+    })
+    this.webview.addEventListener('did-finish-load', () => {
+      loadEnd()
     })
     this.webview.addEventListener('did-navigate-in-page', () => {
-    })
-    this.webview.addEventListener('did-frame-finish-load', (event) => {
+      loadEnd()
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
       WindowActions.setAudioPlaybackActive(this.props.frame, true)

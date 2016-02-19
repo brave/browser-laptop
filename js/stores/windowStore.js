@@ -143,11 +143,13 @@ const doAction = (action) => {
       const key = action.key || windowState.get('activeFrameKey')
       const lastLocation = windowState.getIn(frameStatePath(key).concat(['location']))
       const lastTitle = windowState.getIn(frameStatePath(key).concat(['title']))
+      let locationChanged = !action.location || !lastLocation ||
+        action.location.split('#')[0] !== lastLocation.split('#')[0]
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
         adblock: {},
         trackingProtection: {},
-        title: action.location === lastLocation ? lastTitle : '',
+        title: locationChanged ? '' : lastTitle,
         location: action.location
       })
       updateNavBarInput(action.location, frameStatePath(key))
