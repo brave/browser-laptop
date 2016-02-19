@@ -85,8 +85,7 @@ WindowStore
     canGoBack: boolean,
     canGoForward: boolean,
     isPinned: boolean, // true when the tab is pinned
-    icon: string, // base64 image of favicon
-    iconUrl: // favicon url
+    icon: string, // favicon url
     location: string, // page url
     src: string, // what the iframe src should be
     title: string, // page title

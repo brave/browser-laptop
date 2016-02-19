@@ -11,11 +11,6 @@ module.exports = function getFavicon (frameProps, iconHref) {
       resolve(null)
     }
 
-    const cachedFavicon = frameProps.get('icon')
-    if (cachedFavicon && frameProps.get('iconUrl') === iconHref) {
-      return resolve(cachedFavicon)
-    }
-
     const size = window.devicePixelRatio * 16
     const resolution = '#-moz-resolution=' + size + ',' + size
 
@@ -41,15 +36,7 @@ module.exports = function getFavicon (frameProps, iconHref) {
     if (UrlUtil.isImageDataUrl(iconHref)) {
       resolve(iconHref)
     } else {
-      const img = new window.Image()
-      img.onload = () => {
-        let canvas = document.createElement('canvas')
-        canvas.width = img.naturalWidth
-        canvas.height = img.naturalHeight
-        canvas.getContext('2d').drawImage(img, 0, 0)
-        resolve(canvas.toDataURL('image/x-icon'))
-      }
-      img.src = iconHref + resolution
+      resolve(iconHref + resolution)
     }
   })
 }

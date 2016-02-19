@@ -361,8 +361,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FAVICON:
       getFavicon(action.frameProps, action.favicon).then(icon => {
-        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], icon)
-        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'iconUrl'], action.favicon)
+        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       })
       break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
