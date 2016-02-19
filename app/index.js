@@ -37,6 +37,9 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
 let perWindowState = []
 let sessionStateStoreAttempted = false
 
+// URLs to accept bad certs for.
+let acceptCertUrls = {}
+
 const saveIfAllCollected = () => {
   // If we're shutting down early and can't access the state, it's better
   // to not try to save anything at all and just quit.
@@ -74,6 +77,12 @@ app.on('ready', function () {
     // Tell the page to show an unlocked icon. Note this is sent to the main
     // window webcontents, not the webview webcontents
     BrowserWindow.getAllWindows().map((win) => {
+      if (acceptCertUrls[url] === true) {
+        // Ignore the cert error
+        e.preventDefault()
+        cb(true)
+        return
+      }
       win.webContents.send(messages.CERT_ERROR, {
         url,
         error,
@@ -147,6 +156,11 @@ app.on('ready', function () {
 
     ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
       appActions.changeSetting(key, value)
+    })
+
+    ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
+      acceptCertUrls[url] = true
+      BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
     })
 
     AppStore.addChangeListener(() => {

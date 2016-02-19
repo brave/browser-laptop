@@ -42,7 +42,12 @@ const AboutActions = {
    * @param {string} url - The URL with the cert error
    */
   acceptCertError: function (url) {
-    // TODO
+    const event = new window.CustomEvent(messages.CERT_ERROR_ACCEPTED, {
+      detail: {
+        url
+      }
+    })
+    window.dispatchEvent(event)
   },
 
   /**

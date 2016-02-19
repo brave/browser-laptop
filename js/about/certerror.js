@@ -5,6 +5,10 @@
 const React = require('react')
 const messages = require('../constants/messages')
 const Immutable = require('immutable')
+const Button = require('../components/button')
+const aboutActions = require('./aboutActions')
+
+require('../../less/button.less')
 
 class CertErrorPage extends React.Component {
   constructor () {
@@ -20,11 +24,17 @@ class CertErrorPage extends React.Component {
       }
     })
   }
+
+  onAccept () {
+    aboutActions.acceptCertError(this.state.certDetails.get('url'))
+  }
+
   render () {
     return <div>
       <span data-l10n-id='certErrorText'></span>
       <span>{this.state.certDetails.get('url') || ''}</span>
       <div>{this.state.certDetails.get('error') || ''}</div>
+      <Button l10nId='certErrorButtonText' className='wideButton' onClick={this.onAccept.bind(this)}/>
     </div>
   }
 }

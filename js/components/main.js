@@ -132,6 +132,11 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward.bind(this))
 
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, (e, url) => {
+      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+      WindowActions.loadUrl(activeFrame, url)
+    })
+
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {

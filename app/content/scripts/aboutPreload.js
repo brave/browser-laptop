@@ -26,6 +26,9 @@
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)
   })
+  window.addEventListener('cert-error-accepted', (e) => {
+    ipcRenderer.send('cert-error-accepted', e.detail.url)
+  })
   window.addEventListener('new-frame', (e) => {
     ipcRenderer.sendToHost('new-frame', e.detail.location, e.detail.openInForeground)
   })

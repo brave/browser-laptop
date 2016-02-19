@@ -26,6 +26,7 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_FORWARD: _,
   SHORTCUT_ACTIVE_FRAME_BOOKMARK: _,
   SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK: _,
+  SHORTCUT_ACTIVE_FRAME_LOAD_URL: _, /** @arg {string} url to load */
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
@@ -69,7 +70,8 @@ const messages = {
   CHANGE_SETTING: _,
   NEW_FRAME: _,
   // HTTPS
-  CERT_DETAILS_UPDATED: _ /** @arg {Object} security state of the active frame */
+  CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
+  CERT_ERROR_ACCEPTED: _ /** @arg {string} url where a cert error was accepted */
 }
 
 module.exports = mapValuesByKeys(messages)
