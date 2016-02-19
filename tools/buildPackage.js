@@ -33,8 +33,8 @@ if (isWindows) {
   ])
 } else {
   cmds = cmds.concat([
-    'rm -rf ' + buildDir,
-    'rm -f dist/*.dmg dist/*.nupkg dist/*.exe dist/*.msi dist/RELEASES dist/*.zip'
+    'rm -Rf ' + buildDir,
+    'rm -Rf dist'
   ])
 }
 
