@@ -83,6 +83,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         <li data-index={index + 1}
             onMouseOver={this.onMouseOver.bind(this)}
             onMouseDown={suggestion.onClick}
+            onClick={suggestion.onClick}
             key={suggestion.title}
             className={this.activeIndex === index + 1 ? 'selected' : ''}>
           <span className={`suggestionIcon fa ${suggestion.iconClass}`}/>
