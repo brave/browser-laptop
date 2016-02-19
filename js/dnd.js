@@ -42,7 +42,7 @@ module.exports.onDragOver = (dragType, sourceDragData, sourceBoundingRect, dragg
   }
 }
 
-module.exports.closestTabFromXOffset = (refs, x) => {
+module.exports.closestFromXOffset = (refs, x) => {
   let smallestValue = Number.MAX_VALUE
   let selectedRef
   refs.forEach(ref => {

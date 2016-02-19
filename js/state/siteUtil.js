@@ -98,6 +98,17 @@ module.exports.removeSite = function (sites, frameProps, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
+module.exports.moveSite = function (sites, sourceLocation, destinationLocation, prepend) {
+  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation)
+  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation) + (prepend ? 0 : 1)
+  let sourceSite = sites.get(sourceSiteIndex)
+  sites = sites.splice(sourceSiteIndex, 1)
+  if (newIndex > sourceSiteIndex) {
+    newIndex--
+  }
+  return sites.splice(newIndex, 0, sourceSite)
+}
+
 /**
  * Detemrines the icon class to use for the site
  *

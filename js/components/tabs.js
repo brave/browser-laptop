@@ -42,7 +42,7 @@ class Tabs extends ImmutableComponent {
 
   onDrop (e) {
     const key = this.props.sourceDragData.get('key')
-    let droppedOnTab = dnd.closestTabFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), e.clientX)
+    let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), e.clientX)
     if (droppedOnTab) {
       const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), e.clientX)
       const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
@@ -67,8 +67,8 @@ class Tabs extends ImmutableComponent {
           this.props.currentFrames
             .filter(frameProps => !frameProps.get('isPinned'))
             .map(frameProps =>
-                <Tab sourceDragData={this.props.sourceDragData}
-                  ref={node => this.tabRefs.push(node)}
+                <Tab ref={node => this.tabRefs.push(node)}
+                  sourceDragData={this.props.sourceDragData}
                   draggingOverData={this.props.draggingOverData}
                   frameProps={frameProps}
                   frames={this.props.frames}

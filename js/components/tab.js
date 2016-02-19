@@ -161,8 +161,8 @@ class Tab extends ImmutableComponent {
         tabArea: true,
         draggingOverLeft: this.isDraggingOverLeft,
         draggingOverRight: this.isDraggingOverRight,
-        isPinned: this.isPinned,
         isDragging: this.isDragging,
+        isPinned: this.isPinned,
         partOfFullPageSet: this.props.partOfFullPageSet
       })}>
       <div className={cx({
@@ -173,7 +173,7 @@ class Tab extends ImmutableComponent {
       })}
       data-frame-key={this.props.frameProps.get('key')}
       ref={node => this.tab = node}
-      draggable='true'
+      draggable
       title={this.props.frameProps.get('title')}
       onMouseEnter={this.props.previewTabs ? this.onMouseEnter.bind(this) : null}
       onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}

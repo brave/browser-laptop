@@ -19,7 +19,7 @@
     cursor: default;
     font-size: 11px;
     line-height: 11px;
-    margin: auto 0;
+    margin: auto 3px;
     padding: 2px 5px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -30,6 +30,15 @@
     -webkit-user-select: none;
     &:hover {
       background: lighten(@tabsBackground, 5%);
+    }
+    &.draggingOverLeft {
+      margin-left: @dragSpacing;
+    }
+    &.draggingOverRight {
+      margin-right: @dragSpacing;
+    }
+    &.isDragging {
+      display: none;
     }
   }
 }

@@ -261,6 +261,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))
       break
+    case AppConstants.APP_MOVE_SITE:
+      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceLocation, action.destinationLocation, action.prepend))
+      break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
       appState = appState.set('defaultWindowHeight', action.size[1])

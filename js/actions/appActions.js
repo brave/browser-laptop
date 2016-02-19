@@ -75,6 +75,22 @@ const AppActions = {
   },
 
   /**
+   * Dispatches a message to move a site locations.
+   *
+   * @param {string} sourceLocation - the location of the site to move
+   * @param {string} destinationLocation - the location of the site to move to
+   * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
+   */
+  moveSite: function (sourceLocation, destinationLocation, prepend) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_MOVE_SITE,
+      sourceLocation,
+      destinationLocation,
+      prepend
+    })
+  },
+
+  /**
    * Sets the default window size
    * @param {Array} size - [width, height]
    */

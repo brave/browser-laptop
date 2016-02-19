@@ -55,6 +55,20 @@ Removes a site from the site list
 
 
 
+### moveSite(sourceLocation, destinationLocation, prepend) 
+
+Dispatches a message to move a site locations.
+
+**Parameters**
+
+**sourceLocation**: `string`, the location of the site to move
+
+**destinationLocation**: `string`, the location of the site to move to
+
+**prepend**: `boolean`, Whether or not to prepend to the destinationLocation
+
+
+
 ### setDefaultWindowSize(size) 
 
 Sets the default window size

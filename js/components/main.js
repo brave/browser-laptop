@@ -271,6 +271,8 @@ class Main extends ImmutableComponent {
         </div>
         { showBookmarksToolbar
           ? <BookmarksToolbar settings={settingsState}
+              sourceDragData={this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])}
+              draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
               activeFrame={activeFrame}
               bookmarks={this.props.appState.get('sites')
                 .filter(site => site.get('tags').includes(siteTags.BOOKMARK))
