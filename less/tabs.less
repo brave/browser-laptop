@@ -45,21 +45,25 @@
   justify-content: center;
 
   &:not(.isPinned) {
-    background: @chromeTertiary;
+   border-radius: @borderRadiusTabs @borderRadiusTabs 0px 0px;
+   border-width: 1px 1px 0;
+   background: #DEDEDE;
+   border: 1px solid @chromeTertiary;
+   border-bottom: 1px;
   }
 
   .tabTitle {
     -webkit-user-select: none;
     box-sizing: border-box;
     display: inline-block;
-    font-size: 12px;
+    font-size: 11.5px;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 16px;
     white-space: nowrap;
     vertical-align: middle;
     width: calc(~'100% - 40px');
-    height: 14px;
+    height: 15px;
   }
   .tabIcon {
     background-position: center;
@@ -100,8 +104,10 @@
   }
 
   &.active {
-    background: @activeTabDefaultColor;
-              height: 28px;
+      background: linear-gradient(to bottom, white, @chromePrimary, );
+      height: 28px;
+      box-shadow: inset 1px 1px 2px 0px white;
+      box-shadow: 0px -1px 4px 0px rgba(51, 51, 51, 0.12);
       border: 1px solid #bbb;
       border-bottom: 1px;
   }
@@ -247,6 +253,7 @@
   align-items: center;
   background-color: #aaaaaa;
   border-radius: @borderRadius;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
   display: inline-block;
   margin: auto 2.5px;
@@ -255,7 +262,8 @@
   vertical-align: middle;
 
   &:hover {
-    background-color: lighten(@chromeControlsBackground2, 10%);
+    background-color: @chromePrimary;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0);
   }
 
   &.audioPlaybackActive {
@@ -264,6 +272,7 @@
 
   &.active {
     background-color: @chromePrimary;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0);
 
   }
 }
