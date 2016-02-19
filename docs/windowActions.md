@@ -235,73 +235,31 @@ Dispatches a message to the store to update the back-forward information.
 
 
 
-### tabDragStart(frameProps) 
+### setIsBeingDragged(dragType, sourceDragData, dragging) 
 
-Dispatches a message to the store to indicate that tab dragging has started for that frame.
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
-
-
-
-### tabDragStop(frameProps) 
-
-Dispatches a message to the store to indicate that tab dragging has stopped for that frame.
+Dispatches a message to the store to indicate that dragging has started / stopped for the item.
 
 **Parameters**
 
-**frameProps**: `Object`, the frame properties for the webview in question.
+**dragType**: `string`, The type of drag operation being performed
+
+**sourceDragData**: `Object`, the properties for the item being dragged
+
+**dragging**: `boolean`, true if the item is being dragged.
 
 
 
-### tabDragDraggingOverLeftHalf(frameProps) 
+### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail) 
 
-Dispatches a message to the store to indicate that something is dragging over the left half of this tab.
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
-
-
-
-### tabDragDraggingOverRightHalf(frameProps) 
-
-Dispatches a message to the store to indicate that something is dragging over the right half of this tab.
+Dispatches a message to the store to indicate that something is dragging over this item.
 
 **Parameters**
 
-**frameProps**: `Object`, the frame properties for the webview in question.
+**dragType**: `string`, The type of drag operation being performed
 
+**dragOverKey**: `Object`, A unique identifier for the storage for the item being dragged over
 
-
-### tabDragExit(frameProps) 
-
-Dispatches a message to the store to indicate that tab dragging has exited the frame
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
-
-
-
-### tabDragExitRightHalf(frameProps) 
-
-Dispatches a message to the store to indicate that tab dragging has exited the right half of the frame
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
-
-
-
-### tabDraggingOn(frameProps) 
-
-Dispatches a message to the store to indicate that tab dragging started on the tab
-
-**Parameters**
-
-**frameProps**: `Object`, the frame properties for the webview in question.
+**dragDetail**: `Object`, detail about the item drag operation
 
 
 

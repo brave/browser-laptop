@@ -7,24 +7,12 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 
 const WindowActions = require('../actions/windowActions')
+const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet.js')
 const {getTextColorForBackground} = require('../lib/color')
 
 const contextMenus = require('../contextMenus')
-
-class DragIndicator extends ImmutableComponent {
-  constructor (props) {
-    super(props)
-  }
-
-  render () {
-    return <hr className={cx({
-      dragIndicator: true,
-      dragActive: this.props.active,
-      dragIndicatorEnd: this.props.end
-    })}/>
-  }
-}
+const dnd = require('../dnd')
 
 class Tab extends ImmutableComponent {
   constructor (props) {
@@ -33,6 +21,33 @@ class Tab extends ImmutableComponent {
 
   get isPinned () {
     return this.props.frameProps.get('isPinned')
+  }
+
+  get draggingOverData () {
+    if (!this.props.draggingOverData ||
+        this.props.draggingOverData.get('dragOverKey') !== this.props.frameProps.get('key')) {
+      return
+    }
+
+    return this.props.draggingOverData
+  }
+
+  get isDragging () {
+    return this.props.sourceDragData && this.props.frameProps.get('key') === this.props.sourceDragData.get('key')
+  }
+
+  get isDraggingOverLeft () {
+    if (!this.draggingOverData) {
+      return false
+    }
+    return this.draggingOverData.get('draggingOverLeftHalf')
+  }
+
+  get isDraggingOverRight () {
+    if (!this.draggingOverData) {
+      return false
+    }
+    return this.draggingOverData.get('draggingOverRightHalf')
   }
 
   get displayValue () {
@@ -44,54 +59,15 @@ class Tab extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    WindowActions.tabDragStart(this.props.frameProps)
+    dnd.onDragStart(dragTypes.TAB, this.props.frameProps, e)
   }
 
-  onDragEnd () {
-    WindowActions.tabDragStop(this.props.frameProps)
+  onDragEnd (e) {
+    dnd.onDragEnd(dragTypes.TAB, this.props.frameProps, e)
   }
 
   onDragOver (e) {
-    e.preventDefault()
-
-    // Otherise, only accept it if we have some frameProps
-    if (!this.props.activeDraggedTab) {
-      WindowActions.tabDraggingOn(this.props.frameProps)
-      return
-    }
-
-    const rect = this.tab.getBoundingClientRect()
-    if (e.clientX > rect.left && e.clientX < rect.left + rect.width / 2 &&
-      !this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
-      WindowActions.tabDragDraggingOverLeftHalf(this.props.frameProps)
-    } else if (e.clientX < rect.right && e.clientX >= rect.left + rect.width / 2 &&
-      !this.props.frameProps.get('tabIsDraggingOverRightHalf')) {
-      WindowActions.tabDragDraggingOverRightHalf(this.props.frameProps)
-    }
-  }
-
-  onDragLeave () {
-    if (this.props.frameProps.get('tabIsDraggingOverLeftHalf') ||
-      this.props.frameProps.get('tabIsDraggingOn') ||
-      this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
-      WindowActions.tabDragExit(this.props.frameProps)
-    } else if (this.props.frameProps.get('tabIsDraggingOverRightHalf')) {
-      WindowActions.tabDragExitRightHalf(this.props.frameProps)
-    }
-  }
-
-  onDrop (e) {
-    const sourceFrameProps = this.props.activeDraggedTab
-    if (!sourceFrameProps) {
-      return
-    }
-
-    if (this.props.frameProps.get('tabIsDraggingOverLeftHalf')) {
-      WindowActions.moveTab(sourceFrameProps, this.props.frameProps, true)
-    } else {
-      WindowActions.moveTab(sourceFrameProps, this.props.frameProps, false)
-    }
-    WindowActions.tabDragExit(this.props.frameProps)
+    dnd.onDragOver(dragTypes.TAB, this.props.sourceDragData, this.tab.getBoundingClientRect(), this.props.frameProps.get('key'), this.draggingOverData, e)
   }
 
   setActiveFrame () {
@@ -183,19 +159,17 @@ class Tab extends ImmutableComponent {
     return <div
       className={cx({
         tabArea: true,
+        draggingOverLeft: this.isDraggingOverLeft,
+        draggingOverRight: this.isDraggingOverRight,
         isPinned: this.isPinned,
+        isDragging: this.isDragging,
         partOfFullPageSet: this.props.partOfFullPageSet
       })}>
-      <DragIndicator active={this.props.frameProps.get('tabIsDraggingOverLeftHalf')}/>
       <div className={cx({
         tab: true,
         isPinned: this.isPinned,
         active: this.props.isActive,
-        private: this.props.isPrivate,
-        draggingOn: this.props.frameProps.get('tabIsDraggingOn'),
-        dragging: this.props.frameProps.get('tabIsDragging'),
-        'dragging-over': this.props.frameProps.get('tabIsDraggingOverLeftHalf') ||
-          this.props.frameProps.get('tabIsDraggingOverRightHalf')
+        private: this.props.isPrivate
       })}
       data-frame-key={this.props.frameProps.get('key')}
       ref={node => this.tab = node}
@@ -205,9 +179,7 @@ class Tab extends ImmutableComponent {
       onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}
-      onDragLeave={this.onDragLeave.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      onDrop={this.onDrop.bind(this)}
       onClick={this.onClickTab.bind(this)}
       onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
       style={activeTabStyle}>
@@ -232,9 +204,6 @@ class Tab extends ImmutableComponent {
             data-l10n-id='closeTabButton'
             className='closeTab fa fa-times-circle'/> : null }
       </div>
-      <DragIndicator
-        end
-        active={this.props.frameProps.get('tabIsDraggingOverRightHalf')}/>
     </div>
   }
 }

@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 
 const ImmutableComponent = require('./immutableComponent')
 
@@ -12,6 +13,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 
 const Button = require('./button')
 const Tab = require('./tab')
+const dnd = require('../dnd')
 
 class Tabs extends ImmutableComponent {
   get activeFrameIndex () {
@@ -38,9 +40,22 @@ class Tabs extends ImmutableComponent {
         .size / this.props.tabsPerTabPage)
   }
 
+  onDrop (e) {
+    const key = this.props.sourceDragData.get('key')
+    let droppedOnTab = dnd.closestTabFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), e.clientX)
+    if (droppedOnTab) {
+      const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), e.clientX)
+      const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+      WindowActions.moveTab(this.props.sourceDragData, droppedOnFrameProps, isLeftSide)
+    }
+  }
+
   render () {
+    this.tabRefs = []
     return <div className='tabs'>
-        <span className='tabContainer'>
+        <span className='tabContainer'
+          onDragOver={e => e.preventDefault()}
+          onDrop={this.onDrop.bind(this)}>
         {(() => {
           if (this.props.tabPageIndex > 0) {
             return <span
@@ -52,7 +67,9 @@ class Tabs extends ImmutableComponent {
           this.props.currentFrames
             .filter(frameProps => !frameProps.get('isPinned'))
             .map(frameProps =>
-                <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
+                <Tab sourceDragData={this.props.sourceDragData}
+                  ref={node => this.tabRefs.push(node)}
+                  draggingOverData={this.props.draggingOverData}
                   frameProps={frameProps}
                   frames={this.props.frames}
                   key={'tab-' + frameProps.get('key')}

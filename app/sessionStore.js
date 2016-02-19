@@ -68,6 +68,10 @@ module.exports.cleanSessionData = (sessionData) => {
   delete sessionData.previewFrameKey
   // Don't restore add/edit dialog
   delete sessionData.bookmarkDetail
+  // Don't restore drag data
+  if (sessionData.ui) {
+    delete sessionData.ui.dragging
+  }
   sessionData.frames = sessionData.frames || []
   let newKey = 0
   const cleanFrame = (frame) => {

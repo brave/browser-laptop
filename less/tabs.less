@@ -173,6 +173,18 @@
     flex: 1;
   }
 
+  &.draggingOverLeft {
+    margin-left: @dragSpacing;
+  }
+
+  &.draggingOverRight {
+    margin-right: @dragSpacing;
+  }
+
+  &.isDragging {
+    display: none;
+  }
+
   hr.dragIndicator {
     position: absolute;
     top: 0;

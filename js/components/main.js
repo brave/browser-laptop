@@ -32,6 +32,7 @@ const AppConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
+const dragTypes = require('../constants/dragTypes')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -291,6 +292,8 @@ class Main extends ImmutableComponent {
         </div>
         <TabsToolbar
           paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
+          sourceDragData={this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])}
+          draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settingsState, settings.SHOW_TAB_PREVIEWS)}
           settings={settingsState}
           tabsPerTabPage={tabsPerPage}

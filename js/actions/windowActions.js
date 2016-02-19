@@ -367,86 +367,34 @@ const WindowActions = {
   },
 
   /**
-   * Dispatches a message to the store to indicate that tab dragging has started for that frame.
+   * Dispatches a message to the store to indicate that dragging has started / stopped for the item.
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {string} dragType - The type of drag operation being performed
+   * @param {Object} sourceDragData - the properties for the item being dragged
+   * @param {boolean} dragging - true if the item is being dragged.
    */
-  tabDragStart: function (frameProps) {
+  setIsBeingDragged: function (dragType, sourceDragData, dragging) {
     dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAG_START,
-      frameProps
+      actionType: WindowConstants.WINDOW_SET_IS_BEING_DRAGGED,
+      dragType,
+      sourceDragData,
+      dragging
     })
   },
 
   /**
-   * Dispatches a message to the store to indicate that tab dragging has stopped for that frame.
+   * Dispatches a message to the store to indicate that something is dragging over this item.
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {string} dragType - The type of drag operation being performed
+   * @param {Object} dragOverKey - A unique identifier for the storage for the item being dragged over
+   * @param {Object} dragDetail - detail about the item drag operation
    */
-  tabDragStop: function (frameProps) {
+  setIsBeingDraggedOverDetail: function (dragType, dragOverKey, dragDetail) {
     dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAG_STOP,
-      frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that something is dragging over the left half of this tab.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  tabDragDraggingOverLeftHalf: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAGGING_OVER_LEFT,
-      frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that something is dragging over the right half of this tab.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  tabDragDraggingOverRightHalf: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAGGING_OVER_RIGHT,
-      frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that tab dragging has exited the frame
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  tabDragExit: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAG_EXIT,
-      frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that tab dragging has exited the right half of the frame
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  tabDragExitRightHalf: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAG_EXIT_RIGHT,
-      frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that tab dragging started on the tab
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  tabDraggingOn: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_TAB_DRAGGING_ON,
-      frameProps
+      dragType,
+      actionType: WindowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL,
+      dragOverKey,
+      dragDetail
     })
   },
 

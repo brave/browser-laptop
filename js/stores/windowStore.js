@@ -20,7 +20,6 @@ let windowState = Immutable.fromJS({
   closedFrames: [],
   ui: {
     tabs: {
-      activeDraggedTab: null
     },
     mouseInTitlebar: false
   },
@@ -242,50 +241,18 @@ const doAction = (action) => {
         canGoForward: action.canGoForward
       })
       break
-    case WindowConstants.WINDOW_TAB_DRAG_START:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDragging: true
-      })
-      windowState = windowState.setIn(['ui', 'tabs', 'activeDraggedTab'], action.frameProps)
-      break
-    case WindowConstants.WINDOW_TAB_DRAG_STOP:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDragging: false
-      })
-      windowState = windowState.setIn(['ui', 'tabs', 'activeDraggedTab'], null)
-      break
-    case WindowConstants.WINDOW_TAB_DRAGGING_OVER_LEFT:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDraggingOn: false,
-        tabIsDraggingOverLeftHalf: true,
-        tabIsDraggingOverRightHalf: false
+    case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED:
+      windowState = windowState.mergeIn(['ui', 'dragging'], {
+        dragType: action.dragType,
+        sourceDragData: action.sourceDragData
       })
       break
-    case WindowConstants.WINDOW_TAB_DRAGGING_OVER_RIGHT:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDraggingOn: false,
-        tabIsDraggingOverLeftHalf: false,
-        tabIsDraggingOverRightHalf: true
-      })
-      break
-    case WindowConstants.WINDOW_TAB_DRAG_EXIT:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDraggingOn: false,
-        tabIsDraggingOverLeftHalf: false,
-        tabIsDraggingOverRightHalf: false
-      })
-      break
-    case WindowConstants.WINDOW_TAB_DRAG_EXIT_RIGHT:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDraggingOverRightHalf: false
-      })
-      break
-    case WindowConstants.WINDOW_TAB_DRAGGING_ON:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
-        tabIsDraggingOn: true,
-        tabIsDraggingOverLeftHalf: false,
-        tabIsDraggingOverRightHalf: false
-      })
+    case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
+      if (!action.dragOverKey) {
+        windowState = windowState.deleteIn(['ui', 'dragging'])
+      } else {
+        windowState = windowState.mergeIn(['ui', 'dragging', 'draggingOver'], Immutable.fromJS(Object.assign({}, action.dragDetail, { dragOverKey: action.dragOverKey, dragType: action.dragType })))
+      }
       break
     case WindowConstants.WINDOW_TAB_MOVE:
       const sourceFramePropsIndex = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.sourceFrameProps)

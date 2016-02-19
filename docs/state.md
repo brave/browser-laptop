@@ -154,8 +154,17 @@ WindowStore
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
     mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
+    dragging: {
+      dragType: string, // tab, bookmark
+      sourceDragData: Object, // frameProps or bookmarkDetail
+      draggingOver: {
+        draggingOverLeft: boolean,
+        draggingOverRight: boolean,
+        dragKey: any,
+        dragType: string
+      }
+    },
     tabs: {
-      activeDraggedTab: object,
       tabPageIndex: number, // Index of the current tab page
     },
     siteInfo: {
