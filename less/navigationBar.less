@@ -8,15 +8,22 @@
 
 @import "variables.less";
 
-.navigatorOuterWrapper {
-  border-bottom: 1px solid @chromeTertiary;
-}
-
 .navigatorWrapper {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  margin-left: 70px;
+  padding-left: 70px;
+  border-bottom: 1px solid @chromeTertiary;
+}
+
+.urlbarForm {
+  max-width: calc(~'100% - 72px');
+  position: relative;
+  white-space: nowrap;
+
+  #navigator:not(.titleMode) & {
+    flex: 1;
+  }
 }
 
 #navigator {
@@ -34,20 +41,19 @@
   width: calc(~'100% - 215px');
 
   &.titleMode {
+    margin-left: -130px;
+
     input {
       display: none;
-    }
-    #titleBarWrapper {
-      white-space: nowrap;
     }
     #titleBar {
       display: inline-block;
       background: @chromePrimary;
       color: @chromeText;
       font-size: 15px;
+      max-width: calc(~'100% - 16px'); // space for icon
       overflow-x: hidden;
       text-overflow: ellipsis;
-      max-width: 100%;
       margin-top: 5px;
       /*
       &:focus {
@@ -57,7 +63,7 @@
       }
       */
     }
-    .startButtons, .endButtons {
+    .startButtons {
       visibility: hidden;
     }
 
@@ -73,6 +79,11 @@
         margin-right: 5px;
         min-width: 16px;
       }
+    }
+
+    .bookmark-button {
+      transform: scale(0.6);
+      opacity: 0.6;
     }
   }
 
@@ -98,13 +109,6 @@
     -moz-window-dragging: no-drag;
   }
 
-  form {
-    flex: 1;
-    max-width: calc(~'100% - 72px');
-    position: relative;
-    text-align: center;
-  }
-
   input {
     background: @navigationBarBackground;
     border: none;
@@ -127,7 +131,7 @@
       background: #fff;
       border: 1px solid @focusUrlbarOutline;
       box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
-      color: #333333;
+      color: #333;
       outline: none;
     }
 
@@ -139,13 +143,7 @@
 
   span.navbutton.remove-bookmark-button {
     color: @braveOrange;
-  }
-
-  &:not(.bookmarked) .remove-bookmark-button,
-  &.bookmarked .bookmark-button,
-  &:not(.loading) .stop-button,
-  &.loading .reload-button {
-    display: none;
+    opacity: 1;
   }
 
   .urlbarIcon {

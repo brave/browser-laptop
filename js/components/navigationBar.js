@@ -16,18 +16,24 @@ const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 
 class NavigationBar extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onToggleBookmark = this.onToggleBookmark.bind(this)
+    this.onStop = this.onStop.bind(this)
+    this.onReload = this.onReload.bind(this)
+  }
 
   get loading () {
     return this.props.activeFrame &&
       this.props.activeFrame.get('loading')
   }
 
-  onAddBookmark () {
-    AppActions.addSite(this.props.activeFrame, SiteTags.BOOKMARK)
-  }
-
-  onRemoveBookmark () {
-    AppActions.removeSite(this.props.activeFrame, SiteTags.BOOKMARK)
+  onToggleBookmark (isBookmarked) {
+    if (isBookmarked) {
+      AppActions.removeSite(this.props.activeFrame, SiteTags.BOOKMARK)
+    } else {
+      AppActions.addSite(this.props.activeFrame, SiteTags.BOOKMARK)
+    }
   }
 
   onReload () {
@@ -52,8 +58,8 @@ class NavigationBar extends ImmutableComponent {
   }
 
   componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, this.onAddBookmark.bind(this))
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, this.onRemoveBookmark.bind(this))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark(false))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
   }
 
   componentDidUpdate (prevProps) {
@@ -75,21 +81,21 @@ class NavigationBar extends ImmutableComponent {
         ref='navigator'
         data-frame-key={frameProps.get('key')}
         className={cx({
-          loading: this.loading,
-          bookmarked: this.bookmarked,
           titleMode: this.titleMode
         })}>
 
       { isSourceAboutUrl(frameProps.get('location')) ? null
         : <div className='startButtons'>
-        <Button iconClass='fa-repeat'
-          l10nId='reloadButton'
-          className='navbutton reload-button'
-          onClick={this.onReload.bind(this)} />
-        <Button iconClass='fa-times'
-          l10nId='stopButton'
-          className='navbutton stop-button'
-          onClick={this.onStop.bind(this)} />
+        { this.loading
+          ? <Button iconClass='fa-times'
+              l10nId='reloadButton'
+              className='navbutton stop-button'
+              onClick={this.onStop} />
+          : <Button iconClass='fa-repeat'
+              l10nId='stopButton'
+              className='navbutton reload-button'
+              onClick={this.onReload} />
+        }
       </div>
       }
       <UrlBar ref='urlBar'
@@ -105,14 +111,14 @@ class NavigationBar extends ImmutableComponent {
         />
       { isSourceAboutUrl(frameProps.get('location')) ? null
       : <div className='endButtons'>
-          <Button iconClass='fa-star-o'
-            l10nId='addBookmarkButton'
-            className='navbutton bookmark-button'
-            onClick={this.onAddBookmark.bind(this)} />
-          <Button iconClass='fa-star-o'
-            l10nId='removeBookmarkButton'
-            className='navbutton remove-bookmark-button'
-            onClick={this.onRemoveBookmark.bind(this)} />
+          <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
+            className={cx({
+              'navbutton': true,
+              'bookmark-button': true,
+              'remove-bookmark-button': this.bookmarked
+            })}
+            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'removeBookmarkButton'}
+            onClick={() => this.onToggleBookmark(this.bookmarked)} />
         </div>
       }
     </div>

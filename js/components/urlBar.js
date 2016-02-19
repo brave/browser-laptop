@@ -243,10 +243,10 @@ class UrlBar extends ImmutableComponent {
 
   render () {
     return <form
+      className='urlbarForm'
       action='#'
       id='urlbar'
       ref='urlbar'>
-        <div id='titleBarWrapper'>
         <span
           onDragStart={this.onDragStart.bind(this)}
           draggable
@@ -264,7 +264,6 @@ class UrlBar extends ImmutableComponent {
           <span><strong>{this.hostValue}</strong></span>
           <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
           <span>{this.titleValue}</span>
-        </div>
         </div>
       <input type='text'
         disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
