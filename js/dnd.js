@@ -6,7 +6,7 @@ const WindowActions = require('./actions/windowActions')
 const ReactDOM = require('react-dom')
 
 module.exports.onDragStart = (dragType, key, e) => {
-  e.dataTransfer.effectAllowed = 'move'
+  e.dataTransfer.effectAllowed = 'all'
   WindowActions.setIsBeingDragged(dragType, key, true)
 }
 
@@ -17,6 +17,7 @@ module.exports.onDragEnd = (dragType, key) => {
 
 module.exports.onDragOver = (dragType, sourceDragData, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {
   e.preventDefault()
+  e.dataTransfer.dropEffect = 'move'
 
   // Otherise, only accept it if we have some frameProps
   if (!sourceDragData) {
@@ -59,4 +60,10 @@ module.exports.closestFromXOffset = (refs, x) => {
 module.exports.isLeftSide = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
   return Math.abs(clientX - boundingRect.left) < Math.abs(clientX - boundingRect.right)
+}
+
+module.exports.setupDataTransferURL = (dataTransfer, location, title) => {
+  dataTransfer.setData('text/plain', location)
+  dataTransfer.setData('text/uri-list', location)
+  dataTransfer.setData('text/html', `<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body><A HREF="${location}">${title || location}</A></body></html>`)
 }

@@ -50,11 +50,16 @@ class Tabs extends ImmutableComponent {
     }
   }
 
+  onDragOver (e) {
+    e.dataTransfer.dropEffect = 'move'
+    e.preventDefault()
+  }
+
   render () {
     this.tabRefs = []
     return <div className='tabs'>
         <span className='tabContainer'
-          onDragOver={e => e.preventDefault()}
+          onDragOver={this.onDragOver.bind(this)}
           onDrop={this.onDrop.bind(this)}>
         {(() => {
           if (this.props.tabPageIndex > 0) {

@@ -23,6 +23,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onDragStart (e) {
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
     dnd.onDragStart(dragTypes.BOOKMARK, this.props.location, e)
   }
 
@@ -31,6 +32,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onDragOver (e) {
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
     dnd.onDragOver(dragTypes.BOOKMARK, this.props.sourceDragData, this.bookmarkNode.getBoundingClientRect(), this.props.location, this.draggingOverData, e)
   }
 
@@ -134,6 +136,7 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   onDragOver (e) {
     if (this.props.sourceDragData) {
+      e.dataTransfer.dropEffect = 'move'
       e.preventDefault()
       return
     }
@@ -164,7 +167,7 @@ class BookmarksToolbar extends ImmutableComponent {
             location={bookmark.get('location')}
             title={bookmark.get('title')}/>)
     }
-    { this.leftOver
+    { this.leftOver > 0
       ? <Button iconClass='fa-angle-double-right'
         onClick={this.onMoreBookmarksMenu.bind(this)}
         className='bookmarkButton'/> : null }
