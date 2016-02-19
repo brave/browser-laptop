@@ -335,7 +335,7 @@ Marks the URL bar as active or not
 
 
 
-### setActiveFrameShortcut(frameProps, activeShortcut)
+### setActiveFrameShortcut(frameProps, activeShortcut) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 

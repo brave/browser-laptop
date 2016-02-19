@@ -5,7 +5,7 @@ const { activeWebview, findBarInput, findBarMatches, urlInput } = require('../li
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
-describe.only('findbar', function () {
+describe('findbar', function () {
   Brave.beforeAll(this)
 
   before(function *() {
