@@ -335,11 +335,13 @@ Marks the URL bar as active or not
 
 
 
-### setActiveFrameShortcut(activeShortcut) 
+### setActiveFrameShortcut(frameProps, activeShortcut)
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 
 **Parameters**
+
+**frameProps**: `Object`, Properties of the frame in question
 
 **activeShortcut**: `string`, The text for the new shortcut. Usually this is null to clear info which was previously
 set from an IPC call.

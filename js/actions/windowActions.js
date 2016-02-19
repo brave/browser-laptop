@@ -501,12 +501,14 @@ const WindowActions = {
   /**
    * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
    *
+   * @param {Object} frameProps - Properties of the frame in question
    * @param {string} activeShortcut - The text for the new shortcut. Usually this is null to clear info which was previously
    * set from an IPC call.
    */
-  setActiveFrameShortcut: function (activeShortcut) {
+  setActiveFrameShortcut: function (frameProps, activeShortcut) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT,
+      frameProps,
       activeShortcut
     })
   },

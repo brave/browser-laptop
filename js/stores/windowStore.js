@@ -313,9 +313,7 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
-      windowState = windowState.mergeIn(activeFrameStatePath(), {
-        activeShortcut: action.activeShortcut
-      })
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'activeShortcut'], action.activeShortcut)
       break
     case WindowConstants.WINDOW_SET_SEARCH_DETAIL:
       windowState = windowState.merge({

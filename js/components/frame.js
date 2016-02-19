@@ -113,10 +113,9 @@ class Frame extends ImmutableComponent {
         }
         break
       case 'view-source':
-        const src = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        WindowActions.loadUrl(this.props.frame, src)
+        const location = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        WindowActions.newFrame({location}, true)
         // TODO: Make the URL bar show the view-source: prefix
-        WindowActions.setFrameTitle(this.props.frame, src)
         break
       case 'save':
         // TODO: Sometimes this tries to save in a non-existent directory
@@ -130,7 +129,7 @@ class Frame extends ImmutableComponent {
         break
     }
     if (activeShortcut) {
-      WindowActions.setActiveFrameShortcut(null)
+      WindowActions.setActiveFrameShortcut(this.props.frame, null)
     }
 
     if (this.props.frame.get('location') === 'about:preferences') {
