@@ -254,7 +254,7 @@ const init = (settingsState, args) => {
   ]
 
   if (!isDarwin) {
-    editSubmenu.push(CommonMenu.separatorMenuItem, CommonMenu.preferencesMenuItem)
+    editSubmenu.push(CommonMenu.preferencesMenuItem)
   }
 
   var template = [
