@@ -67,6 +67,17 @@ function tabsToolbarTemplateInit (settingsState, activeFrame) {
   ]
 }
 
+function moreBookmarksTemplateInit (activeFrame, bookmarks) {
+  return bookmarks.map(bookmark => {
+    return {
+      label: bookmark.get('title'),
+      click: () => {
+        WindowActions.loadUrl(activeFrame, bookmark.get('location'))
+      }
+    }
+  }).toJS()
+}
+
 function bookmarkTemplateInit (location, title, activeFrame) {
   return [openInNewTabMenuItem(location),
     openInNewPrivateTabMenuItem(location),
@@ -392,5 +403,10 @@ export function onBookmarkContextMenu (editLocation, editTitle, activeFrame, e) 
     e.stopPropagation()
   }
   const menu = Menu.buildFromTemplate(bookmarkTemplateInit(editLocation, editTitle, activeFrame))
+  menu.popup(remote.getCurrentWindow())
+}
+
+export function onMoreBookmarksMenu (activeFrame, bookmarks) {
+  const menu = Menu.buildFromTemplate(moreBookmarksTemplateInit(activeFrame, bookmarks))
   menu.popup(remote.getCurrentWindow())
 }

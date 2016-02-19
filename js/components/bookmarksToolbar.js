@@ -10,6 +10,7 @@ const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
+const Button = require('../components/button')
 const cx = require('../lib/classSet.js')
 const dnd = require('../dnd')
 
@@ -115,7 +116,8 @@ class BookmarksToolbar extends ImmutableComponent {
         AppActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
   updateBookmarkCount () {
-    this.maxItems = window.innerWidth / bookmarkMaxWidth
+    this.maxItems = window.innerWidth / bookmarkMaxWidth | 0
+    this.leftOver = this.props.bookmarks.size - this.maxItems
   }
   componentWillMount () {
     this.updateBookmarkCount()
@@ -142,6 +144,9 @@ class BookmarksToolbar extends ImmutableComponent {
       e.preventDefault()
     }
   }
+  onMoreBookmarksMenu () {
+    contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.props.bookmarks.skip(this.maxItems))
+  }
   render () {
     this.bookmarkRefs = []
     return <div className='bookmarksToolbar'
@@ -159,6 +164,10 @@ class BookmarksToolbar extends ImmutableComponent {
             location={bookmark.get('location')}
             title={bookmark.get('title')}/>)
     }
+    { this.leftOver
+      ? <Button iconClass='fa-angle-double-right'
+        onClick={this.onMoreBookmarksMenu.bind(this)}
+        className='bookmarkButton'/> : null }
     </div>
   }
 }
