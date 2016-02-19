@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.15](https://github.com/brave/browser-laptop/releases/v0.7.15dev)
+- Added bookmarks toolbar.
+- Added bookmarks manager (Very basic but more features coming soon).
+- File picker crash fix.
+- Optimizations when opening a new tab.
+- Add certificate error pages and improve site security indicators.
+- Various context menu, shortcut, and drag and drop improvements.
+- Various bug fixes and improvements.
 
 ## [0.7.14](https://github.com/brave/browser-laptop/releases/v0.7.14dev)
 - Security (Severity: High): Added process sandboxing for content processes ([c794907](https://github.com/brave/electron/commit/c794907d043ca5c498d1f07f5fdf6e866606ebaf)).
