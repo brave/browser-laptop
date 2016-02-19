@@ -195,67 +195,75 @@ const init = (settingsState, args) => {
     helpMenu.push(aboutBraveMenuItem)
   }
 
+  const editSubmenu = [{
+    label: 'Undo',
+    accelerator: 'CmdOrCtrl+Z',
+    role: 'undo'
+  }, {
+    label: 'Redo',
+    accelerator: 'Shift+CmdOrCtrl+Z',
+    role: 'redo'
+  },
+    CommonMenu.separatorMenuItem,
+    {
+      label: 'Cut',
+      accelerator: 'CmdOrCtrl+X',
+      role: 'cut'
+    }, {
+      label: 'Copy',
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    }, {
+      label: 'Paste',
+      accelerator: 'CmdOrCtrl+V',
+      role: 'paste'
+    }, {
+      label: 'Paste without formatting',
+      accelerator: 'Shift+CmdOrCtrl+V',
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.pasteAndMatchStyle()
+      }
+    },
+    CommonMenu.separatorMenuItem,
+    {
+      label: 'Delete',
+      accelerator: 'Delete',
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.delete()
+      }
+    }, {
+      label: 'Select All',
+      accelerator: 'CmdOrCtrl+A',
+      role: 'selectall'
+    },
+    CommonMenu.separatorMenuItem,
+    CommonMenu.findOnPageMenuItem,
+    {
+      // TODO: hook up find next/prev shortcut. low-priority since this is
+      // probably not used much.
+      label: 'Find Next',
+      enabled: false,
+      accelerator: 'CmdOrCtrl+G'
+    }, {
+      label: 'Find Previous',
+      enabled: false,
+      accelerator: 'Shift+CmdOrCtrl+G'
+    },
+    CommonMenu.separatorMenuItem
+    // OSX inserts "start dictation" and "emoji and symbols" automatically
+  ]
+
+  if (!isDarwin) {
+    editSubmenu.push(CommonMenu.separatorMenuItem, CommonMenu.preferencesMenuItem)
+  }
+
   var template = [
     {
       label: 'File',
       submenu: fileMenu
     }, {
       label: 'Edit',
-      submenu: [
-        {
-          label: 'Undo',
-          accelerator: 'CmdOrCtrl+Z',
-          role: 'undo'
-        }, {
-          label: 'Redo',
-          accelerator: 'Shift+CmdOrCtrl+Z',
-          role: 'redo'
-        },
-        CommonMenu.separatorMenuItem,
-        {
-          label: 'Cut',
-          accelerator: 'CmdOrCtrl+X',
-          role: 'cut'
-        }, {
-          label: 'Copy',
-          accelerator: 'CmdOrCtrl+C',
-          role: 'copy'
-        }, {
-          label: 'Paste',
-          accelerator: 'CmdOrCtrl+V',
-          role: 'paste'
-        }, {
-          label: 'Paste without formatting',
-          accelerator: 'Shift+CmdOrCtrl+V',
-          click: function (item, focusedWindow) {
-            focusedWindow.webContents.pasteAndMatchStyle()
-          }
-        },
-        CommonMenu.separatorMenuItem,
-        {
-          label: 'Delete',
-          accelerator: 'Delete'
-        }, {
-          label: 'Select All',
-          accelerator: 'CmdOrCtrl+A',
-          role: 'selectall'
-        },
-        CommonMenu.separatorMenuItem,
-        CommonMenu.findOnPageMenuItem,
-        {
-          // TODO: hook up find next/prev shortcut. low-priority since this is
-          // probably not used much.
-          label: 'Find Next',
-          enabled: false,
-          accelerator: 'CmdOrCtrl+G'
-        }, {
-          label: 'Find Previous',
-          enabled: false,
-          accelerator: 'Shift+CmdOrCtrl+G'
-        },
-        CommonMenu.separatorMenuItem
-        // OSX inserts "start dictation" and "emoji and symbols" automatically
-      ]
+      submenu: editSubmenu
     }, {
       label: 'View',
       submenu: [
