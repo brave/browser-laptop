@@ -29,6 +29,9 @@ describe.only('findbar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .keys('test')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then(function (value) { return value === 'test' })
+      })
       .waitForVisible(findBarMatches)
     const match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '2 matches')
