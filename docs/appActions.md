@@ -29,7 +29,7 @@ Dispatches an event to the main process to update the browser
 
 
 
-### addSite(frameProps, tag) 
+### addSite(frameProps, tag, originalLocation) 
 
 Adds a site to the site list
 
@@ -38,6 +38,8 @@ Adds a site to the site list
 **frameProps**: `Object`, Properties of the frame in question
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
+
+**originalLocation**: `string`, If specified, the original location to edit / overwrite
 
 
 
