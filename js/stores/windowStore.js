@@ -166,6 +166,14 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         findbarShown: action.shown
       })
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        findbarSelected: action.shown
+      })
+      break
+    case WindowConstants.WINDOW_SET_FINDBAR_SELECTED:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        findbarSelected: action.selected
+      })
       break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
@@ -315,6 +323,7 @@ const doAction = (action) => {
       })
       break
     case WindowConstants.WINDOW_SET_FIND_DETAIL:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findbarSelected'], false)
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'findDetail'], action.findDetail)
       // Since the input value is bound, we need to notify the control sync.
       windowStore.emitChanges()
@@ -458,6 +467,7 @@ frameShortcuts.forEach(shortcut => {
 // Allows the parent process to send window level actions
 if (process.env.NODE_ENV === 'test') {
   ipc.on('handle-action', (e, action) => {
+    action.frameProps = action.frameProps && Immutable.fromJS(action.frameProps)
     doAction(action)
   })
 }

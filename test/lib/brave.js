@@ -25,6 +25,7 @@ var promiseMapSeries = function (array, iterator) {
 
 var exports = {
   keys: {
+    COMMAND: '\ue03d',
     CONTROL: '\ue009',
     ESCAPE: '\ue00c',
     RETURN: '\ue006',
@@ -106,6 +107,17 @@ var exports = {
           isPinned: false
         }), url)
       }, url).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('showFindbar', function () {
+      return this.execute(function () {
+        var Immutable = require('immutable')
+        var windowActions = require('../js/actions/windowActions')
+        windowActions.dispatchViaIPC()
+        windowActions.setFindbarShown(Immutable.fromJS({
+          key: 1
+        }), true)
+      })
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {

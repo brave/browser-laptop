@@ -39,6 +39,7 @@ const windowConstants = {
   WINDOW_SET_FAVICON: _,
   WINDOW_SET_MOUSE_IN_TITLEBAR: _,
   WINDOW_SET_FINDBAR_SHOWN: _, // whether the findbar is shown
+  WINDOW_SET_FINDBAR_SELECTED: _, // whether the findbar is active
   WINDOW_SET_PINNED: _, // Whehter the current tab is pinned or not
   WINDOW_SET_SITE_INFO_VISIBLE: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_RELEASE_NOTES_VISIBLE: _, // Whether or not to show release notes
