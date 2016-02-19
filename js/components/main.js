@@ -282,7 +282,7 @@ class Main extends ImmutableComponent {
           tabPages: true,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, settingsState)}>
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, settingsState, activeFrame)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
                 tabsPerTabPage={tabsPerPage}
