@@ -171,8 +171,8 @@ describe('urlbar', function () {
     it('Uses the default tab color when one is not specified', function *() {
       const page1Url = Brave.server.url('page1.html')
       yield this.app.client.loadUrl(page1Url)
-      let backgroundColor = yield this.app.client.getCssProperty(activeTab, 'background-color')
-      assert.equal(backgroundColor.parsed.hex, '#f3f3f3')
+      let background = yield this.app.client.getCssProperty(activeTab, 'background')
+      assert.equal(background.value, 'rgba(0,0,0,0)linear-gradient(rgb(255,255,255),rgb(243,243,243))repeatscroll0%0%/autopadding-boxborder-box')
     })
 
     // We need a newer electron build first

@@ -253,7 +253,9 @@ var exports = {
 
     this.app.client.addCommand('waitForElementFocus', function (selector) {
       let activeElement
-      return this.element(selector).then(function (el) { activeElement = el })
+      return this.waitForVisible(selector)
+        .element(selector)
+          .then(function (el) { activeElement = el })
         .waitUntil(function () {
           return this.elementActive()
             .then(function (el) {
