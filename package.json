@@ -23,7 +23,7 @@
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/ABPFilterParserData.dat",
     "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/TrackingProtection.dat",
-    "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse-targets.json  ~/Library/Application\\ Support/Brave/rulesets.sqlite*",
+    "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse.json",
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "webpack": "webpack",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
@@ -66,7 +66,6 @@
     "immutable": "^3.7.5",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
-    "sqlite3": "^3.1.0",
     "tracking-protection": "1.0.x",
     "url-loader": "^0.5.7"
   },

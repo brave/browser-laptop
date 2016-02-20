@@ -41,5 +41,5 @@ app/gen
 *.pfx
 
 # HTTPS Everywhere files
-httpse-targets.json
-rulesets.sqlite
+rulesets.json
+httpse.json
