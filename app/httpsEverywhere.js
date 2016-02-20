@@ -3,9 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 'use strict'
 
-const fs = require('fs')
-const sqlite3 = require('sqlite3')
-const path = require('path')
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
@@ -13,32 +10,21 @@ const electron = require('electron')
 const session = electron.session
 
 let httpsEverywhereInitialized = false
-var dbLoaded = false
+// Map of ruleset ID to ruleset content
 var db = null
+// Map of hostname pattern to ruleset ID
 var targets = null
 // Counter for detecting infinite redirect loops
 var redirectCounter = {}
 // Blacklist of canonicalized hosts (host+pathname) that lead to redirect loops
 var redirectBlacklist = []
-// Whether a download of new rulesets is in progress
-var downloadInProgress = false
 
 module.exports.resourceName = 'httpsEverywhere'
 
-function loadRulesets (dirname) {
-  downloadInProgress = false
-  const sqlFile = path.join(dirname, 'rulesets.sqlite')
-  const targetsFile = path.join(dirname, 'httpse-targets.json')
-  db = new sqlite3.Database(sqlFile, sqlite3.OPEN_READONLY, function (dbErr) {
-    if (dbErr) {
-      console.log('error loading httpse rulesets.sqlite')
-    } else {
-      dbLoaded = true
-    }
-  })
-
-  // Load the preloaded mapping of hostname to ruleset IDs
-  targets = JSON.parse(fs.readFileSync(targetsFile, 'utf8'))
+function loadRulesets (data) {
+  var parsedData = JSON.parse(data)
+  targets = parsedData.targets
+  db = parsedData.rulesetStrings
 }
 
 /**
@@ -54,29 +40,16 @@ function getRewrittenUrl (url, cb) {
     return target ? prev.concat(target) : prev
   }, [])
 
-  if (rulesetIds.length === 0) {
-    // No applicable rulesets.
-    cb()
-  } else {
-    // Load the applicable rulesets from the database.
-    loadRulesetsById(rulesetIds, (rulesets) => {
-      try {
-        // Apply the loaded rulesets
-        applyRulesets(url, cb, rulesets)
-      } catch (err) {
-        console.log('error applying rulesets', err, url)
-        cb()
-      }
-    }, (err) => {
-      console.log('error loading rulesets', err, url)
-      cb()
-      if (err && err.message && err.message.includes('SQLITE_CORRUPT') && !downloadInProgress) {
-        console.log('Redownloading corrupted https everywhere files')
-        downloadInProgress = true
-        DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets, true)
-      }
-    })
+  for (var i = 0; i < rulesetIds.length; ++i) {
+    // Try applying each ruleset
+    let result = applyRuleset(url, db[rulesetIds[i]])
+    if (result) {
+      // Redirect to the first rewritten URL
+      cb(result)
+      return
+    }
   }
+  cb()
 }
 
 /**
@@ -112,76 +85,39 @@ function getHostnamePatterns (url) {
 }
 
 /**
- * Loads rulesets from the library by ID
- * @param {Array.<number>} rulesetId the ruleset IDs
- * @param {function(Array.<object>)} cb callback to call with ruleset content
- * @param {function(Error)} errback error callback
- */
-function loadRulesetsById (rulesetIds, cb, errback) {
-  var ids = JSON.stringify(rulesetIds).replace('[', '(').replace(']', ')')
-  var queryForRuleset = 'select contents from rulesets where id in ' + ids
-  if (!dbLoaded || db === null) {
-    // This request occurred before the db finished loading
-    console.log('got request that occurred before HTTPS Everywhere loaded')
-    errback()
-    return
-  }
-  db.all(queryForRuleset, function (err, rows) {
-    var applicableRules
-    try {
-      applicableRules = rows ? rows.map(item => { return JSON.parse(item.contents) }) : []
-    } catch (e) {
-      err = e
-    }
-    if (!err) {
-      cb(applicableRules)
-    } else {
-      errback(err)
-    }
-  })
-}
-
-/**
- * Applies potentially-applicable rewrite rulesets to a URL
+ * Applies a applicable rewrite ruleset to a URL
  * @param {string} url original URL
- * @param {function(string=)} cb the onBeforeRequest listener callback to call
- *   with the rewritten URL (undefined if no rewrite occurred)
- * @param {Array.<object>} applicableRules applicable rulesets
- * @return {string}
+ * @param {Object} applicableRule applicable ruleset
+ * @return {string?} the rewritten URL, or null if no rewrite applied
  */
-function applyRulesets (url, cb, applicableRules) {
-  var i, j, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
-  for (j = 0; j < applicableRules.length; ++j) {
-    ruleset = applicableRules[j].ruleset
-    // If the rule is default_off or has a specified platform, ignore it.
-    if (ruleset.$.default_off || ruleset.$.platform) {
-      cb()
-      return
-    }
-    exclusion = ruleset.exclusion
-    rule = ruleset.rule
-    // If covered by an exclusion, abort.
-    if (exclusion) {
-      for (i = 0; i < exclusion.length; ++i) {
-        exclusionPattern = new RegExp(exclusion[i].$.pattern)
-        if (exclusionPattern.test(url)) {
-          cb()
-          return
-        }
-      }
-    }
-    // Find the first rule that triggers a substitution
-    for (i = 0; i < rule.length; ++i) {
-      fromPattern = new RegExp(rule[i].$.from)
-      newUrl = url.replace(fromPattern, rule[i].$.to)
-      if (newUrl !== url) {
-        cb(newUrl)
-        return
+function applyRuleset (url, applicableRule) {
+  var i, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
+  ruleset = applicableRule.ruleset
+  // If the rule is default_off or has a specified platform, ignore it.
+  if (ruleset.$.default_off || ruleset.$.platform) {
+    return null
+  }
+  exclusion = ruleset.exclusion
+  rule = ruleset.rule
+  // If covered by an exclusion, callback the original URL without trying any
+  // more rulesets.
+  if (exclusion) {
+    for (i = 0; i < exclusion.length; ++i) {
+      exclusionPattern = new RegExp(exclusion[i].$.pattern)
+      if (exclusionPattern.test(url)) {
+        return url
       }
     }
   }
-  // No matching rules :(
-  cb()
+  // Find the first rule that triggers a substitution
+  for (i = 0; i < rule.length; ++i) {
+    fromPattern = new RegExp(rule[i].$.from)
+    newUrl = url.replace(fromPattern, rule[i].$.to)
+    if (newUrl !== url) {
+      return newUrl
+    }
+  }
+  return null
 }
 
 /**
@@ -273,7 +209,6 @@ function registerForSession (session) {
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
-  downloadInProgress = true
   DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
   registerForSession(session.fromPartition(''))
   registerForSession(session.fromPartition('private-1'))
