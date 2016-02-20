@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const {urlInput, urlBarSuggestions} = require('../lib/selectors')
 
-describe.only('urlbarSuggestions', function () {
+describe('urlbarSuggestions', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
