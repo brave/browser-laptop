@@ -253,14 +253,13 @@ var exports = {
 
     this.app.client.addCommand('waitForElementFocus', function (selector) {
       let activeElement
-      return this.waitUntil(function () {
-        return this.elementActive()
-          .then(function (el) {
-            activeElement = el
-            return this.element(selector)
-          })
-          .then(queryElement => queryElement.value.ELEMENT === activeElement.value.ELEMENT)
-      })
+      return this.element(selector).then(function (el) { activeElement = el })
+        .waitUntil(function () {
+          return this.elementActive()
+            .then(function (el) {
+              return el.value.ELEMENT === activeElement.value.ELEMENT
+            })
+        })
     })
   },
 
