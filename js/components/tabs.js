@@ -47,6 +47,9 @@ class Tabs extends ImmutableComponent {
       const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), e.clientX)
       const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
       WindowActions.moveTab(this.props.sourceDragData, droppedOnFrameProps, isLeftSide)
+      if (this.props.sourceDragData.get('isPinned')) {
+        WindowActions.setPinned(this.props.sourceDragData, false)
+      }
     }
   }
 
