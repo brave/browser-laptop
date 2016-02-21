@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 
 const messages = require('../../js/constants/messages')
 const siteTags = require('../../js/constants/siteTags')
-const {urlInput} = require('../lib/selectors')
+const {urlInput, tabsTabs, pinnedTabsTabs} = require('../lib/selectors')
 
 function * loadUrl (client, url) {
   yield client.ipcSend('shortcut-focus-url')
@@ -16,7 +16,7 @@ function * loadUrl (client, url) {
     .keys('\uE007')
 }
 
-describe('pinnedTabs', function () {
+describe.only('pinnedTabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
@@ -33,6 +33,8 @@ describe('pinnedTabs', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(2, true)
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        .elements(tabsTabs).then((res) => res.value.length === 1)
     })
     it('creates when signaled', function *() {
       yield this.app.client
@@ -42,6 +44,8 @@ describe('pinnedTabs', function () {
       yield this.app.client
         .setPinned(2, false)
         .waitForExist('.tab:not(.isPinned)[data-frame-key="2"]')
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 0)
+        .elements(tabsTabs).then((res) => res.value.length === 2)
     })
   })
 
@@ -59,6 +63,8 @@ describe('pinnedTabs', function () {
       yield this.app.client
         .waitForExist('.tab.isPinned[data-frame-key="2"]')
         .waitForExist('.tab.isPinned[data-frame-key="3"]')
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 2)
+        .elements(tabsTabs).then((res) => res.value.length === 1)
     })
     it('disappears when signaled externally', function *() {
       const page1Url = Brave.server.url('page1.html')
@@ -67,6 +73,8 @@ describe('pinnedTabs', function () {
         // true for reverse
         .waitForExist('.tab.isPinned[data-frame-key="2"]', 3000, true)
         .waitForExist('.tab.isPinned[data-frame-key="3"]')
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        .elements(tabsTabs).then((res) => res.value.length === 1)
     })
   })
 
@@ -86,11 +94,15 @@ describe('pinnedTabs', function () {
       yield this.app.client.waitUntil(function () {
         return this.getAttribute('webview[data-frame-key="2"]', 'src').then(src => src === page2Url)
       })
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        .elements(tabsTabs).then((res) => res.value.length === 1)
     })
     it('navigating to a different origin opens a new tab', function *() {
       const page2Url = Brave.server.url('page2.html').replace('localhost', '127.0.0.1')
       yield loadUrl(this.app.client, page2Url)
       this.app.client.waitForExist('webview[data-frame-key="3"]')
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        .elements(tabsTabs).then((res) => res.value.length === 2)
     })
   })
 
@@ -107,6 +119,8 @@ describe('pinnedTabs', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
         .waitForExist('.tab[data-frame-key="3"]')
         .setPinned(3, true)
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 2)
+        .elements(tabsTabs).then((res) => res.value.length === 2)
     })
     it('close attempt retains pinned tab and selects next active frame', function *() {
       yield this.app.client
@@ -115,6 +129,8 @@ describe('pinnedTabs', function () {
         .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitForExist('.tab.active[data-frame-key="2"]')
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 2)
+        .elements(tabsTabs).then((res) => res.value.length === 0)
     })
   })
 })
