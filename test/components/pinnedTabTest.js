@@ -61,12 +61,12 @@ describe('pinnedTabs', function () {
         .waitForExist('.tab.isPinned[data-frame-key="3"]')
     })
     it('disappears when signaled externally', function *() {
-      const page2Url = Brave.server.url('page2.html')
+      const page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .removeSite({ location: page2Url }, siteTags.PINNED)
+        .removeSite({ location: page1Url }, siteTags.PINNED)
         // true for reverse
-        .waitForExist('.tab.isPinned[data-frame-key="3"]', 3000, true)
-        .waitForExist('.tab.isPinned[data-frame-key="2"]')
+        .waitForExist('.tab.isPinned[data-frame-key="2"]', 3000, true)
+        .waitForExist('.tab.isPinned[data-frame-key="3"]')
     })
   })
 
