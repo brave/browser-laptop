@@ -93,4 +93,28 @@ describe.only('pinnedTabs', function () {
       this.app.client.waitForExist('webview[data-frame-key="3"]')
     })
   })
+
+  describe('Closing pinned tabs', function () {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+      const page1Url = Brave.server.url('page1.html')
+      const page2Url = Brave.server.url('page2.html')
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitForExist('.tab[data-frame-key="2"]')
+        .setPinned(2, true)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
+        .waitForExist('.tab[data-frame-key="3"]')
+        .setPinned(3, true)
+    })
+    it('close attempt retains pinned tab and selects next active frame', function *() {
+      yield this.app.client
+        .waitForExist('.tab.active[data-frame-key="3"]')
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+        .waitForExist('.tab.active[data-frame-key="1"]')
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+        .waitForExist('.tab.active[data-frame-key="2"]')
+    })
+  })
 })
