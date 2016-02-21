@@ -9,22 +9,23 @@ describe('findbar', function () {
   Brave.beforeAll(this)
 
   before(function *() {
-    this.url = Brave.server.url('find_in_page.html')
     yield setup(this.app.client)
+    const url = Brave.server.url('find_in_page.html')
     yield this.app.client
-      .waitUntilWindowLoaded()
-      .waitForVisible(activeWebview)
-      .loadUrl(this.url)
+      .loadUrl(url)
+      .waitUntil(function () {
+        return this.getAttribute('webview[data-frame-key="1"]', 'src').then(src => src === url)
+      })
+      .waitForElementFocus('webview[data-frame-key="1"]')
   })
 
   it('should focus findbar on show', function *() {
     yield this.app.client
-      .loadUrl(this.url)
       .showFindbar()
       .waitForElementFocus(findBarInput)
   })
 
-  it.skip('should ignore case by default', function *() {
+  it('should ignore case by default', function *() {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)

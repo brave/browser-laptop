@@ -16,7 +16,7 @@ function * loadUrl (client, url) {
     .keys('\uE007')
 }
 
-describe.only('pinnedTabs', function () {
+describe('pinnedTabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
