@@ -120,15 +120,15 @@ var exports = {
       })
     })
 
-    this.app.client.addCommand('pinTab', function (key) {
-      return this.execute(function (key) {
+    this.app.client.addCommand('setPinned', function (key, isPinned) {
+      return this.execute(function (key, isPinned) {
         var Immutable = require('immutable')
         var windowActions = require('../js/actions/windowActions')
         windowActions.dispatchViaIPC()
         windowActions.setPinned(Immutable.fromJS({
           key
-        }), true)
-      }, key)
+        }), isPinned)
+      }, key, isPinned)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
@@ -146,15 +146,29 @@ var exports = {
     /**
      * Adds a site to the sites list, such as a bookmarks.
      *
-     * @param {string} siteTag - A site tag from js/constants/siteTags.js
      * @param {object} frameProps - Properties for the frame to add
      *   - location
      *   - title
      *   - isPrivate
+     * @param {string} siteTag - A site tag from js/constants/siteTags.js
      */
     this.app.client.addCommand('addSite', function (frameProps, siteTag) {
       return this.execute(function (frameProps, siteTag) {
         return require('../js/actions/appActions').addSite(frameProps, siteTag)
+      }, frameProps, siteTag).then((response) => response.value)
+    })
+
+    /**
+     * Removes a site from the sites list, or removes a bookmark.
+     *
+     * @param {string} siteTag - A site tag from js/constants/siteTags.js
+     * @param {object} frameProps - Properties for the frame to add
+     *   - location
+     *   - title
+     */
+    this.app.client.addCommand('removeSite', function (frameProps, siteTag) {
+      return this.execute(function (frameProps, siteTag) {
+        return require('../js/actions/appActions').removeSite(frameProps, siteTag)
       }, frameProps, siteTag).then((response) => response.value)
     })
 

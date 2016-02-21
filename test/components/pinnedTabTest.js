@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 
 const messages = require('../../js/constants/messages')
+const siteTags = require('../../js/constants/siteTags')
 const {urlInput} = require('../lib/selectors')
 
 describe('pinnedTabs', function () {
@@ -13,54 +14,49 @@ describe('pinnedTabs', function () {
       .waitForVisible(urlInput)
   }
 
-  describe('new pinned tab', function () {
+  describe('Pins an existing frame', function () {
     Brave.beforeAll(this)
     before(function *() {
-      this.page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
-    })
-    it.skip('creates when signaled', function *() {
+      const page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', {isPinned: true})
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitForExist('.tab[data-frame-key="2"]')
+        .setPinned(2, true)
+    })
+    it('creates when signaled', function *() {
+      yield this.app.client
         .waitForExist('.tab.isPinned[data-frame-key="2"]')
     })
-  })
-
-  describe('close pinned tab', function () {
-    Brave.beforeAll(this)
-    before(function *() {
-      this.page1Url = Brave.server.url('page1.html')
-      yield setup(this.app.client)
-    })
-    it.skip('should focus on next tab', function *() {
+    it('unpins and creates a non-pinned tab', function *() {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', {isPinned: true})
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.google.com', {isPinned: true})
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.facebook.com', {isPinned: true})
-        .rightClick('.tab.isPinned[data-frame-key="2"]').then(function () {
-          // need to implement close button on pinned tabs
-          this.click('#close')
-        })
-        .waitForElementFocus('.tab.isPinned[data-frame-key="3"]')
+        .setPinned(2, false)
+        .waitForExist('.tab:not(.isPinned)[data-frame-key="2"]')
     })
   })
 
-  describe('close last pinned tab', function () {
+  describe('Gets pins from external windows', function () {
     Brave.beforeAll(this)
     before(function *() {
-      this.page1Url = Brave.server.url('page1.html')
       yield setup(this.app.client)
-    })
-
-    it.skip('should close the window if there are no other tabs', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      const page2Url = Brave.server.url('page2.html')
       yield this.app.client
-        .rightClick('.tab[data-frame-key="1"]').then(function () {
-          this.click('#pinTab')
-        })
-        .rightClick('.tab.isPinned[data-frame-key="1"]').then(function () {
-          this.click('#close')
-        })
-        .isExisting('#window').should.eventually.equal(false)
+        .addSite({ location: page1Url }, siteTags.PINNED)
+        .addSite({ location: page2Url }, siteTags.PINNED)
+    })
+    it('creates when signaled', function *() {
+      yield this.app.client
+        .waitForExist('.tab.isPinned[data-frame-key="2"]')
+        .waitForExist('.tab.isPinned[data-frame-key="3"]')
+    })
+    it('disappears when signaled externally', function *() {
+      const page2Url = Brave.server.url('page2.html')
+      yield this.app.client
+        .removeSite({ location: page2Url }, siteTags.PINNED)
+        // true for reverse
+        .waitForExist('.tab.isPinned[data-frame-key="3"]', 3000, true)
+        .waitForExist('.tab.isPinned[data-frame-key="2"]')
     })
   })
 })
