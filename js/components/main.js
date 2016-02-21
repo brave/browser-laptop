@@ -230,6 +230,8 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('isPinned'))
     const tabsPerPage = getSetting(settingsState, settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+    const sourceDragTabData = this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB &&
+      this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
         <div className='navigatorWrapper'>
@@ -290,13 +292,14 @@ class Main extends ImmutableComponent {
           onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, settingsState, activeFrame)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
+                sourceDragData={sourceDragTabData}
                 tabsPerTabPage={tabsPerPage}
                 tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
               /> : null }
         </div>
         <TabsToolbar
           paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
-          sourceDragData={this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])}
+          sourceDragData={sourceDragTabData}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settingsState, settings.SHOW_TAB_PREVIEWS)}
           settings={settingsState}
