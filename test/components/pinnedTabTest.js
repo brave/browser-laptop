@@ -16,7 +16,7 @@ function * loadUrl (client, url) {
     .keys('\uE007')
 }
 
-describe.only('pinnedTabs', function () {
+describe('pinnedTabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
@@ -47,6 +47,15 @@ describe.only('pinnedTabs', function () {
         .elements(pinnedTabsTabs).then((res) => res.value.length === 0)
         .elements(tabsTabs).then((res) => res.value.length === 2)
     })
+    it('pinning the same site again combines it', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitForExist('.tab[data-frame-key="3"]')
+        .setPinned(3, true)
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        .elements(tabsTabs).then((res) => res.value.length === 2)
+    })
   })
 
   describe('Gets pins from external windows', function () {
@@ -70,9 +79,13 @@ describe.only('pinnedTabs', function () {
       const page1Url = Brave.server.url('page1.html')
       yield this.app.client
         .removeSite({ location: page1Url }, siteTags.PINNED)
-        // true for reverse
-        .waitForExist('.tab.isPinned[data-frame-key="2"]', 3000, true)
-        .waitForExist('.tab.isPinned[data-frame-key="3"]')
+        .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        .elements(tabsTabs).then((res) => res.value.length === 1)
+    })
+    it('Adding a site that already exists does not add another pinned tab', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client
+        .addSite({ location: page1Url }, siteTags.PINNED)
         .elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         .elements(tabsTabs).then((res) => res.value.length === 1)
     })
