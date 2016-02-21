@@ -46,12 +46,12 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
  */
 const updateTabPageIndex = (frameProps) => {
   // No need to update tab page index if we are given a pinned frame
-  if (frameProps.get('isPinned')) {
+  if (frameProps.get('pinnedLocation')) {
     return
   }
 
   const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter(frame => !frame.get('isPinned')), frameProps, windowStore.cachedSettings[settings.TABS_PER_TAB_PAGE])
+      .filter(frame => !frame.get('pinnedLocation')), frameProps, windowStore.cachedSettings[settings.TABS_PER_TAB_PAGE])
   if (index === -1) {
     return
   }
@@ -201,7 +201,12 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_NEW_FRAME:
       const nextKey = incrementNextKey()
       let nextPartitionNumber = 0
-      if (action.frameOpts.isPartitioned) {
+      if (action.frameOpts.partitionNumber) {
+        nextPartitionNumber = action.frameOpts.partitionNumber
+        if (currentPartitionNumber < nextPartitionNumber) {
+          currentPartitionNumber = nextPartitionNumber
+        }
+      } else if (action.frameOpts.isPartitioned) {
         nextPartitionNumber = incrementPartitionNumber()
       }
       windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
@@ -338,23 +343,35 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_PINNED:
+      // Support lazy obtaining the location via just the key
+      let location = action.frameProps.get('location')
+      if (!location) {
+        const foundFrame = FrameStateUtil.getFrameByKey(windowState, action.frameProps.get('key'))
+        if (foundFrame) {
+          location = foundFrame.get('location')
+        }
+      }
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
-      const alreadyPinnedFrameProps = windowState.get('frames').find(frame => frame.get('isPinned') && frame.get('location') === action.frameProps.get('location'))
+      const alreadyPinnedFrameProps = windowState.get('frames').find(frame => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
         doAction(action)
         action.actionType = WindowConstants.WINDOW_SET_ACTIVE_FRAME
         doAction(action)
       } else {
-        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'isPinned'], action.isPinned)
+        windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
+          action.isPinned ? location : undefined)
       }
       // Remove preview frame key when unpinning / pinning
       // becuase it can get messed up.
       windowState = windowState.merge({
         previewFrameKey: null
       })
-      break
+      // Pin changes need to happen right away or else a race condition could happen for app state
+      // change detection where it adds a second frame
+      windowStore.emitChanges()
+      return
     case WindowConstants.WINDOW_SET_AUDIO_MUTED:
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioMuted'], action.muted)
       break

@@ -20,7 +20,7 @@ class Tab extends ImmutableComponent {
   }
 
   get isPinned () {
-    return this.props.frameProps.get('isPinned')
+    return !!this.props.frameProps.get('pinnedLocation')
   }
 
   get draggingOverData () {

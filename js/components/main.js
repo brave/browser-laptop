@@ -227,7 +227,7 @@ class Main extends ImmutableComponent {
 
     this.frames = {}
     const settingsState = this.props.appState.get('settings') || new Immutable.Map()
-    const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('isPinned'))
+    const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settingsState, settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
     const sourceDragTabData = this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB &&

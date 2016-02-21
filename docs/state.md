@@ -14,6 +14,7 @@ AppStore
     title: string,
     tags: [string], // empty, 'bookmark', 'pinned', or 'reader'
     lastAccessed: datetime,
+    partitionNumber: number // Optionally specifies a specific session
   }],
   visits: [{
     location: string,
@@ -84,10 +85,10 @@ WindowStore
     audioPlaybackActive: boolean, // frame is playing audio
     canGoBack: boolean,
     canGoForward: boolean,
-    isPinned: boolean, // true when the tab is pinned
     icon: string, // favicon url
     location: string, // page url
     src: string, // what the iframe src should be
+    pinnedLocation: string, // Indicates if a frame is pinned and its pin location
     title: string, // page title
     findbarShown: boolean, // whether the findbar is shown
     findbarSelected: boolean,  // findbar text input is selected

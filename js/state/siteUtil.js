@@ -11,10 +11,11 @@ const siteTags = require('../constants/siteTags')
  *
  * @param sites The application state's Immutable sites list
  * @param location The frameProps of the page in question
+ * @param partitionNumber The partition number of the session or undefined
  * @return index of the location or -1 if not found.
  */
-module.exports.getSiteUrlIndex = function (sites, location) {
-  return sites.findIndex(site => site.get('location') === location)
+module.exports.getSiteUrlIndex = function (sites, location, partitionNumber) {
+  return sites.findIndex(site => site.get('location') === location && (site.get('partitionNumber') || 0) === (partitionNumber || 0))
 }
 
 /**
@@ -23,10 +24,11 @@ module.exports.getSiteUrlIndex = function (sites, location) {
  * @param sites The application state's Immutable sites list
  * @param location The location of the page in question
  * @param tag The tag of the site to check
+ * @param partitionNumber The partition number of the session or undefined
  * @return true if the location is already bookmarked
  */
-module.exports.isSiteInList = function (sites, location, tag) {
-  const index = module.exports.getSiteUrlIndex(sites, location)
+module.exports.isSiteInList = function (sites, location, partitionNumber, tag) {
+  const index = module.exports.getSiteUrlIndex(sites, location, partitionNumber)
   if (index === -1) {
     return false
   }
@@ -45,7 +47,7 @@ module.exports.isSiteInList = function (sites, location, tag) {
  * @return The new sites Immutable object
  */
 module.exports.addSite = function (sites, frameProps, tag, originalLocation) {
-  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'))
+  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'), frameProps.get('partitionNumber'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -57,12 +59,15 @@ module.exports.addSite = function (sites, frameProps, tag, originalLocation) {
     }
   }
 
-  const site = Immutable.fromJS({
+  let site = Immutable.fromJS({
     lastAccessed: new Date(),
     tags,
     location: frameProps.get('location'),
     title: frameProps.get('title')
   })
+  if (frameProps.get('partitionNumber')) {
+    site = site.set('partitionNumber', frameProps.get('partitionNumber'))
+  }
 
   if (index === -1) {
     return sites.push(site)
@@ -80,8 +85,8 @@ module.exports.addSite = function (sites, frameProps, tag, originalLocation) {
  */
 module.exports.removeSite = function (sites, frameProps, tag) {
   let index = -1
-  if (frameProps.get('isPinned') && tag === siteTags.PINNED) {
-    index = module.exports.getSiteUrlIndex(sites, frameProps.get('src'))
+  if (frameProps.get('pinnedLocation') && tag === siteTags.PINNED) {
+    index = module.exports.getSiteUrlIndex(sites, frameProps.get('pinnedLocation'), frameProps.get('partitionNumber'))
   }
   // When pinning a tab from the current window the src might not be
   // set to the current site on that first window.
@@ -89,7 +94,7 @@ module.exports.removeSite = function (sites, frameProps, tag) {
   // then check the src then location.  This also fixes pinned sites
   // with HTTPS Everywhere.
   if (index === -1) {
-    index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'))
+    index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'), frameProps.get('partitionNumber'))
   }
   if (index === -1) {
     return sites
@@ -99,8 +104,9 @@ module.exports.removeSite = function (sites, frameProps, tag) {
 }
 
 module.exports.moveSite = function (sites, sourceLocation, destinationLocation, prepend) {
-  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation)
-  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation) + (prepend ? 0 : 1)
+  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation, 0)
+  // TODO: Need partition number for drag and drop
+  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation, 0) + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceSiteIndex)
   sites = sites.splice(sourceSiteIndex, 1)
   if (newIndex > sourceSiteIndex) {

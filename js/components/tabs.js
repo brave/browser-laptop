@@ -7,7 +7,9 @@ const ReactDOM = require('react-dom')
 
 const ImmutableComponent = require('./immutableComponent')
 
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
+const siteTags = require('../constants/siteTags')
 
 const FrameStateUtil = require('../state/frameStateUtil')
 
@@ -24,33 +26,40 @@ class Tabs extends ImmutableComponent {
     if (this.props.tabs.get('tabPageIndex') === 0) {
       return
     }
-    WindowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') - 1)
+    windowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') - 1)
   }
 
   onNextPage () {
     if (this.props.tabs.get('tabPageIndex') + 1 === this.totalPages) {
       return
     }
-    WindowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') + 1)
+    windowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') + 1)
   }
 
   get totalPages () {
     return Math.ceil(this.props.frames
-        .filter(frame => !frame.get('isPinned'))
+        .filter(frame => !frame.get('pinnedLocation'))
         .size / this.props.tabsPerTabPage)
   }
 
   onDrop (e) {
-    const key = this.props.sourceDragData.get('key')
-    let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), e.clientX)
-    if (droppedOnTab) {
-      const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), e.clientX)
-      const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
-      WindowActions.moveTab(this.props.sourceDragData, droppedOnFrameProps, isLeftSide)
-      if (this.props.sourceDragData.get('isPinned')) {
-        WindowActions.setPinned(this.props.sourceDragData, false)
+    const clientX = e.clientX
+    const sourceDragData = this.props.sourceDragData
+    // This must be executed async because the state change that this causes
+    // will cause the onDragEnd to never run
+    setTimeout(() => {
+      const key = sourceDragData.get('key')
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX)
+      if (droppedOnTab) {
+        const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
+        const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+        windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
+        if (sourceDragData.get('pinnedLocation')) {
+          windowActions.setPinned(sourceDragData, false)
+          appActions.removeSite(sourceDragData, siteTags.PINNED)
+        }
       }
-    }
+    }, 0)
   }
 
   onDragOver (e) {
@@ -73,7 +82,7 @@ class Tabs extends ImmutableComponent {
         })()}
         {
           this.props.currentFrames
-            .filter(frameProps => !frameProps.get('isPinned'))
+            .filter(frameProps => !frameProps.get('pinnedLocation'))
             .map(frameProps =>
                 <Tab ref={node => this.tabRefs.push(node)}
                   sourceDragData={this.props.sourceDragData}
@@ -97,7 +106,7 @@ class Tabs extends ImmutableComponent {
         <Button label='+'
           l10nId='newTabButton'
           className='navbutton newFrameButton'
-          onClick={WindowActions.newFrame} />
+          onClick={windowActions.newFrame} />
         </span>
     </div>
   }

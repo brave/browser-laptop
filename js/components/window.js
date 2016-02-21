@@ -94,22 +94,27 @@ class Window extends React.Component {
 
     // Check for new pinned sites which we don't already know about
     const sitesToAdd = sites
-      .filter(site => site.get('tags').includes(SiteTags.PINNED) &&
-        !frames.find(frame => frame.get('isPinned') &&
-        // Compare to the original src of the pinned frame
-        frame.get('src') === site.get('location')))
+      .filter(site => {
+        return site.get('tags').includes(SiteTags.PINNED) &&
+          !frames.find(frame => frame.get('pinnedLocation') &&
+            // Compare to the original src of the pinned frame
+            frame.get('pinnedLocation') === site.get('location') &&
+            (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
+      })
     sitesToAdd.forEach(site => {
       WindowActions.newFrame({
         location: site.get('location'),
+        partitionNumber: site.get('partitionNumber'),
         isPinned: true
       }, false)
     })
 
     // Check for unpinned sites which should be closed
     const framesToClose = frames.filter(frame =>
-      frame.get('isPinned') &&
+      frame.get('pinnedLocation') &&
       // Compare to the original src of the pinned frame
-      !sites.find(site => frame.get('src') === site.get('location') && site.get('tags').includes(SiteTags.PINNED)))
+      !sites.find(site => frame.get('pinnedLocation') === site.get('location') &&
+        (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0) && site.get('tags').includes(SiteTags.PINNED)))
     framesToClose.forEach(frameProps => WindowActions.closeFrame(frames, frameProps, true))
   }
 }

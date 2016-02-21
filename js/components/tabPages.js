@@ -5,7 +5,9 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
+const siteTags = require('../constants/siteTags')
 const {onTabPageContextMenu} = require('../contextMenus')
 
 class TabPage extends ImmutableComponent {
@@ -14,15 +16,22 @@ class TabPage extends ImmutableComponent {
       return
     }
     const moveToFrame = this.props.frames.get(0)
-    // If we're moving to a right page, then we're already shifting everything to the left by one, so we want
-    // to drop it on the right.
-    WindowActions.moveTab(this.props.sourceDragData, moveToFrame,
-      // Has -1 value for pinned tabs
-      this.props.sourceDragFromPageIndex === -1 ||
-      this.props.sourceDragFromPageIndex >= this.props.index)
-    if (this.props.sourceDragData.get('isPinned')) {
-      WindowActions.setPinned(this.props.sourceDragData, false)
-    }
+    const sourceDragData = this.props.sourceDragData
+    const sourceDragFromPageIndex = this.props.sourceDragFromPageIndex
+    // This must be executed async because the state change that this causes
+    // will cause the onDragEnd to never run
+    setTimeout(() => {
+      // If we're moving to a right page, then we're already shifting everything to the left by one, so we want
+      // to drop it on the right.
+      windowActions.moveTab(sourceDragData, moveToFrame,
+        // Has -1 value for pinned tabs
+        sourceDragFromPageIndex === -1 ||
+        sourceDragFromPageIndex >= this.props.index)
+      if (sourceDragData.get('pinnedLocation')) {
+        windowActions.setPinned(sourceDragData, false)
+        appActions.removeSite(sourceDragData, siteTags.PINNED)
+      }
+    }, 0)
   }
 
   onDragOver (e) {
@@ -41,7 +50,7 @@ class TabPage extends ImmutableComponent {
         audioPlaybackActive,
         active: this.props.active})}
         onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
-        onClick={WindowActions.setTabPageIndex.bind(this, this.props.index)
+        onClick={windowActions.setTabPageIndex.bind(this, this.props.index)
       }>
     </span>
   }
@@ -57,7 +66,6 @@ class TabPages extends ImmutableComponent {
         sourceDragFromPageIndex /= this.props.tabsPerTabPage
       }
     }
-    console.log(this.props.sourceDragData)
     return <div>
     {
       tabPageCount > 1 &&

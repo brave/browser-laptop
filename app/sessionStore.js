@@ -90,7 +90,8 @@ module.exports.cleanSessionData = (sessionData) => {
 
     // Set the frame src to the last visited location
     // or else users will see the first visited URL.
-    frame.src = frame.location
+    // Pinned location always get reset to what they are
+    frame.src = frame.pinnedLocation || frame.location
 
     // If a blob is present for the thumbnail, create the object URL
     if (frame.thumbnailBlob) {
@@ -142,6 +143,10 @@ module.exports.cleanSessionData = (sessionData) => {
     sessionData.closedFrames.forEach(cleanFrame)
   }
   if (sessionData.frames) {
+    // Don't restore pinned locations because they will be auto created by the app state change event
+    sessionData.frames = sessionData.frames
+      // frame.isPinned is the old storage format
+      .filter(frame => !frame.isPinned && !frame.pinnedLocation)
     sessionData.frames.forEach(cleanFrame)
   }
 }

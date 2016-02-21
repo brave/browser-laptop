@@ -46,7 +46,7 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrame &&
-      isSiteInList(this.props.sites, this.props.activeFrame.get('location'), SiteTags.BOOKMARK)
+      isSiteInList(this.props.sites, this.props.activeFrame.get('location'), this.props.activeFrame.get('partitionNumber'), SiteTags.BOOKMARK)
   }
 
   get titleMode () {
@@ -65,7 +65,7 @@ class NavigationBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
     const prevBookmarked = prevProps.activeFrame &&
-      isSiteInList(prevProps.sites, prevProps.activeFrame.get('location'), SiteTags.BOOKMARK)
+      isSiteInList(prevProps.sites, prevProps.activeFrame.get('location'), this.props.activeFrame.get('partitionNumber'), SiteTags.BOOKMARK)
     if (this.bookmarked !== prevBookmarked) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
     }

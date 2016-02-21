@@ -164,7 +164,7 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
     partitionNumber,
     element: frameOpts.element,
     features: getFeatures(frameOpts.features),
-    isPinned: frameOpts.isPinned,
+    pinnedLocation: frameOpts.isPinned ? url : undefined,
     key: newKey,
     parentFrameKey: frameOpts.parentFrameKey,
     guestInstanceId: frameOpts.guestInstanceId,

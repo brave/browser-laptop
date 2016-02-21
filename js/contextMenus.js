@@ -114,7 +114,7 @@ function tabTemplateInit (frameProps) {
   })
 
   if (!frameProps.get('isPrivate')) {
-    if (frameProps.get('isPinned')) {
+    if (frameProps.get('pinnedLocation')) {
       items.push({
         label: 'Unpin tab',
         click: (item) => {
@@ -163,7 +163,7 @@ function tabTemplateInit (frameProps) {
     enabled: false
   }])
 
-  if (!frameProps.get('isPinned')) {
+  if (!frameProps.get('pinnedLocation')) {
     items.push({
       label: 'Close tab',
       click: (item, focusedWindow) => {

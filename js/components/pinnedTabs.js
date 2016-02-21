@@ -7,20 +7,31 @@ const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const Tab = require('./tab')
 const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
+const siteTags = require('../constants/siteTags')
 const dnd = require('../dnd')
 
 class PinnedTabs extends ImmutableComponent {
   onDrop (e) {
-    const key = this.props.sourceDragData.get('key')
-    let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), e.clientX)
-    if (droppedOnTab) {
-      const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), e.clientX)
-      const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
-      windowActions.moveTab(this.props.sourceDragData, droppedOnFrameProps, isLeftSide)
-      if (!this.props.sourceDragData.get('isPinned')) {
-        windowActions.setPinned(this.props.sourceDragData, true)
+    const clientX = e.clientX
+    const sourceDragData = this.props.sourceDragData
+    // This must be executed async because the state change that this causes
+    // will cause the onDragEnd to never run
+    setTimeout(() => {
+      const key = sourceDragData.get('key')
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX)
+      if (droppedOnTab) {
+        const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
+        const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+        windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
+        if (!sourceDragData.get('pinnedLocation')) {
+          windowActions.setPinned(sourceDragData, true)
+          appActions.addSite(sourceDragData, siteTags.PINNED)
+        } else {
+          appActions.moveSite(sourceDragData.get('pinnedLocation'), droppedOnFrameProps.get('pinnedLocation'), isLeftSide)
+        }
       }
-    }
+    }, 0)
   }
 
   onDragOver (e) {
@@ -35,7 +46,7 @@ class PinnedTabs extends ImmutableComponent {
       onDrop={this.onDrop.bind(this)}>
        {
           this.props.frames
-            .filter(frameProps => frameProps.get('isPinned'))
+            .filter(frameProps => frameProps.get('pinnedLocation'))
             .map(frameProps =>
                 <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
                   ref={node => this.tabRefs.push(node)}
