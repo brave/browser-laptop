@@ -39,7 +39,6 @@ class CertErrorPage extends React.Component {
   }
 
   render () {
-    console.log(this.state.advanced)
     return <div>
       <span data-l10n-id='certErrorText'></span>
       <span>{this.state.certDetails.get('url') || ''}</span>
