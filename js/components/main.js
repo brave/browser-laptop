@@ -175,7 +175,7 @@ class Main extends ImmutableComponent {
     // TODO
   }
 
-  onHamburgerMenu () {
+  onHamburgerMenu (e) {
     let braverySettings = {}
     Object.keys(AppConfig.resourceNames).forEach((name) => {
       let value = AppConfig.resourceNames[name]
@@ -185,7 +185,7 @@ class Main extends ImmutableComponent {
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
     braverySettings.bookmarked = this.navBar.bookmarked
-    contextMenus.onHamburgerMenu(braverySettings, this.props.appState.get('settings'))
+    contextMenus.onHamburgerMenu(braverySettings, this.props.appState.get('settings'), e)
   }
 
   onMainFocus () {
@@ -262,7 +262,7 @@ class Main extends ImmutableComponent {
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
           }
           { this.props.windowState.get('bookmarkDetail')
-            ? <AddEditBookmark bookmarkDetail={this.props.windowState.get('bookmarkDetail')}/>
+            ? <AddEditBookmark currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])} originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}/>
             : null
           }
           { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
@@ -282,7 +282,7 @@ class Main extends ImmutableComponent {
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
               activeFrame={activeFrame}
               bookmarks={this.props.appState.get('sites')
-                .filter(site => site.get('tags').includes(siteTags.BOOKMARK))
+                .filter(site => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
               }/>
           : null }
         <div className={cx({

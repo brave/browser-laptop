@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const Dialog = require('./dialog')
 const Button = require('./button')
@@ -21,26 +20,42 @@ class AddEditBookmark extends ImmutableComponent {
     this.onClose = this.onClose.bind(this)
   }
   get isBlankTab () {
-    return ['about:blank', 'about:newtab'].includes(this.props.bookmarkDetail.get('location'))
+    return ['about:blank', 'about:newtab'].includes(this.props.currentDetail.get('location'))
+  }
+  get isFolder () {
+    return this.props.currentDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   }
   get location () {
     if (this.isblankTab) {
       return ''
     }
-    return this.props.bookmarkDetail.get('location')
+    return this.props.currentDetail.get('location')
   }
   get title () {
     if (this.isblankTab) {
       return ''
     }
-    return this.props.bookmarkDetail.get('title')
+    return this.props.currentDetail.get('title')
   }
   get partitionNumber () {
     if (this.isblankTab) {
       return undefined
     }
-    return this.props.bookmarkDetail.get('partitionNumber')
+    return this.props.currentDetail.get('partitionNumber')
   }
+
+  get originalLocation () {
+    return this.props.originalDetail && this.props.originalDetail.get('location') || undefined
+  }
+
+  get originalPartitionNumber () {
+    return this.props.originalDetail && this.props.originalDetail.get('partitionNumber') || undefined
+  }
+
+  get originalTitle () {
+    return this.props.originalDetail && this.props.originalDetail.get('title') || undefined
+  }
+
   componentDidMount () {
     this.bookmarkName.select()
     this.bookmarkName.focus()
@@ -56,35 +71,28 @@ class AddEditBookmark extends ImmutableComponent {
     }
   }
   onClose () {
-    windowActions.setBookmarkDetail(null)
+    windowActions.setBookmarkDetail()
   }
   onClick (e) {
     e.stopPropagation()
   }
   onNameChange (e) {
-    windowActions.setBookmarkDetail(Immutable.fromJS({
-      originalLocation: this.props.bookmarkDetail.get('originalLocation'),
-      originalPartitionNumber: this.props.bookmarkDetail.get('originalPartitionNumber'),
-      location: this.location,
-      title: e.target.value,
-      partitionNumber: this.partitionNumber
-    }))
+    const currentDetail = this.props.currentDetail.set('title', e.target.value)
+    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
   }
   onLocationChange (e) {
-    windowActions.setBookmarkDetail(Immutable.fromJS({
-      originalLocation: this.props.bookmarkDetail.get('originalLocation'),
-      originalPartitionNumber: this.props.bookmarkDetail.get('originalPartitionNumber'),
-      location: e.target.value,
-      title: this.title,
-      partitionNumber: this.partitionNumber
-    }))
+    const currentDetail = this.props.currentDetail.set('location', e.target.value)
+    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
   }
   onSave () {
-    appActions.addSite({
-      location: this.location,
-      title: this.title,
-      partitionNumber: this.partitionNumber
-    }, siteTags.BOOKMARK, this.props.bookmarkDetail.get('originalLocation'), this.props.bookmarkDetail.get('originalPartitionNumber'))
+    const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
+    appActions.addSite(
+      {
+        location: this.location,
+        title: this.title,
+        partitionNumber: this.partitionNumber
+      }, tag,
+      this.originalLocation, this.originalPartitionNumber, this.originalTitle, tag)
     this.onClose()
   }
   render () {
@@ -92,12 +100,13 @@ class AddEditBookmark extends ImmutableComponent {
       <div className='addEditBookmark' onClick={this.onClick.bind(this)}>
         <div id='bookmarkName' className='bookmarkFormRow'>
           <label data-l10n-id='nameField' htmlFor='bookmarkName'/>
-          <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.bookmarkDetail.get('title')} ref={bookmarkName => this.bookmarkName = bookmarkName }/>
+          <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.currentDetail.get('title')} ref={bookmarkName => this.bookmarkName = bookmarkName }/>
         </div>
-        <div id='bookmarkLocation' className='bookmarkFormRow'>
+        { !this.isFolder
+          ? <div id='bookmarkLocation' className='bookmarkFormRow'>
           <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
           <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.location} />
-        </div>
+        </div> : null }
         <div className='bookmarkFormRow'>
           <span/>
           <Button l10nId='save' className='primaryButton' onClick={this.onSave.bind(this)}/>

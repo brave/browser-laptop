@@ -18,7 +18,11 @@ const dnd = require('../dnd')
 const bookmarkMaxWidth = 100
 
 class BookmarkToolbarButton extends ImmutableComponent {
-  navigate (e) {
+  click (e) {
+    if (this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
+      contextMenus.onShowBookmarkFolderMenu(this.props.bookmark.get('title'), {target: ReactDOM.findDOMNode(this)})
+      return
+    }
     const isDarwin = process.platform === 'darwin'
     if (e.ctrlKey && !isDarwin ||
         e.metaKey && isDarwin) {
@@ -74,20 +78,22 @@ class BookmarkToolbarButton extends ImmutableComponent {
 
   render () {
     return <span
-      className={cx({
-        bookmarkToolbarButton: true,
-        draggingOverLeft: this.isDraggingOverLeft,
-        draggingOverRight: this.isDraggingOverRight,
-        isDragging: this.isDragging
-      })}
-      draggable
-      ref={node => this.bookmarkNode = node}
-      onClick={this.navigate.bind(this)}
-      onDragStart={this.onDragStart.bind(this)}
-      onDragEnd={this.onDragEnd.bind(this)}
-      onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark.get('location'), this.props.bookmark.get('partitionNumber'), this.props.bookmark.get('title'), this.props.activeFrame)}>
-    { this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }
+        className={cx({
+          bookmarkToolbarButton: true,
+          draggingOverLeft: this.isDraggingOverLeft,
+          draggingOverRight: this.isDraggingOverRight,
+          isDragging: this.isDragging
+        })}
+        draggable
+        ref={node => this.bookmarkNode = node}
+        onClick={this.click.bind(this)}
+        onDragStart={this.onDragStart.bind(this)}
+        onDragEnd={this.onDragEnd.bind(this)}
+        onDragOver={this.onDragOver.bind(this)}
+        onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
+      <span>{ this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }</span>
+      { this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+        ? <span className='bookmarkFolderChevron fa fa-chevron-down'/> : null }
     </span>
   }
 }
@@ -97,10 +103,22 @@ class BookmarksToolbar extends ImmutableComponent {
     e.preventDefault()
     if (this.props.sourceDragData) {
       const bookmark = this.props.sourceDragData
-      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => bookmarkRef && bookmarkRef.props.bookmark.get('location') !== bookmark.get('location')), e.clientX)
+      const bookmarkFolder = bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => {
+        if (!bookmarkRef) {
+          return false
+        }
+        if (bookmarkFolder !== bookmarkRef.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
+          return true
+        }
+        if (bookmarkFolder) {
+          return bookmarkRef.props.bookmark.get('title') !== bookmark.get('title')
+        }
+        return bookmarkRef.props.bookmark.get('location') !== bookmark.get('location') && bookmarkRef.props.bookmark.get('partitionNumber') !== bookmark.get('partitionNumber')
+      }), e.clientX)
       if (droppedOn) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn), e.clientX)
-        AppActions.moveSite(bookmark.get('location'), bookmark.get('partitionNumber'), droppedOn.props.bookmark.get('location'), isLeftSide)
+        AppActions.moveSite(bookmark, droppedOn.props.bookmark, isLeftSide)
       }
       return
     }

@@ -9,6 +9,7 @@ const Tab = require('./tab')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
+const siteUtil = require('../state/siteUtil')
 const dnd = require('../dnd')
 
 class PinnedTabs extends ImmutableComponent {
@@ -28,7 +29,9 @@ class PinnedTabs extends ImmutableComponent {
           windowActions.setPinned(sourceDragData, true)
           appActions.addSite(sourceDragData, siteTags.PINNED)
         } else {
-          appActions.moveSite(sourceDragData.get('pinnedLocation'), sourceDragData.get('partitionNumber'), droppedOnFrameProps.get('pinnedLocation'), isLeftSide)
+          appActions.moveSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED),
+            siteUtil.getDetailFromFrame(droppedOnFrameProps, siteTags.PINNED),
+            isLeftSide)
         }
       }
     }, 0)

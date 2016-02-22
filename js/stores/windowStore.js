@@ -336,9 +336,14 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_BOOKMARK_DETAIL:
-      windowState = windowState.merge({
-        bookmarkDetail: action.bookmarkDetail
-      })
+      if (!action.currentDetail && !action.originalDetail) {
+        windowState = windowState.delete('bookmarkDetail')
+      } else {
+        windowState = windowState.mergeIn(['bookmarkDetail'], {
+          currentDetail: action.currentDetail,
+          originalDetail: action.originalDetail
+        })
+      }
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       return

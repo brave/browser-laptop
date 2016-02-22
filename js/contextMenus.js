@@ -12,19 +12,28 @@ const WindowStore = require('./stores/windowStore')
 const WindowActions = require('./actions/windowActions')
 const AppActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
+const siteUtil = require('./state/siteUtil')
 const CommonMenu = require('./commonMenu')
 const ipc = global.require('electron').ipcRenderer
 
 /**
- * @param {string} location The location to initialize with
- * @param {string} title The title to initialize with
+ * Obtains an add bookmark menu item
+ * @param {object} Detail of the bookmark to initialize with
  */
-const addBookmarkMenuItem = (location, partitionNumber, title) => {
+const addBookmarkMenuItem = (bookmarkDetail) => {
   return {
     label: 'Add Bookmark...',
     click: () => {
-      WindowActions.setBookmarkDetail({ location, partitionNumber, title })
+      WindowActions.setBookmarkDetail(bookmarkDetail)
     }
+  }
+}
+
+const addFolderMenuItem = {
+  label: 'Add Folder...',
+  click: () => {
+    const emptyFolder = Immutable.fromJS({tags: [siteTags.BOOKMARK_FOLDER]})
+    WindowActions.setBookmarkDetail(emptyFolder)
   }
 }
 
@@ -63,7 +72,8 @@ function tabsToolbarTemplateInit (settingsState, activeFrame) {
     CommonMenu.bookmarksMenuItem,
     CommonMenu.bookmarksToolbarMenuItem(settingsState),
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(activeFrame.get('location'), activeFrame.get('partitionNumber'), activeFrame.get('title'))
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
+    addFolderMenuItem
   ]
 }
 
@@ -78,27 +88,49 @@ function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   }).toJS()
 }
 
-function bookmarkTemplateInit (location, title, partitionNumber, activeFrame) {
-  return [openInNewTabMenuItem(location),
-    openInNewPrivateTabMenuItem(location),
-    openInNewSessionTabMenuItem(location),
-    copyLinkLocationMenuItem(location),
-    CommonMenu.separatorMenuItem, {
-      label: 'Edit Bookmark...',
+function bookmarkTemplateInit (bookmarkDetail, activeFrame) {
+  const location = bookmarkDetail.get('location')
+  const title = bookmarkDetail.get('title')
+  const partitionNumber = bookmarkDetail.get('partitionNumber')
+  const isFolder = bookmarkDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+  const template = []
+  if (!isFolder) {
+    template.push(openInNewTabMenuItem(location),
+      openInNewPrivateTabMenuItem(location),
+      openInNewSessionTabMenuItem(location),
+      copyLinkLocationMenuItem(location),
+      CommonMenu.separatorMenuItem)
+  }
+
+  template.push(
+    {
+      label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
       click: () => {
         // originalLocation is undefined signifies add mode
-        WindowActions.setBookmarkDetail({ originalLocation: location, originalPartitionNumber: partitionNumber, location, title, partitionNumber })
+        WindowActions.setBookmarkDetail(bookmarkDetail, bookmarkDetail)
       }
     },
     CommonMenu.separatorMenuItem, {
-      label: 'Delete Bookmark',
+      label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
       click: () => {
-        AppActions.removeSite({ location, partitionNumber }, siteTags.BOOKMARK)
+        AppActions.removeSite({
+          location,
+          partitionNumber,
+          title
+        }, bookmarkDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
       }
     },
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(activeFrame.get('location'), activeFrame.get('partitionNumber'), activeFrame.get('title'))
-  ]
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
+    addFolderMenuItem)
+  return template
+}
+
+function showBookmarkFolderInit (title) {
+  return [{
+    label: '(empty)',
+    enabled: false
+  }]
 }
 
 function tabTemplateInit (frameProps) {
@@ -352,17 +384,18 @@ function mainTemplateInit (nodeProps, frame) {
       }
     }
   },
-  addBookmarkMenuItem(frame.get('location'), frame.get('partitionNumber'), frame.get('title')), {
-    label: 'Add to reading list',
-    enabled: false
-  })
-
+  addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK)),
+    {
+      label: 'Add to reading list',
+      enabled: false
+    })
   return template
 }
 
-export function onHamburgerMenu (braverySettings, settingsState) {
+export function onHamburgerMenu (braverySettings, settingsState, e) {
   const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings, settingsState))
-  hamburgerMenu.popup(remote.getCurrentWindow())
+  const rect = e.target.getBoundingClientRect()
+  hamburgerMenu.popup(remote.getCurrentWindow(), rect.left, rect.bottom)
 }
 
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {
@@ -399,12 +432,19 @@ export function onUrlBarContextMenu (e) {
   inputMenu.popup(remote.getCurrentWindow())
 }
 
-export function onBookmarkContextMenu (editLocation, editPartitionNumber, editTitle, activeFrame, e) {
+export function onBookmarkContextMenu (bookmarkDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
-  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(editLocation, editTitle, editPartitionNumber, activeFrame))
+  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(bookmarkDetail, activeFrame))
   menu.popup(remote.getCurrentWindow())
+}
+
+export function onShowBookmarkFolderMenu (title, e) {
+  const menu = Menu.buildFromTemplate(showBookmarkFolderInit(title))
+  const rectLeft = e.target.getBoundingClientRect()
+  const rectBottom = e.target.parentNode.getBoundingClientRect()
+  menu.popup(remote.getCurrentWindow(), rectLeft.left | 0, rectBottom.bottom | 0)
 }
 
 export function onMoreBookmarksMenu (activeFrame, bookmarks) {

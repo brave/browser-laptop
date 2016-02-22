@@ -14,7 +14,12 @@ const siteTags = require('../constants/siteTags')
  * @param partitionNumber The partition number of the session or undefined
  * @return index of the location or -1 if not found.
  */
-module.exports.getSiteUrlIndex = function (sites, location, partitionNumber) {
+module.exports.getSiteIndex = function (sites, location, partitionNumber, title, tags) {
+  let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
+    typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
+  if (isBookmarkFolder) {
+    return sites.findIndex(site => site.get('title') === title && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+  }
   return sites.findIndex(site => site.get('location') === location && (site.get('partitionNumber') || 0) === (partitionNumber || 0))
 }
 
@@ -22,13 +27,11 @@ module.exports.getSiteUrlIndex = function (sites, location, partitionNumber) {
  * Checks if a frameProps has the specified tag
  *
  * @param sites The application state's Immutable sites list
- * @param location The location of the page in question
- * @param tag The tag of the site to check
- * @param partitionNumber The partition number of the session or undefined
+ * @param siteDetail The site to check if it's in the specified tag
  * @return true if the location is already bookmarked
  */
-module.exports.isSiteInList = function (sites, location, partitionNumber, tag) {
-  const index = module.exports.getSiteUrlIndex(sites, location, partitionNumber)
+module.exports.isSiteInList = function (sites, siteDetail, tag) {
+  const index = module.exports.getSiteIndex(sites, siteDetail.get('location'), siteDetail.get('partitionNumber'), siteDetail.get('title'), tag)
   if (index === -1) {
     return false
   }
@@ -46,11 +49,12 @@ module.exports.isSiteInList = function (sites, location, partitionNumber, tag) {
  * Otherwise it's only considered to be a history item
  * @param originalLocation If specified will modify this old location instead of adding
  * @param originalPartitionNumber If specified will modify this old location's partition number
+ * @param originalTitle If specified will modify this title, only used for bookmark folders
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, frameProps, tag, originalLocation, originalPartitionNumber) {
-  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'), originalPartitionNumber || frameProps.get('partitionNumber'))
-  let tags = sites.getIn([index, 'tags']) || new Immutable.List()
+module.exports.addSite = function (sites, frameProps, tag, originalLocation, originalPartitionNumber, originalTitle, originalTag) {
+  const index = module.exports.getSiteIndex(sites, originalLocation || frameProps.get('location'), originalPartitionNumber || frameProps.get('partitionNumber'), originalTitle || frameProps.get('title'), tag)
+  let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
   } else {
@@ -88,7 +92,7 @@ module.exports.addSite = function (sites, frameProps, tag, originalLocation, ori
 module.exports.removeSite = function (sites, frameProps, tag) {
   let index = -1
   if (frameProps.get('pinnedLocation') && tag === siteTags.PINNED) {
-    index = module.exports.getSiteUrlIndex(sites, frameProps.get('pinnedLocation'), frameProps.get('partitionNumber'))
+    index = module.exports.getSiteIndex(sites, frameProps.get('pinnedLocation'), frameProps.get('partitionNumber'), frameProps.get('title'), tag)
   }
   // When pinning a tab from the current window the src might not be
   // set to the current site on that first window.
@@ -96,7 +100,7 @@ module.exports.removeSite = function (sites, frameProps, tag) {
   // then check the src then location.  This also fixes pinned sites
   // with HTTPS Everywhere.
   if (index === -1) {
-    index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'), frameProps.get('partitionNumber'))
+    index = module.exports.getSiteIndex(sites, frameProps.get('location'), frameProps.get('partitionNumber'), frameProps.get('title'), tag)
   }
   if (index === -1) {
     return sites
@@ -105,10 +109,10 @@ module.exports.removeSite = function (sites, frameProps, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
-module.exports.moveSite = function (sites, sourceLocation, sourcePartitionNumber, destinationLocation, prepend) {
-  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation, sourcePartitionNumber)
+module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend) {
+  const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail.get('location'), sourceDetail.get('partitionNumber'), sourceDetail.get('title'), sourceDetail.get('tags'))
   // TODO: Need partition number for drag and drop
-  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation, sourcePartitionNumber) + (prepend ? 0 : 1)
+  let newIndex = module.exports.getSiteIndex(sites, destinationDetail.get('location'), destinationDetail.get('partitionNumber'), destinationDetail.get('title'), destinationDetail.get('tags')) + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceSiteIndex)
   sites = sites.splice(sourceSiteIndex, 1)
   if (newIndex > sourceSiteIndex) {
@@ -131,4 +135,13 @@ module.exports.getSiteIconClass = function (site) {
     return 'fa-book'
   }
   return 'fa-file-o'
+}
+
+module.exports.getDetailFromFrame = function (frame, tag) {
+  return Immutable.fromJS({
+    location: frame.get('location'),
+    title: frame.get('title'),
+    partitionNumber: frame.get('partitionNumber'),
+    tags: [tag]
+  })
 }

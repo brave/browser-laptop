@@ -370,14 +370,16 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(bookmarkDetail) 
+### setBookmarkDetail(currentDetail, originalDetail) 
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
 
 **Parameters**
 
-**bookmarkDetail**: `Object`, Properties of the bookmark to edit
+**currentDetail**: `Object`, Properties of the bookmark to change to
+
+**originalDetail**: `Object`, Properties of the bookmark to edit
 
 
 
