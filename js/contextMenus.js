@@ -400,8 +400,7 @@ export function onHamburgerMenu (braverySettings, settingsState, e) {
 
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark') {
-    // TODO: Should get the active frame here and use whatever partition they are in ideally
-    onBookmarkContextMenu(nodeProps.location, 0, nodeProps.title, Immutable.fromJS({ location: '', title: '' }))
+    onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
     mainMenu.popup(remote.getCurrentWindow())
