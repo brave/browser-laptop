@@ -217,8 +217,8 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.NEW_FRAME:
-          method = (location, openInForeground) => {
-            WindowActions.newFrame({ location }, openInForeground)
+          method = (frameOpts, openInForeground) => {
+            WindowActions.newFrame(frameOpts, openInForeground)
           }
       }
       method.apply(this, e.args)

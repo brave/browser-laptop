@@ -18,27 +18,36 @@ const dnd = require('../dnd')
 const bookmarkMaxWidth = 100
 
 class BookmarkToolbarButton extends ImmutableComponent {
-  navigate () {
-    WindowActions.loadUrl(this.props.activeFrame, this.props.location)
+  navigate (e) {
+    const isDarwin = process.platform === 'darwin'
+    if (e.ctrlKey && !isDarwin ||
+        e.metaKey && isDarwin) {
+      WindowActions.newFrame({
+        location: this.props.bookmark.get('location'),
+        partitionNumber: this.props.bookmark.get('partitionNumber')
+      }, false)
+    } else {
+      WindowActions.loadUrl(this.props.activeFrame, this.props.bookmark.get('location'))
+    }
   }
 
   onDragStart (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    dnd.onDragStart(dragTypes.BOOKMARK, this.props.location, e)
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('title'))
+    dnd.onDragStart(dragTypes.BOOKMARK, this.props.bookmark, e)
   }
 
   onDragEnd (e) {
-    dnd.onDragEnd(dragTypes.BOOKMARK, this.props.location, e)
+    dnd.onDragEnd(dragTypes.BOOKMARK, this.props.bookmark, e)
   }
 
   onDragOver (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
-    dnd.onDragOver(dragTypes.BOOKMARK, this.props.sourceDragData, this.bookmarkNode.getBoundingClientRect(), this.props.location, this.draggingOverData, e)
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('title'))
+    dnd.onDragOver(dragTypes.BOOKMARK, this.props.sourceDragData, this.bookmarkNode.getBoundingClientRect(), this.props.bookmark, this.draggingOverData, e)
   }
 
   get draggingOverData () {
     if (!this.props.draggingOverData ||
-        this.props.draggingOverData.get('dragOverKey') !== this.props.location) {
+        this.props.draggingOverData.get('dragOverKey') !== this.props.bookmark) {
       return
     }
 
@@ -46,7 +55,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   get isDragging () {
-    return this.props.location === this.props.sourceDragData
+    return this.props.bookmark === this.props.sourceDragData
   }
 
   get isDraggingOverLeft () {
@@ -77,8 +86,8 @@ class BookmarkToolbarButton extends ImmutableComponent {
       onDragStart={this.onDragStart.bind(this)}
       onDragEnd={this.onDragEnd.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.location, this.props.title, this.props.activeFrame)}>
-    { this.props.title || this.props.location }
+      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark.get('location'), this.props.bookmark.get('partitionNumber'), this.props.bookmark.get('title'), this.props.activeFrame)}>
+    { this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }
     </span>
   }
 }
@@ -87,11 +96,11 @@ class BookmarksToolbar extends ImmutableComponent {
   onDrop (e) {
     e.preventDefault()
     if (this.props.sourceDragData) {
-      const location = this.props.sourceDragData
-      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => bookmarkRef && bookmarkRef.props.location !== location), e.clientX)
+      const bookmark = this.props.sourceDragData
+      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => bookmarkRef && bookmarkRef.props.bookmark.get('location') !== bookmark.get('location')), e.clientX)
       if (droppedOn) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn), e.clientX)
-        AppActions.moveSite(location, droppedOn.props.location, isLeftSide)
+        AppActions.moveSite(bookmark.get('location'), bookmark.get('partitionNumber'), droppedOn.props.bookmark.get('location'), isLeftSide)
       }
       return
     }
@@ -164,8 +173,7 @@ class BookmarksToolbar extends ImmutableComponent {
             sourceDragData={this.props.sourceDragData}
             draggingOverData={this.props.draggingOverData}
             activeFrame={this.props.activeFrame}
-            location={bookmark.get('location')}
-            title={bookmark.get('title')}/>)
+            bookmark={bookmark}/>)
     }
     { this.leftOver > 0
       ? <Button iconClass='fa-angle-double-right'

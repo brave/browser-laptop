@@ -181,8 +181,10 @@ WindowStore
   },
   bookmarkDetail: {
     originalLocation: string, // Location of the bookmark being edited
+    originalPartitionNumber: number, // Partition number of the bookmark being edited
     location: string, // Current value for the location
     title: string // Current value for the title
+    partitionNumber: number// Current partition number
   },
 }
 ```

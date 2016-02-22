@@ -68,6 +68,19 @@ describe('pinnedTabs', function () {
           return this.elements(tabsTabs).then((res) => res.value.length === 2)
         })
     })
+    it('pinning the same site again with a different session is allowed', function *() {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPartitioned: true })
+        .waitForExist('.tab[data-frame-key="4"]')
+        .setPinned(4, true)
+        .waitUntil(function () {
+          return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        })
+        .waitUntil(function () {
+          return this.elements(tabsTabs).then((res) => res.value.length === 2)
+        })
+    })
   })
 
   describe('Gets pins from external windows', function () {
@@ -107,6 +120,17 @@ describe('pinnedTabs', function () {
         .addSite({ location: page2Url }, siteTags.PINNED)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        })
+        .waitUntil(function () {
+          return this.elements(tabsTabs).then((res) => res.value.length === 1)
+        })
+    })
+    it('Adding a site with a diff session that already exists is allowed', function *() {
+      const page2Url = Brave.server.url('page2.html')
+      yield this.app.client
+        .addSite({ location: page2Url, partitionNumber: 1 }, siteTags.PINNED)
+        .waitUntil(function () {
+          return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
         })
         .waitUntil(function () {
           return this.elements(tabsTabs).then((res) => res.value.length === 1)

@@ -35,6 +35,12 @@ class AddEditBookmark extends ImmutableComponent {
     }
     return this.props.bookmarkDetail.get('title')
   }
+  get partitionNumber () {
+    if (this.isblankTab) {
+      return undefined
+    }
+    return this.props.bookmarkDetail.get('partitionNumber')
+  }
   componentDidMount () {
     this.bookmarkName.select()
     this.bookmarkName.focus()
@@ -58,22 +64,27 @@ class AddEditBookmark extends ImmutableComponent {
   onNameChange (e) {
     windowActions.setBookmarkDetail(Immutable.fromJS({
       originalLocation: this.props.bookmarkDetail.get('originalLocation'),
+      originalPartitionNumber: this.props.bookmarkDetail.get('originalPartitionNumber'),
       location: this.location,
-      title: e.target.value
+      title: e.target.value,
+      partitionNumber: this.partitionNumber
     }))
   }
   onLocationChange (e) {
     windowActions.setBookmarkDetail(Immutable.fromJS({
       originalLocation: this.props.bookmarkDetail.get('originalLocation'),
+      originalPartitionNumber: this.props.bookmarkDetail.get('originalPartitionNumber'),
       location: e.target.value,
-      title: this.title
+      title: this.title,
+      partitionNumber: this.partitionNumber
     }))
   }
   onSave () {
     appActions.addSite({
       location: this.location,
-      title: this.title
-    }, siteTags.BOOKMARK, this.props.bookmarkDetail.get('originalLocation'))
+      title: this.title,
+      partitionNumber: this.partitionNumber
+    }, siteTags.BOOKMARK, this.props.bookmarkDetail.get('originalLocation'), this.props.bookmarkDetail.get('originalPartitionNumber'))
     this.onClose()
   }
   render () {

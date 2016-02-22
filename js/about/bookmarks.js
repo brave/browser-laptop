@@ -15,20 +15,37 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class BookmarkItem extends ImmutableComponent {
   navigate () {
-    aboutActions.newFrame(this.props.location)
+    aboutActions.newFrame({
+      location: this.props.bookmark.get('location'),
+      partitionNumber: this.props.bookmark.get('partitionNumber')
+    })
   }
   render () {
+    // Figure out the partition info display
+    let partitionNumberInfo
+    if (this.props.bookmark.get('partitionNumber')) {
+      let l10nArgs = {
+        partitionNumber: this.props.bookmark.get('partitionNumber')
+      }
+      partitionNumberInfo =
+        <span> (<span data-l10n-id='partitionNumber' data-l10n-args={JSON.stringify(l10nArgs)}/>)</span>
+    }
+
     return <div role='listitem'
       onContextMenu={aboutActions.contextMenu.bind(this, this.props, 'bookmark')}
       data-context-menu-disable
       draggable='true'
       onDoubleClick={this.navigate.bind(this)}>
-    { this.props.title
+    { this.props.bookmark.get('title')
       ? <span>
-        <span>{this.props.title}</span>
-        <span className='bookmarkLocation'> - {this.props.location}</span>
+        <span>{this.props.bookmark.get('title')}</span>
+        {partitionNumberInfo}
+        <span className='bookmarkLocation'> - {this.props.bookmark.get('location')}</span>
       </span>
-      : <span> {this.props.location}</span>
+      : <span>
+          <span> {this.props.bookmark.get('location')}</span>
+          {partitionNumberInfo}
+        </span>
     }
     </div>
   }
@@ -39,8 +56,7 @@ class BookmarksList extends ImmutableComponent {
     return <list>
     {
       this.props.bookmarks.map(bookmark =>
-          <BookmarkItem location={bookmark.get('location')}
-            title={bookmark.get('title')}/>)
+          <BookmarkItem bookmark={bookmark}/>)
     }
     </list>
   }

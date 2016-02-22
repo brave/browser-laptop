@@ -44,10 +44,12 @@ module.exports.isSiteInList = function (sites, location, partitionNumber, tag) {
  *   'bookmark' for bookmarks.
  *   'reader' for reading list.
  * Otherwise it's only considered to be a history item
+ * @param originalLocation If specified will modify this old location instead of adding
+ * @param originalPartitionNumber If specified will modify this old location's partition number
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, frameProps, tag, originalLocation) {
-  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'), frameProps.get('partitionNumber'))
+module.exports.addSite = function (sites, frameProps, tag, originalLocation, originalPartitionNumber) {
+  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'), originalPartitionNumber || frameProps.get('partitionNumber'))
   let tags = sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -103,10 +105,10 @@ module.exports.removeSite = function (sites, frameProps, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
-module.exports.moveSite = function (sites, sourceLocation, destinationLocation, prepend) {
-  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation, 0)
+module.exports.moveSite = function (sites, sourceLocation, sourcePartitionNumber, destinationLocation, prepend) {
+  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation, sourcePartitionNumber)
   // TODO: Need partition number for drag and drop
-  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation, 0) + (prepend ? 0 : 1)
+  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation, sourcePartitionNumber) + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceSiteIndex)
   sites = sites.splice(sourceSiteIndex, 1)
   if (newIndex > sourceSiteIndex) {

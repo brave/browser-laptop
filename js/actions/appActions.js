@@ -52,12 +52,15 @@ const AppActions = {
    * @param {Object} frameProps - Properties of the frame in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    * @param {string} originalLocation - If specified, the original location to edit / overwrite
+   * @param {number} originalPartitionNumber - If specified, the original partitionNumber to edit / overwrite
    */
-  addSite: function (frameProps, tag, originalLocation) {
+  addSite: function (frameProps, tag, originalLocation, originalPartitionNumber) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_ADD_SITE,
       frameProps,
-      tag
+      tag,
+      originalLocation,
+      originalPartitionNumber
     })
   },
 
@@ -78,13 +81,15 @@ const AppActions = {
    * Dispatches a message to move a site locations.
    *
    * @param {string} sourceLocation - the location of the site to move
+   * @param {number} sourcePartitionNumber- the partition number of the site to move
    * @param {string} destinationLocation - the location of the site to move to
    * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
    */
-  moveSite: function (sourceLocation, destinationLocation, prepend) {
+  moveSite: function (sourceLocation, sourcePartitionNumber, destinationLocation, prepend) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_MOVE_SITE,
       sourceLocation,
+      sourcePartitionNumber,
       destinationLocation,
       prepend
     })

@@ -26,10 +26,10 @@ const AboutActions = {
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672
    */
-  newFrame: function (location, openInForeground = true) {
+  newFrame: function (frameOpts, openInForeground = true) {
     const event = new window.CustomEvent(messages.NEW_FRAME, {
       detail: {
-        location,
+        frameOpts,
         openInForeground
       }
     })

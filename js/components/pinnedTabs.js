@@ -28,7 +28,7 @@ class PinnedTabs extends ImmutableComponent {
           windowActions.setPinned(sourceDragData, true)
           appActions.addSite(sourceDragData, siteTags.PINNED)
         } else {
-          appActions.moveSite(sourceDragData.get('pinnedLocation'), droppedOnFrameProps.get('pinnedLocation'), isLeftSide)
+          appActions.moveSite(sourceDragData.get('pinnedLocation'), sourceDragData.get('partitionNumber'), droppedOnFrameProps.get('pinnedLocation'), isLeftSide)
         }
       }
     }, 0)

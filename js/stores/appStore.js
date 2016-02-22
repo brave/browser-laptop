@@ -256,13 +256,13 @@ const handleAppAction = (action) => {
       appWindow.close()
       break
     case AppConstants.APP_ADD_SITE:
-      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag, action.originalLocation))
+      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag, action.originalLocation, action.originalPartitionNumber))
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceLocation, action.destinationLocation, action.prepend))
+      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceLocation, action.sourcePartitionNumber, action.destinationLocation, action.prepend))
       break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
