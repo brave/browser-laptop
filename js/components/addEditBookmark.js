@@ -44,18 +44,6 @@ class AddEditBookmark extends ImmutableComponent {
     return this.props.currentDetail.get('partitionNumber')
   }
 
-  get originalLocation () {
-    return this.props.originalDetail && this.props.originalDetail.get('location') || undefined
-  }
-
-  get originalPartitionNumber () {
-    return this.props.originalDetail && this.props.originalDetail.get('partitionNumber') || undefined
-  }
-
-  get originalTitle () {
-    return this.props.originalDetail && this.props.originalDetail.get('title') || undefined
-  }
-
   componentDidMount () {
     this.bookmarkName.select()
     this.bookmarkName.focus()
@@ -91,8 +79,7 @@ class AddEditBookmark extends ImmutableComponent {
         location: this.location,
         title: this.title,
         partitionNumber: this.partitionNumber
-      }, tag,
-      this.originalLocation, this.originalPartitionNumber, this.originalTitle, tag)
+      }, tag, this.props.originalDetail)
     this.onClose()
   }
   render () {

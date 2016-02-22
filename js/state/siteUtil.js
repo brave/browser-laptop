@@ -43,17 +43,17 @@ module.exports.isSiteInList = function (sites, siteDetail, tag) {
  *
  * @param sites The application state's Immutable site list
  * @param frameProps The frameProps of the page in question
- * @param tag The tag to add for this site.  Supported tags are:
- *   'bookmark' for bookmarks.
- *   'reader' for reading list.
- * Otherwise it's only considered to be a history item
- * @param originalLocation If specified will modify this old location instead of adding
- * @param originalPartitionNumber If specified will modify this old location's partition number
- * @param originalTitle If specified will modify this title, only used for bookmark folders
+ * @param tag The tag to add for this site.
+ *   See siteTags.js for supported types. No tag means just a history item.
+ * @param originalDetail If specified will modify the specified site detail
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, frameProps, tag, originalLocation, originalPartitionNumber, originalTitle, originalTag) {
-  const index = module.exports.getSiteIndex(sites, originalLocation || frameProps.get('location'), originalPartitionNumber || frameProps.get('partitionNumber'), originalTitle || frameProps.get('title'), tag)
+module.exports.addSite = function (sites, frameProps, tag, originalDetail) {
+  const index = module.exports.getSiteIndex(sites,
+      originalDetail && originalDetail.get('location') || frameProps.get('location'),
+      originalDetail && originalDetail.get('partitionNumber') || frameProps.get('partitionNumber'),
+      originalDetail && originalDetail.get('title') || frameProps.get('title'),
+      tag)
   let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()

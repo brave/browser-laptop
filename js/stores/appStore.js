@@ -256,7 +256,7 @@ const handleAppAction = (action) => {
       appWindow.close()
       break
     case AppConstants.APP_ADD_SITE:
-      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag, action.originalLocation, action.originalPartitionNumber, action.originalTitle))
+      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag, action.originalDetail))
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))

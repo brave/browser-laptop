@@ -29,7 +29,7 @@ Dispatches an event to the main process to update the browser
 
 
 
-### addSite(frameProps, tag, originalLocation, originalPartitionNumber, originalTitle) 
+### addSite(frameProps, tag, originalDetail) 
 
 Adds a site to the site list
 
@@ -39,11 +39,7 @@ Adds a site to the site list
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
-**originalLocation**: `string`, If specified, the original location to edit / overwrite
-
-**originalPartitionNumber**: `number`, If specified, the original partitionNumber to edit / overwrite
-
-**originalTitle**: `string`, If specified, the original title to edit / overwrite
+**originalDetail**: `string`, If specified, the original site detail to edit / overwrite
 
 
 
