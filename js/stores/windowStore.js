@@ -139,6 +139,17 @@ const doAction = (action) => {
         })
       }
       break
+    case WindowConstants.WINDOW_SET_URL_IN_FRAME:
+      windowState = windowState.mergeIn(frameStatePath(action.key), {
+        src: action.location,
+        location: action.location,
+        audioPlaybackActive: false,
+        icon: undefined,
+        themeColor: undefined,
+        computedThemeColor: undefined,
+        title: ''
+      })
+      break
     case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
       const lastLocation = windowState.getIn(frameStatePath(key).concat(['location']))

@@ -92,6 +92,24 @@ const WindowActions = {
   },
 
   /**
+   * Similar to loadUrl, but loads the URL in a specified frame instead of the
+   * active one.
+   * @param {string} location - url to load
+   * @param {number} key - key of the frame to load in
+   */
+  loadUrlInFrame: function (location, key) {
+    location = location.trim()
+    if (UrlUtil.isURL(location)) {
+      location = UrlUtil.getUrlFromInput(location)
+    }
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL_IN_FRAME,
+      location,
+      key
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the current navigated location.
    * This differs from the above in that it will not change the webview's (iframe's) src.
    * This should be used for inter-page navigation but not user initiated loads.
