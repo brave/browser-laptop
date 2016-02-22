@@ -113,7 +113,7 @@ module.exports.findOnPageMenuItem = {
 }
 
 module.exports.checkForUpdateMenuItem = {
-  label: 'Check for updates ...',
+  label: 'Check for updates...',
   click: function (item, focusedWindow) {
     if (electron.BrowserWindow.getAllWindows().length === 0) {
       AppActions.newWindow()
