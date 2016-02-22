@@ -14,6 +14,7 @@ class CertErrorPage extends React.Component {
   constructor () {
     super()
     this.state = {
+      advanced: false,
       certDetails: window.initCertDetails ? Immutable.fromJS(window.initCertDetails) : Immutable.Map()
     }
     window.addEventListener(messages.CERT_DETAILS_UPDATED, (e) => {
@@ -29,12 +30,26 @@ class CertErrorPage extends React.Component {
     aboutActions.acceptCertError(this.state.certDetails.get('url'))
   }
 
+  onSafety () {
+    window.location.href = 'about:newtab'
+  }
+
+  onAdvanced () {
+    this.setState({advanced: true})
+  }
+
   render () {
+    console.log(this.state.advanced)
     return <div>
       <span data-l10n-id='certErrorText'></span>
       <span>{this.state.certDetails.get('url') || ''}</span>
-      <div>{this.state.certDetails.get('error') || ''}</div>
-      <Button l10nId='certErrorButtonText' className='wideButton' onClick={this.onAccept.bind(this)}/>
+      <div style={{color: 'red'}}>{this.state.certDetails.get('error') || ''}</div>
+      <Button l10nId='certErrorSafety' className='wideButton' onClick={this.onSafety.bind(this)}/>
+      <div>
+      {this.state.advanced
+        ? <Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)}/>
+        : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)}/>}
+      </div>
     </div>
   }
 }

@@ -74,15 +74,15 @@ const saveIfAllCollected = () => {
 
 app.on('ready', function () {
   app.on('certificate-error', function (e, webContents, url, error, cert, cb) {
+    if (acceptCertUrls[url] === true) {
+      // Ignore the cert error
+      e.preventDefault()
+      cb(true)
+      return
+    }
     // Tell the page to show an unlocked icon. Note this is sent to the main
     // window webcontents, not the webview webcontents
     BrowserWindow.getAllWindows().map((win) => {
-      if (acceptCertUrls[url] === true) {
-        // Ignore the cert error
-        e.preventDefault()
-        cb(true)
-        return
-      }
       win.webContents.send(messages.CERT_ERROR, {
         url,
         error,

@@ -22,6 +22,8 @@
 <newTabButton title: "Add new tab">
 <certError "HTTPS Certificate Error">
 <certErrorText "This site cannot be loaded due to a certificate error: ">
+<certErrorAdvanced "Advanced settings">
+<certErrorSafety "Back to safety">
 <certErrorButtonText "Ignore certificate error (dangerous!)">
 <openTypeInNewTab "Open {{$type}} in a new tab">
 <openTypeInNewPrivateTab "Open {{$type}} in a new private tab">
