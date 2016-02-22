@@ -61,45 +61,23 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
 }
 
 module.exports.downloadDataFile = (resourceName, url, version, force) => {
-  if (resourceName === 'httpsEverywhere') {
-    return new Promise((resolve, reject) => {
-      downloadSingleFile(resourceName, url, version, force, () => {
-        var targets = AppConfig[resourceName].targetsUrl.replace('{version}', version)
-        downloadSingleFile(resourceName, targets, version, force, resolve, reject)
-      }, reject)
-    })
-  } else {
-    return new Promise((resolve, reject) => {
-      downloadSingleFile(resourceName, url, version, force, resolve, reject)
-    })
-  }
+  return new Promise((resolve, reject) => {
+    downloadSingleFile(resourceName, url, version, force, resolve, reject)
+  })
 }
 
 module.exports.readDataFile = (resourceName, url) => {
-  if (resourceName === 'httpsEverywhere') {
-    // If https everywhere, just return the path to the files on disk
-    return new Promise((resolve, reject) => {
-      fs.stat(storagePath(url), function (err, stats) {
-        if (err || !stats.isFile()) {
-          reject()
-        } else {
-          resolve(app.getPath('userData'))
-        }
-      })
+  return new Promise((resolve, reject) => {
+    fs.readFile(storagePath(url), function (err, data) {
+      if (err || !data || data.length === 0) {
+        // console.log('rejecting for read for resource:', resourceName)
+        reject()
+      } else {
+        // console.log('resolving for read for resource:', resourceName)
+        resolve(data)
+      }
     })
-  } else {
-    return new Promise((resolve, reject) => {
-      fs.readFile(storagePath(url), function (err, data) {
-        if (err || !data || data.length === 0) {
-          // console.log('rejecting for read for resource:', resourceName)
-          reject()
-        } else {
-          // console.log('resolving for read for resource:', resourceName)
-          resolve(data)
-        }
-      })
-    })
-  }
+  })
 }
 
 module.exports.shouldRedownloadFirst = (resourceName, version) => {
