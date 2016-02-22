@@ -81,7 +81,7 @@ const AppActions = {
    * Dispatches a message to move a site locations.
    *
    * @param {string} sourceLocation - the location of the site to move
-   * @param {number} sourcePartitionNumber- the partition number of the site to move
+   * @param {number} sourcePartitionNumber - the partition number of the site to move
    * @param {string} destinationLocation - the location of the site to move to
    * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
    */

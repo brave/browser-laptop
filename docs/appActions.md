@@ -29,7 +29,7 @@ Dispatches an event to the main process to update the browser
 
 
 
-### addSite(frameProps, tag, originalLocation) 
+### addSite(frameProps, tag, originalLocation, originalPartitionNumber) 
 
 Adds a site to the site list
 
@@ -40,6 +40,8 @@ Adds a site to the site list
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
 **originalLocation**: `string`, If specified, the original location to edit / overwrite
+
+**originalPartitionNumber**: `number`, If specified, the original partitionNumber to edit / overwrite
 
 
 
@@ -55,13 +57,15 @@ Removes a site from the site list
 
 
 
-### moveSite(sourceLocation, destinationLocation, prepend) 
+### moveSite(sourceLocation, sourcePartitionNumber, destinationLocation, prepend) 
 
 Dispatches a message to move a site locations.
 
 **Parameters**
 
 **sourceLocation**: `string`, the location of the site to move
+
+**sourcePartitionNumber**: `number`, the partition number of the site to move
 
 **destinationLocation**: `string`, the location of the site to move to
 
