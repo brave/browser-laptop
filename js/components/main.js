@@ -262,7 +262,9 @@ class Main extends ImmutableComponent {
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
           }
           { this.props.windowState.get('bookmarkDetail')
-            ? <AddEditBookmark currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])} originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}/>
+            ? <AddEditBookmark sites={this.props.appState.get('sites')}
+                currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}/>
             : null
           }
           { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])

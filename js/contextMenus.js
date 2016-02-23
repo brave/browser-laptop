@@ -120,11 +120,28 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
   return template
 }
 
-function showBookmarkFolderInit (title) {
-  return [{
-    label: '(empty)',
-    enabled: false
-  }]
+function showBookmarkFolderInit (bookmarks, bookmark, activeFrame) {
+  const items = siteUtil.filterSitesRelativeTo(bookmarks, bookmark)
+  if (items.size === 0) {
+    return [{
+      label: '(empty)',
+      enabled: false
+    }]
+  }
+
+  return items.map(site => {
+    const templateItem = {
+      label: site.get('title'),
+      click: function () {
+        WindowActions.loadUrl(activeFrame, site.get('location'))
+      }
+    }
+    const isFolder = siteUtil.isFolder(site)
+    if (isFolder) {
+      templateItem.submenu = showBookmarkFolderInit(bookmarks, site, activeFrame)
+    }
+    return templateItem
+  }).toJS()
 }
 
 function tabTemplateInit (frameProps) {
@@ -433,8 +450,8 @@ export function onBookmarkContextMenu (siteDetail, activeFrame, e) {
   menu.popup(remote.getCurrentWindow())
 }
 
-export function onShowBookmarkFolderMenu (title, e) {
-  const menu = Menu.buildFromTemplate(showBookmarkFolderInit(title))
+export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
+  const menu = Menu.buildFromTemplate(showBookmarkFolderInit(bookmarks, bookmark, activeFrame))
   const rectLeft = e.target.getBoundingClientRect()
   const rectBottom = e.target.parentNode.getBoundingClientRect()
   menu.popup(remote.getCurrentWindow(), rectLeft.left | 0, rectBottom.bottom | 0)

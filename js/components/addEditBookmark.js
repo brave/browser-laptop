@@ -10,12 +10,14 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
 const siteTags = require('../constants/siteTags')
+const siteUtil = require('../state/siteUtil')
 
 class AddEditBookmark extends ImmutableComponent {
   constructor () {
     super()
     this.onNameChange = this.onNameChange.bind(this)
     this.onLocationChange = this.onLocationChange.bind(this)
+    this.onParentFolderChange = this.onParentFolderChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onClose = this.onClose.bind(this)
   }
@@ -24,6 +26,17 @@ class AddEditBookmark extends ImmutableComponent {
   }
   get isFolder () {
     return this.props.currentDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+  }
+  updateFolders (props) {
+    this.folders = siteUtil.getFolders(this.props.sites, props.currentDetail.get('folderId'))
+  }
+  componentWillMount () {
+    this.updateFolders(this.props)
+  }
+  componentWillUpdate (nextProps) {
+    if (this.props.sites !== nextProps.sites) {
+      this.updateFolders(nextProps)
+    }
   }
   componentDidMount () {
     this.bookmarkName.select()
@@ -53,6 +66,10 @@ class AddEditBookmark extends ImmutableComponent {
     const currentDetail = this.props.currentDetail.set('location', e.target.value)
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
   }
+  onParentFolderChange (e) {
+    const currentDetail = this.props.currentDetail.set('parentFolderId', e.target.value)
+    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
+  }
   onSave () {
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail)
@@ -70,6 +87,14 @@ class AddEditBookmark extends ImmutableComponent {
           <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
           <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
         </div> : null }
+        <div id='bookmarkParentFolder' className='bookmarkFormRow'>
+          <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk'/>
+          <select value={this.props.currentDetail.get('parentFolderId')}
+            onChange={this.onParentFolderChange} >
+          <option value='0' data-l10n-id='bookmarksToolbar'/>
+          { this.folders.map(folder => <option value={folder.folderId}>{folder.label}</option>)}
+          </select>
+        </div>
         <div className='bookmarkFormRow'>
           <span/>
           <Button l10nId='save' className='primaryButton' onClick={this.onSave.bind(this)}/>

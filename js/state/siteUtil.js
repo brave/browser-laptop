@@ -17,7 +17,7 @@ module.exports.getSiteIndex = function (sites, siteDetail, tags) {
   let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
     typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
   if (isBookmarkFolder) {
-    return sites.findIndex(site => site.get('title') === siteDetail.get('title') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+    return sites.findIndex(site => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
   }
   return sites.findIndex(site => site.get('location') === siteDetail.get('location') && (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0))
 }
@@ -37,6 +37,22 @@ module.exports.isSiteInList = function (sites, siteDetail, tag) {
   return sites.get(index).get('tags').includes(tag)
 }
 
+const getNextFolderId = (sites) =>
+  sites.max((siteA, siteB) => {
+    const folderIdA = siteA.get('folderId')
+    const folderIdB = siteB.get('folderId')
+    if (folderIdA === folderIdB) {
+      return 0
+    }
+    if (folderIdA === undefined) {
+      return false
+    }
+    if (folderIdB === undefined) {
+      return true
+    }
+    return folderIdA > folderIdB
+  })
+
 /**
  * Adds the specified siteDetail to sites
  *
@@ -49,6 +65,13 @@ module.exports.isSiteInList = function (sites, siteDetail, tag) {
  */
 module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
+
+  let folderId = siteDetail.get('folderId')
+  if (tag === siteTags.BOOKMARK_FOLDER) {
+    const maxIdItem = getNextFolderId(sites)
+    folderId = (maxIdItem ? maxIdItem.get('folderId') : 0) + 1
+  }
+
   let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -60,8 +83,14 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     location: siteDetail.get('location'),
     title: siteDetail.get('title')
   })
+  if (folderId) {
+    site = site.set('folderId', Number(folderId))
+  }
+  if (siteDetail.get('parentFolderId')) {
+    site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId')))
+  }
   if (siteDetail.get('partitionNumber')) {
-    site = site.set('partitionNumber', siteDetail.get('partitionNumber'))
+    site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber')))
   }
 
   if (index === -1) {
@@ -130,15 +159,50 @@ module.exports.getDetailFromFrame = function (frame, tag) {
 }
 
 module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
-  const isFolder1 = siteDetail1.get('tags').includes(siteTags.BOOKMARK_FOLDER)
-  const isFolder2 = siteDetail2.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+  const isFolder1 = module.exports.isFolder(siteDetail1)
+  const isFolder2 = module.exports.isFolder(siteDetail2)
   if (isFolder1 !== isFolder2) {
     return false
   }
 
   // If they are both folders
   if (isFolder1) {
-    return siteDetail1.get('title') === siteDetail2.get('title')
+    return siteDetail1.get('folderId') === siteDetail2.get('folderId')
   }
   return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') !== siteDetail2.get('partitionNumber')
+}
+
+module.exports.isFolder = function (siteDetail) {
+  return siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+}
+
+/**
+ * Obtains an array of folders
+ */
+module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
+  parentId = parentId || 0
+  let folders = []
+  sites.forEach(site => {
+    if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
+      if (site.get('folderId') === folderId) {
+        return
+      }
+      const label = (labelPrefix || '') + site.get('title')
+      folders.push({
+        folderId: site.get('folderId'),
+        parentFolderId: site.get('parentFolderId'),
+        label
+      })
+      const subsites = module.exports.getFolders(sites, folderId, site.get('folderId'), label + ' / ')
+      folders = folders.concat(subsites)
+    }
+  })
+  return folders
+}
+
+module.exports.filterSitesRelativeTo = function (sites, relSite) {
+  if (!relSite.get('folderId')) {
+    return sites
+  }
+  return sites.filter(site => site.get('parentFolderId') === relSite.get('folderId'))
 }

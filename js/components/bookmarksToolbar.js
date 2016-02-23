@@ -21,7 +21,7 @@ const bookmarkMaxWidth = 100
 class BookmarkToolbarButton extends ImmutableComponent {
   click (e) {
     if (this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
-      contextMenus.onShowBookmarkFolderMenu(this.props.bookmark.get('title'), {target: ReactDOM.findDOMNode(this)})
+      contextMenus.onShowBookmarkFolderMenu(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, {target: ReactDOM.findDOMNode(this)})
       return
     }
     const isDarwin = process.platform === 'darwin'
@@ -180,12 +180,15 @@ class BookmarksToolbar extends ImmutableComponent {
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
     {
-        this.props.bookmarks.take(this.maxItems).map(bookmark =>
+        this.props.bookmarks
+          .filter(bookmark => !bookmark.get('parentFolderId'))
+          .take(this.maxItems).map(bookmark =>
           <BookmarkToolbarButton
             ref={node => this.bookmarkRefs.push(node)}
             sourceDragData={this.props.sourceDragData}
             draggingOverData={this.props.draggingOverData}
             activeFrame={this.props.activeFrame}
+            bookmarks={this.props.bookmarks}
             bookmark={bookmark}/>)
     }
     { this.leftOver > 0
