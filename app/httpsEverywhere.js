@@ -132,6 +132,10 @@ function onBeforeHTTPRequest (details) {
       !Filtering.isResourceEnabled(module.exports.resourceName)) {
     return result
   }
+  // Ignore URLs that are not HTTP
+  if (urlParse(details.url).protocol !== 'http:') {
+    return result
+  }
 
   if (redirectBlacklist.includes(canonicalizeUrl(details.url))) {
     // Don't try to rewrite this request, it'll probably just redirect again.
