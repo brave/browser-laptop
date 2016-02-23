@@ -9,6 +9,7 @@ const contextMenus = require('../contextMenus')
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
+const siteUtil = require('../state/siteUtil')
 const dragTypes = require('../constants/dragTypes')
 const Button = require('../components/button')
 const cx = require('../lib/classSet.js')
@@ -103,18 +104,12 @@ class BookmarksToolbar extends ImmutableComponent {
     e.preventDefault()
     if (this.props.sourceDragData) {
       const bookmark = this.props.sourceDragData
-      const bookmarkFolder = bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+      // Figure out the droppedOn element filtering out the source drag item
       let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => {
         if (!bookmarkRef) {
           return false
         }
-        if (bookmarkFolder !== bookmarkRef.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
-          return true
-        }
-        if (bookmarkFolder) {
-          return bookmarkRef.props.bookmark.get('title') !== bookmark.get('title')
-        }
-        return bookmarkRef.props.bookmark.get('location') !== bookmark.get('location') && bookmarkRef.props.bookmark.get('partitionNumber') !== bookmark.get('partitionNumber')
+        return !siteUtil.isEquivalent(bookmarkRef.props.bookmark, bookmark)
       }), e.clientX)
       if (droppedOn) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn), e.clientX)

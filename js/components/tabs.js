@@ -16,6 +16,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const Button = require('./button')
 const Tab = require('./tab')
 const dnd = require('../dnd')
+const siteUtil = require('../state/siteUtil')
 
 class Tabs extends ImmutableComponent {
   get activeFrameIndex () {
@@ -56,7 +57,7 @@ class Tabs extends ImmutableComponent {
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (sourceDragData.get('pinnedLocation')) {
           windowActions.setPinned(sourceDragData, false)
-          appActions.removeSite(sourceDragData, siteTags.PINNED)
+          appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
         }
       }
     }, 0)

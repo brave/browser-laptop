@@ -49,28 +49,29 @@ const AppActions = {
 
   /**
    * Adds a site to the site list
-   * @param {Object} frameProps - Properties of the frame in question
+   * @param {Object} siteDetail - Properties of the site in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
-   * @param {string} originalDetail - If specified, the original site detail to edit / overwrite
+   * @param {string} originalSiteDetail - If specified, the original site detail to edit / overwrite.
+   *   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
    */
-  addSite: function (frameProps, tag, originalDetail) {
+  addSite: function (siteDetail, tag, originalSiteDetail) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_ADD_SITE,
-      frameProps,
+      siteDetail,
       tag,
-      originalDetail
+      originalSiteDetail
     })
   },
 
   /**
    * Removes a site from the site list
-   * @param {Object} frameProps - Properties of the frame in question
+   * @param {Object} siteDetail - Properties of the site in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    */
-  removeSite: function (frameProps, tag) {
+  removeSite: function (siteDetail, tag) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_SITE,
-      frameProps,
+      siteDetail,
       tag
     })
   },

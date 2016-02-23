@@ -24,8 +24,7 @@ describe('sessionStore', function () {
       yield Brave.app.client.waitForExist(selectors.navigatorNotBookmarked)
       yield Brave.app.client.addSite({
         location: page1Url,
-        title: 'some page',
-        isPrivate: false
+        title: 'some page'
       }, siteTags.BOOKMARK)
       yield Brave.app.client
         .moveToObject(selectors.urlInput)

@@ -3,7 +3,7 @@
 const UrlUtil = require('../../js/lib/urlutil')
 const assert = require('assert')
 
-describe.only('urlutil', function () {
+describe('urlutil', function () {
   describe('getScheme', function () {
     it('null for empty', function *() {
       assert.equal(UrlUtil.getScheme('/file/path/to/file'), null)

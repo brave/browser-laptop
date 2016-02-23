@@ -9,6 +9,7 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const {onTabPageContextMenu} = require('../contextMenus')
+const siteUtil = require('../state/siteUtil')
 
 class TabPage extends ImmutableComponent {
   onDrop (e) {
@@ -29,7 +30,7 @@ class TabPage extends ImmutableComponent {
         sourceDragFromPageIndex >= this.props.index)
       if (sourceDragData.get('pinnedLocation')) {
         windowActions.setPinned(sourceDragData, false)
-        appActions.removeSite(sourceDragData, siteTags.PINNED)
+        appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
       }
     }, 0)
   }

@@ -15,6 +15,7 @@ const SiteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
+const siteUtil = require('../state/siteUtil')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -31,9 +32,9 @@ class NavigationBar extends ImmutableComponent {
 
   onToggleBookmark (isBookmarked) {
     if (isBookmarked) {
-      AppActions.removeSite(this.props.activeFrame, SiteTags.BOOKMARK)
+      AppActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame), SiteTags.BOOKMARK)
     } else {
-      AppActions.addSite(this.props.activeFrame, SiteTags.BOOKMARK)
+      AppActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame), SiteTags.BOOKMARK)
     }
   }
 

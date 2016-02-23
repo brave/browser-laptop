@@ -20,11 +20,11 @@ const ipc = global.require('electron').ipcRenderer
  * Obtains an add bookmark menu item
  * @param {object} Detail of the bookmark to initialize with
  */
-const addBookmarkMenuItem = (bookmarkDetail) => {
+const addBookmarkMenuItem = (siteDetail) => {
   return {
     label: 'Add Bookmark...',
     click: () => {
-      WindowActions.setBookmarkDetail(bookmarkDetail)
+      WindowActions.setBookmarkDetail(siteDetail)
     }
   }
 }
@@ -88,11 +88,9 @@ function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   }).toJS()
 }
 
-function bookmarkTemplateInit (bookmarkDetail, activeFrame) {
-  const location = bookmarkDetail.get('location')
-  const title = bookmarkDetail.get('title')
-  const partitionNumber = bookmarkDetail.get('partitionNumber')
-  const isFolder = bookmarkDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+function bookmarkTemplateInit (siteDetail, activeFrame) {
+  const location = siteDetail.get('location')
+  const isFolder = siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   const template = []
   if (!isFolder) {
     template.push(openInNewTabMenuItem(location),
@@ -107,17 +105,13 @@ function bookmarkTemplateInit (bookmarkDetail, activeFrame) {
       label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
       click: () => {
         // originalLocation is undefined signifies add mode
-        WindowActions.setBookmarkDetail(bookmarkDetail, bookmarkDetail)
+        WindowActions.setBookmarkDetail(siteDetail, siteDetail)
       }
     },
     CommonMenu.separatorMenuItem, {
       label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
       click: () => {
-        AppActions.removeSite({
-          location,
-          partitionNumber,
-          title
-        }, bookmarkDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
+        AppActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
       }
     },
     CommonMenu.separatorMenuItem,
@@ -153,7 +147,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           WindowActions.setPinned(frameProps, false)
           // Handle setting it in app storage for the other windows
-          AppActions.removeSite(frameProps, siteTags.PINNED)
+          AppActions.removeSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
         }
       })
     } else {
@@ -163,7 +157,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           WindowActions.setPinned(frameProps, true)
           // Handle setting it in app storage for the other windows
-          AppActions.addSite(frameProps, siteTags.PINNED)
+          AppActions.addSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
         }
       })
     }
@@ -431,11 +425,11 @@ export function onUrlBarContextMenu (e) {
   inputMenu.popup(remote.getCurrentWindow())
 }
 
-export function onBookmarkContextMenu (bookmarkDetail, activeFrame, e) {
+export function onBookmarkContextMenu (siteDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
-  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(bookmarkDetail, activeFrame))
+  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(siteDetail, activeFrame))
   menu.popup(remote.getCurrentWindow())
 }
 

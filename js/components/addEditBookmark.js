@@ -25,25 +25,6 @@ class AddEditBookmark extends ImmutableComponent {
   get isFolder () {
     return this.props.currentDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   }
-  get location () {
-    if (this.isblankTab) {
-      return ''
-    }
-    return this.props.currentDetail.get('location')
-  }
-  get title () {
-    if (this.isblankTab) {
-      return ''
-    }
-    return this.props.currentDetail.get('title')
-  }
-  get partitionNumber () {
-    if (this.isblankTab) {
-      return undefined
-    }
-    return this.props.currentDetail.get('partitionNumber')
-  }
-
   componentDidMount () {
     this.bookmarkName.select()
     this.bookmarkName.focus()
@@ -74,12 +55,7 @@ class AddEditBookmark extends ImmutableComponent {
   }
   onSave () {
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
-    appActions.addSite(
-      {
-        location: this.location,
-        title: this.title,
-        partitionNumber: this.partitionNumber
-      }, tag, this.props.originalDetail)
+    appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail)
     this.onClose()
   }
   render () {
@@ -92,7 +68,7 @@ class AddEditBookmark extends ImmutableComponent {
         { !this.isFolder
           ? <div id='bookmarkLocation' className='bookmarkFormRow'>
           <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
-          <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.location} />
+          <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
         </div> : null }
         <div className='bookmarkFormRow'>
           <span/>
