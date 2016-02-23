@@ -60,7 +60,7 @@ const init = (settingsState, args) => {
         message: 'Version: ' + app.getVersion() + '\n' +
           'Electron: ' + process.versions['atom-shell'] + '\n' +
           'libchromiumcontent: ' + process.versions['chrome'],
-        icon: path.join(__dirname, 'img', 'braveBtn.png'),
+        icon: path.join(__dirname, 'img', 'braveBtn3x.png'),
         buttons: ['Ok']
       })
     }
