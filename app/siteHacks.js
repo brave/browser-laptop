@@ -15,7 +15,7 @@ module.exports.init = () => {
   if (!AppConfig[resourceName].enabled) {
     return
   }
-  Filtering.registerFilteringCB(details => {
+  Filtering.registerBeforeSendHeadersFilteringCB(details => {
     if (details.resourceType !== 'mainFrame') {
       return {
         shouldBlock: false,

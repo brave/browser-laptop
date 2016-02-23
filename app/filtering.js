@@ -15,21 +15,48 @@ const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
 
-const filteringFns = []
+const beforeSendHeadersFilteringFns = []
+const beforeRequestFilteringFns = []
 
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net']
 
-module.exports.registerFilteringCB = filteringFn => {
-  filteringFns.push(filteringFn)
+module.exports.registerBeforeSendHeadersFilteringCB = filteringFn => {
+  beforeSendHeadersFilteringFns.push(filteringFn)
+}
+
+module.exports.registerBeforeRequestFilteringCB = filteringFn => {
+  beforeRequestFilteringFns.push(filteringFn)
 }
 
 /**
- * Register for notifications for webRequest notifications for
+ * Register for notifications for webRequest.onBeforeRequest for a particular
+ * session.
+ * @param {object} session Session to add webRequest filtering on
+ */
+function registerForBeforeRequest (session) {
+  session.webRequest.onBeforeRequest(function (details, cb) {
+    let redirectURL
+    for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
+      let results = beforeRequestFilteringFns[i](details)
+      if (results.cancel) {
+        cb({cancel: true})
+        return
+      }
+      if (results.redirectURL) {
+        redirectURL = results.redirectURL
+      }
+    }
+    cb({redirectURL: redirectURL})
+  })
+}
+
+/**
+ * Register for notifications for webRequest.onBeforeSendHeaders for
  * a particular session.
  * @param {object} The session to add webRequest filtering on
  */
-function registerForSession (session) {
+function registerForBeforeSendHeaders (session) {
   // For efficiency, avoid calculating sendDNT on every request. This means the
   // browser must be restarted for changes to take effect.
   const sendDNT = getSetting(AppStore.getState().get('settings'), settings.DO_NOT_TRACK)
@@ -41,8 +68,8 @@ function registerForSession (session) {
     }
 
     let results
-    for (let i = 0; i < filteringFns.length; i++) {
-      let currentResults = filteringFns[i](details)
+    for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
+      let currentResults = beforeSendHeadersFilteringFns[i](details)
       if (currentResults && !module.exports.isResourceEnabled(currentResults.resourceName)) {
         continue
       }
@@ -98,9 +125,11 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
 }
 
 module.exports.init = () => {
-  registerForSession(session.fromPartition(''))
-  registerForSession(session.fromPartition('private-1'))
-  registerForSession(session.fromPartition('main-1'))
+  [registerForBeforeRequest, registerForBeforeSendHeaders].forEach(fn => {
+    fn(session.fromPartition(''))
+    fn(session.fromPartition('private-1'))
+    fn(session.fromPartition('main-1'))
+  })
 }
 
 module.exports.isResourceEnabled = (resourceName) => {
