@@ -167,10 +167,8 @@ app.on('ready', function () {
       Menu.init(AppStore.getState().get('settings'))
     })
 
-    // Load HTTPS Everywhere browser "extension"
-    HttpsEverywhere.init()
-
     Filtering.init()
+    HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()
     SiteHacks.init()

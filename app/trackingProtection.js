@@ -20,7 +20,7 @@ let cachedFirstParty = {}
 const whitelistHosts = ['connect.facebook.net']
 
 const startTrackingProtection = (wnd) => {
-  Filtering.registerFilteringCB((details) => {
+  Filtering.registerBeforeSendHeadersFilteringCB((details) => {
     // After every 50 first party hosts, just
     // re-get the first party host list
     if (cachedFirstPartyCount > 50) {
