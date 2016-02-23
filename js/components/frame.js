@@ -200,11 +200,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-title-updated', ({title}) => {
       WindowActions.setFrameTitle(this.props.frame, title)
     })
-    this.webview.addEventListener('dom-ready', (event) => {
-      if (this.props.enableAds) {
-        this.insertAds(event.target.src)
-      }
-    })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
@@ -259,6 +254,9 @@ class Frame extends ImmutableComponent {
       WindowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
+      if (this.props.enableAds) {
+        this.insertAds(this.webview.getURL())
+      }
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
       let security = this.props.frame.get('security')
       if (this.props.frame.get('location') === 'about:certerror' &&
