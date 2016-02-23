@@ -9,6 +9,7 @@
 @import "variables.less";
 
 .navigatorWrapper {
+  -webkit-app-region: drag;
   align-items: center;
   display: flex;
   justify-content: space-between;
@@ -111,6 +112,7 @@
   }
 
   input {
+    -webkit-app-region: no-drag;
     background: @navigationBarBackground;
     border: none;
     border-radius: @borderRadiusURL;
