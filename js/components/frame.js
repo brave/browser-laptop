@@ -76,7 +76,7 @@ class Frame extends ImmutableComponent {
         WindowActions.setSecurityState(this.props.frame, {
           certDetails: details
         })
-        WindowActions.loadUrlInFrame('about:certerror', this.props.frame.get('key'))
+        WindowActions.loadUrl(this.props.frame, 'about:certerror')
       }
     })
     this.updateWebview()

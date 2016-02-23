@@ -46,25 +46,25 @@ const WindowActions = {
   },
 
   /**
-   * Dispatches a message to the store to load a new URL for the active frame.
+   * Dispatches a message to the store to load a new URL.
    * Both the frame's src and location properties will be updated accordingly.
    *
-   * If the activeFrame is a pinned site and the origin of the pinned site does
+   * If the frame is a pinned site and the origin of the pinned site does
    * not match the origin of the passed in location, then a new frame will be
    * created for the load.
    *
    * In general, an iframe's src should not be updated when navigating within the frame to a new page,
    * but the location should. For user entered new URLs, both should be updated.
    *
-   * @param {object} activeFrame - The frame props for the active frame
+   * @param {object} frame - The frame props
    * @param {string} location - The URL of the page to load
    */
-  loadUrl: function (activeFrame, location) {
+  loadUrl: function (frame, location) {
     location = location.trim()
     let newFrame = false
-    if (activeFrame.get('pinnedLocation')) {
+    if (frame.get('pinnedLocation')) {
       try {
-        const origin1 = new window.URL(activeFrame.get('location')).origin
+        const origin1 = new window.URL(frame.get('location')).origin
         const origin2 = new window.URL(location).origin
         if (origin1 !== origin2) {
           newFrame = true
@@ -86,27 +86,10 @@ const WindowActions = {
     } else {
       dispatch({
         actionType: WindowConstants.WINDOW_SET_URL,
-        location
+        location,
+        key: frame.get('key')
       })
     }
-  },
-
-  /**
-   * Similar to loadUrl, but loads the URL in a specified frame instead of the
-   * active one.
-   * @param {string} location - url to load
-   * @param {number} key - key of the frame to load in
-   */
-  loadUrlInFrame: function (location, key) {
-    location = location.trim()
-    if (UrlUtil.isURL(location)) {
-      location = UrlUtil.getUrlFromInput(location)
-    }
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_IN_FRAME,
-      location,
-      key
-    })
   },
 
   /**

@@ -117,13 +117,13 @@ const doAction = (action) => {
       return
     case WindowConstants.WINDOW_SET_URL:
       // reload if the url is unchanged
-      if (FrameStateUtil.getActiveFrame(windowState).get('src') === action.location) {
-        windowState = windowState.mergeIn(activeFrameStatePath(), {
+      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
+        windowState = windowState.mergeIn(frameStatePath(action.key), {
           audioPlaybackActive: false,
           activeShortcut: 'reload'
         })
       } else {
-        windowState = windowState.mergeIn(activeFrameStatePath(), {
+        windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
           location: action.location,
           audioPlaybackActive: false,
@@ -138,17 +138,6 @@ const doAction = (action) => {
           title: ''
         })
       }
-      break
-    case WindowConstants.WINDOW_SET_URL_IN_FRAME:
-      windowState = windowState.mergeIn(frameStatePath(action.key), {
-        src: action.location,
-        location: action.location,
-        audioPlaybackActive: false,
-        icon: undefined,
-        themeColor: undefined,
-        computedThemeColor: undefined,
-        title: ''
-      })
       break
     case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
