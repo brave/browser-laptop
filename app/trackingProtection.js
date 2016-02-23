@@ -17,7 +17,7 @@ let cachedFirstPartyCount = 0
 let cachedFirstParty = {}
 
 // Temporary whitelist until we find a better solution
-const whitelistHosts = ['connect.facebook.net']
+const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticxx.facebook.com', 'www.facebook.com']
 
 const startTrackingProtection = (wnd) => {
   Filtering.registerBeforeSendHeadersFilteringCB((details) => {
