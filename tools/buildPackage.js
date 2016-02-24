@@ -5,6 +5,7 @@
 var VersionInfo = require('./lib/versionInfo')
 var execute = require('./lib/execute')
 const ignoredPaths = require('./lib/ignoredPaths')
+const config = require('./lib/config')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -21,8 +22,22 @@ if (isWindows) {
 }
 
 var env = {
-  NODE_ENV: 'production'
+  NODE_ENV: 'production',
+  CHANNEL: process.env.CHANNEL
 }
+
+var channels = { dev: true, beta: true, stable: true }
+if (!channels[env.CHANNEL]) {
+  throw new Error('CHANNEL environment variable must be set to dev, beta or stable')
+}
+
+console.log('Writing buildConfig.js...')
+config.writeBuildConfig(
+  {
+    channel: env.CHANNEL
+  },
+  'buildConfig.js'
+)
 
 var cmds = ['echo cleaning up target...']
 

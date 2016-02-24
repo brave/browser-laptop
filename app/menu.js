@@ -13,6 +13,7 @@ const app = electron.app
 const AppActions = require('../js/actions/appActions')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
+const Channel = require('./channel')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -59,7 +60,8 @@ const init = (settingsState, args) => {
         title: 'Brave',
         message: 'Version: ' + app.getVersion() + '\n' +
           'Electron: ' + process.versions['atom-shell'] + '\n' +
-          'libchromiumcontent: ' + process.versions['chrome'],
+          'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
+          'Channel: ' + Channel.channel(),
         icon: path.join(__dirname, 'img', 'braveBtn.png'),
         buttons: ['Ok']
       })

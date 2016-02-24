@@ -39,6 +39,7 @@ win64-dist
 
 app/gen
 *.pfx
+buildConfig.js
 
 # HTTPS Everywhere files
 rulesets.json
