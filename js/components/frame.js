@@ -15,6 +15,7 @@ const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
 const Config = require('../constants/config.js')
+const siteHacks = require('../data/siteHacks')
 
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
@@ -60,6 +61,11 @@ class Frame extends ImmutableComponent {
     }
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
+    }
+
+    const hack = siteHacks[urlParse(location).hostname]
+    if (hack && hack.userAgent) {
+      this.webview.setAttribute('useragent', hack.userAgent)
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)

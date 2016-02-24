@@ -26,8 +26,8 @@ module.exports.init = () => {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
     let cbArgs = {}
-    if (hack) {
-      cbArgs = { requestHeaders: hack.call(this, details) }
+    if (hack && hack.requestFilter) {
+      cbArgs = { requestHeaders: hack.requestFilter.call(this, details) }
     }
     return {
       shouldBlock: false,
