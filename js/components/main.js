@@ -137,6 +137,16 @@ class Main extends ImmutableComponent {
       WindowActions.loadUrl(activeFrame, url)
     })
 
+    ipc.on(messages.CERT_ERROR, (e, details) => {
+      const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === details.url)
+      frames.forEach(frame => {
+        WindowActions.setSecurityState(frame, {
+          certDetails: details
+        })
+        WindowActions.loadUrl(frame, 'about:certerror')
+      })
+    })
+
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {

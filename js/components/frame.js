@@ -15,7 +15,6 @@ const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
 const Config = require('../constants/config.js')
-const ipc = global.require('electron').ipcRenderer
 
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
@@ -71,14 +70,6 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidMount () {
-    ipc.on(messages.CERT_ERROR, (e, details) => {
-      if (details.url === this.props.frame.get('location')) {
-        WindowActions.setSecurityState(this.props.frame, {
-          certDetails: details
-        })
-        WindowActions.loadUrl(this.props.frame, 'about:certerror')
-      }
-    })
     this.updateWebview()
   }
 
