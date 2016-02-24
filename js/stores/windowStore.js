@@ -152,7 +152,9 @@ const doAction = (action) => {
         title: locationChanged ? '' : lastTitle,
         location: action.location
       })
-      updateNavBarInput(action.location, frameStatePath(key))
+      if (locationChanged) {
+        updateNavBarInput(action.location, frameStatePath(key))
+      }
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
