@@ -152,10 +152,7 @@ const doAction = (action) => {
         title: locationChanged ? '' : lastTitle,
         location: action.location
       })
-      // check url fragment when updating navbar input
-      if (action.location !== lastLocation) {
-        updateNavBarInput(action.location, frameStatePath(key))
-      }
+      updateNavBarInput(action.location, frameStatePath(key))
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
