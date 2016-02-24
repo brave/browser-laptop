@@ -57,10 +57,12 @@ const messages = {
   POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
   // Init
-  INIT_WINODW: _,
+  INITIALIZE_WINDOW: _,
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,
+  LAST_WINDOW_STATE: _,
+  UNDO_CLOSED_WINDOW: _,
   // Ad block and tracking protection
   BLOCKED_RESOURCE: _,
   // About pages to contentScripts

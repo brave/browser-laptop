@@ -46,25 +46,26 @@ const WindowActions = {
   },
 
   /**
-   * Dispatches a message to the store to load a new URL for the active frame.
+   * Dispatches a message to the store to load a new URL.
    * Both the frame's src and location properties will be updated accordingly.
    *
-   * If the activeFrame is a pinned site and the origin of the pinned site does
+   * If the frame is a pinned site and the origin of the pinned site does
    * not match the origin of the passed in location, then a new frame will be
    * created for the load.
    *
    * In general, an iframe's src should not be updated when navigating within the frame to a new page,
    * but the location should. For user entered new URLs, both should be updated.
    *
-   * @param {object} activeFrame - The frame props for the active frame
+   * @param {object} frame - The frame props
    * @param {string} location - The URL of the page to load
    */
-  loadUrl: function (activeFrame, location) {
+  loadUrl: function (frame, location) {
     location = location.trim()
     let newFrame = false
-    if (activeFrame.get('pinnedLocation')) {
+    if (frame.get('pinnedLocation') && location !== 'about:certerror' &&
+        frame.get('location') !== 'about:certerror') {
       try {
-        const origin1 = new window.URL(activeFrame.get('location')).origin
+        const origin1 = new window.URL(frame.get('location')).origin
         const origin2 = new window.URL(location).origin
         if (origin1 !== origin2) {
           newFrame = true
@@ -86,7 +87,8 @@ const WindowActions = {
     } else {
       dispatch({
         actionType: WindowConstants.WINDOW_SET_URL,
-        location
+        location,
+        key: frame.get('key')
       })
     }
   },
@@ -540,12 +542,14 @@ const WindowActions = {
   /**
    * Dispatches a message to set add/edit bookmark details
    * If set, also indicates that add/edit is shown
-   * @param {Object} bookmarkDetail - Properties of the bookmark to edit
+   * @param {Object} currentDetail - Properties of the bookmark to change to
+   * @param {Object} originalDetail - Properties of the bookmark to edit
    */
-  setBookmarkDetail: function (bookmarkDetail) {
+  setBookmarkDetail: function (currentDetail, originalDetail) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
-      bookmarkDetail
+      currentDetail,
+      originalDetail
     })
   },
 

@@ -62,7 +62,7 @@ const init = (settingsState, args) => {
           'Electron: ' + process.versions['atom-shell'] + '\n' +
           'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
           'Channel: ' + Channel.channel(),
-        icon: path.join(__dirname, 'img', 'braveBtn.png'),
+        icon: path.join(__dirname, 'img', 'braveBtn3x.png'),
         buttons: ['Ok']
       })
     }
@@ -387,7 +387,10 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         CommonMenu.reopenLastClosedTabItem, {
           label: 'Reopen Last Closed Window',
-          enabled: false
+          accelerator: 'Alt+Shift+CmdOrCtrl+T',
+          click: function () {
+            process.emit(messages.UNDO_CLOSED_WINDOW)
+          }
         },
         CommonMenu.separatorMenuItem,
         {

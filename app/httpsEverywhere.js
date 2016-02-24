@@ -6,8 +6,7 @@
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const electron = require('electron')
-const session = electron.session
+const session = require('electron').session
 
 let httpsEverywhereInitialized = false
 // Map of ruleset ID to ruleset content
@@ -30,10 +29,9 @@ function loadRulesets (data) {
 /**
  * Rewrites a URL from HTTP to HTTPS if an HTTPS Everywhere rule is applicable.
  * @param {string} url The URL to rewrite
- * @param {function(string=)} cb the onBeforeRequest listener callback to call
- *   with the rewritten URL (undefined if no rewrite occurred)
+ * @return {string|undefined} the rewritten URL, or undefined if no rewrite
  */
-function getRewrittenUrl (url, cb) {
+function getRewrittenUrl (url) {
   // Get the set of ruleset IDs applicable to this host
   var rulesetIds = getHostnamePatterns(url).reduce((prev, hostname) => {
     var target = targets[hostname]
@@ -45,11 +43,10 @@ function getRewrittenUrl (url, cb) {
     let result = applyRuleset(url, db[rulesetIds[i]])
     if (result) {
       // Redirect to the first rewritten URL
-      cb(result)
-      return
+      return result
     }
   }
-  cb()
+  return undefined
 }
 
 /**
@@ -126,28 +123,27 @@ function applyRuleset (url, applicableRule) {
  */
 function startHttpsEverywhere () {
   httpsEverywhereInitialized = true
+  Filtering.registerBeforeRequestFilteringCB((onBeforeHTTPRequest))
 }
 
-function onBeforeHTTPRequest (details, cb) {
+function onBeforeHTTPRequest (details) {
+  let result = {}
   if (!httpsEverywhereInitialized ||
       !Filtering.isResourceEnabled(module.exports.resourceName)) {
-    cb({})
-    return
+    return result
+  }
+  // Ignore URLs that are not HTTP
+  if (urlParse(details.url).protocol !== 'http:') {
+    return result
   }
 
   if (redirectBlacklist.includes(canonicalizeUrl(details.url))) {
     // Don't try to rewrite this request, it'll probably just redirect again.
     console.log('https everywhere ignoring blacklisted url', details.url)
-    cb({})
   } else {
-    getRewrittenUrl(details.url, (url) => {
-      if (url) {
-        cb({ redirectURL: url })
-      } else {
-        cb({})
-      }
-    })
+    result.redirectURL = getRewrittenUrl(details.url)
   }
+  return result
 }
 
 function onBeforeRedirect (details) {
@@ -186,21 +182,9 @@ function canonicalizeUrl (url) {
  * @param {object} The session to add webRequest filtering on
  */
 function registerForSession (session) {
-  if (!session) {
-    console.log('could not get window session')
-    return null
-  }
-  var wr = session.webRequest
-  if (!wr) {
-    console.log('could not get session webRequest')
-    return null
-  }
-  // Handle HTTPS upgrades
-  wr.onBeforeRequest({
-    urls: ['http://*/*']
-  }, onBeforeHTTPRequest)
   // Try to catch infinite redirect loops on URLs we've redirected to HTTPS
-  wr.onBeforeRedirect({
+  // TODO: Add this to Filtering.js
+  session.webRequest.onBeforeRedirect({
     urls: ['https://*/*']
   }, onBeforeRedirect)
 }

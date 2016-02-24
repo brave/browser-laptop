@@ -29,45 +29,42 @@ Dispatches an event to the main process to update the browser
 
 
 
-### addSite(frameProps, tag, originalLocation, originalPartitionNumber) 
+### addSite(siteDetail, tag, originalSiteDetail) 
 
 Adds a site to the site list
 
 **Parameters**
 
-**frameProps**: `Object`, Properties of the frame in question
+**siteDetail**: `Object`, Properties of the site in question
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
-**originalLocation**: `string`, If specified, the original location to edit / overwrite
-
-**originalPartitionNumber**: `number`, If specified, the original partitionNumber to edit / overwrite
-
+**originalSiteDetail**: `string`, If specified, the original site detail to edit / overwrite.
+  The details of the old entries will be modified if this is set, otherwise only the tag will be added.
 
 
-### removeSite(frameProps, tag) 
+
+### removeSite(siteDetail, tag) 
 
 Removes a site from the site list
 
 **Parameters**
 
-**frameProps**: `Object`, Properties of the frame in question
+**siteDetail**: `Object`, Properties of the site in question
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
 
 
-### moveSite(sourceLocation, sourcePartitionNumber, destinationLocation, prepend) 
+### moveSite(sourceDetail, destinationDetail, prepend) 
 
 Dispatches a message to move a site locations.
 
 **Parameters**
 
-**sourceLocation**: `string`, the location of the site to move
+**sourceDetail**: `string`, the location, partitionNumber, etc of the source moved site
 
-**sourcePartitionNumber**: `number`, the partition number of the site to move
-
-**destinationLocation**: `string`, the location of the site to move to
+**destinationDetail**: `string`, the location, partitionNumber, etc of the destination moved site
 
 **prepend**: `boolean`, Whether or not to prepend to the destinationLocation
 

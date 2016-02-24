@@ -44,6 +44,8 @@ If this fails on Linux with an error related to `abp-filter-parser-cpp`, try upd
 
 Additional notes on troubleshooting installation issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
 
+Some platforms are available as pre-configured VMs. See the [readme](https://github.com/brave/browser-laptop/test/vms/vagrant/README.md) for details
+
 ## Development
 
 To start the server and file watchers run the following on the command line:

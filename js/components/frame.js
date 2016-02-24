@@ -75,7 +75,11 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
-    if (didSrcChange) {
+    const didLocationChange = this.props.frame.get('location') !== prevProps.frame.get('location')
+    // When auto-redirecting to about:certerror, the frame location change and
+    // frame src change are emitted separately. Make sure updateWebview is
+    // called when the location changes.
+    if (didSrcChange || (didLocationChange && this.props.frame.get('location') === 'about:certerror')) {
       this.updateWebview()
     }
     // give focus when switching tabs
@@ -187,11 +191,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-title-updated', ({title}) => {
       WindowActions.setFrameTitle(this.props.frame, title)
     })
-    this.webview.addEventListener('dom-ready', (event) => {
-      if (this.props.enableAds) {
-        this.insertAds(event.target.src)
-      }
-    })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
@@ -246,6 +245,9 @@ class Frame extends ImmutableComponent {
       WindowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
+      if (this.props.enableAds) {
+        this.insertAds(this.webview.getURL())
+      }
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
       let security = this.props.frame.get('security')
       if (this.props.frame.get('location') === 'about:certerror' &&

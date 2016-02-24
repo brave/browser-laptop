@@ -9,7 +9,7 @@ const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 
 // Actions
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
@@ -83,7 +83,7 @@ class Main extends ImmutableComponent {
   loadOpenSearch () {
     let engine = getSetting(this.props.appState.get('settings'), settings.DEFAULT_SEARCH_ENGINE)
     if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
-      loadOpenSearch(engine).then(searchDetail => WindowActions.setSearchDetail(searchDetail))
+      loadOpenSearch(engine).then(searchDetail => windowActions.setSearchDetail(searchDetail))
       this.lastLoadedOpenSearch = engine
     }
   }
@@ -98,13 +98,13 @@ class Main extends ImmutableComponent {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find(frame => frame.get('location') === url)
         if (frameProps) {
-          WindowActions.setActiveFrame(frameProps)
+          windowActions.setActiveFrame(frameProps)
           return
         }
       }
 
       let openInForeground = getSetting(self.props.appState.get('settings'), settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      WindowActions.newFrame({
+      windowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
@@ -112,21 +112,21 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
-      ? WindowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
-      : WindowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
-    ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => WindowActions.undoClosedFrame())
+      ? windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
+      : windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
+    ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
-      WindowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
+      windowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
 
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
-      WindowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
+      windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
       const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
       filteredFrameProps.forEach(frameProps =>
-        WindowActions.setBlockedBy(frameProps, blockType, details.url))
+        windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
@@ -134,7 +134,17 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, (e, url) => {
       const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
-      WindowActions.loadUrl(activeFrame, url)
+      windowActions.loadUrl(activeFrame, url)
+    })
+
+    ipc.on(messages.CERT_ERROR, (e, details) => {
+      const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === details.url)
+      frames.forEach(frame => {
+        windowActions.setSecurityState(frame, {
+          certDetails: details
+        })
+        windowActions.loadUrl(frame, 'about:certerror')
+      })
     })
 
     this.loadOpenSearch()
@@ -153,9 +163,9 @@ class Main extends ImmutableComponent {
 
     const height = navigator.getBoundingClientRect().bottom
     if (pageY <= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
-      WindowActions.setMouseInTitlebar(true)
+      windowActions.setMouseInTitlebar(true)
     } else if (pageY === undefined || pageY > height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
-      WindowActions.setMouseInTitlebar(false)
+      windowActions.setMouseInTitlebar(false)
     }
   }
 
@@ -175,7 +185,7 @@ class Main extends ImmutableComponent {
     // TODO
   }
 
-  onHamburgerMenu () {
+  onHamburgerMenu (e) {
     let braverySettings = {}
     Object.keys(AppConfig.resourceNames).forEach((name) => {
       let value = AppConfig.resourceNames[name]
@@ -185,20 +195,20 @@ class Main extends ImmutableComponent {
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
     braverySettings.bookmarked = this.navBar.bookmarked
-    contextMenus.onHamburgerMenu(braverySettings, this.props.appState.get('settings'))
+    contextMenus.onHamburgerMenu(braverySettings, this.props.appState.get('settings'), e)
   }
 
   onMainFocus () {
     // When the main container is in focus, set the URL bar to inactive.
-    WindowActions.setUrlBarActive(false)
+    windowActions.setUrlBarActive(false)
   }
 
   onHideSiteInfo () {
-    WindowActions.setSiteInfoVisible(false)
+    windowActions.setSiteInfoVisible(false)
   }
 
   onHideReleaseNotes () {
-    WindowActions.setReleaseNotesVisible(false)
+    windowActions.setReleaseNotesVisible(false)
   }
 
   get enableAds () {
@@ -210,7 +220,22 @@ class Main extends ImmutableComponent {
   }
 
   onCloseFrame (activeFrameProps) {
-    WindowActions.closeFrame(this.props.windowState.get('frames'), this.props.frame)
+    windowActions.closeFrame(this.props.windowState.get('frames'), this.props.frame)
+  }
+
+  onDragOver (e) {
+    let intersection = e.dataTransfer.types.filter(x => ['Files'].includes(x))
+    if (intersection.length > 0) {
+      e.dataTransfer.dropEffect = 'copy'
+      e.preventDefault()
+    }
+  }
+
+  onDrop (e) {
+    if (e.dataTransfer.files) {
+      Array.from(e.dataTransfer.files).forEach(file =>
+        windowActions.newFrame({location: file.path, title: file.name}))
+    }
   }
 
   render () {
@@ -234,7 +259,9 @@ class Main extends ImmutableComponent {
       this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
-        <div className='navigatorWrapper'>
+        <div className='navigatorWrapper'
+          onDragOver={this.onDragOver.bind(this)}
+          onDrop={this.onDrop.bind(this)}>
           <div className='backforward'>
             <span data-l10n-id='backButton'
               className='back fa fa-angle-left'
@@ -262,7 +289,9 @@ class Main extends ImmutableComponent {
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
           }
           { this.props.windowState.get('bookmarkDetail')
-            ? <AddEditBookmark bookmarkDetail={this.props.windowState.get('bookmarkDetail')}/>
+            ? <AddEditBookmark sites={this.props.appState.get('sites')}
+                currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}/>
             : null
           }
           { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
@@ -282,7 +311,7 @@ class Main extends ImmutableComponent {
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
               activeFrame={activeFrame}
               bookmarks={this.props.appState.get('sites')
-                .filter(site => site.get('tags').includes(siteTags.BOOKMARK))
+                .filter(site => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
               }/>
           : null }
         <div className={cx({

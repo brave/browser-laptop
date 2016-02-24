@@ -10,65 +10,87 @@ const siteTags = require('../constants/siteTags')
  * Obtains the index of the location in sites
  *
  * @param sites The application state's Immutable sites list
- * @param location The frameProps of the page in question
- * @param partitionNumber The partition number of the session or undefined
- * @return index of the location or -1 if not found.
+ * @param siteDetail The details of the site to get the index of
+ * @return index of the site or -1 if not found.
  */
-module.exports.getSiteUrlIndex = function (sites, location, partitionNumber) {
-  return sites.findIndex(site => site.get('location') === location && (site.get('partitionNumber') || 0) === (partitionNumber || 0))
+module.exports.getSiteIndex = function (sites, siteDetail, tags) {
+  let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
+    typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
+  if (isBookmarkFolder) {
+    return sites.findIndex(site => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+  }
+  return sites.findIndex(site => site.get('location') === siteDetail.get('location') && (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0))
 }
 
 /**
- * Checks if a frameProps has the specified tag
+ * Checks if a siteDetail has the specified tag
  *
  * @param sites The application state's Immutable sites list
- * @param location The location of the page in question
- * @param tag The tag of the site to check
- * @param partitionNumber The partition number of the session or undefined
+ * @param siteDetail The site to check if it's in the specified tag
  * @return true if the location is already bookmarked
  */
-module.exports.isSiteInList = function (sites, location, partitionNumber, tag) {
-  const index = module.exports.getSiteUrlIndex(sites, location, partitionNumber)
+module.exports.isSiteInList = function (sites, siteDetail, tag) {
+  const index = module.exports.getSiteIndex(sites, siteDetail, tag)
   if (index === -1) {
     return false
   }
   return sites.get(index).get('tags').includes(tag)
 }
 
+const getNextFolderId = (sites) =>
+  sites.max((siteA, siteB) => {
+    const folderIdA = siteA.get('folderId')
+    const folderIdB = siteB.get('folderId')
+    if (folderIdA === folderIdB) {
+      return 0
+    }
+    if (folderIdA === undefined) {
+      return false
+    }
+    if (folderIdB === undefined) {
+      return true
+    }
+    return folderIdA > folderIdB
+  })
+
 /**
- * Adds the specified frameProps to sites
+ * Adds the specified siteDetail to sites
  *
  * @param sites The application state's Immutable site list
- * @param frameProps The frameProps of the page in question
- * @param tag The tag to add for this site.  Supported tags are:
- *   'bookmark' for bookmarks.
- *   'reader' for reading list.
- * Otherwise it's only considered to be a history item
- * @param originalLocation If specified will modify this old location instead of adding
- * @param originalPartitionNumber If specified will modify this old location's partition number
+ * @param siteDetails The site details to add a tag to
+ * @param tag The tag to add for this site.
+ *   See siteTags.js for supported types. No tag means just a history item.
+ * @param originalSiteDetail If specified will modify the specified site detail
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, frameProps, tag, originalLocation, originalPartitionNumber) {
-  const index = module.exports.getSiteUrlIndex(sites, originalLocation || frameProps.get('location'), originalPartitionNumber || frameProps.get('partitionNumber'))
-  let tags = sites.getIn([index, 'tags']) || new Immutable.List()
+module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+  const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
+
+  let folderId = siteDetail.get('folderId')
+  if (tag === siteTags.BOOKMARK_FOLDER) {
+    const maxIdItem = getNextFolderId(sites)
+    folderId = (maxIdItem ? maxIdItem.get('folderId') : 0) + 1
+  }
+
+  let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
-  } else {
-    // If we aren't adding any tags and we're a private tab,
-    // then do nothing.
-    if (frameProps.get('isPrivate')) {
-      return sites
-    }
   }
 
   let site = Immutable.fromJS({
     lastAccessed: new Date(),
     tags,
-    location: frameProps.get('location'),
-    title: frameProps.get('title')
+    location: siteDetail.get('location'),
+    title: siteDetail.get('title')
   })
-  if (frameProps.get('partitionNumber')) {
-    site = site.set('partitionNumber', frameProps.get('partitionNumber'))
+  if (folderId) {
+    site = site.set('folderId', Number(folderId))
+  }
+  if (siteDetail.get('parentFolderId')) {
+    site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId')))
+  }
+  if (siteDetail.get('partitionNumber')) {
+    site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber')))
   }
 
   if (index === -1) {
@@ -79,25 +101,14 @@ module.exports.addSite = function (sites, frameProps, tag, originalLocation, ori
 }
 
 /**
- * Removes the specified frameProps from sites
+ * Removes the specified tag from a siteDetail
  *
  * @param sites The application state's Immutable sites list
- * @param frameProps The frameProps of the page in question
+ * @param siteDetail The siteDetail to remove a tag from
  * @return The new sites Immutable object
  */
-module.exports.removeSite = function (sites, frameProps, tag) {
-  let index = -1
-  if (frameProps.get('pinnedLocation') && tag === siteTags.PINNED) {
-    index = module.exports.getSiteUrlIndex(sites, frameProps.get('pinnedLocation'), frameProps.get('partitionNumber'))
-  }
-  // When pinning a tab from the current window the src might not be
-  // set to the current site on that first window.
-  // So only if it's not found with the src and it's a pinned tab,
-  // then check the src then location.  This also fixes pinned sites
-  // with HTTPS Everywhere.
-  if (index === -1) {
-    index = module.exports.getSiteUrlIndex(sites, frameProps.get('location'), frameProps.get('partitionNumber'))
-  }
+module.exports.removeSite = function (sites, siteDetail, tag) {
+  const index = module.exports.getSiteIndex(sites, siteDetail, tag)
   if (index === -1) {
     return sites
   }
@@ -105,10 +116,10 @@ module.exports.removeSite = function (sites, frameProps, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
-module.exports.moveSite = function (sites, sourceLocation, sourcePartitionNumber, destinationLocation, prepend) {
-  const sourceSiteIndex = module.exports.getSiteUrlIndex(sites, sourceLocation, sourcePartitionNumber)
+module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend) {
+  const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail, sourceDetail.get('tags'))
   // TODO: Need partition number for drag and drop
-  let newIndex = module.exports.getSiteUrlIndex(sites, destinationLocation, sourcePartitionNumber) + (prepend ? 0 : 1)
+  let newIndex = module.exports.getSiteIndex(sites, destinationDetail, destinationDetail.get('tags')) + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceSiteIndex)
   sites = sites.splice(sourceSiteIndex, 1)
   if (newIndex > sourceSiteIndex) {
@@ -131,4 +142,67 @@ module.exports.getSiteIconClass = function (site) {
     return 'fa-book'
   }
   return 'fa-file-o'
+}
+
+module.exports.getDetailFromFrame = function (frame, tag) {
+  let location = frame.get('location')
+  if (frame.get('pinnedLocation') && tag === siteTags.PINNED) {
+    location = frame.get('pinnedLocation')
+  }
+
+  return Immutable.fromJS({
+    location,
+    title: frame.get('title'),
+    partitionNumber: frame.get('partitionNumber'),
+    tags: tag ? [tag] : []
+  })
+}
+
+module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
+  const isFolder1 = module.exports.isFolder(siteDetail1)
+  const isFolder2 = module.exports.isFolder(siteDetail2)
+  if (isFolder1 !== isFolder2) {
+    return false
+  }
+
+  // If they are both folders
+  if (isFolder1) {
+    return siteDetail1.get('folderId') === siteDetail2.get('folderId')
+  }
+  return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') === siteDetail2.get('partitionNumber')
+}
+
+module.exports.isFolder = function (siteDetail) {
+  return siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+}
+
+/**
+ * Obtains an array of folders
+ */
+module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
+  parentId = parentId || 0
+  let folders = []
+  sites.forEach(site => {
+    if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
+      if (site.get('folderId') === folderId) {
+        return
+      }
+      const label = (labelPrefix || '') + site.get('title')
+      folders.push({
+        folderId: site.get('folderId'),
+        parentFolderId: site.get('parentFolderId'),
+        label
+      })
+      const subsites = module.exports.getFolders(sites, folderId, site.get('folderId'), label + ' / ')
+      folders = folders.concat(subsites)
+    }
+  })
+  return folders
+}
+
+module.exports.filterSitesRelativeTo = function (sites, relSite) {
+  if (!relSite.get('folderId')) {
+    return sites
+  }
+  return sites.filter(site => site.get('parentFolderId') === relSite.get('folderId'))
 }

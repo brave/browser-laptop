@@ -235,7 +235,6 @@ const handleAppAction = (action) => {
       const willNavigateHandler = (whitelistedUrl, e, url) => {
         if (url !== whitelistedUrl) {
           e.preventDefault()
-          mainWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
         }
       }
 
@@ -246,7 +245,7 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
-          mainWindow.webContents.send(messages.INIT_WINODW, appState.toJS(), frames, action.restoredState)
+          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
         }
       })
       mainWindow.show()
@@ -256,13 +255,13 @@ const handleAppAction = (action) => {
       appWindow.close()
       break
     case AppConstants.APP_ADD_SITE:
-      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.frameProps, action.tag, action.originalLocation, action.originalPartitionNumber))
+      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
       break
     case AppConstants.APP_REMOVE_SITE:
-      appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.frameProps, action.tag))
+      appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceLocation, action.sourcePartitionNumber, action.destinationLocation, action.prepend))
+      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
       break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])

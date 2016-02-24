@@ -9,6 +9,7 @@ const contextMenus = require('../contextMenus')
 const WindowActions = require('../actions/windowActions')
 const AppActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
+const siteUtil = require('../state/siteUtil')
 const dragTypes = require('../constants/dragTypes')
 const Button = require('../components/button')
 const cx = require('../lib/classSet.js')
@@ -18,7 +19,11 @@ const dnd = require('../dnd')
 const bookmarkMaxWidth = 100
 
 class BookmarkToolbarButton extends ImmutableComponent {
-  navigate (e) {
+  click (e) {
+    if (this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
+      contextMenus.onShowBookmarkFolderMenu(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, {target: ReactDOM.findDOMNode(this)})
+      return
+    }
     const isDarwin = process.platform === 'darwin'
     if (e.ctrlKey && !isDarwin ||
         e.metaKey && isDarwin) {
@@ -74,20 +79,22 @@ class BookmarkToolbarButton extends ImmutableComponent {
 
   render () {
     return <span
-      className={cx({
-        bookmarkToolbarButton: true,
-        draggingOverLeft: this.isDraggingOverLeft,
-        draggingOverRight: this.isDraggingOverRight,
-        isDragging: this.isDragging
-      })}
-      draggable
-      ref={node => this.bookmarkNode = node}
-      onClick={this.navigate.bind(this)}
-      onDragStart={this.onDragStart.bind(this)}
-      onDragEnd={this.onDragEnd.bind(this)}
-      onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark.get('location'), this.props.bookmark.get('partitionNumber'), this.props.bookmark.get('title'), this.props.activeFrame)}>
-    { this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }
+        className={cx({
+          bookmarkToolbarButton: true,
+          draggingOverLeft: this.isDraggingOverLeft,
+          draggingOverRight: this.isDraggingOverRight,
+          isDragging: this.isDragging
+        })}
+        draggable
+        ref={node => this.bookmarkNode = node}
+        onClick={this.click.bind(this)}
+        onDragStart={this.onDragStart.bind(this)}
+        onDragEnd={this.onDragEnd.bind(this)}
+        onDragOver={this.onDragOver.bind(this)}
+        onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
+      <span>{ this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }</span>
+      { this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+        ? <span className='bookmarkFolderChevron fa fa-chevron-down'/> : null }
     </span>
   }
 }
@@ -97,10 +104,16 @@ class BookmarksToolbar extends ImmutableComponent {
     e.preventDefault()
     if (this.props.sourceDragData) {
       const bookmark = this.props.sourceDragData
-      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => bookmarkRef && bookmarkRef.props.bookmark.get('location') !== bookmark.get('location')), e.clientX)
+      // Figure out the droppedOn element filtering out the source drag item
+      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => {
+        if (!bookmarkRef) {
+          return false
+        }
+        return !siteUtil.isEquivalent(bookmarkRef.props.bookmark, bookmark)
+      }), e.clientX)
       if (droppedOn) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn), e.clientX)
-        AppActions.moveSite(bookmark.get('location'), bookmark.get('partitionNumber'), droppedOn.props.bookmark.get('location'), isLeftSide)
+        AppActions.moveSite(bookmark, droppedOn.props.bookmark, isLeftSide)
       }
       return
     }
@@ -117,12 +130,17 @@ class BookmarksToolbar extends ImmutableComponent {
         return
       }
     }
+    if (e.dataTransfer.files) {
+      Array.from(e.dataTransfer.files).forEach(file =>
+        AppActions.addSite({ location: file.path, title: file.name }, siteTags.BOOKMARK))
+      return
+    }
 
     let urls = e.dataTransfer.getData('text/uri-list') ||
       e.dataTransfer.getData('text/plain')
     urls = urls.split('\n')
       .map(x => x.trim())
-      .filter(x => !x.startsWith('#'))
+      .filter(x => !x.startsWith('#') && x.length > 0)
       .forEach(url =>
         AppActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
@@ -136,13 +154,6 @@ class BookmarksToolbar extends ImmutableComponent {
   componentWillUpdate () {
     this.updateBookmarkCount()
   }
-  onDragEnter (e) {
-    let intersection = e.dataTransfer.types.filter(x =>
-      ['text/plain', 'text/uri-list', 'text/html'].includes(x))
-    if (intersection.length > 0) {
-      e.preventDefault()
-    }
-  }
   onDragOver (e) {
     if (this.props.sourceDragData) {
       e.dataTransfer.dropEffect = 'move'
@@ -151,8 +162,9 @@ class BookmarksToolbar extends ImmutableComponent {
     }
     // console.log(e.dataTransfer.types, e.dataTransfer.getData('text/plain'), e.dataTransfer.getData('text/uri-list'), e.dataTransfer.getData('text/html'))
     let intersection = e.dataTransfer.types.filter(x =>
-      ['text/plain', 'text/uri-list', 'text/html'].includes(x))
+      ['text/plain', 'text/uri-list', 'text/html', 'Files'].includes(x))
     if (intersection.length > 0) {
+      e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
     }
   }
@@ -163,16 +175,18 @@ class BookmarksToolbar extends ImmutableComponent {
     this.bookmarkRefs = []
     return <div className='bookmarksToolbar'
       onDrop={this.onDrop.bind(this)}
-      onDragEnter={this.onDragOver.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
     {
-        this.props.bookmarks.take(this.maxItems).map(bookmark =>
+        this.props.bookmarks
+          .filter(bookmark => !bookmark.get('parentFolderId'))
+          .take(this.maxItems).map(bookmark =>
           <BookmarkToolbarButton
             ref={node => this.bookmarkRefs.push(node)}
             sourceDragData={this.props.sourceDragData}
             draggingOverData={this.props.draggingOverData}
             activeFrame={this.props.activeFrame}
+            bookmarks={this.props.bookmarks}
             bookmark={bookmark}/>)
     }
     { this.leftOver > 0

@@ -146,30 +146,25 @@ var exports = {
     /**
      * Adds a site to the sites list, such as a bookmarks.
      *
-     * @param {object} frameProps - Properties for the frame to add
-     *   - location
-     *   - title
-     *   - isPrivate
-     * @param {string} siteTag - A site tag from js/constants/siteTags.js
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     * @param {string} tag - A site tag from js/constants/siteTags.js
      */
-    this.app.client.addCommand('addSite', function (frameProps, siteTag) {
-      return this.execute(function (frameProps, siteTag) {
-        return require('../js/actions/appActions').addSite(frameProps, siteTag)
-      }, frameProps, siteTag).then((response) => response.value)
+    this.app.client.addCommand('addSite', function (siteDetail, tag) {
+      return this.execute(function (siteDetail, tag) {
+        return require('../js/actions/appActions').addSite(siteDetail, tag)
+      }, siteDetail, tag).then((response) => response.value)
     })
 
     /**
      * Removes a site from the sites list, or removes a bookmark.
      *
-     * @param {string} siteTag - A site tag from js/constants/siteTags.js
-     * @param {object} frameProps - Properties for the frame to add
-     *   - location
-     *   - title
+     * @param {object} siteDetail - Properties for the frame to add
+     * @param {string} tag - A site tag from js/constants/siteTags.js
      */
-    this.app.client.addCommand('removeSite', function (frameProps, siteTag) {
-      return this.execute(function (frameProps, siteTag) {
-        return require('../js/actions/appActions').removeSite(frameProps, siteTag)
-      }, frameProps, siteTag).then((response) => response.value)
+    this.app.client.addCommand('removeSite', function (siteDetail, tag) {
+      return this.execute(function (siteDetail, tag) {
+        return require('../js/actions/appActions').removeSite(siteDetail, tag)
+      }, siteDetail, tag).then((response) => response.value)
     })
 
     /**

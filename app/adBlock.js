@@ -25,7 +25,7 @@ let mapFilterType = {
 }
 
 const startAdBlocking = () => {
-  Filtering.registerFilteringCB(details => {
+  Filtering.registerBeforeSendHeadersFilteringCB(details => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const shouldBlock = firstPartyUrl.protocol &&
       details.resourceType !== 'mainFrame' &&

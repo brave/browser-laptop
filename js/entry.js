@@ -22,7 +22,7 @@ const WindowStore = require('./stores/windowStore')
 const messages = require('./constants/messages')
 
 // get appStore from url
-ipc.on(messages.INIT_WINODW, (e, appState, frames, initWindowState) => {
+ipc.on(messages.INITIALIZE_WINDOW, (e, appState, frames, initWindowState) => {
   ReactDOM.render(
     <Window appState={appState} frames={frames} initWindowState={initWindowState}/>,
     document.getElementById('windowContainer'))
@@ -30,4 +30,8 @@ ipc.on(messages.INIT_WINODW, (e, appState, frames, initWindowState) => {
 
 ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, WindowStore.getState().toJS())
+})
+
+window.addEventListener('beforeunload', function () {
+  ipc.send(messages.LAST_WINDOW_STATE, WindowStore.getState().toJS())
 })

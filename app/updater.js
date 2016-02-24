@@ -130,7 +130,9 @@ var requestVersionInfo = (done) => {
 
   request(queryString, (err, response, body) => {
     AppActions.setUpdateLastCheck()
-    if (!err && response.statusCode === 200) {
+    if (!err && response.statusCode === 204) {
+      autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
+    } else if (!err && (response.statusCode === 200)) {
       if (body) {
         try {
           body = JSON.parse(body)

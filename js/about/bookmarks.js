@@ -32,7 +32,7 @@ class BookmarkItem extends ImmutableComponent {
     }
 
     return <div role='listitem'
-      onContextMenu={aboutActions.contextMenu.bind(this, this.props, 'bookmark')}
+      onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmark.toJS(), 'bookmark')}
       data-context-menu-disable
       draggable='true'
       onDoubleClick={this.navigate.bind(this)}>

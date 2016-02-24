@@ -107,4 +107,7 @@
 
 <nameField "Title:">
 <locationField "Location:">
+<parentFolderField "Folder:">
 <save "Save">
+
+<bookmarksToolbar "Bookmarks Toolbar">

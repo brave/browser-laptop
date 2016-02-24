@@ -156,18 +156,6 @@ class UrlBar extends ImmutableComponent {
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop.bind(this))
-    ipc.on(messages.CERT_ERROR, (e, details) => {
-      // Sometimes the cert error fires before the active frame location
-      // has been updated, so wait 100ms.
-      window.setTimeout(() => {
-        if (details.url === this.props.activeFrameProps.get('location')) {
-          WindowActions.setSecurityState(this.props.activeFrameProps, {
-            certDetails: details
-          })
-          WindowActions.loadUrl(this.props.activeFrameProps, 'about:certerror')
-        }
-      }, 100)
-    })
   }
 
   componentDidMount () {

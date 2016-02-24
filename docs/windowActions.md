@@ -16,12 +16,12 @@ Dispatches an event to the main process to replace the window state
 
 
 
-### loadUrl(activeFrame, location) 
+### loadUrl(frame, location) 
 
-Dispatches a message to the store to load a new URL for the active frame.
+Dispatches a message to the store to load a new URL.
 Both the frame's src and location properties will be updated accordingly.
 
-If the activeFrame is a pinned site and the origin of the pinned site does
+If the frame is a pinned site and the origin of the pinned site does
 not match the origin of the passed in location, then a new frame will be
 created for the load.
 
@@ -30,7 +30,7 @@ but the location should. For user entered new URLs, both should be updated.
 
 **Parameters**
 
-**activeFrame**: `object`, The frame props for the active frame
+**frame**: `object`, The frame props
 
 **location**: `string`, The URL of the page to load
 
@@ -370,14 +370,16 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(bookmarkDetail) 
+### setBookmarkDetail(currentDetail, originalDetail) 
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
 
 **Parameters**
 
-**bookmarkDetail**: `Object`, Properties of the bookmark to edit
+**currentDetail**: `Object`, Properties of the bookmark to change to
+
+**originalDetail**: `Object`, Properties of the bookmark to edit
 
 
 

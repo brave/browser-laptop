@@ -12,7 +12,7 @@ AppStore
   sites: [{
     location: string,
     title: string,
-    tags: [string], // empty, 'bookmark', 'pinned', or 'reader'
+    tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     lastAccessed: datetime,
     partitionNumber: number // Optionally specifies a specific session
   }],
@@ -180,11 +180,8 @@ WindowStore
     autocompleteURL: string, // ditto re: {searchTerms}
   },
   bookmarkDetail: {
-    originalLocation: string, // Location of the bookmark being edited
-    originalPartitionNumber: number, // Partition number of the bookmark being edited
-    location: string, // Current value for the location
-    title: string // Current value for the title
-    partitionNumber: number// Current partition number
+    currentDetail: object, // Detail of the current bookmark which is in add/edit mode
+    originalDetails: object // Detail of the original bookmark to edit
   },
 }
 ```

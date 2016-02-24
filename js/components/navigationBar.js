@@ -3,17 +3,19 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 
 const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
-const AppActions = require('../actions/appActions')
+const appActions = require('../actions/appActions')
 const {isSiteInList} = require('../state/siteUtil')
-const SiteTags = require('../constants/siteTags')
+const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
+const siteUtil = require('../state/siteUtil')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -30,9 +32,9 @@ class NavigationBar extends ImmutableComponent {
 
   onToggleBookmark (isBookmarked) {
     if (isBookmarked) {
-      AppActions.removeSite(this.props.activeFrame, SiteTags.BOOKMARK)
+      appActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame), siteTags.BOOKMARK)
     } else {
-      AppActions.addSite(this.props.activeFrame, SiteTags.BOOKMARK)
+      appActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame), siteTags.BOOKMARK)
     }
   }
 
@@ -46,7 +48,11 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrame &&
-      isSiteInList(this.props.sites, this.props.activeFrame.get('location'), this.props.activeFrame.get('partitionNumber'), SiteTags.BOOKMARK)
+      isSiteInList(this.props.sites, Immutable.fromJS({
+        location: this.props.activeFrame.get('location'),
+        partitionNumber: this.props.activeFrame.get('partitionNumber'),
+        title: this.props.activeFrame.get('title')
+      }), siteTags.BOOKMARK)
   }
 
   get titleMode () {
@@ -65,7 +71,11 @@ class NavigationBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
     const prevBookmarked = prevProps.activeFrame &&
-      isSiteInList(prevProps.sites, prevProps.activeFrame.get('location'), this.props.activeFrame.get('partitionNumber'), SiteTags.BOOKMARK)
+      isSiteInList(prevProps.sites, Immutable.fromJS({
+        location: prevProps.activeFrame.get('location'),
+        partitionNumber: this.props.activeFrame.get('partitionNumber'),
+        title: this.props.activeFrame.get('title')
+      }), siteTags.BOOKMARK)
     if (this.bookmarked !== prevBookmarked) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
     }

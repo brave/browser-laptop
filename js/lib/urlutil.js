@@ -4,8 +4,11 @@
 
 'use strict'
 
-const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::|:\/\/)/i
+// characters, then : with optional //
+const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)/i
 const defaultScheme = 'http://'
+const fileScheme = 'file://'
+const os = require('os')
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -24,7 +27,7 @@ const UrlUtil = {
     // - scheme + '://' (ex. http://)
     // - null
     let scheme = (rscheme.exec(input) || [])[0]
-    return scheme === 'localhost:' ? null : scheme
+    return scheme === 'localhost://' ? null : scheme
   },
 
   /**
@@ -37,6 +40,30 @@ const UrlUtil = {
   },
 
   /**
+   * Prepends file scheme for file paths, otherwise the default scheme
+   * @param {String} input path, with opetional schema
+   * @returns {String} path with a scheme
+   */
+  prependScheme: function (input) {
+    // expand relative path
+    if (input.startsWith('~/')) {
+      input = input.replace(/^~/, os.homedir())
+    }
+
+    // detect absolute file paths
+    if (input.startsWith('/')) {
+      input = fileScheme + input
+    }
+
+    // If there's no scheme, prepend the default scheme
+    if (!this.hasScheme(input)) {
+      input = defaultScheme + input
+    }
+
+    return input
+  },
+
+  /**
    * Checks if a string is not a URL.
    * @param {String} input The input value.
    * @returns {Boolean} Returns true if this is not a valid URL.
@@ -45,7 +72,7 @@ const UrlUtil = {
     // for cases, ?abc and "a? b" which should searching query
     const case1Reg = /^(\?)|(\?.+\s)/
     // for cases, pure string
-    const case2Reg = /[\?\.\s\:]/
+    const case2Reg = /[\?\.\/\s\:]/
     // for cases, data:uri and view-source:uri
     const case3Reg = /^\w+\:.*/
 
@@ -58,10 +85,7 @@ const UrlUtil = {
       return false
     }
 
-    if (!this.hasScheme(str)) {
-      // No scheme? Prepend to test as a full URL below.
-      str = defaultScheme + str
-    }
+    str = this.prependScheme(str)
 
     try {
       let url = new window.URL(str)
@@ -79,10 +103,7 @@ const UrlUtil = {
   getUrlFromInput: function (input) {
     input = input.trim()
 
-    // If there's no scheme, prepend the default scheme
-    if (!this.hasScheme(input)) {
-      input = defaultScheme + input
-    }
+    input = this.prependScheme(input)
 
     if (this.isNotURL(input)) {
       return input

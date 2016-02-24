@@ -36,6 +36,7 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
 let sessionStateStoreAttempted = false
+let lastWindowState
 
 // URLs to accept bad certs for.
 let acceptCertUrls = {}
@@ -49,6 +50,9 @@ const saveIfAllCollected = () => {
   if (perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
     appState.perWindowState = perWindowState
+    if (perWindowState.length === 0 && lastWindowState) {
+      appState.perWindowState.push(lastWindowState)
+    }
     const ignoreCatch = () => {}
 
     // If the status is still UPDATE_AVAILABLE then the user wants to quit
@@ -122,6 +126,19 @@ app.on('ready', function () {
     saveIfAllCollected()
   })
 
+  ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
+    if (data) {
+      lastWindowState = data
+    }
+  })
+
+  process.on(messages.UNDO_CLOSED_WINDOW, () => {
+    if (lastWindowState) {
+      appActions.newWindow(undefined, undefined, lastWindowState)
+      lastWindowState = undefined
+    }
+  })
+
   loadAppStatePromise.then(initialState => {
     // For tests we always want to load default app state
     const perWindowState = initialState.perWindowState
@@ -167,10 +184,8 @@ app.on('ready', function () {
       Menu.init(AppStore.getState().get('settings'))
     })
 
-    // Load HTTPS Everywhere browser "extension"
-    HttpsEverywhere.init()
-
     Filtering.init()
+    HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()
     SiteHacks.init()

@@ -104,6 +104,45 @@ describe('urlbar', function () {
           .waitForExist(navigatorLoadTime)
       })
     })
+
+    describe('links with url fragments', function () {
+      Brave.beforeAll(this)
+
+      before(function *() {
+        this.page = Brave.server.url('url_fragments.html')
+        var page = this.page
+        yield setup(this.app.client)
+        // Navigate to a page with a title first to ensure it gets reset
+        yield this.app.client
+          .loadUrl(this.page)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then(val => val === page)
+          })
+          .waitUntil(function () {
+            return this.getAttribute(activeWebview, 'src').then(src => src === page)
+          })
+        yield this.app.client
+          .windowByUrl(this.page)
+          .leftClick('#top_link')
+          .windowParentByUrl(this.page + '#top')
+      })
+
+      it('updates the location in the navbar', function *() {
+        var page = this.page
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then(val => val === page + '#top')
+          })
+      })
+
+      it('updates the webview src', function *() {
+        var page = this.page
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getAttribute(activeWebview, 'src').then(src => src === page + '#top')
+          })
+      })
+    })
   })
 
   describe('favicon', function () {

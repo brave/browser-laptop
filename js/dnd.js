@@ -11,7 +11,6 @@ module.exports.onDragStart = (dragType, key, e) => {
 }
 
 module.exports.onDragEnd = (dragType, key) => {
-  console.log('onDragEnd!', dragType, key.toJS())
   WindowActions.setIsBeingDragged(dragType, key, false)
   WindowActions.setIsBeingDraggedOverDetail(dragType)
 }
