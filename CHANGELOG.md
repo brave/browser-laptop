@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.7.16](https://github.com/brave/browser-laptop/releases/v0.7.16dev)
+- Spotty text selection in URL bar fix.
+- Added restore last closed window.
+- Fix session store to restore state from last closed window.
+- Pinned tabs and bookmarks are now session aware (Cmd+Click or Control+Click on Windows to open a bookmark in the original session).
+- Fix video playing on CNBC, fix cityam.com adblocker error.
+- Faster page loading from optimizations in HTTPS Everywhere.
+- HTML drag and drop no longer opens extra tab.
+- Dropping files on bookmarks bar to create bookmarks, and on toolbar to open in new tabs.
+- Certificate error page improvements.
+- Support dropping tabs onto tab set indicators to reorder them.
+- Support pinning and unpinning sites via drag and drop.
+- Fixed bug in auto suggest when hitting enter.
+- Various Linux fixes.
+- Fix 3rd party Facebook login.
+- SQLite dependency for HTTPS Everywhere removed.
+
 ## [0.7.15](https://github.com/brave/browser-laptop/releases/v0.7.15dev)
 - Added bookmarks toolbar.
 - Added bookmarks manager (Very basic but more features coming soon).
