@@ -40,7 +40,7 @@ but the location should. For user entered new URLs, both should be updated.
 
 Dispatches a message to the store to set the current navigated location.
 This differs from the above in that it will not change the webview's (iframe's) src.
-This should be used for inter-page navigation but not user initiated loads.
+This should be used for renderer initiated navigation but not user initiated loads.
 
 **Parameters**
 

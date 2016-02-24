@@ -129,7 +129,7 @@ const doAction = (action) => {
           audioPlaybackActive: false,
           icon: undefined,
           // We want theme colors reset here instead of in WINDOW_SET_LOCATION
-          // because inter page navigation would make the tab color
+          // because intra-page navigation would make the tab color
           // blink otherwise.  The theme color will be reset eventually
           // once the page loads anyway though for the case of navigation change
           // without src change.
@@ -137,6 +137,9 @@ const doAction = (action) => {
           computedThemeColor: undefined,
           title: ''
         })
+        // force a navbar update in case this was called from an app
+        // initiated navigation (bookmarks, etc...)
+        updateNavBarInput(action.location, frameStatePath(action.key))
       }
       break
     case WindowConstants.WINDOW_SET_LOCATION:
@@ -152,7 +155,10 @@ const doAction = (action) => {
         title: locationChanged ? '' : lastTitle,
         location: action.location
       })
-      updateNavBarInput(action.location, frameStatePath(key))
+      // include the url fragment when updating navbar input
+      if (action.location !== lastLocation) {
+        updateNavBarInput(action.location, frameStatePath(key))
+      }
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
