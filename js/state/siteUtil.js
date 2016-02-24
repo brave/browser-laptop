@@ -77,6 +77,11 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     tags = tags.toSet().add(tag).toList()
   }
 
+  let oldSite
+  if (index !== -1) {
+    oldSite = sites.getIn([index])
+  }
+
   let site = Immutable.fromJS({
     lastAccessed: new Date(),
     tags,
@@ -88,6 +93,11 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   }
   if (siteDetail.get('parentFolderId')) {
     site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId')))
+  }
+  if (siteDetail.get('customTitle')) {
+    site = site.set('customTitle', siteDetail.get('customTitle'))
+  } else if (oldSite && oldSite.get('customTitle')) {
+    site = site.set('customTitle', oldSite.get('customTitle'))
   }
   if (siteDetail.get('partitionNumber')) {
     site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber')))

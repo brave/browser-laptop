@@ -81,7 +81,7 @@ function tabsToolbarTemplateInit (settingsState, activeFrame) {
 function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   return bookmarks.map(bookmark => {
     return {
-      label: bookmark.get('title'),
+      label: bookmark.get('customTitle') || bookmark.get('title'),
       click: () => {
         WindowActions.loadUrl(activeFrame, bookmark.get('location'))
       }
@@ -132,7 +132,7 @@ function showBookmarkFolderInit (bookmarks, bookmark, activeFrame) {
 
   return items.map(site => {
     const templateItem = {
-      label: site.get('title'),
+      label: site.get('customTitle') || site.get('title'),
       click: function () {
         WindowActions.loadUrl(activeFrame, site.get('location'))
       }

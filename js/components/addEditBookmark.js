@@ -59,7 +59,12 @@ class AddEditBookmark extends ImmutableComponent {
     e.stopPropagation()
   }
   onNameChange (e) {
-    const currentDetail = this.props.currentDetail.set('title', e.target.value)
+    let currentDetail = this.props.currentDetail
+    if (currentDetail.get('title') === e.target.value) {
+      currentDetail = currentDetail.delete('customTitle')
+    } else {
+      currentDetail = currentDetail.set('customTitle', e.target.value)
+    }
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
   }
   onLocationChange (e) {
@@ -80,7 +85,7 @@ class AddEditBookmark extends ImmutableComponent {
       <div className='addEditBookmark' onClick={this.onClick.bind(this)}>
         <div id='bookmarkName' className='bookmarkFormRow'>
           <label data-l10n-id='nameField' htmlFor='bookmarkName'/>
-          <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.currentDetail.get('title')} ref={bookmarkName => this.bookmarkName = bookmarkName }/>
+          <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.currentDetail.get('customTitle') || this.props.currentDetail.get('title')} ref={bookmarkName => this.bookmarkName = bookmarkName }/>
         </div>
         { !this.isFolder
           ? <div id='bookmarkLocation' className='bookmarkFormRow'>

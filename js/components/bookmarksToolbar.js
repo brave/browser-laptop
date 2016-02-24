@@ -37,7 +37,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('title'))
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
     dnd.onDragStart(dragTypes.BOOKMARK, this.props.bookmark, e)
   }
 
@@ -46,7 +46,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('title'))
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
     dnd.onDragOver(dragTypes.BOOKMARK, this.props.sourceDragData, this.bookmarkNode.getBoundingClientRect(), this.props.bookmark, this.draggingOverData, e)
   }
 
@@ -92,7 +92,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
         onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
-      <span>{ this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }</span>
+      <span>{ this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }</span>
       { this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
         ? <span className='bookmarkFolderChevron fa fa-chevron-down'/> : null }
     </span>
