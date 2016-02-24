@@ -140,10 +140,10 @@ class Main extends ImmutableComponent {
     ipc.on(messages.CERT_ERROR, (e, details) => {
       const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === details.url)
       frames.forEach(frame => {
-        WindowActions.setSecurityState(frame, {
+        windowActions.setSecurityState(frame, {
           certDetails: details
         })
-        WindowActions.loadUrl(frame, 'about:certerror')
+        windowActions.loadUrl(frame, 'about:certerror')
       })
     })
 

@@ -385,7 +385,10 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         CommonMenu.reopenLastClosedTabItem, {
           label: 'Reopen Last Closed Window',
-          enabled: false
+          accelerator: 'Alt+Shift+CmdOrCtrl+T',
+          click: function () {
+            process.emit(messages.UNDO_CLOSED_WINDOW)
+          }
         },
         CommonMenu.separatorMenuItem,
         {

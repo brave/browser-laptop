@@ -61,6 +61,8 @@ const messages = {
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,
+  LAST_WINDOW_STATE: _,
+  UNDO_CLOSED_WINDOW: _,
   // Ad block and tracking protection
   BLOCKED_RESOURCE: _,
   // About pages to contentScripts

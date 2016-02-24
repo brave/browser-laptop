@@ -36,6 +36,7 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
 let sessionStateStoreAttempted = false
+let lastWindowState
 
 // URLs to accept bad certs for.
 let acceptCertUrls = {}
@@ -49,6 +50,9 @@ const saveIfAllCollected = () => {
   if (perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
     appState.perWindowState = perWindowState
+    if (perWindowState.length === 0 && lastWindowState) {
+      appState.perWindowState.push(lastWindowState)
+    }
     const ignoreCatch = () => {}
 
     // If the status is still UPDATE_AVAILABLE then the user wants to quit
@@ -120,6 +124,19 @@ app.on('ready', function () {
       perWindowState.push(data)
     }
     saveIfAllCollected()
+  })
+
+  ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
+    if (data) {
+      lastWindowState = data
+    }
+  })
+
+  process.on(messages.UNDO_CLOSED_WINDOW, () => {
+    if (lastWindowState) {
+      appActions.newWindow(undefined, undefined, lastWindowState)
+      lastWindowState = undefined
+    }
   })
 
   loadAppStatePromise.then(initialState => {

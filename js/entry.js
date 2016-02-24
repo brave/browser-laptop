@@ -31,3 +31,7 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, appState, frames, initWindowState) => {
 ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, WindowStore.getState().toJS())
 })
+
+window.addEventListener('beforeunload', function () {
+  ipc.send(messages.LAST_WINDOW_STATE, WindowStore.getState().toJS())
+})
