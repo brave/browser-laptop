@@ -169,7 +169,7 @@ module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
   if (isFolder1) {
     return siteDetail1.get('folderId') === siteDetail2.get('folderId')
   }
-  return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') !== siteDetail2.get('partitionNumber')
+  return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') === siteDetail2.get('partitionNumber')
 }
 
 module.exports.isFolder = function (siteDetail) {
