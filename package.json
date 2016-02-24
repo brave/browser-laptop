@@ -26,7 +26,12 @@
     "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse.json",
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "webpack": "webpack",
-    "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')"
+    "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')",
+    "vagrant-up-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant up",
+    "vagrant-halt-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant halt",
+    "vagrant-destroy-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant destroy",
+    "vagrant-ssh-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant ssh",
+    "vagrant-rsync-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant rsync-auto"
   },
   "repository": "brave/browser-laptop",
   "author": {
