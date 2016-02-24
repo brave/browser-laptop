@@ -102,7 +102,7 @@ function applyRuleset (url, applicableRule) {
     for (i = 0; i < exclusion.length; ++i) {
       exclusionPattern = new RegExp(exclusion[i].$.pattern)
       if (exclusionPattern.test(url)) {
-        return url
+        return null
       }
     }
   }
