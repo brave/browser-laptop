@@ -152,7 +152,8 @@ const doAction = (action) => {
         title: locationChanged ? '' : lastTitle,
         location: action.location
       })
-      if (locationChanged) {
+      // check url fragment when updating navbar input
+      if (action.location !== lastLocation) {
         updateNavBarInput(action.location, frameStatePath(key))
       }
       break
