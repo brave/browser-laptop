@@ -130,12 +130,17 @@ class BookmarksToolbar extends ImmutableComponent {
         return
       }
     }
+    if (e.dataTransfer.files) {
+      Array.from(e.dataTransfer.files).forEach(file =>
+        AppActions.addSite({ location: file.path, title: file.name }, siteTags.BOOKMARK))
+      return
+    }
 
     let urls = e.dataTransfer.getData('text/uri-list') ||
       e.dataTransfer.getData('text/plain')
     urls = urls.split('\n')
       .map(x => x.trim())
-      .filter(x => !x.startsWith('#'))
+      .filter(x => !x.startsWith('#') && x.length > 0)
       .forEach(url =>
         AppActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
@@ -149,13 +154,6 @@ class BookmarksToolbar extends ImmutableComponent {
   componentWillUpdate () {
     this.updateBookmarkCount()
   }
-  onDragEnter (e) {
-    let intersection = e.dataTransfer.types.filter(x =>
-      ['text/plain', 'text/uri-list', 'text/html'].includes(x))
-    if (intersection.length > 0) {
-      e.preventDefault()
-    }
-  }
   onDragOver (e) {
     if (this.props.sourceDragData) {
       e.dataTransfer.dropEffect = 'move'
@@ -164,8 +162,9 @@ class BookmarksToolbar extends ImmutableComponent {
     }
     // console.log(e.dataTransfer.types, e.dataTransfer.getData('text/plain'), e.dataTransfer.getData('text/uri-list'), e.dataTransfer.getData('text/html'))
     let intersection = e.dataTransfer.types.filter(x =>
-      ['text/plain', 'text/uri-list', 'text/html'].includes(x))
+      ['text/plain', 'text/uri-list', 'text/html', 'Files'].includes(x))
     if (intersection.length > 0) {
+      e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
     }
   }
@@ -176,7 +175,6 @@ class BookmarksToolbar extends ImmutableComponent {
     this.bookmarkRefs = []
     return <div className='bookmarksToolbar'
       onDrop={this.onDrop.bind(this)}
-      onDragEnter={this.onDragOver.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
     {

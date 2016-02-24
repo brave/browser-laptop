@@ -9,9 +9,9 @@ const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
-const AppActions = require('../actions/appActions')
+const appActions = require('../actions/appActions')
 const {isSiteInList} = require('../state/siteUtil')
-const SiteTags = require('../constants/siteTags')
+const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
@@ -32,9 +32,9 @@ class NavigationBar extends ImmutableComponent {
 
   onToggleBookmark (isBookmarked) {
     if (isBookmarked) {
-      AppActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame), SiteTags.BOOKMARK)
+      appActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame), siteTags.BOOKMARK)
     } else {
-      AppActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame), SiteTags.BOOKMARK)
+      appActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame), siteTags.BOOKMARK)
     }
   }
 
@@ -52,7 +52,7 @@ class NavigationBar extends ImmutableComponent {
         location: this.props.activeFrame.get('location'),
         partitionNumber: this.props.activeFrame.get('partitionNumber'),
         title: this.props.activeFrame.get('title')
-      }), SiteTags.BOOKMARK)
+      }), siteTags.BOOKMARK)
   }
 
   get titleMode () {
@@ -75,7 +75,7 @@ class NavigationBar extends ImmutableComponent {
         location: prevProps.activeFrame.get('location'),
         partitionNumber: this.props.activeFrame.get('partitionNumber'),
         title: this.props.activeFrame.get('title')
-      }), SiteTags.BOOKMARK)
+      }), siteTags.BOOKMARK)
     if (this.bookmarked !== prevBookmarked) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
     }

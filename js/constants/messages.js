@@ -57,7 +57,7 @@ const messages = {
   POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
   // Init
-  INIT_WINODW: _,
+  INITIALIZE_WINDOW: _,
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,

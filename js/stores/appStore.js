@@ -235,7 +235,6 @@ const handleAppAction = (action) => {
       const willNavigateHandler = (whitelistedUrl, e, url) => {
         if (url !== whitelistedUrl) {
           e.preventDefault()
-          mainWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
         }
       }
 
@@ -246,7 +245,7 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
-          mainWindow.webContents.send(messages.INIT_WINODW, appState.toJS(), frames, action.restoredState)
+          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
         }
       })
       mainWindow.show()

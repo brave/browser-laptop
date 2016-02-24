@@ -46,26 +46,41 @@ class Tabs extends ImmutableComponent {
   onDrop (e) {
     const clientX = e.clientX
     const sourceDragData = this.props.sourceDragData
-    // This must be executed async because the state change that this causes
-    // will cause the onDragEnd to never run
-    setTimeout(() => {
-      const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX)
-      if (droppedOnTab) {
-        const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
-        windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
-        if (sourceDragData.get('pinnedLocation')) {
-          windowActions.setPinned(sourceDragData, false)
-          appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
+    if (sourceDragData) {
+      // This must be executed async because the state change that this causes
+      // will cause the onDragEnd to never run
+      setTimeout(() => {
+        const key = sourceDragData.get('key')
+        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX)
+        if (droppedOnTab) {
+          const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
+          const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+          windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
+          if (sourceDragData.get('pinnedLocation')) {
+            windowActions.setPinned(sourceDragData, false)
+            appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
+          }
         }
-      }
-    }, 0)
+      }, 0)
+      return
+    }
+    if (e.dataTransfer.files) {
+      Array.from(e.dataTransfer.files).forEach(file =>
+        windowActions.newFrame({location: file.path, title: file.name}))
+    }
   }
 
   onDragOver (e) {
-    e.dataTransfer.dropEffect = 'move'
-    e.preventDefault()
+    if (this.props.sourceDragData) {
+      e.dataTransfer.dropEffect = 'move'
+      e.preventDefault()
+      return
+    }
+    let intersection = e.dataTransfer.types.filter(x => ['Files'].includes(x))
+    if (intersection.length > 0) {
+      e.dataTransfer.dropEffect = 'copy'
+      e.preventDefault()
+    }
   }
 
   render () {
