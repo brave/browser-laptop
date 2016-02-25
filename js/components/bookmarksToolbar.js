@@ -26,7 +26,8 @@ class BookmarkToolbarButton extends ImmutableComponent {
     }
     const isDarwin = process.platform === 'darwin'
     if (e.ctrlKey && !isDarwin ||
-        e.metaKey && isDarwin) {
+        e.metaKey && isDarwin ||
+        e.button === 1) {
       WindowActions.newFrame({
         location: this.props.bookmark.get('location'),
         partitionNumber: this.props.bookmark.get('partitionNumber')
