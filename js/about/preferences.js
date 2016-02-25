@@ -66,7 +66,7 @@ class SettingCheckbox extends ImmutableComponent {
         <input type='checkbox' id={this.props.prefKey}
           disabled={this.props.disabled}
           onChange={changeSetting.bind(null, this.props.prefKey)}
-          checked={getSetting(this.props.settings, this.props.prefKey)}/>
+          checked={getSetting(this.props.prefKey, this.props.settings)}/>
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
     </div>
@@ -77,7 +77,7 @@ class GeneralTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='startsWith'>
-        <select value={getSetting(this.props.settings, settings.STARTUP_MODE)}
+        <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
           onChange={changeSetting.bind(null, settings.STARTUP_MODE)} >
           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
@@ -86,7 +86,7 @@ class GeneralTab extends ImmutableComponent {
       </SettingItem>
       <SettingItem dataL10nId='myHomepage'>
         <input data-l10n-id='homepageInput'
-          value={getSetting(this.props.settings, settings.HOMEPAGE)}
+          value={getSetting(settings.HOMEPAGE, this.props.settings)}
           onChange={changeSetting.bind(null, settings.HOMEPAGE)} />
       </SettingItem>
     </SettingsList>
@@ -97,7 +97,7 @@ class SearchTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='defaultSearchEngine'>
-        <select value={getSetting(this.props.settings, settings.DEFAULT_SEARCH_ENGINE)}
+        <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
           onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)}>
           <option value='./content/search/google.xml'>Google</option>
           <option value='./content/search/duckduckgo.xml'>DuckDuckGo</option>
@@ -115,7 +115,7 @@ class TabsTab extends ImmutableComponent {
           type='number'
           min='3'
           max='20'
-          value={getSetting(this.props.settings, settings.TABS_PER_TAB_PAGE)}
+          value={getSetting(settings.TABS_PER_TAB_PAGE, this.props.settings)}
           onChange={changeSetting.bind(null, settings.TABS_PER_TAB_PAGE)} />
       </SettingItem>
       <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings}/>

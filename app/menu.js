@@ -408,7 +408,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         CommonMenu.bookmarksMenuItem,
-        CommonMenu.bookmarksToolbarMenuItem(settingsState),
+        CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
         {
           label: 'Import Bookmarks',

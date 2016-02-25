@@ -13,6 +13,7 @@ const getFavicon = require('../lib/faviconUtil.js')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
+const getSetting = require('../settings').getSetting
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -51,7 +52,7 @@ const updateTabPageIndex = (frameProps) => {
   }
 
   const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter(frame => !frame.get('pinnedLocation')), frameProps, windowStore.cachedSettings[settings.TABS_PER_TAB_PAGE])
+      .filter(frame => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_TAB_PAGE))
   if (index === -1) {
     return
   }
@@ -66,7 +67,6 @@ const incrementPartitionNumber = () => ++currentPartitionNumber
 class WindowStore extends EventEmitter {
   constructor () {
     super()
-    this.cachedSettings = {}
   }
   getState () {
     return windowState
@@ -89,16 +89,6 @@ class WindowStore extends EventEmitter {
 
   removeChangeListener (callback) {
     this.removeListener(CHANGE_EVENT, callback)
-  }
-
-  /**
-   * Used to stash commonly used settings for auto inclusion in the needed
-   * dispatched events.
-   * @param {string} key - The name of the pref to cache
-   * @param {string} value - The value of the pref to cache
-   */
-  cacheSetting (key, value) {
-    this.cachedSettings[key] = value
   }
 }
 

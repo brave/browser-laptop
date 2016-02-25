@@ -142,7 +142,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       })
 
     // opened frames
-    if (getSetting(this.props.settings, settings.OPENED_TAB_SUGGESTIONS)) {
+    if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.frames,
         maxResults: Config.urlBarSuggestions.maxOpenedFrames,
@@ -157,7 +157,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     // bookmarks, reader list
-    if (getSetting(this.props.settings, settings.BOOKMARK_SUGGESTIONS)) {
+    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
         maxResults: Config.urlBarSuggestions.maxSites,

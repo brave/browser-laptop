@@ -177,7 +177,7 @@ class BookmarksToolbar extends ImmutableComponent {
     return <div className='bookmarksToolbar'
       onDrop={this.onDrop.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
+      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.activeFrame)}>
     {
         this.props.bookmarks
           .filter(bookmark => !bookmark.get('parentFolderId'))

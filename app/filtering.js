@@ -59,7 +59,7 @@ function registerForBeforeRequest (session) {
 function registerForBeforeSendHeaders (session) {
   // For efficiency, avoid calculating sendDNT on every request. This means the
   // browser must be restarted for changes to take effect.
-  const sendDNT = getSetting(AppStore.getState().get('settings'), settings.DO_NOT_TRACK)
+  const sendDNT = getSetting(settings.DO_NOT_TRACK)
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl) {

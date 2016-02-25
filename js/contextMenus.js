@@ -68,10 +68,10 @@ function inputTemplateInit (e) {
   return getEditableItems(hasSelection)
 }
 
-function tabsToolbarTemplateInit (settingsState, activeFrame) {
+function tabsToolbarTemplateInit (activeFrame) {
   return [
     CommonMenu.bookmarksMenuItem,
-    CommonMenu.bookmarksToolbarMenuItem(settingsState),
+    CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
     addFolderMenuItem
@@ -247,7 +247,7 @@ function getEditableItems (hasSelection) {
   }]
 }
 
-function hamburgerTemplateInit (braverySettings, settingsState) {
+function hamburgerTemplateInit (braverySettings) {
   const template = [
     CommonMenu.newTabMenuItem,
     CommonMenu.newPrivateTabMenuItem,
@@ -266,7 +266,7 @@ function hamburgerTemplateInit (braverySettings, settingsState) {
       label: 'Bookmarks',
       submenu: [
         CommonMenu.bookmarksMenuItem,
-        CommonMenu.bookmarksToolbarMenuItem(settingsState)
+        CommonMenu.bookmarksToolbarMenuItem()
       ]
     },
     CommonMenu.separatorMenuItem,
@@ -404,8 +404,8 @@ function mainTemplateInit (nodeProps, frame) {
   return template
 }
 
-export function onHamburgerMenu (braverySettings, settingsState, e) {
-  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings, settingsState))
+export function onHamburgerMenu (braverySettings, e) {
+  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings))
   const rect = e.target.getBoundingClientRect()
   hamburgerMenu.popup(remote.getCurrentWindow(), rect.left, rect.bottom)
 }
@@ -425,9 +425,9 @@ export function onTabContextMenu (frameProps, e) {
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (settings, activeFrame, e) {
+export function onTabsToolbarContextMenu (activeFrame, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(settings, activeFrame))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 

@@ -138,8 +138,8 @@ module.exports.bookmarksMenuItem = {
   }
 }
 
-module.exports.bookmarksToolbarMenuItem = (settingsState) => {
-  const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+module.exports.bookmarksToolbarMenuItem = () => {
+  const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
     label: 'Bookmarks Toolbar',
     type: 'checkbox',
