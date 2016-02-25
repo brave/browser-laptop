@@ -1,0 +1,44 @@
+<preferences "Preferências">
+<general "Geral">
+<search "Pesquisa">
+<tabs "Abas">
+<sync "Sincronização">
+<privacy "Privacidade">
+<security "Segurança">
+<bravery "Bravura">
+
+<hintsTitle "Dicas úteis...">
+<hint0 "O menu Bravura permite ativar ou desativar HTTPS Everywhere. HTTPS Everywhere reescreve automaticamente seu tráfego HTTP para HTTPS para sites suportados, para mantê-lo mais seguro.">
+<hint1 "Brave sempre se atualizará automaticamente, mas você pode verificar se há atualização sob demanda no menu.">
+<hint2 "O menu Arquivo permite criar uma Aba de Nova Sessão. Abas de sessões são como outras abas, mas são executadas em um perfil de usuário diferente. Isso permite que você faça login nos mesmos sites múltiplas vezes com o mesmo navegador.">
+
+<sendUsFeedback "Envie-nos feedback...">
+<loveToHear "Adoraríamos ouví-lo.">
+
+/* General settings page */
+<startsWith "Brave se inicia com">
+<startsWithOptionLastTime "Mostrar minhas janelas e abas da última vez">
+<startsWithOptionHomePage "Mostrar minha página inicial">
+<startsWithOptionNewTabPage "Mostrar a página de nova aba">
+<myHomepage "Minha página inicial é">
+<homepageInput placeholder: "Insira a URL da sua página inicial">
+
+/* Search settings page */
+<defaultSearchEngine "Mecanismo padrão de pesquisa">
+
+/* Tabs settings page */
+<switchToNewTabs "Mudar para novas abas imediatamente">
+<paintTabs "Mostrar abas na cor do tema de página">
+<tabsPerTabPage "Abas por página de aba">
+<showTabPreviews "Mostrar pré-visualizações de abas">
+
+/* Prviacy settings page */
+<suggestionTypes "Ao usar a barra de localização, sugerir:">
+<history "Histórico (ainda não disponível)">
+<bookmarks "Favoritos">
+<openedTabs "Abas abertas">
+<doNotTrack "Enviar um cabeçalho de 'Não rastrear' com as solicitações de navegação (requer reinicialização do navegador)">
+<advancedPrivacySettings "Configurações avançadas de privacidade:">
+
+/* Security settings page */
+<blockAttackSites "Bloquear sites de ataque relatados (ainda não disponível)">
