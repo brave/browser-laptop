@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const { activeWebview, findBarInput, findBarMatches, urlInput } = require('../lib/selectors')
+const { activeWebview, findBarInput, findBarMatches, urlInput, titleBar } = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
@@ -53,7 +53,8 @@ describe('findbar', function () {
       .waitForElementFocus(findBarInput)
       .keys('test search')
     yield this.app.client
-      .click('#navigator')
+      .click(titleBar)
+      .waitForExist(urlInput)
       .click(urlInput)
       .waitForVisible(findBarInput)
       .waitForElementFocus(urlInput)
