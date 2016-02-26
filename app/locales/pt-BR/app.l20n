@@ -34,14 +34,14 @@
 <reloadTab "Recarregar aba">
 <reloadButton title: "Recarregar página">
 <stopButton title: "Parar de carregar">
-<muteTab "Mutar aba">
-<unmuteTab "Remover mutar aba">
+<muteTab "Silenciar aba">
+<unmuteTab "Reativar som da aba">
 <disableProtectionForSite "Desativar proteção contra rastreamento">
 <enableProtectionForSite "Ativar proteção contra rastreamento">
 <disableAdBlockForSite "Desativar bloqueio de anúncios">
 <enableAdBlockForSite "Ativar bloqueio de anúncios">
 <downloadType "Baixar {{$type}}">
-<setDefaultSearch "Definir {{$title}} omo mecanismo padrão de pesquisa">
+<setDefaultSearch "Definir {{$title}} como mecanismo padrão de pesquisa">
 <viewPageSource "Ver Código Fonte da página">
 <menuButton title: "Menu">
 
@@ -68,7 +68,7 @@
 <apply "Aplicar">
 <applyAndRestart "Aplicar e reiniciar">
 
-<fullscreenNotice "{{$origin}}agora está em tela cheia. Pressione ESC para sair.">
+<fullscreenNotice "{{$origin}} agora está em tela cheia. Pressione ESC para sair.">
 
 <secureConnection "Este site é seguro">
 <mixedConnection "Conexão parcialmente insegura">
