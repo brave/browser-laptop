@@ -270,7 +270,17 @@ function hamburgerTemplateInit (braverySettings) {
       ]
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.quitMenuItem
+    {
+      label: 'Help',
+      submenu: [
+        CommonMenu.aboutBraveMenuItem,
+        CommonMenu.separatorMenuItem,
+        CommonMenu.checkForUpdateMenuItem,
+        CommonMenu.separatorMenuItem,
+        CommonMenu.reportAnIssueMenuItem,
+        CommonMenu.submitFeedbackMenuItem
+      ]
+    }
   ]
   return template
 }

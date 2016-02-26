@@ -9,17 +9,13 @@ const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const dialog = electron.dialog
-const app = electron.app
 const AppActions = require('../js/actions/appActions')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
 
 const isDarwin = process.platform === 'darwin'
 
-const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const aboutUrl = 'https://brave.com/'
-
-const path = require('path')
 
 const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = AppConfig.resourceNames.ADBLOCK
@@ -49,20 +45,6 @@ const init = (settingsState, args) => {
         ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
         : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
       CommonMenu.sendToFocusedWindow(focusedWindow, [msg])
-    }
-  }
-
-  const aboutBraveMenuItem = {
-    label: 'About ' + AppConfig.name,
-    click: (item, focusedWindow) => {
-      dialog.showMessageBox({
-        title: 'Brave',
-        message: 'Version: ' + app.getVersion() + '\n' +
-          'Electron: ' + process.versions['atom-shell'] + '\n' +
-          'libchromiumcontent: ' + process.versions['chrome'],
-        icon: path.join(__dirname, 'img', 'braveBtn3x.png'),
-        buttons: ['Ok']
-      })
     }
   }
 
@@ -163,21 +145,10 @@ const init = (settingsState, args) => {
   ]
 
   const helpMenu = [
-    {
-      label: 'Report an issue',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow,
-          [messages.SHORTCUT_NEW_FRAME, issuesUrl])
-      }
-    },
+    CommonMenu.reportAnIssueMenuItem,
     CommonMenu.separatorMenuItem,
+    CommonMenu.submitFeedbackMenuItem,
     {
-      label: 'Submit Feedback...',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
-      }
-    }, {
       label: 'Spread the word about Brave...',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow,
@@ -192,7 +163,7 @@ const init = (settingsState, args) => {
     helpMenu.push(CommonMenu.separatorMenuItem)
     helpMenu.push(CommonMenu.checkForUpdateMenuItem)
     helpMenu.push(CommonMenu.separatorMenuItem)
-    helpMenu.push(aboutBraveMenuItem)
+    helpMenu.push(CommonMenu.aboutBraveMenuItem)
   }
 
   const editSubmenu = [{
@@ -499,7 +470,7 @@ const init = (settingsState, args) => {
     template.unshift({
       label: AppConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
-        aboutBraveMenuItem,
+        CommonMenu.aboutBraveMenuItem,
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem,
         CommonMenu.separatorMenuItem,

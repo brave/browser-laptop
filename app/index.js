@@ -208,6 +208,7 @@ app.on('ready', function () {
 
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+      ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
