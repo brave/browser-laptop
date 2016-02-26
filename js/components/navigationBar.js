@@ -94,7 +94,7 @@ class NavigationBar extends ImmutableComponent {
           titleMode: this.titleMode
         })}>
 
-      { isSourceAboutUrl(frameProps.get('location')) ? null
+      { isSourceAboutUrl(frameProps.get('location')) || this.titleMode ? null
         : <div className='startButtons'>
         { this.loading
           ? <Button iconClass='fa-times'

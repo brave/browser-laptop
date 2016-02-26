@@ -4,10 +4,11 @@ const Brave = require('../lib/brave')
 
 const messages = require('../../js/constants/messages')
 const siteTags = require('../../js/constants/siteTags')
-const {urlInput, tabsTabs, pinnedTabsTabs} = require('../lib/selectors')
+const {urlInput, tabsTabs, pinnedTabsTabs, navigator} = require('../lib/selectors')
 
 function * loadUrl (client, url) {
   yield client.ipcSend('shortcut-focus-url')
+    .moveToObject(navigator)
     .moveToObject(urlInput)
     .click(urlInput)
     .waitForElementFocus(urlInput)
@@ -151,9 +152,10 @@ describe('pinnedTabs', function () {
     it('navigate within the same origin', function *() {
       const page2Url = Brave.server.url('page2.html')
       yield loadUrl(this.app.client, page2Url)
-      yield this.app.client.waitUntil(function () {
-        return this.getAttribute('webview[data-frame-key="2"]', 'src').then(src => src === page2Url)
-      })
+      yield this.app.client
+        .waitUntil(function () {
+          return this.getAttribute('webview[data-frame-key="2"]', 'src').then(src => src === page2Url)
+        })
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
