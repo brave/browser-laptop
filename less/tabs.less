@@ -20,6 +20,10 @@
   display: flex;
   flex: 1;
   z-index: 2;
+  -webkit-app-region: drag;
+  >* {
+    -webkit-app-region: no-drag;
+  }
 
   .browserButton {
     height: 26px;
@@ -215,11 +219,11 @@
 }
 
 .tabsToolbar {
-  -webkit-user-select: none;
   background: @tabsBackground;
   display: flex;
   height: 27px;
   border-bottom: 1px solid #bbb;
+  -webkit-user-select: none;
 }
 
 .tabsToolbarButtons {
@@ -239,6 +243,10 @@
   position: relative;
   text-align: center;
   z-index: 12;
+  -webkit-app-region: drag;
+  >* {
+    -webkit-app-region: no-drag;
+  }
 
   &.singlePage {
     height: 3px;
