@@ -14,6 +14,7 @@ const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
+const ipcMain = electron.ipcMain
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
@@ -124,11 +125,23 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
   }
 }
 
-module.exports.init = () => {
+function initForPartition (partition) {
   [registerForBeforeRequest, registerForBeforeSendHeaders].forEach(fn => {
-    fn(session.fromPartition(''))
-    fn(session.fromPartition('private-1'))
-    fn(session.fromPartition('main-1'))
+    fn(session.fromPartition(partition))
+  })
+}
+
+module.exports.init = () => {
+  ['', 'private-1', 'main-1'].forEach(partition => {
+    initForPartition(partition)
+  })
+  let initializedPartitions = {}
+  ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
+    if (initializedPartitions[partition]) {
+      return
+    }
+    initForPartition(partition)
+    initializedPartitions[partition] = true
   })
 }
 
