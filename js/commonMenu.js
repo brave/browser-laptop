@@ -7,6 +7,7 @@
 const AppConfig = require('./constants/appConfig')
 const AppActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
+const Immutable = require('immutable')
 
 const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = AppConfig.resourceNames.ADBLOCK
@@ -28,6 +29,12 @@ if (process.type === 'browser') {
   app = electron.app
 } else {
   app = electron.remote.app
+}
+
+const ensureAtLeastOneWindow = (frameOpts) => {
+  if (electron.BrowserWindow.getAllWindows().length === 0) {
+    AppActions.newWindow(frameOpts)
+  }
 }
 
 /**
@@ -66,6 +73,7 @@ module.exports.newPrivateTabMenuItem = {
   label: 'New Private Tab',
   accelerator: 'CmdOrCtrl+Alt+T',
   click: function (item, focusedWindow) {
+    ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
   }
 }
@@ -74,6 +82,7 @@ module.exports.newPartitionedTabMenuItem = {
   label: 'New Session Tab',
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
+    ensureAtLeastOneWindow(Immutable.fromJS({ isPartitioned: true }))
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
   }
 }
@@ -115,9 +124,7 @@ module.exports.findOnPageMenuItem = {
 module.exports.checkForUpdateMenuItem = {
   label: 'Check for updates...',
   click: function (item, focusedWindow) {
-    if (electron.BrowserWindow.getAllWindows().length === 0) {
-      AppActions.newWindow()
-    }
+    ensureAtLeastOneWindow()
     process.emit(messages.CHECK_FOR_UPDATE)
   }
 }
