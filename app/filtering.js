@@ -21,7 +21,7 @@ const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 
 // Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net']
+const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
 
 module.exports.registerBeforeSendHeadersFilteringCB = filteringFn => {
   beforeSendHeadersFilteringFns.push(filteringFn)
