@@ -63,6 +63,32 @@ describe('tabs', function () {
     })
   })
 
+  describe('close tab', function() {
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('should close the tab', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'https://www.brave.com')
+        .waitForExist('.tab[data-frame-key="2"]')
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+
+      yield this.app.client
+        .isExisting('.tab[data-frame-key="2"]').should.eventually.be.false
+    })
+    it('should undo last closed tab', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'https://www.brave.com')
+        .waitForExist('.tab[data-frame-key="3"]')
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
+        .waitForExist('.tab[data-frame-key="3"]').should.eventually.be.true
+    })
+  })
+
   describe('webview background-tab events', function () {
     Brave.beforeAll(this)
     before(function *() {
