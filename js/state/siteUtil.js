@@ -128,7 +128,6 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
 
 module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend) {
   const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail, sourceDetail.get('tags'))
-  // TODO: Need partition number for drag and drop
   let newIndex = module.exports.getSiteIndex(sites, destinationDetail, destinationDetail.get('tags')) + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceSiteIndex)
   sites = sites.splice(sourceSiteIndex, 1)
