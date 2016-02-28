@@ -141,7 +141,7 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
-  mainWindow.on('app-command', function(e, cmd) {
+  mainWindow.on('app-command', function (e, cmd) {
     switch (cmd) {
       case 'browser-backward':
         mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
