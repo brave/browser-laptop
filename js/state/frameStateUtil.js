@@ -172,7 +172,7 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
       searchSuggestions: true,
       focused: navbarFocus,
       urlbar: {
-        location: url,
+        location: frameOpts.delayedLoadUrl || url,
         urlPreview: '',
         suggestions: {
           selectedIndex: 0,

@@ -15,26 +15,57 @@
   justify-content: space-between;
   padding-left: 70px;
   border-bottom: 1px solid #bbb;
+  height: 40px;
 }
 
 .urlbarForm {
-  max-width: calc(~'100% - 72px');
+  max-width: calc(~'100% - 80px'); // space for reload and bookmark buttons
   position: relative;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+
+  *:not(legend) {
+    z-index: 1;
+  }
+
+  input:focus + legend:before {
+    content: ' ';
+    position: absolute;
+    background: #fff;
+    border: 1px solid @focusUrlbarOutline;
+    border-radius: 4px;
+    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
+    color: #333;
+    outline: none;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 0;
+  }
 
   #navigator:not(.titleMode) & {
     flex: 1;
+    background: white;
+    border-radius: @borderRadiusURL;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    color: @chromeText;
+    padding: 0 8px;
   }
 }
 
 #navigator {
   font-size: 20px;
-  height: 34px;
+  align-items: center;
   justify-content: center;
   max-width: 900px;
   box-sizing: border-box;
-  margin: 6px 0 0 -114px;
-  padding: 0 0 4px 0;
+  margin: 0 0 0 -114px;
+  padding: 0;
   position: relative;
   display: flex;
   flex-direction: row;
@@ -55,14 +86,11 @@
       max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
-      margin-top: 5px;
-    }
-    .startButtons {
-      display: none;
     }
 
     .endButtons {
       position: absolute;
+      top: -2px;
     }
 
     .urlbarIcon {
@@ -70,7 +98,6 @@
       opacity: 0.4;
       position: relative;
       left: 2px;
-      top: -2px;
       min-width: 0;
 
       &[class*=" fa-"] {
@@ -82,6 +109,7 @@
     .bookmark-button {
       transform: scale(0.6);
       opacity: 0.6;
+      text-align: left;
 
       &:not(.remove-bookmark-button) {
         display: none;
@@ -96,7 +124,6 @@
   .loadTime {
     color: @loadTimeColor;
     font-size: 12px;
-    position: absolute;
     right: 10px;
     text-align: right;
     top: 8px;
@@ -111,19 +138,26 @@
     -moz-window-dragging: no-drag;
   }
 
+  .inputbar-wrapper {
+    background: white;
+    display: flex;
+    flex: 1 1 0;
+    border-radius: 4px;
+    align-items: center;
+    justify-content: center;
+  }
+
   input {
     -webkit-app-region: no-drag;
     background: @navigationBarBackground;
     border: none;
-    border-radius: @borderRadiusURL;
     box-sizing: border-box;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
     color: @chromeText;
+    cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    height: 24px;
     margin: 0 0 0 1px;
-    padding: 0 70px 0 33px;
+    outline: none;
     text-overflow: ellipsis;
     width: 100%;
 
@@ -131,13 +165,6 @@
       background: @chromeControlsBackground2;
     }
 
-    &:focus {
-      background: #fff;
-      border: 1px solid @focusUrlbarOutline;
-      box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
-      color: #333;
-      outline: none;
-    }
 
     &.private {
       background: @privateTabBackground;
@@ -152,8 +179,6 @@
 
   .urlbarIcon {
     color: @buttonColor;
-    position: absolute;
-    top: 6px;
     left: 14px;
     font-size: 15px;
     min-height: 16px;
@@ -168,6 +193,7 @@
     .flyoutDialog;
     box-sizing: border-box;
     width: 100%;
+    left: 0;
     z-index: 311;
 
     .suggestionIcon {

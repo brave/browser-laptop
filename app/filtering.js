@@ -14,12 +14,14 @@ const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
+const ipcMain = electron.ipcMain
+const dialog = electron.dialog
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 
 // Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net']
+const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
 
 module.exports.registerBeforeSendHeadersFilteringCB = filteringFn => {
   beforeSendHeadersFilteringFns.push(filteringFn)
@@ -59,7 +61,7 @@ function registerForBeforeRequest (session) {
 function registerForBeforeSendHeaders (session) {
   // For efficiency, avoid calculating sendDNT on every request. This means the
   // browser must be restarted for changes to take effect.
-  const sendDNT = getSetting(AppStore.getState().get('settings'), settings.DO_NOT_TRACK)
+  const sendDNT = getSetting(settings.DO_NOT_TRACK)
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl) {
@@ -111,6 +113,70 @@ function registerForBeforeSendHeaders (session) {
   })
 }
 
+/**
+ * Register permission request handler
+ * @param {Object} session to add permission request handler on
+ */
+function registerPermissionHandler (session) {
+  // Keep track of per-site permissions granted for this session.
+  // TODO: Localize strings
+  let permissions = {
+    media: {
+      action: 'use your camera and/or microphone',
+      hosts: {}
+    },
+    geolocation: {
+      action: 'see your location',
+      hosts: {}
+    },
+    notifications: {
+      action: 'show you notifications',
+      hosts: {}
+    },
+    midiSysex: {
+      action: 'use web MIDI',
+      hosts: {}
+    },
+    pointerLock: {
+      action: 'disable your mouse cursor',
+      hosts: {}
+    },
+    fullscreen: {
+      action: 'be fullscreen',
+      hosts: {}
+    }
+  }
+  session.setPermissionRequestHandler((webContents, permission, cb) => {
+    let host = urlParse(webContents.getURL()).host
+    let isAllowed = permissions[permission].hosts[host]
+    if (isAllowed !== undefined) {
+      cb(isAllowed)
+    } else {
+      // TODO: Add option to remember decision between restarts.
+      let result = dialog.showMessageBox({
+        type: 'question',
+        message: host + ' is requesting permission to ' + permissions[permission].action,
+        buttons: ['Deny', 'Allow'],
+        defaultId: 0,
+        cancelId: 0
+      })
+      let isTemp = dialog.showMessageBox({
+        type: 'question',
+        title: 'Remember this decision?',
+        message: 'Would you like to remember this decision on ' + host + ' until Brave closes?',
+        buttons: ['Yes', 'No'],
+        defaultId: 0,
+        cancelId: 0
+      })
+      result = !!(result)
+      cb(result)
+      if (!isTemp) {
+        permissions[permission].hosts[host] = result
+      }
+    }
+  })
+}
+
 module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
   // TODO: Always return true if these are IP addresses that aren't the same
   if (!testHost || !baseContextHost) {
@@ -124,11 +190,23 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
   }
 }
 
+function initForPartition (partition) {
+  [registerPermissionHandler, registerForBeforeRequest, registerForBeforeSendHeaders].forEach(fn => {
+    fn(session.fromPartition(partition))
+  })
+}
+
 module.exports.init = () => {
-  [registerForBeforeRequest, registerForBeforeSendHeaders].forEach(fn => {
-    fn(session.fromPartition(''))
-    fn(session.fromPartition('private-1'))
-    fn(session.fromPartition('main-1'))
+  ['', 'private-1', 'main-1'].forEach(partition => {
+    initForPartition(partition)
+  })
+  let initializedPartitions = {}
+  ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
+    if (initializedPartitions[partition]) {
+      return
+    }
+    initForPartition(partition)
+    initializedPartitions[partition] = true
   })
 }
 

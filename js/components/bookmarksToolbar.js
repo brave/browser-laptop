@@ -26,7 +26,8 @@ class BookmarkToolbarButton extends ImmutableComponent {
     }
     const isDarwin = process.platform === 'darwin'
     if (e.ctrlKey && !isDarwin ||
-        e.metaKey && isDarwin) {
+        e.metaKey && isDarwin ||
+        e.button === 1) {
       WindowActions.newFrame({
         location: this.props.bookmark.get('location'),
         partitionNumber: this.props.bookmark.get('partitionNumber')
@@ -37,7 +38,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('title'))
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
     dnd.onDragStart(dragTypes.BOOKMARK, this.props.bookmark, e)
   }
 
@@ -46,7 +47,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('title'))
+    dnd.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
     dnd.onDragOver(dragTypes.BOOKMARK, this.props.sourceDragData, this.bookmarkNode.getBoundingClientRect(), this.props.bookmark, this.draggingOverData, e)
   }
 
@@ -92,7 +93,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
         onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
-      <span>{ this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }</span>
+      <span>{ this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('llocation') }</span>
       { this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
         ? <span className='bookmarkFolderChevron fa fa-chevron-down'/> : null }
     </span>
@@ -176,7 +177,7 @@ class BookmarksToolbar extends ImmutableComponent {
     return <div className='bookmarksToolbar'
       onDrop={this.onDrop.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.settings, this.props.activeFrame)}>
+      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.activeFrame)}>
     {
         this.props.bookmarks
           .filter(bookmark => !bookmark.get('parentFolderId'))

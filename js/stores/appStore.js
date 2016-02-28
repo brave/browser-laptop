@@ -22,6 +22,7 @@ const path = require('path')
 const getSetting = require('../settings').getSetting
 const debounce = require('../lib/debounce.js')
 const EventEmitter = require('events').EventEmitter
+const diff = require('immutablediff')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -143,19 +144,31 @@ const createWindow = (browserOpts, defaults) => {
   return mainWindow
 }
 
+const normalizeAppState = appState => appState.merge({
+  defaultWindowWidth: undefined,
+  defaultWindowHeight: undefined
+})
+
 class AppStore extends EventEmitter {
   getState () {
     return appState
   }
 
-  emitChanges () {
-    if (lastEmittedState !== appState) {
-      lastEmittedState = appState
-      // TODO: Break this apart and only send what's needed
-      const stateJS = this.getState().toJS()
-      BrowserWindow.getAllWindows().forEach(wnd =>
-        wnd.webContents.send(messages.APP_STATE_CHANGE, stateJS))
+  emitFullWindowState (wnd) {
+    wnd.webContents.send(messages.APP_STATE_CHANGE, { state: appState.toJS() })
+    lastEmittedState = appState
+  }
+
+  emitChanges (emitFullState) {
+    if (lastEmittedState) {
+      const d = diff(normalizeAppState(lastEmittedState), normalizeAppState(appState))
+      if (!d.isEmpty()) {
+        BrowserWindow.getAllWindows().forEach(wnd =>
+          wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
+        lastEmittedState = appState
+      }
     }
+
     this.emit(CHANGE_EVENT)
   }
 
@@ -213,8 +226,7 @@ const handleAppAction = (action) => {
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
 
       const mainWindow = createWindow(browserOpts, windowDefaults())
-      const settingsState = appState.get('settings')
-      const homepageSetting = getSetting(settingsState, settings.HOMEPAGE)
+      const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state
       let frames = []
@@ -224,7 +236,7 @@ const handleAppAction = (action) => {
         } else {
           frames.push(frameOpts)
         }
-      } else if (getSetting(settingsState, settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
+      } else if (getSetting(settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
         frames = homepageSetting.split('|').map(homepage => {
           return {
             location: homepage
@@ -245,6 +257,7 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
+          lastEmittedState = appState
           mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
         }
       })

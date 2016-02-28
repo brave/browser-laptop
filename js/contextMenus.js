@@ -31,6 +31,7 @@ const addBookmarkMenuItem = (siteDetail) => {
 
 const addFolderMenuItem = {
   label: 'Add Folder...',
+  enabled: false,
   click: () => {
     const emptyFolder = Immutable.fromJS({tags: [siteTags.BOOKMARK_FOLDER]})
     WindowActions.setBookmarkDetail(emptyFolder)
@@ -67,10 +68,10 @@ function inputTemplateInit (e) {
   return getEditableItems(hasSelection)
 }
 
-function tabsToolbarTemplateInit (settingsState, activeFrame) {
+function tabsToolbarTemplateInit (activeFrame) {
   return [
     CommonMenu.bookmarksMenuItem,
-    CommonMenu.bookmarksToolbarMenuItem(settingsState),
+    CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
     addFolderMenuItem
@@ -80,7 +81,7 @@ function tabsToolbarTemplateInit (settingsState, activeFrame) {
 function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   return bookmarks.map(bookmark => {
     return {
-      label: bookmark.get('title'),
+      label: bookmark.get('customTitle') || bookmark.get('title'),
       click: () => {
         WindowActions.loadUrl(activeFrame, bookmark.get('location'))
       }
@@ -131,7 +132,7 @@ function showBookmarkFolderInit (bookmarks, bookmark, activeFrame) {
 
   return items.map(site => {
     const templateItem = {
-      label: site.get('title'),
+      label: site.get('customTitle') || site.get('title'),
       click: function () {
         WindowActions.loadUrl(activeFrame, site.get('location'))
       }
@@ -246,7 +247,7 @@ function getEditableItems (hasSelection) {
   }]
 }
 
-function hamburgerTemplateInit (braverySettings, settingsState) {
+function hamburgerTemplateInit (braverySettings) {
   const template = [
     CommonMenu.newTabMenuItem,
     CommonMenu.newPrivateTabMenuItem,
@@ -265,11 +266,21 @@ function hamburgerTemplateInit (braverySettings, settingsState) {
       label: 'Bookmarks',
       submenu: [
         CommonMenu.bookmarksMenuItem,
-        CommonMenu.bookmarksToolbarMenuItem(settingsState)
+        CommonMenu.bookmarksToolbarMenuItem()
       ]
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.quitMenuItem
+    {
+      label: 'Help',
+      submenu: [
+        CommonMenu.aboutBraveMenuItem,
+        CommonMenu.separatorMenuItem,
+        CommonMenu.checkForUpdateMenuItem,
+        CommonMenu.separatorMenuItem,
+        CommonMenu.reportAnIssueMenuItem,
+        CommonMenu.submitFeedbackMenuItem
+      ]
+    }
   ]
   return template
 }
@@ -403,8 +414,8 @@ function mainTemplateInit (nodeProps, frame) {
   return template
 }
 
-export function onHamburgerMenu (braverySettings, settingsState, e) {
-  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings, settingsState))
+export function onHamburgerMenu (braverySettings, e) {
+  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings))
   const rect = e.target.getBoundingClientRect()
   hamburgerMenu.popup(remote.getCurrentWindow(), rect.left, rect.bottom)
 }
@@ -424,9 +435,9 @@ export function onTabContextMenu (frameProps, e) {
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (settings, activeFrame, e) {
+export function onTabsToolbarContextMenu (activeFrame, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(settings, activeFrame))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 

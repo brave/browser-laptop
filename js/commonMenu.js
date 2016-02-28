@@ -7,6 +7,9 @@
 const AppConfig = require('./constants/appConfig')
 const AppActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
+const Immutable = require('immutable')
+const Channel = require('../app/channel')
+const path = require('path')
 
 const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = AppConfig.resourceNames.ADBLOCK
@@ -15,6 +18,7 @@ const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
 const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
+const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 
 let electron
 try {
@@ -24,10 +28,22 @@ try {
 }
 
 let app
+let dialog
+let BrowserWindow
 if (process.type === 'browser') {
   app = electron.app
+  dialog = electron.dialog
+  BrowserWindow = electron.BrowserWindow
 } else {
   app = electron.remote.app
+  dialog = electron.remote.dialog
+  BrowserWindow = electron.remote.BrowserWindow
+}
+
+const ensureAtLeastOneWindow = (frameOpts) => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    AppActions.newWindow(frameOpts)
+  }
 }
 
 /**
@@ -66,6 +82,7 @@ module.exports.newPrivateTabMenuItem = {
   label: 'New Private Tab',
   accelerator: 'CmdOrCtrl+Alt+T',
   click: function (item, focusedWindow) {
+    ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
   }
 }
@@ -74,6 +91,7 @@ module.exports.newPartitionedTabMenuItem = {
   label: 'New Session Tab',
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
+    ensureAtLeastOneWindow(Immutable.fromJS({ isPartitioned: true }))
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
   }
 }
@@ -115,10 +133,12 @@ module.exports.findOnPageMenuItem = {
 module.exports.checkForUpdateMenuItem = {
   label: 'Check for updates...',
   click: function (item, focusedWindow) {
-    if (electron.BrowserWindow.getAllWindows().length === 0) {
-      AppActions.newWindow()
+    if (process.type === 'browser') {
+      ensureAtLeastOneWindow()
+      process.emit(messages.CHECK_FOR_UPDATE)
+    } else {
+      electron.ipcRenderer.send(messages.CHECK_FOR_UPDATE)
     }
-    process.emit(messages.CHECK_FOR_UPDATE)
   }
 }
 
@@ -138,8 +158,24 @@ module.exports.bookmarksMenuItem = {
   }
 }
 
-module.exports.bookmarksToolbarMenuItem = (settingsState) => {
-  const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+module.exports.reportAnIssueMenuItem = {
+  label: 'Report an issue',
+  click: function (item, focusedWindow) {
+    module.exports.sendToFocusedWindow(focusedWindow,
+      [messages.SHORTCUT_NEW_FRAME, issuesUrl])
+  }
+}
+
+module.exports.submitFeedbackMenuItem = {
+  label: 'Submit Feedback...',
+  click: function (item, focusedWindow) {
+    module.exports.sendToFocusedWindow(focusedWindow,
+      [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
+  }
+}
+
+module.exports.bookmarksToolbarMenuItem = () => {
+  const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
     label: 'Bookmarks Toolbar',
     type: 'checkbox',
@@ -147,6 +183,21 @@ module.exports.bookmarksToolbarMenuItem = (settingsState) => {
     click: (item, focusedWindow) => {
       AppActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
     }
+  }
+}
+
+module.exports.aboutBraveMenuItem = {
+  label: 'About ' + AppConfig.name,
+  click: (item, focusedWindow) => {
+    dialog.showMessageBox({
+      title: 'Brave',
+      message: 'Version: ' + app.getVersion() + '\n' +
+        'Electron: ' + process.versions['atom-shell'] + '\n' +
+        'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
+        'Channel: ' + Channel.channel(),
+      icon: path.join(__dirname, '..', 'app', 'img', 'braveBtn3x.png'),
+      buttons: ['Ok']
+    })
   }
 }
 

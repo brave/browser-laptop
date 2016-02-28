@@ -34,7 +34,7 @@ const getSetting = require('../js/settings').getSetting
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    const startupModeSettingValue = getSetting(payload.settings || {}, settings.STARTUP_MODE)
+    const startupModeSettingValue = getSetting(settings.STARTUP_MODE)
     const savePerWindowState = startupModeSettingValue === undefined ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
@@ -145,7 +145,7 @@ module.exports.cleanSessionData = (sessionData) => {
   if (sessionData.frames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
     sessionData.frames = sessionData.frames
-      // frame.isPinned is the old storage format
+      // TODO: frame.isPinned is the old storage format, remove that condition after the year 2016
       .filter(frame => !frame.isPinned && !frame.pinnedLocation)
     sessionData.frames.forEach(cleanFrame)
   }

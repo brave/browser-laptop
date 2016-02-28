@@ -6,23 +6,20 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const WindowStore = require('../stores/windowStore')
+const windowStore = require('../stores/windowStore')
+const appStoreRenderer = require('../stores/appStoreRenderer')
 const WindowActions = require('../actions/windowActions')
 const Main = require('./main')
-const ipc = global.require('electron').ipcRenderer
-const messages = require('../constants/messages')
 const SiteTags = require('../constants/siteTags')
 const Config = require('../constants/config')
-const settings = require('../constants/settings')
-const getSetting = require('../settings').getSetting
 
 class Window extends React.Component {
   constructor (props) {
     super(props)
     // initialize appState from props
     // and then listen for updates
-    this.appState = Immutable.fromJS(this.props.appState)
-    this.windowState = Immutable.fromJS(this.props.initWindowState) || WindowStore.getState()
+    this.appState = appStoreRenderer.state
+    this.windowState = Immutable.fromJS(this.props.initWindowState) || windowStore.getState()
     this.state = {
       immutableData: {
         windowState: this.windowState,
@@ -32,19 +29,8 @@ class Window extends React.Component {
     if (this.props.initWindowState) {
       WindowActions.setState(this.windowState)
     }
-    ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
-      this.appState = Immutable.fromJS(action)
-      this.setState({
-        immutableData: {
-          windowState: this.windowState,
-          appState: this.appState
-        }
-      })
-      this.onAppStateChanged()
-    })
-
-    this.onAppStateChanged()
-    WindowStore.addChangeListener(this.onChange.bind(this))
+    windowStore.addChangeListener(this.onChange.bind(this))
+    appStoreRenderer.addChangeListener(this.onAppStateChange.bind(this))
   }
 
   componentWillMount () {
@@ -69,8 +55,8 @@ class Window extends React.Component {
   }
 
   componentWillUnmount () {
-    WindowStore.removeChangeListener(this.onChange.bind(this))
-    ipc.removeListener(this.onAppStateChange)
+    windowStore.removeChangeListener(this.onChange.bind(this))
+    appStoreRenderer.removeChangeListener(this.onAppStateChange.bind(this))
   }
 
   shouldComponentUpdate (nextProps, nextState) {
@@ -78,7 +64,7 @@ class Window extends React.Component {
   }
 
   onChange () {
-    this.windowState = WindowStore.getState()
+    this.windowState = windowStore.getState()
     this.setState({
       immutableData: {
         windowState: this.windowState,
@@ -87,8 +73,15 @@ class Window extends React.Component {
     })
   }
 
-  onAppStateChanged () {
-    WindowStore.cacheSetting(settings.TABS_PER_TAB_PAGE, getSetting(this.appState.get('settings'), settings.TABS_PER_TAB_PAGE))
+  onAppStateChange () {
+    this.appState = appStoreRenderer.state
+    this.setState({
+      immutableData: {
+        windowState: this.windowState,
+        appState: this.appState
+      }
+    })
+
     const sites = this.appState.get('sites')
     const frames = this.windowState.get('frames')
 

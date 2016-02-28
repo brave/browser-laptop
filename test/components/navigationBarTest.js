@@ -57,15 +57,17 @@ describe('urlbar', function () {
 
       it('has title mode', function *() {
         const host = this.host
-        yield this.app.client.waitUntil(function () {
-          return this.getText(titleBar).then(val => val === host + ' | Page 1')
-        })
-        .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
+        yield this.app.client
+          .waitForExist(titleBar)
+          .waitUntil(function () {
+            return this.getText(titleBar).then(val => val === host + ' | Page 1')
+          })
+          .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
       })
 
       it('shows the url on mouseover', function *() {
         yield this.app.client
-          .moveToObject(urlInput)
+          .moveToObject(titleBar)
           .waitForExist(navigatorLoadTime)
           .getValue(urlInput)
           .should.eventually.be.equal(this.page1Url)
@@ -76,7 +78,7 @@ describe('urlbar', function () {
         yield this.app.client
           .ipcSend('shortcut-focus-url', false)
           .waitUntil(function () {
-            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
+            return this.isExisting(titleBar).then(exists => exists === false)
           })
         yield selectsText(this.app.client, page1Url)
       })
@@ -99,7 +101,7 @@ describe('urlbar', function () {
       it('does not have title mode', function *() {
         yield this.app.client
           .waitUntil(function () {
-            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
+            return this.isExisting(titleBar).then(exists => exists === false)
           })
           .waitForExist(navigatorLoadTime)
       })
@@ -130,6 +132,9 @@ describe('urlbar', function () {
       it('updates the location in the navbar', function *() {
         var page = this.page
         yield this.app.client
+          .waitForExist(titleBar)
+          .moveToObject(titleBar)
+          .waitForExist(urlInput)
           .waitUntil(function () {
             return this.getValue(urlInput).then(val => val === page + '#top')
           })

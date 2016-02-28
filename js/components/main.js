@@ -81,7 +81,7 @@ class Main extends ImmutableComponent {
   }
 
   loadOpenSearch () {
-    let engine = getSetting(this.props.appState.get('settings'), settings.DEFAULT_SEARCH_ENGINE)
+    let engine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
     if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
       loadOpenSearch(engine).then(searchDetail => windowActions.setSearchDetail(searchDetail))
       this.lastLoadedOpenSearch = engine
@@ -103,7 +103,7 @@ class Main extends ImmutableComponent {
         }
       }
 
-      let openInForeground = getSetting(self.props.appState.get('settings'), settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
+      let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
       windowActions.newFrame({
         location: url || Config.defaultUrl,
         isPrivate: !!options.isPrivate,
@@ -195,7 +195,7 @@ class Main extends ImmutableComponent {
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
     braverySettings.bookmarked = this.navBar.bookmarked
-    contextMenus.onHamburgerMenu(braverySettings, this.props.appState.get('settings'), e)
+    contextMenus.onHamburgerMenu(braverySettings, e)
   }
 
   onMainFocus () {
@@ -253,8 +253,8 @@ class Main extends ImmutableComponent {
     this.frames = {}
     const settingsState = this.props.appState.get('settings') || new Immutable.Map()
     const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('pinnedLocation'))
-    const tabsPerPage = getSetting(settingsState, settings.TABS_PER_TAB_PAGE)
-    const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+    const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
+    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const sourceDragTabData = this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB &&
       this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])
     return <div id='window' ref={node => this.mainWindow = node}>
@@ -306,7 +306,7 @@ class Main extends ImmutableComponent {
           </div>
         </div>
         { showBookmarksToolbar
-          ? <BookmarksToolbar settings={settingsState}
+          ? <BookmarksToolbar
               sourceDragData={this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])}
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
               activeFrame={activeFrame}
@@ -318,7 +318,7 @@ class Main extends ImmutableComponent {
           tabPages: true,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, settingsState, activeFrame)}>
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
                 sourceDragData={sourceDragTabData}
@@ -327,11 +327,10 @@ class Main extends ImmutableComponent {
               /> : null }
         </div>
         <TabsToolbar
-          paintTabs={getSetting(settingsState, settings.PAINT_TABS)}
+          paintTabs={getSetting(settings.PAINT_TABS)}
           sourceDragData={sourceDragTabData}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
-          previewTabs={getSetting(settingsState, settings.SHOW_TAB_PREVIEWS)}
-          settings={settingsState}
+          previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}
           tabs={this.props.windowState.getIn(['ui', 'tabs'])}
           frames={this.props.windowState.get('frames')}
@@ -349,7 +348,7 @@ class Main extends ImmutableComponent {
           sortedFrames.map(frame =>
             <Frame
               ref={node => this.frames[frame.get('key')] = node}
-              prefOpenInForeground={getSetting(settingsState, settings.SWITCH_TO_NEW_TABS)}
+              prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
               onCloseFrame={this.onCloseFrame}
               frame={frame}
               key={frame.get('key')}

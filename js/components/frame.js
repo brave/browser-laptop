@@ -15,6 +15,8 @@ const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
 const Config = require('../constants/config.js')
+const siteHacks = require('../data/siteHacks')
+const ipc = global.require('electron').ipcRenderer
 
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
@@ -56,10 +58,17 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
-      this.webview.setAttribute('partition', `persist:partition-${this.props.frame.get('partitionNumber')}`)
+      let partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+      ipc.send(messages.INITIALIZE_PARTITION, partition)
+      this.webview.setAttribute('partition', partition)
     }
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
+    }
+
+    const hack = siteHacks[urlParse(location).hostname]
+    if (hack && hack.userAgent) {
+      this.webview.setAttribute('useragent', hack.userAgent)
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
