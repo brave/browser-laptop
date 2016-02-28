@@ -93,7 +93,7 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
   const isFolder = siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   const template = []
   if (!isFolder) {
-    template.push(openInNewTabMenuItem(location),
+    template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
       openInNewPrivateTabMenuItem(location),
       openInNewSessionTabMenuItem(location),
       copyLinkLocationMenuItem(location),
@@ -284,11 +284,11 @@ function hamburgerTemplateInit (braverySettings) {
   return template
 }
 
-const openInNewTabMenuItem = location => {
+const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
   return {
     label: 'Open in new tab',
     click: () => {
-      WindowActions.newFrame({ location }, false)
+      WindowActions.newFrame({ location, isPrivate, partitionNumber }, false)
     }
   }
 }
@@ -331,7 +331,7 @@ function mainTemplateInit (nodeProps, frame) {
   const nodeName = nodeProps.name
 
   if (nodeProps.href) {
-    template.push(openInNewTabMenuItem(nodeProps.href),
+    template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       openInNewPrivateTabMenuItem(nodeProps.href),
       openInNewSessionTabMenuItem(nodeProps.href),
       copyLinkLocationMenuItem(nodeProps.href),
