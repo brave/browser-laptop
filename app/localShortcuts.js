@@ -20,7 +20,9 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+Alt+Left', messages.SHORTCUT_PREV_TAB],
     ['Ctrl+PageDown', messages.SHORTCUT_NEXT_TAB],
     ['Ctrl+PageUp', messages.SHORTCUT_PREV_TAB],
-    ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST]
+    ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
+    ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
+    ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD]
   ]
 
   if (!isDarwin) {
