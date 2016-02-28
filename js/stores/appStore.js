@@ -114,7 +114,6 @@ const createWindow = (browserOpts, defaults) => {
     // Neither a frame nor a titlebar
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
-    titleBarStyle: 'hidden',
     autoHideMenuBar: true,
     titleBarStyle: 'hidden-inset',
     title: AppConfig.name,
