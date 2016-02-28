@@ -8,10 +8,12 @@ const electron = require('electron')
 const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
+const settings = require('../js/constants/settings')
 const dialog = electron.dialog
 const AppActions = require('../js/actions/appActions')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
+const getSetting = require('../js/settings').getSetting
 
 const isDarwin = process.platform === 'darwin'
 
@@ -341,6 +343,12 @@ const init = (settingsState, args) => {
       label: 'History',
       submenu: [
         {
+          label: 'Home',
+          accelerator: 'CmdOrCtrl+Shift+H',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, getSetting(settings.HOMEPAGE)])
+          }
+        }, {
           label: 'Back',
           accelerator: 'CmdOrCtrl+[',
           click: function (item, focusedWindow) {
@@ -452,7 +460,6 @@ const init = (settingsState, args) => {
           enabled: false
         }, {
           label: 'History',
-          // On OSX, Shift+Cmd+H cannot be overridden.
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
         }, {
@@ -507,7 +514,7 @@ const init = (settingsState, args) => {
           role: 'hide'
         }, {
           label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
+          accelerator: 'Command+Alt+H',
           role: 'hideothers'
         }, {
           label: 'Show All',
