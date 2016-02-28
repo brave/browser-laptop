@@ -7,6 +7,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
+const siteTags = require('../constants/siteTags')
 const aboutActions = require('./aboutActions')
 const cx = require('../lib/classSet.js')
 
@@ -59,6 +60,7 @@ class BookmarkFolderItem extends ImmutableComponent {
       .filter(bookmarkFolder => (bookmarkFolder.get('parentFolderId') || 0) === this.props.bookmarkFolder.get('folderId'))
     return <div>
       <div role='listitem'
+        onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmarkFolder.toJS(), 'bookmark-folder')}
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
         draggable='true'
         className={cx({
@@ -88,7 +90,7 @@ class BookmarkFolderList extends ImmutableComponent {
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
           allBookmarkFolders={this.props.allBookmarkFolders}
           selectedFolderId={this.props.selectedFolderId}
-          bookmarkFolder={Immutable.fromJS({folderId: 0})}/>
+          bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})}/>
         : null }
       {
         this.props.bookmarkFolders.map(bookmarkFolder =>

@@ -100,20 +100,27 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       CommonMenu.separatorMenuItem)
   }
 
+  // We want edit / delete items for everything except for the bookmarks toolbar item
+  if (!isFolder || siteDetail.get('folderId') !== 0) {
+    template.push(
+      {
+        label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
+        click: () => {
+          // originalLocation is undefined signifies add mode
+          WindowActions.setBookmarkDetail(siteDetail, siteDetail)
+        }
+      })
+
+    template.push(
+      CommonMenu.separatorMenuItem, {
+        label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
+        click: () => {
+          AppActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
+        }
+      })
+  }
+
   template.push(
-    {
-      label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
-      click: () => {
-        // originalLocation is undefined signifies add mode
-        WindowActions.setBookmarkDetail(siteDetail, siteDetail)
-      }
-    },
-    CommonMenu.separatorMenuItem, {
-      label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
-      click: () => {
-        AppActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
-      }
-    },
     CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
     addFolderMenuItem)
@@ -420,7 +427,7 @@ export function onHamburgerMenu (braverySettings, e) {
 }
 
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {
-  if (contextMenuType === 'bookmark') {
+  if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
