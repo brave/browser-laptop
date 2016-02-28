@@ -18,6 +18,7 @@ const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
+const isDarwin = process.platform === 'darwin'
 
 let electron
 try {
@@ -151,7 +152,7 @@ module.exports.preferencesMenuItem = {
 
 module.exports.bookmarksMenuItem = {
   label: 'Bookmarks manager...',
-  accelerator: process.platform === 'win32' ? 'Shift+Alt+B' : 'CmdOrCtrl+Alt+B',
+  accelerator: isDarwin ? 'CmdOrCtrl+Alt+B' : 'Ctrl+Shift+O',
   click: (item, focusedWindow) => {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
   }
