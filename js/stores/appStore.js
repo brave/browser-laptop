@@ -22,6 +22,7 @@ const path = require('path')
 const getSetting = require('../settings').getSetting
 const debounce = require('../lib/debounce.js')
 const EventEmitter = require('events').EventEmitter
+const Immutable = require('immutable')
 const diff = require('immutablediff')
 
 // Only used internally
@@ -259,6 +260,9 @@ const handleAppAction = (action) => {
         if (isMainFrame) {
           lastEmittedState = appState
           mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
+          if (action.cb) {
+            action.cb()
+          }
         }
       })
       mainWindow.show()
@@ -268,7 +272,12 @@ const handleAppAction = (action) => {
       appWindow.close()
       break
     case AppConstants.APP_ADD_SITE:
-      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+      if (action.siteDetail.constructor === Immutable.List) {
+        action.siteDetail.forEach(s =>
+          appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), s, action.tag)))
+      } else {
+        appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+      }
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))

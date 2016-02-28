@@ -56,7 +56,7 @@ class BookmarkItem extends ImmutableComponent {
 class BookmarkFolderItem extends ImmutableComponent {
   render () {
     const childBookmarkFolders = this.props.allBookmarkFolders
-      .filter(bookmarkFolder => bookmarkFolder.get('parentFolderId') === this.props.bookmarkFolder.get('folderId'))
+      .filter(bookmarkFolder => (bookmarkFolder.get('parentFolderId') || 0) === this.props.bookmarkFolder.get('folderId'))
     return <div>
       <div role='listitem'
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
@@ -139,7 +139,7 @@ class AboutBookmarks extends React.Component {
         <h2>Folders</h2>
       <div className='bookmarkPageContent'>
         <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
-          bookmarkFolders={this.state.bookmarkFolders.filter(bookmark => !bookmark.get('parentFolderId'))}
+          bookmarkFolders={this.state.bookmarkFolders.filter(bookmark => bookmark.get('parentFolderId') === -1)}
           allBookmarkFolders={this.state.bookmarkFolders}
           isRoot
           selectedFolderId={this.state.selectedFolderId} />

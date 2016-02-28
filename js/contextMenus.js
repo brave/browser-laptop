@@ -80,7 +80,7 @@ function tabsToolbarTemplateInit (activeFrame) {
 function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   return bookmarks.map(bookmark => {
     return {
-      label: bookmark.get('customTitle') || bookmark.get('title'),
+      label: bookmark.get('customTitle') || bookmark.get('title') || bookmark.get('location'),
       click: () => {
         WindowActions.loadUrl(activeFrame, bookmark.get('location'))
       }

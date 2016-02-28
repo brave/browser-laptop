@@ -37,7 +37,7 @@ module.exports.isSiteInList = function (sites, siteDetail, tag) {
   return sites.get(index).get('tags').includes(tag)
 }
 
-const getNextFolderId = (sites) =>
+const getNextFolderIdItem = (sites) =>
   sites.max((siteA, siteB) => {
     const folderIdA = siteA.get('folderId')
     const folderIdB = siteB.get('folderId')
@@ -53,6 +53,11 @@ const getNextFolderId = (sites) =>
     return folderIdA > folderIdB
   })
 
+module.exports.getNextFolderId = (sites) => {
+  const maxIdItem = getNextFolderIdItem(sites)
+  return (maxIdItem ? maxIdItem.get('folderId') : 0) + 1
+}
+
 /**
  * Adds the specified siteDetail to sites
  *
@@ -64,12 +69,14 @@ const getNextFolderId = (sites) =>
  * @return The new sites Immutable object
  */
 module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+  if (tag === undefined) {
+    tag = siteDetail.getIn(['tags', 0])
+  }
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
 
   let folderId = siteDetail.get('folderId')
-  if (tag === siteTags.BOOKMARK_FOLDER) {
-    const maxIdItem = getNextFolderId(sites)
-    folderId = (maxIdItem ? maxIdItem.get('folderId') : 0) + 1
+  if (!folderId && tag === siteTags.BOOKMARK_FOLDER) {
+    folderId = module.exports.getNextFolderId(sites)
   }
 
   let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
