@@ -382,8 +382,19 @@ const init = (settingsState, args) => {
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
         {
-          label: 'Import Bookmarks',
-          enabled: false
+          label: 'Import Bookmarks (from HTML export)',
+          click: function (item, focusedWindow) {
+            if (electron.BrowserWindow.getAllWindows().length === 0) {
+              AppActions.newWindow(undefined, undefined, undefined, function () {
+                // The timeout here isn't necessary but giving the window a bit of time to popup
+                // before the modal file picker pops up seems to work nicer.
+                setTimeout(() =>
+                  CommonMenu.sendToFocusedWindow(electron.BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
+              })
+              return
+            }
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.IMPORT_BOOKMARKS])
+          }
           /*
           submenu: [
             {label: 'Google Chrome...'},

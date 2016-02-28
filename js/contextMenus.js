@@ -31,7 +31,6 @@ const addBookmarkMenuItem = (siteDetail) => {
 
 const addFolderMenuItem = {
   label: 'Add Folder...',
-  enabled: false,
   click: () => {
     const emptyFolder = Immutable.fromJS({tags: [siteTags.BOOKMARK_FOLDER]})
     WindowActions.setBookmarkDetail(emptyFolder)
@@ -81,7 +80,7 @@ function tabsToolbarTemplateInit (activeFrame) {
 function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   return bookmarks.map(bookmark => {
     return {
-      label: bookmark.get('customTitle') || bookmark.get('title'),
+      label: bookmark.get('customTitle') || bookmark.get('title') || bookmark.get('location'),
       click: () => {
         WindowActions.loadUrl(activeFrame, bookmark.get('location'))
       }

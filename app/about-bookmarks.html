@@ -13,7 +13,8 @@
     <title data-l10n-id="bookmarks"></title>
     <script>
       function initBookmarksListener (e) {
-        window.initBookmarks = e.detail
+        window.initBookmarks = e.detail.bookmarks
+        window.initBookmarkFolders = e.detail.bookmarkFolders
         window.removeEventListener(initBookmarksListener)
       }
       window.addEventListener('bookmarks-updated', initBookmarksListener)
