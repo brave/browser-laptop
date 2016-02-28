@@ -1,0 +1,182 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+}
+
+html,
+#window {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+#windowContainer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.top {
+//  background: @chromePrimary;
+  background: linear-gradient(to bottom, white, @chromeSecondary, );
+  height: 37px;
+  -webkit-app-region: drag;
+  .backforward {
+    display: flex;
+    z-index: 10;
+
+    span {
+      color: @buttonColor;
+      border-radius: 50%;
+      font-weight: 300;
+      opacity: 0.2;
+
+      &:not([disabled]) {
+        opacity: 0.85;
+      }
+
+      &:not([disabled]):hover {
+        color: @buttonColor;
+        opacity: 1.0;
+        background-color: white;
+      }
+    }
+
+    .back,
+    .forward {
+      font-size: 35px;
+      min-width: 35px;
+      text-align: center;
+      width: 35px;
+    }
+
+    .back {
+      padding-right: 4px;
+    }
+
+    .forward {
+      padding-left: 4px;
+    }
+
+  }
+
+}
+
+.mainContainer {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  width: 100%;
+
+  .tabContainer {
+    flex-grow: 1;
+    position: relative;
+  }
+  >div.tabs {
+    width: 180px;
+    overflow-y: scroll;
+  }
+}
+
+.frameWrapper {
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  // Needed to be able to click and drag to select content in pages.
+  -webkit-user-select: none;
+
+  webview {
+    background-color: #fff;
+    border: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  .webviewContainer {
+    height: 100%;
+    width: 100%;
+    &.isPreview {
+      opacity: 0.5;
+    }
+  }
+
+  &:not(.isActive) {
+    z-index: 1;
+    &.isPreview {
+      background: gray;
+      z-index: 3;
+    }
+  }
+}
+
+.hrefPreview {
+  background: @chromePrimary;
+  border-color: @chromeSecondary;
+  border-style: solid;
+  border-width: 1px 1px 0 0;
+  border-top-right-radius: @borderRadius;
+  bottom: 0;
+  color: @chromeText;
+  font-size: @defaultFontSize;
+  left: 0;
+  max-width: 40%;
+  overflow-x: hidden;
+  padding: 0.2em 0.5em;
+  position: fixed;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.right {
+    left: auto;
+    right: 0;
+    border-width: 1px 0 0 1px;
+    border-top-left-radius: @borderRadius;
+    border-top-right-radius: 0;
+  }
+}
+
+body.fullScreen .frameWrapper.isActive {
+  z-index: 10000;
+}
+
+/* The fullscreen notice is shown above the fullscreen element */
+body.fullScreen .banner {
+  position: absolute;
+  z-index: 10001;
+  top: 0;
+  opacity: 1;
+  transition: opacity 2s ease-in-out;
+}
+
+body.fullScreen .banner.fade {
+  opacity: 0;
+}
+
+[draggable] {
+  -webkit-user-select: none;
+ }
+
+.link {
+  color: @linkColor;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+// In React we often want to have elements but without href, so force pointer cursor
+a {
+  cursor: pointer;
+}

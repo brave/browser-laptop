@@ -1,0 +1,321 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Navigation layers
+ */
+
+@import "variables.less";
+
+.navigatorWrapper {
+  -webkit-app-region: drag;
+  align-items: center;
+  display: inline-block;
+  justify-content: space-between;
+  padding-left: 70px;
+  width: 80px;
+}
+
+.urlbarForm {
+  max-width: calc(~'100% - 80px'); // space for reload and bookmark buttons
+  position: relative;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+
+  *:not(legend) {
+    z-index: 1;
+  }
+
+  input:focus + legend:before {
+    content: ' ';
+    position: absolute;
+    background: #fff;
+    border: 1px solid @focusUrlbarOutline;
+    border-radius: 4px;
+    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
+    color: #333;
+    outline: none;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  #navigator:not(.titleMode) & {
+    flex: 1;
+    background: white;
+    border-radius: @borderRadiusURL;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    color: @chromeText;
+    padding: 0 8px;
+  }
+}
+
+#navigator {
+  font-size: 20px;
+  align-items: center;
+  justify-content: center;
+  max-width: 900px;
+  box-sizing: border-box;
+  margin: 0 0 0 -114px;
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  -webkit-user-select: none;
+  width: calc(~'100% - 215px');
+  display: none;
+
+  &.titleMode {
+    margin-left: -130px;
+
+    input {
+      display: none;
+    }
+    #titleBar {
+      display: inline-block;
+      background:rgba(243, 243, 243, 0);
+      color: @chromeText;
+      font-size: 15px;
+      max-width: 100%;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .endButtons {
+      position: absolute;
+      top: -2px;
+    }
+
+    .urlbarIcon {
+      display: inline-block;
+      opacity: 0.4;
+      position: relative;
+      left: 2px;
+      min-width: 0;
+
+      &[class*=" fa-"] {
+        margin-right: 5px;
+        min-width: 16px;
+      }
+    }
+
+    .bookmark-button {
+      transform: scale(0.6);
+      opacity: 0.6;
+      text-align: left;
+
+      &:not(.remove-bookmark-button) {
+        display: none;
+      }
+    }
+  }
+
+  #titleBar {
+    display: none;
+  }
+
+  .loadTime {
+    color: @loadTimeColor;
+    font-size: 12px;
+    right: 10px;
+    text-align: right;
+    top: 8px;
+  }
+
+  /* Disable selection of button text */
+  > span {
+     -webkit-user-select: none;
+  }
+
+  > * {
+    -moz-window-dragging: no-drag;
+  }
+
+  .inputbar-wrapper {
+    background: white;
+    display: flex;
+    flex: 1 1 0;
+    border-radius: 4px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input {
+    -webkit-app-region: no-drag;
+    background: @navigationBarBackground;
+    border: none;
+    box-sizing: border-box;
+    color: @chromeText;
+    cursor: text;
+    font-size: @defaultFontSize;
+    font-weight: normal;
+    margin: 0 0 0 1px;
+    outline: none;
+    text-overflow: ellipsis;
+    width: 100%;
+
+    &:hover {
+      background: @chromeControlsBackground2;
+    }
+
+
+    &.private {
+      background: @privateTabBackground;
+      color: @chromeText;
+    }
+  }
+
+  span.navbutton.remove-bookmark-button {
+    color: @braveOrange;
+    opacity: 1;
+  }
+
+  .urlbarIcon {
+    color: @buttonColor;
+    left: 14px;
+    font-size: 15px;
+    min-height: 16px;
+    min-width: 16px;
+
+    &.extendedValidation {
+      color: green;
+    }
+  }
+
+  .urlBarSuggestions {
+    .flyoutDialog;
+    box-sizing: border-box;
+    width: 100%;
+    left: 0;
+    z-index: 311;
+
+    .suggestionIcon {
+      margin-right: 10px;
+    }
+
+    .suggestionText {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: calc(~'100% - 30px');
+      vertical-align: middle;
+    }
+
+    li {
+      list-style-type: none;
+      padding: 10px 0;
+      z-index: 333;
+
+      &.selected {
+        color: @highlightBlue;
+      }
+      * {
+        /* To allow for mouse listeners to work on the list items. */
+        pointer-events: none;
+      }
+    }
+
+    li + li {
+      border-top: 1px solid @chromeControlsBackground;
+    }
+  }
+}
+
+.flyoutDialog {
+  background-color: #eeeeee;
+  border-radius: @borderRadius;
+  box-shadow: 2px 2px 8px #3b3b3b;
+  color: #000;
+  font-size: 13px;
+  padding: 10px 30px;
+  position: absolute;
+  text-align: left;
+  top: 30px;
+}
+
+.releaseNotes {
+  .flyoutDialog;
+  width: auto;
+  margin-left: -250px;
+  max-width: 350px;
+  text-align: left;
+
+  h1 {
+    margin-bottom: 10px;
+  }
+}
+
+.siteInfo {
+  >ul {
+    .flyoutDialog;
+    margin-left: -250px;
+    text-align: left;
+    width: auto;
+
+    li {
+      list-style-type: none;
+      padding: 10px 0;
+
+      .fa {
+        padding-right: 10px;
+      }
+      &.extendedValidation {
+        color: green;
+      }
+
+      ul {
+        font-size: smaller;
+        max-height: 300px;
+        overflow-y: scroll;
+        margin-top: -20px;
+        padding: 0 10px;
+        max-width: 350px;
+      }
+    }
+  }
+}
+
+.addEditBookmark {
+  .flyoutDialog;
+   display: table;
+   margin-left: -250px;
+   text-align: left;
+   width: auto;
+
+   >div {
+     display: table-row;
+     >* {
+       display: table-cell;
+     }
+     >label {
+       padding-right: 5px;
+       text-align: right;
+     }
+     >input {
+       margin: 2px;
+       min-width: 250px;
+       padding: 2px;
+     }
+     .primaryButton {
+       float: right;
+     }
+   }
+}
+
+.topLevelEndButtons .braveMenu {
+  background-image: -webkit-image-set(url(../app/img/braveBtn.png) 1x, url(../app/img/braveBtn2x.png) 2x, url(../app/img/braveBtn3x.png) 3x);
+  background-repeat: no-repeat;
+  width: 23px;
+  height: 27px;
+  margin-top: 1px;
+  margin-right: 9px;
+  display: none;
+}
