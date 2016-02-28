@@ -7,6 +7,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
+const remote = electron.remote
 
 // Actions
 const windowActions = require('../actions/windowActions')
@@ -238,6 +239,18 @@ class Main extends ImmutableComponent {
     }
   }
 
+  onDoubleClick (e) {
+    const win = remote.getCurrentWindow()
+    if (!e.target.className.includes('navigatorWrapper')) {
+      return
+    }
+    if (win.isMaximized()) {
+      win.maximize()
+    } else {
+      win.unmaximize()
+    }
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -260,6 +273,7 @@ class Main extends ImmutableComponent {
     return <div id='window' ref={node => this.mainWindow = node}>
       <div className='top'>
         <div className='navigatorWrapper'
+          onDoubleClick={this.onDoubleClick.bind(this)}
           onDragOver={this.onDragOver.bind(this)}
           onDrop={this.onDrop.bind(this)}>
           <div className='backforward'>
