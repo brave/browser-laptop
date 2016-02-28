@@ -145,7 +145,13 @@ module.exports.preferencesMenuItem = {
   label: 'Preferences...',
   accelerator: 'CmdOrCtrl+,',
   click: (item, focusedWindow) => {
-    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
+    if (BrowserWindow.getAllWindows().length === 0) {
+      AppActions.newWindow(Immutable.fromJS({
+        location: 'about:preferences'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
+    }
   }
 }
 
@@ -153,7 +159,13 @@ module.exports.bookmarksMenuItem = {
   label: 'Bookmarks manager...',
   accelerator: 'CmdOrCtrl+Alt+b',
   click: (item, focusedWindow) => {
-    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
+    if (BrowserWindow.getAllWindows().length === 0) {
+      AppActions.newWindow(Immutable.fromJS({
+        location: 'about:bookmarks'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
+    }
   }
 }
 
