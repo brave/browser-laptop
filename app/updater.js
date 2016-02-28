@@ -15,6 +15,7 @@ const AppStore = require('../js/stores/appStore')
 const AppActions = require('../js/actions/appActions')
 const Immutable = require('immutable')
 const dates = require('./dates')
+const Channel = require('./channel')
 
 const fs = require('fs')
 const path = require('path')
@@ -40,12 +41,12 @@ var version = null
 
 // build the complete update url from the base, platform and version
 exports.updateUrl = function (updates, platform) {
-  platformBaseUrl = `${updates.baseUrl}/${platforms[platform]}/${version}`
+  platformBaseUrl = `${updates.baseUrl}/${Channel.channel()}/${version}/${platforms[platform]}`
   debug(`platformBaseUrl = ${platformBaseUrl}`)
   if (platform === 'darwin') {
     return platformBaseUrl
   } else {
-    return updates.winBaseUrl
+    return updates.winBaseUrl.replace('CHANNEL', Channel.channel())
   }
 }
 
