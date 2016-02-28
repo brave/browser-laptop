@@ -151,7 +151,7 @@ module.exports.preferencesMenuItem = {
 
 module.exports.bookmarksMenuItem = {
   label: 'Bookmarks manager...',
-  accelerator: 'CmdOrCtrl+Alt+b',
+  accelerator: process.platform === 'win32' ? 'Shift+Alt+B' : 'CmdOrCtrl+Alt+B',
   click: (item, focusedWindow) => {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
   }
