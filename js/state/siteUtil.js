@@ -5,6 +5,8 @@
 'use strict'
 const Immutable = require('immutable')
 const siteTags = require('../constants/siteTags')
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 /**
  * Obtains the index of the location in sites
@@ -15,7 +17,7 @@ const siteTags = require('../constants/siteTags')
  */
 module.exports.getSiteIndex = function (sites, siteDetail, tags) {
   let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
-    typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
+    tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
   if (isBookmarkFolder) {
     return sites.findIndex(site => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
   }
@@ -90,7 +92,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   }
 
   let site = Immutable.fromJS({
-    lastAccessed: new Date(),
+    lastAccessedTime: new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
     title: siteDetail.get('title')
@@ -216,9 +218,20 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   return folders
 }
 
+module.exports.filterOutNonRecents = function (sites) {
+  const sitesWithTags = sites
+    .filter(site => site.get('tags').size)
+  const topHistorySites = sites
+    .filter(site => site.get('tags').size === 0)
+    .sort((site1, site2) => (site2.get('lastAccessedTime') || 0) - (site1.get('lastAccessedTime') || 0))
+    .take(getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE))
+  return sitesWithTags.concat(topHistorySites)
+}
+
 module.exports.filterSitesRelativeTo = function (sites, relSite) {
   if (!relSite.get('folderId')) {
     return sites
   }
   return sites.filter(site => site.get('parentFolderId') === relSite.get('folderId'))
 }
+

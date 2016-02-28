@@ -70,6 +70,7 @@ module.exports = {
     'privacy.history-suggestions': false,
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
+    'privacy.autocomplete.history-size': 500,
     'security.block-reported-sites': false,
     'bookmarks.toolbar.show': false,
     'privacy.do-not-track': false

@@ -13,7 +13,7 @@ AppStore
     location: string,
     title: string,
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
-    lastAccessed: datetime,
+    lastAccessedTime: number, // datetime.getTime()
     partitionNumber: number // Optionally specifies a specific session
   }],
   visits: [{
