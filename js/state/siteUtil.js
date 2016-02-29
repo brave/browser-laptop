@@ -91,7 +91,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   }
 
   let site = Immutable.fromJS({
-    lastAccessedTime: new Date().getTime(),
+    lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
     title: siteDetail.get('title')
