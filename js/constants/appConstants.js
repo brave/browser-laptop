@@ -9,6 +9,7 @@ const AppConstants = {
   APP_NEW_WINDOW: _,
   APP_CLOSE_WINDOW: _,
   APP_ADD_SITE: _,
+  APP_CLEAR_SITES_WITHOUT_TAGS: _,
   APP_SET_STATE: _,
   APP_REMOVE_SITE: _,
   APP_MOVE_SITE: _,

@@ -64,10 +64,11 @@ class UrlBar extends ImmutableComponent {
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
+        WindowActions.setUrlBarActive(false)
+        this.restore()
         e.preventDefault()
         let location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
-          this.restore()
           WindowActions.setUrlBarSelected(true)
         } else {
           const isLocationUrl = isUrl(location)
@@ -79,7 +80,7 @@ class UrlBar extends ImmutableComponent {
           } else if (this.shouldRenderUrlBarSuggestions && this.urlBarSuggestions.activeIndex > 0) {
             // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
             // load the selected suggestion
-            this.urlBarSuggestions.clickSelected()
+            this.urlBarSuggestions.clickSelected(e)
           } else {
             location = isLocationUrl ? location : searchUrl
             // do search.
@@ -127,9 +128,8 @@ class UrlBar extends ImmutableComponent {
   }
 
   onBlur (e) {
-    WindowActions.setUrlBarActive(false)
-    WindowActions.setUrlBarSelected(false)
     WindowActions.setNavBarFocused(false)
+    WindowActions.setUrlBarSelected(false)
   }
 
   onChange (e) {
@@ -239,8 +239,8 @@ class UrlBar extends ImmutableComponent {
               'fa': true,
               'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
               'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
-              'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
-              'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
+              'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+              'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
               extendedValidation: this.extendedValidationSSL
             })} />
           { this.props.titleMode

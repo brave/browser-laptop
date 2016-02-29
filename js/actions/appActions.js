@@ -69,6 +69,15 @@ const AppActions = {
   },
 
   /**
+   * Clears all sites without tags
+   */
+  clearSitesWithoutTags: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS
+    })
+  },
+
+  /**
    * Removes a site from the site list
    * @param {Object} siteDetail - Properties of the site in question
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.

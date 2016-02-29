@@ -346,6 +346,7 @@ class Frame extends ImmutableComponent {
 
   onFocus () {
     windowActions.setTabPageIndexByFrame(this.props.frame)
+    windowActions.setUrlBarActive(false)
   }
 
   onFindHide () {

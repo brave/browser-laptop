@@ -327,7 +327,10 @@ Marks the URL bar text as selected or not
 
 ### setUrlBarActive(isActive) 
 
-Marks the URL bar as active or not
+Marks the URL bar as active or not.
+If the URL bar is active that means it's in a position that it should be displaying
+autocomplete.  It may choose not to display autocomplete and still be active if there
+are no autocomplete results.
 
 **Parameters**
 

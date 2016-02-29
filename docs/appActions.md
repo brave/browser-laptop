@@ -54,6 +54,12 @@ Adds a site to the site list
 
 
 
+### clearSitesWithoutTags() 
+
+Clears all sites without tags
+
+
+
 ### removeSite(siteDetail, tag) 
 
 Removes a site from the site list
