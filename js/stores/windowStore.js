@@ -304,6 +304,10 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
+      if (!action.isActive) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), null)
+      }
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])

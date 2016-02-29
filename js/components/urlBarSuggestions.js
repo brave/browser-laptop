@@ -47,17 +47,15 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.updateSuggestions(newIndex)
   }
 
-  handleEvent () {
-    this.blur()
-  }
-
   blur () {
     window.removeEventListener('click', this)
     WindowActions.setUrlBarSuggestions(null, null)
     WindowActions.setUrlBarPreview(null)
   }
 
-  clickSelected () {
+  clickSelected (e) {
+    this.ctrlKey = e.ctrlKey
+    this.metaKey = e.metaKey
     ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
   }
 
@@ -82,7 +80,6 @@ class UrlBarSuggestions extends ImmutableComponent {
       {suggestions.map((suggestion, index) =>
         <li data-index={index + 1}
             onMouseOver={this.onMouseOver.bind(this)}
-            onMouseDown={suggestion.onClick}
             onClick={suggestion.onClick}
             key={suggestion.title}
             className={this.activeIndex === index + 1 ? 'selected' : ''}>
@@ -101,20 +98,39 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (this.props.urlLocation === prevProps.urlLocation) {
       return
     }
+    this.suggestionList = this.getNewSuggestionList()
     this.searchXHR()
   }
 
-  updateSuggestions (newIndex) {
+  getNewSuggestionList () {
     if (!this.props.urlLocation && !this.props.urlPreview) {
       return null
     }
 
-    const navigateClickHandler = formatUrl => site => {
+    const navigateClickHandler = formatUrl => (site, e) => {
+      // We have a wonky way of fake clicking from keyboard enter,
+      // so remove the meta keys from the real event here.
+      const metaKey = e.metaKey || this.metaKey
+      const ctrlKey = e.ctrlKey || this.ctrlKey
+      delete this.metaKey
+      delete this.ctrlKey
+
+      const isDarwin = process.platform === 'darwin'
       const location = formatUrl(site)
-      WindowActions.setNavBarUserInput(location)
-      WindowActions.loadUrl(this.props.activeFrameProps, location)
-      WindowActions.setUrlBarActive(false)
-      this.blur()
+      if (ctrlKey && !isDarwin ||
+          metaKey && isDarwin ||
+          e.button === 1) {
+        WindowActions.newFrame({
+          location,
+          partitionNumber: site && site.get && site.get('partitionNumber') || undefined
+        }, false)
+        e.preventDefault()
+        WindowActions.setNavBarFocused(true)
+      } else {
+        WindowActions.loadUrl(this.props.activeFrameProps, location)
+        WindowActions.setUrlBarActive(false)
+        this.blur()
+      }
     }
 
     let suggestions = new Immutable.List()
@@ -195,6 +211,11 @@ class UrlBarSuggestions extends ImmutableComponent {
       classHandler: () => 'fa-link',
       clickHandler: navigateClickHandler(x => x)}))
 
+    return suggestions
+  }
+
+  updateSuggestions (newIndex) {
+    const suggestions = this.suggestionList || this.props.suggestions.get('suggestionList')
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
       WindowActions.setUrlBarPreview(null)
