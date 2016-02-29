@@ -4,11 +4,12 @@
 
 const React = require('react')
 const urlParse = require('url').parse
-const WindowActions = require('../actions/windowActions')
-const AppActions = require('../actions/appActions')
+const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
+const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
@@ -110,13 +111,13 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'zoom-in':
-        WindowActions.zoomIn(this.props.frame)
+        windowActions.zoomIn(this.props.frame)
         break
       case 'zoom-out':
-        WindowActions.zoomOut(this.props.frame)
+        windowActions.zoomOut(this.props.frame)
         break
       case 'zoom-reset':
-        WindowActions.zoomReset(this.props.frame)
+        windowActions.zoomReset(this.props.frame)
         break
       case 'toggle-dev-tools':
         if (this.webview.isDevToolsOpened()) {
@@ -127,7 +128,7 @@ class Frame extends ImmutableComponent {
         break
       case 'view-source':
         const location = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        WindowActions.newFrame({location}, true)
+        windowActions.newFrame({location}, true)
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':
@@ -138,11 +139,11 @@ class Frame extends ImmutableComponent {
         this.webview.print()
         break
       case 'show-findbar':
-        WindowActions.setFindbarShown(this.props.frame, true)
+        windowActions.setFindbarShown(this.props.frame, true)
         break
     }
     if (activeShortcut) {
-      WindowActions.setActiveFrameShortcut(this.props.frame, null)
+      windowActions.setActiveFrameShortcut(this.props.frame, null)
     }
 
     if (this.props.frame.get('location') === 'about:preferences') {
@@ -178,11 +179,11 @@ class Frame extends ImmutableComponent {
       }
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
-        AppActions.newWindow(frameOpts, windowOpts)
+        appActions.newWindow(frameOpts, windowOpts)
       } else {
         let openInForeground = this.props.prefOpenInForeground === true ||
           e.disposition !== 'background-tab'
-        WindowActions.newFrame(frameOpts, openInForeground)
+        windowActions.newFrame(frameOpts, openInForeground)
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
@@ -197,18 +198,18 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (e.favicons && e.favicons.length > 0) {
-        WindowActions.setFavicon(this.props.frame, e.favicons[0])
+        windowActions.setFavicon(this.props.frame, e.favicons[0])
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {
-      WindowActions.setFrameTitle(this.props.frame, title)
+      windowActions.setFrameTitle(this.props.frame, title)
     })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
         case messages.THEME_COLOR_COMPUTED:
           method = (computedThemeColor) =>
-            WindowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
+            windowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
           break
         case messages.CONTEXT_MENU_OPENED:
           method = (nodeProps, contextMenuType) => {
@@ -224,12 +225,12 @@ class Frame extends ImmutableComponent {
             let nearBottom = position.y > (window.innerHeight - 150) // todo: magic number
             let mouseOnLeft = position.x < (window.innerWidth / 2)
             let showOnRight = nearBottom && mouseOnLeft
-            WindowActions.setLinkHoverPreview(href, showOnRight)
+            windowActions.setLinkHoverPreview(href, showOnRight)
           }
           break
         case messages.NEW_FRAME:
           method = (frameOpts, openInForeground) => {
-            WindowActions.newFrame(frameOpts, openInForeground)
+            windowActions.newFrame(frameOpts, openInForeground)
           }
       }
       method.apply(this, e.args)
@@ -240,21 +241,21 @@ class Frame extends ImmutableComponent {
         // Temporary workaround for https://github.com/brave/browser-laptop/issues/787
         this.webview.insertCSS('input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }')
         // TODO: These 3 events should be combined into one
-        WindowActions.onWebviewLoadStart(
+        windowActions.onWebviewLoadStart(
           this.props.frame)
         const key = this.props.frame.get('key')
-        WindowActions.setLocation(event.url, key)
-        WindowActions.setSecurityState(this.props.frame, {
+        windowActions.setLocation(event.url, key)
+        windowActions.setSecurityState(this.props.frame, {
           secure: urlParse(event.url).protocol === 'https:'
         })
       }
-      WindowActions.updateBackForwardState(
+      windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
     }
     const loadEnd = () => {
-      WindowActions.onWebviewLoadEnd(
+      windowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
       if (this.props.enableAds) {
@@ -270,6 +271,11 @@ class Frame extends ImmutableComponent {
           error: security.get('certDetails').error
         })
       }
+      const protocol = urlParse(this.props.frame.get('location')).protocol
+      if (!this.props.frame.get('isPrivate') && (protocol === 'http:' || protocol === 'https:')) {
+        // Register the site for recent history for navigation bar
+        appActions.addSite(siteUtil.getDetailFromFrame(this.props.frame))
+      }
     }
     this.webview.addEventListener('load-commit', (event) => {
       loadStart(event)
@@ -284,7 +290,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-fail-load', () => {
-      WindowActions.onWebviewLoadEnd(
+      windowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
     })
@@ -295,21 +301,21 @@ class Frame extends ImmutableComponent {
       loadEnd()
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
-      WindowActions.setAudioPlaybackActive(this.props.frame, true)
+      windowActions.setAudioPlaybackActive(this.props.frame, true)
     })
     this.webview.addEventListener('media-paused', ({title}) => {
-      WindowActions.setAudioPlaybackActive(this.props.frame, false)
+      windowActions.setAudioPlaybackActive(this.props.frame, false)
     })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       // Due to a bug in Electron, after navigating to a page with a theme color
       // to a page without a theme color, the background is sent to us as black
       // even know there is no background. To work around this we just ignore
       // the theme color in that case and let the computed theme color take over.
-      WindowActions.setThemeColor(this.props.frame, themeColor !== '#000000' ? themeColor : null)
+      windowActions.setThemeColor(this.props.frame, themeColor !== '#000000' ? themeColor : null)
     })
     this.webview.addEventListener('found-in-page', (e) => {
       if (e.result !== undefined && e.result.matches !== undefined) {
-        WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+        windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
           numberOfMatches: e.result.matches
         }))
       }
@@ -339,11 +345,11 @@ class Frame extends ImmutableComponent {
   }
 
   onFocus () {
-    WindowActions.setTabPageIndexByFrame(this.props.frame)
+    windowActions.setTabPageIndexByFrame(this.props.frame)
   }
 
   onFindHide () {
-    WindowActions.setFindbarShown(this.props.frame, false)
+    windowActions.setFindbarShown(this.props.frame, false)
     this.onClearMatch()
   }
 
