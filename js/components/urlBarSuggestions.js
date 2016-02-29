@@ -15,6 +15,7 @@ import Immutable from 'immutable'
 const debounce = require('../lib/debounce.js')
 const {getSiteIconClass} = require('../state/siteUtil.js')
 const settings = require('../constants/settings')
+const siteTags = require('../constants/siteTags')
 const getSetting = require('../settings').getSetting
 
 class UrlBarSuggestions extends ImmutableComponent {
@@ -133,15 +134,14 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
     }
 
+    const urlLocationLower = this.props.urlLocation.toLowerCase()
     let suggestions = new Immutable.List()
     const defaultme = x => x
     const mapListToElements = ({data, maxResults, classHandler, clickHandler = navigateClickHandler,
         sortHandler = defaultme, formatTitle = defaultme,
-        filterValue = site => site.toLowerCase().includes(this.props.urlLocation.toLowerCase())
+        filterValue = site => site.toLowerCase().includes(urlLocationLower)
     }) => // Filter out things which are already in our own list at a smaller index
-      data.filter((site, index) => {
-        return data.findIndex(x => formatTitle(x).toLowerCase() === formatTitle(site).toLowerCase()) === index
-      })
+      data
       // Per suggestion provider filter
       .filter(filterValue)
       // Filter out things which are already in the suggestions list
@@ -168,14 +168,12 @@ class UrlBarSuggestions extends ImmutableComponent {
         formatTitle: frame => frame.get('title') || frame.get('location'),
         filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
-          (frame.get('title') && frame.get('title').toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-          frame.get('location') && frame.get('location').toLowerCase().includes(this.props.urlLocation.toLowerCase()))}))
+          (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
+          frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))}))
     }
 
-    // bookmarks, reader list
-    const includeBookmarks = getSetting(settings.BOOKMARK_SUGGESTIONS)
-    const includeHistory = getSetting(settings.HISTORY_SUGGESTIONS)
-    if (includeBookmarks || includeHistory) {
+    // bookmarks
+    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
         maxResults: Config.urlBarSuggestions.maxSites,
@@ -190,9 +188,32 @@ class UrlBarSuggestions extends ImmutableComponent {
         filterValue: site => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
-          return (title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-            location.toLowerCase().includes(this.props.urlLocation.toLowerCase())) &&
-            (site.get('tags') && site.get('tags').size > 0 || includeHistory)
+          return (title.toLowerCase().includes(urlLocationLower) ||
+            location.toLowerCase().includes(urlLocationLower)) &&
+            site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
+        }
+      }))
+    }
+
+    // history
+    if (getSetting(settings.HISTORY_SUGGESTIONS)) {
+      suggestions = suggestions.concat(mapListToElements({
+        data: this.props.sites,
+        maxResults: Config.urlBarSuggestions.maxSites,
+        classHandler: getSiteIconClass,
+        clickHandler: navigateClickHandler(site => {
+          return site.get('location')
+        }),
+        sortHandler: (site1, site2) => {
+          return site2.get('tags').size - site1.get('tags').size
+        },
+        formatTitle: site => site.get('title') || site.get('location'),
+        filterValue: site => {
+          const title = site.get('title') || ''
+          const location = site.get('location') || ''
+          return (title.toLowerCase().includes(urlLocationLower) ||
+            location.toLowerCase().includes(urlLocationLower)) &&
+            (!site.get('tags') || site.get('tags').size === 0)
         }
       }))
     }

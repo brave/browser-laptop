@@ -63,7 +63,7 @@ export default class FindBar extends ImmutableComponent {
     if (this.props.selected) {
       this.focus()
     }
-    if (this.props.findDetail && !prevProps.findDetail ||
+    if (!this.props.findDetail || !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
         this.props.findDetail.get('caseSensitivity') !== prevProps.findDetail.get('caseSensitivity')) {
       // Redo search if details have changed
