@@ -6,11 +6,11 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 
 ## Requirements
 
-1. `nodejs **>= 5.0**`
+1. `nodejs` **`>= 5.0`**
 
     Install from your package manager or download from https://nodejs.org
 
-2. `node-gyp **3.2.1**`
+2. `node-gyp` **`3.2.1`**
 
         sudo npm install -g node-gyp@3.2.1
         
