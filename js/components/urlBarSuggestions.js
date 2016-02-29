@@ -173,7 +173,9 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     // bookmarks, reader list
-    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
+    const includeBookmarks = getSetting(settings.BOOKMARK_SUGGESTIONS)
+    const includeHistory = getSetting(settings.HISTORY_SUGGESTIONS)
+    if (includeBookmarks || includeHistory) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
         maxResults: Config.urlBarSuggestions.maxSites,
@@ -188,8 +190,9 @@ class UrlBarSuggestions extends ImmutableComponent {
         filterValue: site => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
-          return title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-            location.toLowerCase().includes(this.props.urlLocation.toLowerCase())
+          return (title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
+            location.toLowerCase().includes(this.props.urlLocation.toLowerCase())) &&
+            (site.get('tags') && site.get('tags').size > 0 || includeHistory)
         }
       }))
     }
