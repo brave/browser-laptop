@@ -1,5 +1,4 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+/* This Source Code Form is subject to the terms of the Mozilla Public * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
@@ -218,6 +217,10 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   return folders
 }
 
+/**
+ * Filters out non recent sites based on the app setting for history size.
+ * @param sites The application state's Immutable sites list.
+ */
 module.exports.filterOutNonRecents = function (sites) {
   const sitesWithTags = sites
     .filter(site => site.get('tags').size)
@@ -228,6 +231,11 @@ module.exports.filterOutNonRecents = function (sites) {
   return sitesWithTags.concat(topHistorySites)
 }
 
+/**
+ * Filters sites relative to a parent site (folder).
+ * @param sites The application state's Immutable sites list.
+ * @param relSite The folder to filter to.
+ */
 module.exports.filterSitesRelativeTo = function (sites, relSite) {
   if (!relSite.get('folderId')) {
     return sites
@@ -235,3 +243,18 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
   return sites.filter(site => site.get('parentFolderId') === relSite.get('folderId'))
 }
 
+/**
+ * Clears out all sites that have no tags.
+ * @param sites The application state's Immutable sites list.
+ */
+module.exports.clearSitesWithoutTags = function (sites) {
+  return sites.filter(site => site.get('tags') && site.get('tags').size > 0)
+}
+
+/**
+ * Determines if the sites list has any sites with no tags
+ * @param sites The application state's Immutable sites list.
+ */
+module.exports.hasNoTagSites = function (sites) {
+  return sites.findIndex(site => !site.get('tags') || site.get('tags').size === 0) !== -1
+}

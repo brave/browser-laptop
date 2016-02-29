@@ -10,10 +10,12 @@ const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const dialog = electron.dialog
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
+const siteUtil = require('../js/state/siteUtil')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
 const getSetting = require('../js/settings').getSetting
+const appStore = require('../js/stores/appStore')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -118,7 +120,7 @@ const init = (settingsState, args) => {
       accelerator: 'CmdOrCtrl+Shift+W',
       click: function (item, focusedWindow) {
         if (focusedWindow) {
-          AppActions.closeWindow(focusedWindow.id)
+          appActions.closeWindow(focusedWindow.id)
         }
       }
     },
@@ -374,6 +376,15 @@ const init = (settingsState, args) => {
           label: 'Show All History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
+        },
+        CommonMenu.separatorMenuItem,
+        {
+          label: 'Clear History',
+          accelerator: 'Shift+CmdOrCtrl+Delete',
+          enabled: siteUtil.hasNoTagSites(appStore.getState().get('sites')),
+          click: function (item, focusedWindow) {
+            appActions.clearSitesWithoutTags(appStore.getState().get('sites'))
+          }
         }
       ]
     }, {
@@ -393,7 +404,7 @@ const init = (settingsState, args) => {
           label: 'Import Bookmarks (from HTML export)',
           click: function (item, focusedWindow) {
             if (electron.BrowserWindow.getAllWindows().length === 0) {
-              AppActions.newWindow(undefined, undefined, undefined, function () {
+              appActions.newWindow(undefined, undefined, undefined, function () {
                 // The timeout here isn't necessary but giving the window a bit of time to popup
                 // before the modal file picker pops up seems to work nicer.
                 setTimeout(() =>

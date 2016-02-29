@@ -311,6 +311,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
       break
+    case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
+      appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))
+      break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
       appState = appState.set('defaultWindowHeight', action.size[1])
