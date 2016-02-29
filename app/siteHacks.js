@@ -18,21 +18,22 @@ module.exports.init = () => {
   Filtering.registerBeforeSendHeadersFilteringCB(details => {
     if (details.resourceType !== 'mainFrame') {
       return {
-        shouldBlock: false,
         resourceName
       }
     }
 
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
-    let cbArgs = {}
+    let customCookie
     if (hack && hack.requestFilter) {
-      cbArgs = { requestHeaders: hack.requestFilter.call(this, details) }
+      const result = hack.requestFilter.call(this, details)
+      if (result && result.customCookie) {
+        customCookie = result.customCookie
+      }
     }
     return {
-      shouldBlock: false,
       resourceName,
-      cbArgs
+      customCookie
     }
   })
 }

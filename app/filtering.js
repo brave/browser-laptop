@@ -20,6 +20,8 @@ const dialog = electron.dialog
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 
+const trasnparent1PxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
 
@@ -38,11 +40,28 @@ module.exports.registerBeforeRequestFilteringCB = filteringFn => {
  */
 function registerForBeforeRequest (session) {
   session.webRequest.onBeforeRequest(function (details, cb) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl) {
+      cb({})
+      return
+    }
+
     let redirectURL
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
+      if (!module.exports.isResourceEnabled(results.resourceName)) {
+        continue
+      }
       if (results.cancel) {
-        cb({cancel: true})
+        // We have no good way of knowing which BrowserWindow the blocking is for
+        // yet so send it everywhere and let listeners decide how to respond.
+        BrowserWindow.getAllWindows().forEach(wnd =>
+          wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
+        if (details.resourceType === 'image') {
+          cb({ redirectURL: trasnparent1PxGif })
+        } else {
+          cb({ cancel: true })
+        }
         return
       }
       if (results.redirectURL) {
@@ -69,19 +88,23 @@ function registerForBeforeSendHeaders (session) {
       return
     }
 
-    let results
+    let requestHeaders = details.requestHeaders
+    let customHeaders = false
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
-      let currentResults = beforeSendHeadersFilteringFns[i](details)
-      if (currentResults && !module.exports.isResourceEnabled(currentResults.resourceName)) {
+      let results = beforeSendHeadersFilteringFns[i](details)
+      if (!module.exports.isResourceEnabled(results.resourceName)) {
         continue
       }
-      results = currentResults
-      if (results.shouldBlock) {
-        break
+      if (results.cancel) {
+        cb({cancel: true})
+        return
+      }
+      if (results.customCookie) {
+        requestHeaders.Cookie = results.customCookie
+        customHeaders = true
       }
     }
 
-    let requestHeaders = details.requestHeaders
     let hostname = urlParse(details.url || '').hostname
     if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
         module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
@@ -89,26 +112,22 @@ function registerForBeforeSendHeaders (session) {
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie']) {
         requestHeaders['Cookie'] = undefined
+        customHeaders = true
       }
       if (requestHeaders['Referer']) {
         requestHeaders['Referer'] = refererExceptions.includes(hostname) ? 'http://localhost' : undefined
+        customHeaders = true
       }
     }
     if (sendDNT) {
       requestHeaders['DNT'] = '1'
+      customHeaders = true
     }
 
-    if (!results || !results.shouldBlock) {
-      cb({requestHeaders: requestHeaders})
-    } else if (results.shouldBlock) {
-      // We have no good way of knowing which BrowserWindow the blocking is for
-      // yet so send it everywhere and let listeners decide how to respond.
-      BrowserWindow.getAllWindows().forEach(wnd =>
-        wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
-      cb({
-        requestHeaders: requestHeaders,
-        cancel: true
-      })
+    if (customHeaders) {
+      cb({ requestHeaders })
+    } else {
+      cb({})
     }
   })
 }

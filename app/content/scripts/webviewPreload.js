@@ -362,12 +362,6 @@
     return undefined
   }
   ipcRenderer.on('post-page-load-run', function () {
-    // Hide broken images
-    Array.from(document.querySelectorAll('img')).forEach(function (img) {
-      img.addEventListener('error', function () {
-        this.style.visibility = 'hidden'
-      })
-    })
     ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
   })
 }).apply(this)

@@ -1,8 +1,9 @@
 module.exports = {
   'forbes.com': {
     requestFilter: function(details) {
-      details.requestHeaders.Cookie = details.requestHeaders.Cookie + `; forbes_ab=true; welcomeAd=true; adblock_session=Off; dailyWelcomeCookie=true`
-      return details.requestHeaders
+      return {
+        customCookie: details.requestHeaders.Cookie + `; forbes_ab=true; welcomeAd=true; adblock_session=Off; dailyWelcomeCookie=true`
+      }
     },
   },
   'www.cityam.com': {
