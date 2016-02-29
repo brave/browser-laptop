@@ -56,7 +56,7 @@ const getNextFolderIdItem = (sites) =>
 
 module.exports.getNextFolderId = (sites) => {
   const maxIdItem = getNextFolderIdItem(sites)
-  return (maxIdItem ? maxIdItem.get('folderId') : 0) + 1
+  return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
 }
 
 /**
