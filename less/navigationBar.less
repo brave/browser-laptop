@@ -14,7 +14,7 @@
   display: flex;
   justify-content: space-between;
   padding-left: 70px;
-  border-bottom: 1px solid #bbb;
+  border-bottom: 1px solid #aaaaaa;
 }
 
 .urlbarForm {
@@ -29,11 +29,11 @@
 
 #navigator {
   font-size: 20px;
-  height: 34px;
+  height: 29px;
   justify-content: center;
   max-width: 900px;
   box-sizing: border-box;
-  margin: 6px 0 0 -114px;
+  margin: 2px 0 0 -114px;
   padding: 0 0 4px 0;
   position: relative;
   display: flex;
@@ -51,7 +51,7 @@
       display: inline-block;
       background:rgba(243, 243, 243, 0);
       color: @chromeText;
-      font-size: 15px;
+      font-size: 14px;
       max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
@@ -82,6 +82,7 @@
     .bookmark-button {
       transform: scale(0.6);
       opacity: 0.6;
+      margin: 0 0 0 -3px;
 
       &:not(.remove-bookmark-button) {
         display: none;
@@ -117,7 +118,7 @@
     border: none;
     border-radius: @borderRadiusURL;
     box-sizing: border-box;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
     color: @chromeText;
     cursor: text;
     font-size: @defaultFontSize;
@@ -134,8 +135,9 @@
 
     &:focus {
       background: #fff;
-      border: 1px solid @focusUrlbarOutline;
-      box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
+      border: 2px solid @focusUrlbarOutline;
+//      box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
+        box-shadow: inset 0 1px 8px rgba(0, 137, 255, 0.5);
       color: #333;
       outline: none;
     }
@@ -151,12 +153,20 @@
     opacity: 1;
   }
 
-  .urlbarIcon {
-    color: @buttonColor;
-    position: absolute;
-    top: 6px;
-    left: 14px;
+    
+    
+   .urlbarIcon.fa-unlock, .urlbarIcon.fa-lock {
+    color: @chromeText;
     font-size: 15px;
+
+}
+    
+  .urlbarIcon {
+    color: @focusUrlbarOutline;
+    position: absolute;
+    top: 8px;
+    left: 14px;
+    font-size: 12px;
     min-height: 16px;
     min-width: 16px;
 
@@ -290,6 +300,6 @@
   background-repeat: no-repeat;
   width: 23px;
   height: 27px;
-  margin-top: 1px;
+  margin-top: 4px;
   margin-right: 9px;
 }
