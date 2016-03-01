@@ -20,7 +20,7 @@ let cachedFirstParty = {}
 const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticxx.facebook.com', 'www.facebook.com']
 
 const startTrackingProtection = (wnd) => {
-  Filtering.registerBeforeSendHeadersFilteringCB((details) => {
+  Filtering.registerBeforeRequestFilteringCB((details) => {
     // After every 50 first party hosts, just
     // re-get the first party host list
     if (cachedFirstPartyCount > 50) {
@@ -41,7 +41,7 @@ const startTrackingProtection = (wnd) => {
       }
     }
     const urlHost = URL.parse(details.url).hostname
-    const shouldBlock = firstPartyUrl.protocol &&
+    const cancel = firstPartyUrl.protocol &&
       details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&
       !whitelistHosts.includes(urlHost) &&
@@ -51,9 +51,9 @@ const startTrackingProtection = (wnd) => {
       !cachedFirstParty[firstPartyUrlHost].find((baseHost) =>
         !Filtering.isThirdPartyHost(baseHost, urlHost))
 
-    DataFile.debug(module.exports.resourceName, details, shouldBlock)
+    DataFile.debug(module.exports.resourceName, details, cancel)
     return {
-      shouldBlock,
+      cancel,
       resourceName: module.exports.resourceName
     }
   })

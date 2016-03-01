@@ -127,7 +127,7 @@ function startHttpsEverywhere () {
 }
 
 function onBeforeHTTPRequest (details) {
-  let result = {}
+  let result = { resourceName: module.exports.resourceName }
   if (!httpsEverywhereInitialized ||
       !Filtering.isResourceEnabled(module.exports.resourceName)) {
     return result
