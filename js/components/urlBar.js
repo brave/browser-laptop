@@ -88,6 +88,8 @@ class UrlBar extends ImmutableComponent {
               WindowActions.newFrame({ location }, true)
             } else if (e.metaKey) {
               WindowActions.newFrame({ location }, false)
+            } else if (location === this.props.activeFrameProps.get('location')) {
+              WindowActions.reload(this.props.activeFrameProps)
             } else {
               WindowActions.loadUrl(this.props.activeFrameProps, location)
             }

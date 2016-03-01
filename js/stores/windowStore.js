@@ -106,32 +106,31 @@ const doAction = (action) => {
       currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
       // We should not emit here because the Window already know about the change on startup.
       return
+    case WindowConstants.WINDOW_RELOAD_FRAME:
+      windowState = windowState.mergeIn(frameStatePath(action.key), {
+        audioPlaybackActive: false,
+        activeShortcut: 'reload'
+      })
+      break
     case WindowConstants.WINDOW_SET_URL:
-      // reload if the url is unchanged
-      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
-        windowState = windowState.mergeIn(frameStatePath(action.key), {
-          audioPlaybackActive: false,
-          activeShortcut: 'reload'
-        })
-      } else {
-        windowState = windowState.mergeIn(frameStatePath(action.key), {
-          src: action.location,
-          location: action.location,
-          audioPlaybackActive: false,
-          icon: undefined,
-          // We want theme colors reset here instead of in WINDOW_SET_LOCATION
-          // because intra-page navigation would make the tab color
-          // blink otherwise.  The theme color will be reset eventually
-          // once the page loads anyway though for the case of navigation change
-          // without src change.
-          themeColor: undefined,
-          computedThemeColor: undefined,
-          title: ''
-        })
-        // force a navbar update in case this was called from an app
-        // initiated navigation (bookmarks, etc...)
-        updateNavBarInput(action.location, frameStatePath(action.key))
-      }
+      windowState = windowState.mergeIn(frameStatePath(action.key), {
+        src: action.location,
+        location: action.location,
+        navigationTime: new Date().getTime(),
+        audioPlaybackActive: false,
+        icon: undefined,
+        // We want theme colors reset here instead of in WINDOW_SET_LOCATION
+        // because intra-page navigation would make the tab color
+        // blink otherwise.  The theme color will be reset eventually
+        // once the page loads anyway though for the case of navigation change
+        // without src change.
+        themeColor: undefined,
+        computedThemeColor: undefined,
+        title: ''
+      })
+      // force a navbar update in case this was called from an app
+      // initiated navigation (bookmarks, etc...)
+      updateNavBarInput(action.location, frameStatePath(action.key))
       break
     case WindowConstants.WINDOW_SET_LOCATION:
       const key = action.key || windowState.get('activeFrameKey')
