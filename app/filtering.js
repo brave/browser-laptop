@@ -124,15 +124,24 @@ function registerForBeforeSendHeaders (session) {
   // For efficiency, avoid calculating sendDNT on every request. This means the
   // browser must be restarted for changes to take effect.
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
+  let spoofedUserAgent
+  const braveRegex = new RegExp('brave/.+? ', 'gi')
+
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
+    let requestHeaders = details.requestHeaders
+
+    // To minimize fingerprintability, remove Brave from the UA string.
+    // This can be removed once https://github.com/atom/electron/issues/3602 is
+    // resolved
+    spoofedUserAgent = spoofedUserAgent || requestHeaders['User-Agent'].replace(braveRegex, '')
+    requestHeaders['User-Agent'] = spoofedUserAgent
+
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl) {
       cb({})
       return
     }
 
-    let requestHeaders = details.requestHeaders
-    let customHeaders = false
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
       if (!module.exports.isResourceEnabled(results.resourceName)) {
@@ -144,7 +153,6 @@ function registerForBeforeSendHeaders (session) {
       }
       if (results.customCookie) {
         requestHeaders.Cookie = results.customCookie
-        customHeaders = true
       }
     }
 
@@ -155,23 +163,16 @@ function registerForBeforeSendHeaders (session) {
       // Clear cookie and referer on third-party requests
       if (requestHeaders['Cookie']) {
         requestHeaders['Cookie'] = undefined
-        customHeaders = true
       }
       if (requestHeaders['Referer'] && !refererExceptions.includes(hostname)) {
         requestHeaders['Referer'] = undefined
-        customHeaders = true
       }
     }
     if (sendDNT) {
       requestHeaders['DNT'] = '1'
-      customHeaders = true
     }
 
-    if (customHeaders) {
-      cb({ requestHeaders })
-    } else {
-      cb({})
-    }
+    cb({ requestHeaders })
   })
 }
 
