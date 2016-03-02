@@ -119,6 +119,18 @@ const WindowActions = {
   },
 
   /**
+   * Dispatches a message to the store to reload the page on the given frame.
+   *
+   * @param {Object} frameProps - The frame properties of the frame to reload
+   */
+  reload: function (frameProps) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_RELOAD_FRAME,
+      frameProps
+    })
+  },
+
+  /**
    * Dispatches a message to set the security state.
    * @param {Object} frameProps - The frame properties to modify.
    * @param {Object} securityState - The security state properties that have

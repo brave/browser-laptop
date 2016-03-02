@@ -85,11 +85,12 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
+    const didNavTimeChange = this.props.frame.get('navigationTime') !== prevProps.frame.get('navigationTime')
     const didLocationChange = this.props.frame.get('location') !== prevProps.frame.get('location')
     // When auto-redirecting to about:certerror, the frame location change and
     // frame src change are emitted separately. Make sure updateWebview is
     // called when the location changes.
-    if (didSrcChange || (didLocationChange && this.props.frame.get('location') === 'about:certerror')) {
+    if (didNavTimeChange || didSrcChange || (didLocationChange && this.props.frame.get('location') === 'about:certerror')) {
       this.updateWebview()
     }
     // give focus when switching tabs

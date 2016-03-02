@@ -99,6 +99,7 @@ WindowStore
     loading: boolean,
     themeColor: string, // css compatible color string
     computedThemeColor: string, // css computed theme color from the favicon
+    navigationTime: datetime, // timestamp of when the user began navigation
     startLoadTime: datetime,
     endtLoadTime: datetime,
     guestInstanceId: string, // not persisted
