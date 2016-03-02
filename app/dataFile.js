@@ -10,7 +10,7 @@ const path = require('path')
 const urlParse = require('url').parse
 const app = require('electron').app
 const AppConfig = require('../js/constants/appConfig')
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
 const cachedDataFiles = {}
 
 const storagePath = (url) =>
@@ -49,8 +49,8 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
           reject('could not rename downloaded file')
         } else {
           // console.log('resolving for download:', resourceName)
-          AppActions.setResourceETag(resourceName, etag)
-          AppActions.setResourceLastCheck(resourceName, version, new Date().getTime())
+          appActions.setResourceETag(resourceName, etag)
+          appActions.setResourceLastCheck(resourceName, version, new Date().getTime())
           resolve()
         }
       })

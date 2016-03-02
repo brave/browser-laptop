@@ -7,7 +7,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
 const messages = require('../constants/messages')
 
-const AppActions = {
+const appActions = {
   /**
    * Dispatches an event to the main process to replace the app state
    * This is called from the main process on startup before anything else
@@ -201,4 +201,4 @@ const AppActions = {
   }
 }
 
-module.exports = AppActions
+module.exports = appActions

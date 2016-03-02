@@ -8,7 +8,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 const Main = require('./main')
 const SiteTags = require('../constants/siteTags')
 const Config = require('../constants/config')
@@ -27,7 +27,7 @@ class Window extends React.Component {
       }
     }
     if (this.props.initWindowState) {
-      WindowActions.setState(this.windowState)
+      windowActions.setState(this.windowState)
     }
     windowStore.addChangeListener(this.onChange.bind(this))
     appStoreRenderer.addChangeListener(this.onAppStateChange.bind(this))
@@ -36,12 +36,12 @@ class Window extends React.Component {
   componentWillMount () {
     if (!this.props.initWindowState || this.props.initWindowState.frames.length === 0) {
       if (this.props.frames.length === 0) {
-        WindowActions.newFrame({
+        windowActions.newFrame({
           location: Config.defaultUrl
         })
       } else {
         this.props.frames.forEach(frame => {
-          WindowActions.newFrame(frame)
+          windowActions.newFrame(frame)
         })
       }
     }
@@ -95,7 +95,7 @@ class Window extends React.Component {
             (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
       })
     sitesToAdd.forEach(site => {
-      WindowActions.newFrame({
+      windowActions.newFrame({
         location: site.get('location'),
         partitionNumber: site.get('partitionNumber'),
         isPinned: true
@@ -108,7 +108,7 @@ class Window extends React.Component {
       // Compare to the original src of the pinned frame
       !sites.find(site => frame.get('pinnedLocation') === site.get('location') &&
         (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0) && site.get('tags').includes(SiteTags.PINNED)))
-    framesToClose.forEach(frameProps => WindowActions.closeFrame(frames, frameProps, true))
+    framesToClose.forEach(frameProps => windowActions.closeFrame(frames, frameProps, true))
   }
 }
 Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }

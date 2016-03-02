@@ -12,23 +12,23 @@ const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 const remote = electron.remote
 const messages = require('../constants/messages')
-const AppActions = require('./appActions')
+const appActions = require('./appActions')
 const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
 
 function dispatch (action) {
-  if (WindowActions.dispatchToIPC) {
+  if (windowActions.dispatchToIPC) {
     // serialize immutable
     if (action.frameProps && action.frameProps.toJS) {
       action.frameProps = action.frameProps.toJS()
     }
     remote.getCurrentWindow().webContents.send('handle-action', action)
-    WindowActions.dispatchToIPC = false
+    windowActions.dispatchToIPC = false
   } else {
     WindowDispatcher.dispatch(action)
   }
 }
 
-const WindowActions = {
+const windowActions = {
   dispatchViaIPC: function () {
     this.dispatchToIPC = true
   },
@@ -80,7 +80,7 @@ const WindowActions = {
     }
 
     if (newFrame) {
-      WindowActions.newFrame({
+      windowActions.newFrame({
         location
       }, true)
       return
@@ -275,7 +275,7 @@ const WindowActions = {
       // only has pinned frames and tried to close, so close the
       // whole app.
       if (nonPinnedFrames.size === 0) {
-        AppActions.closeWindow(remote.getCurrentWindow().id)
+        appActions.closeWindow(remote.getCurrentWindow().id)
         return
       }
 
@@ -296,7 +296,7 @@ const WindowActions = {
         frameProps
       })
     } else {
-      AppActions.closeWindow(remote.getCurrentWindow().id)
+      appActions.closeWindow(remote.getCurrentWindow().id)
     }
   },
 
@@ -702,4 +702,4 @@ const WindowActions = {
   }
 }
 
-module.exports = WindowActions
+module.exports = windowActions

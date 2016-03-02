@@ -6,7 +6,7 @@ const React = require('react')
 
 const ImmutableComponent = require('./immutableComponent')
 
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet.js')
 const {getTextColorForBackground} = require('../lib/color')
@@ -72,16 +72,16 @@ class Tab extends ImmutableComponent {
   }
 
   setActiveFrame () {
-    WindowActions.setActiveFrame(this.props.frameProps)
+    windowActions.setActiveFrame(this.props.frameProps)
   }
 
   onCloseFrame (event) {
     event.stopPropagation()
-    WindowActions.closeFrame(this.props.frames, this.props.frameProps)
+    windowActions.closeFrame(this.props.frames, this.props.frameProps)
   }
 
   onMuteFrame (muted) {
-    WindowActions.setAudioMuted(this.props.frameProps, muted)
+    windowActions.setAudioMuted(this.props.frameProps, muted)
   }
 
   get loading () {
@@ -93,7 +93,7 @@ class Tab extends ImmutableComponent {
   onMouseLeave () {
     window.clearTimeout(this.hoverTimeout)
     this.lastPreviewClearTime = new Date().getTime()
-    WindowActions.setPreviewFrame(null)
+    windowActions.setPreviewFrame(null)
   }
 
   onMouseEnter () {
@@ -103,7 +103,7 @@ class Tab extends ImmutableComponent {
     const previewMode = new Date().getTime() - this.lastPreviewClearTime < 1500
     window.clearTimeout(this.hoverClearTimeout)
     this.hoverTimeout =
-      window.setTimeout(WindowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 400)
+      window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 400)
   }
 
   onClickTab (e) {

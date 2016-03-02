@@ -12,7 +12,7 @@ const messages = require('../js/constants/messages')
 const UpdateStatus = require('../js/constants/updateStatus')
 const querystring = require('querystring')
 const AppStore = require('../js/stores/appStore')
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
 const Immutable = require('immutable')
 const dates = require('./dates')
 
@@ -69,7 +69,7 @@ var scheduleUpdates = () => {
 // set the feed url for the auto-update system
 exports.init = (platform, ver) => {
   // When starting up we should not expect an update to be available
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_NONE)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_NONE)
 
   // Browser version X.X.X
   version = ver
@@ -129,7 +129,7 @@ var requestVersionInfo = (done) => {
   debug(queryString)
 
   request(queryString, (err, response, body) => {
-    AppActions.setUpdateLastCheck()
+    appActions.setUpdateLastCheck()
     if (!err && response.statusCode === 204) {
       autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
     } else if (!err && (response.statusCode === 200)) {
@@ -153,7 +153,7 @@ var requestVersionInfo = (done) => {
 var downloadHandler = (err, metadata) => {
   assert.equal(err, null)
   debug('Metadata: ' + JSON.stringify(metadata))
-  AppActions.setUpdateStatus(undefined, undefined, Immutable.fromJS(metadata))
+  appActions.setUpdateStatus(undefined, undefined, Immutable.fromJS(metadata))
   if (process.platform === 'win32') {
     // check versions to see if an update is required
     if (metadata) {
@@ -173,12 +173,12 @@ exports.checkForUpdate = (verbose) => {
       updateStatus !== UpdateStatus.UPDATE_NOT_AVAILABLE &&
       updateStatus !== UpdateStatus.UPDATE_NONE) {
     debug('Already checking for updates...')
-    AppActions.setUpdateStatus(undefined, verbose)
+    appActions.setUpdateStatus(undefined, verbose)
     return
   }
   // Force falsy or truthy here so session store will write out a value
   // and it won't auto make updater UI appear periodically.
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_CHECKING, !!verbose)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_CHECKING, !!verbose)
   debug('checkForUpdates')
   try {
     requestVersionInfo(downloadHandler)
@@ -191,7 +191,7 @@ exports.checkForUpdate = (verbose) => {
 exports.updateNowRequested = () => {
   debug('update requested in updater')
   // App shutdown process will save state and then call autoUpdater.quitAndInstall
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_APPLYING_RESTART)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_APPLYING_RESTART)
 }
 
 exports.quitAndInstall = () => {
@@ -210,23 +210,23 @@ autoUpdater.on('update-downloaded', (evt, releaseNotes, releaseDate, updateURL) 
   if (updateURL) {
     debug('Update URL: ' + updateURL)
   }
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_AVAILABLE)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_AVAILABLE)
 })
 
 // Download has started
 autoUpdater.on(messages.UPDATE_AVAILABLE, (evt) => {
   debug('update downloading')
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_DOWNLOADING)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_DOWNLOADING)
 })
 
 // The current version of the software is up to date
 autoUpdater.on(messages.UPDATE_NOT_AVAILABLE, (evt) => {
   debug('update not available')
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_NOT_AVAILABLE)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_NOT_AVAILABLE)
 })
 
 // Handle autoUpdater errors (Network, permissions etc...)
 autoUpdater.on('error', (err) => {
-  AppActions.setUpdateStatus(UpdateStatus.UPDATE_ERROR)
+  appActions.setUpdateStatus(UpdateStatus.UPDATE_ERROR)
   debug(err)
 })

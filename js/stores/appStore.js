@@ -14,7 +14,7 @@ const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
-const AppActions = require('../actions/appActions')
+const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
@@ -122,7 +122,7 @@ const createWindow = (browserOpts, defaults) => {
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
-    AppActions.setDefaultWindowSize(evt.sender.getSize())
+    appActions.setDefaultWindowSize(evt.sender.getSize())
   })
 
   mainWindow.on('close', function () {
