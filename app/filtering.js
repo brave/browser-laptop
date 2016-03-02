@@ -20,7 +20,7 @@ const dialog = electron.dialog
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 
-const trasnparent1PxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
@@ -58,7 +58,7 @@ function registerForBeforeRequest (session) {
         BrowserWindow.getAllWindows().forEach(wnd =>
           wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
         if (details.resourceType === 'image') {
-          cb({ redirectURL: trasnparent1PxGif })
+          cb({ redirectURL: transparent1pxGif })
         } else {
           cb({ cancel: true })
         }
