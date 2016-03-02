@@ -57,7 +57,7 @@ module.exports = {
     autoRuntimeUpdate: false,
     // url to check for updates
     baseUrl: `${updateHost}/1/releases`,
-    winBaseUrl: `${winUpdateHost}/releases/CHANNEL/winx64`
+    winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/winx64`
   },
   defaultSettings: {
     'general.startup-mode': 'lastTime',
