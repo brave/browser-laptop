@@ -31,7 +31,7 @@ function processBookmarkNode (parserState, domNode) {
           title: domNode.innerText,
           folderId: parserState.nextFolderId,
           parentFolderId: parserState.parentFolderId,
-          lastAccessedTime: domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE'),
+          lastAccessedTime: (domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE') || 0) * 1000,
           tags: [siteTags.BOOKMARK_FOLDER]
         }
         parserState.lastFolderId = parserState.nextFolderId
@@ -50,7 +50,7 @@ function processBookmarkNode (parserState, domNode) {
         title: domNode.innerText,
         location: domNode.href,
         parentFolderId: parserState.parentFolderId,
-        lastAccessedTime: domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE'),
+        lastAccessedTime: (domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE') || 0) * 1000,
         tags: [siteTags.BOOKMARK]
       }
       parserState.sites.push(site)
