@@ -8,7 +8,7 @@ const ReactDOM = require('react-dom')
 const windowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 import top500 from './../data/top500.js'
 const {isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 import Immutable from 'immutable'
@@ -161,7 +161,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.frames,
-        maxResults: Config.urlBarSuggestions.maxOpenedFrames,
+        maxResults: config.urlBarSuggestions.maxOpenedFrames,
         classHandler: () => 'fa-file',
         clickHandler: (frameProps) =>
           windowActions.setActiveFrame(frameProps),
@@ -176,7 +176,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
-        maxResults: Config.urlBarSuggestions.maxSites,
+        maxResults: config.urlBarSuggestions.maxSites,
         classHandler: getSiteIconClass,
         clickHandler: navigateClickHandler(site => {
           return site.get('location')
@@ -199,7 +199,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.HISTORY_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
-        maxResults: Config.urlBarSuggestions.maxSites,
+        maxResults: config.urlBarSuggestions.maxSites,
         classHandler: getSiteIconClass,
         clickHandler: navigateClickHandler(site => {
           return site.get('location')
@@ -222,7 +222,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (this.props.searchSuggestions) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.suggestions.get('searchResults'),
-        maxResults: Config.urlBarSuggestions.maxTopSites,
+        maxResults: config.urlBarSuggestions.maxTopSites,
         classHandler: () => 'fa-search',
         clickHandler: navigateClickHandler(searchTerms => this.props.searchDetail.get('searchURL')
           .replace('{searchTerms}', searchTerms))}))
@@ -231,7 +231,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Alexa top 500
     suggestions = suggestions.concat(mapListToElements({
       data: top500,
-      maxResults: Config.urlBarSuggestions.maxSearch,
+      maxResults: config.urlBarSuggestions.maxSearch,
       classHandler: () => 'fa-link',
       clickHandler: navigateClickHandler(x => x)}))
 

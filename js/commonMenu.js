@@ -4,17 +4,17 @@
 
 'use strict'
 
-const AppConfig = require('./constants/appConfig')
+const appConfig = require('./constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
 const path = require('path')
 
-const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
-const adblock = AppConfig.resourceNames.ADBLOCK
-const adInsertion = AppConfig.resourceNames.AD_INSERTION
-const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
-const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = appConfig.resourceNames.ADBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
+const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
@@ -62,7 +62,7 @@ module.exports.sendToFocusedWindow = (focusedWindow, message) => {
 }
 
 module.exports.quitMenuItem = {
-  label: 'Quit ' + AppConfig.name,
+  label: 'Quit ' + appConfig.name,
   accelerator: 'Command+Q',
   click: app.quit
 }
@@ -182,7 +182,7 @@ module.exports.submitFeedbackMenuItem = {
   label: 'Submit Feedback...',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow,
-      [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
+      [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
   }
 }
 
@@ -199,7 +199,7 @@ module.exports.bookmarksToolbarMenuItem = () => {
 }
 
 module.exports.aboutBraveMenuItem = {
-  label: 'About ' + AppConfig.name,
+  label: 'About ' + appConfig.name,
   click: (item, focusedWindow) => {
     dialog.showMessageBox({
       title: 'Brave',

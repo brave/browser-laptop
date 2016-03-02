@@ -6,7 +6,7 @@
 
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const WindowConstants = require('../constants/windowConstants')
-const Config = require('../constants/config')
+const config = require('../constants/config')
 const UrlUtil = require('../lib/urlutil')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
@@ -249,7 +249,7 @@ const windowActions = {
     if (openInForeground === undefined) {
       openInForeground = true
     }
-    frameOpts.location = frameOpts.location || Config.defaultUrl
+    frameOpts.location = frameOpts.location || config.defaultUrl
     if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
       frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
     }

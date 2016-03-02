@@ -15,7 +15,7 @@ const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 
@@ -333,7 +333,7 @@ class Frame extends ImmutableComponent {
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
-    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
+    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
   }
 
   goBack () {

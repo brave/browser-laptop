@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Config = require('../constants/config')
+const config = require('../constants/config')
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
@@ -431,7 +431,7 @@ const doAction = (action) => {
       if (zoomInLevel === undefined) {
         zoomInLevel = 1
       }
-      if (Config.zoom.max > zoomInLevel) {
+      if (config.zoom.max > zoomInLevel) {
         zoomInLevel += 1
       }
       windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomInLevel)
@@ -442,13 +442,13 @@ const doAction = (action) => {
       if (zoomOutLevel === undefined) {
         zoomOutLevel = 1
       }
-      if (Config.zoom.min < zoomOutLevel) {
+      if (config.zoom.min < zoomOutLevel) {
         zoomOutLevel -= 1
       }
       windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomOutLevel)
       break
     case WindowConstants.WINDOW_ZOOM_RESET:
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), Config.zoom.defaultValue)
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), config.zoom.defaultValue)
       break
     default:
   }

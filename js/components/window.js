@@ -11,7 +11,7 @@ const appStoreRenderer = require('../stores/appStoreRenderer')
 const windowActions = require('../actions/windowActions')
 const Main = require('./main')
 const SiteTags = require('../constants/siteTags')
-const Config = require('../constants/config')
+const config = require('../constants/config')
 
 class Window extends React.Component {
   constructor (props) {
@@ -37,7 +37,7 @@ class Window extends React.Component {
     if (!this.props.initWindowState || this.props.initWindowState.frames.length === 0) {
       if (this.props.frames.length === 0) {
         windowActions.newFrame({
-          location: Config.defaultUrl
+          location: config.defaultUrl
         })
       } else {
         this.props.frames.forEach(frame => {

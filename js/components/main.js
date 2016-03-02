@@ -29,8 +29,8 @@ const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 
 // Constants
-const Config = require('../constants/config')
-const AppConfig = require('../constants/appConfig')
+const config = require('../constants/config')
+const appConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
@@ -107,7 +107,7 @@ class Main extends ImmutableComponent {
 
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
       windowActions.newFrame({
-        location: url || Config.defaultUrl,
+        location: url || config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
       }, openInForeground)
@@ -189,10 +189,10 @@ class Main extends ImmutableComponent {
 
   onHamburgerMenu (e) {
     let braverySettings = {}
-    Object.keys(AppConfig.resourceNames).forEach((name) => {
-      let value = AppConfig.resourceNames[name]
+    Object.keys(appConfig.resourceNames).forEach((name) => {
+      let value = appConfig.resourceNames[name]
       let enabled = this.props.appState.getIn([value, 'enabled'])
-      braverySettings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
+      braverySettings[value] = enabled === undefined ? appConfig[value].enabled : enabled
     })
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
@@ -211,7 +211,7 @@ class Main extends ImmutableComponent {
   get enableAds () {
     let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
-      enabled = AppConfig.adInsertion.enabled
+      enabled = appConfig.adInsertion.enabled
     }
     return enabled
   }
