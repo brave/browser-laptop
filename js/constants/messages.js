@@ -74,7 +74,9 @@ const messages = {
   NEW_FRAME: _,
   // HTTPS
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
-  CERT_ERROR_ACCEPTED: _ /** @arg {string} url where a cert error was accepted */
+  CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
+  // Bookmarks
+  IMPORT_BOOKMARKS: _
 }
 
 module.exports = mapValuesByKeys(messages)

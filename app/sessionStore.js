@@ -134,6 +134,14 @@ module.exports.cleanSessionData = (sessionData) => {
     // restored.  We will be able to keep this once we
     // don't regenerate new frame keys when opening storage.
     delete frame.parentFrameKey
+
+    if (frame.navbar && frame.navbar.urlbar) {
+      frame.navbar.urlbar.urlPreview = null
+      if (frame.navbar.urlbar.suggestions) {
+        frame.navbar.urlbar.suggestions.selectedIndex = null
+        frame.navbar.urlbar.suggestions.suggestionList = null
+      }
+    }
   }
 
   // Clean closed frame data before frames because the keys are re-ordered

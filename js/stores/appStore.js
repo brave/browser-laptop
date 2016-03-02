@@ -4,9 +4,9 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
-const AppConfig = require('../constants/appConfig')
+const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
-const SiteUtil = require('../state/siteUtil')
+const siteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
@@ -20,9 +20,10 @@ const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
 const path = require('path')
 const getSetting = require('../settings').getSetting
-const debounce = require('../lib/debounce.js')
 const EventEmitter = require('events').EventEmitter
+const Immutable = require('immutable')
 const diff = require('immutablediff')
+const debounce = require('../lib/debounce.js')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -115,7 +116,7 @@ const createWindow = (browserOpts, defaults) => {
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden',
     autoHideMenuBar: true,
-    title: AppConfig.name,
+    title: appConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))
 
@@ -138,6 +139,17 @@ const createWindow = (browserOpts, defaults) => {
 
   mainWindow.on('scroll-touch-end', function (e) {
     mainWindow.webContents.send('scroll-touch-end')
+  })
+
+  mainWindow.on('app-command', function (e, cmd) {
+    switch (cmd) {
+      case 'browser-backward':
+        mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+        return
+      case 'browser-forward':
+        mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+        return
+    }
   })
 
   LocalShortcuts.register(mainWindow)
@@ -216,6 +228,16 @@ function setDefaultWindowSize () {
 const appStore = new AppStore()
 const emitChanges = debounce(appStore.emitChanges.bind(appStore), 5)
 
+/**
+ * Clears out the top X non tagged sites.
+ * This is debounced to every 1 minute, the cleanup is not particularly intensive
+ * but there's no point to cleanup frequently.
+ */
+const filterOutNonRecents = debounce(() => {
+  appState = appState.set('sites', siteUtil.filterOutNonRecents(appState.get('sites')))
+  emitChanges()
+}, 60 * 1000)
+
 const handleAppAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
@@ -259,6 +281,9 @@ const handleAppAction = (action) => {
         if (isMainFrame) {
           lastEmittedState = appState
           mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
+          if (action.cb) {
+            action.cb()
+          }
         }
       })
       mainWindow.show()
@@ -268,13 +293,26 @@ const handleAppAction = (action) => {
       appWindow.close()
       break
     case AppConstants.APP_ADD_SITE:
-      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+      const oldSiteSize = appState.get('sites').size
+      if (action.siteDetail.constructor === Immutable.List) {
+        action.siteDetail.forEach(s =>
+          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag)))
+      } else {
+        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+      }
+      // If there was an item added then clear out the old history entries
+      if (oldSiteSize !== appState.get('sites').size) {
+        filterOutNonRecents()
+      }
       break
     case AppConstants.APP_REMOVE_SITE:
-      appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
+      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
+      break
+    case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
+      appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))
       break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])

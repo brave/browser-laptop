@@ -15,6 +15,7 @@ import Immutable from 'immutable'
 const debounce = require('../lib/debounce.js')
 const {getSiteIconClass} = require('../state/siteUtil.js')
 const settings = require('../constants/settings')
+const siteTags = require('../constants/siteTags')
 const getSetting = require('../settings').getSetting
 
 class UrlBarSuggestions extends ImmutableComponent {
@@ -47,17 +48,15 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.updateSuggestions(newIndex)
   }
 
-  handleEvent () {
-    this.blur()
-  }
-
   blur () {
     window.removeEventListener('click', this)
     WindowActions.setUrlBarSuggestions(null, null)
     WindowActions.setUrlBarPreview(null)
   }
 
-  clickSelected () {
+  clickSelected (e) {
+    this.ctrlKey = e.ctrlKey
+    this.metaKey = e.metaKey
     ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
   }
 
@@ -82,7 +81,6 @@ class UrlBarSuggestions extends ImmutableComponent {
       {suggestions.map((suggestion, index) =>
         <li data-index={index + 1}
             onMouseOver={this.onMouseOver.bind(this)}
-            onMouseDown={suggestion.onClick}
             onClick={suggestion.onClick}
             key={suggestion.title}
             className={this.activeIndex === index + 1 ? 'selected' : ''}>
@@ -101,31 +99,49 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (this.props.urlLocation === prevProps.urlLocation) {
       return
     }
+    this.suggestionList = this.getNewSuggestionList()
     this.searchXHR()
   }
 
-  updateSuggestions (newIndex) {
+  getNewSuggestionList () {
     if (!this.props.urlLocation && !this.props.urlPreview) {
       return null
     }
 
-    const navigateClickHandler = formatUrl => site => {
+    const navigateClickHandler = formatUrl => (site, e) => {
+      // We have a wonky way of fake clicking from keyboard enter,
+      // so remove the meta keys from the real event here.
+      const metaKey = e.metaKey || this.metaKey
+      const ctrlKey = e.ctrlKey || this.ctrlKey
+      delete this.metaKey
+      delete this.ctrlKey
+
+      const isDarwin = process.platform === 'darwin'
       const location = formatUrl(site)
-      WindowActions.setNavBarUserInput(location)
-      WindowActions.loadUrl(this.props.activeFrameProps, location)
-      WindowActions.setUrlBarActive(false)
-      this.blur()
+      if (ctrlKey && !isDarwin ||
+          metaKey && isDarwin ||
+          e.button === 1) {
+        WindowActions.newFrame({
+          location,
+          partitionNumber: site && site.get && site.get('partitionNumber') || undefined
+        }, false)
+        e.preventDefault()
+        WindowActions.setNavBarFocused(true)
+      } else {
+        WindowActions.loadUrl(this.props.activeFrameProps, location)
+        WindowActions.setUrlBarActive(false)
+        this.blur()
+      }
     }
 
+    const urlLocationLower = this.props.urlLocation.toLowerCase()
     let suggestions = new Immutable.List()
     const defaultme = x => x
     const mapListToElements = ({data, maxResults, classHandler, clickHandler = navigateClickHandler,
         sortHandler = defaultme, formatTitle = defaultme,
-        filterValue = site => site.toLowerCase().includes(this.props.urlLocation.toLowerCase())
+        filterValue = site => site.toLowerCase().includes(urlLocationLower)
     }) => // Filter out things which are already in our own list at a smaller index
-      data.filter((site, index) => {
-        return data.findIndex(x => formatTitle(x).toLowerCase() === formatTitle(site).toLowerCase()) === index
-      })
+      data
       // Per suggestion provider filter
       .filter(filterValue)
       // Filter out things which are already in the suggestions list
@@ -152,11 +168,11 @@ class UrlBarSuggestions extends ImmutableComponent {
         formatTitle: frame => frame.get('title') || frame.get('location'),
         filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
-          (frame.get('title') && frame.get('title').toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-          frame.get('location') && frame.get('location').toLowerCase().includes(this.props.urlLocation.toLowerCase()))}))
+          (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
+          frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))}))
     }
 
-    // bookmarks, reader list
+    // bookmarks
     if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
@@ -172,8 +188,32 @@ class UrlBarSuggestions extends ImmutableComponent {
         filterValue: site => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
-          return title.toLowerCase().includes(this.props.urlLocation.toLowerCase()) ||
-            location.toLowerCase().includes(this.props.urlLocation.toLowerCase())
+          return (title.toLowerCase().includes(urlLocationLower) ||
+            location.toLowerCase().includes(urlLocationLower)) &&
+            site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
+        }
+      }))
+    }
+
+    // history
+    if (getSetting(settings.HISTORY_SUGGESTIONS)) {
+      suggestions = suggestions.concat(mapListToElements({
+        data: this.props.sites,
+        maxResults: Config.urlBarSuggestions.maxSites,
+        classHandler: getSiteIconClass,
+        clickHandler: navigateClickHandler(site => {
+          return site.get('location')
+        }),
+        sortHandler: (site1, site2) => {
+          return site2.get('tags').size - site1.get('tags').size
+        },
+        formatTitle: site => site.get('title') || site.get('location'),
+        filterValue: site => {
+          const title = site.get('title') || ''
+          const location = site.get('location') || ''
+          return (title.toLowerCase().includes(urlLocationLower) ||
+            location.toLowerCase().includes(urlLocationLower)) &&
+            (!site.get('tags') || site.get('tags').size === 0)
         }
       }))
     }
@@ -195,6 +235,11 @@ class UrlBarSuggestions extends ImmutableComponent {
       classHandler: () => 'fa-link',
       clickHandler: navigateClickHandler(x => x)}))
 
+    return suggestions
+  }
+
+  updateSuggestions (newIndex) {
+    const suggestions = this.suggestionList || this.props.suggestions.get('suggestionList')
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
       WindowActions.setUrlBarPreview(null)

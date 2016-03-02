@@ -137,7 +137,7 @@ class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox disabled dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
+        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings}/>
         <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings}/>
       </SettingsList>

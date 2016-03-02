@@ -1,10 +1,11 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+/* This Source Code Form is subject to the terms of the Mozilla Public * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
 const Immutable = require('immutable')
 const siteTags = require('../constants/siteTags')
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 /**
  * Obtains the index of the location in sites
@@ -15,7 +16,7 @@ const siteTags = require('../constants/siteTags')
  */
 module.exports.getSiteIndex = function (sites, siteDetail, tags) {
   let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
-    typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
+    tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
   if (isBookmarkFolder) {
     return sites.findIndex(site => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
   }
@@ -37,7 +38,7 @@ module.exports.isSiteInList = function (sites, siteDetail, tag) {
   return sites.get(index).get('tags').includes(tag)
 }
 
-const getNextFolderId = (sites) =>
+const getNextFolderIdItem = (sites) =>
   sites.max((siteA, siteB) => {
     const folderIdA = siteA.get('folderId')
     const folderIdB = siteB.get('folderId')
@@ -53,6 +54,11 @@ const getNextFolderId = (sites) =>
     return folderIdA > folderIdB
   })
 
+module.exports.getNextFolderId = (sites) => {
+  const maxIdItem = getNextFolderIdItem(sites)
+  return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
+}
+
 /**
  * Adds the specified siteDetail to sites
  *
@@ -64,12 +70,14 @@ const getNextFolderId = (sites) =>
  * @return The new sites Immutable object
  */
 module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+  if (tag === undefined) {
+    tag = siteDetail.getIn(['tags', 0])
+  }
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
 
   let folderId = siteDetail.get('folderId')
-  if (tag === siteTags.BOOKMARK_FOLDER) {
-    const maxIdItem = getNextFolderId(sites)
-    folderId = (maxIdItem ? maxIdItem.get('folderId') : 0) + 1
+  if (!folderId && tag === siteTags.BOOKMARK_FOLDER) {
+    folderId = module.exports.getNextFolderId(sites)
   }
 
   let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
@@ -83,7 +91,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   }
 
   let site = Immutable.fromJS({
-    lastAccessed: new Date(),
+    lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
     title: siteDetail.get('title')
@@ -209,9 +217,44 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   return folders
 }
 
+/**
+ * Filters out non recent sites based on the app setting for history size.
+ * @param sites The application state's Immutable sites list.
+ */
+module.exports.filterOutNonRecents = function (sites) {
+  const sitesWithTags = sites
+    .filter(site => site.get('tags').size)
+  const topHistorySites = sites
+    .filter(site => site.get('tags').size === 0)
+    .sort((site1, site2) => (site2.get('lastAccessedTime') || 0) - (site1.get('lastAccessedTime') || 0))
+    .take(getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE))
+  return sitesWithTags.concat(topHistorySites)
+}
+
+/**
+ * Filters sites relative to a parent site (folder).
+ * @param sites The application state's Immutable sites list.
+ * @param relSite The folder to filter to.
+ */
 module.exports.filterSitesRelativeTo = function (sites, relSite) {
   if (!relSite.get('folderId')) {
     return sites
   }
   return sites.filter(site => site.get('parentFolderId') === relSite.get('folderId'))
+}
+
+/**
+ * Clears out all sites that have no tags.
+ * @param sites The application state's Immutable sites list.
+ */
+module.exports.clearSitesWithoutTags = function (sites) {
+  return sites.filter(site => site.get('tags') && site.get('tags').size > 0)
+}
+
+/**
+ * Determines if the sites list has any sites with no tags
+ * @param sites The application state's Immutable sites list.
+ */
+module.exports.hasNoTagSites = function (sites) {
+  return sites.findIndex(site => !site.get('tags') || site.get('tags').size === 0) !== -1
 }

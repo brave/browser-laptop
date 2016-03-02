@@ -8,10 +8,14 @@ const electron = require('electron')
 const AppConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
+const settings = require('../js/constants/settings')
 const dialog = electron.dialog
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
+const siteUtil = require('../js/state/siteUtil')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
+const getSetting = require('../js/settings').getSetting
+const appStore = require('../js/stores/appStore')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -116,7 +120,7 @@ const init = (settingsState, args) => {
       accelerator: 'CmdOrCtrl+Shift+W',
       click: function (item, focusedWindow) {
         if (focusedWindow) {
-          AppActions.closeWindow(focusedWindow.id)
+          appActions.closeWindow(focusedWindow.id)
         }
       }
     },
@@ -341,6 +345,12 @@ const init = (settingsState, args) => {
       label: 'History',
       submenu: [
         {
+          label: 'Home',
+          accelerator: 'CmdOrCtrl+Shift+H',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, getSetting(settings.HOMEPAGE)])
+          }
+        }, {
           label: 'Back',
           accelerator: 'CmdOrCtrl+[',
           click: function (item, focusedWindow) {
@@ -366,6 +376,15 @@ const init = (settingsState, args) => {
           label: 'Show All History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
+        },
+        CommonMenu.separatorMenuItem,
+        {
+          label: 'Clear History',
+          accelerator: 'Shift+CmdOrCtrl+Delete',
+          enabled: siteUtil.hasNoTagSites(appStore.getState().get('sites')),
+          click: function (item, focusedWindow) {
+            appActions.clearSitesWithoutTags(appStore.getState().get('sites'))
+          }
         }
       ]
     }, {
@@ -382,8 +401,19 @@ const init = (settingsState, args) => {
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
         {
-          label: 'Import Bookmarks',
-          enabled: false
+          label: 'Import Bookmarks (from HTML export)',
+          click: function (item, focusedWindow) {
+            if (electron.BrowserWindow.getAllWindows().length === 0) {
+              appActions.newWindow(undefined, undefined, undefined, function () {
+                // The timeout here isn't necessary but giving the window a bit of time to popup
+                // before the modal file picker pops up seems to work nicer.
+                setTimeout(() =>
+                  CommonMenu.sendToFocusedWindow(electron.BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
+              })
+              return
+            }
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.IMPORT_BOOKMARKS])
+          }
           /*
           submenu: [
             {label: 'Google Chrome...'},
@@ -441,7 +471,6 @@ const init = (settingsState, args) => {
           enabled: false
         }, {
           label: 'History',
-          // On OSX, Shift+Cmd+H cannot be overridden.
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
         }, {
@@ -496,7 +525,7 @@ const init = (settingsState, args) => {
           role: 'hide'
         }, {
           label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
+          accelerator: 'Command+Alt+H',
           role: 'hideothers'
         }, {
           label: 'Show All',

@@ -489,7 +489,10 @@ const WindowActions = {
   },
 
   /**
-   * Marks the URL bar as active or not
+   * Marks the URL bar as active or not.
+   * If the URL bar is active that means it's in a position that it should be displaying
+   * autocomplete.  It may choose not to display autocomplete and still be active if there
+   * are no autocomplete results.
    *
    * @param {boolean} isActive - Whether or not the URL bar should be marked as active
    */

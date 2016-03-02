@@ -31,7 +31,6 @@ const addBookmarkMenuItem = (siteDetail) => {
 
 const addFolderMenuItem = {
   label: 'Add Folder...',
-  enabled: false,
   click: () => {
     const emptyFolder = Immutable.fromJS({tags: [siteTags.BOOKMARK_FOLDER]})
     WindowActions.setBookmarkDetail(emptyFolder)
@@ -81,7 +80,7 @@ function tabsToolbarTemplateInit (activeFrame) {
 function moreBookmarksTemplateInit (activeFrame, bookmarks) {
   return bookmarks.map(bookmark => {
     return {
-      label: bookmark.get('customTitle') || bookmark.get('title'),
+      label: bookmark.get('customTitle') || bookmark.get('title') || bookmark.get('location'),
       click: () => {
         WindowActions.loadUrl(activeFrame, bookmark.get('location'))
       }
@@ -94,27 +93,34 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
   const isFolder = siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   const template = []
   if (!isFolder) {
-    template.push(openInNewTabMenuItem(location),
+    template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
       openInNewPrivateTabMenuItem(location),
       openInNewSessionTabMenuItem(location),
       copyLinkLocationMenuItem(location),
       CommonMenu.separatorMenuItem)
   }
 
+  // We want edit / delete items for everything except for the bookmarks toolbar item
+  if (!isFolder || siteDetail.get('folderId') !== 0) {
+    template.push(
+      {
+        label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
+        click: () => {
+          // originalLocation is undefined signifies add mode
+          WindowActions.setBookmarkDetail(siteDetail, siteDetail)
+        }
+      })
+
+    template.push(
+      CommonMenu.separatorMenuItem, {
+        label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
+        click: () => {
+          AppActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
+        }
+      })
+  }
+
   template.push(
-    {
-      label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
-      click: () => {
-        // originalLocation is undefined signifies add mode
-        WindowActions.setBookmarkDetail(siteDetail, siteDetail)
-      }
-    },
-    CommonMenu.separatorMenuItem, {
-      label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
-      click: () => {
-        AppActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
-      }
-    },
     CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
     addFolderMenuItem)
@@ -285,11 +291,11 @@ function hamburgerTemplateInit (braverySettings) {
   return template
 }
 
-const openInNewTabMenuItem = location => {
+const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
   return {
     label: 'Open in new tab',
     click: () => {
-      WindowActions.newFrame({ location }, false)
+      WindowActions.newFrame({ location, isPrivate, partitionNumber }, false)
     }
   }
 }
@@ -332,7 +338,7 @@ function mainTemplateInit (nodeProps, frame) {
   const nodeName = nodeProps.name
 
   if (nodeProps.href) {
-    template.push(openInNewTabMenuItem(nodeProps.href),
+    template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       openInNewPrivateTabMenuItem(nodeProps.href),
       openInNewSessionTabMenuItem(nodeProps.href),
       copyLinkLocationMenuItem(nodeProps.href),
@@ -421,7 +427,7 @@ export function onHamburgerMenu (braverySettings, e) {
 }
 
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {
-  if (contextMenuType === 'bookmark') {
+  if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))

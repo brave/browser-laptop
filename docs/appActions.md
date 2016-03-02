@@ -17,9 +17,19 @@ This is called from the main process on startup before anything else
 
 
 
-### newWindow() 
+### newWindow(frameOpts, browserOpts, restoredState, cb) 
 
-Dispatches an event to the main process to create a new window
+Dispatches an event to the main process to create a new window.
+
+**Parameters**
+
+**frameOpts**: `Object`, Options for the first frame in the window.
+
+**browserOpts**: `Object`, Options for the browser.
+
+**restoredState**: `Object`, State for the window to restore.
+
+**cb**: `function`, Callback to call after the window is loaded, will only work if called from the main process.
 
 
 
@@ -35,12 +45,18 @@ Adds a site to the site list
 
 **Parameters**
 
-**siteDetail**: `Object`, Properties of the site in question
+**siteDetail**: `Object`, Properties of the site in question, can also be an array of siteDetail
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
 **originalSiteDetail**: `string`, If specified, the original site detail to edit / overwrite.
   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
+
+
+
+### clearSitesWithoutTags() 
+
+Clears all sites without tags
 
 
 

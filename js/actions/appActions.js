@@ -22,14 +22,19 @@ const AppActions = {
   },
 
   /**
-   * Dispatches an event to the main process to create a new window
+   * Dispatches an event to the main process to create a new window.
+   * @param {Object} frameOpts - Options for the first frame in the window.
+   * @param {Object} browserOpts - Options for the browser.
+   * @param {Object} restoredState - State for the window to restore.
+   * @param {function} cb - Callback to call after the window is loaded, will only work if called from the main process.
    */
-  newWindow: function (frameOpts, browserOpts, restoredState) {
+  newWindow: function (frameOpts, browserOpts, restoredState, cb) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_NEW_WINDOW,
       frameOpts,
       browserOpts,
-      restoredState
+      restoredState,
+      cb
     })
   },
 
@@ -49,7 +54,7 @@ const AppActions = {
 
   /**
    * Adds a site to the site list
-   * @param {Object} siteDetail - Properties of the site in question
+   * @param {Object} siteDetail - Properties of the site in question, can also be an array of siteDetail
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    * @param {string} originalSiteDetail - If specified, the original site detail to edit / overwrite.
    *   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
@@ -60,6 +65,15 @@ const AppActions = {
       siteDetail,
       tag,
       originalSiteDetail
+    })
+  },
+
+  /**
+   * Clears all sites without tags
+   */
+  clearSitesWithoutTags: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS
     })
   },
 

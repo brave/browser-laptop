@@ -47,3 +47,4 @@ buildConfig.js
 # HTTPS Everywhere files
 rulesets.json
 httpse.json
+httpse.sqlite

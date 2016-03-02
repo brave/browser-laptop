@@ -67,9 +67,10 @@ module.exports = {
     'tabs.paint-tabs': true,
     'tabs.tabs-per-tab-page': 6,
     'tabs.show-tab-previews': true,
-    'privacy.history-suggestions': false,
+    'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
+    'privacy.autocomplete.history-size': 500,
     'security.block-reported-sites': false,
     'bookmarks.toolbar.show': false,
     'privacy.do-not-track': false

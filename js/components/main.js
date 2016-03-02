@@ -7,6 +7,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
+const remote = electron.remote
 
 // Actions
 const windowActions = require('../actions/windowActions')
@@ -198,11 +199,6 @@ class Main extends ImmutableComponent {
     contextMenus.onHamburgerMenu(braverySettings, e)
   }
 
-  onMainFocus () {
-    // When the main container is in focus, set the URL bar to inactive.
-    windowActions.setUrlBarActive(false)
-  }
-
   onHideSiteInfo () {
     windowActions.setSiteInfoVisible(false)
   }
@@ -238,6 +234,31 @@ class Main extends ImmutableComponent {
     }
   }
 
+  onDoubleClick (e) {
+    const win = remote.getCurrentWindow()
+    if (!e.target.className.includes('navigatorWrapper')) {
+      return
+    }
+    if (win.isMaximized()) {
+      win.maximize()
+    } else {
+      win.unmaximize()
+    }
+  }
+
+  onClickWindow (e) {
+    // Check for an ancestor of urlbarForm or urlBarSuggestions and if none are found
+    // then set the URL bar as non active (no autocomplete).
+    let node = e.target
+    while (node) {
+      if (node.className === 'urlbarForm' || node.className === 'urlBarSuggestions') {
+        return
+      }
+      node = node.parentNode
+    }
+    windowActions.setUrlBarActive(false)
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -257,9 +278,10 @@ class Main extends ImmutableComponent {
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const sourceDragTabData = this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB &&
       this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])
-    return <div id='window' ref={node => this.mainWindow = node}>
+    return <div id='window' ref={node => this.mainWindow = node} onClick={this.onClickWindow.bind(this)}>
       <div className='top'>
         <div className='navigatorWrapper'
+          onDoubleClick={this.onDoubleClick.bind(this)}
           onDragOver={this.onDragOver.bind(this)}
           onDrop={this.onDrop.bind(this)}>
           <div className='backforward'>
@@ -341,8 +363,7 @@ class Main extends ImmutableComponent {
         />
         <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
-      <div className='mainContainer'
-        onFocus={this.onMainFocus.bind(this)}>
+      <div className='mainContainer'>
         <div className='tabContainer'>
         {
           sortedFrames.map(frame =>
@@ -357,6 +378,11 @@ class Main extends ImmutableComponent {
                 ? this.props.appState.get('sites')
                     .filter(site => site.get('tags')
                       .includes(siteTags.BOOKMARK)) || new Immutable.Map()
+                : null}
+              bookmarkFolders={frame.get('location') === 'about:bookmarks'
+                ? this.props.appState.get('sites')
+                    .filter(site => site.get('tags')
+                      .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

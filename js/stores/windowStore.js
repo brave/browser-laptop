@@ -14,6 +14,7 @@ const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
+const importFromHTML = require('../lib/importer').importFromHTML
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -303,6 +304,10 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
+      if (!action.isActive) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), null)
+      }
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
@@ -460,6 +465,21 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowState = FrameStateUtil.makePrevFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
   emitChanges()
+})
+
+ipc.on(messages.IMPORT_BOOKMARKS, () => {
+  const dialog = require('electron').remote.dialog
+  const files = dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{
+      name: 'HTML',
+      extensions: ['html', 'htm']
+    }]
+  })
+  if (files && files.length > 0) {
+    const file = files[0]
+    importFromHTML(file)
+  }
 })
 
 const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar']

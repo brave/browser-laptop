@@ -6,6 +6,7 @@ const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
 const messages = require('../js/constants/messages')
+const isDarwin = process.platform === 'darwin'
 
 module.exports.register = (win) => {
   // Most of these events will simply be listened to by the app store and acted
@@ -22,12 +23,14 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST]
   ]
 
-  if (process.platform === 'win32') {
+  if (!isDarwin) {
     simpleWebContentEvents.push(
       ['F5', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
       ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD],
       ['F12', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS],
-      ['Alt+D', messages.SHORTCUT_FOCUS_URL, false])
+      ['Alt+D', messages.SHORTCUT_FOCUS_URL, false],
+      ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
+      ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
   }
 
   // Tab ordering shortcuts

@@ -34,7 +34,7 @@
 
 /* Prviacy settings page */
 <suggestionTypes "When using the location bar, suggest:">
-<history "History (not available yet)">
+<history "History">
 <bookmarks "Bookmarks">
 <openedTabs "Open tabs">
 <doNotTrack "Send a 'Do Not Track' header with browsing requests (requires browser restart)">
