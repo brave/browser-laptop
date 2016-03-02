@@ -35,4 +35,7 @@
   window.addEventListener('context-menu-opened', (e) => {
     ipcRenderer.sendToHost('context-menu-opened', e.detail.nodeProps, e.detail.contextMenuType)
   })
+  window.addEventListener('move-site', (e) => {
+    ipcRenderer.send('move-site', e.detail.sourceDetail, e.detail.destinationDetail, e.detail.prepend, e.detail.destinationIsParent)
+  })
 }).apply(this)

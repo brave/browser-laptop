@@ -1,0 +1,69 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+.contextMenu {
+  display: flex;
+  color: black;
+  cursor: default;
+  font-size: 11px;
+  overflow-y: scroll;
+  padding: 0px 0px;
+  position: absolute;
+  z-index: 350;
+  min-width: 100px;
+  max-width: 300px;
+  -webkit-user-select: none;
+
+  .contextMenuSingle {
+    background-color: @toolbarBackground;
+    border-left: 1px solid @toolbarBorderColor;
+    border-right: 1px solid @toolbarBorderColor;
+    border-bottom: 1px solid @toolbarBorderColor;
+    display: table;
+    margin-left: -1px; // avoid double border
+
+    &.isSubmenu {
+      position: relative;
+    }
+  }
+}
+
+.contextMenuItem {
+  padding: 7px;
+  box-sizing: border-box;
+  max-width: 300px;
+  display: flex;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
+
+  &:not([disabled]) {
+    &:hover {
+      background-color: lighten(@menuSelectionColor, 5%);
+    }
+  }
+  &[disabled] {
+    color: #bbb;
+  }
+
+  .submenuIndicatorContainer {
+    display: flex;
+    margin: auto 0 auto auto;
+
+    .submenuIndicatorSpacer {
+      flex-grow: 1;
+    }
+
+    .submenuIndicator {
+      color: #676767;
+      font-size: 10px;
+      float: right;
+      margin: auto 0 auto 5px;
+    }
+  }
+}

@@ -309,7 +309,7 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent))
       break
     case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
       appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))

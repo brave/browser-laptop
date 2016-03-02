@@ -8,7 +8,9 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
+const dragTypes = require('../constants/dragTypes')
 const aboutActions = require('./aboutActions')
+const dndData = require('../dndData')
 const cx = require('../lib/classSet.js')
 
 // Stylesheets
@@ -16,6 +18,21 @@ require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class BookmarkItem extends ImmutableComponent {
+  onDragStart (e) {
+    e.dataTransfer.effectAllowed = 'all'
+    dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmark)
+  }
+  onDragOver (e) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+  onDrop (e) {
+    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    if (bookmark) {
+      aboutActions.moveSite(bookmark.toJS(), this.props.bookmark.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), false)
+    }
+  }
   navigate () {
     aboutActions.newFrame({
       location: this.props.bookmark.get('location'),
@@ -34,14 +51,17 @@ class BookmarkItem extends ImmutableComponent {
     }
 
     return <div role='listitem'
+      onDrop={this.onDrop.bind(this)}
+      onDragStart={this.onDragStart.bind(this)}
+      onDragOver={this.onDragOver.bind(this)}
       className='listItem'
       onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmark.toJS(), 'bookmark')}
       data-context-menu-disable
       draggable='true'
       onDoubleClick={this.navigate.bind(this)}>
-    { this.props.bookmark.get('title')
+    { this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')
       ? <span>
-        <span>{this.props.bookmark.get('title')}</span>
+        <span>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
         {partitionNumberInfo}
         <span className='bookmarkLocation'> - {this.props.bookmark.get('location')}</span>
       </span>
@@ -55,11 +75,30 @@ class BookmarkItem extends ImmutableComponent {
 }
 
 class BookmarkFolderItem extends ImmutableComponent {
+  onDragStart (e) {
+    e.dataTransfer.effectAllowed = 'all'
+    dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmarkFolder.get('location'), this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmarkFolder)
+  }
+  onDragOver (e) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  onDrop (e) {
+    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    if (bookmark) {
+      aboutActions.moveSite(bookmark.toJS(), this.props.bookmarkFolder.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), true)
+    }
+  }
   render () {
     const childBookmarkFolders = this.props.allBookmarkFolders
       .filter(bookmarkFolder => (bookmarkFolder.get('parentFolderId') || 0) === this.props.bookmarkFolder.get('folderId'))
     return <div>
       <div role='listitem'
+        onDrop={this.onDrop.bind(this)}
+        onDragStart={this.onDragStart.bind(this)}
+        onDragOver={this.onDragOver.bind(this)}
         onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmarkFolder.toJS(), 'bookmark-folder')}
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
         draggable='true'

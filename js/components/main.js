@@ -26,6 +26,7 @@ const SiteInfo = require('./siteInfo')
 const AddEditBookmark = require('./addEditBookmark')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
+const ContextMenu = require('./contextMenu')
 
 // Constants
 const Config = require('../constants/config')
@@ -246,6 +247,17 @@ class Main extends ImmutableComponent {
     }
   }
 
+  onMouseDown (e) {
+    let node = e.target
+    while (node) {
+      if (node.className === 'contextMenu') {
+        return
+      }
+      node = node.parentNode
+    }
+    windowActions.setContextMenuDetail()
+  }
+
   onClickWindow (e) {
     // Check for an ancestor of urlbarForm or urlBarSuggestions and if none are found
     // then set the URL bar as non active (no autocomplete).
@@ -276,9 +288,13 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const sourceDragTabData = this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB &&
-      this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])
-    return <div id='window' ref={node => this.mainWindow = node} onClick={this.onClickWindow.bind(this)}>
+    return <div id='window'
+        ref={node => this.mainWindow = node}
+        onMouseDown={this.onMouseDown.bind(this)}
+        onClick={this.onClickWindow.bind(this)}>
+      { this.props.windowState.get('contextMenuDetail')
+        ? <ContextMenu
+            contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/> : null }
       <div className='top'>
         <div className='navigatorWrapper'
           onDoubleClick={this.onDoubleClick.bind(this)}
@@ -329,9 +345,9 @@ class Main extends ImmutableComponent {
         </div>
         { showBookmarksToolbar
           ? <BookmarksToolbar
-              sourceDragData={this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])}
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
               activeFrame={activeFrame}
+              contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
               bookmarks={this.props.appState.get('sites')
                 .filter(site => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
               }/>
@@ -343,14 +359,12 @@ class Main extends ImmutableComponent {
           onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
-                sourceDragData={sourceDragTabData}
                 tabsPerTabPage={tabsPerPage}
                 tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
               /> : null }
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
-          sourceDragData={sourceDragTabData}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}

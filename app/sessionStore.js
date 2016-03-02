@@ -62,8 +62,7 @@ module.exports.cleanSessionData = (sessionData) => {
     sessionData = {}
   }
   // Hide the context menu when we restore.
-  sessionData.contextMenuDetail = null
-
+  delete sessionData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
   delete sessionData.previewFrameKey
   // Don't restore add/edit dialog

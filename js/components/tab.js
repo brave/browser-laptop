@@ -33,7 +33,8 @@ class Tab extends ImmutableComponent {
   }
 
   get isDragging () {
-    return this.props.sourceDragData && this.props.frameProps.get('key') === this.props.sourceDragData.get('key')
+    const sourceDragData = dnd.getInProcessDragData()
+    return sourceDragData && this.props.frameProps.get('key') === sourceDragData.get('key')
   }
 
   get isDraggingOverLeft () {
@@ -67,7 +68,7 @@ class Tab extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.props.sourceDragData, this.tab.getBoundingClientRect(), this.props.frameProps.get('key'), this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tab.getBoundingClientRect(), this.props.frameProps.get('key'), this.draggingOverData, e)
   }
 
   setActiveFrame () {

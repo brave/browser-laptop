@@ -134,13 +134,40 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
-module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend) {
+/**
+ * Moves the specified site from one location to another
+ *
+ * @param sites The application state's Immutable sites list
+ * @param siteDetail The site detail to move
+ * @param destinationDetail The site detail to move to
+ * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
+ * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
+ * @return The new sites Immutable object
+ */
+module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent) {
   const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail, sourceDetail.get('tags'))
-  let newIndex = module.exports.getSiteIndex(sites, destinationDetail, destinationDetail.get('tags')) + (prepend ? 0 : 1)
+  let destinationSiteIndex
+  if (destinationIsParent) {
+    // When the destinatiaon is the parent we want to put it at the end
+    destinationSiteIndex = sites.size - 1
+    prepend = false
+  } else {
+    destinationSiteIndex = module.exports.getSiteIndex(sites, destinationDetail, destinationDetail.get('tags'))
+  }
+
+  let newIndex = destinationSiteIndex + (prepend ? 0 : 1)
   let sourceSite = sites.get(sourceSiteIndex)
+  let destinationSite = sites.get(destinationSiteIndex)
   sites = sites.splice(sourceSiteIndex, 1)
   if (newIndex > sourceSiteIndex) {
     newIndex--
+  }
+  if (destinationIsParent) {
+    sourceSite = sourceSite.set('parentFolderId', destinationDetail.get('folderId'))
+  } else if (!destinationSite.get('parentFolderId')) {
+    sourceSite = sourceSite.delete('parentFolderId')
+  } else {
+    sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
   }
   return sites.splice(newIndex, 0, sourceSite)
 }
@@ -175,6 +202,12 @@ module.exports.getDetailFromFrame = function (frame, tag) {
   })
 }
 
+/**
+ * Compares 2 site details
+ * @param siteDetail1 The first site detail to compare.
+ * @param siteDetail2 The second site detail to compare.
+ * @return true if the site details should be considered the same.
+ */
 module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
   const isFolder1 = module.exports.isFolder(siteDetail1)
   const isFolder2 = module.exports.isFolder(siteDetail2)
@@ -189,6 +222,11 @@ module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
   return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') === siteDetail2.get('partitionNumber')
 }
 
+/**
+ * Determines if the site detail is a folder.
+ * @param siteDetail The site detail to check.
+ * @return true if the site detail is a folder.
+ */
 module.exports.isFolder = function (siteDetail) {
   return siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
 }
@@ -204,13 +242,13 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
       if (site.get('folderId') === folderId) {
         return
       }
-      const label = (labelPrefix || '') + site.get('title')
+      const label = (labelPrefix || '') + site.get('customTitle') || site.get('title')
       folders.push({
         folderId: site.get('folderId'),
         parentFolderId: site.get('parentFolderId'),
         label
       })
-      const subsites = module.exports.getFolders(sites, folderId, site.get('folderId'), label + ' / ')
+      const subsites = module.exports.getFolders(sites, folderId, site.get('folderId'), (label || '') + ' / ')
       folders = folders.concat(subsites)
     }
   })

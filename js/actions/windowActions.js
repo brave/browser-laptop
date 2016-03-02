@@ -386,22 +386,6 @@ const WindowActions = {
   },
 
   /**
-   * Dispatches a message to the store to indicate that dragging has started / stopped for the item.
-   *
-   * @param {string} dragType - The type of drag operation being performed
-   * @param {Object} sourceDragData - the properties for the item being dragged
-   * @param {boolean} dragging - true if the item is being dragged.
-   */
-  setIsBeingDragged: function (dragType, sourceDragData, dragging) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_IS_BEING_DRAGGED,
-      dragType,
-      sourceDragData,
-      dragging
-    })
-  },
-
-  /**
    * Dispatches a message to the store to indicate that something is dragging over this item.
    *
    * @param {string} dragType - The type of drag operation being performed
@@ -553,6 +537,18 @@ const WindowActions = {
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
       currentDetail,
       originalDetail
+    })
+  },
+
+  /**
+   * Dispatches a message to set context menu detail.
+   * If set, also indicates that the context menu is shown.
+   * @param {Object} detail - The context menu detail
+   */
+  setContextMenuDetail: function (detail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
+      detail
     })
   },
 

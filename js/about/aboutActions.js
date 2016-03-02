@@ -63,6 +63,18 @@ const AboutActions = {
       }
     })
     window.dispatchEvent(event)
+  },
+
+  moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
+    const event = new window.CustomEvent(messages.MOVE_SITE, {
+      detail: {
+        sourceDetail,
+        destinationDetail,
+        prepend,
+        destinationIsParent
+      }
+    })
+    window.dispatchEvent(event)
   }
 }
 module.exports = AboutActions

@@ -14,7 +14,7 @@ const ipc = global.require('electron').ipcRenderer
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
-const dnd = require('../dnd')
+const dndData = require('../dndData')
 
 const {isUrl} = require('../lib/appUrlUtil')
 
@@ -221,7 +221,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.activeFrameProps.get('location'), this.props.activeFrameProps.get('title'))
+    dndData.setupDataTransferURL(e.dataTransfer, this.props.activeFrameProps.get('location'), this.props.activeFrameProps.get('title'))
   }
 
   render () {

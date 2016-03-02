@@ -9,18 +9,20 @@ const Tab = require('./tab')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
+const dragTypes = require('../constants/dragTypes')
 const siteUtil = require('../state/siteUtil')
 const dnd = require('../dnd')
+const dndData = require('../dndData')
 
 class PinnedTabs extends ImmutableComponent {
   onDrop (e) {
     const clientX = e.clientX
-    const sourceDragData = this.props.sourceDragData
     // This must be executed async because the state change that this causes
     // will cause the onDragEnd to never run
     setTimeout(() => {
+      const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
       const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX)
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
         const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
@@ -53,7 +55,6 @@ class PinnedTabs extends ImmutableComponent {
             .map(frameProps =>
                 <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
                   ref={node => this.tabRefs.push(node)}
-                  sourceDragData={this.props.sourceDragData}
                   draggingOverData={this.props.draggingOverData}
                   frameProps={frameProps}
                   frames={this.props.frames}

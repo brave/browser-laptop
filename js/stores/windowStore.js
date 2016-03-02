@@ -253,12 +253,6 @@ const doAction = (action) => {
         canGoForward: action.canGoForward
       })
       break
-    case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED:
-      windowState = windowState.mergeIn(['ui', 'dragging'], {
-        dragType: action.dragType,
-        sourceDragData: action.sourceDragData
-      })
-      break
     case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
       if (!action.dragOverKey) {
         windowState = windowState.deleteIn(['ui', 'dragging'])
@@ -346,6 +340,15 @@ const doAction = (action) => {
         })
       }
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
+      windowStore.emitChanges()
+      return
+    case WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
+      if (!action.detail) {
+        windowState = windowState.delete('contextMenuDetail')
+      } else {
+        windowState = windowState.set('contextMenuDetail', action.detail)
+      }
+      // Drag and drop bookmarks code expects this to be set sync
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_PINNED:
