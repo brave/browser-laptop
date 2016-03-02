@@ -46,6 +46,7 @@ exports.updateUrl = function (updates, platform) {
   if (platform === 'darwin') {
     return platformBaseUrl
   } else {
+    debug(updates.winBaseUrl.replace('CHANNEL', Channel.channel()))
     return updates.winBaseUrl.replace('CHANNEL', Channel.channel())
   }
 }
