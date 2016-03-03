@@ -23,20 +23,25 @@ const ipc = global.require('electron').ipcRenderer
  * Obtains an add bookmark menu item
  * @param {object} Detail of the bookmark to initialize with
  */
-const addBookmarkMenuItem = (siteDetail) => {
+const addBookmarkMenuItem = (siteDetail, parentSiteDetail) => {
   return {
     label: 'Add Bookmark...',
     click: () => {
+      siteDetail = siteDetail.set('parentFolderId', parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId')))
       windowActions.setBookmarkDetail(siteDetail)
     }
   }
 }
 
-const addFolderMenuItem = {
-  label: 'Add Folder...',
-  click: () => {
-    const emptyFolder = Immutable.fromJS({tags: [siteTags.BOOKMARK_FOLDER]})
-    windowActions.setBookmarkDetail(emptyFolder)
+const addFolderMenuItem = (parentSiteDetail) => {
+  return {
+    label: 'Add Folder...',
+    click: () => {
+      const emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER],
+        parentFolderId: parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId'))
+      })
+      windowActions.setBookmarkDetail(emptyFolder)
+    }
   }
 }
 
@@ -76,7 +81,7 @@ function tabsToolbarTemplateInit (activeFrame) {
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
-    addFolderMenuItem
+    addFolderMenuItem()
   ]
 }
 
@@ -114,8 +119,8 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
 
   template.push(
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
-    addFolderMenuItem)
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail),
+    addFolderMenuItem(siteDetail))
   return template
 }
 
