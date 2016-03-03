@@ -61,8 +61,10 @@ class Frame extends ImmutableComponent {
     // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
     // automatically while keeping the content script loaded.
     if (aboutPreload) {
-      this.webview.addEventListener('drop', (e) => {
-        e.preventDefault()
+      this.webviewContainer.addEventListener('drop', (e) => {
+        if (e.dataTransfer.getData('text/uri-list')) {
+          e.preventDefault()
+        }
       })
     }
     if (this.props.frame.get('isPrivate')) {

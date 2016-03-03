@@ -20,8 +20,9 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 class BookmarkItem extends ImmutableComponent {
   onDragStart (e) {
     e.dataTransfer.effectAllowed = 'all'
-    dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmark.get('location'), this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmark)
+    // TODO: Pass the location here when content scripts are fixed
+    dndData.setupDataTransferURL(e.dataTransfer, '', this.props.bookmark.get('customTitle') || this.props.bookmark.get('title'))
   }
   onDragOver (e) {
     e.preventDefault()
