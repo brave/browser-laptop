@@ -8,6 +8,7 @@ const appConfig = require('./constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
+const Channel = require('../app/channel')
 const path = require('path')
 
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
@@ -205,7 +206,8 @@ module.exports.aboutBraveMenuItem = {
       title: 'Brave',
       message: 'Version: ' + app.getVersion() + '\n' +
         'Electron: ' + process.versions['atom-shell'] + '\n' +
-        'libchromiumcontent: ' + process.versions['chrome'],
+        'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
+        'Channel: ' + Channel.channel(),
       icon: path.join(__dirname, '..', 'app', 'img', 'braveBtn3x.png'),
       buttons: ['Ok']
     })
