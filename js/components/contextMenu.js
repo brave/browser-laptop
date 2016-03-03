@@ -15,6 +15,12 @@ export default class ContextMenuItem extends ImmutableComponent {
   get hasSubmenu () {
     return this.submenu && this.submenu.size > 0
   }
+  onClick (e) {
+    e.stopPropagation()
+    if (this.props.contextMenuItem.get('click')) {
+      this.props.contextMenuItem.get('click')(e)
+    }
+  }
   onDragStart (e) {
     if (this.props.contextMenuItem.get('dragStart')) {
       this.props.contextMenuItem.get('dragStart')(e)
@@ -80,7 +86,7 @@ export default class ContextMenuItem extends ImmutableComponent {
         disabled={this.props.contextMenuItem.get('enabled') === false}
         onMouseEnter={this.onMouseEnter.bind(this)}
         onMouseLeave={this.onMouseLeave.bind(this)}
-        onClick={this.props.contextMenuItem.get('click')}>
+        onClick={this.onClick.bind(this)}>
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>
       { this.hasSubmenu
@@ -118,6 +124,9 @@ export default class ContextMenuSingle extends ImmutableComponent {
  * Represents a context menu including all submenus
  */
 export default class ContextMenu extends ImmutableComponent {
+  onClick () {
+    windowActions.setContextMenuDetail()
+  }
   get openedSubmenuDetails () {
     return this.props.contextMenuDetail.get('openedSubmenuDetails') || new Immutable.List()
   }
@@ -141,7 +150,9 @@ export default class ContextMenu extends ImmutableComponent {
     if (this.props.contextMenuDetail.get('maxHeight')) {
       styles.maxHeight = this.props.contextMenuDetail.get('maxHeight')
     }
-    return <div className='contextMenu' style={styles}>
+    return <div className='contextMenu'
+      onClick={this.onClick.bind(this)}
+      style={styles}>
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         template={this.props.contextMenuDetail.get('template')}/>
