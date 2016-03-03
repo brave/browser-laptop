@@ -175,6 +175,10 @@ app.on('ready', function () {
       appActions.changeSetting(key, value)
     })
 
+    ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
+      appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
+    })
+
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
       acceptCertUrls[url] = true
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)

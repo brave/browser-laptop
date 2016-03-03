@@ -72,6 +72,7 @@ const messages = {
   // About pages from contentScript
   CHANGE_SETTING: _,
   NEW_FRAME: _,
+  MOVE_SITE: _,
   // HTTPS
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */

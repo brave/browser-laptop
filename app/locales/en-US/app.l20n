@@ -44,6 +44,7 @@
 <setDefaultSearch "Set {{$title}} as default search engine">
 <viewPageSource "View Page Source">
 <menuButton title: "Menu">
+<emptyFolderItem "(empty)">
 
 <braveMenuTotalReplacements "Total Replacements: {{$count}}">
 

@@ -184,15 +184,19 @@
   }
 
   &.draggingOverLeft {
-    margin-left: @dragSpacing;
+    &:not(.isDragging) {
+      margin-left: @dragSpacing;
+    }
   }
 
   &.draggingOverRight {
-    margin-right: @dragSpacing;
+    &:not(.isDragging) {
+      margin-right: @dragSpacing;
+    }
   }
 
   &.isDragging {
-    display: none;
+    opacity: 0.2;
   }
 
   hr.dragIndicator {

@@ -15,7 +15,7 @@ const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 
@@ -36,8 +36,10 @@ class Frame extends ImmutableComponent {
       : ''
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
+    let aboutPreload = false
     if (['about:preferences', 'about:bookmarks', 'about:certerror'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
+      aboutPreload = true
     }
 
     contentScripts = contentScripts.join(',')
@@ -56,6 +58,15 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
+    // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
+    // automatically while keeping the content script loaded.
+    if (aboutPreload) {
+      this.webviewContainer.addEventListener('drop', (e) => {
+        if (e.dataTransfer.getData('text/uri-list')) {
+          e.preventDefault()
+        }
+      })
+    }
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
@@ -333,7 +344,7 @@ class Frame extends ImmutableComponent {
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
-    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
+    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
   }
 
   goBack () {
@@ -347,6 +358,7 @@ class Frame extends ImmutableComponent {
   onFocus () {
     windowActions.setTabPageIndexByFrame(this.props.frame)
     windowActions.setUrlBarActive(false)
+    windowActions.setContextMenuDetail()
   }
 
   onFindHide () {

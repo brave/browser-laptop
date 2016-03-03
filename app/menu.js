@@ -5,7 +5,7 @@
 'use strict'
 
 const electron = require('electron')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
@@ -21,11 +21,11 @@ const isDarwin = process.platform === 'darwin'
 
 const aboutUrl = 'https://brave.com/'
 
-const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
-const adblock = AppConfig.resourceNames.ADBLOCK
-const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
-const adInsertion = AppConfig.resourceNames.AD_INSERTION
-const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = appConfig.resourceNames.ADBLOCK
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
+const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 
 let menuArgs = {}
 
@@ -497,7 +497,7 @@ const init = (settingsState, args) => {
 
   if (isDarwin) {
     template.unshift({
-      label: AppConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
+      label: appConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
         CommonMenu.aboutBraveMenuItem,
         CommonMenu.separatorMenuItem,
@@ -510,7 +510,7 @@ const init = (settingsState, args) => {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
+              [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
           }
         },
         CommonMenu.separatorMenuItem,
@@ -520,7 +520,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: 'Hide ' + AppConfig.name,
+          label: 'Hide ' + appConfig.name,
           accelerator: 'Command+H',
           role: 'hide'
         }, {

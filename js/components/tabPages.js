@@ -8,8 +8,11 @@ const cx = require('../lib/classSet.js')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
+const dragTypes = require('../constants/dragTypes')
 const {onTabPageContextMenu} = require('../contextMenus')
 const siteUtil = require('../state/siteUtil')
+const dnd = require('../dnd')
+const dndData = require('../dndData')
 
 class TabPage extends ImmutableComponent {
   onDrop (e) {
@@ -17,7 +20,7 @@ class TabPage extends ImmutableComponent {
       return
     }
     const moveToFrame = this.props.frames.get(0)
-    const sourceDragData = this.props.sourceDragData
+    const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
     const sourceDragFromPageIndex = this.props.sourceDragFromPageIndex
     // This must be executed async because the state change that this causes
     // will cause the onDragEnd to never run
@@ -32,6 +35,7 @@ class TabPage extends ImmutableComponent {
         windowActions.setPinned(sourceDragData, false)
         appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
       }
+      windowActions.setIsBeingDraggedOverDetail()
     }, 0)
   }
 
@@ -61,8 +65,9 @@ class TabPages extends ImmutableComponent {
   render () {
     const tabPageCount = Math.ceil(this.props.frames.size / this.props.tabsPerTabPage)
     let sourceDragFromPageIndex
-    if (this.props.sourceDragData) {
-      sourceDragFromPageIndex = this.props.frames.findIndex(frame => frame.get('key') === this.props.sourceDragData.get('key'))
+    const sourceDragData = dnd.getInProcessDragData()
+    if (sourceDragData) {
+      sourceDragFromPageIndex = this.props.frames.findIndex(frame => frame.get('key') === sourceDragData.get('key'))
       if (sourceDragFromPageIndex !== -1) {
         sourceDragFromPageIndex /= this.props.tabsPerTabPage
       }
@@ -75,7 +80,6 @@ class TabPages extends ImmutableComponent {
           key={`tabPage-${i}`}
           frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
           index={i}
-          sourceDragData={this.props.sourceDragData}
           sourceDragFromPageIndex={sourceDragFromPageIndex}
           active={this.props.tabPageIndex === i}/>)
     }

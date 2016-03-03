@@ -10,12 +10,14 @@ const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
+const dragTypes = require('../constants/dragTypes')
 
 const FrameStateUtil = require('../state/frameStateUtil')
 
 const Button = require('./button')
 const Tab = require('./tab')
 const dnd = require('../dnd')
+const dndData = require('../dndData')
 const siteUtil = require('../state/siteUtil')
 
 class Tabs extends ImmutableComponent {
@@ -45,13 +47,13 @@ class Tabs extends ImmutableComponent {
 
   onDrop (e) {
     const clientX = e.clientX
-    const sourceDragData = this.props.sourceDragData
+    const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
     if (sourceDragData) {
       // This must be executed async because the state change that this causes
       // will cause the onDragEnd to never run
       setTimeout(() => {
         const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX)
+        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
           const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
@@ -71,7 +73,7 @@ class Tabs extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    if (this.props.sourceDragData) {
+    if (dndData.hasDragData(e.dataTransfer, dragTypes.TAB)) {
       e.dataTransfer.dropEffect = 'move'
       e.preventDefault()
       return
@@ -101,7 +103,6 @@ class Tabs extends ImmutableComponent {
             .filter(frameProps => !frameProps.get('pinnedLocation'))
             .map(frameProps =>
                 <Tab ref={node => this.tabRefs.push(node)}
-                  sourceDragData={this.props.sourceDragData}
                   draggingOverData={this.props.draggingOverData}
                   frameProps={frameProps}
                   frames={this.props.frames}

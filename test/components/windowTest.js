@@ -22,7 +22,7 @@ describe('application window', function () {
     })
   })
 
-  describe('AppActions.newWindow', function () {
+  describe('appActions.newWindow', function () {
     describe('default', function () {
       Brave.beforeAll(this)
 

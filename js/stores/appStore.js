@@ -14,7 +14,7 @@ const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
-const AppActions = require('../actions/appActions')
+const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
@@ -122,7 +122,7 @@ const createWindow = (browserOpts, defaults) => {
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
-    AppActions.setDefaultWindowSize(evt.sender.getSize())
+    appActions.setDefaultWindowSize(evt.sender.getSize())
   })
 
   mainWindow.on('close', function () {
@@ -309,7 +309,7 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent))
       break
     case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
       appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))

@@ -9,8 +9,8 @@ const fs = require('fs')
 const path = require('path')
 const urlParse = require('url').parse
 const app = require('electron').app
-const AppConfig = require('../js/constants/appConfig')
-const AppActions = require('../js/actions/appActions')
+const appConfig = require('../js/constants/appConfig')
+const appActions = require('../js/actions/appActions')
 const cachedDataFiles = {}
 
 const storagePath = (url) =>
@@ -49,8 +49,8 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
           reject('could not rename downloaded file')
         } else {
           // console.log('resolving for download:', resourceName)
-          AppActions.setResourceETag(resourceName, etag)
-          AppActions.setResourceLastCheck(resourceName, version, new Date().getTime())
+          appActions.setResourceETag(resourceName, etag)
+          appActions.setResourceLastCheck(resourceName, version, new Date().getTime())
           resolve()
         }
       })
@@ -85,7 +85,7 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
   const lastCheckDate = AppStore.getState().getIn([resourceName, 'lastCheckDate'])
   const lastCheckVersion = AppStore.getState().getIn([resourceName, 'lastCheckVersion'])
   return lastCheckVersion !== version ||
-    lastCheckDate && (new Date().getTime() - lastCheckDate) > AppConfig[resourceName].msBetweenRechecks
+    lastCheckDate && (new Date().getTime() - lastCheckDate) > appConfig[resourceName].msBetweenRechecks
 }
 
 /**
@@ -98,10 +98,10 @@ module.exports.shouldRedownloadFirst = (resourceName, version) => {
  *   directory where the data was downloaded.
  */
 module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) => {
-  const version = AppConfig[resourceName].version
-  const url = AppConfig[resourceName].url.replace('{version}', version)
+  const version = appConfig[resourceName].version
+  const url = appConfig[resourceName].url.replace('{version}', version)
 
-  if (!AppConfig[resourceName].enabled) {
+  if (!appConfig[resourceName].enabled) {
     return
   }
 

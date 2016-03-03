@@ -9,7 +9,7 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
@@ -106,7 +106,7 @@ function registerForBeforeSendHeaders (session) {
     }
 
     let hostname = urlParse(details.url || '').hostname
-    if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK) &&
         module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
                                         hostname)) {
       // Clear cookie and referer on third-party requests
@@ -232,7 +232,7 @@ module.exports.init = () => {
 module.exports.isResourceEnabled = (resourceName) => {
   const enabledFromState = AppStore.getState().getIn([resourceName, 'enabled'])
   if (enabledFromState === undefined) {
-    return AppConfig[resourceName].enabled
+    return appConfig[resourceName].enabled
   }
   return enabledFromState
 }

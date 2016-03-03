@@ -72,7 +72,7 @@ Removes a site from the site list
 
 
 
-### moveSite(sourceDetail, destinationDetail, prepend) 
+### moveSite(sourceDetail, destinationDetail, prepend, destinationIsParent) 
 
 Dispatches a message to move a site locations.
 
@@ -83,6 +83,9 @@ Dispatches a message to move a site locations.
 **destinationDetail**: `string`, the location, partitionNumber, etc of the destination moved site
 
 **prepend**: `boolean`, Whether or not to prepend to the destinationLocation
+
+**destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
+  If false, the destinationDetail is considered a sibling.
 
 
 

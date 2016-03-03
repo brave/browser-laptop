@@ -5,7 +5,7 @@
 @import "variables.less";
 
 .bookmarksToolbar {
-  background: #EEEEEE;
+  background: @toolbarBackground;
   border-bottom: 1px solid #BBBBBB;
   border-top: 1px solid #FFFFFF;
   box-sizing: border-box;
@@ -37,13 +37,17 @@
       background: lighten(@tabsBackground, 5%);
     }
     &.draggingOverLeft {
-      margin-left: @dragSpacing;
+      &:not(.isDragging) {
+        margin-left: 25px;
+      }
     }
     &.draggingOverRight {
-      margin-right: @dragSpacing;
+      &:not(.isDragging) {
+        margin-right: 25px;
+      }
     }
     &.isDragging {
-      display: none;
+      opacity: 0.2;
     }
     .bookmarkFolderChevron {
       color: #676767;

@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const Config = require('../../js/constants/config')
+const config = require('../../js/constants/config')
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
@@ -37,7 +37,7 @@ describe('urlbar', function () {
     .getAttribute(urlInput, 'placeholder').should.eventually.equal('Search or enter an address')
   }
 
-  function selectsText (client, text = Config.defaultUrl) {
+  function selectsText (client, text = config.defaultUrl) {
     return client.waitUntil(function () {
       return this.getSelectedText().then(function (value) { return value === text })
     })
@@ -377,7 +377,7 @@ describe('urlbar', function () {
       })
 
       it('reverts typing on escape', function *() {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(Config.defaultUrl)
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal(config.defaultUrl)
         yield selectsText(this.app.client)
       })
     })
@@ -432,7 +432,7 @@ describe('urlbar', function () {
 
       it('focuses on the webview', function *() {
         this.app.client.waitUntil(function () {
-          return this.getAttribute(':focus', 'src').then(src => src === Config.defaultUrl)
+          return this.getAttribute(':focus', 'src').then(src => src === config.defaultUrl)
         })
       })
     })

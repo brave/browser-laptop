@@ -7,7 +7,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
 const messages = require('../constants/messages')
 
-const AppActions = {
+const appActions = {
   /**
    * Dispatches an event to the main process to replace the app state
    * This is called from the main process on startup before anything else
@@ -96,13 +96,16 @@ const AppActions = {
    * @param {string} sourceDetail - the location, partitionNumber, etc of the source moved site
    * @param {string} destinationDetail - the location, partitionNumber, etc of the destination moved site
    * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
+   * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
+   *   If false, the destinationDetail is considered a sibling.
    */
-  moveSite: function (sourceDetail, destinationDetail, prepend) {
+  moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_MOVE_SITE,
       sourceDetail,
       destinationDetail,
-      prepend
+      prepend,
+      destinationIsParent
     })
   },
 
@@ -198,4 +201,4 @@ const AppActions = {
   }
 }
 
-module.exports = AppActions
+module.exports = appActions
