@@ -230,7 +230,11 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   render () {
     this.bookmarkRefs = []
-    return <div className='bookmarksToolbar'
+    return <div
+      className={cx({
+        bookmarksToolbar: true,
+        allowDragging: this.props.shouldAllowWindowDrag
+      })}
       onDrop={this.onDrop.bind(this)}
       onDragEnter={this.onDragEnter.bind(this)}
       onDragOver={this.onDragOver.bind(this)}

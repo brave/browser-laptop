@@ -13,9 +13,11 @@
   flex: 1;
   padding: 3px 10px;
   height: 23px;
-  -webkit-app-region: drag;
-  >* {
-    -webkit-app-region: no-drag;
+  &.allowDragging {
+    -webkit-app-region: drag;
+    >* {
+      -webkit-app-region: no-drag;
+    }
   }
 
   .bookmarkToolbarButton {

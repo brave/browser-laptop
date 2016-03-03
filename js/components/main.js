@@ -292,6 +292,12 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
+    const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+    const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
+      !this.props.windowState.get('bookmarkDetail') &&
+      !siteInfoIsVisible &&
+      !releaseNotesIsVisible
     return <div id='window'
         ref={node => this.mainWindow = node}
         onMouseDown={this.onMouseDown.bind(this)}
@@ -325,7 +331,7 @@ class Main extends ImmutableComponent {
             settings={settingsState}
             searchDetail={this.props.windowState.get('searchDetail')}
           />
-          { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+          { siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
                 siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
@@ -333,10 +339,11 @@ class Main extends ImmutableComponent {
           { this.props.windowState.get('bookmarkDetail')
             ? <AddEditBookmark sites={this.props.appState.get('sites')}
                 currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}/>
+                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+              />
             : null
           }
-          { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+          { releaseNotesIsVisible
             ? <ReleaseNotes
                 metadata={this.props.appState.getIn(['updates', 'metadata'])}
                 onHide={this.onHideReleaseNotes.bind(this)} /> : null
@@ -350,6 +357,7 @@ class Main extends ImmutableComponent {
         { showBookmarksToolbar
           ? <BookmarksToolbar
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+              shouldAllowWindowDrag={shouldAllowWindowDrag}
               activeFrame={activeFrame}
               windowWidth={this.props.appState.get('defaultWindowWidth')}
               contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
@@ -359,7 +367,7 @@ class Main extends ImmutableComponent {
           : null }
         <div className={cx({
           tabPages: true,
-          allowDragging: !this.props.windowState.get('contextMenuDetail'),
+          allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
           onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame)}>
@@ -371,7 +379,7 @@ class Main extends ImmutableComponent {
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+          shouldAllowWindowDrag={shouldAllowWindowDrag}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}

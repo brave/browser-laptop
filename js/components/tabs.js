@@ -91,7 +91,7 @@ class Tabs extends ImmutableComponent {
     return <div className='tabs'>
         <span className={cx({
           tabStripContainer: true,
-          allowDragging: !this.props.contextMenuDetail
+          allowDragging: this.props.shouldAllowWindowDrag
         })}
           onDragOver={this.onDragOver.bind(this)}
           onDrop={this.onDrop.bind(this)}>
