@@ -148,6 +148,9 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
       bookmark: site,
       draggable: true,
       label: site.get('customTitle') || site.get('title') || site.get('location'),
+      contextMenu: function (e) {
+        onBookmarkContextMenu(site, activeFrame, e)
+      },
       dragEnd: function (e) {
         dnd.onDragEnd(dragTypes.BOOKMARK, site, e)
       },

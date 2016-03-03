@@ -37,6 +37,12 @@ export default class ContextMenuItem extends ImmutableComponent {
     }
     windowActions.setContextMenuDetail()
   }
+  onContextMenu (e) {
+    if (this.props.contextMenuItem.get('contextMenu')) {
+      this.props.contextMenuItem.get('contextMenu')(e)
+    }
+    windowActions.setContextMenuDetail()
+  }
   onMouseEnter (e) {
     let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
     openedSubmenuDetails = openedSubmenuDetails ? openedSubmenuDetails.splice(this.props.submenuIndex, this.props.contextMenuDetail.get('openedSubmenuDetails').size) : new Immutable.List()
@@ -70,6 +76,7 @@ export default class ContextMenuItem extends ImmutableComponent {
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
         onDrop={this.onDrop.bind(this)}
+        onContextMenu={this.onContextMenu.bind(this)}
         disabled={this.props.contextMenuItem.get('enabled') === false}
         onMouseEnter={this.onMouseEnter.bind(this)}
         onMouseLeave={this.onMouseLeave.bind(this)}
