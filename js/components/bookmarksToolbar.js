@@ -187,15 +187,18 @@ class BookmarksToolbar extends ImmutableComponent {
       .forEach(url =>
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
-  updateBookmarkCount () {
-    this.maxItems = window.innerWidth / bookmarkMaxWidth | 0
-    this.leftOver = this.props.bookmarks.size - this.maxItems
+  updateBookmarkData () {
+    const maxItems = window.innerWidth / bookmarkMaxWidth | 0
+    const noParentItems = this.props.bookmarks
+      .filter(bookmark => !bookmark.get('parentFolderId'))
+    this.bookmarksForToolbar = noParentItems.take(maxItems)
+    this.overflowBookmarkItems = noParentItems.skip(maxItems)
   }
   componentWillMount () {
-    this.updateBookmarkCount()
+    this.updateBookmarkData()
   }
   componentWillUpdate () {
-    this.updateBookmarkCount()
+    this.updateBookmarkData()
   }
   onDragOver (e) {
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
@@ -213,7 +216,7 @@ class BookmarksToolbar extends ImmutableComponent {
     }
   }
   onMoreBookmarksMenu (e) {
-    contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.props.bookmarks, this.maxItems, e)
+    contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.props.bookmarks, this.overflowBookmarkItems, e)
   }
   render () {
     this.bookmarkRefs = []
@@ -222,9 +225,7 @@ class BookmarksToolbar extends ImmutableComponent {
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.activeFrame)}>
     {
-        this.props.bookmarks
-          .filter(bookmark => !bookmark.get('parentFolderId'))
-          .take(this.maxItems).map(bookmark =>
+        this.bookmarksForToolbar.map(bookmark =>
           <BookmarkToolbarButton
             ref={node => this.bookmarkRefs.push(node)}
             contextMenuDetail={this.props.contextMenuDetail}
@@ -233,7 +234,7 @@ class BookmarksToolbar extends ImmutableComponent {
             bookmarks={this.props.bookmarks}
             bookmark={bookmark}/>)
     }
-    { this.leftOver > 0
+    { this.overflowBookmarkItems.size !== 0
       ? <Button iconClass='fa-angle-double-right'
         onClick={this.onMoreBookmarksMenu.bind(this)}
         className='bookmarkButton'/> : null }

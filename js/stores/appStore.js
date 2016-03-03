@@ -156,11 +156,6 @@ const createWindow = (browserOpts, defaults) => {
   return mainWindow
 }
 
-const normalizeAppState = appState => appState.merge({
-  defaultWindowWidth: undefined,
-  defaultWindowHeight: undefined
-})
-
 class AppStore extends EventEmitter {
   getState () {
     return appState
@@ -173,7 +168,7 @@ class AppStore extends EventEmitter {
 
   emitChanges (emitFullState) {
     if (lastEmittedState) {
-      const d = diff(normalizeAppState(lastEmittedState), normalizeAppState(appState))
+      const d = diff(lastEmittedState, appState)
       if (!d.isEmpty()) {
         BrowserWindow.getAllWindows().forEach(wnd =>
           wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
