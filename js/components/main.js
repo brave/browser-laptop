@@ -347,6 +347,7 @@ class Main extends ImmutableComponent {
           ? <BookmarksToolbar
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
               activeFrame={activeFrame}
+              windowWidth={this.props.appState.get('defaultWindowWidth')}
               contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
               bookmarks={this.props.appState.get('sites')
                 .filter(site => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))

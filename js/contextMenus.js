@@ -521,8 +521,8 @@ export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
   }))
 }
 
-export function onMoreBookmarksMenu (activeFrame, allBookmarkItems, takenCount, e) {
-  const menuTemplate = moreBookmarksTemplateInit(allBookmarkItems, allBookmarkItems.skip(takenCount), activeFrame)
+export function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
+  const menuTemplate = moreBookmarksTemplateInit(allBookmarkItems, overflowItems, activeFrame)
   const rect = e.target.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
