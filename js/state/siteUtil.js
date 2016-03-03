@@ -134,6 +134,16 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
+function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
+  if (bookmarkFolder.get('parentFolderId')) {
+    parentFolderIds.push(bookmarkFolder.get('parentFolderId'))
+    const nextItem = allBookmarks.find(item => item.get('folderId') === bookmarkFolder.get('parentFolderId'))
+    if (nextItem) {
+      fillParentFolders(parentFolderIds, nextItem, allBookmarks)
+    }
+  }
+}
+
 /**
  * Moves the specified site from one location to another
  *
@@ -145,6 +155,16 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
  * @return The new sites Immutable object
  */
 module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent) {
+  // Disallow loops
+  let parentFolderIds = []
+  if (destinationDetail.get('parentFolderId') && sourceDetail.get('folderId')) {
+    fillParentFolders(parentFolderIds, destinationDetail, sites)
+    if (sourceDetail.get('folderId') === destinationDetail.get('folderId') ||
+        parentFolderIds.includes(sourceDetail.get('folderId'))) {
+      return sites
+    }
+  }
+
   const sourceSiteIndex = module.exports.getSiteIndex(sites, sourceDetail, sourceDetail.get('tags'))
   let destinationSiteIndex
   if (destinationIsParent) {
@@ -162,11 +182,11 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
   if (newIndex > sourceSiteIndex) {
     newIndex--
   }
-  if (destinationIsParent) {
+  if (destinationIsParent && destinationDetail.get('folderId') !== sourceSite.get('folderId')) {
     sourceSite = sourceSite.set('parentFolderId', destinationDetail.get('folderId'))
   } else if (!destinationSite.get('parentFolderId')) {
     sourceSite = sourceSite.delete('parentFolderId')
-  } else {
+  } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
     sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
   }
   return sites.splice(newIndex, 0, sourceSite)

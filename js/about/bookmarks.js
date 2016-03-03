@@ -77,9 +77,11 @@ class BookmarkItem extends ImmutableComponent {
 
 class BookmarkFolderItem extends ImmutableComponent {
   onDragStart (e) {
-    e.dataTransfer.effectAllowed = 'all'
-    dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmarkFolder.get('location'), this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmarkFolder)
+    if (this.props.draggable !== false) {
+      e.dataTransfer.effectAllowed = 'all'
+      dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmarkFolder.get('location'), this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
+      dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmarkFolder)
+    }
   }
   onDragOver (e) {
     e.preventDefault()
@@ -102,7 +104,7 @@ class BookmarkFolderItem extends ImmutableComponent {
         onDragOver={this.onDragOver.bind(this)}
         onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmarkFolder.toJS(), 'bookmark-folder')}
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
-        draggable='true'
+        draggable={this.props.draggable !== false ? 'true' : 'false'}
         className={cx({
           listItem: true,
           selected: this.props.selected
@@ -126,11 +128,12 @@ class BookmarkFolderList extends ImmutableComponent {
     return <list className='bookmarkFolderList'>
       { this.props.isRoot
         ? <BookmarkFolderItem selected={this.props.selectedFolderId === 0}
-          dataL10nId='bookmarksToolbar'
-          onChangeSelectedFolder={this.props.onChangeSelectedFolder}
-          allBookmarkFolders={this.props.allBookmarkFolders}
-          selectedFolderId={this.props.selectedFolderId}
-          bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})}/>
+            dataL10nId='bookmarksToolbar'
+            draggable={false}
+            onChangeSelectedFolder={this.props.onChangeSelectedFolder}
+            allBookmarkFolders={this.props.allBookmarkFolders}
+            selectedFolderId={this.props.selectedFolderId}
+            bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})}/>
         : null }
       {
         this.props.bookmarkFolders.map(bookmarkFolder =>
