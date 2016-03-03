@@ -200,6 +200,13 @@ class BookmarksToolbar extends ImmutableComponent {
   componentWillUpdate () {
     this.updateBookmarkData()
   }
+  onDragEnter (e) {
+    if (dndData.hasDragData(e.dataTransfer, dragTypes.BOOKMARK)) {
+      if (Array.from(e.target.classList).includes('overflowIndicator')) {
+        this.onMoreBookmarksMenu(e)
+      }
+    }
+  }
   onDragOver (e) {
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
     if (sourceDragData) {
@@ -222,6 +229,7 @@ class BookmarksToolbar extends ImmutableComponent {
     this.bookmarkRefs = []
     return <div className='bookmarksToolbar'
       onDrop={this.onDrop.bind(this)}
+      onDragEnter={this.onDragEnter.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.activeFrame)}>
     {
@@ -235,7 +243,7 @@ class BookmarksToolbar extends ImmutableComponent {
             bookmark={bookmark}/>)
     }
     { this.overflowBookmarkItems.size !== 0
-      ? <Button iconClass='fa-angle-double-right'
+      ? <Button iconClass='overflowIndicator fa-angle-double-right'
         onClick={this.onMoreBookmarksMenu.bind(this)}
         className='bookmarkButton'/> : null }
     </div>
