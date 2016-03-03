@@ -36,8 +36,10 @@ class Frame extends ImmutableComponent {
       : ''
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
+    let aboutPreload = false
     if (['about:preferences', 'about:bookmarks', 'about:certerror'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
+      aboutPreload = true
     }
 
     contentScripts = contentScripts.join(',')
@@ -56,6 +58,13 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
+    // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
+    // automatically while keeping the content script loaded.
+    if (aboutPreload) {
+      this.webview.addEventListener('drop', (e) => {
+        e.preventDefault()
+      })
+    }
     if (this.props.frame.get('isPrivate')) {
       this.webview.setAttribute('partition', 'private-1')
     } else if (this.props.frame.get('partitionNumber')) {
