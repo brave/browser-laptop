@@ -355,6 +355,7 @@ class Main extends ImmutableComponent {
           : null }
         <div className={cx({
           tabPages: true,
+          allowDragging: !this.props.windowState.get('contextMenuDetail'),
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
           onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame)}>
@@ -366,6 +367,7 @@ class Main extends ImmutableComponent {
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}

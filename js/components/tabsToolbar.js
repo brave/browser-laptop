@@ -41,6 +41,7 @@ class TabsToolbar extends ImmutableComponent {
         draggingOverData={this.props.draggingOverData}
         tabs={this.props.tabs}/> : null }
       <Tabs tabs={this.props.tabs}
+        contextMenuDetail={this.props.contextMenuDetail}
         draggingOverData={this.props.draggingOverData}
         paintTabs={this.props.paintTabs}
         previewTabs={this.props.previewTabs}

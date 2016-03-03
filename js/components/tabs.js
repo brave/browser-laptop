@@ -11,6 +11,7 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
+const cx = require('../lib/classSet')
 
 const FrameStateUtil = require('../state/frameStateUtil')
 
@@ -88,7 +89,10 @@ class Tabs extends ImmutableComponent {
   render () {
     this.tabRefs = []
     return <div className='tabs'>
-        <span className='tabContainer'
+        <span className={cx({
+          tabStripContainer: true,
+          allowDragging: !this.props.contextMenuDetail
+        })}
           onDragOver={this.onDragOver.bind(this)}
           onDrop={this.onDrop.bind(this)}>
         {(() => {
