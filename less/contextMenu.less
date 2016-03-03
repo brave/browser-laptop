@@ -13,8 +13,6 @@
   padding: 0px 0px;
   position: absolute;
   z-index: 350;
-  min-width: 100px;
-  max-width: 300px;
   -webkit-user-select: none;
 
   .contextMenuSingle {
@@ -24,6 +22,8 @@
     border-bottom: 1px solid @toolbarBorderColor;
     display: table;
     margin-left: -1px; // avoid double border
+    min-width: 100px;
+    max-width: 300px;
 
     &.isSubmenu {
       position: relative;
