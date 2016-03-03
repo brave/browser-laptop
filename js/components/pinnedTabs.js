@@ -17,10 +17,11 @@ const dndData = require('../dndData')
 class PinnedTabs extends ImmutableComponent {
   onDrop (e) {
     const clientX = e.clientX
+    const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
+
     // This must be executed async because the state change that this causes
     // will cause the onDragEnd to never run
     setTimeout(() => {
-      const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
       const key = sourceDragData.get('key')
       let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
       if (droppedOnTab) {
