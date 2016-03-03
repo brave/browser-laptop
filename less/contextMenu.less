@@ -9,19 +9,22 @@
   color: black;
   cursor: default;
   font-size: 11px;
-  overflow-y: scroll;
+  &.contextMenuScrollable {
+    overflow-y: scroll;
+  }
   padding: 0px 0px;
   position: absolute;
   z-index: 350;
   -webkit-user-select: none;
+  &.reverseExpand {
+    flex-direction: row-reverse;
+  }
 
   .contextMenuSingle {
     background-color: @toolbarBackground;
-    border-left: 1px solid @toolbarBorderColor;
-    border-right: 1px solid @toolbarBorderColor;
-    border-bottom: 1px solid @toolbarBorderColor;
+    border: 1px solid @toolbarBorderColor;
+    box-sizing: border-box;
     display: table;
-    margin-left: -1px; // avoid double border
     min-width: 100px;
     max-width: 300px;
 

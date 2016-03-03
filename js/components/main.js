@@ -250,7 +250,7 @@ class Main extends ImmutableComponent {
   onMouseDown (e) {
     let node = e.target
     while (node) {
-      if (node.className === 'contextMenu') {
+      if (node.classList && node.classList.contains('contextMenu')) {
         return
       }
       node = node.parentNode

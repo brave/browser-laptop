@@ -54,11 +54,11 @@ export default class ContextMenuItem extends ImmutableComponent {
     openedSubmenuDetails = openedSubmenuDetails ? openedSubmenuDetails.splice(this.props.submenuIndex, this.props.contextMenuDetail.get('openedSubmenuDetails').size) : new Immutable.List()
     if (this.hasSubmenu) {
       let node = e.target
-      while (node && !node.className.split(' ').includes('contextMenuItem')) {
+      while (node && node.classList && !node.classList.contains('contextMenuItem')) {
         node = node.parentNode
       }
       let parentNode = node.parentNode
-      while (parentNode && parentNode.className !== 'contextMenu') {
+      while (parentNode && parentNode.classList && !parentNode.classList.contains('contextMenu')) {
         parentNode = parentNode.parentNode
       }
       const parentBoundingRect = parentNode.getBoundingClientRect()
@@ -150,7 +150,11 @@ export default class ContextMenu extends ImmutableComponent {
     if (this.props.contextMenuDetail.get('maxHeight')) {
       styles.maxHeight = this.props.contextMenuDetail.get('maxHeight')
     }
-    return <div className='contextMenu'
+    return <div className={cx({
+        contextMenu: true,
+        reverseExpand: this.props.contextMenuDetail.get('right') !== undefined,
+        contextMenuScrollable: this.props.contextMenuDetail.get('maxHeight') !== undefined
+      })}
       onClick={this.onClick.bind(this)}
       style={styles}>
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
