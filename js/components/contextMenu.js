@@ -150,7 +150,8 @@ export default class ContextMenu extends ImmutableComponent {
     if (this.props.contextMenuDetail.get('maxHeight')) {
       styles.maxHeight = this.props.contextMenuDetail.get('maxHeight')
     }
-    return <div className={cx({
+    return <div
+      className={cx({
         contextMenu: true,
         reverseExpand: this.props.contextMenuDetail.get('right') !== undefined,
         contextMenuScrollable: this.props.contextMenuDetail.get('maxHeight') !== undefined
