@@ -39,7 +39,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         partitionNumber: this.props.bookmark.get('partitionNumber')
       }, false)
     } else {
-      windowActions.loadUrl(this.props.activeFrame, this.props.bookmark.get('location'))
+      windowActions.newFrame(this.props.activeFrame, this.props.bookmark.get('location'))
     }
   }
 
@@ -192,13 +192,16 @@ class BookmarksToolbar extends ImmutableComponent {
     const noParentItems = this.props.bookmarks
       .filter(bookmark => !bookmark.get('parentFolderId'))
     this.bookmarksForToolbar = noParentItems.take(maxItems)
-    this.overflowBookmarkItems = noParentItems.skip(maxItems)
+    this.overflowBookmarkItems = noParentItems.skip(maxItems).take(100)
   }
   componentWillMount () {
     this.updateBookmarkData()
   }
-  componentWillUpdate () {
-    this.updateBookmarkData()
+  componentWillUpdate (prevProps) {
+    if (prevProps.bookmarks !== this.props.bookmarks ||
+        prevProps.windowWidth !== this.props.windowWidth) {
+      this.updateBookmarkData()
+    }
   }
   onDragEnter (e) {
     if (dndData.hasDragData(e.dataTransfer, dragTypes.BOOKMARK)) {

@@ -188,7 +188,15 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
 }
 
 function moreBookmarksTemplateInit (allBookmarkItems, bookmarks, activeFrame) {
-  return bookmarkItemsInit(allBookmarkItems, bookmarks, activeFrame)
+  const template = bookmarkItemsInit(allBookmarkItems, bookmarks, activeFrame)
+  template.push({
+    l10nLabelId: 'moreBookmarks',
+    click: function () {
+      windowActions.newFrame({ location: 'about:bookmarks' })
+      windowActions.setContextMenuDetail()
+    }
+  })
+  return template
 }
 
 function tabTemplateInit (frameProps) {
