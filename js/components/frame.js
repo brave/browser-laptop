@@ -26,6 +26,7 @@ const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 class Frame extends ImmutableComponent {
   constructor () {
     super()
+    this.previousLocation = 'about:newtab'
   }
 
   updateWebview () {
@@ -95,13 +96,23 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
+    const location = this.props.frame.get('location')
+    const prevLocation = prevProps.frame.get('location')
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
-    const didLocationChange = this.props.frame.get('location') !== prevProps.frame.get('location')
+    const didLocationChange = location !== prevLocation
     // When auto-redirecting to about:certerror, the frame location change and
     // frame src change are emitted separately. Make sure updateWebview is
     // called when the location changes.
-    if (didSrcChange || (didLocationChange && this.props.frame.get('location') === 'about:certerror')) {
+    if (didSrcChange || (didLocationChange && location === 'about:certerror')) {
       this.updateWebview()
+    }
+    if (didLocationChange && location !== 'about:certerror' &&
+        prevLocation !== 'about:certerror' &&
+        urlParse(prevLocation).host !== urlParse(location).host) {
+      // Keep track of one previous location so the cert error page can return to
+      // it. Don't record same-origin location changes because these will
+      // often end up re-triggering the cert error.
+      this.previousLocation = prevLocation
     }
     // give focus when switching tabs
     if (this.props.isActive && !prevProps.isActive) {
@@ -279,7 +290,9 @@ class Frame extends ImmutableComponent {
         // Don't send certDetails.cert since it is big and crashes the page
         this.webview.send(messages.CERT_DETAILS_UPDATED, {
           url: security.get('certDetails').url,
-          error: security.get('certDetails').error
+          error: security.get('certDetails').error,
+          previousLocation: this.previousLocation,
+          frameKey: this.props.frame.get('key')
         })
       }
       const protocol = urlParse(this.props.frame.get('location')).protocol

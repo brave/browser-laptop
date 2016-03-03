@@ -51,6 +51,16 @@ const AboutActions = {
   },
 
   /**
+   * Reject a certificate error.
+   *
+   * @param {Object} detail
+   */
+  rejectCertError: function (detail) {
+    const event = new window.CustomEvent(messages.CERT_ERROR_REJECTED, {detail})
+    window.dispatchEvent(event)
+  },
+
+  /**
    * Opens a context menu
    */
   contextMenu: function (nodeProps, contextMenuType, e) {

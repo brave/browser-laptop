@@ -31,7 +31,10 @@ class CertErrorPage extends React.Component {
   }
 
   onSafety () {
-    window.location.href = 'about:newtab'
+    aboutActions.rejectCertError({
+      previousLocation: this.state.certDetails.get('previousLocation'),
+      frameKey: this.state.certDetails.get('frameKey')
+    })
   }
 
   onAdvanced () {
