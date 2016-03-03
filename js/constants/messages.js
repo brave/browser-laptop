@@ -76,6 +76,7 @@ const messages = {
   // HTTPS
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
+  CERT_ERROR_REJECTED: _, /** @arg {string} url where a cert error was rejected */
   // Bookmarks
   IMPORT_BOOKMARKS: _
 }

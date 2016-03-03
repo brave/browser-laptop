@@ -149,6 +149,10 @@ class Main extends ImmutableComponent {
       })
     })
 
+    ipc.on(messages.CERT_ERROR_REJECTED, (e, previousLocation, frameKey) => {
+      windowActions.loadUrl(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey), previousLocation)
+    })
+
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {

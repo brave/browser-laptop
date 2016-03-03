@@ -184,6 +184,10 @@ app.on('ready', function () {
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
     })
 
+    ipcMain.on(messages.CERT_ERROR_REJECTED, (event, previousLocation, frameKey) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.CERT_ERROR_REJECTED, previousLocation, frameKey)
+    })
+
     AppStore.addChangeListener(() => {
       Menu.init(AppStore.getState().get('settings'))
     })
