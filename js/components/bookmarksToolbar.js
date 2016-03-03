@@ -187,20 +187,20 @@ class BookmarksToolbar extends ImmutableComponent {
       .forEach(url =>
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
-  updateBookmarkData () {
+  updateBookmarkData (props) {
     const maxItems = window.innerWidth / bookmarkMaxWidth | 0
-    const noParentItems = this.props.bookmarks
+    const noParentItems = props.bookmarks
       .filter(bookmark => !bookmark.get('parentFolderId'))
     this.bookmarksForToolbar = noParentItems.take(maxItems)
     this.overflowBookmarkItems = noParentItems.skip(maxItems).take(100)
   }
   componentWillMount () {
-    this.updateBookmarkData()
+    this.updateBookmarkData(this.props)
   }
-  componentWillUpdate (prevProps) {
-    if (prevProps.bookmarks !== this.props.bookmarks ||
-        prevProps.windowWidth !== this.props.windowWidth) {
-      this.updateBookmarkData()
+  componentWillUpdate (nextProps) {
+    if (nextProps.bookmarks !== this.props.bookmarks ||
+        nextProps.windowWidth !== this.props.windowWidth) {
+      this.updateBookmarkData(nextProps)
     }
   }
   onDragEnter (e) {
