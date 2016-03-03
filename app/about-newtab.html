@@ -4,14 +4,14 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self' 'unsafe-inline'; connect-src 'self' ws://localhost:*">
     <meta name="availableLanguages" content="en-US">
     <meta name="defaultLanguage" content="en-US">
     <title data-l10n-id="newTab"></title>
     <script>
       window.addEventListener('load', function () {
-        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        var po = document.createElement('script'); po.async = true;
         po.src = 'gen/aboutPages.entry.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
       })
