@@ -28,6 +28,7 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
+const showAbout = require('./aboutDialog').showAbout
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -223,6 +224,9 @@ app.on('ready', function () {
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+
+      process.on(messages.SHOW_ABOUT, showAbout)
+      ipcMain.on(messages.SHOW_ABOUT, showAbout)
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {

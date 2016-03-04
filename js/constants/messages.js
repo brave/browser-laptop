@@ -44,6 +44,7 @@ const messages = {
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
   CHECK_FOR_UPDATE: _,
+  SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
   // App state
   APP_INITIALIZED: _,

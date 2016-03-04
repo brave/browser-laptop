@@ -8,8 +8,6 @@ const appConfig = require('./constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
-const Channel = require('../app/channel')
-const path = require('path')
 
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = appConfig.resourceNames.ADBLOCK
@@ -29,15 +27,12 @@ try {
 }
 
 let app
-let dialog
 let BrowserWindow
 if (process.type === 'browser') {
   app = electron.app
-  dialog = electron.dialog
   BrowserWindow = electron.BrowserWindow
 } else {
   app = electron.remote.app
-  dialog = electron.remote.dialog
   BrowserWindow = electron.remote.BrowserWindow
 }
 
@@ -202,15 +197,11 @@ module.exports.bookmarksToolbarMenuItem = () => {
 module.exports.aboutBraveMenuItem = {
   label: 'About ' + appConfig.name,
   click: (item, focusedWindow) => {
-    dialog.showMessageBox({
-      title: 'Brave',
-      message: 'Version: ' + app.getVersion() + '\n' +
-        'Electron: ' + process.versions['atom-shell'] + '\n' +
-        'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
-        'Channel: ' + Channel.channel(),
-      icon: path.join(__dirname, '..', 'app', 'img', 'braveAbout.png'),
-      buttons: ['Ok']
-    })
+    if (process.type === 'browser') {
+      process.emit(messages.SHOW_ABOUT)
+    } else {
+      electron.ipcRenderer.send(messages.SHOW_ABOUT)
+    }
   }
 }
 
