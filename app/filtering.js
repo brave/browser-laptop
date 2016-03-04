@@ -216,7 +216,7 @@ function initForPartition (partition) {
 }
 
 module.exports.init = () => {
-  ['', 'private-1', 'main-1'].forEach(partition => {
+  ['', 'main-1'].forEach(partition => {
     initForPartition(partition)
   })
   let initializedPartitions = {}

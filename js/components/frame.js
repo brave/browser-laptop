@@ -68,10 +68,13 @@ class Frame extends ImmutableComponent {
         }
       })
     }
+    let partition
     if (this.props.frame.get('isPrivate')) {
-      this.webview.setAttribute('partition', 'private-1')
+      partition = 'private-1'
     } else if (this.props.frame.get('partitionNumber')) {
-      let partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+      partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+    }
+    if (partition) {
       ipc.send(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
     }
