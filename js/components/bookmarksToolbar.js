@@ -39,7 +39,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         partitionNumber: this.props.bookmark.get('partitionNumber')
       }, false)
     } else {
-      windowActions.newFrame(this.props.activeFrame, this.props.bookmark.get('location'))
+      windowActions.loadUrl(this.props.activeFrame, this.props.bookmark.get('location'))
     }
   }
 
