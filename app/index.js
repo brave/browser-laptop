@@ -59,7 +59,13 @@ const saveIfAllCollected = () => {
     // and not restart
     if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
         appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
-      appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+      // In this case on win32, the process doesn't try to auto restart, so avoid the user
+      // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
+      if (process.platform === 'win32') {
+        appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
+      } else {
+        appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+      }
     }
 
     SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
