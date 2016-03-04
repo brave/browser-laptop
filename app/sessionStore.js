@@ -38,7 +38,10 @@ const getSetting = require('../js/settings').getSetting
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    const startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    let startupModeSettingValue
+    if (require('../js/stores/appStore').getState()) {
+      startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    }
     const savePerWindowState = startupModeSettingValue === undefined ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
