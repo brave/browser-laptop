@@ -208,7 +208,7 @@ module.exports.aboutBraveMenuItem = {
         'Electron: ' + process.versions['atom-shell'] + '\n' +
         'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
         'Channel: ' + Channel.channel(),
-      icon: path.join(__dirname, '..', 'app', 'img', 'braveBtn3x.png'),
+      icon: path.join(__dirname, '..', 'app', 'img', 'braveAbout.png'),
       buttons: ['Ok']
     })
   }
