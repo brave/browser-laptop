@@ -99,16 +99,14 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (folderId) {
     site = site.set('folderId', Number(folderId))
   }
-  if (siteDetail.get('parentFolderId')) {
-    site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId')))
+  if (siteDetail.get('parentFolderId') || oldSite && oldSite.get('parentFolderId')) {
+    site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId') || oldSite.get('parentFolderId')))
   }
-  if (siteDetail.get('customTitle')) {
-    site = site.set('customTitle', siteDetail.get('customTitle'))
-  } else if (oldSite && oldSite.get('customTitle')) {
-    site = site.set('customTitle', oldSite.get('customTitle'))
+  if (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')) {
+    site = site.set('customTitle', siteDetail.get('customTitle') || oldSite.get('customTitle'))
   }
-  if (siteDetail.get('partitionNumber')) {
-    site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber')))
+  if (siteDetail.get('partitionNumber') || oldSite && oldSite.get('partitionNumber')) {
+    site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber') || oldSite.get('partitionNumber')))
   }
 
   if (index === -1) {
