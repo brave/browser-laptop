@@ -340,6 +340,7 @@ class Main extends ImmutableComponent {
             ? <AddEditBookmark sites={this.props.appState.get('sites')}
                 currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
                 originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+                destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}
               />
             : null
           }
@@ -370,7 +371,7 @@ class Main extends ImmutableComponent {
           allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame)}>
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
                 tabsPerTabPage={tabsPerPage}

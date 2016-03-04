@@ -295,6 +295,9 @@ const handleAppAction = (action) => {
       } else {
         appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
       }
+      if (action.destinationDetail) {
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false))
+      }
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()

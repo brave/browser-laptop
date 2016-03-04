@@ -531,12 +531,14 @@ const windowActions = {
    * If set, also indicates that add/edit is shown
    * @param {Object} currentDetail - Properties of the bookmark to change to
    * @param {Object} originalDetail - Properties of the bookmark to edit
+   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
    */
-  setBookmarkDetail: function (currentDetail, originalDetail) {
+  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
       currentDetail,
-      originalDetail
+      originalDetail,
+      destinationDetail
     })
   },
 

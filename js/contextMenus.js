@@ -28,7 +28,7 @@ const addBookmarkMenuItem = (siteDetail, parentSiteDetail) => {
     label: 'Add Bookmark...',
     click: () => {
       siteDetail = siteDetail.set('parentFolderId', parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId')))
-      windowActions.setBookmarkDetail(siteDetail)
+      windowActions.setBookmarkDetail(siteDetail, undefined, parentSiteDetail)
     }
   }
 }
@@ -40,7 +40,7 @@ const addFolderMenuItem = (parentSiteDetail) => {
       const emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER],
         parentFolderId: parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId'))
       })
-      windowActions.setBookmarkDetail(emptyFolder)
+      windowActions.setBookmarkDetail(emptyFolder, undefined, parentSiteDetail)
     }
   }
 }
@@ -75,13 +75,13 @@ function inputTemplateInit (e) {
   return getEditableItems(hasSelection)
 }
 
-function tabsToolbarTemplateInit (activeFrame) {
+function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail) {
   return [
     CommonMenu.bookmarksMenuItem,
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK)),
-    addFolderMenuItem()
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail),
+    addFolderMenuItem(closestDestinationDetail)
   ]
 }
 
@@ -489,9 +489,9 @@ export function onTabContextMenu (frameProps, e) {
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (activeFrame, e) {
+export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 

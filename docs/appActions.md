@@ -39,7 +39,7 @@ Dispatches an event to the main process to update the browser
 
 
 
-### addSite(siteDetail, tag, originalSiteDetail) 
+### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent) 
 
 Adds a site to the site list
 
@@ -50,6 +50,8 @@ Adds a site to the site list
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
 **originalSiteDetail**: `string`, If specified, the original site detail to edit / overwrite.
+
+**destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
 
 
@@ -83,9 +85,9 @@ Dispatches a message to move a site locations.
 **destinationDetail**: `string`, the location, partitionNumber, etc of the destination moved site
 
 **prepend**: `boolean`, Whether or not to prepend to the destinationLocation
+  If false, the destinationDetail is considered a sibling.
 
 **destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
-  If false, the destinationDetail is considered a sibling.
 
 
 

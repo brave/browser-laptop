@@ -359,7 +359,7 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(currentDetail, originalDetail) 
+### setBookmarkDetail(currentDetail, originalDetail, destinationDetail) 
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
@@ -369,6 +369,8 @@ If set, also indicates that add/edit is shown
 **currentDetail**: `Object`, Properties of the bookmark to change to
 
 **originalDetail**: `Object`, Properties of the bookmark to edit
+
+**destinationDetail**: `Object`, Will move the added bookmark to the specified position
 
 
 

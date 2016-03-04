@@ -65,19 +65,19 @@ class AddEditBookmark extends ImmutableComponent {
     } else {
       currentDetail = currentDetail.set('customTitle', e.target.value)
     }
-    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
+    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onLocationChange (e) {
     const currentDetail = this.props.currentDetail.set('location', e.target.value)
-    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
+    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onParentFolderChange (e) {
     const currentDetail = this.props.currentDetail.set('parentFolderId', e.target.value)
-    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail)
+    windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onSave () {
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
-    appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail)
+    appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
     this.onClose()
   }
   render () {

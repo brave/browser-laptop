@@ -228,6 +228,10 @@ class BookmarksToolbar extends ImmutableComponent {
   onMoreBookmarksMenu (e) {
     contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.props.bookmarks, this.overflowBookmarkItems, e)
   }
+  onContextMenu (e) {
+    const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter(x => !!x), e.clientX).selectedRef
+    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, e)
+  }
   render () {
     this.bookmarkRefs = []
     return <div
@@ -238,7 +242,7 @@ class BookmarksToolbar extends ImmutableComponent {
       onDrop={this.onDrop.bind(this)}
       onDragEnter={this.onDragEnter.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.activeFrame)}>
+      onContextMenu={this.onContextMenu.bind(this)}>
     {
         this.bookmarksForToolbar.map(bookmark =>
           <BookmarkToolbarButton
