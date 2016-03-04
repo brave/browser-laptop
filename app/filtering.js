@@ -114,8 +114,8 @@ function registerForBeforeSendHeaders (session) {
         requestHeaders['Cookie'] = undefined
         customHeaders = true
       }
-      if (requestHeaders['Referer']) {
-        requestHeaders['Referer'] = refererExceptions.includes(hostname) ? 'http://localhost' : undefined
+      if (requestHeaders['Referer'] && !refererExceptions.includes(hostname)) {
+        requestHeaders['Referer'] = undefined
         customHeaders = true
       }
     }
