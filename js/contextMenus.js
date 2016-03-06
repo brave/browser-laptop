@@ -173,9 +173,19 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
           appActions.moveSite(bookmarkItem, site, dndData.shouldPrependVerticalItem(e.target, e.clientY))
         }
       },
-      click: function () {
+      click: function (e) {
         if (!isFolder) {
-          windowActions.loadUrl(activeFrame, site.get('location'))
+          const isDarwin = process.platform === 'darwin'
+          if (e.ctrlKey && !isDarwin ||
+              e.metaKey && isDarwin ||
+              e.button === 1) {
+            windowActions.newFrame({
+              location: site.get('location'),
+              partitionNumber: site && site.get && site.get('partitionNumber') || undefined
+            }, false)
+          } else {
+            windowActions.loadUrl(activeFrame, site.get('location'))
+          }
           windowActions.setContextMenuDetail()
         }
       }
