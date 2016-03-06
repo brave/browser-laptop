@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// UPDATE_HOST should be set to the host name for the auto-updater server
-const updateHost = process.env.UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
-const winUpdateHost = process.env.WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
-const crashURL = process.env.CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
+// BRAVE_UPDATE_HOST should be set to the host name for the auto-updater server
+const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
+const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
+const crashURL = process.env.BRAVE_CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
 
 module.exports = {
   name: 'Brave',
