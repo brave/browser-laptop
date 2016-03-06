@@ -9,7 +9,7 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
@@ -20,7 +20,7 @@ const dialog = electron.dialog
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 
-const trasnparent1PxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
@@ -58,7 +58,7 @@ function registerForBeforeRequest (session) {
         BrowserWindow.getAllWindows().forEach(wnd =>
           wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
         if (details.resourceType === 'image') {
-          cb({ redirectURL: trasnparent1PxGif })
+          cb({ redirectURL: transparent1pxGif })
         } else {
           cb({ cancel: true })
         }
@@ -106,7 +106,7 @@ function registerForBeforeSendHeaders (session) {
     }
 
     let hostname = urlParse(details.url || '').hostname
-    if (module.exports.isResourceEnabled(AppConfig.resourceNames.COOKIEBLOCK) &&
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK) &&
         module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
                                         hostname)) {
       // Clear cookie and referer on third-party requests
@@ -114,8 +114,8 @@ function registerForBeforeSendHeaders (session) {
         requestHeaders['Cookie'] = undefined
         customHeaders = true
       }
-      if (requestHeaders['Referer']) {
-        requestHeaders['Referer'] = refererExceptions.includes(hostname) ? 'http://localhost' : undefined
+      if (requestHeaders['Referer'] && !refererExceptions.includes(hostname)) {
+        requestHeaders['Referer'] = undefined
         customHeaders = true
       }
     }
@@ -216,7 +216,7 @@ function initForPartition (partition) {
 }
 
 module.exports.init = () => {
-  ['', 'private-1', 'main-1'].forEach(partition => {
+  ['', 'main-1'].forEach(partition => {
     initForPartition(partition)
   })
   let initializedPartitions = {}
@@ -232,7 +232,7 @@ module.exports.init = () => {
 module.exports.isResourceEnabled = (resourceName) => {
   const enabledFromState = AppStore.getState().getIn([resourceName, 'enabled'])
   if (enabledFromState === undefined) {
-    return AppConfig[resourceName].enabled
+    return appConfig[resourceName].enabled
   }
   return enabledFromState
 }

@@ -9,7 +9,7 @@ const electron = require('electron')
 const app = electron.app
 const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
 let appInitialized = false
 
 app.on('will-finish-launching', function () {
@@ -29,7 +29,7 @@ app.on('will-finish-launching', function () {
       if (wnd) {
         wnd.webContents.send(messages.SHORTCUT_NEW_FRAME, path)
       } else {
-        AppActions.newWindow(Immutable.fromJS({
+        appActions.newWindow(Immutable.fromJS({
           location: path
         }))
       }

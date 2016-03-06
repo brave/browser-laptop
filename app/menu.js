@@ -5,7 +5,7 @@
 'use strict'
 
 const electron = require('electron')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
@@ -21,11 +21,11 @@ const isDarwin = process.platform === 'darwin'
 
 const aboutUrl = 'https://brave.com/'
 
-const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
-const adblock = AppConfig.resourceNames.ADBLOCK
-const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
-const adInsertion = AppConfig.resourceNames.AD_INSERTION
-const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = appConfig.resourceNames.ADBLOCK
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
+const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 
 let menuArgs = {}
 
@@ -400,28 +400,7 @@ const init = (settingsState, args) => {
         CommonMenu.bookmarksMenuItem,
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        {
-          label: 'Import Bookmarks (from HTML export)',
-          click: function (item, focusedWindow) {
-            if (electron.BrowserWindow.getAllWindows().length === 0) {
-              appActions.newWindow(undefined, undefined, undefined, function () {
-                // The timeout here isn't necessary but giving the window a bit of time to popup
-                // before the modal file picker pops up seems to work nicer.
-                setTimeout(() =>
-                  CommonMenu.sendToFocusedWindow(electron.BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
-              })
-              return
-            }
-            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.IMPORT_BOOKMARKS])
-          }
-          /*
-          submenu: [
-            {label: 'Google Chrome...'},
-            {label: 'Firefox...'},
-            {label: 'Safari...'}
-          ]
-          */
-        }
+        CommonMenu.importBookmarksMenuItem
       ]
     },
     CommonMenu.buildBraveryMenu({
@@ -497,7 +476,7 @@ const init = (settingsState, args) => {
 
   if (isDarwin) {
     template.unshift({
-      label: AppConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
+      label: appConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
         CommonMenu.aboutBraveMenuItem,
         CommonMenu.separatorMenuItem,
@@ -510,7 +489,7 @@ const init = (settingsState, args) => {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
+              [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
           }
         },
         CommonMenu.separatorMenuItem,
@@ -520,7 +499,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: 'Hide ' + AppConfig.name,
+          label: 'Hide ' + appConfig.name,
           accelerator: 'Command+H',
           role: 'hide'
         }, {

@@ -5,10 +5,10 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 import top500 from './../data/top500.js'
 const {isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 import Immutable from 'immutable'
@@ -50,8 +50,8 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   blur () {
     window.removeEventListener('click', this)
-    WindowActions.setUrlBarSuggestions(null, null)
-    WindowActions.setUrlBarPreview(null)
+    windowActions.setUrlBarSuggestions(null, null)
+    windowActions.setUrlBarPreview(null)
   }
 
   clickSelected (e) {
@@ -121,15 +121,15 @@ class UrlBarSuggestions extends ImmutableComponent {
       if (ctrlKey && !isDarwin ||
           metaKey && isDarwin ||
           e.button === 1) {
-        WindowActions.newFrame({
+        windowActions.newFrame({
           location,
           partitionNumber: site && site.get && site.get('partitionNumber') || undefined
         }, false)
         e.preventDefault()
-        WindowActions.setNavBarFocused(true)
+        windowActions.setNavBarFocused(true)
       } else {
-        WindowActions.loadUrl(this.props.activeFrameProps, location)
-        WindowActions.setUrlBarActive(false)
+        windowActions.loadUrl(this.props.activeFrameProps, location)
+        windowActions.setUrlBarActive(false)
         this.blur()
       }
     }
@@ -161,10 +161,10 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.frames,
-        maxResults: Config.urlBarSuggestions.maxOpenedFrames,
+        maxResults: config.urlBarSuggestions.maxOpenedFrames,
         classHandler: () => 'fa-file',
         clickHandler: (frameProps) =>
-          WindowActions.setActiveFrame(frameProps),
+          windowActions.setActiveFrame(frameProps),
         formatTitle: frame => frame.get('title') || frame.get('location'),
         filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
@@ -176,7 +176,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
-        maxResults: Config.urlBarSuggestions.maxSites,
+        maxResults: config.urlBarSuggestions.maxSites,
         classHandler: getSiteIconClass,
         clickHandler: navigateClickHandler(site => {
           return site.get('location')
@@ -199,7 +199,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.HISTORY_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
-        maxResults: Config.urlBarSuggestions.maxSites,
+        maxResults: config.urlBarSuggestions.maxSites,
         classHandler: getSiteIconClass,
         clickHandler: navigateClickHandler(site => {
           return site.get('location')
@@ -222,7 +222,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (this.props.searchSuggestions) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.suggestions.get('searchResults'),
-        maxResults: Config.urlBarSuggestions.maxTopSites,
+        maxResults: config.urlBarSuggestions.maxTopSites,
         classHandler: () => 'fa-search',
         clickHandler: navigateClickHandler(searchTerms => this.props.searchDetail.get('searchURL')
           .replace('{searchTerms}', searchTerms))}))
@@ -231,7 +231,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Alexa top 500
     suggestions = suggestions.concat(mapListToElements({
       data: top500,
-      maxResults: Config.urlBarSuggestions.maxSearch,
+      maxResults: config.urlBarSuggestions.maxSearch,
       classHandler: () => 'fa-link',
       clickHandler: navigateClickHandler(x => x)}))
 
@@ -242,15 +242,15 @@ class UrlBarSuggestions extends ImmutableComponent {
     const suggestions = this.suggestionList || this.props.suggestions.get('suggestionList')
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
-      WindowActions.setUrlBarPreview(null)
+      windowActions.setUrlBarPreview(null)
       newIndex = null
     } else {
       const currentActive = suggestions.get(newIndex - 1)
       if (currentActive && currentActive.title) {
-        WindowActions.setUrlBarPreview(currentActive.title)
+        windowActions.setUrlBarPreview(currentActive.title)
       }
     }
-    WindowActions.setUrlBarSuggestions(suggestions, newIndex)
+    windowActions.setUrlBarSuggestions(suggestions, newIndex)
   }
 
   searchXHR () {
@@ -267,11 +267,11 @@ class UrlBarSuggestions extends ImmutableComponent {
       xhr.responseType = 'json'
       xhr.send()
       xhr.onload = () => {
-        WindowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
+        windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
         this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
       }
     } else {
-      WindowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
+      windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
       this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
     }
   }

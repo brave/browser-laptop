@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.0](https://github.com/brave/browser-laptop/releases/v0.8.0dev)
+- Bookmark management: Bookmark folders added, drag and drop bookmarks and folders from within the Bookmark Toolbar and Bookmark Manager.
+- Ability to import bookmarks from a Firefox or Chrome HTML export.
+- History is now remembered for better autocomplete results.
+- Permission dialogs added for sites wanting to request special permissions.
+- Various shortcuts added for each platform.
+- Support added for mouse back/forward web buttons.
+- Window is now maximized when navigation bar is double clicked.
+- Mouse middle clicking on bookmarks now opens the link in a new tab.
+- Adblock and tracking protection fixed for non default sessions.
+- Various cert warning page fixes.
+- Don’t show context menu if a page has its own (Google docs).
+- Added Home menu item and shortcut to go to home page.
+- Added Clear history menu item.
+- Help menu added to the hamburger menu.
+- Various top level menu items now work when there are no windows open.
+- Links opened from the context menu item “Open in new tab”  now retains private / session it was opened from.
+- Extra protection against badly downloaded adblock, tracking protection, and https everywhere data files.
+- Image blocking now replaces images with a 1px transparent local data url instead of blocking the request for better site compat (macworld.com).
+- about: pages now have an icon so they can look better when pinned.
+- Multiple update channel support added for future builds (beta, release channel support).
+- Various other improvements and fixes.
+
 ## [0.7.16](https://github.com/brave/browser-laptop/releases/v0.7.16dev)
 - Spotty text selection in URL bar fix.
 - Added restore last closed window.

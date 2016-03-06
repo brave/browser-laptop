@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Immutable from 'immutable'
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 const urlParse = require('url').parse
 
 export function isFrameKeyActive (windowState, frameKey) {
@@ -145,12 +145,12 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
  * @return Immutable top level application state ready to merge back in
  */
 export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
-  const url = frameOpts.location || Config.defaultUrl
+  const url = frameOpts.location || config.defaultUrl
   const navbarFocus = activeFrameKey === newKey &&
-                      url === Config.defaultUrl &&
+                      url === config.defaultUrl &&
                       frameOpts.delayedLoadUrl === undefined
   const frame = Immutable.fromJS({
-    zoomLevel: Config.zoom.defaultValue,
+    zoomLevel: config.zoom.defaultValue,
     audioMuted: false, // frame is muted
     canGoBack: false,
     canGoForward: false,
@@ -244,7 +244,7 @@ export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
     if (frameProps.get('thumbnailBlob')) {
       window.URL.revokeObjectURL(frameProps.get('thumbnailBlob'))
     }
-    if (closedFrames.size > Config.maxClosedFrames) {
+    if (closedFrames.size > config.maxClosedFrames) {
       closedFrames = closedFrames.shift()
     }
   }
@@ -276,7 +276,7 @@ export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
  */
 export function removeOtherFrames (frames, closedFrames, frameProps) {
   closedFrames = closedFrames.concat(frames.filter(currentFrameProps => !currentFrameProps.get('isPrivate') && currentFrameProps.get('key') !== frameProps.get('key')))
-    .take(Config.maxClosedFrames)
+    .take(config.maxClosedFrames)
   closedFrames.forEach(currentFrameProps => {
     if (currentFrameProps.get('thumbnailBlob')) {
       window.URL.revokeObjectURL(currentFrameProps.get('thumbnailBlob'))

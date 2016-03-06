@@ -15,7 +15,7 @@ const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 
@@ -26,6 +26,7 @@ const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 class Frame extends ImmutableComponent {
   constructor () {
     super()
+    this.previousLocation = 'about:newtab'
   }
 
   updateWebview () {
@@ -36,8 +37,10 @@ class Frame extends ImmutableComponent {
       : ''
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
+    let aboutPreload = false
     if (['about:preferences', 'about:bookmarks', 'about:certerror'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
+      aboutPreload = true
     }
 
     contentScripts = contentScripts.join(',')
@@ -56,10 +59,22 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
+    // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
+    // automatically while keeping the content script loaded.
+    if (aboutPreload) {
+      this.webviewContainer.addEventListener('drop', (e) => {
+        if (e.dataTransfer.getData('text/uri-list')) {
+          e.preventDefault()
+        }
+      })
+    }
+    let partition
     if (this.props.frame.get('isPrivate')) {
-      this.webview.setAttribute('partition', 'private-1')
+      partition = 'private-1'
     } else if (this.props.frame.get('partitionNumber')) {
-      let partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+      partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+    }
+    if (partition) {
       ipc.send(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
     }
@@ -84,13 +99,23 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
+    const location = this.props.frame.get('location')
+    const prevLocation = prevProps.frame.get('location')
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
-    const didLocationChange = this.props.frame.get('location') !== prevProps.frame.get('location')
+    const didLocationChange = location !== prevLocation
     // When auto-redirecting to about:certerror, the frame location change and
     // frame src change are emitted separately. Make sure updateWebview is
     // called when the location changes.
-    if (didSrcChange || (didLocationChange && this.props.frame.get('location') === 'about:certerror')) {
+    if (didSrcChange || (didLocationChange && location === 'about:certerror')) {
       this.updateWebview()
+    }
+    if (didLocationChange && location !== 'about:certerror' &&
+        prevLocation !== 'about:certerror' &&
+        urlParse(prevLocation).host !== urlParse(location).host) {
+      // Keep track of one previous location so the cert error page can return to
+      // it. Don't record same-origin location changes because these will
+      // often end up re-triggering the cert error.
+      this.previousLocation = prevLocation
     }
     // give focus when switching tabs
     if (this.props.isActive && !prevProps.isActive) {
@@ -268,7 +293,9 @@ class Frame extends ImmutableComponent {
         // Don't send certDetails.cert since it is big and crashes the page
         this.webview.send(messages.CERT_DETAILS_UPDATED, {
           url: security.get('certDetails').url,
-          error: security.get('certDetails').error
+          error: security.get('certDetails').error,
+          previousLocation: this.previousLocation,
+          frameKey: this.props.frame.get('key')
         })
       }
       const protocol = urlParse(this.props.frame.get('location')).protocol
@@ -333,7 +360,7 @@ class Frame extends ImmutableComponent {
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
-    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
+    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
   }
 
   goBack () {
@@ -347,6 +374,7 @@ class Frame extends ImmutableComponent {
   onFocus () {
     windowActions.setTabPageIndexByFrame(this.props.frame)
     windowActions.setUrlBarActive(false)
+    windowActions.setContextMenuDetail()
   }
 
   onFindHide () {

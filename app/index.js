@@ -28,6 +28,7 @@ const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
+const showAbout = require('./aboutDialog').showAbout
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -57,17 +58,23 @@ const saveIfAllCollected = () => {
 
     // If the status is still UPDATE_AVAILABLE then the user wants to quit
     // and not restart
-    if (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
-        appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED) {
-      appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+    if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
+        appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
+      // In this case on win32, the process doesn't try to auto restart, so avoid the user
+      // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
+      if (process.platform === 'win32') {
+        appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
+      } else {
+        appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+      }
     }
 
     SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
       sessionStateStoreAttempted = true
       // If there's an update to apply, then do it here.
       // Otherwise just quit.
-      if (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
-          appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART) {
+      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
+          appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
         Updater.quitAndInstall()
       } else {
         app.quit()
@@ -175,9 +182,17 @@ app.on('ready', function () {
       appActions.changeSetting(key, value)
     })
 
+    ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
+      appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
+    })
+
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
       acceptCertUrls[url] = true
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
+    })
+
+    ipcMain.on(messages.CERT_ERROR_REJECTED, (event, previousLocation, frameKey) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.CERT_ERROR_REJECTED, previousLocation, frameKey)
     })
 
     AppStore.addChangeListener(() => {
@@ -203,12 +218,15 @@ app.on('ready', function () {
       if (err) throw new Error('package.json could not be accessed')
 
       // Setup the auto updater, check the env variable first because it's
-      // used to cehck the update channel before releases.
+      // used to check the update channel before releases.
       Updater.init(process.platform, process.env.BRAVE_UPDATE_VERSION || pack.version)
 
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
+
+      process.on(messages.SHOW_ABOUT, showAbout)
+      ipcMain.on(messages.SHOW_ABOUT, showAbout)
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {

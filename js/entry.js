@@ -12,6 +12,7 @@ require('../css/findbar.less')
 require('../css/dialogs.less')
 require('../css/updateBar.less')
 require('../css/bookmarksToolbar.less')
+require('../less/contextMenu.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')

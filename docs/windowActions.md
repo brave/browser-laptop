@@ -247,20 +247,6 @@ Dispatches a message to the store to update the back-forward information.
 
 
 
-### setIsBeingDragged(dragType, sourceDragData, dragging) 
-
-Dispatches a message to the store to indicate that dragging has started / stopped for the item.
-
-**Parameters**
-
-**dragType**: `string`, The type of drag operation being performed
-
-**sourceDragData**: `Object`, the properties for the item being dragged
-
-**dragging**: `boolean`, true if the item is being dragged.
-
-
-
 ### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail) 
 
 Dispatches a message to the store to indicate that something is dragging over this item.
@@ -373,7 +359,7 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(currentDetail, originalDetail) 
+### setBookmarkDetail(currentDetail, originalDetail, destinationDetail) 
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
@@ -383,6 +369,19 @@ If set, also indicates that add/edit is shown
 **currentDetail**: `Object`, Properties of the bookmark to change to
 
 **originalDetail**: `Object`, Properties of the bookmark to edit
+
+**destinationDetail**: `Object`, Will move the added bookmark to the specified position
+
+
+
+### setContextMenuDetail(detail) 
+
+Dispatches a message to set context menu detail.
+If set, also indicates that the context menu is shown.
+
+**Parameters**
+
+**detail**: `Object`, The context menu detail
 
 
 

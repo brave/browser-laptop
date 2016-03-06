@@ -7,12 +7,12 @@
 const URL = require('url')
 const Filtering = require('./filtering')
 const siteHacks = require('../js/data/siteHacks')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 
 const resourceName = 'siteHacks'
 
 module.exports.init = () => {
-  if (!AppConfig[resourceName].enabled) {
+  if (!appConfig[resourceName].enabled) {
     return
   }
   Filtering.registerBeforeSendHeadersFilteringCB(details => {

@@ -125,7 +125,6 @@ WindowStore
       passiveMixedContent: boolean, // has passive mixed content
     },
     parentFrameKey: number, // the key of the frame this frame was opened from
-    contextMenuDetail: {...},
     modalPromptDetail: {...},
     basicAuthDetail: {...},
     findDetail: {
@@ -157,7 +156,6 @@ WindowStore
     mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
     dragging: {
       dragType: string, // tab, bookmark
-      sourceDragData: Object, // frameProps or bookmarkDetail
       draggingOver: {
         draggingOverLeft: boolean,
         draggingOverRight: boolean,
@@ -183,5 +181,24 @@ WindowStore
     currentDetail: object, // Detail of the current bookmark which is in add/edit mode
     originalDetails: object // Detail of the original bookmark to edit
   },
+  contextMenuDetail: {
+    left: number, // the left position of the context menu
+    right: number, // the right position of the context menu
+    top: number, // the top position of the context menu
+    bottom: number, // the bottom position of the context menu
+    maxHeight: number, // the maximum height of the context menu
+    template: [{
+      label: string, // label of context menu item
+      click: function, // callback for the context menu to call when clicked
+      dragOver: function, // callback for when something is dragged over this item
+      drop: function, // callback for when something is dropped on this item
+    }],
+    openedSubmenuDetails: [{
+      y: number, // the relative y position
+      template: [
+        // per above
+      ]
+    }]
+  }
 }
 ```

@@ -26,10 +26,11 @@ const SiteInfo = require('./siteInfo')
 const AddEditBookmark = require('./addEditBookmark')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
+const ContextMenu = require('./contextMenu')
 
 // Constants
-const Config = require('../constants/config')
-const AppConfig = require('../constants/appConfig')
+const config = require('../constants/config')
+const appConfig = require('../constants/appConfig')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
@@ -106,7 +107,7 @@ class Main extends ImmutableComponent {
 
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
       windowActions.newFrame({
-        location: url || Config.defaultUrl,
+        location: url || config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
       }, openInForeground)
@@ -146,6 +147,10 @@ class Main extends ImmutableComponent {
         })
         windowActions.loadUrl(frame, 'about:certerror')
       })
+    })
+
+    ipc.on(messages.CERT_ERROR_REJECTED, (e, previousLocation, frameKey) => {
+      windowActions.loadUrl(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey), previousLocation)
     })
 
     this.loadOpenSearch()
@@ -188,10 +193,10 @@ class Main extends ImmutableComponent {
 
   onHamburgerMenu (e) {
     let braverySettings = {}
-    Object.keys(AppConfig.resourceNames).forEach((name) => {
-      let value = AppConfig.resourceNames[name]
+    Object.keys(appConfig.resourceNames).forEach((name) => {
+      let value = appConfig.resourceNames[name]
       let enabled = this.props.appState.getIn([value, 'enabled'])
-      braverySettings[value] = enabled === undefined ? AppConfig[value].enabled : enabled
+      braverySettings[value] = enabled === undefined ? appConfig[value].enabled : enabled
     })
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
@@ -210,7 +215,7 @@ class Main extends ImmutableComponent {
   get enableAds () {
     let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
-      enabled = AppConfig.adInsertion.enabled
+      enabled = appConfig.adInsertion.enabled
     }
     return enabled
   }
@@ -246,6 +251,17 @@ class Main extends ImmutableComponent {
     }
   }
 
+  onMouseDown (e) {
+    let node = e.target
+    while (node) {
+      if (node.classList && node.classList.contains('contextMenu')) {
+        return
+      }
+      node = node.parentNode
+    }
+    windowActions.setContextMenuDetail()
+  }
+
   onClickWindow (e) {
     // Check for an ancestor of urlbarForm or urlBarSuggestions and if none are found
     // then set the URL bar as non active (no autocomplete).
@@ -276,9 +292,19 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const sourceDragTabData = this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.TAB &&
-      this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])
-    return <div id='window' ref={node => this.mainWindow = node} onClick={this.onClickWindow.bind(this)}>
+    const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+    const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
+      !this.props.windowState.get('bookmarkDetail') &&
+      !siteInfoIsVisible &&
+      !releaseNotesIsVisible
+    return <div id='window'
+        ref={node => this.mainWindow = node}
+        onMouseDown={this.onMouseDown.bind(this)}
+        onClick={this.onClickWindow.bind(this)}>
+      { this.props.windowState.get('contextMenuDetail')
+        ? <ContextMenu
+            contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/> : null }
       <div className='top'>
         <div className='navigatorWrapper'
           onDoubleClick={this.onDoubleClick.bind(this)}
@@ -305,7 +331,7 @@ class Main extends ImmutableComponent {
             settings={settingsState}
             searchDetail={this.props.windowState.get('searchDetail')}
           />
-          { this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+          { siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
                 siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
@@ -313,10 +339,12 @@ class Main extends ImmutableComponent {
           { this.props.windowState.get('bookmarkDetail')
             ? <AddEditBookmark sites={this.props.appState.get('sites')}
                 currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}/>
+                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+                destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}
+              />
             : null
           }
-          { this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+          { releaseNotesIsVisible
             ? <ReleaseNotes
                 metadata={this.props.appState.getIn(['updates', 'metadata'])}
                 onHide={this.onHideReleaseNotes.bind(this)} /> : null
@@ -329,28 +357,30 @@ class Main extends ImmutableComponent {
         </div>
         { showBookmarksToolbar
           ? <BookmarksToolbar
-              sourceDragData={this.props.windowState.getIn(['ui', 'dragging', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'sourceDragData'])}
               draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+              shouldAllowWindowDrag={shouldAllowWindowDrag}
               activeFrame={activeFrame}
+              windowWidth={this.props.appState.get('defaultWindowWidth')}
+              contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
               bookmarks={this.props.appState.get('sites')
                 .filter(site => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
               }/>
           : null }
         <div className={cx({
           tabPages: true,
+          allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame)}>
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined)}>
           { nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
-                sourceDragData={sourceDragTabData}
                 tabsPerTabPage={tabsPerPage}
                 tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
               /> : null }
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
-          sourceDragData={sourceDragTabData}
+          shouldAllowWindowDrag={shouldAllowWindowDrag}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}

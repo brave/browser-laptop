@@ -6,8 +6,8 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 
 const Button = require('./button')
-const AppActions = require('../actions/appActions')
-const WindowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
+const windowActions = require('../actions/windowActions')
 const UpdateStatus = require('../constants/updateStatus')
 const remote = global.require('electron').remote
 const path = require('path')
@@ -35,7 +35,7 @@ class UpdateHello extends ImmutableComponent {
         case UpdateStatus.UPDATE_ERROR:
           break
       }
-      AppActions.setUpdateStatus(nextStatus)
+      appActions.setUpdateStatus(nextStatus)
     }
   }
 
@@ -61,7 +61,7 @@ class UpdateHide extends ImmutableComponent {
   render () {
     return <Button className='updateButton updateSecondaryButton'
       l10nId='updateHide'
-      onClick={AppActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false)} />
+      onClick={appActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false)} />
   }
 }
 
@@ -86,13 +86,13 @@ class UpdateAvailable extends ImmutableComponent {
       { this.props.metadata && this.props.metadata.get('notes')
         ? <Button className='updateButton updateDetails updateSecondaryButton'
             l10nId='updateDetails'
-            onClick={WindowActions.setReleaseNotesVisible.bind(null, true)} /> : null }
+            onClick={windowActions.setReleaseNotesVisible.bind(null, true)} /> : null }
       <Button className='updateButton updateLaterButton updateSecondaryButton'
         l10nId='updateLater'
-        onClick={AppActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false)} />
+        onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false)} />
       <Button className='updateButton updateNowButton'
         l10nId='updateNow'
-        onClick={AppActions.updateRequested} />
+        onClick={appActions.updateRequested} />
     </div>
   }
 }

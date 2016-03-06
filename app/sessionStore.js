@@ -17,7 +17,11 @@ const app = require('app')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const sessionStorageVersion = 1
-const sessionStorageName = `session-store-${sessionStorageVersion}`
+let suffix = ''
+if (process.env.NODE_ENV === 'development') {
+  suffix = '-dev'
+}
+const sessionStorageName = `session-store-${sessionStorageVersion}${suffix}`
 const storagePath = process.env.NODE_ENV !== 'test'
   ? path.join(app.getPath('userData'), sessionStorageName)
   : path.join(process.env.HOME, '.brave-test-session-store-1')
@@ -34,7 +38,10 @@ const getSetting = require('../js/settings').getSetting
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    const startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    let startupModeSettingValue
+    if (require('../js/stores/appStore').getState()) {
+      startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    }
     const savePerWindowState = startupModeSettingValue === undefined ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
@@ -62,8 +69,7 @@ module.exports.cleanSessionData = (sessionData) => {
     sessionData = {}
   }
   // Hide the context menu when we restore.
-  sessionData.contextMenuDetail = null
-
+  delete sessionData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
   delete sessionData.previewFrameKey
   // Don't restore add/edit dialog

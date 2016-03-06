@@ -2,59 +2,99 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const WindowActions = require('./actions/windowActions')
+const windowActions = require('./actions/windowActions')
 const ReactDOM = require('react-dom')
+const dndData = require('./dndData')
+const dragTypes = require('./constants/dragTypes')
 
-module.exports.onDragStart = (dragType, key, e) => {
+let inProcessDragData
+let inProcessDragType
+
+module.exports.getInProcessDragData = () => {
+  return inProcessDragData
+}
+
+module.exports.getInProcessDragType = () => {
+  return inProcessDragType
+}
+
+module.exports.onDragStart = (dragType, data, e) => {
   e.dataTransfer.effectAllowed = 'all'
-  WindowActions.setIsBeingDragged(dragType, key, true)
+  dndData.setupDataTransferBraveData(e.dataTransfer, dragType, data)
+  if (dragType === dragTypes.BOOKMARK) {
+    dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('customTitle') || data.get('title'))
+  }
+  inProcessDragData = data
+  inProcessDragType = dragType
 }
 
 module.exports.onDragEnd = (dragType, key) => {
-  WindowActions.setIsBeingDragged(dragType, key, false)
-  WindowActions.setIsBeingDraggedOverDetail(dragType)
+  windowActions.setIsBeingDraggedOverDetail(dragType)
+  windowActions.setContextMenuDetail()
+  inProcessDragData = undefined
+  inProcessDragType = undefined
 }
 
-module.exports.onDragOver = (dragType, sourceDragData, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {
+module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {
+  if (inProcessDragType !== dragType) {
+    return
+  }
+
   e.preventDefault()
   e.dataTransfer.dropEffect = 'move'
-
   // Otherise, only accept it if we have some frameProps
-  if (!sourceDragData) {
-    WindowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+  if (!dndData.hasDragData(e.dataTransfer, dragType)) {
+    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
       draggingOverLeftHalf: false,
       draggingOverRightHalf: false
     })
     return
   }
 
-  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + sourceBoundingRect.width / 2 &&
+  if (!sourceBoundingRect) {
+    return
+  }
+
+  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + sourceBoundingRect.width / 5 &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverLeftHalf'))) {
-    WindowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
       draggingOverLeftHalf: true,
       draggingOverRightHalf: false
     })
-  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + sourceBoundingRect.width / 2 &&
+    windowActions.setContextMenuDetail()
+  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + sourceBoundingRect.width / 5 &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverRightHalf'))) {
-    WindowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
       draggingOverLeftHalf: false,
       draggingOverRightHalf: true
     })
+    windowActions.setContextMenuDetail()
   }
 }
 
 module.exports.closestFromXOffset = (refs, x) => {
   let smallestValue = Number.MAX_VALUE
   let selectedRef
-  refs.forEach(ref => {
+  for (let ref of refs) {
     let refNode = ReactDOM.findDOMNode(ref)
-    let currentDistance = Math.abs(x - refNode.getBoundingClientRect().left)
+    let boundingRect = refNode.getBoundingClientRect()
+    if (x > boundingRect.left && x < boundingRect.right) {
+      return {
+        selectedRef: ref,
+        isDroppedOn: true
+      }
+    }
+    const rect = refNode.getBoundingClientRect()
+    let currentDistance = Math.abs(x - rect.left + (rect.right - rect.left))
     if (currentDistance < smallestValue) {
       smallestValue = currentDistance
       selectedRef = ref
     }
-  })
-  return selectedRef
+  }
+  return {
+    selectedRef,
+    isDroppedOn: false
+  }
 }
 
 module.exports.isLeftSide = (domNode, clientX) => {
@@ -62,8 +102,9 @@ module.exports.isLeftSide = (domNode, clientX) => {
   return Math.abs(clientX - boundingRect.left) < Math.abs(clientX - boundingRect.right)
 }
 
-module.exports.setupDataTransferURL = (dataTransfer, location, title) => {
-  dataTransfer.setData('text/plain', location)
-  dataTransfer.setData('text/uri-list', location)
-  dataTransfer.setData('text/html', `<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body><A HREF="${location}">${title || location}</A></body></html>`)
+module.exports.isMiddle = (domNode, clientX) => {
+  const boundingRect = domNode.getBoundingClientRect()
+  const isLeft = clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 3
+  const isRight = clientX > boundingRect.right - (boundingRect.right - boundingRect.left) / 3
+  return !isLeft && !isRight
 }
