@@ -65,12 +65,15 @@
   box-sizing: border-box;
   margin: 0 0 0 -114px;
   padding: 0;
-  position: relative;
+  position: absolute;
   display: flex;
   flex-direction: row;
   -webkit-user-select: none;
-  width: calc(~'100% - 215px');
-  display: none;
+  width: 600px;
+  display: block;
+  top: 300px;
+  left: 300px;
+  z-index: 1000;
 
   &.titleMode {
     margin-left: -130px;

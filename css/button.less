@@ -7,9 +7,9 @@
 span.browserButton {
   cursor: default;
   display: inline-block;
-  line-height: 30px;
-  width: 30px;
-  height: 30px;
+  line-height: 37px;
+  width: 37px;
+  height: 37px;
   font-size: 17px;
   color: @buttonColor;
   border-radius: 0;
@@ -36,14 +36,11 @@ span.browserButton {
 }
 
 span.browserButton.newFrameButton {
-  font-family: helvetica;
-  font-weight: 100;
-  font-size: 26px;
-  line-height: 30px;
+  text-indent: -1000em;
   width: 37px;
   height: 37px;
   vertical-align: middle;
-  background: rgba(0,0,0,.1)
+  background: rgba(0,0,0,.1) url("../app/img/icon-add.svg") center no-repeat;
 }
 
 .buttonCommon {
@@ -78,4 +75,12 @@ span.browserButton.subtleButton {
   font-size: 14px;
   background-color: #ccc;
   .buttonCommon;
+}
+
+span.browserButton.menu-button{
+  background: url("../app/img/icon-more.svg") center no-repeat;
+}
+
+span.browserButton:before{
+  display: none;
 }
