@@ -14,15 +14,16 @@
   z-index: 310;
 }
 
-.tabContainer {
+.tabStripContainer {
   display: flex;
   flex: 1;
   z-index: 2;
-  -webkit-app-region: drag;
-  >* {
-    -webkit-app-region: no-drag;
+  &.allowDragging {
+    -webkit-app-region: drag;
+    >* {
+      -webkit-app-region: no-drag;
+    }
   }
-
   .browserButton {
     height: 26px;
     line-height: 22px;
