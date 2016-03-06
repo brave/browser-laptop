@@ -330,7 +330,9 @@ function hamburgerTemplateInit (braverySettings) {
       label: 'Bookmarks',
       submenu: [
         CommonMenu.bookmarksMenuItem,
-        CommonMenu.bookmarksToolbarMenuItem()
+        CommonMenu.bookmarksToolbarMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.importBookmarksMenuItem
       ]
     },
     CommonMenu.separatorMenuItem,
