@@ -165,6 +165,139 @@
     })
   })
 
+  // Tries to detect username/password using roughly the heuristic from
+  // http://mxr.mozilla.org/firefox/source/toolkit/components/passwordmgr/src/nsLoginManager.js
+  document.addEventListener('DOMContentLoaded', (e) => {
+    // Don't autofill on non-HTTP(S) sites for now
+    if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
+      return
+    }
+
+    if (document.querySelectorAll('input[type=password]:not([autocomplete=off])').length === 0) {
+      // No password fields; abort
+      return
+    }
+
+    var formNodes = document.querySelectorAll('form:not([autocomplete=off])')
+    var formOrigin = [document.location.protocol, document.location.host].join('//')
+
+    // Map of action origin to [[password element, username element]]
+    var credentials = {}
+
+    Array.from(formNodes).forEach(form => {
+      var fields = getFormFields(form, false)
+      var action = form.action || document.location.href
+      var usernameElem = fields[0]
+      var passwordElem = fields[1]
+      if (passwordElem) {
+        if (credentials[action]) {
+          credentials[action].push([passwordElem, usernameElem])
+        } else {
+          credentials[action] = [[passwordElem, usernameElem]]
+        }
+        // Ask the main process for the credentials
+        ipcRenderer.send('get-password', formOrigin, action)
+        console.log('got password field', formOrigin, action, usernameElem, passwordElem)
+      }
+    })
+
+    ipcRenderer.on('got-password', (e, username, password, origin, action) => {
+      var elems = credentials[action]
+      if (formOrigin === origin && elems) {
+        elems.forEach((elem) => {
+          // Autofill password
+          elem[0].value = password
+          if (username && elem[1]) {
+            // Autofill the username if there is one
+            elem[1].value = username
+          }
+        })
+      }
+    })
+  })
+
+  /**
+   * Gets form fields.
+   * @param {Element} form - The form to inspect
+   * @param {boolean} isSubmission - Whether the form is being submitted
+   * @return {Array.<Element>}
+   */
+  function getFormFields (form, isSubmission) {
+    var passwords = getPasswordFields(form, isSubmission)
+
+    // We have no idea what is going on with a form that has 0 or >3 password fields
+    if (passwords.length === 0 || passwords.length > 3) {
+      return [null, null, null]
+    }
+
+    // Search backwards from first password field to find the username field
+    var previousSibling = passwords[0].previousSibling
+    var username = null
+    while (previousSibling) {
+      if (previousSibling.type === 'text' && previousSibling.autocomplete !== 'off') {
+        username = previousSibling
+        break
+      }
+      previousSibling = previousSibling.previousSibling
+    }
+
+    // If not a submission, autofill the first password field and ignore the rest
+    if (!isSubmission || passwords.length === 1) {
+      return [username, passwords[0], null]
+    }
+
+    // Otherwise, this is probably a password change form and we need to figure out
+    // what username/password combo to save.
+    var oldPassword = null
+    var newPassword = null
+    var value1 = passwords[0].value
+    var value2 = passwords[1].value
+    var value3 = passwords[2] ? passwords[2].value : ''
+
+    if (passwords.length === 2) {
+      if (value1 === value2) {
+        // Treat as if there were 1 pw field
+        newPassword = passwords[0]
+      } else {
+        oldPassword = passwords[0]
+        newPassword = passwords[1]
+      }
+    } else {
+      // There is probably a "confirm your password" field for the new
+      // password, so the new password is the one that is repeated.
+      if (value1 === value2 && value2 === value3) {
+        // Treat as if there were 1 pw field
+        newPassword = passwords[0]
+      } else if (value1 === value2) {
+        newPassword = passwords[0]
+        oldPassword = passwords[2]
+      } else if (value2 === value3) {
+        newPassword = passwords[2]
+        oldPassword = passwords[0]
+      } else if (value1 === value3) {
+        // Weird
+        newPassword = passwords[0]
+        oldPassword = passwords[1]
+      }
+    }
+    return [username, newPassword, oldPassword]
+  }
+
+  /**
+   * Gets password fields in a form.
+   * @param {Element} form - The form to inspect
+   * @param {boolean} isSubmission - Whether the form is being submitted
+   * @return {Array.<Element>|null}
+   */
+  function getPasswordFields (form, isSubmission) {
+    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off])'))
+    if (isSubmission) {
+      // Skip empty fields
+      passwordNodes = passwordNodes.filter((e) => { return !e.value })
+    }
+    return passwordNodes
+  }
+
   function hasSelection (node) {
     try {
       if (node && node.selectionStart !== undefined &&

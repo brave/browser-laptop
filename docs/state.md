@@ -21,6 +21,12 @@ AppStore
     startTime: number, // datetime.getTime()
     endTime: number // datetime.getTime()
   }],
+  passwords: [{
+    origin: string,
+    action: string,
+    username: string,
+    password: string // encrypted before saving to disk
+  }],
   adblock: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version

@@ -272,6 +272,11 @@ app.on('ready', function () {
       Updater.updateNowRequested()
     })
 
+    ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
+      console.log('got pw request', origin, action)
+      e.sender.send(messages.GOT_PASSWORD, 'foo', 'bar', origin, action)
+    })
+
     // Setup the crash handling
     CrashHerald.init()
 
