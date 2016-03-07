@@ -63,6 +63,40 @@ describe('tabs', function () {
     })
   })
 
+  describe('close tab', function() {
+    var windowCountBeforeTabClose = 3
+    var windowCountAfterTabClose = 2
+    Brave.beforeAll(this)
+    before(function *() {
+      yield setup(this.app.client)
+    })
+    it('should close the tab', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitUntil(function() {
+          return this.getWindowCount().then(count => count === windowCountBeforeTabClose)
+        })
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+        .waitUntil(function() {
+          return this.getWindowCount().then(count => count === windowCountAfterTabClose)
+        })
+       })
+    it('should undo last closed tab', function *() {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .waitForExist('.tab[data-frame-key="3"]')
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+        .waitUntil(function() {
+          return this.getWindowCount().then(count => count === windowCountAfterTabClose)
+        })
+        .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
+        .waitForExist('.tab[data-frame-key="3"]')
+        .waitUntil(function() {
+          return this.getWindowCount().then(count => count === windowCountBeforeTabClose)
+        })
+    })
+  })
+
   describe('webview background-tab events', function () {
     Brave.beforeAll(this)
     before(function *() {
