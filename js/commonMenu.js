@@ -4,17 +4,20 @@
 
 'use strict'
 
-const AppConfig = require('./constants/appConfig')
-const AppActions = require('../js/actions/appActions')
+const appConfig = require('./constants/appConfig')
+const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
+const Immutable = require('immutable')
 
-const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
-const adblock = AppConfig.resourceNames.ADBLOCK
-const adInsertion = AppConfig.resourceNames.AD_INSERTION
-const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
-const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = appConfig.resourceNames.ADBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
+const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
+const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
+const isDarwin = process.platform === 'darwin'
 
 let electron
 try {
@@ -24,10 +27,19 @@ try {
 }
 
 let app
+let BrowserWindow
 if (process.type === 'browser') {
   app = electron.app
+  BrowserWindow = electron.BrowserWindow
 } else {
   app = electron.remote.app
+  BrowserWindow = electron.remote.BrowserWindow
+}
+
+const ensureAtLeastOneWindow = (frameOpts) => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    appActions.newWindow(frameOpts)
+  }
 }
 
 /**
@@ -46,7 +58,7 @@ module.exports.sendToFocusedWindow = (focusedWindow, message) => {
 }
 
 module.exports.quitMenuItem = {
-  label: 'Quit ' + AppConfig.name,
+  label: 'Quit ' + appConfig.name,
   accelerator: 'Command+Q',
   click: app.quit
 }
@@ -57,7 +69,7 @@ module.exports.newTabMenuItem = {
   click: function (item, focusedWindow) {
     if (!module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
       // no active windows
-      AppActions.newWindow()
+      appActions.newWindow()
     }
   }
 }
@@ -66,6 +78,7 @@ module.exports.newPrivateTabMenuItem = {
   label: 'New Private Tab',
   accelerator: 'CmdOrCtrl+Alt+T',
   click: function (item, focusedWindow) {
+    ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
   }
 }
@@ -74,6 +87,7 @@ module.exports.newPartitionedTabMenuItem = {
   label: 'New Session Tab',
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
+    ensureAtLeastOneWindow(Immutable.fromJS({ isPartitioned: true }))
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
   }
 }
@@ -81,7 +95,7 @@ module.exports.newPartitionedTabMenuItem = {
 module.exports.newWindowMenuItem = {
   label: 'New Window',
   accelerator: 'CmdOrCtrl+N',
-  click: () => AppActions.newWindow()
+  click: () => appActions.newWindow()
 }
 
 module.exports.reopenLastClosedTabItem = {
@@ -115,10 +129,12 @@ module.exports.findOnPageMenuItem = {
 module.exports.checkForUpdateMenuItem = {
   label: 'Check for updates...',
   click: function (item, focusedWindow) {
-    if (electron.BrowserWindow.getAllWindows().length === 0) {
-      AppActions.newWindow()
+    if (process.type === 'browser') {
+      ensureAtLeastOneWindow()
+      process.emit(messages.CHECK_FOR_UPDATE)
+    } else {
+      electron.ipcRenderer.send(messages.CHECK_FOR_UPDATE)
     }
-    process.emit(messages.CHECK_FOR_UPDATE)
   }
 }
 
@@ -126,26 +142,88 @@ module.exports.preferencesMenuItem = {
   label: 'Preferences...',
   accelerator: 'CmdOrCtrl+,',
   click: (item, focusedWindow) => {
-    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({
+        location: 'about:preferences'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences', { singleFrame: true }])
+    }
   }
 }
 
 module.exports.bookmarksMenuItem = {
   label: 'Bookmarks manager...',
-  accelerator: 'CmdOrCtrl+Alt+b',
+  accelerator: isDarwin ? 'CmdOrCtrl+Alt+B' : 'Ctrl+Shift+O',
   click: (item, focusedWindow) => {
-    module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({
+        location: 'about:bookmarks'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:bookmarks', { singleFrame: true }])
+    }
   }
 }
 
-module.exports.bookmarksToolbarMenuItem = (settingsState) => {
-  const showBookmarksToolbar = getSetting(settingsState, settings.SHOW_BOOKMARKS_TOOLBAR)
+module.exports.importBookmarksMenuItem = {
+  label: 'Import Bookmarks (from HTML export)',
+  click: function (item, focusedWindow) {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(undefined, undefined, undefined, function () {
+        // The timeout here isn't necessary but giving the window a bit of time to popup
+        // before the modal file picker pops up seems to work nicer.
+        setTimeout(() =>
+          module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
+      })
+      return
+    }
+    module.exports.sendToFocusedWindow(focusedWindow, [messages.IMPORT_BOOKMARKS])
+  }
+  /*
+  submenu: [
+    {label: 'Google Chrome...'},
+    {label: 'Firefox...'},
+    {label: 'Safari...'}
+  ]
+  */
+}
+
+module.exports.reportAnIssueMenuItem = {
+  label: 'Report an issue',
+  click: function (item, focusedWindow) {
+    module.exports.sendToFocusedWindow(focusedWindow,
+      [messages.SHORTCUT_NEW_FRAME, issuesUrl])
+  }
+}
+
+module.exports.submitFeedbackMenuItem = {
+  label: 'Submit Feedback...',
+  click: function (item, focusedWindow) {
+    module.exports.sendToFocusedWindow(focusedWindow,
+      [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
+  }
+}
+
+module.exports.bookmarksToolbarMenuItem = () => {
+  const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
     label: 'Bookmarks Toolbar',
     type: 'checkbox',
     checked: showBookmarksToolbar,
     click: (item, focusedWindow) => {
-      AppActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
+    }
+  }
+}
+
+module.exports.aboutBraveMenuItem = {
+  label: 'About ' + appConfig.name,
+  click: (item, focusedWindow) => {
+    if (process.type === 'browser') {
+      process.emit(messages.SHOW_ABOUT)
+    } else {
+      electron.ipcRenderer.send(messages.SHOW_ABOUT)
     }
   }
 }
@@ -164,9 +242,9 @@ module.exports.buildBraveryMenu = function (settings, init) {
         label: 'Replace ads',
         checked: blockAds && replaceAds && blockTracking,
         click: function (item, focusedWindow) {
-          AppActions.setResourceEnabled(adblock, true)
-          AppActions.setResourceEnabled(adInsertion, true)
-          AppActions.setResourceEnabled(trackingProtection, true)
+          appActions.setResourceEnabled(adblock, true)
+          appActions.setResourceEnabled(adInsertion, true)
+          appActions.setResourceEnabled(trackingProtection, true)
           init()
         }
       }, {
@@ -174,9 +252,9 @@ module.exports.buildBraveryMenu = function (settings, init) {
         label: 'Block ads',
         checked: blockAds && !replaceAds && blockTracking,
         click: function (item, focusedWindow) {
-          AppActions.setResourceEnabled(adblock, true)
-          AppActions.setResourceEnabled(adInsertion, false)
-          AppActions.setResourceEnabled(trackingProtection, true)
+          appActions.setResourceEnabled(adblock, true)
+          appActions.setResourceEnabled(adInsertion, false)
+          appActions.setResourceEnabled(trackingProtection, true)
           init()
         }
       }, {
@@ -184,9 +262,9 @@ module.exports.buildBraveryMenu = function (settings, init) {
         label: 'Allow ads and tracking',
         checked: !blockAds && !replaceAds && !blockTracking,
         click: function (item, focusedWindow) {
-          AppActions.setResourceEnabled(adblock, false)
-          AppActions.setResourceEnabled(adInsertion, false)
-          AppActions.setResourceEnabled(trackingProtection, false)
+          appActions.setResourceEnabled(adblock, false)
+          appActions.setResourceEnabled(adInsertion, false)
+          appActions.setResourceEnabled(trackingProtection, false)
           init()
         }
       },
@@ -196,7 +274,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
         label: 'Block 3rd party cookies',
         checked: blockCookies,
         click: function (item, focusedWindow) {
-          AppActions.setResourceEnabled(cookieblock, !blockCookies)
+          appActions.setResourceEnabled(cookieblock, !blockCookies)
           init()
         }
       }, {
@@ -209,7 +287,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
         label: 'HTTPS Everywhere',
         checked: useHttps,
         click: function (item, focusedWindow) {
-          AppActions.setResourceEnabled(httpsEverywhere, !useHttps)
+          appActions.setResourceEnabled(httpsEverywhere, !useHttps)
           init()
         }
       }

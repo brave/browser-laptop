@@ -7,32 +7,33 @@
 const URL = require('url')
 const Filtering = require('./filtering')
 const siteHacks = require('../js/data/siteHacks')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 
 const resourceName = 'siteHacks'
 
 module.exports.init = () => {
-  if (!AppConfig[resourceName].enabled) {
+  if (!appConfig[resourceName].enabled) {
     return
   }
   Filtering.registerBeforeSendHeadersFilteringCB(details => {
     if (details.resourceType !== 'mainFrame') {
       return {
-        shouldBlock: false,
         resourceName
       }
     }
 
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
-    let cbArgs = {}
+    let customCookie
     if (hack && hack.requestFilter) {
-      cbArgs = { requestHeaders: hack.requestFilter.call(this, details) }
+      const result = hack.requestFilter.call(this, details)
+      if (result && result.customCookie) {
+        customCookie = result.customCookie
+      }
     }
     return {
-      shouldBlock: false,
       resourceName,
-      cbArgs
+      customCookie
     }
   })
 }

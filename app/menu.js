@@ -5,27 +5,27 @@
 'use strict'
 
 const electron = require('electron')
-const AppConfig = require('../js/constants/appConfig')
+const appConfig = require('../js/constants/appConfig')
 const Menu = require('menu')
 const messages = require('../js/constants/messages')
+const settings = require('../js/constants/settings')
 const dialog = electron.dialog
-const app = electron.app
-const AppActions = require('../js/actions/appActions')
+const appActions = require('../js/actions/appActions')
+const siteUtil = require('../js/state/siteUtil')
 const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
+const getSetting = require('../js/settings').getSetting
+const appStore = require('../js/stores/appStore')
 
 const isDarwin = process.platform === 'darwin'
 
-const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const aboutUrl = 'https://brave.com/'
 
-const path = require('path')
-
-const httpsEverywhere = AppConfig.resourceNames.HTTPS_EVERYWHERE
-const adblock = AppConfig.resourceNames.ADBLOCK
-const cookieblock = AppConfig.resourceNames.COOKIEBLOCK
-const adInsertion = AppConfig.resourceNames.AD_INSERTION
-const trackingProtection = AppConfig.resourceNames.TRACKING_PROTECTION
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const adblock = appConfig.resourceNames.ADBLOCK
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
+const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 
 let menuArgs = {}
 
@@ -49,20 +49,6 @@ const init = (settingsState, args) => {
         ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
         : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
       CommonMenu.sendToFocusedWindow(focusedWindow, [msg])
-    }
-  }
-
-  const aboutBraveMenuItem = {
-    label: 'About ' + AppConfig.name,
-    click: (item, focusedWindow) => {
-      dialog.showMessageBox({
-        title: 'Brave',
-        message: 'Version: ' + app.getVersion() + '\n' +
-          'Electron: ' + process.versions['atom-shell'] + '\n' +
-          'libchromiumcontent: ' + process.versions['chrome'],
-        icon: path.join(__dirname, 'img', 'braveBtn3x.png'),
-        buttons: ['Ok']
-      })
     }
   }
 
@@ -134,7 +120,7 @@ const init = (settingsState, args) => {
       accelerator: 'CmdOrCtrl+Shift+W',
       click: function (item, focusedWindow) {
         if (focusedWindow) {
-          AppActions.closeWindow(focusedWindow.id)
+          appActions.closeWindow(focusedWindow.id)
         }
       }
     },
@@ -163,21 +149,10 @@ const init = (settingsState, args) => {
   ]
 
   const helpMenu = [
-    {
-      label: 'Report an issue',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow,
-          [messages.SHORTCUT_NEW_FRAME, issuesUrl])
-      }
-    },
+    CommonMenu.reportAnIssueMenuItem,
     CommonMenu.separatorMenuItem,
+    CommonMenu.submitFeedbackMenuItem,
     {
-      label: 'Submit Feedback...',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
-      }
-    }, {
       label: 'Spread the word about Brave...',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow,
@@ -192,7 +167,7 @@ const init = (settingsState, args) => {
     helpMenu.push(CommonMenu.separatorMenuItem)
     helpMenu.push(CommonMenu.checkForUpdateMenuItem)
     helpMenu.push(CommonMenu.separatorMenuItem)
-    helpMenu.push(aboutBraveMenuItem)
+    helpMenu.push(CommonMenu.aboutBraveMenuItem)
   }
 
   const editSubmenu = [{
@@ -370,6 +345,12 @@ const init = (settingsState, args) => {
       label: 'History',
       submenu: [
         {
+          label: 'Home',
+          accelerator: 'CmdOrCtrl+Shift+H',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, getSetting(settings.HOMEPAGE)])
+          }
+        }, {
           label: 'Back',
           accelerator: 'CmdOrCtrl+[',
           click: function (item, focusedWindow) {
@@ -395,6 +376,15 @@ const init = (settingsState, args) => {
           label: 'Show All History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
+        },
+        CommonMenu.separatorMenuItem,
+        {
+          label: 'Clear History',
+          accelerator: 'Shift+CmdOrCtrl+Delete',
+          enabled: siteUtil.hasNoTagSites(appStore.getState().get('sites')),
+          click: function (item, focusedWindow) {
+            appActions.clearSitesWithoutTags(appStore.getState().get('sites'))
+          }
         }
       ]
     }, {
@@ -408,19 +398,9 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         CommonMenu.bookmarksMenuItem,
-        CommonMenu.bookmarksToolbarMenuItem(settingsState),
+        CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        {
-          label: 'Import Bookmarks',
-          enabled: false
-          /*
-          submenu: [
-            {label: 'Google Chrome...'},
-            {label: 'Firefox...'},
-            {label: 'Safari...'}
-          ]
-          */
-        }
+        CommonMenu.importBookmarksMenuItem
       ]
     },
     CommonMenu.buildBraveryMenu({
@@ -470,7 +450,6 @@ const init = (settingsState, args) => {
           enabled: false
         }, {
           label: 'History',
-          // On OSX, Shift+Cmd+H cannot be overridden.
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
         }, {
@@ -497,9 +476,9 @@ const init = (settingsState, args) => {
 
   if (isDarwin) {
     template.unshift({
-      label: AppConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
+      label: appConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
-        aboutBraveMenuItem,
+        CommonMenu.aboutBraveMenuItem,
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem,
         CommonMenu.separatorMenuItem,
@@ -510,7 +489,7 @@ const init = (settingsState, args) => {
           label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, AppConfig.contactUrl])
+              [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
           }
         },
         CommonMenu.separatorMenuItem,
@@ -520,12 +499,12 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: 'Hide ' + AppConfig.name,
+          label: 'Hide ' + appConfig.name,
           accelerator: 'Command+H',
           role: 'hide'
         }, {
           label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
+          accelerator: 'Command+Alt+H',
           role: 'hideothers'
         }, {
           label: 'Show All',

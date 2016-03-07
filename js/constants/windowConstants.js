@@ -13,7 +13,6 @@ const windowConstants = {
   WINDOW_SET_ACTIVE_FRAME: _,
   WINDOW_SET_PREVIEW_FRAME: _,
   WINDOW_SET_TAB_PAGE_INDEX: _,
-  WINDOW_SET_IS_BEING_DRAGGED: _,
   WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL: _,
   WINDOW_TAB_MOVE: _,
   WINDOW_SET_THEME_COLOR: _,
@@ -34,6 +33,7 @@ const windowConstants = {
   WINDOW_SET_SEARCH_DETAIL: _,
   WINDOW_SET_FIND_DETAIL: _,
   WINDOW_SET_BOOKMARK_DETAIL: _, // If set, also indicates that add/edit is shown
+  WINDOW_SET_CONTEXT_MENU_DETAIL: _, // If set, also indicates that the context menu is shown
   WINDOW_SET_AUDIO_MUTED: _,
   WINDOW_SET_AUDIO_PLAYBACK_ACTIVE: _,
   WINDOW_SET_FAVICON: _,

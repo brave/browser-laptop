@@ -210,29 +210,35 @@
   }
 
   document.addEventListener('contextmenu', (e) => {
-    var name = e.target.nodeName.toUpperCase()
-    var href
-    var maybeLink = e.target
-    while (maybeLink.parentNode) {
-      // Override for about: pages
-      if (maybeLink.getAttribute('data-context-menu-disable')) {
+    window.setTimeout(() => {
+      // there is another event being fired on contextmenu, don't show this one
+      if (e.defaultPrevented) {
         return
       }
-      if (maybeLink.nodeName.toUpperCase() === 'A') {
-        href = maybeLink.href
-        break
+      var name = e.target.nodeName.toUpperCase()
+      var href
+      var maybeLink = e.target
+      while (maybeLink.parentNode) {
+        // Override for about: pages
+        if (maybeLink.getAttribute('data-context-menu-disable')) {
+          return
+        }
+        if (maybeLink.nodeName.toUpperCase() === 'A') {
+          href = maybeLink.href
+          break
+        }
+        maybeLink = maybeLink.parentNode
       }
-      maybeLink = maybeLink.parentNode
-    }
-    var nodeProps = {
-      name: name,
-      href: href,
-      src: e.target.src,
-      isContentEditable: e.target.isContentEditable,
-      hasSelection: hasSelection(e.target)
-    }
-    ipcRenderer.sendToHost('context-menu-opened', nodeProps)
-    e.preventDefault()
+      var nodeProps = {
+        name: name,
+        href: href,
+        src: e.target.src,
+        isContentEditable: e.target.isContentEditable,
+        hasSelection: hasSelection(e.target)
+      }
+      ipcRenderer.sendToHost('context-menu-opened', nodeProps)
+      e.preventDefault()
+    }, 0)
   }, false)
 
   document.onkeydown = (e) => {
@@ -356,12 +362,6 @@
     return undefined
   }
   ipcRenderer.on('post-page-load-run', function () {
-    // Hide broken images
-    Array.from(document.querySelectorAll('img')).forEach(function (img) {
-      img.addEventListener('error', function () {
-        this.style.visibility = 'hidden'
-      })
-    })
     ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
   })
 }).apply(this)

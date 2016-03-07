@@ -6,7 +6,7 @@ const React = require('react')
 const urlParse = require('url').parse
 
 const ImmutableComponent = require('./immutableComponent')
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 const KeyCodes = require('../constants/keyCodes')
 const cx = require('../lib/classSet.js')
 const ipc = global.require('electron').ipcRenderer
@@ -14,7 +14,7 @@ const ipc = global.require('electron').ipcRenderer
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
-const dnd = require('../dnd')
+const dndData = require('../dndData')
 
 const {isUrl} = require('../lib/appUrlUtil')
 
@@ -42,8 +42,6 @@ class UrlBar extends ImmutableComponent {
     const urlInput = this.urlInput
     if (focused) {
       urlInput.focus()
-    } else {
-      urlInput.blur()
     }
   }
 
@@ -60,40 +58,41 @@ class UrlBar extends ImmutableComponent {
   // restores the url bar to the current location
   restore () {
     const location = this.props.activeFrameProps.get('location')
-    WindowActions.setNavBarUserInput(location)
+    windowActions.setNavBarUserInput(location)
   }
 
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
+        windowActions.setUrlBarActive(false)
+        this.restore()
         e.preventDefault()
         let location = this.props.urlbar.get('location')
         if (location === null || location.length === 0) {
-          this.restore()
-          WindowActions.setUrlBarSelected(true)
+          windowActions.setUrlBarSelected(true)
         } else {
           const isLocationUrl = isUrl(location)
           const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', location)
           // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
           // For whitepsace we want a search no matter what.
           if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
-            WindowActions.loadUrl(this.props.activeFrameProps, `www.${location}.com`)
+            windowActions.loadUrl(this.props.activeFrameProps, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions && this.urlBarSuggestions.activeIndex > 0) {
             // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
             // load the selected suggestion
-            this.urlBarSuggestions.clickSelected()
+            this.urlBarSuggestions.clickSelected(e)
           } else {
             location = isLocationUrl ? location : searchUrl
             // do search.
             if (e.altKey) {
-              WindowActions.newFrame({ location }, true)
+              windowActions.newFrame({ location }, true)
             } else if (e.metaKey) {
-              WindowActions.newFrame({ location }, false)
+              windowActions.newFrame({ location }, false)
             } else {
-              WindowActions.loadUrl(this.props.activeFrameProps, location)
+              windowActions.loadUrl(this.props.activeFrameProps, location)
             }
           }
-          // this can't go through AppActions for some reason
+          // this can't go through appActions for some reason
           // or the whole window will reload on the first page request
           this.updateDOMInputFocus(false)
         }
@@ -123,36 +122,35 @@ class UrlBar extends ImmutableComponent {
   onClick (e) {
     // if the url bar is already selected then clicking in it should make it active
     if (this.isSelected()) {
-      WindowActions.setUrlBarSelected(false)
-      WindowActions.setUrlBarActive(true)
+      windowActions.setUrlBarSelected(false)
+      windowActions.setUrlBarActive(true)
     }
   }
 
   onBlur (e) {
-    WindowActions.setUrlBarActive(false)
-    WindowActions.setUrlBarSelected(false)
-    WindowActions.setNavBarFocused(false)
+    windowActions.setNavBarFocused(false)
+    windowActions.setUrlBarSelected(false)
   }
 
   onChange (e) {
-    WindowActions.setUrlBarSelected(false)
-    WindowActions.setUrlBarActive(true)
-    WindowActions.setNavBarUserInput(e.target.value)
+    windowActions.setUrlBarSelected(false)
+    windowActions.setUrlBarActive(true)
+    windowActions.setNavBarUserInput(e.target.value)
   }
 
   onFocus (e) {
-    WindowActions.setUrlBarSelected(true)
+    windowActions.setUrlBarSelected(true)
   }
 
   onActiveFrameStop () {
     this.restore()
-    WindowActions.setUrlBarSelected(true)
-    WindowActions.setUrlBarActive(false)
+    windowActions.setUrlBarSelected(true)
+    windowActions.setUrlBarActive(false)
   }
 
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e, forSearchMode) => {
-      WindowActions.setUrlBarSelected(true, forSearchMode)
+      windowActions.setUrlBarSelected(true, forSearchMode)
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop.bind(this))
@@ -214,7 +212,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onSiteInfo () {
-    WindowActions.setSiteInfoVisible(true)
+    windowActions.setSiteInfoVisible(true)
   }
 
   get shouldRenderUrlBarSuggestions () {
@@ -223,7 +221,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    dnd.setupDataTransferURL(e.dataTransfer, this.props.activeFrameProps.get('location'), this.props.activeFrameProps.get('title'))
+    dndData.setupDataTransferURL(e.dataTransfer, this.props.activeFrameProps.get('location'), this.props.activeFrameProps.get('title'))
   }
 
   render () {
@@ -232,57 +230,64 @@ class UrlBar extends ImmutableComponent {
       action='#'
       id='urlbar'
       ref='urlbar'>
-        <span
-          onDragStart={this.onDragStart.bind(this)}
-          draggable
-          onClick={this.onSiteInfo}
-          className={cx({
-            urlbarIcon: true,
-            'fa': true,
-            'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
-            'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
-            'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
-            'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('focused') && this.props.loading === false,
-            extendedValidation: this.extendedValidationSSL
-          })}/>
-        <div id='titleBar'>
-          <span><strong>{this.hostValue}</strong></span>
-          <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
-          <span>{this.titleValue}</span>
-        </div>
-      <input type='text'
-        disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
-        onFocus={this.onFocus.bind(this)}
-        onBlur={this.onBlur.bind(this)}
-        onKeyDown={this.onKeyDown.bind(this)}
-        onChange={this.onChange.bind(this)}
-        onClick={this.onClick.bind(this)}
-        onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
-        value={this.locationValue}
-        data-l10n-id='urlbar'
-        className={cx({
-          insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
-          private: this.private,
-          testHookLoadDone: !this.props.loading
-        })}
-        id='urlInput'
-        readOnly={this.props.titleMode}
-        ref={node => this.urlInput = node}/>
-        { !this.props.titleMode
-          ? <span className='loadTime'>{this.loadTime}</span> : null }
-        { this.shouldRenderUrlBarSuggestions
-        ? <UrlBarSuggestions
-          ref={node => this.urlBarSuggestions = node}
-          suggestions={this.props.urlbar.get('suggestions')}
-          settings={this.props.settings}
-          sites={this.props.sites}
-          frames={this.props.frames}
-          searchDetail={this.searchDetail}
-          searchSuggestions={this.props.searchSuggestions}
-          activeFrameProps={this.props.activeFrameProps}
-          urlLocation={this.props.urlbar.get('location')}
-          urlPreview={this.props.urlbar.get('urlPreview')}
-          previewActiveIndex={this.props.previewActiveIndex || 0} /> : null }
+          <span
+            onDragStart={this.onDragStart.bind(this)}
+            draggable
+            onClick={this.onSiteInfo}
+            className={cx({
+              urlbarIcon: true,
+              'fa': true,
+              'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
+              'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
+              'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+              'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+              extendedValidation: this.extendedValidationSSL
+            })} />
+          { this.props.titleMode
+            ? <div id='titleBar'>
+              <span><strong>{this.hostValue}</strong></span>
+              <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
+              <span>{this.titleValue}</span>
+            </div>
+
+            : <input type='text'
+              disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
+              onFocus={this.onFocus.bind(this)}
+              onBlur={this.onBlur.bind(this)}
+              onKeyDown={this.onKeyDown.bind(this)}
+              onChange={this.onChange.bind(this)}
+              onClick={this.onClick.bind(this)}
+              onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
+              value={this.locationValue}
+              data-l10n-id='urlbar'
+              className={cx({
+                insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
+                private: this.private,
+                testHookLoadDone: !this.props.loading
+              })}
+              id='urlInput'
+              readOnly={this.props.titleMode}
+              ref={node => this.urlInput = node}/>
+          }
+            <legend/>
+
+            { this.props.titleMode ? null
+              : <span className='loadTime'>{this.loadTime}</span>
+            }
+
+            { this.shouldRenderUrlBarSuggestions
+            ? <UrlBarSuggestions
+              ref={node => this.urlBarSuggestions = node}
+              suggestions={this.props.urlbar.get('suggestions')}
+              settings={this.props.settings}
+              sites={this.props.sites}
+              frames={this.props.frames}
+              searchDetail={this.searchDetail}
+              searchSuggestions={this.props.searchSuggestions}
+              activeFrameProps={this.props.activeFrameProps}
+              urlLocation={this.props.urlbar.get('location')}
+              urlPreview={this.props.urlbar.get('urlPreview')}
+              previewActiveIndex={this.props.previewActiveIndex || 0} /> : null }
       </form>
   }
 }

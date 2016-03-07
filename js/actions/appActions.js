@@ -7,7 +7,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
 const messages = require('../constants/messages')
 
-const AppActions = {
+const appActions = {
   /**
    * Dispatches an event to the main process to replace the app state
    * This is called from the main process on startup before anything else
@@ -22,14 +22,19 @@ const AppActions = {
   },
 
   /**
-   * Dispatches an event to the main process to create a new window
+   * Dispatches an event to the main process to create a new window.
+   * @param {Object} frameOpts - Options for the first frame in the window.
+   * @param {Object} browserOpts - Options for the browser.
+   * @param {Object} restoredState - State for the window to restore.
+   * @param {function} cb - Callback to call after the window is loaded, will only work if called from the main process.
    */
-  newWindow: function (frameOpts, browserOpts, restoredState) {
+  newWindow: function (frameOpts, browserOpts, restoredState, cb) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_NEW_WINDOW,
       frameOpts,
       browserOpts,
-      restoredState
+      restoredState,
+      cb
     })
   },
 
@@ -49,17 +54,28 @@ const AppActions = {
 
   /**
    * Adds a site to the site list
-   * @param {Object} siteDetail - Properties of the site in question
+   * @param {Object} siteDetail - Properties of the site in question, can also be an array of siteDetail
    * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
    * @param {string} originalSiteDetail - If specified, the original site detail to edit / overwrite.
+   * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
    *   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
    */
-  addSite: function (siteDetail, tag, originalSiteDetail) {
+  addSite: function (siteDetail, tag, originalSiteDetail, destinationDetail) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_ADD_SITE,
       siteDetail,
       tag,
-      originalSiteDetail
+      originalSiteDetail,
+      destinationDetail
+    })
+  },
+
+  /**
+   * Clears all sites without tags
+   */
+  clearSitesWithoutTags: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS
     })
   },
 
@@ -82,13 +98,16 @@ const AppActions = {
    * @param {string} sourceDetail - the location, partitionNumber, etc of the source moved site
    * @param {string} destinationDetail - the location, partitionNumber, etc of the destination moved site
    * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
+   *   If false, the destinationDetail is considered a sibling.
+   * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
    */
-  moveSite: function (sourceDetail, destinationDetail, prepend) {
+  moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_MOVE_SITE,
       sourceDetail,
       destinationDetail,
-      prepend
+      prepend,
+      destinationIsParent
     })
   },
 
@@ -184,4 +203,4 @@ const AppActions = {
   }
 }
 
-module.exports = AppActions
+module.exports = appActions

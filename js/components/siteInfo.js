@@ -6,7 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const Dialog = require('./dialog')
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 
 class SiteInfo extends ImmutableComponent {
   constructor (props) {
@@ -43,11 +43,11 @@ class SiteInfo extends ImmutableComponent {
     return this.props.frameProps.getIn(['partitionNumber'])
   }
   onToggleTPList (e) {
-    WindowActions.setSiteInfoVisible(true, !this.isTPListShown)
+    windowActions.setSiteInfoVisible(true, !this.isTPListShown)
     e.stopPropagation()
   }
   onToggleBlockedAds (e) {
-    WindowActions.setSiteInfoVisible(true, undefined, !this.isBlockedAdsShown)
+    windowActions.setSiteInfoVisible(true, undefined, !this.isBlockedAdsShown)
     e.stopPropagation()
   }
   render () {

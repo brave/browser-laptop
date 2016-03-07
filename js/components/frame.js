@@ -4,18 +4,20 @@
 
 const React = require('react')
 const urlParse = require('url').parse
-const WindowActions = require('../actions/windowActions')
-const AppActions = require('../actions/appActions')
+const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
+const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
 const path = require('path')
 const contextMenus = require('../contextMenus')
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
+const ipc = global.require('electron').ipcRenderer
 
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
@@ -24,6 +26,7 @@ const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 class Frame extends ImmutableComponent {
   constructor () {
     super()
+    this.previousLocation = 'about:newtab'
   }
 
   updateWebview () {
@@ -34,8 +37,10 @@ class Frame extends ImmutableComponent {
       : ''
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
+    let aboutPreload = false
     if (['about:preferences', 'about:bookmarks', 'about:certerror'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
+      aboutPreload = true
     }
 
     contentScripts = contentScripts.join(',')
@@ -54,10 +59,24 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
+    // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
+    // automatically while keeping the content script loaded.
+    if (aboutPreload) {
+      this.webviewContainer.addEventListener('drop', (e) => {
+        if (e.dataTransfer.getData('text/uri-list')) {
+          e.preventDefault()
+        }
+      })
+    }
+    let partition
     if (this.props.frame.get('isPrivate')) {
-      this.webview.setAttribute('partition', 'private-1')
+      partition = 'private-1'
     } else if (this.props.frame.get('partitionNumber')) {
-      this.webview.setAttribute('partition', `persist:partition-${this.props.frame.get('partitionNumber')}`)
+      partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+    }
+    if (partition) {
+      ipc.send(messages.INITIALIZE_PARTITION, partition)
+      this.webview.setAttribute('partition', partition)
     }
     if (this.props.frame.get('guestInstanceId')) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
@@ -80,13 +99,23 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
+    const location = this.props.frame.get('location')
+    const prevLocation = prevProps.frame.get('location')
     const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
-    const didLocationChange = this.props.frame.get('location') !== prevProps.frame.get('location')
+    const didLocationChange = location !== prevLocation
     // When auto-redirecting to about:certerror, the frame location change and
     // frame src change are emitted separately. Make sure updateWebview is
     // called when the location changes.
-    if (didSrcChange || (didLocationChange && this.props.frame.get('location') === 'about:certerror')) {
+    if (didSrcChange || (didLocationChange && location === 'about:certerror')) {
       this.updateWebview()
+    }
+    if (didLocationChange && location !== 'about:certerror' &&
+        prevLocation !== 'about:certerror' &&
+        urlParse(prevLocation).host !== urlParse(location).host) {
+      // Keep track of one previous location so the cert error page can return to
+      // it. Don't record same-origin location changes because these will
+      // often end up re-triggering the cert error.
+      this.previousLocation = prevLocation
     }
     // give focus when switching tabs
     if (this.props.isActive && !prevProps.isActive) {
@@ -107,13 +136,13 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'zoom-in':
-        WindowActions.zoomIn(this.props.frame)
+        windowActions.zoomIn(this.props.frame)
         break
       case 'zoom-out':
-        WindowActions.zoomOut(this.props.frame)
+        windowActions.zoomOut(this.props.frame)
         break
       case 'zoom-reset':
-        WindowActions.zoomReset(this.props.frame)
+        windowActions.zoomReset(this.props.frame)
         break
       case 'toggle-dev-tools':
         if (this.webview.isDevToolsOpened()) {
@@ -124,7 +153,7 @@ class Frame extends ImmutableComponent {
         break
       case 'view-source':
         const location = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        WindowActions.newFrame({location}, true)
+        windowActions.newFrame({location}, true)
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':
@@ -135,17 +164,20 @@ class Frame extends ImmutableComponent {
         this.webview.print()
         break
       case 'show-findbar':
-        WindowActions.setFindbarShown(this.props.frame, true)
+        windowActions.setFindbarShown(this.props.frame, true)
         break
     }
     if (activeShortcut) {
-      WindowActions.setActiveFrameShortcut(this.props.frame, null)
+      windowActions.setActiveFrameShortcut(this.props.frame, null)
     }
 
     if (this.props.frame.get('location') === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
     } else if (this.props.frame.get('location') === 'about:bookmarks') {
-      this.webview.send(messages.BOOKMARKS_UPDATED, this.props.bookmarks.toJS())
+      this.webview.send(messages.BOOKMARKS_UPDATED, {
+        bookmarks: this.props.bookmarks.toJS(),
+        bookmarkFolders: this.props.bookmarkFolders.toJS()
+      })
     }
   }
 
@@ -172,11 +204,11 @@ class Frame extends ImmutableComponent {
       }
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
-        AppActions.newWindow(frameOpts, windowOpts)
+        appActions.newWindow(frameOpts, windowOpts)
       } else {
         let openInForeground = this.props.prefOpenInForeground === true ||
           e.disposition !== 'background-tab'
-        WindowActions.newFrame(frameOpts, openInForeground)
+        windowActions.newFrame(frameOpts, openInForeground)
       }
     })
     this.webview.addEventListener('destroyed', (e) => {
@@ -191,18 +223,18 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('page-favicon-updated', (e) => {
       if (e.favicons && e.favicons.length > 0) {
-        WindowActions.setFavicon(this.props.frame, e.favicons[0])
+        windowActions.setFavicon(this.props.frame, e.favicons[0])
       }
     })
     this.webview.addEventListener('page-title-updated', ({title}) => {
-      WindowActions.setFrameTitle(this.props.frame, title)
+      windowActions.setFrameTitle(this.props.frame, title)
     })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
         case messages.THEME_COLOR_COMPUTED:
           method = (computedThemeColor) =>
-            WindowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
+            windowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
           break
         case messages.CONTEXT_MENU_OPENED:
           method = (nodeProps, contextMenuType) => {
@@ -218,12 +250,12 @@ class Frame extends ImmutableComponent {
             let nearBottom = position.y > (window.innerHeight - 150) // todo: magic number
             let mouseOnLeft = position.x < (window.innerWidth / 2)
             let showOnRight = nearBottom && mouseOnLeft
-            WindowActions.setLinkHoverPreview(href, showOnRight)
+            windowActions.setLinkHoverPreview(href, showOnRight)
           }
           break
         case messages.NEW_FRAME:
           method = (frameOpts, openInForeground) => {
-            WindowActions.newFrame(frameOpts, openInForeground)
+            windowActions.newFrame(frameOpts, openInForeground)
           }
       }
       method.apply(this, e.args)
@@ -234,21 +266,21 @@ class Frame extends ImmutableComponent {
         // Temporary workaround for https://github.com/brave/browser-laptop/issues/787
         this.webview.insertCSS('input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }')
         // TODO: These 3 events should be combined into one
-        WindowActions.onWebviewLoadStart(
+        windowActions.onWebviewLoadStart(
           this.props.frame)
         const key = this.props.frame.get('key')
-        WindowActions.setLocation(event.url, key)
-        WindowActions.setSecurityState(this.props.frame, {
+        windowActions.setLocation(event.url, key)
+        windowActions.setSecurityState(this.props.frame, {
           secure: urlParse(event.url).protocol === 'https:'
         })
       }
-      WindowActions.updateBackForwardState(
+      windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
     }
     const loadEnd = () => {
-      WindowActions.onWebviewLoadEnd(
+      windowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
       if (this.props.enableAds) {
@@ -261,8 +293,15 @@ class Frame extends ImmutableComponent {
         // Don't send certDetails.cert since it is big and crashes the page
         this.webview.send(messages.CERT_DETAILS_UPDATED, {
           url: security.get('certDetails').url,
-          error: security.get('certDetails').error
+          error: security.get('certDetails').error,
+          previousLocation: this.previousLocation,
+          frameKey: this.props.frame.get('key')
         })
+      }
+      const protocol = urlParse(this.props.frame.get('location')).protocol
+      if (!this.props.frame.get('isPrivate') && (protocol === 'http:' || protocol === 'https:')) {
+        // Register the site for recent history for navigation bar
+        appActions.addSite(siteUtil.getDetailFromFrame(this.props.frame))
       }
     }
     this.webview.addEventListener('load-commit', (event) => {
@@ -278,7 +317,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-fail-load', () => {
-      WindowActions.onWebviewLoadEnd(
+      windowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
     })
@@ -289,21 +328,21 @@ class Frame extends ImmutableComponent {
       loadEnd()
     })
     this.webview.addEventListener('media-started-playing', ({title}) => {
-      WindowActions.setAudioPlaybackActive(this.props.frame, true)
+      windowActions.setAudioPlaybackActive(this.props.frame, true)
     })
     this.webview.addEventListener('media-paused', ({title}) => {
-      WindowActions.setAudioPlaybackActive(this.props.frame, false)
+      windowActions.setAudioPlaybackActive(this.props.frame, false)
     })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       // Due to a bug in Electron, after navigating to a page with a theme color
       // to a page without a theme color, the background is sent to us as black
       // even know there is no background. To work around this we just ignore
       // the theme color in that case and let the computed theme color take over.
-      WindowActions.setThemeColor(this.props.frame, themeColor !== '#000000' ? themeColor : null)
+      windowActions.setThemeColor(this.props.frame, themeColor !== '#000000' ? themeColor : null)
     })
     this.webview.addEventListener('found-in-page', (e) => {
       if (e.result !== undefined && e.result.matches !== undefined) {
-        WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+        windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
           numberOfMatches: e.result.matches
         }))
       }
@@ -321,7 +360,7 @@ class Frame extends ImmutableComponent {
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
-    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, Config.vault.replacementUrl)
+    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
   }
 
   goBack () {
@@ -333,11 +372,13 @@ class Frame extends ImmutableComponent {
   }
 
   onFocus () {
-    WindowActions.setTabPageIndexByFrame(this.props.frame)
+    windowActions.setTabPageIndexByFrame(this.props.frame)
+    windowActions.setUrlBarActive(false)
+    windowActions.setContextMenuDetail()
   }
 
   onFindHide () {
-    WindowActions.setFindbarShown(this.props.frame, false)
+    windowActions.setFindbarShown(this.props.frame, false)
     this.onClearMatch()
   }
 

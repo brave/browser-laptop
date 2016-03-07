@@ -60,7 +60,8 @@ class NavigationBar extends ImmutableComponent {
       this.props.activeFrame.get('title') &&
       !['about:blank', 'about:newtab'].includes(this.props.activeFrame.get('location')) &&
       !this.loading &&
-      !this.props.navbar.getIn(['urlbar', 'focused'])
+      !this.props.navbar.getIn(['urlbar', 'focused']) &&
+      !this.props.navbar.getIn(['urlbar', 'active'])
   }
 
   componentDidMount () {
@@ -94,7 +95,7 @@ class NavigationBar extends ImmutableComponent {
           titleMode: this.titleMode
         })}>
 
-      { isSourceAboutUrl(frameProps.get('location')) ? null
+      { isSourceAboutUrl(frameProps.get('location')) || this.titleMode ? null
         : <div className='startButtons'>
         { this.loading
           ? <Button iconClass='fa-times'

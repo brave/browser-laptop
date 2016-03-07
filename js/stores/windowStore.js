@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Config = require('../constants/config')
+const config = require('../constants/config')
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
@@ -13,6 +13,8 @@ const getFavicon = require('../lib/faviconUtil.js')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
+const getSetting = require('../settings').getSetting
+const importFromHTML = require('../lib/importer').importFromHTML
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -51,7 +53,7 @@ const updateTabPageIndex = (frameProps) => {
   }
 
   const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter(frame => !frame.get('pinnedLocation')), frameProps, windowStore.cachedSettings[settings.TABS_PER_TAB_PAGE])
+      .filter(frame => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_TAB_PAGE))
   if (index === -1) {
     return
   }
@@ -66,7 +68,6 @@ const incrementPartitionNumber = () => ++currentPartitionNumber
 class WindowStore extends EventEmitter {
   constructor () {
     super()
-    this.cachedSettings = {}
   }
   getState () {
     return windowState
@@ -89,16 +90,6 @@ class WindowStore extends EventEmitter {
 
   removeChangeListener (callback) {
     this.removeListener(CHANGE_EVENT, callback)
-  }
-
-  /**
-   * Used to stash commonly used settings for auto inclusion in the needed
-   * dispatched events.
-   * @param {string} key - The name of the pref to cache
-   * @param {string} value - The value of the pref to cache
-   */
-  cacheSetting (key, value) {
-    this.cachedSettings[key] = value
   }
 }
 
@@ -262,12 +253,6 @@ const doAction = (action) => {
         canGoForward: action.canGoForward
       })
       break
-    case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED:
-      windowState = windowState.mergeIn(['ui', 'dragging'], {
-        dragType: action.dragType,
-        sourceDragData: action.sourceDragData
-      })
-      break
     case WindowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL:
       if (!action.dragOverKey) {
         windowState = windowState.deleteIn(['ui', 'dragging'])
@@ -313,6 +298,10 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
+      if (!action.isActive) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), null)
+      }
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
@@ -347,10 +336,20 @@ const doAction = (action) => {
       } else {
         windowState = windowState.mergeIn(['bookmarkDetail'], {
           currentDetail: action.currentDetail,
-          originalDetail: action.originalDetail
+          originalDetail: action.originalDetail,
+          destinationDetail: action.destinationDetail
         })
       }
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
+      windowStore.emitChanges()
+      return
+    case WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
+      if (!action.detail) {
+        windowState = windowState.delete('contextMenuDetail')
+      } else {
+        windowState = windowState.set('contextMenuDetail', action.detail)
+      }
+      // Drag and drop bookmarks code expects this to be set sync
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_PINNED:
@@ -433,7 +432,7 @@ const doAction = (action) => {
       if (zoomInLevel === undefined) {
         zoomInLevel = 1
       }
-      if (Config.zoom.max > zoomInLevel) {
+      if (config.zoom.max > zoomInLevel) {
         zoomInLevel += 1
       }
       windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomInLevel)
@@ -444,13 +443,13 @@ const doAction = (action) => {
       if (zoomOutLevel === undefined) {
         zoomOutLevel = 1
       }
-      if (Config.zoom.min < zoomOutLevel) {
+      if (config.zoom.min < zoomOutLevel) {
         zoomOutLevel -= 1
       }
       windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomOutLevel)
       break
     case WindowConstants.WINDOW_ZOOM_RESET:
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), Config.zoom.defaultValue)
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), config.zoom.defaultValue)
       break
     default:
   }
@@ -470,6 +469,21 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowState = FrameStateUtil.makePrevFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
   emitChanges()
+})
+
+ipc.on(messages.IMPORT_BOOKMARKS, () => {
+  const dialog = require('electron').remote.dialog
+  const files = dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{
+      name: 'HTML',
+      extensions: ['html', 'htm']
+    }]
+  })
+  if (files && files.length > 0) {
+    const file = files[0]
+    importFromHTML(file)
+  }
 })
 
 const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar']

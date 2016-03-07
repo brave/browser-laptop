@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const Config = require('../../js/constants/config')
+const config = require('../../js/constants/config')
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
@@ -37,7 +37,7 @@ describe('urlbar', function () {
     .getAttribute(urlInput, 'placeholder').should.eventually.equal('Search or enter an address')
   }
 
-  function selectsText (client, text = Config.defaultUrl) {
+  function selectsText (client, text = config.defaultUrl) {
     return client.waitUntil(function () {
       return this.getSelectedText().then(function (value) { return value === text })
     })
@@ -57,15 +57,17 @@ describe('urlbar', function () {
 
       it('has title mode', function *() {
         const host = this.host
-        yield this.app.client.waitUntil(function () {
-          return this.getText(titleBar).then(val => val === host + ' | Page 1')
-        })
-        .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
+        yield this.app.client
+          .waitForExist(titleBar)
+          .waitUntil(function () {
+            return this.getText(titleBar).then(val => val === host + ' | Page 1')
+          })
+          .isExisting(navigatorLoadTime).then(isExisting => assert(!isExisting))
       })
 
       it('shows the url on mouseover', function *() {
         yield this.app.client
-          .moveToObject(urlInput)
+          .moveToObject(titleBar)
           .waitForExist(navigatorLoadTime)
           .getValue(urlInput)
           .should.eventually.be.equal(this.page1Url)
@@ -76,7 +78,7 @@ describe('urlbar', function () {
         yield this.app.client
           .ipcSend('shortcut-focus-url', false)
           .waitUntil(function () {
-            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
+            return this.isExisting(titleBar).then(exists => exists === false)
           })
         yield selectsText(this.app.client, page1Url)
       })
@@ -99,7 +101,7 @@ describe('urlbar', function () {
       it('does not have title mode', function *() {
         yield this.app.client
           .waitUntil(function () {
-            return this.getCssProperty(titleBar, 'display').then(display => display.value === 'none')
+            return this.isExisting(titleBar).then(exists => exists === false)
           })
           .waitForExist(navigatorLoadTime)
       })
@@ -130,6 +132,9 @@ describe('urlbar', function () {
       it('updates the location in the navbar', function *() {
         var page = this.page
         yield this.app.client
+          .waitForExist(titleBar)
+          .moveToObject(titleBar)
+          .waitForExist(urlInput)
           .waitUntil(function () {
             return this.getValue(urlInput).then(val => val === page + '#top')
           })
@@ -372,7 +377,7 @@ describe('urlbar', function () {
       })
 
       it('reverts typing on escape', function *() {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(Config.defaultUrl)
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal(config.defaultUrl)
         yield selectsText(this.app.client)
       })
     })
@@ -427,7 +432,7 @@ describe('urlbar', function () {
 
       it('focuses on the webview', function *() {
         this.app.client.waitUntil(function () {
-          return this.getAttribute(':focus', 'src').then(src => src === Config.defaultUrl)
+          return this.getAttribute(':focus', 'src').then(src => src === config.defaultUrl)
         })
       })
     })

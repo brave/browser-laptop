@@ -4,9 +4,9 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
-const AppConfig = require('../constants/appConfig')
+const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
-const SiteUtil = require('../state/siteUtil')
+const siteUtil = require('../state/siteUtil')
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
@@ -14,14 +14,16 @@ const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
-const AppActions = require('../actions/appActions')
+const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
 const path = require('path')
 const getSetting = require('../settings').getSetting
-const debounce = require('../lib/debounce.js')
 const EventEmitter = require('events').EventEmitter
+const Immutable = require('immutable')
+const diff = require('immutablediff')
+const debounce = require('../lib/debounce.js')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -114,13 +116,13 @@ const createWindow = (browserOpts, defaults) => {
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden',
     autoHideMenuBar: true,
-    title: AppConfig.name,
+    title: appConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
-    AppActions.setDefaultWindowSize(evt.sender.getSize())
+    appActions.setDefaultWindowSize(evt.sender.getSize())
   })
 
   mainWindow.on('close', function () {
@@ -139,6 +141,17 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
+  mainWindow.on('app-command', function (e, cmd) {
+    switch (cmd) {
+      case 'browser-backward':
+        mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+        return
+      case 'browser-forward':
+        mainWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+        return
+    }
+  })
+
   LocalShortcuts.register(mainWindow)
   return mainWindow
 }
@@ -148,14 +161,21 @@ class AppStore extends EventEmitter {
     return appState
   }
 
-  emitChanges () {
-    if (lastEmittedState !== appState) {
-      lastEmittedState = appState
-      // TODO: Break this apart and only send what's needed
-      const stateJS = this.getState().toJS()
-      BrowserWindow.getAllWindows().forEach(wnd =>
-        wnd.webContents.send(messages.APP_STATE_CHANGE, stateJS))
+  emitFullWindowState (wnd) {
+    wnd.webContents.send(messages.APP_STATE_CHANGE, { state: appState.toJS() })
+    lastEmittedState = appState
+  }
+
+  emitChanges (emitFullState) {
+    if (lastEmittedState) {
+      const d = diff(lastEmittedState, appState)
+      if (!d.isEmpty()) {
+        BrowserWindow.getAllWindows().forEach(wnd =>
+          wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
+        lastEmittedState = appState
+      }
     }
+
     this.emit(CHANGE_EVENT)
   }
 
@@ -203,6 +223,16 @@ function setDefaultWindowSize () {
 const appStore = new AppStore()
 const emitChanges = debounce(appStore.emitChanges.bind(appStore), 5)
 
+/**
+ * Clears out the top X non tagged sites.
+ * This is debounced to every 1 minute, the cleanup is not particularly intensive
+ * but there's no point to cleanup frequently.
+ */
+const filterOutNonRecents = debounce(() => {
+  appState = appState.set('sites', siteUtil.filterOutNonRecents(appState.get('sites')))
+  emitChanges()
+}, 60 * 1000)
+
 const handleAppAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
@@ -213,8 +243,7 @@ const handleAppAction = (action) => {
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
 
       const mainWindow = createWindow(browserOpts, windowDefaults())
-      const settingsState = appState.get('settings')
-      const homepageSetting = getSetting(settingsState, settings.HOMEPAGE)
+      const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state
       let frames = []
@@ -224,7 +253,7 @@ const handleAppAction = (action) => {
         } else {
           frames.push(frameOpts)
         }
-      } else if (getSetting(settingsState, settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
+      } else if (getSetting(settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
         frames = homepageSetting.split('|').map(homepage => {
           return {
             location: homepage
@@ -245,7 +274,11 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
+          lastEmittedState = appState
           mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
+          if (action.cb) {
+            action.cb()
+          }
         }
       })
       mainWindow.show()
@@ -255,13 +288,29 @@ const handleAppAction = (action) => {
       appWindow.close()
       break
     case AppConstants.APP_ADD_SITE:
-      appState = appState.set('sites', SiteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+      const oldSiteSize = appState.get('sites').size
+      if (action.siteDetail.constructor === Immutable.List) {
+        action.siteDetail.forEach(s =>
+          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag)))
+      } else {
+        appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
+      }
+      if (action.destinationDetail) {
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false))
+      }
+      // If there was an item added then clear out the old history entries
+      if (oldSiteSize !== appState.get('sites').size) {
+        filterOutNonRecents()
+      }
       break
     case AppConstants.APP_REMOVE_SITE:
-      appState = appState.set('sites', SiteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
+      appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', SiteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent))
+      break
+    case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
+      appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))
       break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])

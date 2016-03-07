@@ -12,13 +12,43 @@ html, body, #appContainer, #appContainer > div {
 
 .bookmarksPage {
   margin: 20px;
+
+  .bookmarkPageContent {
+    border-top: 1px solid @chromeBorderColor;
+    display: flex;
+
+    .bookmarkList {
+      padding-top: 10px;
+    }
+
+    >.bookmarkFolderList {
+      border-right: 1px solid @chromeBorderColor;
+      padding-top: 10px;
+    }
+
+    .bookmarkFolderList {
+      min-width: 220px;
+
+      .bookmarkFolderIcon {
+        margin-right: 5px;
+      }
+    }
+  }
 }
 
-list >* {
-  padding: 5px;
-  margin-bottom: 5px;
+.bookmarkFolderList list >* {
+  padding-left: 12px;
+}
+
+list .listItem {
+  cursor: default;
+  padding: 12px;
+  -webkit-user-select: none;
   &:hover {
     background-color: lighten(@highlightBlue, 30%);
+  }
+  &.selected {
+    background-color: lighten(@highlightBlue, 20%);
   }
 }
 

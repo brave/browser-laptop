@@ -7,7 +7,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const keyCodes = require('../constants/keyCodes')
 const Button = require('./button.js')
-const WindowActions = require('../actions/windowActions')
+const windowActions = require('../actions/windowActions')
 
 export default class FindBar extends ImmutableComponent {
   constructor () {
@@ -21,14 +21,14 @@ export default class FindBar extends ImmutableComponent {
   }
 
   onChange (e) {
-    WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.isCaseSensitive
     }))
   }
 
   onCaseSensitivityChange (e) {
-    WindowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
       searchString: this.searchString,
       caseSensitivity: e.target.checked
     }))
@@ -63,7 +63,7 @@ export default class FindBar extends ImmutableComponent {
     if (this.props.selected) {
       this.focus()
     }
-    if (this.props.findDetail && !prevProps.findDetail ||
+    if (!this.props.findDetail || !prevProps.findDetail ||
         this.props.findDetail.get('searchString') !== prevProps.findDetail.get('searchString') ||
         this.props.findDetail.get('caseSensitivity') !== prevProps.findDetail.get('caseSensitivity')) {
       // Redo search if details have changed
@@ -92,7 +92,7 @@ export default class FindBar extends ImmutableComponent {
   }
 
   onBlur (e) {
-    WindowActions.setFindbarSelected(this.props.frame, false)
+    windowActions.setFindbarSelected(this.props.frame, false)
   }
 
   get numberOfMatches () {

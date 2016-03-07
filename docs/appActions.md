@@ -17,9 +17,19 @@ This is called from the main process on startup before anything else
 
 
 
-### newWindow() 
+### newWindow(frameOpts, browserOpts, restoredState, cb) 
 
-Dispatches an event to the main process to create a new window
+Dispatches an event to the main process to create a new window.
+
+**Parameters**
+
+**frameOpts**: `Object`, Options for the first frame in the window.
+
+**browserOpts**: `Object`, Options for the browser.
+
+**restoredState**: `Object`, State for the window to restore.
+
+**cb**: `function`, Callback to call after the window is loaded, will only work if called from the main process.
 
 
 
@@ -29,18 +39,26 @@ Dispatches an event to the main process to update the browser
 
 
 
-### addSite(siteDetail, tag, originalSiteDetail) 
+### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent) 
 
 Adds a site to the site list
 
 **Parameters**
 
-**siteDetail**: `Object`, Properties of the site in question
+**siteDetail**: `Object`, Properties of the site in question, can also be an array of siteDetail
 
 **tag**: `string`, A tag to associate with the site. e.g. bookmarks.
 
 **originalSiteDetail**: `string`, If specified, the original site detail to edit / overwrite.
+
+**destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
   The details of the old entries will be modified if this is set, otherwise only the tag will be added.
+
+
+
+### clearSitesWithoutTags() 
+
+Clears all sites without tags
 
 
 
@@ -56,7 +74,7 @@ Removes a site from the site list
 
 
 
-### moveSite(sourceDetail, destinationDetail, prepend) 
+### moveSite(sourceDetail, destinationDetail, prepend, destinationIsParent) 
 
 Dispatches a message to move a site locations.
 
@@ -67,6 +85,9 @@ Dispatches a message to move a site locations.
 **destinationDetail**: `string`, the location, partitionNumber, etc of the destination moved site
 
 **prepend**: `boolean`, Whether or not to prepend to the destinationLocation
+  If false, the destinationDetail is considered a sibling.
+
+**destinationIsParent**: `boolean`, Whether or not the destinationDetail should be considered the new parent.
 
 
 

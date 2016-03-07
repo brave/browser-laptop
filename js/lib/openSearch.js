@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Config = require('../constants/config.js')
+const config = require('../constants/config.js')
 import Immutable from 'immutable'
 
 /**
@@ -11,7 +11,7 @@ import Immutable from 'immutable'
 export function loadOpenSearch (path) {
   return new Promise(resolve => {
     const xhr = new window.XMLHttpRequest()
-    xhr.open('GET', path || Config.defaultOpenSearchPath, true)
+    xhr.open('GET', path || config.defaultOpenSearchPath, true)
     xhr.send()
     xhr.onload = () => {
       const parser = new window.DOMParser()

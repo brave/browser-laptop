@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.7.16",
+  "version": "0.8.0",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -69,6 +69,8 @@
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
     "immutable": "^3.7.5",
+    "immutablediff": "^0.4.2",
+    "immutablepatch": "^0.2.2",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
     "tracking-protection": "1.0.x",
@@ -108,6 +110,7 @@
     "nsp": "^2.2.0",
     "pre-commit": "^1.1.2",
     "spectron": "^0.36.0",
+    "sqlite3": "^3.1.1",
     "standard": "^5.4.1",
     "style-loader": "^0.13.0",
     "webdriverio": "^4.0.3",

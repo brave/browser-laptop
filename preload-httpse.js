@@ -8,6 +8,7 @@
 'use strict'
 var fs = require('fs')
 var parseString = require('xml2js').parseString
+var sqlite3 = require('sqlite3')
 
 // Manually exclude sites that are broken until they are fixed in the next
 // HTTPS Everywhere release.
@@ -38,3 +39,33 @@ for (let id in rulesets.rulesetStrings) {
 }
 console.log('Writing httpse.json')
 fs.writeFileSync('httpse.json', JSON.stringify(rulesets), 'utf8')
+
+// Convert httpse.json to sqlite for mobile
+console.log('creating httpse.sqlite')
+var db = new sqlite3.Database('httpse.sqlite', function (err) {
+  if (err !== null) {
+    throw new Error('FATAL: could not open db: ' + err)
+  }
+
+  db.exec(['DROP TABLE IF EXISTS rulesets',
+          'CREATE TABLE rulesets (id INTEGER PRIMARY KEY, contents TEXT)',
+          'DROP TABLE IF EXISTS targets',
+          'CREATE TABLE targets (host TEXT, ids TEXT)'].join('; '), function (err) {
+    if (err !== null) {
+      throw new Error('FATAL: could not create tables: ' + err)
+    }
+
+    var rulesetStatement = db.prepare('INSERT INTO rulesets (id, contents) VALUES(?, ?)')
+    var targetStatement = db.prepare('INSERT INTO targets (host, ids) VALUES(?, ?)')
+
+    // TODO: Speed this up
+    for (var id in rulesets.rulesetStrings) {
+      let contents = JSON.stringify(rulesets.rulesetStrings[id])
+      rulesetStatement.run(id, contents)
+    }
+    for (var target in rulesets.targets) {
+      let ids = JSON.stringify(rulesets.targets[target])
+      targetStatement.run(target, ids)
+    }
+  })
+})

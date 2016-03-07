@@ -49,6 +49,7 @@ function config () {
     },
     plugins: [
       new WebpackNotifierPlugin({title: 'Brave-' + env}),
+      new webpack.IgnorePlugin(/^\.\/stores\/appStore$/),
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify(env),

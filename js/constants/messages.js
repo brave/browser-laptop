@@ -44,6 +44,7 @@ const messages = {
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
   CHECK_FOR_UPDATE: _,
+  SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
   // App state
   APP_INITIALIZED: _,
@@ -58,6 +59,7 @@ const messages = {
   THEME_COLOR_COMPUTED: _,
   // Init
   INITIALIZE_WINDOW: _,
+  INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,
@@ -71,9 +73,13 @@ const messages = {
   // About pages from contentScript
   CHANGE_SETTING: _,
   NEW_FRAME: _,
+  MOVE_SITE: _,
   // HTTPS
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
-  CERT_ERROR_ACCEPTED: _ /** @arg {string} url where a cert error was accepted */
+  CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
+  CERT_ERROR_REJECTED: _, /** @arg {string} url where a cert error was rejected */
+  // Bookmarks
+  IMPORT_BOOKMARKS: _
 }
 
 module.exports = mapValuesByKeys(messages)

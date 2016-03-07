@@ -25,16 +25,16 @@ let mapFilterType = {
 }
 
 const startAdBlocking = () => {
-  Filtering.registerBeforeSendHeadersFilteringCB(details => {
+  Filtering.registerBeforeRequestFilteringCB(details => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
-    const shouldBlock = firstPartyUrl.protocol &&
+    const cancel = firstPartyUrl.protocol &&
       details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
-    DataFile.debug(details, shouldBlock)
+    DataFile.debug(details, cancel)
     return {
-      shouldBlock,
+      cancel,
       resourceName: module.exports.resourceName
     }
   })

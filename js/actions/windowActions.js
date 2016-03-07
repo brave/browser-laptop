@@ -6,29 +6,29 @@
 
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const WindowConstants = require('../constants/windowConstants')
-const Config = require('../constants/config')
+const config = require('../constants/config')
 const UrlUtil = require('../lib/urlutil')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 const remote = electron.remote
 const messages = require('../constants/messages')
-const AppActions = require('./appActions')
+const appActions = require('./appActions')
 const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
 
 function dispatch (action) {
-  if (WindowActions.dispatchToIPC) {
+  if (windowActions.dispatchToIPC) {
     // serialize immutable
     if (action.frameProps && action.frameProps.toJS) {
       action.frameProps = action.frameProps.toJS()
     }
     remote.getCurrentWindow().webContents.send('handle-action', action)
-    WindowActions.dispatchToIPC = false
+    windowActions.dispatchToIPC = false
   } else {
     WindowDispatcher.dispatch(action)
   }
 }
 
-const WindowActions = {
+const windowActions = {
   dispatchViaIPC: function () {
     this.dispatchToIPC = true
   },
@@ -80,7 +80,7 @@ const WindowActions = {
     }
 
     if (newFrame) {
-      WindowActions.newFrame({
+      windowActions.newFrame({
         location
       }, true)
       return
@@ -249,7 +249,7 @@ const WindowActions = {
     if (openInForeground === undefined) {
       openInForeground = true
     }
-    frameOpts.location = frameOpts.location || Config.defaultUrl
+    frameOpts.location = frameOpts.location || config.defaultUrl
     if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
       frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
     }
@@ -275,7 +275,7 @@ const WindowActions = {
       // only has pinned frames and tried to close, so close the
       // whole app.
       if (nonPinnedFrames.size === 0) {
-        AppActions.closeWindow(remote.getCurrentWindow().id)
+        appActions.closeWindow(remote.getCurrentWindow().id)
         return
       }
 
@@ -296,7 +296,7 @@ const WindowActions = {
         frameProps
       })
     } else {
-      AppActions.closeWindow(remote.getCurrentWindow().id)
+      appActions.closeWindow(remote.getCurrentWindow().id)
     }
   },
 
@@ -382,22 +382,6 @@ const WindowActions = {
       frameProps,
       canGoBack,
       canGoForward
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that dragging has started / stopped for the item.
-   *
-   * @param {string} dragType - The type of drag operation being performed
-   * @param {Object} sourceDragData - the properties for the item being dragged
-   * @param {boolean} dragging - true if the item is being dragged.
-   */
-  setIsBeingDragged: function (dragType, sourceDragData, dragging) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_IS_BEING_DRAGGED,
-      dragType,
-      sourceDragData,
-      dragging
     })
   },
 
@@ -489,7 +473,10 @@ const WindowActions = {
   },
 
   /**
-   * Marks the URL bar as active or not
+   * Marks the URL bar as active or not.
+   * If the URL bar is active that means it's in a position that it should be displaying
+   * autocomplete.  It may choose not to display autocomplete and still be active if there
+   * are no autocomplete results.
    *
    * @param {boolean} isActive - Whether or not the URL bar should be marked as active
    */
@@ -544,12 +531,26 @@ const WindowActions = {
    * If set, also indicates that add/edit is shown
    * @param {Object} currentDetail - Properties of the bookmark to change to
    * @param {Object} originalDetail - Properties of the bookmark to edit
+   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
    */
-  setBookmarkDetail: function (currentDetail, originalDetail) {
+  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
       currentDetail,
-      originalDetail
+      originalDetail,
+      destinationDetail
+    })
+  },
+
+  /**
+   * Dispatches a message to set context menu detail.
+   * If set, also indicates that the context menu is shown.
+   * @param {Object} detail - The context menu detail
+   */
+  setContextMenuDetail: function (detail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
+      detail
     })
   },
 
@@ -703,4 +704,4 @@ const WindowActions = {
   }
 }
 
-module.exports = WindowActions
+module.exports = windowActions

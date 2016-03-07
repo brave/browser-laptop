@@ -17,7 +17,11 @@ const app = require('app')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const sessionStorageVersion = 1
-const sessionStorageName = `session-store-${sessionStorageVersion}`
+let suffix = ''
+if (process.env.NODE_ENV === 'development') {
+  suffix = '-dev'
+}
+const sessionStorageName = `session-store-${sessionStorageVersion}${suffix}`
 const storagePath = process.env.NODE_ENV !== 'test'
   ? path.join(app.getPath('userData'), sessionStorageName)
   : path.join(process.env.HOME, '.brave-test-session-store-1')
@@ -34,7 +38,10 @@ const getSetting = require('../js/settings').getSetting
 module.exports.saveAppState = (payload) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
-    const startupModeSettingValue = getSetting(payload.settings || {}, settings.STARTUP_MODE)
+    let startupModeSettingValue
+    if (require('../js/stores/appStore').getState()) {
+      startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    }
     const savePerWindowState = startupModeSettingValue === undefined ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
@@ -62,8 +69,7 @@ module.exports.cleanSessionData = (sessionData) => {
     sessionData = {}
   }
   // Hide the context menu when we restore.
-  sessionData.contextMenuDetail = null
-
+  delete sessionData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
   delete sessionData.previewFrameKey
   // Don't restore add/edit dialog
@@ -134,6 +140,14 @@ module.exports.cleanSessionData = (sessionData) => {
     // restored.  We will be able to keep this once we
     // don't regenerate new frame keys when opening storage.
     delete frame.parentFrameKey
+
+    if (frame.navbar && frame.navbar.urlbar) {
+      frame.navbar.urlbar.urlPreview = null
+      if (frame.navbar.urlbar.suggestions) {
+        frame.navbar.urlbar.suggestions.selectedIndex = null
+        frame.navbar.urlbar.suggestions.suggestionList = null
+      }
+    }
   }
 
   // Clean closed frame data before frames because the keys are re-ordered
@@ -145,7 +159,7 @@ module.exports.cleanSessionData = (sessionData) => {
   if (sessionData.frames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
     sessionData.frames = sessionData.frames
-      // frame.isPinned is the old storage format
+      // TODO: frame.isPinned is the old storage format, remove that condition after the year 2016
       .filter(frame => !frame.isPinned && !frame.pinnedLocation)
     sessionData.frames.forEach(cleanFrame)
   }
