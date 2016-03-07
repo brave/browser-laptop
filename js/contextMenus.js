@@ -10,6 +10,7 @@ const clipboard = electron.clipboard
 const messages = require('./constants/messages')
 const WindowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
+const bookmarkActions = require('./actions/bookmarkActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
@@ -174,20 +175,7 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
         }
       },
       click: function (e) {
-        if (!isFolder) {
-          const isDarwin = process.platform === 'darwin'
-          if (e.ctrlKey && !isDarwin ||
-              e.metaKey && isDarwin ||
-              e.button === 1) {
-            windowActions.newFrame({
-              location: site.get('location'),
-              partitionNumber: site && site.get && site.get('partitionNumber') || undefined
-            }, false)
-          } else {
-            windowActions.loadUrl(activeFrame, site.get('location'))
-          }
-          windowActions.setContextMenuDetail()
-        }
+        bookmarkActions.clickBookmarkItem(allBookmarkItems, site, activeFrame, e)
       }
     }
     if (isFolder) {

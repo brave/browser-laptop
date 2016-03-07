@@ -7,6 +7,7 @@ const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const contextMenus = require('../contextMenus')
 const windowActions = require('../actions/windowActions')
+const bookmarkActions = require('../actions/bookmarkActions')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
@@ -21,7 +22,8 @@ const bookmarkMaxWidth = 100
 
 class BookmarkToolbarButton extends ImmutableComponent {
   onClick (e) {
-    if (this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
+    if (!bookmarkActions.clickBookmarkItem(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, e) &&
+        this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
       if (this.props.contextMenuDetail) {
         windowActions.setContextMenuDetail()
         return
@@ -29,17 +31,6 @@ class BookmarkToolbarButton extends ImmutableComponent {
       e.target = ReactDOM.findDOMNode(this)
       contextMenus.onShowBookmarkFolderMenu(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, e)
       return
-    }
-    const isDarwin = process.platform === 'darwin'
-    if (e.ctrlKey && !isDarwin ||
-        e.metaKey && isDarwin ||
-        e.button === 1) {
-      windowActions.newFrame({
-        location: this.props.bookmark.get('location'),
-        partitionNumber: this.props.bookmark.get('partitionNumber')
-      }, false)
-    } else {
-      windowActions.loadUrl(this.props.activeFrame, this.props.bookmark.get('location'))
     }
   }
 
