@@ -137,7 +137,7 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
       },
       drop (e) {
         e.preventDefault()
-        const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+        const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
         if (bookmark) {
           appActions.moveSite(bookmark, parentBookmarkFolder, false, true)
         }
@@ -169,7 +169,7 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
       },
       drop: function (e) {
         e.preventDefault()
-        const bookmarkItem = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+        const bookmarkItem = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
         if (bookmarkItem) {
           appActions.moveSite(bookmarkItem, site, dndData.shouldPrependVerticalItem(e.target, e.clientY))
         }

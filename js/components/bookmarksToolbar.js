@@ -134,7 +134,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
 class BookmarksToolbar extends ImmutableComponent {
   onDrop (e) {
     e.preventDefault()
-    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
       // Figure out the droppedOn element filtering out the source drag item
       let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => {

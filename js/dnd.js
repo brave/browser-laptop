@@ -3,9 +3,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const windowActions = require('./actions/windowActions')
+const appActions = require('./actions/appActions')
 const ReactDOM = require('react-dom')
 const dndData = require('./dndData')
 const dragTypes = require('./constants/dragTypes')
+const siteTags = require('./constants/siteTags')
+const siteUtil = require('./state/siteUtil')
 
 let inProcessDragData
 let inProcessDragType
@@ -85,7 +88,7 @@ module.exports.closestFromXOffset = (refs, x) => {
       }
     }
     const rect = refNode.getBoundingClientRect()
-    let currentDistance = Math.abs(x - rect.left + (rect.right - rect.left))
+    let currentDistance = Math.abs(x - rect.left + (rect.right - rect.left) / 2)
     if (currentDistance < smallestValue) {
       smallestValue = currentDistance
       selectedRef = ref
@@ -99,7 +102,7 @@ module.exports.closestFromXOffset = (refs, x) => {
 
 module.exports.isLeftSide = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
-  return Math.abs(clientX - boundingRect.left) < Math.abs(clientX - boundingRect.right)
+  return clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 2
 }
 
 module.exports.isMiddle = (domNode, clientX) => {
@@ -107,4 +110,16 @@ module.exports.isMiddle = (domNode, clientX) => {
   const isLeft = clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 3
   const isRight = clientX > boundingRect.right - (boundingRect.right - boundingRect.left) / 3
   return !isLeft && !isRight
+}
+
+module.exports.prepareBookmarkDataFromCompatible = (dataTransfer) => {
+  let bookmark = dndData.getDragData(dataTransfer, dragTypes.BOOKMARK)
+  if (!bookmark) {
+    const frameProps = dndData.getDragData(dataTransfer, dragTypes.TAB)
+    if (frameProps) {
+      bookmark = siteUtil.getDetailFromFrame(frameProps, siteTags.BOOKMARK)
+      appActions.addSite(bookmark, siteTags.BOOKMARK)
+    }
+  }
+  return bookmark
 }
