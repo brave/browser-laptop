@@ -90,8 +90,16 @@ class Main extends ImmutableComponent {
     }
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps) {
     this.loadOpenSearch()
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFramePrev = FrameStateUtil.getActiveFrame(prevProps.windowState)
+    const activeFrameTitle = activeFrame && (activeFrame.get('title') || activeFrame.get('location')) || ''
+    const activeFramePrevTitle = activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location')) || ''
+    const win = remote.getCurrentWindow()
+    if (activeFrameTitle !== activeFramePrevTitle && win) {
+      win.setTitle(activeFrameTitle)
+    }
   }
 
   componentDidMount () {
