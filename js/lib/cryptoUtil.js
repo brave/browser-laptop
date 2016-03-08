@@ -12,16 +12,17 @@ const AES_256_GCM = 'aes-256-gcm'
  * Encrypts and integrity-protects some text using AES GCM 256
  * @param {string} text - utf8 encoded text to encrypt
  * @param {string} key - binary encoded secret key, 32 bytes
- * @param {string} iv - binary encoded IV, 12 bytes
- * @return {{content: string, tag: string}}
+ * @return {{content: string, tag: string, iv: string}}
  */
-module.exports.encryptAuthenticate = function (text, key, iv) {
+module.exports.encryptAuthenticate = function (text, key) {
+  var iv = module.exports.getRandomBytes(12).toString('binary')
   var cipher = crypto.createCipheriv(AES_256_GCM, key, iv)
   var encrypted = cipher.update(text, 'utf8', 'binary')
   encrypted += cipher.final('binary')
   return {
     content: encrypted,
-    tag: cipher.getAuthTag().toString('binary')
+    tag: cipher.getAuthTag().toString('binary'),
+    iv: iv
   }
 }
 
@@ -45,4 +46,13 @@ module.exports.decryptVerify = function (encrypted, authTag, key, iv) {
     console.log('got decryption failure', e)
     return null
   }
+}
+
+/**
+ * Generates a buffer of N random bytes.
+ * @param {number} size - number of bytes to generate
+ * @return {Buffer}
+ */
+module.exports.getRandomBytes = function (size) {
+  return crypto.randomBytes(size)
 }

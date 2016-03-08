@@ -197,11 +197,25 @@
         }
         // Ask the main process for the credentials
         ipcRenderer.send('get-password', formOrigin, action)
-        console.log('got password field', formOrigin, action, usernameElem, passwordElem)
       }
+
+      // Whenever a form is submitted, offer to save it in the password manager
+      // if the credentials have changed.
+      form.addEventListener('submit', e => {
+        var fields = getFormFields(form, true)
+        // Re-get action in case it has changed
+        var action = form.action || document.location.href
+        var usernameElem = fields[0] || {}
+        var passwordElem = fields[1] || {}
+        ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
+                         formOrigin, action)
+      })
     })
 
     ipcRenderer.on('got-password', (e, username, password, origin, action) => {
+      // TODO: If there are multiple accounts, this always autofills the
+      // most recently-added one. We should detect when the username is
+      // entered and get the corresponding password.
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {
@@ -230,15 +244,22 @@
       return [null, null, null]
     }
 
-    // Search backwards from first password field to find the username field
-    var previousSibling = passwords[0].previousSibling
-    var username = null
-    while (previousSibling) {
-      if (previousSibling.type === 'text' && previousSibling.autocomplete !== 'off') {
-        username = previousSibling
-        break
+    // look for any form field that has username-ish attributes
+    var username = form.querySelector(['input[type=text][autocomplete=email]']) ||
+        form.querySelector(['input[type=text][autocomplete=username]']) ||
+        form.querySelector(['input[type=text][name=email]']) ||
+        form.querySelector(['input[type=text][name=username]']) ||
+        form.querySelector(['input[type=text][name=user]'])
+    if (!username) {
+      // Search backwards from first password field to find the username field
+      let previousSibling = passwords[0].previousSibling
+      while (previousSibling) {
+        if (previousSibling.type === 'text' && previousSibling.autocomplete !== 'off') {
+          username = previousSibling
+          break
+        }
+        previousSibling = previousSibling.previousSibling
       }
-      previousSibling = previousSibling.previousSibling
     }
 
     // If not a submission, autofill the first password field and ignore the rest
@@ -290,10 +311,15 @@
    * @return {Array.<Element>|null}
    */
   function getPasswordFields (form, isSubmission) {
+    var oldPassword = form.querySelector('input[autocomplete=current-password]')
+    var newPassword = form.querySelector('input[autocomplete=new-password]')
+    if (newPassword || oldPassword) {
+      return [oldPassword, newPassword]
+    }
     var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off])'))
     if (isSubmission) {
       // Skip empty fields
-      passwordNodes = passwordNodes.filter((e) => { return !e.value })
+      passwordNodes = passwordNodes.filter((e) => { return e.value })
     }
     return passwordNodes
   }

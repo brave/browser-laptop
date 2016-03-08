@@ -210,6 +210,7 @@ module.exports.loadAppState = () => {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }
       data.settings = data.settings || {}
+      data.passwords = data.passwords || []
       resolve(data)
     })
   })
@@ -222,6 +223,7 @@ module.exports.defaultAppState = () => {
   return {
     sites: [],
     visits: [],
-    settings: {}
+    settings: {},
+    passwords: []
   }
 }

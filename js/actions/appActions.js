@@ -190,6 +190,17 @@ const appActions = {
   },
 
   /**
+   * Saves login credentials
+   * @param {Object} passwordDetail - login details
+   */
+  savePassword: function (passwordDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_PASSWORD,
+      passwordDetail
+    })
+  },
+
+  /**
    * Changes an application level setting
    * @param {string} key - The key name for the setting
    * @param {string} value - The value of the setting
