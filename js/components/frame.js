@@ -298,10 +298,17 @@ class Frame extends ImmutableComponent {
           frameKey: this.props.frame.get('key')
         })
       }
-      const protocol = urlParse(this.props.frame.get('location')).protocol
+
+      const parsedUrl = urlParse(this.props.frame.get('location'))
+      const protocol = parsedUrl.protocol
       if (!this.props.frame.get('isPrivate') && (protocol === 'http:' || protocol === 'https:')) {
         // Register the site for recent history for navigation bar
         appActions.addSite(siteUtil.getDetailFromFrame(this.props.frame))
+      }
+
+      const hack = siteHacks[parsedUrl.hostname]
+      if (hack && hack.pageLoadEndScript) {
+        this.webview.executeJavaScript(hack.pageLoadEndScript)
       }
     }
     this.webview.addEventListener('load-commit', (event) => {
