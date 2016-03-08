@@ -31,6 +31,8 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
 const debounce = require('../js/lib/debounce.js')
+const CryptoUtil = require('../js/lib/cryptoUtil')
+const keytar = require('keytar')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -272,9 +274,31 @@ app.on('ready', function () {
       Updater.updateNowRequested()
     })
 
+    let masterPassword = null
     ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
       console.log('got pw request', origin, action)
-      e.sender.send(messages.GOT_PASSWORD, 'foo', 'bar', origin, action)
+      masterPassword = masterPassword || keytar.getPassword('Brave', 'master password')
+      if (masterPassword === null) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+
+      const passwords = AppStore.getState().get('passwords')
+      if (passwords) {
+        // Note this only autocompletes the most recent username/pw if there
+        // are multiple accounts
+        let result = passwords.findLast((password) => {
+          return password.get('origin') === origin && password.get('action') === action
+        })
+        if (result) {
+          let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                  result.get('authTag'),
+                                                  masterPassword,
+                                                  result.get('iv'))
+          e.sender.send(messages.GOT_PASSWORD, result.get('username'),
+                        password, origin, action)
+        }
+      }
     })
 
     // Setup the crash handling

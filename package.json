@@ -71,6 +71,7 @@
     "immutable": "^3.7.5",
     "immutablediff": "^0.4.2",
     "immutablepatch": "^0.2.2",
+    "keytar": "^3.0.0",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
     "tracking-protection": "1.0.x",

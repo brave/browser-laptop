@@ -22,10 +22,12 @@ AppStore
     endTime: number // datetime.getTime()
   }],
   passwords: [{
-    origin: string,
-    action: string,
+    origin: string, // origin of the form
+    action: string, // URL of the form action
     username: string,
-    password: string // encrypted before saving to disk
+    encryptedPassword: string, // encrypted by master password, binary-encoded
+    authTag: string, // AES-GCM authentication data, binary-encoded
+    iv: string // AES-GCM initialization vector, binary-encoded
   }],
   adblock: {
     etag: string, // last downloaded data file etag
