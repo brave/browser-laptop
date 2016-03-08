@@ -14,8 +14,8 @@
   display: flex;
   justify-content: space-between;
   padding-left: 70px;
-  border-bottom: 1px solid #bbb;
-  height: 40px;
+  border-bottom: 1px solid #aaaaaa;
+  height: 35px;
 }
 
 .urlbarForm {
@@ -35,9 +35,10 @@
     content: ' ';
     position: absolute;
     background: #fff;
-    border: 1px solid @focusUrlbarOutline;
+    border: 2px solid @focusUrlbarOutline;
     border-radius: 4px;
     box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
+    box-shadow: inset 0 1px 8px rgba(0, 137, 255, 0.5);
     color: #333;
     outline: none;
     top: 0;
@@ -52,9 +53,9 @@
     background: white;
     border-radius: @borderRadiusURL;
     box-sizing: border-box;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
     color: @chromeText;
-    padding: 0 8px;
+    padding: 0 10px;
   }
 }
 
@@ -99,10 +100,15 @@
       position: relative;
       left: 2px;
       min-width: 0;
+        
 
       &[class*=" fa-"] {
         margin-right: 5px;
-        min-width: 16px;
+        margin-top: 3px;
+        font-size: 14px;
+        min-height: 12px;
+        color: @chromeText;
+        min-width: 14px;
       }
     }
 
@@ -155,7 +161,7 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 0 0 0 1px;
+    margin: 2px 0 0 3px;
     outline: none;
     text-overflow: ellipsis;
     width: 100%;
@@ -177,10 +183,10 @@
   }
 
   .urlbarIcon {
-    color: @buttonColor;
+    color: @focusUrlbarOutline;
     left: 14px;
-    font-size: 15px;
-    min-height: 16px;
+    font-size: 14px;
+    min-height: 10px;
     min-width: 16px;
 
     &.extendedValidation {
@@ -315,5 +321,5 @@
   width: 23px;
   height: 27px;
   margin-top: 1px;
-  margin-right: 9px;
+  margin-right: 8px;
 }
