@@ -44,12 +44,15 @@
 <setDefaultSearch "Definir {{$title}} como mecanismo padrão de pesquisa">
 <viewPageSource "Ver Código Fonte da página">
 <menuButton title: "Menu">
+<emptyFolderItem "(vazio)">
+<moreBookmarks "Mais favoritos...">
 
 <braveMenuTotalReplacements "Total de Substituições: {{$count}}">
 
 <basicAuthRequired "Autenticação Necessária">
-<basicAuthUsername placeholder: "Nome de usuário">
-<basicAuthPassword placeholder: "Senha">
+<basicAuthUsername "Nome de usuário:">
+<basicAuthPassword "Senha:">
+<basicAuthMessage "{{$host}} requer um nome de usuário e uma senha.">
 
 <crashScreenHeader "Algo deu errado =(">
 <crashScreenText "Um erro ocorreu ao exibir esta página. Para continuar, recarregue ou navegue para outra página.">
