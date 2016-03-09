@@ -64,6 +64,18 @@ Dispatches a message to set the security state.
 
 
 
+### setLoginRequiredDetail(frameProps, detail) 
+
+Dispatches a message to set the login required detail.
+
+**Parameters**
+
+**frameProps**: `Object`, The frame where the login required prompt should be shown.
+
+**detail**: `Object`, Details of the login required operation.
+
+
+
 ### setNavBarUserInput(location) 
 
 Dispatches a message to the store to set the user entered text for the URL bar.
