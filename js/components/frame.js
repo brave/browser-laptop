@@ -86,6 +86,9 @@ class Frame extends ImmutableComponent {
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
+    if (hack && hack.allowRunningInsecureContent) {
+      this.webview.setAttribute('allowRunningInsecureContent', true)
+    }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
     if (!this.webviewContainer.firstChild) {

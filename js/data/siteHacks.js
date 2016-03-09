@@ -11,20 +11,19 @@ module.exports = {
   },
   'player.twitch.tv': {
     onBeforeRequest: function(details) {
-      console.log('onBeforeRequest player.twitch.tv', details)
       if (details.resourceType !== 'subFrame' || details.url.includes('&html5')) {
         return
       }
-      console.log('details for player.twitch.tv', details)
       return {
         redirectURL: details.url + '&html5'
       }
     }
   },
   'www.twitch.tv': {
+    allowRunningInsecureContent: true,
     pageLoadEndScript: `$('.js-player').html(
       $('<iframe>').attr({
-        src: 'http://player.twitch.tv/?branding=false&html5&showInfo=false&channel=' + $(location).attr('pathname'),
+        src: 'https://player.twitch.tv/?branding=false&html5&showInfo=false&channel=' + $(location).attr('pathname'),
         width: '100%',
         height: '100%',
         allowfullscreen: true,
