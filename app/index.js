@@ -106,8 +106,6 @@ app.on('ready', function () {
   app.on('login', function (e, webContents, request, authInfo, cb) {
     e.preventDefault()
     authCallbacks[request.url] = cb
-    // Tell the page to show an unlocked icon. Note this is sent to the main
-    // window webcontents, not the webview webcontents
     BrowserWindow.getAllWindows().map((win) => {
       win.webContents.send(messages.LOGIN_REQUIRED, {
         url: request.url,
