@@ -16,7 +16,8 @@ var exclusions = {
   'Nike.com.xml': 'breaks nikeplus.com',
   'PJ_Media.xml': 'mixed content on https://pjmedia.com/instapundit/',
   'Slashdot.xml': 'redirect loop on mobile slashdot.org',
-  'Vox.com.xml': 'redirect loop on vox.com'
+  'Vox.com.xml': 'redirect loop on vox.com',
+  'Delta.com.xml': 'https://delta.com does not redirect to https://www.delta.com'
 }
 
 var rulesets = JSON.parse(fs.readFileSync('rulesets.json', 'utf8'))
