@@ -24,6 +24,7 @@ const UpdateBar = require('./updateBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
 const AddEditBookmark = require('./addEditBookmark')
+const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
@@ -155,6 +156,12 @@ class Main extends ImmutableComponent {
         })
         windowActions.loadUrl(frame, 'about:certerror')
       })
+    })
+
+    ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
+      const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === detail.url)
+      frames.forEach(frame =>
+        windowActions.setLoginRequiredDetail(frame, detail))
     })
 
     ipc.on(messages.CERT_ERROR_REJECTED, (e, previousLocation, frameKey) => {
@@ -343,6 +350,10 @@ class Main extends ImmutableComponent {
             ? <SiteInfo frameProps={activeFrame}
                 siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
+          }
+          { activeFrame.getIn(['security', 'loginRequiredDetail'])
+            ? <LoginRequired frameProps={activeFrame}/>
+            : null
           }
           { this.props.windowState.get('bookmarkDetail')
             ? <AddEditBookmark sites={this.props.appState.get('sites')}

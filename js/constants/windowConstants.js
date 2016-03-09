@@ -45,6 +45,7 @@ const windowConstants = {
   WINDOW_SET_RELEASE_NOTES_VISIBLE: _, // Whether or not to show release notes
   WINDOW_SET_BLOCKED_BY: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_SECURITY_STATE: _,
+  WINDOW_SET_LOGIN_REQUIRED_DETAIL: _,
   WINDOW_SET_STATE: _,
   WINDOW_ZOOM_IN: _,
   WINDOW_ZOOM_OUT: _,

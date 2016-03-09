@@ -130,7 +130,15 @@ class Frame extends ImmutableComponent {
         if (this.props.frame.get('location') === 'about:preferences') {
           break
         }
-        this.webview.reload()
+        // Ensure that the webview thinks we're on the same location as the browser does.
+        // This can happen for pages which don't load properly.
+        // Some examples are basic http auth and bookmarklets.
+        // In this case both the user display and the user think they're on frame.get('location').
+        if (this.webview.getURL() !== this.props.frame.get('location')) {
+          this.webview.loadURL(this.props.frame.get('location'))
+        } else {
+          this.webview.reload()
+        }
         break
       case 'clean-reload':
         this.webview.reloadIgnoringCache()

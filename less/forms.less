@@ -1,0 +1,137 @@
+@import "variables.less";
+
+.flyoutDialog {
+  background-color: @toolbarBackground;
+  border-radius: @borderRadius;
+  box-shadow: 2px 2px 8px #3b3b3b;
+  color: #000;
+  font-size: 13px;
+  padding: 10px 30px;
+  position: absolute;
+  text-align: left;
+  top: 30px;
+}
+
+.releaseNotes {
+  .flyoutDialog;
+  width: auto;
+  margin-left: -250px;
+  max-width: 350px;
+  text-align: left;
+
+  h1 {
+    margin-bottom: 10px;
+  }
+}
+
+.siteInfo {
+  >ul {
+    .flyoutDialog;
+    margin-left: -250px;
+    text-align: left;
+    width: auto;
+
+    li {
+      list-style-type: none;
+      padding: 10px 0;
+
+      .fa {
+        padding-right: 10px;
+      }
+      &.extendedValidation {
+        color: green;
+      }
+
+      ul {
+        font-size: smaller;
+        max-height: 300px;
+        overflow-y: scroll;
+        margin-top: -20px;
+        padding: 0 10px;
+        max-width: 350px;
+      }
+    }
+  }
+}
+
+.genericForm {
+  .flyoutDialog;
+  display: table;
+  margin-left: -250px;
+  text-align: left;
+  width: auto;
+
+  .genericFormSubtitle {
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .genericFormTable {
+    display: table;
+    >div {
+      &:not(.formHeader) {
+        display: table-row;
+        >* {
+          display: table-cell;
+        }
+      }
+      >label {
+        padding-right: 5px;
+       text-align: right;
+      }
+      >input {
+        margin: 2px;
+        min-width: 250px;
+        padding: 2px;
+      }
+      .primaryButton {
+        float: right;
+      }
+    }
+  }
+}
+
+#navigator {
+  .urlBarSuggestions {
+    .flyoutDialog;
+    box-sizing: border-box;
+    width: 100%;
+    left: 0;
+    z-index: 311;
+
+    .suggestionIcon {
+      margin-right: 10px;
+    }
+
+    .suggestionText {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: calc(~'100% - 30px');
+      vertical-align: middle;
+    }
+
+    li {
+      list-style-type: none;
+      padding: 10px 0;
+      z-index: 333;
+
+      &.selected {
+        color: @highlightBlue;
+      }
+      * {
+        /* To allow for mouse listeners to work on the list items. */
+        pointer-events: none;
+      }
+    }
+
+    li + li {
+      border-top: 1px solid @chromeControlsBackground;
+    }
+  }
+}

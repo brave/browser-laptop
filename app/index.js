@@ -41,6 +41,8 @@ let lastWindowState
 
 // URLs to accept bad certs for.
 let acceptCertUrls = {}
+// URLs to callback for auth.
+let authCallbacks = {}
 
 const saveIfAllCollected = () => {
   // If we're shutting down early and can't access the state, it's better
@@ -101,6 +103,18 @@ app.on('ready', function () {
       })
     })
   })
+  app.on('login', function (e, webContents, request, authInfo, cb) {
+    e.preventDefault()
+    authCallbacks[request.url] = cb
+    // Tell the page to show an unlocked icon. Note this is sent to the main
+    // window webcontents, not the webview webcontents
+    BrowserWindow.getAllWindows().map((win) => {
+      win.webContents.send(messages.LOGIN_REQUIRED, {
+        url: request.url,
+        authInfo
+      })
+    })
+  })
   app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
@@ -138,7 +152,20 @@ app.on('ready', function () {
       lastWindowState = data
     }
   })
-
+  ipcMain.on(messages.LOGIN_RESPONSE, (e, url, username, password) => {
+    if (username || password) {
+      // Having 2 of the same tab URLs open right now, where both require auth
+      // can cause an error / alert here.  Ignore it for now.
+      try {
+        if (authCallbacks[url]) {
+          authCallbacks[url](username, password)
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    delete authCallbacks[url]
+  })
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
       appActions.newWindow(undefined, undefined, lastWindowState)

@@ -39,6 +39,8 @@ const messages = {
   QUIT_APPLICATION: _,
   UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
+  LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
+  LOGIN_RESPONSE: _,
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,

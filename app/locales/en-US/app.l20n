@@ -50,8 +50,9 @@
 <braveMenuTotalReplacements "Total Replacements: {{$count}}">
 
 <basicAuthRequired "Authentication Required">
-<basicAuthUsername placeholder: "Username">
-<basicAuthPassword placeholder: "Password">
+<basicAuthUsername "Username:">
+<basicAuthPassword "Password:">
+<basicAuthMessage "{{$host}} requires a username and password.">
 
 <crashScreenHeader "Something went wrong =(">
 <crashScreenText "An error occurred while displaying this webpage. To continue, reload or navigate to another page.">

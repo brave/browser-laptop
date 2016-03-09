@@ -120,6 +120,12 @@ WindowStore
             issuer: string
         }
       }, // the certificate details if any
+      loginRequiredDetail: {
+        isProxy: boolean,
+        host: string,
+        port: number,
+        realm: string
+      },
       isExtendedValidation: boolean, // is using https ev
       activeMixedContent: boolean, // has active mixed content
       passiveMixedContent: boolean, // has passive mixed content
