@@ -351,7 +351,7 @@ class Main extends ImmutableComponent {
                 siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
           }
-          { activeFrame.getIn(['security', 'loginRequiredDetail'])
+          { activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
             ? <LoginRequired frameProps={activeFrame}/>
             : null
           }

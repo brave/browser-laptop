@@ -281,7 +281,7 @@ const windowActions = {
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
     // Flush out any pending login required prompts
-    if (frameProps.getIn(['security', 'loginRequiredDetail'])) {
+    if (frameProps && frameProps.getIn(['security', 'loginRequiredDetail'])) {
       ipc.send(messages.LOGIN_RESPONSE, frameProps.get('location'))
     }
     // Unless a caller explicitly specifies to close a pinned frame, then
