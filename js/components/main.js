@@ -158,6 +158,11 @@ class Main extends ImmutableComponent {
       })
     })
 
+    ipc.on(messages.SET_SECURITY_STATE, (e, frameKey, securityState) => {
+      windowActions.setSecurityState(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey),
+                                     securityState)
+    })
+
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
       const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === detail.url)
       frames.forEach(frame =>

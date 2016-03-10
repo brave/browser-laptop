@@ -29,6 +29,7 @@ const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
 const showAbout = require('./aboutDialog').showAbout
+const urlParse = require('url').parse
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -214,6 +215,16 @@ app.on('ready', function () {
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
       acceptCertUrls[url] = true
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
+    })
+
+    ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
+      // If the host is associated with a URL with a cert error, update the
+      // security state to insecure
+      if (Object.keys(acceptCertUrls).map(url => { return urlParse(url).host }).includes(host)) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.SET_SECURITY_STATE, frameKey, {
+          secure: false
+        })
+      }
     })
 
     ipcMain.on(messages.CERT_ERROR_REJECTED, (event, previousLocation, frameKey) => {

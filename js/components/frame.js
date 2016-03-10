@@ -289,10 +289,15 @@ class Frame extends ImmutableComponent {
         windowActions.setLocation(event.url, key)
         const parsedUrl = urlParse(event.url)
         const hack = siteHacks[parsedUrl.hostname]
+        const isSecure = parsedUrl.protocol === 'https:' &&
+          (!hack || !hack.allowRunningInsecureContent)
         windowActions.setSecurityState(this.props.frame, {
-          secure: parsedUrl.protocol === 'https:' &&
-            (!hack || !hack.allowRunningInsecureContent)
+          secure: isSecure
         })
+        if (isSecure) {
+          // Check that there isn't a cert error.
+          ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frame.get('key'))
+        }
       }
       windowActions.updateBackForwardState(
         this.props.frame,

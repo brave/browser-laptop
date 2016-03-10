@@ -80,6 +80,8 @@ const messages = {
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CERT_ERROR_REJECTED: _, /** @arg {string} url where a cert error was rejected */
+  SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
+  CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
   // Bookmarks
   IMPORT_BOOKMARKS: _
 }
