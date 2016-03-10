@@ -32,6 +32,8 @@ class Frame extends ImmutableComponent {
   updateWebview () {
     let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
+    const hack = siteHacks[urlParse(location).hostname]
+    const allowRunningInsecureContent = !!(hack && hack.allowRunningInsecureContent)
     let appRoot = window.baseHref
       ? 'file://' + path.resolve(__dirname, '..', '..', 'app') + '/'
       : ''
@@ -48,14 +50,15 @@ class Frame extends ImmutableComponent {
       this.webview && contentScripts !== this.webview.getAttribute('contentScripts')
 
     // Create the webview dynamically because React doesn't whitelist all
-    // of the attributes we need.  Clear out old webviews if the contentScripts
-    // change because they cannot change after being added to the DOM.
-    if (contentScriptsChanged) {
+    // of the attributes we need.  Clear out old webviews if the contentScripts change or if
+    // allowRunningInsecureContent changes because they cannot change after being added to the DOM.
+    if (!this.webview || this.webview.allowRunningInsecureContent !== allowRunningInsecureContent || contentScriptsChanged) {
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
+      this.webview = document.createElement('webview')
+      src = location
     }
-    this.webview = !contentScriptsChanged && this.webview || document.createElement('webview')
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
@@ -82,12 +85,12 @@ class Frame extends ImmutableComponent {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
 
-    const hack = siteHacks[urlParse(location).hostname]
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
-    if (hack && hack.allowRunningInsecureContent) {
+    if (allowRunningInsecureContent) {
       this.webview.setAttribute('allowRunningInsecureContent', true)
+      this.webview.allowRunningInsecureContent = true
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
@@ -109,7 +112,10 @@ class Frame extends ImmutableComponent {
     // When auto-redirecting to about:certerror, the frame location change and
     // frame src change are emitted separately. Make sure updateWebview is
     // called when the location changes.
-    if (didSrcChange || (didLocationChange && location === 'about:certerror')) {
+    const hack = siteHacks[urlParse(location).hostname]
+    const allowRunningInsecureContent = !!(hack && hack.allowRunningInsecureContent)
+    if (didSrcChange || didLocationChange && location === 'about:certerror' || !this.webview ||
+        allowRunningInsecureContent !== this.webview.allowRunningInsecureContent) {
       this.updateWebview()
     }
     if (didLocationChange && location !== 'about:certerror' &&
