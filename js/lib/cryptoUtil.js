@@ -15,8 +15,10 @@ const AES_256_GCM = 'aes-256-gcm'
  * @return {{content: string, tag: string, iv: string}}
  */
 module.exports.encryptAuthenticate = function (text, key) {
-  var iv = module.exports.getRandomBytes(12).toString('binary')
+  var ivBuffer = module.exports.getRandomBytes(12)
+  var iv = ivBuffer.toString('binary')
   var cipher = crypto.createCipheriv(AES_256_GCM, key, iv)
+  cipher.setAAD(ivBuffer)
   var encrypted = cipher.update(text, 'utf8', 'binary')
   encrypted += cipher.final('binary')
   return {
@@ -37,6 +39,7 @@ module.exports.encryptAuthenticate = function (text, key) {
 module.exports.decryptVerify = function (encrypted, authTag, key, iv) {
   try {
     let decipher = crypto.createDecipheriv(AES_256_GCM, key, iv)
+    decipher.setAAD(new Buffer(iv, 'binary'))
     decipher.setAuthTag(new Buffer(authTag, 'binary'))
     let decrypted = decipher.update(encrypted, 'binary', 'utf8')
     decrypted += decipher.final('utf8')
