@@ -132,7 +132,8 @@
     font-size: 12px;
     right: 10px;
     text-align: right;
-    top: 8px;
+    margin: 3px 0 0 0;
+    top: 9px;
   }
 
   /* Disable selection of button text */
@@ -161,7 +162,7 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 2px 0 0 3px;
+    margin: 3px 0 0 3px;
     outline: none;
     text-overflow: ellipsis;
     width: 100%;
@@ -182,10 +183,25 @@
     opacity: 1;
   }
 
+    .urlbarIcon.fa-unlock-alt {
+    margin-top: 4px;
+    font-size: 16px;
+    min-height: 10px;
+    min-width: 16px;
+}  
+    
+    .urlbarIcon.fa-lock {
+    margin-top: 4px;
+    font-size: 16px;
+    min-height: 10px;
+    min-width: 16px;
+}
+    
   .urlbarIcon {
     color: @focusUrlbarOutline;
     left: 14px;
-    font-size: 14px;
+    margin-top: 1px;
+    font-size: 13px;
     min-height: 10px;
     min-width: 16px;
 
@@ -200,6 +216,6 @@
   background-repeat: no-repeat;
   width: 23px;
   height: 27px;
-  margin-top: 1px;
+  margin-top: 3px;
   margin-right: 8px;
 }
