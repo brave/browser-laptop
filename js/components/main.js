@@ -312,7 +312,9 @@ class Main extends ImmutableComponent {
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
-      !releaseNotesIsVisible
+      !releaseNotesIsVisible &&
+      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
+
     return <div id='window'
         ref={node => this.mainWindow = node}
         onMouseDown={this.onMouseDown.bind(this)}
