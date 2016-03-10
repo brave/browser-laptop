@@ -287,8 +287,11 @@ class Frame extends ImmutableComponent {
           this.props.frame)
         const key = this.props.frame.get('key')
         windowActions.setLocation(event.url, key)
+        const parsedUrl = urlParse(event.url)
+        const hack = siteHacks[parsedUrl.hostname]
         windowActions.setSecurityState(this.props.frame, {
-          secure: urlParse(event.url).protocol === 'https:'
+          secure: parsedUrl.protocol === 'https:' &&
+            (!hack || !hack.allowRunningInsecureContent)
         })
       }
       windowActions.updateBackForwardState(
