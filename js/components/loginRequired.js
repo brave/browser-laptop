@@ -10,6 +10,7 @@ const KeyCodes = require('../constants/keyCodes')
 const messages = require('../constants/messages')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
+const url = require('url')
 
 class LoginRequired extends React.Component {
   constructor () {
@@ -73,10 +74,7 @@ class LoginRequired extends React.Component {
   }
   render () {
     const l10nArgs = {
-      host: this.detail.authInfo.host
-    }
-    if (this.detail.authInfo.port) {
-      l10nArgs.host += ':' + this.detail.authInfo.port
+      host: url.resolve(this.props.frameProps.get('location'), '/')
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
       <div className='genericForm' onClick={this.onClick.bind(this)}>
