@@ -86,8 +86,8 @@ WindowStore
     canGoBack: boolean,
     canGoForward: boolean,
     icon: string, // favicon url
-    location: string, // page url
-    src: string, // what the iframe src should be
+    location: string, // The currently navigated location
+    src: string, // The iframe src attribute
     pinnedLocation: string, // Indicates if a frame is pinned and its pin location
     title: string, // page title
     findbarShown: boolean, // whether the findbar is shown

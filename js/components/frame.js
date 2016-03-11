@@ -152,6 +152,9 @@ class Frame extends ImmutableComponent {
       case 'clean-reload':
         this.webview.reloadIgnoringCache()
         break
+      case 'explicitLoadURL':
+        this.webview.loadURL(this.props.frame.get('location'))
+        break
       case 'zoom-in':
         windowActions.zoomIn(this.props.frame)
         break

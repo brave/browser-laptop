@@ -107,13 +107,21 @@ const doAction = (action) => {
       // We should not emit here because the Window already know about the change on startup.
       return
     case WindowConstants.WINDOW_SET_URL:
-      // reload if the url is unchanged
-      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
+      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') === action.location) {
+        // reload if the url is unchanged
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           audioPlaybackActive: false,
           activeShortcut: 'reload'
         })
       } else {
+      // If the user is changing back to the original src and they already navigated away then we need to
+      // explicitly set a new location via webview.loadURL.
+        let activeShortcut
+        if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') !== action.location &&
+            FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
+          activeShortcut = 'explicitLoadURL'
+        }
+
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
           location: action.location,
@@ -126,7 +134,8 @@ const doAction = (action) => {
           // without src change.
           themeColor: undefined,
           computedThemeColor: undefined,
-          title: ''
+          title: '',
+          activeShortcut
         })
         // force a navbar update in case this was called from an app
         // initiated navigation (bookmarks, etc...)
