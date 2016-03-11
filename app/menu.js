@@ -173,25 +173,35 @@ const init = (settingsState, args) => {
   const editSubmenu = [{
     label: 'Undo',
     accelerator: 'CmdOrCtrl+Z',
-    role: 'undo'
+    click: function (item, focusedWindow) {
+      focusedWindow.webContents.undo()
+    }
   }, {
     label: 'Redo',
     accelerator: 'Shift+CmdOrCtrl+Z',
-    role: 'redo'
+    click: function (item, focusedWindow) {
+      focusedWindow.webContents.redo()
+    }
   },
     CommonMenu.separatorMenuItem,
     {
       label: 'Cut',
       accelerator: 'CmdOrCtrl+X',
-      role: 'cut'
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.cut()
+      }
     }, {
       label: 'Copy',
       accelerator: 'CmdOrCtrl+C',
-      role: 'copy'
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.copy()
+      }
     }, {
       label: 'Paste',
       accelerator: 'CmdOrCtrl+V',
-      role: 'paste'
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.paste()
+      }
     }, {
       label: 'Paste without formatting',
       accelerator: 'Shift+CmdOrCtrl+V',
@@ -209,7 +219,9 @@ const init = (settingsState, args) => {
     }, {
       label: 'Select All',
       accelerator: 'CmdOrCtrl+A',
-      role: 'selectall'
+      click: function (item, focusedWindow) {
+        focusedWindow.webContents.selectAll()
+      }
     },
     CommonMenu.separatorMenuItem,
     CommonMenu.findOnPageMenuItem,
