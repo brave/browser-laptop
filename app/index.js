@@ -30,6 +30,7 @@ const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
 const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
+const debounce = require('../js/lib/debounce.js')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -37,7 +38,8 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
-let sessionStateStoreAttempted = false
+let sessionStateStoreCompleteOnQuit = false
+let beforeQuitSaveStarted = false
 let lastWindowState
 
 // URLs to accept bad certs for.
@@ -48,7 +50,7 @@ let authCallbacks = {}
 const saveIfAllCollected = () => {
   // If we're shutting down early and can't access the state, it's better
   // to not try to save anything at all and just quit.
-  if (!AppStore.getState()) {
+  if (beforeQuitSaveStarted && !AppStore.getState()) {
     app.exit(0)
   }
   if (perWindowState.length === BrowserWindow.getAllWindows().length) {
@@ -57,34 +59,52 @@ const saveIfAllCollected = () => {
     if (perWindowState.length === 0 && lastWindowState) {
       appState.perWindowState.push(lastWindowState)
     }
-    const ignoreCatch = () => {}
 
-    // If the status is still UPDATE_AVAILABLE then the user wants to quit
-    // and not restart
-    if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
-        appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
-      // In this case on win32, the process doesn't try to auto restart, so avoid the user
-      // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
-      if (process.platform === 'win32') {
-        appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
-      } else {
-        appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+    if (beforeQuitSaveStarted) {
+      // If the status is still UPDATE_AVAILABLE then the user wants to quit
+      // and not restart
+      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
+          appState.updates.status === UpdateStatus.UPDATE_AVAILABLE_DEFERRED)) {
+        // In this case on win32, the process doesn't try to auto restart, so avoid the user
+        // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
+        if (process.platform === 'win32') {
+          appState.updates.status = UpdateStatus.UPDATE_APPLYING_RESTART
+        } else {
+          appState.updates.status = UpdateStatus.UPDATE_APPLYING_NO_RESTART
+        }
       }
     }
 
+    const ignoreCatch = () => {}
     SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
-      sessionStateStoreAttempted = true
-      // If there's an update to apply, then do it here.
-      // Otherwise just quit.
-      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
-          appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-        Updater.quitAndInstall()
-      } else {
-        app.quit()
+      if (beforeQuitSaveStarted) {
+        sessionStateStoreCompleteOnQuit = true
+        // If there's an update to apply, then do it here.
+        // Otherwise just quit.
+        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
+            appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
+          Updater.quitAndInstall()
+        } else {
+          app.quit()
+        }
       }
     })
   }
 }
+
+/**
+ * Saves the session storage for all windows
+ * This is debounced to every 5 minutes, the save is not particularly intensive but it does do IO
+ * and there's not much gained if saved more frequently since it's also saved on shutdown.
+ */
+const initiateSessionStateSave = debounce(() => {
+  if (beforeQuitSaveStarted) {
+    return
+  }
+  perWindowState.length = 0
+  saveIfAllCollected()
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+}, 5 * 60 * 1000)
 
 app.on('ready', function () {
   app.on('certificate-error', function (e, webContents, url, error, cert, cb) {
@@ -130,12 +150,18 @@ app.on('ready', function () {
   })
 
   app.on('before-quit', function (e) {
-    if (sessionStateStoreAttempted || BrowserWindow.getAllWindows().length === 0) {
+    beforeQuitSaveStarted = true
+    if (sessionStateStoreCompleteOnQuit) {
+      return
+    }
+
+    if (BrowserWindow.getAllWindows().length === 0) {
       saveIfAllCollected()
       return
     }
 
     e.preventDefault()
+    perWindowState.length = 0
     BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
   })
 
@@ -174,17 +200,17 @@ app.on('ready', function () {
 
   loadAppStatePromise.then(initialState => {
     // For tests we always want to load default app state
-    const perWindowState = initialState.perWindowState
+    const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
     appActions.setState(Immutable.fromJS(initialState))
-    return perWindowState
-  }).then(perWindowState => {
-    if (!perWindowState || perWindowState.length === 0) {
+    return loadedPerWindowState
+  }).then(loadedPerWindowState => {
+    if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {
         appActions.newWindow()
       }
     } else {
-      perWindowState.forEach(wndState => {
+      loadedPerWindowState.forEach(wndState => {
         appActions.newWindow(undefined, undefined, wndState)
       })
     }
@@ -233,6 +259,7 @@ app.on('ready', function () {
 
     AppStore.addChangeListener(() => {
       Menu.init(AppStore.getState().get('settings'))
+      initiateSessionStateSave()
     })
 
     Filtering.init()
