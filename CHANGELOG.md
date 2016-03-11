@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
+- Upgrade to libchromiumcontent v49.
+- Upgrade to Electron 0.37.0.
+- Basic HTTP authentication now supported.
+- Support for Twitch.tv
+- Possible fix for copy text sometimes not working.
+- Fix bookmarks not working after navigating within a page using push state api.
+- Save session state periodically to prevent data loss.
+- Window titles actually being set for better compatibility with other apps.
+- We now show a broken lock icon for pages with certificate errors.
+- Tweaked various UI bits.
+- Fixed text cursor jumping to the end of a text input in the settings pane.
+- Added import bookmarks item to the hamburger menu.
+- Middle clicking on a bookmark folder now opens all bookmarks.
+- Control tab, command tab, and middle click now works for bookmarks within a menu on the toolbar.
+- Typekit and Google fonts fix.
+- Dragging favicon onto bookmarks bar now respects position of the drop.
+
 ## [0.8.0](https://github.com/brave/browser-laptop/releases/v0.8.0dev)
 - Bookmark management: Bookmark folders added, drag and drop bookmarks and folders from within the Bookmark Toolbar and Bookmark Manager.
 - Ability to import bookmarks from a Firefox or Chrome HTML export.
