@@ -40,6 +40,8 @@ Make sure you have all of the pre-requisite compilers/applications [Installed](h
 
         npm install
 
+For now, newer versions of node (5.8) require you to `cd node_modules/abp-filter-parser-cpp` after the `npm install` and run `make`.
+
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
 Additional notes on troubleshooting installation issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
