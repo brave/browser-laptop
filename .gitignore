@@ -37,8 +37,10 @@ public/built
 # electron-packager output dirs
 *-darwin-x64
 *-win32-x64
+*-linux-x64
 dist
 win64-dist
+Brave.tar.bz2
 
 app/gen
 *.pfx
