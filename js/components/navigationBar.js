@@ -103,7 +103,7 @@ class NavigationBar extends ImmutableComponent {
               className='navbutton stop-button'
               onClick={this.onStop} />
           : <Button iconClass='fa-repeat'
-              l10nId='stopButton'
+              l10nId='reloadButton'
               className='navbutton reload-button'
               onClick={this.onReload} />
         }
