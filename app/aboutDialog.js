@@ -12,7 +12,6 @@ module.exports.showAbout = function () {
       'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
       'V8: ' + process.versions.v8 + '\n' +
       'Node.js: ' + process.versions.node + '\n' +
-      'OpenSSL: ' + process.versions.openssl + '\n' +
       'Update channel: ' + Channel.channel(),
     icon: path.join(__dirname, '..', 'app', 'img', 'braveAbout.png'),
     buttons: ['Ok']
