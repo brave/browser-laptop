@@ -7,10 +7,13 @@ const path = require('path')
 module.exports.showAbout = function () {
   dialog.showMessageBox({
     title: 'Brave',
-    message: 'Version: ' + app.getVersion() + '\n' +
+    message: 'Brave: ' + app.getVersion() + '\n' +
       'Electron: ' + process.versions['atom-shell'] + '\n' +
       'libchromiumcontent: ' + process.versions['chrome'] + '\n' +
-      'Channel: ' + Channel.channel(),
+      'V8: ' + process.versions.v8 + '\n' +
+      'Node.js: ' + process.versions.node + '\n' +
+      'OpenSSL: ' + process.versions.openssl + '\n' +
+      'Update channel: ' + Channel.channel(),
     icon: path.join(__dirname, '..', 'app', 'img', 'braveAbout.png'),
     buttons: ['Ok']
   })
