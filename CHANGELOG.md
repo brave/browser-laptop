@@ -3,6 +3,7 @@
 ## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
 - Upgrade to libchromiumcontent v49.
 - Upgrade to Electron 0.37.1.
+- Upgrade to Node.js trunk w/ V8 4.9
 - Basic HTTP authentication now supported.
 - Support for Twitch.tv
 - Possible fix for copy text sometimes not working.
