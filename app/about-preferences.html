@@ -14,7 +14,7 @@
     <script>
       function initSettingsListener (e) {
         window.initSettings = e.detail
-        window.removeEventListener(initSettingsListener)
+        window.removeEventListener('settings-updated', initSettingsListener)
       }
       window.addEventListener('settings-updated', initSettingsListener)
       window.addEventListener('load', function () {
