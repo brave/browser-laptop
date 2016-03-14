@@ -155,12 +155,12 @@ app.on('ready', function () {
       return
     }
 
+    e.preventDefault()
     if (BrowserWindow.getAllWindows().length === 0) {
       saveIfAllCollected()
       return
     }
 
-    e.preventDefault()
     perWindowState.length = 0
     BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
   })
