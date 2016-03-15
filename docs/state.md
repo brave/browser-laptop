@@ -112,6 +112,7 @@ WindowStore
     guestInstanceId: string, // not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
+    activeShortcutDetails: object, // Additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },

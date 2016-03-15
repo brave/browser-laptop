@@ -173,12 +173,12 @@
       return
     }
 
-    if (document.querySelectorAll('input[type=password]:not([autocomplete=off])').length === 0) {
+    if (document.querySelectorAll('input[type=password]:not([autocomplete=off i])').length === 0) {
       // No password fields; abort
       return
     }
 
-    var formNodes = document.querySelectorAll('form:not([autocomplete=off])')
+    var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
     var formOrigin = [document.location.protocol, document.location.host].join('//')
 
     // Map of action origin to [[password element, username element]]
@@ -189,14 +189,30 @@
       var action = form.action || document.location.href
       var usernameElem = fields[0]
       var passwordElem = fields[1]
-      if (passwordElem) {
-        if (credentials[action]) {
-          credentials[action].push([passwordElem, usernameElem])
-        } else {
-          credentials[action] = [[passwordElem, usernameElem]]
-        }
+
+      if (!passwordElem) {
+        return
+      }
+
+      if (credentials[action]) {
+        credentials[action].push([passwordElem, usernameElem])
+      } else {
+        credentials[action] = [[passwordElem, usernameElem]]
+      }
+
+      if (!usernameElem) {
         // Ask the main process for the credentials
         ipcRenderer.send('get-password', formOrigin, action)
+      } else {
+        // Wait for user to pick the username, then autofill password
+        usernameElem.addEventListener('focus', e => {
+          let rect = usernameElem.getBoundingClientRect()
+          ipcRenderer.send('show-username-list', formOrigin, action, {
+            bottom: rect.bottom,
+            left: rect.left,
+            width: rect.width
+          })
+        })
       }
 
       // Whenever a form is submitted, offer to save it in the password manager
@@ -213,9 +229,6 @@
     })
 
     ipcRenderer.on('got-password', (e, username, password, origin, action) => {
-      // TODO: If there are multiple accounts, this always autofills the
-      // most recently-added one. We should detect when the username is
-      // entered and get the corresponding password.
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {
@@ -245,11 +258,11 @@
     }
 
     // look for any form field that has username-ish attributes
-    var username = form.querySelector(['input[type=text][autocomplete=email]']) ||
-        form.querySelector(['input[type=text][autocomplete=username]']) ||
-        form.querySelector(['input[type=text][name=email]']) ||
-        form.querySelector(['input[type=text][name=username]']) ||
-        form.querySelector(['input[type=text][name=user]'])
+    var username = form.querySelector(['input[type=text][autocomplete=email i]']) ||
+        form.querySelector(['input[type=text][autocomplete=username i]']) ||
+        form.querySelector(['input[type=text][name=email i]']) ||
+        form.querySelector(['input[type=text][name=username i]']) ||
+        form.querySelector(['input[type=text][name=user i]'])
     if (!username) {
       // Search backwards from first password field to find the username field
       let previousSibling = passwords[0].previousSibling
@@ -311,12 +324,12 @@
    * @return {Array.<Element>|null}
    */
   function getPasswordFields (form, isSubmission) {
-    var oldPassword = form.querySelector('input[autocomplete=current-password]')
-    var newPassword = form.querySelector('input[autocomplete=new-password]')
+    var oldPassword = form.querySelector('input[autocomplete=current-password i]')
+    var newPassword = form.querySelector('input[autocomplete=new-password i]')
     if (newPassword || oldPassword) {
       return [oldPassword, newPassword]
     }
-    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off])'))
+    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
     if (isSubmission) {
       // Skip empty fields
       passwordNodes = passwordNodes.filter((e) => { return e.value })

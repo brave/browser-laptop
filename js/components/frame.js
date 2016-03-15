@@ -131,6 +131,7 @@ class Frame extends ImmutableComponent {
       this.webview.focus()
     }
     const activeShortcut = this.props.frame.get('activeShortcut')
+    const activeShortcutDetails = this.props.frame.get('activeShortcutDetails')
     switch (activeShortcut) {
       case 'stop':
         this.webview.stop()
@@ -186,9 +187,19 @@ class Frame extends ImmutableComponent {
       case 'show-findbar':
         windowActions.setFindbarShown(this.props.frame, true)
         break
+      case 'fill-password':
+        let currentUrl = urlParse(this.webview.getURL())
+        if (currentUrl &&
+            [currentUrl.protocol, currentUrl.host].join('//') === activeShortcutDetails.get('origin')) {
+          this.webview.send(messages.GOT_PASSWORD,
+                            activeShortcutDetails.get('username'),
+                            activeShortcutDetails.get('password'),
+                            activeShortcutDetails.get('origin'),
+                            activeShortcutDetails.get('action'))
+        }
     }
     if (activeShortcut) {
-      windowActions.setActiveFrameShortcut(this.props.frame, null)
+      windowActions.setActiveFrameShortcut(this.props.frame, null, null)
     }
 
     if (this.props.frame.get('location') === 'about:preferences') {

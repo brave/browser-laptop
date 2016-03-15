@@ -173,6 +173,11 @@ class Main extends ImmutableComponent {
       windowActions.loadUrl(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey), previousLocation)
     })
 
+    ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
+      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect, activeFrame)
+    })
+
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {

@@ -510,12 +510,14 @@ const windowActions = {
    * @param {Object} frameProps - Properties of the frame in question
    * @param {string} activeShortcut - The text for the new shortcut. Usually this is null to clear info which was previously
    * set from an IPC call.
+   * @param {string} activeShortcutDetails - Parameters for the shortcut action
    */
-  setActiveFrameShortcut: function (frameProps, activeShortcut) {
+  setActiveFrameShortcut: function (frameProps, activeShortcut, activeShortcutDetails) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT,
       frameProps,
-      activeShortcut
+      activeShortcut,
+      activeShortcutDetails
     })
   },
 

@@ -63,6 +63,8 @@ const messages = {
   GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */
   SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
+  SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect */
+  FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */

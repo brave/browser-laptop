@@ -303,9 +303,7 @@ app.on('ready', function () {
 
       const passwords = AppStore.getState().get('passwords')
       if (passwords) {
-        // Note this only autocompletes the most recent username/pw if there
-        // are multiple accounts
-        let result = passwords.findLast((password) => {
+        let result = passwords.findLast(password => {
           return password.get('origin') === origin && password.get('action') === action
         })
         if (result) {
@@ -315,6 +313,33 @@ app.on('ready', function () {
                                                   result.get('iv'))
           e.sender.send(messages.GOT_PASSWORD, result.get('username'),
                         password, origin, action)
+        }
+      }
+    })
+
+    ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect) => {
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+
+      const passwords = AppStore.getState().get('passwords')
+      if (passwords) {
+        let usernames = {}
+        let results = passwords.filter(password => {
+          return password.get('username') && password.get('origin') === origin && password.get('action') === action
+        })
+        results.forEach(result => {
+          usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                                       result.get('authTag'),
+                                                                       masterKey,
+                                                                       result.get('iv')) || ''
+        })
+        if (Object.keys(usernames).length > 0) {
+          BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_USERNAME_LIST,
+                                                            usernames, origin, action,
+                                                            boundingRect)
         }
       }
     })
