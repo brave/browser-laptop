@@ -174,8 +174,7 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
-      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
-      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect, activeFrame)
+      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect)
     })
 
     this.loadOpenSearch()

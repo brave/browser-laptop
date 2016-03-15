@@ -197,14 +197,14 @@ function moreBookmarksTemplateInit (allBookmarkItems, bookmarks, activeFrame) {
   return template
 }
 
-function usernameTemplateInit (usernames, origin, action, activeFrame) {
+function usernameTemplateInit (usernames, origin, action) {
   let items = []
   for (let username in usernames) {
     let password = usernames[username]
     items.push({
       label: username,
       click: (item, focusedWindow) => {
-        windowActions.setActiveFrameShortcut(activeFrame, messages.FILL_PASSWORD, {
+        windowActions.setActiveFrameShortcut(null, messages.FILL_PASSWORD, {
           username,
           password,
           origin,
@@ -554,10 +554,9 @@ export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  * @param {string} origin - origin of the form
  * @param {string} action - action of the form
  * @param {Object} boundingRect - bounding rectangle of username input field
- * @param {Object} activeFrame - active frame
  */
-export function onShowUsernameMenu (usernames, origin, action, boundingRect, activeFrame) {
-  const menuTemplate = usernameTemplateInit(usernames, origin, action, activeFrame)
+export function onShowUsernameMenu (usernames, origin, action, boundingRect) {
+  const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
     top: boundingRect.bottom + 62,

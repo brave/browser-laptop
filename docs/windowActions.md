@@ -336,7 +336,7 @@ are no autocomplete results.
 
 
 
-### setActiveFrameShortcut(frameProps, activeShortcut) 
+### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 
@@ -346,6 +346,8 @@ Dispatches a message to the store to indicate that the pending frame shortcut in
 
 **activeShortcut**: `string`, The text for the new shortcut. Usually this is null to clear info which was previously
 set from an IPC call.
+
+**activeShortcutDetails**: `string`, Parameters for the shortcut action
 
 
 
