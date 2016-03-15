@@ -177,6 +177,10 @@ class Main extends ImmutableComponent {
       contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect)
     })
 
+    ipc.on(messages.HIDE_CONTEXT_MENU, () => {
+      windowActions.setContextMenuDetail()
+    })
+
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {

@@ -317,6 +317,10 @@ app.on('ready', function () {
       }
     })
 
+    ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.HIDE_CONTEXT_MENU)
+    })
+
     ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect) => {
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {

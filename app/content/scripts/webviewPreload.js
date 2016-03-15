@@ -213,6 +213,13 @@
             width: rect.width
           })
         })
+        usernameElem.addEventListener('blur', e => {
+          // Wait for the background to process the focus event
+          // before hiding the context menu
+          window.setTimeout(() => {
+            ipcRenderer.send('hide-context-menu')
+          }, 300)
+        })
       }
 
       // Whenever a form is submitted, offer to save it in the password manager
