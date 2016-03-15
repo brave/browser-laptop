@@ -49,7 +49,8 @@ if (isWindows) {
 } else {
   cmds = cmds.concat([
     'rm -Rf ' + buildDir,
-    'rm -Rf dist'
+    'rm -Rf dist',
+    'rm -f Brave.tar.bz2'
   ])
 }
 
