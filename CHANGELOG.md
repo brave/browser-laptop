@@ -18,6 +18,7 @@
 - Control tab, command tab, and middle click now works for bookmarks within a menu on the toolbar.
 - Typekit and Google fonts fix.
 - Dragging favicon onto bookmarks bar now respects position of the drop.
+- We now `display: none` on background webviews for better performance.
 
 ## [0.8.0](https://github.com/brave/browser-laptop/releases/v0.8.0dev)
 - Bookmark management: Bookmark folders added, drag and drop bookmarks and folders from within the Bookmark Toolbar and Bookmark Manager.

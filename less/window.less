@@ -119,6 +119,13 @@ html,
       background: gray;
       z-index: 3;
     }
+
+    // Webviews can cause flickers w/ Chrome  v49 if left visible
+    // in the background.  This also has a major benefit for background
+    // tabs that have video and animations in them.
+    &:not(.isPreview) {
+      display: none;
+    }
   }
 }
 
