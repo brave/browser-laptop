@@ -20,7 +20,7 @@
     "preload-httpse": "node ./preload-httpse.js",
     "build-package": "node ./tools/buildPackage.js",
     "build-installer": "node ./tools/buildInstaller.js",
-    "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-*",
+    "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-1-dev",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/ABPFilterParserData.dat",
     "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/TrackingProtection.dat",
     "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse.json",
