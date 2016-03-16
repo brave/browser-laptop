@@ -195,7 +195,7 @@ function windowDefaults () {
     show: false,
     width: appState.get('defaultWindowWidth'),
     height: appState.get('defaultWindowHeight'),
-    minWidth: 500,
+    minWidth: 480,
     minHeight: 300,
     minModalHeight: 100,
     minModalWidth: 100,
