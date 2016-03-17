@@ -14,6 +14,6 @@ if (process.platform === 'win32') {
   }
 }
 
-app.on('will-finish-launching', function () {
+app.on('will-finish-launching', () => {
   app.setAppUserModelId(appUserModelId)
 })
