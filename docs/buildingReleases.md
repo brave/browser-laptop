@@ -27,7 +27,7 @@ rm -Rf ~/.electron
 npm install
 ```
 
-If you already have the repo checked out, it's recommended to `rm -RF node_modules` instead of the clone.
+If you already have the repo checked out, it's recommended to `rm -Rf node_modules` instead of the clone.
 
 Then do the following per OS:
 
@@ -64,7 +64,7 @@ The primary purpose of doing this is to be able to update dependencies for secur
 
 - Rebase `brave/libchromiumcontent` from `atom/libchromiumcontent` upstream.
 - Change `brave/libchromiumcontent/VERSION` to contain the chromium version tag to change to.  Example `49.0.2623.75`.   You can see the latest tags here: https://chromium.googlesource.com/chromium/src.git/+refs
-- From `brave/electron/script/lib/config.py` change LIBCHROMIUMCONTENT_COMMIT to point to the correct changeset from `brave/libchromiumcontent`.
+- From `brave/electron/script/lib/config.py` change `LIBCHROMIUMCONTENT_COMMIT` to point to the correct changeset from `brave/libchromiumcontent`.
 - You can create patches as needed inside `brave/libchromiumcontent/patches`.  They will be automatically applied when doing builds.
 - Some of the patches just mentioned will need rebasing on the new version.
 - run `LIBCHROMIUMCONTENT_S3_BUCKET=brave-laptop-binaries LIBCHROMIUMCONTENT_S3_ACCESS_KEY=key-here AWS_ACCESS_KEY_SECRET=key-here AWS_ACCESS_KEY_SECRET=key-here LIBCHROMIUMCONTENT_S3_SECRET_KEY=key-here ./script/cibuild`.
