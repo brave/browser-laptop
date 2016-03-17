@@ -35,7 +35,7 @@ module.exports.register = (win) => {
 
   // Tab ordering shortcuts
   Array.from(new Array(8), (x, i) => i).reduce((list, i) => {
-    list.push(['CmdOrCtrl+' + String(i + 1), messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, i])
+    list.push([`CmdOrCtrl+${String(i + 1)}`, messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, i])
     return list
   }, simpleWebContentEvents)
 
