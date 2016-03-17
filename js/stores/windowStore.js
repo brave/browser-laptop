@@ -326,7 +326,11 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'activeShortcut'], action.activeShortcut)
+      const framePath = action.frameProps ? ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
+      windowState = windowState.mergeIn(framePath, {
+        activeShortcut: action.activeShortcut,
+        activeShortcutDetails: action.activeShortcutDetails
+      })
       break
     case WindowConstants.WINDOW_SET_SEARCH_DETAIL:
       windowState = windowState.merge({
@@ -507,7 +511,8 @@ frameShortcuts.forEach(shortcut => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {
     windowState = windowState.mergeIn(activeFrameStatePath(), {
-      activeShortcut: shortcut
+      activeShortcut: shortcut,
+      activeShortcutDetails: null
     })
     emitChanges()
   })
@@ -516,7 +521,8 @@ frameShortcuts.forEach(shortcut => {
     ipc.on(`shortcut-frame-${shortcut}`, (e, i) => {
       const path = ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), i)]
       windowState = windowState.mergeIn(path, {
-        activeShortcut: shortcut
+        activeShortcut: shortcut,
+        activeShortcutDetails: null
       })
       emitChanges()
     })

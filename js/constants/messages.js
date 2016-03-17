@@ -59,6 +59,13 @@ const messages = {
   STOP_LOAD: _,
   POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
+  HIDE_CONTEXT_MENU: _,
+  // Password manager
+  GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
+  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */
+  SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
+  SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
+  FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */

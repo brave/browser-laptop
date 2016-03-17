@@ -31,6 +31,9 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
 const debounce = require('../js/lib/debounce.js')
+const CryptoUtil = require('../js/lib/cryptoUtil')
+const keytar = require('keytar')
+const dialog = electron.dialog
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -46,6 +49,24 @@ let lastWindowState
 let acceptCertUrls = {}
 // URLs to callback for auth.
 let authCallbacks = {}
+
+/**
+ * Gets the master key for encrypting login credentials from the OS keyring.
+ */
+const getMasterKey = () => {
+  const appName = 'Brave'
+  const accountName = 'login master key'
+  let masterKey = keytar.getPassword(appName, accountName)
+  if (masterKey === null) {
+    // Either the user denied access or no master key has been created.
+    // We can't tell the difference so try making a new master key.
+    let success = keytar.addPassword(appName, accountName, CryptoUtil.getRandomBytes(32).toString('binary'))
+    if (success) {
+      masterKey = keytar.getPassword(appName, accountName)
+    }
+  }
+  return masterKey
+}
 
 const saveIfAllCollected = () => {
   // If we're shutting down early and can't access the state, it's better
@@ -270,6 +291,118 @@ app.on('ready', function () {
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.updateNowRequested()
+    })
+
+    let masterKey
+    ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+
+      const passwords = AppStore.getState().get('passwords')
+      if (passwords) {
+        let result = passwords.findLast(password => {
+          return password.get('origin') === origin && password.get('action') === action
+        })
+        if (result) {
+          let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                  result.get('authTag'),
+                                                  masterKey,
+                                                  result.get('iv'))
+          e.sender.send(messages.GOT_PASSWORD, result.get('username'),
+                        password, origin, action)
+        }
+      }
+    })
+
+    ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.HIDE_CONTEXT_MENU)
+      }
+    })
+
+    ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect, value) => {
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+
+      const passwords = AppStore.getState().get('passwords')
+      if (passwords) {
+        let usernames = {}
+        let results = passwords.filter(password => {
+          return password.get('username') &&
+            password.get('username').includes(value) &&
+            password.get('origin') === origin &&
+            password.get('action') === action
+        })
+        results.forEach(result => {
+          usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                                       result.get('authTag'),
+                                                                       masterKey,
+                                                                       result.get('iv')) || ''
+        })
+        if (Object.keys(usernames).length > 0 &&
+            BrowserWindow.getFocusedWindow()) {
+          BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_USERNAME_LIST,
+                                                            usernames, origin, action,
+                                                            boundingRect)
+        }
+      }
+    })
+
+    ipcMain.on(messages.SAVE_PASSWORD, (e, username, password, origin, action) => {
+      if (!password || !origin || !action) {
+        return
+      }
+
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+
+      const passwords = AppStore.getState().get('passwords')
+
+      // If the same password already exists, don't offer to save it
+      let result = passwords.findLast((pw) => {
+        return pw.get('origin') === origin && pw.get('action') === action && (username ? pw.get('username') === username : !pw.get('username'))
+      })
+      if (result && password === CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                          result.get('authTag'),
+                                                          masterKey,
+                                                          result.get('iv'))) {
+        return
+      }
+
+      var message = username
+        ? 'Would you like Brave to save the password for ' + username + ' on ' + origin + '?'
+        : 'Would you like Brave to save this password on ' + origin + '?'
+      dialog.showMessageBox({
+        type: 'question',
+        title: 'Save password?',
+        message: message,
+        buttons: ['Yes', 'No'],
+        defaultId: 1,
+        cancelId: 1
+      }, buttonId => {
+        if (buttonId !== 0) {
+          return
+        }
+        // Save the password
+        const encrypted = CryptoUtil.encryptAuthenticate(password, masterKey)
+        appActions.savePassword({
+          origin,
+          action,
+          username: username || '',
+          encryptedPassword: encrypted.content,
+          authTag: encrypted.tag,
+          iv: encrypted.iv
+        })
+      })
     })
 
     // Setup the crash handling

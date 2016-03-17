@@ -173,6 +173,14 @@ class Main extends ImmutableComponent {
       windowActions.loadUrl(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey), previousLocation)
     })
 
+    ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
+      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect)
+    })
+
+    ipc.on(messages.HIDE_CONTEXT_MENU, () => {
+      windowActions.setContextMenuDetail()
+    })
+
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {

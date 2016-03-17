@@ -21,6 +21,14 @@ AppStore
     startTime: number, // datetime.getTime()
     endTime: number // datetime.getTime()
   }],
+  passwords: [{
+    origin: string, // origin of the form
+    action: string, // URL of the form action
+    username: string,
+    encryptedPassword: string, // encrypted by master password, binary-encoded
+    authTag: string, // AES-GCM authentication data, binary-encoded
+    iv: string // AES-GCM initialization vector, binary-encoded
+  }],
   adblock: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
@@ -104,6 +112,7 @@ WindowStore
     guestInstanceId: string, // not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
+    activeShortcutDetails: object, // Additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },

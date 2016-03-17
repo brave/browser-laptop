@@ -165,6 +165,217 @@
     })
   })
 
+  function onFormSubmit (form, formOrigin) {
+    var fields = getFormFields(form, true)
+    var passwordElem = fields[1]
+    if (!passwordElem || !passwordElem.value) {
+      return
+    }
+    // Re-get action in case it has changed
+    var action = form.action || document.location.href
+    var usernameElem = fields[0] || {}
+    ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
+                     formOrigin, action)
+  }
+
+  /**
+   * Try to autofill a form with credentials, using roughly the heuristic from
+   * http://mxr.mozilla.org/firefox/source/toolkit/components/passwordmgr/src/nsLoginManager.js
+   * @param {Object.<string, Array.<Element>>} credentials - map of form action
+   *   to password/username elements with that action
+   * @param {string} formOrigin - origin of the form
+   * @param {Element} form - the form node
+   */
+  function tryAutofillForm (credentials, formOrigin, form) {
+    var fields = getFormFields(form, false)
+    var action = form.action || document.location.href
+    var usernameElem = fields[0]
+    var passwordElem = fields[1]
+
+    if (!passwordElem) {
+      return
+    }
+
+    if (credentials[action]) {
+      credentials[action].push([passwordElem, usernameElem])
+    } else {
+      credentials[action] = [[passwordElem, usernameElem]]
+    }
+
+    if (!usernameElem) {
+      // Ask the main process for the only credentials we have
+      ipcRenderer.send('get-password', formOrigin, action)
+    } else {
+      // Wait for user to pick the username, then autofill password
+      usernameElem.addEventListener('focus', e => {
+        let rect = usernameElem.getBoundingClientRect()
+        // TODO: This should update on every keystroke
+        ipcRenderer.send('show-username-list', formOrigin, action, {
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width
+        }, usernameElem.value || '')
+      })
+      usernameElem.addEventListener('blur', e => {
+        // Wait for the background to process the focus event
+        // before hiding the context menu
+        // TODO: Figure out why the context menu sometimes appears
+        // when the username elem doesn't appear to be focused
+        window.setTimeout(() => {
+          ipcRenderer.send('hide-context-menu')
+        }, 300)
+      })
+    }
+
+    // Whenever a form is submitted, offer to save it in the password manager
+    // if the credentials have changed.
+    form.addEventListener('submit', e => {
+      onFormSubmit(form, formOrigin)
+    })
+    Array.from(form.querySelectorAll('button')).forEach(button => {
+      button.addEventListener('click', e => {
+        onFormSubmit(form, formOrigin)
+      })
+    })
+  }
+
+  document.addEventListener('DOMContentLoaded', (e) => {
+    // Don't autofill on non-HTTP(S) sites for now
+    if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
+      return
+    }
+
+    if (document.querySelectorAll('input[type=password]:not([autocomplete=off i])').length === 0) {
+      // No password fields; abort
+      return
+    }
+
+    // Map of action origin to [[password element, username element]]
+    var credentials = {}
+
+    var formOrigin = [document.location.protocol, document.location.host].join('//')
+    var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
+
+    Array.from(formNodes).forEach(form => {
+      tryAutofillForm(credentials, formOrigin, form)
+    })
+
+    ipcRenderer.on('got-password', (e, username, password, origin, action) => {
+      var elems = credentials[action]
+      if (formOrigin === origin && elems) {
+        elems.forEach((elem) => {
+          // Autofill password
+          elem[0].value = password
+          if (username && elem[1]) {
+            // Autofill the username if there is one
+            elem[1].value = username
+          }
+        })
+      }
+    })
+  })
+
+  /**
+   * Gets form fields.
+   * @param {Element} form - The form to inspect
+   * @param {boolean} isSubmission - Whether the form is being submitted
+   * @return {Array.<Element>}
+   */
+  function getFormFields (form, isSubmission) {
+    var passwords = getPasswordFields(form, isSubmission)
+
+    // We have no idea what is going on with a form that has 0 or >3 password fields
+    if (passwords.length === 0 || passwords.length > 3) {
+      return [null, null, null]
+    }
+
+    // look for any form field that has username-ish attributes
+    var username = form.querySelector(['input[type=email i]']) ||
+        form.querySelector(['input[autocomplete=email i]']) ||
+        form.querySelector(['input[autocomplete=username i]']) ||
+        form.querySelector(['input[name=email i]']) ||
+        form.querySelector(['input[name=username i]']) ||
+        form.querySelector(['input[name=user i]'])
+
+    if (!username) {
+      // Search backwards from first password field to find the username field
+      let previousSibling = passwords[0].previousSibling
+      while (previousSibling) {
+        if (previousSibling.type === 'text' && previousSibling.autocomplete !== 'off') {
+          username = previousSibling
+          break
+        }
+        previousSibling = previousSibling.previousSibling
+      }
+    }
+
+    // If not a submission, autofill the first password field and ignore the rest
+    if (!isSubmission || passwords.length === 1) {
+      return [username, passwords[0], null]
+    }
+
+    // Otherwise, this is probably a password change form and we need to figure out
+    // what username/password combo to save.
+    var oldPassword = null
+    var newPassword = null
+    var value1 = passwords[0] ? passwords[0].value : ''
+    var value2 = passwords[1] ? passwords[1].value : ''
+    var value3 = passwords[2] ? passwords[2].value : ''
+
+    if (passwords.length === 2) {
+      if (value1 === value2) {
+        // Treat as if there were 1 pw field
+        newPassword = passwords[0]
+      } else {
+        oldPassword = passwords[0]
+        newPassword = passwords[1]
+      }
+    } else {
+      // There is probably a "confirm your password" field for the new
+      // password, so the new password is the one that is repeated.
+      if (value1 === value2 && value2 === value3) {
+        // Treat as if there were 1 pw field
+        newPassword = passwords[0]
+      } else if (value1 === value2) {
+        newPassword = passwords[0]
+        oldPassword = passwords[2]
+      } else if (value2 === value3) {
+        newPassword = passwords[2]
+        oldPassword = passwords[0]
+      } else if (value1 === value3) {
+        // Weird
+        newPassword = passwords[0]
+        oldPassword = passwords[1]
+      }
+    }
+    return [username, newPassword, oldPassword]
+  }
+
+  /**
+   * Gets password fields in a form.
+   * @param {Element} form - The form to inspect
+   * @param {boolean} isSubmission - Whether the form is being submitted
+   * @return {Array.<Element>|null}
+   */
+  function getPasswordFields (form, isSubmission) {
+    var currentPassword = form.querySelector('input[autocomplete=current-password i]')
+    var newPassword = form.querySelector('input[autocomplete=new-password i]')
+    if (currentPassword) {
+      if (!newPassword) {
+        // This probably isn't a password change form; ex: twitter login
+        return [currentPassword]
+      } else {
+        return [currentPassword, newPassword]
+      }
+    }
+    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
+    if (isSubmission) {
+      // Skip empty fields
+      passwordNodes = passwordNodes.filter((e) => { return e.value })
+    }
+    return passwordNodes
+  }
+
   function hasSelection (node) {
     try {
       if (node && node.selectionStart !== undefined &&

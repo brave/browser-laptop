@@ -167,6 +167,11 @@ function registerPermissionHandler (session) {
   }
   session.setPermissionRequestHandler((webContents, permission, cb) => {
     let host = urlParse(webContents.getURL()).host
+    if (!permissions[permission]) {
+      console.log('WARNING: got registered permission request', permission)
+      cb(false)
+      return
+    }
     let isAllowed = permissions[permission].hosts[host]
     if (isAllowed !== undefined) {
       cb(isAllowed)
