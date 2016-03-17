@@ -32,7 +32,7 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
   var req = request.get({
     url,
     headers
-  }).on('response', function (response) {
+  }).on('response', response => {
     // console.log('response...', resourceName)
     if (response.statusCode !== 200) {
       // console.log(resourceName, 'status code: ', response.statusCode)
@@ -42,8 +42,8 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
     const etag = response.headers['etag']
 
     // console.log('setting dwonloadPath...', resourceName)
-    req.pipe(fs.createWriteStream(downloadPath(url)).on('close', function () {
-      fs.rename(downloadPath(url), storagePath(url), function (err) {
+    req.pipe(fs.createWriteStream(downloadPath(url)).on('close', () => {
+      fs.rename(downloadPath(url), storagePath(url), err => {
         if (err) {
           // console.log('rjecting for download:', resourceName)
           reject('could not rename downloaded file')
@@ -68,7 +68,7 @@ module.exports.downloadDataFile = (resourceName, url, version, force) => {
 
 module.exports.readDataFile = (resourceName, url) => {
   return new Promise((resolve, reject) => {
-    fs.readFile(storagePath(url), function (err, data) {
+    fs.readFile(storagePath(url), (err, data) => {
       if (err || !data || data.length === 0) {
         // console.log('rejecting for read for resource:', resourceName)
         reject()
