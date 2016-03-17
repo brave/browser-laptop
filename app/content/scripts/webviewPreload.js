@@ -209,11 +209,12 @@
       // Wait for user to pick the username, then autofill password
       usernameElem.addEventListener('focus', e => {
         let rect = usernameElem.getBoundingClientRect()
+        // TODO: This should update on every keystroke
         ipcRenderer.send('show-username-list', formOrigin, action, {
           bottom: rect.bottom,
           left: rect.left,
           width: rect.width
-        })
+        }, usernameElem.value || '')
       })
       usernameElem.addEventListener('blur', e => {
         // Wait for the background to process the focus event

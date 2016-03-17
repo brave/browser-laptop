@@ -323,7 +323,7 @@ app.on('ready', function () {
       }
     })
 
-    ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect) => {
+    ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect, value) => {
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
@@ -334,7 +334,10 @@ app.on('ready', function () {
       if (passwords) {
         let usernames = {}
         let results = passwords.filter(password => {
-          return password.get('username') && password.get('origin') === origin && password.get('action') === action
+          return password.get('username') &&
+            password.get('username').includes(value) &&
+            password.get('origin') === origin &&
+            password.get('action') === action
         })
         results.forEach(result => {
           usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
