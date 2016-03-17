@@ -127,8 +127,8 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-app.on('ready', function () {
-  app.on('certificate-error', function (e, webContents, url, error, cert, cb) {
+app.on('ready', () => {
+  app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     if (acceptCertUrls[url] === true) {
       // Ignore the cert error
       e.preventDefault()
@@ -145,7 +145,7 @@ app.on('ready', function () {
       })
     })
   })
-  app.on('login', function (e, webContents, request, authInfo, cb) {
+  app.on('login', (e, webContents, request, authInfo, cb) => {
     e.preventDefault()
     authCallbacks[request.url] = cb
     BrowserWindow.getAllWindows().map((win) => {
@@ -155,7 +155,7 @@ app.on('ready', function () {
       })
     })
   })
-  app.on('window-all-closed', function () {
+  app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
@@ -163,14 +163,14 @@ app.on('ready', function () {
     }
   })
 
-  app.on('activate', function () {
+  app.on('activate', () => {
     // (OS X) open a new window when the user clicks on the app icon if there aren't any open
     if (BrowserWindow.getAllWindows().length === 0) {
       appActions.newWindow()
     }
   })
 
-  app.on('before-quit', function (e) {
+  app.on('before-quit', e => {
     beforeQuitSaveStarted = true
     if (sessionStateStoreCompleteOnQuit) {
       return

@@ -77,7 +77,7 @@ exports.init = (platform, ver) => {
   version = ver
 
   var baseUrl = exports.updateUrl(appConfig.updates, platform)
-  debug('updateUrl = ' + baseUrl)
+  debug(`updateUrl = ${baseUrl}`)
 
   scheduleUpdates()
 
@@ -154,7 +154,7 @@ var requestVersionInfo = (done) => {
 
 var downloadHandler = (err, metadata) => {
   assert.equal(err, null)
-  debug('Metadata: ' + JSON.stringify(metadata))
+  debug(`Metadata: ${JSON.stringify(metadata)}`)
   appActions.setUpdateStatus(undefined, undefined, Immutable.fromJS(metadata))
   if (process.platform === 'win32') {
     // check versions to see if an update is required
@@ -204,13 +204,13 @@ exports.quitAndInstall = () => {
 autoUpdater.on('update-downloaded', (evt, releaseNotes, releaseDate, updateURL) => {
   debug('update downloaded')
   if (releaseNotes) {
-    debug('Release notes :' + releaseNotes)
+    debug(`Release notes : ${releaseNotes}`)
   }
   if (releaseDate) {
-    debug('Release date: ' + releaseDate)
+    debug(`Release date: ${releaseDate}`)
   }
   if (updateURL) {
-    debug('Update URL: ' + updateURL)
+    debug(`Update URL: ${updateURL}`)
   }
   appActions.setUpdateStatus(UpdateStatus.UPDATE_AVAILABLE)
 })

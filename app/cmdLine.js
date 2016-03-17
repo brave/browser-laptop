@@ -12,10 +12,10 @@ const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
 let appInitialized = false
 
-app.on('will-finish-launching', function () {
+app.on('will-finish-launching', () => {
   // User clicked a link when w were the default or via command line like:
   // open -a Brave http://www.brave.com
-  app.on('open-url', function (event, path) {
+  app.on('open-url', (event, path) => {
     event.preventDefault()
 
     if (appInitialized) {

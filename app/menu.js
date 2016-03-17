@@ -71,7 +71,7 @@ const init = (settingsState, args) => {
       click: (item, focusedWindow) => {
         dialog.showOpenDialog(focusedWindow, {
           properties: ['openFile', 'multiSelections']
-        }, function (paths) {
+        }, (paths) => {
           if (paths) {
             paths.forEach((path) => {
               CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
@@ -499,7 +499,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: 'Hide ' + appConfig.name,
+          label: `Hide ${appConfig.name}`,
           accelerator: 'Command+H',
           role: 'hide'
         }, {

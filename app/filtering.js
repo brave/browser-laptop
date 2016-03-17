@@ -39,7 +39,7 @@ module.exports.registerBeforeRequestFilteringCB = filteringFn => {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForBeforeRequest (session) {
-  session.webRequest.onBeforeRequest(function (details, cb) {
+  session.webRequest.onBeforeRequest((details, cb) => {
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl) {
       cb({})
