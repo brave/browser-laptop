@@ -36,7 +36,7 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
     // console.log('response...', resourceName)
     if (response.statusCode !== 200) {
       // console.log(resourceName, 'status code: ', response.statusCode)
-      reject('Got HTTP status code ' + response.statusCode)
+      reject(`Got HTTP status code ${response.statusCode}`)
       return
     }
     const etag = response.headers['etag']
