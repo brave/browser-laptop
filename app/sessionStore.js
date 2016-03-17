@@ -140,6 +140,8 @@ module.exports.cleanSessionData = (sessionData) => {
     // restored.  We will be able to keep this once we
     // don't regenerate new frame keys when opening storage.
     delete frame.parentFrameKey
+    // Delete the active shortcut details
+    delete frame.activeShortcutDetails
 
     if (frame.navbar && frame.navbar.urlbar) {
       frame.navbar.urlbar.urlPreview = null
