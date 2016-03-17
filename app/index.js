@@ -318,7 +318,9 @@ app.on('ready', function () {
     })
 
     ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.HIDE_CONTEXT_MENU)
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.HIDE_CONTEXT_MENU)
+      }
     })
 
     ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect) => {
@@ -340,7 +342,8 @@ app.on('ready', function () {
                                                                        masterKey,
                                                                        result.get('iv')) || ''
         })
-        if (Object.keys(usernames).length > 0) {
+        if (Object.keys(usernames).length > 0 &&
+            BrowserWindow.getFocusedWindow()) {
           BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_USERNAME_LIST,
                                                             usernames, origin, action,
                                                             boundingRect)

@@ -165,8 +165,79 @@
     })
   })
 
-  // Tries to detect username/password using roughly the heuristic from
-  // http://mxr.mozilla.org/firefox/source/toolkit/components/passwordmgr/src/nsLoginManager.js
+  function onFormSubmit (form, formOrigin) {
+    var fields = getFormFields(form, true)
+    var passwordElem = fields[1]
+    if (!passwordElem || !passwordElem.value) {
+      return
+    }
+    // Re-get action in case it has changed
+    var action = form.action || document.location.href
+    var usernameElem = fields[0] || {}
+    ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
+                     formOrigin, action)
+  }
+
+  /**
+   * Try to autofill a form with credentials, using roughly the heuristic from
+   * http://mxr.mozilla.org/firefox/source/toolkit/components/passwordmgr/src/nsLoginManager.js
+   * @param {Object.<string, Array.<Element>>} credentials - map of form action
+   *   to password/username elements with that action
+   * @param {string} formOrigin - origin of the form
+   * @param {Element} form - the form node
+   */
+  function tryAutofillForm (credentials, formOrigin, form) {
+    var fields = getFormFields(form, false)
+    var action = form.action || document.location.href
+    var usernameElem = fields[0]
+    var passwordElem = fields[1]
+
+    if (!passwordElem) {
+      return
+    }
+
+    if (credentials[action]) {
+      credentials[action].push([passwordElem, usernameElem])
+    } else {
+      credentials[action] = [[passwordElem, usernameElem]]
+    }
+
+    if (!usernameElem) {
+      // Ask the main process for the only credentials we have
+      ipcRenderer.send('get-password', formOrigin, action)
+    } else {
+      // Wait for user to pick the username, then autofill password
+      usernameElem.addEventListener('focus', e => {
+        let rect = usernameElem.getBoundingClientRect()
+        ipcRenderer.send('show-username-list', formOrigin, action, {
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width
+        })
+      })
+      usernameElem.addEventListener('blur', e => {
+        // Wait for the background to process the focus event
+        // before hiding the context menu
+        // TODO: Figure out why the context menu sometimes appears
+        // when the username elem doesn't appear to be focused
+        window.setTimeout(() => {
+          ipcRenderer.send('hide-context-menu')
+        }, 300)
+      })
+    }
+
+    // Whenever a form is submitted, offer to save it in the password manager
+    // if the credentials have changed.
+    form.addEventListener('submit', e => {
+      onFormSubmit(form, formOrigin)
+    })
+    Array.from(form.querySelectorAll('button')).forEach(button => {
+      button.addEventListener('click', e => {
+        onFormSubmit(form, formOrigin)
+      })
+    })
+  }
+
   document.addEventListener('DOMContentLoaded', (e) => {
     // Don't autofill on non-HTTP(S) sites for now
     if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
@@ -178,61 +249,14 @@
       return
     }
 
-    var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
-    var formOrigin = [document.location.protocol, document.location.host].join('//')
-
     // Map of action origin to [[password element, username element]]
     var credentials = {}
 
+    var formOrigin = [document.location.protocol, document.location.host].join('//')
+    var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
+
     Array.from(formNodes).forEach(form => {
-      var fields = getFormFields(form, false)
-      var action = form.action || document.location.href
-      var usernameElem = fields[0]
-      var passwordElem = fields[1]
-
-      if (!passwordElem) {
-        return
-      }
-
-      if (credentials[action]) {
-        credentials[action].push([passwordElem, usernameElem])
-      } else {
-        credentials[action] = [[passwordElem, usernameElem]]
-      }
-
-      if (!usernameElem) {
-        // Ask the main process for the credentials
-        ipcRenderer.send('get-password', formOrigin, action)
-      } else {
-        // Wait for user to pick the username, then autofill password
-        usernameElem.addEventListener('focus', e => {
-          let rect = usernameElem.getBoundingClientRect()
-          ipcRenderer.send('show-username-list', formOrigin, action, {
-            bottom: rect.bottom,
-            left: rect.left,
-            width: rect.width
-          })
-        })
-        usernameElem.addEventListener('blur', e => {
-          // Wait for the background to process the focus event
-          // before hiding the context menu
-          window.setTimeout(() => {
-            ipcRenderer.send('hide-context-menu')
-          }, 300)
-        })
-      }
-
-      // Whenever a form is submitted, offer to save it in the password manager
-      // if the credentials have changed.
-      form.addEventListener('submit', e => {
-        var fields = getFormFields(form, true)
-        // Re-get action in case it has changed
-        var action = form.action || document.location.href
-        var usernameElem = fields[0] || {}
-        var passwordElem = fields[1] || {}
-        ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
-                         formOrigin, action)
-      })
+      tryAutofillForm(credentials, formOrigin, form)
     })
 
     ipcRenderer.on('got-password', (e, username, password, origin, action) => {
@@ -265,11 +289,13 @@
     }
 
     // look for any form field that has username-ish attributes
-    var username = form.querySelector(['input[type=text][autocomplete=email i]']) ||
-        form.querySelector(['input[type=text][autocomplete=username i]']) ||
-        form.querySelector(['input[type=text][name=email i]']) ||
-        form.querySelector(['input[type=text][name=username i]']) ||
-        form.querySelector(['input[type=text][name=user i]'])
+    var username = form.querySelector(['input[type=email i]']) ||
+        form.querySelector(['input[autocomplete=email i]']) ||
+        form.querySelector(['input[autocomplete=username i]']) ||
+        form.querySelector(['input[name=email i]']) ||
+        form.querySelector(['input[name=username i]']) ||
+        form.querySelector(['input[name=user i]'])
+
     if (!username) {
       // Search backwards from first password field to find the username field
       let previousSibling = passwords[0].previousSibling
