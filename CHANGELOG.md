@@ -6,7 +6,6 @@
 - Upgrade to Node v5.8.
 - Basic HTTP authentication now supported.
 - Support for Twitch.tv
-- Possible fix for copy text sometimes not working.
 - Fix bookmarks not working after navigating within a page using push state api.
 - Save session state periodically to prevent data loss.
 - Window titles actually being set for better compatibility with other apps.
