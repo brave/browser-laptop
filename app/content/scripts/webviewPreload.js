@@ -318,8 +318,8 @@
     // what username/password combo to save.
     var oldPassword = null
     var newPassword = null
-    var value1 = passwords[0].value
-    var value2 = passwords[1].value
+    var value1 = passwords[0] ? passwords[0].value : ''
+    var value2 = passwords[1] ? passwords[1].value : ''
     var value3 = passwords[2] ? passwords[2].value : ''
 
     if (passwords.length === 2) {
@@ -358,10 +358,15 @@
    * @return {Array.<Element>|null}
    */
   function getPasswordFields (form, isSubmission) {
-    var oldPassword = form.querySelector('input[autocomplete=current-password i]')
+    var currentPassword = form.querySelector('input[autocomplete=current-password i]')
     var newPassword = form.querySelector('input[autocomplete=new-password i]')
-    if (newPassword || oldPassword) {
-      return [oldPassword, newPassword]
+    if (currentPassword) {
+      if (!newPassword) {
+        // This probably isn't a password change form; ex: twitter login
+        return [currentPassword]
+      } else {
+        return [currentPassword, newPassword]
+      }
     }
     var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
     if (isSubmission) {
