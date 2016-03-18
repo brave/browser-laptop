@@ -179,6 +179,16 @@ Dispatches a message to the store to create a new frame
 
 
 
+### cloneFrame(frameProps) 
+
+Dispatches a message to the store to create a new frame similar to the passed arg.
+
+**Parameters**
+
+**frameProps**: `Object`, The properties of the frame to clone
+
+
+
 ### closeFrame(frames, frameProps) 
 
 Dispatches a message to close a frame

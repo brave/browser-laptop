@@ -274,6 +274,19 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to create a new frame similar to the passed arg.
+   *
+   * @param {Object} frameProps - The properties of the frame to clone
+   */
+  cloneFrame: function (frameProps) {
+    this.newFrame({
+      location: frameProps.get('location'),
+      isPrivate: frameProps.get('isPrivate'),
+      partitionNumber: frameProps.get('partitionNumber')
+    }, false)
+  },
+
+  /**
    * Dispatches a message to close a frame
    *
    * @param {Object[]} frames - Immutable list of of all the frames

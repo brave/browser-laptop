@@ -7,6 +7,7 @@
 const siteUtil = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const windowActions = require('./windowActions')
+const eventUtil = require('../lib/eventUtil.js')
 
 const bookmarkActions = {
   /**
@@ -16,10 +17,7 @@ const bookmarkActions = {
   clickBookmarkItem: function (allBookmarkItems, bookmarkItem, activeFrame, e) {
     const isFolder = siteUtil.isFolder(bookmarkItem)
     if (!isFolder) {
-      const isDarwin = process.platform === 'darwin'
-      if (e.ctrlKey && !isDarwin ||
-          e.metaKey && isDarwin ||
-          e.button === 1) {
+      if (eventUtil.isForSecondaryAction(e)) {
         windowActions.newFrame({
           location: bookmarkItem.get('location'),
           partitionNumber: bookmarkItem && bookmarkItem.get && bookmarkItem.get('partitionNumber') || undefined
@@ -29,7 +27,7 @@ const bookmarkActions = {
       }
       windowActions.setContextMenuDetail()
       return true
-    } else if (e.button === 1) {
+    } else if (eventUtil.isForSecondaryAction(e)) {
       // We have a middle clicked folder
       allBookmarkItems
         .filter(bookmark => bookmark.get('parentFolderId') === bookmarkItem.get('folderId') && bookmark.get('tags').includes(siteTags.BOOKMARK))

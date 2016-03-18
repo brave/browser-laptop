@@ -10,12 +10,14 @@ const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
 const appActions = require('../actions/appActions')
+const windowActions = require('../actions/windowActions')
 const {isSiteInList} = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 const siteUtil = require('../state/siteUtil')
+const eventUtil = require('../lib/eventUtil')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -38,8 +40,12 @@ class NavigationBar extends ImmutableComponent {
     }
   }
 
-  onReload () {
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+  onReload (e) {
+    if (eventUtil.isForSecondaryAction(e)) {
+      windowActions.cloneFrame(this.props.activeFrame)
+    } else {
+      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+    }
   }
 
   onStop () {
