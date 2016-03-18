@@ -66,6 +66,12 @@ function registerForBeforeRequest (session) {
       }
       if (results.redirectURL) {
         redirectURL = results.redirectURL
+        // Show the ruleset that was applied and the URLs that were upgraded in
+        // siteinfo
+        if (results.ruleset) {
+          BrowserWindow.getAllWindows().forEach(wnd =>
+            wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
+        }
       }
     }
     cb({redirectURL: redirectURL})

@@ -148,10 +148,12 @@ const doAction = (action) => {
       const lastTitle = windowState.getIn(frameStatePath(key).concat(['title']))
       let locationChanged = !action.location || !lastLocation ||
         action.location.split('#')[0] !== lastLocation.split('#')[0]
+      let lastHttpse = windowState.getIn(frameStatePath(key).concat(['httpsEverywhere'])) || {}
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
         adblock: {},
         trackingProtection: {},
+        httpsEverywhere: locationChanged ? {} : lastHttpse,
         title: locationChanged ? '' : lastTitle,
         location: action.location
       })
@@ -417,6 +419,9 @@ const doAction = (action) => {
       if (action.expandAdblock !== undefined) {
         windowState = windowState.setIn(['ui', 'siteInfo', 'expandAdblock'], action.expandAdblock)
       }
+      if (action.expandHttpse !== undefined) {
+        windowState = windowState.setIn(['ui', 'siteInfo', 'expandHttpse'], action.expandHttpse)
+      }
       break
     case WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
@@ -444,6 +449,11 @@ const doAction = (action) => {
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
+      break
+    case WindowConstants.WINDOW_SET_REDIRECTED_BY:
+      const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
+      let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
+      windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
     // Zoom state
     case WindowConstants.WINDOW_ZOOM_IN:

@@ -89,6 +89,7 @@ const messages = {
   CERT_ERROR_REJECTED: _, /** @arg {string} url where a cert error was rejected */
   SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
+  HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
   // Bookmarks
   IMPORT_BOOKMARKS: _
 }

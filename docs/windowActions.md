@@ -470,7 +470,7 @@ Dispatches a message to indicate if the mouse is in the titlebar
 
 
 
-### setSiteInfoVisible(isVisible, expandTrackingProtection, expandAdblock) 
+### setSiteInfoVisible(isVisible, expandTrackingProtection, expandAdblock, expandHttpse) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -481,6 +481,8 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 **expandTrackingProtection**: `boolean`, If specified, indicates if the TP section should be expanded
 
 **expandAdblock**: `boolean`, If specified, indicates if the adblock section should be expanded
+
+**expandHttpse**: `boolean`, If specified, indicates if the httpse section should be expanded
 
 
 
@@ -507,7 +509,7 @@ for a hovered link
 
 
 
-### setBlockedBy(frameProps, blockType) 
+### setBlockedBy(frameProps, blockType, location) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -516,6 +518,22 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 **frameProps**: `object`, The frame to set blocked info on
 
 **blockType**: `string`, either 'adblock' or 'trackingProtection'
+
+**location**: `string`, URL that was blocked
+
+
+
+### setRedirectedBy(frameProps, ruleset, location) 
+
+Similar to setBlockedBy but for httpse redirects
+
+**Parameters**
+
+**frameProps**: `Object`, The frame to set blocked info on
+
+**ruleset**: `string`, Name of the HTTPS Everywhere ruleset XML file
+
+**location**: `string`, URL that was redirected
 
 
 

@@ -140,6 +140,12 @@ class Main extends ImmutableComponent {
         windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
+    ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
+      const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach(frameProps =>
+        windowActions.setRedirectedBy(frameProps, ruleset, details.url))
+    })
+
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward.bind(this))
 

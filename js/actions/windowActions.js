@@ -663,13 +663,15 @@ const windowActions = {
    * @param {boolean} isVisible - true if the site info should be shown
    * @param {boolean} expandTrackingProtection - If specified, indicates if the TP section should be expanded
    * @param {boolean} expandAdblock - If specified, indicates if the adblock section should be expanded
+   * @param {boolean} expandHttpse - If specified, indicates if the httpse section should be expanded
    */
-  setSiteInfoVisible: function (isVisible, expandTrackingProtection, expandAdblock) {
+  setSiteInfoVisible: function (isVisible, expandTrackingProtection, expandAdblock, expandHttpse) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE,
       isVisible,
       expandTrackingProtection,
-      expandAdblock
+      expandAdblock,
+      expandHttpse
     })
   },
 
@@ -704,12 +706,28 @@ const windowActions = {
    *
    * @param {object} frameProps - The frame to set blocked info on
    * @param {string} blockType - either 'adblock' or 'trackingProtection'
+   * @param {string} location - URL that was blocked
    */
   setBlockedBy: function (frameProps, blockType, location) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BLOCKED_BY,
       frameProps,
       blockType,
+      location
+    })
+  },
+
+  /**
+   * Similar to setBlockedBy but for httpse redirects
+   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {string} ruleset - Name of the HTTPS Everywhere ruleset XML file
+   * @param {string} location - URL that was redirected
+   */
+  setRedirectedBy: function (frameProps, ruleset, location) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_REDIRECTED_BY,
+      frameProps,
+      ruleset,
       location
     })
   },

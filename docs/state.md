@@ -119,6 +119,7 @@ WindowStore
     trackingProtection: {
       blocked: Array<string>
     },
+    httpsEverywhere: Object.<string, Array.<string>>, // map of XML rulesets name to redirected resources
     security: {
       isSecure: boolean, // is using https
       certDetails: {
@@ -183,6 +184,9 @@ WindowStore
     },
     siteInfo: {
       isVisible: boolean, // Whether or not to show site info like # of blocked ads
+      expandTrackingProtection: boolean,
+      expandAdblock: boolean,
+      expandHttpse: boolean
     },
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes

@@ -29,7 +29,7 @@ function loadRulesets (data) {
 /**
  * Rewrites a URL from HTTP to HTTPS if an HTTPS Everywhere rule is applicable.
  * @param {string} url The URL to rewrite
- * @return {string|undefined} the rewritten URL, or undefined if no rewrite
+ * @return {{redirectURL: string|undefined, ruleset: string|undefined}}
  */
 function getRewrittenUrl (url) {
   // Get the set of ruleset IDs applicable to this host
@@ -85,7 +85,7 @@ function getHostnamePatterns (url) {
  * Applies a applicable rewrite ruleset to a URL
  * @param {string} url original URL
  * @param {Object} applicableRule applicable ruleset
- * @return {string?} the rewritten URL, or null if no rewrite applied
+ * @return {{redirectURL: string|undefined, ruleset: string|undefined}|null}
  */
 function applyRuleset (url, applicableRule) {
   var i, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
@@ -111,7 +111,10 @@ function applyRuleset (url, applicableRule) {
     fromPattern = new RegExp(rule[i].$.from)
     newUrl = url.replace(fromPattern, rule[i].$.to)
     if (newUrl !== url) {
-      return newUrl
+      return {
+        redirectURL: newUrl,
+        ruleset: ruleset.$.f
+      }
     }
   }
   return null
@@ -141,7 +144,11 @@ function onBeforeHTTPRequest (details) {
     // Don't try to rewrite this request, it'll probably just redirect again.
     console.log('https everywhere ignoring blacklisted url', details.url)
   } else {
-    result.redirectURL = getRewrittenUrl(details.url)
+    let rewritten = getRewrittenUrl(details.url)
+    if (rewritten) {
+      result.redirectURL = rewritten.redirectURL
+      result.ruleset = rewritten.ruleset
+    }
   }
   return result
 }

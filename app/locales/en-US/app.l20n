@@ -79,6 +79,7 @@
 <blockedTrackingElements "{{$blockedTrackingElementsSize}} Blocked tracking elements">
 <replacedAds "{{$replacedAdsSize}} Ads replaced">
 <blockedAds "{{$blockedAdsSize}} Ads blocked">
+<redirectedResources "{{$redirectedResourcesSize}} Resources upgraded to HTTPS">
 
 <updateNow "update now">
 <updateChecking "We're checking for updates...">
