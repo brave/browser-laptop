@@ -1,7 +1,14 @@
 # Changelog
 
+## [0.8.2](https://github.com/brave/browser-laptop/releases/v0.8.2dev)
+- Password saving feature added.
+- Brave is now a single instance application.
+- HTTPS Everywhere information is now displayed in the site information popup.
+- Upgraded to libchromiumcontent 49.0.2623.87.
+- Upgraded to Node v5.9.
+
 ## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
-- Upgrade to libchromiumcontent v49.
+- Upgrade to libchromiumcontent 49.0.2623.75.
 - Upgrade to Electron v0.37.2.
 - Upgrade to Node v5.8.
 - Basic HTTP authentication now supported.
