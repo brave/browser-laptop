@@ -135,6 +135,7 @@ export default class FindBar extends ImmutableComponent {
         data-l10n-id='findResults'/>
     } else if (this.numberOfMatches !== -1 && this.searchString) {
       const l10nArgs = {
+        activeMatchOrdinal: this.activeMatchOrdinal,
         numberOfMatches: this.numberOfMatches
       }
       findMatchText = <div className='foundResults'

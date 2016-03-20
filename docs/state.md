@@ -146,7 +146,8 @@ WindowStore
     findDetail: {
       searchString: string, // the string being searched
       caseSensitivity: boolean, // whether we are doing a case sensitive search
-      numberOfMatches: number // Total number of matches on the page
+      numberOfMatches: number, // Total number of matches on the page
+      activeMatchOrdinal: number // The current ordinal of the match
     }
     unloaded: boolean, // true if the tab is unloaded
 

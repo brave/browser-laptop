@@ -387,9 +387,10 @@ class Frame extends ImmutableComponent {
       windowActions.setThemeColor(this.props.frame, themeColor !== '#000000' ? themeColor : null)
     })
     this.webview.addEventListener('found-in-page', (e) => {
-      if (e.result !== undefined && e.result.matches !== undefined) {
+      if (e.result !== undefined && (e.result.matches !== undefined || e.result.activeMatchOrdinal !== undefined)) {
         windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
-          numberOfMatches: e.result.matches
+          numberOfMatches: e.result.matches || this.props.frame.getIn(['findDetail', 'numberOfMatches']),
+          activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.frame.getIn(['findDetail', 'activeMatchOrdinal'])
         }))
       }
     })

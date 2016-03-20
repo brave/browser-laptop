@@ -4,6 +4,7 @@
 - Password saving feature added.
 - Brave is now a single instance application.
 - HTTPS Everywhere information is now displayed in the site information popup.
+- Find in page now shows match ordinal.
 - Upgraded to libchromiumcontent 49.0.2623.87.
 - Upgraded to Node v5.9.
 
