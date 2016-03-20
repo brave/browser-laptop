@@ -81,6 +81,12 @@ class Main extends ImmutableComponent {
       deltaY = 0
       startTime = 0
     })
+    ipc.on(messages.LEAVE_FULL_SCREEN, () => {
+      const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+      if (activeFrame && activeFrame.get('isFullScreen')) {
+        windowActions.setFullScreen(activeFrame, false)
+      }
+    })
   }
 
   loadOpenSearch () {
@@ -100,6 +106,12 @@ class Main extends ImmutableComponent {
     const win = remote.getCurrentWindow()
     if (activeFrameTitle !== activeFramePrevTitle && win) {
       win.setTitle(activeFrameTitle)
+    }
+
+    // If the tab changes or was closed, exit out of full screen to give a better
+    // picture of what's happening.
+    if (activeFrame.get('key') !== activeFramePrev.get('key') && activeFramePrev.get('isFullScreen')) {
+      windowActions.setFullScreen(activeFramePrev, false)
     }
   }
 
@@ -335,6 +347,9 @@ class Main extends ImmutableComponent {
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
     return <div id='window'
+        className={cx({
+          isFullScreen: activeFrame && activeFrame.get('isFullScreen')
+        })}
         ref={node => this.mainWindow = node}
         onMouseDown={this.onMouseDown.bind(this)}
         onClick={this.onClickWindow.bind(this)}>

@@ -60,6 +60,7 @@ const messages = {
   POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
   HIDE_CONTEXT_MENU: _,
+  LEAVE_FULL_SCREEN: _,
   // Password manager
   GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */

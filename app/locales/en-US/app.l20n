@@ -46,6 +46,7 @@
 <menuButton title: "Menu">
 <emptyFolderItem "(empty)">
 <moreBookmarks "More bookmarks...">
+<fullScreenModeWarning "{{$host}} entered full screen mode, press ESC to exit.">
 
 <braveMenuTotalReplacements "Total Replacements: {{$count}}">
 

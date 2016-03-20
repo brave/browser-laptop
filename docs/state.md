@@ -106,6 +106,8 @@ WindowStore
     partitionNumber: number, // the session partition to use
     loading: boolean,
     themeColor: string, // css compatible color string
+    isFullScreen: boolean, // true if the frame should be shown as full screen
+    showFullScreenWarning: boolean, // true if a warning should be shown about full screen
     computedThemeColor: string, // css computed theme color from the favicon
     startLoadTime: datetime,
     endtLoadTime: datetime,

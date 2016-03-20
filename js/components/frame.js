@@ -18,7 +18,7 @@ const contextMenus = require('../contextMenus')
 const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
-
+const FullScreenWarning = require('./fullScreenWarning')
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
@@ -373,6 +373,13 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-navigate-in-page', () => {
       loadEnd()
     })
+    this.webview.addEventListener('enter-html-full-screen', () => {
+      windowActions.setFullScreen(this.props.frame, true, true)
+      setTimeout(windowActions.setFullScreen.bind(this, this.props.frame, undefined, false), 5000)
+    })
+    this.webview.addEventListener('leave-html-full-screen', () => {
+      windowActions.setFullScreen(this.props.frame, false)
+    })
     this.webview.addEventListener('media-started-playing', ({title}) => {
       windowActions.setAudioPlaybackActive(this.props.frame, true)
     })
@@ -467,6 +474,10 @@ class Frame extends ImmutableComponent {
           isPreview: this.props.isPreview,
           isActive: this.props.isActive
         })}>
+      { this.props.frame.get('isFullScreen') && this.props.frame.get('showFullScreenWarning')
+        ? <FullScreenWarning frameProps={this.props.frame}/>
+        : null
+      }
       { this.props.frame.get('findbarShown')
       ? <FindBar
         onFind={this.onFind.bind(this)}

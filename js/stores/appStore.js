@@ -141,6 +141,10 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
+  mainWindow.on('leave-full-screen', function () {
+    mainWindow.webContents.send(messages.LEAVE_FULL_SCREEN)
+  })
+
   mainWindow.on('app-command', function (e, cmd) {
     switch (cmd) {
       case 'browser-backward':

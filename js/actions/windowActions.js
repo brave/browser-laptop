@@ -237,6 +237,29 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to indicate that the webview entered full screen mode.
+   *
+   * @param {Object} frameProps - The frame properties to put in full screen
+   * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
+   * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
+   */
+  setFullScreen: function (frameProps, isFullScreen, showFullScreenWarning) {
+    if (isFullScreen === false) {
+      // Make sure the associated webview is in sync with what we're doing
+      const webview = document.querySelector(`webview[data-frame-key="${frameProps.get('key')}"]`)
+      if (webview) {
+        webview.executeJavaScript('document.webkitExitFullscreen()')
+      }
+    }
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FULL_SCREEN,
+      frameProps,
+      isFullScreen,
+      showFullScreenWarning
+    })
+  },
+
+  /**
    * Dispatches a message to the store to indicate if the navigation bar is focused.
    *
    * @param {boolean} focused - true if the navigation bar should be considered as focused
@@ -293,6 +316,10 @@ const windowActions = {
    * @param {Object} frameProps - The properties of the frame to close
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
+    // If the frame was full screen, exit
+    if (frameProps && frameProps.get('isFullScreen')) {
+      this.setFullScreen(frameProps, false)
+    }
     // Flush out any pending login required prompts
     if (frameProps && frameProps.getIn(['security', 'loginRequiredDetail'])) {
       ipc.send(messages.LOGIN_RESPONSE, frameProps.get('location'))

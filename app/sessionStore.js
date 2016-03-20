@@ -138,6 +138,9 @@ module.exports.cleanSessionData = (sessionData) => {
     // Remove find in page details
     delete frame.findDetail
     delete frame.findbarShown
+    // Don't restore full screen state
+    delete frame.isFullScreen
+    delete frame.showFullScreenWarning
     // Don't store child tab open ordering since keys
     // currently get re-generated when session store is
     // restored.  We will be able to keep this once we

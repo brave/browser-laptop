@@ -198,6 +198,12 @@ const doAction = (action) => {
         endLoadTime: new Date().getTime()
       })
       break
+    case WindowConstants.WINDOW_SET_FULL_SCREEN:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : windowState.getIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)].concat('isFullScreen')),
+        showFullScreenWarning: action.showFullScreenWarning
+      })
+      break
     case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'focused']), action.focused)
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.focused)
