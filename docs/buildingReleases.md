@@ -76,4 +76,5 @@ The primary purpose of doing this is to be able to update dependencies for secur
 
 - Rebase `brave/node` from a tag or changeset in `https://github.com/nodejs/node`.
 - Update `brave/electron/vendor/node` submodule to refer to the latest changeset in `brave/node`.
+- Update each of the building machines to match the version of Node that you're upgrading to. This is needed because `postinstall` rebuilds native modules and it should match the exact Node version.
 - You can tell which Node version we're on by looking at the first `brave/node` commit which is not from `electron/node`.  I.e. the first one from `nodejs/node`.
