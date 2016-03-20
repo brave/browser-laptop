@@ -11,8 +11,8 @@ To create a new release of `brave/electron` for use in `brave/electron-prebuilt`
 - Clone electron with `git clone --recursive git@github.com:brave/electron`
 - Rebase `brave/electron`'s commits to the upstream tag you'd like to create a release for.  e.g. `git rebase v0.37.2`
 - Make sure the submodule dependencies in `vendor/` are up to date.
-- For Linux and OSX builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> ATOM_SHELL_./script/cibuild`.  Replace `<your-github-token>` with a token generated from https://github.com/settings/tokens
-- For Windows builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> npm run cibuild-windows`.
+- For Linux and OSX builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> LIBCHROMIUMCONTENT_MIRROR=https://s3.amazonaws.com/brave-laptop-binaries/libchromiumcontent ./script/cibuild`.  Replace `<your-github-token>` with a token generated from https://github.com/settings/tokens
+- For Windows builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> LIBCHROMIUMCONTENT_MIRROR=https://s3.amazonaws.com/brave-laptop-binaries/libchromiumcontent npm run cibuild-windows`.
 - Manually download the release zip to a subfolder of `brave/browser-laptop-releases` and push it out.
 - Mark the release draft as completed in the `brave/electron` repository releases page.
 - Increase the version number of the package.json file so that `npm install` in `browser-laptop` will start using it.
