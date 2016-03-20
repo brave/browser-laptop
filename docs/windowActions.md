@@ -156,6 +156,20 @@ Dispatches a message to the store to indicate that the webview is done loading.
 
 
 
+### setFullScreen(frameProps, isFullScreen, showFullScreenWarning) 
+
+Dispatches a message to the store to indicate that the webview entered full screen mode.
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties to put in full screen
+
+**isFullScreen**: `boolean`, true if the webview is entering full screen mode.
+
+**showFullScreenWarning**: `boolean`, true if a warning about entering full screen should be shown.
+
+
+
 ### setNavBarFocused(focused) 
 
 Dispatches a message to the store to indicate if the navigation bar is focused.
