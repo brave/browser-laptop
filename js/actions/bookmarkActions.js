@@ -10,6 +10,14 @@ const windowActions = require('./windowActions')
 const eventUtil = require('../lib/eventUtil.js')
 
 const bookmarkActions = {
+  openBookmarksInFolder: function (allBookmarkItems, folderDetail) {
+    // We have a middle clicked folder
+    allBookmarkItems
+      .filter(bookmark => bookmark.get('parentFolderId') === folderDetail.get('folderId') && bookmark.get('tags').includes(siteTags.BOOKMARK))
+      .forEach(bookmark =>
+        windowActions.newFrame(siteUtil.toFrameOpts(bookmark), false))
+  },
+
   /**
    * Performs an action based on the passed in event to the bookmark item
    * @return true if an action was performed
@@ -28,14 +36,7 @@ const bookmarkActions = {
       windowActions.setContextMenuDetail()
       return true
     } else if (eventUtil.isForSecondaryAction(e)) {
-      // We have a middle clicked folder
-      allBookmarkItems
-        .filter(bookmark => bookmark.get('parentFolderId') === bookmarkItem.get('folderId') && bookmark.get('tags').includes(siteTags.BOOKMARK))
-        .forEach(bookmark =>
-          windowActions.newFrame({
-            location: bookmark.get('location'),
-            partitionNumber: bookmark.get('partitionNumber')
-          }, false))
+      this.openBookmarksInFolder(allBookmarkItems, bookmarkItem)
       windowActions.setContextMenuDetail()
       return true
     }

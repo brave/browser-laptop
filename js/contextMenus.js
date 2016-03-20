@@ -18,6 +18,7 @@ const siteUtil = require('./state/siteUtil')
 const CommonMenu = require('./commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
+const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 
 /**
@@ -95,6 +96,9 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       openInNewPrivateTabMenuItem(location),
       openInNewSessionTabMenuItem(location),
       copyLinkLocationMenuItem(location),
+      CommonMenu.separatorMenuItem)
+  } else {
+    template.push(openAllInNewTabsMenuItem(appStoreRenderer.state.get('sites'), siteDetail),
       CommonMenu.separatorMenuItem)
   }
 
@@ -364,6 +368,15 @@ const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
     label: 'Open in new tab',
     click: () => {
       windowActions.newFrame({ location, isPrivate, partitionNumber }, false)
+    }
+  }
+}
+
+const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
+  return {
+    label: 'Open all in tabs',
+    click: () => {
+      bookmarkActions.openBookmarksInFolder(allSites, folderDetail)
     }
   }
 }
