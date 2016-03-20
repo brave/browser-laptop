@@ -9,6 +9,7 @@
 - Open all bookmarks in bookmark folder context menu added.
 - Upgraded to libchromiumcontent 49.0.2623.87.
 - Upgraded to Node v5.9.
+- Various other bug fixes.
 
 ## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
 - Upgrade to libchromiumcontent 49.0.2623.75.

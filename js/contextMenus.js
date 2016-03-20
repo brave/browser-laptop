@@ -304,23 +304,26 @@ function tabTemplateInit (frameProps) {
 }
 
 function getEditableItems (hasSelection) {
-  return [{
-    label: 'Cut',
-    enabled: hasSelection,
-    accelerator: 'CmdOrCtrl+X',
-    // Enabled doesn't work when a role is used
-    role: hasSelection && 'cut' || undefined
-  }, {
-    label: 'Copy',
-    enabled: hasSelection,
-    accelerator: 'CmdOrCtrl+C',
-    // Enabled doesn't work when a role is used
-    role: hasSelection && 'copy' || undefined
-  }, {
+  const items = []
+  if (hasSelection) {
+    items.push({
+      label: 'Cut',
+      enabled: hasSelection,
+      accelerator: 'CmdOrCtrl+X',
+      role: 'cut'
+    }, {
+      label: 'Copy',
+      enabled: hasSelection,
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    })
+  }
+  items.push({
     label: 'Paste',
     accelerator: 'CmdOrCtrl+V',
     role: 'paste'
-  }]
+  })
+  return items
 }
 
 function hamburgerTemplateInit (braverySettings) {
