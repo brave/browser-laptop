@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const { activeWebview, findBarInput, findBarMatches, urlInput, titleBar } = require('../lib/selectors')
+const { activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar } = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
@@ -34,8 +34,20 @@ describe('findbar', function () {
          return this.getValue(findBarInput).then(val => val === 'test')
        })
       .waitForVisible(findBarMatches)
-    const match = yield this.app.client.getText(findBarMatches)
-    assert.equal(match, '2 matches')
+    let match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '1 of 2')
+
+    // Clicking next goes to the next match
+    yield this.app.client
+      .click(findBarNextButton)
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '2 of 2')
+
+    // Clicking next again loops back to the first match
+    yield this.app.client
+      .click(findBarNextButton)
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '1 of 2')
   })
 
   it('should re-focus findbar if open after blur', function *() {
