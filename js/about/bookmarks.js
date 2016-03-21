@@ -95,8 +95,10 @@ class BookmarkFolderItem extends ImmutableComponent {
     }
   }
   render () {
-    const childBookmarkFolders = this.props.allBookmarkFolders
-      .filter(bookmarkFolder => (bookmarkFolder.get('parentFolderId') || 0) === this.props.bookmarkFolder.get('folderId'))
+    const childBookmarkFolders = this.props.bookmarkFolder.get('folderId') === -1
+      ? []
+      : this.props.allBookmarkFolders
+          .filter(bookmarkFolder => (bookmarkFolder.get('parentFolderId') || 0) === this.props.bookmarkFolder.get('folderId'))
     return <div>
       <div role='listitem'
         onDrop={this.onDrop.bind(this)}
@@ -143,6 +145,15 @@ class BookmarkFolderList extends ImmutableComponent {
             selectedFolderId={this.props.selectedFolderId}
             onChangeSelectedFolder={this.props.onChangeSelectedFolder}/>)
       }
+      { this.props.isRoot
+        ? <BookmarkFolderItem selected={this.props.selectedFolderId === -1}
+            dataL10nId='otherBookmarks'
+            draggable={false}
+            onChangeSelectedFolder={this.props.onChangeSelectedFolder}
+            allBookmarkFolders={this.props.allBookmarkFolders}
+            selectedFolderId={this.props.selectedFolderId}
+            bookmarkFolder={Immutable.fromJS({folderId: -1, tags: [siteTags.BOOKMARK_FOLDER]})}/>
+        : null }
     </list>
   }
 }
