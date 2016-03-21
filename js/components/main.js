@@ -110,7 +110,8 @@ class Main extends ImmutableComponent {
 
     // If the tab changes or was closed, exit out of full screen to give a better
     // picture of what's happening.
-    if (activeFrame.get('key') !== activeFramePrev.get('key') && activeFramePrev.get('isFullScreen')) {
+    if (activeFramePrev && activeFrame &&
+        activeFrame.get('key') !== activeFramePrev.get('key') && activeFramePrev.get('isFullScreen')) {
       windowActions.setFullScreen(activeFramePrev, false)
     }
   }
