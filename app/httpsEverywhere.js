@@ -6,9 +6,7 @@
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const session = require('electron').session
 
-let httpsEverywhereInitialized = false
 // Map of ruleset ID to ruleset content
 var db = null
 // Map of hostname pattern to ruleset ID
@@ -17,6 +15,8 @@ var targets = null
 var redirectCounter = {}
 // Blacklist of canonicalized hosts (host+pathname) that lead to redirect loops
 var redirectBlacklist = []
+// Canonicalized hosts that have been recently redirected via a 307
+var recent307Counter = {}
 
 module.exports.resourceName = 'httpsEverywhere'
 
@@ -32,6 +32,11 @@ function loadRulesets (data) {
  * @return {{redirectURL: string|undefined, ruleset: string|undefined}}
  */
 function getRewrittenUrl (url) {
+  // Rulesets not yet loaded
+  if (!db || !targets) {
+    return undefined
+  }
+
   // Get the set of ruleset IDs applicable to this host
   var rulesetIds = getHostnamePatterns(url).reduce((prev, hostname) => {
     var target = targets[hostname]
@@ -121,18 +126,21 @@ function applyRuleset (url, applicableRule) {
 }
 
 /**
- * Called when the HTTPS EVerywhere data file
+ * Called when the HTTPS Everywhere data file
  * is downloaded and ready.
  */
 function startHttpsEverywhere () {
-  httpsEverywhereInitialized = true
-  Filtering.registerBeforeRequestFilteringCB((onBeforeHTTPRequest))
+  // Reset the recently-redirected counter every 100 ms
+  setTimeout(() => {
+    recent307Counter = {}
+  }, 100)
+  Filtering.registerBeforeRequestFilteringCB(onBeforeHTTPRequest)
+  Filtering.registerBeforeRedirectFilteringCB(onBeforeRedirect)
 }
 
 function onBeforeHTTPRequest (details) {
   let result = { resourceName: module.exports.resourceName }
-  if (!httpsEverywhereInitialized ||
-      !Filtering.isResourceEnabled(module.exports.resourceName)) {
+  if (!Filtering.isResourceEnabled(module.exports.resourceName)) {
     return result
   }
   // Ignore URLs that are not HTTP
@@ -142,7 +150,7 @@ function onBeforeHTTPRequest (details) {
 
   if (redirectBlacklist.includes(canonicalizeUrl(details.url))) {
     // Don't try to rewrite this request, it'll probably just redirect again.
-    console.log('https everywhere ignoring blacklisted url', details.url)
+    return result
   } else {
     let rewritten = getRewrittenUrl(details.url)
     if (rewritten) {
@@ -154,22 +162,46 @@ function onBeforeHTTPRequest (details) {
 }
 
 function onBeforeRedirect (details) {
-  if (!httpsEverywhereInitialized ||
-      !Filtering.isResourceEnabled(module.exports.resourceName)) {
+  if (!Filtering.isResourceEnabled(module.exports.resourceName)) {
     return
   }
 
   var canonicalUrl = canonicalizeUrl(details.url)
+
+  // If the URL is already blacklisted, we are done
+  if (redirectBlacklist.includes(canonicalUrl)) {
+    return
+  }
+
+  // Heuristic part 1: Count same-page redirects using the request ID
   if (details.id in redirectCounter) {
-    canonicalUrl = canonicalizeUrl(details.url)
     redirectCounter[details.id] += 1
-    if (redirectCounter[details.id] > 5 && !redirectBlacklist.includes(canonicalUrl)) {
+    if (redirectCounter[details.id] > 5) {
       // Blacklist this host
-      console.log('blacklisting url', canonicalUrl)
+      console.log('blacklisting url from HTTPS Everywhere', canonicalUrl)
       redirectBlacklist.push(canonicalUrl)
+      return
     }
   } else {
     redirectCounter[details.id] = 1
+  }
+
+  // Heuristic part 2: Count internal redirects for server-initiated redirects that
+  // increase the request ID on every redirect.
+  if (details.statusCode === 307) {
+    if (canonicalUrl in recent307Counter) {
+      recent307Counter[canonicalUrl] += 1
+      if (recent307Counter[canonicalUrl] > 5) {
+        // If this URL has been internally-redirected more than 5 times in 100
+        // ms, it's probably an HTTPS-Everywhere redirect loop.
+        console.log('blacklisting url from HTTPS Everywhere for too many 307s',
+                    canonicalUrl)
+        redirectBlacklist.push(canonicalUrl)
+        return
+      }
+    } else {
+      recent307Counter[canonicalUrl] = 1
+    }
   }
 }
 
@@ -184,25 +216,9 @@ function canonicalizeUrl (url) {
 }
 
 /**
- * Register for notifications for webRequest notifications for
- * a particular session.
- * @param {object} The session to add webRequest filtering on
- */
-function registerForSession (session) {
-  // Try to catch infinite redirect loops on URLs we've redirected to HTTPS
-  // TODO: Add this to Filtering.js
-  session.webRequest.onBeforeRedirect({
-    urls: ['https://*/*']
-  }, onBeforeRedirect)
-}
-
-/**
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
   DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
-  registerForSession(session.fromPartition(''))
-  registerForSession(session.fromPartition('private-1'))
-  registerForSession(session.fromPartition('main-1'))
 }
 
