@@ -7,6 +7,7 @@
 - HTTPS Everywhere information is now displayed in the site information popup.
 - Find in page now shows match ordinal.
 - Open all bookmarks in bookmark folder context menu added.
+- Add Safari support for already existing Chrome / Firefox bookmarks import.
 - Upgraded to libchromiumcontent 49.0.2623.87.
 - Upgraded to Node v5.9.
 - Various other bug fixes.
