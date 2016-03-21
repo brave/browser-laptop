@@ -205,6 +205,12 @@ class Main extends ImmutableComponent {
     window.addEventListener('mousemove', (e) => {
       self.checkForTitleMode(e.pageY)
     })
+
+    const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+    const win = remote.getCurrentWindow()
+    if (activeFrame && win) {
+      win.setTitle(activeFrame.get('title'))
+    }
   }
 
   checkForTitleMode (pageY) {
