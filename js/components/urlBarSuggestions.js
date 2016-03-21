@@ -223,7 +223,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         maxResults: config.urlBarSuggestions.maxTopSites,
         classHandler: () => 'fa-search',
         clickHandler: navigateClickHandler(searchTerms => this.props.searchDetail.get('searchURL')
-          .replace('{searchTerms}', searchTerms))}))
+          .replace('{searchTerms}', encodeURIComponent(searchTerms)))}))
     }
 
     // Alexa top 500
@@ -261,7 +261,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (!isUrl(urlLocation) && urlLocation.length > 0) {
       const xhr = new window.XMLHttpRequest({mozSystem: true})
       xhr.open('GET', this.props.searchDetail.get('autocompleteURL')
-        .replace('{searchTerms}', urlLocation), true)
+        .replace('{searchTerms}', encodeURIComponent(urlLocation)), true)
       xhr.responseType = 'json'
       xhr.send()
       xhr.onload = () => {

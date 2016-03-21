@@ -73,7 +73,7 @@ class UrlBar extends ImmutableComponent {
           windowActions.setUrlBarSelected(true)
         } else {
           const isLocationUrl = isUrl(location)
-          const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', location)
+          const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
           // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
           // For whitepsace we want a search no matter what.
           if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
