@@ -10,8 +10,9 @@ module.exports = {
     userAgent: 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 Googlebot'
   },
   'player.twitch.tv': {
+    allowRunningInsecureContent: true,
     onBeforeRequest: function(details) {
-      if (details.resourceType !== 'subFrame' || details.url.includes('&html5')) {
+      if (details.resourceType !== 'subFrame' && details.resourceType !== 'mainFrame' || details.url.includes('&html5')) {
         return
       }
       return {
