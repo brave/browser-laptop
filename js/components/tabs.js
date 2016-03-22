@@ -61,7 +61,7 @@ class Tabs extends ImmutableComponent {
           windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             windowActions.setPinned(sourceDragData, false)
-            appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
+            appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED), siteTags.PINNED)
           }
         }
       }, 0)

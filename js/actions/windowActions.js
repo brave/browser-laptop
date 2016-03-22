@@ -133,6 +133,19 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to set the login required detail.
+   * @param {Object} frameProps - The frame where the login required prompt should be shown.
+   * @param {Object} detail - Details of the login required operation.
+   */
+  setLoginRequiredDetail: function (frameProps, detail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_LOGIN_REQUIRED_DETAIL,
+      frameProps,
+      detail
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the user entered text for the URL bar.
    * Unlike setLocation and loadUrl, this does not modify the state of src and location.
    *
@@ -224,6 +237,29 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to indicate that the webview entered full screen mode.
+   *
+   * @param {Object} frameProps - The frame properties to put in full screen
+   * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
+   * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
+   */
+  setFullScreen: function (frameProps, isFullScreen, showFullScreenWarning) {
+    if (isFullScreen === false) {
+      // Make sure the associated webview is in sync with what we're doing
+      const webview = document.querySelector(`webview[data-frame-key="${frameProps.get('key')}"]`)
+      if (webview) {
+        webview.executeJavaScript('document.webkitExitFullscreen()')
+      }
+    }
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FULL_SCREEN,
+      frameProps,
+      isFullScreen,
+      showFullScreenWarning
+    })
+  },
+
+  /**
    * Dispatches a message to the store to indicate if the navigation bar is focused.
    *
    * @param {boolean} focused - true if the navigation bar should be considered as focused
@@ -261,12 +297,33 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to create a new frame similar to the passed arg.
+   *
+   * @param {Object} frameProps - The properties of the frame to clone
+   */
+  cloneFrame: function (frameProps) {
+    this.newFrame({
+      location: frameProps.get('location'),
+      isPrivate: frameProps.get('isPrivate'),
+      partitionNumber: frameProps.get('partitionNumber')
+    }, false)
+  },
+
+  /**
    * Dispatches a message to close a frame
    *
    * @param {Object[]} frames - Immutable list of of all the frames
    * @param {Object} frameProps - The properties of the frame to close
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
+    // If the frame was full screen, exit
+    if (frameProps && frameProps.get('isFullScreen')) {
+      this.setFullScreen(frameProps, false)
+    }
+    // Flush out any pending login required prompts
+    if (frameProps && frameProps.getIn(['security', 'loginRequiredDetail'])) {
+      ipc.send(messages.LOGIN_RESPONSE, frameProps.get('location'))
+    }
     // Unless a caller explicitly specifies to close a pinned frame, then
     // ignore the call.
     const nonPinnedFrames = frames.filter(frame => !frame.get('pinnedLocation'))
@@ -493,12 +550,14 @@ const windowActions = {
    * @param {Object} frameProps - Properties of the frame in question
    * @param {string} activeShortcut - The text for the new shortcut. Usually this is null to clear info which was previously
    * set from an IPC call.
+   * @param {string} activeShortcutDetails - Parameters for the shortcut action
    */
-  setActiveFrameShortcut: function (frameProps, activeShortcut) {
+  setActiveFrameShortcut: function (frameProps, activeShortcut, activeShortcutDetails) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT,
       frameProps,
-      activeShortcut
+      activeShortcut,
+      activeShortcutDetails
     })
   },
 
@@ -631,13 +690,15 @@ const windowActions = {
    * @param {boolean} isVisible - true if the site info should be shown
    * @param {boolean} expandTrackingProtection - If specified, indicates if the TP section should be expanded
    * @param {boolean} expandAdblock - If specified, indicates if the adblock section should be expanded
+   * @param {boolean} expandHttpse - If specified, indicates if the httpse section should be expanded
    */
-  setSiteInfoVisible: function (isVisible, expandTrackingProtection, expandAdblock) {
+  setSiteInfoVisible: function (isVisible, expandTrackingProtection, expandAdblock, expandHttpse) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE,
       isVisible,
       expandTrackingProtection,
-      expandAdblock
+      expandAdblock,
+      expandHttpse
     })
   },
 
@@ -672,12 +733,28 @@ const windowActions = {
    *
    * @param {object} frameProps - The frame to set blocked info on
    * @param {string} blockType - either 'adblock' or 'trackingProtection'
+   * @param {string} location - URL that was blocked
    */
   setBlockedBy: function (frameProps, blockType, location) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BLOCKED_BY,
       frameProps,
       blockType,
+      location
+    })
+  },
+
+  /**
+   * Similar to setBlockedBy but for httpse redirects
+   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {string} ruleset - Name of the HTTPS Everywhere ruleset XML file
+   * @param {string} location - URL that was redirected
+   */
+  setRedirectedBy: function (frameProps, ruleset, location) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_REDIRECTED_BY,
+      frameProps,
+      ruleset,
       location
     })
   },

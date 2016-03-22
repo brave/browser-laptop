@@ -46,12 +46,14 @@
 <menuButton title: "Menu">
 <emptyFolderItem "(empty)">
 <moreBookmarks "More bookmarks...">
+<fullScreenModeWarning "{{$host}} entered full screen mode, press ESC to exit.">
 
 <braveMenuTotalReplacements "Total Replacements: {{$count}}">
 
 <basicAuthRequired "Authentication Required">
-<basicAuthUsername placeholder: "Username">
-<basicAuthPassword placeholder: "Password">
+<basicAuthUsername "Username:">
+<basicAuthPassword "Password:">
+<basicAuthMessage "{{$host}} requires a username and password.">
 
 <crashScreenHeader "Something went wrong =(">
 <crashScreenText "An error occurred while displaying this webpage. To continue, reload or navigate to another page.">
@@ -78,6 +80,7 @@
 <blockedTrackingElements "{{$blockedTrackingElementsSize}} Blocked tracking elements">
 <replacedAds "{{$replacedAdsSize}} Ads replaced">
 <blockedAds "{{$blockedAdsSize}} Ads blocked">
+<redirectedResources "{{$redirectedResourcesSize}} Resources upgraded to HTTPS">
 
 <updateNow "update now">
 <updateChecking "We're checking for updates...">
@@ -113,3 +116,4 @@
 <save "Save">
 
 <bookmarksToolbar "Bookmarks Toolbar">
+<otherBookmarks "Other Bookmarks">

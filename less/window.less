@@ -18,6 +18,12 @@ html,
   height: 100%;
   overflow: hidden;
   width: 100%;
+
+  &.isFullScreen {
+    .top {
+      display: none;
+    }
+  }
 }
 
 #windowContainer {
@@ -95,6 +101,19 @@ html,
   top: 0;
   left: 0;
 
+  .fullScreenModeWarning {
+    background: #3a3a3a;
+    color: white;
+    font-size: larger;
+    left: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+  }
+
   // Needed to be able to click and drag to select content in pages.
   -webkit-user-select: none;
 
@@ -118,6 +137,13 @@ html,
     &.isPreview {
       background: gray;
       z-index: 3;
+    }
+
+    // Webviews can cause flickers w/ Chrome  v49 if left visible
+    // in the background.  This also has a major benefit for background
+    // tabs that have video and animations in them.
+    &:not(.isPreview) {
+      visibility: hidden;
     }
   }
 }

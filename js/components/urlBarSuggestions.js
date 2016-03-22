@@ -17,6 +17,7 @@ const {getSiteIconClass} = require('../state/siteUtil.js')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const getSetting = require('../settings').getSetting
+const eventUtil = require('../lib/eventUtil.js')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
@@ -111,16 +112,13 @@ class UrlBarSuggestions extends ImmutableComponent {
     const navigateClickHandler = formatUrl => (site, e) => {
       // We have a wonky way of fake clicking from keyboard enter,
       // so remove the meta keys from the real event here.
-      const metaKey = e.metaKey || this.metaKey
-      const ctrlKey = e.ctrlKey || this.ctrlKey
+      e.metaKey = e.metaKey || this.metaKey
+      e.ctrlKey = e.ctrlKey || this.ctrlKey
       delete this.metaKey
       delete this.ctrlKey
 
-      const isDarwin = process.platform === 'darwin'
       const location = formatUrl(site)
-      if (ctrlKey && !isDarwin ||
-          metaKey && isDarwin ||
-          e.button === 1) {
+      if (eventUtil.isForSecondaryAction(e)) {
         windowActions.newFrame({
           location,
           partitionNumber: site && site.get && site.get('partitionNumber') || undefined
@@ -146,7 +144,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       .filter(filterValue)
       // Filter out things which are already in the suggestions list
       .filter(site =>
-        suggestions.findIndex(x => x.title.toLowerCase() === formatTitle(site).toLowerCase()) === -1)
+        suggestions.findIndex(x => x.title.toLowerCase() === (formatTitle(site) || '').toLowerCase()) === -1)
       .sort(sortHandler)
       .take(maxResults)
       .map(site => {
@@ -225,7 +223,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         maxResults: config.urlBarSuggestions.maxTopSites,
         classHandler: () => 'fa-search',
         clickHandler: navigateClickHandler(searchTerms => this.props.searchDetail.get('searchURL')
-          .replace('{searchTerms}', searchTerms))}))
+          .replace('{searchTerms}', encodeURIComponent(searchTerms)))}))
     }
 
     // Alexa top 500
@@ -263,7 +261,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (!isUrl(urlLocation) && urlLocation.length > 0) {
       const xhr = new window.XMLHttpRequest({mozSystem: true})
       xhr.open('GET', this.props.searchDetail.get('autocompleteURL')
-        .replace('{searchTerms}', urlLocation), true)
+        .replace('{searchTerms}', encodeURIComponent(urlLocation)), true)
       xhr.responseType = 'json'
       xhr.send()
       xhr.onload = () => {

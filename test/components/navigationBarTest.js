@@ -348,7 +348,7 @@ describe('urlbar', function () {
       })
 
       it('has the file icon', function *() {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-file-o')
+        yield this.app.client.waitForExist('.urlbarIcon.fa-file')
       })
     })
 

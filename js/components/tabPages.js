@@ -33,7 +33,7 @@ class TabPage extends ImmutableComponent {
         sourceDragFromPageIndex >= this.props.index)
       if (sourceDragData.get('pinnedLocation')) {
         windowActions.setPinned(sourceDragData, false)
-        appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData), siteTags.PINNED)
+        appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED), siteTags.PINNED)
       }
       windowActions.setIsBeingDraggedOverDetail()
     }, 0)

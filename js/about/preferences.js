@@ -21,9 +21,9 @@ const hintCount = 3
 require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const changeSetting = (key, e) => {
+const changeSetting = (cb, key, e) => {
   if (e.target.type === 'checkbox') {
-    aboutActions.changeSetting(key, e.target.checked)
+    cb(key, e.target.checked)
   } else {
     let value = e.target.value
     if (e.target.type === 'number') {
@@ -34,7 +34,7 @@ const changeSetting = (key, e) => {
       }
       value = Math.min(e.target.getAttribute('max'), Math.max(value, e.target.getAttribute('min')))
     }
-    aboutActions.changeSetting(key, value)
+    cb(key, value)
   }
 }
 
@@ -65,7 +65,7 @@ class SettingCheckbox extends ImmutableComponent {
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
           disabled={this.props.disabled}
-          onChange={changeSetting.bind(null, this.props.prefKey)}
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
           checked={getSetting(this.props.prefKey, this.props.settings)}/>
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
@@ -78,7 +78,7 @@ class GeneralTab extends ImmutableComponent {
     return <SettingsList>
       <SettingItem dataL10nId='startsWith'>
         <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
-          onChange={changeSetting.bind(null, settings.STARTUP_MODE)} >
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
           <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
           <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
           <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage'/>
@@ -87,7 +87,7 @@ class GeneralTab extends ImmutableComponent {
       <SettingItem dataL10nId='myHomepage'>
         <input data-l10n-id='homepageInput'
           value={getSetting(settings.HOMEPAGE, this.props.settings)}
-          onChange={changeSetting.bind(null, settings.HOMEPAGE)} />
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
       </SettingItem>
     </SettingsList>
   }
@@ -98,7 +98,7 @@ class SearchTab extends ImmutableComponent {
     return <SettingsList>
       <SettingItem dataL10nId='defaultSearchEngine'>
         <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
-          onChange={changeSetting.bind(null, settings.DEFAULT_SEARCH_ENGINE)}>
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_SEARCH_ENGINE)}>
           <option value='./content/search/google.xml'>Google</option>
           <option value='./content/search/duckduckgo.xml'>DuckDuckGo</option>
         </select>
@@ -116,11 +116,11 @@ class TabsTab extends ImmutableComponent {
           min='3'
           max='20'
           value={getSetting(settings.TABS_PER_TAB_PAGE, this.props.settings)}
-          onChange={changeSetting.bind(null, settings.TABS_PER_TAB_PAGE)} />
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_TAB_PAGE)} />
       </SettingItem>
-      <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings}/>
-      <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings}/>
-      <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings}/>
+      <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+      <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+      <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
     </SettingsList>
   }
 }
@@ -137,12 +137,12 @@ class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings}/>
-        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings}/>
-        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings}/>
+        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
       <SettingsList dataL10nId='advancedPrivacySettings'>
-        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings}/>
+        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
     </div>
   }
@@ -151,7 +151,7 @@ class PrivacyTab extends ImmutableComponent {
 class SecurityTab extends ImmutableComponent {
   render () {
     return <SettingsList>
-      <SettingCheckbox disabled dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings}/>
+      <SettingCheckbox disabled dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
     </SettingsList>
   }
 }
@@ -260,6 +260,7 @@ class AboutPreferences extends React.Component {
         settings: Immutable.fromJS(e.detail || {})
       })
     })
+    this.onChangeSetting = this.onChangeSetting.bind(this)
   }
 
   changeTab (preferenceTab) {
@@ -288,30 +289,37 @@ class AboutPreferences extends React.Component {
     return newNumber
   }
 
+  onChangeSetting (key, value) {
+    this.setState({
+      settings: this.state.settings.set(key, value)
+    })
+    aboutActions.changeSetting(key, value)
+  }
+
   render () {
     let tab
     const settings = this.state.settings
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
-        tab = <GeneralTab settings={settings}/>
+        tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
       case preferenceTabs.SEARCH:
-        tab = <SearchTab settings={settings}/>
+        tab = <SearchTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
       case preferenceTabs.TABS:
-        tab = <TabsTab settings={settings}/>
+        tab = <TabsTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
       case preferenceTabs.SYNC:
-        tab = <SyncTab settings={settings}/>
+        tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
       case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab settings={settings}/>
+        tab = <PrivacyTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings}/>
+        tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
       case preferenceTabs.BRAVERY:
-        tab = <BraveryTab settings={settings}/>
+        tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting}/>
         break
     }
     return <div>

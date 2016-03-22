@@ -240,6 +240,7 @@ export function undoCloseFrame (windowState, closedFrames) {
  */
 export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
   if (!frameProps.get('isPrivate')) {
+    frameProps = frameProps.set('isFullScreen', false)
     closedFrames = closedFrames.push(frameProps)
     if (frameProps.get('thumbnailBlob')) {
       window.URL.revokeObjectURL(frameProps.get('thumbnailBlob'))

@@ -10,12 +10,14 @@ const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
 const appActions = require('../actions/appActions')
+const windowActions = require('../actions/windowActions')
 const {isSiteInList} = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 const siteUtil = require('../state/siteUtil')
+const eventUtil = require('../lib/eventUtil')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -32,14 +34,18 @@ class NavigationBar extends ImmutableComponent {
 
   onToggleBookmark (isBookmarked) {
     if (isBookmarked) {
-      appActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame), siteTags.BOOKMARK)
+      appActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK), siteTags.BOOKMARK)
     } else {
-      appActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame), siteTags.BOOKMARK)
+      appActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK), siteTags.BOOKMARK)
     }
   }
 
-  onReload () {
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+  onReload (e) {
+    if (eventUtil.isForSecondaryAction(e)) {
+      windowActions.cloneFrame(this.props.activeFrame)
+    } else {
+      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+    }
   }
 
   onStop () {
@@ -103,7 +109,7 @@ class NavigationBar extends ImmutableComponent {
               className='navbutton stop-button'
               onClick={this.onStop} />
           : <Button iconClass='fa-repeat'
-              l10nId='stopButton'
+              l10nId='reloadButton'
               className='navbutton reload-button'
               onClick={this.onReload} />
         }

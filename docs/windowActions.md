@@ -64,6 +64,18 @@ Dispatches a message to set the security state.
 
 
 
+### setLoginRequiredDetail(frameProps, detail) 
+
+Dispatches a message to set the login required detail.
+
+**Parameters**
+
+**frameProps**: `Object`, The frame where the login required prompt should be shown.
+
+**detail**: `Object`, Details of the login required operation.
+
+
+
 ### setNavBarUserInput(location) 
 
 Dispatches a message to the store to set the user entered text for the URL bar.
@@ -144,6 +156,20 @@ Dispatches a message to the store to indicate that the webview is done loading.
 
 
 
+### setFullScreen(frameProps, isFullScreen, showFullScreenWarning) 
+
+Dispatches a message to the store to indicate that the webview entered full screen mode.
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties to put in full screen
+
+**isFullScreen**: `boolean`, true if the webview is entering full screen mode.
+
+**showFullScreenWarning**: `boolean`, true if a warning about entering full screen should be shown.
+
+
+
 ### setNavBarFocused(focused) 
 
 Dispatches a message to the store to indicate if the navigation bar is focused.
@@ -164,6 +190,16 @@ Dispatches a message to the store to create a new frame
                  These may not all be hooked up in Electron yet.
 
 **openInForeground**: `boolean`, true if the new frame should become the new active frame
+
+
+
+### cloneFrame(frameProps) 
+
+Dispatches a message to the store to create a new frame similar to the passed arg.
+
+**Parameters**
+
+**frameProps**: `Object`, The properties of the frame to clone
 
 
 
@@ -324,7 +360,7 @@ are no autocomplete results.
 
 
 
-### setActiveFrameShortcut(frameProps, activeShortcut) 
+### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 
@@ -334,6 +370,8 @@ Dispatches a message to the store to indicate that the pending frame shortcut in
 
 **activeShortcut**: `string`, The text for the new shortcut. Usually this is null to clear info which was previously
 set from an IPC call.
+
+**activeShortcutDetails**: `string`, Parameters for the shortcut action
 
 
 
@@ -446,7 +484,7 @@ Dispatches a message to indicate if the mouse is in the titlebar
 
 
 
-### setSiteInfoVisible(isVisible, expandTrackingProtection, expandAdblock) 
+### setSiteInfoVisible(isVisible, expandTrackingProtection, expandAdblock, expandHttpse) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -457,6 +495,8 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 **expandTrackingProtection**: `boolean`, If specified, indicates if the TP section should be expanded
 
 **expandAdblock**: `boolean`, If specified, indicates if the adblock section should be expanded
+
+**expandHttpse**: `boolean`, If specified, indicates if the httpse section should be expanded
 
 
 
@@ -483,7 +523,7 @@ for a hovered link
 
 
 
-### setBlockedBy(frameProps, blockType) 
+### setBlockedBy(frameProps, blockType, location) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -492,6 +532,22 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 **frameProps**: `object`, The frame to set blocked info on
 
 **blockType**: `string`, either 'adblock' or 'trackingProtection'
+
+**location**: `string`, URL that was blocked
+
+
+
+### setRedirectedBy(frameProps, ruleset, location) 
+
+Similar to setBlockedBy but for httpse redirects
+
+**Parameters**
+
+**frameProps**: `Object`, The frame to set blocked info on
+
+**ruleset**: `string`, Name of the HTTPS Everywhere ruleset XML file
+
+**location**: `string`, URL that was redirected
 
 
 

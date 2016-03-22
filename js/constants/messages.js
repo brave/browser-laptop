@@ -39,6 +39,8 @@ const messages = {
   QUIT_APPLICATION: _,
   UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
+  LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
+  LOGIN_RESPONSE: _,
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,
@@ -57,6 +59,14 @@ const messages = {
   STOP_LOAD: _,
   POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
+  HIDE_CONTEXT_MENU: _,
+  LEAVE_FULL_SCREEN: _,
+  // Password manager
+  GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
+  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */
+  SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
+  SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
+  FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
@@ -78,6 +88,9 @@ const messages = {
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CERT_ERROR_REJECTED: _, /** @arg {string} url where a cert error was rejected */
+  SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
+  CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
+  HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
   // Bookmarks
   IMPORT_BOOKMARKS: _
 }

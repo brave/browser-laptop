@@ -25,8 +25,8 @@ module.exports.init = () => {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
     let customCookie
-    if (hack && hack.requestFilter) {
-      const result = hack.requestFilter.call(this, details)
+    if (hack && hack.onBeforeSendHeaders) {
+      const result = hack.onBeforeSendHeaders.call(this, details)
       if (result && result.customCookie) {
         customCookie = result.customCookie
       }
@@ -34,6 +34,21 @@ module.exports.init = () => {
     return {
       resourceName,
       customCookie
+    }
+  })
+  Filtering.registerBeforeRequestFilteringCB(details => {
+    let domain = URL.parse(details.url).hostname
+    let hack = siteHacks[domain]
+    let redirectURL
+    if (hack && hack.onBeforeRequest) {
+      const result = hack.onBeforeRequest.call(this, details)
+      if (result && result.redirectURL) {
+        redirectURL = result.redirectURL
+      }
+    }
+    return {
+      resourceName,
+      redirectURL
     }
   })
 }

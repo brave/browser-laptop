@@ -19,6 +19,7 @@ const dialog = electron.dialog
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
+const beforeRedirectFilteringFns = []
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
@@ -33,13 +34,17 @@ module.exports.registerBeforeRequestFilteringCB = filteringFn => {
   beforeRequestFilteringFns.push(filteringFn)
 }
 
+module.exports.registerBeforeRedirectFilteringCB = filteringFn => {
+  beforeRedirectFilteringFns.push(filteringFn)
+}
+
 /**
  * Register for notifications for webRequest.onBeforeRequest for a particular
  * session.
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForBeforeRequest (session) {
-  session.webRequest.onBeforeRequest(function (details, cb) {
+  session.webRequest.onBeforeRequest((details, cb) => {
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl) {
       cb({})
@@ -66,9 +71,36 @@ function registerForBeforeRequest (session) {
       }
       if (results.redirectURL) {
         redirectURL = results.redirectURL
+        // Show the ruleset that was applied and the URLs that were upgraded in
+        // siteinfo
+        if (results.ruleset) {
+          BrowserWindow.getAllWindows().forEach(wnd =>
+            wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
+        }
       }
     }
     cb({redirectURL: redirectURL})
+  })
+}
+
+/**
+ * Register for notifications for webRequest.onBeforeRedirect for a particular
+ * session.
+ * @param {object} session Session to add webRequest filtering on
+ */
+function registerForBeforeRedirect (session) {
+  // Note that onBeforeRedirect listener doesn't take a callback
+  session.webRequest.onBeforeRedirect(function (details) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl) {
+      return
+    }
+    for (let i = 0; i < beforeRedirectFilteringFns.length; i++) {
+      // Note that since this isn't supposed to have a return value, the
+      // redirect filtering function must check whether the resource is
+      // enabled and do nothing if it's not.
+      beforeRedirectFilteringFns[i](details)
+    }
   })
 }
 
@@ -167,6 +199,11 @@ function registerPermissionHandler (session) {
   }
   session.setPermissionRequestHandler((webContents, permission, cb) => {
     let host = urlParse(webContents.getURL()).host
+    if (!permissions[permission]) {
+      console.log('WARNING: got registered permission request', permission)
+      cb(false)
+      return
+    }
     let isAllowed = permissions[permission].hosts[host]
     if (isAllowed !== undefined) {
       cb(isAllowed)
@@ -210,7 +247,7 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
 }
 
 function initForPartition (partition) {
-  [registerPermissionHandler, registerForBeforeRequest, registerForBeforeSendHeaders].forEach(fn => {
+  [registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach(fn => {
     fn(session.fromPartition(partition))
   })
 }

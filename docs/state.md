@@ -21,6 +21,14 @@ AppStore
     startTime: number, // datetime.getTime()
     endTime: number // datetime.getTime()
   }],
+  passwords: [{
+    origin: string, // origin of the form
+    action: string, // URL of the form action
+    username: string,
+    encryptedPassword: string, // encrypted by master password, binary-encoded
+    authTag: string, // AES-GCM authentication data, binary-encoded
+    iv: string // AES-GCM initialization vector, binary-encoded
+  }],
   adblock: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
@@ -86,8 +94,8 @@ WindowStore
     canGoBack: boolean,
     canGoForward: boolean,
     icon: string, // favicon url
-    location: string, // page url
-    src: string, // what the iframe src should be
+    location: string, // The currently navigated location
+    src: string, // The iframe src attribute
     pinnedLocation: string, // Indicates if a frame is pinned and its pin location
     title: string, // page title
     findbarShown: boolean, // whether the findbar is shown
@@ -98,18 +106,22 @@ WindowStore
     partitionNumber: number, // the session partition to use
     loading: boolean,
     themeColor: string, // css compatible color string
+    isFullScreen: boolean, // true if the frame should be shown as full screen
+    showFullScreenWarning: boolean, // true if a warning should be shown about full screen
     computedThemeColor: string, // css computed theme color from the favicon
     startLoadTime: datetime,
     endtLoadTime: datetime,
     guestInstanceId: string, // not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
+    activeShortcutDetails: object, // Additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },
     trackingProtection: {
       blocked: Array<string>
     },
+    httpsEverywhere: Object.<string, Array.<string>>, // map of XML rulesets name to redirected resources
     security: {
       isSecure: boolean, // is using https
       certDetails: {
@@ -120,6 +132,12 @@ WindowStore
             issuer: string
         }
       }, // the certificate details if any
+      loginRequiredDetail: {
+        isProxy: boolean,
+        host: string,
+        port: number,
+        realm: string
+      },
       isExtendedValidation: boolean, // is using https ev
       activeMixedContent: boolean, // has active mixed content
       passiveMixedContent: boolean, // has passive mixed content
@@ -130,7 +148,8 @@ WindowStore
     findDetail: {
       searchString: string, // the string being searched
       caseSensitivity: boolean, // whether we are doing a case sensitive search
-      numberOfMatches: number // Total number of matches on the page
+      numberOfMatches: number, // Total number of matches on the page
+      activeMatchOrdinal: number // The current ordinal of the match
     }
     unloaded: boolean, // true if the tab is unloaded
 
@@ -168,6 +187,9 @@ WindowStore
     },
     siteInfo: {
       isVisible: boolean, // Whether or not to show site info like # of blocked ads
+      expandTrackingProtection: boolean,
+      expandAdblock: boolean,
+      expandHttpse: boolean
     },
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes

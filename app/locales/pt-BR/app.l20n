@@ -44,12 +44,16 @@
 <setDefaultSearch "Definir {{$title}} como mecanismo padrão de pesquisa">
 <viewPageSource "Ver Código Fonte da página">
 <menuButton title: "Menu">
+<emptyFolderItem "(vazio)">
+<moreBookmarks "Mais favoritos...">
+<fullScreenModeWarning "{{$host}} entrou em modo de tela cheia, pressione ESC para sair.">
 
 <braveMenuTotalReplacements "Total de Substituições: {{$count}}">
 
 <basicAuthRequired "Autenticação Necessária">
-<basicAuthUsername placeholder: "Nome de usuário">
-<basicAuthPassword placeholder: "Senha">
+<basicAuthUsername "Nome de usuário:">
+<basicAuthPassword "Senha:">
+<basicAuthMessage "{{$host}} requer um nome de usuário e uma senha.">
 
 <crashScreenHeader "Algo deu errado =(">
 <crashScreenText "Um erro ocorreu ao exibir esta página. Para continuar, recarregue ou navegue para outra página.">
@@ -76,6 +80,7 @@
 <blockedTrackingElements "{{$blockedTrackingElementsSize}} Elementos de rastreamento bloqueados">
 <replacedAds "{{$replacedAdsSize}} Anúncios substituídos">
 <blockedAds "{{$blockedAdsSize}} Anúncios bloqueados">
+<redirectedResources "{{$redirectedResourcesSize}} Recursos atualizados para HTTPS">
 
 <updateNow "atualizar agora">
 <updateChecking "Estamos verificando atualizações...">
@@ -111,3 +116,4 @@
 <save "Salvar">
 
 <bookmarksToolbar "Barra de Favoritos">
+<otherBookmarks "Outros Favoritos">

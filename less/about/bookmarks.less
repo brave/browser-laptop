@@ -19,6 +19,7 @@ html, body, #appContainer, #appContainer > div {
 
     .bookmarkList {
       padding-top: 10px;
+      overflow: hidden;
     }
 
     >.bookmarkFolderList {
@@ -42,6 +43,9 @@ html, body, #appContainer, #appContainer > div {
 
 list .listItem {
   cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+
   padding: 12px;
   -webkit-user-select: none;
   &:hover {
@@ -50,8 +54,26 @@ list .listItem {
   &.selected {
     background-color: lighten(@highlightBlue, 20%);
   }
+
+  .bookmarkItem {
+    display: flex;
+  }
+}
+
+.bookmarkSeparator {
+  color: #aaa;
+  padding: 0 4px;
 }
 
 .bookmarkLocation {
   color: #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bookmarkTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

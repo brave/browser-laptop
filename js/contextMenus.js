@@ -10,6 +10,7 @@ const clipboard = electron.clipboard
 const messages = require('./constants/messages')
 const WindowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
+const bookmarkActions = require('./actions/bookmarkActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
@@ -17,6 +18,7 @@ const siteUtil = require('./state/siteUtil')
 const CommonMenu = require('./commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
+const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 
 /**
@@ -95,6 +97,9 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       openInNewSessionTabMenuItem(location),
       copyLinkLocationMenuItem(location),
       CommonMenu.separatorMenuItem)
+  } else {
+    template.push(openAllInNewTabsMenuItem(appStoreRenderer.state.get('sites'), siteDetail),
+      CommonMenu.separatorMenuItem)
   }
 
   // We want edit / delete items for everything except for the bookmarks toolbar item
@@ -136,7 +141,7 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
       },
       drop (e) {
         e.preventDefault()
-        const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+        const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
         if (bookmark) {
           appActions.moveSite(bookmark, parentBookmarkFolder, false, true)
         }
@@ -168,26 +173,13 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
       },
       drop: function (e) {
         e.preventDefault()
-        const bookmarkItem = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+        const bookmarkItem = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
         if (bookmarkItem) {
           appActions.moveSite(bookmarkItem, site, dndData.shouldPrependVerticalItem(e.target, e.clientY))
         }
       },
       click: function (e) {
-        if (!isFolder) {
-          const isDarwin = process.platform === 'darwin'
-          if (e.ctrlKey && !isDarwin ||
-              e.metaKey && isDarwin ||
-              e.button === 1) {
-            windowActions.newFrame({
-              location: site.get('location'),
-              partitionNumber: site && site.get && site.get('partitionNumber') || undefined
-            }, false)
-          } else {
-            windowActions.loadUrl(activeFrame, site.get('location'))
-          }
-          windowActions.setContextMenuDetail()
-        }
+        bookmarkActions.clickBookmarkItem(allBookmarkItems, site, activeFrame, e)
       }
     }
     if (isFolder) {
@@ -207,6 +199,26 @@ function moreBookmarksTemplateInit (allBookmarkItems, bookmarks, activeFrame) {
     }
   })
   return template
+}
+
+function usernameTemplateInit (usernames, origin, action) {
+  let items = []
+  for (let username in usernames) {
+    let password = usernames[username]
+    items.push({
+      label: username,
+      click: (item, focusedWindow) => {
+        windowActions.setActiveFrameShortcut(null, messages.FILL_PASSWORD, {
+          username,
+          password,
+          origin,
+          action
+        })
+        windowActions.setContextMenuDetail()
+      }
+    })
+  }
+  return items
 }
 
 function tabTemplateInit (frameProps) {
@@ -229,7 +241,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, false)
           // Handle setting it in app storage for the other windows
-          appActions.removeSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
+          appActions.removeSite(siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED), siteTags.PINNED)
         }
       })
     } else {
@@ -239,7 +251,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, true)
           // Handle setting it in app storage for the other windows
-          appActions.addSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
+          appActions.addSite(siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED), siteTags.PINNED)
         }
       })
     }
@@ -292,23 +304,26 @@ function tabTemplateInit (frameProps) {
 }
 
 function getEditableItems (hasSelection) {
-  return [{
-    label: 'Cut',
-    enabled: hasSelection,
-    accelerator: 'CmdOrCtrl+X',
-    // Enabled doesn't work when a role is used
-    role: hasSelection && 'cut' || undefined
-  }, {
-    label: 'Copy',
-    enabled: hasSelection,
-    accelerator: 'CmdOrCtrl+C',
-    // Enabled doesn't work when a role is used
-    role: hasSelection && 'copy' || undefined
-  }, {
+  const items = []
+  if (hasSelection) {
+    items.push({
+      label: 'Cut',
+      enabled: hasSelection,
+      accelerator: 'CmdOrCtrl+X',
+      role: 'cut'
+    }, {
+      label: 'Copy',
+      enabled: hasSelection,
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    })
+  }
+  items.push({
     label: 'Paste',
     accelerator: 'CmdOrCtrl+V',
     role: 'paste'
-  }]
+  })
+  return items
 }
 
 function hamburgerTemplateInit (braverySettings) {
@@ -356,6 +371,15 @@ const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
     label: 'Open in new tab',
     click: () => {
       windowActions.newFrame({ location, isPrivate, partitionNumber }, false)
+    }
+  }
+}
+
+const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
+  return {
+    label: 'Open all in tabs',
+    click: () => {
+      bookmarkActions.openBookmarksInFolder(allSites, folderDetail)
     }
   }
 }
@@ -537,6 +561,21 @@ export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: (rectLeft.left | 0) - 2,
     top: (rectBottom.bottom | 0) - 1,
+    template: menuTemplate
+  }))
+}
+
+/**
+ * @param {Object} usernames - map of username to plaintext password
+ * @param {string} origin - origin of the form
+ * @param {string} action - action of the form
+ * @param {Object} boundingRect - bounding rectangle of username input field
+ */
+export function onShowUsernameMenu (usernames, origin, action, boundingRect) {
+  const menuTemplate = usernameTemplateInit(usernames, origin, action)
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: boundingRect.left,
+    top: boundingRect.bottom + 62,
     template: menuTemplate
   }))
 }

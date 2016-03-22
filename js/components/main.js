@@ -24,6 +24,7 @@ const UpdateBar = require('./updateBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
 const AddEditBookmark = require('./addEditBookmark')
+const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
@@ -80,6 +81,12 @@ class Main extends ImmutableComponent {
       deltaY = 0
       startTime = 0
     })
+    ipc.on(messages.LEAVE_FULL_SCREEN, () => {
+      const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+      if (activeFrame && activeFrame.get('isFullScreen')) {
+        windowActions.setFullScreen(activeFrame, false)
+      }
+    })
   }
 
   loadOpenSearch () {
@@ -90,8 +97,23 @@ class Main extends ImmutableComponent {
     }
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps) {
     this.loadOpenSearch()
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const activeFramePrev = FrameStateUtil.getActiveFrame(prevProps.windowState)
+    const activeFrameTitle = activeFrame && (activeFrame.get('title') || activeFrame.get('location')) || ''
+    const activeFramePrevTitle = activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location')) || ''
+    const win = remote.getCurrentWindow()
+    if (activeFrameTitle !== activeFramePrevTitle && win) {
+      win.setTitle(activeFrameTitle)
+    }
+
+    // If the tab changes or was closed, exit out of full screen to give a better
+    // picture of what's happening.
+    if (activeFramePrev && activeFrame &&
+        activeFrame.get('key') !== activeFramePrev.get('key') && activeFramePrev.get('isFullScreen')) {
+      windowActions.setFullScreen(activeFramePrev, false)
+    }
   }
 
   componentDidMount () {
@@ -131,6 +153,12 @@ class Main extends ImmutableComponent {
         windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
+    ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
+      const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach(frameProps =>
+        windowActions.setRedirectedBy(frameProps, ruleset, details.url))
+    })
+
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward.bind(this))
 
@@ -149,8 +177,27 @@ class Main extends ImmutableComponent {
       })
     })
 
+    ipc.on(messages.SET_SECURITY_STATE, (e, frameKey, securityState) => {
+      windowActions.setSecurityState(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey),
+                                     securityState)
+    })
+
+    ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
+      const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === detail.url)
+      frames.forEach(frame =>
+        windowActions.setLoginRequiredDetail(frame, detail))
+    })
+
     ipc.on(messages.CERT_ERROR_REJECTED, (e, previousLocation, frameKey) => {
       windowActions.loadUrl(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey), previousLocation)
+    })
+
+    ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
+      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect)
+    })
+
+    ipc.on(messages.HIDE_CONTEXT_MENU, () => {
+      windowActions.setContextMenuDetail()
     })
 
     this.loadOpenSearch()
@@ -158,6 +205,12 @@ class Main extends ImmutableComponent {
     window.addEventListener('mousemove', (e) => {
       self.checkForTitleMode(e.pageY)
     })
+
+    const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+    const win = remote.getCurrentWindow()
+    if (activeFrame && win) {
+      win.setTitle(activeFrame.get('title'))
+    }
   }
 
   checkForTitleMode (pageY) {
@@ -297,8 +350,13 @@ class Main extends ImmutableComponent {
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
-      !releaseNotesIsVisible
+      !releaseNotesIsVisible &&
+      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
+
     return <div id='window'
+        className={cx({
+          isFullScreen: activeFrame && activeFrame.get('isFullScreen')
+        })}
         ref={node => this.mainWindow = node}
         onMouseDown={this.onMouseDown.bind(this)}
         onClick={this.onClickWindow.bind(this)}>
@@ -335,6 +393,10 @@ class Main extends ImmutableComponent {
             ? <SiteInfo frameProps={activeFrame}
                 siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
                 onHide={this.onHideSiteInfo.bind(this)} /> : null
+          }
+          { activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
+            ? <LoginRequired frameProps={activeFrame}/>
+            : null
           }
           { this.props.windowState.get('bookmarkDetail')
             ? <AddEditBookmark sites={this.props.appState.get('sites')}

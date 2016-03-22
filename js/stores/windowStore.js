@@ -107,13 +107,21 @@ const doAction = (action) => {
       // We should not emit here because the Window already know about the change on startup.
       return
     case WindowConstants.WINDOW_SET_URL:
-      // reload if the url is unchanged
-      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
+      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') === action.location) {
+        // reload if the url is unchanged
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           audioPlaybackActive: false,
           activeShortcut: 'reload'
         })
       } else {
+      // If the user is changing back to the original src and they already navigated away then we need to
+      // explicitly set a new location via webview.loadURL.
+        let activeShortcut
+        if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') !== action.location &&
+            FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
+          activeShortcut = 'explicitLoadURL'
+        }
+
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
           location: action.location,
@@ -126,7 +134,8 @@ const doAction = (action) => {
           // without src change.
           themeColor: undefined,
           computedThemeColor: undefined,
-          title: ''
+          title: '',
+          activeShortcut
         })
         // force a navbar update in case this was called from an app
         // initiated navigation (bookmarks, etc...)
@@ -139,10 +148,12 @@ const doAction = (action) => {
       const lastTitle = windowState.getIn(frameStatePath(key).concat(['title']))
       let locationChanged = !action.location || !lastLocation ||
         action.location.split('#')[0] !== lastLocation.split('#')[0]
+      let lastHttpse = windowState.getIn(frameStatePath(key).concat(['httpsEverywhere'])) || {}
       windowState = windowState.mergeIn(frameStatePath(key), {
         audioPlaybackActive: false,
         adblock: {},
         trackingProtection: {},
+        httpsEverywhere: locationChanged ? {} : lastHttpse,
         title: locationChanged ? '' : lastTitle,
         location: action.location
       })
@@ -185,6 +196,12 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
         endLoadTime: new Date().getTime()
+      })
+      break
+    case WindowConstants.WINDOW_SET_FULL_SCREEN:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : windowState.getIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)].concat('isFullScreen')),
+        showFullScreenWarning: action.showFullScreenWarning
       })
       break
     case WindowConstants.WINDOW_SET_NAVBAR_FOCUSED:
@@ -317,7 +334,11 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
-      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'activeShortcut'], action.activeShortcut)
+      const framePath = action.frameProps ? ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
+      windowState = windowState.mergeIn(framePath, {
+        activeShortcut: action.activeShortcut,
+        activeShortcutDetails: action.activeShortcutDetails
+      })
       break
     case WindowConstants.WINDOW_SET_SEARCH_DETAIL:
       windowState = windowState.merge({
@@ -404,6 +425,9 @@ const doAction = (action) => {
       if (action.expandAdblock !== undefined) {
         windowState = windowState.setIn(['ui', 'siteInfo', 'expandAdblock'], action.expandAdblock)
       }
+      if (action.expandHttpse !== undefined) {
+        windowState = windowState.setIn(['ui', 'siteInfo', 'expandHttpse'], action.expandHttpse)
+      }
       break
     case WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
@@ -419,11 +443,23 @@ const doAction = (action) => {
                                         action.securityState.certDetails)
       }
       break
+    case WindowConstants.WINDOW_SET_LOGIN_REQUIRED_DETAIL:
+      if (action.detail) {
+        windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['security', 'loginRequiredDetail']), action.detail)
+      } else {
+        windowState = windowState.deleteIn(frameStatePathForFrame(action.frameProps).concat(['security', 'loginRequiredDetail']))
+      }
+      break
     case WindowConstants.WINDOW_SET_BLOCKED_BY:
       const blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()
       blockedBy = blockedBy.toSet().add(action.location).toList()
       windowState = windowState.setIn(blockedByPath, blockedBy)
+      break
+    case WindowConstants.WINDOW_SET_REDIRECTED_BY:
+      const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
+      let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
+      windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
     // Zoom state
     case WindowConstants.WINDOW_ZOOM_IN:
@@ -491,7 +527,8 @@ frameShortcuts.forEach(shortcut => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {
     windowState = windowState.mergeIn(activeFrameStatePath(), {
-      activeShortcut: shortcut
+      activeShortcut: shortcut,
+      activeShortcutDetails: null
     })
     emitChanges()
   })
@@ -500,7 +537,8 @@ frameShortcuts.forEach(shortcut => {
     ipc.on(`shortcut-frame-${shortcut}`, (e, i) => {
       const path = ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), i)]
       windowState = windowState.mergeIn(path, {
-        activeShortcut: shortcut
+        activeShortcut: shortcut,
+        activeShortcutDetails: null
       })
       emitChanges()
     })

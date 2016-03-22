@@ -112,6 +112,9 @@ module.exports.cleanSessionData = (sessionData) => {
     delete frame.replacedAds
     delete frame.blockedAds
     delete frame.blockedByTracking
+    delete frame.trackingProtection
+    delete frame.httpsEverywhere
+    delete frame.adblock
 
     // Guest instance ID's are not valid after restarting.
     // Electron won't know about them.
@@ -135,11 +138,16 @@ module.exports.cleanSessionData = (sessionData) => {
     // Remove find in page details
     delete frame.findDetail
     delete frame.findbarShown
+    // Don't restore full screen state
+    delete frame.isFullScreen
+    delete frame.showFullScreenWarning
     // Don't store child tab open ordering since keys
     // currently get re-generated when session store is
     // restored.  We will be able to keep this once we
     // don't regenerate new frame keys when opening storage.
     delete frame.parentFrameKey
+    // Delete the active shortcut details
+    delete frame.activeShortcutDetails
 
     if (frame.navbar && frame.navbar.urlbar) {
       frame.navbar.urlbar.urlPreview = null
@@ -210,6 +218,7 @@ module.exports.loadAppState = () => {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }
       data.settings = data.settings || {}
+      data.passwords = data.passwords || []
       resolve(data)
     })
   })
@@ -222,6 +231,7 @@ module.exports.defaultAppState = () => {
   return {
     sites: [],
     visits: [],
-    settings: {}
+    settings: {},
+    passwords: []
   }
 }

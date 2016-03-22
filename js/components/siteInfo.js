@@ -39,6 +39,15 @@ class SiteInfo extends ImmutableComponent {
   get isBlockedAdsShown () {
     return this.props.siteInfo.get('expandAdblock')
   }
+  get isHttpseShown () {
+    return this.props.siteInfo.get('expandHttpse')
+  }
+  get redirectedResources () {
+    return this.props.frameProps.get('httpsEverywhere')
+  }
+  get isRedirectingResources () {
+    return this.redirectedResources && this.redirectedResources.size > 0
+  }
   get partitionNumber () {
     return this.props.frameProps.getIn(['partitionNumber'])
   }
@@ -48,6 +57,10 @@ class SiteInfo extends ImmutableComponent {
   }
   onToggleBlockedAds (e) {
     windowActions.setSiteInfoVisible(true, undefined, !this.isBlockedAdsShown)
+    e.stopPropagation()
+  }
+  onToggleHttpseList (e) {
+    windowActions.setSiteInfoVisible(true, undefined, undefined, !this.isHttpseShown)
     e.stopPropagation()
   }
   render () {
@@ -106,6 +119,23 @@ class SiteInfo extends ImmutableComponent {
         ? <li><ul>
         {
           this.blockedAds.map(site => <li key={site}>{site}</li>)
+        }
+        </ul></li> : null
+      }
+      { this.isRedirectingResources
+        ? <li>
+            <a onClick={this.onToggleHttpseList.bind(this)}><span className='fa fa-shield'/>
+              <span data-l10n-args={JSON.stringify({redirectedResourcesSize: this.redirectedResources.size})}
+                data-l10n-id='redirectedResources'/>
+            </a>
+          </li> : null
+      }
+      { this.isRedirectingResources && this.isHttpseShown
+        ? <li><ul>
+        {
+          this.redirectedResources.map((sites, ruleset) =>
+                                       <li key={ruleset}>{[ruleset, JSON.stringify(sites.toJS())].join(': ')}
+                                       </li>)
         }
         </ul></li> : null
       }

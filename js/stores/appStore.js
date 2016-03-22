@@ -141,6 +141,10 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
+  mainWindow.on('leave-full-screen', function () {
+    mainWindow.webContents.send(messages.LEAVE_FULL_SCREEN)
+  })
+
   mainWindow.on('app-command', function (e, cmd) {
     switch (cmd) {
       case 'browser-backward':
@@ -195,7 +199,7 @@ function windowDefaults () {
     show: false,
     width: appState.get('defaultWindowWidth'),
     height: appState.get('defaultWindowHeight'),
-    minWidth: 500,
+    minWidth: 480,
     minHeight: 300,
     minModalHeight: 100,
     minModalWidth: 100,
@@ -286,6 +290,21 @@ const handleAppAction = (action) => {
     case AppConstants.APP_CLOSE_WINDOW:
       const appWindow = BrowserWindow.fromId(action.appWindowId)
       appWindow.close()
+      break
+    case AppConstants.APP_ADD_PASSWORD:
+      // If there is already an entry for this exact origin, action, and
+      // username if it exists, update the password instead of creating a new entry
+      let passwords = appState.get('passwords').filterNot((pw) => {
+        return pw.get('origin') === action.passwordDetail.origin &&
+          pw.get('action') === action.passwordDetail.action &&
+          (!pw.get('username') || pw.get('username') === action.passwordDetail.username)
+      })
+      appState = appState.set('passwords', passwords.push(Immutable.fromJS(action.passwordDetail)))
+      break
+    case AppConstants.APP_REMOVE_PASSWORD:
+      appState.set('passwords', appState.get('passwords').filterNot((pw) => {
+        return Immutable.is(pw, Immutable.fromJS(action.passwordDetail))
+      }))
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size

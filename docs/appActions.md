@@ -160,6 +160,16 @@ Sets the update status
 
 
 
+### savePassword(passwordDetail) 
+
+Saves login credentials
+
+**Parameters**
+
+**passwordDetail**: `Object`, login details
+
+
+
 ### changeSetting(key, value) 
 
 Changes an application level setting

@@ -221,6 +221,18 @@ module.exports.getDetailFromFrame = function (frame, tag) {
 }
 
 /**
+ * Converts a siteDetail to frameOpts format
+ * @param {Object} siteDetail - A site detail as per app state
+ * @return {Object} A frameOpts plain JS object, not ImmutableJS
+ */
+module.exports.toFrameOpts = function (siteDetail) {
+  return {
+    location: siteDetail.get('location'),
+    partitionNumber: siteDetail.get('partitionNumber')
+  }
+}
+
+/**
  * Compares 2 site details
  * @param siteDetail1 The first site detail to compare.
  * @param siteDetail2 The second site detail to compare.

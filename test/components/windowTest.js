@@ -136,7 +136,7 @@ describe('application window', function () {
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
-              return window.open(page1, 'page1', 'height=300, width=500, top=100, left=0')
+              return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
             }
           }, this.page1)
           .click('#trigger')
@@ -162,7 +162,7 @@ describe('application window', function () {
           .getWindowHeight().should.eventually.be.equal(375) // height plus navbar
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowWidth().should.eventually.be.equal(500)
+          .getWindowWidth().should.eventually.be.equal(480)
       })
 
       it('sets the window position', function *() {
@@ -206,13 +206,13 @@ describe('application window', function () {
           .waitForVisible(Selectors.activeWebview)
       })
 
-      it('has a min width of 500 and height of 300', function *() {
+      it('has a min width of 480 and height of 300', function *() {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .getWindowHeight().should.eventually.equal(300)
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowWidth().should.eventually.equal(500)
+          .getWindowWidth().should.eventually.equal(480)
       })
     })
 
@@ -268,7 +268,7 @@ describe('application window', function () {
             .url(this.window_open_page)
             .execute(function (page1) {
               global.triggerFunction = function () {
-                return window.open(page1, 'page1', 'height=300, width=500, top=100, left=0')
+                return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
               }
             }, this.page1)
             .click('#trigger')
@@ -359,7 +359,7 @@ describe('application window', function () {
             .url(this.window_open_page)
             .execute(function (page1) {
               global.triggerFunction = function () {
-                return window.open(page1, 'page1', 'height=300, width=500, top=100, left=0')
+                return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
               }
             }, this.page1)
             .click('#trigger')
@@ -482,7 +482,7 @@ describe('application window', function () {
         .url(this.window_open_page)
         .execute(function (page1) {
           global.triggerFunction = function () {
-            return window.open(page1, 'page1', 'height=300, width=500, top=100, left=0')
+            return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
           }
           document.getElementById('trigger').click()
         }, this.page1)

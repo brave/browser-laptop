@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.8.2](https://github.com/brave/browser-laptop/releases/v0.8.2dev)
+- Password saving feature added.
+- Brave is now a single instance application.
+- HTTPS Everywhere information is now displayed in the site information popup.
+- Find in page now shows match ordinal.
+- Open all bookmarks in bookmark folder context menu added.
+- Improved bookmark import support (Safari, Pinboard).
+- Fixes for full screen mode.
+- Fixes for pinned sites not unpinning.
+- Upgraded to libchromiumcontent 49.0.2623.87.
+- Upgraded to Node v5.9.
+- Various other bug fixes.
+
+## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
+- Upgrade to libchromiumcontent 49.0.2623.75.
+- Upgrade to Electron v0.37.2.
+- Upgrade to Node v5.8.
+- Basic HTTP authentication now supported.
+- Support for Twitch.tv
+- Fix bookmarks not working after navigating within a page using push state api.
+- Save session state periodically to prevent data loss.
+- Window titles actually being set for better compatibility with other apps.
+- We now show a broken lock icon for pages with certificate errors.
+- Tweaked various UI bits.
+- Fixed text cursor jumping to the end of a text input in the settings pane.
+- Added import bookmarks item to the hamburger menu.
+- Middle clicking on a bookmark folder now opens all bookmarks.
+- Control tab, command tab, and middle click now works for bookmarks within a menu on the toolbar.
+- Typekit and Google fonts fix.
+- Dragging favicon onto bookmarks bar now respects position of the drop.
+- We now `display: none` on background webviews for better performance.
+
 ## [0.8.0](https://github.com/brave/browser-laptop/releases/v0.8.0dev)
 - Bookmark management: Bookmark folders added, drag and drop bookmarks and folders from within the Bookmark Toolbar and Bookmark Manager.
 - Ability to import bookmarks from a Firefox or Chrome HTML export.

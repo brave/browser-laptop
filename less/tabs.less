@@ -9,8 +9,9 @@
   box-sizing: border-box;
   display: flex;
   flex: 1;
+  overflow: auto;
   padding: 0 4px 0 6px;
-  height: 26px;
+  height: 23px;
   position: relative;
   white-space: nowrap;
   z-index: 310;
@@ -20,6 +21,8 @@
   display: flex;
   flex: 1;
   z-index: 2;
+  overflow-x: auto;
+  overflow-y: hidden;
   &.allowDragging {
     -webkit-app-region: drag;
     >* {
@@ -38,7 +41,7 @@
   box-sizing: border-box;
   color: #3B3B3B;
   display: flex;
-  height: 27px;
+  height: 22px;
   margin: 0;
   transition: transform 200ms ease;
   left: 0;
@@ -109,7 +112,8 @@
 
   &.active {
       background: linear-gradient(to bottom, white, @chromePrimary, );
-      height: 28px;
+      height: 24px;
+      margin-top: -1px;
       box-shadow: inset 1px 1px 2px 0px white;
       box-shadow: 0px -1px 4px 0px rgba(51, 51, 51, 0.12);
       border: 1px solid #bbb;
@@ -173,6 +177,7 @@
   padding: 0 2px 0 0;
   position: relative;
   vertical-align: top;
+  overflow: hidden;
   // There's a special case that tabs should span the full width
   // if there are a full set of them.
   &:not(.partOfFullPageSet) {
@@ -225,8 +230,7 @@
 .tabsToolbar {
   background: @tabsBackground;
   display: flex;
-  height: 27px;
-  border-bottom: 1px solid #bbb;
+  height: 23px;
   -webkit-user-select: none;
 }
 
@@ -235,14 +239,14 @@
   padding-right: 2px;
   .browserButton {
     display: inline-block;
-    line-height: 26px;
+    line-height: 21px;
   }
 }
 
 .tabPages {
   background: @tabsBackground;
   display: flex;
-  height: 14px;
+  height: 12px;
   justify-content: center;
   position: relative;
   text-align: center;
@@ -276,7 +280,8 @@
   vertical-align: middle;
 
   &:hover {
-    background-color: @chromePrimary;
+    background-color: #f0f0f0;
+    border: 2px solid white;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0);
   }
 
@@ -293,19 +298,25 @@
 
 .prevTab,
 .nextTab {
-  display: none;
-  color: #3B3B3B;
-  font-size: 19px !important;
-  height: 27px;
-  line-height: 25px !important;
-  text-align: center;
-  vertical-align: top;
-  width: 34px;
+    display: none;
+    color: #a0a0a0;
+    font-size: 21px !important;
+    height: 20px;
+    line-height: 17px !important;
+    text-align: center;
+    vertical-align: top;
+    margin-top: 1px;
+    margin-left: -5px;
+    margin-right: -5px;
+    width: 34px;
+    
   &:not([disabled]) {
     display: block;
-    background: @chromeSecondary;
+    background: @tabsBackground;
+      
     &:hover {
-      background: lighten(#eeeeee, 10%);
+  //    background: lighten(#eeeeee, 10%);
+            color: white;
     }
   }
 }

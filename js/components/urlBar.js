@@ -13,6 +13,7 @@ const ipc = global.require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
+const dragTypes = require('../constants/dragTypes')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 
@@ -72,7 +73,7 @@ class UrlBar extends ImmutableComponent {
           windowActions.setUrlBarSelected(true)
         } else {
           const isLocationUrl = isUrl(location)
-          const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', location)
+          const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
           // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
           // For whitepsace we want a search no matter what.
           if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
@@ -222,6 +223,7 @@ class UrlBar extends ImmutableComponent {
 
   onDragStart (e) {
     dndData.setupDataTransferURL(e.dataTransfer, this.props.activeFrameProps.get('location'), this.props.activeFrameProps.get('title'))
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.props.activeFrameProps)
   }
 
   render () {
@@ -238,9 +240,9 @@ class UrlBar extends ImmutableComponent {
               urlbarIcon: true,
               'fa': true,
               'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
-              'fa-unlock': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
+              'fa-unlock-alt': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
               'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
-              'fa fa-file-o': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+              'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
               extendedValidation: this.extendedValidationSSL
             })} />
           { this.props.titleMode

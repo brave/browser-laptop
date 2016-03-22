@@ -26,7 +26,10 @@ function processBookmarkNode (parserState, domNode) {
       }
       break
     case 'H3':
-      if (!domNode.getAttribute('PERSONAL_TOOLBAR_FOLDER')) {
+      if (!domNode.getAttribute('PERSONAL_TOOLBAR_FOLDER') &&
+          // Safari doesn't have a PERSONAL_TOOLBAR_FOLDER attribute but it has node
+          // text of Favorites and it's the first item.
+          (domNode.innerText !== 'Favorites' || parserState.foundBookmarksToolbar)) {
         const folder = {
           title: domNode.innerText,
           folderId: parserState.nextFolderId,
@@ -39,6 +42,7 @@ function processBookmarkNode (parserState, domNode) {
         parserState.sites.push(folder)
       } else {
         parserState.lastFolderId = 0
+        parserState.foundBookmarksToolbar = true
       }
       break
     case 'A':
@@ -88,8 +92,8 @@ module.exports.importFromHTML = (path) => {
         sites: []
       }
 
-      // Process each of the nodes starting with the first DL node
-      processBookmarkNode(parserState, doc.querySelector('dl'))
+      // Process each of the nodes starting with the first node which is either DL or DT
+      processBookmarkNode(parserState, doc.querySelector('dl, dt'))
 
       // Add the sites to the app store in the main process
       appActions.addSite(Immutable.fromJS(parserState.sites))
