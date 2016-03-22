@@ -46,6 +46,7 @@
 <menuButton title: "Menu">
 <emptyFolderItem "(vazio)">
 <moreBookmarks "Mais favoritos...">
+<fullScreenModeWarning "{{$host}} entrou em modo de tela cheia, pressione ESC para sair.">
 
 <braveMenuTotalReplacements "Total de Substituições: {{$count}}">
 
@@ -79,6 +80,7 @@
 <blockedTrackingElements "{{$blockedTrackingElementsSize}} Elementos de rastreamento bloqueados">
 <replacedAds "{{$replacedAdsSize}} Anúncios substituídos">
 <blockedAds "{{$blockedAdsSize}} Anúncios bloqueados">
+<redirectedResources "{{$redirectedResourcesSize}} Recursos atualizados para HTTPS">
 
 <updateNow "atualizar agora">
 <updateChecking "Estamos verificando atualizações...">
@@ -114,3 +116,4 @@
 <save "Salvar">
 
 <bookmarksToolbar "Barra de Favoritos">
+<otherBookmarks "Outros Favoritos">
