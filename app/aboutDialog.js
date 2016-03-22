@@ -12,7 +12,9 @@ Electron: ${process.versions['atom-shell']}
 libchromiumcontent: ${process.versions['chrome']}
 V8: ${process.versions.v8}
 Node.js: ${process.versions.node}
-Update channel: ${Channel.channel()}`,
+Update channel: ${Channel.channel()}
+
+This software uses libraries from the FFmpeg project under the LGPLv2.1`,
     icon: path.join(__dirname, '..', 'app', 'img', 'braveAbout.png'),
     buttons: ['Ok']
   })
