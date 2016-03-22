@@ -488,7 +488,11 @@ function mainTemplateInit (nodeProps, frame) {
         focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
       }
     }
-  }, {
+  })
+
+  template.push(CommonMenu.separatorMenuItem)
+
+  template.push({
     label: 'View Page Source',
     click: (item, focusedWindow) => {
       if (focusedWindow) {
@@ -501,6 +505,19 @@ function mainTemplateInit (nodeProps, frame) {
       label: 'Add to reading list',
       enabled: false
     })
+
+  template.push(CommonMenu.separatorMenuItem)
+  
+  template.push({
+    label: 'Inspect Element',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        document.querySelector( 'webview' ).openDevTools();
+        document.querySelector( 'webview' ).inspectElement(nodeProps.offsetX, nodeProps.offsetY);
+        // Used for Brave dev tools: focusedWindow.openDevTools();
+      }
+    }
+  })
   return template
 }
 
