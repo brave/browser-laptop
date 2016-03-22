@@ -241,7 +241,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, false)
           // Handle setting it in app storage for the other windows
-          appActions.removeSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
+          appActions.removeSite(siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED), siteTags.PINNED)
         }
       })
     } else {
@@ -251,7 +251,7 @@ function tabTemplateInit (frameProps) {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, true)
           // Handle setting it in app storage for the other windows
-          appActions.addSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
+          appActions.addSite(siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED), siteTags.PINNED)
         }
       })
     }

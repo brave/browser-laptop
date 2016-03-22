@@ -3,11 +3,12 @@
 ## [0.8.2](https://github.com/brave/browser-laptop/releases/v0.8.2dev)
 - Password saving feature added.
 - Brave is now a single instance application.
-- Various full screen mode fixes.
 - HTTPS Everywhere information is now displayed in the site information popup.
 - Find in page now shows match ordinal.
 - Open all bookmarks in bookmark folder context menu added.
-- Add Safari support for already existing Chrome / Firefox bookmarks import.
+- Improved bookmark import support (Safari, Pinboard).
+- Fixes for full screen mode.
+- Fixes for pinned sites not unpinning.
 - Upgraded to libchromiumcontent 49.0.2623.87.
 - Upgraded to Node v5.9.
 - Various other bug fixes.
