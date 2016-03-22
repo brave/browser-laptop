@@ -357,7 +357,7 @@ app.on('ready', () => {
         let usernames = {}
         let results = passwords.filter(password => {
           return password.get('username') &&
-            password.get('username').includes(value) &&
+            password.get('username').startsWith(value) &&
             password.get('origin') === origin &&
             password.get('action') === action
         })
@@ -367,11 +367,16 @@ app.on('ready', () => {
                                                                        masterKey,
                                                                        result.get('iv')) || ''
         })
-        if (Object.keys(usernames).length > 0 &&
-            BrowserWindow.getFocusedWindow()) {
-          BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_USERNAME_LIST,
-                                                            usernames, origin, action,
-                                                            boundingRect)
+        let win = BrowserWindow.getFocusedWindow()
+        if (!win) {
+          return
+        }
+        if (Object.keys(usernames).length > 0) {
+          win.webContents.send(messages.SHOW_USERNAME_LIST,
+                               usernames, origin, action,
+                               boundingRect)
+        } else {
+          win.webContents.send(messages.HIDE_CONTEXT_MENU)
         }
       }
     })

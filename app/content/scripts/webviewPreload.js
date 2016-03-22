@@ -165,7 +165,11 @@
     })
   })
 
+  let submittedForms = []
   function onFormSubmit (form, formOrigin) {
+    if (submittedForms.includes(form)) {
+      return
+    }
     var fields = getFormFields(form, true)
     var passwordElem = fields[1]
     if (!passwordElem || !passwordElem.value) {
@@ -176,6 +180,7 @@
     var usernameElem = fields[0] || {}
     ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
                      formOrigin, action)
+    submittedForms.push(form)
   }
 
   /**
@@ -206,24 +211,13 @@
       // Ask the main process for the only credentials we have
       ipcRenderer.send('get-password', formOrigin, action)
     } else {
-      // Wait for user to pick the username, then autofill password
-      usernameElem.addEventListener('focus', e => {
+      usernameElem.addEventListener('keyup', e => {
         let rect = usernameElem.getBoundingClientRect()
-        // TODO: This should update on every keystroke
         ipcRenderer.send('show-username-list', formOrigin, action, {
           bottom: rect.bottom,
           left: rect.left,
           width: rect.width
         }, usernameElem.value || '')
-      })
-      usernameElem.addEventListener('blur', e => {
-        // Wait for the background to process the focus event
-        // before hiding the context menu
-        // TODO: Figure out why the context menu sometimes appears
-        // when the username elem doesn't appear to be focused
-        window.setTimeout(() => {
-          ipcRenderer.send('hide-context-menu')
-        }, 300)
       })
     }
 
@@ -239,15 +233,20 @@
     })
   }
 
-  document.addEventListener('DOMContentLoaded', (e) => {
+  /**
+   * I think window load events might fire before this script runs, so
+   * try running the listener immediately. Otherwise run it on window.onload.
+   * @return {boolean}
+   */
+  function onLoadListener () {
     // Don't autofill on non-HTTP(S) sites for now
     if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
-      return
+      return false
     }
 
     if (document.querySelectorAll('input[type=password]:not([autocomplete=off i])').length === 0) {
       // No password fields; abort
-      return
+      return false
     }
 
     // Map of action origin to [[password element, username element]]
@@ -273,7 +272,12 @@
         })
       }
     })
-  })
+    return true
+  }
+
+  if (!onLoadListener()) {
+    window.addEventListener('load', onLoadListener)
+  }
 
   /**
    * Gets form fields.
