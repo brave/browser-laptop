@@ -61,12 +61,12 @@ class BookmarkItem extends ImmutableComponent {
       draggable='true'
       onDoubleClick={this.navigate.bind(this)}>
     { this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')
-      ? <span>
-        <span>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
+      ? <span className='bookmarkItem' title={this.props.bookmark.get('location')}>
+        <span className='bookmarkTitle'>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
         {partitionNumberInfo}
-        <span className='bookmarkLocation'> - {this.props.bookmark.get('location')}</span>
+        <span className='bookmarkSeparator'>-</span><span className='bookmarkLocation'>{this.props.bookmark.get('location')}</span>
       </span>
-      : <span>
+      : <span className='bookmarkItem' title={this.props.bookmark.get('location')}>
           <span> {this.props.bookmark.get('location')}</span>
           {partitionNumberInfo}
         </span>
