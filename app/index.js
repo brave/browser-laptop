@@ -405,6 +405,7 @@ app.on('ready', () => {
         return
       }
 
+      // TODO: If the username already exists, s/save/update
       var message = username
         ? 'Would you like Brave to save the password for ' + username + ' on ' + origin + '?'
         : 'Would you like Brave to save this password on ' + origin + '?'

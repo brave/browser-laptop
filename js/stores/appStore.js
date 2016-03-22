@@ -297,7 +297,7 @@ const handleAppAction = (action) => {
       let passwords = appState.get('passwords').filterNot((pw) => {
         return pw.get('origin') === action.passwordDetail.origin &&
           pw.get('action') === action.passwordDetail.action &&
-          (!pw.get('username') || pw.get('username') === action.passwordDetail.action)
+          (!pw.get('username') || pw.get('username') === action.passwordDetail.username)
       })
       appState = appState.set('passwords', passwords.push(Immutable.fromJS(action.passwordDetail)))
       break
