@@ -295,6 +295,32 @@ function tabTemplateInit (frameProps) {
     })
   }
 
+  items.push(CommonMenu.separatorMenuItem)
+
+  items.push({
+    label: 'Close other tabs',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, true)
+      }
+    }
+  }, {
+    label: 'Close tabs to the right',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, false)
+      }
+    }
+  }, {
+    label: 'Close tabs to the left',
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, false, true)
+      }
+    }
+  },
+  CommonMenu.separatorMenuItem)
+
   items.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem,
     { enabled: WindowStore.getState().get('closedFrames').size > 0 }

@@ -30,6 +30,7 @@ const messages = {
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
+  SHORTCUT_CLOSE_OTHER_FRAMES: _, /** @arg {boolean} close to the right, @arg {boolean} close to the left */
   SHORTCUT_UNDO_CLOSED_FRAME: _,
   SHORTCUT_FRAME_MUTE: _,
   SHORTCUT_FRAME_RELOAD: _, /** @arg {number} key of frame */

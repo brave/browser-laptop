@@ -140,6 +140,20 @@ class Main extends ImmutableComponent {
       : windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
+    ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, key, isCloseRight, isCloseLeft) => {
+      const currentIndex = FrameStateUtil.getFrameIndex(self.props.windowState, key)
+      if (currentIndex === -1) {
+        return
+      }
+
+      self.props.windowState.get('frames').forEach((frame, i) => {
+        if (!frame.get('pinnedLocation') &&
+            (i < currentIndex && isCloseLeft || i > currentIndex && isCloseRight)) {
+          windowActions.closeFrame(self.props.windowState.get('frames'), frame)
+        }
+      })
+    })
+
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
       windowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
