@@ -166,9 +166,10 @@
 .tabArea {
   box-sizing: border-box;
   display: inline-block;
-  padding: 0 1px 0 0;
+  padding: 0 2px 0 0;
   position: relative;
   vertical-align: top;
+  overflow: hidden;
   // There's a special case that tabs should span the full width
   // if there are a full set of them.
   &:not(.partOfFullPageSet) {
@@ -180,15 +181,19 @@
   }
 
   &.draggingOverLeft {
-    margin-left: @dragSpacing;
+    &:not(.isDragging) {
+      margin-left: @dragSpacing;
+    }
   }
 
   &.draggingOverRight {
-    margin-right: @dragSpacing;
+    &:not(.isDragging) {
+      margin-right: @dragSpacing;
+    }
   }
 
   &.isDragging {
-    display: none;
+    opacity: 0.2;
   }
 
   hr.dragIndicator {
