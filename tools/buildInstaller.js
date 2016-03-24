@@ -54,11 +54,14 @@ if (isDarwin) {
   console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion +
     '_amd64.deb')
   cmds = [
+    // .deb file
     'electron-installer-debian' +
       ' --src Brave-linux-x64/' +
       ' --dest dist/' +
       ' --arch amd64' +
-      ' --config res/debConfig.json'
+      ' --config res/debConfig.json',
+    // .tar.bz2 file
+    'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
   ]
 } else {
   console.log('Installer not supported for platform: ' + process.platform)
