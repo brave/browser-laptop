@@ -367,6 +367,19 @@ class Main extends ImmutableComponent {
       !releaseNotesIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
+    const navigationBar =
+      <NavigationBar
+        ref={node => this.navBar = node}
+        navbar={activeFrame && activeFrame.get('navbar')}
+        frames={this.props.windowState.get('frames')}
+        sites={this.props.appState.get('sites')}
+        activeFrame={activeFrame}
+        mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
+        searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
+        settings={settingsState}
+        searchDetail={this.props.windowState.get('searchDetail')}
+      />
+
     return <div id='window'
         className={cx({
           isFullScreen: activeFrame && activeFrame.get('isFullScreen')
@@ -392,17 +405,7 @@ class Main extends ImmutableComponent {
               disabled={!activeFrame || !activeFrame.get('canGoForward')}
               onClick={this.onForward.bind(this)} />
           </div>
-          <NavigationBar
-            ref={node => this.navBar = node}
-            navbar={activeFrame && activeFrame.get('navbar')}
-            frames={this.props.windowState.get('frames')}
-            sites={this.props.appState.get('sites')}
-            activeFrame={activeFrame}
-            mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
-            settings={settingsState}
-            searchDetail={this.props.windowState.get('searchDetail')}
-          />
+          {navigationBar}
           { siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
                 siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
@@ -466,6 +469,7 @@ class Main extends ImmutableComponent {
           key='tab-bar'
           activeFrame={activeFrame}
           onMenu={this.onHamburgerMenu.bind(this)}
+          navigationBar={navigationBar}
         />
         <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
