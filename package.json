@@ -95,6 +95,7 @@
     "css-loader": "^0.23.0",
     "electron-builder": "^2.3.1",
     "electron-installer-debian": "^0.2.0",
+    "electron-installer-redhat": "^0.2.0",
     "electron-installer-squirrel-windows": "^1.2.2",
     "electron-packager": "brave/electron-packager",
     "electron-rebuild": "^1.1.1",

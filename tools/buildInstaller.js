@@ -51,15 +51,21 @@ if (isDarwin) {
     'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --cert_path=' + cert + ' --cert_password=' + certPassword
   ]
 } else if (isLinux) {
-  console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion +
-    '_amd64.deb')
+  console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')
+  console.log('Or install with sudo rpm -i dist/brave_' + VersionInfo.braveVersion + '.amd64.rpm')
   cmds = [
     // .deb file
     'electron-installer-debian' +
       ' --src Brave-linux-x64/' +
       ' --dest dist/' +
       ' --arch amd64' +
-      ' --config res/debConfig.json',
+      ' --config res/linuxPackaging.json',
+    // .rpm file
+    'electron-installer-redhat' +
+      ' --src Brave-linux-x64/' +
+      ' --dest dist/' +
+      ' --arch amd64' +
+      ' --config res/linuxPackaging.json',
     // .tar.bz2 file
     'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
   ]
