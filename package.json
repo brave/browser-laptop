@@ -57,9 +57,9 @@
   ],
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/bbondy/electron-sample/issues"
+    "url": "https://github.com/brave/browser-laptop/issues"
   },
-  "homepage": "https://github.com/bbondy/electron-sample#readme",
+  "homepage": "https://www.brave.com/",
   "dependencies": {
     "abp-filter-parser-cpp": "1.1.x",
     "electron-localshortcut": "^0.6.0",

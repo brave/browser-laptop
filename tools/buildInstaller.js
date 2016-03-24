@@ -54,7 +54,11 @@ if (isDarwin) {
   console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion +
     '_amd64.deb')
   cmds = [
-    'electron-installer-debian --src Brave-linux-x64/ --dest dist/ --arch amd64'
+    'electron-installer-debian' +
+      ' --src Brave-linux-x64/' +
+      ' --dest dist/' +
+      ' --arch amd64' +
+      ' --config res/debConfig.json'
   ]
 } else {
   console.log('Installer not supported for platform: ' + process.platform)
