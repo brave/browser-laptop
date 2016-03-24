@@ -3,6 +3,7 @@ var execute = require('./lib/execute')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
+const isLinux = process.platform === 'linux'
 const arch = 'x64'
 const buildDir = 'Brave-' + process.platform + '-' + arch
 const outDir = 'dist'
@@ -48,6 +49,12 @@ if (isDarwin) {
   }
   cmds = [
     'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --cert_path=' + cert + ' --cert_password=' + certPassword
+  ]
+} else if (isLinux) {
+  console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion +
+    '_amd64.deb')
+  cmds = [
+    'electron-installer-debian --src Brave-linux-x64/ --dest dist/ --arch amd64'
   ]
 } else {
   console.log('Installer not supported for platform: ' + process.platform)

@@ -82,4 +82,8 @@ cmds = cmds.concat([
     ' --version-string.FileDescription=\"Brave\"'
 ])
 
+if (process.platform === 'linux') {
+  cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
+}
+
 execute(cmds, env, console.log.bind(null, 'done'))

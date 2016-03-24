@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
+- Debian .deb packaging now provided.
+
 ## [0.8.2](https://github.com/brave/browser-laptop/releases/v0.8.2dev)
 - Password saving feature added.
 - Brave is now a single instance application.
