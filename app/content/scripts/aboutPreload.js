@@ -22,6 +22,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('password-details-updated', (e, details) => {
+    const event = new window.CustomEvent('password-details-updated', {
+      detail: details
+    })
+    window.dispatchEvent(event)
+  })
 
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)

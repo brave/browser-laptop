@@ -490,6 +490,7 @@ class Main extends ImmutableComponent {
                     .filter(site => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
+              passwords={this.props.appState.get('passwords')}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
