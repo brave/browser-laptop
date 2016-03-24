@@ -10,8 +10,12 @@ export function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
 }
 
+export function getFrameIndex (windowState, frame) {
+  return findIndexForFrameKey(windowState.get('frames'), frame)
+}
+
 export function getActiveFrameIndex (windowState) {
-  return findIndexForFrameKey(windowState.get('frames'), windowState.get('activeFrameKey'))
+  return getFrameIndex(windowState, windowState.get('activeFrameKey'))
 }
 
 export function getFrameByIndex (windowState, i) {
