@@ -61,28 +61,23 @@
   font-size: 20px;
   align-items: center;
   justify-content: center;
-  max-width: 900px;
   box-sizing: border-box;
-  margin: 0 0 0 -114px;
+  margin: 0;
   padding: 0;
-  position: absolute;
   display: flex;
   flex-direction: row;
   -webkit-user-select: none;
-  width: 600px;
+  width: 100%;
   display: block;
-  top: 300px;
-  left: 300px;
-  z-index: 1000;
 
   &.titleMode {
-    margin-left: -130px;
+    // margin-left: -130px;
 
     input {
       display: none;
     }
     #titleBar {
-      display: inline-block;
+      display: none;
       background:rgba(243, 243, 243, 0);
       color: @chromeText;
       font-size: 15px;
@@ -162,7 +157,7 @@
     margin: 0 0 0 1px;
     outline: none;
     text-overflow: ellipsis;
-    width: 100%;
+    width: 500px;
 
     &:hover {
       background: @chromeControlsBackground2;
