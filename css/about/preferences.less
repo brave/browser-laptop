@@ -1,0 +1,180 @@
+@import "../variables.less";
+@textColor: #3B3B3B;
+@prefTopBg: #999;
+@prefTopBgButtonSelected: #656565;
+@prefTopBgButtonHover: #444;
+
+* {
+  color: @textColor;
+  font-family: "Arial";
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #appContainer, #appContainer > div {
+  height: 100%;
+}
+
+.prefTabContainer {
+  flex-grow: 1;
+  padding: 60px 30px 30px 30px;
+}
+
+.preferencesTopBar {
+  background-color: @prefTopBg;
+  >div {
+    display: inline-block;
+    &:hover {
+      .topBarButton.fa {
+        background-color: @prefTopBgButtonHover;
+      }
+    }
+
+    &.selected {
+      .topBarButton.fa {
+        background-color: @prefTopBgButtonSelected;
+      }
+      .tabMarker {
+        border-top-color: @prefTopBgButtonSelected;
+      }
+    }
+
+    &.notImplemented {
+      display: none;
+    }
+  }
+}
+
+.topBarButton.fa {
+  color: white;
+  cursor: default;
+  display: inline-block;
+  font-size: 22px;
+  padding: 20px;
+  position: relative;
+  width: 40px;
+  text-align: center;
+}
+
+.helpfulHints {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: default;
+  flex-grow: 0;
+  height: 100%;
+  padding: 30px 0;
+  width: 200px;
+
+  .hintsTitleContainer {
+    -webkit-user-select: none;
+    -webkit-app-region: no-drag;
+    font-size: inherit;
+    font-weight: normal;
+    margin: 10px;
+  }
+  > div {
+    color: @braveOrange;
+    font-size: smaller;
+    margin: 10px;
+  }
+  >.helpfulHintsBottom {
+    position: absolute;
+    bottom: 0;
+    a {
+      color: @braveOrange;
+    }
+    .loveToHear {
+      color: initial;
+      font-size: smaller;
+      margin-top: 5px;
+      margin-bottom: 30px;
+    }
+  }
+  .hintsRefresh {
+    margin-left: 15px;
+    font-size: smaller;
+  }
+}
+
+.prefBody {
+  display: flex;
+  height: 100%;
+}
+
+@markerSize: 6px;
+
+.tabMarkerContainer {
+  position: relative;
+
+  .tabMarker {
+    border-left: @markerSize solid transparent;
+    border-right: @markerSize solid transparent;
+    border-top: @markerSize solid @prefTopBg;
+    height: 0;
+    left: ~"calc(50% - 6px)";
+    position: absolute;
+    width: 0;
+  }
+}
+
+.tabMarkerText {
+  color: white;
+  font-size: 10px;
+  left: 0;
+  position: absolute;
+  margin-top: 3px;
+  right: 0;
+}
+
+a {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.settingsListTitle {
+  margin-bottom: 10px;
+}
+
+.settingsList {
+  display: table;
+  margin-bottom: 10px;
+  width: 500px;
+  .settingItem {
+    display: table-row;
+    margin-bottom: 10px;
+    span {
+      text-align: right;
+      padding-right: 10px;
+    }
+    label {
+      text-align: left;
+    }
+    .checkboxContainer {
+      width: 100px;
+      input {
+        text-align: right;
+      }
+    }
+    >input[type="number"] {
+      width: 50px;
+      min-width: 50px;
+    }
+    >* {
+      display: table-cell;
+      margin-bottom: 10px;
+      min-width: 150px;
+    }
+  }
+}
+
+input:not([type="checkbox"]), select {
+  box-sizing: border-box;
+  height: 17px;
+  padding-left: 2px;
+  width: 250px;
+}
+
+input[type="checkbox"][disabled] {
+  opacity: 0.8;
+  pointer-events: none;
+}

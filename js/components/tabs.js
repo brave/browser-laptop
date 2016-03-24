@@ -107,6 +107,7 @@ class Tabs extends ImmutableComponent {
             .filter(frameProps => !frameProps.get('pinnedLocation'))
             .map(frameProps =>
                 <Tab ref={node => this.tabRefs.push(node)}
+                  navigationBar={this.props.navigationBar}
                   draggingOverData={this.props.draggingOverData}
                   frameProps={frameProps}
                   frames={this.props.frames}

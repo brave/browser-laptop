@@ -1,0 +1,64 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+.bookmarksToolbar {
+  background: #EEEEEE;
+  border-bottom: 1px solid #BBBBBB;
+  border-top: 1px solid #FFFFFF;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  padding: 3px 10px;
+  height: 23px;
+  -webkit-app-region: drag;
+  >* {
+    -webkit-app-region: no-drag;
+  }
+
+  .bookmarkToolbarButton {
+    border-radius: @borderRadius;
+    color: black;
+    cursor: default;
+    font-size: 11px;
+    line-height: 11px;
+    margin: auto 3px;
+    padding: 2px 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    user-select: none;
+    white-space: nowrap;
+    max-width: 100px;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    &:hover {
+      background: lighten(@tabsBackground, 5%);
+    }
+    &.draggingOverLeft {
+      margin-left: @dragSpacing;
+    }
+    &.draggingOverRight {
+      margin-right: @dragSpacing;
+    }
+    &.isDragging {
+      display: none;
+    }
+    .bookmarkFolderChevron {
+      color: #676767;
+      margin-left: 4px;
+    }
+  }
+
+  .bookmarkButton {
+    box-sizing: border-box;
+    font-size: 14px;
+    height: auto;
+    line-height: 12px;
+    margin-left: auto;
+    margin-right: 5px;
+    width: auto;
+    -webkit-user-select: none;
+  }
+}

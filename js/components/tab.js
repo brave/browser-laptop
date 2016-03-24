@@ -196,6 +196,7 @@ class Tab extends ImmutableComponent {
         })}
         style={iconStyle}/>
         {playIcon}
+        {this.props.navigationBar}
         { !this.isPinned
           ? <div className='tabTitle'>
           {this.displayValue}

@@ -1,0 +1,86 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+span.browserButton {
+  cursor: default;
+  display: inline-block;
+  line-height: 37px;
+  width: 37px;
+  height: 37px;
+  font-size: 17px;
+  color: @buttonColor;
+  border-radius: 0;
+  text-align: center;
+  transition: .1s opacity, .1s background;
+  user-select: none;
+  -webkit-user-select: none;
+
+  &:not([disabled]):hover {
+    color: black;
+  }
+
+  &[disabled] {
+    opacity: .25;
+    pointer-events: none;
+  }
+
+  &.smallButton {
+    line-height: 18px;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+}
+
+span.browserButton.newFrameButton {
+  text-indent: -1000em;
+  width: 37px;
+  height: 37px;
+  vertical-align: middle;
+  background: rgba(0,0,0,.1) url("../app/img/icon-add.svg") center no-repeat;
+}
+
+.buttonCommon {
+  color: #fff;
+  font-size: inherit;
+  height: 22px;
+  line-height: 22px;
+  margin-right: 0px;
+  margin-top: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+span.browserButton.primaryButton {
+  background-color: @braveOrange;
+  .buttonCommon;
+}
+
+span.browserButton.wideButton {
+  background-color: @braveOrange;
+  width: auto;
+  .buttonCommon;
+}
+
+span.browserButton.secondaryButton {
+  background-color: #eee;
+  .buttonCommon;
+}
+
+span.browserButton.subtleButton {
+  width: auto;
+  font-size: 14px;
+  background-color: #ccc;
+  .buttonCommon;
+}
+
+span.browserButton.navbutton.menu-button{
+  background: url("../app/img/icon-more.svg") center no-repeat;
+}
+
+span.browserButton.navbutton.menu-button:before{
+  display: none;
+}

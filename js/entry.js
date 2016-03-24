@@ -3,17 +3,16 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // Stylesheets are included here for webpack live reloading
-require('../less/window.less')
-require('../less/button.less')
+require('../css/window.less')
+require('../css/button.less')
+require('../css/main.less')
+require('../css/navigationBar.less')
+require('../css/tabs.less')
+require('../css/findbar.less')
+require('../css/dialogs.less')
+require('../css/updateBar.less')
+require('../css/bookmarksToolbar.less')
 require('../less/contextMenu.less')
-require('../less/main.less')
-require('../less/navigationBar.less')
-require('../less/forms.less')
-require('../less/tabs.less')
-require('../less/findbar.less')
-require('../less/dialogs.less')
-require('../less/updateBar.less')
-require('../less/bookmarksToolbar.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
 const React = require('react')
