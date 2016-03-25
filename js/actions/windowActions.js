@@ -778,6 +778,13 @@ const windowActions = {
       frameProps,
       actionType: WindowConstants.WINDOW_ZOOM_RESET
     })
+  },
+
+  inspectElement: function (x, y) {
+    const webview = document.querySelector('webview')
+    if (webview) {
+      webview.inspectElement(x, y)
+    }
   }
 }
 

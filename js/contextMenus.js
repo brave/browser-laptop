@@ -532,16 +532,10 @@ function mainTemplateInit (nodeProps, frame) {
       enabled: false
     })
 
-  template.push(CommonMenu.separatorMenuItem)
-  
-  template.push({
+  template.push(CommonMenu.separatorMenuItem, {
     label: 'Inspect Element',
     click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        document.querySelector( 'webview' ).openDevTools();
-        document.querySelector( 'webview' ).inspectElement(nodeProps.offsetX, nodeProps.offsetY);
-        // Used for Brave dev tools: focusedWindow.openDevTools();
-      }
+      windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
     }
   })
   return template
