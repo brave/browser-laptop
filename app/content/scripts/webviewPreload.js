@@ -449,7 +449,9 @@
         href: href,
         src: e.target.src,
         isContentEditable: e.target.isContentEditable,
-        hasSelection: hasSelection(e.target)
+        hasSelection: hasSelection(e.target),
+        offsetX: e.pageX,
+        offsetY: e.pageY
       }
       ipcRenderer.sendToHost('context-menu-opened', nodeProps)
       e.preventDefault()
