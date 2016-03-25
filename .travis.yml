@@ -19,3 +19,4 @@ addons:
     packages:
       - xvfb
       - g++-4.8
+      - libgnome-keyring-dev
