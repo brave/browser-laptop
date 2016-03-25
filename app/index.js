@@ -127,26 +127,28 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, we should focus our window.
-  let focusedFirst = false
-  BrowserWindow.getAllWindows().forEach(win => {
-    if (win) {
-      if (win.isMinimized()) {
-        win.restore()
+if (process.env.NODE_ENV !== 'development') {
+  const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    let focusedFirst = false
+    BrowserWindow.getAllWindows().forEach(win => {
+      if (win) {
+        if (win.isMinimized()) {
+          win.restore()
+        }
+        if (!focusedFirst) {
+          win.focus()
+          focusedFirst = true
+        }
       }
-      if (!focusedFirst) {
-        win.focus()
-        focusedFirst = true
-      }
+    })
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow()
     }
   })
-  if (BrowserWindow.getAllWindows().length === 0) {
-    appActions.newWindow()
+  if (appAlreadyStartedShouldQuit) {
+    app.exit(0)
   }
-})
-if (appAlreadyStartedShouldQuit) {
-  app.exit(0)
 }
 
 app.on('ready', () => {
