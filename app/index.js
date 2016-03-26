@@ -322,6 +322,12 @@ app.on('ready', () => {
     })
 
     let masterKey
+    ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {
+      appActions.deletePassword(password)
+    })
+    ipcMain.on(messages.CLEAR_PASSWORDS, () => {
+      appActions.clearPasswords()
+    })
     ipcMain.on(messages.DECRYPT_PASSWORD, (e, encrypted, authTag, iv, id) => {
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
@@ -432,7 +438,7 @@ app.on('ready', () => {
         title: 'Save password?',
         message: message,
         buttons: ['Yes', 'No'],
-        defaultId: 1,
+        defaultId: 0,
         cancelId: 1
       }, buttonId => {
         if (buttonId !== 0) {

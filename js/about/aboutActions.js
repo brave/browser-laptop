@@ -104,6 +104,18 @@ const AboutActions = {
       detail: text
     })
     window.dispatchEvent(event)
+  },
+
+  deletePassword: function (password) {
+    const event = new window.CustomEvent(messages.DELETE_PASSWORD, {
+      detail: password
+    })
+    window.dispatchEvent(event)
+  },
+
+  clearPasswords: function () {
+    const event = new window.CustomEvent(messages.CLEAR_PASSWORDS)
+    window.dispatchEvent(event)
   }
 }
 module.exports = AboutActions

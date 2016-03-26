@@ -59,4 +59,10 @@
   window.addEventListener('set-clipboard', (e) => {
     ipcRenderer.send('set-clipboard', e.detail)
   })
+  window.addEventListener('delete-password', (e) => {
+    ipcRenderer.send('delete-password', e.detail)
+  })
+  window.addEventListener('clear-passwords', (e) => {
+    ipcRenderer.send('clear-passwords')
+  })
 }).apply(this)

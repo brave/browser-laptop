@@ -209,6 +209,9 @@ class Frame extends ImmutableComponent {
         bookmarks: this.props.bookmarks.toJS(),
         bookmarkFolders: this.props.bookmarkFolders.toJS()
       })
+    } else if (this.props.frame.get('location') === 'about:passwords' &&
+               prevProps.passwords !== this.props.passwords) {
+      this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
     }
   }
 

@@ -50,7 +50,7 @@ class PasswordItem extends React.Component {
   }
 
   onDelete () {
-    aboutActions.deletePassword(this.props.password)
+    aboutActions.deletePassword(this.props.password.toJS())
   }
 
   onCopy () {
@@ -71,7 +71,7 @@ class PasswordItem extends React.Component {
       this.setState({
         notification: null
       })
-    }, 1000)
+    }, 700)
   }
 
   onDecrypt (e) {
@@ -139,7 +139,7 @@ class AboutPasswords extends React.Component {
   constructor () {
     super()
     this.state = {
-      passwordDetails: window.initPasswords ? Immutable.fromJS(window.initPasswords) : Immutable.List()
+      passwordDetails: window.initPasswords ? Immutable.fromJS(window.initPasswords) : new Immutable.List()
     }
     window.addEventListener(messages.PASSWORD_DETAILS_UPDATED, (e) => {
       if (e.detail) {
@@ -151,7 +151,11 @@ class AboutPasswords extends React.Component {
   }
 
   onClear () {
-    aboutActions.clearPasswords()
+    const msg = 'Are you sure you want to delete all saved passwords? ' +
+      'This cannot be undone.'
+    if (window.confirm(msg)) {
+      aboutActions.clearPasswords()
+    }
   }
 
   render () {
@@ -165,7 +169,6 @@ class AboutPasswords extends React.Component {
             <th data-l10n-id='passwordsSite'></th>
             <th data-l10n-id='passwordsUsername'></th>
             <th data-l10n-id='passwordsPassword'></th>
-            <th data-l10n-id='passwordsActions'></th>
           </tr>
         </thead>
         <tbody>
@@ -176,8 +179,8 @@ class AboutPasswords extends React.Component {
         </table>
       </div>
       <div className='passwordsPageFooter'>
-        <a href='#' data-l10n-id='clearPasswords'
-          onClick={this.onClear.bind(this)}></a>
+        <span data-l10n-id='clearPasswords'
+          onClick={this.onClear.bind(this)}></span>
       </div>
     </div>
   }

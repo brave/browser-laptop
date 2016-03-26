@@ -201,6 +201,26 @@ const appActions = {
   },
 
   /**
+   * Deletes login credentials
+   * @param {Object} passwordDetail - login details
+   */
+  deletePassword: function (passwordDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_PASSWORD,
+      passwordDetail
+    })
+  },
+
+  /**
+   * Deletes all saved login credentials
+   */
+  clearPasswords: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_PASSWORDS
+    })
+  },
+
+  /**
    * Changes an application level setting
    * @param {string} key - The key name for the setting
    * @param {string} value - The value of the setting

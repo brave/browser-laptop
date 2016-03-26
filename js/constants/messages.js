@@ -72,6 +72,8 @@ const messages = {
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
   DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
+  DELETE_PASSWORD: _, /** @arg {Object} password */
+  CLEAR_PASSWORDS: _,
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
