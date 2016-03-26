@@ -146,7 +146,7 @@ export default class FindBar extends ImmutableComponent {
     return <div className='findBar' onBlur={this.onBlur}>
       <span className='searchStringContainer'>
         <input type='text'
-          ref={node => this.searchInput = node}
+          ref={(node) => { this.searchInput = node }}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
           value={this.searchString}/>

@@ -30,7 +30,7 @@ describe('sessionStore', function () {
         .moveToObject(selectors.urlInput)
         .waitForExist(selectors.navigatorBookmarked)
         .waitUntil(function () {
-          return this.getValue(selectors.urlInput).then(val => val === page1Url)
+          return this.getValue(selectors.urlInput).then((val) => val === page1Url)
         })
       yield Brave.stopApp()
       yield Brave.startApp(false)
@@ -46,7 +46,7 @@ describe('sessionStore', function () {
       yield Brave.app.client
         .moveToObject(selectors.urlInput)
         .waitUntil(function () {
-          return this.getValue(selectors.urlInput).then(val => val === page1Url)
+          return this.getValue(selectors.urlInput).then((val) => val === page1Url)
         })
     })
 

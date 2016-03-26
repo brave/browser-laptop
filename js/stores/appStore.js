@@ -174,7 +174,7 @@ class AppStore extends EventEmitter {
     if (lastEmittedState) {
       const d = diff(lastEmittedState, appState)
       if (!d.isEmpty()) {
-        BrowserWindow.getAllWindows().forEach(wnd =>
+        BrowserWindow.getAllWindows().forEach((wnd) =>
           wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
         lastEmittedState = appState
       }
@@ -258,7 +258,7 @@ const handleAppAction = (action) => {
           frames.push(frameOpts)
         }
       } else if (getSetting(settings.STARTUP_MODE) === 'homePage' && homepageSetting) {
-        frames = homepageSetting.split('|').map(homepage => {
+        frames = homepageSetting.split('|').map((homepage) => {
           return {
             location: homepage
           }
@@ -309,8 +309,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
       if (action.siteDetail.constructor === Immutable.List) {
-        action.siteDetail.forEach(s =>
-          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag)))
+        action.siteDetail.forEach((s) => {
+          appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), s, action.tag))
+        })
       } else {
         appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
       }

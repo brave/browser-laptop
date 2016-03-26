@@ -465,35 +465,40 @@ class Frame extends ImmutableComponent {
 
   render () {
     return <div
-        className={cx({
-          frameWrapper: true,
-          isPreview: this.props.isPreview,
-          isActive: this.props.isActive
-        })}>
-      { this.props.frame.get('isFullScreen') && this.props.frame.get('showFullScreenWarning')
+      className={cx({
+        frameWrapper: true,
+        isPreview: this.props.isPreview,
+        isActive: this.props.isActive
+      })}>
+      {
+        this.props.frame.get('isFullScreen') && this.props.frame.get('showFullScreenWarning')
         ? <FullScreenWarning frameProps={this.props.frame}/>
         : null
       }
-      { this.props.frame.get('findbarShown')
-      ? <FindBar
-        onFind={this.onFind.bind(this)}
-        onFindHide={this.onFindHide.bind(this)}
-        frame={this.props.frame}
-        selected={this.props.frame.get('findbarSelected')}
-        findDetail={this.props.frame.get('findDetail')}
-      /> : null }
-      <div ref={node => this.webviewContainer = node}
+      {
+        this.props.frame.get('findbarShown')
+        ? <FindBar
+          onFind={this.onFind.bind(this)}
+          onFindHide={this.onFindHide.bind(this)}
+          frame={this.props.frame}
+          selected={this.props.frame.get('findbarSelected')}
+          findDetail={this.props.frame.get('findDetail')}/>
+        : null
+      }
+      <div ref={(node) => { this.webviewContainer = node }}
         className={cx({
           webviewContainer: true,
           isPreview: this.props.isPreview
         })}/>
-      { this.props.frame.get('hrefPreview')
+      {
+        this.props.frame.get('hrefPreview')
         ? <div className={cx({
           hrefPreview: true,
           right: this.props.frame.get('showOnRight')
         })}>
           {this.props.frame.get('hrefPreview')}
-        </div> : null
+        </div>
+        : null
       }
     </div>
   }

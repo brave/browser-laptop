@@ -14,7 +14,7 @@ describe('findbar', function () {
     yield this.app.client
       .loadUrl(url)
       .waitUntil(function () {
-        return this.getAttribute('webview[data-frame-key="1"]', 'src').then(src => src === url)
+        return this.getAttribute('webview[data-frame-key="1"]', 'src').then((src) => src === url)
       })
       .waitForElementFocus('webview[data-frame-key="1"]')
   })
@@ -31,7 +31,7 @@ describe('findbar', function () {
       .waitForElementFocus(findBarInput)
       .setValue(findBarInput, 'test')
        .waitUntil(function () {
-         return this.getValue(findBarInput).then(val => val === 'test')
+         return this.getValue(findBarInput).then((val) => val === 'test')
        })
       .waitForVisible(findBarMatches)
     let match = yield this.app.client.getText(findBarMatches)

@@ -42,7 +42,7 @@ class Tabs extends ImmutableComponent {
 
   get totalPages () {
     return Math.ceil(this.props.frames
-        .filter(frame => !frame.get('pinnedLocation'))
+        .filter((frame) => !frame.get('pinnedLocation'))
         .size / this.props.tabsPerTabPage)
   }
 
@@ -54,10 +54,10 @@ class Tabs extends ImmutableComponent {
       // will cause the onDragEnd to never run
       setTimeout(() => {
         const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
+        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((tab) => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-          const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+          const droppedOnFrameProps = this.props.frames.find((frame) => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
           windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             windowActions.setPinned(sourceDragData, false)
@@ -68,7 +68,7 @@ class Tabs extends ImmutableComponent {
       return
     }
     if (e.dataTransfer.files) {
-      Array.from(e.dataTransfer.files).forEach(file =>
+      Array.from(e.dataTransfer.files).forEach((file) =>
         windowActions.newFrame({location: file.path, title: file.name}))
     }
   }
@@ -79,7 +79,7 @@ class Tabs extends ImmutableComponent {
       e.preventDefault()
       return
     }
-    let intersection = e.dataTransfer.types.filter(x => ['Files'].includes(x))
+    let intersection = e.dataTransfer.types.filter((x) => ['Files'].includes(x))
     if (intersection.length > 0) {
       e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
@@ -89,33 +89,33 @@ class Tabs extends ImmutableComponent {
   render () {
     this.tabRefs = []
     return <div className='tabs'>
-        <span className={cx({
-          tabStripContainer: true,
-          allowDragging: this.props.shouldAllowWindowDrag
-        })}
-          onDragOver={this.onDragOver.bind(this)}
-          onDrop={this.onDrop.bind(this)}>
+      <span className={cx({
+        tabStripContainer: true,
+        allowDragging: this.props.shouldAllowWindowDrag
+      })}
+        onDragOver={this.onDragOver.bind(this)}
+        onDrop={this.onDrop.bind(this)}>
         {(() => {
           if (this.props.tabPageIndex > 0) {
             return <span
-                className='prevTab fa fa-angle-double-left'
-                onClick={this.onPrevPage.bind(this)} />
+              className='prevTab fa fa-angle-double-left'
+              onClick={this.onPrevPage.bind(this)} />
           }
         })()}
         {
           this.props.currentFrames
-            .filter(frameProps => !frameProps.get('pinnedLocation'))
-            .map(frameProps =>
-                <Tab ref={node => this.tabRefs.push(node)}
-                  draggingOverData={this.props.draggingOverData}
-                  frameProps={frameProps}
-                  frames={this.props.frames}
-                  key={'tab-' + frameProps.get('key')}
-                  paintTabs={this.props.paintTabs}
-                  previewTabs={this.props.previewTabs}
-                  isActive={this.props.activeFrame === frameProps}
-                  isPrivate={frameProps.get('isPrivate')}
-                  partOfFullPageSet={this.props.partOfFullPageSet}/>)
+            .filter((frameProps) => !frameProps.get('pinnedLocation'))
+            .map((frameProps) =>
+              <Tab ref={(node) => this.tabRefs.push(node)}
+                draggingOverData={this.props.draggingOverData}
+                frameProps={frameProps}
+                frames={this.props.frames}
+                key={'tab-' + frameProps.get('key')}
+                paintTabs={this.props.paintTabs}
+                previewTabs={this.props.previewTabs}
+                isActive={this.props.activeFrame === frameProps}
+                isPrivate={frameProps.get('isPrivate')}
+                partOfFullPageSet={this.props.partOfFullPageSet}/>)
         }
         {(() => {
           if (this.props.currentFrames.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
@@ -128,7 +128,7 @@ class Tabs extends ImmutableComponent {
           l10nId='newTabButton'
           className='navbutton newFrameButton'
           onClick={windowActions.newFrame} />
-        </span>
+      </span>
     </div>
   }
 }

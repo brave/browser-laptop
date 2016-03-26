@@ -26,15 +26,15 @@ const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAE
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
 
-module.exports.registerBeforeSendHeadersFilteringCB = filteringFn => {
+module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
 }
 
-module.exports.registerBeforeRequestFilteringCB = filteringFn => {
+module.exports.registerBeforeRequestFilteringCB = (filteringFn) => {
   beforeRequestFilteringFns.push(filteringFn)
 }
 
-module.exports.registerBeforeRedirectFilteringCB = filteringFn => {
+module.exports.registerBeforeRedirectFilteringCB = (filteringFn) => {
   beforeRedirectFilteringFns.push(filteringFn)
 }
 
@@ -60,7 +60,7 @@ function registerForBeforeRequest (session) {
       if (results.cancel) {
         // We have no good way of knowing which BrowserWindow the blocking is for
         // yet so send it everywhere and let listeners decide how to respond.
-        BrowserWindow.getAllWindows().forEach(wnd =>
+        BrowserWindow.getAllWindows().forEach((wnd) =>
           wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
         if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
@@ -74,7 +74,7 @@ function registerForBeforeRequest (session) {
         // Show the ruleset that was applied and the URLs that were upgraded in
         // siteinfo
         if (results.ruleset) {
-          BrowserWindow.getAllWindows().forEach(wnd =>
+          BrowserWindow.getAllWindows().forEach((wnd) =>
             wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
         }
       }
@@ -247,13 +247,13 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
 }
 
 function initForPartition (partition) {
-  [registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach(fn => {
+  [registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
     fn(session.fromPartition(partition))
   })
 }
 
 module.exports.init = () => {
-  ['', 'main-1'].forEach(partition => {
+  ['', 'main-1'].forEach((partition) => {
     initForPartition(partition)
   })
   let initializedPartitions = {}

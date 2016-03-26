@@ -82,14 +82,14 @@ export function getFramePropPath (windowState, frameProps, propName) {
  * Obtains the index for the specified frame key
  */
 export function findIndexForFrameKey (frames, key) {
-  return frames.findIndex(frame => frame.get('key') === key)
+  return frames.findIndex((frame) => frame.get('key') === key)
 }
 
 /**
  * Obtains the frameProps index in the frames
  */
 export function getFramePropsIndex (frames, frameProps) {
-  return frames.findIndex(found => found.get('key') === frameProps.get('key'))
+  return frames.findIndex((found) => found.get('key') === frameProps.get('key'))
 }
 
 /**
@@ -102,7 +102,7 @@ export function getFeatures (featureStr) {
     .reduce((acc, feature) => {
       feature = feature
         .split('=')
-        .map(featureElem => featureElem.trim())
+        .map((featureElem) => featureElem.trim())
       if (feature.length !== 2) {
         return acc
       }
@@ -280,9 +280,9 @@ export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
  * @return Immutable top level application state ready to merge back in
  */
 export function removeOtherFrames (frames, closedFrames, frameProps) {
-  closedFrames = closedFrames.concat(frames.filter(currentFrameProps => !currentFrameProps.get('isPrivate') && currentFrameProps.get('key') !== frameProps.get('key')))
+  closedFrames = closedFrames.concat(frames.filter((currentFrameProps) => !currentFrameProps.get('isPrivate') && currentFrameProps.get('key') !== frameProps.get('key')))
     .take(config.maxClosedFrames)
-  closedFrames.forEach(currentFrameProps => {
+  closedFrames.forEach((currentFrameProps) => {
     if (currentFrameProps.get('thumbnailBlob')) {
       window.URL.revokeObjectURL(currentFrameProps.get('thumbnailBlob'))
     }

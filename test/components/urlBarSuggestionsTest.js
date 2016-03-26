@@ -27,7 +27,7 @@ describe('urlbarSuggestions', function () {
       .waitForElementFocus(urlInput)
       .setValue(urlInput, 'Page 1')
       .waitUntil(function () {
-        return this.getValue(urlInput).then(val => val === 'Page 1')
+        return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
       .waitForExist(urlBarSuggestions)
       .click(urlBarSuggestions + ' li')
@@ -41,7 +41,7 @@ describe('urlbarSuggestions', function () {
       .waitForElementFocus(urlInput)
       .setValue(urlInput, 'Page 1')
       .waitUntil(function () {
-        return this.getValue(urlInput).then(val => val === 'Page 1')
+        return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
       .waitForExist(urlBarSuggestions)
       .keys('Down arrow')

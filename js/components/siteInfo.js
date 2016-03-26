@@ -9,9 +9,6 @@ const Dialog = require('./dialog')
 const windowActions = require('../actions/windowActions')
 
 class SiteInfo extends ImmutableComponent {
-  constructor (props) {
-    super(props)
-  }
   get isExtendedValidation () {
     return this.props.frameProps.getIn(['security', 'isExtendedValidation'])
   }
@@ -67,10 +64,11 @@ class SiteInfo extends ImmutableComponent {
     let secureIcon
     if (this.isSecure && !this.isMixedContent) {
       secureIcon = <li><span
-      className={cx({
-        fa: true,
-        'fa-lock': true,
-        extendedValidation: this.isExtendedValidation})}/><span data-l10n-id='secureConnection'/></li>
+        className={cx({
+          fa: true,
+          'fa-lock': true,
+          extendedValidation: this.isExtendedValidation
+        })}/><span data-l10n-id='secureConnection'/></li>
     } else if (this.isMixedContent) {
       secureIcon = <li><span className='fa fa-unlock-alt'/><span data-l10n-id='mixedConnection'/></li>
     } else {
@@ -89,55 +87,70 @@ class SiteInfo extends ImmutableComponent {
     }
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
-      <ul onClick={e => e.stopPropagation()}>
-      { secureIcon }
-      { partitionInfo }
-      { this.isBlockingTrackedContent
+      <ul onClick={(e) => e.stopPropagation()}>
+      {
+        secureIcon
+      }
+      {
+        partitionInfo
+      }
+      {
+        this.isBlockingTrackedContent
         ? <li>
-            <a onClick={this.onToggleTPList.bind(this)}><span className='fa fa-shield'/>
+          <a onClick={this.onToggleTPList.bind(this)}><span className='fa fa-shield'/>
             <span data-l10n-args={JSON.stringify({blockedTrackingElementsSize: this.blockedByTrackingList.size})}
               data-l10n-id='blockedTrackingElements'/>
-            </a>
-          </li> : null
-    }
-      { this.isTPListShown && this.blockedByTrackingList && this.blockedByTrackingList.size > 0
+          </a>
+        </li>
+        : null
+      }
+      {
+        this.isTPListShown && this.blockedByTrackingList && this.blockedByTrackingList.size > 0
         ? <li><ul>
         {
-          this.blockedByTrackingList.map(site => <li key={site}>{site}</li>)
+          this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
         }
-        </ul></li> : null
+        </ul></li>
+        : null
       }
-      { this.isBlockingAds
+      {
+        this.isBlockingAds
         ? <li>
-            <a onClick={this.onToggleBlockedAds.bind(this)}><span className='fa fa-shield'/>
-              <span data-l10n-args={JSON.stringify({blockedAdsSize: this.blockedAds.size})}
-                data-l10n-id='blockedAds'/>
-            </a>
-          </li> : null
+          <a onClick={this.onToggleBlockedAds.bind(this)}><span className='fa fa-shield'/>
+            <span data-l10n-args={JSON.stringify({blockedAdsSize: this.blockedAds.size})}
+              data-l10n-id='blockedAds'/>
+          </a>
+        </li>
+        : null
       }
-      { this.isBlockingAds && this.isBlockedAdsShown
+      {
+        this.isBlockingAds && this.isBlockedAdsShown
         ? <li><ul>
         {
-          this.blockedAds.map(site => <li key={site}>{site}</li>)
+          this.blockedAds.map((site) => <li key={site}>{site}</li>)
         }
-        </ul></li> : null
+        </ul></li>
+        : null
       }
-      { this.isRedirectingResources
+      {
+        this.isRedirectingResources
         ? <li>
-            <a onClick={this.onToggleHttpseList.bind(this)}><span className='fa fa-shield'/>
-              <span data-l10n-args={JSON.stringify({redirectedResourcesSize: this.redirectedResources.size})}
-                data-l10n-id='redirectedResources'/>
-            </a>
-          </li> : null
+          <a onClick={this.onToggleHttpseList.bind(this)}><span className='fa fa-shield'/>
+            <span data-l10n-args={JSON.stringify({redirectedResourcesSize: this.redirectedResources.size})}
+              data-l10n-id='redirectedResources'/>
+          </a>
+        </li>
+        : null
       }
-      { this.isRedirectingResources && this.isHttpseShown
+      {
+        this.isRedirectingResources && this.isHttpseShown
         ? <li><ul>
         {
           this.redirectedResources.map((sites, ruleset) =>
-                                       <li key={ruleset}>{[ruleset, JSON.stringify(sites.toJS())].join(': ')}
-                                       </li>)
+            <li key={ruleset}>{[ruleset, JSON.stringify(sites.toJS())].join(': ')}</li>)
         }
-        </ul></li> : null
+        </ul></li>
+        : null
       }
       </ul>
     </Dialog>

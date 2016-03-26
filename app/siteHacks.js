@@ -15,7 +15,7 @@ module.exports.init = () => {
   if (!appConfig[resourceName].enabled) {
     return
   }
-  Filtering.registerBeforeSendHeadersFilteringCB(details => {
+  Filtering.registerBeforeSendHeadersFilteringCB((details) => {
     if (details.resourceType !== 'mainFrame') {
       return {
         resourceName
@@ -36,7 +36,7 @@ module.exports.init = () => {
       customCookie
     }
   })
-  Filtering.registerBeforeRequestFilteringCB(details => {
+  Filtering.registerBeforeRequestFilteringCB((details) => {
     let domain = URL.parse(details.url).hostname
     let hack = siteHacks[domain]
     let redirectURL

@@ -32,7 +32,7 @@ export default class Dialog extends ImmutableComponent {
   render () {
     return <div className={'dialog ' + (this.props.className || '')}
       tabIndex='-1'
-      ref={node => this.dialog = node}
+      ref={(node) => { this.dialog = node }}
       onKeyDown={this.onKeyDown.bind(this)}
       onClick={this.onClick.bind(this)}>
         {this.props.children}

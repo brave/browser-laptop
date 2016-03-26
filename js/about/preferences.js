@@ -41,8 +41,11 @@ const changeSetting = (cb, key, e) => {
 class SettingsList extends ImmutableComponent {
   render () {
     return <div>
-      { this.props.dataL10nId
-        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId}/> : null }
+      {
+        this.props.dataL10nId
+        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId}/>
+        : null
+      }
       <div className='settingsList'>
         {this.props.children}
       </div>
@@ -179,10 +182,13 @@ class TopBarButton extends ImmutableComponent {
         <div className='tabMarkerText'
           data-l10n-id={this.props.dataL10nId}/>
       </div>
-      { this.props.selected
-      ? <div className='tabMarkerContainer'>
+      {
+        this.props.selected
+        ? <div className='tabMarkerContainer'>
           <div className='tabMarker'/>
-        </div> : null }
+        </div>
+        : null
+      }
     </div>
   }
 }

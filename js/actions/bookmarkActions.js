@@ -13,8 +13,8 @@ const bookmarkActions = {
   openBookmarksInFolder: function (allBookmarkItems, folderDetail) {
     // We have a middle clicked folder
     allBookmarkItems
-      .filter(bookmark => bookmark.get('parentFolderId') === folderDetail.get('folderId') && bookmark.get('tags').includes(siteTags.BOOKMARK))
-      .forEach(bookmark =>
+      .filter((bookmark) => bookmark.get('parentFolderId') === folderDetail.get('folderId') && bookmark.get('tags').includes(siteTags.BOOKMARK))
+      .forEach((bookmark) =>
         windowActions.newFrame(siteUtil.toFrameOpts(bookmark), false))
   },
 

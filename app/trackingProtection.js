@@ -62,5 +62,5 @@ const startTrackingProtection = (wnd) => {
 module.exports.init = () => {
   trackingProtection = new TrackingProtection()
   DataFile.init(module.exports.resourceName, startTrackingProtection,
-                data => trackingProtection.deserialize(data))
+                (data) => trackingProtection.deserialize(data))
 }

@@ -39,4 +39,4 @@ app.on('will-finish-launching', () => {
   })
 })
 
-process.on(messages.APP_INITIALIZED, () => appInitialized = true)
+process.on(messages.APP_INITIALIZED, () => { appInitialized = true })

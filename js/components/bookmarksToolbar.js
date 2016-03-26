@@ -109,24 +109,31 @@ class BookmarkToolbarButton extends ImmutableComponent {
 
   render () {
     return <span
-        className={cx({
-          bookmarkToolbarButton: true,
-          draggingOverLeft: this.isDraggingOverLeft && !this.isExpanded,
-          draggingOverRight: this.isDraggingOverRight && !this.isExpanded,
-          isDragging: this.isDragging
-        })}
-        draggable
-        ref={node => this.bookmarkNode = node}
-        onClick={this.onClick.bind(this)}
-        onDragStart={this.onDragStart.bind(this)}
-        onDragEnd={this.onDragEnd.bind(this)}
-        onDragEnter={this.onDragEnter.bind(this)}
-        onDragLeave={this.onDragLeave.bind(this)}
-        onDragOver={this.onDragOver.bind(this)}
-        onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
-      <span>{ this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location') }</span>
-      { this.isFolder
-        ? <span className='bookmarkFolderChevron fa fa-chevron-down'/> : null }
+      className={cx({
+        bookmarkToolbarButton: true,
+        draggingOverLeft: this.isDraggingOverLeft && !this.isExpanded,
+        draggingOverRight: this.isDraggingOverRight && !this.isExpanded,
+        isDragging: this.isDragging
+      })}
+      draggable
+      ref={(node) => { this.bookmarkNode = node }}
+      onClick={this.onClick.bind(this)}
+      onDragStart={this.onDragStart.bind(this)}
+      onDragEnd={this.onDragEnd.bind(this)}
+      onDragEnter={this.onDragEnter.bind(this)}
+      onDragLeave={this.onDragLeave.bind(this)}
+      onDragOver={this.onDragOver.bind(this)}
+      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
+      <span>
+      {
+        this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location')
+      }
+      </span>
+      {
+        this.isFolder
+        ? <span className='bookmarkFolderChevron fa fa-chevron-down'/>
+        : null
+      }
     </span>
   }
 }
@@ -137,7 +144,7 @@ class BookmarksToolbar extends ImmutableComponent {
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
       // Figure out the droppedOn element filtering out the source drag item
-      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter(bookmarkRef => {
+      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter((bookmarkRef) => {
         if (!bookmarkRef) {
           return false
         }
@@ -165,7 +172,7 @@ class BookmarksToolbar extends ImmutableComponent {
       }
     }
     if (e.dataTransfer.files) {
-      Array.from(e.dataTransfer.files).forEach(file =>
+      Array.from(e.dataTransfer.files).forEach((file) =>
         appActions.addSite({ location: file.path, title: file.name }, siteTags.BOOKMARK))
       return
     }
@@ -173,15 +180,15 @@ class BookmarksToolbar extends ImmutableComponent {
     let urls = e.dataTransfer.getData('text/uri-list') ||
       e.dataTransfer.getData('text/plain')
     urls = urls.split('\n')
-      .map(x => x.trim())
-      .filter(x => !x.startsWith('#') && x.length > 0)
-      .forEach(url =>
+      .map((x) => x.trim())
+      .filter((x) => !x.startsWith('#') && x.length > 0)
+      .forEach((url) =>
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
   updateBookmarkData (props) {
     const maxItems = window.innerWidth / bookmarkMaxWidth | 0
     const noParentItems = props.bookmarks
-      .filter(bookmark => !bookmark.get('parentFolderId'))
+      .filter((bookmark) => !bookmark.get('parentFolderId'))
     this.bookmarksForToolbar = noParentItems.take(maxItems)
     this.overflowBookmarkItems = noParentItems.skip(maxItems).take(100)
   }
@@ -209,7 +216,7 @@ class BookmarksToolbar extends ImmutableComponent {
       return
     }
     // console.log(e.dataTransfer.types, e.dataTransfer.getData('text/plain'), e.dataTransfer.getData('text/uri-list'), e.dataTransfer.getData('text/html'))
-    let intersection = e.dataTransfer.types.filter(x =>
+    let intersection = e.dataTransfer.types.filter((x) =>
       ['text/plain', 'text/uri-list', 'text/html', 'Files'].includes(x))
     if (intersection.length > 0) {
       e.dataTransfer.dropEffect = 'copy'
@@ -220,7 +227,7 @@ class BookmarksToolbar extends ImmutableComponent {
     contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.props.bookmarks, this.overflowBookmarkItems, e)
   }
   onContextMenu (e) {
-    const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter(x => !!x), e.clientX).selectedRef
+    const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
     contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, e)
   }
   render () {
@@ -235,19 +242,22 @@ class BookmarksToolbar extends ImmutableComponent {
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={this.onContextMenu.bind(this)}>
     {
-        this.bookmarksForToolbar.map(bookmark =>
+        this.bookmarksForToolbar.map((bookmark) =>
           <BookmarkToolbarButton
-            ref={node => this.bookmarkRefs.push(node)}
+            ref={(node) => this.bookmarkRefs.push(node)}
             contextMenuDetail={this.props.contextMenuDetail}
             draggingOverData={this.props.draggingOverData}
             activeFrame={this.props.activeFrame}
             bookmarks={this.props.bookmarks}
             bookmark={bookmark}/>)
     }
-    { this.overflowBookmarkItems.size !== 0
+    {
+      this.overflowBookmarkItems.size !== 0
       ? <Button iconClass='overflowIndicator fa-angle-double-right'
         onClick={this.onMoreBookmarksMenu.bind(this)}
-        className='bookmarkButton'/> : null }
+        className='bookmarkButton'/>
+      : null
+    }
     </div>
   }
 }

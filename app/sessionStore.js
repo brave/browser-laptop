@@ -45,8 +45,9 @@ module.exports.saveAppState = (payload) => {
     const savePerWindowState = startupModeSettingValue === undefined ||
       startupModeSettingValue === 'lastTime'
     if (payload.perWindowState && savePerWindowState) {
-      payload.perWindowState.forEach(wndPayload =>
-        wndPayload.frames = wndPayload.frames.filter(frame => !frame.isPrivate))
+      payload.perWindowState.forEach((wndPayload) => {
+        wndPayload.frames = wndPayload.frames.filter((frame) => !frame.isPrivate)
+      })
     } else {
       delete payload.perWindowState
     }
@@ -168,7 +169,7 @@ module.exports.cleanSessionData = (sessionData) => {
     // Don't restore pinned locations because they will be auto created by the app state change event
     sessionData.frames = sessionData.frames
       // TODO: frame.isPinned is the old storage format, remove that condition after the year 2016
-      .filter(frame => !frame.isPinned && !frame.pinnedLocation)
+      .filter((frame) => !frame.isPinned && !frame.pinnedLocation)
     sessionData.frames.forEach(cleanFrame)
   }
 }

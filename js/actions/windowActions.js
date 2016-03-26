@@ -326,7 +326,7 @@ const windowActions = {
     }
     // Unless a caller explicitly specifies to close a pinned frame, then
     // ignore the call.
-    const nonPinnedFrames = frames.filter(frame => !frame.get('pinnedLocation'))
+    const nonPinnedFrames = frames.filter((frame) => !frame.get('pinnedLocation'))
     if (frameProps && frameProps.get('pinnedLocation')) {
       // Check for no frames at all, and if that's the case the user
       // only has pinned frames and tried to close, so close the
@@ -343,7 +343,7 @@ const windowActions = {
       }
     }
 
-    const pinnedFrames = frames.filter(frame => frame.get('pinnedLocation'))
+    const pinnedFrames = frames.filter((frame) => frame.get('pinnedLocation'))
 
     // If there is at least 1 pinned frame don't close the window until subsequent
     // close attempts

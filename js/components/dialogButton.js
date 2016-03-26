@@ -25,7 +25,7 @@ export class DialogButton extends ImmutableComponent {
       onClick={this.clickHandler}
       data-l10n-id={this.props['data-l10n-id']}>
         {this.props.text}
-      </span>
+    </span>
   }
 }
 

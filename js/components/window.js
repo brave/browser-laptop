@@ -40,7 +40,7 @@ class Window extends React.Component {
           location: config.defaultUrl
         })
       } else {
-        this.props.frames.forEach(frame => {
+        this.props.frames.forEach((frame) => {
           windowActions.newFrame(frame)
         })
       }
@@ -87,14 +87,14 @@ class Window extends React.Component {
 
     // Check for new pinned sites which we don't already know about
     const sitesToAdd = sites
-      .filter(site => {
+      .filter((site) => {
         return site.get('tags').includes(SiteTags.PINNED) &&
-          !frames.find(frame => frame.get('pinnedLocation') &&
+          !frames.find((frame) => frame.get('pinnedLocation') &&
             // Compare to the original src of the pinned frame
             frame.get('pinnedLocation') === site.get('location') &&
             (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
       })
-    sitesToAdd.forEach(site => {
+    sitesToAdd.forEach((site) => {
       windowActions.newFrame({
         location: site.get('location'),
         partitionNumber: site.get('partitionNumber'),
@@ -103,12 +103,12 @@ class Window extends React.Component {
     })
 
     // Check for unpinned sites which should be closed
-    const framesToClose = frames.filter(frame =>
+    const framesToClose = frames.filter((frame) =>
       frame.get('pinnedLocation') &&
       // Compare to the original src of the pinned frame
-      !sites.find(site => frame.get('pinnedLocation') === site.get('location') &&
+      !sites.find((site) => frame.get('pinnedLocation') === site.get('location') &&
         (frame.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0) && site.get('tags').includes(SiteTags.PINNED)))
-    framesToClose.forEach(frameProps => windowActions.closeFrame(frames, frameProps, true))
+    framesToClose.forEach((frameProps) => windowActions.closeFrame(frames, frameProps, true))
   }
 }
 Window.propTypes = { appState: React.PropTypes.object, frames: React.PropTypes.array, initWindowState: React.PropTypes.object }

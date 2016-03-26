@@ -124,14 +124,14 @@ const initiateSessionStateSave = debounce(() => {
   }
   perWindowState.length = 0
   saveIfAllCollected()
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+  BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
 if (process.env.NODE_ENV !== 'development') {
   const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     let focusedFirst = false
-    BrowserWindow.getAllWindows().forEach(win => {
+    BrowserWindow.getAllWindows().forEach((win) => {
       if (win) {
         if (win.isMinimized()) {
           win.restore()
@@ -194,7 +194,7 @@ app.on('ready', () => {
     }
   })
 
-  app.on('before-quit', e => {
+  app.on('before-quit', (e) => {
     beforeQuitSaveStarted = true
     if (sessionStateStoreCompleteOnQuit) {
       return
@@ -207,7 +207,7 @@ app.on('ready', () => {
     }
 
     perWindowState.length = 0
-    BrowserWindow.getAllWindows().forEach(win => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+    BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
   })
 
   ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
@@ -243,19 +243,19 @@ app.on('ready', () => {
     }
   })
 
-  loadAppStatePromise.then(initialState => {
+  loadAppStatePromise.then((initialState) => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
-  }).then(loadedPerWindowState => {
+  }).then((loadedPerWindowState) => {
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {
         appActions.newWindow()
       }
     } else {
-      loadedPerWindowState.forEach(wndState => {
+      loadedPerWindowState.forEach((wndState) => {
         appActions.newWindow(undefined, undefined, wndState)
       })
     }
@@ -291,7 +291,7 @@ app.on('ready', () => {
     ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
       // If the host is associated with a URL with a cert error, update the
       // security state to insecure
-      if (Object.keys(acceptCertUrls).map(url => { return urlParse(url).host }).includes(host)) {
+      if (Object.keys(acceptCertUrls).map((url) => { return urlParse(url).host }).includes(host)) {
         BrowserWindow.getFocusedWindow().webContents.send(messages.SET_SECURITY_STATE, frameKey, {
           secure: false
         })
@@ -327,7 +327,7 @@ app.on('ready', () => {
 
       const passwords = AppStore.getState().get('passwords')
       if (passwords) {
-        let result = passwords.findLast(password => {
+        let result = passwords.findLast((password) => {
           return password.get('origin') === origin && password.get('action') === action
         })
         if (result) {
@@ -357,13 +357,13 @@ app.on('ready', () => {
       const passwords = AppStore.getState().get('passwords')
       if (passwords) {
         let usernames = {}
-        let results = passwords.filter(password => {
+        let results = passwords.filter((password) => {
           return password.get('username') &&
             password.get('username').startsWith(value) &&
             password.get('origin') === origin &&
             password.get('action') === action
         })
-        results.forEach(result => {
+        results.forEach((result) => {
           usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
                                                                        result.get('authTag'),
                                                                        masterKey,
@@ -418,7 +418,7 @@ app.on('ready', () => {
         buttons: ['Yes', 'No'],
         defaultId: 1,
         cancelId: 1
-      }, buttonId => {
+      }, (buttonId) => {
         if (buttonId !== 0) {
           return
         }

@@ -74,11 +74,11 @@ describe('tabs', function () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
-          return this.getWindowCount().then(count => count === windowCountBeforeTabClose)
+          return this.getWindowCount().then((count) => count === windowCountBeforeTabClose)
         })
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.getWindowCount().then(count => count === windowCountAfterTabClose)
+          return this.getWindowCount().then((count) => count === windowCountAfterTabClose)
         })
     })
     it('should undo last closed tab', function * () {
@@ -87,12 +87,12 @@ describe('tabs', function () {
         .waitForExist('.tab[data-frame-key="3"]')
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.getWindowCount().then(count => count === windowCountAfterTabClose)
+          return this.getWindowCount().then((count) => count === windowCountAfterTabClose)
         })
         .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
         .waitForExist('.tab[data-frame-key="3"]')
         .waitUntil(function () {
-          return this.getWindowCount().then(count => count === windowCountBeforeTabClose)
+          return this.getWindowCount().then((count) => count === windowCountBeforeTabClose)
         })
     })
   })

@@ -232,65 +232,69 @@ class UrlBar extends ImmutableComponent {
       action='#'
       id='urlbar'
       ref='urlbar'>
-          <span
-            onDragStart={this.onDragStart.bind(this)}
-            draggable
-            onClick={this.onSiteInfo}
+      <span
+        onDragStart={this.onDragStart.bind(this)}
+        draggable
+        onClick={this.onSiteInfo}
+        className={cx({
+          urlbarIcon: true,
+          'fa': true,
+          'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
+          'fa-unlock-alt': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
+          'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+          'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+          extendedValidation: this.extendedValidationSSL
+        })} />
+        {
+          this.props.titleMode
+          ? <div id='titleBar'>
+            <span><strong>{this.hostValue}</strong></span>
+            <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
+            <span>{this.titleValue}</span>
+          </div>
+          : <input type='text'
+            disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
+            onFocus={this.onFocus.bind(this)}
+            onBlur={this.onBlur.bind(this)}
+            onKeyDown={this.onKeyDown.bind(this)}
+            onChange={this.onChange.bind(this)}
+            onClick={this.onClick.bind(this)}
+            onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
+            value={this.locationValue}
+            data-l10n-id='urlbar'
             className={cx({
-              urlbarIcon: true,
-              'fa': true,
-              'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
-              'fa-unlock-alt': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
-              'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
-              'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
-              extendedValidation: this.extendedValidationSSL
-            })} />
-          { this.props.titleMode
-            ? <div id='titleBar'>
-              <span><strong>{this.hostValue}</strong></span>
-              <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
-              <span>{this.titleValue}</span>
-            </div>
+              insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
+              private: this.private,
+              testHookLoadDone: !this.props.loading
+            })}
+            id='urlInput'
+            readOnly={this.props.titleMode}
+            ref={(node) => { this.urlInput = node }}/>
+        }
+      <legend/>
+        {
+          this.props.titleMode
+          ? null
+          : <span className='loadTime'>{this.loadTime}</span>
+        }
 
-            : <input type='text'
-              disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
-              onFocus={this.onFocus.bind(this)}
-              onBlur={this.onBlur.bind(this)}
-              onKeyDown={this.onKeyDown.bind(this)}
-              onChange={this.onChange.bind(this)}
-              onClick={this.onClick.bind(this)}
-              onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
-              value={this.locationValue}
-              data-l10n-id='urlbar'
-              className={cx({
-                insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
-                private: this.private,
-                testHookLoadDone: !this.props.loading
-              })}
-              id='urlInput'
-              readOnly={this.props.titleMode}
-              ref={node => this.urlInput = node}/>
-          }
-            <legend/>
-
-            { this.props.titleMode ? null
-              : <span className='loadTime'>{this.loadTime}</span>
-            }
-
-            { this.shouldRenderUrlBarSuggestions
-            ? <UrlBarSuggestions
-              ref={node => this.urlBarSuggestions = node}
-              suggestions={this.props.urlbar.get('suggestions')}
-              settings={this.props.settings}
-              sites={this.props.sites}
-              frames={this.props.frames}
-              searchDetail={this.searchDetail}
-              searchSuggestions={this.props.searchSuggestions}
-              activeFrameProps={this.props.activeFrameProps}
-              urlLocation={this.props.urlbar.get('location')}
-              urlPreview={this.props.urlbar.get('urlPreview')}
-              previewActiveIndex={this.props.previewActiveIndex || 0} /> : null }
-      </form>
+        {
+          this.shouldRenderUrlBarSuggestions
+          ? <UrlBarSuggestions
+            ref={(node) => { this.urlBarSuggestions = node }}
+            suggestions={this.props.urlbar.get('suggestions')}
+            settings={this.props.settings}
+            sites={this.props.sites}
+            frames={this.props.frames}
+            searchDetail={this.searchDetail}
+            searchSuggestions={this.props.searchSuggestions}
+            activeFrameProps={this.props.activeFrameProps}
+            urlLocation={this.props.urlbar.get('location')}
+            urlPreview={this.props.urlbar.get('urlPreview')}
+            previewActiveIndex={this.props.previewActiveIndex || 0} />
+          : null
+        }
+    </form>
   }
 }
 

@@ -83,10 +83,13 @@ class UpdateAvailable extends ImmutableComponent {
       <span className='updateMessage' data-l10n-id='updateAvail'/>
       <span className='updateRequiresRelaunch' data-l10n-id='updateRequiresRelaunch'/>
       <span className='updateSpacer'/>
-      { this.props.metadata && this.props.metadata.get('notes')
+      {
+        this.props.metadata && this.props.metadata.get('notes')
         ? <Button className='updateButton updateDetails updateSecondaryButton'
-            l10nId='updateDetails'
-            onClick={windowActions.setReleaseNotesVisible.bind(null, true)} /> : null }
+          l10nId='updateDetails'
+          onClick={windowActions.setReleaseNotesVisible.bind(null, true)} />
+        : null
+      }
       <Button className='updateButton updateLaterButton updateSecondaryButton'
         l10nId='updateLater'
         onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false)} />
@@ -170,11 +173,21 @@ class UpdateBar extends ImmutableComponent {
     }
 
     return <div className='updateBar'>
-      { updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null }
-      { updateStatus === UpdateStatus.UPDATE_CHECKING ? <UpdateChecking updateStatus={updateStatus}/> : null }
-      { updateStatus === UpdateStatus.UPDATE_DOWNLOADING ? <UpdateDownloading updateStatus={updateStatus}/> : null }
-      { updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE ? <UpdateNotAvailable updateStatus={updateStatus}/> : null }
-      { updateStatus === UpdateStatus.UPDATE_ERROR ? <UpdateError updateStatus={updateStatus}/> : null }
+      {
+        updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null
+      }
+      {
+        updateStatus === UpdateStatus.UPDATE_CHECKING ? <UpdateChecking updateStatus={updateStatus}/> : null
+      }
+      {
+        updateStatus === UpdateStatus.UPDATE_DOWNLOADING ? <UpdateDownloading updateStatus={updateStatus}/> : null
+      }
+      {
+        updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE ? <UpdateNotAvailable updateStatus={updateStatus}/> : null
+      }
+      {
+        updateStatus === UpdateStatus.UPDATE_ERROR ? <UpdateError updateStatus={updateStatus}/> : null
+      }
     </div>
   }
 }

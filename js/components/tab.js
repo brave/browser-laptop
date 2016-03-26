@@ -15,10 +15,6 @@ const contextMenus = require('../contextMenus')
 const dnd = require('../dnd')
 
 class Tab extends ImmutableComponent {
-  constructor (props) {
-    super(props)
-  }
-
   get isPinned () {
     return !!this.props.frameProps.get('pinnedLocation')
   }
@@ -154,7 +150,7 @@ class Tab extends ImmutableComponent {
         'fa-volume-off': this.props.frameProps.get('audioPlaybackActive') &&
           this.props.frameProps.get('audioMuted')
       })}
-      onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
+        onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
     }
 
     return <div
@@ -172,38 +168,50 @@ class Tab extends ImmutableComponent {
         active: this.props.isActive,
         private: this.props.isPrivate
       })}
-      data-frame-key={this.props.frameProps.get('key')}
-      ref={node => this.tab = node}
-      draggable
-      title={this.props.frameProps.get('title')}
-      onMouseEnter={this.props.previewTabs ? this.onMouseEnter.bind(this) : null}
-      onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}
-      onDragStart={this.onDragStart.bind(this)}
-      onDragEnd={this.onDragEnd.bind(this)}
-      onDragOver={this.onDragOver.bind(this)}
-      onClick={this.onClickTab.bind(this)}
-      onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
-      style={activeTabStyle}>
-        { this.props.frameProps.get('isPrivate')
-          ? <div className='privateIcon fa fa-eye'/> : null }
-        { this.props.frameProps.get('partitionNumber')
+        data-frame-key={this.props.frameProps.get('key')}
+        ref={(node) => { this.tab = node }}
+        draggable
+        title={this.props.frameProps.get('title')}
+        onMouseEnter={this.props.previewTabs ? this.onMouseEnter.bind(this) : null}
+        onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}
+        onDragStart={this.onDragStart.bind(this)}
+        onDragEnd={this.onDragEnd.bind(this)}
+        onDragOver={this.onDragOver.bind(this)}
+        onClick={this.onClickTab.bind(this)}
+        onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
+        style={activeTabStyle}>
+        {
+          this.props.frameProps.get('isPrivate')
+          ? <div className='privateIcon fa fa-eye'/>
+          : null
+        }
+        {
+          this.props.frameProps.get('partitionNumber')
           ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.frameProps.get('partitionNumber') })}
-              data-l10n-id='sessionInfoTab'
-              className='privateIcon fa fa-user'/> : null }
+            data-l10n-id='sessionInfoTab'
+            className='privateIcon fa fa-user'/>
+          : null
+        }
         <div className={cx({
           tabIcon: true,
           'fa fa-circle-o-notch fa-spin': this.loading
         })}
-        style={iconStyle}/>
+          style={iconStyle}/>
         {playIcon}
-        { !this.isPinned
+        {
+          !this.isPinned
           ? <div className='tabTitle'>
-          {this.displayValue}
-        </div> : null }
-      { !this.isPinned
-        ? <span onClick={this.onCloseFrame.bind(this)}
+            {this.displayValue}
+          </div>
+          : null
+        }
+        {
+          !this.isPinned
+          ? <span onClick={this.onCloseFrame.bind(this)}
             data-l10n-id='closeTabButton'
-            className='closeTab fa fa-times-circle'/> : null }
+            className='closeTab fa fa-times-circle'/>
+          : null
+        }
       </div>
     </div>
   }

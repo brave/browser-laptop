@@ -92,7 +92,7 @@ class Main extends ImmutableComponent {
   loadOpenSearch () {
     let engine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
     if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
-      loadOpenSearch(engine).then(searchDetail => windowActions.setSearchDetail(searchDetail))
+      loadOpenSearch(engine).then((searchDetail) => windowActions.setSearchDetail(searchDetail))
       this.lastLoadedOpenSearch = engine
     }
   }
@@ -120,7 +120,7 @@ class Main extends ImmutableComponent {
     this.registerSwipeListener()
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
-        const frameProps = self.props.windowState.get('frames').find(frame => frame.get('location') === url)
+        const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
         if (frameProps) {
           windowActions.setActiveFrame(frameProps)
           return
@@ -162,14 +162,14 @@ class Main extends ImmutableComponent {
       windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
-      filteredFrameProps.forEach(frameProps =>
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach((frameProps) =>
         windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter(frame => frame.get('location') === details.firstPartyUrl)
-      filteredFrameProps.forEach(frameProps =>
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach((frameProps) =>
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
 
@@ -182,8 +182,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.CERT_ERROR, (e, details) => {
-      const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === details.url)
-      frames.forEach(frame => {
+      const frames = self.props.windowState.get('frames').filter((frame) => frame.get('location') === details.url)
+      frames.forEach((frame) => {
         windowActions.setSecurityState(frame, {
           certDetails: details
         })
@@ -197,8 +197,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frames = self.props.windowState.get('frames').filter(frame => frame.get('location') === detail.url)
-      frames.forEach(frame =>
+      const frames = self.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
+      frames.forEach((frame) =>
         windowActions.setLoginRequiredDetail(frame, detail))
     })
 
@@ -292,7 +292,7 @@ class Main extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    let intersection = e.dataTransfer.types.filter(x => ['Files'].includes(x))
+    let intersection = e.dataTransfer.types.filter((x) => ['Files'].includes(x))
     if (intersection.length > 0) {
       e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
@@ -301,7 +301,7 @@ class Main extends ImmutableComponent {
 
   onDrop (e) {
     if (e.dataTransfer.files) {
-      Array.from(e.dataTransfer.files).forEach(file =>
+      Array.from(e.dataTransfer.files).forEach((file) =>
         windowActions.newFrame({location: file.path, title: file.name}))
     }
   }
@@ -356,7 +356,7 @@ class Main extends ImmutableComponent {
 
     this.frames = {}
     const settingsState = this.props.appState.get('settings') || new Immutable.Map()
-    const nonPinnedFrames = this.props.windowState.get('frames').filter(frame => !frame.get('pinnedLocation'))
+    const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
@@ -368,15 +368,18 @@ class Main extends ImmutableComponent {
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
     return <div id='window'
-        className={cx({
-          isFullScreen: activeFrame && activeFrame.get('isFullScreen')
-        })}
-        ref={node => this.mainWindow = node}
-        onMouseDown={this.onMouseDown.bind(this)}
-        onClick={this.onClickWindow.bind(this)}>
-      { this.props.windowState.get('contextMenuDetail')
+      className={cx({
+        isFullScreen: activeFrame && activeFrame.get('isFullScreen')
+      })}
+      ref={(node) => { this.mainWindow = node }}
+      onMouseDown={this.onMouseDown.bind(this)}
+      onClick={this.onClickWindow.bind(this)}>
+      {
+        this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
-            contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/> : null }
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/>
+        : null
+      }
       <div className='top'>
         <div className='navigatorWrapper'
           onDoubleClick={this.onDoubleClick.bind(this)}
@@ -393,7 +396,7 @@ class Main extends ImmutableComponent {
               onClick={this.onForward.bind(this)} />
           </div>
           <NavigationBar
-            ref={node => this.navBar = node}
+            ref={(node) => { this.navBar = node }}
             navbar={activeFrame && activeFrame.get('navbar')}
             frames={this.props.windowState.get('frames')}
             sites={this.props.appState.get('sites')}
@@ -403,27 +406,32 @@ class Main extends ImmutableComponent {
             settings={settingsState}
             searchDetail={this.props.windowState.get('searchDetail')}
           />
-          { siteInfoIsVisible
+          {
+            siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
-                siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
-                onHide={this.onHideSiteInfo.bind(this)} /> : null
+              siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
+              onHide={this.onHideSiteInfo.bind(this)} />
+            : null
           }
-          { activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
+          {
+            activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
             ? <LoginRequired frameProps={activeFrame}/>
             : null
           }
-          { this.props.windowState.get('bookmarkDetail')
+          {
+            this.props.windowState.get('bookmarkDetail')
             ? <AddEditBookmark sites={this.props.appState.get('sites')}
-                currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-                originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-                destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}
-              />
+              currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+              originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}/>
             : null
           }
-          { releaseNotesIsVisible
+          {
+            releaseNotesIsVisible
             ? <ReleaseNotes
-                metadata={this.props.appState.getIn(['updates', 'metadata'])}
-                onHide={this.onHideReleaseNotes.bind(this)} /> : null
+              metadata={this.props.appState.getIn(['updates', 'metadata'])}
+              onHide={this.onHideReleaseNotes.bind(this)} />
+            : null
           }
           <div className='topLevelEndButtons'>
             <Button iconClass='braveMenu'
@@ -431,28 +439,32 @@ class Main extends ImmutableComponent {
               onClick={this.onBraveMenu.bind(this)} />
           </div>
         </div>
-        { showBookmarksToolbar
+        {
+          showBookmarksToolbar
           ? <BookmarksToolbar
-              draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
-              shouldAllowWindowDrag={shouldAllowWindowDrag}
-              activeFrame={activeFrame}
-              windowWidth={this.props.appState.get('defaultWindowWidth')}
-              contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-              bookmarks={this.props.appState.get('sites')
-                .filter(site => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
-              }/>
-          : null }
+            draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
+            shouldAllowWindowDrag={shouldAllowWindowDrag}
+            activeFrame={activeFrame}
+            windowWidth={this.props.appState.get('defaultWindowWidth')}
+            contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+            bookmarks={this.props.appState.get('sites')
+              .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+            }/>
+          : null
+        }
         <div className={cx({
           tabPages: true,
           allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
           onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined)}>
-          { nonPinnedFrames.size > tabsPerPage
+          {
+            nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
-                tabsPerTabPage={tabsPerPage}
-                tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
-              /> : null }
+              tabsPerTabPage={tabsPerPage}
+              tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}/>
+            : null
+          }
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
@@ -472,9 +484,9 @@ class Main extends ImmutableComponent {
       <div className='mainContainer'>
         <div className='tabContainer'>
         {
-          sortedFrames.map(frame =>
+          sortedFrames.map((frame) =>
             <Frame
-              ref={node => this.frames[frame.get('key')] = node}
+              ref={(node) => { this.frames[frame.get('key')] = node }}
               prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
               onCloseFrame={this.onCloseFrame}
               frame={frame}
@@ -482,12 +494,12 @@ class Main extends ImmutableComponent {
               settings={frame.get('location') === 'about:preferences' ? settingsState || new Immutable.Map() : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
-                    .filter(site => site.get('tags')
+                    .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK)) || new Immutable.Map()
                 : null}
               bookmarkFolders={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
-                    .filter(site => site.get('tags')
+                    .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
               enableAds={this.enableAds}

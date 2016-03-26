@@ -154,12 +154,12 @@
       '[id^="ad-slot-banner-"]',
       '[data-ad-slot]'
     ]
-    commonSelectors.forEach(commonSelector => {
+    commonSelectors.forEach((commonSelector) => {
       var nodes = document.querySelectorAll(commonSelector)
       if (!nodes) {
         return
       }
-      Array.from(nodes).forEach(node => {
+      Array.from(nodes).forEach((node) => {
         processAdNode(node, fallbackNodeDataForCommon[node.id], placeholderUrl)
       })
     })
@@ -211,7 +211,7 @@
       // Ask the main process for the only credentials we have
       ipcRenderer.send('get-password', formOrigin, action)
     } else {
-      usernameElem.addEventListener('keyup', e => {
+      usernameElem.addEventListener('keyup', (e) => {
         let rect = usernameElem.getBoundingClientRect()
         ipcRenderer.send('show-username-list', formOrigin, action, {
           bottom: rect.bottom,
@@ -223,11 +223,11 @@
 
     // Whenever a form is submitted, offer to save it in the password manager
     // if the credentials have changed.
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', (e) => {
       onFormSubmit(form, formOrigin)
     })
-    Array.from(form.querySelectorAll('button')).forEach(button => {
-      button.addEventListener('click', e => {
+    Array.from(form.querySelectorAll('button')).forEach((button) => {
+      button.addEventListener('click', (e) => {
         onFormSubmit(form, formOrigin)
       })
     })
@@ -255,7 +255,7 @@
     var formOrigin = [document.location.protocol, document.location.host].join('//')
     var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
 
-    Array.from(formNodes).forEach(form => {
+    Array.from(formNodes).forEach((form) => {
       tryAutofillForm(credentials, formOrigin, form)
     })
 

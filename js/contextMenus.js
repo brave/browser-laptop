@@ -49,7 +49,7 @@ const addFolderMenuItem = (parentSiteDetail) => {
 
 function tabPageTemplateInit (framePropsList) {
   const muteAll = (framePropsList, mute) => {
-    framePropsList.forEach(frameProps => {
+    framePropsList.forEach((frameProps) => {
       if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
         windowActions.setAudioMuted(frameProps, true)
       } else if (!mute && frameProps.get('audioMuted')) {
@@ -152,7 +152,7 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 }
 
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
-  return items.map(site => {
+  return items.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     const templateItem = {
       bookmark: site,
@@ -261,14 +261,14 @@ function tabTemplateInit (frameProps) {
     if (frameProps.get('audioMuted')) {
       items.push({
         label: 'Unmute tab',
-        click: item => {
+        click: (item) => {
           windowActions.setAudioMuted(frameProps, false)
         }
       })
     } else {
       items.push({
         label: 'Mute tab',
-        click: item => {
+        click: (item) => {
           windowActions.setAudioMuted(frameProps, true)
         }
       })
@@ -410,7 +410,7 @@ const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
   }
 }
 
-const openInNewPrivateTabMenuItem = location => {
+const openInNewPrivateTabMenuItem = (location) => {
   return {
     label: 'Open in new private tab',
     click: () => {
@@ -422,7 +422,7 @@ const openInNewPrivateTabMenuItem = location => {
   }
 }
 
-const openInNewSessionTabMenuItem = location => {
+const openInNewSessionTabMenuItem = (location) => {
   return {
     label: 'Open in new session tab',
     click: (item, focusedWindow) => {
@@ -434,7 +434,7 @@ const openInNewSessionTabMenuItem = location => {
   }
 }
 
-const copyLinkLocationMenuItem = location => {
+const copyLinkLocationMenuItem = (location) => {
   return {
     label: 'Copy link address',
     click: () => {

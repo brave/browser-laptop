@@ -6,7 +6,7 @@ const assert = require('assert')
 
 describe('settings', function () {
   it('All settings have default values', function *() {
-    Object.keys(settings).forEach(setting => {
+    Object.keys(settings).forEach((setting) => {
       assert.notStrictEqual(appConfig.defaultSettings[settings[setting]], undefined)
     })
   })

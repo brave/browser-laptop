@@ -81,10 +81,10 @@ class UrlBarSuggestions extends ImmutableComponent {
     return <ul className='urlBarSuggestions'>
       {suggestions.map((suggestion, index) =>
         <li data-index={index + 1}
-            onMouseOver={this.onMouseOver.bind(this)}
-            onClick={suggestion.onClick}
-            key={suggestion.title}
-            className={this.activeIndex === index + 1 ? 'selected' : ''}>
+          onMouseOver={this.onMouseOver.bind(this)}
+          onClick={suggestion.onClick}
+          key={suggestion.title}
+          className={this.activeIndex === index + 1 ? 'selected' : ''}>
           <span className={`suggestionIcon fa ${suggestion.iconClass}`}/>
           <span className='suggestionText'>{suggestion.title}</span>
         </li>
@@ -109,7 +109,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       return null
     }
 
-    const navigateClickHandler = formatUrl => (site, e) => {
+    const navigateClickHandler = (formatUrl) => (site, e) => {
       // We have a wonky way of fake clicking from keyboard enter,
       // so remove the meta keys from the real event here.
       e.metaKey = e.metaKey || this.metaKey
@@ -134,20 +134,20 @@ class UrlBarSuggestions extends ImmutableComponent {
 
     const urlLocationLower = this.props.urlLocation.toLowerCase()
     let suggestions = new Immutable.List()
-    const defaultme = x => x
+    const defaultme = (x) => x
     const mapListToElements = ({data, maxResults, classHandler, clickHandler = navigateClickHandler,
         sortHandler = defaultme, formatTitle = defaultme,
-        filterValue = site => site.toLowerCase().includes(urlLocationLower)
+        filterValue = (site) => site.toLowerCase().includes(urlLocationLower)
     }) => // Filter out things which are already in our own list at a smaller index
       data
       // Per suggestion provider filter
       .filter(filterValue)
       // Filter out things which are already in the suggestions list
-      .filter(site =>
-        suggestions.findIndex(x => x.title.toLowerCase() === (formatTitle(site) || '').toLowerCase()) === -1)
+      .filter((site) =>
+        suggestions.findIndex((x) => x.title.toLowerCase() === (formatTitle(site) || '').toLowerCase()) === -1)
       .sort(sortHandler)
       .take(maxResults)
-      .map(site => {
+      .map((site) => {
         return {
           onClick: clickHandler.bind(null, site),
           title: formatTitle(site),
@@ -163,8 +163,8 @@ class UrlBarSuggestions extends ImmutableComponent {
         classHandler: () => 'fa-file',
         clickHandler: (frameProps) =>
           windowActions.setActiveFrame(frameProps),
-        formatTitle: frame => frame.get('title') || frame.get('location'),
-        filterValue: frame => !isSourceAboutUrl(frame.get('location')) &&
+        formatTitle: (frame) => frame.get('title') || frame.get('location'),
+        filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
           (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
           frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))}))
@@ -176,14 +176,14 @@ class UrlBarSuggestions extends ImmutableComponent {
         data: this.props.sites,
         maxResults: config.urlBarSuggestions.maxSites,
         classHandler: getSiteIconClass,
-        clickHandler: navigateClickHandler(site => {
+        clickHandler: navigateClickHandler((site) => {
           return site.get('location')
         }),
         sortHandler: (site1, site2) => {
           return site2.get('tags').size - site1.get('tags').size
         },
-        formatTitle: site => site.get('title') || site.get('location'),
-        filterValue: site => {
+        formatTitle: (site) => site.get('title') || site.get('location'),
+        filterValue: (site) => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
           return (title.toLowerCase().includes(urlLocationLower) ||
@@ -199,14 +199,14 @@ class UrlBarSuggestions extends ImmutableComponent {
         data: this.props.sites,
         maxResults: config.urlBarSuggestions.maxSites,
         classHandler: getSiteIconClass,
-        clickHandler: navigateClickHandler(site => {
+        clickHandler: navigateClickHandler((site) => {
           return site.get('location')
         }),
         sortHandler: (site1, site2) => {
           return site2.get('tags').size - site1.get('tags').size
         },
-        formatTitle: site => site.get('title') || site.get('location'),
-        filterValue: site => {
+        formatTitle: (site) => site.get('title') || site.get('location'),
+        filterValue: (site) => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
           return (title.toLowerCase().includes(urlLocationLower) ||
@@ -222,7 +222,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         data: this.props.suggestions.get('searchResults'),
         maxResults: config.urlBarSuggestions.maxTopSites,
         classHandler: () => 'fa-search',
-        clickHandler: navigateClickHandler(searchTerms => this.props.searchDetail.get('searchURL')
+        clickHandler: navigateClickHandler((searchTerms) => this.props.searchDetail.get('searchURL')
           .replace('{searchTerms}', encodeURIComponent(searchTerms)))}))
     }
 
@@ -231,7 +231,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       data: top500,
       maxResults: config.urlBarSuggestions.maxSearch,
       classHandler: () => 'fa-link',
-      clickHandler: navigateClickHandler(x => x)}))
+      clickHandler: navigateClickHandler((x) => x)}))
 
     return suggestions
   }

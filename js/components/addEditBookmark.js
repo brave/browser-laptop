@@ -86,19 +86,24 @@ class AddEditBookmark extends ImmutableComponent {
         <div className='genericFormTable'>
           <div id='bookmarkName' className='formRow'>
             <label data-l10n-id='nameField' htmlFor='bookmarkName'/>
-            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.currentDetail.get('customTitle') || this.props.currentDetail.get('title')} ref={bookmarkName => this.bookmarkName = bookmarkName }/>
+            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.currentDetail.get('customTitle') || this.props.currentDetail.get('title')} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}/>
           </div>
-          { !this.isFolder
+          {
+            !this.isFolder
             ? <div id='bookmarkLocation' className='formRow'>
-            <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
-            <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
-          </div> : null }
+              <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
+              <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
+            </div>
+            : null
+          }
           <div id='bookmarkParentFolder' className='formRow'>
             <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk'/>
             <select value={this.props.currentDetail.get('parentFolderId')}
               onChange={this.onParentFolderChange} >
-            <option value='0' data-l10n-id='bookmarksToolbar'/>
-            { this.folders.map(folder => <option value={folder.folderId}>{folder.label}</option>)}
+              <option value='0' data-l10n-id='bookmarksToolbar'/>
+            {
+              this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
+            }
             </select>
           </div>
           <div className='formRow'>

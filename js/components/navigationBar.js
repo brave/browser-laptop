@@ -95,25 +95,27 @@ class NavigationBar extends ImmutableComponent {
     }
 
     return <div id='navigator'
-        ref='navigator'
-        data-frame-key={frameProps.get('key')}
-        className={cx({
-          titleMode: this.titleMode
-        })}>
-
-      { isSourceAboutUrl(frameProps.get('location')) || this.titleMode ? null
+      ref='navigator'
+      data-frame-key={frameProps.get('key')}
+      className={cx({
+        titleMode: this.titleMode
+      })}>
+      {
+        isSourceAboutUrl(frameProps.get('location')) || this.titleMode
+        ? null
         : <div className='startButtons'>
-        { this.loading
+        {
+          this.loading
           ? <Button iconClass='fa-times'
-              l10nId='reloadButton'
-              className='navbutton stop-button'
-              onClick={this.onStop} />
+            l10nId='reloadButton'
+            className='navbutton stop-button'
+            onClick={this.onStop} />
           : <Button iconClass='fa-repeat'
-              l10nId='reloadButton'
-              className='navbutton reload-button'
-              onClick={this.onReload} />
+            l10nId='reloadButton'
+            className='navbutton reload-button'
+            onClick={this.onReload} />
         }
-      </div>
+        </div>
       }
       <UrlBar ref='urlBar'
         sites={this.props.sites}
@@ -126,8 +128,10 @@ class NavigationBar extends ImmutableComponent {
         settings={this.props.settings}
         urlbar={this.props.navbar.get('urlbar')}
         />
-      { isSourceAboutUrl(frameProps.get('location')) ? null
-      : <div className='endButtons'>
+      {
+        isSourceAboutUrl(frameProps.get('location'))
+        ? null
+        : <div className='endButtons'>
           <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
             className={cx({
               'navbutton': true,

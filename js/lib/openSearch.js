@@ -9,7 +9,7 @@ import Immutable from 'immutable'
  * Loads the specified open search path and resolves the returned promise.
  */
 export function loadOpenSearch (path) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const xhr = new window.XMLHttpRequest()
     xhr.open('GET', path || config.defaultOpenSearchPath, true)
     xhr.send()

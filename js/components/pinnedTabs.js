@@ -23,10 +23,10 @@ class PinnedTabs extends ImmutableComponent {
     // will cause the onDragEnd to never run
     setTimeout(() => {
       const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter(tab => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((tab) => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        const droppedOnFrameProps = this.props.frames.find(frame => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+        const droppedOnFrameProps = this.props.frames.find((frame) => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
           windowActions.setPinned(sourceDragData, true)
@@ -52,19 +52,19 @@ class PinnedTabs extends ImmutableComponent {
       onDrop={this.onDrop.bind(this)}>
        {
           this.props.frames
-            .filter(frameProps => frameProps.get('pinnedLocation'))
-            .map(frameProps =>
-                <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
-                  ref={node => this.tabRefs.push(node)}
-                  draggingOverData={this.props.draggingOverData}
-                  frameProps={frameProps}
-                  frames={this.props.frames}
-                  key={'tab-' + frameProps.get('key')}
-                  paintTabs={this.props.paintTabs}
-                  previewTabs={this.props.previewTabs}
-                  isActive={this.props.activeFrame === frameProps}
-                  isPrivate={frameProps.get('isPrivate')}
-                  partOfFullPageSet={this.props.partOfFullPageSet}/>)
+            .filter((frameProps) => frameProps.get('pinnedLocation'))
+            .map((frameProps) =>
+              <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
+                ref={(node) => this.tabRefs.push(node)}
+                draggingOverData={this.props.draggingOverData}
+                frameProps={frameProps}
+                frames={this.props.frames}
+                key={'tab-' + frameProps.get('key')}
+                paintTabs={this.props.paintTabs}
+                previewTabs={this.props.previewTabs}
+                isActive={this.props.activeFrame === frameProps}
+                isPrivate={frameProps.get('isPrivate')}
+                partOfFullPageSet={this.props.partOfFullPageSet}/>)
       }
     </div>
   }

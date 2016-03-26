@@ -76,24 +76,27 @@ export default class ContextMenuItem extends ImmutableComponent {
   }
   render () {
     return <div className='contextMenuItem'
-        role='listitem'
-        draggable={this.props.contextMenuItem.get('draggable')}
-        onDragStart={this.onDragStart.bind(this)}
-        onDragEnd={this.onDragEnd.bind(this)}
-        onDragOver={this.onDragOver.bind(this)}
-        onDrop={this.onDrop.bind(this)}
-        onContextMenu={this.onContextMenu.bind(this)}
-        disabled={this.props.contextMenuItem.get('enabled') === false}
-        onMouseEnter={this.onMouseEnter.bind(this)}
-        onMouseLeave={this.onMouseLeave.bind(this)}
-        onClick={this.onClick.bind(this)}>
+      role='listitem'
+      draggable={this.props.contextMenuItem.get('draggable')}
+      onDragStart={this.onDragStart.bind(this)}
+      onDragEnd={this.onDragEnd.bind(this)}
+      onDragOver={this.onDragOver.bind(this)}
+      onDrop={this.onDrop.bind(this)}
+      onContextMenu={this.onContextMenu.bind(this)}
+      disabled={this.props.contextMenuItem.get('enabled') === false}
+      onMouseEnter={this.onMouseEnter.bind(this)}
+      onMouseLeave={this.onMouseLeave.bind(this)}
+      onClick={this.onClick.bind(this)}>
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>
-      { this.hasSubmenu
-      ? <span className='submenuIndicatorContainer'>
+      {
+        this.hasSubmenu
+        ? <span className='submenuIndicatorContainer'>
           <span className='submenuIndicatorSpacer'/>
           <span className='submenuIndicator fa fa-chevron-right'/>
-        </span> : null }
+        </span>
+        : null
+      }
     </div>
   }
 }
@@ -111,11 +114,13 @@ export default class ContextMenuSingle extends ImmutableComponent {
       contextMenuSingle: true,
       isSubmenu: this.props.submenuIndex !== 0
     })} style={styles}>
-    { this.props.template.map(contextMenuItem =>
+    {
+      this.props.template.map((contextMenuItem) =>
         <ContextMenuItem contextMenuItem={contextMenuItem}
           submenuIndex={this.props.submenuIndex}
           contextMenuDetail={this.props.contextMenuDetail}
-        />) }
+        />)
+    }
     </div>
   }
 }
@@ -161,7 +166,8 @@ export default class ContextMenu extends ImmutableComponent {
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         template={this.props.contextMenuDetail.get('template')}/>
-      { this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
+      {
+        this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
             template={openedSubmenuDetail.get('template')}

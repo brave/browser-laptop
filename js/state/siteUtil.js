@@ -18,9 +18,9 @@ module.exports.getSiteIndex = function (sites, siteDetail, tags) {
   let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
     tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
   if (isBookmarkFolder) {
-    return sites.findIndex(site => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+    return sites.findIndex((site) => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
   }
-  return sites.findIndex(site => site.get('location') === siteDetail.get('location') && (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0))
+  return sites.findIndex((site) => site.get('location') === siteDetail.get('location') && (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0))
 }
 
 /**
@@ -135,7 +135,7 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
 function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
   if (bookmarkFolder.get('parentFolderId')) {
     parentFolderIds.push(bookmarkFolder.get('parentFolderId'))
-    const nextItem = allBookmarks.find(item => item.get('folderId') === bookmarkFolder.get('parentFolderId'))
+    const nextItem = allBookmarks.find((item) => item.get('folderId') === bookmarkFolder.get('parentFolderId'))
     if (nextItem) {
       fillParentFolders(parentFolderIds, nextItem, allBookmarks)
     }
@@ -267,7 +267,7 @@ module.exports.isFolder = function (siteDetail) {
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
   parentId = parentId || 0
   let folders = []
-  sites.forEach(site => {
+  sites.forEach((site) => {
     if ((site.get('parentFolderId') || 0) === parentId && module.exports.isFolder(site)) {
       if (site.get('folderId') === folderId) {
         return
@@ -291,9 +291,9 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
  */
 module.exports.filterOutNonRecents = function (sites) {
   const sitesWithTags = sites
-    .filter(site => site.get('tags').size)
+    .filter((site) => site.get('tags').size)
   const topHistorySites = sites
-    .filter(site => site.get('tags').size === 0)
+    .filter((site) => site.get('tags').size === 0)
     .sort((site1, site2) => (site2.get('lastAccessedTime') || 0) - (site1.get('lastAccessedTime') || 0))
     .take(getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE))
   return sitesWithTags.concat(topHistorySites)
@@ -308,7 +308,7 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
   if (!relSite.get('folderId')) {
     return sites
   }
-  return sites.filter(site => site.get('parentFolderId') === relSite.get('folderId'))
+  return sites.filter((site) => site.get('parentFolderId') === relSite.get('folderId'))
 }
 
 /**
@@ -316,7 +316,7 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
  * @param sites The application state's Immutable sites list.
  */
 module.exports.clearSitesWithoutTags = function (sites) {
-  return sites.filter(site => site.get('tags') && site.get('tags').size > 0)
+  return sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
 }
 
 /**
@@ -324,5 +324,5 @@ module.exports.clearSitesWithoutTags = function (sites) {
  * @param sites The application state's Immutable sites list.
  */
 module.exports.hasNoTagSites = function (sites) {
-  return sites.findIndex(site => !site.get('tags') || site.get('tags').size === 0) !== -1
+  return sites.findIndex((site) => !site.get('tags') || site.get('tags').size === 0) !== -1
 }

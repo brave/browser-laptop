@@ -53,7 +53,7 @@ const updateTabPageIndex = (frameProps) => {
   }
 
   const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter(frame => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_TAB_PAGE))
+      .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_TAB_PAGE))
   if (index === -1) {
     return
   }
@@ -66,9 +66,6 @@ const incrementNextKey = () => ++currentKey
 const incrementPartitionNumber = () => ++currentPartitionNumber
 
 class WindowStore extends EventEmitter {
-  constructor () {
-    super()
-  }
   getState () {
     return windowState
   }
@@ -384,7 +381,7 @@ const doAction = (action) => {
       }
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
-      const alreadyPinnedFrameProps = windowState.get('frames').find(frame => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
+      const alreadyPinnedFrameProps = windowState.get('frames').find((frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
         doAction(action)
@@ -410,7 +407,7 @@ const doAction = (action) => {
       windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'audioPlaybackActive'], action.audioPlaybackActive)
       break
     case WindowConstants.WINDOW_SET_FAVICON:
-      getFavicon(action.frameProps, action.favicon).then(icon => {
+      getFavicon(action.frameProps, action.favicon).then((icon) => {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       })
       break
@@ -523,7 +520,7 @@ ipc.on(messages.IMPORT_BOOKMARKS, () => {
 })
 
 const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar']
-frameShortcuts.forEach(shortcut => {
+frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {
     windowState = windowState.mergeIn(activeFrameStatePath(), {

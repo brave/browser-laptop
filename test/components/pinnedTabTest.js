@@ -154,7 +154,7 @@ describe('pinnedTabs', function () {
       yield loadUrl(this.app.client, page2Url)
       yield this.app.client
         .waitUntil(function () {
-          return this.getAttribute('webview[data-frame-key="2"]', 'src').then(src => src === page2Url)
+          return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === page2Url)
         })
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)

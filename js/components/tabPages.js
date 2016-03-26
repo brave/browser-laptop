@@ -45,7 +45,7 @@ class TabPage extends ImmutableComponent {
   }
 
   render () {
-    const audioPlaybackActive = this.props.frames.find(frame =>
+    const audioPlaybackActive = this.props.frames.find((frame) =>
       frame.get('audioPlaybackActive') && !frame.get('audioMuted'))
     return <span data-tab-page={this.props.index}
       onDragOver={this.onDragOver.bind(this)}
@@ -54,8 +54,8 @@ class TabPage extends ImmutableComponent {
         tabPage: true,
         audioPlaybackActive,
         active: this.props.active})}
-        onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
-        onClick={windowActions.setTabPageIndex.bind(this, this.props.index)
+      onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
+      onClick={windowActions.setTabPageIndex.bind(this, this.props.index)
       }>
     </span>
   }
@@ -67,7 +67,7 @@ class TabPages extends ImmutableComponent {
     let sourceDragFromPageIndex
     const sourceDragData = dnd.getInProcessDragData()
     if (sourceDragData) {
-      sourceDragFromPageIndex = this.props.frames.findIndex(frame => frame.get('key') === sourceDragData.get('key'))
+      sourceDragFromPageIndex = this.props.frames.findIndex((frame) => frame.get('key') === sourceDragData.get('key'))
       if (sourceDragFromPageIndex !== -1) {
         sourceDragFromPageIndex /= this.props.tabsPerTabPage
       }

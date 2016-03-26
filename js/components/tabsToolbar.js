@@ -25,21 +25,24 @@ class TabsToolbar extends ImmutableComponent {
     const tabPageIndex = this.props.tabs.get('tabPageIndex')
     const startingFrameIndex = tabPageIndex * this.props.tabsPerTabPage
     const pinnedFrames = this.props.frames
-      .filter(frame => frame.get('pinnedLocation'))
+      .filter((frame) => frame.get('pinnedLocation'))
     const currentFrames = this.props.frames
-      .filter(frame => !frame.get('pinnedLocation'))
+      .filter((frame) => !frame.get('pinnedLocation'))
       .slice(startingFrameIndex, startingFrameIndex + this.props.tabsPerTabPage)
 
     return <div className='tabsToolbar'
       onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, this.props.activeFrame, undefined)}>
-      { pinnedFrames.size > 0
+      {
+        pinnedFrames.size > 0
         ? <PinnedTabs sites={this.props.sites}
-        frames={this.props.frames}
-        activeFrame={this.props.activeFrame}
-        paintTabs={this.props.paintTabs}
-        previewTabs={this.props.previewTabs}
-        draggingOverData={this.props.draggingOverData}
-        tabs={this.props.tabs}/> : null }
+          frames={this.props.frames}
+          activeFrame={this.props.activeFrame}
+          paintTabs={this.props.paintTabs}
+          previewTabs={this.props.previewTabs}
+          draggingOverData={this.props.draggingOverData}
+          tabs={this.props.tabs}/>
+        : null
+      }
       <Tabs tabs={this.props.tabs}
         shouldAllowWindowDrag={this.props.shouldAllowWindowDrag}
         draggingOverData={this.props.draggingOverData}
