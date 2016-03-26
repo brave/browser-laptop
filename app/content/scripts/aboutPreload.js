@@ -28,6 +28,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('decrypted-password', (e, details) => {
+    const event = new window.CustomEvent('decrypted-password', {
+      detail: details
+    })
+    window.dispatchEvent(event)
+  })
 
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)
@@ -46,5 +52,11 @@
   })
   window.addEventListener('move-site', (e) => {
     ipcRenderer.send('move-site', e.detail.sourceDetail, e.detail.destinationDetail, e.detail.prepend, e.detail.destinationIsParent)
+  })
+  window.addEventListener('decrypt-password', (e) => {
+    ipcRenderer.send('decrypt-password', e.detail.encryptedPassword, e.detail.authTag, e.detail.iv, e.detail.id)
+  })
+  window.addEventListener('set-clipboard', (e) => {
+    ipcRenderer.send('set-clipboard', e.detail)
   })
 }).apply(this)

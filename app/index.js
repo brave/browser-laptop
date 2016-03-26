@@ -279,6 +279,10 @@ app.on('ready', () => {
       appActions.changeSetting(key, value)
     })
 
+    ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
+      electron.clipboard.writeText(text)
+    })
+
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
       appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
     })
@@ -318,6 +322,18 @@ app.on('ready', () => {
     })
 
     let masterKey
+    ipcMain.on(messages.DECRYPT_PASSWORD, (e, encrypted, authTag, iv, id) => {
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+      let decrypted = CryptoUtil.decryptVerify(encrypted, authTag, masterKey, iv)
+      e.sender.send(messages.DECRYPTED_PASSWORD, {
+        id,
+        decrypted
+      })
+    })
     ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {

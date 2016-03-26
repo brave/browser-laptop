@@ -62,6 +62,7 @@ const messages = {
   THEME_COLOR_COMPUTED: _,
   HIDE_CONTEXT_MENU: _,
   LEAVE_FULL_SCREEN: _,
+  SET_CLIPBOARD: _,
   // Password manager
   GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */
@@ -69,6 +70,8 @@ const messages = {
   SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
   FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
+  DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
+  DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
