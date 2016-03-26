@@ -516,28 +516,25 @@ function mainTemplateInit (nodeProps, frame) {
     }
   })
 
-  template.push(CommonMenu.separatorMenuItem)
-
-  template.push({
-    label: 'View Page Source',
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
-      }
-    }
-  },
-  addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK)),
+  template.push(CommonMenu.separatorMenuItem,
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK)),
     {
       label: 'Add to reading list',
       enabled: false
+    }, CommonMenu.separatorMenuItem,
+    {
+      label: 'View Page Source',
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+        }
+      }
+    }, {
+      label: 'Inspect Element',
+      click: (item, focusedWindow) => {
+        windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
+      }
     })
-
-  template.push(CommonMenu.separatorMenuItem, {
-    label: 'Inspect Element',
-    click: (item, focusedWindow) => {
-      windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
-    }
-  })
   return template
 }
 
