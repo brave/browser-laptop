@@ -69,8 +69,9 @@ The primary purpose of doing this is to be able to update dependencies for secur
 - Some of the patches just mentioned will need rebasing on the new version.
 - run `LIBCHROMIUMCONTENT_S3_BUCKET=brave-laptop-binaries LIBCHROMIUMCONTENT_S3_ACCESS_KEY=key-here AWS_ACCESS_KEY_SECRET=key-here AWS_ACCESS_KEY_SECRET=key-here LIBCHROMIUMCONTENT_S3_SECRET_KEY=key-here ./script/cibuild`.
 - Brave's S3 bucket `brave-laptop-binaries` will be updated with the needed binaries.
-- Update `brave/brightray/vendor/libchromiumcontent`'s submodule to point to the latest `brave/libchromiumcontent` changeset.
-- Update `brave/electron/vendor/brighray`'s submodule to point to the latest `brave/brightray` changeset.
+- Update `brave/brightray`'s `/vendor/libchromiumcontent` submodule to point to the latest `brave/libchromiumcontent` changeset.
+- Update `brave/electron`'s `/vendor/brighray` submodule to point to the latest `brave/brightray` changeset.
+- Update `brave/electron/atom/common/chrome_version.h` to include the latest version.  I think it is also set automatically on builds though.
 
 # Updating Node
 
