@@ -288,7 +288,7 @@ class Main extends ImmutableComponent {
   }
 
   onCloseFrame (activeFrameProps) {
-    windowActions.closeFrame(this.props.windowState.get('frames'), this.props.frame)
+    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
 
   onDragOver (e) {
