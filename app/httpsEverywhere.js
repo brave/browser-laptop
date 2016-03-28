@@ -6,6 +6,7 @@
 const urlParse = require('url').parse
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
+const LRUCache = require('lru_cache/core').LRUCache
 
 // Map of ruleset ID to ruleset content
 var db = null
@@ -17,6 +18,8 @@ var redirectCounter = {}
 var redirectBlacklist = []
 // Canonicalized hosts that have been recently redirected via a 307
 var recent307Counter = {}
+// Map of url to applyRuleset response
+var cachedRewrites = new LRUCache(100)
 
 module.exports.resourceName = 'httpsEverywhere'
 
@@ -37,21 +40,27 @@ function getRewrittenUrl (url) {
     return undefined
   }
 
-  // Get the set of ruleset IDs applicable to this host
-  var rulesetIds = getHostnamePatterns(url).reduce((prev, hostname) => {
-    var target = targets[hostname]
-    return target ? prev.concat(target) : prev
-  }, [])
+  var cachedRewrite = cachedRewrites.get(url)
+  if (cachedRewrite) {
+    return cachedRewrite
+  } else {
+    // Get the set of ruleset IDs applicable to this host
+    let rulesetIds = getHostnamePatterns(url).reduce((prev, hostname) => {
+      var target = targets[hostname]
+      return target ? prev.concat(target) : prev
+    }, [])
 
-  for (var i = 0; i < rulesetIds.length; ++i) {
-    // Try applying each ruleset
-    let result = applyRuleset(url, db[rulesetIds[i]])
-    if (result) {
-      // Redirect to the first rewritten URL
-      return result
+    for (var i = 0; i < rulesetIds.length; ++i) {
+      // Try applying each ruleset
+      let result = applyRuleset(url, db[rulesetIds[i]])
+      if (result) {
+        cachedRewrites.put(url, result)
+        // Redirect to the first rewritten URL
+        return result
+      }
     }
+    return undefined
   }
-  return undefined
 }
 
 /**
@@ -221,4 +230,3 @@ function canonicalizeUrl (url) {
 module.exports.init = () => {
   DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
 }
-
