@@ -125,7 +125,6 @@ class NavigationBar extends ImmutableComponent {
         frames={this.props.frames}
         loading={this.loading}
         titleMode={this.titleMode}
-        settings={this.props.settings}
         urlbar={this.props.navbar.get('urlbar')}
         />
       {
