@@ -85,6 +85,37 @@ const AboutActions = {
       }
     })
     window.dispatchEvent(event)
+  },
+
+  decryptPassword: function (encryptedPassword, authTag, iv, id) {
+    const event = new window.CustomEvent(messages.DECRYPT_PASSWORD, {
+      detail: {
+        encryptedPassword,
+        authTag,
+        iv,
+        id
+      }
+    })
+    window.dispatchEvent(event)
+  },
+
+  setClipboard: function (text) {
+    const event = new window.CustomEvent(messages.SET_CLIPBOARD, {
+      detail: text
+    })
+    window.dispatchEvent(event)
+  },
+
+  deletePassword: function (password) {
+    const event = new window.CustomEvent(messages.DELETE_PASSWORD, {
+      detail: password
+    })
+    window.dispatchEvent(event)
+  },
+
+  clearPasswords: function () {
+    const event = new window.CustomEvent(messages.CLEAR_PASSWORDS)
+    window.dispatchEvent(event)
   }
 }
 module.exports = AboutActions

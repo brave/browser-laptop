@@ -15,6 +15,7 @@ const AppConstants = {
   APP_MOVE_SITE: _,
   APP_ADD_PASSWORD: _, /** @param {Object} passwordDetail */
   APP_REMOVE_PASSWORD: _, /** @param {Object} passwordDetail */
+  APP_CLEAR_PASSWORDS: _,
   APP_SET_DEFAULT_WINDOW_SIZE: _,
   APP_SET_DATA_FILE_ETAG: _,
   APP_SET_DATA_FILE_LAST_CHECK: _,

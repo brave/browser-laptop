@@ -302,9 +302,12 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', passwords.push(Immutable.fromJS(action.passwordDetail)))
       break
     case AppConstants.APP_REMOVE_PASSWORD:
-      appState.set('passwords', appState.get('passwords').filterNot((pw) => {
+      appState = appState.set('passwords', appState.get('passwords').filterNot((pw) => {
         return Immutable.is(pw, Immutable.fromJS(action.passwordDetail))
       }))
+      break
+    case AppConstants.APP_CLEAR_PASSWORDS:
+      appState = appState.set('passwords', new Immutable.List())
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size

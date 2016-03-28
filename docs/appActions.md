@@ -170,6 +170,22 @@ Saves login credentials
 
 
 
+### deletePassword(passwordDetail) 
+
+Deletes login credentials
+
+**Parameters**
+
+**passwordDetail**: `Object`, login details
+
+
+
+### clearPasswords() 
+
+Deletes all saved login credentials
+
+
+
 ### changeSetting(key, value) 
 
 Changes an application level setting
