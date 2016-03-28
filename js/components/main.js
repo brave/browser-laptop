@@ -355,7 +355,6 @@ class Main extends ImmutableComponent {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
 
     this.frames = {}
-    const settingsState = this.props.appState.get('settings') || new Immutable.Map()
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
@@ -403,7 +402,6 @@ class Main extends ImmutableComponent {
             activeFrame={activeFrame}
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
-            settings={settingsState}
             searchDetail={this.props.windowState.get('searchDetail')}
           />
           {
@@ -491,7 +489,9 @@ class Main extends ImmutableComponent {
               onCloseFrame={this.onCloseFrame}
               frame={frame}
               key={frame.get('key')}
-              settings={frame.get('location') === 'about:preferences' ? settingsState || new Immutable.Map() : null}
+              settings={frame.get('location') === 'about:preferences'
+                ? this.props.appState.get('settings') || new Immutable.Map()
+                : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')
