@@ -55,17 +55,41 @@ let authCallbacks = {}
  */
 const getMasterKey = () => {
   const appName = 'Brave'
-  const accountName = 'login master key'
+  // Previously the master key was binary encoded, which caused compatibility
+  // issues with various keyrings. In 0.8.3, switch to hex encoding for storage.
+  const oldAccountName = 'login master key'
+  const accountName = 'login master key v2'
+  let oldMasterKey = keytar.getPassword(appName, oldAccountName)
   let masterKey = keytar.getPassword(appName, accountName)
+
+  let success = false
+
   if (masterKey === null) {
-    // Either the user denied access or no master key has been created.
+    if (typeof oldMasterKey === 'string') {
+      // The user made a v1 (binary) key. Try converting it to hex if it
+      // appears to be 32 bytes.
+      let oldBuffer = new Buffer(oldMasterKey, 'binary')
+      if (oldBuffer.length === 32) {
+        success = keytar.addPassword(appName, accountName, oldBuffer.toString('hex'))
+      }
+    }
+
+    // Either the user denied access or no master key has ever been created.
     // We can't tell the difference so try making a new master key.
-    let success = keytar.addPassword(appName, accountName, CryptoUtil.getRandomBytes(32).toString('binary'))
+    success = success || keytar.addPassword(appName, accountName, CryptoUtil.getRandomBytes(32).toString('hex'))
+
     if (success) {
+      // A key should have been created
       masterKey = keytar.getPassword(appName, accountName)
     }
   }
-  return masterKey
+
+  if (typeof masterKey === 'string') {
+    // Convert from hex to binary
+    return (new Buffer(masterKey, 'hex')).toString('binary')
+  } else {
+    return null
+  }
 }
 
 const saveIfAllCollected = () => {
