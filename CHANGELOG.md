@@ -1,7 +1,10 @@
 # Changelog
 
 ## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
-- Debian .deb packaging now provided.
+- .deb and .rpm [Linux packages available](https://github.com/brave/browser-laptop/blob/master/docs/linuxInstall.md) for various distros.
+- Upgrade to libchromiumcontent 49.0.2623.108
+- Upgrade to Electron 0.37.3
+- Upgrade to Node 5.9.1
 
 ## [0.8.2](https://github.com/brave/browser-laptop/releases/v0.8.2dev)
 - Password saving feature added.
@@ -18,8 +21,8 @@
 
 ## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
 - Upgrade to libchromiumcontent 49.0.2623.75.
-- Upgrade to Electron v0.37.2.
-- Upgrade to Node v5.8.
+- Upgrade to Electron 0.37.2.
+- Upgrade to Node 5.8.
 - Basic HTTP authentication now supported.
 - Support for Twitch.tv
 - Fix bookmarks not working after navigating within a page using push state api.
