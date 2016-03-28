@@ -16,6 +16,9 @@
   padding-left: 70px;
   border-bottom: 1px solid #aaaaaa;
   height: 35px;
+  @media (max-width: @breakpointNarrowViewport) {
+      padding-left: 0;
+  }
 }
 
 .urlbarForm {
@@ -72,6 +75,11 @@
   flex-direction: row;
   -webkit-user-select: none;
   width: calc(~'100% - 215px');
+
+  @media (max-width: @breakpointNarrowViewport) {
+      width: 100%;
+      z-index: 99999;
+  }
 
   &.titleMode {
     margin-left: -130px;
