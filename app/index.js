@@ -49,11 +49,17 @@ let lastWindowState
 let acceptCertUrls = {}
 // URLs to callback for auth.
 let authCallbacks = {}
+// Don't show the keytar prompt more than once per ten seconds
+let throttleKeytar = false
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
 const getMasterKey = () => {
+  if (throttleKeytar) {
+    return null
+  }
+
   const appName = 'Brave'
   // Previously the master key was binary encoded, which caused compatibility
   // issues with various keyrings. In 0.8.3, switch to hex encoding for storage.
@@ -88,6 +94,10 @@ const getMasterKey = () => {
     // Convert from hex to binary
     return (new Buffer(masterKey, 'hex')).toString('binary')
   } else {
+    throttleKeytar = true
+    setTimeout(() => {
+      throttleKeytar = false
+    }, 10000)
     return null
   }
 }
