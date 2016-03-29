@@ -9,6 +9,7 @@ const path = require('path')
 
 var menuIdentifiers = () => {
   return [
+    'confirmClearPasswords',
     'about',
     'quit',
     'addToReadingList',
@@ -142,7 +143,8 @@ exports.init = (language) => {
 
     const propertyFiles = [
       path.join(__dirname, 'locales', lang, 'menu.properties'),
-      path.join(__dirname, 'locales', lang, 'app.properties')
+      path.join(__dirname, 'locales', lang, 'app.properties'),
+      path.join(__dirname, 'locales', lang, 'password.properties')
     ]
 
     // contexts are immutable if langs change a new context must be created
