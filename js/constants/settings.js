@@ -22,7 +22,8 @@ const settings = {
   // Security Tab
   BLOCK_REPORTED_SITES: 'security.block-reported-sites',
   // Other settings
-  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show'
+  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
+  LANGUAGE: 'en-US'
 }
 
 module.exports = settings
