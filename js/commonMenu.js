@@ -59,7 +59,7 @@ module.exports.sendToFocusedWindow = (focusedWindow, message) => {
 }
 
 module.exports.quitMenuItem = {
-  label: 'Quit ' + appConfig.name,
+  label: locale.translation('quit') + ' ' + appConfig.name,
   accelerator: 'Command+Q',
   click: app.quit
 }
@@ -246,7 +246,7 @@ module.exports.bookmarksToolbarMenuItem = () => {
 }
 
 module.exports.aboutBraveMenuItem = {
-  label: 'About ' + appConfig.name,
+  label: locale.translation('about') + ' ' + appConfig.name,
   click: (item, focusedWindow) => {
     if (process.type === 'browser') {
       process.emit(messages.SHOW_ABOUT)
