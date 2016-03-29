@@ -7,6 +7,8 @@
 if (process.platform === 'win32') {
   require('./windowsInit')
 }
+const locale = require('./locale')
+locale.init('en-US')
 
 const Immutable = require('immutable')
 const electron = require('electron')

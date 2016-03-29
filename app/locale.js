@@ -7,47 +7,10 @@
 const L20n = require('l20n')
 const path = require('path')
 
-var ctx = null
-var translations = {}
-
-exports.init = (lang) => {
-  const langs = [
-    { code: 'en-US' }
-  ]
-
-  // fetchResource is node-specific, Env isn't
-  const env = new L20n.Env(L20n.fetchResource)
-
-  const propertyFiles = [
-    path.join(__dirname, 'locales', lang, 'menu.properties'),
-    path.join(__dirname, 'locales', lang, 'app.properties')
-  ]
-
-  // contexts are immutable if langs change a new context must be created
-  ctx = env.createContext(langs, propertyFiles)
-  return ctx
-}
-
-exports.translate = (identifiers, done) => {
-  ctx.formatValues.apply(ctx, identifiers).then((values) => {
-    values.forEach((value, idx) => {
-      translations[identifiers[idx]] = value
-    })
-    done(null, values)
-  })
-}
-
-exports.translation = (token, args) => {
-  // todo - handle parameters
-  if (translations[token]) {
-    return translations[token]
-  } else {
-    return `[${token.toUpperCase()}]`
-  }
-}
-
-exports.menuIdentifiers = () => {
+var menuIdentifiers = () => {
   return [
+    'about',
+    'quit',
     'addToReadingList',
     'viewPageSource',
     'copyImageAddress',
@@ -154,3 +117,45 @@ exports.menuIdentifiers = () => {
     'httpsEverywhere'
   ]
 }
+
+var ctx = null
+var translations = {}
+var lang = 'en-US'
+
+exports.translation = (token) => {
+  if (translations[token]) {
+    return translations[token]
+  } else {
+    return `[${token.toUpperCase()}]`
+  }
+}
+
+exports.init = (language) => {
+  lang = language
+  const langs = [
+    { code: 'en-US' }
+  ]
+
+  if (!translations.about) {
+    // fetchResource is node-specific, Env isn't
+    const env = new L20n.Env(L20n.fetchResource)
+
+    const propertyFiles = [
+      path.join(__dirname, 'locales', lang, 'menu.properties'),
+      path.join(__dirname, 'locales', lang, 'app.properties')
+    ]
+
+    // contexts are immutable if langs change a new context must be created
+    ctx = env.createContext(langs, propertyFiles)
+
+    var identifiers = menuIdentifiers()
+    ctx.formatValues.apply(ctx, identifiers).then((values) => {
+      values.forEach((value, idx) => {
+        translations[identifiers[idx]] = value
+      })
+    })
+  }
+}
+
+// Default
+exports.init('en-US')

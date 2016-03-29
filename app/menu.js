@@ -29,13 +29,6 @@ const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 
 let menuArgs = {}
 
-locale.init('en-US')
-locale.translate(locale.menuIdentifiers(), (err, translations) => {
-  if (err) {
-    throw new Error('Translation error: ' + err.toString())
-  }
-})
-
 /**
  * Sets up the menu.
  * @param {Object} settingsState - Application settings state
@@ -70,10 +63,10 @@ const init = (settingsState, args) => {
 //            process.crash()
 //          }
 //        },
-    CommonMenu.newTabMenuItem,
-    CommonMenu.newPrivateTabMenuItem,
-    CommonMenu.newPartitionedTabMenuItem,
-    CommonMenu.newWindowMenuItem,
+    CommonMenu.newTabMenuItem(),
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('openFile'),
@@ -155,13 +148,13 @@ const init = (settingsState, args) => {
       */
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.printMenuItem
+    CommonMenu.printMenuItem()
   ]
 
   const helpMenu = [
-    CommonMenu.reportAnIssueMenuItem,
+    CommonMenu.reportAnIssueMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.submitFeedbackMenuItem,
+    CommonMenu.submitFeedbackMenuItem(),
     {
       label: locale.translation('spreadTheWord'),
       click: function (item, focusedWindow) {
@@ -173,11 +166,11 @@ const init = (settingsState, args) => {
 
   if (!isDarwin) {
     fileMenu.push(CommonMenu.separatorMenuItem)
-    fileMenu.push(CommonMenu.quitMenuItem)
+    fileMenu.push(CommonMenu.quitMenuItem())
     helpMenu.push(CommonMenu.separatorMenuItem)
-    helpMenu.push(CommonMenu.checkForUpdateMenuItem)
+    helpMenu.push(CommonMenu.checkForUpdateMenuItem())
     helpMenu.push(CommonMenu.separatorMenuItem)
-    helpMenu.push(CommonMenu.aboutBraveMenuItem)
+    helpMenu.push(CommonMenu.aboutBraveMenuItem())
   }
 
   const editSubmenu = [{
@@ -222,7 +215,7 @@ const init = (settingsState, args) => {
       role: 'selectall'
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.findOnPageMenuItem,
+    CommonMenu.findOnPageMenuItem(),
     {
       // TODO: hook up find next/prev shortcut. low-priority since this is
       // probably not used much.
@@ -239,7 +232,7 @@ const init = (settingsState, args) => {
   ]
 
   if (!isDarwin) {
-    editSubmenu.push(CommonMenu.preferencesMenuItem)
+    editSubmenu.push(CommonMenu.preferencesMenuItem())
   }
 
   var template = [
@@ -374,7 +367,8 @@ const init = (settingsState, args) => {
           }
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.reopenLastClosedTabItem, {
+        CommonMenu.reopenLastClosedTabItem(),
+        {
           label: locale.translation('reopenLastClosedTab'),
           accelerator: 'Alt+Shift+CmdOrCtrl+T',
           click: function () {
@@ -407,10 +401,10 @@ const init = (settingsState, args) => {
           accelerator: 'Shift+CmdOrCtrl+D'
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.bookmarksMenuItem,
+        CommonMenu.bookmarksMenuItem(),
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.importBookmarksMenuItem
+        CommonMenu.importBookmarksMenuItem()
       ]
     },
     CommonMenu.buildBraveryMenu({
@@ -479,12 +473,12 @@ const init = (settingsState, args) => {
     template.unshift({
       label: appConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
-        CommonMenu.aboutBraveMenuItem,
+        CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem,
+        CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.preferencesMenuItem,
-        CommonMenu.bookmarksMenuItem,
+        CommonMenu.preferencesMenuItem(),
+        CommonMenu.bookmarksMenuItem(),
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('sendUsFeedback'),
@@ -512,7 +506,7 @@ const init = (settingsState, args) => {
           role: 'unhide'
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.quitMenuItem
+        CommonMenu.quitMenuItem()
       ]
     })
   }
