@@ -105,21 +105,21 @@ class PasswordItem extends React.Component {
         {this.state.shown ? this.state.decrypted : '*'.repeat(password.get('encryptedPassword').length)}
       </td>
       <td className='passwordActions'>
-      <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
-        onClick={this.onCopy.bind(this)}>
-      </span>
+        <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
+          onClick={this.onCopy.bind(this)}>
+        </span>
       {
         this.state.shown
         ? <span className='passwordAction fa fa-eye-slash'
-              title='Hide password'
-              onClick={this.onHide.bind(this)}></span>
+          title='Hide password'
+          onClick={this.onHide.bind(this)}></span>
         : <span className='passwordAction fa fa-eye'
-              title='Show password'
-              onClick={this.onShow.bind(this)}></span>
+          title='Show password'
+          onClick={this.onShow.bind(this)}></span>
       }
-      <span className='passwordAction fa fa-trash' title='Delete password'
-        onClick={this.onDelete.bind(this)}>
-      </span>
+        <span className='passwordAction fa fa-trash' title='Delete password'
+          onClick={this.onDelete.bind(this)}>
+        </span>
       </td>
       {
         this.state.notification
@@ -164,18 +164,19 @@ class AboutPasswords extends React.Component {
       <h2 data-l10n-id='passwordsTitle'></h2>
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
-        <thead>
-          <tr>
-            <th data-l10n-id='passwordsSite'></th>
-            <th data-l10n-id='passwordsUsername'></th>
-            <th data-l10n-id='passwordsPassword'></th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.state.passwordDetails.map(item =>
-            <PasswordItem password={item} id={counter++}/>)
+          <thead>
+            <tr>
+              <th data-l10n-id='passwordsSite'></th>
+              <th data-l10n-id='passwordsUsername'></th>
+              <th data-l10n-id='passwordsPassword'></th>
+            </tr>
+          </thead>
+          <tbody>
+          {
+            this.state.passwordDetails.map((item) =>
+              <PasswordItem password={item} id={counter++}/>)
           }
-        </tbody>
+          </tbody>
         </table>
       </div>
       <div className='passwordsPageFooter'>
