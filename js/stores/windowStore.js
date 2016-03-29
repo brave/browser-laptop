@@ -426,6 +426,9 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'siteInfo', 'expandHttpse'], action.expandHttpse)
       }
       break
+    case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
+      windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
+      break
     case WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break

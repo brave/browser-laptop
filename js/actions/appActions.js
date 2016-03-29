@@ -112,6 +112,29 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to add/edit download details
+   * If set, also indicates that add/edit is shown
+   * @param {string} downloadId - A unique ID for the download
+   * @param {Object} downloadDetail - Properties for the download
+   */
+  mergeDownloadDetail: function (downloadId, downloadDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_MERGE_DOWNLOAD_DETAIL,
+      downloadId,
+      downloadDetail
+    })
+  },
+
+  /**
+   * Dispatches a message to clear all completed downloads
+   */
+  clearCompletedDownloads: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS
+    })
+  },
+
+  /**
    * Sets the default window size
    * @param {Array} size - [width, height]
    */

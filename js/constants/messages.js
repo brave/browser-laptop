@@ -42,6 +42,9 @@ const messages = {
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
   LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
   LOGIN_RESPONSE: _,
+  // Downloads
+  SHOW_DOWNLOADS_TOOLBAR: _, /** Ensures the downloads toolbar is visible */
+  DOWNLOAD_ACTION: _, /** @arg {string} downloadId, @arg {string} action such as 'resume', 'pause', or 'cancel' */
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,

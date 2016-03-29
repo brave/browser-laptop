@@ -9,13 +9,19 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
+const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
+const downloadStates = require('../js/constants/downloadStates')
+const downloadActions = require('../js/constants/downloadActions')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const settings = require('../js/constants/settings')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
+const app = electron.app
+const uuid = require('node-uuid')
+const path = require('path')
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
@@ -25,6 +31,11 @@ const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAE
 
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
+
+/**
+ * Maps downloadId to an electron download-item
+ */
+const downloadMap = {}
 
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
@@ -246,14 +257,74 @@ module.exports.isThirdPartyHost = (baseContextHost, testHost) => {
   }
 }
 
+function updateDownloadState (downloadId, item, state) {
+  if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.COMPLETED) {
+    delete downloadMap[downloadId]
+  } else {
+    downloadMap[downloadId] = item
+  }
+
+  if (!item) {
+    appActions.mergeDownloadDetail(downloadId, { state })
+    return
+  }
+
+  const downloadItemStartTime = AppStore.getState().getIn(['downloads', downloadId, 'startTime'])
+  appActions.mergeDownloadDetail(downloadId, {
+    startTime: downloadItemStartTime || new Date().getTime(),
+    savePath: item.getSavePath(),
+    url: item.getURL(),
+    filename: item.getFilename(),
+    totalBytes: item.getTotalBytes(),
+    receivedBytes: item.getReceivedBytes(),
+    state
+  })
+}
+
+function registerForDownloadListener (session) {
+  session.on('will-download', function (event, item, webContents) {
+    const win = BrowserWindow.getFocusedWindow()
+    const savePath = dialog.showSaveDialog(win, {
+      title: 'test',
+      defaultPath: path.join(app.getPath('downloads'), item.getFilename())
+    })
+    // User cancelled out of save dialog prompt
+    if (!savePath) {
+      event.preventDefault()
+      return
+    }
+    item.setSavePath(savePath)
+
+    const downloadId = uuid.v4()
+    updateDownloadState(downloadId, item, downloadStates.PENDING)
+    if (win) {
+      win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
+    }
+    item.on('updated', function () {
+      let state = downloadStates.IN_PROGRESS
+      const downloadItem = AppStore.getState().getIn(['downloads', downloadId])
+      if (downloadItem && downloadItem.get('state') === downloadStates.PAUSED) {
+        state = downloadStates.PAUSED
+      }
+      updateDownloadState(downloadId, item, state)
+    })
+    item.on('done', function (e, state) {
+      updateDownloadState(downloadId, item, state)
+    })
+  })
+}
+
 function initForPartition (partition) {
-  [registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
+  ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders, registerForDownloadListener].forEach((fn) => {
     fn(session.fromPartition(partition))
   })
 }
 
 module.exports.init = () => {
-  ['', 'main-1'].forEach((partition) => {
+  setTimeout(() => {
+    registerForDownloadListener(session.defaultSession)
+  }, 1000)
+  ;['', 'main-1'].forEach((partition) => {
     initForPartition(partition)
   })
   let initializedPartitions = {}
@@ -263,6 +334,29 @@ module.exports.init = () => {
     }
     initForPartition(partition)
     initializedPartitions[partition] = true
+  })
+  ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
+    const item = downloadMap[downloadId]
+    switch (action) {
+      case downloadActions.CANCEL:
+        updateDownloadState(downloadId, item, downloadStates.CANCELLED)
+        if (item) {
+          item.cancel()
+        }
+        break
+      case downloadActions.PAUSE:
+        if (item) {
+          item.pause()
+        }
+        updateDownloadState(downloadId, item, downloadStates.PAUSED)
+        break
+      case downloadActions.RESUME:
+        if (item) {
+          item.resume()
+        }
+        updateDownloadState(downloadId, item, downloadStates.IN_PROGRESS)
+        break
+    }
   })
 }
 

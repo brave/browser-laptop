@@ -16,6 +16,16 @@ AppStore
     lastAccessedTime: number, // datetime.getTime()
     partitionNumber: number // Optionally specifies a specific session
   }],
+  downloads: [{
+    downloadId: string,
+    startTime: number, // datetime.getTime()
+    filename: string,
+    savePath: string,
+    url: string,
+    totalBytes: Number,
+    receivedBytes: Number,
+    state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
+  }],
   visits: [{
     location: string,
     startTime: number, // datetime.getTime()
@@ -190,6 +200,9 @@ WindowStore
       expandTrackingProtection: boolean,
       expandAdblock: boolean,
       expandHttpse: boolean
+    },
+    downloadsToolbar: {
+      isVisible: boolean, // Whether or not the downloads toolbar is visible
     },
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes

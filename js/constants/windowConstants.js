@@ -43,6 +43,7 @@ const windowConstants = {
   WINDOW_SET_FINDBAR_SELECTED: _, // whether the findbar is active
   WINDOW_SET_PINNED: _, // Whehter the current tab is pinned or not
   WINDOW_SET_SITE_INFO_VISIBLE: _, // Whether or not to show site info like # of blocked ads
+  WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE: _, // Whether or not to show the downloads toolbar
   WINDOW_SET_RELEASE_NOTES_VISIBLE: _, // Whether or not to show release notes
   WINDOW_SET_BLOCKED_BY: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_REDIRECTED_BY: _, // Whether or not to show site info like redirected resources

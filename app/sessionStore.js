@@ -215,6 +215,8 @@ module.exports.loadAppState = () => {
       // We used to store a huge list of IDs but we didn't use them.
       // Get rid of them here.
       delete data.windows
+      // Don't restore downloads for now
+      delete data.downloads
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }

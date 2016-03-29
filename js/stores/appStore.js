@@ -12,6 +12,7 @@ const app = electron.app
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
+const downloadStates = require('../constants/downloadStates')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const appActions = require('../actions/appActions')
@@ -331,6 +332,19 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent))
+      break
+    case AppConstants.APP_MERGE_DOWNLOAD_DETAIL:
+      if (action.downloadDetail) {
+        appState = appState.mergeIn(['downloads', action.downloadId], action.downloadDetail)
+      } else {
+        appState = appState.deleteIn(['downloads', action.downloadId])
+      }
+      break
+    case AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS:
+      const downloads = appState.get('downloads')
+        .filter((download) =>
+          ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
+      appState = appState.set('downloads', downloads)
       break
     case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
       appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))

@@ -87,6 +87,22 @@ function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail) {
   ]
 }
 
+function downloadsToolbarTemplateInit () {
+  return [{
+    label: 'Hide downloads bar',
+    click: () => {
+      windowActions.setDownloadsToolbarVisible(false)
+    }
+  },
+  CommonMenu.separatorMenuItem,
+  {
+    label: 'Clear completed downloads',
+    click: () => {
+      appActions.clearCompletedDownloads()
+    }
+  }]
+}
+
 function bookmarkTemplateInit (siteDetail, activeFrame) {
   const location = siteDetail.get('location')
   const isFolder = siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
@@ -563,6 +579,12 @@ export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail,
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
+}
+
+export function onDownloadsToolbarContextMenu (e) {
+  e.stopPropagation()
+  const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit())
+  downloadsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
 export function onTabPageContextMenu (framePropsList, e) {

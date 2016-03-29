@@ -1,0 +1,126 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+:root {
+  --download-item-width: 200px;
+  --download-item-margin: 10px;
+  --download-bar-padding: 20px;
+}
+
+.downloadsBar {
+  -webkit-user-select: none;
+  box-sizing: border-box;
+  cursor: default;
+  background-color: #e6e6e6;
+  border-top: 1px solid #888;
+  bottom: 0;
+  color: black;
+  display: flex;
+  height: 50px;
+  padding: 5px var(--download-bar-padding);
+  position: absolute;
+  width: 100%;
+  z-index: 3;
+
+  .downloadItems {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    .downloadItem {
+      background-color: white;
+      border: 1px solid @chromeTertiary;
+      border-radius: @borderRadius;
+      box-sizing: border-box;
+      display: flex;
+      font-size: 11px;
+      flex-direction: column;
+      height: 36px;
+      padding: 0 14px;
+      position: relative;
+      margin: auto var(--download-item-margin) auto 0;
+      max-width: var(--download-item-width);
+      min-width: var(--download-item-width);
+
+      &:hover {
+        height: 62px;
+        top: -24px;
+      }
+
+      &:not(:hover) {
+        .downloadActions {
+          display: none;
+        }
+      }
+
+      &.paused {
+        .downloadProgress {
+          border-right: 1px solid black;
+        }
+      }
+
+      &.completed, &.interrupted, &.cancelled {
+        .downloadState {
+          font-weight: bold;
+        }
+      }
+
+      .downloadProgress {
+        background-color: @highlightBlue;
+        left: 0;
+        opacity: 0.5;
+        position: absolute;
+        height: 35px;
+        width: 100%;
+      }
+
+      .downloadInfo {
+        display: flex;
+        margin: auto 0;
+        .downloadFilename, .downloadState {
+          margin: auto 0;
+        }
+
+        .downloadArrow {
+          margin: auto 0 auto auto;
+        }
+      }
+
+      .downloadActions {
+        margin: auto 0;
+        .browserButton {
+          font-size: 14px;
+          height: auto;
+          line-height: inherit;
+          margin: auto 15px auto auto;
+          width: auto;
+
+          &.removeDownloadFromList {
+            float: right;
+            margin-right: 0;
+          }
+
+          &:hover {
+            color: @highlightBlue;
+          }
+        }
+      }
+    }
+  }
+
+  .downloadBarButtons {
+    margin: auto 0;
+
+    .downloadButton {
+      margin: 0 2px;
+
+      &.hideButton:not([disabled]):hover {
+        background: @chromeControlsWarningBackground;
+      }
+    }
+  }
+}
+
+

@@ -703,6 +703,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to indicate if the downloads toolbar is visible
+   *
+   * @param {boolean} isVisible - true if the site info should be shown
+   */
+  setDownloadsToolbarVisible: function (isVisible) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE,
+      isVisible
+    })
+  },
+
+  /**
    * Dispatches a message to indicate the release notes should be visible
    *
    * @param {boolean} isVisible - true if the site info should be shown
