@@ -8,6 +8,7 @@ const appConfig = require('./constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
+const locale = require('../app/locale')
 
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = appConfig.resourceNames.ADBLOCK
@@ -64,7 +65,7 @@ module.exports.quitMenuItem = {
 }
 
 module.exports.newTabMenuItem = {
-  label: 'New Tab',
+  label: locale.translation('newTab'),
   accelerator: 'CmdOrCtrl+T',
   click: function (item, focusedWindow) {
     if (!module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
@@ -75,7 +76,7 @@ module.exports.newTabMenuItem = {
 }
 
 module.exports.newPrivateTabMenuItem = {
-  label: 'New Private Tab',
+  label: locale.translation('newPrivateTab'),
   accelerator: 'CmdOrCtrl+Alt+T',
   click: function (item, focusedWindow) {
     ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))
@@ -84,7 +85,7 @@ module.exports.newPrivateTabMenuItem = {
 }
 
 module.exports.newPartitionedTabMenuItem = {
-  label: 'New Session Tab',
+  label: locale.translation('newSessionTab'),
   accelerator: 'CmdOrCtrl+Alt+S',
   click: function (item, focusedWindow) {
     ensureAtLeastOneWindow(Immutable.fromJS({ isPartitioned: true }))
@@ -93,13 +94,13 @@ module.exports.newPartitionedTabMenuItem = {
 }
 
 module.exports.newWindowMenuItem = {
-  label: 'New Window',
+  label: locale.translation('newWindow'),
   accelerator: 'CmdOrCtrl+N',
   click: () => appActions.newWindow()
 }
 
 module.exports.reopenLastClosedTabItem = {
-  label: 'Reopen Last Closed Tab',
+  label: locale.translation('reopenLastClosedTab'),
   accelerator: 'Shift+CmdOrCtrl+T',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
@@ -111,7 +112,7 @@ module.exports.separatorMenuItem = {
 }
 
 module.exports.printMenuItem = {
-  label: 'Print...',
+  label: locale.translation('print'),
   accelerator: 'CmdOrCtrl+P',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_PRINT])
@@ -119,7 +120,7 @@ module.exports.printMenuItem = {
 }
 
 module.exports.findOnPageMenuItem = {
-  label: 'Find on page...',
+  label: locale.translation('findOnPage'),
   accelerator: 'CmdOrCtrl+F',
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR])
@@ -127,7 +128,7 @@ module.exports.findOnPageMenuItem = {
 }
 
 module.exports.checkForUpdateMenuItem = {
-  label: 'Check for updates...',
+  label: locale.translation('checkForUpdates'),
   click: function (item, focusedWindow) {
     if (process.type === 'browser') {
       ensureAtLeastOneWindow()
@@ -139,7 +140,7 @@ module.exports.checkForUpdateMenuItem = {
 }
 
 module.exports.preferencesMenuItem = {
-  label: 'Preferences...',
+  label: locale.translation('preferences'),
   accelerator: 'CmdOrCtrl+,',
   click: (item, focusedWindow) => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -153,7 +154,7 @@ module.exports.preferencesMenuItem = {
 }
 
 module.exports.bookmarksMenuItem = {
-  label: 'Bookmarks manager...',
+  label: locale.translation('bookmarksManager'),
   accelerator: isDarwin ? 'CmdOrCtrl+Alt+B' : 'Ctrl+Shift+O',
   click: (item, focusedWindow) => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -194,7 +195,7 @@ module.exports.passwordsMenuItem = {
 }
 
 module.exports.importBookmarksMenuItem = {
-  label: 'Import Bookmarks (from HTML export)',
+  label: locale.translation('importBookmarks'),
   click: function (item, focusedWindow) {
     if (BrowserWindow.getAllWindows().length === 0) {
       appActions.newWindow(undefined, undefined, undefined, function () {
@@ -217,7 +218,7 @@ module.exports.importBookmarksMenuItem = {
 }
 
 module.exports.reportAnIssueMenuItem = {
-  label: 'Report an issue',
+  label: locale.translation('reportAnIssue'),
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow,
       [messages.SHORTCUT_NEW_FRAME, issuesUrl])
@@ -225,7 +226,7 @@ module.exports.reportAnIssueMenuItem = {
 }
 
 module.exports.submitFeedbackMenuItem = {
-  label: 'Submit Feedback...',
+  label: locale.translation('submitFeedback'),
   click: function (item, focusedWindow) {
     module.exports.sendToFocusedWindow(focusedWindow,
       [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
@@ -235,7 +236,7 @@ module.exports.submitFeedbackMenuItem = {
 module.exports.bookmarksToolbarMenuItem = () => {
   const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
-    label: 'Bookmarks Toolbar',
+    label: locale.translation('bookmarksToolbar'),
     type: 'checkbox',
     checked: showBookmarksToolbar,
     click: (item, focusedWindow) => {
@@ -262,11 +263,11 @@ module.exports.buildBraveryMenu = function (settings, init) {
   const blockCookies = settings[cookieblock] || false
   const useHttps = settings[httpsEverywhere] || false
   return {
-    label: 'Bravery',
+    label: locale.translation('bravery'),
     submenu: [
       {
         type: 'radio',
-        label: 'Replace ads',
+        label: locale.translation('replaceAds'),
         checked: blockAds && replaceAds && blockTracking,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(adblock, true)
@@ -276,7 +277,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
         }
       }, {
         type: 'radio',
-        label: 'Block ads',
+        label: locale.translation('blockAds'),
         checked: blockAds && !replaceAds && blockTracking,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(adblock, true)
@@ -286,7 +287,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
         }
       }, {
         type: 'radio',
-        label: 'Allow ads and tracking',
+        label: locale.translation('allowAdsAndTracking'),
         checked: !blockAds && !replaceAds && !blockTracking,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(adblock, false)
@@ -298,7 +299,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
       module.exports.separatorMenuItem,
       {
         type: 'checkbox',
-        label: 'Block 3rd party cookies',
+        label: locale.translation('block3rdPartyCookie'),
         checked: blockCookies,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(cookieblock, !blockCookies)
@@ -306,12 +307,12 @@ module.exports.buildBraveryMenu = function (settings, init) {
         }
       }, {
         type: 'checkbox',
-        label: 'Block Popups',
+        label: locale.translation('blockPopups'),
         enabled: false,
         checked: true
       }, {
         type: 'checkbox',
-        label: 'HTTPS Everywhere',
+        label: locale.translation('httpsEverywhere'),
         checked: useHttps,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(httpsEverywhere, !useHttps)

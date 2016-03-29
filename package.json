@@ -75,7 +75,10 @@
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
     "tracking-protection": "1.0.x",
-    "url-loader": "^0.5.7"
+    "url-loader": "^0.5.7",
+    "l20n": "^3.5.1",
+    "string.prototype.endswith": "^0.2.0",
+    "string.prototype.startswith": "^0.2.0"
   },
   "devDependencies": {
     "asar": "^0.10.0",
