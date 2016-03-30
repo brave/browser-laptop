@@ -8,7 +8,7 @@ const appConfig = require('./constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
-const locale = require('../app/locale')
+const locale = require('../js/l10n')
 
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = appConfig.resourceNames.ADBLOCK

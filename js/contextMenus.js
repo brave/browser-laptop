@@ -22,7 +22,7 @@ const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
-const locale = require('../app/locale')
+const locale = require('../js/l10n')
 
 /**
  * Obtains an add bookmark menu item

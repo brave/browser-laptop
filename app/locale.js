@@ -6,6 +6,7 @@
 
 const L20n = require('l20n')
 const path = require('path')
+const ipcMain = require('electron').ipcMain
 
 var menuIdentifiers = () => {
   return [
@@ -123,6 +124,8 @@ var ctx = null
 var translations = {}
 var lang = 'en-US'
 
+// Return a translate token from cache or a placeholder
+// indicating that no translation is available
 exports.translation = (token) => {
   if (translations[token]) {
     return translations[token]
@@ -131,33 +134,47 @@ exports.translation = (token) => {
   }
 }
 
-exports.init = (language) => {
+exports.init = (language, cb) => {
+  // Default to noop callback
+  cb = cb || function () {}
+
   lang = language
+
+  // Languages to support
   const langs = [
-    { code: 'en-US' }
+    { code: 'en-US' },
+    { code: 'nl-NL' },
+    { code: 'pt-BR' }
   ]
 
-  if (!translations.about) {
-    // fetchResource is node-specific, Env isn't
-    const env = new L20n.Env(L20n.fetchResource)
+  // Property files to parse
+  const propertyFiles = [
+    path.join(__dirname, 'locales', lang, 'menu.properties'),
+    path.join(__dirname, 'locales', lang, 'app.properties'),
+    path.join(__dirname, 'locales', lang, 'password.properties')
+  ]
 
-    const propertyFiles = [
-      path.join(__dirname, 'locales', lang, 'menu.properties'),
-      path.join(__dirname, 'locales', lang, 'app.properties'),
-      path.join(__dirname, 'locales', lang, 'password.properties')
-    ]
+  // If langs change a new context must be created
+  const env = new L20n.Env(L20n.fetchResource)
+  ctx = env.createContext(langs, propertyFiles)
 
-    // contexts are immutable if langs change a new context must be created
-    ctx = env.createContext(langs, propertyFiles)
-
-    var identifiers = menuIdentifiers()
-    ctx.formatValues.apply(ctx, identifiers).then((values) => {
-      values.forEach((value, idx) => {
-        translations[identifiers[idx]] = value
-      })
+  // Translate the menu identifiers
+  var identifiers = menuIdentifiers()
+  ctx.formatValues.apply(ctx, identifiers).then((values) => {
+    // Cache the translations for later retrieval
+    values.forEach((value, idx) => {
+      translations[identifiers[idx]] = value
     })
-  }
+    // Signal when complete
+    cb(translations)
+  })
 }
 
-// Default
-exports.init('en-US')
+// If this is in the main process
+if (ipcMain) {
+  // Respond to requests for translations from the renderer process
+  ipcMain.on('translation', (event, arg) => {
+    // Return the translation synchronously
+    event.returnValue = exports.translation(arg)
+  })
+}

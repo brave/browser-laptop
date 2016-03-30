@@ -7,8 +7,8 @@
 if (process.platform === 'win32') {
   require('./windowsInit')
 }
-const locale = require('./locale')
-locale.init('en-US')
+
+var locale = require('./locale')
 
 const Immutable = require('immutable')
 const electron = require('electron')
@@ -37,6 +37,7 @@ const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
+const settings = require('../js/constants/settings')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -259,6 +260,7 @@ app.on('ready', () => {
       lastWindowState = data
     }
   })
+
   ipcMain.on(messages.LOGIN_RESPONSE, (e, url, username, password) => {
     if (username || password) {
       // Having 2 of the same tab URLs open right now, where both require auth
@@ -273,6 +275,7 @@ app.on('ready', () => {
     }
     delete authCallbacks[url]
   })
+
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
       appActions.newWindow(undefined, undefined, lastWindowState)
@@ -281,6 +284,13 @@ app.on('ready', () => {
   })
 
   loadAppStatePromise.then((initialState) => {
+    // Initiate the translation for a configured language and
+    // reset the browser window
+    locale.init(initialState.settings[settings.LANGUAGE || 'en-US'], (strings) => {
+      Menu.init(AppStore.getState().get('settings'))
+    })
+
+    // Do this after loading the state
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState

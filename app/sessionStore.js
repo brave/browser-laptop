@@ -31,7 +31,7 @@ const getSetting = require('../js/settings').getSetting
 /**
  * Saves the specified immutable browser state to storage.
  *
- * @param {object} payload - Applicaiton state as per
+ * @param {object} payload - Application state as per
  *   https://github.com/brave/browser/wiki/Application-State
  *   (not immutable data)
  * @return a promise which resolves when the state is saved
