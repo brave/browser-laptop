@@ -137,7 +137,7 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
         break
       case 'reload':
-        if (this.props.frame.get('location') === 'about:preferences') {
+        if (['about:preferences', 'about:downloads', 'about:bookmarks', 'about:passwords', 'about:certerror'].includes(this.props.frame.get('location'))) {
           break
         }
         // Ensure that the webview thinks we're on the same location as the browser does.
