@@ -272,7 +272,7 @@ module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {
       if (site.get('folderId') === folderId) {
         return
       }
-      const label = (labelPrefix || '') + site.get('customTitle') || site.get('title')
+      const label = (labelPrefix || '') + (site.get('customTitle') || site.get('title'))
       folders.push({
         folderId: site.get('folderId'),
         parentFolderId: site.get('parentFolderId'),
