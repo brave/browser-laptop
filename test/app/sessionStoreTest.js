@@ -27,7 +27,7 @@ describe('sessionStore', function () {
         title: 'some page'
       }, siteTags.BOOKMARK)
       yield Brave.app.client
-        .moveToObject(selectors.urlInput)
+        .moveToObject(selectors.navigator)
         .waitForExist(selectors.navigatorBookmarked)
         .waitUntil(function () {
           return this.getValue(selectors.urlInput).then((val) => val === page1Url)
