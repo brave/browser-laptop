@@ -110,7 +110,7 @@
     "npm": "3.8.3",
     "nsp": "^2.2.0",
     "pre-commit": "^1.1.2",
-    "spectron": "^0.36.0",
+    "spectron": "^1.37.0",
     "sqlite3": "^3.1.1",
     "standard": "^6.0.8",
     "style-loader": "^0.13.0",
