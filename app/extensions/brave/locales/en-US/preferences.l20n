@@ -42,4 +42,5 @@
 
 /* Security settings page */
 <usePasswordManager "Use Brave's password manager">
+<useOnePassword "Use 1Password (requires 1Password Application)">
 <managePasswords "Manage passwords...">

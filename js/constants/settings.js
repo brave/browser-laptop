@@ -22,6 +22,7 @@ const settings = {
   DO_NOT_TRACK: 'privacy.do-not-track',
   // Security Tab
   PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
+  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show'
 }

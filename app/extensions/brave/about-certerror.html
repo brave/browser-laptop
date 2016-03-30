@@ -5,17 +5,16 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; form-action 'none'; referrer no-referrer; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' ws://localhost:*; font-src 'self'">
     <meta name="availableLanguages" content="en-US">
     <meta name="defaultLanguage" content="en-US">
     <meta name='theme-color' content='#ff5000'>
-    <title data-l10n-id="passwordsTitle"></title>
+    <title data-l10n-id="certError"></title>
     <script>
-      function initPasswordsListener (e) {
-        window.initPasswords = e.detail
-        window.removeEventListener('password-details-updated', initPasswordsListener)
+      function initCertDetailsListener (e) {
+        window.initCertDetails = e.detail
+        window.removeEventListener('cert-details-updated', initCertDetailsListener)
       }
-      window.addEventListener('password-details-updated', initPasswordsListener)
+      window.addEventListener('cert-details-updated', initCertDetailsListener)
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.async = true;
         po.src = 'gen/aboutPages.entry.js';
@@ -23,7 +22,7 @@
       })
     </script>
     <script src="ext/l20n.min.js" async></script>
-    <link rel="localization" href="locales/{locale}/passwords.l20n">
+    <link rel="localization" href="locales/{locale}/app.l20n">
  </head>
  <body>
     <div id="appContainer"/>

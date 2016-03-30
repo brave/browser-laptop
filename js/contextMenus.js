@@ -22,6 +22,8 @@ const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
+const getSetting = require('./settings').getSetting
+const settings = require('./constants/settings')
 
 /**
  * Obtains an add bookmark menu item
@@ -635,6 +637,20 @@ function mainTemplateInit (nodeProps, frame) {
         windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
       }
     })
+
+  if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
+    template.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: '1Password',
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            ipc.send('chrome-browser-action-clicked-aomjjhallfgjeglblehebfpbcfeobpgk', '1Password')
+          }
+        }
+      })
+  }
+
   return template
 }
 

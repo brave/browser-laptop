@@ -6,11 +6,12 @@ const siteTags = require('../../js/constants/siteTags')
 
 describe('sessionStore', function () {
   function * setup (client) {
+    Brave.addCommands()
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.browserWindowUrl)
       .waitForVisible('#window')
       .waitForVisible(urlInput)
-    Brave.addCommands()
   }
 
   describe('state is preserved', function () {

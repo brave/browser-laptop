@@ -35,6 +35,7 @@ const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
+const path = require('path')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -348,6 +349,20 @@ app.on('ready', () => {
     AppStore.addChangeListener(() => {
       Menu.init(AppStore.getState().get('settings'))
       initiateSessionStateSave()
+    })
+
+    // TODO(bridiver) - load everything in the extensions directory
+    // nbhlofbabihjaodgnlpmgjhdjjmojpah
+    process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'))
+    process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
+    process.on('did-extension-load-error', function (name, error_message) {
+      console.error('Error loading extension ' + name + ':', error_message)
+    })
+    process.on('did-extension-load', function (name) {
+      console.log('extension ' + name + ' loaded')
+    })
+    process.on('chrome-browser-action-registered', function (channel, actionTitle) {
+      // TODO - update the menu and shortcuts
     })
 
     Filtering.init()

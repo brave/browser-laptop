@@ -10,11 +10,11 @@
     "checks": "npm run check-security",
     "check-security": "nsp check",
     "docs": "jsdox js/actions/appActions.js js/actions/windowActions.js --output docs",
-    "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-dcheck",
+    "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "watch-all": "npm run watch & npm run watch-test",
     "watch-test": "NODE_ENV=test webpack --watch",
-    "watch": "webpack-dev-server --inline --hot --colors --content-base=./app/",
+    "watch": "webpack-dev-server --inline --hot --colors --content-base=./app/extensions/brave",
     "electron-rebuild": "electron-rebuild",
     "lint": "standard",
     "preload-httpse": "node ./preload-httpse.js",
@@ -128,6 +128,7 @@
   },
   "standard": {
     "ignore": [
+      "app/extensions/**",
       "Brave-darwin-x64/**",
       "less/**",
       "res/**",

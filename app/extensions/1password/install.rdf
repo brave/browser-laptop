@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. --><RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>onepassword4@agilebits.com</em:id>
+    <em:version>ONEPASSWORD_DISPLAY_VERSION</em:version>
+    <em:type>2</em:type>
+    <em:bootstrap>true</em:bootstrap>
+    <em:unpack>false</em:unpack>
+
+	<em:targetApplication>
+	 <Description>
+	  <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!--Firefox-->
+	  <em:minVersion>38.0</em:minVersion>
+	  <em:maxVersion>43.*</em:maxVersion> <!--  must be valid/published: https://addons.mozilla.org/en-US/firefox/pages/appversions -->
+	 </Description>
+	</em:targetApplication>
+
+
+    <!-- Front End MetaData -->
+    <em:name>1Password</em:name>
+    <em:description>Password and identity manager for Mac, Windows, iOS and Android.</em:description>
+    <em:creator>AgileBits Inc</em:creator>
+    <em:homepageURL>https://agilebits.com/onepassword</em:homepageURL>
+    <em:updateURL>ONEPASSWORD_UPDATE_URL</em:updateURL>
+  </Description>
+</RDF>

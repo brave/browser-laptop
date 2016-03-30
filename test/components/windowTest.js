@@ -10,15 +10,30 @@ describe('application window', function () {
     it('opens a window and loads the UI', function *() {
       yield this.app.client
         .waitUntilWindowLoaded()
+        .waitForUrl(Brave.newTabUrl)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(activeWebview)
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .getWindowCount().should.eventually.equal(2) // main window and webview
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .isWindowMinimized().should.eventually.be.false
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .isWindowDevToolsOpened().should.eventually.be.false
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .isWindowVisible().should.eventually.be.true
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .isWindowFocused().should.eventually.be.true
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .getWindowWidth().should.eventually.be.getDefaultWindowWidth()
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
         .getWindowHeight().should.eventually.be.getDefaultWindowHeight()
-        .waitForVisible('#window')
     })
   })
 
@@ -39,21 +54,22 @@ describe('application window', function () {
               return count === 4 // two windows with two views each
             })
           })
-          .waitForVisible(activeWebview)
       })
 
       it('offsets from the focused window', function *() {
         yield this.app.client
-          .getWindowBounds().then((res) => res.x).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
+          .windowByIndex(2).getWindowBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
         yield this.app.client
-          .getWindowBounds().then((res) => res.y).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
+          .windowByIndex(2).getWindowBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
       it('has the default width and height', function *() {
         yield this.app.client
-          .getWindowWidth().should.eventually.be.getDefaultWindowWidth()
+          .windowByIndex(2).getWindowWidth().should.eventually.be.getDefaultWindowWidth()
         yield this.app.client
-          .getWindowHeight().should.eventually.be.getDefaultWindowHeight()
+          .windowByIndex(2).getWindowHeight().should.eventually.be.getDefaultWindowHeight()
       })
     })
 
@@ -70,22 +86,22 @@ describe('application window', function () {
               return count === 4 // two windows with two views each
             })
           })
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
       })
 
       it('offsets from the focused window', function *() {
         yield this.app.client
-          .getWindowBounds().then((res) => res.x).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
+          .windowByIndex(2).getWindowBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
         yield this.app.client
-          .getWindowBounds().then((res) => res.y).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
+          .windowByIndex(2).getWindowBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
       it('has the width and height of the last window resize', function *() {
         yield this.app.client
-          .getWindowWidth().should.eventually.be.equal(600)
+          .windowByIndex(2).getWindowWidth().should.eventually.be.equal(600)
         yield this.app.client
-          .getWindowHeight().should.eventually.be.equal(700)
+          .windowByIndex(2).getWindowHeight().should.eventually.be.equal(700)
       })
     })
 
@@ -102,6 +118,7 @@ describe('application window', function () {
               return count === 4 // two windows with two views each
             })
           })
+          .windowByIndex(2) // the new browser window
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
       })
@@ -130,9 +147,7 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .waitForUrl(Brave.newTabUrl)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
@@ -153,7 +168,7 @@ describe('application window', function () {
 
       it('set the url', function *() {
         yield this.app.client
-          .windowByUrl(this.page1)
+          .waitForUrl(this.page1)
       })
 
       it('sets the width and height', function *() {
@@ -182,8 +197,7 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .waitForUrl(Brave.newTabUrl)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
@@ -259,12 +273,11 @@ describe('application window', function () {
         before(function *() {
           this.window_open_page = Brave.server.url('window_open.html')
           this.page1 = Brave.server.urlWithIpAddress('page1.html')
-          var page1 = this.page1 // for wait closure
 
           yield this.app.client
             .waitUntilWindowLoaded()
             .waitForVisible(activeWebview)
-            .windowByIndex(1)
+            .waitForUrl(Brave.newTabUrl)
             .url(this.window_open_page)
             .execute(function (page1) {
               global.triggerFunction = function () {
@@ -278,11 +291,7 @@ describe('application window', function () {
               })
             })
             // page1 loaded
-            .waitUntil(function () {
-              return this.windowByUrl(page1).getUrl().then((response) => {
-                return response === page1
-              })
-            })
+            .waitForUrl(this.page1)
         })
 
         it('has parent document.domain set to localhost', function *() {
@@ -612,30 +621,20 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .waitForUrl(Brave.newTabUrl)
           .url(this.click_with_target_page)
           .waitForVisible('#none')
           .click('#none')
       })
 
       it('loads in the current tab', function *() {
-        var page1 = this.page1 // for wait closure
         yield this.app.client
-          // page1 loaded
-          .waitUntil(function () {
-            return this.windowByUrl(page1).getUrl().then((response) => {
-              return response === page1
-            })
-          })
-
-        // this isn't a very good test because it could evaluate before the new
-        // tab/window opens. Is there something else we can check?
-        yield this.app.client
+          .waitForUrl(this.page1)
           .getWindowCount().should.eventually.equal(2) // still just one window
 
-        yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
       })
     })
 
@@ -647,30 +646,20 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .waitForUrl(Brave.newTabUrl)
           .url(this.click_with_target_page)
           .waitForVisible('#_self')
           .click('#_self')
       })
 
       it('loads in the current tab', function *() {
-        var page1 = this.page1 // for wait closure
         yield this.app.client
-          // page1 loaded
-          .waitUntil(function () {
-            return this.windowByUrl(page1).getUrl().then((response) => {
-              return response === page1
-            })
-          })
-
-        // this isn't a very good test because it could evaluate before the new
-        // tab/window opens. Is there something else we can check?
-        yield this.app.client
+          .waitForUrl(this.page1)
           .getWindowCount().should.eventually.equal(2) // still just one window
 
-        yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
       })
     })
 
@@ -682,9 +671,7 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .waitForUrl(Brave.newTabUrl)
           .url(this.click_with_target_page)
           .frame('parent')
           .waitForVisible('#_parent')
@@ -692,21 +679,13 @@ describe('application window', function () {
       })
 
       it('sets the url of the parent frame in the same domain', function *() {
-        var page1 = this.page1 // for wait closure
         yield this.app.client
-          // page1 loaded
-          .waitUntil(function () {
-            return this.windowByUrl(page1).getUrl().then((response) => {
-              return response === page1
-            })
-          })
-
-        // this isn't a very good test because it could evaluate before the new
-        // tab/window opens. Is there something else we can check?
-        yield this.app.client
+          .waitForUrl(this.page1)
           .getWindowCount().should.eventually.equal(2) // still just one window
 
-        yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
       })
     })
 
@@ -720,7 +699,7 @@ describe('application window', function () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .windowByUrl(Brave.newTabUrl)
           .url(this.click_with_target_page)
           .frame('parent')
           .frame('top')

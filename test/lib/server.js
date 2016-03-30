@@ -109,6 +109,13 @@ Server.create = function (root, callback) {
   var fork = require('child_process').fork
   var child = fork(`${__dirname}/serverChild.js`, [root])
 
+  process.on('exit', () => child.kill('SIGQUIT'))
+  process.on('SIGHUP', () => child.kill('SIGHUP'))
+  process.on('SIGINT', () => child.kill('SIGINT'))
+  process.on('SIGQUIT', () => child.kill('SIGQUIT'))
+  process.on('SIGABRT', () => child.kill('SIGABRT'))
+  process.on('SIGTERM', () => child.kill('SIGTERM'))
+
   // wait for start message ['start', PORT_NUMBER].
   child.on('message', function (data) {
     if (Array.isArray(data) && data[0] === 'start') {

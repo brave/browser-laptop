@@ -102,8 +102,8 @@ class SearchTab extends ImmutableComponent {
       <SettingItem dataL10nId='defaultSearchEngine'>
         <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
           onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_SEARCH_ENGINE)}>
-          <option value='./content/search/google.xml'>Google</option>
-          <option value='./content/search/duckduckgo.xml'>DuckDuckGo</option>
+          <option value='search/google.xml'>Google</option>
+          <option value='search/duckduckgo.xml'>DuckDuckGo</option>
         </select>
       </SettingItem>
     </SettingsList>
@@ -156,6 +156,7 @@ class SecurityTab extends ImmutableComponent {
     return <div>
       <SettingsList>
         <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
       <div>
         <span className='linkText' data-l10n-id='managePasswords'

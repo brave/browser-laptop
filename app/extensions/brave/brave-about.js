@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function () {
-  var ipcRenderer = process.binding.v8_util.getHiddenValue(this, 'ipc')
+  var ipcRenderer = chrome.ipc;
   ipcRenderer.on('settings-updated', (e, settings) => {
     const event = new window.CustomEvent('settings-updated', {
       detail: settings
