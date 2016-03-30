@@ -180,6 +180,19 @@ module.exports.downloadsMenuItem = {
   }
 }
 
+module.exports.passwordsMenuItem = {
+  label: 'Passwords manager...',
+  click: (item, focusedWindow) => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({
+        location: 'about:passwords'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:passwords', { singleFrame: true }])
+    }
+  }
+}
+
 module.exports.importBookmarksMenuItem = {
   label: 'Import Bookmarks (from HTML export)',
   click: function (item, focusedWindow) {

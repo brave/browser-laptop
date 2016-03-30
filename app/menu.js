@@ -445,7 +445,8 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         CommonMenu.bookmarksMenuItem,
-        CommonMenu.downloadsMenuItem, {
+        CommonMenu.downloadsMenuItem,
+        CommonMenu.passwordsMenuItem, {
           label: 'History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
