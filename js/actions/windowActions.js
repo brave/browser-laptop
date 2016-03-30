@@ -772,16 +772,18 @@ const windowActions = {
   },
 
   zoomIn: function (frameProps) {
-    dispatch({
-      frameProps,
-      actionType: WindowConstants.WINDOW_ZOOM_IN
-    })
+    windowActions.zoom(frameProps, 0.5)
   },
 
   zoomOut: function (frameProps) {
+    windowActions.zoom(frameProps, -0.5)
+  },
+
+  zoom: function (frameProps, stepSize) {
     dispatch({
       frameProps,
-      actionType: WindowConstants.WINDOW_ZOOM_OUT
+      stepSize,
+      actionType: WindowConstants.WINDOW_ZOOM
     })
   },
 

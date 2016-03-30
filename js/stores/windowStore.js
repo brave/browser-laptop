@@ -462,27 +462,17 @@ const doAction = (action) => {
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
     // Zoom state
-    case WindowConstants.WINDOW_ZOOM_IN:
-      let zoomInLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
+    case WindowConstants.WINDOW_ZOOM:
+      let zoomLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
       // for backwards compatibility with previous stored window state
-      if (zoomInLevel === undefined) {
-        zoomInLevel = 1
+      if (zoomLevel === undefined) {
+        zoomLevel = 1
       }
-      if (config.zoom.max > zoomInLevel) {
-        zoomInLevel += 1
+      if (config.zoom.max >= zoomLevel + action.stepSize &&
+          config.zoom.min <= zoomLevel + action.stepSize) {
+        zoomLevel += action.stepSize
       }
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomInLevel)
-      break
-    case WindowConstants.WINDOW_ZOOM_OUT:
-      let zoomOutLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
-      // for backwards compatibility with previous stored window state
-      if (zoomOutLevel === undefined) {
-        zoomOutLevel = 1
-      }
-      if (config.zoom.min < zoomOutLevel) {
-        zoomOutLevel -= 1
-      }
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomOutLevel)
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomLevel)
       break
     case WindowConstants.WINDOW_ZOOM_RESET:
       windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), config.zoom.defaultValue)

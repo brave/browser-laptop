@@ -19,6 +19,7 @@ const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const FullScreenWarning = require('./fullScreenWarning')
+const debounce = require('../lib/debounce.js')
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
@@ -27,6 +28,7 @@ class Frame extends ImmutableComponent {
   constructor () {
     super()
     this.previousLocation = 'about:newtab'
+    this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 5)
   }
 
   updateWebview () {
@@ -412,6 +414,9 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('audioMuted')) {
       this.webview.setAudioMuted(true)
     }
+
+    // Handle zoom using Ctrl/Cmd and the mouse wheel.
+    this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
 
   insertAds (currentLocation) {
@@ -439,6 +444,23 @@ class Frame extends ImmutableComponent {
   onFindHide () {
     windowActions.setFindbarShown(this.props.frame, false)
     this.onClearMatch()
+  }
+
+  onUpdateWheelZoom () {
+    if (this.wheelDeltaY > 0) {
+      windowActions.zoomIn(this.props.frame)
+    } else {
+      windowActions.zoomOut(this.props.frame)
+    }
+    this.wheelDeltaY = 0
+  }
+
+  onMouseWheel (e) {
+    if (e.deltaY !== 0 && e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+      e.preventDefault()
+      this.wheelDeltaY = (this.wheelDeltaY || 0) + e.wheelDeltaY
+      this.onUpdateWheelZoom()
+    }
   }
 
   onFind (searchString, caseSensitivity, forward) {
