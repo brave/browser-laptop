@@ -1,8 +1,14 @@
 # Changelog
 
 ## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
-- Added downloads toolbar.
+- Added downloads toolbar which shows when there are active downloads.
 - Added downloads manager (about:downloads).
+- Added passwords manager (about:passwords).
+- Inspect Element context menu option added to bring up the DOM inspector.
+- Mouse wheel zooming with modifier key.
+- Close other tabs context menu items added.
+- Password saving fixes.
+- Bookmark fixes.
 - Upgrade to libchromiumcontent 49.0.2623.108.
 - Upgrade to Electron 0.37.3.
 - Upgrade to Node 5.9.1.
