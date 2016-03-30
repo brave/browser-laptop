@@ -27,6 +27,7 @@ class Frame extends ImmutableComponent {
   constructor () {
     super()
     this.previousLocation = 'about:newtab'
+    this.mouseWheelZoomCount = 0
   }
 
   updateWebview () {
@@ -412,6 +413,9 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('audioMuted')) {
       this.webview.setAudioMuted(true)
     }
+
+    // Handle zoom using Ctrl/Cmd and the mouse wheel.
+    this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
 
   insertAds (currentLocation) {
@@ -439,6 +443,20 @@ class Frame extends ImmutableComponent {
   onFindHide () {
     windowActions.setFindbarShown(this.props.frame, false)
     this.onClearMatch()
+  }
+
+  onMouseWheel (e) {
+    if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+      // Do not change the zoom level on each WheelEvent.
+      if (this.mouseWheelZoomCount++ === 15) {
+        this.mouseWheelZoomCount = 0
+        if (e.deltaY >= 0) {
+          windowActions.zoomIn(this.props.frame)
+        } else {
+          windowActions.zoomOut(this.props.frame)
+        }
+      }
+    }
   }
 
   onFind (searchString, caseSensitivity, forward) {
