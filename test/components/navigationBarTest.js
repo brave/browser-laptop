@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
-const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, titleBar, urlbarIcon} = require('../lib/selectors')
+const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 
@@ -52,12 +52,15 @@ describe('urlbar', function () {
         this.host = urlParse(this.page1Url).host
         yield setup(this.app.client)
         yield this.app.client.loadUrl(this.page1Url)
-        yield this.app.client.waitForValue(urlInput)
+        yield this.app.client
+          .moveToObject(navigator)
+          .waitForValue(urlInput)
       })
 
       it('has title mode', function *() {
         const host = this.host
         yield this.app.client
+          .moveToObject(activeWebview)
           .waitForExist(titleBar)
           .waitUntil(function () {
             return this.getText(titleBar).then((val) => val === host + ' | Page 1')
@@ -67,6 +70,7 @@ describe('urlbar', function () {
 
       it('shows the url on mouseover', function *() {
         yield this.app.client
+          .moveToObject(activeWebview)
           .moveToObject(titleBar)
           .waitForExist(navigatorLoadTime)
           .getValue(urlInput)
@@ -77,6 +81,7 @@ describe('urlbar', function () {
         let page1Url = this.page1Url
         yield this.app.client
           .ipcSend('shortcut-focus-url', false)
+          .moveToObject(activeWebview)
           .waitUntil(function () {
             return this.isExisting(titleBar).then((exists) => exists === false)
           })
@@ -93,13 +98,18 @@ describe('urlbar', function () {
         yield setup(this.app.client)
         // Navigate to a page with a title first to ensure it gets reset
         yield this.app.client.loadUrl(this.page1Url)
-        yield this.app.client.waitForValue(urlInput)
+        yield this.app.client
+          .moveToObject(navigator)
+          .waitForValue(urlInput)
         yield this.app.client.loadUrl(this.pageNoTitle)
-        yield this.app.client.waitForValue(urlInput)
+        yield this.app.client
+          .moveToObject(navigator)
+          .waitForValue(urlInput)
       })
 
       it('does not have title mode', function *() {
         yield this.app.client
+          .moveToObject(activeWebview)
           .waitUntil(function () {
             return this.isExisting(titleBar).then((exists) => exists === false)
           })
@@ -132,6 +142,7 @@ describe('urlbar', function () {
       it('updates the location in the navbar', function *() {
         var page = this.page
         yield this.app.client
+          .moveToObject(activeWebview)
           .waitForExist(titleBar)
           .moveToObject(titleBar)
           .waitForExist(urlInput)
