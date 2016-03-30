@@ -14,6 +14,7 @@ const dndData = require('../dndData')
 const cx = require('../lib/classSet.js')
 
 // Stylesheets
+require('../../less/about/itemList.less')
 require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -62,12 +63,12 @@ class BookmarkItem extends ImmutableComponent {
       onDoubleClick={this.navigate.bind(this)}>
     {
       this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')
-      ? <span className='bookmarkItem' title={this.props.bookmark.get('location')}>
-        <span className='bookmarkTitle'>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
+      ? <span className='aboutListItem' title={this.props.bookmark.get('location')}>
+        <span className='aboutItemTitle'>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
         {partitionNumberInfo}
-        <span className='bookmarkSeparator'>-</span><span className='bookmarkLocation'>{this.props.bookmark.get('location')}</span>
+        <span className='aboutItemSeparator'>-</span><span className='aboutItemLocation'>{this.props.bookmark.get('location')}</span>
       </span>
-      : <span className='bookmarkItem' title={this.props.bookmark.get('location')}>
+      : <span className='aboutListItem' title={this.props.bookmark.get('location')}>
         <span>{this.props.bookmark.get('location')}</span>
         {partitionNumberInfo}
       </span>
@@ -199,7 +200,7 @@ class AboutBookmarks extends React.Component {
   }
   render () {
     return <div className='bookmarksPage'>
-      <h2>Folders</h2>
+      <h2 data-l10n-id='folders'/>
       <div className='bookmarkPageContent'>
         <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
           bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}

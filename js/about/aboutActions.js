@@ -87,6 +87,15 @@ const AboutActions = {
     window.dispatchEvent(event)
   },
 
+  openDownloadPath: function (download) {
+    const event = new window.CustomEvent(messages.OPEN_DOWNLOAD_PATH, {
+      detail: {
+        download: download.toJS()
+      }
+    })
+    window.dispatchEvent(event)
+  },
+
   decryptPassword: function (encryptedPassword, authTag, iv, id) {
     const event = new window.CustomEvent(messages.DECRYPT_PASSWORD, {
       detail: {

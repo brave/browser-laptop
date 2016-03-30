@@ -40,7 +40,7 @@ class Frame extends ImmutableComponent {
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
     let aboutPreload = false
-    if (['about:preferences', 'about:bookmarks', 'about:certerror', 'about:passwords'].includes(location)) {
+    if (['about:preferences', 'about:bookmarks', 'about:downloads', 'about:certerror', 'about:passwords'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
       aboutPreload = true
     }
@@ -208,6 +208,10 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.BOOKMARKS_UPDATED, {
         bookmarks: this.props.bookmarks.toJS(),
         bookmarkFolders: this.props.bookmarkFolders.toJS()
+      })
+    } else if (this.props.frame.get('location') === 'about:downloads') {
+      this.webview.send(messages.DOWNLOADS_UPDATED, {
+        downloads: this.props.downloads.toJS()
       })
     } else if (this.props.frame.get('location') === 'about:passwords' &&
                prevProps.passwords !== this.props.passwords) {

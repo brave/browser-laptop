@@ -444,21 +444,10 @@ const init = (settingsState, args) => {
           enabled: false
         },
         CommonMenu.separatorMenuItem,
-        {
-          label: 'Downloads',
-          accelerator: 'Shift+CmdOrCtrl+J',
-          enabled: false
-        }, {
+        CommonMenu.bookmarksMenuItem,
+        CommonMenu.downloadsMenuItem, {
           label: 'History',
           accelerator: 'CmdOrCtrl+Y',
-          enabled: false
-        }, {
-          label: 'Bookmarks',
-          accelerator: 'Alt+CmdOrCtrl+B',
-          enabled: false
-        }, {
-          label: 'Tab Manager',
-          accelerator: 'Alt+CmdOrCtrl+M',
           enabled: false
         },
         CommonMenu.separatorMenuItem,

@@ -16,6 +16,7 @@ const path = require('path')
 const app = require('app')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
+const downloadStates = require('../js/constants/downloadStates')
 const sessionStorageVersion = 1
 let suffix = ''
 if (process.env.NODE_ENV === 'development') {
@@ -215,8 +216,21 @@ module.exports.loadAppState = () => {
       // We used to store a huge list of IDs but we didn't use them.
       // Get rid of them here.
       delete data.windows
-      // Don't restore downloads for now
-      delete data.downloads
+      // Delete downloaded items older than a week
+      if (data.downloads) {
+        const dateOffset = 7 * 24 * 60 * 60 * 1000
+        const lastWeek = new Date().getTime() - dateOffset
+        Object.keys(data.downloads).forEach((downloadId) => {
+          if (data.downloads[downloadId].startTime < lastWeek) {
+            delete data.downloads[downloadId]
+          } else {
+            const state = data.downloads[downloadId].state
+            if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
+              data.downloads[downloadId].state = downloadStates.INTERRUPTED
+            }
+          }
+        })
+      }
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }

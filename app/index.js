@@ -34,6 +34,7 @@ const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
+const shell = electron.shell
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -319,6 +320,10 @@ app.on('ready', () => {
 
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
       appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
+    })
+
+    ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
+      shell.openItem(download.savePath)
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {

@@ -16,6 +16,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('downloads-updated', (e, downloads) => {
+    const event = new window.CustomEvent('downloads-updated', {
+      detail: downloads
+    })
+    window.dispatchEvent(event)
+  })
   ipcRenderer.on('cert-details-updated', (e, details) => {
     const event = new window.CustomEvent('cert-details-updated', {
       detail: details
@@ -52,6 +58,9 @@
   })
   window.addEventListener('move-site', (e) => {
     ipcRenderer.send('move-site', e.detail.sourceDetail, e.detail.destinationDetail, e.detail.prepend, e.detail.destinationIsParent)
+  })
+  window.addEventListener('open-download-path', (e) => {
+    ipcRenderer.send('open-download-path', e.detail.download)
   })
   window.addEventListener('decrypt-password', (e) => {
     ipcRenderer.send('decrypt-password', e.detail.encryptedPassword, e.detail.authTag, e.detail.iv, e.detail.id)

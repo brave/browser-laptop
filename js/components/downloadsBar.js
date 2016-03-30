@@ -5,74 +5,13 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Button = require('./button')
-const electron = require('electron')
-const shell = electron.shell
-const remote = electron.remote
-const clipboard = electron.clipboard
-const ipc = electron.ipcRenderer
 const contextMenus = require('../contextMenus')
-const messages = require('../constants/messages')
 const downloadStates = require('../constants/downloadStates')
-const downloadActions = require('../constants/downloadActions')
-const appActions = require('../actions/appActions')
-const windowActions = require('../actions/windowActions')
+const downloadActions = require('../actions/downloadActions')
+const downloadUtil = require('../state/downloadUtil')
 const cx = require('../lib/classSet')
-const fs = require('fs')
 
 class DownloadItem extends ImmutableComponent {
-  constructor () {
-    super()
-    this.clearDownload = this.clearDownload.bind(this)
-    this.deleteDownload = this.deleteDownload.bind(this)
-    this.redownloadURL = this.redownloadURL.bind(this)
-    this.openDownloadPath = this.openDownloadPath.bind(this)
-    this.locateShellPath = this.locateShellPath.bind(this)
-    this.copyLinkToClipboard = this.copyLinkToClipboard.bind(this)
-    this.cancelDownload = this.cancelDownload.bind(this)
-    this.pauseDownload = this.pauseDownload.bind(this)
-    this.resumeDownload = this.resumeDownload.bind(this)
-    this.onMouseEnter = this.onMouseEnter.bind(this)
-    this.onMouseLeave = this.onMouseLeave.bind(this)
-  }
-  clearDownload (e) {
-    if (e) {
-      e.stopPropagation()
-    }
-    if (this.props.downloadsSize === 1) {
-      this.props.onHideDownloads()
-    }
-    appActions.mergeDownloadDetail(this.props.downloadId)
-  }
-  deleteDownload () {
-    this.clearDownload()
-    fs.exists(this.savePath, (exists) => {
-      if (exists) {
-        shell.moveItemToTrash(this.props.download.get('savePath'))
-      }
-    })
-  }
-  redownloadURL () {
-    remote.getCurrentWebContents().downloadURL(this.props.download.get('url'))
-    this.clearDownload()
-  }
-  copyLinkToClipboard () {
-    clipboard.writeText(this.props.download.get('url'))
-  }
-  openDownloadPath () {
-    shell.openItem(this.props.download.get('savePath'))
-  }
-  locateShellPath () {
-    shell.showItemInFolder(this.props.download.get('savePath'))
-  }
-  cancelDownload () {
-    ipc.send(messages.DOWNLOAD_ACTION, this.props.downloadId, downloadActions.CANCEL)
-  }
-  pauseDownload () {
-    ipc.send(messages.DOWNLOAD_ACTION, this.props.downloadId, downloadActions.PAUSE)
-  }
-  resumeDownload () {
-    ipc.send(messages.DOWNLOAD_ACTION, this.props.downloadId, downloadActions.RESUME)
-  }
   get isInterrupted () {
     return this.props.download.get('state') === downloadStates.INTERRUPTED
   }
@@ -88,94 +27,64 @@ class DownloadItem extends ImmutableComponent {
   get isPaused () {
     return this.props.download.get('state') === downloadStates.PAUSED
   }
-  get isExpanded () {
-    return this.props.download.get('isExpanded')
-  }
-  get savePath () {
-    return this.props.download.get('savePath')
-  }
-  onMouseEnter () {
-    appActions.mergeDownloadDetail(this.props.downloadId, { isExpanded: true })
-  }
-  onMouseLeave () {
-    appActions.mergeDownloadDetail(this.props.downloadId, { isExpanded: false })
-  }
-  get stateL10nId () {
-    switch (this.props.download.get('state')) {
-      case downloadStates.INTERRUPTED:
-        return 'downloadInterrupted'
-      case downloadStates.CANCELLED:
-        return 'downloadCancelled'
-      case downloadStates.IN_PROGRESS:
-        return 'downloadInProgress'
-      case downloadStates.COMPLETED:
-        return 'downloadCompleted'
-      case downloadStates.PAUSED:
-        return 'downloadPaused'
-    }
-    return undefined
-  }
   render () {
-    const percentComplete = Math.ceil(this.props.download.get('receivedBytes') / this.props.download.get('totalBytes') * 100) + '%'
     const progressStyle = {
-      width: percentComplete
+      width: downloadUtil.getPercentageComplete(this.props.download)
     }
     const l10nStateArgs = {}
     if (this.isCancelled || this.isInterrupted) {
       progressStyle.display = 'none'
-    } else if (this.isInProgress || this.isPaused) {
-      l10nStateArgs.downloadPercent = percentComplete
+    } else if (downloadUtil.isPendingState(this.props.download)) {
+      l10nStateArgs.downloadPercent = downloadUtil.getPercentageComplete(this.props.download)
     }
     return <span
-      onDoubleClick={this.openDownloadPath}
-      onMouseEnter={this.onMouseEnter}
-      onMouseLeave={this.onMouseLeave}
+      onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, this.props.downloadId, this.props.download)}
+      onDoubleClick={downloadActions.openDownloadPath.bind(null, this.props.download)}
       className={cx({
         downloadItem: true,
         [this.props.download.get('state')]: true
       })}>
       <div className='downloadActions'>
         {
-          this.isInProgress
-          ? <Button l10nId='downloadPause' iconClass='fa-pause' onClick={this.pauseDownload}/>
+          downloadUtil.shouldAllowPause(this.props.download)
+          ? <Button l10nId='downloadPause' iconClass='fa-pause' onClick={downloadActions.pauseDownload.bind(null, this.props.downloadId)}/>
           : null
         }
         {
-          this.isPaused
-          ? <Button l10nId='downloadResume' iconClass='fa-play' onClick={this.resumeDownload}/>
+          downloadUtil.shouldAllowResume(this.props.download)
+          ? <Button l10nId='downloadResume' iconClass='fa-play' onClick={downloadActions.resumeDownload.bind(null, this.props.downloadId)}/>
           : null
         }
         {
-          this.isInProgress || this.isPaused
-          ? <Button l10nId='downloadCancel' iconClass='fa-times' onClick={this.cancelDownload}/>
+          downloadUtil.shouldAllowCancel(this.props.download)
+          ? <Button l10nId='downloadCancel' iconClass='fa-times' onClick={downloadActions.cancelDownload.bind(null, this.props.downloadId)}/>
           : null
         }
         {
-          this.isCancelled || this.isInterrupted || this.isCompleted
-          ? <Button l10nId='downloadRedownload' iconClass='fa-repeat' onClick={this.redownloadURL}/>
+          downloadUtil.shouldAllowRedownload(this.props.download)
+          ? <Button l10nId='downloadRedownload' iconClass='fa-repeat' onClick={downloadActions.redownloadURL.bind(null, this.props.download, this.props.downloadId)}/>
           : null
         }
         {
-          this.isCancelled || this.isInterrupted || this.isInProgress || this.isPaused || this.isCompleted
-          ? <Button l10nId='downloadCopyLinkLocation' iconClass='fa-link' onClick={this.copyLinkToClipboard}/>
+          downloadUtil.shouldAllowCopyLink(this.props.download)
+          ? <Button l10nId='downloadCopyLinkLocation' iconClass='fa-link' onClick={downloadActions.copyLinkToClipboard.bind(null, this.props.download)}/>
           : null
         }
         {
-          this.isInProgress || this.isCompleted || this.isPaused
-          ? <Button l10nId='downloadOpenPath' iconClass='fa-folder-open-o' onClick={this.locateShellPath}/>
+          downloadUtil.shouldAllowOpenDownloadLocation(this.props.download)
+          ? <Button l10nId='downloadOpenPath' iconClass='fa-folder-open-o' onClick={downloadActions.locateShellPath.bind(null, this.props.download)}/>
           : null
         }
         {
-          this.isCancelled || this.isInterrupted || this.isCompleted
-          ? <Button l10nId='downloadDelete' iconClass='fa-trash-o' onClick={this.deleteDownload}/>
+          downloadUtil.shouldAllowDelete(this.props.download)
+          ? <Button l10nId='downloadDelete' iconClass='fa-trash-o' onClick={downloadActions.deleteDownload.bind(null, this.props.downloads, this.props.download, this.props.downloadId)}/>
           : null
         }
         {
-          this.isInterrupted || this.isCompleted || this.isCancelled
-          ? <Button l10nId='downloadRemoveFromList' iconClass='fa-times' className='removeDownloadFromList' onClick={this.clearDownload} />
+          downloadUtil.shouldAllowRemoveFromList(this.props.download)
+          ? <Button l10nId='downloadRemoveFromList' iconClass='fa-times' className='removeDownloadFromList' onClick={downloadActions.clearDownload.bind(null, this.props.downloads, this.props.downloadId)} />
           : null
         }
-
       </div>
       {
         this.isInProgress || this.isPaused
@@ -191,35 +100,24 @@ class DownloadItem extends ImmutableComponent {
           </div>
         {
           this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
-          ? <div className='downloadState' data-l10n-id={this.stateL10nId} data-l10n-args={JSON.stringify(l10nStateArgs)}/>
+          ? <div className='downloadState' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)}/>
           : null
         }
         </span>
-        <span className={cx({
-          downloadArrow: true,
-          fa: true,
-          'fa-caret-down': !this.isExpanded
-        })}/>
+        <span className='downloadArrow fa-caret-down fa'/>
       </div>
     </span>
   }
 }
 
 class DownloadsBar extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onHideDownloads = this.onHideDownloads.bind(this)
-  }
-  onHideDownloads () {
-    windowActions.setDownloadsToolbarVisible(false)
-  }
   render () {
     const downloadItemWidth = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--download-item-width'))
     const downloadItemMargin = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--download-item-margin'))
     const downloadBarPadding = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--download-bar-padding'))
     const numItems = Math.floor((this.props.windowWidth - downloadBarPadding * 2) / (downloadItemWidth + downloadItemMargin))
     return <div className='downloadsBar'
-      onContextMenu={contextMenus.onDownloadsToolbarContextMenu}>
+      onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, undefined, undefined)}>
       <div className='downloadItems'>
       {
         this.props.downloads
@@ -230,14 +128,13 @@ class DownloadsBar extends ImmutableComponent {
             <DownloadItem download={download}
               windowWidth={this.props.windowWidth}
               downloadId={downloadId}
-              downloadsSize={this.props.downloads.size}
-              onHideDownloads={this.onHideDownloads}/>)
+              downloadsSize={this.props.downloads.size}/>)
       }
       </div>
       <div className='downloadBarButtons'>
         <Button iconClass='fa-times'
           className='downloadButton smallButton hideButton'
-          onClick={this.onHideDownloads} />
+          onClick={downloadActions.hideDownloadsToolbar} />
       </div>
     </div>
   }

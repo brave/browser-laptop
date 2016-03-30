@@ -509,6 +509,7 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK)) || new Immutable.Map()
                 : null}
+              downloads={this.props.appState.get('downloads') || new Immutable.Map()}
               bookmarkFolders={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')

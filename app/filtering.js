@@ -265,7 +265,7 @@ function updateDownloadState (downloadId, item, state) {
   }
 
   if (!item) {
-    appActions.mergeDownloadDetail(downloadId, { state })
+    appActions.mergeDownloadDetail(downloadId, { state: downloadStates.INTERRUPTED })
     return
   }
 
@@ -285,7 +285,6 @@ function registerForDownloadListener (session) {
   session.on('will-download', function (event, item, webContents) {
     const win = BrowserWindow.getFocusedWindow()
     const savePath = dialog.showSaveDialog(win, {
-      title: 'test',
       defaultPath: path.join(app.getPath('downloads'), item.getFilename())
     })
     // User cancelled out of save dialog prompt

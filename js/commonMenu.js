@@ -166,6 +166,20 @@ module.exports.bookmarksMenuItem = {
   }
 }
 
+module.exports.downloadsMenuItem = {
+  label: 'Downloads manager...',
+  accelerator: isDarwin ? 'CmdOrCtrl+Shift+J' : 'Ctrl+J',
+  click: (item, focusedWindow) => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({
+        location: 'about:downloads'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:downloads', { singleFrame: true }])
+    }
+  }
+}
+
 module.exports.importBookmarksMenuItem = {
   label: 'Import Bookmarks (from HTML export)',
   click: function (item, focusedWindow) {

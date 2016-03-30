@@ -15,6 +15,9 @@ switch (getSourceAboutUrl(window.location.href)) {
   case 'about:bookmarks':
     rootComponent = require('./bookmarks')
     break
+  case 'about:downloads':
+    rootComponent = require('./downloads')
+    break
   case 'about:certerror':
     rootComponent = require('./certerror')
     break

@@ -11,10 +11,12 @@ const messages = require('./constants/messages')
 const WindowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
 const bookmarkActions = require('./actions/bookmarkActions')
+const downloadActions = require('./actions/downloadActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
+const downloadUtil = require('./state/downloadUtil')
 const CommonMenu = require('./commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
@@ -87,20 +89,86 @@ function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail) {
   ]
 }
 
-function downloadsToolbarTemplateInit () {
-  return [{
-    label: 'Hide downloads bar',
-    click: () => {
-      windowActions.setDownloadsToolbarVisible(false)
+function downloadsToolbarTemplateInit (downloadId, downloadItem) {
+  const menu = []
+
+  if (downloadItem) {
+    const downloads = appStoreRenderer.state.get('downloads')
+    if (downloadUtil.shouldAllowPause(downloadItem)) {
+      menu.push({
+        label: 'Pause',
+        click: downloadActions.pauseDownload.bind(null, downloadId)
+      })
     }
-  },
-  CommonMenu.separatorMenuItem,
-  {
-    label: 'Clear completed downloads',
-    click: () => {
-      appActions.clearCompletedDownloads()
+
+    if (downloadUtil.shouldAllowResume(downloadItem)) {
+      menu.push({
+        label: 'Resume',
+        click: downloadActions.resumeDownload.bind(null, downloadId)
+      })
     }
-  }]
+
+    if (downloadUtil.shouldAllowCancel(downloadItem)) {
+      menu.push({
+        label: 'Cancel',
+        click: downloadActions.cancelDownload.bind(null, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowRedownload(downloadItem)) {
+      menu.push({
+        label: 'Download Again',
+        click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
+      menu.push({
+        label: 'Copy Link Location',
+        click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
+      })
+    }
+
+    if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
+      menu.push({
+        label: 'Open Folder Path',
+        click: downloadActions.locateShellPath.bind(null, downloadItem)
+      })
+    }
+
+    if (downloadUtil.shouldAllowDelete(downloadItem)) {
+      menu.push({
+        label: 'Delete Download',
+        click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
+      menu.push({
+        label: 'Clear Download',
+        click: downloadActions.clearDownload.bind(null, downloads, downloadId)
+      })
+    }
+    menu.push(CommonMenu.separatorMenuItem)
+  }
+
+  if (appStoreRenderer.state.getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
+    menu.push({
+      label: 'Hide downloads bar',
+      click: () => {
+        windowActions.setDownloadsToolbarVisible(false)
+      }
+    })
+  }
+
+  menu.push(CommonMenu.separatorMenuItem,
+    {
+      label: 'Clear completed downloads',
+      click: () => {
+        appActions.clearCompletedDownloads()
+      }
+    })
+  return menu
 }
 
 function bookmarkTemplateInit (siteDetail, activeFrame) {
@@ -392,6 +460,7 @@ function hamburgerTemplateInit (braverySettings) {
         CommonMenu.importBookmarksMenuItem
       ]
     },
+    CommonMenu.downloadsMenuItem,
     CommonMenu.separatorMenuItem,
     {
       label: 'Help',
@@ -563,6 +632,8 @@ export function onHamburgerMenu (braverySettings, e) {
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+  } else if (contextMenuType === 'download') {
+    onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
     mainMenu.popup(remote.getCurrentWindow())
@@ -581,9 +652,11 @@ export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail,
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
-export function onDownloadsToolbarContextMenu (e) {
-  e.stopPropagation()
-  const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit())
+export function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
+  if (e) {
+    e.stopPropagation()
+  }
+  const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit(downloadId, downloadItem))
   downloadsToolbarMenu.popup(remote.getCurrentWindow())
 }
 

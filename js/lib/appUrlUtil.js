@@ -28,6 +28,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:blank': module.exports.getAppUrl('./about-blank.html'),
   'about:history': module.exports.getAppUrl('./about-history.html'),
   'about:bookmarks': module.exports.getAppUrl('./about-bookmarks.html'),
+  'about:downloads': module.exports.getAppUrl('./about-downloads.html'),
   'about:newtab': module.exports.getAppUrl('./about-newtab.html'),
   'about:preferences': module.exports.getAppUrl('./about-preferences.html'),
   'about:config': module.exports.getAppUrl('./about-config.html'),
