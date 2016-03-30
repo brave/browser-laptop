@@ -314,7 +314,7 @@ function registerForDownloadListener (session) {
 }
 
 function initForPartition (partition) {
-  ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders, registerForDownloadListener].forEach((fn) => {
+  ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
     fn(session.fromPartition(partition))
   })
 }
