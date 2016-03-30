@@ -19,7 +19,7 @@ if (process.type === 'browser') {
   getCurrentWebContents = electron.getCurrentWebContents
 } else {
   shell = electron.remote.shell
-  ipc = electron.remote.ipcRenderer
+  ipc = electron.ipcRenderer
   clipboard = electron.remote.clipboard
   getCurrentWebContents = electron.remote.getCurrentWebContents
 }
