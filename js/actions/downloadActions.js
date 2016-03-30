@@ -4,16 +4,31 @@
 
 'use strict'
 
-const electron = require('electron')
-const shell = electron.shell
-const ipc = electron.ipcRenderer
-const remote = electron.remote
-const clipboard = electron.clipboard
+let electron
+try {
+  electron = require('electron')
+} catch (e) {
+  electron = global.require('electron')
+}
+
+let shell, ipc, clipboard, getCurrentWebContents
+if (process.type === 'browser') {
+  shell = electron.shell
+  ipc = electron.ipcRenderer
+  clipboard = electron.clipboard
+  getCurrentWebContents = electron.getCurrentWebContents
+} else {
+  shell = electron.remote.shell
+  ipc = electron.remote.ipcRenderer
+  clipboard = electron.remote.clipboard
+  getCurrentWebContents = electron.remote.getCurrentWebContents
+}
+
 const appDownloadActions = require('../constants/downloadActions')
 const appActions = require('../actions/appActions')
-const windowActions = require('../actions/windowActions')
 const messages = require('../constants/messages')
 const fs = require('fs')
+const path = require('path')
 
 /**
   * Creates an action function for the specified app download action
@@ -30,20 +45,31 @@ const downloadActions = {
     clipboard.writeText(download.get('url'))
   },
   openDownloadPath: function (download) {
-    shell.openItem(download.get('savePath'))
-  },
-  locateShellPath: function (download) {
-    shell.showItemInFolder(download.get('savePath'))
-  },
-  hideDownloadsToolbar: function () {
-    windowActions.setDownloadsToolbarVisible(false)
-  },
-  deleteDownload: function (downloads, download, downloadId) {
     fs.exists(download.get('savePath'), (exists) => {
       if (exists) {
-        shell.moveItemToTrash(download.get('savePath'))
+        shell.openItem(download.get('savePath'))
+      } else {
+        shell.beep()
       }
     })
+  },
+  locateShellPath: function (download) {
+    fs.exists(download.get('savePath'), (exists) => {
+      if (exists) {
+        shell.showItemInFolder(download.get('savePath'))
+      } else {
+        shell.openItem(path.dirname(download.get('savePath')))
+      }
+    })
+  },
+  hideDownloadsToolbar: function () {
+    if (process.type === 'renderer') {
+      const windowActions = require('../actions/windowActions')
+      windowActions.setDownloadsToolbarVisible(false)
+    }
+  },
+  deleteDownload: function (downloads, download, downloadId) {
+    shell.moveItemToTrash(download.get('savePath'))
     downloadActions.clearDownload(downloads, downloadId)
   },
   clearDownload: function (downloads, downloadId) {
@@ -53,7 +79,7 @@ const downloadActions = {
     appActions.mergeDownloadDetail(downloadId)
   },
   redownloadURL: function (download, downloadId) {
-    remote.getCurrentWebContents().downloadURL(download.get('url'))
+    getCurrentWebContents().downloadURL(download.get('url'))
     downloadActions.clearDownload(undefined, downloadId)
   }
 }

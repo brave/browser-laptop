@@ -17,6 +17,7 @@ const Menu = require('./menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const CrashHerald = require('./crash-herald')
@@ -34,7 +35,6 @@ const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
-const shell = electron.shell
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -323,7 +323,7 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
-      shell.openItem(download.savePath)
+      downloadActions.openDownloadPath(Immutable.fromJS(download))
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
