@@ -460,7 +460,7 @@ function hamburgerTemplateInit (braverySettings) {
         CommonMenu.importBookmarksMenuItem()
       ]
     },
-    CommonMenu.downloadsMenuItem,
+    CommonMenu.downloadsMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('help'),

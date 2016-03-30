@@ -189,44 +189,50 @@ module.exports.bookmarksMenuItem = () => {
   }
 }
 
-module.exports.downloadsMenuItem = {
-  label: locale.translation('downloadsManager'),
-  accelerator: isDarwin ? 'CmdOrCtrl+Shift+J' : 'Ctrl+J',
-  click: (item, focusedWindow) => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow(Immutable.fromJS({
-        location: 'about:downloads'
-      }))
-    } else {
-      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:downloads', { singleFrame: true }])
+module.exports.downloadsMenuItem = () => {
+  return {
+    label: locale.translation('downloadsManager'),
+    accelerator: isDarwin ? 'CmdOrCtrl+Shift+J' : 'Ctrl+J',
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:downloads'
+        }))
+      } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:downloads', { singleFrame: true }])
+      }
     }
   }
 }
 
-module.exports.passwordsMenuItem = {
-  label: 'Passwords manager...',
-  click: (item, focusedWindow) => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow(Immutable.fromJS({
-        location: 'about:passwords'
-      }))
-    } else {
-      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:passwords', { singleFrame: true }])
+module.exports.passwordsMenuItem = () => {
+  return {
+    label: 'Passwords manager...',
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:passwords'
+        }))
+      } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:passwords', { singleFrame: true }])
+      }
     }
   }
 }
 
-module.exports.importBookmarksMenuItem = {
-  label: locale.translation('importBookmarks'),
-  click: function (item, focusedWindow) {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow(undefined, undefined, undefined, function () {
-        // The timeout here isn't necessary but giving the window a bit of time to popup
-        // before the modal file picker pops up seems to work nicer.
-        setTimeout(() =>
-          module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
-      })
-      return
+module.exports.importBookmarksMenuItem = () => {
+  return {
+    label: locale.translation('importBookmarks'),
+    click: function (item, focusedWindow) {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(undefined, undefined, undefined, function () {
+          // The timeout here isn't necessary but giving the window a bit of time to popup
+          // before the modal file picker pops up seems to work nicer.
+          setTimeout(() =>
+            module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
+        })
+        return
+      }
     }
   }
   /*

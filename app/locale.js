@@ -10,6 +10,7 @@ const ipcMain = require('electron').ipcMain
 
 var menuIdentifiers = () => {
   return [
+    'downloadsManager',
     'confirmClearPasswords',
     'about',
     'quit',

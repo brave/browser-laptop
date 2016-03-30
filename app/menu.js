@@ -448,7 +448,7 @@ const init = (settingsState, args) => {
           enabled: false
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.bookmarksMenuItem,
+        CommonMenu.bookmarksMenuItem(),
         CommonMenu.downloadsMenuItem(),
         CommonMenu.passwordsMenuItem(),
         {
