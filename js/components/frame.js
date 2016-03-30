@@ -19,6 +19,7 @@ const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const FullScreenWarning = require('./fullScreenWarning')
+const debounce = require('../lib/debounce.js')
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
@@ -27,7 +28,7 @@ class Frame extends ImmutableComponent {
   constructor () {
     super()
     this.previousLocation = 'about:newtab'
-    this.mouseWheelZoomCount = 0
+    this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 5)
   }
 
   updateWebview () {
@@ -445,18 +446,20 @@ class Frame extends ImmutableComponent {
     this.onClearMatch()
   }
 
+  onUpdateWheelZoom () {
+    if (this.wheelDeltaY > 0) {
+      windowActions.zoomIn(this.props.frame)
+    } else {
+      windowActions.zoomOut(this.props.frame)
+    }
+    this.wheelDeltaY = 0
+  }
+
   onMouseWheel (e) {
-    if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+    if (e.deltaY !== 0 && e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
       e.preventDefault()
-      // Do not change the zoom level on each WheelEvent.
-      if (this.mouseWheelZoomCount++ === 15) {
-        this.mouseWheelZoomCount = 0
-        if (e.deltaY >= 0) {
-          windowActions.zoomIn(this.props.frame)
-        } else {
-          windowActions.zoomOut(this.props.frame)
-        }
-      }
+      this.wheelDeltaY = (this.wheelDeltaY || 0) + e.wheelDeltaY
+      this.onUpdateWheelZoom()
     }
   }
 
