@@ -1,10 +1,13 @@
 # Changelog
 
 ## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
+- Added downloads toolbar.
+- Added downloads manager (about:downloads).
+- Upgrade to libchromiumcontent 49.0.2623.108.
+- Upgrade to Electron 0.37.3.
+- Upgrade to Node 5.9.1.
+- Fixed various bugs.
 - .deb and .rpm [Linux packages available](https://github.com/brave/browser-laptop/blob/master/docs/linuxInstall.md) for various distros.
-- Upgrade to libchromiumcontent 49.0.2623.108
-- Upgrade to Electron 0.37.3
-- Upgrade to Node 5.9.1
 
 ## [0.8.2](https://github.com/brave/browser-laptop/releases/v0.8.2dev)
 - Password saving feature added.
