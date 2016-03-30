@@ -447,6 +447,7 @@ class Frame extends ImmutableComponent {
 
   onMouseWheel (e) {
     if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+      e.preventDefault()
       // Do not change the zoom level on each WheelEvent.
       if (this.mouseWheelZoomCount++ === 15) {
         this.mouseWheelZoomCount = 0
