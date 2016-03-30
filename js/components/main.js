@@ -460,7 +460,7 @@ class Main extends ImmutableComponent {
           allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined)}>
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined, undefined)}>
           {
             nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}

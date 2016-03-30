@@ -72,7 +72,7 @@ class AddEditBookmark extends ImmutableComponent {
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onParentFolderChange (e) {
-    const currentDetail = this.props.currentDetail.set('parentFolderId', e.target.value)
+    const currentDetail = this.props.currentDetail.set('parentFolderId', Number(e.target.value))
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onSave () {

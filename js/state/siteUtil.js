@@ -150,9 +150,10 @@ function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
  * @param destinationDetail The site detail to move to
  * @param prepend Whether the destination detail should be prepended or not, not used if destinationIsParent is true
  * @param destinationIsParent Whether the item should be moved inside of the destinationDetail.
+ * @param disallowReparent If set to true, parent folder will not be set
  * @return The new sites Immutable object
  */
-module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent) {
+module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent, disallowReparent) {
   // Disallow loops
   let parentFolderIds = []
   if (destinationDetail.get('parentFolderId') && sourceDetail.get('folderId')) {
@@ -180,12 +181,15 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
   if (newIndex > sourceSiteIndex) {
     newIndex--
   }
-  if (destinationIsParent && destinationDetail.get('folderId') !== sourceSite.get('folderId')) {
-    sourceSite = sourceSite.set('parentFolderId', destinationDetail.get('folderId'))
-  } else if (!destinationSite.get('parentFolderId')) {
-    sourceSite = sourceSite.delete('parentFolderId')
-  } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
-    sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
+
+  if (!disallowReparent) {
+    if (destinationIsParent && destinationDetail.get('folderId') !== sourceSite.get('folderId')) {
+      sourceSite = sourceSite.set('parentFolderId', destinationDetail.get('folderId'))
+    } else if (!destinationSite.get('parentFolderId')) {
+      sourceSite = sourceSite.delete('parentFolderId')
+    } else if (destinationSite.get('parentFolderId') !== sourceSite.get('parentFolderId')) {
+      sourceSite = sourceSite.set('parentFolderId', destinationSite.get('parentFolderId'))
+    }
   }
   return sites.splice(newIndex, 0, sourceSite)
 }

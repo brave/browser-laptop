@@ -320,7 +320,7 @@ const handleAppAction = (action) => {
         appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
       }
       if (action.destinationDetail) {
-        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false))
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false, true))
       }
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
@@ -331,7 +331,7 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
       break
     case AppConstants.APP_MERGE_DOWNLOAD_DETAIL:
       if (action.downloadDetail) {

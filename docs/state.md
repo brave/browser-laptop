@@ -14,7 +14,9 @@ AppStore
     title: string,
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     lastAccessedTime: number, // datetime.getTime()
-    partitionNumber: number // Optionally specifies a specific session
+    partitionNumber: number, // Optionally specifies a specific session
+    folderId: number, // Set for bookmark folders only
+    parentFolderId: number // Set for bookmarks and bookmark folders only
   }],
   downloads: [{
     downloadId: string,

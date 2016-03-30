@@ -27,24 +27,27 @@ const ipc = global.require('electron').ipcRenderer
  * Obtains an add bookmark menu item
  * @param {object} Detail of the bookmark to initialize with
  */
-const addBookmarkMenuItem = (siteDetail, parentSiteDetail) => {
+const addBookmarkMenuItem = (siteDetail, closestDestinationDetail, isParent) => {
   return {
     label: 'Add Bookmark...',
     click: () => {
-      siteDetail = siteDetail.set('parentFolderId', parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId')))
-      windowActions.setBookmarkDetail(siteDetail, undefined, parentSiteDetail)
+      if (isParent) {
+        siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+      }
+      windowActions.setBookmarkDetail(siteDetail, undefined, closestDestinationDetail)
     }
   }
 }
 
-const addFolderMenuItem = (parentSiteDetail) => {
+const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   return {
     label: 'Add Folder...',
     click: () => {
-      const emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER],
-        parentFolderId: parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId'))
-      })
-      windowActions.setBookmarkDetail(emptyFolder, undefined, parentSiteDetail)
+      let emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER] })
+      if (isParent) {
+        emptyFolder = emptyFolder.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+      }
+      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail)
     }
   }
 }
@@ -79,13 +82,13 @@ function inputTemplateInit (e) {
   return getEditableItems(hasSelection)
 }
 
-function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail) {
+function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
   return [
     CommonMenu.bookmarksMenuItem,
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail),
-    addFolderMenuItem(closestDestinationDetail)
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
+    addFolderMenuItem(closestDestinationDetail, isParent)
   ]
 }
 
@@ -208,8 +211,8 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
 
   template.push(
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail),
-    addFolderMenuItem(siteDetail))
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+    addFolderMenuItem(siteDetail, true))
   return template
 }
 
@@ -602,7 +605,7 @@ function mainTemplateInit (nodeProps, frame) {
   })
 
   template.push(CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK)),
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
     {
       label: 'Add to reading list',
       enabled: false
@@ -646,9 +649,9 @@ export function onTabContextMenu (frameProps, e) {
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, e) {
+export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
