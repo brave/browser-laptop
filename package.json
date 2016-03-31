@@ -100,6 +100,7 @@
     "empty-port": "0.0.2",
     "gulp": "^3.9.0",
     "jsdox": "^0.4.9",
+    "jsonfile": "^2.2.3",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
     "mocha": "^2.3.4",
