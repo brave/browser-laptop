@@ -28,6 +28,7 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 
 let menuArgs = {}
+let lastSettingsState, lastArgs
 
 /**
  * Sets up the menu.
@@ -37,6 +38,17 @@ let menuArgs = {}
  *   bookmarked
  */
 const init = (settingsState, args) => {
+  // Check for uneeded updates.
+  // Updating the menu when it is not needed causes the menu to close if expanded
+  // and also causes menu clicks to not work.  So we don't want to update it a lot
+  // when app state changes, like when there are downloads.
+  // Note that settingsState is not used directly below, but getSetting uses it.
+  if (settingsState === lastSettingsState && args === lastArgs) {
+    return
+  }
+
+  lastSettingsState = settingsState
+  lastArgs = args
   menuArgs = Object.assign(menuArgs, args || {})
   // Create references to menu items that need to be updated dynamically
   const bookmarkPageMenuItem = {
