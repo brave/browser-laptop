@@ -371,16 +371,9 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_PINNED:
-      // Support lazy obtaining the location via just the key
-      let location = action.frameProps.get('location')
-      if (!location) {
-        const foundFrame = FrameStateUtil.getFrameByKey(windowState, action.frameProps.get('key'))
-        if (foundFrame) {
-          location = foundFrame.get('location')
-        }
-      }
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
+      const location = action.frameProps.get('location')
       const alreadyPinnedFrameProps = windowState.get('frames').find((frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME

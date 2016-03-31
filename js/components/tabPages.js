@@ -6,11 +6,8 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
-const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const {onTabPageContextMenu} = require('../contextMenus')
-const siteUtil = require('../state/siteUtil')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
 
@@ -33,7 +30,6 @@ class TabPage extends ImmutableComponent {
         sourceDragFromPageIndex >= this.props.index)
       if (sourceDragData.get('pinnedLocation')) {
         windowActions.setPinned(sourceDragData, false)
-        appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED), siteTags.PINNED)
       }
       windowActions.setIsBeingDraggedOverDetail()
     }, 0)

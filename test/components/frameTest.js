@@ -99,7 +99,7 @@ describe('view source', function () {
 
   it('open from pinned tab', function *() {
     yield this.app.client
-      .setPinned(2, true)
+      .setPinned(this.url, true)
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
       .waitForExist(this.webview2)
   })

@@ -14,6 +14,8 @@ const remote = electron.remote
 const messages = require('../constants/messages')
 const appActions = require('./appActions')
 const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
+const siteUtil = require('../state/siteUtil')
+const siteTags = require('../constants/siteTags')
 
 function dispatch (action) {
   if (windowActions.dispatchToIPC) {
@@ -210,6 +212,12 @@ const windowActions = {
       frameProps,
       isPinned
     })
+    const siteDetail = siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED)
+    if (isPinned) {
+      appActions.addSite(siteDetail, siteTags.PINNED)
+    } else {
+      appActions.removeSite(siteDetail, siteTags.PINNED)
+    }
   },
 
   /**
