@@ -6,6 +6,7 @@
 <downloadCompleted "Completed">
 <downloadInProgress "Downloading: {{$downloadPercent}}">
 <downloadPaused "Paused: {{$downloadPercent}}">
+<downloadInProgressUnknownTotal "Downloading...">
 
 <downloadPause title: "Pause Download">
 <downloadResume title: "Resume Download">

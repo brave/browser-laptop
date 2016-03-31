@@ -38,7 +38,11 @@ module.exports.getL10nId = (download) => {
     case downloadStates.CANCELLED:
       return 'downloadCancelled'
     case downloadStates.IN_PROGRESS:
-      return 'downloadInProgress'
+      if (!download.get('totalBytes')) {
+        return 'downloadInProgressUnknownTotal'
+      } else {
+        return 'downloadInProgress'
+      }
     case downloadStates.COMPLETED:
       return 'downloadCompleted'
     case downloadStates.PAUSED:

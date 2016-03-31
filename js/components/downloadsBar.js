@@ -87,7 +87,7 @@ class DownloadItem extends ImmutableComponent {
         }
       </div>
       {
-        this.isInProgress || this.isPaused
+        (this.isInProgress || this.isPaused) && this.props.download.get('totalBytes')
         ? <div className='downloadProgress' style={progressStyle}/>
         : null
       }
