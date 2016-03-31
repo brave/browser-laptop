@@ -56,12 +56,14 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.  Clear out old webviews if the contentScripts change or if
     // allowRunningInsecureContent changes because they cannot change after being added to the DOM.
+    let webviewAdded = false
     if (!this.webview || this.webview.allowRunningInsecureContent !== allowRunningInsecureContent || contentScriptsChanged) {
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
       this.webview = document.createElement('webview')
       src = location
+      webviewAdded = true
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
@@ -98,7 +100,7 @@ class Frame extends ImmutableComponent {
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
-    if (!this.webviewContainer.firstChild) {
+    if (webviewAdded) {
       this.webviewContainer.appendChild(this.webview)
       this.addEventListeners()
     }
