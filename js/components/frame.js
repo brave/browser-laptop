@@ -20,6 +20,8 @@ const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
+const getSetting = require('../settings').getSetting
+const settings = require('../constants/settings')
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
@@ -331,6 +333,9 @@ class Frame extends ImmutableComponent {
         this.insertAds(this.webview.getURL())
       }
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
+      if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
+        this.webview.send(messages.AUTOFILL_PASSWORD)
+      }
       let security = this.props.frame.get('security')
       if (this.props.frame.get('location') === 'about:certerror' &&
           security && security.get('certDetails')) {

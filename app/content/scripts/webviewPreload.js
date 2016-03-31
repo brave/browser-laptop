@@ -234,11 +234,9 @@
   }
 
   /**
-   * I think window load events might fire before this script runs, so
-   * try running the listener immediately. Otherwise run it on window.onload.
    * @return {boolean}
    */
-  function onLoadListener () {
+  function autofillPasswordListener () {
     // Don't autofill on non-HTTP(S) sites for now
     if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
       return false
@@ -275,9 +273,8 @@
     return true
   }
 
-  if (!onLoadListener()) {
-    window.addEventListener('load', onLoadListener)
-  }
+  // Fires when the page is loaded and the default pw manager is enabled
+  ipcRenderer.on('autofill-password', autofillPasswordListener)
 
   /**
    * Gets form fields.
