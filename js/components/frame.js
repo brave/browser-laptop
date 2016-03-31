@@ -28,7 +28,7 @@ class Frame extends ImmutableComponent {
   constructor () {
     super()
     this.previousLocation = 'about:newtab'
-    this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 5)
+    this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
   }
 
   updateWebview () {
@@ -456,17 +456,19 @@ class Frame extends ImmutableComponent {
   onUpdateWheelZoom () {
     if (this.wheelDeltaY > 0) {
       windowActions.zoomIn(this.props.frame)
-    } else {
+    } else if (this.wheelDeltaY < 0) {
       windowActions.zoomOut(this.props.frame)
     }
     this.wheelDeltaY = 0
   }
 
   onMouseWheel (e) {
-    if (e.deltaY !== 0 && e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+    if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
       e.preventDefault()
       this.wheelDeltaY = (this.wheelDeltaY || 0) + e.wheelDeltaY
       this.onUpdateWheelZoom()
+    } else {
+      this.wheelDeltaY = 0
     }
   }
 
