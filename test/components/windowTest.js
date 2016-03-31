@@ -567,13 +567,11 @@ describe('application window', function () {
 
         yield this.app.client
           .windowByIndex(0)
-          .waitForVisible('.frameWrapper:nth-child(1) webview')
           .waitUntil(function () {
             return this.getAttribute('.frameWrapper:nth-child(1) webview', 'src').then((src) => src === click_with_target_page)
           })
         yield this.app.client
           .windowByIndex(0)
-          .waitForVisible('.frameWrapper:nth-child(2) webview')
           .waitUntil(function () {
             return this.getAttribute('.frameWrapper:nth-child(2) webview', 'src').then((src) => src === page1)
           })
@@ -598,7 +596,6 @@ describe('application window', function () {
             return this.getAttribute('.frameWrapper:nth-child(1) webview', 'src').then((src) => src === click_with_target_page)
           })
         yield this.app.client
-          .waitForVisible('.frameWrapper:nth-child(2) webview')
           .waitUntil(function () {
             return this.getAttribute('.frameWrapper:nth-child(2) webview', 'src').then((src) => src === page2)
           })
