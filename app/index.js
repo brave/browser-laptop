@@ -96,9 +96,9 @@ const getMasterKey = () => {
     return (new Buffer(masterKey, 'hex')).toString('binary')
   } else {
     throttleKeytar = true
-    setTimeout(() => {
+    debounce(() => {
       throttleKeytar = false
-    }, 10000)
+    }, 1000 * 60 * 5)
     return null
   }
 }
