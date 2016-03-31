@@ -1,6 +1,7 @@
 # Changelog
 
 ## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
+- Add ability to enable/disable password manager in Preferences
 - Added downloads toolbar which shows when there are active downloads.
 - Added downloads manager (about:downloads).
 - Added passwords manager (about:passwords).
