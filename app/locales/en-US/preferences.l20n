@@ -32,7 +32,7 @@
 <tabsPerTabPage "Tabs per tab page">
 <showTabPreviews "Show tab previews on hover">
 
-/* Prviacy settings page */
+/* Privacy settings page */
 <suggestionTypes "When using the location bar, suggest:">
 <history "History">
 <bookmarks "Bookmarks">
@@ -42,3 +42,5 @@
 
 /* Security settings page */
 <blockAttackSites "Block reported attack sites (not available yet)">
+<usePasswordManager "Use Brave's password manager">
+<managePasswords "Manage passwords...">

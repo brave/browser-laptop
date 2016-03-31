@@ -73,6 +73,7 @@ module.exports = {
     'privacy.autocomplete.history-size': 500,
     'security.block-reported-sites': false,
     'bookmarks.toolbar.show': false,
-    'privacy.do-not-track': false
+    'privacy.do-not-track': false,
+    'security.passwords.manager-enabled': true
   }
 }

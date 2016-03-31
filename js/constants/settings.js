@@ -21,6 +21,7 @@ const settings = {
   DO_NOT_TRACK: 'privacy.do-not-track',
   // Security Tab
   BLOCK_REPORTED_SITES: 'security.block-reported-sites',
+  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show'
 }
