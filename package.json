@@ -74,7 +74,7 @@
     "keytar": "^3.0.0",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
-    "tracking-protection": "1.0.x",
+    "tracking-protection": "1.1.x",
     "url-loader": "^0.5.7"
   },
   "devDependencies": {
@@ -107,7 +107,6 @@
     "node-libs-browser": "^0.5.3",
     "node-static": "^0.7.7",
     "node-uuid": "^1.4.7",
-    "npm": "3.8.3",
     "nsp": "^2.2.0",
     "pre-commit": "^1.1.2",
     "spectron": "^1.37.0",
