@@ -380,25 +380,27 @@ app.on('ready', () => {
       })
     })
     ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
+      const passwords = AppStore.getState().get('passwords')
+      if (!passwords || passwords.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      const passwords = AppStore.getState().get('passwords')
-      if (passwords) {
-        let result = passwords.findLast((password) => {
-          return password.get('origin') === origin && password.get('action') === action
-        })
-        if (result) {
-          let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
-                                                  result.get('authTag'),
-                                                  masterKey,
-                                                  result.get('iv'))
-          e.sender.send(messages.GOT_PASSWORD, result.get('username'),
-                        password, origin, action)
-        }
+      let result = passwords.findLast((password) => {
+        return password.get('origin') === origin && password.get('action') === action
+      })
+      if (result) {
+        let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                result.get('authTag'),
+                                                masterKey,
+                                                result.get('iv'))
+        e.sender.send(messages.GOT_PASSWORD, result.get('username'),
+                      password, origin, action)
       }
     })
 
@@ -409,38 +411,40 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect, value) => {
+      const passwords = AppStore.getState().get('passwords')
+      if (!passwords || passwords.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      const passwords = AppStore.getState().get('passwords')
-      if (passwords) {
-        let usernames = {}
-        let results = passwords.filter((password) => {
-          return password.get('username') &&
-            password.get('username').startsWith(value) &&
-            password.get('origin') === origin &&
-            password.get('action') === action
-        })
-        results.forEach((result) => {
-          usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
-                                                                       result.get('authTag'),
-                                                                       masterKey,
-                                                                       result.get('iv')) || ''
-        })
-        let win = BrowserWindow.getFocusedWindow()
-        if (!win) {
-          return
-        }
-        if (Object.keys(usernames).length > 0) {
-          win.webContents.send(messages.SHOW_USERNAME_LIST,
-                               usernames, origin, action,
-                               boundingRect)
-        } else {
-          win.webContents.send(messages.HIDE_CONTEXT_MENU)
-        }
+      let usernames = {}
+      let results = passwords.filter((password) => {
+        return password.get('username') &&
+          password.get('username').startsWith(value) &&
+          password.get('origin') === origin &&
+          password.get('action') === action
+      })
+      results.forEach((result) => {
+        usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                                     result.get('authTag'),
+                                                                     masterKey,
+                                                                     result.get('iv')) || ''
+      })
+      let win = BrowserWindow.getFocusedWindow()
+      if (!win) {
+        return
+      }
+      if (Object.keys(usernames).length > 0) {
+        win.webContents.send(messages.SHOW_USERNAME_LIST,
+                             usernames, origin, action,
+                             boundingRect)
+      } else {
+        win.webContents.send(messages.HIDE_CONTEXT_MENU)
       }
     })
 
