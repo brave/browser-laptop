@@ -391,10 +391,11 @@ app.on('ready', () => {
         return
       }
 
-      let result = passwords.findLast((password) => {
+      let results = passwords.filter((password) => {
         return password.get('origin') === origin && password.get('action') === action
       })
-      if (result) {
+      if (results.size === 1) {
+        let result = results.first()
         let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
                                                 result.get('authTag'),
                                                 masterKey,

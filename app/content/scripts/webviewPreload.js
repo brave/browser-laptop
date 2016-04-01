@@ -207,10 +207,10 @@
       credentials[action] = [[passwordElem, usernameElem]]
     }
 
-    if (!usernameElem) {
-      // Ask the main process for the only credentials we have
-      ipcRenderer.send('get-password', formOrigin, action)
-    } else {
+    // Fill the password immediately if there's only one
+    ipcRenderer.send('get-password', formOrigin, action)
+
+    if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
         let rect = usernameElem.getBoundingClientRect()
         ipcRenderer.send('show-username-list', formOrigin, action, {
