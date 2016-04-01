@@ -328,7 +328,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: 'Toggle Developer Tools',
-          accelerator: 'CmdOrCtrl+Alt+I',
+          accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
           }
