@@ -137,7 +137,7 @@ class NavigationBar extends ImmutableComponent {
               'bookmark-button': true,
               'remove-bookmark-button': this.bookmarked
             })}
-            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'removeBookmarkButton'}
+            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
             onClick={() => this.onToggleBookmark(this.bookmarked)} />
         </div>
       }
