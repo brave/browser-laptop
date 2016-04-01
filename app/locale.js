@@ -8,6 +8,7 @@ const L20n = require('l20n')
 const path = require('path')
 const ipcMain = require('electron').ipcMain
 
+// Exhaustive list of identifiers used by top and context menus
 var menuIdentifiers = () => {
   return [
     'downloadsManager',
@@ -131,24 +132,32 @@ exports.translation = (token) => {
   if (translations[token]) {
     return translations[token]
   } else {
+    // This will return an identifier in upper case enclosed in square brackets
+    // Useful for determining if a translation was not requested in the menu
+    // identifiers above.
     return `[${token.toUpperCase()}]`
   }
 }
 
+// Initialize translations for a language providing an optional
+// callback executed after the translation caching process
+// is complete.
 exports.init = (language, cb) => {
   // Default to noop callback
   cb = cb || function () {}
 
+  // Currently selected language identifier I.e. 'en-US'
   lang = language
 
-  // Languages to support
+  // Languages to support - TODO retrieve this dynamically
   const langs = [
     { code: 'en-US' },
     { code: 'nl-NL' },
-    { code: 'pt-BR' }
+    { code: 'pt-BR' },
+    { code: 'bn-BD' }
   ]
 
-  // Property files to parse
+  // Property files to parse (only ones containing menu specific identifiers)
   const propertyFiles = [
     path.join(__dirname, 'locales', lang, 'menu.properties'),
     path.join(__dirname, 'locales', lang, 'app.properties'),
@@ -174,8 +183,8 @@ exports.init = (language, cb) => {
 // If this is in the main process
 if (ipcMain) {
   // Respond to requests for translations from the renderer process
-  ipcMain.on('translation', (event, arg) => {
-    // Return the translation synchronously
-    event.returnValue = exports.translation(arg)
+  ipcMain.on('translations', (event, arg) => {
+    // Return the entire set of translations synchronously
+    event.returnValue = translations
   })
 }
