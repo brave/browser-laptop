@@ -32,7 +32,7 @@
 <tabsPerTabPage "Abas por página de aba">
 <showTabPreviews "Mostrar pré-visualizações de abas">
 
-/* Prviacy settings page */
+/* Privacy settings page */
 <suggestionTypes "Ao usar a barra de localização, sugerir:">
 <history "Histórico">
 <bookmarks "Favoritos">
@@ -42,3 +42,5 @@
 
 /* Security settings page */
 <blockAttackSites "Bloquear sites de ataque relatados (ainda não disponível)">
+<usePasswordManager "Usar Gerenciador de Senhas do Brave">
+<managePasswords "Gerenciar senhas...">

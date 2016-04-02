@@ -1,0 +1,18 @@
+<downloads "Downloads">
+<noDownloads "Não há downloads">
+
+<downloadInterrupted "Interrompido">
+<downloadCancelled "Cancelado">
+<downloadCompleted "Concluído">
+<downloadInProgress "Transferindo: {{$downloadPercent}}">
+<downloadPaused "Pausado: {{$downloadPercent}}">
+<downloadInProgressUnknownTotal "Transferindo...">
+
+<downloadPause title: "Pausar Download">
+<downloadResume title: "Retomar Download">
+<downloadCancel title: "Cancelar Download">
+<downloadRedownload title: "Transferir Novamente">
+<downloadCopyLinkLocation title: "Copiar Local do Link">
+<downloadDelete title: "Apagar Download">
+<downloadOpenPath title: "Abrir Caminho da Pasta">
+<downloadRemoveFromList title: "Remover Download da Lista">
