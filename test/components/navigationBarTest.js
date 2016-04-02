@@ -127,6 +127,8 @@ describe('urlbar', function () {
         // Navigate to a page with a title first to ensure it gets reset
         yield this.app.client
           .loadUrl(this.page)
+          .moveToObject(navigator)
+          .waitForValue(urlInput)
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === page)
           })
