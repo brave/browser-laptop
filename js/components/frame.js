@@ -201,7 +201,8 @@ class Frame extends ImmutableComponent {
                             activeShortcutDetails.get('username'),
                             activeShortcutDetails.get('password'),
                             activeShortcutDetails.get('origin'),
-                            activeShortcutDetails.get('action'))
+                            activeShortcutDetails.get('action'),
+                            true)
         }
     }
     if (activeShortcut) {

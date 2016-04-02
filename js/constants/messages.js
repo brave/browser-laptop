@@ -68,8 +68,8 @@ const messages = {
   SET_CLIPBOARD: _,
   AUTOFILL_PASSWORD: _,
   // Password manager
-  GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
-  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */
+  GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
+  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
   SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
   SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
   FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */

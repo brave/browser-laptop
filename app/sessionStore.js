@@ -14,6 +14,7 @@
 const fs = require('fs')
 const path = require('path')
 const app = require('app')
+const urlParse = require('url').parse
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
@@ -236,6 +237,28 @@ module.exports.loadAppState = () => {
       }
       data.settings = data.settings || {}
       data.passwords = data.passwords || []
+      // We used to store passwords with the form action full URL. Transition
+      // to using origin + pathname for 0.9.0
+      if (data.passwords.length > 0) {
+        let newPasswords = []
+        data.passwords.forEach((entry) => {
+          let a = urlParse(entry.action)
+          if (a.path !== a.pathname) {
+            entry.action = [a.protocol, a.host].join('//') + a.pathname
+          }
+          // Deduplicate
+          for (let i = 0; i < newPasswords.length; i++) {
+            let newEntry = newPasswords[i]
+            if (entry.origin === newEntry.origin &&
+                entry.action === newEntry.action &&
+                entry.username === newEntry.username) {
+              return
+            }
+          }
+          newPasswords.push(entry)
+        })
+        data.passwords = newPasswords
+      }
       resolve(data)
     })
   })

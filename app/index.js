@@ -379,7 +379,7 @@ app.on('ready', () => {
         decrypted
       })
     })
-    ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
+    ipcMain.on(messages.GET_PASSWORDS, (e, origin, action) => {
       const passwords = AppStore.getState().get('passwords')
       if (!passwords || passwords.size === 0) {
         return
@@ -394,15 +394,15 @@ app.on('ready', () => {
       let results = passwords.filter((password) => {
         return password.get('origin') === origin && password.get('action') === action
       })
-      if (results.size === 1) {
-        let result = results.first()
+      let isUnique = results.size === 1
+      results.forEach((result) => {
         let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
                                                 result.get('authTag'),
                                                 masterKey,
                                                 result.get('iv'))
         e.sender.send(messages.GOT_PASSWORD, result.get('username'),
-                      password, origin, action)
-      }
+                      password, origin, action, isUnique)
+      })
     })
 
     ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {

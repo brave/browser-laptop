@@ -179,7 +179,7 @@
     var action = form.action || document.location.href
     var usernameElem = fields[0] || {}
     ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
-                     formOrigin, action)
+                     formOrigin, normalizeURL(action))
     submittedForms.push(form)
   }
 
@@ -194,6 +194,7 @@
   function tryAutofillForm (credentials, formOrigin, form) {
     var fields = getFormFields(form, false)
     var action = form.action || document.location.href
+    action = normalizeURL(action)
     var usernameElem = fields[0]
     var passwordElem = fields[1]
 
@@ -207,8 +208,9 @@
       credentials[action] = [[passwordElem, usernameElem]]
     }
 
-    // Fill the password immediately if there's only one
-    ipcRenderer.send('get-password', formOrigin, action)
+    // Fill the password immediately if there's only one or if the username
+    // is already autofilled
+    ipcRenderer.send('get-passwords', formOrigin, action)
 
     if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
@@ -231,6 +233,16 @@
         onFormSubmit(form, formOrigin)
       })
     })
+  }
+
+  /**
+   * Gets protocol + host + path from a URL.
+   * @return {string}
+   */
+  function normalizeURL (url) {
+    var a = document.createElement('a')
+    a.href = url
+    return [a.protocol, a.host].join('//') + a.pathname
   }
 
   /**
@@ -257,15 +269,22 @@
       tryAutofillForm(credentials, formOrigin, form)
     })
 
-    ipcRenderer.on('got-password', (e, username, password, origin, action) => {
+    ipcRenderer.on('got-password', (e, username, password, origin, action, isUnique) => {
+      console.log('got password', username, isUnique)
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {
-          // Autofill password
-          elem[0].value = password
-          if (username && elem[1]) {
-            // Autofill the username if there is one
-            elem[1].value = username
+          if (isUnique) {
+            // Autofill password if there is only one available
+            elem[0].value = password
+            if (username && elem[1]) {
+              // Autofill the username if needed
+              elem[1].value = username
+            }
+          } else if (elem[1] && username && username === elem[1].value) {
+            // If the username is already autofilled by something else, fill
+            // in the corresponding password
+            elem[0].value = password
           }
         })
       }
