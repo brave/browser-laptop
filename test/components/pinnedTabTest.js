@@ -23,6 +23,7 @@ describe('pinnedTabs', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(this.page1Url, true)
+        .waitForExist(pinnedTabsTabs)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
@@ -135,6 +136,7 @@ describe('pinnedTabs', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(page1Url, true)
+        .waitForExist(pinnedTabsTabs)
     })
     it('navigate within the same origin', function *() {
       const page2Url = Brave.server.url('page2.html')
@@ -175,9 +177,11 @@ describe('pinnedTabs', function () {
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(page1Url, true)
+        .waitForExist(pinnedTabsTabs)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
         .waitForExist('.tab[data-frame-key="3"]')
         .setPinned(page2Url, true)
+        .waitForExist(pinnedTabsTabs)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
         })
