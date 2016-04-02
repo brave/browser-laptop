@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const Selectors = require('../lib/selectors')
+const {activeWebview} = require('../lib/selectors')
 
 describe('application window', function () {
   describe('application launch', function () {
@@ -10,7 +10,7 @@ describe('application window', function () {
     it('opens a window and loads the UI', function *() {
       yield this.app.client
         .waitUntilWindowLoaded()
-        .waitForVisible(Selectors.activeWebview)
+        .waitForVisible(activeWebview)
         .getWindowCount().should.eventually.equal(2) // main window and webview
         .isWindowMinimized().should.eventually.be.false
         .isWindowDevToolsOpened().should.eventually.be.false
@@ -39,7 +39,7 @@ describe('application window', function () {
               return count === 4 // two windows with two views each
             })
           })
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
       })
 
       it('offsets from the focused window', function *() {
@@ -71,7 +71,7 @@ describe('application window', function () {
             })
           })
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
       })
 
       it('offsets from the focused window', function *() {
@@ -103,7 +103,7 @@ describe('application window', function () {
             })
           })
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
       })
 
       it('is maximized', function *() {
@@ -131,7 +131,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
@@ -182,7 +182,7 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
@@ -203,7 +203,7 @@ describe('application window', function () {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
       })
 
       it('has a min width of 480 and height of 300', function *() {
@@ -226,7 +226,7 @@ describe('application window', function () {
         yield this.app.client
           .windowByIndex(0)
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
@@ -263,7 +263,7 @@ describe('application window', function () {
 
           yield this.app.client
             .waitUntilWindowLoaded()
-            .waitForVisible(Selectors.activeWebview)
+            .waitForVisible(activeWebview)
             .windowByIndex(1)
             .url(this.window_open_page)
             .execute(function (page1) {
@@ -354,7 +354,7 @@ describe('application window', function () {
 
           yield this.app.client
             .waitUntilWindowLoaded()
-            .waitForVisible(Selectors.activeWebview)
+            .waitForVisible(activeWebview)
             .windowByIndex(1)
             .url(this.window_open_page)
             .execute(function (page1) {
@@ -477,7 +477,7 @@ describe('application window', function () {
 
       yield this.app.client
         .waitUntilWindowLoaded()
-        .waitForVisible(Selectors.activeWebview)
+        .waitForVisible(activeWebview)
         .windowByIndex(1)
         .url(this.window_open_page)
         .execute(function (page1) {
@@ -513,7 +513,7 @@ describe('application window', function () {
         yield this.app.client
           .windowByIndex(0)
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
@@ -554,7 +554,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(this.click_with_target_page)
           .waitForVisible('#name')
@@ -613,7 +613,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(this.click_with_target_page)
           .waitForVisible('#none')
@@ -648,7 +648,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(this.click_with_target_page)
           .waitForVisible('#_self')
@@ -683,7 +683,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(this.click_with_target_page)
           .frame('parent')
@@ -719,7 +719,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(Selectors.activeWebview)
+          .waitForVisible(activeWebview)
           .windowByIndex(1)
           .url(this.click_with_target_page)
           .frame('parent')
