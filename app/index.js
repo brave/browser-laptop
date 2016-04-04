@@ -50,7 +50,7 @@ let lastWindowState
 let acceptCertUrls = {}
 // URLs to callback for auth.
 let authCallbacks = {}
-// Don't show the keytar prompt more than once per ten seconds
+// Don't show the keytar prompt more than once per 5 minutes
 let throttleKeytar = false
 
 /**
