@@ -385,15 +385,20 @@ app.on('ready', () => {
         return
       }
 
+      let results = passwords.filter((password) => {
+        return password.get('origin') === origin && password.get('action') === action
+      })
+
+      if (results.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      let results = passwords.filter((password) => {
-        return password.get('origin') === origin && password.get('action') === action
-      })
       let isUnique = results.size === 1
       results.forEach((result) => {
         let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
@@ -417,12 +422,6 @@ app.on('ready', () => {
         return
       }
 
-      masterKey = masterKey || getMasterKey()
-      if (!masterKey) {
-        console.log('Could not access master password; aborting')
-        return
-      }
-
       let usernames = {}
       let results = passwords.filter((password) => {
         return password.get('username') &&
@@ -430,6 +429,17 @@ app.on('ready', () => {
           password.get('origin') === origin &&
           password.get('action') === action
       })
+
+      if (results.size === 0) {
+        return
+      }
+
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+
       results.forEach((result) => {
         usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
                                                                      result.get('authTag'),
