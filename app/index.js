@@ -492,7 +492,7 @@ app.on('ready', () => {
         title: 'Save password?',
         message: message,
         buttons: ['Yes', 'No'],
-        defaultId: 0,
+        defaultId: 1,
         cancelId: 1
       }, (buttonId) => {
         if (buttonId !== 0) {
