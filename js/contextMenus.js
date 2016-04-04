@@ -592,13 +592,29 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   template.push({
+    label: 'Back',
+    enabled: frame.get('canGoBack'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+      }
+    }
+  }, {
+    label: 'Forward',
+    enabled: frame.get('canGoForward'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+      }
+    }
+  }, {
     label: 'Reload',
     click: (item, focusedWindow) => {
       if (focusedWindow) {
         focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
       }
     }
-  })
+  }, CommonMenu.separatorMenuItem)
 
   template.push(CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
