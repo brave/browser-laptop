@@ -188,7 +188,7 @@ function onBeforeRedirect (details) {
 
   // Heuristic part 2: Count internal redirects for server-initiated redirects that
   // increase the request ID on every redirect.
-  if (details.statusCode === 307) {
+  if (details.statusCode === 307 && ['mainFrame', 'subFrame'].includes(details.resourceType)) {
     if (canonicalUrl in recent307Counter) {
       recent307Counter[canonicalUrl] += 1
       if (recent307Counter[canonicalUrl] > 5) {
