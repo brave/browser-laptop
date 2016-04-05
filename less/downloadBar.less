@@ -85,10 +85,18 @@
         margin: auto 0;
         .downloadFilename, .downloadState {
           margin: auto 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding-right: 5px;
         }
 
         .downloadArrow {
           margin: auto 0 auto auto;
+        }
+
+        >span {
+          width: 100%;
         }
       }
 
