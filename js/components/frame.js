@@ -204,6 +204,10 @@ class Frame extends ImmutableComponent {
                             activeShortcutDetails.get('action'),
                             true)
         }
+        break
+      case 'focus-webview':
+        setImmediate(() => this.webview.focus())
+        break
     }
     if (activeShortcut) {
       windowActions.setActiveFrameShortcut(this.props.frame, null, null)
