@@ -68,6 +68,7 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
+    this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
     // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
     // automatically while keeping the content script loaded.
     if (aboutPreload) {

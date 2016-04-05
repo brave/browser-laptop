@@ -6,6 +6,7 @@ const settings = {
   // General tab
   STARTUP_MODE: 'general.startup-mode',
   HOMEPAGE: 'general.homepage',
+  USERAGENT: 'general.useragent.value',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   // Tabs tab

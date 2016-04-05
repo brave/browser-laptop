@@ -54,6 +54,11 @@ module.exports.saveAppState = (payload) => {
       delete payload.perWindowState
     }
 
+    if (payload.settings) {
+      // useragent value gets recalculated on restart
+      payload.settings[settings.USERAGENT] = undefined
+    }
+
     fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
       if (err) {
         reject(err)

@@ -121,19 +121,22 @@ function registerForBeforeRedirect (session) {
  * @param {object} The session to add webRequest filtering on
  */
 function registerForBeforeSendHeaders (session) {
-  // For efficiency, avoid calculating sendDNT on every request. This means the
+  // For efficiency, avoid calculating these settings on every request. This means the
   // browser must be restarted for changes to take effect.
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
-  let spoofedUserAgent
+  let spoofedUserAgent = getSetting(settings.USERAGENT)
   const braveRegex = new RegExp('brave/.+? ', 'gi')
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     let requestHeaders = details.requestHeaders
 
-    // To minimize fingerprintability, remove Brave from the UA string.
-    // This can be removed once https://github.com/atom/electron/issues/3602 is
-    // resolved
-    spoofedUserAgent = spoofedUserAgent || requestHeaders['User-Agent'].replace(braveRegex, '')
+    if (!spoofedUserAgent) {
+      // To minimize fingerprintability, remove Brave from the UA string.
+      // This can be removed once https://github.com/atom/electron/issues/3602 is
+      // resolved
+      spoofedUserAgent = requestHeaders['User-Agent'].replace(braveRegex, '')
+      appActions.changeSetting(settings.USERAGENT, spoofedUserAgent)
+    }
     requestHeaders['User-Agent'] = spoofedUserAgent
 
     // Using an electron binary which isn't from Brave
