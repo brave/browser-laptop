@@ -173,8 +173,12 @@ class AboutPasswords extends React.Component {
           </thead>
           <tbody>
           {
-            this.state.passwordDetails.map((item) =>
-              <PasswordItem password={item} id={counter++}/>)
+            this.state.passwordDetails
+              ? this.state.passwordDetails.sort((a, b) => {
+                return a.get('origin') > b.get('origin') ? 1 : -1
+              }).map((item) =>
+                <PasswordItem password={item} id={counter++}/>)
+              : null
           }
           </tbody>
         </table>
