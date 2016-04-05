@@ -1,5 +1,7 @@
 var VersionInfo = require('./lib/versionInfo')
 var execute = require('./lib/execute')
+var format = require('util').format
+var path = require('path')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -48,7 +50,7 @@ if (isDarwin) {
     throw new Error('Certificate password required. Set environment variable CERT_PASSWORD.')
   }
   cmds = [
-    'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --cert_path=' + cert + ' --cert_password=' + certPassword
+    'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --sign_with_params=' + format('"-a -fd sha256 -f \\"%s\\" -p \\"%s\\" -t http://timestamp.verisign.com/scripts/timstamp.dll"', path.resolve(cert), certPassword)
   ]
 } else if (isLinux) {
   console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')
