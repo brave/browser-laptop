@@ -37,6 +37,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
+const keyCodes = require('../constants/keyCodes')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -48,6 +49,17 @@ class Main extends ImmutableComponent {
   constructor () {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
+  }
+  registerWindowLevelShortcuts () {
+    // For window level shortcuts that don't work as local shortcuts
+    const isDarwin = process.platform === 'darwin'
+    if (!isDarwin) {
+      document.addEventListener('keydown', (e) => {
+        if (e.which === keyCodes.F12) {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
+        }
+      })
+    }
   }
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
@@ -119,6 +131,7 @@ class Main extends ImmutableComponent {
 
   componentDidMount () {
     this.registerSwipeListener()
+    this.registerWindowLevelShortcuts()
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
