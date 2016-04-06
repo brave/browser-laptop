@@ -280,7 +280,7 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
           lastEmittedState = appState
-          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
+          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
           if (action.cb) {
             action.cb()
           }
