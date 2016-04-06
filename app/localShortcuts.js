@@ -30,6 +30,11 @@ module.exports.register = (win) => {
       ['Alt+D', messages.SHORTCUT_FOCUS_URL, false],
       ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
       ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+
+    electronLocalshortcut.register(win, 'F11', (win) => {
+      const focusedWindow = win || BrowserWindow.getFocusedWindow()
+      focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+    })
   }
 
   // Tab ordering shortcuts
