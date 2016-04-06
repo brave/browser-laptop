@@ -21,11 +21,12 @@ const isDarwin = process.platform === 'darwin'
 
 const aboutUrl = 'https://brave.com/'
 
-const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 
 let menuArgs = {}
 let lastSettingsState, lastArgs
@@ -420,7 +421,8 @@ const init = (settingsState, args) => {
       cookieblock: Filtering.isResourceEnabled(cookieblock),
       adInsertion: Filtering.isResourceEnabled(adInsertion),
       trackingProtection: Filtering.isResourceEnabled(trackingProtection),
-      httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere)
+      httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere),
+      safeBrowsing: Filtering.isResourceEnabled(safeBrowsing)
     }, init.bind(this, settingsState, {bookmarked: bookmarkPageMenuItem.checked})),
     {
       label: 'Window',

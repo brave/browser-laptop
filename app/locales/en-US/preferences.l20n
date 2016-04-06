@@ -41,6 +41,5 @@
 <advancedPrivacySettings "Advanced privacy settings:">
 
 /* Security settings page */
-<blockAttackSites "Block reported attack sites (not available yet)">
 <usePasswordManager "Use Brave's password manager">
 <managePasswords "Manage passwords...">

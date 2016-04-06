@@ -156,7 +156,6 @@ class SecurityTab extends ImmutableComponent {
     return <div>
       <SettingsList>
         <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-        <SettingCheckbox disabled dataL10nId='blockAttackSites' prefKey={settings.BLOCK_REPORTED_SITES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
       <div>
         <span className='linkText' data-l10n-id='managePasswords'

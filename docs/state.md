@@ -47,6 +47,12 @@ AppStore
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable adblocking
   },
+  safeBrowsing: {
+    etag: string, // last downloaded data file etag
+    lastCheckVersion: string, // last checked data file version
+    lastCheckDate: number, // last checked data file date.getTime()
+    enabled: boolean // Enable adblocking
+  },
   trackingProtection: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version

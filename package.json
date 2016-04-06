@@ -22,6 +22,7 @@
     "build-installer": "node ./tools/buildInstaller.js",
     "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-1-dev",
     "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/ABPFilterParserData.dat",
+    "clean-sb-data": "rm -f ~/Library/Application\\ Support/Brave/SafeBrowsingData.dat",
     "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/TrackingProtection.dat",
     "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse.json",
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",

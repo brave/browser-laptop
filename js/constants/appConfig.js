@@ -12,6 +12,7 @@ module.exports = {
   contactUrl: 'mailto:support@brave.com',
   resourceNames: {
     ADBLOCK: 'adblock',
+    SAFE_BROWSING: 'safeBrowsing',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
     AD_INSERTION: 'adInsertion',
@@ -22,6 +23,12 @@ module.exports = {
   },
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
+    version: '1',
+    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    enabled: true
+  },
+  safeBrowsing: {
+    url: 'https://s3.amazonaws.com/safe-browsing-data/{version}/SafeBrowsingData.dat',
     version: '1',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
@@ -72,7 +79,6 @@ module.exports = {
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
     'privacy.autocomplete.history-size': 500,
-    'security.block-reported-sites': false,
     'bookmarks.toolbar.show': false,
     'privacy.do-not-track': false,
     'security.passwords.manager-enabled': true

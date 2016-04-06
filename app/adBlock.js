@@ -10,7 +10,8 @@ const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
 const FilterOptions = ABPFilterParserLib.FilterOptions
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
-module.exports.resourceName = 'adblock'
+module.exports.adBlockResourceName = 'adblock'
+module.exports.safeBrowsingResourceName = 'safeBrowsing'
 
 let adblock
 let mapFilterType = {
@@ -24,24 +25,29 @@ let mapFilterType = {
   other: FilterOptions.other
 }
 
-const startAdBlocking = () => {
+const startAdBlocking = (resourceName, shouldCheckMainFrame) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const cancel = firstPartyUrl.protocol &&
-      details.resourceType !== 'mainFrame' &&
+      (shouldCheckMainFrame || details.resourceType !== 'mainFrame') &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
     DataFile.debug(details, cancel)
     return {
       cancel,
-      resourceName: module.exports.resourceName
+      resourceName
     }
   })
 }
 
-module.exports.init = () => {
+module.exports.initInstance = (resourceName, shouldCheckMainFrame) => {
   adblock = new ABPFilterParser()
-  DataFile.init(module.exports.resourceName, startAdBlocking,
+  DataFile.init(resourceName, startAdBlocking.bind(null, resourceName, shouldCheckMainFrame),
                 (data) => adblock.deserialize(data))
+  return module.exports
 }
+
+module.exports.init = () => module.exports
+    .initInstance(module.exports.adBlockResourceName, false)
+    .initInstance(module.exports.safeBrowsingResourceName, true)
