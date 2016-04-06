@@ -321,6 +321,8 @@ class Frame extends ImmutableComponent {
       if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
         this.webview.send(messages.AUTOFILL_PASSWORD)
       }
+      // TODO: Add setting for blocking canvas fingerprinting
+      this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
       let security = this.props.frame.get('security')
       if (this.props.frame.get('location') === 'about:certerror' &&
           security && security.get('certDetails')) {
