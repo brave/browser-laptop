@@ -33,7 +33,6 @@ const startAdBlocking = (resourceName, shouldCheckMainFrame) => {
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
-    DataFile.debug(details, cancel)
     return {
       cancel,
       resourceName

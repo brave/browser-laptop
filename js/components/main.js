@@ -185,6 +185,12 @@ class Main extends ImmutableComponent {
         windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
+    ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach((frameProps) =>
+        windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank'))
+    })
+
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
       const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>

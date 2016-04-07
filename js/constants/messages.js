@@ -86,8 +86,9 @@ const messages = {
   RESPONSE_WINDOW_STATE: _,
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
-  // Ad block and tracking protection
+  // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
+  BLOCKED_PAGE: _,
   // About pages to contentScripts
   SETTINGS_UPDATED: _,
   BOOKMARKS_UPDATED: _,

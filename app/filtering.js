@@ -71,8 +71,11 @@ function registerForBeforeRequest (session) {
       if (results.cancel) {
         // We have no good way of knowing which BrowserWindow the blocking is for
         // yet so send it everywhere and let listeners decide how to respond.
+        let message = details.resourceType === 'mainFrame'
+          ? messages.BLOCKED_PAGE
+          : messages.BLOCKED_RESOURCE
         BrowserWindow.getAllWindows().forEach((wnd) =>
-          wnd.webContents.send(messages.BLOCKED_RESOURCE, results.resourceName, details))
+          wnd.webContents.send(message, results.resourceName, details))
         if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {

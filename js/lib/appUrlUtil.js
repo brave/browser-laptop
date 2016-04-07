@@ -33,6 +33,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:preferences': module.exports.getAppUrl('./about-preferences.html'),
   'about:config': module.exports.getAppUrl('./about-config.html'),
   'about:certerror': module.exports.getAppUrl('./about-certerror.html'),
+  'about:safebrowsing': module.exports.getAppUrl('./about-safebrowsing.html'),
   'about:passwords': module.exports.getAppUrl('./about-passwords.html')
 })
 
