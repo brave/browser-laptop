@@ -315,7 +315,8 @@
         form.querySelector(['input[autocomplete=username i]']) ||
         form.querySelector(['input[name=email i]']) ||
         form.querySelector(['input[name=username i]']) ||
-        form.querySelector(['input[name=user i]'])
+        form.querySelector(['input[name=user i]']) ||
+        form.querySelector(['input[name="session[username_or_email]"]'])
 
     if (!username) {
       // Search backwards from first password field to find the username field
