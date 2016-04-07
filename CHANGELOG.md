@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.9.0](https://github.com/brave/browser-laptop/releases/v0.9.0dev)
+- 1Password support bundled.
+- Added malware and phishing protection with click through pages.
+- Some downloads bar and password saving fixes.
+- Windows installer now using SHA-256 digest and gets signed with a timestamp.
+- New look for the SSL cert warning pages.
+- Windows shortcuts added F12 for developer tools and F11 for fullscreen.
+- Partial extensions support added internally for running some Chrome extensions unmodified.
+- Upgrade to Node 5.10.0.
+
 ## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
 - Add ability to enable/disable password manager in Preferences
 - Added downloads toolbar which shows when there are active downloads.
