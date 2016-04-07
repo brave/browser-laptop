@@ -96,7 +96,6 @@ AppStore
     'privacy.history-suggestions': boolean, // Auto suggest for history enabled
     'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
     'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
-    'security.block-reported-sites': boolean, // true to block reported web forgery sites
     'security.passwords.manager-enabled': boolean // whether to use default password manager
   }]
 }
