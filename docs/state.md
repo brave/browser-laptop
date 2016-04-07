@@ -14,7 +14,19 @@ AppStore
     title: string,
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     lastAccessedTime: number, // datetime.getTime()
-    partitionNumber: number // Optionally specifies a specific session
+    partitionNumber: number, // Optionally specifies a specific session
+    folderId: number, // Set for bookmark folders only
+    parentFolderId: number // Set for bookmarks and bookmark folders only
+  }],
+  downloads: [{
+    downloadId: string,
+    startTime: number, // datetime.getTime()
+    filename: string,
+    savePath: string,
+    url: string,
+    totalBytes: Number,
+    receivedBytes: Number,
+    state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
   }],
   visits: [{
     location: string,
@@ -30,6 +42,12 @@ AppStore
     iv: string // AES-GCM initialization vector, binary-encoded
   }],
   adblock: {
+    etag: string, // last downloaded data file etag
+    lastCheckVersion: string, // last checked data file version
+    lastCheckDate: number, // last checked data file date.getTime()
+    enabled: boolean // Enable adblocking
+  },
+  safeBrowsing: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
@@ -68,15 +86,17 @@ AppStore
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
     'general.homepage': string, // URL of the user's homepage
+    'general.useragent.value': (undefined|string), // custom user agent value
     'search.default-search-engine': string, // path to the open search XML
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.tabs-per-tab-page': number, // Number of tabs per tab page
     'tabs.show-tab-previews': boolean, // True to show tab previews
+    'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // Auto suggest for history enabled
     'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
     'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
-    'security.block-reported-sites': boolean // true to block reported web forgery sites
+    'security.passwords.manager-enabled': boolean // whether to use default password manager
   }]
 }
 ```
@@ -190,6 +210,9 @@ WindowStore
       expandTrackingProtection: boolean,
       expandAdblock: boolean,
       expandHttpse: boolean
+    },
+    downloadsToolbar: {
+      isVisible: boolean, // Whether or not the downloads toolbar is visible
     },
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes

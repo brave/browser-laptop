@@ -223,7 +223,16 @@ const doAction = (action) => {
       windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
         nextKey, nextPartitionNumber, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
       if (action.openInForeground) {
-        updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
+        const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+        updateTabPageIndex(activeFrame)
+        // For about:newtab we want to have the urlbar focused, not the new frame.
+        // Otherwise we want to focus the new tab when it is a new frame in the foreground.
+        if (activeFrame.get('location') !== 'about:newtab') {
+          windowState = windowState.mergeIn(activeFrameStatePath(), {
+            activeShortcut: 'focus-webview',
+            activeShortcutDetails: null
+          })
+        }
       }
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
@@ -371,16 +380,9 @@ const doAction = (action) => {
       windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_PINNED:
-      // Support lazy obtaining the location via just the key
-      let location = action.frameProps.get('location')
-      if (!location) {
-        const foundFrame = FrameStateUtil.getFrameByKey(windowState, action.frameProps.get('key'))
-        if (foundFrame) {
-          location = foundFrame.get('location')
-        }
-      }
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
+      const location = action.frameProps.get('location')
       const alreadyPinnedFrameProps = windowState.get('frames').find((frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
@@ -426,6 +428,9 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'siteInfo', 'expandHttpse'], action.expandHttpse)
       }
       break
+    case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
+      windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
+      break
     case WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break
@@ -459,27 +464,17 @@ const doAction = (action) => {
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
     // Zoom state
-    case WindowConstants.WINDOW_ZOOM_IN:
-      let zoomInLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
+    case WindowConstants.WINDOW_ZOOM:
+      let zoomLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
       // for backwards compatibility with previous stored window state
-      if (zoomInLevel === undefined) {
-        zoomInLevel = 1
+      if (zoomLevel === undefined) {
+        zoomLevel = 1
       }
-      if (config.zoom.max > zoomInLevel) {
-        zoomInLevel += 1
+      if (config.zoom.max >= zoomLevel + action.stepSize &&
+          config.zoom.min <= zoomLevel + action.stepSize) {
+        zoomLevel += action.stepSize
       }
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomInLevel)
-      break
-    case WindowConstants.WINDOW_ZOOM_OUT:
-      let zoomOutLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
-      // for backwards compatibility with previous stored window state
-      if (zoomOutLevel === undefined) {
-        zoomOutLevel = 1
-      }
-      if (config.zoom.min < zoomOutLevel) {
-        zoomOutLevel -= 1
-      }
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomOutLevel)
+      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomLevel)
       break
     case WindowConstants.WINDOW_ZOOM_RESET:
       windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), config.zoom.defaultValue)

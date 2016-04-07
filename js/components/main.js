@@ -21,6 +21,7 @@ const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
 const UpdateBar = require('./updateBar')
+const DownloadsBar = require('./downloadsBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
 const AddEditBookmark = require('./addEditBookmark')
@@ -36,6 +37,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
+const keyCodes = require('../constants/keyCodes')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -47,6 +49,17 @@ class Main extends ImmutableComponent {
   constructor () {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
+  }
+  registerWindowLevelShortcuts () {
+    // For window level shortcuts that don't work as local shortcuts
+    const isDarwin = process.platform === 'darwin'
+    if (!isDarwin) {
+      document.addEventListener('keydown', (e) => {
+        if (e.which === keyCodes.F12) {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
+        }
+      })
+    }
   }
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
@@ -118,6 +131,7 @@ class Main extends ImmutableComponent {
 
   componentDidMount () {
     this.registerSwipeListener()
+    this.registerWindowLevelShortcuts()
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
@@ -154,6 +168,10 @@ class Main extends ImmutableComponent {
       })
     })
 
+    ipc.on(messages.SHOW_DOWNLOADS_TOOLBAR, () => {
+      windowActions.setDownloadsToolbarVisible(true)
+    })
+
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
       windowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
@@ -165,6 +183,12 @@ class Main extends ImmutableComponent {
       const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setBlockedBy(frameProps, blockType, details.url))
+    })
+
+    ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach((frameProps) =>
+        windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank'))
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
@@ -288,7 +312,7 @@ class Main extends ImmutableComponent {
   }
 
   onCloseFrame (activeFrameProps) {
-    windowActions.closeFrame(this.props.windowState.get('frames'), this.props.frame)
+    windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
 
   onDragOver (e) {
@@ -355,7 +379,6 @@ class Main extends ImmutableComponent {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
 
     this.frames = {}
-    const settingsState = this.props.appState.get('settings') || new Immutable.Map()
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
     const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
@@ -403,7 +426,6 @@ class Main extends ImmutableComponent {
             activeFrame={activeFrame}
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
-            settings={settingsState}
             searchDetail={this.props.windowState.get('searchDetail')}
           />
           {
@@ -457,7 +479,7 @@ class Main extends ImmutableComponent {
           allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined)}>
+          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined, undefined)}>
           {
             nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
@@ -491,17 +513,21 @@ class Main extends ImmutableComponent {
               onCloseFrame={this.onCloseFrame}
               frame={frame}
               key={frame.get('key')}
-              settings={frame.get('location') === 'about:preferences' ? settingsState || new Immutable.Map() : null}
+              settings={frame.get('location') === 'about:preferences'
+                ? this.props.appState.get('settings') || new Immutable.Map()
+                : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK)) || new Immutable.Map()
                 : null}
+              downloads={this.props.appState.get('downloads') || new Immutable.Map()}
               bookmarkFolders={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
+              passwords={this.props.appState.get('passwords')}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
@@ -509,6 +535,13 @@ class Main extends ImmutableComponent {
         }
         </div>
       </div>
+      {
+        this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
+        ? <DownloadsBar
+          windowWidth={this.props.appState.get('defaultWindowWidth')}
+          downloads={this.props.appState.get('downloads')}/>
+        : null
+      }
     </div>
   }
 }

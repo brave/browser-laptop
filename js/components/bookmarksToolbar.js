@@ -228,7 +228,7 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   onContextMenu (e) {
     const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
-    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, e)
+    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest.isDroppedOn, e)
   }
   render () {
     this.bookmarkRefs = []

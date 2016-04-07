@@ -8,8 +8,6 @@ const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 
 const windowActions = require('../actions/windowActions')
-const appActions = require('../actions/appActions')
-const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
 
@@ -19,7 +17,6 @@ const Button = require('./button')
 const Tab = require('./tab')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
-const siteUtil = require('../state/siteUtil')
 
 class Tabs extends ImmutableComponent {
   get activeFrameIndex () {
@@ -61,7 +58,6 @@ class Tabs extends ImmutableComponent {
           windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             windowActions.setPinned(sourceDragData, false)
-            appActions.removeSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED), siteTags.PINNED)
           }
         }
       }, 0)

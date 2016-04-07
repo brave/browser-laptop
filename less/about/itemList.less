@@ -1,0 +1,43 @@
+@import "../variables.less";
+
+* {
+  font-family: "Arial";
+  margin: 0;
+  padding: 0;
+}
+
+list .listItem {
+  cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+
+  padding: 12px;
+  -webkit-user-select: none;
+  &:hover {
+    background-color: lighten(@highlightBlue, 30%);
+  }
+  &.selected {
+    background-color: lighten(@highlightBlue, 20%);
+  }
+  .aboutListItem {
+    display: flex;
+  }
+}
+
+.aboutItemSeparator {
+  color: #aaa;
+  padding: 0 4px;
+}
+
+.aboutItemTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aboutItemLocation {
+  color: #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

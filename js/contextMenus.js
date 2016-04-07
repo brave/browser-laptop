@@ -11,10 +11,12 @@ const messages = require('./constants/messages')
 const WindowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
 const bookmarkActions = require('./actions/bookmarkActions')
+const downloadActions = require('./actions/downloadActions')
 const appActions = require('./actions/appActions')
 const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
+const downloadUtil = require('./state/downloadUtil')
 const CommonMenu = require('./commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
@@ -25,24 +27,27 @@ const ipc = global.require('electron').ipcRenderer
  * Obtains an add bookmark menu item
  * @param {object} Detail of the bookmark to initialize with
  */
-const addBookmarkMenuItem = (siteDetail, parentSiteDetail) => {
+const addBookmarkMenuItem = (siteDetail, closestDestinationDetail, isParent) => {
   return {
     label: 'Add Bookmark...',
     click: () => {
-      siteDetail = siteDetail.set('parentFolderId', parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId')))
-      windowActions.setBookmarkDetail(siteDetail, undefined, parentSiteDetail)
+      if (isParent) {
+        siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+      }
+      windowActions.setBookmarkDetail(siteDetail, undefined, closestDestinationDetail)
     }
   }
 }
 
-const addFolderMenuItem = (parentSiteDetail) => {
+const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   return {
     label: 'Add Folder...',
     click: () => {
-      const emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER],
-        parentFolderId: parentSiteDetail && (parentSiteDetail.get('folderId') || parentSiteDetail.get('parentFolderId'))
-      })
-      windowActions.setBookmarkDetail(emptyFolder, undefined, parentSiteDetail)
+      let emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER] })
+      if (isParent) {
+        emptyFolder = emptyFolder.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
+      }
+      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail)
     }
   }
 }
@@ -77,14 +82,96 @@ function inputTemplateInit (e) {
   return getEditableItems(hasSelection)
 }
 
-function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail) {
+function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
   return [
     CommonMenu.bookmarksMenuItem,
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail),
-    addFolderMenuItem(closestDestinationDetail)
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
+    addFolderMenuItem(closestDestinationDetail, isParent)
   ]
+}
+
+function downloadsToolbarTemplateInit (downloadId, downloadItem) {
+  const menu = []
+
+  if (downloadItem) {
+    const downloads = appStoreRenderer.state.get('downloads')
+    if (downloadUtil.shouldAllowPause(downloadItem)) {
+      menu.push({
+        label: 'Pause',
+        click: downloadActions.pauseDownload.bind(null, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowResume(downloadItem)) {
+      menu.push({
+        label: 'Resume',
+        click: downloadActions.resumeDownload.bind(null, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowCancel(downloadItem)) {
+      menu.push({
+        label: 'Cancel',
+        click: downloadActions.cancelDownload.bind(null, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowRedownload(downloadItem)) {
+      menu.push({
+        label: 'Download Again',
+        click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
+      menu.push({
+        label: 'Copy Link Location',
+        click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
+      })
+    }
+
+    if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
+      menu.push({
+        label: 'Open Folder Path',
+        click: downloadActions.locateShellPath.bind(null, downloadItem)
+      })
+    }
+
+    if (downloadUtil.shouldAllowDelete(downloadItem)) {
+      menu.push({
+        label: 'Delete Download',
+        click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
+      })
+    }
+
+    if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
+      menu.push({
+        label: 'Clear Download',
+        click: downloadActions.clearDownload.bind(null, downloads, downloadId)
+      })
+    }
+    menu.push(CommonMenu.separatorMenuItem)
+  }
+
+  if (appStoreRenderer.state.getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
+    menu.push({
+      label: 'Hide downloads bar',
+      click: () => {
+        windowActions.setDownloadsToolbarVisible(false)
+      }
+    })
+  }
+
+  menu.push(CommonMenu.separatorMenuItem,
+    {
+      label: 'Clear completed downloads',
+      click: () => {
+        appActions.clearCompletedDownloads()
+      }
+    })
+  return menu
 }
 
 function bookmarkTemplateInit (siteDetail, activeFrame) {
@@ -124,8 +211,8 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
 
   template.push(
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail),
-    addFolderMenuItem(siteDetail))
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+    addFolderMenuItem(siteDetail, true))
   return template
 }
 
@@ -240,8 +327,6 @@ function tabTemplateInit (frameProps) {
         click: (item) => {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, false)
-          // Handle setting it in app storage for the other windows
-          appActions.removeSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
         }
       })
     } else {
@@ -250,8 +335,6 @@ function tabTemplateInit (frameProps) {
         click: (item) => {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, true)
-          // Handle setting it in app storage for the other windows
-          appActions.addSite(siteUtil.getDetailFromFrame(frameProps), siteTags.PINNED)
         }
       })
     }
@@ -376,6 +459,7 @@ function hamburgerTemplateInit (braverySettings) {
         CommonMenu.importBookmarksMenuItem
       ]
     },
+    CommonMenu.downloadsMenuItem,
     CommonMenu.separatorMenuItem,
     {
       label: 'Help',
@@ -508,16 +592,32 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   template.push({
+    label: 'Back',
+    enabled: frame.get('canGoBack'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+      }
+    }
+  }, {
+    label: 'Forward',
+    enabled: frame.get('canGoForward'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+      }
+    }
+  }, {
     label: 'Reload',
     click: (item, focusedWindow) => {
       if (focusedWindow) {
         focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
       }
     }
-  })
+  }, CommonMenu.separatorMenuItem)
 
   template.push(CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK)),
+    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
     {
       label: 'Add to reading list',
       enabled: false
@@ -547,6 +647,8 @@ export function onHamburgerMenu (braverySettings, e) {
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+  } else if (contextMenuType === 'download') {
+    onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
     mainMenu.popup(remote.getCurrentWindow())
@@ -559,10 +661,18 @@ export function onTabContextMenu (frameProps, e) {
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, e) {
+export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
-  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail))
+  const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
+}
+
+export function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
+  if (e) {
+    e.stopPropagation()
+  }
+  const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit(downloadId, downloadItem))
+  downloadsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
 export function onTabPageContextMenu (framePropsList, e) {

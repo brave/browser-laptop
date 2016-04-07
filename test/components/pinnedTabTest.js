@@ -4,18 +4,7 @@ const Brave = require('../lib/brave')
 
 const messages = require('../../js/constants/messages')
 const siteTags = require('../../js/constants/siteTags')
-const {urlInput, tabsTabs, pinnedTabsTabs, navigator} = require('../lib/selectors')
-
-function * loadUrl (client, url) {
-  yield client.ipcSend('shortcut-focus-url')
-    .moveToObject(navigator)
-    .moveToObject(urlInput)
-    .click(urlInput)
-    .waitForElementFocus(urlInput)
-    .setValue(urlInput, url)
-    // hit enter
-    .keys('\uE007')
-}
+const {urlInput, tabsTabs, pinnedTabsTabs} = require('../lib/selectors')
 
 describe('pinnedTabs', function () {
   function * setup (client) {
@@ -29,11 +18,12 @@ describe('pinnedTabs', function () {
     Brave.beforeAll(this)
     before(function *() {
       yield setup(this.app.client)
-      const page1Url = Brave.server.url('page1.html')
+      this.page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
-        .setPinned(2, true)
+        .setPinned(this.page1Url, true)
+        .waitForExist(pinnedTabsTabs)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
@@ -47,7 +37,7 @@ describe('pinnedTabs', function () {
     })
     it('unpins and creates a non-pinned tab', function *() {
       yield this.app.client
-        .setPinned(2, false)
+        .setPinned(this.page1Url, false)
         .waitForExist('.tab:not(.isPinned)[data-frame-key="2"]')
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 0)
@@ -57,11 +47,10 @@ describe('pinnedTabs', function () {
         })
     })
     it('pinning the same site again combines it', function *() {
-      const page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
         .waitForExist('.tab[data-frame-key="3"]')
-        .setPinned(3, true)
+        .setPinned(this.page1Url, true)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
@@ -70,11 +59,10 @@ describe('pinnedTabs', function () {
         })
     })
     it('pinning the same site again with a different session is allowed', function *() {
-      const page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPartitioned: true })
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url, { isPartitioned: true })
         .waitForExist('.tab[data-frame-key="4"]')
-        .setPinned(4, true)
+        .setPinned(this.page1Url, true)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
@@ -147,11 +135,13 @@ describe('pinnedTabs', function () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
-        .setPinned(2, true)
+        .setPinned(page1Url, true)
+        .waitForExist(pinnedTabsTabs)
     })
     it('navigate within the same origin', function *() {
       const page2Url = Brave.server.url('page2.html')
-      yield loadUrl(this.app.client, page2Url)
+      yield this.app.client
+        .loadUrl(page2Url)
       yield this.app.client
         .waitUntil(function () {
           return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === page2Url)
@@ -165,7 +155,8 @@ describe('pinnedTabs', function () {
     })
     it('navigating to a different origin opens a new tab', function *() {
       const page2Url = Brave.server.url('page2.html').replace('localhost', '127.0.0.1')
-      yield loadUrl(this.app.client, page2Url)
+      yield this.app.client
+        .loadUrl(page2Url)
       this.app.client.waitForExist('webview[data-frame-key="3"]')
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
@@ -185,10 +176,12 @@ describe('pinnedTabs', function () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
         .waitForExist('.tab[data-frame-key="2"]')
-        .setPinned(2, true)
+        .setPinned(page1Url, true)
+        .waitForExist(pinnedTabsTabs)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
         .waitForExist('.tab[data-frame-key="3"]')
-        .setPinned(3, true)
+        .setPinned(page2Url, true)
+        .waitForExist(pinnedTabsTabs)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
         })

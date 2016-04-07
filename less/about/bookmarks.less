@@ -1,15 +1,5 @@
 @import "../variables.less";
 
-* {
-  font-family: "Arial";
-  margin: 0;
-  padding: 0;
-}
-
-html, body, #appContainer, #appContainer > div {
-  height: 100%;
-}
-
 .bookmarksPage {
   margin: 20px;
 
@@ -39,41 +29,4 @@ html, body, #appContainer, #appContainer > div {
 
 .bookmarkFolderList list >* {
   padding-left: 12px;
-}
-
-list .listItem {
-  cursor: default;
-  overflow: hidden;
-  white-space: nowrap;
-
-  padding: 12px;
-  -webkit-user-select: none;
-  &:hover {
-    background-color: lighten(@highlightBlue, 30%);
-  }
-  &.selected {
-    background-color: lighten(@highlightBlue, 20%);
-  }
-
-  .bookmarkItem {
-    display: flex;
-  }
-}
-
-.bookmarkSeparator {
-  color: #aaa;
-  padding: 0 4px;
-}
-
-.bookmarkLocation {
-  color: #aaa;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bookmarkTitle {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

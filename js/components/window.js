@@ -91,6 +91,10 @@ class Window extends React.Component {
       }
     })
 
+    if (!this.props.includePinnedSites) {
+      return
+    }
+
     const sites = this.appState.get('sites')
     const frames = this.windowState.get('frames')
 

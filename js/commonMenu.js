@@ -9,11 +9,12 @@ const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
 
-const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = appConfig.resourceNames.ADBLOCK
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
-const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
@@ -166,6 +167,33 @@ module.exports.bookmarksMenuItem = {
   }
 }
 
+module.exports.downloadsMenuItem = {
+  label: 'Downloads manager...',
+  accelerator: isDarwin ? 'CmdOrCtrl+Shift+J' : 'Ctrl+J',
+  click: (item, focusedWindow) => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({
+        location: 'about:downloads'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:downloads', { singleFrame: true }])
+    }
+  }
+}
+
+module.exports.passwordsMenuItem = {
+  label: 'Passwords manager...',
+  click: (item, focusedWindow) => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      appActions.newWindow(Immutable.fromJS({
+        location: 'about:passwords'
+      }))
+    } else {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:passwords', { singleFrame: true }])
+    }
+  }
+}
+
 module.exports.importBookmarksMenuItem = {
   label: 'Import Bookmarks (from HTML export)',
   click: function (item, focusedWindow) {
@@ -234,6 +262,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
   const blockTracking = settings[trackingProtection] || false
   const blockCookies = settings[cookieblock] || false
   const useHttps = settings[httpsEverywhere] || false
+  const useSafeBrowsing = settings[safeBrowsing] || false
   return {
     label: 'Bravery',
     submenu: [
@@ -288,6 +317,14 @@ module.exports.buildBraveryMenu = function (settings, init) {
         checked: useHttps,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(httpsEverywhere, !useHttps)
+          init()
+        }
+      }, {
+        type: 'checkbox',
+        label: 'Block Phishing and Malware',
+        checked: useSafeBrowsing,
+        click: function (item, focusedWindow) {
+          appActions.setResourceEnabled(safeBrowsing, !useSafeBrowsing)
           init()
         }
       }

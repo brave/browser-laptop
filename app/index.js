@@ -17,6 +17,7 @@ const Menu = require('./menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const CrashHerald = require('./crash-herald')
@@ -49,11 +50,17 @@ let lastWindowState
 let acceptCertUrls = {}
 // URLs to callback for auth.
 let authCallbacks = {}
+// Don't show the keytar prompt more than once per 5 minutes
+let throttleKeytar = false
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
 const getMasterKey = () => {
+  if (throttleKeytar) {
+    return null
+  }
+
   const appName = 'Brave'
   // Previously the master key was binary encoded, which caused compatibility
   // issues with various keyrings. In 0.8.3, switch to hex encoding for storage.
@@ -88,6 +95,10 @@ const getMasterKey = () => {
     // Convert from hex to binary
     return (new Buffer(masterKey, 'hex')).toString('binary')
   } else {
+    throttleKeytar = true
+    debounce(() => {
+      throttleKeytar = false
+    }, 1000 * 60 * 5)
     return null
   }
 }
@@ -151,7 +162,7 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
   const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     let focusedFirst = false
@@ -303,8 +314,16 @@ app.on('ready', () => {
       appActions.changeSetting(key, value)
     })
 
+    ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
+      electron.clipboard.writeText(text)
+    })
+
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
       appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
+    })
+
+    ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
+      downloadActions.openDownloadPath(Immutable.fromJS(download))
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
@@ -342,27 +361,53 @@ app.on('ready', () => {
     })
 
     let masterKey
-    ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
+    ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {
+      appActions.deletePassword(password)
+    })
+    ipcMain.on(messages.CLEAR_PASSWORDS, () => {
+      appActions.clearPasswords()
+    })
+    ipcMain.on(messages.DECRYPT_PASSWORD, (e, encrypted, authTag, iv, id) => {
+      masterKey = masterKey || getMasterKey()
+      if (!masterKey) {
+        console.log('Could not access master password; aborting')
+        return
+      }
+      let decrypted = CryptoUtil.decryptVerify(encrypted, authTag, masterKey, iv)
+      e.sender.send(messages.DECRYPTED_PASSWORD, {
+        id,
+        decrypted
+      })
+    })
+    ipcMain.on(messages.GET_PASSWORDS, (e, origin, action) => {
+      const passwords = AppStore.getState().get('passwords')
+      if (!passwords || passwords.size === 0) {
+        return
+      }
+
+      let results = passwords.filter((password) => {
+        return password.get('origin') === origin && password.get('action') === action
+      })
+
+      if (results.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      const passwords = AppStore.getState().get('passwords')
-      if (passwords) {
-        let result = passwords.findLast((password) => {
-          return password.get('origin') === origin && password.get('action') === action
-        })
-        if (result) {
-          let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
-                                                  result.get('authTag'),
-                                                  masterKey,
-                                                  result.get('iv'))
-          e.sender.send(messages.GOT_PASSWORD, result.get('username'),
-                        password, origin, action)
-        }
-      }
+      let isUnique = results.size === 1
+      results.forEach((result) => {
+        let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                result.get('authTag'),
+                                                masterKey,
+                                                result.get('iv'))
+        e.sender.send(messages.GOT_PASSWORD, result.get('username'),
+                      password, origin, action, isUnique)
+      })
     })
 
     ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {
@@ -372,38 +417,45 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect, value) => {
+      const passwords = AppStore.getState().get('passwords')
+      if (!passwords || passwords.size === 0) {
+        return
+      }
+
+      let usernames = {}
+      let results = passwords.filter((password) => {
+        return password.get('username') &&
+          password.get('username').startsWith(value) &&
+          password.get('origin') === origin &&
+          password.get('action') === action
+      })
+
+      if (results.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      const passwords = AppStore.getState().get('passwords')
-      if (passwords) {
-        let usernames = {}
-        let results = passwords.filter((password) => {
-          return password.get('username') &&
-            password.get('username').startsWith(value) &&
-            password.get('origin') === origin &&
-            password.get('action') === action
-        })
-        results.forEach((result) => {
-          usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
-                                                                       result.get('authTag'),
-                                                                       masterKey,
-                                                                       result.get('iv')) || ''
-        })
-        let win = BrowserWindow.getFocusedWindow()
-        if (!win) {
-          return
-        }
-        if (Object.keys(usernames).length > 0) {
-          win.webContents.send(messages.SHOW_USERNAME_LIST,
-                               usernames, origin, action,
-                               boundingRect)
-        } else {
-          win.webContents.send(messages.HIDE_CONTEXT_MENU)
-        }
+      results.forEach((result) => {
+        usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                                     result.get('authTag'),
+                                                                     masterKey,
+                                                                     result.get('iv')) || ''
+      })
+      let win = BrowserWindow.getFocusedWindow()
+      if (!win) {
+        return
+      }
+      if (Object.keys(usernames).length > 0) {
+        win.webContents.send(messages.SHOW_USERNAME_LIST,
+                             usernames, origin, action,
+                             boundingRect)
+      } else {
+        win.webContents.send(messages.HIDE_CONTEXT_MENU)
       }
     })
 
@@ -440,7 +492,7 @@ app.on('ready', () => {
         title: 'Save password?',
         message: message,
         buttons: ['Yes', 'No'],
-        defaultId: 1,
+        defaultId: 0,
         cancelId: 1
       }, (buttonId) => {
         if (buttonId !== 0) {

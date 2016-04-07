@@ -500,6 +500,16 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 
 
 
+### setDownloadsToolbarVisible(isVisible) 
+
+Dispatches a message to indicate if the downloads toolbar is visible
+
+**Parameters**
+
+**isVisible**: `boolean`, true if the site info should be shown
+
+
+
 ### setReleaseNotesVisible(isVisible) 
 
 Dispatches a message to indicate the release notes should be visible

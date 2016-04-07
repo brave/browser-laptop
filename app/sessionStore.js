@@ -14,8 +14,10 @@
 const fs = require('fs')
 const path = require('path')
 const app = require('app')
+const urlParse = require('url').parse
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
+const downloadStates = require('../js/constants/downloadStates')
 const sessionStorageVersion = 1
 let suffix = ''
 if (process.env.NODE_ENV === 'development') {
@@ -50,6 +52,11 @@ module.exports.saveAppState = (payload) => {
       })
     } else {
       delete payload.perWindowState
+    }
+
+    if (payload.settings) {
+      // useragent value gets recalculated on restart
+      payload.settings[settings.USERAGENT] = undefined
     }
 
     fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
@@ -215,11 +222,48 @@ module.exports.loadAppState = () => {
       // We used to store a huge list of IDs but we didn't use them.
       // Get rid of them here.
       delete data.windows
+      // Delete downloaded items older than a week
+      if (data.downloads) {
+        const dateOffset = 7 * 24 * 60 * 60 * 1000
+        const lastWeek = new Date().getTime() - dateOffset
+        Object.keys(data.downloads).forEach((downloadId) => {
+          if (data.downloads[downloadId].startTime < lastWeek) {
+            delete data.downloads[downloadId]
+          } else {
+            const state = data.downloads[downloadId].state
+            if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
+              data.downloads[downloadId].state = downloadStates.INTERRUPTED
+            }
+          }
+        })
+      }
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }
       data.settings = data.settings || {}
       data.passwords = data.passwords || []
+      // We used to store passwords with the form action full URL. Transition
+      // to using origin + pathname for 0.9.0
+      if (data.passwords.length > 0) {
+        let newPasswords = []
+        data.passwords.forEach((entry) => {
+          let a = urlParse(entry.action)
+          if (a.path !== a.pathname) {
+            entry.action = [a.protocol, a.host].join('//') + a.pathname
+          }
+          // Deduplicate
+          for (let i = 0; i < newPasswords.length; i++) {
+            let newEntry = newPasswords[i]
+            if (entry.origin === newEntry.origin &&
+                entry.action === newEntry.action &&
+                entry.username === newEntry.username) {
+              return
+            }
+          }
+          newPasswords.push(entry)
+        })
+        data.passwords = newPasswords
+      }
       resolve(data)
     })
   })

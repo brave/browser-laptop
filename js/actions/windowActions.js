@@ -14,6 +14,8 @@ const remote = electron.remote
 const messages = require('../constants/messages')
 const appActions = require('./appActions')
 const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
+const siteUtil = require('../state/siteUtil')
+const siteTags = require('../constants/siteTags')
 
 function dispatch (action) {
   if (windowActions.dispatchToIPC) {
@@ -210,6 +212,12 @@ const windowActions = {
       frameProps,
       isPinned
     })
+    const siteDetail = siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED)
+    if (isPinned) {
+      appActions.addSite(siteDetail, siteTags.PINNED)
+    } else {
+      appActions.removeSite(siteDetail, siteTags.PINNED)
+    }
   },
 
   /**
@@ -703,6 +711,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to indicate if the downloads toolbar is visible
+   *
+   * @param {boolean} isVisible - true if the site info should be shown
+   */
+  setDownloadsToolbarVisible: function (isVisible) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE,
+      isVisible
+    })
+  },
+
+  /**
    * Dispatches a message to indicate the release notes should be visible
    *
    * @param {boolean} isVisible - true if the site info should be shown
@@ -760,16 +780,18 @@ const windowActions = {
   },
 
   zoomIn: function (frameProps) {
-    dispatch({
-      frameProps,
-      actionType: WindowConstants.WINDOW_ZOOM_IN
-    })
+    windowActions.zoom(frameProps, 0.5)
   },
 
   zoomOut: function (frameProps) {
+    windowActions.zoom(frameProps, -0.5)
+  },
+
+  zoom: function (frameProps, stepSize) {
     dispatch({
       frameProps,
-      actionType: WindowConstants.WINDOW_ZOOM_OUT
+      stepSize,
+      actionType: WindowConstants.WINDOW_ZOOM
     })
   },
 

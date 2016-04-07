@@ -28,10 +28,13 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:blank': module.exports.getAppUrl('./about-blank.html'),
   'about:history': module.exports.getAppUrl('./about-history.html'),
   'about:bookmarks': module.exports.getAppUrl('./about-bookmarks.html'),
+  'about:downloads': module.exports.getAppUrl('./about-downloads.html'),
   'about:newtab': module.exports.getAppUrl('./about-newtab.html'),
   'about:preferences': module.exports.getAppUrl('./about-preferences.html'),
   'about:config': module.exports.getAppUrl('./about-config.html'),
-  'about:certerror': module.exports.getAppUrl('./about-certerror.html')
+  'about:certerror': module.exports.getAppUrl('./about-certerror.html'),
+  'about:safebrowsing': module.exports.getAppUrl('./about-safebrowsing.html'),
+  'about:passwords': module.exports.getAppUrl('./about-passwords.html')
 })
 
 // Map of target URLs mapped to source about: URLs

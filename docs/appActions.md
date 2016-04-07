@@ -91,6 +91,25 @@ Dispatches a message to move a site locations.
 
 
 
+### mergeDownloadDetail(downloadId, downloadDetail) 
+
+Dispatches a message to add/edit download details
+If set, also indicates that add/edit is shown
+
+**Parameters**
+
+**downloadId**: `string`, A unique ID for the download
+
+**downloadDetail**: `Object`, Properties for the download
+
+
+
+### clearCompletedDownloads() 
+
+Dispatches a message to clear all completed downloads
+
+
+
 ### setDefaultWindowSize(size) 
 
 Sets the default window size
@@ -167,6 +186,22 @@ Saves login credentials
 **Parameters**
 
 **passwordDetail**: `Object`, login details
+
+
+
+### deletePassword(passwordDetail) 
+
+Deletes login credentials
+
+**Parameters**
+
+**passwordDetail**: `Object`, login details
+
+
+
+### clearPasswords() 
+
+Deletes all saved login credentials
 
 
 

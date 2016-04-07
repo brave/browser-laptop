@@ -79,6 +79,15 @@ class UrlBar extends ImmutableComponent {
           if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
             windowActions.loadUrl(this.props.activeFrameProps, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions && this.urlBarSuggestions.activeIndex > 0) {
+            // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
+            const isDarwin = process.platform === 'darwin'
+            if (e.altKey) {
+              if (isDarwin) {
+                e.metaKey = true
+              } else {
+                e.ctrlKey = true
+              }
+            }
             // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
@@ -283,7 +292,6 @@ class UrlBar extends ImmutableComponent {
           ? <UrlBarSuggestions
             ref={(node) => { this.urlBarSuggestions = node }}
             suggestions={this.props.urlbar.get('suggestions')}
-            settings={this.props.settings}
             sites={this.props.sites}
             frames={this.props.frames}
             searchDetail={this.searchDetail}

@@ -120,15 +120,15 @@ var exports = {
       })
     })
 
-    this.app.client.addCommand('setPinned', function (key, isPinned) {
-      return this.execute(function (key, isPinned) {
+    this.app.client.addCommand('setPinned', function (location, isPinned) {
+      return this.execute(function (location, isPinned) {
         var Immutable = require('immutable')
         var windowActions = require('../js/actions/windowActions')
         windowActions.dispatchViaIPC()
         windowActions.setPinned(Immutable.fromJS({
-          key
+          location
         }), isPinned)
-      }, key, isPinned)
+      }, location, isPinned)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {

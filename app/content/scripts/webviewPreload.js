@@ -179,7 +179,7 @@
     var action = form.action || document.location.href
     var usernameElem = fields[0] || {}
     ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
-                     formOrigin, action)
+                     formOrigin, normalizeURL(action))
     submittedForms.push(form)
   }
 
@@ -194,6 +194,7 @@
   function tryAutofillForm (credentials, formOrigin, form) {
     var fields = getFormFields(form, false)
     var action = form.action || document.location.href
+    action = normalizeURL(action)
     var usernameElem = fields[0]
     var passwordElem = fields[1]
 
@@ -207,10 +208,11 @@
       credentials[action] = [[passwordElem, usernameElem]]
     }
 
-    if (!usernameElem) {
-      // Ask the main process for the only credentials we have
-      ipcRenderer.send('get-password', formOrigin, action)
-    } else {
+    // Fill the password immediately if there's only one or if the username
+    // is already autofilled
+    ipcRenderer.send('get-passwords', formOrigin, action)
+
+    if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
         let rect = usernameElem.getBoundingClientRect()
         ipcRenderer.send('show-username-list', formOrigin, action, {
@@ -234,11 +236,19 @@
   }
 
   /**
-   * I think window load events might fire before this script runs, so
-   * try running the listener immediately. Otherwise run it on window.onload.
+   * Gets protocol + host + path from a URL.
+   * @return {string}
+   */
+  function normalizeURL (url) {
+    var a = document.createElement('a')
+    a.href = url
+    return [a.protocol, a.host].join('//') + a.pathname
+  }
+
+  /**
    * @return {boolean}
    */
-  function onLoadListener () {
+  function autofillPasswordListener () {
     // Don't autofill on non-HTTP(S) sites for now
     if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
       return false
@@ -259,15 +269,22 @@
       tryAutofillForm(credentials, formOrigin, form)
     })
 
-    ipcRenderer.on('got-password', (e, username, password, origin, action) => {
+    ipcRenderer.on('got-password', (e, username, password, origin, action, isUnique) => {
+      console.log('got password', username, isUnique)
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {
-          // Autofill password
-          elem[0].value = password
-          if (username && elem[1]) {
-            // Autofill the username if there is one
-            elem[1].value = username
+          if (isUnique) {
+            // Autofill password if there is only one available
+            elem[0].value = password
+            if (username && elem[1]) {
+              // Autofill the username if needed
+              elem[1].value = username
+            }
+          } else if (elem[1] && username && username === elem[1].value) {
+            // If the username is already autofilled by something else, fill
+            // in the corresponding password
+            elem[0].value = password
           }
         })
       }
@@ -275,9 +292,8 @@
     return true
   }
 
-  if (!onLoadListener()) {
-    window.addEventListener('load', onLoadListener)
-  }
+  // Fires when the page is loaded and the default pw manager is enabled
+  ipcRenderer.on('autofill-password', autofillPasswordListener)
 
   /**
    * Gets form fields.
@@ -299,7 +315,8 @@
         form.querySelector(['input[autocomplete=username i]']) ||
         form.querySelector(['input[name=email i]']) ||
         form.querySelector(['input[name=username i]']) ||
-        form.querySelector(['input[name=user i]'])
+        form.querySelector(['input[name=user i]']) ||
+        form.querySelector(['input[name="session[username_or_email]"]'])
 
     if (!username) {
       // Search backwards from first password field to find the username field

@@ -42,6 +42,9 @@ const messages = {
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
   LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
   LOGIN_RESPONSE: _,
+  // Downloads
+  SHOW_DOWNLOADS_TOOLBAR: _, /** Ensures the downloads toolbar is visible */
+  DOWNLOAD_ACTION: _, /** @arg {string} downloadId, @arg {string} action such as 'resume', 'pause', or 'cancel' */
   // Updates
   UPDATE_REQUESTED: _,
   UPDATE_AVAILABLE: _,
@@ -62,12 +65,19 @@ const messages = {
   THEME_COLOR_COMPUTED: _,
   HIDE_CONTEXT_MENU: _,
   LEAVE_FULL_SCREEN: _,
+  SET_CLIPBOARD: _,
+  AUTOFILL_PASSWORD: _,
   // Password manager
-  GET_PASSWORD: _, /** @arg {string} formOrigin, @arg {string} action */
-  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password */
+  GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
+  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
   SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
   SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
   FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
+  PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
+  DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
+  DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
+  DELETE_PASSWORD: _, /** @arg {Object} password */
+  CLEAR_PASSWORDS: _,
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
@@ -76,15 +86,18 @@ const messages = {
   RESPONSE_WINDOW_STATE: _,
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
-  // Ad block and tracking protection
+  // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
+  BLOCKED_PAGE: _,
   // About pages to contentScripts
   SETTINGS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
+  DOWNLOADS_UPDATED: _,
   // About pages from contentScript
   CHANGE_SETTING: _,
   NEW_FRAME: _,
   MOVE_SITE: _,
+  OPEN_DOWNLOAD_PATH: _,
   // HTTPS
   CERT_DETAILS_UPDATED: _, /** @arg {Object} security state of the active frame */
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */

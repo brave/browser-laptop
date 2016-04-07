@@ -50,6 +50,19 @@ describe('findbar', function () {
     assert.equal(match, '1 of 2')
   })
 
+  it('should display no results correctly', function *() {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test-not-found')
+       .waitUntil(function () {
+         return this.getValue(findBarInput).then((val) => val === 'test-not-found')
+       })
+      .waitForVisible(findBarMatches)
+    let match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '0 matches')
+  })
+
   it('should re-focus findbar if open after blur', function *() {
     yield this.app.client
       .showFindbar()
@@ -99,7 +112,7 @@ describe('view source', function () {
 
   it('open from pinned tab', function *() {
     yield this.app.client
-      .setPinned(2, true)
+      .setPinned(this.url, true)
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
       .waitForExist(this.webview2)
   })

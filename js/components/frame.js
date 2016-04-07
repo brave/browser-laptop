@@ -19,6 +19,9 @@ const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const FullScreenWarning = require('./fullScreenWarning')
+const debounce = require('../lib/debounce.js')
+const getSetting = require('../settings').getSetting
+const settings = require('../constants/settings')
 import adInfo from '../data/adInfo.js'
 import FindBar from './findbar.js'
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
@@ -27,6 +30,7 @@ class Frame extends ImmutableComponent {
   constructor () {
     super()
     this.previousLocation = 'about:newtab'
+    this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
   }
 
   updateWebview () {
@@ -40,7 +44,7 @@ class Frame extends ImmutableComponent {
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
     let aboutPreload = false
-    if (['about:preferences', 'about:bookmarks', 'about:certerror'].includes(location)) {
+    if (['about:preferences', 'about:bookmarks', 'about:downloads', 'about:certerror', 'about:safebrowsing', 'about:passwords'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
       aboutPreload = true
     }
@@ -52,16 +56,19 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need.  Clear out old webviews if the contentScripts change or if
     // allowRunningInsecureContent changes because they cannot change after being added to the DOM.
+    let webviewAdded = false
     if (!this.webview || this.webview.allowRunningInsecureContent !== allowRunningInsecureContent || contentScriptsChanged) {
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
       this.webview = document.createElement('webview')
       src = location
+      webviewAdded = true
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('contentScripts', contentScripts)
+    this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
     // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
     // automatically while keeping the content script loaded.
     if (aboutPreload) {
@@ -94,7 +101,7 @@ class Frame extends ImmutableComponent {
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
-    if (!this.webviewContainer.firstChild) {
+    if (webviewAdded) {
       this.webviewContainer.appendChild(this.webview)
       this.addEventListeners()
     }
@@ -137,7 +144,7 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
         break
       case 'reload':
-        if (this.props.frame.get('location') === 'about:preferences') {
+        if (['about:preferences', 'about:downloads', 'about:bookmarks', 'about:passwords', 'about:certerror'].includes(this.props.frame.get('location'))) {
           break
         }
         // Ensure that the webview thinks we're on the same location as the browser does.
@@ -195,8 +202,13 @@ class Frame extends ImmutableComponent {
                             activeShortcutDetails.get('username'),
                             activeShortcutDetails.get('password'),
                             activeShortcutDetails.get('origin'),
-                            activeShortcutDetails.get('action'))
+                            activeShortcutDetails.get('action'),
+                            true)
         }
+        break
+      case 'focus-webview':
+        setImmediate(() => this.webview.focus())
+        break
     }
     if (activeShortcut) {
       windowActions.setActiveFrameShortcut(this.props.frame, null, null)
@@ -209,6 +221,13 @@ class Frame extends ImmutableComponent {
         bookmarks: this.props.bookmarks.toJS(),
         bookmarkFolders: this.props.bookmarkFolders.toJS()
       })
+    } else if (this.props.frame.get('location') === 'about:downloads') {
+      this.webview.send(messages.DOWNLOADS_UPDATED, {
+        downloads: this.props.downloads.toJS()
+      })
+    } else if (this.props.frame.get('location') === 'about:passwords' &&
+               prevProps.passwords !== this.props.passwords) {
+      this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
     }
   }
 
@@ -322,6 +341,9 @@ class Frame extends ImmutableComponent {
         this.insertAds(this.webview.getURL())
       }
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
+      if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
+        this.webview.send(messages.AUTOFILL_PASSWORD)
+      }
       let security = this.props.frame.get('security')
       if (this.props.frame.get('location') === 'about:certerror' &&
           security && security.get('certDetails')) {
@@ -332,6 +354,8 @@ class Frame extends ImmutableComponent {
           previousLocation: this.previousLocation,
           frameKey: this.props.frame.get('key')
         })
+      } else if (this.props.frame.get('location') === 'about:passwords') {
+        this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
       }
 
       const parsedUrl = urlParse(this.props.frame.get('location'))
@@ -391,6 +415,13 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('found-in-page', (e) => {
       if (e.result !== undefined && (e.result.matches !== undefined || e.result.activeMatchOrdinal !== undefined)) {
+        if (e.result.matches === 0) {
+          windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+            numberOfMatches: 0,
+            activeMatchOrdinal: 0
+          }))
+          return
+        }
         windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
           numberOfMatches: e.result.matches || this.props.frame.getIn(['findDetail', 'numberOfMatches']),
           activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.frame.getIn(['findDetail', 'activeMatchOrdinal'])
@@ -403,6 +434,9 @@ class Frame extends ImmutableComponent {
     if (this.props.frame.get('audioMuted')) {
       this.webview.setAudioMuted(true)
     }
+
+    // Handle zoom using Ctrl/Cmd and the mouse wheel.
+    this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
 
   insertAds (currentLocation) {
@@ -430,6 +464,25 @@ class Frame extends ImmutableComponent {
   onFindHide () {
     windowActions.setFindbarShown(this.props.frame, false)
     this.onClearMatch()
+  }
+
+  onUpdateWheelZoom () {
+    if (this.wheelDeltaY > 0) {
+      windowActions.zoomIn(this.props.frame)
+    } else if (this.wheelDeltaY < 0) {
+      windowActions.zoomOut(this.props.frame)
+    }
+    this.wheelDeltaY = 0
+  }
+
+  onMouseWheel (e) {
+    if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+      e.preventDefault()
+      this.wheelDeltaY = (this.wheelDeltaY || 0) + e.wheelDeltaY
+      this.onUpdateWheelZoom()
+    } else {
+      this.wheelDeltaY = 0
+    }
   }
 
   onFind (searchString, caseSensitivity, forward) {

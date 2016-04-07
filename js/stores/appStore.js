@@ -12,6 +12,7 @@ const app = electron.app
 const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
+const downloadStates = require('../constants/downloadStates')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const appActions = require('../actions/appActions')
@@ -279,7 +280,7 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
           lastEmittedState = appState
-          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, appState.toJS(), frames, action.restoredState)
+          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
           if (action.cb) {
             action.cb()
           }
@@ -302,9 +303,12 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', passwords.push(Immutable.fromJS(action.passwordDetail)))
       break
     case AppConstants.APP_REMOVE_PASSWORD:
-      appState.set('passwords', appState.get('passwords').filterNot((pw) => {
+      appState = appState.set('passwords', appState.get('passwords').filterNot((pw) => {
         return Immutable.is(pw, Immutable.fromJS(action.passwordDetail))
       }))
+      break
+    case AppConstants.APP_CLEAR_PASSWORDS:
+      appState = appState.set('passwords', new Immutable.List())
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -316,7 +320,7 @@ const handleAppAction = (action) => {
         appState = appState.set('sites', siteUtil.addSite(appState.get('sites'), action.siteDetail, action.tag, action.originalSiteDetail))
       }
       if (action.destinationDetail) {
-        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false))
+        appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.siteDetail, action.destinationDetail, false, false, true))
       }
       // If there was an item added then clear out the old history entries
       if (oldSiteSize !== appState.get('sites').size) {
@@ -327,7 +331,20 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
-      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent))
+      appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
+      break
+    case AppConstants.APP_MERGE_DOWNLOAD_DETAIL:
+      if (action.downloadDetail) {
+        appState = appState.mergeIn(['downloads', action.downloadId], action.downloadDetail)
+      } else {
+        appState = appState.deleteIn(['downloads', action.downloadId])
+      }
+      break
+    case AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS:
+      const downloads = appState.get('downloads')
+        .filter((download) =>
+          ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
+      appState = appState.set('downloads', downloads)
       break
     case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
       appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))
