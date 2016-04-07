@@ -6,6 +6,7 @@
 - Some downloads bar and password saving fixes.
 - Windows installer now using SHA-256 digest and gets signed with a timestamp.
 - New look for the SSL cert warning pages.
+- Removed Brave from the User Agent HTTP header to reduce fingerprinting.
 - Windows shortcuts added F12 for developer tools and F11 for fullscreen.
 - Partial extensions support added internally for running some Chrome extensions unmodified.
 - Upgrade to Node 5.10.0.
