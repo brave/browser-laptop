@@ -13,7 +13,6 @@ const Filtering = require('./filtering')
 module.exports.adBlockResourceName = 'adblock'
 module.exports.safeBrowsingResourceName = 'safeBrowsing'
 
-let adblock
 let mapFilterType = {
   mainFrame: FilterOptions.document,
   subFrame: FilterOptions.subdocument,
@@ -25,7 +24,7 @@ let mapFilterType = {
   other: FilterOptions.other
 }
 
-const startAdBlocking = (resourceName, shouldCheckMainFrame) => {
+const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     const cancel = firstPartyUrl.protocol &&
@@ -41,8 +40,8 @@ const startAdBlocking = (resourceName, shouldCheckMainFrame) => {
 }
 
 module.exports.initInstance = (resourceName, shouldCheckMainFrame) => {
-  adblock = new ABPFilterParser()
-  DataFile.init(resourceName, startAdBlocking.bind(null, resourceName, shouldCheckMainFrame),
+  let adblock = new ABPFilterParser()
+  DataFile.init(resourceName, startAdBlocking.bind(null, adblock, resourceName, shouldCheckMainFrame),
                 (data) => adblock.deserialize(data))
   return module.exports
 }
