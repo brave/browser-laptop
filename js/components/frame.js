@@ -44,7 +44,7 @@ class Frame extends ImmutableComponent {
 
     let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
     let aboutPreload = false
-    if (['about:preferences', 'about:bookmarks', 'about:downloads', 'about:certerror', 'about:passwords'].includes(location)) {
+    if (['about:preferences', 'about:bookmarks', 'about:downloads', 'about:certerror', 'about:safebrowsing', 'about:passwords'].includes(location)) {
       contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
       aboutPreload = true
     }
