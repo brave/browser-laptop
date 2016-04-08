@@ -578,17 +578,13 @@ function mainTemplateInit (nodeProps, frame) {
       label: 'Redo',
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
-    }, CommonMenu.separatorMenuItem, ...editableItems)
+    }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
     template.push({
       label: 'Copy',
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
-    })
-  }
-
-  if (template.length > 0) {
-    template.push(CommonMenu.separatorMenuItem)
+    }, CommonMenu.separatorMenuItem)
   }
 
   template.push({
