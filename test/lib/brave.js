@@ -33,7 +33,7 @@ var exports = {
   },
 
   browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
-  newTabUrl: 'chrome-extension://nbhlofbabihjaodgnlpmgjhdjjmojpah/about-newtab.html',
+  newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
 
   beforeAllServerSetup: function (context) {
     context.beforeAll(function (done) {
