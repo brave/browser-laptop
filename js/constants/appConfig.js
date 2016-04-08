@@ -41,7 +41,7 @@ module.exports = {
   },
   httpsEverywhere: {
     url: 'https://s3.amazonaws.com/https-everywhere-data/{version}/httpse.json',
-    version: '5.1.3', // latest stable release from https://eff.org/https-everywhere
+    version: '5.1.6', // latest stable release from https://eff.org/https-everywhere
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
