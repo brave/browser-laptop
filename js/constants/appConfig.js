@@ -70,7 +70,7 @@ module.exports = {
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
     'general.useragent.value': undefined, // Set at runtime
-    'search.default-search-engine': 'search/google.xml',
+    'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
     'tabs.tabs-per-tab-page': 6,

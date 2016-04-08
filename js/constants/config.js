@@ -32,7 +32,7 @@ module.exports = {
   navigationBar: {
     defaultSearchSuggestions: false
   },
-  defaultOpenSearchPath: 'search/google.xml',
+  defaultOpenSearchPath: 'content/search/google.xml',
   vault: {
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
