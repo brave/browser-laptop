@@ -352,9 +352,15 @@ app.on('ready', () => {
     })
 
     // TODO(bridiver) - load everything in the extensions directory
-    // nbhlofbabihjaodgnlpmgjhdjjmojpah
-    process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'))
-    process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
+    // mnojpmjdmbbfmejpflffifhffcmidifd
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      process.emit('load-extension', 'brave', path.join(__dirname, '..', '..', 'extensions'), 'component')
+      process.emit('load-extension', '1password', path.join(__dirname, '..', '..', 'extensions'))
+    } else {
+      process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'), 'component')
+      process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
+    }
+
     process.on('did-extension-load-error', function (name, error_message) {
       console.error('Error loading extension ' + name + ':', error_message)
     })

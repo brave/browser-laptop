@@ -6,6 +6,7 @@ var VersionInfo = require('./lib/versionInfo')
 var execute = require('./lib/execute')
 const ignoredPaths = require('./lib/ignoredPaths')
 const config = require('./lib/config')
+const path = require('path')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -84,6 +85,10 @@ cmds = cmds.concat([
 
 if (process.platform === 'linux') {
   cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
+} else if (process.platform === 'darwin') {
+  cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
+} else if (process.platform === 'win32') {
+  cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 }
 
 execute(cmds, env, console.log.bind(null, 'done'))

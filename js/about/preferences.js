@@ -102,8 +102,8 @@ class SearchTab extends ImmutableComponent {
       <SettingItem dataL10nId='defaultSearchEngine'>
         <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
           onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_SEARCH_ENGINE)}>
-          <option value='search/google.xml'>Google</option>
-          <option value='search/duckduckgo.xml'>DuckDuckGo</option>
+          <option value='content/search/google.xml'>Google</option>
+          <option value='content/search/duckduckgo.xml'>DuckDuckGo</option>
         </select>
       </SettingItem>
     </SettingsList>

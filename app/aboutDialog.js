@@ -15,7 +15,7 @@ Node.js: ${process.versions.node}
 Update channel: ${Channel.channel()}
 
 This software uses libraries from the FFmpeg project under the LGPLv2.1`,
-    icon: path.join(__dirname, '..', 'app', 'img', 'braveAbout.png'),
+    icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
     buttons: ['Ok']
   })
 }

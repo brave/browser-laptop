@@ -16,10 +16,9 @@ module.exports.getAppUrl = function (relativeUrl) {
   if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:' + process.env.BRAVE_PORT + '/' + relativeUrl
   } else {
-    return 'chrome-extension://nbhlofbabihjaodgnlpmgjhdjjmojpah/' + relativeUrl
+    return 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/' + relativeUrl
   }
 }
-
 /**
  * Returns the URL to the application's manifest
  */
