@@ -354,10 +354,10 @@ app.on('ready', () => {
     // TODO(bridiver) - load everything in the extensions directory
     // mnojpmjdmbbfmejpflffifhffcmidifd
     if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-      process.emit('load-extension', 'brave', path.join(__dirname, '..', '..', 'extensions'))
+      process.emit('load-extension', 'brave', path.join(__dirname, '..', '..', 'extensions'), 'component')
       process.emit('load-extension', '1password', path.join(__dirname, '..', '..', 'extensions'))
     } else {
-      process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'))
+      process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'), 'component')
       process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
     }
 

@@ -6,16 +6,22 @@
     {
       "run_at": "document_start",
       "matches": [
+        "http://localhost:*/about-about.html",
         "http://localhost:*/about-preferences.html",
         "http://localhost:*/about-bookmarks.html",
         "http://localhost:*/about-downloads.html",
         "http://localhost:*/about-certerror.html",
+        "http://localhost:*/about-newtab.html",
         "http://localhost:*/about-passwords.html",
-        "file://*/extensions/brave/about-preferences.html",
-        "file://*/extensions/brave/about-bookmarks.html",
-        "file://*/extensions/brave/about-downloads.html",
-        "file://*/extensions/brave/about-certerror.html",
-        "file://*/extensions/brave/about-passwords.html"
+        "http://localhost:*/about-safebrowsing.html",
+        "file:///*/app/extensions/about-about.html",
+        "file:///*/app/extensions/about-preferences.html",
+        "file:///*/app/extensions/about-bookmarks.html",
+        "file:///*/app/extensions/about-downloads.html",
+        "file:///*/app/extensions/about-certerror.html",
+        "file:///*/app/extensions/about-newtab.html",
+        "file:///*/app/extensions/about-passwords.html",
+        "file:///*/app/extensions/about-safebrowsing.html"
       ],
       "js": [
         "brave-about.js"
