@@ -72,20 +72,23 @@ function getRewrittenUrl (url) {
  */
 function getHostnamePatterns (url) {
   var host = urlParse(url).hostname
-  var segmented = host.split('.')
   var hostPatterns = [host]
+
+  // Ensure host is well-formed (RFC 1035)
+  if (host.includes('..') || host.length > 255) {
+    console.log('HTTPS Everywhere ignoring malformed host:', host)
+    return hostPatterns
+  }
+
+  var segmented = host.split('.')
 
   // Since targets can contain a single wildcard, replace each label of the
   // hostname with "*" in turn.
   segmented.forEach((label, index) => {
     // copy the original array
     var tmp = segmented.slice()
-    if (label.length === 0) {
-      console.log('got host with 0-length label', url)
-    } else {
-      tmp[index] = '*'
-      hostPatterns.push(tmp.join('*'))
-    }
+    tmp[index] = '*'
+    hostPatterns.push(tmp.join('*'))
   })
   // Now eat away from the left with * so that for x.y.z.google.com we also
   // check *.z.google.com and *.google.com.
