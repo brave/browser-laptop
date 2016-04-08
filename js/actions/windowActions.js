@@ -803,7 +803,7 @@ const windowActions = {
   },
 
   inspectElement: function (x, y) {
-    const webview = document.querySelector('webview')
+    const webview = document.querySelector('.frameWrapper.isActive webview')
     if (webview) {
       webview.inspectElement(x, y)
     }
