@@ -87,6 +87,8 @@ if (process.platform === 'linux') {
   cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
 } else if (process.platform === 'darwin') {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
+} else if (process.platform === 'win32') {
+  cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 }
 
 execute(cmds, env, console.log.bind(null, 'done'))
