@@ -13,15 +13,19 @@
         "http://localhost:*/about-certerror.html",
         "http://localhost:*/about-newtab.html",
         "http://localhost:*/about-passwords.html",
-        "http://localhost:*/about-safebrowsing.html",
-        "file:///*/app/extensions/about-about.html",
-        "file:///*/app/extensions/about-preferences.html",
-        "file:///*/app/extensions/about-bookmarks.html",
-        "file:///*/app/extensions/about-downloads.html",
-        "file:///*/app/extensions/about-certerror.html",
-        "file:///*/app/extensions/about-newtab.html",
-        "file:///*/app/extensions/about-passwords.html",
-        "file:///*/app/extensions/about-safebrowsing.html"
+        "http://localhost:*/about-safebrowsing.html"
+      ],
+      "js": [
+        "brave-about.js"
+      ]
+    },
+    {
+      "run_at": "document_start",
+      "matches": [
+        "file:///*"
+      ],
+      "include_globs": [
+        "file:///*/app/extensions/brave/about-*.html"
       ],
       "js": [
         "brave-about.js"
