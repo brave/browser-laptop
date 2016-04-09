@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+
 ## [0.9.0](https://github.com/brave/browser-laptop/releases/v0.9.0dev)
 - 1Password support bundled.
 - Added malware and phishing protection with click through pages.
