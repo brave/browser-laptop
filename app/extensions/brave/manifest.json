@@ -47,7 +47,8 @@
     }
   ],
   "web_accessible_resources": [
-    "about-*.html"
+    "about-*.html",
+    "img/favicon.ico"
   ],
   "content_security_policy": "default-src 'none'; form-action 'none'; referrer no-referrer; script-src 'self' 'sha256-WKTZm6xAv1S6ZPj06fLgGJEk12do0kMJPlXx/OqbKP8=' 'sha256-s6WaVkuKHECB28gsZO9smpa6c2f0eoty5VRl6f0puuU=' 'sha256-HsOdXjs288x8XTlB4Z857JBcrvmBstVfCaFWUs3F3SE=' 'sha256-06j/tIM/7p/P3q6kDOi59fFHfEf/26bor4LquLLVWd4=' 'sha256-fx56Vo6XGuWOIkM08YYtgiYaOlIx5orK/5/+ErG+0sw=' 'sha256-cvjoofOo/s13seDKCJJ5VtcsHSGVaOzqNV2W0TpYb5Y='; connect-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'",
   "incognito": "spanning",
