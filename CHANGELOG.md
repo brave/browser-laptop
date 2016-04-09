@@ -1,6 +1,7 @@
 # Changelog
 
 ## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+- Upgrade to React v15 for cleaner DOM and faster performance.
 
 ## [0.9.0](https://github.com/brave/browser-laptop/releases/v0.9.0dev)
 - 1Password support bundled.

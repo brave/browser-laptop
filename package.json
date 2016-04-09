@@ -74,8 +74,8 @@
     "immutablepatch": "^0.2.2",
     "lru_cache": "^1.0.0",
     "keytar": "^3.0.0",
-    "react": "^0.14.3",
-    "react-dom": "^0.14.3",
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1",
     "tracking-protection": "1.1.x",
     "url-loader": "^0.5.7"
   },
