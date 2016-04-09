@@ -54,6 +54,44 @@ let authCallbacks = {}
 // Don't show the keytar prompt more than once per 5 minutes
 let throttleKeytar = false
 
+// Widevine include
+let widevineVersion = '1.4.8.866'
+let baseWidevinePath = '../js/plugins/widevine/' + widevineVersion + '/_platform_specific/'
+var widevine_adapter_path = ''
+
+// PepperFlash include
+let pepperVersion = '21.0.0.213'
+let basePepperPath = '../js/plugins/pepperflash/' + pepperVersion + '/_platform_specific/'
+var pepper_adapter_path = ''
+
+switch (process.platform) {
+  case 'win32':
+    widevine_adapter_path = baseWidevinePath + 'win_x86/widevinecdmadapter.dll'
+    pepper_adapter_path = basePepperPath + 'win_x86/pepflashplayer.dll'
+    break
+  case 'win64':
+    widevine_adapter_path = baseWidevinePath + 'win_x64/widevinecdmadapter.dll'
+    pepper_adapter_path = basePepperPath + 'win_x64/pepflashplayer.dll'
+    break
+  case 'linux':
+    widevine_adapter_path = baseWidevinePath + 'linux/libwidevinecdmadapter.so'
+    pepper_adapter_path = basePepperPath + 'linux/libpepflashplayer.so'
+    break
+  default:
+    widevine_adapter_path = baseWidevinePath + 'mac_x64/widevinecdmadapter.plugin'
+    pepper_adapter_path = basePepperPath + 'mac_x64/PepperFlashPlayer.plugin'
+    break
+}
+
+var widevinePath = path.join(__dirname, widevine_adapter_path)
+var pepperPath = path.join(__dirname, pepper_adapter_path)
+
+app.commandLine.appendSwitch('widevine-cdm-path', widevinePath)
+app.commandLine.appendSwitch('ppapi-flash-path', pepperPath)
+
+app.commandLine.appendSwitch('widevine-cdm-version', widevineVersion)
+app.commandLine.appendSwitch('ppapi-flash-version', pepperVersion)
+
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
