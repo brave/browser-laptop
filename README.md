@@ -2,7 +2,7 @@
 
 # Brave Browser
 
-Laptop and Desktop browser for OS X, Windows and Linux.
+Brave is a secure, with no tracking cookies and harmful advertises  for Laptop and Desktop browser for OS X, Windows and Linux.
 
 ## Requirements
 
