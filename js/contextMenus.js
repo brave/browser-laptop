@@ -527,6 +527,15 @@ const copyLinkLocationMenuItem = (location) => {
   }
 }
 
+const copyEmailLocationMenuItem = (location) => {
+  return {
+    label: 'Copy Email address',
+    click: () => {
+      clipboard.writeText(location.substring('mailto:'.length, location.length))
+    }
+  }
+}
+
 function mainTemplateInit (nodeProps, frame) {
   const template = []
   const nodeName = nodeProps.name
@@ -534,9 +543,14 @@ function mainTemplateInit (nodeProps, frame) {
   if (nodeProps.href) {
     template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       openInNewPrivateTabMenuItem(nodeProps.href),
-      openInNewSessionTabMenuItem(nodeProps.href),
-      copyLinkLocationMenuItem(nodeProps.href),
-      CommonMenu.separatorMenuItem)
+      openInNewSessionTabMenuItem(nodeProps.href))
+
+    if (nodeProps.href.substring(0, 'mailto:'.length).toLowerCase() === 'mailto:') {
+      template.push(copyEmailLocationMenuItem(nodeProps.href))
+    } else {
+      template.push(copyLinkLocationMenuItem(nodeProps.href))
+    }
+    template.push(CommonMenu.separatorMenuItem)
   }
 
   if (nodeName === 'IMG') {
