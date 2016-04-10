@@ -1,7 +1,12 @@
 # Changelog
 
 ## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+- Undo closed tab now focuses the webview.
 - Upgrade to React v15 for cleaner DOM and faster performance.
+- Fix for about: pages font size.
+- Fix for clicking on some JavaScript links not working.
+- Fix startup error relating to session storage and passwords saved from forms without actions.
+- Fix docusign.com login button not working.
 
 ## [0.9.0](https://github.com/brave/browser-laptop/releases/v0.9.0dev)
 - 1Password support bundled.
