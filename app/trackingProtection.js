@@ -9,7 +9,6 @@ const TrackingProtection = require('tracking-protection').CTPParser
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const LRUCache = require('lru_cache/core').LRUCache
-const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 
 module.exports.resourceName = 'trackingProtection'
 
@@ -19,7 +18,6 @@ let cachedFirstParty = new LRUCache(50)
 
 // Temporary whitelist until we find a better solution
 const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticxx.facebook.com', 'www.facebook.com']
-const whitelistBaseDomains = ['fbcdn.net']
 
 const startTrackingProtection = (wnd) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
@@ -42,7 +40,6 @@ const startTrackingProtection = (wnd) => {
       cachedFirstParty.get(firstPartyUrlHost) &&
       trackingProtection.matchesTracker(firstPartyUrlHost, urlHost) &&
       urlHost !== firstPartyUrlHost &&
-      !whitelistBaseDomains.includes(getBaseDomain(urlHost)) &&
       !cachedFirstParty.get(firstPartyUrlHost).find((baseHost) =>
         !Filtering.isThirdPartyHost(baseHost, urlHost))
 
