@@ -208,12 +208,10 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
         click: () => {
           appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
         }
-      })
+      }, CommonMenu.separatorMenuItem)
   }
 
-  template.push(
-    CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
     addFolderMenuItem(siteDetail, true))
   return template
 }
@@ -618,8 +616,7 @@ function mainTemplateInit (nodeProps, frame) {
     }
   }, CommonMenu.separatorMenuItem)
 
-  template.push(CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
+  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
     {
       label: 'Add to reading list',
       enabled: false
