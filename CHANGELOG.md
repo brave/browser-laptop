@@ -7,6 +7,8 @@
 - Fix for clicking on some JavaScript links not working.
 - Fix startup error relating to session storage and passwords saved from forms without actions.
 - Fix docusign.com login button not working.
+- Fix for Twitch.tv.
+- Fix for startup problem with default window size.
 
 ## [0.9.0](https://github.com/brave/browser-laptop/releases/v0.9.0dev)
 - 1Password support bundled.
