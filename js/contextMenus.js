@@ -529,7 +529,7 @@ const copyLinkLocationMenuItem = (location) => {
 
 const copyEmailLocationMenuItem = (location) => {
   return {
-    label: 'Copy Email address',
+    label: 'Copy Email Address',
     click: () => {
       clipboard.writeText(location.substring('mailto:'.length, location.length))
     }
@@ -545,7 +545,7 @@ function mainTemplateInit (nodeProps, frame) {
       openInNewPrivateTabMenuItem(nodeProps.href),
       openInNewSessionTabMenuItem(nodeProps.href))
 
-    if (nodeProps.href.substring(0, 'mailto:'.length).toLowerCase() === 'mailto:') {
+    if (nodeProps.href.toLowerCase().startsWith('mailto:')) {
       template.push(copyEmailLocationMenuItem(nodeProps.href))
     } else {
       template.push(copyLinkLocationMenuItem(nodeProps.href))
