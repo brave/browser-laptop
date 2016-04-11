@@ -163,30 +163,6 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-  const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    let focusedFirst = false
-    BrowserWindow.getAllWindows().forEach((win) => {
-      if (win) {
-        if (win.isMinimized()) {
-          win.restore()
-        }
-        if (!focusedFirst) {
-          win.focus()
-          focusedFirst = true
-        }
-      }
-    })
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
-    }
-  })
-  if (appAlreadyStartedShouldQuit) {
-    app.exit(0)
-  }
-}
-
 app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     if (acceptCertUrls[url] === true) {
@@ -220,13 +196,6 @@ app.on('ready', () => {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       setTimeout(app.quit, 0)
-    }
-  })
-
-  app.on('activate', () => {
-    // (OS X) open a new window when the user clicks on the app icon if there aren't any open
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
     }
   })
 
