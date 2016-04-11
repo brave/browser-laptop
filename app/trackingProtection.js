@@ -8,36 +8,28 @@ const URL = require('url')
 const TrackingProtection = require('tracking-protection').CTPParser
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
+const LRUCache = require('lru_cache/core').LRUCache
 
 module.exports.resourceName = 'trackingProtection'
 
 let trackingProtection
 
-let cachedFirstPartyCount = 0
-let cachedFirstParty = {}
+let cachedFirstParty = new LRUCache(50)
 
 // Temporary whitelist until we find a better solution
 const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticxx.facebook.com', 'www.facebook.com']
 
 const startTrackingProtection = (wnd) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
-    // After every 50 first party hosts, just
-    // re-get the first party host list
-    if (cachedFirstPartyCount > 50) {
-      cachedFirstPartyCount = 0
-      cachedFirstParty = {}
-    }
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
     if (firstPartyUrlHost.startsWith('www.')) {
       firstPartyUrlHost = firstPartyUrlHost.substring(4)
     }
     if (firstPartyUrl.protocol && firstPartyUrl.protocol.startsWith('http')) {
-      if (!cachedFirstParty[firstPartyUrlHost]) {
+      if (!cachedFirstParty.get(firstPartyUrlHost)) {
         let firstPartyHosts = trackingProtection.findFirstPartyHosts(firstPartyUrlHost)
-        cachedFirstParty[firstPartyUrlHost] =
-          firstPartyHosts && firstPartyHosts.split(',') || []
-        ++cachedFirstPartyCount
+        cachedFirstParty.put(firstPartyUrlHost, firstPartyHosts && firstPartyHosts.split(',') || [])
       }
     }
     const urlHost = URL.parse(details.url).hostname
@@ -45,10 +37,10 @@ const startTrackingProtection = (wnd) => {
       details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&
       !whitelistHosts.includes(urlHost) &&
-      cachedFirstParty[firstPartyUrlHost] &&
-      trackingProtection.matchesTracker(urlHost) &&
+      cachedFirstParty.get(firstPartyUrlHost) &&
+      trackingProtection.matchesTracker(firstPartyUrlHost, urlHost) &&
       urlHost !== firstPartyUrlHost &&
-      !cachedFirstParty[firstPartyUrlHost].find((baseHost) =>
+      !cachedFirstParty.get(firstPartyUrlHost).find((baseHost) =>
         !Filtering.isThirdPartyHost(baseHost, urlHost))
 
     DataFile.debug(module.exports.resourceName, details, cancel)

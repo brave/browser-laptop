@@ -16,12 +16,10 @@
   cursor: default;
   background-color: #e6e6e6;
   border-top: 1px solid #888;
-  bottom: 0;
   color: black;
   display: flex;
   height: 50px;
   padding: 5px var(--download-bar-padding);
-  position: absolute;
   width: 100%;
   z-index: 3;
 
@@ -85,10 +83,19 @@
         margin: auto 0;
         .downloadFilename, .downloadState {
           margin: auto 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding-right: 5px;
         }
 
         .downloadArrow {
+          width: 14px;
           margin: auto 0 auto auto;
+        }
+
+        >span {
+          width: 100%;
         }
       }
 

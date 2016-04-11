@@ -10,11 +10,12 @@ const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
 const locale = require('../js/l10n')
 
-const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const adblock = appConfig.resourceNames.ADBLOCK
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
-const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
@@ -296,6 +297,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
   const blockTracking = settings[trackingProtection] || false
   const blockCookies = settings[cookieblock] || false
   const useHttps = settings[httpsEverywhere] || false
+  const useSafeBrowsing = settings[safeBrowsing] || false
   return {
     label: locale.translation('bravery'),
     submenu: [
@@ -350,6 +352,14 @@ module.exports.buildBraveryMenu = function (settings, init) {
         checked: useHttps,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(httpsEverywhere, !useHttps)
+          init()
+        }
+      }, {
+        type: 'checkbox',
+        label: 'Block Phishing and Malware',
+        checked: useSafeBrowsing,
+        click: function (item, focusedWindow) {
+          appActions.setResourceEnabled(safeBrowsing, !useSafeBrowsing)
           init()
         }
       }

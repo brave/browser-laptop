@@ -1,19 +1,8 @@
-@import "../variables.less";
-@textColor: #3B3B3B;
+@import "./common.less";
+
 @prefTopBg: #999;
 @prefTopBgButtonSelected: #656565;
 @prefTopBgButtonHover: #444;
-
-* {
-  color: @textColor;
-  font-family: "Arial";
-  margin: 0;
-  padding: 0;
-}
-
-html, body, #appContainer, #appContainer > div {
-  height: 100%;
-}
 
 .prefTabContainer {
   flex-grow: 1;
@@ -177,4 +166,9 @@ input:not([type="checkbox"]), select {
 input[type="checkbox"][disabled] {
   opacity: 0.8;
   pointer-events: none;
+}
+
+.linkText {
+  cursor: pointer;
+  text-decoration: underline;
 }

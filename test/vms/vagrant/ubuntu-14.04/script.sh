@@ -1,7 +1,7 @@
 set -e
 sudo apt-get update
 sudo apt-get install -y dkms build-essential linux-headers-$(uname -r) clang libdbus-1-dev libgtk2.0-dev libnotify-dev libgnome-keyring-dev libgconf2-dev \
-                       libasound2-dev libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib
+                       libasound2-dev libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib libxss-dev libpci-dev libpulse-dev libexif-dev
 sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11
 sudo apt-get install -y --no-install-recommends ubuntu-desktop xterm
 sudo sh -c "echo '[SeatDefaults]
@@ -14,5 +14,4 @@ sudo apt-get install -y curl
 curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo npm install -g node-gyp@3.2.1
-cd /home/vagrant/browser-laptop && npm install
 sudo service lightdm start

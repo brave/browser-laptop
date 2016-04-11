@@ -23,6 +23,8 @@ const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
+const getSetting = require('./settings').getSetting
+const settings = require('./constants/settings')
 
 /**
  * Obtains an add bookmark menu item
@@ -207,12 +209,10 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
         click: () => {
           appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
         }
-      })
+      }, CommonMenu.separatorMenuItem)
   }
 
-  template.push(
-    CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
     addFolderMenuItem(siteDetail, true))
   return template
 }
@@ -579,30 +579,41 @@ function mainTemplateInit (nodeProps, frame) {
       label: locale.translation('redo'),
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
-    }, CommonMenu.separatorMenuItem, ...editableItems)
+    }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
     template.push({
       label: locale.translation('copy'),
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
-    })
-  }
-
-  if (template.length > 0) {
-    template.push(CommonMenu.separatorMenuItem)
+    }, CommonMenu.separatorMenuItem)
   }
 
   template.push({
+    label: locale.translation('Back'),
+    enabled: frame.get('canGoBack'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+      }
+    }
+  }, {
+    label: locale.translation('Forward'),
+    enabled: frame.get('canGoForward'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+      }
+    }
+  }, {
     label: locale.translation('reload'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
         focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
       }
     }
-  })
+  }, CommonMenu.separatorMenuItem)
 
-  template.push(CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
+  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
     {
       label: locale.translation('addToReadingList'),
       enabled: false
@@ -620,6 +631,20 @@ function mainTemplateInit (nodeProps, frame) {
         windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
       }
     })
+
+  if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
+    template.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: '1Password',
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            ipc.send('chrome-browser-action-clicked-aomjjhallfgjeglblehebfpbcfeobpgk', '1Password')
+          }
+        }
+      })
+  }
+
   return template
 }
 

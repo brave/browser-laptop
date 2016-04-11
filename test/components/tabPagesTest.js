@@ -10,6 +10,7 @@ describe('tab pages', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.browserWindowUrl)
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }

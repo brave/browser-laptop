@@ -10,30 +10,35 @@ const UrlUtil = require('./urlutil')
  */
 module.exports.getAppUrl = function (relativeUrl) {
   if (relativeUrl === undefined) {
-    relativeUrl = '/'
+    relativeUrl = ''
   }
-  return new window.URL(relativeUrl, window.baseHref || window.location).href
-}
 
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:' + process.env.BRAVE_PORT + '/' + relativeUrl
+  } else {
+    return 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/' + relativeUrl
+  }
+}
 /**
  * Returns the URL to the application's manifest
  */
 module.exports.getManifestUrl = function () {
-  return module.exports.getAppUrl('./manifest.webapp')
+  return module.exports.getAppUrl('manifest.webapp')
 }
 
 // Map of source about: URLs mapped to target URLs
 module.exports.aboutUrls = new Immutable.Map({
-  'about:about': module.exports.getAppUrl('./about-about.html'),
-  'about:blank': module.exports.getAppUrl('./about-blank.html'),
-  'about:history': module.exports.getAppUrl('./about-history.html'),
-  'about:bookmarks': module.exports.getAppUrl('./about-bookmarks.html'),
-  'about:downloads': module.exports.getAppUrl('./about-downloads.html'),
-  'about:newtab': module.exports.getAppUrl('./about-newtab.html'),
-  'about:preferences': module.exports.getAppUrl('./about-preferences.html'),
-  'about:config': module.exports.getAppUrl('./about-config.html'),
-  'about:certerror': module.exports.getAppUrl('./about-certerror.html'),
-  'about:passwords': module.exports.getAppUrl('./about-passwords.html')
+  'about:about': module.exports.getAppUrl('about-about.html'),
+  'about:blank': module.exports.getAppUrl('about-blank.html'),
+  'about:history': module.exports.getAppUrl('about-history.html'),
+  'about:bookmarks': module.exports.getAppUrl('about-bookmarks.html'),
+  'about:downloads': module.exports.getAppUrl('about-downloads.html'),
+  'about:newtab': module.exports.getAppUrl('about-newtab.html'),
+  'about:preferences': module.exports.getAppUrl('about-preferences.html'),
+  'about:config': module.exports.getAppUrl('about-config.html'),
+  'about:certerror': module.exports.getAppUrl('about-certerror.html'),
+  'about:safebrowsing': module.exports.getAppUrl('about-safebrowsing.html'),
+  'about:passwords': module.exports.getAppUrl('about-passwords.html')
 })
 
 // Map of target URLs mapped to source about: URLs

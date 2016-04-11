@@ -6,6 +6,7 @@ const settings = {
   // General tab
   STARTUP_MODE: 'general.startup-mode',
   HOMEPAGE: 'general.homepage',
+  USERAGENT: 'general.useragent.value',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   // Tabs tab
@@ -20,7 +21,8 @@ const settings = {
   AUTOCOMPLETE_HISTORY_SIZE: 'privacy.autocomplete.history-size',
   DO_NOT_TRACK: 'privacy.do-not-track',
   // Security Tab
-  BLOCK_REPORTED_SITES: 'security.block-reported-sites',
+  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
+  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   LANGUAGE: 'general.language'

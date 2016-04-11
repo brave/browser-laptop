@@ -20,6 +20,19 @@ module.exports = {
       }
     }
   },
+  'www.wired.com': {
+    // Site hack from
+    // https://github.com/gorhill/uBlock/blob/ce2d235e4fd2ade2be101fa7030870044b30fd3c/assets/ublock/resources.txt#L699
+    pageLoadEndScript: `(function() {
+      var sto = window.setTimeout,
+        re = /^function n\(\)/;
+      window.setTimeout = function(a, b) {
+          if ( b !== 50 || !re.test(a.toString()) ) {
+                sto(a, b);
+              }
+        };
+    })();`
+  },
   'www.twitch.tv': {
     allowRunningInsecureContent: true,
     pageLoadEndScript: `$('.js-player').html(
@@ -32,5 +45,16 @@ module.exports = {
       }).css('border', 0)
     );
     $('.player-overlay, .player-loading').hide();`
+  },
+  'www.googletagmanager.com': {
+     onBeforeRequest: function(details) {
+      if (details.url === '/gtm.js') {
+        return
+      }
+      return {
+        // Block / polyfill similar to this: https://github.com/gorhill/uBlock/blob/de1ed89f62bf041416d2a721ec00741667bf3fa8/assets/ublock/resources.txt#L385
+        redirectURL: 'data:application/javascript,(function() { var noopfn = function() { ; }; window.ga = window.ga || noopfn; })();'
+      }
+    }
   }
 }

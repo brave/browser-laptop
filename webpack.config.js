@@ -21,6 +21,7 @@ function config () {
             /node_modules/,
             /\.min.js$/,
             path.resolve(__dirname, 'app'),
+            path.resolve(__dirname, 'app', 'extensions'),
             path.resolve(__dirname, 'app', 'content', 'scripts')
           ],
           loader: 'babel'
@@ -98,7 +99,7 @@ var app = {
   target: 'electron',
   entry: ['./js/entry.js'],
   output: {
-    path: path.resolve(__dirname, 'app', 'gen'),
+    path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
     filename: 'app.entry.js',
     publicPath: './gen/'
   }
@@ -109,7 +110,7 @@ var aboutPages = {
   target: 'web',
   entry: ['./js/about/entry.js'],
   output: {
-    path: path.resolve(__dirname, 'app', 'gen'),
+    path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
     filename: 'aboutPages.entry.js',
     publicPath: './gen/'
   }

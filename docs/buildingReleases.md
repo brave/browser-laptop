@@ -64,11 +64,11 @@ The primary purpose of doing this is to be able to update dependencies for secur
 
 - Rebase `brave/libchromiumcontent` from `atom/libchromiumcontent` upstream.
 - Change `brave/libchromiumcontent/VERSION` to contain the chromium version tag to change to.  Example `49.0.2623.75`.   You can see the latest tags here: https://chromium.googlesource.com/chromium/src.git/+refs
-- From `brave/electron/script/lib/config.py` change `LIBCHROMIUMCONTENT_COMMIT` to point to the correct changeset from `brave/libchromiumcontent`.
 - You can create patches as needed inside `brave/libchromiumcontent/patches`.  They will be automatically applied when doing builds.
 - Some of the patches just mentioned will need rebasing on the new version.
 - run `LIBCHROMIUMCONTENT_S3_BUCKET=brave-laptop-binaries LIBCHROMIUMCONTENT_S3_ACCESS_KEY=key-here AWS_ACCESS_KEY_SECRET=key-here AWS_ACCESS_KEY_SECRET=key-here LIBCHROMIUMCONTENT_S3_SECRET_KEY=key-here ./script/cibuild`.
 - Brave's S3 bucket `brave-laptop-binaries` will be updated with the needed binaries.
+- From `brave/electron/script/lib/config.py` change `LIBCHROMIUMCONTENT_COMMIT` to point to the correct changeset from `brave/libchromiumcontent`.
 - Update `brave/brightray`'s `/vendor/libchromiumcontent` submodule to point to the latest `brave/libchromiumcontent` changeset.
 - Update `brave/electron`'s `/vendor/brighray` submodule to point to the latest `brave/brightray` changeset.
 - Update `brave/electron/atom/common/chrome_version.h` to include the latest version.  I think it is also set automatically on builds though.

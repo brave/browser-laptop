@@ -42,7 +42,7 @@ dist
 win64-dist
 Brave.tar.bz2
 
-app/gen
+app/extensions/brave/gen
 *.pfx
 buildConfig.js
 

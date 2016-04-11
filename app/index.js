@@ -38,6 +38,7 @@ const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
 const settings = require('../js/constants/settings')
+const path = require('path')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -53,7 +54,7 @@ let lastWindowState
 let acceptCertUrls = {}
 // URLs to callback for auth.
 let authCallbacks = {}
-// Don't show the keytar prompt more than once per ten seconds
+// Don't show the keytar prompt more than once per 5 minutes
 let throttleKeytar = false
 
 /**
@@ -99,9 +100,9 @@ const getMasterKey = () => {
     return (new Buffer(masterKey, 'hex')).toString('binary')
   } else {
     throttleKeytar = true
-    setTimeout(() => {
+    debounce(() => {
       throttleKeytar = false
-    }, 10000)
+    }, 1000 * 60 * 5)
     return null
   }
 }
@@ -165,30 +166,6 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-  const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    let focusedFirst = false
-    BrowserWindow.getAllWindows().forEach((win) => {
-      if (win) {
-        if (win.isMinimized()) {
-          win.restore()
-        }
-        if (!focusedFirst) {
-          win.focus()
-          focusedFirst = true
-        }
-      }
-    })
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
-    }
-  })
-  if (appAlreadyStartedShouldQuit) {
-    app.exit(0)
-  }
-}
-
 app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     if (acceptCertUrls[url] === true) {
@@ -222,13 +199,6 @@ app.on('ready', () => {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       setTimeout(app.quit, 0)
-    }
-  })
-
-  app.on('activate', () => {
-    // (OS X) open a new window when the user clicks on the app icon if there aren't any open
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
     }
   })
 
@@ -362,6 +332,26 @@ app.on('ready', () => {
       initiateSessionStateSave()
     })
 
+    // TODO(bridiver) - load everything in the extensions directory
+    // mnojpmjdmbbfmejpflffifhffcmidifd
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      process.emit('load-extension', 'brave', path.join(__dirname, '..', '..', 'extensions'), 'component')
+      process.emit('load-extension', '1password', path.join(__dirname, '..', '..', 'extensions'))
+    } else {
+      process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'), 'component')
+      process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
+    }
+
+    process.on('did-extension-load-error', function (name, error_message) {
+      console.error('Error loading extension ' + name + ':', error_message)
+    })
+    process.on('did-extension-load', function (name) {
+      console.log('extension ' + name + ' loaded')
+    })
+    process.on('chrome-browser-action-registered', function (channel, actionTitle) {
+      // TODO - update the menu and shortcuts
+    })
+
     Filtering.init()
     HttpsEverywhere.init()
     TrackingProtection.init()
@@ -391,27 +381,35 @@ app.on('ready', () => {
         decrypted
       })
     })
-    ipcMain.on(messages.GET_PASSWORD, (e, origin, action) => {
+    ipcMain.on(messages.GET_PASSWORDS, (e, origin, action) => {
+      const passwords = AppStore.getState().get('passwords')
+      if (!passwords || passwords.size === 0) {
+        return
+      }
+
+      let results = passwords.filter((password) => {
+        return password.get('origin') === origin && password.get('action') === action
+      })
+
+      if (results.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      const passwords = AppStore.getState().get('passwords')
-      if (passwords) {
-        let result = passwords.findLast((password) => {
-          return password.get('origin') === origin && password.get('action') === action
-        })
-        if (result) {
-          let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
-                                                  result.get('authTag'),
-                                                  masterKey,
-                                                  result.get('iv'))
-          e.sender.send(messages.GOT_PASSWORD, result.get('username'),
-                        password, origin, action)
-        }
-      }
+      let isUnique = results.size === 1
+      results.forEach((result) => {
+        let password = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                result.get('authTag'),
+                                                masterKey,
+                                                result.get('iv'))
+        e.sender.send(messages.GOT_PASSWORD, result.get('username'),
+                      password, origin, action, isUnique)
+      })
     })
 
     ipcMain.on(messages.HIDE_CONTEXT_MENU, () => {
@@ -421,38 +419,45 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect, value) => {
+      const passwords = AppStore.getState().get('passwords')
+      if (!passwords || passwords.size === 0) {
+        return
+      }
+
+      let usernames = {}
+      let results = passwords.filter((password) => {
+        return password.get('username') &&
+          password.get('username').startsWith(value) &&
+          password.get('origin') === origin &&
+          password.get('action') === action
+      })
+
+      if (results.size === 0) {
+        return
+      }
+
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
         console.log('Could not access master password; aborting')
         return
       }
 
-      const passwords = AppStore.getState().get('passwords')
-      if (passwords) {
-        let usernames = {}
-        let results = passwords.filter((password) => {
-          return password.get('username') &&
-            password.get('username').startsWith(value) &&
-            password.get('origin') === origin &&
-            password.get('action') === action
-        })
-        results.forEach((result) => {
-          usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
-                                                                       result.get('authTag'),
-                                                                       masterKey,
-                                                                       result.get('iv')) || ''
-        })
-        let win = BrowserWindow.getFocusedWindow()
-        if (!win) {
-          return
-        }
-        if (Object.keys(usernames).length > 0) {
-          win.webContents.send(messages.SHOW_USERNAME_LIST,
-                               usernames, origin, action,
-                               boundingRect)
-        } else {
-          win.webContents.send(messages.HIDE_CONTEXT_MENU)
-        }
+      results.forEach((result) => {
+        usernames[result.get('username')] = CryptoUtil.decryptVerify(result.get('encryptedPassword'),
+                                                                     result.get('authTag'),
+                                                                     masterKey,
+                                                                     result.get('iv')) || ''
+      })
+      let win = BrowserWindow.getFocusedWindow()
+      if (!win) {
+        return
+      }
+      if (Object.keys(usernames).length > 0) {
+        win.webContents.send(messages.SHOW_USERNAME_LIST,
+                             usernames, origin, action,
+                             boundingRect)
+      } else {
+        win.webContents.send(messages.HIDE_CONTEXT_MENU)
       }
     })
 

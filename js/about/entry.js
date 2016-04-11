@@ -24,6 +24,9 @@ switch (getSourceAboutUrl(window.location.href)) {
   case 'about:passwords':
     rootComponent = require('./passwords')
     break
+  case 'about:safebrowsing':
+    rootComponent = require('./safebrowsing')
+    break
 }
 
 if (rootComponent) {

@@ -159,9 +159,9 @@ exports.init = (language, cb) => {
 
   // Property files to parse (only ones containing menu specific identifiers)
   const propertyFiles = [
-    path.join(__dirname, 'locales', lang, 'menu.properties'),
-    path.join(__dirname, 'locales', lang, 'app.properties'),
-    path.join(__dirname, 'locales', lang, 'password.properties')
+    path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
+    path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
+    path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'password.properties')
   ]
 
   // If langs change a new context must be created

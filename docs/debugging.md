@@ -34,6 +34,6 @@ Unlike with the renderer process, since the main process isn't using webpack dev
 
 Content is the web page which is loaded.  You can open the loaded content dev tools using `Command+Shift+I` on OS X or `Control+Shift+I` on Windows.
 
-If you'd like to see code run on each page load, you can edit `app/content/webviewPreload.js`.
+If you'd like to see code run on each page load, you can edit `app/extensions/brave/brave-default.js`.
 
 Calls to `console.log` and related functions go into the per page dev tools console mentioned above.

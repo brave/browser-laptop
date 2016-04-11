@@ -37,6 +37,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
+const keyCodes = require('../constants/keyCodes')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -48,6 +49,17 @@ class Main extends ImmutableComponent {
   constructor () {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
+  }
+  registerWindowLevelShortcuts () {
+    // For window level shortcuts that don't work as local shortcuts
+    const isDarwin = process.platform === 'darwin'
+    if (!isDarwin) {
+      document.addEventListener('keydown', (e) => {
+        if (e.which === keyCodes.F12) {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
+        }
+      })
+    }
   }
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
@@ -119,6 +131,7 @@ class Main extends ImmutableComponent {
 
   componentDidMount () {
     this.registerSwipeListener()
+    this.registerWindowLevelShortcuts()
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
@@ -170,6 +183,12 @@ class Main extends ImmutableComponent {
       const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setBlockedBy(frameProps, blockType, details.url))
+    })
+
+    ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      filteredFrameProps.forEach((frameProps) =>
+        windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank'))
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
@@ -484,13 +503,6 @@ class Main extends ImmutableComponent {
         />
         <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
-      {
-        this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
-        ? <DownloadsBar
-          windowWidth={this.props.appState.get('defaultWindowWidth')}
-          downloads={this.props.appState.get('downloads')}/>
-        : null
-      }
       <div className='mainContainer'>
         <div className='tabContainer'>
         {
@@ -523,6 +535,13 @@ class Main extends ImmutableComponent {
         }
         </div>
       </div>
+      {
+        this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
+        ? <DownloadsBar
+          windowWidth={this.props.appState.get('defaultWindowWidth')}
+          downloads={this.props.appState.get('downloads')}/>
+        : null
+      }
     </div>
   }
 }

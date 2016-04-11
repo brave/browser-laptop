@@ -28,10 +28,10 @@ const Immutable = require('immutable')
 const patch = require('immutablepatch')
 
 // get appStore from url
-ipc.on(messages.INITIALIZE_WINDOW, (e, appState, frames, initWindowState) => {
+ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
   appStoreRenderer.state = Immutable.fromJS(appState)
   ReactDOM.render(
-    <Window frames={frames} initWindowState={initWindowState}/>,
+    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState}/>,
     document.getElementById('windowContainer'))
 })
 
