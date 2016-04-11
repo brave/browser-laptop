@@ -217,6 +217,9 @@ function windowDefaults () {
  * haven't been initialized yet
  */
 function setDefaultWindowSize () {
+  if (!appState) {
+    return
+  }
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
   if (!appState.get('defaultWindowWidth') && !appState.get('defaultWindowHeight')) {
