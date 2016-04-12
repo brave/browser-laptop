@@ -214,7 +214,7 @@ if (typeof this.KeyEvent === 'undefined') {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] +
                             '; padding: 0; margin: 0; overflow: hidden;">' + xhttp.responseText + '</body></html>'
-        var sandbox = 'allow-scripts allow-popups allow-popups-to-escape-sandbox'
+        var sandbox = 'allow-popups allow-popups-to-escape-sandbox'
         if (node.tagName === 'IFRAME') {
           node.srcdoc = src
           node.sandbox = sandbox
