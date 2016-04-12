@@ -1,10 +1,11 @@
+// @flow weak
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 // inject missing DOM Level 3 KeyEvent
 // https://www.w3.org/TR/2001/WD-DOM-Level-3-Events-20010410/DOM3-Events.html#events-Events-KeyEvent
-if (typeof this.KeyEvent === 'undefined') {
-  this.KeyEvent = {
+if (typeof KeyEvent === 'undefined') {
+  KeyEvent = {
     DOM_VK_CANCEL: 3,
     DOM_VK_HELP: 6,
     DOM_VK_BACK_SPACE: 8,
@@ -223,13 +224,10 @@ if (typeof this.KeyEvent === 'undefined') {
             node.removeChild(node.firstChild)
           }
           var iframe = document.createElement('iframe')
-          iframe.style.padding = 0
-          iframe.style.border = 0
-          iframe.style.margin = 0
-          iframe.style.width = adSize[0] + 'px'
-          iframe.style.height = adSize[1] + 'px'
-          iframe.srcdoc = src
-          iframe.sandbox = sandbox
+          iframe.setAttribute('sandbox', sandbox)
+          iframe.setAttribute('srcdoc', src)
+          iframe.setAttribute('style',
+                              'padding: 0; border: 0; margin: 0; width: ' + adSize[0] + 'px; ' + 'height: ' + adSize[1] + 'px;')
           node.appendChild(iframe)
           ensureNodeVisible(node)
           if (node.parentNode) {
@@ -600,29 +598,29 @@ if (typeof this.KeyEvent === 'undefined') {
     }, 0)
   }, false)
 
-  document.onkeydown = (e) => {
+  document.addEventListener('keydown', (e) => {
     switch (e.keyCode) {
-      case this.KeyEvent.DOM_VK_ESCAPE:
+      case KeyEvent.DOM_VK_ESCAPE:
         e.preventDefault()
         ipcRenderer.sendToHost('stop-load')
         break
-      case this.KeyEvent.DOM_VK_BACK_SPACE:
+      case KeyEvent.DOM_VK_BACK_SPACE:
         if (!isEditable(document.activeElement)) {
           e.shiftKey ? window.history.forward() : window.history.back()
         }
         break
-      case this.KeyEvent.DOM_VK_LEFT:
+      case KeyEvent.DOM_VK_LEFT:
         if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
           window.history.back()
         }
         break
-      case this.KeyEvent.DOM_VK_RIGHT:
+      case KeyEvent.DOM_VK_RIGHT:
         if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
           window.history.forward()
         }
         break
     }
-  }
+  })
 
   // shamelessly taken from https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
   function delegate (event, selector) {

@@ -1,0 +1,10 @@
+[ignore]
+.*/node_modules/.*
+.*/app/extensions/brave/gen/.*
+.*/build/Release/.*
+.*/public/built/.*
+.*/dist/.*
+.*/win64-dist/.*
+
+[libs]
+decls
