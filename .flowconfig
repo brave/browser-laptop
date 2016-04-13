@@ -1,10 +1,9 @@
 [ignore]
-.*/node_modules/.*
 .*/app/extensions/brave/gen/.*
+.*/test/.*/*.json
+.*/node_modules/fbjs/lib/.*
 .*/build/Release/.*
 .*/public/built/.*
-.*/dist/.*
-.*/win64-dist/.*
 
 [libs]
 decls
