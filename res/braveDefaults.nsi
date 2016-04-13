@@ -3,6 +3,10 @@
 !include "Win8WinVer.nsh"
 !include "GetParameters.nsh"
 !include "GetParent.nsh"
+!include "StrStr.nsh"
+
+!addplugindir "."
+!include "UAC.nsh"
 
 !define MUI_ICON "app.ico"
 !insertmacro MUI_LANGUAGE "English"
@@ -14,9 +18,74 @@ OutFile "../Brave-win32-x64/resources/BraveDefaults.exe"
 RequestExecutionLevel user
 Var BraveEXEPath
 Var BraveIconPath
+Var IsElevated
+Var IsUninstall
+
+Function .onInit
+  ; The StartMenuInternet key can be set in HKCU on Win8 and above.
+  ${IfNot} ${AtLeastWin8}
+    SetShellVarContext all
+  ${EndIf}
+
+  ; Determine if we're elevated currently
+  ClearErrors
+  WriteRegStr HKLM "Software\Brave" "InstallerTest" "Write Test"
+  DeleteRegValue HKLM "Software\Brave" "InstallerTest"
+  ${If} ${Errors}
+    StrCpy $IsElevated "0"
+  ${Else}
+    StrCpy $IsElevated "1"
+  ${EndIf}
+
+  Call GetParameters
+  Pop $1
+
+  ; Determine if this is an uninstall or an install
+  ${StrStr} $4 $1 "-uninstall"
+  ${StrStr} $5 $1 "/uninstall"
+
+  ${If} $4 != ""
+  ${OrIf} $4 != ""
+    StrCpy $IsUninstall "1"
+  ${Else}
+    StrCpy $IsUninstall "0"
+  ${EndIf}
+
+  ; If we already have the defaults key, there's nothing to do so we can abort early without even needing to elevate on Win7.
+  ${If} $IsUninstall == "0"
+    ClearErrors
+    ReadRegStr $2 SHCTX "SOFTWARE\Classes\BraveHTML" ""
+    ${IfNot} ${Errors}
+      Quit
+    ${EndIf}
+  ${EndIf}
+
+  ; Elevate if we're on Win7 and below.  Win8 allows keys to be set as HKCU so this is not needed there.
+  ${IfNot} ${AtLeastWin8}
+  ; Don't even try to elevate if we are already elevated.
+  ${AndIf} $IsElevated == "0"
+    !insertmacro UAC_RunElevated
+    ${Switch} $0
+    ${Case} 0
+      ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
+      ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
+        ;fall-through and die
+      ${Case} 1223
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Unable to elevate, Brave will not be able to be set as the default browser."
+        Quit
+      ${Case} 1062
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Logon service not running, aborting!"
+        Quit
+        ${Default}
+        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "Unable to elevate , error $0"
+        Quit
+    ${EndSwitch}
+  ${EndIf}
+FunctionEnd
 
 Section "Defaults Section" SecDummy
-
+  ; For now we don't need a 64-bit reg view
+  ; SetRegView 64
 
   Push $EXEDIR
   Call GetParent
@@ -27,11 +96,6 @@ Section "Defaults Section" SecDummy
 
   Call GetParameters
   Pop $1
-
-  ; The StartMenuInternet key can be set in HKCU on Win8 and above.
-  ${IfNot} ${AtLeastWin8}
-    SetShellVarContext all
-  ${EndIf}
 
   ${If} $1 == "/uninstall"
   ${OrIf} $1 == "-uninstall"
