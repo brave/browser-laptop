@@ -48,8 +48,8 @@ let sessionStateStoreCompleteOnQuit = false
 let beforeQuitSaveStarted = false
 let lastWindowState
 
-// URLs to accept bad certs for.
-let acceptCertUrls = {}
+// Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
+let acceptCertDomains = {}
 // URLs to callback for auth.
 let authCallbacks = {}
 // Don't show the keytar prompt more than once per 5 minutes
@@ -166,7 +166,8 @@ const initiateSessionStateSave = debounce(() => {
 
 app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
-    if (acceptCertUrls[url] === true) {
+    let host = urlParse(url).host
+    if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
       e.preventDefault()
       cb(true)
@@ -298,14 +299,17 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
-      acceptCertUrls[url] = true
+      let host = urlParse(url).host
+      if (host) {
+        acceptCertDomains[host] = true
+      }
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
     })
 
     ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
       // If the host is associated with a URL with a cert error, update the
       // security state to insecure
-      if (Object.keys(acceptCertUrls).map((url) => { return urlParse(url).host }).includes(host)) {
+      if (acceptCertDomains[host]) {
         BrowserWindow.getFocusedWindow().webContents.send(messages.SET_SECURITY_STATE, frameKey, {
           secure: false
         })
