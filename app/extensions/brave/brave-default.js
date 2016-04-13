@@ -285,8 +285,12 @@ if (typeof KeyEvent === 'undefined') {
     })
   })
 
+  function savePassword(username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
+    ipcRenderer.send('save-password', username, pw, origin, action)
+  }
+
   let submittedForms = []
-  function onFormSubmit (form, formOrigin) {
+  function onFormSubmit (form/*: HTMLFormElement*/, formOrigin/*: string*/) {
     if (submittedForms.includes(form)) {
       return
     }
@@ -298,8 +302,7 @@ if (typeof KeyEvent === 'undefined') {
     // Re-get action in case it has changed
     var action = form.action || document.location.href
     var usernameElem = fields[0] || {}
-    ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
-                     formOrigin, normalizeURL(action))
+    savePassword(usernameElem.value, passwordElem.value, formOrigin, normalizeURL(action))
     submittedForms.push(form)
   }
 
@@ -396,7 +399,6 @@ if (typeof KeyEvent === 'undefined') {
     })
 
     ipcRenderer.on('got-password', (e, username, password, origin, action, isUnique) => {
-      console.log('got password', username, isUnique)
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {
@@ -427,7 +429,7 @@ if (typeof KeyEvent === 'undefined') {
    * @param {boolean} isSubmission - Whether the form is being submitted
    * @return {Array.<Element>}
    */
-  function getFormFields (form, isSubmission) {
+  function getFormFields (form/*: HTMLFormElement */, isSubmission/*: boolean*/)/*: Array<?HTMLInputElement>*/ {
     var passwords = getPasswordFields(form, isSubmission)
 
     // We have no idea what is going on with a form that has 0 or >3 password fields
@@ -436,21 +438,23 @@ if (typeof KeyEvent === 'undefined') {
     }
 
     // look for any form field that has username-ish attributes
-    var username = form.querySelector(['input[type=email i]']) ||
-        form.querySelector(['input[autocomplete=email i]']) ||
-        form.querySelector(['input[autocomplete=username i]']) ||
-        form.querySelector(['input[name=email i]']) ||
-        form.querySelector(['input[name=username i]']) ||
-        form.querySelector(['input[name=user i]']) ||
-        form.querySelector(['input[name="session[username_or_email]"]'])
+    var username = form.querySelector('input[type=email i]') ||
+        form.querySelector('input[autocomplete=email i]') ||
+        form.querySelector('input[autocomplete=username i]') ||
+        form.querySelector('input[name=email i]') ||
+        form.querySelector('input[name=username i]') ||
+        form.querySelector('input[name=user i]') ||
+        form.querySelector('input[name="session[username_or_email]"]')
 
     if (!username) {
       // Search backwards from first password field to find the username field
       let previousSibling = passwords[0].previousSibling
       while (previousSibling) {
-        if (previousSibling.type === 'text' && previousSibling.autocomplete !== 'off') {
-          username = previousSibling
-          break
+        if ((previousSibling instanceof HTMLElement)) {
+          if (previousSibling.getAttribute('type') === 'text' && previousSibling.getAttribute('autocomplete') !== 'off') {
+            username = previousSibling
+            break
+          }
         }
         previousSibling = previousSibling.previousSibling
       }
@@ -458,7 +462,7 @@ if (typeof KeyEvent === 'undefined') {
 
     // If not a submission, autofill the first password field and ignore the rest
     if (!isSubmission || passwords.length === 1) {
-      return [username, passwords[0], null]
+      return [username instanceof HTMLInputElement ? username : null, passwords[0], null]
     }
 
     // Otherwise, this is probably a password change form and we need to figure out
@@ -495,7 +499,7 @@ if (typeof KeyEvent === 'undefined') {
         oldPassword = passwords[1]
       }
     }
-    return [username, newPassword, oldPassword]
+    return [username instanceof HTMLInputElement ? username : null, newPassword, oldPassword]
   }
 
   /**
@@ -507,18 +511,18 @@ if (typeof KeyEvent === 'undefined') {
   function getPasswordFields (form, isSubmission) {
     var currentPassword = form.querySelector('input[autocomplete=current-password i]')
     var newPassword = form.querySelector('input[autocomplete=new-password i]')
-    if (currentPassword) {
+    if (currentPassword instanceof HTMLInputElement) {
       if (!newPassword) {
         // This probably isn't a password change form; ex: twitter login
         return [currentPassword]
-      } else {
+      } else if (newPassword instanceof HTMLInputElement){
         return [currentPassword, newPassword]
       }
     }
     var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
     if (isSubmission) {
       // Skip empty fields
-      passwordNodes = passwordNodes.filter((e) => { return e.value })
+      passwordNodes = passwordNodes.filter((e) => { return (e instanceof HTMLInputElement && e.value) })
     }
     return passwordNodes
   }
