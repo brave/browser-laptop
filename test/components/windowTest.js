@@ -3,6 +3,16 @@
 const Brave = require('../lib/brave')
 const {activeWebview} = require('../lib/selectors')
 
+const requireIsAvailable = function () {
+  return this.execute(function () {
+    try {
+      return (typeof require) !== 'undefined'
+    } catch (e) {
+      return false
+    }
+  })
+}
+
 describe('application window', function () {
   describe('application launch', function () {
     Brave.beforeAll(this)
@@ -45,15 +55,14 @@ describe('application window', function () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .newWindowAction()
-      })
-
-      it('opens a new window', function *() {
-        yield this.app.client
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
               return count === 4 // two windows with two views each
             })
           })
+          .windowByIndex(2)
+          .waitUntilWindowLoaded()
+          .waitUntil(requireIsAvailable)
       })
 
       it('offsets from the focused window', function *() {
@@ -86,6 +95,9 @@ describe('application window', function () {
               return count === 4 // two windows with two views each
             })
           })
+          .windowByIndex(2)
+          .waitUntilWindowLoaded()
+          .waitUntil(requireIsAvailable)
       })
 
       it('offsets from the focused window', function *() {
