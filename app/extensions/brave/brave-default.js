@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -134,12 +134,12 @@ if (typeof KeyEvent === 'undefined') {
   /**
    * Ensures a node replacement div is visible and has a proper zIndex
    */
-  function ensureNodeVisible (node) {
+  function ensureNodeVisible (node/*: Element*/)/* : void */ {
     if (document.defaultView.getComputedStyle(node).display === 'none') {
-      node.style.display = ''
+      node.setAttribute('style', 'display: ""')
     }
     if (document.defaultView.getComputedStyle(node).zIndex === '-1') {
-      node.style.zIndex = ''
+      node.setAttribute('style', 'zIndex: ""')
     }
   }
 
@@ -174,7 +174,7 @@ if (typeof KeyEvent === 'undefined') {
       return [iframeData.width || iframeData.w, iframeData.height || iframeData.h]
     }
 
-    return null
+    return []
   }
 
   /**
@@ -191,7 +191,7 @@ if (typeof KeyEvent === 'undefined') {
 
     var adSize = getAdSize(node, iframeData)
     // Could not determine the ad size, so just skip this replacement
-    if (!adSize) {
+    if (!adSize.length) {
       // we have a replace node node but no replacement, so just display none on it
       node.style.display = 'none'
       return
@@ -217,8 +217,8 @@ if (typeof KeyEvent === 'undefined') {
                             '; padding: 0; margin: 0; overflow: hidden;">' + xhttp.responseText + '</body></html>'
         var sandbox = 'allow-popups allow-popups-to-escape-sandbox'
         if (node.tagName === 'IFRAME') {
-          node.srcdoc = src
-          node.sandbox = sandbox
+          node.setAttribute('srcdoc', src)
+          node.setAttribute('sandbox', sandbox)
         } else {
           while (node.firstChild) {
             node.removeChild(node.firstChild)
@@ -230,10 +230,10 @@ if (typeof KeyEvent === 'undefined') {
                               'padding: 0; border: 0; margin: 0; width: ' + adSize[0] + 'px; ' + 'height: ' + adSize[1] + 'px;')
           node.appendChild(iframe)
           ensureNodeVisible(node)
-          if (node.parentNode) {
-            ensureNodeVisible(node.parentNode)
-            if (node.parentNode) {
-              ensureNodeVisible(node.parentNode.parentNode)
+          if (node.parentElement) {
+            ensureNodeVisible(node.parentElement)
+            if (node.parentNode.parentElement) {
+              ensureNodeVisible(node.parentNode.parentElement)
             }
           }
         }
@@ -334,6 +334,9 @@ if (typeof KeyEvent === 'undefined') {
 
     if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
+        if (!usernameElem) {
+          return
+        }
         let rect = usernameElem.getBoundingClientRect()
         ipcRenderer.send('show-username-list', formOrigin, action, {
           bottom: rect.bottom,
@@ -521,14 +524,16 @@ if (typeof KeyEvent === 'undefined') {
   }
 
   function hasSelection (node) {
-    try {
-      if (node && node.selectionStart !== undefined &&
-          node.selectionEnd !== undefined &&
-          node.selectionStart !== node.selectionEnd) {
+    // Combining these two if clauses causes Flow to throw "recursion limit
+    // exceeded" :(
+    if (node instanceof HTMLTextAreaElement) {
+      if (node.selectionEnd !== node.selectionStart) {
         return true
       }
-    } catch (e) {
-      return false
+    } else if (node instanceof HTMLInputElement) {
+      if (node.selectionEnd !== node.selectionStart) {
+        return true
+      }
     }
 
     var selection = window.getSelection()
@@ -564,31 +569,50 @@ if (typeof KeyEvent === 'undefined') {
     return window.navigator.platform.includes('Mac')
   }
 
-  document.addEventListener('contextmenu', (e) => {
+  document.addEventListener('contextmenu', (e/*: Event*/) => {
     window.setTimeout(() => {
+      if (!(e instanceof MouseEvent)) {
+        return
+      }
       // there is another event being fired on contextmenu, don't show this one
       if (e.defaultPrevented) {
         return
       }
+      if (!(e.target instanceof HTMLElement)) {
+        return
+      }
+
       var name = e.target.nodeName.toUpperCase()
       var href
       var maybeLink = e.target
+      // flow requires this check to happen again
+      if (!(maybeLink instanceof HTMLElement)) {
+        return
+      }
+
       while (maybeLink.parentNode) {
         // Override for about: pages
         if (maybeLink.getAttribute('data-context-menu-disable')) {
           return
         }
         if (maybeLink.nodeName.toUpperCase() === 'A') {
-          href = maybeLink.href
+          href = maybeLink.getAttribute('href')
           break
         }
         maybeLink = maybeLink.parentNode
+        if (!(maybeLink instanceof HTMLElement)) {
+          return
+        }
+      }
+
+      if (!(e.target instanceof HTMLElement)) {
+        return
       }
       var nodeProps = {
         name: name,
         href: href,
-        src: e.target.src,
         isContentEditable: e.target.isContentEditable,
+        src: e.target.getAttribute('src'),
         hasSelection: hasSelection(e.target),
         offsetX: e.pageX,
         offsetY: e.pageY
@@ -598,7 +622,10 @@ if (typeof KeyEvent === 'undefined') {
     }, 0)
   }, false)
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', (e /*: Event*/) => {
+    if (!(e instanceof KeyboardEvent)) {
+      return
+    }
     switch (e.keyCode) {
       case KeyEvent.DOM_VK_ESCAPE:
         e.preventDefault()
@@ -626,10 +653,15 @@ if (typeof KeyEvent === 'undefined') {
   function delegate (event, selector) {
     var target = event.target
     var related = event.relatedTarget
+
+    if (!(target instanceof Element && related instanceof Element)) {
+      return
+    }
+
     var match
 
     // search for a parent node matching the delegation selector
-    while (target && target !== document && !(match = target.matches(selector))) {
+    while (target && target !== document && target.matches && !(match = target.matches(selector))) {
       target = target.parentNode
     }
 
@@ -651,7 +683,10 @@ if (typeof KeyEvent === 'undefined') {
     return target
   }
 
-  document.addEventListener('mouseover', (event) => {
+  document.addEventListener('mouseover', (event/*: Event*/) => {
+    if (!(event instanceof MouseEvent)) {
+      return
+    }
     var target = delegate(event, 'a')
     if (target) {
       const pos = {
@@ -662,7 +697,10 @@ if (typeof KeyEvent === 'undefined') {
     }
   })
 
-  document.addEventListener('mouseout', (event) => {
+  document.addEventListener('mouseout', (event/*: Event*/) => {
+    if (!(event instanceof MouseEvent)) {
+      return
+    }
     if (delegate(event, 'a')) {
       ipcRenderer.sendToHost('link-hovered', null)
     }
