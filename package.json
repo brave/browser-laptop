@@ -32,7 +32,8 @@
     "vagrant-halt-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant halt",
     "vagrant-destroy-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant destroy",
     "vagrant-ssh-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant ssh",
-    "vagrant-rsync-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant rsync-auto"
+    "vagrant-rsync-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant rsync-auto",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2"
   },
   "repository": "brave/browser-laptop",
   "author": {
@@ -100,6 +101,7 @@
     "electron-packager": "brave/electron-packager",
     "electron-rebuild": "^1.1.1",
     "empty-port": "0.0.2",
+    "flow-bin": "^0.22.1",
     "gulp": "^3.9.0",
     "jsdox": "^0.4.9",
     "jsonfile": "^2.2.3",
@@ -138,7 +140,8 @@
       "doc/**",
       "public/**",
       "app/ext/**",
-      "app/gen/**"
+      "app/gen/**",
+      "decls/**"
     ]
   },
   "pre-commit": [
