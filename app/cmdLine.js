@@ -44,11 +44,11 @@ const focusOrOpenWindow = function (url) {
 // Checks an array of arguments if it can find a url
 const getUrlFromCommandLine = (argv) => {
   if (argv) {
-    if (argv.length === 2) {
+    if (argv.length === 2 && !argv[1].startsWith('-')) {
       return argv[1]
     }
     const index = argv.indexOf('--')
-    if (index !== -1 && index + 1 < argv.length) {
+    if (index !== -1 && index + 1 < argv.length && !argv[index + 1].startsWith('-')) {
       return argv[index + 1]
     }
   }

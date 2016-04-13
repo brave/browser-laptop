@@ -8,12 +8,5 @@
       { "x": 438, "y": 344, "type": "link", "path": "/Applications" },
       { "x": 192, "y": 344, "type": "file" }
     ]
-  },
-  "win32": {
-    "title" : "Brave",
-    "version" : "0.0.3",
-    "iconUrl" : "res/app.ico",
-    "setup_icon" : "res/app.ico",
-    "nsiTemplate" : "res/installer.nsi.tpl"
   }
 }

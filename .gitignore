@@ -51,6 +51,3 @@ buildConfig.js
 rulesets.json
 httpse.json
 httpse.sqlite
-
-# Temporary build files
-res/BraveDefaults.exe
