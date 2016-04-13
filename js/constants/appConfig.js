@@ -69,7 +69,7 @@ module.exports = {
   defaultSettings: {
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
-    'general.useragent.value': undefined, // Set at runtime
+    'general.useragent.value': null, // Set at runtime
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
@@ -81,6 +81,7 @@ module.exports = {
     'privacy.autocomplete.history-size': 500,
     'bookmarks.toolbar.show': false,
     'privacy.do-not-track': false,
-    'security.passwords.manager-enabled': true
+    'security.passwords.manager-enabled': true,
+    'security.passwords.one-password-enabled': false
   }
 }
