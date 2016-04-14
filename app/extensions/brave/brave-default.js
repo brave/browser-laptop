@@ -765,11 +765,13 @@ if (typeof KeyEvent === 'undefined') {
   })
 
   /** Begin canvas fingerprinting detection **/
+  /**
+   * @return {string}
+   */
   function getPageScript () {
-    // return a string
-    return '(' + function (ERROR) {
+    return '(' + Function.prototype.toString.call(function (ERROR) {
       ERROR.stackTraceLimit = Infinity // collect all frames
-      var event_id = document.currentScript.getAttribute('data-event-id')
+      var event_id = document.currentScript ? document.currentScript.getAttribute('data-event-id') : ''
 
       // from Underscore v1.6.0
       function debounce (func, wait, immediate) {
@@ -885,26 +887,13 @@ if (typeof KeyEvent === 'undefined') {
       }
 
       /**
-       * Monitor the writes in a canvas instance
+       * Monitor the reads from a canvas instance
        * @param item special item objects
        */
       function trapInstanceMethod (item) {
-        var is_canvas_write = (
-          item.propName === 'fillText' || item.propName === 'strokeText'
-        )
-
         item.obj[item.propName] = (function (orig) {
           return function () {
-            var args = arguments
-
-            if (is_canvas_write) {
-              // to avoid false positives,
-              // bail if the text being written is too short
-              if (!args[0] || args[0].length < 5) {
-                return orig.apply(this, args)
-              }
-            }
-
+            console.log('trapping', item.objName)
             var script_url = getOriginatingScriptUrl()
             var msg = {
               obj: item.objName,
@@ -912,83 +901,50 @@ if (typeof KeyEvent === 'undefined') {
               scriptUrl: stripLineAndColumnNumbers(script_url)
             }
 
-            if (item.hasOwnProperty('extra')) {
-              msg.extra = item.extra.apply(this, args)
-            }
-
+            // Block the read from occuring; send info to background page instead
+            console.log('blocking canvas read', msg)
             send(msg)
-
-            /*
-            if (is_canvas_write) {
-              // optimization: one canvas write is enough,
-              // restore original write method
-              // to this CanvasRenderingContext2D object instance
-              this[item.propName] = orig
-            }
-
-            return orig.apply(this, args)
-            */
           }
         }(item.obj[item.propName]))
       }
 
       var methods = []
-      var canvasMethods = ['getImageData', 'fillText', 'strokeText']
+      var canvasMethods = ['getImageData', 'getLineDash', 'measureText']
       canvasMethods.forEach(function (method) {
         var item = {
           objName: 'CanvasRenderingContext2D.prototype',
           propName: method,
-          obj: window.CanvasRenderingContext2D.prototype,
-          extra: function () {
-            return {
-              canvas: true
-            }
-          }
-        }
-
-        if (method === 'getImageData') {
-          item.extra = function () {
-            var args = arguments
-            var width = args[2]
-            var height = args[3]
-
-            // "this" is a CanvasRenderingContext2D object
-            if (width === undefined) {
-              width = this.canvas.width
-            }
-            if (height === undefined) {
-              height = this.canvas.height
-            }
-
-            return {
-              canvas: true,
-              width: width,
-              height: height
-            }
-          }
+          obj: window.CanvasRenderingContext2D.prototype
         }
 
         methods.push(item)
       })
 
-      methods.push({
-        objName: 'HTMLCanvasElement.prototype',
-        propName: 'toDataURL',
-        obj: window.HTMLCanvasElement.prototype,
-        extra: function () {
-          // "this" is a canvas element
-          return {
-            canvas: true,
-            width: this.width,
-            height: this.height
-          }
+      var canvasElementMethods = ['toDataURL', 'toBlob']
+      canvasElementMethods.forEach(function (method) {
+        var item = {
+          objName: 'HTMLCanvasElement.prototype',
+          propName: method,
+          obj: window.HTMLCanvasElement.prototype
         }
+        methods.push(item)
+      })
+
+      var webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
+        'getShaderPrecisionFormat', 'getExtension']
+      webglMethods.forEach(function (method) {
+        var item = {
+          objName: 'WebGLRenderingContext.prototype',
+          propName: method,
+          obj: window.WebGLRenderingContext.prototype
+        }
+        methods.push(item)
       })
 
       methods.forEach(trapInstanceMethod)
 
     // save locally to keep from getting overwritten by site code
-    } + '(Error));'
+    }) + '(Error));'
   }
 
   /**
@@ -1013,10 +969,13 @@ if (typeof KeyEvent === 'undefined') {
   }
 
   ipcRenderer.on('block-canvas-fingerprinting', function () {
-    var event_id = Math.random()
+    var event_id = Math.random().toString()
 
     // listen for messages from the script we are about to insert
     document.addEventListener(event_id, function (e) {
+      if (!e.detail) {
+        return
+      }
       // pass these on to the background page
       ipcRenderer.send('got-canvas-fingerprinting', e.detail)
     })

@@ -305,6 +305,8 @@ class Frame extends ImmutableComponent {
           ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frame.get('key'))
         }
       }
+      // TODO: Add setting for blocking canvas fingerprinting
+      this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
       windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
@@ -321,8 +323,6 @@ class Frame extends ImmutableComponent {
       if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
         this.webview.send(messages.AUTOFILL_PASSWORD)
       }
-      // TODO: Add setting for blocking canvas fingerprinting
-      this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
       let security = this.props.frame.get('security')
       if (this.props.frame.get('location') === 'about:certerror' &&
           security && security.get('certDetails')) {
