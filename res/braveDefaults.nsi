@@ -37,6 +37,13 @@ Function .onInit
     StrCpy $IsElevated "1"
   ${EndIf}
 
+  Push $EXEDIR
+  Call GetParent
+  POP $0
+
+  StrCpy $BraveEXEPath "$0\Brave.exe"
+  StrCpy $BraveIconPath "$0\Brave.exe,0"
+
   Call GetParameters
   Pop $1
 
@@ -45,16 +52,23 @@ Function .onInit
   ${StrStr} $5 $1 "/uninstall"
 
   ${If} $4 != ""
-  ${OrIf} $4 != ""
+  ${OrIf} $5 != ""
     StrCpy $IsUninstall "1"
   ${Else}
     StrCpy $IsUninstall "0"
+    ; Document / protocol handler class
+    ; These need to always be in HKCU becuase they contain the actual path of the exe which changes
+    ; on each update.  If on HKLM then the user could not elevate later and cause a problem.
+    ; They should also be in this block early because we always want to re-create on each update.
+    WriteRegStr HKCU "SOFTWARE\Classes\BraveHTML" "" "Brave HTML Document"
+    WriteRegStr HKCU "SOFTWARE\Classes\BraveHTML\DefaultIcon" "" "$BraveIconPath"
+    WriteRegStr HKCU "SOFTWARE\Classes\BraveHTML\shell\open\command" "" '"$BraveEXEPath" -- "%1"'
   ${EndIf}
 
   ; If we already have the defaults key, there's nothing to do so we can abort early without even needing to elevate on Win7.
   ${If} $IsUninstall == "0"
     ClearErrors
-    ReadRegStr $2 SHCTX "SOFTWARE\Classes\BraveHTML" ""
+    ReadRegStr $2 SHCTX "SOFTWARE\RegisteredApplications" "Brave"
     ${IfNot} ${Errors}
       Quit
     ${EndIf}
@@ -84,32 +98,17 @@ Function .onInit
 FunctionEnd
 
 Section "Defaults Section" SecDummy
-  ; For now we don't need a 64-bit reg view
-  ; SetRegView 64
-
-  Push $EXEDIR
-  Call GetParent
-  POP $0
-
-  StrCpy $BraveEXEPath "$0\Brave.exe"
-  StrCpy $BraveIconPath "$0\Brave.exe,0"
-
   Call GetParameters
   Pop $1
 
-  ${If} $1 == "/uninstall"
-  ${OrIf} $1 == "-uninstall"
-    DeleteRegKey SHCTX "SOFTWARE\Classes\BraveHTML"
+  ${If} $IsUninstall == "1"
+    DeleteRegKey HKCU "SOFTWARE\Classes\BraveHTML"
     DeleteRegKey SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave"
     DeleteRegValue SHCTX "SOFTWARE\RegisteredApplications" "Brave"
-  ${Else}
-    ; Uninstall icon
-    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Brave" "DisplayIcon" "$BraveIconPath"
 
-    ; Document / protocol handler class
-    WriteRegStr SHCTX "SOFTWARE\Classes\BraveHTML" "" "Brave HTML Document"
-    WriteRegStr SHCTX "SOFTWARE\Classes\BraveHTML\DefaultIcon" "" "$BraveIconPath"
-    WriteRegStr SHCTX "SOFTWARE\Classes\BraveHTML\shell\open\command" "" '"$BraveEXEPath" -- "%1"'
+    SetShellVarContext current
+    Delete "$DESKTOP\Brave.lnk"
+  ${Else}
 
     ; Define capabilities
     WriteRegStr SHCTX "SOFTWARE\RegisteredApplications" "Brave" "Software\Clients\StartMenuInternet\Brave\Capabilities"
@@ -131,5 +130,8 @@ Section "Defaults Section" SecDummy
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities\URLAssociations" "http" "BraveHTML"
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities\URLAssociations" "https" "BraveHTML"
     WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\Brave\Capabilities\URLAssociations" "mailto" "BraveHTML"
+    ; Uninstall icon
+    SetRegView 64
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Brave" "DisplayIcon" "$BraveIconPath"
   ${EndIf}
 SectionEnd

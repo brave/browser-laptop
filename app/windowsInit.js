@@ -23,11 +23,11 @@ if (process.platform === 'win32') {
   const cmd = process.argv[1];
   if (cmd === '--squirrel-install' || cmd === '--squirrel-updated') {
     // Launch defaults helper to add defaults on install
-    spawn(getBraveDefaultsBinPath())
+    spawn(getBraveDefaultsBinPath(), [], { detached: true })
   } else if (cmd === '--squirrel-uninstall') {
     // Launch defaults helper to remove defaults on uninstall
     // Sync to avoid file path in use on uninstall
-    spawnSync(getBraveDefaultsBinPath(), ['/uninstall'])
+    spawnSync(getBraveDefaultsBinPath(), ['-uninstall'])
   }
 
   if (shouldQuit) {
