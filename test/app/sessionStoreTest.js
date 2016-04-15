@@ -22,7 +22,8 @@ describe('sessionStore', function () {
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client.loadUrl(page1Url)
-      yield Brave.app.client.waitForExist(navigatorNotBookmarked)
+        .moveToObject(navigator)
+        .waitForExist(navigatorNotBookmarked)
       yield Brave.app.client.addSite({
         location: page1Url,
         title: 'some page'

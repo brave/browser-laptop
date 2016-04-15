@@ -57,7 +57,7 @@ module.exports.registerBeforeRedirectFilteringCB = (filteringFn) => {
 function registerForBeforeRequest (session) {
   session.webRequest.onBeforeRequest((details, cb) => {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl) {
+    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
       cb({})
       return
     }
@@ -106,7 +106,7 @@ function registerForBeforeRedirect (session) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl) {
+    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
       return
     }
     for (let i = 0; i < beforeRedirectFilteringFns.length; i++) {
@@ -131,6 +131,12 @@ function registerForBeforeSendHeaders (session) {
   const braveRegex = new RegExp('brave/.+? ', 'gi')
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+      cb({})
+      return
+    }
+
     let requestHeaders = details.requestHeaders
 
     if (!spoofedUserAgent) {
@@ -140,13 +146,8 @@ function registerForBeforeSendHeaders (session) {
       spoofedUserAgent = requestHeaders['User-Agent'].replace(braveRegex, '')
       appActions.changeSetting(settings.USERAGENT, spoofedUserAgent)
     }
-    requestHeaders['User-Agent'] = spoofedUserAgent
 
-    // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl) {
-      cb({})
-      return
-    }
+    requestHeaders['User-Agent'] = spoofedUserAgent
 
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
@@ -324,6 +325,19 @@ function initForPartition (partition) {
   ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
     fn(session.fromPartition(partition))
   })
+}
+
+function shouldIgnoreUrl (url) {
+  // Ensure host is well-formed (RFC 1035) and has a non-empty hostname
+  try {
+    let host = urlParse(url).hostname
+    if (host.includes('..') || host.length > 255 || host.length === 0) {
+      return true
+    }
+  } catch (e) {
+    return true
+  }
+  return false
 }
 
 module.exports.init = () => {

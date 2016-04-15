@@ -1,10 +1,11 @@
+// @flow
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 // inject missing DOM Level 3 KeyEvent
 // https://www.w3.org/TR/2001/WD-DOM-Level-3-Events-20010410/DOM3-Events.html#events-Events-KeyEvent
-if (typeof this.KeyEvent === 'undefined') {
-  this.KeyEvent = {
+if (typeof KeyEvent === 'undefined') {
+  KeyEvent = {
     DOM_VK_CANCEL: 3,
     DOM_VK_HELP: 6,
     DOM_VK_BACK_SPACE: 8,
@@ -133,12 +134,12 @@ if (typeof this.KeyEvent === 'undefined') {
   /**
    * Ensures a node replacement div is visible and has a proper zIndex
    */
-  function ensureNodeVisible (node) {
+  function ensureNodeVisible (node/*: Element*/)/* : void */ {
     if (document.defaultView.getComputedStyle(node).display === 'none') {
-      node.style.display = ''
+      node.setAttribute('style', 'display: ""')
     }
     if (document.defaultView.getComputedStyle(node).zIndex === '-1') {
-      node.style.zIndex = ''
+      node.setAttribute('style', 'zIndex: ""')
     }
   }
 
@@ -173,7 +174,7 @@ if (typeof this.KeyEvent === 'undefined') {
       return [iframeData.width || iframeData.w, iframeData.height || iframeData.h]
     }
 
-    return null
+    return []
   }
 
   /**
@@ -190,7 +191,7 @@ if (typeof this.KeyEvent === 'undefined') {
 
     var adSize = getAdSize(node, iframeData)
     // Could not determine the ad size, so just skip this replacement
-    if (!adSize) {
+    if (!adSize.length) {
       // we have a replace node node but no replacement, so just display none on it
       node.style.display = 'none'
       return
@@ -214,28 +215,25 @@ if (typeof this.KeyEvent === 'undefined') {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] +
                             '; padding: 0; margin: 0; overflow: hidden;">' + xhttp.responseText + '</body></html>'
-        var sandbox = 'allow-scripts allow-popups allow-popups-to-escape-sandbox'
+        var sandbox = 'allow-popups allow-popups-to-escape-sandbox'
         if (node.tagName === 'IFRAME') {
-          node.srcdoc = src
-          node.sandbox = sandbox
+          node.setAttribute('srcdoc', src)
+          node.setAttribute('sandbox', sandbox)
         } else {
           while (node.firstChild) {
             node.removeChild(node.firstChild)
           }
           var iframe = document.createElement('iframe')
-          iframe.style.padding = 0
-          iframe.style.border = 0
-          iframe.style.margin = 0
-          iframe.style.width = adSize[0] + 'px'
-          iframe.style.height = adSize[1] + 'px'
-          iframe.srcdoc = src
-          iframe.sandbox = sandbox
+          iframe.setAttribute('sandbox', sandbox)
+          iframe.setAttribute('srcdoc', src)
+          iframe.setAttribute('style',
+                              'padding: 0; border: 0; margin: 0; width: ' + adSize[0] + 'px; ' + 'height: ' + adSize[1] + 'px;')
           node.appendChild(iframe)
           ensureNodeVisible(node)
-          if (node.parentNode) {
-            ensureNodeVisible(node.parentNode)
-            if (node.parentNode) {
-              ensureNodeVisible(node.parentNode.parentNode)
+          if (node.parentElement) {
+            ensureNodeVisible(node.parentElement)
+            if (node.parentNode.parentElement) {
+              ensureNodeVisible(node.parentNode.parentElement)
             }
           }
         }
@@ -287,8 +285,12 @@ if (typeof this.KeyEvent === 'undefined') {
     })
   })
 
+  function savePassword(username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
+    ipcRenderer.send('save-password', username, pw, origin, action)
+  }
+
   let submittedForms = []
-  function onFormSubmit (form, formOrigin) {
+  function onFormSubmit (form/*: HTMLFormElement*/, formOrigin/*: string*/) {
     if (submittedForms.includes(form)) {
       return
     }
@@ -300,8 +302,7 @@ if (typeof this.KeyEvent === 'undefined') {
     // Re-get action in case it has changed
     var action = form.action || document.location.href
     var usernameElem = fields[0] || {}
-    ipcRenderer.send('save-password', usernameElem.value, passwordElem.value,
-                     formOrigin, normalizeURL(action))
+    savePassword(usernameElem.value, passwordElem.value, formOrigin, normalizeURL(action))
     submittedForms.push(form)
   }
 
@@ -336,6 +337,9 @@ if (typeof this.KeyEvent === 'undefined') {
 
     if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
+        if (!usernameElem) {
+          return
+        }
         let rect = usernameElem.getBoundingClientRect()
         ipcRenderer.send('show-username-list', formOrigin, action, {
           bottom: rect.bottom,
@@ -395,7 +399,6 @@ if (typeof this.KeyEvent === 'undefined') {
     })
 
     ipcRenderer.on('got-password', (e, username, password, origin, action, isUnique) => {
-      console.log('got password', username, isUnique)
       var elems = credentials[action]
       if (formOrigin === origin && elems) {
         elems.forEach((elem) => {
@@ -426,7 +429,7 @@ if (typeof this.KeyEvent === 'undefined') {
    * @param {boolean} isSubmission - Whether the form is being submitted
    * @return {Array.<Element>}
    */
-  function getFormFields (form, isSubmission) {
+  function getFormFields (form/*: HTMLFormElement */, isSubmission/*: boolean*/)/*: Array<?HTMLInputElement>*/ {
     var passwords = getPasswordFields(form, isSubmission)
 
     // We have no idea what is going on with a form that has 0 or >3 password fields
@@ -435,21 +438,23 @@ if (typeof this.KeyEvent === 'undefined') {
     }
 
     // look for any form field that has username-ish attributes
-    var username = form.querySelector(['input[type=email i]']) ||
-        form.querySelector(['input[autocomplete=email i]']) ||
-        form.querySelector(['input[autocomplete=username i]']) ||
-        form.querySelector(['input[name=email i]']) ||
-        form.querySelector(['input[name=username i]']) ||
-        form.querySelector(['input[name=user i]']) ||
-        form.querySelector(['input[name="session[username_or_email]"]'])
+    var username = form.querySelector('input[type=email i]') ||
+        form.querySelector('input[autocomplete=email i]') ||
+        form.querySelector('input[autocomplete=username i]') ||
+        form.querySelector('input[name=email i]') ||
+        form.querySelector('input[name=username i]') ||
+        form.querySelector('input[name=user i]') ||
+        form.querySelector('input[name="session[username_or_email]"]')
 
     if (!username) {
       // Search backwards from first password field to find the username field
       let previousSibling = passwords[0].previousSibling
       while (previousSibling) {
-        if (previousSibling.type === 'text' && previousSibling.autocomplete !== 'off') {
-          username = previousSibling
-          break
+        if ((previousSibling instanceof HTMLElement)) {
+          if (previousSibling.getAttribute('type') === 'text' && previousSibling.getAttribute('autocomplete') !== 'off') {
+            username = previousSibling
+            break
+          }
         }
         previousSibling = previousSibling.previousSibling
       }
@@ -457,7 +462,7 @@ if (typeof this.KeyEvent === 'undefined') {
 
     // If not a submission, autofill the first password field and ignore the rest
     if (!isSubmission || passwords.length === 1) {
-      return [username, passwords[0], null]
+      return [username instanceof HTMLInputElement ? username : null, passwords[0], null]
     }
 
     // Otherwise, this is probably a password change form and we need to figure out
@@ -494,7 +499,7 @@ if (typeof this.KeyEvent === 'undefined') {
         oldPassword = passwords[1]
       }
     }
-    return [username, newPassword, oldPassword]
+    return [username instanceof HTMLInputElement ? username : null, newPassword, oldPassword]
   }
 
   /**
@@ -506,31 +511,33 @@ if (typeof this.KeyEvent === 'undefined') {
   function getPasswordFields (form, isSubmission) {
     var currentPassword = form.querySelector('input[autocomplete=current-password i]')
     var newPassword = form.querySelector('input[autocomplete=new-password i]')
-    if (currentPassword) {
+    if (currentPassword instanceof HTMLInputElement) {
       if (!newPassword) {
         // This probably isn't a password change form; ex: twitter login
         return [currentPassword]
-      } else {
+      } else if (newPassword instanceof HTMLInputElement){
         return [currentPassword, newPassword]
       }
     }
     var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
     if (isSubmission) {
       // Skip empty fields
-      passwordNodes = passwordNodes.filter((e) => { return e.value })
+      passwordNodes = passwordNodes.filter((e) => { return (e instanceof HTMLInputElement && e.value) })
     }
     return passwordNodes
   }
 
   function hasSelection (node) {
-    try {
-      if (node && node.selectionStart !== undefined &&
-          node.selectionEnd !== undefined &&
-          node.selectionStart !== node.selectionEnd) {
+    // Combining these two if clauses causes Flow to throw "recursion limit
+    // exceeded" :(
+    if (node instanceof HTMLTextAreaElement) {
+      if (node.selectionEnd !== node.selectionStart) {
         return true
       }
-    } catch (e) {
-      return false
+    } else if (node instanceof HTMLInputElement) {
+      if (node.selectionEnd !== node.selectionStart) {
+        return true
+      }
     }
 
     var selection = window.getSelection()
@@ -566,31 +573,50 @@ if (typeof this.KeyEvent === 'undefined') {
     return window.navigator.platform.includes('Mac')
   }
 
-  document.addEventListener('contextmenu', (e) => {
+  document.addEventListener('contextmenu', (e/*: Event*/) => {
     window.setTimeout(() => {
+      if (!(e instanceof MouseEvent)) {
+        return
+      }
       // there is another event being fired on contextmenu, don't show this one
       if (e.defaultPrevented) {
         return
       }
+      if (!(e.target instanceof HTMLElement)) {
+        return
+      }
+
       var name = e.target.nodeName.toUpperCase()
       var href
       var maybeLink = e.target
+      // flow requires this check to happen again
+      if (!(maybeLink instanceof HTMLElement)) {
+        return
+      }
+
       while (maybeLink.parentNode) {
         // Override for about: pages
         if (maybeLink.getAttribute('data-context-menu-disable')) {
           return
         }
         if (maybeLink.nodeName.toUpperCase() === 'A') {
-          href = maybeLink.href
+          href = maybeLink.getAttribute('href')
           break
         }
         maybeLink = maybeLink.parentNode
+        if (!(maybeLink instanceof HTMLElement)) {
+          return
+        }
+      }
+
+      if (!(e.target instanceof HTMLElement)) {
+        return
       }
       var nodeProps = {
         name: name,
         href: href,
-        src: e.target.src,
         isContentEditable: e.target.isContentEditable,
+        src: e.target.getAttribute('src'),
         hasSelection: hasSelection(e.target),
         offsetX: e.pageX,
         offsetY: e.pageY
@@ -600,38 +626,46 @@ if (typeof this.KeyEvent === 'undefined') {
     }, 0)
   }, false)
 
-  document.onkeydown = (e) => {
+  document.addEventListener('keydown', (e /*: Event*/) => {
+    if (!(e instanceof KeyboardEvent)) {
+      return
+    }
     switch (e.keyCode) {
-      case this.KeyEvent.DOM_VK_ESCAPE:
+      case KeyEvent.DOM_VK_ESCAPE:
         e.preventDefault()
         ipcRenderer.sendToHost('stop-load')
         break
-      case this.KeyEvent.DOM_VK_BACK_SPACE:
+      case KeyEvent.DOM_VK_BACK_SPACE:
         if (!isEditable(document.activeElement)) {
           e.shiftKey ? window.history.forward() : window.history.back()
         }
         break
-      case this.KeyEvent.DOM_VK_LEFT:
+      case KeyEvent.DOM_VK_LEFT:
         if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
           window.history.back()
         }
         break
-      case this.KeyEvent.DOM_VK_RIGHT:
+      case KeyEvent.DOM_VK_RIGHT:
         if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
           window.history.forward()
         }
         break
     }
-  }
+  })
 
   // shamelessly taken from https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
   function delegate (event, selector) {
     var target = event.target
     var related = event.relatedTarget
+
+    if (!(target instanceof Element && related instanceof Element)) {
+      return
+    }
+
     var match
 
     // search for a parent node matching the delegation selector
-    while (target && target !== document && !(match = target.matches(selector))) {
+    while (target && target !== document && target.matches && !(match = target.matches(selector))) {
       target = target.parentNode
     }
 
@@ -653,7 +687,10 @@ if (typeof this.KeyEvent === 'undefined') {
     return target
   }
 
-  document.addEventListener('mouseover', (event) => {
+  document.addEventListener('mouseover', (event/*: Event*/) => {
+    if (!(event instanceof MouseEvent)) {
+      return
+    }
     var target = delegate(event, 'a')
     if (target) {
       const pos = {
@@ -664,7 +701,10 @@ if (typeof this.KeyEvent === 'undefined') {
     }
   })
 
-  document.addEventListener('mouseout', (event) => {
+  document.addEventListener('mouseout', (event/*: Event*/) => {
+    if (!(event instanceof MouseEvent)) {
+      return
+    }
     if (delegate(event, 'a')) {
       ipcRenderer.sendToHost('link-hovered', null)
     }

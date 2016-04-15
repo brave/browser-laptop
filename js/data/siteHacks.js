@@ -1,3 +1,5 @@
+const urlParse = require('url').parse
+
 module.exports = {
   'forbes.com': {
     onBeforeSendHeaders: function(details) {
@@ -48,7 +50,7 @@ module.exports = {
   },
   'www.googletagmanager.com': {
      onBeforeRequest: function(details) {
-      if (details.url === '/gtm.js') {
+      if (urlParse(details.url).pathname !== '/gtm.js') {
         return
       }
       return {

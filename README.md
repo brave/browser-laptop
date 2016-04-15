@@ -2,10 +2,13 @@
 
 # Brave Browser
 
-Laptop and Desktop browser for OS X, Windows and Linux.
+Desktop browser for OS X, Windows and Linux. To download the latest release,
+go to https://github.com/brave/browser-laptop/releases. To build Brave from
+source code, see below.
 
-## Requirements
+## Build prerequisites
 
+### All platforms
 1. `nodejs` **`>= 5.0`**
 
     Install from your package manager or download from https://nodejs.org
@@ -13,13 +16,20 @@ Laptop and Desktop browser for OS X, Windows and Linux.
 2. `node-gyp` **`3.2.1`**
 
         sudo npm install -g node-gyp@3.2.1
-        
-[Prerequisites](https://github.com/brave/browser-laptop/blob/master/docs/prerequisites.md) for Windows
 
+### Windows
+Ensure you have the following installed:  
+
+* [Node.js 5+](https://nodejs.org/en/)
+* [Python 2.7](https://www.python.org/downloads/)  
+* [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)  
+
+###  Linux
+* `apt-get install libgnome-keyring-dev`
 
 ## Installation
 
-Make sure you have all of the pre-requisite compilers/applications [Installed](https://github.com/brave/browser-laptop/blob/master/docs/prerequisites.md)
+After installing the prerequisites:
 
 1. Clone the git repository from GitHub:
 
@@ -88,6 +98,11 @@ Build instructions:
 - [OSX build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
 - [Windows build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-windows.md)
 - [Linux build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-linux.md)
+
+### Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. 
+
 
 ## Packaging for bundles, installers, and updates
 

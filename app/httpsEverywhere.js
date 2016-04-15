@@ -73,13 +73,6 @@ function getRewrittenUrl (url) {
 function getHostnamePatterns (url) {
   var host = urlParse(url).hostname
   var hostPatterns = [host]
-
-  // Ensure host is well-formed (RFC 1035)
-  if (host.includes('..') || host.length > 255) {
-    console.log('HTTPS Everywhere ignoring malformed host:', host)
-    return hostPatterns
-  }
-
   var segmented = host.split('.')
 
   // Since targets can contain a single wildcard, replace each label of the

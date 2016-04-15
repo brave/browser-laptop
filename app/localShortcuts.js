@@ -27,6 +27,7 @@ module.exports.register = (win) => {
     simpleWebContentEvents.push(
       ['F5', messages.SHORTCUT_ACTIVE_FRAME_RELOAD],
       ['Ctrl+F5', messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD],
+      ['Ctrl+F4', messages.SHORTCUT_CLOSE_FRAME],
       ['Alt+D', messages.SHORTCUT_FOCUS_URL, false],
       ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
       ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
