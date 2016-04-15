@@ -893,7 +893,6 @@ if (typeof KeyEvent === 'undefined') {
       function trapInstanceMethod (item) {
         item.obj[item.propName] = (function (orig) {
           return function () {
-            console.log('trapping', item.objName)
             var script_url = getOriginatingScriptUrl()
             var msg = {
               obj: item.objName,

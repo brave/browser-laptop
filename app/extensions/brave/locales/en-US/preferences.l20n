@@ -38,6 +38,7 @@
 <bookmarks "Bookmarks">
 <openedTabs "Open tabs">
 <doNotTrack "Send a 'Do Not Track' header with browsing requests (requires browser restart)">
+<blockCanvasFingerprinting "Block HTML canvas and WebGL fingerprinting">
 <advancedPrivacySettings "Advanced privacy settings:">
 
 /* Security settings page */
