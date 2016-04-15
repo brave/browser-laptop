@@ -10,17 +10,21 @@ const path = require('path')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
-const arch = 'x64'
-const buildDir = 'Brave-' + process.platform + '-' + arch
+var arch = 'x64'
 
 var appIcon
 if (isWindows) {
   appIcon = 'res/app.ico'
+  if (process.env.TARGET_ARCH === 'ia32') {
+    arch = 'ia32'
+  }
 } else if (isDarwin) {
   appIcon = 'res/app.icns'
 } else {
   appIcon = 'res/app.png'
 }
+
+const buildDir = 'Brave-' + process.platform + '-' + arch
 
 var env = {
   NODE_ENV: 'production',
@@ -44,7 +48,8 @@ var cmds = ['echo cleaning up target...']
 
 if (isWindows) {
   cmds = cmds.concat([
-    '(if exist ' + buildDir + ' rmdir /s /q ' + buildDir + ')',
+    '(if exist Brave-win32-x64 rmdir /s /q Brave-win32-x64)',
+    '(if exist Brave-win32-ia32 rmdir /s /q Brave-win32-ia32)',
     '(if exist dist rmdir /s /q dist)'
   ])
 } else {
