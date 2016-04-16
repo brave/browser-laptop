@@ -13,7 +13,7 @@
 
 SilentInstall silent
 
-Name "Modern UI Test"
+Name "Brave"
 OutFile "../Brave-win32-x64/resources/BraveDefaults.exe"
 RequestExecutionLevel user
 Var BraveEXEPath
