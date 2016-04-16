@@ -11,6 +11,7 @@ const path = require('path')
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 var arch = 'x64'
+const isLinux = process.platform === 'linux'
 
 var appIcon
 if (isWindows) {
@@ -88,11 +89,12 @@ cmds = cmds.concat([
     ' --version-string.FileDescription=\"Brave\"'
 ])
 
-if (process.platform === 'linux') {
+if (isLinux) {
   cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
-} else if (process.platform === 'darwin') {
+} else if (isDarwin) {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
-} else if (process.platform === 'win32') {
+} else if (isWindows) {
+  cmds.push('makensis.exe res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 }
 

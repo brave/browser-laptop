@@ -10,6 +10,7 @@ const app = electron.app
 const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
+const isDarwin = process.platform === 'darwin'
 let appInitialized = false
 
 const focusOrOpenWindow = function (url) {
@@ -40,10 +41,36 @@ const focusOrOpenWindow = function (url) {
   return true
 }
 
+// Checks an array of arguments if it can find a url
+const getUrlFromCommandLine = (argv) => {
+  if (argv) {
+    if (argv.length === 2 && !argv[1].startsWith('-')) {
+      return argv[1]
+    }
+    const index = argv.indexOf('--')
+    if (index !== -1 && index + 1 < argv.length && !argv[index + 1].startsWith('-')) {
+      return argv[index + 1]
+    }
+  }
+  return undefined
+}
+
+// For OS X, there are events like open-url instead
+if (!isDarwin) {
+  const openUrl = getUrlFromCommandLine(process.argv)
+  if (openUrl) {
+    module.exports.newWindowURL = openUrl
+  }
+}
+
 if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-  const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
+  const appAlreadyStartedShouldQuit = app.makeSingleInstance((argv, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
-    focusOrOpenWindow()
+    if (isDarwin) {
+      focusOrOpenWindow()
+    } else {
+      focusOrOpenWindow(getUrlFromCommandLine(argv))
+    }
   })
   if (appAlreadyStartedShouldQuit) {
     app.exit(0)
