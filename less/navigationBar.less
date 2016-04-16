@@ -8,34 +8,40 @@
 
 @import "variables.less";
 
+/**
+ * Layout
+ */
+
 .navigatorWrapper {
-  -webkit-app-region: drag;
-  align-items: center;
   display: flex;
   justify-content: space-between;
-  padding-left: 70px;
+  -webkit-app-region: drag;
+  align-items: center;
+  padding: 0 70px;
   border-bottom: 1px solid #aaaaaa;
   height: 35px;
+
   @media (max-width: @breakpointNarrowViewport) {
-      padding-left: 0;
+    padding: 0;
   }
 }
 
 .platform--darwin {
-    .navigatorWrapper {
-        padding-left: 70px;
-    }
+  .navigatorWrapper {
+    padding-left: 70px;
+  }
 }
 
 .urlbarForm {
-  max-width: calc(~'100% - 80px'); // space for reload and bookmark buttons
-  position: relative;
-  white-space: nowrap;
-  display: flex;
   align-items: center;
   justify-content: center;
   height: 24px;
-  margin-left: 78px;
+  padding: 0 10px;
+
+  display: flex;
+  flex-grow: 1;
+  min-width: 0%; // allow the navigator to shrink
+  position: relative;
 
   *:not(legend) {
     z-index: 1;
@@ -59,38 +65,33 @@
   }
 
   #navigator:not(.titleMode) & {
-    flex: 1;
     background: white;
     border-radius: @borderRadiusURL;
-    box-sizing: border-box;
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
     color: @chromeText;
-    padding: 0 10px;
   }
 }
 
 #navigator {
+  display: flex;
+  flex-grow: 1;
+  min-width: 0%; // allow the navigator to shrink
   font-size: 20px;
+
   align-items: center;
   justify-content: center;
   max-width: 900px;
   box-sizing: border-box;
-  margin: 0 0 0 -114px;
   padding: 0;
   position: relative;
-  display: flex;
-  flex-direction: row;
   -webkit-user-select: none;
-  width: calc(~'100% - 215px');
 
   @media (max-width: @breakpointNarrowViewport) {
-      width: 100%;
-      z-index: 99999;
+    width: 100%;
+    z-index: 99999;
   }
 
   &.titleMode {
-    margin-left: -130px;
-
     input {
       display: none;
     }
@@ -102,6 +103,7 @@
       max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .endButtons {
@@ -115,7 +117,6 @@
       position: relative;
       left: 2px;
       min-width: 0;
-        
 
       &[class*=" fa-"] {
         margin-right: 5px;
@@ -140,6 +141,7 @@
 
   #titleBar {
     display: none;
+    text-overflow: ellipsis;
   }
 
   .loadTime {
@@ -177,10 +179,11 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 3px 0 0 3px;
+    margin: 3px 3px 0 3px;
     outline: none;
     text-overflow: ellipsis;
-    width: 100%;
+    flex-grow: 1;
+    min-width: 0%; // allow the navigator to shrink
 
     &:hover {
       background: @chromeControlsBackground2;
@@ -198,20 +201,20 @@
     opacity: 1;
   }
 
-    .urlbarIcon.fa-unlock-alt {
+  .urlbarIcon.fa-unlock-alt {
     margin-top: 4px;
     font-size: 16px;
     min-height: 10px;
     min-width: 16px;
-}  
-    
-    .urlbarIcon.fa-lock {
+  }
+
+  .urlbarIcon.fa-lock {
     margin-top: 4px;
     font-size: 16px;
     min-height: 10px;
     min-width: 16px;
-}
-    
+  }
+
   .urlbarIcon {
     color: @focusUrlbarOutline;
     left: 14px;
@@ -226,11 +229,15 @@
   }
 }
 
-.topLevelEndButtons .braveMenu {
-  background-image: -webkit-image-set(url(../app/img/braveBtn.png) 1x, url(../app/img/braveBtn2x.png) 2x, url(../app/img/braveBtn3x.png) 3x);
-  background-repeat: no-repeat;
-  width: 23px;
-  height: 27px;
-  margin-top: 3px;
-  margin-right: 8px;
+.topLevelEndButtons {
+  margin-left: 4px;
+  .braveMenu {
+    background-image: -webkit-image-set(url(../app/img/braveBtn.png) 1x, url(../app/img/braveBtn2x.png) 2x, url(../app/img/braveBtn3x.png) 3x);
+    background-repeat: no-repeat;
+    width: 23px;
+    height: 27px;
+    margin-top: 3px;
+    margin-right: 8px;
+  }
 }
+
