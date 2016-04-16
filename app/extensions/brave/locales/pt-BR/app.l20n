@@ -1,0 +1,119 @@
+<reload "Recarregar">
+<addBookmark "Adicionar favorito">
+<addBookmarkButton title: "Página de favoritos">
+<removeBookmark "Remover favorito">
+<removeBookmarkButton title: "Remover favorito">
+<addToReadingList "Adicionar à lista de leitura">
+<removeFromReadingList "Remover da lista de leitura">
+<forward "Avançar">
+<forwardButton title: "Avançar">
+<back "Voltar">
+<backButton title: "Voltar">
+<ok "OK">
+<cancel "Cancelar">
+<submit "Submeter">
+<settings "Configurações">
+<aboutPages "Páginas Sobre">
+<listOfAboutPages "Lista de páginas Sobre">
+<history "Histórico">
+<settingName "Nome da configuração">
+<settingValue "Valor da configuração">
+<newTab "Nova aba">
+<newTabButton title: "Adicionar nova aba">
+<certError "Erro de Certificado HTTPS">
+<certErrorText "Este site não pode ser carregado devido a um erro de certificado: ">
+<certErrorAdvanced "Configurações avançadas">
+<certErrorSafety "Voltar à segurança">
+<certErrorButtonText "Ignorar erro de certificado (perigoso!)">
+<openTypeInNewTab "Abrir {{$type}} em uma nova aba">
+<openTypeInNewPrivateTab "Abrir {{$type}} em uma nova aba privada">
+<copyLinkLocation "Copiar Local do Link">
+<closeTab "Fechar aba">
+<closeTabButton title: "Fechar aba">
+<closeOtherTabs "Fechar outras abas">
+<reloadTab "Recarregar aba">
+<reloadButton title: "Recarregar página">
+<stopButton title: "Parar de carregar">
+<muteTab "Silenciar aba">
+<unmuteTab "Reativar som da aba">
+<disableProtectionForSite "Desativar proteção contra rastreamento">
+<enableProtectionForSite "Ativar proteção contra rastreamento">
+<disableAdBlockForSite "Desativar bloqueio de anúncios">
+<enableAdBlockForSite "Ativar bloqueio de anúncios">
+<downloadType "Baixar {{$type}}">
+<setDefaultSearch "Definir {{$title}} como mecanismo padrão de pesquisa">
+<viewPageSource "Ver Código Fonte da página">
+<menuButton title: "Menu">
+<emptyFolderItem "(vazio)">
+<moreBookmarks "Mais favoritos...">
+<fullScreenModeWarning "{{$host}} entrou em modo de tela cheia, pressione ESC para sair.">
+
+<braveMenuTotalReplacements "Total de Substituições: {{$count}}">
+
+<basicAuthRequired "Autenticação Necessária">
+<basicAuthUsername "Nome de usuário:">
+<basicAuthPassword "Senha:">
+<basicAuthMessage "{{$host}} requer um nome de usuário e uma senha.">
+
+<crashScreenHeader "Algo deu errado =(">
+<crashScreenText "Um erro ocorreu ao exibir esta página. Para continuar, recarregue ou navegue para outra página.">
+
+<deny "Negar">
+<grant "Garantir">
+<permRequestHeader "{{$origin}} está solicitando permissão">
+<geolocationPermission "Geolocalização">
+<audioCapturePermission "Captura de Áudio">
+<videoCapturePermission "Captura de Vídeo">
+
+<urlbar placeholder: "Pesquisar ou inserir um endereço">
+
+<runtimeUpdatePending "Uma atualização de tempo de execução, que exige que a aplicação seja reiniciada, está disponível.">
+<appUpdatePending "Uma atualização está disponível.">
+<apply "Aplicar">
+<applyAndRestart "Aplicar e reiniciar">
+
+<fullscreenNotice "{{$origin}} agora está em tela cheia. Pressione ESC para sair.">
+
+<secureConnection "Este site é seguro">
+<mixedConnection "Conexão parcialmente insegura">
+<insecureConnection "Utilizando uma conexão insegura">
+<blockedTrackingElements "{{$blockedTrackingElementsSize}} Elementos de rastreamento bloqueados">
+<replacedAds "{{$replacedAdsSize}} Anúncios substituídos">
+<blockedAds "{{$blockedAdsSize}} Anúncios bloqueados">
+<redirectedResources "{{$redirectedResourcesSize}} Recursos atualizados para HTTPS">
+
+<updateNow "atualizar agora">
+<updateChecking "Estamos verificando atualizações...">
+<updateDownloading "Atualização encontrada, estamos baixando...">
+<updateLater "mais tarde">
+<updateDetails "detalhes">
+<updateError "Não conseguimos atualizar.">
+<updateHello "Olá!">
+<updateOops "Oops!">
+<updateNotYet "Ainda não!">
+<updateAvail "Uma atualização do Brave acabou de ser lançada.">
+<updateNotAvail "Desculpe, ainda não há atualizações. Por favor, volte mais tarde.">
+<updateRequiresRelaunch "Requer uma reinicialização rápida...">
+<updateViewLog "Ver registro">
+<updateHide "Ocultar">
+
+<sessionInfoCommon "Esta aba usa a sessão {{$partitionNumber}}">
+<sessionInfo "{{sessionInfoCommon}}">
+<sessionInfoTab
+  title: "{{sessionInfoCommon}}">
+
+<findResults "{{$activeMatchOrdinal}} de {{$numberOfMatches}}">
+
+<findResultMatches[@cldr.plural($numberOfMatches)] {
+  uma: "{{$numberOfMatches}} correspondência",
+  *várias: "{{$numberOfMatches}} correspondências"
+}>
+<caseSensitivity "Igualar caixa">
+
+<nameField "Título:">
+<locationField "Localização:">
+<parentFolderField "Pasta:">
+<save "Salvar">
+
+<bookmarksToolbar "Barra de Favoritos">
+<otherBookmarks "Outros Favoritos">

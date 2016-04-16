@@ -48,7 +48,7 @@ languages.forEach(function (languageCode) {
         console.log(error.toString())
       } else {
         // Build the filename and store the translation file
-        var filename = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'), resource + '.properties')
+        var filename = path.join(__dirname, '..', 'app', 'locales', languageCode.replace('_', '-'), resource + '.properties')
         fs.writeFileSync(filename, body)
         console.log('[*] ' + filename)
       }
