@@ -12,10 +12,10 @@ const settings = require('../js/constants/settings')
 const dialog = electron.dialog
 const appActions = require('../js/actions/appActions')
 const siteUtil = require('../js/state/siteUtil')
+const CommonMenu = require('../js/commonMenu')
 const Filtering = require('./filtering')
 const getSetting = require('../js/settings').getSetting
 const appStore = require('../js/stores/appStore')
-const locale = require('./locale')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -39,10 +39,7 @@ let lastSettingsState, lastArgs
  *   bookmarked
  */
 const init = (settingsState, args) => {
-  // This needs to be within the init method to handle translations
-  const CommonMenu = require('../js/commonMenu')
-
-  // Check for uneeded updates.
+  // Check for unneeded updates.
   // Updating the menu when it is not needed causes the menu to close if expanded
   // and also causes menu clicks to not work.  So we don't want to update it a lot
   // when app state changes, like when there are downloads.
@@ -53,11 +50,10 @@ const init = (settingsState, args) => {
 
   lastSettingsState = settingsState
   lastArgs = args
-
   menuArgs = Object.assign(menuArgs, args || {})
   // Create references to menu items that need to be updated dynamically
   const bookmarkPageMenuItem = {
-    label: locale.translation('bookmarkPage'),
+    label: 'Bookmark this page',
     type: 'checkbox',
     accelerator: 'CmdOrCtrl+D',
     checked: menuArgs.bookmarked || false,
@@ -77,13 +73,13 @@ const init = (settingsState, args) => {
 //            process.crash()
 //          }
 //        },
-    CommonMenu.newTabMenuItem(),
-    CommonMenu.newPrivateTabMenuItem(),
-    CommonMenu.newPartitionedTabMenuItem(),
-    CommonMenu.newWindowMenuItem(),
+    CommonMenu.newTabMenuItem,
+    CommonMenu.newPrivateTabMenuItem,
+    CommonMenu.newPartitionedTabMenuItem,
+    CommonMenu.newWindowMenuItem,
     CommonMenu.separatorMenuItem,
     {
-      label: locale.translation('openFile'),
+      label: 'Open File...',
       accelerator: 'CmdOrCtrl+O',
       click: (item, focusedWindow) => {
         dialog.showOpenDialog(focusedWindow, {
@@ -97,13 +93,13 @@ const init = (settingsState, args) => {
         })
       }
     }, {
-      label: locale.translation('openLocation'),
+      label: 'Open Location...',
       accelerator: 'CmdOrCtrl+L',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
       }
     }, {
-      label: locale.translation('openSearch'),
+      label: 'Open Search...',
       accelerator: 'CmdOrCtrl+K',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
@@ -111,7 +107,7 @@ const init = (settingsState, args) => {
     },
     CommonMenu.separatorMenuItem,
     {
-      label: locale.translation('importFrom'),
+      label: 'Import from...',
       enabled: false
       /*
       submenu: [
@@ -125,7 +121,7 @@ const init = (settingsState, args) => {
     {
       // this should be disabled when
       // no windows are active
-      label: locale.translation('closeTab'),
+      label: 'Close Tab',
       accelerator: 'CmdOrCtrl+W',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
@@ -133,7 +129,7 @@ const init = (settingsState, args) => {
     }, {
       // this should be disabled when
       // no windows are active
-      label: locale.translation('closeWindow'),
+      label: 'Close Window',
       accelerator: 'CmdOrCtrl+Shift+W',
       click: function (item, focusedWindow) {
         if (focusedWindow) {
@@ -143,13 +139,13 @@ const init = (settingsState, args) => {
     },
     CommonMenu.separatorMenuItem,
     {
-      label: locale.translation('savePageAs'),
+      label: 'Save Page As...',
       accelerator: 'CmdOrCtrl+S',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
       }
     }, {
-      label: locale.translation('share'),
+      label: 'Share...',
       enabled: false
       /*
       submenu: [
@@ -162,15 +158,15 @@ const init = (settingsState, args) => {
       */
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.printMenuItem()
+    CommonMenu.printMenuItem
   ]
 
   const helpMenu = [
-    CommonMenu.reportAnIssueMenuItem(),
+    CommonMenu.reportAnIssueMenuItem,
     CommonMenu.separatorMenuItem,
-    CommonMenu.submitFeedbackMenuItem(),
+    CommonMenu.submitFeedbackMenuItem,
     {
-      label: locale.translation('spreadTheWord'),
+      label: 'Spread the word about Brave...',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow,
                             [messages.SHORTCUT_NEW_FRAME, aboutUrl])
@@ -180,37 +176,37 @@ const init = (settingsState, args) => {
 
   if (!isDarwin) {
     fileMenu.push(CommonMenu.separatorMenuItem)
-    fileMenu.push(CommonMenu.quitMenuItem())
+    fileMenu.push(CommonMenu.quitMenuItem)
     helpMenu.push(CommonMenu.separatorMenuItem)
-    helpMenu.push(CommonMenu.checkForUpdateMenuItem())
+    helpMenu.push(CommonMenu.checkForUpdateMenuItem)
     helpMenu.push(CommonMenu.separatorMenuItem)
-    helpMenu.push(CommonMenu.aboutBraveMenuItem())
+    helpMenu.push(CommonMenu.aboutBraveMenuItem)
   }
 
   const editSubmenu = [{
-    label: locale.translation('undo'),
+    label: 'Undo',
     accelerator: 'CmdOrCtrl+Z',
     role: 'undo'
   }, {
-    label: locale.translation('redo'),
+    label: 'Redo',
     accelerator: 'Shift+CmdOrCtrl+Z',
     role: 'redo'
   },
     CommonMenu.separatorMenuItem,
     {
-      label: locale.translation('cut'),
+      label: 'Cut',
       accelerator: 'CmdOrCtrl+X',
       role: 'cut'
     }, {
-      label: locale.translation('copy'),
+      label: 'Copy',
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
     }, {
-      label: locale.translation('paste'),
+      label: 'Paste',
       accelerator: 'CmdOrCtrl+V',
       role: 'paste'
     }, {
-      label: locale.translation('pasteWithoutFormatting'),
+      label: 'Paste without formatting',
       accelerator: 'Shift+CmdOrCtrl+V',
       click: function (item, focusedWindow) {
         focusedWindow.webContents.pasteAndMatchStyle()
@@ -218,26 +214,26 @@ const init = (settingsState, args) => {
     },
     CommonMenu.separatorMenuItem,
     {
-      label: locale.translation('delete'),
+      label: 'Delete',
       accelerator: 'Delete',
       click: function (item, focusedWindow) {
         focusedWindow.webContents.delete()
       }
     }, {
-      label: locale.translation('selectAll'),
+      label: 'Select All',
       accelerator: 'CmdOrCtrl+A',
       role: 'selectall'
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.findOnPageMenuItem(),
+    CommonMenu.findOnPageMenuItem,
     {
       // TODO: hook up find next/prev shortcut. low-priority since this is
       // probably not used much.
-      label: locale.translation('findNext'),
+      label: 'Find Next',
       enabled: false,
       accelerator: 'CmdOrCtrl+G'
     }, {
-      label: locale.translation('findPrevious'),
+      label: 'Find Previous',
       enabled: false,
       accelerator: 'Shift+CmdOrCtrl+G'
     },
@@ -246,33 +242,33 @@ const init = (settingsState, args) => {
   ]
 
   if (!isDarwin) {
-    editSubmenu.push(CommonMenu.preferencesMenuItem())
+    editSubmenu.push(CommonMenu.preferencesMenuItem)
   }
 
   var template = [
     {
-      label: locale.translation('file'),
+      label: 'File',
       submenu: fileMenu
     }, {
-      label: locale.translation('edit'),
+      label: 'Edit',
       submenu: editSubmenu
     }, {
-      label: locale.translation('view'),
+      label: 'View',
       submenu: [
         {
-          label: locale.translation('actualSize'),
+          label: 'Actual Size',
           accelerator: 'CmdOrCtrl+0',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET])
           }
         }, {
-          label: locale.translation('zoomIn'),
+          label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN])
           }
         }, {
-          label: locale.translation('zoomOut'),
+          label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT])
@@ -280,7 +276,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('toolbars'),
+          label: 'Toolbars',
           enabled: false
           /*
           submenu: [
@@ -293,13 +289,13 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('reloadPage'),
+          label: 'Reload Page',
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
           }
         }, {
-          label: locale.translation('cleanReload'),
+          label: 'Clean Reload',
           accelerator: 'CmdOrCtrl+Shift+R',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
@@ -307,17 +303,17 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('readingView'),
+          label: 'Reading View',
           enabled: false,
           accelerator: 'Alt+CmdOrCtrl+R'
         }, {
-          label: locale.translation('tabManager'),
+          label: 'Tab Manager',
           enabled: false,
           accelerator: 'Alt+CmdOrCtrl+M'
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('textEncoding'),
+          label: 'Text Encoding',
           enabled: false
           /*
           submenu: [
@@ -332,13 +328,13 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('toggleDeveloperTools'),
+          label: 'Toggle Developer Tools',
           accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
           }
         }, {
-          label: locale.translation('toggleBrowserConsole'),
+          label: 'Toggle Browser Console',
           accelerator: 'CmdOrCtrl+Alt+J',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
@@ -348,7 +344,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('toggleFullScreenView'),
+          label: 'Toggle Full Screen View',
           accelerator: 'Shift+CmdOrCtrl+F',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
@@ -359,31 +355,30 @@ const init = (settingsState, args) => {
         }
       ]
     }, {
-      label: locale.translation('history'),
+      label: 'History',
       submenu: [
         {
-          label: locale.translation('home'),
+          label: 'Home',
           accelerator: 'CmdOrCtrl+Shift+H',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, getSetting(settings.HOMEPAGE)])
           }
         }, {
-          label: locale.translation('back'),
+          label: 'Back',
           accelerator: 'CmdOrCtrl+[',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
           }
         }, {
-          label: locale.translation('forward'),
+          label: 'Forward',
           accelerator: 'CmdOrCtrl+]',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
           }
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.reopenLastClosedTabItem(),
-        {
-          label: locale.translation('reopenLastClosedTab'),
+        CommonMenu.reopenLastClosedTabItem, {
+          label: 'Reopen Last Closed Window',
           accelerator: 'Alt+Shift+CmdOrCtrl+T',
           click: function () {
             process.emit(messages.UNDO_CLOSED_WINDOW)
@@ -391,13 +386,13 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('showAllHistory'),
+          label: 'Show All History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('clearHistory'),
+          label: 'Clear History',
           accelerator: 'Shift+CmdOrCtrl+Delete',
           enabled: siteUtil.hasNoTagSites(appStore.getState().get('sites')),
           click: function (item, focusedWindow) {
@@ -406,19 +401,19 @@ const init = (settingsState, args) => {
         }
       ]
     }, {
-      label: locale.translation('bookmarks'),
+      label: 'Bookmarks',
       submenu: [
         bookmarkPageMenuItem,
         {
-          label: locale.translation('addToFavoritesBar'),
+          label: 'Add to Favorites Bar',
           enabled: false,
           accelerator: 'Shift+CmdOrCtrl+D'
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.bookmarksMenuItem(),
+        CommonMenu.bookmarksMenuItem,
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.importBookmarksMenuItem()
+        CommonMenu.importBookmarksMenuItem
       ]
     },
     CommonMenu.buildBraveryMenu({
@@ -430,55 +425,54 @@ const init = (settingsState, args) => {
       safeBrowsing: Filtering.isResourceEnabled(safeBrowsing)
     }, init.bind(this, settingsState, {bookmarked: bookmarkPageMenuItem.checked})),
     {
-      label: locale.translation('window'),
+      label: 'Window',
       role: 'window',
       submenu: [
         {
-          label: locale.translation('minimize'),
+          label: 'Minimize',
           accelerator: 'CmdOrCtrl+M',
           role: 'minimize'
           // "Minimize all" added automatically
         }, {
-          label: locale.translation('zoom'),
+          label: 'Zoom',
           enabled: false
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('selectNextTab'),
+          label: 'Select Next Tab',
           accelerator: 'Ctrl+Tab',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEXT_TAB])
           }
         }, {
-          label: locale.translation('selectPreviousTab'),
+          label: 'Select Previous Tab',
           accelerator: 'Ctrl+Shift+Tab',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_PREV_TAB])
           }
         }, {
-          label: locale.translation('moveTabToNewWindow'),
+          label: 'Move Tab to New Window',
           enabled: false
         }, {
-          label: locale.translation('mergeAllWindows'),
+          label: 'Merge All Windows',
           enabled: false
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.bookmarksMenuItem(),
-        CommonMenu.downloadsMenuItem(),
-        CommonMenu.passwordsMenuItem(),
-        {
-          label: locale.translation('history'),
+        CommonMenu.bookmarksMenuItem,
+        CommonMenu.downloadsMenuItem,
+        CommonMenu.passwordsMenuItem, {
+          label: 'History',
           accelerator: 'CmdOrCtrl+Y',
           enabled: false
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('bringAllToFront'),
+          label: 'Bring All to Front',
           role: 'front'
         }
       ]
     }, {
-      label: locale.translation('help'),
+      label: 'Help',
       role: 'help',
       submenu: helpMenu
     }
@@ -488,15 +482,15 @@ const init = (settingsState, args) => {
     template.unshift({
       label: appConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
       submenu: [
-        CommonMenu.aboutBraveMenuItem(),
+        CommonMenu.aboutBraveMenuItem,
         CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem(),
+        CommonMenu.checkForUpdateMenuItem,
         CommonMenu.separatorMenuItem,
-        CommonMenu.preferencesMenuItem(),
-        CommonMenu.bookmarksMenuItem(),
+        CommonMenu.preferencesMenuItem,
+        CommonMenu.bookmarksMenuItem,
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('sendUsFeedback'),
+          label: 'Send us Feedback...',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow,
               [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
@@ -504,7 +498,7 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: locale.translation('services'),
+          label: 'Services',
           role: 'services'
         },
         CommonMenu.separatorMenuItem,
@@ -513,15 +507,15 @@ const init = (settingsState, args) => {
           accelerator: 'Command+H',
           role: 'hide'
         }, {
-          label: locale.translation('hideOthers'),
+          label: 'Hide Others',
           accelerator: 'Command+Alt+H',
           role: 'hideothers'
         }, {
-          label: locale.translation('showAll'),
+          label: 'Show All',
           role: 'unhide'
         },
         CommonMenu.separatorMenuItem,
-        CommonMenu.quitMenuItem()
+        CommonMenu.quitMenuItem
       ]
     })
   }
