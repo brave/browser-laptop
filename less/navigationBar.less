@@ -8,9 +8,6 @@
 
 @import "variables.less";
 
-/**
- * Layout
- */
 
 .navigatorWrapper {
   display: flex;
@@ -20,6 +17,8 @@
   padding: 0 70px;
   border-bottom: 1px solid #aaaaaa;
   height: 35px;
+
+  transition: padding @transitionDuration ease-in-out;
 
   @media (max-width: @breakpointNarrowViewport) {
     padding: 0;
