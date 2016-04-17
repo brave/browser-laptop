@@ -10,6 +10,7 @@ describe('urlbar', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.browserWindowUrl)
       .waitForVisible('#window')
       .waitForEnabled(urlInput)
   }

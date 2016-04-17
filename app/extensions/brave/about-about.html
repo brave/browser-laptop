@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="availableLanguages" content="en-US">
+    <meta name="defaultLanguage" content="en-US">
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <title data-l10n-id="aboutPages"></title>
+    <script>
+      window.addEventListener('load', function () {
+        var po = document.createElement('script'); po.async = true;
+        po.src = 'gen/aboutPages.entry.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })
+    </script>
+    <script src="ext/l20n.min.js" async></script>
+    <link rel="localization" href="locales/{locale}/app.l20n">
+  </head>
+  <body>
+    <div id="appContainer"/>
+  </body>
+</html>

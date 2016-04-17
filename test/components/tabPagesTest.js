@@ -10,6 +10,7 @@ describe('tab pages', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.browserWindowUrl)
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
@@ -64,9 +65,10 @@ describe('tab pages', function () {
 
     describe('tabs per page setting', function () {
       it('takes effect immediately', function *() {
+        const defaultTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE]
         yield this.app.client.changeSetting(settings.TABS_PER_TAB_PAGE, 1)
         yield this.app.client.waitUntil(function () {
-          return this.elements(tabPage).then((res) => res.value.length === 7)
+          return this.elements(tabPage).then((res) => res.value.length === (defaultTabsPerPage + 1))
         })
       })
     })

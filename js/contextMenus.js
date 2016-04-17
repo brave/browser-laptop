@@ -22,6 +22,8 @@ const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
+const getSetting = require('./settings').getSetting
+const settings = require('./constants/settings')
 
 /**
  * Obtains an add bookmark menu item
@@ -206,12 +208,10 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
         click: () => {
           appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
         }
-      })
+      }, CommonMenu.separatorMenuItem)
   }
 
-  template.push(
-    CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
     addFolderMenuItem(siteDetail, true))
   return template
 }
@@ -527,6 +527,15 @@ const copyLinkLocationMenuItem = (location) => {
   }
 }
 
+const copyEmailAddressMenuItem = (location) => {
+  return {
+    label: 'Copy Email Address',
+    click: () => {
+      clipboard.writeText(location.substring('mailto:'.length, location.length))
+    }
+  }
+}
+
 function mainTemplateInit (nodeProps, frame) {
   const template = []
   const nodeName = nodeProps.name
@@ -534,9 +543,14 @@ function mainTemplateInit (nodeProps, frame) {
   if (nodeProps.href) {
     template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       openInNewPrivateTabMenuItem(nodeProps.href),
-      openInNewSessionTabMenuItem(nodeProps.href),
-      copyLinkLocationMenuItem(nodeProps.href),
-      CommonMenu.separatorMenuItem)
+      openInNewSessionTabMenuItem(nodeProps.href))
+
+    if (nodeProps.href.toLowerCase().startsWith('mailto:')) {
+      template.push(copyEmailAddressMenuItem(nodeProps.href))
+    } else {
+      template.push(copyLinkLocationMenuItem(nodeProps.href))
+    }
+    template.push(CommonMenu.separatorMenuItem)
   }
 
   if (nodeName === 'IMG') {
@@ -578,17 +592,13 @@ function mainTemplateInit (nodeProps, frame) {
       label: 'Redo',
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
-    }, CommonMenu.separatorMenuItem, ...editableItems)
+    }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
     template.push({
       label: 'Copy',
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
-    })
-  }
-
-  if (template.length > 0) {
-    template.push(CommonMenu.separatorMenuItem)
+    }, CommonMenu.separatorMenuItem)
   }
 
   template.push({
@@ -616,8 +626,7 @@ function mainTemplateInit (nodeProps, frame) {
     }
   }, CommonMenu.separatorMenuItem)
 
-  template.push(CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
+  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
     {
       label: 'Add to reading list',
       enabled: false
@@ -635,6 +644,20 @@ function mainTemplateInit (nodeProps, frame) {
         windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
       }
     })
+
+  if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
+    template.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: '1Password',
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            ipc.send('chrome-browser-action-clicked-aomjjhallfgjeglblehebfpbcfeobpgk', '1Password')
+          }
+        }
+      })
+  }
+
   return template
 }
 

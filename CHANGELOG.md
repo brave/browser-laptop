@@ -1,11 +1,22 @@
 # Changelog
 
+## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+- Undo closed tab now focuses the webview.
+- Upgrade to React v15 for cleaner DOM and faster performance.
+- Fix for about: pages font size.
+- Fix for clicking on some JavaScript links not working.
+- Fix startup error relating to session storage and passwords saved from forms without actions.
+- Fix docusign.com login button not working.
+- Fix for Twitch.tv.
+- Fix for startup problem with default window size.
+
 ## [0.9.0](https://github.com/brave/browser-laptop/releases/v0.9.0dev)
 - 1Password support bundled.
 - Added malware and phishing protection with click through pages.
 - Some downloads bar and password saving fixes.
 - Windows installer now using SHA-256 digest and gets signed with a timestamp.
 - New look for the SSL cert warning pages.
+- Removed Brave from the User Agent HTTP header to reduce fingerprinting.
 - Windows shortcuts added F12 for developer tools and F11 for fullscreen.
 - Partial extensions support added internally for running some Chrome extensions unmodified.
 - Upgrade to Node 5.10.0.

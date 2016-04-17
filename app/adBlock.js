@@ -27,10 +27,16 @@ let mapFilterType = {
 const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
+    let firstPartyUrlHost = firstPartyUrl.hostname || ''
+    if (firstPartyUrlHost.startsWith('www.')) {
+      firstPartyUrlHost = firstPartyUrlHost.substring(4)
+    }
+    const urlHost = URL.parse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&
       (shouldCheckMainFrame || details.resourceType !== 'mainFrame') &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
+      urlHost !== firstPartyUrlHost &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
     return {
       cancel,

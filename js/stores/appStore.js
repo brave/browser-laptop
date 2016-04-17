@@ -115,7 +115,7 @@ const createWindow = (browserOpts, defaults) => {
     // Neither a frame nor a titlebar
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
-    titleBarStyle: 'hidden',
+    titleBarStyle: 'hidden-inset',
     autoHideMenuBar: true,
     title: appConfig.name,
     webPreferences: defaults.webPreferences
@@ -217,6 +217,9 @@ function windowDefaults () {
  * haven't been initialized yet
  */
 function setDefaultWindowSize () {
+  if (!appState) {
+    return
+  }
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
   if (!appState.get('defaultWindowWidth') && !appState.get('defaultWindowHeight')) {
@@ -273,8 +276,8 @@ const handleAppAction = (action) => {
       }
 
       const whitelistedUrl = process.env.NODE_ENV === 'development'
-        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/index-dev.html'
-        : 'file://' + path.resolve(__dirname, '..', '..') + '/app/index.html'
+        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index-dev.html'
+        : 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html'
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {

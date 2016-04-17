@@ -60,6 +60,13 @@ const updateTabPageIndex = (frameProps) => {
   windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], index)
 }
 
+const focusWebview = (frameStatePath) => {
+  windowState = windowState.mergeIn(frameStatePath, {
+    activeShortcut: 'focus-webview',
+    activeShortcutDetails: null
+  })
+}
+
 let currentKey = 0
 let currentPartitionNumber = 0
 const incrementNextKey = () => ++currentKey
@@ -228,10 +235,7 @@ const doAction = (action) => {
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
         if (activeFrame.get('location') !== 'about:newtab') {
-          windowState = windowState.mergeIn(activeFrameStatePath(), {
-            activeShortcut: 'focus-webview',
-            activeShortcutDetails: null
-          })
+          focusWebview(activeFrameStatePath())
         }
       }
       break
@@ -249,6 +253,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(FrameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
+      focusWebview(activeFrameStatePath())
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
       windowState = windowState.merge({

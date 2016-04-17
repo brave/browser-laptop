@@ -247,9 +247,13 @@ module.exports.loadAppState = () => {
       if (data.passwords.length > 0) {
         let newPasswords = []
         data.passwords.forEach((entry) => {
-          let a = urlParse(entry.action)
-          if (a.path !== a.pathname) {
-            entry.action = [a.protocol, a.host].join('//') + a.pathname
+          if (typeof entry.action === 'string') {
+            let a = urlParse(entry.action)
+            if (a.path !== a.pathname) {
+              entry.action = [a.protocol, a.host].join('//') + a.pathname
+            }
+          } else {
+            entry.action = ''
           }
           // Deduplicate
           for (let i = 0; i < newPasswords.length; i++) {

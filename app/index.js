@@ -1,3 +1,4 @@
+// @flow
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -35,6 +36,7 @@ const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
+const path = require('path')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -46,8 +48,8 @@ let sessionStateStoreCompleteOnQuit = false
 let beforeQuitSaveStarted = false
 let lastWindowState
 
-// URLs to accept bad certs for.
-let acceptCertUrls = {}
+// Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
+let acceptCertDomains = {}
 // URLs to callback for auth.
 let authCallbacks = {}
 // Don't show the keytar prompt more than once per 5 minutes
@@ -162,33 +164,10 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-  const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    let focusedFirst = false
-    BrowserWindow.getAllWindows().forEach((win) => {
-      if (win) {
-        if (win.isMinimized()) {
-          win.restore()
-        }
-        if (!focusedFirst) {
-          win.focus()
-          focusedFirst = true
-        }
-      }
-    })
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
-    }
-  })
-  if (appAlreadyStartedShouldQuit) {
-    app.exit(0)
-  }
-}
-
 app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
-    if (acceptCertUrls[url] === true) {
+    let host = urlParse(url).host
+    if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
       e.preventDefault()
       cb(true)
@@ -219,13 +198,6 @@ app.on('ready', () => {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       setTimeout(app.quit, 0)
-    }
-  })
-
-  app.on('activate', () => {
-    // (OS X) open a new window when the user clicks on the app icon if there aren't any open
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
     }
   })
 
@@ -327,14 +299,17 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
-      acceptCertUrls[url] = true
+      let host = urlParse(url).host
+      if (host) {
+        acceptCertDomains[host] = true
+      }
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
     })
 
     ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
       // If the host is associated with a URL with a cert error, update the
       // security state to insecure
-      if (Object.keys(acceptCertUrls).map((url) => { return urlParse(url).host }).includes(host)) {
+      if (acceptCertDomains[host]) {
         BrowserWindow.getFocusedWindow().webContents.send(messages.SET_SECURITY_STATE, frameKey, {
           secure: false
         })
@@ -348,6 +323,26 @@ app.on('ready', () => {
     AppStore.addChangeListener(() => {
       Menu.init(AppStore.getState().get('settings'))
       initiateSessionStateSave()
+    })
+
+    // TODO(bridiver) - load everything in the extensions directory
+    // mnojpmjdmbbfmejpflffifhffcmidifd
+    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      process.emit('load-extension', 'brave', path.join(__dirname, '..', '..', 'extensions'), 'component')
+      process.emit('load-extension', '1password', path.join(__dirname, '..', '..', 'extensions'))
+    } else {
+      process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'), 'component')
+      process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
+    }
+
+    process.on('did-extension-load-error', function (name, error_message) {
+      console.error('Error loading extension ' + name + ':', error_message)
+    })
+    process.on('did-extension-load', function (name) {
+      console.log('extension ' + name + ' loaded')
+    })
+    process.on('chrome-browser-action-registered', function (channel, actionTitle) {
+      // TODO - update the menu and shortcuts
     })
 
     Filtering.init()

@@ -41,7 +41,7 @@ module.exports = {
   },
   httpsEverywhere: {
     url: 'https://s3.amazonaws.com/https-everywhere-data/{version}/httpse.json',
-    version: '5.1.3', // latest stable release from https://eff.org/https-everywhere
+    version: '5.1.6', // latest stable release from https://eff.org/https-everywhere
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
@@ -69,11 +69,11 @@ module.exports = {
   defaultSettings: {
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
-    'general.useragent.value': undefined, // Set at runtime
-    'search.default-search-engine': './content/search/google.xml',
+    'general.useragent.value': null, // Set at runtime
+    'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
-    'tabs.tabs-per-tab-page': 6,
+    'tabs.tabs-per-tab-page': 10,
     'tabs.show-tab-previews': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
@@ -81,6 +81,7 @@ module.exports = {
     'privacy.autocomplete.history-size': 500,
     'bookmarks.toolbar.show': false,
     'privacy.do-not-track': false,
-    'security.passwords.manager-enabled': true
+    'security.passwords.manager-enabled': true,
+    'security.passwords.one-password-enabled': false
   }
 }

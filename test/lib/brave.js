@@ -32,6 +32,9 @@ var exports = {
     SHIFT: '\ue008'
   },
 
+  browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
+  newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
+
   beforeAllServerSetup: function (context) {
     context.beforeAll(function (done) {
       Server.create(`${__dirname}/../fixtures/`, (err, _server) => {
@@ -98,10 +101,37 @@ var exports = {
       }, message, ...param).then((response) => response.value)
     })
 
+    var windowHandlesOrig = this.app.client.windowHandles
+    Object.getPrototypeOf(this.app.client).windowHandles = function () {
+      return windowHandlesOrig.apply(this)
+        .then(function (response) {
+          var handles = response.value
+          return promiseMapSeries(handles, (handle) => {
+            return this.window(handle).getUrl()
+          }).then((urls) => {
+            var newHandles = []
+            for (var i = 0; i < urls.length; i++) {
+              // ignore extension urls unless they are "about" pages
+              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/))) {
+                newHandles.push(handles[i])
+              }
+            }
+            response.value = newHandles
+            return response
+          })
+        })
+    }
+
+    this.app.client.addCommand('waitForUrl', function (url) {
+      return this.waitUntil(function () {
+        return this.windowByUrl(url).then((response) => response, () => false)
+      })
+    })
+
     this.app.client.addCommand('loadUrl', function (url) {
       return this.execute(function (url) {
         var Immutable = require('immutable')
-        var windowActions = require('../js/actions/windowActions')
+        var windowActions = require('../../../js/actions/windowActions')
         windowActions.dispatchViaIPC()
         windowActions.loadUrl(Immutable.fromJS({
           isPinned: false
@@ -112,7 +142,7 @@ var exports = {
     this.app.client.addCommand('showFindbar', function () {
       return this.execute(function () {
         var Immutable = require('immutable')
-        var windowActions = require('../js/actions/windowActions')
+        var windowActions = require('../../../js/actions/windowActions')
         windowActions.dispatchViaIPC()
         windowActions.setFindbarShown(Immutable.fromJS({
           key: 1
@@ -123,7 +153,7 @@ var exports = {
     this.app.client.addCommand('setPinned', function (location, isPinned) {
       return this.execute(function (location, isPinned) {
         var Immutable = require('immutable')
-        var windowActions = require('../js/actions/windowActions')
+        var windowActions = require('../../../js/actions/windowActions')
         windowActions.dispatchViaIPC()
         windowActions.setPinned(Immutable.fromJS({
           location
@@ -139,7 +169,7 @@ var exports = {
 
     this.app.client.addCommand('newWindowAction', function (frameOpts, browserOpts) {
       return this.execute(function () {
-        return require('../js/actions/appActions').newWindow()
+        return require('../../../js/actions/appActions').newWindow()
       }, frameOpts, browserOpts).then((response) => response.value)
     })
 
@@ -151,7 +181,7 @@ var exports = {
      */
     this.app.client.addCommand('addSite', function (siteDetail, tag) {
       return this.execute(function (siteDetail, tag) {
-        return require('../js/actions/appActions').addSite(siteDetail, tag)
+        return require('../../../js/actions/appActions').addSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
     })
 
@@ -163,7 +193,7 @@ var exports = {
      */
     this.app.client.addCommand('removeSite', function (siteDetail, tag) {
       return this.execute(function (siteDetail, tag) {
-        return require('../js/actions/appActions').removeSite(siteDetail, tag)
+        return require('../../../js/actions/appActions').removeSite(siteDetail, tag)
       }, siteDetail, tag).then((response) => response.value)
     })
 
@@ -175,7 +205,7 @@ var exports = {
      */
     this.app.client.addCommand('changeSetting', function (key, value) {
       return this.execute(function (key, value) {
-        return require('../js/actions/appActions').changeSetting(key, value)
+        return require('../../../js/actions/appActions').changeSetting(key, value)
       }, key, value).then((response) => response.value)
     })
 
@@ -236,14 +266,14 @@ var exports = {
       return this.windowHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
           return context.window(handle).getUrl()
+        }).then(function (response) {
+          let index = response.indexOf(url)
+          if (index !== -1) {
+            return context.window(handles[index])
+          } else {
+            return undefined
+          }
         })
-      }).then(function (response) {
-        let index = response.indexOf(url)
-        if (index !== -1) {
-          return context.windowByIndex(index)
-        } else {
-          return undefined
-        }
       })
     })
 
@@ -272,6 +302,8 @@ var exports = {
             })
         })
     })
+
+    this.app.client.waitUntilWindowLoaded().windowByUrl(exports.browserWindowUrl)
   },
 
   startApp: function (cleanSessionStore = true) {

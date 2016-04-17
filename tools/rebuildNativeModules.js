@@ -18,6 +18,8 @@ var cmds = [
   'cd ../../node_modules/tracking-protection',
   rebuildCmd,
   'cd ../../node_modules/keytar',
+  rebuildCmd,
+  'cd ../../node_modules/lru_cache',
   rebuildCmd
 ]
 

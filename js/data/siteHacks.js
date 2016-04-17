@@ -1,3 +1,5 @@
+const urlParse = require('url').parse
+
 module.exports = {
   'forbes.com': {
     onBeforeSendHeaders: function(details) {
@@ -45,5 +47,16 @@ module.exports = {
       }).css('border', 0)
     );
     $('.player-overlay, .player-loading').hide();`
+  },
+  'www.googletagmanager.com': {
+     onBeforeRequest: function(details) {
+      if (urlParse(details.url).pathname !== '/gtm.js') {
+        return
+      }
+      return {
+        // Block / polyfill similar to this: https://github.com/gorhill/uBlock/blob/de1ed89f62bf041416d2a721ec00741667bf3fa8/assets/ublock/resources.txt#L385
+        redirectURL: 'data:application/javascript,(function() { var noopfn = function() { ; }; window.ga = window.ga || noopfn; })();'
+      }
+    }
   }
 }

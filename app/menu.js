@@ -39,7 +39,7 @@ let lastSettingsState, lastArgs
  *   bookmarked
  */
 const init = (settingsState, args) => {
-  // Check for uneeded updates.
+  // Check for unneeded updates.
   // Updating the menu when it is not needed causes the menu to close if expanded
   // and also causes menu clicks to not work.  So we don't want to update it a lot
   // when app state changes, like when there are downloads.

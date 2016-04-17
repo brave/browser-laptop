@@ -6,11 +6,12 @@ const siteTags = require('../../js/constants/siteTags')
 
 describe('sessionStore', function () {
   function * setup (client) {
+    Brave.addCommands()
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.browserWindowUrl)
       .waitForVisible('#window')
       .waitForVisible(urlInput)
-    Brave.addCommands()
   }
 
   describe('state is preserved', function () {
@@ -21,7 +22,8 @@ describe('sessionStore', function () {
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client.loadUrl(page1Url)
-      yield Brave.app.client.waitForExist(navigatorNotBookmarked)
+        .moveToObject(navigator)
+        .waitForExist(navigatorNotBookmarked)
       yield Brave.app.client.addSite({
         location: page1Url,
         title: 'some page'

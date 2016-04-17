@@ -13,7 +13,6 @@ const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
-const path = require('path')
 const contextMenus = require('../contextMenus')
 const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
@@ -38,26 +37,12 @@ class Frame extends ImmutableComponent {
     let location = this.props.frame.get('location')
     const hack = siteHacks[urlParse(location).hostname]
     const allowRunningInsecureContent = !!(hack && hack.allowRunningInsecureContent)
-    let appRoot = window.baseHref
-      ? 'file://' + path.resolve(__dirname, '..', '..', 'app') + '/'
-      : ''
-
-    let contentScripts = [appRoot + 'content/scripts/webviewPreload.js']
-    let aboutPreload = false
-    if (['about:preferences', 'about:bookmarks', 'about:downloads', 'about:certerror', 'about:safebrowsing', 'about:passwords'].includes(location)) {
-      contentScripts.push(appRoot + 'content/scripts/aboutPreload.js')
-      aboutPreload = true
-    }
-
-    contentScripts = contentScripts.join(',')
-    const contentScriptsChanged =
-      this.webview && contentScripts !== this.webview.getAttribute('contentScripts')
 
     // Create the webview dynamically because React doesn't whitelist all
-    // of the attributes we need.  Clear out old webviews if the contentScripts change or if
+    // of the attributes we need.  Clear out old webviews if
     // allowRunningInsecureContent changes because they cannot change after being added to the DOM.
     let webviewAdded = false
-    if (!this.webview || this.webview.allowRunningInsecureContent !== allowRunningInsecureContent || contentScriptsChanged) {
+    if (!this.webview || this.webview.allowRunningInsecureContent !== allowRunningInsecureContent) {
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
@@ -67,17 +52,8 @@ class Frame extends ImmutableComponent {
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    this.webview.setAttribute('contentScripts', contentScripts)
     this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
-    // Don't allow dropping on webviews with aboutPreload since they navigate within the same process
-    // automatically while keeping the content script loaded.
-    if (aboutPreload) {
-      this.webviewContainer.addEventListener('drop', (e) => {
-        if (e.dataTransfer.getData('text/uri-list')) {
-          e.preventDefault()
-        }
-      })
-    }
+
     let partition
     if (this.props.frame.get('isPrivate')) {
       partition = 'private-1'
@@ -234,7 +210,7 @@ class Frame extends ImmutableComponent {
   addEventListeners () {
     this.webview.addEventListener('focus', this.onFocus.bind(this))
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
-    this.webview.addEventListener('new-window', (e, url, frameName, disposition, options) => {
+    this.webview.addEventListener('new-window', (e) => {
       e.preventDefault()
 
       let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
@@ -260,6 +236,9 @@ class Frame extends ImmutableComponent {
           e.disposition !== 'background-tab'
         windowActions.newFrame(frameOpts, openInForeground)
       }
+    })
+    this.webview.addEventListener('dom-ready', (e) => {
+      this.webview.setActive(this.props.isActive)
     })
     this.webview.addEventListener('destroyed', (e) => {
       this.props.onCloseFrame(this.props.frame)
@@ -309,8 +288,6 @@ class Frame extends ImmutableComponent {
 
     const loadStart = (event) => {
       if (event.isMainFrame && !event.isErrorPage && !event.isFrameSrcDoc) {
-        // Temporary workaround for https://github.com/brave/browser-laptop/issues/787
-        this.webview.insertCSS('input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }')
         // TODO: These 3 events should be combined into one
         windowActions.onWebviewLoadStart(
           this.props.frame)
@@ -459,6 +436,7 @@ class Frame extends ImmutableComponent {
     windowActions.setTabPageIndexByFrame(this.props.frame)
     windowActions.setUrlBarActive(false)
     windowActions.setContextMenuDetail()
+    this.webview.setActive(this.props.isActive)
   }
 
   onFindHide () {

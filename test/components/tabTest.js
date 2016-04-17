@@ -9,6 +9,7 @@ describe('tabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.browserWindowUrl)
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
@@ -72,27 +73,36 @@ describe('tabs', function () {
     })
     it('should close the tab', function * () {
       yield this.app.client
+        .waitForUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
-          return this.getWindowCount().then((count) => count === windowCountBeforeTabClose)
+          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountBeforeTabClose)
         })
+      yield this.app.client
+        .waitForUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.getWindowCount().then((count) => count === windowCountAfterTabClose)
+          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountAfterTabClose)
         })
     })
     it('should undo last closed tab', function * () {
       yield this.app.client
+        .waitForUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
-        .waitForExist('.tab[data-frame-key="3"]')
+        .waitUntil(function () {
+          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountBeforeTabClose)
+        })
+      yield this.app.client
+        .waitForUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.getWindowCount().then((count) => count === windowCountAfterTabClose)
+          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountAfterTabClose)
         })
+      yield this.app.client
+        .waitForUrl(Brave.browserWindowUrl)
         .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
-        .waitForExist('.tab[data-frame-key="3"]')
         .waitUntil(function () {
-          return this.getWindowCount().then((count) => count === windowCountBeforeTabClose)
+          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountBeforeTabClose)
         })
     })
   })
