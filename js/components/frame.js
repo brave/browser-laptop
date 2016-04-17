@@ -305,6 +305,9 @@ class Frame extends ImmutableComponent {
           ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frame.get('key'))
         }
       }
+      if (getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)) {
+        this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
+      }
       windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),

@@ -67,6 +67,8 @@ const messages = {
   LEAVE_FULL_SCREEN: _,
   SET_CLIPBOARD: _,
   AUTOFILL_PASSWORD: _,
+  BLOCK_CANVAS_FINGERPRINTING: _,
+  GOT_CANVAS_FINGERPRINTING: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */

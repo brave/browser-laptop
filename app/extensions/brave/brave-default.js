@@ -763,4 +763,225 @@ if (typeof KeyEvent === 'undefined') {
   ipcRenderer.on('post-page-load-run', function () {
     ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
   })
+
+  /** Begin canvas fingerprinting detection **/
+  /**
+   * @return {string}
+   */
+  function getPageScript () {
+    return '(' + Function.prototype.toString.call(function (ERROR) {
+      ERROR.stackTraceLimit = Infinity // collect all frames
+      var event_id = document.currentScript ? document.currentScript.getAttribute('data-event-id') : ''
+
+      // from Underscore v1.6.0
+      function debounce (func, wait, immediate) {
+        var timeout, args, context, timestamp, result
+
+        var later = function () {
+          var last = Date.now() - timestamp
+          if (last < wait) {
+            timeout = setTimeout(later, wait - last)
+          } else {
+            timeout = null
+            if (!immediate) {
+              result = func.apply(context, args)
+              context = args = null
+            }
+          }
+        }
+
+        return function () {
+          context = this
+          args = arguments
+          timestamp = Date.now()
+          var callNow = immediate && !timeout
+          if (!timeout) {
+            timeout = setTimeout(later, wait)
+          }
+          if (callNow) {
+            result = func.apply(context, args)
+            context = args = null
+          }
+          return result
+        }
+      }
+
+      // messages the injected script
+      var send = (function () {
+        var messages = []
+        // debounce sending queued messages
+        var _send = debounce(function () {
+          document.dispatchEvent(new window.CustomEvent(event_id, {
+            detail: messages
+          }))
+          // clear the queue
+          messages = []
+        }, 100)
+        return function (msg) {
+          // queue the message
+          messages.push(msg)
+          _send()
+        }
+      }())
+
+      // https://code.google.com/p/v8-wiki/wiki/JavaScriptStackTraceApi
+      /**
+       * Customize the stack trace
+       * @param structured If true, change to customized version
+       * @returns {*} Returns the stack trace
+       */
+      function getStackTrace (structured) {
+        var errObj = {}
+        var origFormatter
+        var stack
+
+        if (structured) {
+          origFormatter = ERROR.prepareStackTrace
+          ERROR.prepareStackTrace = function (errObj, structuredStackTrace) {
+            return structuredStackTrace
+          }
+        }
+
+        ERROR.captureStackTrace(errObj, getStackTrace)
+        stack = errObj.stack
+
+        if (structured) {
+          ERROR.prepareStackTrace = origFormatter
+        }
+
+        return stack
+      }
+
+      /**
+       * Checks the stack trace for the originating URL
+       * @returns {String} The URL of the originating script (URL:Line number:Column number)
+       */
+      function getOriginatingScriptUrl () {
+        var trace = getStackTrace(true)
+
+        if (trace.length < 2) {
+          return ''
+        }
+
+        // this script is at 0 and 1
+        var callSite = trace[2]
+
+        if (callSite.isEval()) {
+          // argh, getEvalOrigin returns a string ...
+          var eval_origin = callSite.getEvalOrigin()
+          var script_url_matches = eval_origin.match(/\((http.*:\d+:\d+)/)
+
+          return script_url_matches && script_url_matches[1] || eval_origin
+        } else {
+          return callSite.getFileName() + ':' + callSite.getLineNumber() + ':' + callSite.getColumnNumber()
+        }
+      }
+
+      /**
+       *  Strip away the line and column number (from stack trace urls)
+       * @param script_url The stack trace url to strip
+       * @returns {String} the pure URL
+       */
+      function stripLineAndColumnNumbers (script_url) {
+        return script_url.replace(/:\d+:\d+$/, '')
+      }
+
+      /**
+       * Monitor the reads from a canvas instance
+       * @param item special item objects
+       */
+      function trapInstanceMethod (item) {
+        item.obj[item.propName] = (function (orig) {
+          return function () {
+            var script_url = getOriginatingScriptUrl()
+            var msg = {
+              obj: item.objName,
+              prop: item.propName,
+              scriptUrl: stripLineAndColumnNumbers(script_url)
+            }
+
+            // Block the read from occuring; send info to background page instead
+            console.log('blocking canvas read', msg)
+            send(msg)
+          }
+        }(item.obj[item.propName]))
+      }
+
+      var methods = []
+      var canvasMethods = ['getImageData', 'getLineDash', 'measureText']
+      canvasMethods.forEach(function (method) {
+        var item = {
+          objName: 'CanvasRenderingContext2D.prototype',
+          propName: method,
+          obj: window.CanvasRenderingContext2D.prototype
+        }
+
+        methods.push(item)
+      })
+
+      var canvasElementMethods = ['toDataURL', 'toBlob']
+      canvasElementMethods.forEach(function (method) {
+        var item = {
+          objName: 'HTMLCanvasElement.prototype',
+          propName: method,
+          obj: window.HTMLCanvasElement.prototype
+        }
+        methods.push(item)
+      })
+
+      var webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
+        'getShaderPrecisionFormat', 'getExtension']
+      webglMethods.forEach(function (method) {
+        var item = {
+          objName: 'WebGLRenderingContext.prototype',
+          propName: method,
+          obj: window.WebGLRenderingContext.prototype
+        }
+        methods.push(item)
+      })
+
+      methods.forEach(trapInstanceMethod)
+
+    // save locally to keep from getting overwritten by site code
+    }) + '(Error));'
+  }
+
+  /**
+   * Executes a script in the page DOM context
+   *
+   * @param text The content of the script to insert
+   * @param data attributes to set in the inserted script tag
+   */
+  function insertScript (text, data) {
+    var parent = document.documentElement
+    var script = document.createElement('script')
+
+    script.text = text
+    script.async = false
+
+    for (var key in data) {
+      script.setAttribute('data-' + key.replace('_', '-'), data[key])
+    }
+
+    parent.insertBefore(script, parent.firstChild)
+    parent.removeChild(script)
+  }
+
+  ipcRenderer.on('block-canvas-fingerprinting', function () {
+    var event_id = Math.random().toString()
+
+    // listen for messages from the script we are about to insert
+    document.addEventListener(event_id, function (e) {
+      if (!e.detail) {
+        return
+      }
+      // pass these on to the background page
+      ipcRenderer.send('got-canvas-fingerprinting', e.detail)
+    })
+
+    insertScript(getPageScript(), {
+      event_id: event_id
+    })
+  })
+  /* End canvas fingerprinting detection */
 }).apply(this)

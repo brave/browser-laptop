@@ -96,6 +96,7 @@ AppStore
     'privacy.history-suggestions': boolean, // Auto suggest for history enabled
     'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
     'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
+    'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
     'security.passwords.manager-enabled': boolean // whether to use default password manager
   }]
 }
