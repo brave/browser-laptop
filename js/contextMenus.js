@@ -603,7 +603,7 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   template.push({
-    label: locale.translation('Back'),
+    label: locale.translation('back'),
     enabled: frame.get('canGoBack'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
@@ -611,7 +611,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     }
   }, {
-    label: locale.translation('Forward'),
+    label: locale.translation('forward'),
     enabled: frame.get('canGoForward'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
