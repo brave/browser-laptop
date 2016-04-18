@@ -92,6 +92,15 @@ app.on('will-finish-launching', () => {
       module.exports.newWindowURL = path
     }
   })
+
+  // User clicked on a file or dragged a file to the dock on OS X
+  app.on('open-file', (event, path) => {
+    event.preventDefault()
+
+    if (!focusOrOpenWindow(path)) {
+      module.exports.newWindowURL = path
+    }
+  })
 })
 
 process.on(messages.APP_INITIALIZED, () => { appInitialized = true })
