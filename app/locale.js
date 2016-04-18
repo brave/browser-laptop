@@ -9,7 +9,7 @@ const path = require('path')
 const ipcMain = require('electron').ipcMain
 
 // Exhaustive list of identifiers used by top and context menus
-var menuIdentifiers = () => {
+var menuIdentifiers = function () {
   return [
     'downloadsManager',
     'confirmClearPasswords',
@@ -128,21 +128,21 @@ var lang = 'en-US'
 
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
-exports.translation = (token) => {
+exports.translation = function (token) {
   if (translations[token]) {
     return translations[token]
   } else {
     // This will return an identifier in upper case enclosed in square brackets
     // Useful for determining if a translation was not requested in the menu
     // identifiers above.
-    return `[${token.toUpperCase()}]`
+    return '[' + token.toUpperCase() + ']'
   }
 }
 
 // Initialize translations for a language providing an optional
 // callback executed after the translation caching process
 // is complete.
-exports.init = (language, cb) => {
+exports.init = function (language, cb) {
   // Default to noop callback
   cb = cb || function () {}
 
@@ -170,9 +170,9 @@ exports.init = (language, cb) => {
 
   // Translate the menu identifiers
   var identifiers = menuIdentifiers()
-  ctx.formatValues.apply(ctx, identifiers).then((values) => {
+  ctx.formatValues.apply(ctx, identifiers).then(function (values) {
     // Cache the translations for later retrieval
-    values.forEach((value, idx) => {
+    values.forEach(function (value, idx) {
       translations[identifiers[idx]] = value
     })
     // Signal when complete
@@ -183,7 +183,7 @@ exports.init = (language, cb) => {
 // If this is in the main process
 if (ipcMain) {
   // Respond to requests for translations from the renderer process
-  ipcMain.on('translations', (event, arg) => {
+  ipcMain.on('translations', function (event, arg) {
     // Return the entire set of translations synchronously
     event.returnValue = translations
   })
