@@ -20,7 +20,7 @@ const getBraveDefaultsBinPath = () => {
 if (process.platform === 'win32') {
   const shouldQuit = require('electron-squirrel-startup')
 
-  const cmd = process.argv[1];
+  const cmd = process.argv[1]
   if (cmd === '--squirrel-install' || cmd === '--squirrel-updated') {
     // Launch defaults helper to add defaults on install
     spawn(getBraveDefaultsBinPath(), [], { detached: true })
