@@ -33,10 +33,10 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
     }
     const urlHost = URL.parse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&
-      (shouldCheckMainFrame || details.resourceType !== 'mainFrame') &&
+      (shouldCheckMainFrame || (details.resourceType !== 'mainFrame' &&
+                                urlHost !== firstPartyUrlHost)) &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
-      urlHost !== firstPartyUrlHost &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
     return {
       cancel,
