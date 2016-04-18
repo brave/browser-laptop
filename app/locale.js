@@ -144,15 +144,20 @@ exports.translation = function (token) {
 // Default language locale identifier
 const DEFAULT_LANGUAGE = 'en-US'
 
+const availableLanguages = [
+  'en-US',
+  'pr-BR',
+  'nl-NL'
+]
+
 // Currently configured languages - TODO (make this dynamic)
-const configuredLanguages = {
-  'en-US': true,
-  'pt-BR': true,
-  'nl-NL': true
-}
+const configuredLanguages = {}
+availableLanguages.forEach(function (lang) {
+  configuredLanguages[lang] = true
+})
 
 // Return the default locale in xx-XX format I.e. pt-BR
-const defaultLocale = () => {
+const defaultLocale = function () {
   // If electron has the locale
   if (app.getLocale()) {
     // Retrieve the language and convert _ to -
@@ -183,11 +188,9 @@ exports.init = function (language, cb) {
   lang = language || defaultLocale()
 
   // Languages to support - TODO retrieve this dynamically
-  const langs = [
-    { code: 'en-US' },
-    { code: 'nl-NL' },
-    { code: 'pt-BR' }
-  ]
+  const langs = availableLanguages.map(function (lang) {
+    return { code: lang }
+  })
 
   // Property files to parse (only ones containing menu specific identifiers)
   const propertyFiles = [
