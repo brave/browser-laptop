@@ -282,7 +282,7 @@ function updateDownloadState (downloadId, item, state) {
     startTime: downloadItemStartTime || new Date().getTime(),
     savePath: item.getSavePath(),
     url: item.getURL(),
-    filename: item.getFilename(),
+    filename: item.getSavePath() && path.basename(item.getSavePath()) || item.getFilename(),
     totalBytes: item.getTotalBytes(),
     receivedBytes: item.getReceivedBytes(),
     state
