@@ -7,6 +7,8 @@
 const L20n = require('l20n')
 const path = require('path')
 const ipcMain = require('electron').ipcMain
+const electron = require('electron')
+const app = electron.app
 
 // Exhaustive list of identifiers used by top and context menus
 var menuIdentifiers = function () {
@@ -139,6 +141,37 @@ exports.translation = function (token) {
   }
 }
 
+// Default language locale identifier
+const DEFAULT_LANGUAGE = 'en-US'
+
+// Currently configured languages - TODO (make this dynamic)
+const configuredLanguages = {
+  'en-US': true,
+  'pt-BR': true,
+  'nl-NL': true
+}
+
+// Return the default locale in xx-XX format I.e. pt-BR
+const defaultLocale = () => {
+  // If electron has the locale
+  if (app.getLocale()) {
+    // Retrieve the language and convert _ to -
+    var lang = app.getLocale().replace('_', '-')
+    // If there is no country code designated use the language code
+    if (!lang.match(/-/)) {
+      lang = lang + '-' + lang.toUpperCase()
+    }
+    // If we have the language configured
+    if (configuredLanguages[lang]) {
+      return lang
+    } else {
+      return DEFAULT_LANGUAGE
+    }
+  } else {
+    return DEFAULT_LANGUAGE
+  }
+}
+
 // Initialize translations for a language providing an optional
 // callback executed after the translation caching process
 // is complete.
@@ -147,14 +180,13 @@ exports.init = function (language, cb) {
   cb = cb || function () {}
 
   // Currently selected language identifier I.e. 'en-US'
-  lang = language
+  lang = language || defaultLocale()
 
   // Languages to support - TODO retrieve this dynamically
   const langs = [
     { code: 'en-US' },
     { code: 'nl-NL' },
-    { code: 'pt-BR' },
-    { code: 'bn-BD' }
+    { code: 'pt-BR' }
   ]
 
   // Property files to parse (only ones containing menu specific identifiers)

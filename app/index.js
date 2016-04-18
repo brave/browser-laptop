@@ -257,8 +257,9 @@ app.on('ready', () => {
 
   loadAppStatePromise.then((initialState) => {
     // Initiate the translation for a configured language and
-    // reset the browser window
-    locale.init(initialState.settings[settings.LANGUAGE || 'en-US'], (strings) => {
+    // reset the browser window. This will default to en-US if
+    // not yet configured.
+    locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
       Menu.init(AppStore.getState().get('settings'), {})
     })
 
