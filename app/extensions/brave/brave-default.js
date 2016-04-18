@@ -460,6 +460,9 @@ if (typeof KeyEvent === 'undefined') {
       }
     }
 
+    // Last resort: find the first text input in the form
+    username = username || form.querySelector('input[type=text i]')
+
     // If not a submission, autofill the first password field and ignore the rest
     if (!isSubmission || passwords.length === 1) {
       return [username instanceof HTMLInputElement ? username : null, passwords[0], null]
