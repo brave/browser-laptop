@@ -383,7 +383,7 @@ if (typeof KeyEvent === 'undefined') {
       return false
     }
 
-    if (document.querySelectorAll('input[type=password]:not([autocomplete=off i])').length === 0) {
+    if (document.querySelectorAll('input[type=password]').length === 0) {
       // No password fields; abort
       return false
     }
@@ -392,7 +392,7 @@ if (typeof KeyEvent === 'undefined') {
     var credentials = {}
 
     var formOrigin = [document.location.protocol, document.location.host].join('//')
-    var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
+    var formNodes = document.querySelectorAll('form')
 
     Array.from(formNodes).forEach((form) => {
       tryAutofillForm(credentials, formOrigin, form)
@@ -451,7 +451,7 @@ if (typeof KeyEvent === 'undefined') {
       let previousSibling = passwords[0].previousSibling
       while (previousSibling) {
         if ((previousSibling instanceof HTMLElement)) {
-          if (previousSibling.getAttribute('type') === 'text' && previousSibling.getAttribute('autocomplete') !== 'off') {
+          if (previousSibling.getAttribute('type') === 'text') {
             username = previousSibling
             break
           }
@@ -519,7 +519,7 @@ if (typeof KeyEvent === 'undefined') {
         return [currentPassword, newPassword]
       }
     }
-    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
+    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]'))
     if (isSubmission) {
       // Skip empty fields
       passwordNodes = passwordNodes.filter((e) => { return (e instanceof HTMLInputElement && e.value) })
