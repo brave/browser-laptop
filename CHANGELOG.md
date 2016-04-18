@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+- Added the ability to set Brave as the default browser within Control Panel on Windows.
+- Added 32-bit Windows support.
+- Added ability to block HTML canvas and WebGL fingerprinting which can be enabled in preferences.
+- Multi language support.  Initially this includes: en-US, nl-NL, and pt-Br.
+
 ## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
 - Undo closed tab now focuses the webview.
 - Upgrade to React v15 for cleaner DOM and faster performance.
