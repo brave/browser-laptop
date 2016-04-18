@@ -1,8 +1,8 @@
 {
   "osx": {
     "title": "Brave",
-    "background": "res/background.png",
-    "icon": "res/brave_installer.icns",
+    "background": "background.png",
+    "icon": "brave_installer.icns",
     "icon-size": 80,
     "contents": [
       { "x": 438, "y": 344, "type": "link", "path": "/Applications" },
