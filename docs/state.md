@@ -19,14 +19,15 @@ AppStore
     parentFolderId: number // Set for bookmarks and bookmark folders only
   }],
   downloads: [{
-    downloadId: string,
-    startTime: number, // datetime.getTime()
-    filename: string,
-    savePath: string,
-    url: string,
-    totalBytes: Number,
-    receivedBytes: Number,
-    state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
+    [downloadId]: {
+      startTime: number, // datetime.getTime()
+      filename: string,
+      savePath: string,
+      url: string,
+      totalBytes: Number,
+      receivedBytes: Number,
+      state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
+    }
   }],
   visits: [{
     location: string,
@@ -183,7 +184,7 @@ WindowStore
         suggestions: {
           selectedIndex: number, // index of the item in focus
           searchResults: array,
-          suggestionList: object,
+          suggestionList: Object,
         },
         focused: boolean, // whether the urlbar is focused
         active: boolean, // whether the user is typing in the urlbar
@@ -224,8 +225,8 @@ WindowStore
     autocompleteURL: string, // ditto re: {searchTerms}
   },
   bookmarkDetail: {
-    currentDetail: object, // Detail of the current bookmark which is in add/edit mode
-    originalDetails: object // Detail of the original bookmark to edit
+    currentDetail: Object, // Detail of the current bookmark which is in add/edit mode
+    originalDetails: Object // Detail of the original bookmark to edit
   },
   contextMenuDetail: {
     left: number, // the left position of the context menu
