@@ -8,26 +8,127 @@
 
 @import "variables.less";
 
+// On MacOS we need to keep a padding left to avoid overlapping
+// with the window buttons to close/maximize/minimize the window.
+.platform--darwin .navigatorWrapper .backforward {
+  margin-left: 70px;
+}
 
+
+// Here I grouped the rules to keep the layout of the top bar consistent.
+// The tricky part is to keep the title in `#navigator` centered when the
+// box on its left has different size than the one on the right.
+// This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
+  @buttonSpacing: 4px;
+  @buttonWidth: 35px;
+  @braveButtonWidth: 23px;
+  @margin: 70px;
+
+  // Since we want to keep the navigator centered, we need to calculate the
+  // difference between the width of the left box and the width of the right box.
+  @centerOffset: @margin + 2 * (@buttonWidth + @buttonSpacing) // width area on the left
+                 - (@braveButtonWidth + 2 * @buttonSpacing);
+
   display: flex;
-  justify-content: space-between;
-  -webkit-app-region: drag;
-  align-items: center;
-  padding: 0 0 0 70px;
-  border-bottom: 1px solid #aaaaaa;
-  height: 35px;
 
-  transition: padding @transitionDuration ease-in-out;
+  // Buttons on the left
+  .backforward {
+    display: flex;
+    margin-left: @margin;
 
-  @media (max-width: @breakpointNarrowViewport) {
-    padding: 0;
+    .back,
+    .forward {
+      width: @buttonWidth;
+    }
+
+    .back {
+      padding-right: @buttonSpacing;
+    }
+
+    .forward {
+      padding-left: @buttonSpacing;
+    }
+
+  }
+
+  // Navigation bar at the center
+  #navigator {
+    display: flex;
+    flex-grow: 1;
+    min-width: 0%; // allow the navigator to shrink
+    max-width: 900px;
+
+    &.titleMode {
+      padding-right: @centerOffset;
+    }
+
+    @media (max-width: @breakpointNarrowViewport) {
+      padding-right: 0;
+    }
+
+    @media (max-width: @breakpointNarrowViewport) {
+      width: 100%;
+    }
+
+    &.titleMode {
+      @media (max-width: @breakpointNarrowViewport) {
+        transition: padding @transitionDuration ease-in-out;
+        padding-right: 0;
+      }
+    }
+  }
+
+  // Buttons on the right
+  .topLevelEndButtons {
+
+    .braveMenu {
+      width: @braveButtonWidth;
+      margin-left: @buttonSpacing;
+      margin-right: @buttonSpacing;
+    }
   }
 }
 
-.platform--darwin {
-  .navigatorWrapper {
-    padding-left: 70px;
+
+.navigatorWrapper {
+  justify-content: space-between;
+  -webkit-app-region: drag;
+  align-items: center;
+  border-bottom: 1px solid #aaaaaa;
+  height: 35px;
+
+  /**
+   * Left buttons
+   */
+  .backforward {
+    display: flex;
+    z-index: 10;
+
+    transition: margin @transitionDuration ease-in-out;
+
+    span {
+      color: @buttonColor;
+      border-radius: 50%;
+      font-weight: 300;
+      opacity: 0.2;
+
+      &:not([disabled]) {
+        opacity: 0.85;
+      }
+
+      &:not([disabled]):hover {
+        color: @buttonColor;
+        opacity: 1.0;
+        background-color: white;
+      }
+    }
+
+    .back,
+    .forward {
+      font-size: 35px;
+      text-align: center;
+    }
   }
 }
 
@@ -72,23 +173,15 @@
 }
 
 #navigator {
-  display: flex;
-  flex-grow: 1;
-  min-width: 0%; // allow the navigator to shrink
   font-size: 20px;
-
   align-items: center;
   justify-content: center;
-  max-width: 900px;
   box-sizing: border-box;
   padding: 0;
   position: relative;
   -webkit-user-select: none;
 
-  @media (max-width: @breakpointNarrowViewport) {
-    width: 100%;
-    z-index: 99999;
-  }
+  z-index: 99999;
 
   &.titleMode {
     input {
@@ -228,17 +321,13 @@
   }
 }
 
-.topLevelEndButtons {
-  margin-left: 4px;
-  .braveMenu {
-    background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x,
-                                        url(../app/extensions/brave/img/braveBtn2x.png) 2x,
-                                        url(../app/extensions/brave/img/braveBtn3x.png) 3x);
-    background-repeat: no-repeat;
-    width: 23px;
-    height: 27px;
-    margin-top: 3px;
-    margin-right: 8px;
-  }
+
+.topLevelEndButtons .braveMenu {
+  background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x,
+                                      url(../app/extensions/brave/img/braveBtn2x.png) 2x,
+                                      url(../app/extensions/brave/img/braveBtn3x.png) 3x);
+  background-repeat: no-repeat;
+  height: 27px;
+  margin-top: 3px;
 }
 
