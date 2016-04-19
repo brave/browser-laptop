@@ -29,6 +29,9 @@ AppStore
       state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
     }
   }],
+  siteSettings: {
+    [origin]: Object // settings object
+  },
   visits: [{
     location: string,
     startTime: number, // datetime.getTime()
