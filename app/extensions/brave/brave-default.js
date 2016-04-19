@@ -599,8 +599,8 @@ if (typeof KeyEvent === 'undefined') {
         if (!maybeLink.getAttribute || maybeLink.getAttribute('data-context-menu-disable')) {
           return
         }
-        if (maybeLink.nodeName && maybeLink.nodeName.toUpperCase() === 'A') {
-          href = maybeLink.getAttribute('href')
+        if (maybeLink instanceof HTMLAnchorElement) {
+          href = maybeLink.href
           break
         }
         maybeLink = maybeLink.parentNode
