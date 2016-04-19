@@ -383,7 +383,7 @@ if (typeof KeyEvent === 'undefined') {
       return false
     }
 
-    if (document.querySelectorAll('input[type=password]:not([autocomplete=off i])').length === 0) {
+    if (document.querySelectorAll('input[type=password]').length === 0) {
       // No password fields; abort
       return false
     }
@@ -392,7 +392,7 @@ if (typeof KeyEvent === 'undefined') {
     var credentials = {}
 
     var formOrigin = [document.location.protocol, document.location.host].join('//')
-    var formNodes = document.querySelectorAll('form:not([autocomplete=off i])')
+    var formNodes = document.querySelectorAll('form')
 
     Array.from(formNodes).forEach((form) => {
       tryAutofillForm(credentials, formOrigin, form)
@@ -451,7 +451,7 @@ if (typeof KeyEvent === 'undefined') {
       let previousSibling = passwords[0].previousSibling
       while (previousSibling) {
         if ((previousSibling instanceof HTMLElement)) {
-          if (previousSibling.getAttribute('type') === 'text' && previousSibling.getAttribute('autocomplete') !== 'off') {
+          if (previousSibling.getAttribute('type') === 'text') {
             username = previousSibling
             break
           }
@@ -459,6 +459,9 @@ if (typeof KeyEvent === 'undefined') {
         previousSibling = previousSibling.previousSibling
       }
     }
+
+    // Last resort: find the first text input in the form
+    username = username || form.querySelector('input[type=text i]')
 
     // If not a submission, autofill the first password field and ignore the rest
     if (!isSubmission || passwords.length === 1) {
@@ -519,7 +522,7 @@ if (typeof KeyEvent === 'undefined') {
         return [currentPassword, newPassword]
       }
     }
-    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]:not([autocomplete=off i])'))
+    var passwordNodes = Array.from(form.querySelectorAll('input[type=password]'))
     if (isSubmission) {
       // Skip empty fields
       passwordNodes = passwordNodes.filter((e) => { return (e instanceof HTMLInputElement && e.value) })
@@ -582,41 +585,32 @@ if (typeof KeyEvent === 'undefined') {
       if (e.defaultPrevented) {
         return
       }
-      if (!(e.target instanceof HTMLElement)) {
+
+      if (!e.target.nodeName) {
         return
       }
 
       var name = e.target.nodeName.toUpperCase()
       var href
       var maybeLink = e.target
-      // flow requires this check to happen again
-      if (!(maybeLink instanceof HTMLElement)) {
-        return
-      }
 
       while (maybeLink.parentNode) {
         // Override for about: pages
-        if (maybeLink.getAttribute('data-context-menu-disable')) {
+        if (!maybeLink.getAttribute || maybeLink.getAttribute('data-context-menu-disable')) {
           return
         }
-        if (maybeLink.nodeName.toUpperCase() === 'A') {
-          href = maybeLink.getAttribute('href')
+        if (maybeLink instanceof HTMLAnchorElement) {
+          href = maybeLink.href
           break
         }
         maybeLink = maybeLink.parentNode
-        if (!(maybeLink instanceof HTMLElement)) {
-          return
-        }
       }
 
-      if (!(e.target instanceof HTMLElement)) {
-        return
-      }
       var nodeProps = {
         name: name,
         href: href,
-        isContentEditable: e.target.isContentEditable,
-        src: e.target.getAttribute('src'),
+        isContentEditable: e.target.isContentEditable || false,
+        src: e.target.getAttribute ? e.target.getAttribute('src') : undefined,
         hasSelection: hasSelection(e.target),
         offsetX: e.pageX,
         offsetY: e.pageY

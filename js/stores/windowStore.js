@@ -108,6 +108,10 @@ const doAction = (action) => {
       windowState = action.windowState
       currentKey = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
       currentPartitionNumber = windowState.get('frames').reduce((previousVal, frame) => Math.max(previousVal, frame.get('partitionNumber')), 0)
+      const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+      if (activeFrame && activeFrame.get('location') !== 'about:newtab') {
+        focusWebview(activeFrameStatePath())
+      }
       // We should not emit here because the Window already know about the change on startup.
       return
     case WindowConstants.WINDOW_SET_URL:

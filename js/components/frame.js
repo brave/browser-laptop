@@ -457,7 +457,7 @@ class Frame extends ImmutableComponent {
   }
 
   onMouseWheel (e) {
-    if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+    if (e.ctrlKey) {
       e.preventDefault()
       this.wheelDeltaY = (this.wheelDeltaY || 0) + e.wheelDeltaY
       this.onUpdateWheelZoom()
