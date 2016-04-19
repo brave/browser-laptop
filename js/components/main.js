@@ -243,7 +243,12 @@ class Main extends ImmutableComponent {
     window.addEventListener('mousemove', (e) => {
       self.checkForTitleMode(e.pageY)
     })
-
+    window.addEventListener('focus', () => {
+      // For whatever reason other elements are preserved but webviews are not.
+      if (document.activeElement && document.activeElement.tagName === 'BODY') {
+        windowActions.setWebviewFocused()
+      }
+    })
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
     const win = remote.getCurrentWindow()
     if (activeFrame && win) {

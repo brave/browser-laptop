@@ -279,6 +279,13 @@ const windowActions = {
     })
   },
 
+  setWebviewFocused: function () {
+    const webview = document.querySelector('.frameWrapper.isActive webview')
+    if (webview) {
+      webview.focus()
+    }
+  },
+
   /**
    * Dispatches a message to the store to create a new frame
    *
