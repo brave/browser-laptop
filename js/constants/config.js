@@ -14,7 +14,7 @@ module.exports = {
     defaultValue: 0,
     min: -8,
     max: 9,
-    step: 1
+    step: 0.5
   },
   maxClosedFrames: 100,
   thumbnail: {

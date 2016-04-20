@@ -217,6 +217,20 @@ Changes an application level setting
 
 
 
+### changeSiteSetting(hostPattern, key, value) 
+
+Change a hostPattern's config
+
+**Parameters**
+
+**hostPattern**: `string`, The host pattern to update the config for
+
+**key**: `string`, The config key to update
+
+**value**: `string | number`, The value to update to
+
+
+
 
 * * *
 

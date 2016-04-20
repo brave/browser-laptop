@@ -86,6 +86,7 @@ var menuIdentifiers = function () {
     'reopenLastClosedWindow',
     'showAllHistory',
     'clearHistory',
+    'clearSiteData',
     'bookmarks',
     'addToFavoritesBar',
     'window',

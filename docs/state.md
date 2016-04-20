@@ -29,6 +29,11 @@ AppStore
       state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
     }
   }],
+  siteSettings: {
+    [hostPattern]: {
+      zoomLevel: number
+    }
+  },
   visits: [{
     location: string,
     startTime: number, // datetime.getTime()
@@ -110,7 +115,6 @@ WindowStore
   activeFrameKey: number,
   previewFrameKey: number,
   frames: [{
-    zoomLevel: number, // current frame zoom level
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
     canGoBack: boolean,

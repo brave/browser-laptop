@@ -37,6 +37,11 @@ const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
  */
 const downloadMap = {}
 
+/**
+ * Maps partition name to the session object
+ */
+const registeredSessions = {}
+
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
 }
@@ -323,7 +328,9 @@ function registerForDownloadListener (session) {
 
 function initForPartition (partition) {
   ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
-    fn(session.fromPartition(partition))
+    let ses = session.fromPartition(partition)
+    registeredSessions[partition] = ses
+    fn(ses)
   })
 }
 
@@ -386,4 +393,14 @@ module.exports.isResourceEnabled = (resourceName) => {
     return appConfig[resourceName].enabled
   }
   return enabledFromState
+}
+
+module.exports.clearSessionData = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    ses.clearStorageData(() => {
+    })
+    ses.clearCache(() => {
+    })
+  }
 }
