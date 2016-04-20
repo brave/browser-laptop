@@ -30,7 +30,9 @@ AppStore
     }
   }],
   siteSettings: {
-    [origin]: Object // settings object
+    [hostPattern]: {
+      zoomLevel: number
+    }
   },
   visits: [{
     location: string,
@@ -113,7 +115,6 @@ WindowStore
   activeFrameKey: number,
   previewFrameKey: number,
   frames: [{
-    zoomLevel: number, // current frame zoom level
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
     canGoBack: boolean,

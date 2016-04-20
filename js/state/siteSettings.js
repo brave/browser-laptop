@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const urlParse = require('url').parse
+const Immutable = require('immutable')
 
 /**
   * Obtains the site settings stored for a specific pattern.
@@ -15,13 +16,16 @@ module.exports.getSiteSettingsForHostPattern = (siteSettings, hostPattern) =>
   siteSettings.get(hostPattern)
 
 /**
-  * Set the settings object for the specified host pattern.
+  * Merges the settings for the specified host pattern.
   * @param {Object} siteSettings - The top level app state site settings indexed by hostPattern.
   * @param {string} hostPattern - The host pattern to merge into
-  * @param {Object} settingObj - An object of settings for the site
+  * @param {string} key - A setting key
+  * @param {string|number} value - A setting value
   */
-module.exports.setSiteSettings = (siteSettings, hostPattern, settingObj) =>
-  siteSettings.set(hostPattern, settingObj)
+module.exports.mergeSiteSetting = (siteSettings, hostPattern, key, value) =>
+  (siteSettings || Immutable.Map()).mergeIn([hostPattern], {
+    [key]: value
+  })
 
 /**
   * Remove all site settings for the specified hostPattern.
@@ -38,6 +42,9 @@ module.exports.removeSiteSettings = (siteSettings, hostPattern) =>
   * @return {Object} A merged settings object for the specified site setting or undefined
   */
 module.exports.getSiteSettingsForURL = (siteSettings, location) => {
+  if (!location || !siteSettings) {
+    return undefined
+  }
   // Example: https://www.brianbondy.com:8080/projects
   //   parsedUrl.host: www.brianbondy.com:8080
   //   parsedUrl.hostname: www.brianbondy.com
@@ -77,10 +84,10 @@ module.exports.getSiteSettingsForURL = (siteSettings, location) => {
 
   // Merge all the settingObj with the more specific first rules taking precedence
   const settingObj = settingObjs.reduce((mergedSettingObj, settingObj) =>
-    Object.assign(settingObj || {}, mergedSettingObj), {})
-  if (Object.keys(settingObj).length === 0) {
+    (settingObj || Immutable.Map()).merge(mergedSettingObj), Immutable.Map())
+  if (settingObj.size === 0) {
     return undefined
   }
-  return settingObj
+  return Immutable.fromJS(settingObj)
 }
 
