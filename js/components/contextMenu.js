@@ -18,6 +18,7 @@ export default class ContextMenuItem extends ImmutableComponent {
   onClick (e) {
     e.stopPropagation()
     if (this.props.contextMenuItem.get('click')) {
+      windowActions.setContextMenuDetail()
       this.props.contextMenuItem.get('click')(e)
     }
   }
@@ -64,7 +65,7 @@ export default class ContextMenuItem extends ImmutableComponent {
       const parentBoundingRect = parentNode.getBoundingClientRect()
       const boundingRect = node.getBoundingClientRect()
       openedSubmenuDetails = openedSubmenuDetails.push(Immutable.fromJS({
-        y: boundingRect.top - parentBoundingRect.top,
+        y: boundingRect.top - parentBoundingRect.top - 1,
         template: this.submenu
       }))
     }
@@ -75,7 +76,15 @@ export default class ContextMenuItem extends ImmutableComponent {
     }
   }
   render () {
-    return <div className='contextMenuItem'
+    if (this.props.contextMenuItem.get('type') === 'separator') {
+      return <div className='contextMenuItem contextMenuSeparator' role='listitem'>
+        <hr/>
+      </div>
+    }
+    return <div className={cx({
+      contextMenuItem: true,
+      checkedMenuItem: this.props.contextMenuItem.get('checked')
+    })}
       role='listitem'
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
@@ -87,6 +96,11 @@ export default class ContextMenuItem extends ImmutableComponent {
       onMouseEnter={this.onMouseEnter.bind(this)}
       onMouseLeave={this.onMouseLeave.bind(this)}
       onClick={this.onClick.bind(this)}>
+      {
+        this.props.contextMenuItem.get('checked')
+        ? <span className='fa fa-check contextMenuCheckIndicator'/>
+        : null
+      }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>
       {

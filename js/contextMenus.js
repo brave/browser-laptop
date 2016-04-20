@@ -663,9 +663,13 @@ function mainTemplateInit (nodeProps, frame) {
 }
 
 export function onHamburgerMenu (braverySettings, e) {
-  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings))
+  const menuTemplate = hamburgerTemplateInit(braverySettings)
   const rect = e.target.getBoundingClientRect()
-  hamburgerMenu.popup(remote.getCurrentWindow(), rect.left, rect.bottom)
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    right: 0,
+    top: rect.bottom + 2,
+    template: menuTemplate
+  }))
 }
 
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {

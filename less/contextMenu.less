@@ -5,9 +5,11 @@
 @import "variables.less";
 
 .contextMenu {
-  display: flex;
+  border-radius: @borderRadius;
+  box-sizing: border-box;
   color: black;
   cursor: default;
+  display: flex;
   font-size: 11px;
   &.contextMenuScrollable {
     overflow-y: scroll;
@@ -23,6 +25,7 @@
   .contextMenuSingle {
     background-color: @toolbarBackground;
     border: 1px solid @toolbarBorderColor;
+    border-radius: @borderRadius;
     box-sizing: border-box;
     display: table;
     min-width: 100px;
@@ -35,7 +38,14 @@
 }
 
 .contextMenuItem {
-  padding: 7px;
+  padding: 6px 10px 6px 20px;
+  &.checkedMenuItem {
+    padding-left: 4px;
+
+    .contextMenuCheckIndicator {
+      padding-right: 4px;
+    }
+  }
   box-sizing: border-box;
   max-width: 300px;
   display: flex;
@@ -44,9 +54,22 @@
   overflow: hidden;
   -webkit-user-select: none;
 
+  &.contextMenuSeparator {
+    padding: 1px 0px;
+
+    hr {
+      background-color: #bbb;
+      border: none;
+      height: 1px;
+      width: 100%;
+    }
+  }
+
   &:not([disabled]) {
-    &:hover {
-      background-color: lighten(@menuSelectionColor, 5%);
+    &:not(.contextMenuSeparator) {
+      &:hover {
+        background-color: lighten(@menuSelectionColor, 5%);
+      }
     }
   }
   &[disabled] {
