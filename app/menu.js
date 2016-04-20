@@ -403,6 +403,11 @@ const init = (settingsState, args) => {
           click: function (item, focusedWindow) {
             appActions.clearSitesWithoutTags(appStore.getState().get('sites'))
           }
+        }, {
+          label: locale.translation('clearSiteData'),
+          click: function () {
+            Filtering.clearSessionData()
+          }
         }
       ]
     }, {

@@ -561,6 +561,18 @@ Similar to setBlockedBy but for httpse redirects
 
 
 
+### inspectElement(x, y) 
+
+Inspect the element for the active webview at the x, y content position
+
+**Parameters**
+
+**x**: `number`, horizontal position of the element to inspect
+
+**y**: `number`, vertical position of the element to inspect
+
+
+
 
 * * *
 

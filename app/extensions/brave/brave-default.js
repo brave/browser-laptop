@@ -585,41 +585,32 @@ if (typeof KeyEvent === 'undefined') {
       if (e.defaultPrevented) {
         return
       }
-      if (!(e.target instanceof HTMLElement)) {
+
+      if (!e.target.nodeName) {
         return
       }
 
       var name = e.target.nodeName.toUpperCase()
       var href
       var maybeLink = e.target
-      // flow requires this check to happen again
-      if (!(maybeLink instanceof HTMLElement)) {
-        return
-      }
 
       while (maybeLink.parentNode) {
         // Override for about: pages
-        if (maybeLink.getAttribute('data-context-menu-disable')) {
+        if (!maybeLink.getAttribute || maybeLink.getAttribute('data-context-menu-disable')) {
           return
         }
-        if (maybeLink.nodeName.toUpperCase() === 'A') {
-          href = maybeLink.getAttribute('href')
+        if (maybeLink instanceof HTMLAnchorElement) {
+          href = maybeLink.href
           break
         }
         maybeLink = maybeLink.parentNode
-        if (!(maybeLink instanceof HTMLElement)) {
-          return
-        }
       }
 
-      if (!(e.target instanceof HTMLElement)) {
-        return
-      }
       var nodeProps = {
         name: name,
         href: href,
-        isContentEditable: e.target.isContentEditable,
-        src: e.target.getAttribute('src'),
+        isContentEditable: e.target.isContentEditable || false,
+        src: e.target.getAttribute ? e.target.getAttribute('src') : undefined,
         hasSelection: hasSelection(e.target),
         offsetX: e.pageX,
         offsetY: e.pageY

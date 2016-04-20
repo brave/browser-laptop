@@ -12,9 +12,9 @@ const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 module.exports = {
   zoom: {
     defaultValue: 0,
-    min: -8,
-    max: 9,
-    step: 1
+    min: -7,
+    max: 7,
+    step: 0.5
   },
   maxClosedFrames: 100,
   thumbnail: {

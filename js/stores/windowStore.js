@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const config = require('../constants/config')
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
@@ -471,22 +470,6 @@ const doAction = (action) => {
       const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
-      break
-    // Zoom state
-    case WindowConstants.WINDOW_ZOOM:
-      let zoomLevel = FrameStateUtil.getFramePropValue(windowState, action.frameProps, 'zoomLevel')
-      // for backwards compatibility with previous stored window state
-      if (zoomLevel === undefined) {
-        zoomLevel = 1
-      }
-      if (config.zoom.max >= zoomLevel + action.stepSize &&
-          config.zoom.min <= zoomLevel + action.stepSize) {
-        zoomLevel += action.stepSize
-      }
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), zoomLevel)
-      break
-    case WindowConstants.WINDOW_ZOOM_RESET:
-      windowState = windowState.setIn(FrameStateUtil.getFramePropPath(windowState, action.frameProps, 'zoomLevel'), config.zoom.defaultValue)
       break
     default:
   }

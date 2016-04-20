@@ -86,6 +86,7 @@ var menuIdentifiers = function () {
     'reopenLastClosedWindow',
     'showAllHistory',
     'clearHistory',
+    'clearSiteData',
     'bookmarks',
     'addToFavoritesBar',
     'window',
@@ -139,7 +140,7 @@ exports.translation = function (token) {
     // This will return an identifier in upper case enclosed in square brackets
     // Useful for determining if a translation was not requested in the menu
     // identifiers above.
-    return '[' + token.toUpperCase() + ']'
+    return token.toUpperCase()
   }
 }
 

@@ -51,11 +51,19 @@ const ensureAtLeastOneWindow = (frameOpts) => {
  * @return {boolean} whether the message was sent
  */
 module.exports.sendToFocusedWindow = (focusedWindow, message) => {
-  if (focusedWindow) {
-    focusedWindow.webContents.send.apply(focusedWindow.webContents, message)
-    return true
+  if (process.type === 'browser') {
+    if (focusedWindow) {
+      focusedWindow.webContents.send.apply(focusedWindow.webContents, message)
+      return true
+    } else {
+      return false
+    }
   } else {
-    return false
+    const ipcRenderer = require('electron').ipcRenderer
+    // The spliced in arg is the empty event arg
+    message.splice(1, 0, {})
+    ipcRenderer.emit.apply(ipcRenderer, message)
+    return true
   }
 }
 
@@ -233,6 +241,9 @@ module.exports.importBookmarksMenuItem = () => {
             module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
         })
         return
+      } else {
+        setTimeout(() =>
+          module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
       }
     }
   }

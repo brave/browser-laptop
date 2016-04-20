@@ -297,7 +297,8 @@ class Main extends ImmutableComponent {
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
     braverySettings.bookmarked = this.navBar.bookmarked
-    contextMenus.onHamburgerMenu(braverySettings, e)
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    contextMenus.onHamburgerMenu(braverySettings, activeFrame && activeFrame.get('location') || '', e)
   }
 
   onHideSiteInfo () {
@@ -405,6 +406,7 @@ class Main extends ImmutableComponent {
       {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
+          siteSettings={this.props.appState.get('siteSettings')}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/>
         : null
       }
@@ -533,6 +535,7 @@ class Main extends ImmutableComponent {
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
               passwords={this.props.appState.get('passwords')}
+              siteSettings={this.props.appState.get('siteSettings')}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
