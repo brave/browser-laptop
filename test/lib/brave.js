@@ -286,7 +286,7 @@ var exports = {
         internal.viewInstanceId
         // This allows you to send more args than just the event itself like would only
         // be possible with dispatchEvent.
-        require('electron').ipcRenderer.emit('ATOM_SHELL_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
+        require('electron').ipcRenderer.emit('ELECTRON_GUEST_VIEW_INTERNAL_DISPATCH_EVENT-' + internal.viewInstanceId, ...params)
       }, frameKey, eventName, ...params).then((response) => response.value)
     })
 
