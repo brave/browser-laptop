@@ -91,6 +91,7 @@ cmds = cmds.concat([
 
 if (isLinux) {
   cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
+  cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 } else if (isDarwin) {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
 } else if (isWindows) {
