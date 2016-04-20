@@ -54,6 +54,25 @@
   overflow: hidden;
   -webkit-user-select: none;
 
+  &.multiContextMenuItem {
+    display: flex;
+
+    .contextMenuSubItem {
+      border: 1px solid black;
+      border-radius: @borderRadius;
+      flex-grow: 1;
+      margin: 1px;
+      padding: 4px;
+      text-align: center;
+    }
+
+    .multiItemTitle {
+      margin-top: auto;
+      margin-bottom: auto;
+      padding-right: 10px;
+    }
+  }
+
   &.contextMenuSeparator {
     padding: 1px 0px;
 

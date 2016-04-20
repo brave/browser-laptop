@@ -6,6 +6,8 @@ const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
+const config = require('../constants/config')
+const siteSettings = require('../state/siteSettings')
 const cx = require('../lib/classSet.js')
 
 export default class ContextMenuItem extends ImmutableComponent {
@@ -15,11 +17,13 @@ export default class ContextMenuItem extends ImmutableComponent {
   get hasSubmenu () {
     return this.submenu && this.submenu.size > 0
   }
-  onClick (e) {
+  onClick (clickAction, shouldHide, e) {
     e.stopPropagation()
-    if (this.props.contextMenuItem.get('click')) {
-      windowActions.setContextMenuDetail()
-      this.props.contextMenuItem.get('click')(e)
+    if (clickAction) {
+      if (shouldHide) {
+        windowActions.setContextMenuDetail()
+      }
+      clickAction(e)
     }
   }
   onDragStart (e) {
@@ -75,10 +79,33 @@ export default class ContextMenuItem extends ImmutableComponent {
     if (this.hasSubmenu) {
     }
   }
+  getLabelForItem (item) {
+    const label = item.get('label')
+    if (label) {
+      return label
+    }
+    if (item.get('labelDataBind') === 'zoomLevel') {
+      const settings = siteSettings.getSiteSettingsForURL(this.props.siteSettings, item.get('dataBindParam'))
+      const zoomLevel = settings && settings.get('zoomLevel') || config.zoom.defaultValue
+      return ((100 + zoomLevel * 10) | 0) + '%'
+    }
+    return ''
+  }
   render () {
     if (this.props.contextMenuItem.get('type') === 'separator') {
       return <div className='contextMenuItem contextMenuSeparator' role='listitem'>
         <hr/>
+      </div>
+    } else if (this.props.contextMenuItem.get('type') === 'multi') {
+      return <div className='contextMenuItem multiContextMenuItem'>
+        <span className='multiItemTitle' data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}/>
+      {
+        this.props.contextMenuItem.get('submenu').map((subItem) =>
+          <div className='contextMenuSubItem'
+            onClick={this.onClick.bind(this, subItem.get('click'), false)}>
+            <span>{this.getLabelForItem(subItem)}</span>
+          </div>)
+      }
       </div>
     }
     return <div className={cx({
@@ -95,7 +122,7 @@ export default class ContextMenuItem extends ImmutableComponent {
       disabled={this.props.contextMenuItem.get('enabled') === false}
       onMouseEnter={this.onMouseEnter.bind(this)}
       onMouseLeave={this.onMouseLeave.bind(this)}
-      onClick={this.onClick.bind(this)}>
+      onClick={this.onClick.bind(this, this.props.contextMenuItem.get('click'), true)}>
       {
         this.props.contextMenuItem.get('checked')
         ? <span className='fa fa-check contextMenuCheckIndicator'/>
@@ -132,6 +159,7 @@ export default class ContextMenuSingle extends ImmutableComponent {
       this.props.template.map((contextMenuItem) =>
         <ContextMenuItem contextMenuItem={contextMenuItem}
           submenuIndex={this.props.submenuIndex}
+          siteSettings={this.props.siteSettings}
           contextMenuDetail={this.props.contextMenuDetail}
         />)
     }
@@ -179,11 +207,13 @@ export default class ContextMenu extends ImmutableComponent {
       style={styles}>
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
+        siteSettings={this.props.siteSettings}
         template={this.props.contextMenuDetail.get('template')}/>
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
+            siteSettings={this.props.siteSettings}
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')}/>)
       }

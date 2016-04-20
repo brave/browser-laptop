@@ -436,15 +436,43 @@ function getEditableItems (hasSelection) {
   return items
 }
 
-function hamburgerTemplateInit (braverySettings) {
+function hamburgerTemplateInit (braverySettings, location, e) {
   const template = [
-    CommonMenu.newTabMenuItem(),
-    CommonMenu.newPrivateTabMenuItem(),
-    CommonMenu.newPartitionedTabMenuItem(),
-    CommonMenu.newWindowMenuItem(),
+    {
+      l10nLabelId: 'new',
+      submenu: [
+        CommonMenu.newTabMenuItem(),
+        CommonMenu.newPrivateTabMenuItem(),
+        CommonMenu.newPartitionedTabMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.newWindowMenuItem()
+      ]
+    },
     CommonMenu.separatorMenuItem,
     CommonMenu.findOnPageMenuItem(),
     CommonMenu.printMenuItem(),
+    CommonMenu.separatorMenuItem,
+    {
+      l10nLabelId: 'zoom',
+      type: 'multi',
+      submenu: [{
+        label: '-',
+        click: () => {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
+        }
+      }, {
+        labelDataBind: 'zoomLevel',
+        dataBindParam: location,
+        click: () => {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET)
+        }
+      }, {
+        label: '+',
+        click: () => {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
+        }
+      }]
+    },
     CommonMenu.separatorMenuItem,
     CommonMenu.buildBraveryMenu(braverySettings, function () {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: braverySettings.bookmarked})
@@ -662,8 +690,8 @@ function mainTemplateInit (nodeProps, frame) {
   return template
 }
 
-export function onHamburgerMenu (braverySettings, e) {
-  const menuTemplate = hamburgerTemplateInit(braverySettings)
+export function onHamburgerMenu (braverySettings, location, e) {
+  const menuTemplate = hamburgerTemplateInit(braverySettings, location, e)
   const rect = e.target.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
