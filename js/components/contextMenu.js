@@ -103,7 +103,7 @@ export default class ContextMenuItem extends ImmutableComponent {
         this.props.contextMenuItem.get('submenu').map((subItem) =>
           <div className='contextMenuSubItem'
             onClick={this.onClick.bind(this, subItem.get('click'), false)}>
-            <span>{this.getLabelForItem(subItem)}</span>
+            <span data-l10n-id={subItem.get('l10nLabelId')}>{this.getLabelForItem(subItem)}</span>
           </div>)
       }
       </div>
