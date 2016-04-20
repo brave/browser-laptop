@@ -396,6 +396,10 @@ const handleAppAction = (action) => {
       appState = appState.set('siteSettings',
         siteSettings.mergeSiteSetting(appState.get('siteSettings'), action.hostPattern, action.key, action.value))
       break
+    case AppConstants.APP_SHOW_MESSAGE_BOX:
+      let notifications = appState.get('notifications')
+      appState = appState.set('notifications', notifications.push(Immutable.fromJS(action.detail)))
+      break
     default:
   }
 

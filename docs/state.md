@@ -89,6 +89,11 @@ AppStore
     verbose: boolean, // Whether to show update UI for checking, downloading, and errors
     lastCheckTimestamp: boolean
   },
+  notifications: [{
+    message: string,
+    id: string,
+    buttons: Array<string>
+  }], // the notifications for the frame. not preserved across restart.
   settings: [{
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage

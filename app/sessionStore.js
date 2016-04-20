@@ -219,6 +219,8 @@ module.exports.loadAppState = () => {
           return
         }
       }
+      // Don't show notifications from the last session
+      data.notifications = []
       // We used to store a huge list of IDs but we didn't use them.
       // Get rid of them here.
       delete data.windows
@@ -281,6 +283,7 @@ module.exports.defaultAppState = () => {
     sites: [],
     visits: [],
     settings: {},
-    passwords: []
+    passwords: [],
+    notifications: []
   }
 }

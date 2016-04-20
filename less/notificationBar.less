@@ -1,0 +1,38 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+.notificationBar {
+  background-color: #fff;
+  border-bottom: 1px solid #888;
+  padding: 8px 20px;
+
+  >div {
+    display: flex;
+  }
+
+  .notificationMessage {
+    color: #000;
+    font-size: 15px;
+    padding-left: 10px;
+    margin: auto 0;
+  }
+
+  .notificationSecondaryButton {
+    background-color: #eee;
+  }
+
+  .notificationButton {
+    padding: 0px 25px;
+    float: right;
+    font-size: 14px;
+    width: auto;
+    margin: auto 5px;
+  }
+
+  .notificationSpacer {
+    flex-grow: 1;
+  }
+}
