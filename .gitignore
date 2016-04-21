@@ -40,6 +40,8 @@ public/built
 *-win32-ia32
 *-linux-x64
 dist
+dist-x64
+dist-ia32
 win64-dist
 Brave.tar.bz2
 

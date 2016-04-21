@@ -50,9 +50,19 @@ var cmds = ['echo cleaning up target...']
 if (isWindows) {
   cmds = cmds.concat([
     '(if exist Brave-win32-x64 rmdir /s /q Brave-win32-x64)',
-    '(if exist Brave-win32-ia32 rmdir /s /q Brave-win32-ia32)',
-    '(if exist dist rmdir /s /q dist)'
+    '(if exist Brave-win32-ia32 rmdir /s /q Brave-win32-ia32)'
   ])
+
+  // Remove the destination folder for the selected arch
+  if (arch === 'ia32') {
+    cmds = cmds.concat([
+      '(if exist dist-ia32 rmdir /s /q dist-ia32)'
+    ])
+  } else {
+    cmds = cmds.concat([
+      '(if exist dist-x64 rmdir /s /q dist-x64)'
+    ])
+  }
 } else {
   cmds = cmds.concat([
     'rm -Rf ' + buildDir,
