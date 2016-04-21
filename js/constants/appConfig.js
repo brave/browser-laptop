@@ -9,7 +9,7 @@ const crashURL = process.env.BRAVE_CRASH_URL || 'https://laptop-updates.brave.co
 
 module.exports = {
   name: 'Brave',
-  contactUrl: 'mailto:support@brave.com',
+  contactUrl: 'mailto:support+laptop@brave.com',
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',
