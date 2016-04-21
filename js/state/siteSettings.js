@@ -9,7 +9,7 @@ const Immutable = require('immutable')
   * Obtains the site settings stored for a specific pattern.
   * @param {Object} siteSettings - The top level app state site settings indexed by hostPattern.
   * @param {string} hostPattern - The host pattern to lookup.
-  *   Supported hostPattern values are of the form: protocol|(http[?|s])://[*.]<hostname>[:*]
+  *   Supported hostPattern values are of the form: protocol|(https[?])://[*.]<hostname>[:*]
   * @return {Object} The exact setting object for the specified host pattern or undefined.
   */
 module.exports.getSiteSettingsForHostPattern = (siteSettings, hostPattern) =>
@@ -55,14 +55,18 @@ module.exports.getSiteSettingsForURL = (siteSettings, location) => {
   let settingObjs = []
 
   const parsedUrl = urlParse(location)
+  if (!parsedUrl.host || !parsedUrl.hostname || !parsedUrl.protocol) {
+    return undefined
+  }
+
   settingObjs.push(
     `${parsedUrl.protocol}//${parsedUrl.host}`,
     `${parsedUrl.protocol}//${parsedUrl.hostname}:*`,
     `${parsedUrl.protocol}//*`
   )
   if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-    settingObjs.push(`http?://${parsedUrl.host}`,
-      `http?://${parsedUrl.hostname}:*`)
+    settingObjs.push(`https?://${parsedUrl.host}`,
+      `https?://${parsedUrl.hostname}:*`)
   }
 
   let host = parsedUrl.host
@@ -75,11 +79,11 @@ module.exports.getSiteSettingsForURL = (siteSettings, location) => {
       `${parsedUrl.protocol}//*.${parsedUrl.hostname}:*`
     )
     if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-      settingObjs.push(`http?://*.${parsedUrl.host}`,
-        `http?://*.${parsedUrl.hostname}:*`)
+      settingObjs.push(`https?://*.${parsedUrl.host}`,
+        `https?://*.${parsedUrl.hostname}:*`)
     }
   }
-
+  settingObjs.push('*')
   settingObjs = settingObjs.map((hostPattern) => siteSettings.get(hostPattern))
 
   // Merge all the settingObj with the more specific first rules taking precedence
