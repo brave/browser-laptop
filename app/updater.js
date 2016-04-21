@@ -25,7 +25,7 @@ const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
-    console.log(contents)
+  console.log(contents)
   fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + '\n')
 }
 
@@ -52,9 +52,13 @@ exports.updateUrl = function (updates, platform, arch) {
   if (platform === 'darwin') {
     return platformBaseUrl
   } else {
-    var windowsUpdateUrlWithArch = updates.winBaseUrl.replace('CHANNEL', Channel.channel()) + platforms[platform]
-    debug(windowsUpdateUrlWithArch)
-    return windowsUpdateUrlWithArch
+    if (platform.match(/^win32/)) {
+      var windowsUpdateUrlWithArch = updates.winBaseUrl.replace('CHANNEL', Channel.channel()) + platforms[platform]
+      return windowsUpdateUrlWithArch
+    } else {
+      // Unsupport platform for automatic updates
+      return null
+    }
   }
 }
 
