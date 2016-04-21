@@ -96,7 +96,7 @@ AppStore
     'search.default-search-engine': string, // path to the open search XML
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
-    'tabs.tabs-per-tab-page': number, // Number of tabs per tab page
+    'tabs.tabs-per-page': number, // Number of tabs per tab page
     'tabs.show-tab-previews': boolean, // True to show tab previews
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // Auto suggest for history enabled

@@ -24,7 +24,7 @@ describe('tab pages', function () {
         assert.equal(0, res.value.length)
       })
       // Create a full tab set, but not a second page
-      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE] - 1; i++) {
+      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE] - 1; i++) {
         yield this.app.client.click(newFrameButton)
       }
     })
@@ -65,8 +65,8 @@ describe('tab pages', function () {
 
     describe('tabs per page setting', function () {
       it('takes effect immediately', function *() {
-        const defaultTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_TAB_PAGE]
-        yield this.app.client.changeSetting(settings.TABS_PER_TAB_PAGE, 1)
+        const defaultTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
+        yield this.app.client.changeSetting(settings.TABS_PER_PAGE, 1)
         yield this.app.client.waitUntil(function () {
           return this.elements(tabPage).then((res) => res.value.length === (defaultTabsPerPage + 1))
         })

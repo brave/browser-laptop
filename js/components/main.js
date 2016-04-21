@@ -386,7 +386,7 @@ class Main extends ImmutableComponent {
 
     this.frames = {}
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
-    const tabsPerPage = getSetting(settings.TABS_PER_TAB_PAGE)
+    const tabsPerPage = getSetting(settings.TABS_PER_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])

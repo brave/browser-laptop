@@ -73,7 +73,7 @@ module.exports = {
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
-    'tabs.tabs-per-tab-page': 10,
+    'tabs.tabs-per-page': 10,
     'tabs.show-tab-previews': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
