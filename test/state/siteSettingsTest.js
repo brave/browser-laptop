@@ -28,7 +28,7 @@ describe('siteSettings', function () {
       siteSettingsMap = new Immutable.Map()
       siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https://www.brave.com:*', 'prop1', 2)
     })
-    it('can obtain without a port', function *() {
+    it('can obtain with a wildcard port for host pattern', function *() {
       const setting = siteSettings.getSiteSettingsForHostPattern(siteSettingsMap, 'https://www.brave.com:*')
       assert.strictEqual(setting.get('prop1'), 2)
     })
@@ -58,7 +58,7 @@ describe('siteSettings', function () {
   describe('http or https specific URLs', function () {
     before(function () {
       siteSettingsMap = new Immutable.Map()
-      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'http?://www.brave.com', 'prop1', 4)
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https?://www.brave.com', 'prop1', 4)
     })
     it('Can obtain from https url', function *() {
       const setting = siteSettings.getSiteSettingsForURL(siteSettingsMap, 'https://www.brave.com/projects')
@@ -72,7 +72,7 @@ describe('siteSettings', function () {
   describe('subdomain wildcards', function () {
     before(function () {
       siteSettingsMap = new Immutable.Map()
-      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'http?://*.brave.com:*', 'prop1', 5)
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https?://*.brave.com:*', 'prop1', 5)
     })
     it('Can obtain from no subdomain', function *() {
       const setting = siteSettings.getSiteSettingsForURL(siteSettingsMap, 'https://brave.com/projects')
@@ -124,6 +124,11 @@ describe('siteSettings', function () {
 
       siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https://www.brave.com:*', 'prop1', 2)
       siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https://www.brave.com:*', 'prop2', 2)
+
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, '*', 'prop1', 4)
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, '*', 'prop2', 4)
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, '*', 'prop3', 4)
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, '*', 'prop4', 4)
     })
     it('can obtain a site setting from a host pattern', function *() {
       let setting = siteSettings.getSiteSettingsForHostPattern(siteSettingsMap, 'https://www.brave.com')
@@ -139,12 +144,19 @@ describe('siteSettings', function () {
       assert.strictEqual(setting.get('prop1'), 3)
       assert.strictEqual(setting.get('prop2'), 3)
       assert.strictEqual(setting.get('prop3'), 3)
+
+      setting = siteSettings.getSiteSettingsForHostPattern(siteSettingsMap, '*')
+      assert.strictEqual(setting.get('prop1'), 4)
+      assert.strictEqual(setting.get('prop2'), 4)
+      assert.strictEqual(setting.get('prop3'), 4)
+      assert.strictEqual(setting.get('prop4'), 4)
     })
     it('can obtain properly combined settings', function *() {
       const setting = siteSettings.getSiteSettingsForURL(siteSettingsMap, 'https://www.brave.com')
       assert.strictEqual(setting.get('prop1'), 1)
       assert.strictEqual(setting.get('prop2'), 2)
       assert.strictEqual(setting.get('prop3'), 3)
+      assert.strictEqual(setting.get('prop4'), 4)
     })
   })
 })

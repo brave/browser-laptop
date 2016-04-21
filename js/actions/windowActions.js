@@ -85,7 +85,6 @@ const windowActions = {
       windowActions.newFrame({
         location
       }, true)
-      return
     } else {
       dispatch({
         actionType: WindowConstants.WINDOW_SET_URL,

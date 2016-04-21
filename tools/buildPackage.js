@@ -104,7 +104,7 @@ if (isLinux) {
 } else if (isDarwin) {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
 } else if (isWindows) {
-  cmds.push('makensis.exe res/braveDefaults.nsi')
+  cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 }
 

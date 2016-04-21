@@ -35,7 +35,7 @@ describe('urlbar', function () {
     return client.waitUntil(function () {
       return this.getAttribute(urlInput, 'value').then((value) => value === '')
     })
-    .getAttribute(urlInput, 'placeholder').should.eventually.equal('Search or enter an address')
+    .getAttribute(urlInput, 'placeholder').should.eventually.equal('Enter a URL or search term')
   }
 
   function selectsText (client, text = config.defaultUrl) {
@@ -307,15 +307,38 @@ describe('urlbar', function () {
         yield this.app.client.keys('\uE007')
       })
 
-      it('gives focus to the webview', function () {
-        this.app.client.waitUntil(function () {
-          return this.getAttribute(':focus', 'src').then((src) => src === this.page1)
+      it('webview has focus', function *() {
+        yield this.app.client.waitForElementFocus(activeWebview)
+      })
+
+      it('webview loads url', function *() {
+        var page1 = this.page1
+        yield this.app.client.waitUntil(function () {
+          return this.getAttribute(activeWebview, 'src').then((src) => src === page1)
         })
       })
     })
 
     describe('with non-url input value', function () {
 
+    })
+
+    describe('with javascript url input value', function () {
+      Brave.beforeAll(this)
+
+      before(function *() {
+        yield setup(this.app.client)
+        // wait for the urlInput to be fully initialized
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client.keys('  javascript:alert(1)')
+        // hit enter
+        yield this.app.client.keys('\uE007')
+      })
+      it('filters javascript urls', function *() {
+        yield this.app.client.waitUntil(function () {
+          return this.getValue(urlInput).then((val) => !val.includes('javascript:'))
+        })
+      })
     })
 
     describe('page with focused form input', function () {

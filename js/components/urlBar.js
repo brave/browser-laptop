@@ -72,8 +72,9 @@ class UrlBar extends ImmutableComponent {
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
         } else {
+          // Filter javascript URLs to prevent self-XSS
+          location = location.replace(/^(\s*javascript:)+/i, '')
           const isLocationUrl = isUrl(location)
-          const searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
           // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
           // For whitepsace we want a search no matter what.
           if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
@@ -92,6 +93,7 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
+            let searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
             location = isLocationUrl ? location : searchUrl
             // do search.
             if (e.altKey) {
