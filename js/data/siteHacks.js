@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const urlParse = require('url').parse
+
 module.exports = {
   'forbes.com': {
     onBeforeSendHeaders: function(details) {
@@ -48,7 +54,7 @@ module.exports = {
   },
   'www.googletagmanager.com': {
      onBeforeRequest: function(details) {
-      if (details.url === '/gtm.js') {
+      if (urlParse(details.url).pathname !== '/gtm.js') {
         return
       }
       return {

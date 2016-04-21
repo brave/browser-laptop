@@ -6,10 +6,16 @@ var path = require('path')
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
-const arch = 'x64'
-const buildDir = 'Brave-' + process.platform + '-' + arch
 const outDir = 'dist'
+var arch = 'x64'
 var cmds
+
+if (isWindows) {
+  if (process.env.TARGET_ARCH === 'ia32') {
+    arch = 'ia32'
+  }
+}
+const buildDir = 'Brave-' + process.platform + '-' + arch
 
 console.log('Building install and update for version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
@@ -35,7 +41,7 @@ if (isDarwin) {
     'electron-builder \"' + buildDir + '/Brave.app\"' +
       ' --platform=osx ' +
       ' --out=\"' + outDir + '\" ' +
-      ' --config=builderConfig.json ' +
+      ' --config=res/builderConfig.json ' +
       ' --overwrite',
 
      // Create an update zip
@@ -50,7 +56,9 @@ if (isDarwin) {
     throw new Error('Certificate password required. Set environment variable CERT_PASSWORD.')
   }
   cmds = [
-    'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --config=builderConfig.json --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --sign_with_params=' + format('"-a -fd sha256 -f \\"%s\\" -p \\"%s\\" -t http://timestamp.verisign.com/scripts/timstamp.dll"', path.resolve(cert), certPassword)
+    'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --sign_with_params=' + format('"-a -fd sha256 -f \\"%s\\" -p \\"%s\\" -t http://timestamp.verisign.com/scripts/timstamp.dll"', path.resolve(cert), certPassword),
+    'mv dist/BraveSetup.exe dist/BraveSetup-' + arch + '.exe',
+    'mv dist/Setup.msi dist/BraveSetup-' + arch + '.msi'
   ]
 } else if (isLinux) {
   console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')

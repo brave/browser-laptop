@@ -149,7 +149,7 @@ class Main extends ImmutableComponent {
       }, openInForeground)
     })
 
-    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined'
+    ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
       ? windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
       : windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
@@ -243,7 +243,12 @@ class Main extends ImmutableComponent {
     window.addEventListener('mousemove', (e) => {
       self.checkForTitleMode(e.pageY)
     })
-
+    window.addEventListener('focus', () => {
+      // For whatever reason other elements are preserved but webviews are not.
+      if (document.activeElement && document.activeElement.tagName === 'BODY') {
+        windowActions.setWebviewFocused()
+      }
+    })
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
     const win = remote.getCurrentWindow()
     if (activeFrame && win) {
@@ -292,7 +297,8 @@ class Main extends ImmutableComponent {
     // whether the current page is bookmarked. needed to re-initialize the
     // application menu.
     braverySettings.bookmarked = this.navBar.bookmarked
-    contextMenus.onHamburgerMenu(braverySettings, e)
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    contextMenus.onHamburgerMenu(braverySettings, activeFrame && activeFrame.get('location') || '', e)
   }
 
   onHideSiteInfo () {
@@ -400,6 +406,7 @@ class Main extends ImmutableComponent {
       {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
+          siteSettings={this.props.appState.get('siteSettings')}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/>
         : null
       }
@@ -528,6 +535,7 @@ class Main extends ImmutableComponent {
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
               passwords={this.props.appState.get('passwords')}
+              siteSettings={this.props.appState.get('siteSettings')}
               enableAds={this.enableAds}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}

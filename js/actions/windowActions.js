@@ -85,7 +85,6 @@ const windowActions = {
       windowActions.newFrame({
         location
       }, true)
-      return
     } else {
       dispatch({
         actionType: WindowConstants.WINDOW_SET_URL,
@@ -277,6 +276,13 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_NAVBAR_FOCUSED,
       focused
     })
+  },
+
+  setWebviewFocused: function () {
+    const webview = document.querySelector('.frameWrapper.isActive webview')
+    if (webview) {
+      webview.focus()
+    }
   },
 
   /**
@@ -779,29 +785,11 @@ const windowActions = {
     })
   },
 
-  zoomIn: function (frameProps) {
-    windowActions.zoom(frameProps, 0.5)
-  },
-
-  zoomOut: function (frameProps) {
-    windowActions.zoom(frameProps, -0.5)
-  },
-
-  zoom: function (frameProps, stepSize) {
-    dispatch({
-      frameProps,
-      stepSize,
-      actionType: WindowConstants.WINDOW_ZOOM
-    })
-  },
-
-  zoomReset: function (frameProps) {
-    dispatch({
-      frameProps,
-      actionType: WindowConstants.WINDOW_ZOOM_RESET
-    })
-  },
-
+  /**
+   * Inspect the element for the active webview at the x, y content position
+   * @param {number} x - horizontal position of the element to inspect
+   * @param {number} y - vertical position of the element to inspect
+   */
   inspectElement: function (x, y) {
     const webview = document.querySelector('.frameWrapper.isActive webview')
     if (webview) {

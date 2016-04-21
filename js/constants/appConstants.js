@@ -24,7 +24,8 @@ const AppConstants = {
   APP_SET_RESOURCE_ENABLED: _,
   APP_UPDATE_LAST_CHECK: _,
   APP_SET_UPDATE_STATUS: _,
-  APP_CHANGE_SETTING: _
+  APP_CHANGE_SETTING: _,
+  APP_CHANGE_SITE_SETTING: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)

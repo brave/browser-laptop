@@ -14,7 +14,7 @@ class TabsToolbarButtons extends ImmutableComponent {
     return <div className='tabsToolbarButtons'>
       <Button iconClass='fa-bars'
         l10nId='menuButton'
-        className='navbutton menu-button'
+        className='navbutton menuButton'
         onClick={this.props.onMenu} />
     </div>
   }

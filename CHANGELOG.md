@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+- Added the ability to set Brave as the default browser within Control Panel on Windows.
+- Added 32-bit Windows support.
+- Added ability to block HTML canvas and WebGL fingerprinting which can be enabled in preferences.
+- Zoom is now persisted across sessions and remembered per origin.
+- Added menu item to clear all cookies and site data.
+- Multi language support.  Initially this includes: en-US, nl-NL, and pt-Br.
+- Ability to open html files when Brave is the default on OS X.
+- Block 'javascript:' URLs from being loaded when entered in URL bar
+- Fixed various bugs.
+- Upgrade to libchromiumcontent 49.0.2623.112.
+
 ## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
 - Undo closed tab now focuses the webview.
 - Upgrade to React v15 for cleaner DOM and faster performance.

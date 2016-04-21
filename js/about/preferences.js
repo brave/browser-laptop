@@ -92,6 +92,14 @@ class GeneralTab extends ImmutableComponent {
           value={getSetting(settings.HOMEPAGE, this.props.settings)}
           onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
       </SettingItem>
+      <SettingItem dataL10nId='selectedLanguage'>
+        <select value={getSetting(settings.LANGUAGE, this.props.settings)}
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
+          <option data-l10n-id='en-US' value='en-US'/>
+          <option data-l10n-id='nl-NL' value='nl-NL'/>
+          <option data-l10n-id='pt-BR' value='pt-BR'/>
+        </select>
+      </SettingItem>
     </SettingsList>
   }
 }
@@ -114,12 +122,14 @@ class TabsTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingItem dataL10nId='tabsPerTabPage'>
-        <input
-          type='number'
-          min='3'
-          max='20'
+        <select
           value={getSetting(settings.TABS_PER_TAB_PAGE, this.props.settings)}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_TAB_PAGE)} />
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_TAB_PAGE)}>
+          {
+            new Array(18).fill(0).map((x, i) =>
+              <option value={i + 3} key={i + 3}>{i + 3}</option>)
+          }
+        </select>
       </SettingItem>
       <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
@@ -146,6 +156,7 @@ class PrivacyTab extends ImmutableComponent {
       </SettingsList>
       <SettingsList dataL10nId='advancedPrivacySettings'>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
     </div>
   }

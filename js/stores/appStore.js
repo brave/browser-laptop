@@ -7,6 +7,7 @@ const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
+const siteSettings = require('../state/siteSettings')
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
@@ -392,6 +393,10 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
+      break
+    case AppConstants.APP_CHANGE_SITE_SETTING:
+      appState = appState.set('siteSettings',
+        siteSettings.mergeSiteSetting(appState.get('siteSettings'), action.hostPattern, action.key, action.value))
       break
     default:
   }

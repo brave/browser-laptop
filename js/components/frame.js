@@ -10,6 +10,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const siteUtil = require('../state/siteUtil')
+const siteSettings = require('../state/siteSettings')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
@@ -85,6 +86,35 @@ class Frame extends ImmutableComponent {
 
   componentDidMount () {
     this.updateWebview()
+    if (this.zoomLevel !== config.zoom.defaultValue) {
+      // Timeout to work around setting zoom too early not working in Electron
+      setTimeout(() => this.webview.setZoomLevel(this.zoomLevel), 1000)
+      setTimeout(() => this.webview.setZoomLevel(this.zoomLevel), 2000)
+    }
+  }
+
+  zoom (stepSize) {
+    let newZoomLevel = this.zoomLevel
+    if (stepSize !== undefined &&
+        config.zoom.max >= this.zoomLevel + stepSize &&
+      config.zoom.min <= this.zoomLevel + stepSize) {
+      newZoomLevel += stepSize
+    } else if (stepSize === undefined) {
+      newZoomLevel = config.zoom.defaultValue
+    }
+    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel)
+  }
+
+  zoomIn () {
+    this.zoom(config.zoom.step)
+  }
+
+  zoomOut () {
+    this.zoom(config.zoom.step * -1)
+  }
+
+  zoomReset () {
+    this.zoom()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -140,13 +170,13 @@ class Frame extends ImmutableComponent {
         this.webview.loadURL(this.props.frame.get('location'))
         break
       case 'zoom-in':
-        windowActions.zoomIn(this.props.frame)
+        this.zoomIn()
         break
       case 'zoom-out':
-        windowActions.zoomOut(this.props.frame)
+        this.zoomOut()
         break
       case 'zoom-reset':
-        windowActions.zoomReset(this.props.frame)
+        this.zoomReset()
         break
       case 'toggle-dev-tools':
         if (this.webview.isDevToolsOpened()) {
@@ -305,6 +335,9 @@ class Frame extends ImmutableComponent {
           ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frame.get('key'))
         }
       }
+      if (getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)) {
+        this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
+      }
       windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
@@ -432,6 +465,11 @@ class Frame extends ImmutableComponent {
     this.webview.goForward()
   }
 
+  get origin () {
+    const parsedUrl = urlParse(this.props.frame.get('location'))
+    return `${parsedUrl.protocol}//${parsedUrl.host}`
+  }
+
   onFocus () {
     windowActions.setTabPageIndexByFrame(this.props.frame)
     windowActions.setUrlBarActive(false)
@@ -446,15 +484,15 @@ class Frame extends ImmutableComponent {
 
   onUpdateWheelZoom () {
     if (this.wheelDeltaY > 0) {
-      windowActions.zoomIn(this.props.frame)
+      this.zoomIn()
     } else if (this.wheelDeltaY < 0) {
-      windowActions.zoomOut(this.props.frame)
+      this.zoomOut()
     }
     this.wheelDeltaY = 0
   }
 
   onMouseWheel (e) {
-    if (e.ctrlKey || (e.metaKey && process.platform === 'darwin')) {
+    if (e.ctrlKey) {
       e.preventDefault()
       this.wheelDeltaY = (this.wheelDeltaY || 0) + e.wheelDeltaY
       this.onUpdateWheelZoom()
@@ -488,10 +526,23 @@ class Frame extends ImmutableComponent {
       this.webview.setAudioMuted(false)
     }
 
-    let zoomLevel = nextProps.frame.get('zoomLevel')
-    if (zoomLevel !== this.props.frame.get('zoomLevel')) {
-      this.webview.setZoomLevel(zoomLevel)
+    const nextLocation = nextProps.frame.get('location')
+    const nextSiteSettings = siteSettings.getSiteSettingsForURL(nextProps.siteSettings, nextLocation)
+    if (nextSiteSettings) {
+      const nextZoom = nextSiteSettings.get('zoomLevel')
+      if (this.zoomLevel !== nextZoom) {
+        this.webview.setZoomLevel(nextZoom)
+      }
     }
+  }
+
+  get zoomLevel () {
+    const location = this.props.frame.get('location')
+    const settings = siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
+    if (!settings) {
+      return config.zoom.defaultValue
+    }
+    return settings.get('zoomLevel')
   }
 
   render () {

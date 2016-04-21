@@ -254,6 +254,21 @@ const appActions = {
       key,
       value
     })
+  },
+
+  /**
+   * Change a hostPattern's config
+   * @param {string} hostPattern - The host pattern to update the config for
+   * @param {string} key - The config key to update
+   * @param {string|number} value - The value to update to
+   */
+  changeSiteSetting: function (hostPattern, key, value) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+      hostPattern,
+      key,
+      value
+    })
   }
 }
 

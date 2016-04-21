@@ -22,6 +22,7 @@ const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
+const locale = require('../js/l10n')
 const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
 
@@ -31,7 +32,7 @@ const settings = require('./constants/settings')
  */
 const addBookmarkMenuItem = (siteDetail, closestDestinationDetail, isParent) => {
   return {
-    label: 'Add Bookmark...',
+    label: locale.translation('addBookmark'),
     click: () => {
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -43,7 +44,7 @@ const addBookmarkMenuItem = (siteDetail, closestDestinationDetail, isParent) => 
 
 const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   return {
-    label: 'Add Folder...',
+    label: locale.translation('addFolder'),
     click: () => {
       let emptyFolder = Immutable.fromJS({ tags: [siteTags.BOOKMARK_FOLDER] })
       if (isParent) {
@@ -65,12 +66,12 @@ function tabPageTemplateInit (framePropsList) {
     })
   }
   return [{
-    label: 'Unmute tabs',
+    label: locale.translation('unmuteTabs'),
     click: (item, focusedWindow) => {
       muteAll(framePropsList, false)
     }
   }, {
-    label: 'Mute tabs',
+    label: locale.translation('muteTabs'),
     click: (item, focusedWindow) => {
       muteAll(framePropsList, true)
     }
@@ -86,7 +87,7 @@ function inputTemplateInit (e) {
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
   return [
-    CommonMenu.bookmarksMenuItem,
+    CommonMenu.bookmarksMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
     addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
@@ -195,7 +196,7 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
   if (!isFolder || siteDetail.get('folderId') !== 0) {
     template.push(
       {
-        label: isFolder ? 'Edit Folder...' : 'Edit Bookmark...',
+        label: isFolder ? locale.translation('editFolder') : locale.translation('editBookmark'),
         click: () => {
           // originalLocation is undefined signifies add mode
           windowActions.setBookmarkDetail(siteDetail, siteDetail)
@@ -204,7 +205,7 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
 
     template.push(
       CommonMenu.separatorMenuItem, {
-        label: isFolder ? 'Delete Folder' : 'Delete Bookmark',
+        label: isFolder ? locale.translation('deleteFolder') : locale.translation('deleteBookmark'),
         click: () => {
           appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
         }
@@ -312,7 +313,7 @@ function tabTemplateInit (frameProps) {
   const tabKey = frameProps.get('key')
   const items = []
   items.push({
-    label: 'Reload tab',
+    label: locale.translation('reloadTab'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
         focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
@@ -323,7 +324,7 @@ function tabTemplateInit (frameProps) {
   if (!frameProps.get('isPrivate')) {
     if (frameProps.get('pinnedLocation')) {
       items.push({
-        label: 'Unpin tab',
+        label: locale.translation('unpinTab'),
         click: (item) => {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, false)
@@ -331,7 +332,7 @@ function tabTemplateInit (frameProps) {
       })
     } else {
       items.push({
-        label: 'Pin tab',
+        label: locale.translation('pinTab'),
         click: (item) => {
           // Handle converting the current tab window into a pinned site
           windowActions.setPinned(frameProps, true)
@@ -343,14 +344,14 @@ function tabTemplateInit (frameProps) {
   if (frameProps.get('audioPlaybackActive')) {
     if (frameProps.get('audioMuted')) {
       items.push({
-        label: 'Unmute tab',
+        label: locale.translation('unmuteTab'),
         click: (item) => {
           windowActions.setAudioMuted(frameProps, false)
         }
       })
     } else {
       items.push({
-        label: 'Mute tab',
+        label: locale.translation('Mute Tab'),
         click: (item) => {
           windowActions.setAudioMuted(frameProps, true)
         }
@@ -359,16 +360,16 @@ function tabTemplateInit (frameProps) {
   }
 
   Array.prototype.push.apply(items, [{
-    label: 'Disable tracking protection',
+    label: locale.translation('disableTrackingProtection'),
     enabled: false
   }, {
-    label: 'Disable ad block',
+    label: locale.translation('disableAdBlock'),
     enabled: false
   }])
 
   if (!frameProps.get('pinnedLocation')) {
     items.push({
-      label: 'Close tab',
+      label: locale.translation('closeTab'),
       click: (item, focusedWindow) => {
         if (focusedWindow) {
           // TODO: Don't switch active tabs when this is called
@@ -405,7 +406,7 @@ function tabTemplateInit (frameProps) {
   CommonMenu.separatorMenuItem)
 
   items.push(Object.assign({},
-    CommonMenu.reopenLastClosedTabItem,
+    CommonMenu.reopenLastClosedTabItem(),
     { enabled: WindowStore.getState().get('closedFrames').size > 0 }
   ))
 
@@ -416,60 +417,88 @@ function getEditableItems (hasSelection) {
   const items = []
   if (hasSelection) {
     items.push({
-      label: 'Cut',
+      label: locale.translation('cut'),
       enabled: hasSelection,
       accelerator: 'CmdOrCtrl+X',
       role: 'cut'
     }, {
-      label: 'Copy',
+      label: locale.translation('copy'),
       enabled: hasSelection,
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
     })
   }
   items.push({
-    label: 'Paste',
+    label: locale.translation('paste'),
     accelerator: 'CmdOrCtrl+V',
     role: 'paste'
   })
   return items
 }
 
-function hamburgerTemplateInit (braverySettings) {
+function hamburgerTemplateInit (braverySettings, location, e) {
   const template = [
-    CommonMenu.newTabMenuItem,
-    CommonMenu.newPrivateTabMenuItem,
-    CommonMenu.newPartitionedTabMenuItem,
-    CommonMenu.newWindowMenuItem,
+    {
+      l10nLabelId: 'new',
+      submenu: [
+        CommonMenu.newTabMenuItem(),
+        CommonMenu.newPrivateTabMenuItem(),
+        CommonMenu.newPartitionedTabMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.newWindowMenuItem()
+      ]
+    },
     CommonMenu.separatorMenuItem,
-    CommonMenu.findOnPageMenuItem,
-    CommonMenu.printMenuItem,
+    CommonMenu.findOnPageMenuItem(),
+    CommonMenu.printMenuItem(),
+    CommonMenu.separatorMenuItem,
+    {
+      l10nLabelId: 'zoom',
+      type: 'multi',
+      submenu: [{
+        label: '-',
+        click: () => {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
+        }
+      }, {
+        labelDataBind: 'zoomLevel',
+        dataBindParam: location,
+        click: () => {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET)
+        }
+      }, {
+        label: '+',
+        click: () => {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
+        }
+      }]
+    },
     CommonMenu.separatorMenuItem,
     CommonMenu.buildBraveryMenu(braverySettings, function () {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: braverySettings.bookmarked})
     }),
     CommonMenu.separatorMenuItem,
-    CommonMenu.preferencesMenuItem,
+    CommonMenu.preferencesMenuItem(),
     {
-      label: 'Bookmarks',
+      label: locale.translation('bookmarks'),
       submenu: [
-        CommonMenu.bookmarksMenuItem,
+        CommonMenu.bookmarksMenuItem(),
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.importBookmarksMenuItem
+        CommonMenu.importBookmarksMenuItem()
       ]
     },
-    CommonMenu.downloadsMenuItem,
+    CommonMenu.downloadsMenuItem(),
     CommonMenu.separatorMenuItem,
     {
-      label: 'Help',
+      label: locale.translation('help'),
       submenu: [
-        CommonMenu.aboutBraveMenuItem,
+        CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem,
+        CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.reportAnIssueMenuItem,
-        CommonMenu.submitFeedbackMenuItem
+        CommonMenu.reportAnIssueMenuItem(),
+        CommonMenu.submitFeedbackMenuItem()
       ]
     }
   ]
@@ -478,7 +507,7 @@ function hamburgerTemplateInit (braverySettings) {
 
 const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
   return {
-    label: 'Open in new tab',
+    label: locale.translation('openInNewTab'),
     click: () => {
       windowActions.newFrame({ location, isPrivate, partitionNumber }, false)
     }
@@ -487,7 +516,7 @@ const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
 
 const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
   return {
-    label: 'Open all in tabs',
+    label: locale.translation('openAllInTabs'),
     click: () => {
       bookmarkActions.openBookmarksInFolder(allSites, folderDetail)
     }
@@ -496,7 +525,7 @@ const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
 
 const openInNewPrivateTabMenuItem = (location) => {
   return {
-    label: 'Open in new private tab',
+    label: locale.translation('openInNewPrivateTab'),
     click: () => {
       windowActions.newFrame({
         location,
@@ -508,7 +537,7 @@ const openInNewPrivateTabMenuItem = (location) => {
 
 const openInNewSessionTabMenuItem = (location) => {
   return {
-    label: 'Open in new session tab',
+    label: locale.translation('openInNewSessionTab'),
     click: (item, focusedWindow) => {
       windowActions.newFrame({
         location,
@@ -520,9 +549,18 @@ const openInNewSessionTabMenuItem = (location) => {
 
 const copyLinkLocationMenuItem = (location) => {
   return {
-    label: 'Copy link address',
+    label: locale.translation('copyLinkAddress'),
     click: () => {
       clipboard.writeText(location)
+    }
+  }
+}
+
+const copyEmailAddressMenuItem = (location) => {
+  return {
+    label: 'Copy Email Address',
+    click: () => {
+      clipboard.writeText(location.substring('mailto:'.length, location.length))
     }
   }
 }
@@ -534,14 +572,19 @@ function mainTemplateInit (nodeProps, frame) {
   if (nodeProps.href) {
     template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       openInNewPrivateTabMenuItem(nodeProps.href),
-      openInNewSessionTabMenuItem(nodeProps.href),
-      copyLinkLocationMenuItem(nodeProps.href),
-      CommonMenu.separatorMenuItem)
+      openInNewSessionTabMenuItem(nodeProps.href))
+
+    if (nodeProps.href.toLowerCase().startsWith('mailto:')) {
+      template.push(copyEmailAddressMenuItem(nodeProps.href))
+    } else {
+      template.push(copyLinkLocationMenuItem(nodeProps.href))
+    }
+    template.push(CommonMenu.separatorMenuItem)
   }
 
   if (nodeName === 'IMG') {
     template.push({
-      label: 'Save image...',
+      label: locale.translation('saveImage'),
       click: (item, focusedWindow) => {
         if (focusedWindow && nodeProps.src) {
           focusedWindow.webContents.downloadURL(nodeProps.src)
@@ -549,7 +592,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     })
     template.push({
-      label: 'Open image in new tab',
+      label: locale.translation('openImageInNewTab'),
       click: (item, focusedWindow) => {
         if (focusedWindow && nodeProps.src) {
           // TODO: open this in the next tab instead of last tab
@@ -558,7 +601,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     })
     template.push({
-      label: 'Copy image address',
+      label: locale.translation('copyImageAddress'),
       click: (item, focusedWindow) => {
         if (focusedWindow && nodeProps.src) {
           clipboard.writeText(nodeProps.src)
@@ -571,24 +614,24 @@ function mainTemplateInit (nodeProps, frame) {
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
     const editableItems = getEditableItems(nodeProps.hasSelection)
     template.push({
-      label: 'Undo',
+      label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',
       role: 'undo'
     }, {
-      label: 'Redo',
+      label: locale.translation('redo'),
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
     }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
     template.push({
-      label: 'Copy',
+      label: locale.translation('copy'),
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
     }, CommonMenu.separatorMenuItem)
   }
 
   template.push({
-    label: 'Back',
+    label: locale.translation('back'),
     enabled: frame.get('canGoBack'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
@@ -596,7 +639,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     }
   }, {
-    label: 'Forward',
+    label: locale.translation('forward'),
     enabled: frame.get('canGoForward'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
@@ -604,7 +647,7 @@ function mainTemplateInit (nodeProps, frame) {
       }
     }
   }, {
-    label: 'Reload',
+    label: locale.translation('reload'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
         focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
@@ -614,18 +657,18 @@ function mainTemplateInit (nodeProps, frame) {
 
   template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
     {
-      label: 'Add to reading list',
+      label: locale.translation('addToReadingList'),
       enabled: false
     }, CommonMenu.separatorMenuItem,
     {
-      label: 'View Page Source',
+      label: locale.translation('viewPageSource'),
       click: (item, focusedWindow) => {
         if (focusedWindow) {
           focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
         }
       }
     }, {
-      label: 'Inspect Element',
+      label: locale.translation('inspectElement'),
       click: (item, focusedWindow) => {
         windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
       }
@@ -647,10 +690,14 @@ function mainTemplateInit (nodeProps, frame) {
   return template
 }
 
-export function onHamburgerMenu (braverySettings, e) {
-  const hamburgerMenu = Menu.buildFromTemplate(hamburgerTemplateInit(braverySettings))
+export function onHamburgerMenu (braverySettings, location, e) {
+  const menuTemplate = hamburgerTemplateInit(braverySettings, location, e)
   const rect = e.target.getBoundingClientRect()
-  hamburgerMenu.popup(remote.getCurrentWindow(), rect.left, rect.bottom)
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    right: 0,
+    top: rect.bottom + 2,
+    template: menuTemplate
+  }))
 }
 
 export function onMainContextMenu (nodeProps, frame, contextMenuType) {

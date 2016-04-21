@@ -20,11 +20,13 @@ const settings = {
   OPENED_TAB_SUGGESTIONS: 'privacy.opened-tab-suggestions',
   AUTOCOMPLETE_HISTORY_SIZE: 'privacy.autocomplete.history-size',
   DO_NOT_TRACK: 'privacy.do-not-track',
+  BLOCK_CANVAS_FINGERPRINTING: 'privacy.block-canvas-fingerprinting',
   // Security Tab
   PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   // Other settings
-  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show'
+  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
+  LANGUAGE: 'general.language'
 }
 
 module.exports = settings

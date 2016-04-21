@@ -9,7 +9,7 @@ const crashURL = process.env.BRAVE_CRASH_URL || 'https://laptop-updates.brave.co
 
 module.exports = {
   name: 'Brave',
-  contactUrl: 'mailto:support@brave.com',
+  contactUrl: 'mailto:support+laptop@brave.com',
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',
@@ -69,7 +69,7 @@ module.exports = {
   defaultSettings: {
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
-    'general.useragent.value': undefined, // Set at runtime
+    'general.useragent.value': null, // Set at runtime
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
@@ -79,8 +79,10 @@ module.exports = {
     'privacy.bookmark-suggestions': true,
     'privacy.opened-tab-suggestions': true,
     'privacy.autocomplete.history-size': 500,
+    'privacy.block-canvas-fingerprinting': false,
     'bookmarks.toolbar.show': false,
     'privacy.do-not-track': false,
-    'security.passwords.manager-enabled': true
+    'security.passwords.manager-enabled': true,
+    'security.passwords.one-password-enabled': false
   }
 }

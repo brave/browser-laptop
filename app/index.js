@@ -1,3 +1,4 @@
+// @flow
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -7,6 +8,8 @@
 if (process.platform === 'win32') {
   require('./windowsInit')
 }
+
+var locale = require('./locale')
 
 const Immutable = require('immutable')
 const electron = require('electron')
@@ -35,6 +38,7 @@ const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const dialog = electron.dialog
+const settings = require('../js/constants/settings')
 const path = require('path')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
@@ -47,8 +51,8 @@ let sessionStateStoreCompleteOnQuit = false
 let beforeQuitSaveStarted = false
 let lastWindowState
 
-// URLs to accept bad certs for.
-let acceptCertUrls = {}
+// Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
+let acceptCertDomains = {}
 // URLs to callback for auth.
 let authCallbacks = {}
 // Don't show the keytar prompt more than once per 5 minutes
@@ -163,33 +167,10 @@ const initiateSessionStateSave = debounce(() => {
   BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
 }, 5 * 60 * 1000)
 
-if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-  const appAlreadyStartedShouldQuit = app.makeSingleInstance((commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    let focusedFirst = false
-    BrowserWindow.getAllWindows().forEach((win) => {
-      if (win) {
-        if (win.isMinimized()) {
-          win.restore()
-        }
-        if (!focusedFirst) {
-          win.focus()
-          focusedFirst = true
-        }
-      }
-    })
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
-    }
-  })
-  if (appAlreadyStartedShouldQuit) {
-    app.exit(0)
-  }
-}
-
 app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
-    if (acceptCertUrls[url] === true) {
+    let host = urlParse(url).host
+    if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
       e.preventDefault()
       cb(true)
@@ -223,13 +204,6 @@ app.on('ready', () => {
     }
   })
 
-  app.on('activate', () => {
-    // (OS X) open a new window when the user clicks on the app icon if there aren't any open
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow()
-    }
-  })
-
   app.on('before-quit', (e) => {
     beforeQuitSaveStarted = true
     if (sessionStateStoreCompleteOnQuit) {
@@ -258,6 +232,7 @@ app.on('ready', () => {
       lastWindowState = data
     }
   })
+
   ipcMain.on(messages.LOGIN_RESPONSE, (e, url, username, password) => {
     if (username || password) {
       // Having 2 of the same tab URLs open right now, where both require auth
@@ -272,6 +247,7 @@ app.on('ready', () => {
     }
     delete authCallbacks[url]
   })
+
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
       appActions.newWindow(undefined, undefined, lastWindowState)
@@ -280,6 +256,14 @@ app.on('ready', () => {
   })
 
   loadAppStatePromise.then((initialState) => {
+    // Initiate the translation for a configured language and
+    // reset the browser window. This will default to en-US if
+    // not yet configured.
+    locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
+      Menu.init(AppStore.getState().get('settings'), {})
+    })
+
+    // Do this after loading the state
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
@@ -328,14 +312,17 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
-      acceptCertUrls[url] = true
+      let host = urlParse(url).host
+      if (host) {
+        acceptCertDomains[host] = true
+      }
       BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
     })
 
     ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
       // If the host is associated with a URL with a cert error, update the
       // security state to insecure
-      if (Object.keys(acceptCertUrls).map((url) => { return urlParse(url).host }).includes(host)) {
+      if (acceptCertDomains[host]) {
         BrowserWindow.getFocusedWindow().webContents.send(messages.SET_SECURITY_STATE, frameKey, {
           secure: false
         })
@@ -530,6 +517,10 @@ app.on('ready', () => {
           iv: encrypted.iv
         })
       })
+    })
+
+    ipcMain.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {
+      console.log('got canvas fingerprint block', details)
     })
 
     // Setup the crash handling
