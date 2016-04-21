@@ -123,11 +123,12 @@ class TabsTab extends ImmutableComponent {
     return <SettingsList>
       <SettingItem dataL10nId='tabsPerTabPage'>
         <select
-          value={getSetting(settings.TABS_PER_TAB_PAGE, this.props.settings)}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_TAB_PAGE)}>
+          value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
+          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
           {
-            new Array(18).fill(0).map((x, i) =>
-              <option value={i + 3} key={i + 3}>{i + 3}</option>)
+            // Sorry, Brad says he hates primes :'(
+            [6, 8, 10, 20].map((x) =>
+              <option value={x} key={x}>{x}</option>)
           }
         </select>
       </SettingItem>

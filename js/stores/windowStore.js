@@ -52,7 +52,7 @@ const updateTabPageIndex = (frameProps) => {
   }
 
   const index = FrameStateUtil.getFrameTabPageIndex(windowState.get('frames')
-      .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_TAB_PAGE))
+      .filter((frame) => !frame.get('pinnedLocation')), frameProps, getSetting(settings.TABS_PER_PAGE))
   if (index === -1) {
     return
   }

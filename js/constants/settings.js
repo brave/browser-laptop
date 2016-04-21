@@ -12,7 +12,7 @@ const settings = {
   // Tabs tab
   SWITCH_TO_NEW_TABS: 'tabs.switch-to-new-tabs',
   PAINT_TABS: 'tabs.paint-tabs',
-  TABS_PER_TAB_PAGE: 'tabs.tabs-per-tab-page',
+  TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
