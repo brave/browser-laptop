@@ -6,7 +6,7 @@ var path = require('path')
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
-const outDir = 'dist'
+var outDir = 'dist'
 var arch = 'x64'
 var cmds
 
@@ -55,10 +55,15 @@ if (isDarwin) {
   if (!certPassword) {
     throw new Error('Certificate password required. Set environment variable CERT_PASSWORD.')
   }
+
+  // Because both x64 and ia32 creates a RELEASES and a .nupkg file we
+  // need to store the output files in separate directories
+  outDir = `${outDir}-${arch}`
+
   cmds = [
     'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --sign_with_params=' + format('"-a -fd sha256 -f \\"%s\\" -p \\"%s\\" -t http://timestamp.verisign.com/scripts/timstamp.dll"', path.resolve(cert), certPassword),
-    'mv dist/BraveSetup.exe dist/BraveSetup-' + arch + '.exe',
-    'mv dist/Setup.msi dist/BraveSetup-' + arch + '.msi'
+    `mv ${outDir}/BraveSetup.exe ${outDir}/BraveSetup-${arch}.exe`,
+    `mv ${outDir}/Setup.msi ${outDir}/BraveSetup-${arch}.msi`
   ]
 } else if (isLinux) {
   console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')

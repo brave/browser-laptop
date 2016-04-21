@@ -31,7 +31,8 @@ var debug = function (contents) {
 // this maps the result of a call to process.platform to an update API identifier
 var platforms = {
   'darwin': 'osx',
-  'win32': 'winx64'
+  'win32x64': 'winx64',
+  'win32ia32': 'winia32'
 }
 
 // We are storing this as a package variable because a number of functions need access
@@ -40,8 +41,13 @@ var platformBaseUrl = null
 var version = null
 
 // build the complete update url from the base, platform and version
-exports.updateUrl = function (updates, platform) {
+exports.updateUrl = function (updates, platform, arch) {
+  // For windows we need to separate x64 and ia32 for update purposes
+  if (platform === 'win32') {
+    platform = platform + arch
+  }
   platformBaseUrl = `${updates.baseUrl}/${Channel.channel()}/${version}/${platforms[platform]}`
+  console.log(platformBaseUrl)
   debug(`platformBaseUrl = ${platformBaseUrl}`)
   if (platform === 'darwin') {
     return platformBaseUrl
@@ -69,14 +75,14 @@ var scheduleUpdates = () => {
 }
 
 // set the feed url for the auto-update system
-exports.init = (platform, ver) => {
+exports.init = (platform, arch, ver) => {
   // When starting up we should not expect an update to be available
   appActions.setUpdateStatus(UpdateStatus.UPDATE_NONE)
 
   // Browser version X.X.X
   version = ver
 
-  var baseUrl = exports.updateUrl(appConfig.updates, platform)
+  var baseUrl = exports.updateUrl(appConfig.updates, platform, arch)
   debug(`updateUrl = ${baseUrl}`)
 
   scheduleUpdates()

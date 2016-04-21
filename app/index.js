@@ -533,7 +533,7 @@ app.on('ready', () => {
 
       // Setup the auto updater, check the env variable first because it's
       // used to check the update channel before releases.
-      Updater.init(process.platform, process.env.BRAVE_UPDATE_VERSION || pack.version)
+      Updater.init(process.platform, process.arch, process.env.BRAVE_UPDATE_VERSION || pack.version)
 
       // This is fired by a menu entry (for now - will be scheduled)
       process.on(messages.CHECK_FOR_UPDATE, () => Updater.checkForUpdate(true))
