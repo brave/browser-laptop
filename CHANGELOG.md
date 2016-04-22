@@ -9,6 +9,7 @@
 - Multi language support.  Initially this includes: en-US, nl-NL, and pt-Br.
 - Ability to open html files when Brave is the default on OS X.
 - Block 'javascript:' URLs from being loaded when entered in URL bar
+- Printing fixed.
 - Fixed various bugs.
 - Upgrade to libchromiumcontent 49.0.2623.112.
 
