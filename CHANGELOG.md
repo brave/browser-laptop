@@ -8,10 +8,11 @@
 - Added menu item to clear all cookies and site data.
 - Multi language support.  Initially this includes: en-US, nl-NL, and pt-Br.
 - Ability to open html files when Brave is the default on OS X.
-- Block 'javascript:' URLs from being loaded when entered in URL bar
+- Block 'javascript:' URLs from being loaded when entered in URL bar.
 - Printing fixed.
 - Fixed various bugs.
 - Upgrade to libchromiumcontent 49.0.2623.112.
+- Upgrade to Electron 0.37.6.
 
 ## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
 - Undo closed tab now focuses the webview.
