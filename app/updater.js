@@ -47,13 +47,17 @@ exports.updateUrl = function (updates, platform, arch) {
     platform = platform + arch
   }
   platformBaseUrl = `${updates.baseUrl}/${Channel.channel()}/${version}/${platforms[platform]}`
-  console.log(platformBaseUrl)
   debug(`platformBaseUrl = ${platformBaseUrl}`)
   if (platform === 'darwin') {
     return platformBaseUrl
   } else {
-    debug(updates.winBaseUrl.replace('CHANNEL', Channel.channel()))
-    return updates.winBaseUrl.replace('CHANNEL', Channel.channel())
+    if (platform.match(/^win32/)) {
+      var windowsUpdateUrlWithArch = updates.winBaseUrl.replace('CHANNEL', Channel.channel()) + platforms[platform]
+      return windowsUpdateUrlWithArch
+    } else {
+      // Unsupport platform for automatic updates
+      return null
+    }
   }
 }
 

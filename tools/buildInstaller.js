@@ -58,7 +58,7 @@ if (isDarwin) {
 
   // Because both x64 and ia32 creates a RELEASES and a .nupkg file we
   // need to store the output files in separate directories
-  outDir = `${outDir}-${arch}`
+  outDir = path.join(outDir, arch)
 
   cmds = [
     'electron-installer-squirrel-windows "' + buildDir + '" --platform=win --out="' + outDir + '" --name=brave --product_name="Brave" --overwrite --debug --loading_gif="res/brave_splash_installing.gif" --setup_icon=res/app.ico --sign_with_params=' + format('"-a -fd sha256 -f \\"%s\\" -p \\"%s\\" -t http://timestamp.verisign.com/scripts/timstamp.dll"', path.resolve(cert), certPassword),
