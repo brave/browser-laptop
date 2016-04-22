@@ -9,7 +9,7 @@ const fs = require('fs')
 const request = require('request')
 
 // The names of the directories in the locales folder are used as a list of languages to retrieve
-var languages = fs.readdirSync(path.join(__dirname, '..', 'app', 'locales')).filter(function (language) {
+var languages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales')).filter(function (language) {
   return language !== 'en-US'
 }).map(function (language) {
   return language.replace('-', '_')
