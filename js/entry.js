@@ -20,12 +20,16 @@ require('../node_modules/font-awesome/css/font-awesome.css')
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
-const ipc = global.require('electron').ipcRenderer
+const electron = global.require('electron')
+const ipc = electron.ipcRenderer
+const webFrame = electron.webFrame
 const windowStore = require('./stores/windowStore')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
+
+webFrame.setZoomLevelLimits(1, 1)
 
 // get appStore from url
 ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
