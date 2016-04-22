@@ -195,12 +195,19 @@ exports.init = function (language, cb) {
     return { code: lang }
   })
 
-  // Property files to parse (only ones containing menu specific identifiers)
-  const propertyFiles = [
-    path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
-    path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
-    path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'password.properties')
-  ]
+  const propertyFiles = []
+  const appendLangProperties = (lang) => {
+    // Property files to parse (only ones containing menu specific identifiers)
+    propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'password.properties'))
+  }
+
+  appendLangProperties(lang)
+  if (lang !== DEFAULT_LANGUAGE) {
+    // Pass in the default locale as well
+    appendLangProperties(DEFAULT_LANGUAGE)
+  }
 
   // If langs change a new context must be created
   const env = new L20n.Env(L20n.fetchResource)
