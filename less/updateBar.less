@@ -13,7 +13,7 @@
     display: flex;
   }
 
-  .updateHello{
+  .updateHello {
     color: @braveOrange;
     font-size: 18px;
     margin: auto 0;
@@ -52,5 +52,14 @@
     background-color: @braveOrange;
     color: #fff;
     margin-right: 0px;
+
+    &:hover {
+      background-color: lighten(@braveOrange, 10%);
+      color: #fff !important;
+    }
+    &:active {
+      background-color: darken(@braveOrange, 10%);
+      color: #fff !important;
+    }
   }
 }
