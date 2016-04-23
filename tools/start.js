@@ -5,4 +5,4 @@ var env = {
   NODE_ENV: 'development'
 }
 
-execute('electron "' + path.join(__dirname, '..') + '" ' + process.argv[2], env)
+execute('electron "' + path.join(__dirname, '..') + '" ' + process.argv.slice(2).join(' '), env)
