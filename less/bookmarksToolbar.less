@@ -12,7 +12,7 @@
   display: flex;
   flex: 1;
   padding: 3px 10px;
-  height: 23px;
+  height: 30px;
   &.allowDragging {
     -webkit-app-region: drag;
     >* {
@@ -35,6 +35,8 @@
     max-width: 100px;
     box-sizing: border-box;
     -webkit-user-select: none;
+    align-items: center;
+    display: flex;
     &:hover {
       background: lighten(@tabsBackground, 5%);
     }
@@ -50,6 +52,12 @@
     }
     &.isDragging {
       opacity: 0.2;
+    }
+    .bookmarkFavicon {
+      background-position: center;
+      background-repeat: no-repeat;
+      display: inline-block;
+      margin-right: 4px;
     }
     .bookmarkFolderChevron {
       color: #676767;
