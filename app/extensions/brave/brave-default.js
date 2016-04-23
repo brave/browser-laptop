@@ -531,28 +531,7 @@ if (typeof KeyEvent === 'undefined') {
   }
 
   function hasSelection (node) {
-    // Combining these two if clauses causes Flow to throw "recursion limit
-    // exceeded" :(
-    if (node instanceof HTMLTextAreaElement) {
-      if (node.selectionEnd !== node.selectionStart) {
-        return true
-      }
-    } else if (node instanceof HTMLInputElement) {
-      if (node.selectionEnd !== node.selectionStart) {
-        return true
-      }
-    }
-
-    var selection = window.getSelection()
-    for (var i = 0; i < selection.rangeCount; i++) {
-      var range = window.getSelection().getRangeAt(i)
-      if (range.endOffset !== undefined &&
-          range.startOffset !== undefined &&
-          range.endOffset !== range.startOffset) {
-        return true
-      }
-    }
-    return false
+    return window.getSelection().toString().length > 0
   }
 
   /**
