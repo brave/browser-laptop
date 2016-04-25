@@ -1,6 +1,10 @@
 # Changelog
 
-## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
+## [0.9.3](https://github.com/brave/browser-laptop/releases/v0.9.3dev)
+- More zoom fixes for page navigation.
+- Upgrade to Electron 0.37.7.
+
+## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.2dev)
 - Added the ability to set Brave as the default browser within Control Panel on Windows.
 - Added 32-bit Windows support.
 - Added ability to block HTML canvas and WebGL fingerprinting which can be enabled in preferences.
