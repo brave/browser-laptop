@@ -79,27 +79,33 @@ class SettingCheckbox extends ImmutableComponent {
 class GeneralTab extends ImmutableComponent {
   render () {
     return <SettingsList>
-      <SettingItem dataL10nId='startsWith'>
-        <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
-          <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
-          <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
-          <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage'/>
-        </select>
-      </SettingItem>
-      <SettingItem dataL10nId='myHomepage'>
-        <input data-l10n-id='homepageInput'
-          value={getSetting(settings.HOMEPAGE, this.props.settings)}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
-      </SettingItem>
-      <SettingItem dataL10nId='selectedLanguage'>
-        <select value={getSetting(settings.LANGUAGE, this.props.settings)}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
-          <option data-l10n-id='en-US' value='en-US'/>
-          <option data-l10n-id='nl-NL' value='nl-NL'/>
-          <option data-l10n-id='pt-BR' value='pt-BR'/>
-        </select>
-      </SettingItem>
+      <SettingsList>
+        <SettingItem dataL10nId='startsWith'>
+          <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
+            <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
+            <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
+            <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage'/>
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='myHomepage'>
+          <input data-l10n-id='homepageInput'
+            value={getSetting(settings.HOMEPAGE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
+        </SettingItem>
+        <SettingItem dataL10nId='selectedLanguage'>
+          <select value={getSetting(settings.LANGUAGE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
+            <option data-l10n-id='en-US' value='en-US'/>
+            <option data-l10n-id='nl-NL' value='nl-NL'/>
+            <option data-l10n-id='pt-BR' value='pt-BR'/>
+          </select>
+        </SettingItem>
+      </SettingsList>
+      <SettingsList dataL10nId='bookmarkToolbarSettings'>
+        <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+      </SettingsList>
     </SettingsList>
   }
 }

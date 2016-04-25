@@ -19,7 +19,6 @@
       -webkit-app-region: no-drag;
     }
   }
-
   .bookmarkToolbarButton {
     border-radius: @borderRadius;
     color: black;
@@ -35,6 +34,8 @@
     max-width: 100px;
     box-sizing: border-box;
     -webkit-user-select: none;
+    align-items: center;
+    display: flex;
     &:hover {
       background: lighten(@tabsBackground, 5%);
     }
@@ -50,6 +51,12 @@
     }
     &.isDragging {
       opacity: 0.2;
+    }
+    .bookmarkFavicon {
+      background-position: center;
+      background-repeat: no-repeat;
+      display: inline-block;
+      margin-right: 4px;
     }
     .bookmarkFolderChevron {
       color: #676767;
@@ -67,4 +74,7 @@
     width: auto;
     -webkit-user-select: none;
   }
+}
+.showFavicons {
+  height: 30px;
 }

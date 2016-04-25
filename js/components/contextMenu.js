@@ -9,6 +9,8 @@ const windowActions = require('../actions/windowActions')
 const config = require('../constants/config')
 const siteSettings = require('../state/siteSettings')
 const cx = require('../lib/classSet.js')
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 export default class ContextMenuItem extends ImmutableComponent {
   get submenu () {
@@ -92,6 +94,27 @@ export default class ContextMenuItem extends ImmutableComponent {
     return ''
   }
   render () {
+    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+    const iconSize = 16
+    let iconStyle = {
+      minWidth: iconSize,
+      width: iconSize
+    }
+
+    if (showFavicon) {
+      let icon = this.props.contextMenuItem.get('favicon')
+
+      if (icon) {
+        iconStyle = Object.assign(iconStyle, {
+          backgroundImage: `url(${icon})`,
+          backgroundSize: iconSize,
+          height: iconSize
+        })
+      } else {
+        showFavicon = false
+      }
+    }
+
     if (this.props.contextMenuItem.get('type') === 'separator') {
       return <div className='contextMenuItem contextMenuSeparator' role='listitem'>
         <hr/>
@@ -127,6 +150,9 @@ export default class ContextMenuItem extends ImmutableComponent {
         this.props.contextMenuItem.get('checked')
         ? <span className='fa fa-check contextMenuCheckIndicator'/>
         : null
+      }
+      {
+        !this.hasSubmenu && showFavicon ? <span className="bookmarkFavicon" style={iconStyle}></span> : null
       }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>

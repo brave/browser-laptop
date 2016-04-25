@@ -26,6 +26,7 @@ const settings = {
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
+  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   LANGUAGE: 'general.language'
 }
 

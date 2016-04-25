@@ -108,6 +108,9 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (siteDetail.get('partitionNumber') || oldSite && oldSite.get('partitionNumber')) {
     site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber') || oldSite.get('partitionNumber')))
   }
+  if (siteDetail.get('favicon') || oldSite && oldSite.get('favicon')) {
+    site = site.set('favicon', siteDetail.get('favicon') || oldSite.get('favicon'))
+  }
 
   if (index === -1) {
     return sites.push(site)
@@ -195,7 +198,7 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
 }
 
 /**
- * Detemrines the icon class to use for the site
+ * Determines the icon class to use for the site
  *
  * @param site The site in question
  * @return the class of the fontawesome icon to use
@@ -220,7 +223,8 @@ module.exports.getDetailFromFrame = function (frame, tag) {
     location,
     title: frame.get('title'),
     partitionNumber: frame.get('partitionNumber'),
-    tags: tag ? [tag] : []
+    tags: tag ? [tag] : [],
+    favicon: frame.get('icon')
   })
 }
 

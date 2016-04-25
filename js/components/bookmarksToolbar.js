@@ -16,6 +16,8 @@ const Button = require('../components/button')
 const cx = require('../lib/classSet.js')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
 
 // TODO: Obtain from the less file
 const bookmarkMaxWidth = 100
@@ -108,6 +110,27 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   render () {
+    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+    const iconSize = 16
+    let iconStyle = {
+      minWidth: iconSize,
+      width: iconSize
+    }
+
+    if (showFavicon) {
+      let icon = this.props.bookmark.get('favicon')
+
+      if (icon) {
+        iconStyle = Object.assign(iconStyle, {
+          backgroundImage: `url(${icon})`,
+          backgroundSize: iconSize,
+          height: iconSize
+        })
+      } else {
+        showFavicon = false
+      }
+    }
+
     return <span
       className={cx({
         bookmarkToolbarButton: true,
@@ -124,6 +147,9 @@ class BookmarkToolbarButton extends ImmutableComponent {
       onDragLeave={this.onDragLeave.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
+      {
+        !this.isFolder && showFavicon ? <span className="bookmarkFavicon" style={iconStyle}></span> : null
+      }
       <span>
       {
         this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location')
@@ -231,12 +257,15 @@ class BookmarksToolbar extends ImmutableComponent {
     contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest.isDroppedOn, e)
   }
   render () {
+    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
     this.bookmarkRefs = []
     return <div
-      className={cx({
-        bookmarksToolbar: true,
-        allowDragging: this.props.shouldAllowWindowDrag
-      })}
+      className={
+        cx({
+          bookmarksToolbar: true,
+          allowDragging: this.props.shouldAllowWindowDrag
+        }) + (showFavicon ? ' showFavicons' : '')
+      }
       onDrop={this.onDrop.bind(this)}
       onDragEnter={this.onDragEnter.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
