@@ -8,6 +8,7 @@ const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
 const siteSettings = require('../state/siteSettings')
+const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
@@ -20,7 +21,6 @@ const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
-const path = require('path')
 const getSetting = require('../settings').getSetting
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
@@ -276,9 +276,7 @@ const handleAppAction = (action) => {
         }
       }
 
-      const whitelistedUrl = process.env.NODE_ENV === 'development'
-        ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index-dev.html'
-        : 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html'
+      const whitelistedUrl = appUrlUtil.getIndexHTML()
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {

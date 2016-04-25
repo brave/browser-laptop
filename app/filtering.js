@@ -16,6 +16,7 @@ const downloadActions = require('../js/constants/downloadActions')
 const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
+const appUrlUtil = require('../js/lib/appUrlUtil')
 const settings = require('../js/constants/settings')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
@@ -222,7 +223,13 @@ function registerPermissionHandler (session) {
     }
   }
   session.setPermissionRequestHandler((webContents, permission, cb) => {
-    let host = urlParse(webContents.getURL()).host
+    const url = webContents.getURL()
+    // Allow notifications for the main app
+    if (url === appUrlUtil.getIndexHTML() && permission === 'notifications') {
+      cb(true)
+      return
+    }
+    const host = urlParse(url).host
     if (!permissions[permission]) {
       console.log('WARNING: got registered permission request', permission)
       cb(false)

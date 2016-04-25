@@ -4,6 +4,7 @@
 
 const Immutable = require('immutable')
 const UrlUtil = require('./urlutil')
+const path = require('path')
 
 /**
  * Determines the path of a relative URL from the hosted app
@@ -19,6 +20,13 @@ module.exports.getAppUrl = function (relativeUrl) {
     return 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/' + relativeUrl
   }
 }
+
+module.exports.getIndexHTML = function () {
+  return process.env.NODE_ENV === 'development'
+    ? 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index-dev.html'
+    : 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html'
+}
+
 /**
  * Returns the URL to the application's manifest
  */
