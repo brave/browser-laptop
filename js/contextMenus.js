@@ -681,7 +681,7 @@ function mainTemplateInit (nodeProps, frame) {
         label: '1Password',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked-aomjjhallfgjeglblehebfpbcfeobpgk', '1Password')
+            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', '1Password')
           }
         }
       })
