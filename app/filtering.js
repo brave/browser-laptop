@@ -220,6 +220,10 @@ function registerPermissionHandler (session) {
     fullscreen: {
       action: 'be fullscreen',
       hosts: {}
+    },
+    openExternal: {
+      action: 'open an external application',
+      hosts: {}
     }
   }
   session.setPermissionRequestHandler((webContents, permission, cb) => {
@@ -231,7 +235,7 @@ function registerPermissionHandler (session) {
     }
     const host = urlParse(url).host
     if (!permissions[permission]) {
-      console.log('WARNING: got registered permission request', permission)
+      console.log('WARNING: got unregistered permission request', permission)
       cb(false)
       return
     }
