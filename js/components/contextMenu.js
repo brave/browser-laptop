@@ -152,7 +152,7 @@ export default class ContextMenuItem extends ImmutableComponent {
         : null
       }
       {
-        !this.hasSubmenu && showFavicon ? <span className="bookmarkFavicon" style={iconStyle}></span> : null
+        !this.hasSubmenu && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
       }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>

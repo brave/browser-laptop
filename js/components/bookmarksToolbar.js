@@ -148,7 +148,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       onDragOver={this.onDragOver.bind(this)}
       onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
       {
-        !this.isFolder && showFavicon ? <span className="bookmarkFavicon" style={iconStyle}></span> : null
+        !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
       }
       <span>
       {
@@ -263,8 +263,9 @@ class BookmarksToolbar extends ImmutableComponent {
       className={
         cx({
           bookmarksToolbar: true,
-          allowDragging: this.props.shouldAllowWindowDrag
-        }) + (showFavicon ? ' showFavicons' : '')
+          allowDragging: this.props.shouldAllowWindowDrag,
+          showFavicon
+        })
       }
       onDrop={this.onDrop.bind(this)}
       onDragEnter={this.onDragEnter.bind(this)}
