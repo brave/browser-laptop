@@ -49,7 +49,7 @@ class BookmarkItem extends ImmutableComponent {
         partitionNumber: this.props.bookmark.get('partitionNumber')
       }
       partitionNumberInfo =
-        <span> (<span data-l10n-id='partitionNumber' data-l10n-args={JSON.stringify(l10nArgs)}/>)</span>
+        <span>&nbsp;(<span data-l10n-id='partitionNumber' data-l10n-args={JSON.stringify(l10nArgs)}/>)</span>
     }
 
     return <div role='listitem'
