@@ -13,6 +13,7 @@ AppStore
     location: string,
     title: string,
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
+    favicon: string, // URL of the favicon
     lastAccessedTime: number, // datetime.getTime()
     partitionNumber: number, // Optionally specifies a specific session
     folderId: number, // Set for bookmark folders only

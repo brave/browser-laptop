@@ -57,6 +57,7 @@ function processBookmarkNode (parserState, domNode) {
       const site = {
         title: domNode.innerText,
         location: domNode.href,
+        favicon: domNode.getAttribute('ICON'),
         parentFolderId: parserState.parentFolderId,
         lastAccessedTime: (domNode.getAttribute('LAST_MODIFIED') || domNode.getAttribute('ADD_DATE') || 0) * 1000,
         tags: [siteTags.BOOKMARK]
