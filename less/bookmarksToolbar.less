@@ -12,14 +12,13 @@
   display: flex;
   flex: 1;
   padding: 3px 10px;
-  height: 30px;
+  height: 23px;
   &.allowDragging {
     -webkit-app-region: drag;
     >* {
       -webkit-app-region: no-drag;
     }
   }
-
   .bookmarkToolbarButton {
     border-radius: @borderRadius;
     color: black;
@@ -75,4 +74,7 @@
     width: auto;
     -webkit-user-select: none;
   }
+}
+.showFavicons {
+  height: 30px;
 }

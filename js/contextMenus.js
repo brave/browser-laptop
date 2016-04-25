@@ -246,6 +246,7 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
       bookmark: site,
       draggable: true,
       label: site.get('customTitle') || site.get('title') || site.get('location'),
+      favicon: site.get('favicon'),
       contextMenu: function (e) {
         onBookmarkContextMenu(site, activeFrame, e)
       },

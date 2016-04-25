@@ -126,6 +126,8 @@ class BookmarkToolbarButton extends ImmutableComponent {
           backgroundSize: iconSize,
           height: iconSize
         })
+      } else {
+        showFavicon = false
       }
     }
 
@@ -255,12 +257,15 @@ class BookmarksToolbar extends ImmutableComponent {
     contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest.isDroppedOn, e)
   }
   render () {
+    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
     this.bookmarkRefs = []
     return <div
-      className={cx({
-        bookmarksToolbar: true,
-        allowDragging: this.props.shouldAllowWindowDrag
-      })}
+      className={
+        cx({
+          bookmarksToolbar: true,
+          allowDragging: this.props.shouldAllowWindowDrag
+        }) + (showFavicon ? ' showFavicons' : '')
+      }
       onDrop={this.onDrop.bind(this)}
       onDragEnter={this.onDragEnter.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
