@@ -11,7 +11,7 @@ const electron = require('electron')
 const app = electron.app
 
 // Exhaustive list of identifiers used by top and context menus
-var menuIdentifiers = function () {
+var rendererIdentifiers = function () {
   return [
     'downloadsManager',
     'confirmClearPasswords',
@@ -123,7 +123,9 @@ var menuIdentifiers = function () {
     'allowAdsAndTracking',
     'block3rdPartyCookie',
     'blockPopups',
-    'httpsEverywhere'
+    'httpsEverywhere',
+    // Other identifiers
+    'urlCopied'
   ]
 }
 
@@ -213,8 +215,8 @@ exports.init = function (language, cb) {
   const env = new L20n.Env(L20n.fetchResource)
   ctx = env.createContext(langs, propertyFiles)
 
-  // Translate the menu identifiers
-  var identifiers = menuIdentifiers()
+  // Translate the renderer identifiers
+  var identifiers = rendererIdentifiers()
   ctx.formatValues.apply(ctx, identifiers).then(function (values) {
     // Cache the translations for later retrieval
     values.forEach(function (value, idx) {
