@@ -150,7 +150,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       {
         !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
       }
-      <span>
+      <span className='bookmarkText'>
       {
         this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location')
       }

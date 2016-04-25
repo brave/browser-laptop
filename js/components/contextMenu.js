@@ -9,8 +9,6 @@ const windowActions = require('../actions/windowActions')
 const config = require('../constants/config')
 const siteSettings = require('../state/siteSettings')
 const cx = require('../lib/classSet.js')
-const settings = require('../constants/settings')
-const getSetting = require('../settings').getSetting
 
 export default class ContextMenuItem extends ImmutableComponent {
   get submenu () {
@@ -94,25 +92,22 @@ export default class ContextMenuItem extends ImmutableComponent {
     return ''
   }
   render () {
-    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
     const iconSize = 16
     let iconStyle = {
       minWidth: iconSize,
       width: iconSize
     }
 
-    if (showFavicon) {
-      let icon = this.props.contextMenuItem.get('favicon')
-
-      if (icon) {
-        iconStyle = Object.assign(iconStyle, {
-          backgroundImage: `url(${icon})`,
-          backgroundSize: iconSize,
-          height: iconSize
-        })
-      } else {
-        showFavicon = false
-      }
+    const icon = this.props.contextMenuItem.get('icon')
+    let faIcon
+    if (icon) {
+      iconStyle = Object.assign(iconStyle, {
+        backgroundImage: `url(${icon})`,
+        backgroundSize: iconSize,
+        height: iconSize
+      })
+    } else {
+      faIcon = this.props.contextMenuItem.get('faIcon')
     }
 
     if (this.props.contextMenuItem.get('type') === 'separator') {
@@ -133,7 +128,9 @@ export default class ContextMenuItem extends ImmutableComponent {
     }
     return <div className={cx({
       contextMenuItem: true,
-      checkedMenuItem: this.props.contextMenuItem.get('checked')
+      hasFaIcon: faIcon,
+      checkedMenuItem: this.props.contextMenuItem.get('checked'),
+      hasIcon: icon || faIcon
     })}
       role='listitem'
       draggable={this.props.contextMenuItem.get('draggable')}
@@ -152,7 +149,15 @@ export default class ContextMenuItem extends ImmutableComponent {
         : null
       }
       {
-        !this.hasSubmenu && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
+        !this.hasSubmenu && (icon || faIcon)
+          ? <span className={cx({
+            contextMenuIcon: true,
+            hasFaIcon: !!faIcon,
+            fa: faIcon,
+            [faIcon]: !!faIcon
+          })}
+            style={iconStyle}></span>
+          : null
       }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>

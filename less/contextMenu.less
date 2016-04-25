@@ -36,13 +36,20 @@
     }
   }
 
-  .bookmarkFavicon {
+  .contextMenuIcon {
+    font-size: 14px;
     margin-right: 8px;
   }
 }
 
 .contextMenuItem {
   padding: 6px 10px 6px 20px;
+  &.hasIcon {
+    padding-left: 10px;
+    &.hasFaIcon {
+      padding-left: 12px;
+    }
+  }
   &.checkedMenuItem {
     padding-left: 4px;
 
