@@ -439,6 +439,9 @@ app.on('ready', () => {
       })
 
       if (results.size === 0) {
+        if (BrowserWindow.getFocusedWindow()) {
+          BrowserWindow.getFocusedWindow().webContents.send(messages.HIDE_CONTEXT_MENU)
+        }
         return
       }
 

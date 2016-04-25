@@ -337,15 +337,23 @@ if (typeof KeyEvent === 'undefined') {
 
     if (usernameElem) {
       usernameElem.addEventListener('keyup', (e) => {
-        if (!usernameElem) {
+        if (!usernameElem || !(e instanceof KeyboardEvent)) {
           return
         }
-        let rect = usernameElem.getBoundingClientRect()
-        ipcRenderer.send('show-username-list', formOrigin, action, {
-          bottom: rect.bottom,
-          left: rect.left,
-          width: rect.width
-        }, usernameElem.value || '')
+        switch (e.keyCode) {
+          case KeyEvent.DOM_VK_ESCAPE:
+            e.preventDefault()
+            e.stopPropagation()
+            ipcRenderer.send('hide-context-menu')
+            break
+          default:
+            let rect = usernameElem.getBoundingClientRect()
+            ipcRenderer.send('show-username-list', formOrigin, action, {
+              bottom: rect.bottom,
+              left: rect.left,
+              width: rect.width
+            }, usernameElem.value || '')
+        }
       })
     }
 
