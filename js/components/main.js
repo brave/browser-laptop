@@ -231,7 +231,8 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
-      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect)
+      const topOffset = this.tabContainer.getBoundingClientRect().top
+      contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect, topOffset)
     })
 
     ipc.on(messages.HIDE_CONTEXT_MENU, () => {
@@ -511,7 +512,8 @@ class Main extends ImmutableComponent {
         <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
       <div className='mainContainer'>
-        <div className='tabContainer'>
+        <div className='tabContainer'
+          ref={(node) => { this.tabContainer = node }}>
         {
           sortedFrames.map((frame) =>
             <Frame

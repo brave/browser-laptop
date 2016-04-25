@@ -773,12 +773,14 @@ export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  * @param {string} origin - origin of the form
  * @param {string} action - action of the form
  * @param {Object} boundingRect - bounding rectangle of username input field
+ * @param {number} topOffset - distance from webview to the top of window
  */
-export function onShowUsernameMenu (usernames, origin, action, boundingRect) {
+export function onShowUsernameMenu (usernames, origin, action, boundingRect,
+                                    topOffset) {
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
-    top: boundingRect.bottom + 62,
+    top: boundingRect.bottom + topOffset,
     template: menuTemplate
   }))
 }
