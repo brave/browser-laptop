@@ -86,11 +86,6 @@ class Frame extends ImmutableComponent {
 
   componentDidMount () {
     this.updateWebview()
-    if (this.zoomLevel !== config.zoom.defaultValue) {
-      // Timeout to work around setting zoom too early not working in Electron
-      setTimeout(() => this.webview.setZoomLevel(this.zoomLevel), 1000)
-      setTimeout(() => this.webview.setZoomLevel(this.zoomLevel), 2000)
-    }
   }
 
   zoom (stepSize) {
@@ -342,6 +337,10 @@ class Frame extends ImmutableComponent {
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
+      if (this.zoomLevel !== config.zoom.defaultValue) {
+        // Timeout to work around setting zoom too early not working in Electron
+        this.webview.setZoomLevel(this.zoomLevel)
+      }
     }
     const loadEnd = () => {
       windowActions.onWebviewLoadEnd(
