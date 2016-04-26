@@ -5,25 +5,29 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 
-const Button = require('./button')
+const ipc = require('electron').ipcRenderer
+const messages = require('../constants/messages')
 
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
-    console.log('got click of index', buttonIndex, this.props.detail.id)
+    ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'), buttonIndex, this.checkbox.checked)
   }
 
   render () {
     let i = 0
     return <div className='notificationItem'>
-      <span className='notificationMessage'>this.props.detail.message</span>
-      {
-        this.props.detail.buttons.map((button) => {
-          <Button disabled={false}
-            label={button}
-            className='notificationButton'
-            onClick={this.clickHandler.bind(i++, this)}/>
-        })
-      }
+      <span className='notificationMessage'>{this.props.detail.get('message')}</span>
+      <span className='notificationOptions'>
+        <label><input type='checkbox' ref={(node) => { this.checkbox = node }}/>{'Remember this decision'}</label>
+        {
+          this.props.detail.get('buttons').map((button) =>
+            <button
+              type='button'
+              className='notificationButton'
+              onClick={this.clickHandler.bind(this, i++)}>{button}</button>
+          )
+        }
+      </span>
     </div>
   }
 }
@@ -36,9 +40,9 @@ class NotificationBar extends ImmutableComponent {
 
     return <div className='notificationBar'>
     {
-      this.props.notifications.map((notificationDetail) => {
+      this.props.notifications.map((notificationDetail) =>
         <NotificationItem detail={notificationDetail} />
-      })
+      )
     }
     </div>
   }

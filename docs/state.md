@@ -32,7 +32,14 @@ AppStore
   }],
   siteSettings: {
     [hostPattern]: {
-      zoomLevel: number
+      zoomLevel: number,
+      mediaPermission: boolean,
+      geolocationPermission: boolean,
+      notificationsPermission: boolean,
+      midiSysexPermission: boolean,
+      pointerLockPermission: boolean,
+      fullscreenPermission: boolean,
+      openExternalPermission: boolean
     }
   },
   visits: [{
@@ -91,7 +98,6 @@ AppStore
   },
   notifications: [{
     message: string,
-    id: string,
     buttons: Array<string>
   }], // the notifications for the frame. not preserved across restart.
   settings: [{

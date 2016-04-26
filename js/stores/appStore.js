@@ -400,6 +400,11 @@ const handleAppAction = (action) => {
       let notifications = appState.get('notifications')
       appState = appState.set('notifications', notifications.push(Immutable.fromJS(action.detail)))
       break
+    case AppConstants.APP_HIDE_MESSAGE_BOX:
+      appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+        return notification.get('message') === action.message
+      }))
+      break
     default:
   }
 

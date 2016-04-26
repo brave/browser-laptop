@@ -4,14 +4,12 @@
 
 @import "variables.less";
 
-.notificationBar {
-  background-color: #fff;
+.notificationItem {
+  background-color: #ffefc0;
   border-bottom: 1px solid #888;
-  padding: 8px 20px;
-
-  >div {
-    display: flex;
-  }
+  display: inline-block;
+  width: 100%;
+  padding: 6px;
 
   .notificationMessage {
     color: #000;
@@ -25,14 +23,28 @@
   }
 
   .notificationButton {
-    padding: 0px 25px;
-    float: right;
-    font-size: 14px;
+    padding: 2px 15px;
     width: auto;
-    margin: auto 5px;
+    margin-right: 10px;
+  }
+
+  .notificationOptions {
+    float: right;
   }
 
   .notificationSpacer {
     flex-grow: 1;
+  }
+
+  label {
+    font-size: 15px;
+    padding: 0 10px;
+    color: #666;
+  }
+  input[type="checkbox"] {
+    margin: 0 3px;
+  }
+  button {
+    font-size: 13px;
   }
 }
