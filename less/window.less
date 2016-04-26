@@ -33,48 +33,7 @@ html,
 }
 
 .top {
-//  background: @chromePrimary;
     background: linear-gradient(to bottom, white, @chromeSecondary, );
-
-  .backforward {
-    display: flex;
-    z-index: 10;
-
-    span {
-      color: @buttonColor;
-      border-radius: 50%;
-      font-weight: 300;
-      opacity: 0.2;
-
-      &:not([disabled]) {
-        opacity: 0.85;
-      }
-
-      &:not([disabled]):hover {
-        color: @buttonColor;
-        opacity: 1.0;
-        background-color: white;
-      }
-    }
-
-    .back,
-    .forward {
-      font-size: 35px;
-      min-width: 35px;
-      text-align: center;
-      width: 35px;
-    }
-
-    .back {
-      padding-right: 4px;
-    }
-
-    .forward {
-      padding-left: 4px;
-    }
-
-  }
-
 }
 
 .mainContainer {

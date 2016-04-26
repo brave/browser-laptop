@@ -8,24 +8,140 @@
 
 @import "variables.less";
 
+// On MacOS we need to keep a padding left to avoid overlapping
+// with the window buttons to close/maximize/minimize the window.
+.platform--darwin .navigatorWrapper .backforward {
+  margin-left: 70px;
+}
+
+
+// Here I grouped the rules to keep the layout of the top bar consistent.
+// The tricky part is to keep the title in `#navigator` centered when the
+// box on its left has different size than the one on the right.
+// This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
+  @buttonSpacing: 4px;
+  @buttonWidth: 35px;
+  @braveButtonWidth: 23px;
+  @margin: 70px;
+
+  // Since we want to keep the navigator centered, we need to calculate the
+  // difference between the width of the left box and the width of the right box.
+  @centerOffset: @margin + 2 * (@buttonWidth + @buttonSpacing) // width area on the left
+                 - (@braveButtonWidth + 2 * @buttonSpacing);
+
+  display: flex;
+
+  // Buttons on the left
+  .backforward {
+    display: flex;
+    margin-left: @margin;
+
+    .back,
+    .forward {
+      width: @buttonWidth;
+    }
+
+    .back {
+      padding-right: @buttonSpacing;
+    }
+
+    .forward {
+      padding-left: @buttonSpacing;
+    }
+
+  }
+
+  // Navigation bar at the center
+  #navigator {
+    display: flex;
+    flex-grow: 1;
+    min-width: 0%; // allow the navigator to shrink
+    max-width: 900px;
+
+    &.titleMode {
+      padding-right: @centerOffset;
+    }
+
+    @media (max-width: @breakpointNarrowViewport) {
+      padding-right: 0;
+    }
+
+    @media (max-width: @breakpointNarrowViewport) {
+      width: 100%;
+    }
+
+    &.titleMode {
+      @media (max-width: @breakpointNarrowViewport) {
+        transition: padding @transitionDuration ease-in-out;
+        padding-right: 0;
+      }
+    }
+  }
+
+  // Buttons on the right
+  .topLevelEndButtons {
+
+    .braveMenu {
+      width: @braveButtonWidth;
+      margin-left: @buttonSpacing;
+      margin-right: @buttonSpacing;
+    }
+  }
+}
+
+
+.navigatorWrapper {
+  justify-content: space-between;
   -webkit-app-region: drag;
   align-items: center;
-  display: flex;
-  justify-content: space-between;
-  padding-left: 70px;
   border-bottom: 1px solid #aaaaaa;
   height: 35px;
+
+  /**
+   * Left buttons
+   */
+  .backforward {
+    display: flex;
+    z-index: 10;
+
+    transition: margin @transitionDuration ease-in-out;
+
+    span {
+      color: @buttonColor;
+      border-radius: 50%;
+      font-weight: 300;
+      opacity: 0.2;
+
+      &:not([disabled]) {
+        opacity: 0.85;
+      }
+
+      &:not([disabled]):hover {
+        color: @buttonColor;
+        opacity: 1.0;
+        background-color: white;
+      }
+    }
+
+    .back,
+    .forward {
+      font-size: 35px;
+      text-align: center;
+    }
+  }
 }
 
 .urlbarForm {
-  max-width: calc(~'100% - 80px'); // space for reload and bookmark buttons
-  position: relative;
-  white-space: nowrap;
-  display: flex;
   align-items: center;
   justify-content: center;
   height: 24px;
+  padding: 0 10px;
+
+  display: flex;
+  flex-grow: 1;
+  min-width: 0%; // allow the navigator to shrink
+  position: relative;
 
   *:not(legend) {
     z-index: 1;
@@ -49,13 +165,10 @@
   }
 
   #navigator:not(.titleMode) & {
-    flex: 1;
     background: white;
     border-radius: @borderRadiusURL;
-    box-sizing: border-box;
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
     color: @chromeText;
-    padding: 0 10px;
   }
 }
 
@@ -63,19 +176,14 @@
   font-size: 20px;
   align-items: center;
   justify-content: center;
-  max-width: 900px;
   box-sizing: border-box;
-  margin: 0 0 0 -114px;
   padding: 0;
   position: relative;
-  display: flex;
-  flex-direction: row;
   -webkit-user-select: none;
-  width: calc(~'100% - 215px');
+
+  z-index: 99999;
 
   &.titleMode {
-    margin-left: -130px;
-
     input {
       display: none;
     }
@@ -87,6 +195,7 @@
       max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .endButtons {
@@ -100,7 +209,6 @@
       position: relative;
       left: 2px;
       min-width: 0;
-
 
       &[class*=" fa-"] {
         margin-right: 5px;
@@ -125,6 +233,7 @@
 
   #titleBar {
     display: none;
+    text-overflow: ellipsis;
   }
 
   .loadTime {
@@ -162,10 +271,11 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 3px 0 0 3px;
+    margin: 3px 3px 0 3px;
     outline: none;
     text-overflow: ellipsis;
-    width: 100%;
+    flex-grow: 1;
+    min-width: 0%; // allow the navigator to shrink
 
     &:hover {
       background: @chromeControlsBackground2;
@@ -183,19 +293,19 @@
     opacity: 1;
   }
 
-    .urlbarIcon.fa-unlock-alt {
+  .urlbarIcon.fa-unlock-alt {
     margin-top: 4px;
     font-size: 16px;
     min-height: 10px;
     min-width: 16px;
-}
+  }
 
-    .urlbarIcon.fa-lock {
+  .urlbarIcon.fa-lock {
     margin-top: 4px;
     font-size: 16px;
     min-height: 10px;
     min-width: 16px;
-}
+  }
 
   .urlbarIcon {
     color: @focusUrlbarOutline;
@@ -211,11 +321,13 @@
   }
 }
 
+
 .topLevelEndButtons .braveMenu {
-  background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x, url(../app/extensions/brave/img/braveBtn2x.png) 2x, url(../app/extensions/brave/img/braveBtn3x.png) 3x);
+  background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn.png) 1x,
+                                      url(../app/extensions/brave/img/braveBtn2x.png) 2x,
+                                      url(../app/extensions/brave/img/braveBtn3x.png) 3x);
   background-repeat: no-repeat;
-  width: 23px;
   height: 27px;
   margin-top: 3px;
-  margin-right: 8px;
 }
+
