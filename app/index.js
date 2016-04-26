@@ -37,8 +37,8 @@ const urlParse = require('url').parse
 const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
-const dialog = electron.dialog
 const settings = require('../js/constants/settings')
+const siteSettings = require('../js/state/siteSettings')
 const path = require('path')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
@@ -57,6 +57,9 @@ let acceptCertDomains = {}
 let authCallbacks = {}
 // Don't show the keytar prompt more than once per 5 minutes
 let throttleKeytar = false
+
+// Map of password notification bar messages to their callbacks
+const passwordCallbacks = {}
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
@@ -474,6 +477,10 @@ app.on('ready', () => {
       if (!password || !origin || !action) {
         return
       }
+      const originSettings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), origin)
+      if (originSettings && originSettings.get('savePasswords') === false) {
+        return
+      }
 
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
@@ -494,21 +501,35 @@ app.on('ready', () => {
         return
       }
 
-      // TODO: If the username already exists, s/save/update
       var message = username
-        ? 'Would you like Brave to save the password for ' + username + ' on ' + origin + '?'
-        : 'Would you like Brave to save this password on ' + origin + '?'
-      dialog.showMessageBox({
-        type: 'question',
-        title: 'Save password?',
-        message: message,
-        buttons: ['Yes', 'No'],
-        defaultId: 0,
-        cancelId: 1
-      }, (buttonId) => {
-        if (buttonId !== 0) {
+        ? `Would you like Brave to remember the password for ${username} on ${origin}?`
+        : `Would you like Brave to remember your password on ${origin}?`
+
+      if (message in passwordCallbacks) {
+        // Notification already shown
+        return
+      }
+
+      appActions.showMessageBox({
+        buttons: ['Yes', 'No', 'Never for this site'],
+        options: {
+          persist: false,
+          advancedText: '[Password settings]',
+          advancedLink: 'about:passwords'
+        },
+        message
+      })
+
+      passwordCallbacks[message] = (buttonIndex) => {
+        if (buttonIndex === 1) {
           return
         }
+        if (buttonIndex === 2) {
+          // Never save the password on this site
+          appActions.changeSiteSetting(origin, 'savePasswords', false)
+          return
+        }
+
         // Save the password
         const encrypted = CryptoUtil.encryptAuthenticate(password, masterKey)
         appActions.savePassword({
@@ -519,7 +540,15 @@ app.on('ready', () => {
           authTag: encrypted.tag,
           iv: encrypted.iv
         })
-      })
+      }
+    })
+
+    ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
+      if (passwordCallbacks[message]) {
+        passwordCallbacks[message](buttonIndex)
+        delete passwordCallbacks[message]
+      }
+      appActions.hideMessageBox(message)
     })
 
     ipcMain.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {

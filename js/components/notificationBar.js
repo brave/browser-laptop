@@ -10,15 +10,32 @@ const messages = require('../constants/messages')
 
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
-    ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'), buttonIndex, this.checkbox.checked)
+    ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'),
+             buttonIndex, this.checkbox ? this.checkbox.checked : false)
+  }
+
+  openAdvanced () {
+    ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, this.props.detail.get('options').get('advancedLink'))
   }
 
   render () {
     let i = 0
+    const options = this.props.detail.get('options')
     return <div className='notificationItem'>
       <span className='notificationMessage'>{this.props.detail.get('message')}</span>
+      <span className='notificationAdvanced'>
+        {
+          options.get('advancedText') && options.get('advancedLink')
+            ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
+            : null
+        }
+      </span>
       <span className='notificationOptions'>
-        <label><input type='checkbox' ref={(node) => { this.checkbox = node }}/>{'Remember this decision'}</label>
+        {
+          options.get('persist')
+            ? <label><input type='checkbox' ref={(node) => { this.checkbox = node }}/>{'Remember this decision'}</label>
+            : null
+        }
         {
           this.props.detail.get('buttons').map((button) =>
             <button

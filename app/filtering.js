@@ -45,9 +45,9 @@ const downloadMap = {}
 const registeredSessions = {}
 
 /**
- * Maps notification messages to their callback
+ * Maps permission notification bar messages to their callback
  */
-const notificationCallbacks = {}
+const permissionCallbacks = {}
 
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
@@ -254,17 +254,20 @@ function registerPermissionHandler (session) {
       return
     }
     const message = `Allow ${host} to ${permissions[permission].action}?`
-    if (message in notificationCallbacks) {
+    if (message in permissionCallbacks) {
       // This notification is already shown
       return
     }
 
     appActions.showMessageBox({
       buttons: ['Deny', 'Allow'],
+      options: {
+        persist: true
+      },
       message
     })
-    notificationCallbacks[message] = (buttonIndex, persist) => {
-      let result = !!(buttonIndex)
+    permissionCallbacks[message] = (buttonIndex, persist) => {
+      const result = !!(buttonIndex)
       cb(result)
       if (persist) {
         // remember site setting for this host over http(s)
@@ -403,9 +406,9 @@ module.exports.init = () => {
     }
   })
   ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
-    if (notificationCallbacks[message]) {
-      notificationCallbacks[message](buttonIndex, persist)
-      delete notificationCallbacks[message]
+    if (permissionCallbacks[message]) {
+      permissionCallbacks[message](buttonIndex, persist)
+      delete permissionCallbacks[message]
     }
     appActions.hideMessageBox(message)
   })

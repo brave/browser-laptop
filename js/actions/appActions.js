@@ -273,7 +273,7 @@ const appActions = {
 
   /**
    * Shows a message box in the notification bar
-   * @param {{message: string, buttons: Array.<string>}} detail
+   * @param {{message: string, buttons: Array.<string>, options: Object}} detail
    */
   showMessageBox: function (detail) {
     AppDispatcher.dispatch({

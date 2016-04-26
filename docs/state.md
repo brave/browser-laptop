@@ -39,7 +39,8 @@ AppStore
       midiSysexPermission: boolean,
       pointerLockPermission: boolean,
       fullscreenPermission: boolean,
-      openExternalPermission: boolean
+      openExternalPermission: boolean,
+      savePasswords: boolean // Only false for now
     }
   },
   visits: [{
@@ -98,7 +99,12 @@ AppStore
   },
   notifications: [{
     message: string,
-    buttons: Array<string>
+    buttons: Array<string>,
+    options: {
+      persist: boolean, // whether to show a 'Remember this decision' checkbox
+      advancedText: string, // more info text
+      advancedLink: string, // more info link URL
+    }
   }], // the notifications for the frame. not preserved across restart.
   settings: [{
     // See defaults in js/constants/appConfig.js
