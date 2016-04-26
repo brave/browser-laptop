@@ -12,7 +12,7 @@
   display: flex;
   flex: 1;
   padding: 3px 10px;
-  height: 23px;
+  height: @bookmarksToolbarHeight;
   &.allowDragging {
     -webkit-app-region: drag;
     >* {
@@ -20,7 +20,7 @@
     }
   }
   &.showFavicon {
-    height: 28px;
+    height: @bookmarksToolbarWithFaviconsHeight;
   }
   .bookmarkToolbarButton {
     border-radius: @borderRadius;

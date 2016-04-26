@@ -11,7 +11,7 @@
   flex: 1;
   overflow: auto;
   padding: 0 4px 0 6px;
-  height: 23px;
+  height: @tabsToolbarHeight;
   position: relative;
   white-space: nowrap;
   z-index: 310;
@@ -230,7 +230,7 @@
 .tabsToolbar {
   background: @tabsBackground;
   display: flex;
-  height: 23px;
+  height: @tabsToolbarHeight;
   -webkit-user-select: none;
 }
 
@@ -246,7 +246,7 @@
 .tabPages {
   background: @tabsBackground;
   display: flex;
-  height: 12px;
+  height: @tabPagesHeight;
   justify-content: center;
   position: relative;
   text-align: center;
@@ -309,11 +309,11 @@
     margin-left: -5px;
     margin-right: -5px;
     width: 34px;
-    
+
   &:not([disabled]) {
     display: block;
     background: @tabsBackground;
-      
+
     &:hover {
   //    background: lighten(#eeeeee, 10%);
             color: white;

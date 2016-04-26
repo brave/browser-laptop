@@ -791,7 +791,6 @@ export function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItem
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
     top: rect.bottom,
-    maxHeight: window.innerHeight - 100,
     template: menuTemplate
   }))
 }
