@@ -77,9 +77,11 @@ const messages = {
   SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
   FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
+  PASSWORD_SITE_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
   DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
   DELETE_PASSWORD: _, /** @arg {Object} password */
+  DELETE_PASSWORD_SITE: _, /** @arg {string} site */
   CLEAR_PASSWORDS: _,
   // Init
   INITIALIZE_WINDOW: _,

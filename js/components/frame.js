@@ -226,9 +226,16 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.DOWNLOADS_UPDATED, {
         downloads: this.props.downloads.toJS()
       })
-    } else if (this.props.frame.get('location') === 'about:passwords' &&
-               prevProps.passwords !== this.props.passwords) {
-      this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
+    } else if (this.props.frame.get('location') === 'about:passwords') {
+      if (prevProps.passwords !== this.props.passwords) {
+        this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
+      }
+      if (prevProps.siteSettings !== this.props.siteSettings) {
+        if (this.props.siteSettings) {
+          this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
+                            this.props.siteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
+        }
+      }
     }
   }
 
@@ -365,6 +372,8 @@ class Frame extends ImmutableComponent {
         })
       } else if (this.props.frame.get('location') === 'about:passwords') {
         this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
+        this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
+                          this.props.siteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
       }
 
       const parsedUrl = urlParse(this.props.frame.get('location'))

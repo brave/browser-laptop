@@ -10,6 +10,27 @@ const aboutActions = require('./aboutActions')
 require('../../less/about/passwords.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
+class SiteItem extends React.Component {
+  onDelete () {
+    aboutActions.deletePasswordSite(this.props.site)
+  }
+
+  render () {
+    return <tr className='passwordItem'>
+      <td className='passwordOrigin'>{this.props.site}</td>
+      <td className='passwordActions'>
+        <span className='passwordAction fa fa-times' title='Remove site'
+          onClick={this.onDelete.bind(this)}>
+        </span>
+      </td>
+    </tr>
+  }
+}
+
+SiteItem.propTypes = {
+  site: React.PropTypes.string
+}
+
 class PasswordItem extends React.Component {
   constructor () {
     super()
@@ -139,12 +160,20 @@ class AboutPasswords extends React.Component {
   constructor () {
     super()
     this.state = {
-      passwordDetails: window.initPasswords ? Immutable.fromJS(window.initPasswords) : new Immutable.List()
+      passwordDetails: window.initPasswords ? Immutable.fromJS(window.initPasswords) : new Immutable.List(),
+      disabledSiteDetails: window.initDisabledSites ? Immutable.fromJS(window.initDisabledSites) : new Immutable.Map()
     }
     window.addEventListener(messages.PASSWORD_DETAILS_UPDATED, (e) => {
       if (e.detail) {
         this.setState({
           passwordDetails: Immutable.fromJS(e.detail)
+        })
+      }
+    })
+    window.addEventListener(messages.PASSWORD_SITE_DETAILS_UPDATED, (e) => {
+      if (e.detail) {
+        this.setState({
+          disabledSiteDetails: Immutable.fromJS(e.detail)
         })
       }
     })
@@ -161,7 +190,9 @@ class AboutPasswords extends React.Component {
   render () {
     let counter = 0
     return <div className='passwordsPage'>
-      <h2 data-l10n-id='passwordsTitle'></h2>
+      <h1 data-l10n-id='passwordsTitle'></h1>
+      <div className='passwordInstructions' data-l10n-id='passwordDisableInstructions'></div>
+      <h2 data-l10n-id='savedPasswords'></h2>
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
           <thead>
@@ -182,10 +213,23 @@ class AboutPasswords extends React.Component {
           }
           </tbody>
         </table>
+        <div className='passwordsPageFooter'>
+          <span data-l10n-id='clearPasswords'
+            onClick={this.onClear.bind(this)}></span>
+        </div>
       </div>
-      <div className='passwordsPageFooter'>
-        <span data-l10n-id='clearPasswords'
-          onClick={this.onClear.bind(this)}></span>
+      <h2 data-l10n-id='passwordSites'></h2>
+      <div className='passwordsPageContent'>
+        <table className='passwordsList'>
+          <tbody>
+          {
+            this.state.disabledSiteDetails
+              ? this.state.disabledSiteDetails.map((item, site) =>
+                <SiteItem site={site}/>)
+              : null
+          }
+          </tbody>
+        </table>
       </div>
     </div>
   }

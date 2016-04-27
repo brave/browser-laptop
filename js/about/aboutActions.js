@@ -122,6 +122,13 @@ const AboutActions = {
     window.dispatchEvent(event)
   },
 
+  deletePasswordSite: function (origin) {
+    const event = new window.CustomEvent(messages.DELETE_PASSWORD_SITE, {
+      detail: origin
+    })
+    window.dispatchEvent(event)
+  },
+
   clearPasswords: function () {
     const event = new window.CustomEvent(messages.CLEAR_PASSWORDS)
     window.dispatchEvent(event)

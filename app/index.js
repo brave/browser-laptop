@@ -375,6 +375,9 @@ app.on('ready', () => {
     ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {
       appActions.deletePassword(password)
     })
+    ipcMain.on(messages.DELETE_PASSWORD_SITE, (e, origin) => {
+      appActions.changeSiteSetting(origin, 'savePasswords', undefined)
+    })
     ipcMain.on(messages.CLEAR_PASSWORDS, () => {
       appActions.clearPasswords()
     })
