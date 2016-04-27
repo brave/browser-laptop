@@ -254,18 +254,17 @@ function registerPermissionHandler (session) {
       return
     }
     const message = `Allow ${host} to ${permissions[permission].action}?`
-    if (message in permissionCallbacks) {
-      // This notification is already shown
-      return
+    if (!(message in permissionCallbacks)) {
+      // This notification is not shown yet
+      appActions.showMessageBox({
+        buttons: ['Deny', 'Allow'],
+        options: {
+          persist: true
+        },
+        message
+      })
     }
 
-    appActions.showMessageBox({
-      buttons: ['Deny', 'Allow'],
-      options: {
-        persist: true
-      },
-      message
-    })
     permissionCallbacks[message] = (buttonIndex, persist) => {
       const result = !!(buttonIndex)
       cb(result)

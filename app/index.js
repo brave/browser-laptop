@@ -508,20 +508,18 @@ app.on('ready', () => {
         ? `Would you like Brave to remember the password for ${username} on ${origin}?`
         : `Would you like Brave to remember your password on ${origin}?`
 
-      if (message in passwordCallbacks) {
-        // Notification already shown
-        return
+      if (!(message in passwordCallbacks)) {
+        // Notification not shown already
+        appActions.showMessageBox({
+          buttons: ['Yes', 'No', 'Never for this site'],
+          options: {
+            persist: false,
+            advancedText: '[Password settings]',
+            advancedLink: 'about:passwords'
+          },
+          message
+        })
       }
-
-      appActions.showMessageBox({
-        buttons: ['Yes', 'No', 'Never for this site'],
-        options: {
-          persist: false,
-          advancedText: '[Password settings]',
-          advancedLink: 'about:passwords'
-        },
-        message
-      })
 
       passwordCallbacks[message] = (buttonIndex) => {
         if (buttonIndex === 1) {
