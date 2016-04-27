@@ -231,6 +231,26 @@ Change a hostPattern's config
 
 
 
+### showMessageBox(detail) 
+
+Shows a message box in the notification bar
+
+**Parameters**
+
+**detail**: `Object`, Shows a message box in the notification bar
+
+
+
+### hideMessageBox(message) 
+
+Hides a message box in the notification bar
+
+**Parameters**
+
+**message**: `string`, Hides a message box in the notification bar
+
+
+
 
 * * *
 

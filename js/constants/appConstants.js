@@ -25,7 +25,9 @@ const AppConstants = {
   APP_UPDATE_LAST_CHECK: _,
   APP_SET_UPDATE_STATUS: _,
   APP_CHANGE_SETTING: _,
-  APP_CHANGE_SITE_SETTING: _
+  APP_CHANGE_SITE_SETTING: _,
+  APP_SHOW_MESSAGE_BOX: _, /** @param {Object} detail */
+  APP_HIDE_MESSAGE_BOX: _ /** @param {string} message */
 }
 
 module.exports = mapValuesByKeys(AppConstants)

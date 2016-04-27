@@ -17,6 +17,7 @@ const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
+const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
@@ -42,6 +43,11 @@ const downloadMap = {}
  * Maps partition name to the session object
  */
 const registeredSessions = {}
+
+/**
+ * Maps permission notification bar messages to their callback
+ */
+const permissionCallbacks = {}
 
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
@@ -198,32 +204,25 @@ function registerPermissionHandler (session) {
   // TODO: Localize strings
   let permissions = {
     media: {
-      action: 'use your camera and/or microphone',
-      hosts: {}
+      action: 'use your camera and/or microphone'
     },
     geolocation: {
-      action: 'see your location',
-      hosts: {}
+      action: 'see your location'
     },
     notifications: {
-      action: 'show you notifications',
-      hosts: {}
+      action: 'show you notifications'
     },
     midiSysex: {
-      action: 'use web MIDI',
-      hosts: {}
+      action: 'use web MIDI'
     },
     pointerLock: {
-      action: 'disable your mouse cursor',
-      hosts: {}
+      action: 'disable your mouse cursor'
     },
     fullscreen: {
-      action: 'be fullscreen',
-      hosts: {}
+      action: 'use fullscreen mode'
     },
     openExternal: {
-      action: 'open an external application',
-      hosts: {}
+      action: 'open an external application'
     }
   }
   session.setPermissionRequestHandler((webContents, permission, cb) => {
@@ -233,36 +232,45 @@ function registerPermissionHandler (session) {
       cb(true)
       return
     }
-    const host = urlParse(url).host
+
     if (!permissions[permission]) {
       console.log('WARNING: got unregistered permission request', permission)
       cb(false)
       return
     }
-    let isAllowed = permissions[permission].hosts[host]
-    if (isAllowed !== undefined) {
-      cb(isAllowed)
-    } else {
-      // TODO: Add option to remember decision between restarts.
-      let result = dialog.showMessageBox({
-        type: 'question',
-        message: host + ' is requesting permission to ' + permissions[permission].action,
+
+    // Check whether there is a persistent site setting for this host
+    const settings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), url)
+    if (settings) {
+      const isAllowed = settings.get(permission + 'Permission')
+      if (isAllowed !== undefined) {
+        cb(isAllowed)
+        return
+      }
+    }
+
+    const host = urlParse(url).host
+    if (!host) {
+      return
+    }
+    const message = `Allow ${host} to ${permissions[permission].action}?`
+    if (!(message in permissionCallbacks)) {
+      // This notification is not shown yet
+      appActions.showMessageBox({
         buttons: ['Deny', 'Allow'],
-        defaultId: 0,
-        cancelId: 0
+        options: {
+          persist: true
+        },
+        message
       })
-      let isTemp = dialog.showMessageBox({
-        type: 'question',
-        title: 'Remember this decision?',
-        message: 'Would you like to remember this decision on ' + host + ' until Brave closes?',
-        buttons: ['Yes', 'No'],
-        defaultId: 0,
-        cancelId: 0
-      })
-      result = !!(result)
+    }
+
+    permissionCallbacks[message] = (buttonIndex, persist) => {
+      const result = !!(buttonIndex)
       cb(result)
-      if (!isTemp) {
-        permissions[permission].hosts[host] = result
+      if (persist) {
+        // remember site setting for this host over http(s)
+        appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result)
       }
     }
   })
@@ -395,6 +403,13 @@ module.exports.init = () => {
         updateDownloadState(downloadId, item, downloadStates.IN_PROGRESS)
         break
     }
+  })
+  ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
+    if (permissionCallbacks[message]) {
+      permissionCallbacks[message](buttonIndex, persist)
+      delete permissionCallbacks[message]
+    }
+    appActions.hideMessageBox(message)
   })
 }
 
