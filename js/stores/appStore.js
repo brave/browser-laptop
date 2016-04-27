@@ -208,7 +208,8 @@ function windowDefaults () {
     windowOffset: 20,
     webPreferences: {
       sharedWorker: true,
-      partition: 'main-1'
+      partition: 'main-1',
+      plugins: true
     }
   }
 }

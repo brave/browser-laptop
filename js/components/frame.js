@@ -124,6 +124,7 @@ class Frame extends ImmutableComponent {
     const allowRunningInsecureContent = !!(hack && hack.allowRunningInsecureContent)
     if (didSrcChange || didLocationChange && location === 'about:certerror' || !this.webview ||
         allowRunningInsecureContent !== this.webview.allowRunningInsecureContent) {
+      this.webview.setAttribute('plugins', 'true')
       this.updateWebview()
     }
     if (didLocationChange && location !== 'about:certerror' &&
