@@ -68,8 +68,12 @@ languages.forEach(function (languageCode) {
         }
         // Build the filename and store the translation file
         var filename = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'), resource + '.properties')
-        fs.writeFileSync(filename, body)
         console.log('[*] ' + filename)
+        if (process.env.TEST) {
+          console.log(body)
+        } else {
+          fs.writeFileSync(filename, body)
+        }
       }
     })
   })
