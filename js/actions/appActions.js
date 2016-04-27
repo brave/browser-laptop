@@ -269,6 +269,28 @@ const appActions = {
       key,
       value
     })
+  },
+
+  /**
+   * Shows a message box in the notification bar
+   * @param {{message: string, buttons: Array.<string>, options: Object}} detail
+   */
+  showMessageBox: function (detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SHOW_MESSAGE_BOX,
+      detail
+    })
+  },
+
+  /**
+   * Hides a message box in the notification bar
+   * @param {string} message
+   */
+  hideMessageBox: function (message) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_HIDE_MESSAGE_BOX,
+      message
+    })
   }
 }
 

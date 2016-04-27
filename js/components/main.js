@@ -21,6 +21,7 @@ const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
 const UpdateBar = require('./updateBar')
+const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
@@ -469,6 +470,8 @@ class Main extends ImmutableComponent {
               onClick={this.onBraveMenu.bind(this)} />
           </div>
         </div>
+        <UpdateBar updates={this.props.appState.get('updates')} />
+        <NotificationBar notifications={this.props.appState.get('notifications')} />
         {
           showBookmarksToolbar
           ? <BookmarksToolbar
@@ -509,7 +512,6 @@ class Main extends ImmutableComponent {
           activeFrame={activeFrame}
           onMenu={this.onHamburgerMenu.bind(this)}
         />
-        <UpdateBar updates={this.props.appState.get('updates')} />
       </div>
       <div className='mainContainer'>
         <div className='tabContainer'

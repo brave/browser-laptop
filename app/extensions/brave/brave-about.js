@@ -34,6 +34,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('password-site-details-updated', (e, details) => {
+    const event = new window.CustomEvent('password-site-details-updated', {
+      detail: details
+    })
+    window.dispatchEvent(event)
+  })
   ipcRenderer.on('decrypted-password', (e, details) => {
     const event = new window.CustomEvent('decrypted-password', {
       detail: details
@@ -70,6 +76,9 @@
   })
   window.addEventListener('delete-password', (e) => {
     ipcRenderer.send('delete-password', e.detail)
+  })
+  window.addEventListener('delete-password-site', (e) => {
+    ipcRenderer.send('delete-password-site', e.detail)
   })
   window.addEventListener('clear-passwords', (e) => {
     ipcRenderer.send('clear-passwords')

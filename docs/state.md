@@ -32,7 +32,15 @@ AppStore
   }],
   siteSettings: {
     [hostPattern]: {
-      zoomLevel: number
+      zoomLevel: number,
+      mediaPermission: boolean,
+      geolocationPermission: boolean,
+      notificationsPermission: boolean,
+      midiSysexPermission: boolean,
+      pointerLockPermission: boolean,
+      fullscreenPermission: boolean,
+      openExternalPermission: boolean,
+      savePasswords: boolean // Only false for now
     }
   },
   visits: [{
@@ -89,6 +97,15 @@ AppStore
     verbose: boolean, // Whether to show update UI for checking, downloading, and errors
     lastCheckTimestamp: boolean
   },
+  notifications: [{
+    message: string,
+    buttons: Array<string>,
+    options: {
+      persist: boolean, // whether to show a 'Remember this decision' checkbox
+      advancedText: string, // more info text
+      advancedLink: string, // more info link URL
+    }
+  }], // the notifications for the frame. not preserved across restart.
   settings: [{
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
