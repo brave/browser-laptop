@@ -10,6 +10,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('site-settings-updated', (e, settings) => {
+    const event = new window.CustomEvent('site-settings-updated', {
+      detail: settings
+    })
+    window.dispatchEvent(event)
+  })
   ipcRenderer.on('bookmarks-updated', (e, bookmarks) => {
     const event = new window.CustomEvent('bookmarks-updated', {
       detail: bookmarks
@@ -49,6 +55,9 @@
 
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)
+  })
+  window.addEventListener('change-site-setting', (e) => {
+    ipcRenderer.send('change-site-setting', e.detail.hostPattern, e.detail.key, e.detail.value)
   })
   window.addEventListener('cert-error-accepted', (e) => {
     ipcRenderer.send('cert-error-accepted', e.detail.url)

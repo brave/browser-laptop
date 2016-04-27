@@ -243,7 +243,7 @@ function registerPermissionHandler (session) {
     const settings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), url)
     if (settings) {
       const isAllowed = settings.get(permission + 'Permission')
-      if (isAllowed !== undefined) {
+      if (typeof isAllowed === 'boolean') {
         cb(isAllowed)
         return
       }

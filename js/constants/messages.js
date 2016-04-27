@@ -96,10 +96,12 @@ const messages = {
   BLOCKED_PAGE: _,
   // About pages to contentScripts
   SETTINGS_UPDATED: _,
+  SITE_SETTINGS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   // About pages from contentScript
   CHANGE_SETTING: _,
+  CHANGE_SITE_SETTING: _,
   NEW_FRAME: _,
   MOVE_SITE: _,
   OPEN_DOWNLOAD_PATH: _,

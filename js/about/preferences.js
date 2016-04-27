@@ -21,6 +21,15 @@ const hintCount = 3
 require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
+const permissionNames = ['mediaPermission',
+  'geolocationPermission',
+  'notificationsPermission',
+  'midiSysexPermission',
+  'pointerLockPermission',
+  'fullscreenPermission',
+  'openExternalPermission'
+]
+
 const changeSetting = (cb, key, e) => {
   if (e.target.type === 'checkbox') {
     cb(key, e.target.checked)
@@ -153,6 +162,69 @@ class SyncTab extends ImmutableComponent {
   }
 }
 
+class SitePermissionsPage extends React.Component {
+  constructor () {
+    super()
+    this.state = {
+      settings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map()
+    }
+    window.addEventListener(messages.SITE_SETTINGS_UPDATED, (e) => {
+      this.setState({
+        settings: Immutable.fromJS(e.detail || {})
+      })
+    })
+  }
+
+  getPermissionSettings (entry) {
+    return entry.filter((value, settingName) => settingName.endsWith('Permission'))
+  }
+
+  hasEntryForPermission (name) {
+    return this.state.settings.some((value) => {
+      return value.get ? typeof value.get(name) === 'boolean' : false
+    })
+  }
+
+  deletePermission (name, hostPattern) {
+    aboutActions.changeSiteSetting(hostPattern, name, null)
+  }
+
+  render () {
+    return <div>
+      <div data-l10n-id='sitePermissions'></div>
+      <ul className='sitePermissions'>
+        {
+          permissionNames.map((name) =>
+            this.hasEntryForPermission(name)
+            ? <li>
+              <div data-l10n-id={name} className='permissionName'></div>
+              <ul>
+              {
+                this.state.settings.map((value, hostPattern) => {
+                  if (!value.size) {
+                    return null
+                  }
+                  const granted = value.get(name)
+                  if (typeof granted === 'boolean') {
+                    return <div className='permissionItem'>
+                      <span className='fa fa-times permissionAction'
+                        onClick={this.deletePermission.bind(this, name, hostPattern)}></span>
+                      <span className='permissionHost'>{hostPattern + ': '}</span>
+                      <span className='permissionStatus' data-l10n-id={granted ? 'alwaysAllow' : 'alwaysDeny'}></span>
+                    </div>
+                  }
+                  return null
+                })
+              }
+              </ul>
+            </li>
+            : null)
+        }
+      </ul>
+    </div>
+  }
+}
+
 class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
@@ -165,6 +237,7 @@ class PrivacyTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
+      <SitePermissionsPage/>
     </div>
   }
 }
