@@ -84,6 +84,7 @@ module.exports = {
     'bookmarks.toolbar.showFavicon': false,
     'privacy.do-not-track': false,
     'security.passwords.manager-enabled': true,
-    'security.passwords.one-password-enabled': false
+    'security.passwords.one-password-enabled': false,
+    'general.downloads.defaultSavePath': null
   }
 }
