@@ -325,8 +325,11 @@ class Frame extends ImmutableComponent {
         windowActions.onWebviewLoadStart(
           this.props.frame)
         const key = this.props.frame.get('key')
-        windowActions.setLocation(event.url, key)
         const parsedUrl = urlParse(event.url)
+        if (['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:',
+             'view-source:'].includes(parsedUrl.protocol)) {
+          windowActions.setLocation(event.url, key)
+        }
         const hack = siteHacks[parsedUrl.hostname]
         const isSecure = parsedUrl.protocol === 'https:' &&
           (!hack || !hack.allowRunningInsecureContent)
