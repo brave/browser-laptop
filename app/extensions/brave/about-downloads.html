@@ -5,7 +5,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="availableLanguages" content="en-US">
+    <meta name="availableLanguages" content="en-US, fr-FR, nl-NL, pt-BR">
     <meta name="defaultLanguage" content="en-US">
     <meta name='theme-color' content='#000080'>
     <link rel="shortcut icon" href="img/favicon.ico" />
@@ -16,10 +16,14 @@
         window.removeEventListener('downloads-updated', initDownloadsListener)
       }
       window.addEventListener('downloads-updated', initDownloadsListener)
+      window.addEventListener('language', function (evt, language) {
+        document.l10n.requestLanguages([evt.detail])
+      })
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.async = true;
         po.src = 'gen/aboutPages.entry.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+        window.dispatchEvent(new CustomEvent('request-language'))
       })
     </script>
     <script src="ext/l20n.min.js" async></script>

@@ -152,7 +152,8 @@ const DEFAULT_LANGUAGE = 'en-US'
 const availableLanguages = [
   'en-US',
   'pr-BR',
-  'nl-NL'
+  'nl-NL',
+  'fr-FR'
 ]
 
 // Currently configured languages - TODO (make this dynamic)
@@ -233,5 +234,10 @@ if (ipcMain) {
   ipcMain.on('translations', function (event, arg) {
     // Return the entire set of translations synchronously
     event.returnValue = translations
+  })
+
+  // Respond to requests for the currently configured language code
+  ipcMain.on('request-language', function (event) {
+    event.sender.send('language', lang)
   })
 }

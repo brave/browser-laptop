@@ -108,6 +108,7 @@ class GeneralTab extends ImmutableComponent {
             <option data-l10n-id='en-US' value='en-US'/>
             <option data-l10n-id='nl-NL' value='nl-NL'/>
             <option data-l10n-id='pt-BR' value='pt-BR'/>
+            <option data-l10n-id='fr-FR' value='fr-FR'/>
           </select>
         </SettingItem>
       </SettingsList>

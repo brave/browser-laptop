@@ -10,10 +10,14 @@
     <link rel="shortcut icon" href="img/favicon.ico" />
     <title data-l10n-id="aboutPages"></title>
     <script>
+      window.addEventListener('language', function (evt, language) {
+        document.l10n.requestLanguages([evt.detail])
+      })
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.async = true;
         po.src = 'gen/aboutPages.entry.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+        window.dispatchEvent(new CustomEvent('request-language'))
       })
     </script>
     <script src="ext/l20n.min.js" async></script>
