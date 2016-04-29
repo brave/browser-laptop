@@ -259,7 +259,7 @@ class Main extends ImmutableComponent {
   }
 
   checkForTitleMode (pageY) {
-    const navigator = document.querySelector('#navigator')
+    const navigator = document.querySelector('.top')
     // Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
     if (!navigator) {
       return
