@@ -66,6 +66,19 @@ languages.forEach(function (languageCode) {
         if (response.statusCode === 401) {
           throw new Error('Unauthorized - Are the USERNAME and PASSWORD env vars set correctly?')
         }
+        // Check to see if the directory exists, if not create it
+        var directory = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'))
+        if (!fs.existsSync(directory)) {
+          console.log(`${languageCode} does not exist - creating directory`)
+          if (!process.env.TEST) {
+            fs.mkdirSync(directory)
+          } else {
+            console.log(`${languageCode} would have been created`)
+          }
+        } else {
+          // Directory exists - continue
+        }
+
         // Build the filename and store the translation file
         var filename = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'), resource + '.properties')
         console.log('[*] ' + filename)
