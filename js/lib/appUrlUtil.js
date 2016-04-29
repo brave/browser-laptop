@@ -3,8 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const UrlUtil = require('./urlutil')
 const path = require('path')
+const UrlUtil = require('./urlutil')
+const config = require('../constants/config')
 
 /**
  * Determines the path of a relative URL from the hosted app
@@ -17,8 +18,15 @@ module.exports.getAppUrl = function (relativeUrl) {
   if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:' + process.env.BRAVE_PORT + '/' + relativeUrl
   } else {
-    return 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/' + relativeUrl
+    return 'chrome-extension://' + config.braveExtensionId + '/' + relativeUrl
   }
+}
+
+module.exports.getExtensionsPath = function () {
+  return (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test')
+    // the path is different for release builds because extensions are not in the asar file
+    ? path.join(__dirname, '..', '..', '..', '..', 'extensions')
+    : path.join(__dirname, '..', '..', 'app', 'extensions')
 }
 
 module.exports.getIndexHTML = function () {

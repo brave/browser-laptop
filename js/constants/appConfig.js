@@ -67,6 +67,7 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
   defaultSettings: {
+    'general.language': 'en-US',
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
     'general.show-home-button': false,
@@ -86,6 +87,7 @@ module.exports = {
     'privacy.do-not-track': false,
     'security.passwords.manager-enabled': true,
     'security.passwords.one-password-enabled': false,
+    'security.passwords.dashlane-enabled': false,
     'general.downloads.default-save-path': null
   }
 }

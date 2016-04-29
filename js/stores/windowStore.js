@@ -387,6 +387,15 @@ const doAction = (action) => {
       // Drag and drop bookmarks code expects this to be set sync
       windowStore.emitChanges()
       return
+    case WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
+      if (!action.detail) {
+        windowState = windowState.delete('popupWindowDetail')
+      } else {
+        windowState = windowState.set('popupWindowDetail', action.detail)
+      }
+      // Drag and drop bookmarks code expects this to be set sync
+      windowStore.emitChanges()
+      return
     case WindowConstants.WINDOW_SET_PINNED:
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.

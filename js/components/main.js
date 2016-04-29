@@ -30,6 +30,7 @@ const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
+const PopupWindow = require('./popupWindow')
 
 // Constants
 const config = require('../constants/config')
@@ -148,6 +149,16 @@ class Main extends ImmutableComponent {
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned
       }, openInForeground)
+    })
+
+    ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
+      windowActions.setPopupWindowDetail(Immutable.fromJS({
+        left: props.offsetX,
+        top: props.offsetY + 100,
+        maxHeight: window.innerHeight - 100,
+        minHeight: 400,
+        src
+      }))
     })
 
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
@@ -353,12 +364,14 @@ class Main extends ImmutableComponent {
   onMouseDown (e) {
     let node = e.target
     while (node) {
-      if (node.classList && node.classList.contains('contextMenu')) {
+      if (node.classList && node.classList.contains('popupWindow')) {
         return
       }
       node = node.parentNode
     }
+    // TODO(bridiver) combine context menu and popup window
     windowActions.setContextMenuDetail()
+    windowActions.setPopupWindowDetail()
   }
 
   onClickWindow (e) {
@@ -410,6 +423,12 @@ class Main extends ImmutableComponent {
         ? <ContextMenu
           siteSettings={this.props.appState.get('siteSettings')}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
+        : null
+      }
+      {
+        this.props.windowState.get('popupWindowDetail')
+        ? <PopupWindow
+          detail={this.props.windowState.get('popupWindowDetail')}/>
         : null
       }
       <div className='top'>

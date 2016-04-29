@@ -241,6 +241,11 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
+    this.webview.addEventListener('set-active', (e) => {
+      if (!this.props.isActive) {
+        windowActions.setActiveFrame(this.props.frame)
+      }
+    })
     this.webview.addEventListener('focus', this.onFocus.bind(this))
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
@@ -486,6 +491,7 @@ class Frame extends ImmutableComponent {
     windowActions.setTabPageIndexByFrame(this.props.frame)
     windowActions.setUrlBarActive(false)
     windowActions.setContextMenuDetail()
+    windowActions.setPopupWindowDetail()
     this.webview.setActive(this.props.isActive)
   }
 

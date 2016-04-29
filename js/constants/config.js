@@ -37,5 +37,6 @@ module.exports = {
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
     replacementUrl: adHost
-  }
+  },
+  braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd'
 }
