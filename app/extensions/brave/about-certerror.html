@@ -5,7 +5,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="availableLanguages" content="en-US, fr-FR, pt-BR, nl-NL">
+    <meta name="availableLanguages" content="">
     <meta name="defaultLanguage" content="en-US">
     <meta name='theme-color' content='#ff5000'>
     <title data-l10n-id="certError"></title>
@@ -15,8 +15,9 @@
         window.removeEventListener('cert-details-updated', initCertDetailsListener)
       }
       window.addEventListener('cert-details-updated', initCertDetailsListener)
-      window.addEventListener('language', function (evt, language) {
-        document.l10n.requestLanguages([evt.detail])
+      window.addEventListener('language', function (evt) {
+        document.l10n.requestLanguages([evt.detail.langCode])
+        document.getElementsByName('availableLanguages')[0].content = evt.detail.languageCodes.join(', ')
       })
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.async = true;

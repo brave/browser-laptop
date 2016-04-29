@@ -5,12 +5,13 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="availableLanguages" content="en-US, fr-FR, nl-NL, pt-BR">
+    <meta name="availableLanguages" content="">
     <meta name="defaultLanguage" content="en-US">
     <title data-l10n-id="newTab"></title>
     <script>
-      window.addEventListener('language', function (evt, language) {
-        document.l10n.requestLanguages([evt.detail])
+      window.addEventListener('language', function (evt) {
+        document.l10n.requestLanguages([evt.detail.langCode])
+        document.getElementsByName('availableLanguages')[0].content = evt.detail.languageCodes.join(', ')
       })
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.async = true;

@@ -5,7 +5,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="availableLanguages" content="en-US, fr-FR, nl-NL, pt-BR">
+    <meta name="availableLanguages" content="">
     <meta name="defaultLanguage" content="en-US">
     <meta name='theme-color' content='#000080'>
     <link rel="shortcut icon" href="img/favicon.ico" />
@@ -16,8 +16,9 @@
         window.removeEventListener('downloads-updated', initDownloadsListener)
       }
       window.addEventListener('downloads-updated', initDownloadsListener)
-      window.addEventListener('language', function (evt, language) {
-        document.l10n.requestLanguages([evt.detail])
+      window.addEventListener('language', function (evt) {
+        document.l10n.requestLanguages([evt.detail.langCode])
+        document.getElementsByName('availableLanguages')[0].content = evt.detail.languageCodes.join(', ')
       })
       window.addEventListener('load', function () {
         var po = document.createElement('script'); po.async = true;

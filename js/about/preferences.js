@@ -86,7 +86,20 @@ class SettingCheckbox extends ImmutableComponent {
 }
 
 class GeneralTab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.state = {
+      languageCodes: window.languageCodes
+    }
+  }
+
   render () {
+    var languageOptions = this.state.languageCodes.map(function (lc) {
+      return (
+        <option data-l10n-id={lc} value={lc}/>
+      )
+    })
+
     return <SettingsList>
       <SettingsList>
         <SettingItem dataL10nId='startsWith'>
@@ -105,10 +118,7 @@ class GeneralTab extends ImmutableComponent {
         <SettingItem dataL10nId='selectedLanguage'>
           <select value={getSetting(settings.LANGUAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
-            <option data-l10n-id='en-US' value='en-US'/>
-            <option data-l10n-id='nl-NL' value='nl-NL'/>
-            <option data-l10n-id='pt-BR' value='pt-BR'/>
-            <option data-l10n-id='fr-FR' value='fr-FR'/>
+            {languageOptions}
           </select>
         </SettingItem>
       </SettingsList>
