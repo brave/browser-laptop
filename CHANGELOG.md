@@ -1,7 +1,14 @@
 # Changelog
 
 ## [0.9.3](https://github.com/brave/browser-laptop/releases/v0.9.3dev)
+- Added permission handler for external protocols.
+- Permission prompts now save decisions between restarts.
+- Bookmark Toolbar favicons (can be turned on in about:preferences).
+- Downlooads remember last save location.
 - More zoom fixes for page navigation.
+- More password autifill fixes.
+- More locales added.
+- Upgrade to libchromiumcontent 50.0.2661.86.
 - Upgrade to Electron 0.37.7.
 
 ## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.2dev)

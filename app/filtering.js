@@ -316,15 +316,15 @@ function updateDownloadState (downloadId, item, state) {
 function registerForDownloadListener (session) {
   session.on('will-download', function (event, item, webContents) {
     const win = BrowserWindow.getFocusedWindow()
-    const savePath = dialog.showSaveDialog(win, {
-      defaultPath: path.join(app.getPath('downloads'), item.getFilename())
-    })
+    const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), item.getFilename())
+    const savePath = dialog.showSaveDialog(win, { defaultPath })
     // User cancelled out of save dialog prompt
     if (!savePath) {
       event.preventDefault()
       return
     }
     item.setSavePath(savePath)
+    appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, path.dirname(savePath))
 
     const downloadId = uuid.v4()
     updateDownloadState(downloadId, item, downloadStates.PENDING)

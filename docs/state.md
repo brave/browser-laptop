@@ -121,7 +121,8 @@ AppStore
     'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
     'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
     'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
-    'security.passwords.manager-enabled': boolean // whether to use default password manager
+    'security.passwords.manager-enabled': boolean, // whether to use default password manager
+    'general.downloads.defaultSavePath': string, // The default path to store files, this will be updated on each save until another pref is added to control that.
   }]
 }
 ```

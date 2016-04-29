@@ -7,6 +7,7 @@ const settings = {
   STARTUP_MODE: 'general.startup-mode',
   HOMEPAGE: 'general.homepage',
   USERAGENT: 'general.useragent.value',
+  DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.defaultSavePath',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   // Tabs tab

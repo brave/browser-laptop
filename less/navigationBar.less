@@ -184,6 +184,13 @@
 
   z-index: 99999;
 
+  form {
+    -webkit-app-region: drag;
+    input {
+      -webkit-app-region: no-drag;
+    }
+  }
+
   &.titleMode {
     input {
       display: none;
