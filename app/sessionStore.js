@@ -196,7 +196,7 @@ module.exports.loadAppState = () => {
       }
 
       try {
-        data = JSON.parse(data)
+        data = Object.assign(module.exports.defaultAppState(), JSON.parse(data))
       } catch (e) {
         // TODO: Session state is corrupted, maybe we should backup this
         // corrupted value for people to report into support.
@@ -242,8 +242,6 @@ module.exports.loadAppState = () => {
       if (data.perWindowState) {
         data.perWindowState.forEach(module.exports.cleanSessionData)
       }
-      data.settings = data.settings || {}
-      data.passwords = data.passwords || []
       // We used to store passwords with the form action full URL. Transition
       // to using origin + pathname for 0.9.0
       if (data.passwords.length > 0) {
@@ -283,6 +281,7 @@ module.exports.defaultAppState = () => {
     sites: [],
     visits: [],
     settings: {},
+    siteSettings: {},
     passwords: [],
     notifications: []
   }
