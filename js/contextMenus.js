@@ -30,9 +30,9 @@ const settings = require('./constants/settings')
  * Obtains an add bookmark menu item
  * @param {object} Detail of the bookmark to initialize with
  */
-const addBookmarkMenuItem = (siteDetail, closestDestinationDetail, isParent) => {
+const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isParent) => {
   return {
-    label: locale.translation('addBookmark'),
+    label: locale.translation(label),
     click: () => {
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -90,7 +90,7 @@ function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParen
     CommonMenu.bookmarksMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
+    addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
     addFolderMenuItem(closestDestinationDetail, isParent)
   ]
 }
@@ -212,7 +212,7 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       }, CommonMenu.separatorMenuItem)
   }
 
-  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+  template.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
     addFolderMenuItem(siteDetail, true))
   return template
 }
@@ -315,14 +315,17 @@ function usernameTemplateInit (usernames, origin, action) {
 function tabTemplateInit (frameProps) {
   const tabKey = frameProps.get('key')
   const items = []
-  items.push({
-    label: locale.translation('reloadTab'),
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
+  items.push(
+    CommonMenu.newTabMenuItem(),
+    CommonMenu.separatorMenuItem,
+    {
+      label: locale.translation('reloadTab'),
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
+        }
       }
-    }
-  })
+    })
 
   if (!frameProps.get('isPrivate')) {
     if (frameProps.get('pinnedLocation')) {
@@ -344,7 +347,17 @@ function tabTemplateInit (frameProps) {
     }
   }
 
+  items.push({
+    label: locale.translation('moveTabToNewWindow'),
+    enabled: false,
+    click: (item, focusedWindow) => {
+      //TODO: actually move tab to new window
+    }
+  })
+
   if (frameProps.get('audioPlaybackActive')) {
+    items.push(CommonMenu.separatorMenuItem)
+
     if (frameProps.get('audioMuted')) {
       items.push({
         label: locale.translation('unmuteTab'),
@@ -354,7 +367,7 @@ function tabTemplateInit (frameProps) {
       })
     } else {
       items.push({
-        label: locale.translation('Mute Tab'),
+        label: locale.translation('muteTab'),
         click: (item) => {
           windowActions.setAudioMuted(frameProps, true)
         }
@@ -362,13 +375,7 @@ function tabTemplateInit (frameProps) {
     }
   }
 
-  Array.prototype.push.apply(items, [{
-    label: locale.translation('disableTrackingProtection'),
-    enabled: false
-  }, {
-    label: locale.translation('disableAdBlock'),
-    enabled: false
-  }])
+  items.push(CommonMenu.separatorMenuItem)
 
   if (!frameProps.get('pinnedLocation')) {
     items.push({
@@ -382,27 +389,11 @@ function tabTemplateInit (frameProps) {
     })
   }
 
-  items.push(CommonMenu.separatorMenuItem)
-
   items.push({
-    label: 'Close other tabs',
+    label: locale.translation('closeOtherTabs'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
         focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, true)
-      }
-    }
-  }, {
-    label: 'Close tabs to the right',
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, false)
-      }
-    }
-  }, {
-    label: 'Close tabs to the left',
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, false, true)
       }
     }
   },
@@ -538,6 +529,15 @@ const openInNewPrivateTabMenuItem = (location) => {
   }
 }
 
+const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
+  return {
+    label: locale.translation('openInNewWindow'),
+    click: () => {
+      appActions.newWindow({ location, isPrivate, partitionNumber })
+    }
+  }
+}
+
 const openInNewSessionTabMenuItem = (location) => {
   return {
     label: locale.translation('openInNewSessionTab'),
@@ -561,7 +561,7 @@ const copyLinkLocationMenuItem = (location) => {
 
 const copyEmailAddressMenuItem = (location) => {
   return {
-    label: 'Copy Email Address',
+    label: locale.translation('copyEmailAddress'),
     click: () => {
       clipboard.writeText(location.substring('mailto:'.length, location.length))
     }
@@ -575,14 +575,24 @@ function mainTemplateInit (nodeProps, frame) {
   if (nodeProps.href) {
     template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       openInNewPrivateTabMenuItem(nodeProps.href),
-      openInNewSessionTabMenuItem(nodeProps.href))
+      openInNewWindowMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
+      CommonMenu.separatorMenuItem,
+      openInNewSessionTabMenuItem(nodeProps.href),
+      CommonMenu.separatorMenuItem)
 
     if (nodeProps.href.toLowerCase().startsWith('mailto:')) {
       template.push(copyEmailAddressMenuItem(nodeProps.href))
     } else {
-      template.push(copyLinkLocationMenuItem(nodeProps.href))
+      template.push(copyLinkLocationMenuItem(nodeProps.href), {
+          label: locale.translation('saveLinkAs'),
+          click: (item, focusedWindow) => {
+            if (focusedWindow && nodeProps.href) {
+              focusedWindow.webContents.downloadURL(nodeProps.href)
+            }
+          }
+        },
+        CommonMenu.separatorMenuItem)
     }
-    template.push(CommonMenu.separatorMenuItem)
   }
 
   if (nodeName === 'IMG') {
@@ -627,55 +637,87 @@ function mainTemplateInit (nodeProps, frame) {
     }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
     template.push({
+      label: locale.translation('openSearch'),
+      enabled: false,
+      click: (item, focusedWindow) => {
+        //TODO: ..
+      }
+    }, {
       label: locale.translation('copy'),
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
     }, CommonMenu.separatorMenuItem)
+  } else {
+    if (nodeProps.href) {
+      template.push(addBookmarkMenuItem('bookmarkLink', {
+        location: nodeProps.href,
+        tags: [siteTags.BOOKMARK]
+      }, false), {
+        label: locale.translation('openSearch'),
+        enabled: false,
+        click: (item, focusedWindow) => {
+          //TODO: ..
+        }
+      })
+    } else {
+      template.push(
+        {
+          label: locale.translation('back'),
+          enabled: frame.get('canGoBack'),
+          click: (item, focusedWindow) => {
+            if (focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+            }
+          }
+        }, {
+          label: locale.translation('forward'),
+          enabled: frame.get('canGoForward'),
+          click: (item, focusedWindow) => {
+            if (focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+            }
+          }
+        },
+        CommonMenu.separatorMenuItem, {
+          label: locale.translation('reloadPage'),
+          click: (item, focusedWindow) => {
+            if (focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+            }
+          }
+        },
+        addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false), {
+          label: locale.translation('find'),
+          accelerator: 'CmdOrCtrl+F',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
+          }
+        }
+        //CommonMenu.separatorMenuItem
+        //TODO: bravery menu goes here
+        )
+    }
+
+    template.push(CommonMenu.separatorMenuItem);
+
+    if (!nodeProps.href) {
+      template.push({
+        label: locale.translation('viewPageSource'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+          }
+        }
+      })
+    }
   }
 
   template.push({
-    label: locale.translation('back'),
-    enabled: frame.get('canGoBack'),
+    label: locale.translation('inspectElement'),
     click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
-      }
+      windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
     }
-  }, {
-    label: locale.translation('forward'),
-    enabled: frame.get('canGoForward'),
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-      }
-    }
-  }, {
-    label: locale.translation('reload'),
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-      }
-    }
-  }, CommonMenu.separatorMenuItem)
-
-  template.push(addBookmarkMenuItem(siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
-    {
-      label: locale.translation('addToReadingList'),
-      enabled: false
-    }, CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('viewPageSource'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
-        }
-      }
-    }, {
-      label: locale.translation('inspectElement'),
-      click: (item, focusedWindow) => {
-        windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
-      }
-    })
+  })
 
   if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
     template.push(
