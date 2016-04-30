@@ -351,7 +351,7 @@ function tabTemplateInit (frameProps) {
     label: locale.translation('moveTabToNewWindow'),
     enabled: false,
     click: (item, focusedWindow) => {
-      //TODO: actually move tab to new window
+      // TODO: actually move tab to new window
     }
   })
 
@@ -584,14 +584,14 @@ function mainTemplateInit (nodeProps, frame) {
       template.push(copyEmailAddressMenuItem(nodeProps.href))
     } else {
       template.push(copyLinkLocationMenuItem(nodeProps.href), {
-          label: locale.translation('saveLinkAs'),
-          click: (item, focusedWindow) => {
-            if (focusedWindow && nodeProps.href) {
-              focusedWindow.webContents.downloadURL(nodeProps.href)
-            }
+        label: locale.translation('saveLinkAs'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.href) {
+            focusedWindow.webContents.downloadURL(nodeProps.href)
           }
-        },
-        CommonMenu.separatorMenuItem)
+        }
+      },
+      CommonMenu.separatorMenuItem)
     }
   }
 
@@ -640,7 +640,7 @@ function mainTemplateInit (nodeProps, frame) {
       label: locale.translation('openSearch'),
       enabled: false,
       click: (item, focusedWindow) => {
-        //TODO: ..
+        // TODO: ..
       }
     }, {
       label: locale.translation('copy'),
@@ -656,7 +656,7 @@ function mainTemplateInit (nodeProps, frame) {
         label: locale.translation('openSearch'),
         enabled: false,
         click: (item, focusedWindow) => {
-          //TODO: ..
+          // TODO: ..
         }
       })
     } else {
@@ -693,12 +693,12 @@ function mainTemplateInit (nodeProps, frame) {
             focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
           }
         }
-        //CommonMenu.separatorMenuItem
-        //TODO: bravery menu goes here
+        // CommonMenu.separatorMenuItem
+        // TODO: bravery menu goes here
         )
     }
 
-    template.push(CommonMenu.separatorMenuItem);
+    template.push(CommonMenu.separatorMenuItem)
 
     if (!nodeProps.href) {
       template.push({
