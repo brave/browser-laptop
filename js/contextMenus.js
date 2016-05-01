@@ -347,13 +347,13 @@ function tabTemplateInit (frameProps) {
     }
   }
 
-  items.push({
-    label: locale.translation('moveTabToNewWindow'),
-    enabled: false,
-    click: (item, focusedWindow) => {
-      // TODO: actually move tab to new window
-    }
-  })
+  // items.push({
+  //   label: locale.translation('moveTabToNewWindow'),
+  //   enabled: false,
+  //   click: (item, focusedWindow) => {
+  //     // TODO: actually move tab to new window
+  //   }
+  // })
 
   if (frameProps.get('audioPlaybackActive')) {
     items.push(CommonMenu.separatorMenuItem)
@@ -636,29 +636,33 @@ function mainTemplateInit (nodeProps, frame) {
       role: 'redo'
     }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
-    template.push({
-      label: locale.translation('openSearch'),
-      enabled: false,
-      click: (item, focusedWindow) => {
-        // TODO: ..
-      }
-    }, {
-      label: locale.translation('copy'),
-      accelerator: 'CmdOrCtrl+C',
-      role: 'copy'
-    }, CommonMenu.separatorMenuItem)
+    template.push(
+    // {
+    //   label: locale.translation('openSearch'),
+    //   enabled: false,
+    //   click: (item, focusedWindow) => {
+    //     // TODO: ..
+    //   }
+    // },
+      {
+        label: locale.translation('copy'),
+        accelerator: 'CmdOrCtrl+C',
+        role: 'copy'
+      }, CommonMenu.separatorMenuItem)
   } else {
     if (nodeProps.href) {
       template.push(addBookmarkMenuItem('bookmarkLink', {
         location: nodeProps.href,
         tags: [siteTags.BOOKMARK]
-      }, false), {
-        label: locale.translation('openSearch'),
-        enabled: false,
-        click: (item, focusedWindow) => {
-          // TODO: ..
-        }
-      })
+      }, false)
+      // ,{
+      //   label: locale.translation('openSearch'),
+      //   enabled: false,
+      //   click: (item, focusedWindow) => {
+      //     // TODO: ..
+      //   }
+      // }
+      )
     } else {
       template.push(
         {
