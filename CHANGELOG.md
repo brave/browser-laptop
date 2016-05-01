@@ -4,9 +4,9 @@
 - Added permission handler for external protocols.
 - Permission prompts now save decisions between restarts.
 - Bookmark Toolbar favicons (can be turned on in about:preferences).
-- Downlooads remember last save location.
+- Downloads remember last save location.
 - More zoom fixes for page navigation.
-- More password autifill fixes.
+- More password autofill fixes.
 - More locales added.
 - Upgrade to libchromiumcontent 50.0.2661.86.
 - Upgrade to Electron 0.37.7.
