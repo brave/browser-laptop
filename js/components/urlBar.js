@@ -201,11 +201,7 @@ class UrlBar extends ImmutableComponent {
 
     if (startLoadTime && endLoadTime) {
       const loadMilliseconds = endLoadTime - startLoadTime
-      if (loadMilliseconds > 1000) {
-        loadTime = (loadMilliseconds / 1000).toFixed(2) + 's'
-      } else {
-        loadTime = loadMilliseconds + 'ms'
-      }
+      loadTime = (loadMilliseconds / 1000).toFixed(2) + 's'
     }
     return loadTime
   }
@@ -287,7 +283,7 @@ class UrlBar extends ImmutableComponent {
         }
       <legend/>
         {
-          this.props.titleMode
+          this.props.titleMode || this.aboutPage
           ? null
           : <span className='loadTime'>{this.loadTime}</span>
         }
