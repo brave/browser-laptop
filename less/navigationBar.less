@@ -186,7 +186,8 @@
 
   form {
     -webkit-app-region: drag;
-    input {
+    // Disable window dragging so that selecting text and dragging the favicon is possible.
+    input, .urlbarIcon {
       -webkit-app-region: no-drag;
     }
   }
