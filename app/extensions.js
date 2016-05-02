@@ -17,11 +17,11 @@ module.exports.init = () => {
   })
 
   let installedExtensions = {}
-  let extensionInstalled = (install_info) => {
-    if (install_info.error) {
-      console.error(install_info.error)
+  let extensionInstalled = (installInfo) => {
+    if (installInfo.error) {
+      console.error(installInfo.error)
     }
-    installedExtensions[install_info.name] = install_info
+    installedExtensions[installInfo.name] = installInfo
   }
 
   let installExtension = function (name, path, options = {}) {
@@ -29,16 +29,16 @@ module.exports.init = () => {
   }
 
   let enableExtension = (name) => {
-    var install_info = installedExtensions[name]
-    if (install_info) {
-      process.emit('enable-extension', install_info.id)
+    var installInfo = installedExtensions[name]
+    if (installInfo) {
+      process.emit('enable-extension', installInfo.id)
     }
   }
 
   let disableExtension = (name) => {
-    var install_info = installedExtensions[name]
-    if (install_info) {
-      process.emit('disable-extension', install_info.id)
+    var installInfo = installedExtensions[name]
+    if (installInfo) {
+      process.emit('disable-extension', installInfo.id)
     }
   }
 
