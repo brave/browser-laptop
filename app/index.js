@@ -25,6 +25,7 @@ const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
 const CrashHerald = require('./crash-herald')
 const PackageLoader = require('./package-loader')
+const Extensions = require('./extensions')
 const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
@@ -39,7 +40,6 @@ const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
-const path = require('path')
 
 let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
@@ -345,26 +345,7 @@ app.on('ready', () => {
       initiateSessionStateSave()
     })
 
-    // TODO(bridiver) - load everything in the extensions directory
-    // mnojpmjdmbbfmejpflffifhffcmidifd
-    if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-      process.emit('load-extension', 'brave', path.join(__dirname, '..', '..', 'extensions'), 'component')
-      process.emit('load-extension', '1password', path.join(__dirname, '..', '..', 'extensions'))
-    } else {
-      process.emit('load-extension', 'brave', path.join(__dirname, 'extensions'), 'component')
-      process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
-    }
-
-    process.on('did-extension-load-error', function (name, errorMessage) {
-      console.error('Error loading extension ' + name + ':', errorMessage)
-    })
-    process.on('did-extension-load', function (name) {
-      console.log('extension ' + name + ' loaded')
-    })
-    process.on('chrome-browser-action-registered', function (channel, actionTitle) {
-      // TODO - update the menu and shortcuts
-    })
-
+    Extensions.init()
     Filtering.init()
     HttpsEverywhere.init()
     TrackingProtection.init()

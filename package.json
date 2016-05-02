@@ -23,7 +23,7 @@
     "lint": "standard",
     "postinstall": "node ./tools/rebuildNativeModules.js&&webpack",
     "preload-httpse": "node ./preload-httpse.js",
-    "start": "node ./tools/start.js --debug=5858 -enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
+    "start": "node ./tools/start.js --debug=5858 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')",
     "vagrant-destroy-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant destroy",

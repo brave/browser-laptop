@@ -269,6 +269,14 @@ WindowStore
         // per above
       ]
     }]
-  }
+  },
+  popupWindowDetail: {
+    left: number, // the left position of the popup window
+    right: number, // the right position of the popup window
+    top: number, // the top position of the popup window
+    bottom: number, // the bottom position of the popup window
+    maxHeight: number, // the maximum height of the popup window
+    src: string, // the src for the popup window webview
+  },
 }
 ```

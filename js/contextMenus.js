@@ -730,7 +730,19 @@ function mainTemplateInit (nodeProps, frame) {
         label: '1Password',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', '1Password')
+            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', '1Password', nodeProps)
+          }
+        }
+      })
+  }
+  if (getSetting(settings.DASHLANE_ENABLED)) {
+    template.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: 'Dashlane',
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            ipc.send('chrome-browser-action-clicked', 'fdjamakpfbbddfjaooikfcpapjohcfmg', 'Dashlane', nodeProps)
           }
         }
       })

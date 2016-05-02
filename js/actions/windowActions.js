@@ -638,6 +638,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to set popup window detail.
+   * If set, also indicates that the popup window is shown.
+   * @param {Object} detail - The popup window detail
+   */
+  setPopupWindowDetail: function (detail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
+      detail
+    })
+  },
+
+  /**
    * Dispatches a message to indicate that the frame should be muted
    *
    * @param {Object} frameProps - Properties of the frame in question

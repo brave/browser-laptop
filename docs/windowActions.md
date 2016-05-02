@@ -423,6 +423,17 @@ If set, also indicates that the context menu is shown.
 
 
 
+### setPopupWindowDetail(detail) 
+
+Dispatches a message to set popup window detail.
+If set, also indicates that the popup window is shown.
+
+**Parameters**
+
+**detail**: `Object`, The popup window detail
+
+
+
 ### setAudioMuted(frameProps, muted) 
 
 Dispatches a message to indicate that the frame should be muted
