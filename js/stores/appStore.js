@@ -109,6 +109,8 @@ const createWindow = (browserOpts, defaults) => {
   browserOpts.width = browserOpts.width < minWidth ? minWidth : browserOpts.width
   browserOpts.height = browserOpts.height < minHeight ? minHeight : browserOpts.height
 
+  const autoHideMenuBarSetting = getSetting(settings.AUTO_HIDE_MENU_BAR)
+
   let mainWindow = new BrowserWindow(Object.assign({
     // smaller min size for "modal" windows
     minWidth,
@@ -117,7 +119,7 @@ const createWindow = (browserOpts, defaults) => {
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden-inset',
-    autoHideMenuBar: true,
+    autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))

@@ -76,6 +76,7 @@ module.exports = {
     'general.homepage': 'https://www.brave.com',
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
+    'general.autohide-menubar': false,
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
