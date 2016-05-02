@@ -40,7 +40,7 @@ AppStore
       pointerLockPermission: boolean,
       fullscreenPermission: boolean,
       openExternalPermission: boolean,
-      savePasswords: boolean // Only false or undefined
+      savePasswords: boolean // Only false or undefined/null
     }
   },
   visits: [{

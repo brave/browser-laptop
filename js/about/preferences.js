@@ -176,13 +176,23 @@ class SitePermissionsPage extends React.Component {
     })
   }
 
-  getPermissionSettings (entry) {
-    return entry.filter((value, settingName) => settingName.endsWith('Permission'))
-  }
-
   hasEntryForPermission (name) {
     return this.state.settings.some((value) => {
       return value.get ? typeof value.get(name) === 'boolean' : false
+    })
+  }
+
+  isPermissionsNonEmpty () {
+    // Check whether there is at least one permission set
+    return this.state.settings.some((value) => {
+      if (value && value.get) {
+        for (let i = 0; i < permissionNames.length; i++) {
+          if (typeof value.get(permissionNames[i]) === 'boolean') {
+            return true
+          }
+        }
+      }
+      return false
     })
   }
 
@@ -191,7 +201,8 @@ class SitePermissionsPage extends React.Component {
   }
 
   render () {
-    return <div>
+    return this.isPermissionsNonEmpty()
+    ? <div>
       <div data-l10n-id='sitePermissions'></div>
       <ul className='sitePermissions'>
         {
@@ -223,6 +234,7 @@ class SitePermissionsPage extends React.Component {
         }
       </ul>
     </div>
+    : null
   }
 }
 
