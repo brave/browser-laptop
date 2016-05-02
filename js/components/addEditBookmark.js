@@ -91,30 +91,30 @@ class AddEditBookmark extends ImmutableComponent {
       <div className='genericForm' onClick={this.onClick.bind(this)}>
         <div className='genericFormTable'>
           <div id='bookmarkName' className='formRow'>
-            <label data-l10n-id='nameField' htmlFor='bookmarkName'/>
-            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}/>
+            <label data-l10n-id='nameField' htmlFor='bookmarkName' />
+            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
           </div>
           {
             !this.isFolder
             ? <div id='bookmarkLocation' className='formRow'>
-              <label data-l10n-id='locationField' htmlFor='bookmarkLocation'/>
+              <label data-l10n-id='locationField' htmlFor='bookmarkLocation' />
               <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
             </div>
             : null
           }
           <div id='bookmarkParentFolder' className='formRow'>
-            <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk'/>
+            <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk' />
             <select value={this.props.currentDetail.get('parentFolderId')}
               onChange={this.onParentFolderChange} >
-              <option value='0' data-l10n-id='bookmarksToolbar'/>
+              <option value='0' data-l10n-id='bookmarksToolbar' />
             {
               this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
             }
             </select>
           </div>
           <div className='formRow'>
-            <span/>
-            <Button l10nId='save' className='primaryButton' onClick={this.onSave.bind(this)}/>
+            <span />
+            <Button l10nId='save' className='primaryButton' onClick={this.onSave.bind(this)} />
           </div>
         </div>
       </div>

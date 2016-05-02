@@ -81,9 +81,9 @@ const UrlUtil = {
     // for cases, ?abc and "a? b" which should searching query
     const case1Reg = /^(\?)|(\?.+\s)/
     // for cases, pure string
-    const case2Reg = /[\?\.\/\s\:]/
+    const case2Reg = /[\?\.\/\s:]/
     // for cases, data:uri and view-source:uri
-    const case3Reg = /^\w+\:.*/
+    const case3Reg = /^\w+:.*/
 
     let str = input.trim()
     if (case1Reg.test(str) || !case2Reg.test(str) ||

@@ -33,7 +33,7 @@ class NotificationItem extends ImmutableComponent {
       <span className='notificationOptions'>
         {
           options.get('persist')
-            ? <span><input type='checkbox' ref={(node) => { this.checkbox = node }}/><label data-l10n-id='rememberDecision'/></span>
+            ? <span><input type='checkbox' ref={(node) => { this.checkbox = node }} /><label data-l10n-id='rememberDecision' /></span>
             : null
         }
         {

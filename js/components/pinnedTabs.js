@@ -63,7 +63,7 @@ class PinnedTabs extends ImmutableComponent {
                 previewTabs={this.props.previewTabs}
                 isActive={this.props.activeFrame === frameProps}
                 isPrivate={frameProps.get('isPrivate')}
-                partOfFullPageSet={this.props.partOfFullPageSet}/>)
+                partOfFullPageSet={this.props.partOfFullPageSet} />)
       }
     </div>
   }

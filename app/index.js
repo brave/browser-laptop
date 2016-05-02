@@ -355,8 +355,8 @@ app.on('ready', () => {
       process.emit('load-extension', '1password', path.join(__dirname, 'extensions'))
     }
 
-    process.on('did-extension-load-error', function (name, error_message) {
-      console.error('Error loading extension ' + name + ':', error_message)
+    process.on('did-extension-load-error', function (name, errorMessage) {
+      console.error('Error loading extension ' + name + ':', errorMessage)
     })
     process.on('did-extension-load', function (name) {
       console.log('extension ' + name + ' loaded')

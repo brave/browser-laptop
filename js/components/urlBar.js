@@ -279,9 +279,9 @@ class UrlBar extends ImmutableComponent {
             })}
             id='urlInput'
             readOnly={this.props.titleMode}
-            ref={(node) => { this.urlInput = node }}/>
+            ref={(node) => { this.urlInput = node }} />
         }
-      <legend/>
+      <legend />
         {
           this.props.titleMode || this.aboutPage
           ? null

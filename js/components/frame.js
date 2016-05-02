@@ -566,7 +566,7 @@ class Frame extends ImmutableComponent {
       })}>
       {
         this.props.frame.get('isFullScreen') && this.props.frame.get('showFullScreenWarning')
-        ? <FullScreenWarning frameProps={this.props.frame}/>
+        ? <FullScreenWarning frameProps={this.props.frame} />
         : null
       }
       {
@@ -576,14 +576,14 @@ class Frame extends ImmutableComponent {
           onFindHide={this.onFindHide.bind(this)}
           frame={this.props.frame}
           selected={this.props.frame.get('findbarSelected')}
-          findDetail={this.props.frame.get('findDetail')}/>
+          findDetail={this.props.frame.get('findDetail')} />
         : null
       }
       <div ref={(node) => { this.webviewContainer = node }}
         className={cx({
           webviewContainer: true,
           isPreview: this.props.isPreview
-        })}/>
+        })} />
       {
         this.props.frame.get('hrefPreview')
         ? <div className={cx({

@@ -18,7 +18,7 @@ describe('tab pages', function () {
   describe('basic tab page functionality', function () {
     Brave.beforeAll(this)
 
-    before(function *() {
+    before(function * () {
       yield setup(this.app.client)
       yield this.app.client.elements(tabPage, function (e, res) {
         assert.equal(0, res.value.length)
@@ -44,7 +44,7 @@ describe('tab pages', function () {
     })
 
     describe('allows changing to tab pages', function () {
-      before(function *() {
+      before(function * () {
         // Make sure there are 2 tab pages
         yield this.app.client.click(newFrameButton)
           .waitUntil(function () {
@@ -52,7 +52,7 @@ describe('tab pages', function () {
           })
       })
 
-      it('clicking tab page changes', function *() {
+      it('clicking tab page changes', function * () {
         yield this.app.client.click(tabPage1)
           .waitForExist(tabPage1 + '.active')
       })
@@ -64,7 +64,7 @@ describe('tab pages', function () {
     })
 
     describe('tabs per page setting', function () {
-      it('takes effect immediately', function *() {
+      it('takes effect immediately', function * () {
         const defaultTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
         yield this.app.client.changeSetting(settings.TABS_PER_PAGE, 1)
         yield this.app.client.waitUntil(function () {

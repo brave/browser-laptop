@@ -85,7 +85,7 @@ class UrlBarSuggestions extends ImmutableComponent {
           onClick={suggestion.onClick}
           key={suggestion.title}
           className={this.activeIndex === index + 1 ? 'selected' : ''}>
-          <span className={`suggestionIcon fa ${suggestion.iconClass}`}/>
+          <span className={`suggestionIcon fa ${suggestion.iconClass}`} />
           <span className='suggestionText'>{suggestion.title}</span>
         </li>
       )}

@@ -14,7 +14,7 @@ describe('urlbarSuggestions', function () {
   }
 
   Brave.beforeAll(this)
-  before(function *() {
+  before(function * () {
     this.page1Url = Brave.server.url('page1.html')
     yield setup(this.app.client)
     yield this.app.client.loadUrl(this.page1Url)
@@ -23,7 +23,7 @@ describe('urlbarSuggestions', function () {
       .waitForElementFocus(urlInput)
   })
 
-  it('navigates to a suggestion when clicked', function *() {
+  it('navigates to a suggestion when clicked', function * () {
     yield this.app.client.ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
       .setValue(urlInput, 'Page 1')
@@ -35,7 +35,7 @@ describe('urlbarSuggestions', function () {
       .waitForExist('.tab[data-frame-key="1"].active')
   })
 
-  it('navigates to a suggestion with keyboard', function *() {
+  it('navigates to a suggestion with keyboard', function * () {
     yield this.app.client.ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForExist('.tab[data-frame-key="3"].active')
       .ipcSend('shortcut-focus-url')

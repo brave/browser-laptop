@@ -409,7 +409,7 @@ class Main extends ImmutableComponent {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
           siteSettings={this.props.appState.get('siteSettings')}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/>
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
         : null
       }
       <div className='top'>
@@ -446,7 +446,7 @@ class Main extends ImmutableComponent {
           }
           {
             activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
-            ? <LoginRequired frameProps={activeFrame}/>
+            ? <LoginRequired frameProps={activeFrame} />
             : null
           }
           {
@@ -454,7 +454,7 @@ class Main extends ImmutableComponent {
             ? <AddEditBookmark sites={this.props.appState.get('sites')}
               currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
               originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}/>
+              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
             : null
           }
           {
@@ -482,7 +482,7 @@ class Main extends ImmutableComponent {
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
             bookmarks={this.props.appState.get('sites')
               .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
-            }/>
+            } />
           : null
         }
         <div className={cx({
@@ -495,7 +495,7 @@ class Main extends ImmutableComponent {
             nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
               tabsPerTabPage={tabsPerPage}
-              tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}/>
+              tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])} />
             : null
           }
         </div>
@@ -551,7 +551,7 @@ class Main extends ImmutableComponent {
         this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
         ? <DownloadsBar
           windowWidth={this.props.appState.get('defaultWindowWidth')}
-          downloads={this.props.appState.get('downloads')}/>
+          downloads={this.props.appState.get('downloads')} />
         : null
       }
     </div>

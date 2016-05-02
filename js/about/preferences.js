@@ -52,7 +52,7 @@ class SettingsList extends ImmutableComponent {
     return <div>
       {
         this.props.dataL10nId
-        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId}/>
+        ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId} />
         : null
       }
       <div className='settingsList'>
@@ -65,7 +65,7 @@ class SettingsList extends ImmutableComponent {
 class SettingItem extends ImmutableComponent {
   render () {
     return <div className='settingItem'>
-      <span data-l10n-id={this.props.dataL10nId}/>
+      <span data-l10n-id={this.props.dataL10nId} />
       {this.props.children}
     </div>
   }
@@ -78,9 +78,9 @@ class SettingCheckbox extends ImmutableComponent {
         <input type='checkbox' id={this.props.prefKey}
           disabled={this.props.disabled}
           onChange={changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
-          checked={getSetting(this.props.prefKey, this.props.settings)}/>
+          checked={getSetting(this.props.prefKey, this.props.settings)} />
       </span>
-      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey}/>
+      <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
     </div>
   }
 }
@@ -92,17 +92,17 @@ class GeneralTab extends ImmutableComponent {
         <SettingItem dataL10nId='selectedLanguage'>
           <select value={getSetting(settings.LANGUAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
-            <option data-l10n-id='en-US' value='en-US'/>
-            <option data-l10n-id='nl-NL' value='nl-NL'/>
-            <option data-l10n-id='pt-BR' value='pt-BR'/>
+            <option data-l10n-id='en-US' value='en-US' />
+            <option data-l10n-id='nl-NL' value='nl-NL' />
+            <option data-l10n-id='pt-BR' value='pt-BR' />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='startsWith'>
           <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
-            <option data-l10n-id='startsWithOptionLastTime' value='lastTime'/>
-            <option data-l10n-id='startsWithOptionHomePage' value='homePage'/>
-            <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage'/>
+            <option data-l10n-id='startsWithOptionLastTime' value='lastTime' />
+            <option data-l10n-id='startsWithOptionHomePage' value='homePage' />
+            <option data-l10n-id='startsWithOptionNewTabPage' value='newTabPage' />
           </select>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>
@@ -110,11 +110,11 @@ class GeneralTab extends ImmutableComponent {
             value={getSetting(settings.HOMEPAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
-        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SettingsList dataL10nId='bookmarkToolbarSettings'>
-        <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
     </SettingsList>
   }
@@ -148,9 +148,9 @@ class TabsTab extends ImmutableComponent {
           }
         </select>
       </SettingItem>
-      <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-      <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-      <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+      <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
     </SettingsList>
   }
 }
@@ -230,15 +230,15 @@ class PrivacyTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SettingsList dataL10nId='advancedPrivacySettings'>
-        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <SitePermissionsPage/>
+      <SitePermissionsPage />
     </div>
   }
 }
@@ -247,8 +247,8 @@ class SecurityTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList>
-        <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
-        <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+        <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <div>
         <span className='linkText' data-l10n-id='managePasswords'
@@ -281,12 +281,12 @@ class TopBarButton extends ImmutableComponent {
           [this.props.icon]: true
         })}>
         <div className='tabMarkerText'
-          data-l10n-id={this.props.dataL10nId}/>
+          data-l10n-id={this.props.dataL10nId} />
       </div>
       {
         this.props.selected
         ? <div className='tabMarkerContainer'>
-          <div className='tabMarker'/>
+          <div className='tabMarker' />
         </div>
         : null
       }
@@ -341,14 +341,14 @@ class HelpfulHints extends ImmutableComponent {
   render () {
     return <div className='helpfulHints'>
       <span className='hintsTitleContainer'>
-        <span data-l10n-id='hintsTitle'/>
+        <span data-l10n-id='hintsTitle' />
         <span className='hintsRefresh fa fa-refresh'
-          onClick={this.props.refreshHint}/>
+          onClick={this.props.refreshHint} />
       </span>
-      <div data-l10n-id={`hint${this.props.hintNumber}`}/>
+      <div data-l10n-id={`hint${this.props.hintNumber}`} />
       <div className='helpfulHintsBottom'>
         <a data-l10n-id='sendUsFeedback' href={appConfig.contactUrl} />
-        <div className='loveToHear' data-l10n-id='loveToHear'/>
+        <div className='loveToHear' data-l10n-id='loveToHear' />
       </div>
     </div>
   }
@@ -408,38 +408,38 @@ class AboutPreferences extends React.Component {
     const settings = this.state.settings
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
-        tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SEARCH:
-        tab = <SearchTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <SearchTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.TABS:
-        tab = <TabsTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <TabsTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SYNC:
-        tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <PrivacyTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.BRAVERY:
-        tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting}/>
+        tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
     }
     return <div>
       <TopBar preferenceTab={this.state.preferenceTab}
-        changeTab={this.changeTab.bind(this)}/>
+        changeTab={this.changeTab.bind(this)} />
       <div className='prefBody'>
         <div className='prefTabContainer'>
           {tab}
         </div>
-        <HelpfulHints hintNumber={this.state.hintNumber} refreshHint={this.refreshHint.bind(this)}/>
+        <HelpfulHints hintNumber={this.state.hintNumber} refreshHint={this.refreshHint.bind(this)} />
       </div>
     </div>
   }
 }
 
-module.exports = <AboutPreferences/>
+module.exports = <AboutPreferences />

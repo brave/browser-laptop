@@ -31,7 +31,7 @@ class DownloadItem extends ImmutableComponent {
     {
       <div className='aboutListItem' title={this.props.download.get('url')}>
         <div className='aboutItemTitle'>{this.props.download.get('filename')}</div>
-        <div className='aboutItemTitle' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)}/>
+        <div className='aboutItemTitle' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
         <div className='aboutItemLocation'>{this.props.download.get('url')}</div>
       </div>
     }
@@ -45,8 +45,8 @@ class DownloadsList extends ImmutableComponent {
     {
       this.props.downloads.size > 0
       ? this.props.downloads.map((download, downloadId) =>
-        <DownloadItem download={download} downloadId={downloadId}/>)
-      : <div className='downloadList' data-l10n-id='noDownloads'/>
+        <DownloadItem download={download} downloadId={downloadId} />)
+      : <div className='downloadList' data-l10n-id='noDownloads' />
     }
     </list>
   }
@@ -66,12 +66,12 @@ class AboutDownloads extends React.Component {
   }
   render () {
     return <div className='downloadsPage'>
-      <h2 data-l10n-id='downloads'/>
+      <h2 data-l10n-id='downloads' />
       <div className='downloadPageContent'>
-        <DownloadsList downloads={this.state.downloads}/>
+        <DownloadsList downloads={this.state.downloads} />
       </div>
     </div>
   }
 }
 
-module.exports = <AboutDownloads/>
+module.exports = <AboutDownloads />

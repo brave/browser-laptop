@@ -13,4 +13,4 @@ class NewTabPage extends ImmutableComponent {
   }
 }
 
-module.exports = <NewTabPage/>
+module.exports = <NewTabPage />

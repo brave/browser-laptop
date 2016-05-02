@@ -9,7 +9,7 @@ const { aboutUrls } = require('../lib/appUrlUtil')
 class AboutAbout extends ImmutableComponent {
   render () {
     return <div>
-      <h1 data-l10n-id='listOfAboutPages'/>
+      <h1 data-l10n-id='listOfAboutPages' />
       <ul>
       {
       aboutUrls.keySeq().sort().map((aboutSourceUrl) =>
@@ -24,4 +24,4 @@ class AboutAbout extends ImmutableComponent {
   }
 }
 
-module.exports = <AboutAbout/>
+module.exports = <AboutAbout />

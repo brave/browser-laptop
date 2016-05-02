@@ -157,7 +157,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       </span>
       {
         this.isFolder
-        ? <span className='bookmarkFolderChevron fa fa-chevron-down'/>
+        ? <span className='bookmarkFolderChevron fa fa-chevron-down' />
         : null
       }
     </span>
@@ -279,13 +279,13 @@ class BookmarksToolbar extends ImmutableComponent {
             draggingOverData={this.props.draggingOverData}
             activeFrame={this.props.activeFrame}
             bookmarks={this.props.bookmarks}
-            bookmark={bookmark}/>)
+            bookmark={bookmark} />)
     }
     {
       this.overflowBookmarkItems.size !== 0
       ? <Button iconClass='overflowIndicator fa-angle-double-right'
         onClick={this.onMoreBookmarksMenu.bind(this)}
-        className='bookmarkButton'/>
+        className='bookmarkButton' />
       : null
     }
     </div>

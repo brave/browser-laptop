@@ -208,7 +208,7 @@ class AboutPasswords extends React.Component {
               ? this.state.passwordDetails.sort((a, b) => {
                 return a.get('origin') > b.get('origin') ? 1 : -1
               }).map((item) =>
-                <PasswordItem password={item} id={counter++}/>)
+                <PasswordItem password={item} id={counter++} />)
               : null
           }
           </tbody>
@@ -225,7 +225,7 @@ class AboutPasswords extends React.Component {
           {
             this.state.disabledSiteDetails
               ? this.state.disabledSiteDetails.map((item, site) =>
-                <SiteItem site={site}/>)
+                <SiteItem site={site} />)
               : null
           }
           </tbody>
@@ -235,4 +235,4 @@ class AboutPasswords extends React.Component {
   }
 }
 
-module.exports = <AboutPasswords/>
+module.exports = <AboutPasswords />

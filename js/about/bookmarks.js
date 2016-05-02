@@ -49,7 +49,7 @@ class BookmarkItem extends ImmutableComponent {
         partitionNumber: this.props.bookmark.get('partitionNumber')
       }
       partitionNumberInfo =
-        <span>&nbsp;(<span data-l10n-id='partitionNumber' data-l10n-args={JSON.stringify(l10nArgs)}/>)</span>
+        <span>&nbsp;(<span data-l10n-id='partitionNumber' data-l10n-args={JSON.stringify(l10nArgs)} />)</span>
     }
 
     return <div role='listitem'
@@ -113,7 +113,7 @@ class BookmarkFolderItem extends ImmutableComponent {
           listItem: true,
           selected: this.props.selected
         })}>
-        <span className='bookmarkFolderIcon fa fa-folder-o'/>
+        <span className='bookmarkFolderIcon fa fa-folder-o' />
         <span data-l10n-id={this.props.dataL10nId}>
           {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}</span>
       </div>
@@ -122,7 +122,7 @@ class BookmarkFolderItem extends ImmutableComponent {
         ? <BookmarkFolderList onChangeSelectedFolder={this.props.onChangeSelectedFolder}
           bookmarkFolders={childBookmarkFolders}
           selectedFolderId={this.props.selectedFolderId}
-          allBookmarkFolders={this.props.allBookmarkFolders}/>
+          allBookmarkFolders={this.props.allBookmarkFolders} />
         : null
       }
     </div>
@@ -140,7 +140,7 @@ class BookmarkFolderList extends ImmutableComponent {
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
           allBookmarkFolders={this.props.allBookmarkFolders}
           selectedFolderId={this.props.selectedFolderId}
-          bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})}/>
+          bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})} />
         : null
       }
       {
@@ -149,7 +149,7 @@ class BookmarkFolderList extends ImmutableComponent {
             allBookmarkFolders={this.props.allBookmarkFolders}
             selected={this.props.selectedFolderId === bookmarkFolder.get('folderId')}
             selectedFolderId={this.props.selectedFolderId}
-            onChangeSelectedFolder={this.props.onChangeSelectedFolder}/>)
+            onChangeSelectedFolder={this.props.onChangeSelectedFolder} />)
       }
       {
         this.props.isRoot
@@ -159,7 +159,7 @@ class BookmarkFolderList extends ImmutableComponent {
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
           allBookmarkFolders={this.props.allBookmarkFolders}
           selectedFolderId={this.props.selectedFolderId}
-          bookmarkFolder={Immutable.fromJS({folderId: -1, tags: [siteTags.BOOKMARK_FOLDER]})}/>
+          bookmarkFolder={Immutable.fromJS({folderId: -1, tags: [siteTags.BOOKMARK_FOLDER]})} />
         : null
       }
     </list>
@@ -171,7 +171,7 @@ class BookmarksList extends ImmutableComponent {
     return <list className='bookmarkList'>
     {
       this.props.bookmarks.map((bookmark) =>
-        <BookmarkItem bookmark={bookmark}/>)
+        <BookmarkItem bookmark={bookmark} />)
     }
     </list>
   }
@@ -200,17 +200,17 @@ class AboutBookmarks extends React.Component {
   }
   render () {
     return <div className='bookmarksPage'>
-      <h2 data-l10n-id='folders'/>
+      <h2 data-l10n-id='folders' />
       <div className='bookmarkPageContent'>
         <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
           bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
           allBookmarkFolders={this.state.bookmarkFolders}
           isRoot
           selectedFolderId={this.state.selectedFolderId} />
-        <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)}/>
+        <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />
       </div>
     </div>
   }
 }
 
-module.exports = <AboutBookmarks/>
+module.exports = <AboutBookmarks />
