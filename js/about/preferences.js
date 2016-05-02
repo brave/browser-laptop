@@ -130,6 +130,9 @@ class GeneralTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+      <SettingsList dataL10nId='appearanceSettings'>
+        <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU_BAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
+      </SettingsList>
     </SettingsList>
   }
 }
