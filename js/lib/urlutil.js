@@ -63,6 +63,15 @@ const UrlUtil = {
     return input
   },
 
+  canParseURL: function (input) {
+    try {
+      let url = new window.URL(input)
+      return !!url
+    } catch (e) {
+      return false
+    }
+  },
+
   /**
    * Checks if a string is not a URL.
    * @param {String} input The input value.
@@ -82,17 +91,11 @@ const UrlUtil = {
       return true
     }
     if (case3Reg.test(str)) {
-      return false
+      return !this.canParseURL(str)
     }
 
     str = this.prependScheme(str)
-
-    try {
-      let url = new window.URL(str)
-      return !url
-    } catch (e) {
-      return true
-    }
+    return !this.canParseURL(str)
   },
 
   /**
