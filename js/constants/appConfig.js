@@ -16,9 +16,13 @@ module.exports = {
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
     AD_INSERTION: 'adInsertion',
+    NOSCRIPT: 'noScript',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
   },
   cookieblock: {
+    enabled: true
+  },
+  noScript: {
     enabled: true
   },
   adblock: {

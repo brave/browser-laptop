@@ -28,6 +28,7 @@ const path = require('path')
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
+const headersReceivedFilteringFns = []
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
@@ -59,6 +60,10 @@ module.exports.registerBeforeRequestFilteringCB = (filteringFn) => {
 
 module.exports.registerBeforeRedirectFilteringCB = (filteringFn) => {
   beforeRedirectFilteringFns.push(filteringFn)
+}
+
+module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
+  headersReceivedFilteringFns.push(filteringFn)
 }
 
 /**
@@ -192,6 +197,32 @@ function registerForBeforeSendHeaders (session) {
     }
 
     cb({ requestHeaders })
+  })
+}
+
+/**
+ * Register for notifications for webRequest.onHeadersReceived for a particular
+ * session.
+ * @param {object} session Session to add webRequest filtering on
+ */
+function registerForHeadersReceived (session) {
+  // Note that onBeforeRedirect listener doesn't take a callback
+  session.webRequest.onHeadersReceived(function (details, cb) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+      return
+    }
+    for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
+      let results = headersReceivedFilteringFns[i](details)
+      if (!module.exports.isResourceEnabled(results.resourceName)) {
+        continue
+      }
+      if (results.responseHeaders) {
+        cb({responseHeaders: results.responseHeaders})
+        return
+      }
+    }
+    cb({})
   })
 }
 
@@ -346,12 +377,21 @@ function registerForDownloadListener (session) {
   })
 }
 
+function registerSession (partition, fn) {
+  let ses = session.fromPartition(partition)
+  registeredSessions[partition] = ses
+  fn(ses)
+}
+
 function initForPartition (partition) {
-  ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
-    let ses = session.fromPartition(partition)
-    registeredSessions[partition] = ses
-    fn(ses)
-  })
+  let fns = [registerForBeforeRequest, registerForBeforeRedirect,
+    registerForBeforeSendHeaders, registerPermissionHandler]
+  if (partition !== 'main-1') {
+    // Don't block scripts in the background page
+    fns.push(registerForHeadersReceived)
+  }
+
+  fns.forEach(registerSession.bind(this, partition))
 }
 
 function shouldIgnoreUrl (url) {

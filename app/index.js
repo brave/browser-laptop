@@ -28,6 +28,7 @@ const PackageLoader = require('./package-loader')
 const Extensions = require('./extensions')
 const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
+const NoScript = require('./noscript')
 const AdBlock = require('./adBlock')
 const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
@@ -351,6 +352,7 @@ app.on('ready', () => {
     TrackingProtection.init()
     AdBlock.init()
     SiteHacks.init()
+    NoScript.init()
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.updateNowRequested()
