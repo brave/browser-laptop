@@ -89,6 +89,14 @@ class GeneralTab extends ImmutableComponent {
   render () {
     return <SettingsList>
       <SettingsList>
+        <SettingItem dataL10nId='selectedLanguage'>
+          <select value={getSetting(settings.LANGUAGE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
+            <option data-l10n-id='en-US' value='en-US'/>
+            <option data-l10n-id='nl-NL' value='nl-NL'/>
+            <option data-l10n-id='pt-BR' value='pt-BR'/>
+          </select>
+        </SettingItem>
         <SettingItem dataL10nId='startsWith'>
           <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
@@ -102,14 +110,7 @@ class GeneralTab extends ImmutableComponent {
             value={getSetting(settings.HOMEPAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
-        <SettingItem dataL10nId='selectedLanguage'>
-          <select value={getSetting(settings.LANGUAGE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
-            <option data-l10n-id='en-US' value='en-US'/>
-            <option data-l10n-id='nl-NL' value='nl-NL'/>
-            <option data-l10n-id='pt-BR' value='pt-BR'/>
-          </select>
-        </SettingItem>
+        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>
       </SettingsList>
       <SettingsList dataL10nId='bookmarkToolbarSettings'>
         <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}/>

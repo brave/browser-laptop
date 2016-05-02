@@ -8,6 +8,7 @@
 - More zoom fixes for page navigation.
 - More password autofill fixes.
 - More locales added.
+- Added optional Home button.
 - Upgrade to libchromiumcontent 50.0.2661.86.
 - Upgrade to Electron 0.37.7.
 

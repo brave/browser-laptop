@@ -69,6 +69,7 @@ module.exports = {
   defaultSettings: {
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
+    'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
@@ -85,6 +86,6 @@ module.exports = {
     'privacy.do-not-track': false,
     'security.passwords.manager-enabled': true,
     'security.passwords.one-password-enabled': false,
-    'general.downloads.defaultSavePath': null
+    'general.downloads.default-save-path': null
   }
 }
