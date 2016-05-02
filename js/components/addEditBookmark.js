@@ -80,13 +80,19 @@ class AddEditBookmark extends ImmutableComponent {
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
     this.onClose()
   }
+  get displayBookmarkName () {
+    if (this.props.currentDetail.get('customTitle') !== undefined) {
+      return this.props.currentDetail.get('customTitle')
+    }
+    return this.props.currentDetail.get('title')
+  }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
       <div className='genericForm' onClick={this.onClick.bind(this)}>
         <div className='genericFormTable'>
           <div id='bookmarkName' className='formRow'>
             <label data-l10n-id='nameField' htmlFor='bookmarkName'/>
-            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.props.currentDetail.get('customTitle') || this.props.currentDetail.get('title')} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}/>
+            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }}/>
           </div>
           {
             !this.isFolder
