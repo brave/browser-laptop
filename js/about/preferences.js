@@ -164,27 +164,15 @@ class SyncTab extends ImmutableComponent {
 }
 
 class SitePermissionsPage extends React.Component {
-  constructor () {
-    super()
-    this.state = {
-      settings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map()
-    }
-    window.addEventListener(messages.SITE_SETTINGS_UPDATED, (e) => {
-      this.setState({
-        settings: Immutable.fromJS(e.detail || {})
-      })
-    })
-  }
-
   hasEntryForPermission (name) {
-    return this.state.settings.some((value) => {
+    return this.props.siteSettings.some((value) => {
       return value.get ? typeof value.get(name) === 'boolean' : false
     })
   }
 
   isPermissionsNonEmpty () {
     // Check whether there is at least one permission set
-    return this.state.settings.some((value) => {
+    return this.props.siteSettings.some((value) => {
       if (value && value.get) {
         for (let i = 0; i < permissionNames.length; i++) {
           if (typeof value.get(permissionNames[i]) === 'boolean') {
@@ -212,7 +200,7 @@ class SitePermissionsPage extends React.Component {
               <div data-l10n-id={name} className='permissionName'></div>
               <ul>
               {
-                this.state.settings.map((value, hostPattern) => {
+                this.props.siteSettings.map((value, hostPattern) => {
                   if (!value.size) {
                     return null
                   }
@@ -250,7 +238,7 @@ class PrivacyTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <SitePermissionsPage />
+      <SitePermissionsPage siteSettings={this.props.siteSettings} />
     </div>
   }
 }
@@ -373,11 +361,17 @@ class AboutPreferences extends React.Component {
     this.state = {
       preferenceTab: preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
-      settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map()
+      settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map(),
+      siteSettings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map()
     }
     window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
       this.setState({
         settings: Immutable.fromJS(e.detail || {})
+      })
+    })
+    window.addEventListener(messages.SITE_SETTINGS_UPDATED, (e) => {
+      this.setState({
+        siteSettings: Immutable.fromJS(e.detail || {})
       })
     })
     this.onChangeSetting = this.onChangeSetting.bind(this)
@@ -419,6 +413,7 @@ class AboutPreferences extends React.Component {
   render () {
     let tab
     const settings = this.state.settings
+    const siteSettings = this.state.siteSettings
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} />
@@ -433,7 +428,7 @@ class AboutPreferences extends React.Component {
         tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <PrivacyTab settings={settings} siteSettings={siteSettings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting} />
