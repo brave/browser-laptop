@@ -130,7 +130,7 @@
     "xml2js": "^0.4.15"
   },
   "optionalDependencies": {
-    "electron-installer-debian": "^0.2.0",
+    "electron-installer-debian": "^0.3.0",
     "electron-installer-redhat": "^0.2.0"
   },
   "standard": {
