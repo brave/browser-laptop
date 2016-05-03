@@ -242,7 +242,7 @@ class Frame extends ImmutableComponent {
 
   addEventListeners () {
     this.webview.addEventListener('set-active', (e) => {
-      if (!this.props.isActive) {
+      if (e.active && !this.props.isActive) {
         windowActions.setActiveFrame(this.props.frame)
       }
     })
