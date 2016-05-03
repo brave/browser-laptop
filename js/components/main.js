@@ -364,7 +364,8 @@ class Main extends ImmutableComponent {
   onMouseDown (e) {
     let node = e.target
     while (node) {
-      if (node.classList && node.classList.contains('popupWindow')) {
+      if (node.classList &&
+          (node.classList.contains('popupWindow') || node.classList.contains('contextMenu'))) {
         return
       }
       node = node.parentNode
