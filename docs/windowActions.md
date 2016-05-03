@@ -446,6 +446,29 @@ Dispatches a message to indicate that the frame should be muted
 
 
 
+### muteAllAudio(framePropsList, muted) 
+
+Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
+
+**Parameters**
+
+**framePropsList**: `Object`, List of frame properties to consider
+
+**muted**: `boolean`, true if the frames should be muted
+
+
+
+### muteAllAudioExcept(frameToSkip) 
+
+Dispatches a mute call to all frames except the one provided.
+The provided frame will have its audio unmuted.
+
+**Parameters**
+
+**frameToSkip**: `Object`, Properties of the frame to keep audio
+
+
+
 ### setAudioPlaybackActive(frameProps, audioPlaybackActive) 
 
 Dispatches a message to indicate that audio is playing

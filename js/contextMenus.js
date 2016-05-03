@@ -56,24 +56,15 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
 }
 
 function tabPageTemplateInit (framePropsList) {
-  const muteAll = (framePropsList, mute) => {
-    framePropsList.forEach((frameProps) => {
-      if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
-        windowActions.setAudioMuted(frameProps, true)
-      } else if (!mute && frameProps.get('audioMuted')) {
-        windowActions.setAudioMuted(frameProps, false)
-      }
-    })
-  }
   return [{
     label: locale.translation('unmuteTabs'),
     click: (item, focusedWindow) => {
-      muteAll(framePropsList, false)
+      windowActions.muteAllAudio(framePropsList, false)
     }
   }, {
     label: locale.translation('muteTabs'),
     click: (item, focusedWindow) => {
-      muteAll(framePropsList, true)
+      windowActions.muteAllAudio(framePropsList, true)
     }
   }]
 }
@@ -328,23 +319,15 @@ function tabTemplateInit (frameProps) {
     })
 
   if (!frameProps.get('isPrivate')) {
-    if (frameProps.get('pinnedLocation')) {
-      items.push({
-        label: locale.translation('unpinTab'),
-        click: (item) => {
-          // Handle converting the current tab window into a pinned site
-          windowActions.setPinned(frameProps, false)
-        }
-      })
-    } else {
-      items.push({
-        label: locale.translation('pinTab'),
-        click: (item) => {
-          // Handle converting the current tab window into a pinned site
-          windowActions.setPinned(frameProps, true)
-        }
-      })
-    }
+    const isPinned = frameProps.get('pinnedLocation')
+
+    items.push({
+      label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
+      click: (item) => {
+        // Handle converting the current tab window into a pinned site
+        windowActions.setPinned(frameProps, !isPinned)
+      }
+    })
   }
 
   // items.push({
@@ -355,24 +338,23 @@ function tabTemplateInit (frameProps) {
   //   }
   // })
 
-  if (frameProps.get('audioPlaybackActive')) {
-    items.push(CommonMenu.separatorMenuItem)
+  items.push(CommonMenu.separatorMenuItem,
+    {
+      label: locale.translation('muteOtherTabs'),
+      click: (item, focusedWindow) => {
+        windowActions.muteAllAudioExcept(frameProps)
+      }
+    })
 
-    if (frameProps.get('audioMuted')) {
-      items.push({
-        label: locale.translation('unmuteTab'),
-        click: (item) => {
-          windowActions.setAudioMuted(frameProps, false)
-        }
-      })
-    } else {
-      items.push({
-        label: locale.translation('muteTab'),
-        click: (item) => {
-          windowActions.setAudioMuted(frameProps, true)
-        }
-      })
-    }
+  if (frameProps.get('audioPlaybackActive')) {
+    const isMuted = frameProps.get('audioMuted')
+
+    items.push({
+      label: locale.translation(isMuted ? 'unmuteTab' : 'muteTab'),
+      click: (item) => {
+        windowActions.setAudioMuted(frameProps, !isMuted)
+      }
+    })
   }
 
   items.push(CommonMenu.separatorMenuItem)

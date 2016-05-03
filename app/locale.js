@@ -42,6 +42,7 @@ var rendererIdentifiers = function () {
     'editBookmark',
     'unmuteTabs',
     'muteTabs',
+    'muteOtherTabs',
     'addBookmark',
     'addFolder',
     'newTab',

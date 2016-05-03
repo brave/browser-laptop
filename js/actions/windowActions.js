@@ -664,6 +664,40 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
+   *
+   * @param {Object} framePropsList - List of frame properties to consider
+   * @param {boolean} muted - true if the frames should be muted
+   */
+  muteAllAudio: function (framePropsList, mute) {
+    framePropsList.forEach((frameProps) => {
+      if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
+        this.setAudioMuted(frameProps, true)
+      } else if (!mute && frameProps.get('audioMuted')) {
+        this.setAudioMuted(frameProps, false)
+      }
+    })
+  },
+
+  /**
+   * Dispatches a mute call to all frames except the one provided.
+   * The provided frame will have its audio unmuted.
+   *
+   * @param {Object} frameToSkip - Properties of the frame to keep audio
+   */
+  muteAllAudioExcept: function (frameToSkip) {
+    let framePropsList = windowStore.getState().get('frames')
+
+    framePropsList.forEach((frameProps) => {
+      if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
+        this.setAudioMuted(frameProps, true)
+      } else {
+        this.setAudioMuted(frameProps, false)
+      }
+    })
+  },
+
+  /**
    * Dispatches a message to indicate that audio is playing
    *
    * @param {Object} frameProps - Properties of the frame in question
