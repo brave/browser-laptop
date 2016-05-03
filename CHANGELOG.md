@@ -1,6 +1,7 @@
 # Changelog
 
 ## [0.9.3](https://github.com/brave/browser-laptop/releases/v0.9.3dev)
+- Dashlane support bundled.
 - Added permission handler for external protocols.
 - Permission prompts now save decisions between restarts.
 - Bookmark Toolbar favicons (can be turned on in about:preferences).
@@ -9,6 +10,7 @@
 - More password autofill fixes.
 - More locales added.
 - Added optional Home button.
+- Fixed various bugs.
 - Upgrade to libchromiumcontent 50.0.2661.86.
 - Upgrade to Electron 0.37.7.
 
