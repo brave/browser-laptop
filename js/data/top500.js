@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Immutable from 'immutable'
+const Immutable = require('immutable')
 
 // Top 500 alexa sites sorted by popularity
 const top500 = Immutable.fromJS([

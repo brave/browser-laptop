@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const config = require('../constants/config.js')
-import Immutable from 'immutable'
+const Immutable = require('immutable')
 
 /**
  * Loads the specified open search path and resolves the returned promise.

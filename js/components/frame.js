@@ -22,8 +22,8 @@ const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
-import adInfo from '../data/adInfo.js'
-import FindBar from './findbar.js'
+const adInfo = require('../data/adInfo.js')
+const FindBar = require('./findbar.js')
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 
 class Frame extends ImmutableComponent {
