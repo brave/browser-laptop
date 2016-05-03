@@ -130,6 +130,7 @@ var rendererIdentifiers = function () {
     'allowAdsAndTracking',
     'block3rdPartyCookie',
     'blockPopups',
+    'noScript',
     'httpsEverywhere',
     // Other identifiers
     'urlCopied'
