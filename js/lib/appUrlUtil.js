@@ -25,7 +25,7 @@ module.exports.getAppUrl = function (relativeUrl) {
 module.exports.getExtensionsPath = function () {
   return (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test')
     // the path is different for release builds because extensions are not in the asar file
-    ? path.join(__dirname, '..', '..', '..', '..', 'extensions')
+    ? path.join(__dirname, '..', '..', '..', 'extensions')
     : path.join(__dirname, '..', '..', 'app', 'extensions')
 }
 
