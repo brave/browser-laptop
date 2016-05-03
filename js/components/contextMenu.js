@@ -231,7 +231,6 @@ export default class ContextMenu extends ImmutableComponent {
     return <div
       className={cx({
         contextMenu: true,
-        popupWindow: true,
         reverseExpand: this.props.contextMenuDetail.get('right') !== undefined,
         contextMenuScrollable: this.props.contextMenuDetail.get('maxHeight') !== undefined
       })}
