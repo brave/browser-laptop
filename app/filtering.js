@@ -229,7 +229,7 @@ function registerPermissionHandler (session) {
     const url = webContents.getURL()
     // Allow notifications for the main app
     if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||
-        url.startsWith('chrome-extension://' && permission === 'openExternal')) {
+        url.startsWith('chrome-extension://') && permission === 'openExternal') {
       cb(true)
       return
     }
