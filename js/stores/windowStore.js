@@ -160,6 +160,7 @@ const doAction = (action) => {
         audioPlaybackActive: false,
         adblock: {},
         trackingProtection: {},
+        noScript: {},
         httpsEverywhere: locationChanged ? {} : lastHttpse,
         title: locationChanged ? '' : lastTitle,
         location: action.location
@@ -433,6 +434,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
+    case WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
+      windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)
+      break
     case WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
       windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)
       if (action.expandTrackingProtection !== undefined) {
@@ -479,11 +483,6 @@ const doAction = (action) => {
       const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
-      break
-    case WindowConstants.WINDOW_SET_NOSCRIPT:
-      const noScriptPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'noScript']
-      let noScript = windowState.getIn(noScriptPath) || new Immutable.List()
-      windowState = windowState.setIn(noScriptPath, noScript.push(action.source))
       break
     default:
   }

@@ -226,6 +226,10 @@ class UrlBar extends ImmutableComponent {
     windowActions.setSiteInfoVisible(true)
   }
 
+  onNoScript () {
+    windowActions.setNoScriptVisible(true)
+  }
+
   get shouldRenderUrlBarSuggestions () {
     return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
       this.props.urlbar.get('active')
@@ -237,6 +241,8 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
+    const scriptsBlocked = this.props.activeFrameProps.getIn(['noScript', 'blocked'])
+    console.log('scripts blocked', scriptsBlocked ? scriptsBlocked.toJS() : null)
     return <form
       className='urlbarForm'
       action='#'
@@ -282,6 +288,11 @@ class UrlBar extends ImmutableComponent {
             ref={(node) => { this.urlInput = node }} />
         }
       <legend />
+        {
+          !this.props.enableNoScript || this.props.titleMode || this.aboutPage || !scriptsBlocked || !scriptsBlocked.size
+          ? null
+          : <span className='noScript fa fa-ban' onClick={this.onNoScript}></span>
+        }
         {
           this.props.titleMode || this.aboutPage
           ? null

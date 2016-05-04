@@ -239,6 +239,9 @@ WindowStore
       expandAdblock: boolean,
       expandHttpse: boolean
     },
+    noScriptInfo: {
+      isVisible: boolean, // Whether the noscript infobox is visible
+    },
     downloadsToolbar: {
       isVisible: boolean, // Whether or not the downloads toolbar is visible
     },

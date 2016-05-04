@@ -607,6 +607,16 @@ Sets which scripts were blocked on a page.
 
 
 
+### setNoScriptVisible(isVisible) 
+
+Sets whether the noscript icon is visible.
+
+**Parameters**
+
+**isVisible**: `boolean`, Sets whether the noscript icon is visible.
+
+
+
 ### inspectElement(x, y) 
 
 Inspect the element for the active webview at the x, y content position
