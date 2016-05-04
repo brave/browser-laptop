@@ -23,7 +23,7 @@ module.exports = {
     enabled: true
   },
   noScript: {
-    enabled: true
+    enabled: false
   },
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
