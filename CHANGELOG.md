@@ -11,7 +11,7 @@
 - More locales added.
 - Added optional Home button.
 - Fixed various bugs.
-- Upgrade to libchromiumcontent 50.0.2661.86.
+- Upgrade to libchromiumcontent 50.0.2661.94.
 - Upgrade to Electron 0.37.7.
 
 ## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.2dev)
