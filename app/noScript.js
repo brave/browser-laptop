@@ -35,10 +35,6 @@ function onHeadersReceived (details) {
     return result
   }
 
-  if (details.resourceType === 'subFrame') {
-    console.log('got subframe')
-  }
-
   let origin = siteUtil.getOrigin(details.firstPartyUrl)
   if (details.resourceType.endsWith('Frame') && origin) {
     // Ignore temporarily-whitelisted URLs.
