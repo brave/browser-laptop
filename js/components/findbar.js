@@ -9,7 +9,7 @@ const keyCodes = require('../constants/keyCodes')
 const Button = require('./button.js')
 const windowActions = require('../actions/windowActions')
 
-export default class FindBar extends ImmutableComponent {
+class FindBar extends ImmutableComponent {
   constructor () {
     super()
     this.onBlur = this.onBlur.bind(this)
@@ -178,3 +178,5 @@ export default class FindBar extends ImmutableComponent {
     </div>
   }
 }
+
+module.exports = FindBar

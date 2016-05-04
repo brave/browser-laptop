@@ -16,6 +16,7 @@ const appActions = require('./appActions')
 const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
 const siteUtil = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
+const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
   if (windowActions.dispatchToIPC) {
@@ -303,7 +304,7 @@ const windowActions = {
     if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
       frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
     } else {
-      const defaultURL = require('../stores/windowStore').getState().getIn(['searchDetail', 'searchURL'])
+      const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
       if (defaultURL) {
         frameOpts.location = defaultURL
           .replace('{searchTerms}', encodeURIComponent(frameOpts.location))

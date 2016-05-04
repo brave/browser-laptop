@@ -492,4 +492,4 @@ const top500 = Immutable.fromJS([
   'commentcamarche.net'
 ])
 
-export default top500
+module.exports = top500
