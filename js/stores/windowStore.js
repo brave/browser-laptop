@@ -480,6 +480,11 @@ const doAction = (action) => {
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
       break
+    case WindowConstants.WINDOW_SET_NOSCRIPT:
+      const noScriptPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'noScript']
+      let noScript = windowState.getIn(noScriptPath) || new Immutable.List()
+      windowState = windowState.setIn(noScriptPath, noScript.push(action.source))
+      break
     default:
   }
 

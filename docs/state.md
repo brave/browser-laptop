@@ -167,6 +167,9 @@ WindowStore
       blocked: Array<string>
     },
     httpsEverywhere: Object.<string, Array.<string>>, // map of XML rulesets name to redirected resources
+    noScript: {
+      blocked: Array<string>
+    },
     security: {
       isSecure: boolean, // is using https
       certDetails: {

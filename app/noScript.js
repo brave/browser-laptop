@@ -8,7 +8,7 @@ const Filtering = require('./filtering')
 
 module.exports.resourceName = 'noScript'
 
-function startNoscript () {
+function startNoScript () {
   Filtering.registerHeadersReceivedFilteringCB(onHeadersReceived)
 }
 
@@ -41,4 +41,4 @@ function onHeadersReceived (details) {
 /**
  * Loads noscript
  */
-module.exports.init = startNoscript
+module.exports.init = startNoScript

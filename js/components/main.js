@@ -330,6 +330,14 @@ class Main extends ImmutableComponent {
     return enabled
   }
 
+  get enableNoScript () {
+    let enabled = this.props.appState.getIn(['noScript', 'enabled'])
+    if (enabled === undefined) {
+      enabled = appConfig.noScript.enabled
+    }
+    return enabled
+  }
+
   onCloseFrame (activeFrameProps) {
     windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
@@ -561,6 +569,7 @@ class Main extends ImmutableComponent {
               passwords={this.props.appState.get('passwords')}
               siteSettings={this.props.appState.get('siteSettings')}
               enableAds={this.enableAds}
+              enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)
