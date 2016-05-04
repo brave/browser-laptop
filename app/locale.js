@@ -205,7 +205,7 @@ exports.init = function (language, cb) {
   })
 
   const propertyFiles = []
-  const appendLangProperties = (lang) => {
+  const appendLangProperties = function (lang) {
     // Property files to parse (only ones containing menu specific identifiers)
     propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
