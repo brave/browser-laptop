@@ -441,7 +441,6 @@ class Frame extends ImmutableComponent {
         // Note that the site was blocked
         // TODO: Parse out the location of the script that was blocked and send
         // it too
-        console.log('console message', e)
         windowActions.setBlockedBy(this.props.frame,
                                    'noScript', e.message)
       }

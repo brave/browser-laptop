@@ -115,7 +115,9 @@ const messages = {
   // Bookmarks
   IMPORT_BOOKMARKS: _,
   // Extensions
-  NEW_POPUP_WINDOW: _
+  NEW_POPUP_WINDOW: _,
+  // NoScript
+  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on, @arg {boolean} once - whether to only allow once*/
 }
 
 module.exports = mapValuesByKeys(messages)

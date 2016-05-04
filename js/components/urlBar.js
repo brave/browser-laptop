@@ -242,7 +242,6 @@ class UrlBar extends ImmutableComponent {
 
   render () {
     const scriptsBlocked = this.props.activeFrameProps.getIn(['noScript', 'blocked'])
-    console.log('scripts blocked', scriptsBlocked ? scriptsBlocked.toJS() : null)
     return <form
       className='urlbarForm'
       action='#'

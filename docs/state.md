@@ -40,7 +40,8 @@ AppStore
       pointerLockPermission: boolean,
       fullscreenPermission: boolean,
       openExternalPermission: boolean,
-      savePasswords: boolean // Only false or undefined/null
+      savePasswords: boolean, // Only false or undefined/null
+      noScript: boolean // Only false or undefined/null
     }
   },
   visits: [{
@@ -85,6 +86,9 @@ AppStore
   },
   cookieblock: {
     enabled: boolean // Enable 3p cookie/referer blocking
+  },
+  cookieblock: {
+    enabled: boolean // Enable noscript
   },
   defaultWindowHeight: number,
   defaultWindowWidth: number,

@@ -5,11 +5,23 @@
 
 const urlParse = require('url').parse
 const Filtering = require('./filtering')
+const AppStore = require('../js/stores/appStore')
+const siteSettings = require('../js/state/siteSettings')
+const siteUtil = require('../js/state/siteUtil')
+const ipcMain = require('electron').ipcMain
+const messages = require('../js/constants/messages')
 
 module.exports.resourceName = 'noScript'
 
+// Resources that should be temporarily allowed. True = allow once,
+// false = allow until restart.
+let temporarilyAllowed = {}
+
 function startNoScript () {
   Filtering.registerHeadersReceivedFilteringCB(onHeadersReceived)
+  ipcMain.on(messages.TEMPORARY_ALLOW_SCRIPTS, (e, origin, allowOnce) => {
+    temporarilyAllowed[origin] = allowOnce
+  })
 }
 
 function onHeadersReceived (details) {
@@ -21,6 +33,26 @@ function onHeadersReceived (details) {
   let parsed = urlParse(details.firstPartyUrl)
   if (['about:', 'chrome:', 'chrome-extension:'].includes(parsed.protocol) || ['stylesheet', 'script', 'image'].includes(details.resourceType) || parsed.hostname === 'localhost') {
     return result
+  }
+
+  if (details.resourceType === 'subFrame') {
+    console.log('got subframe')
+  }
+
+  let origin = siteUtil.getOrigin(details.firstPartyUrl)
+  if (details.resourceType.endsWith('Frame') && origin) {
+    // Ignore temporarily-whitelisted URLs.
+    if (origin in temporarilyAllowed) {
+      if (temporarilyAllowed[origin] === true) {
+        delete temporarilyAllowed[origin]
+      }
+      return result
+    }
+    // Ignore persistently-whitelisted URLs.
+    let settings = siteSettings.getSiteSettingsForHostPattern(AppStore.getState().get('siteSettings'), origin)
+    if (settings && settings.get('noScript') === false) {
+      return result
+    }
   }
 
   result.responseHeaders = details.responseHeaders

@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 const siteTags = require('../constants/siteTags')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
+const urlParse = require('url').parse
 
 /**
  * Obtains the index of the location in sites
@@ -333,4 +334,23 @@ module.exports.clearSitesWithoutTags = function (sites) {
  */
 module.exports.hasNoTagSites = function (sites) {
   return sites.findIndex((site) => !site.get('tags') || site.get('tags').size === 0) !== -1
+}
+
+/**
+ * Gets a site origin (scheme + hostname + port) from a URL or null if not
+ * available.
+ * @param {string} location
+ * @return {string?}
+ */
+module.exports.getOrigin = function (location) {
+  // Returns scheme + hostname + port
+  if (typeof location !== 'string') {
+    return null
+  }
+  let parsed = urlParse(location)
+  if (parsed.host) {
+    return location.split(parsed.host)[0] + parsed.host
+  } else {
+    return null
+  }
 }
