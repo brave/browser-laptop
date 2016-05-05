@@ -42,10 +42,6 @@ const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 
-let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
-  return SessionStore.defaultAppState()
-})
-
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
 let sessionStateStoreCompleteOnQuit = false
@@ -172,6 +168,10 @@ const initiateSessionStateSave = debounce(() => {
 }, 5 * 60 * 1000)
 
 app.on('ready', () => {
+  let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
+    return SessionStore.defaultAppState()
+  })
+
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
