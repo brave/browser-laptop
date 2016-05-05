@@ -24,6 +24,8 @@ const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
 const adInfo = require('../data/adInfo.js')
 const FindBar = require('./findbar.js')
+const consoleStrings = require('../constants/console')
+
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 
 class Frame extends ImmutableComponent {
@@ -432,6 +434,16 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('media-paused', ({title}) => {
       windowActions.setAudioPlaybackActive(this.props.frame, false)
+    })
+    this.webview.addEventListener('console-message', (e) => {
+      if (this.props.enableNoScript && e.level === 2 &&
+          e.message && e.message.includes(consoleStrings.SCRIPT_BLOCKED)) {
+        // Note that the site was blocked
+        // TODO: Parse out the location of the script that was blocked and send
+        // it too
+        windowActions.setBlockedBy(this.props.frame,
+                                   'noScript', e.message)
+      }
     })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       // Due to a bug in Electron, after navigating to a page with a theme color

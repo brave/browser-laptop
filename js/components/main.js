@@ -31,6 +31,7 @@ const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
+const NoScriptInfo = require('./noScriptInfo')
 
 // Constants
 const config = require('../constants/config')
@@ -318,6 +319,10 @@ class Main extends ImmutableComponent {
     windowActions.setSiteInfoVisible(false)
   }
 
+  onHideNoScript () {
+    windowActions.setNoScriptVisible(false)
+  }
+
   onHideReleaseNotes () {
     windowActions.setReleaseNotesVisible(false)
   }
@@ -326,6 +331,14 @@ class Main extends ImmutableComponent {
     let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
       enabled = appConfig.adInsertion.enabled
+    }
+    return enabled
+  }
+
+  get enableNoScript () {
+    let enabled = this.props.appState.getIn(['noScript', 'enabled'])
+    if (enabled === undefined) {
+      enabled = appConfig.noScript.enabled
     }
     return enabled
   }
@@ -405,11 +418,13 @@ class Main extends ImmutableComponent {
     const tabsPerPage = getSetting(settings.TABS_PER_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !releaseNotesIsVisible &&
+      !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
     return <div id='window'
@@ -456,6 +471,7 @@ class Main extends ImmutableComponent {
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
+            enableNoScript={this.enableNoScript}
           />
           {
             siteInfoIsVisible
@@ -476,6 +492,12 @@ class Main extends ImmutableComponent {
               originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
               destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
             : null
+          }
+          {
+            noScriptIsVisible
+              ? <NoScriptInfo frameProps={activeFrame}
+                onHide={this.onHideNoScript.bind(this)} />
+              : null
           }
           {
             releaseNotesIsVisible
@@ -561,6 +583,7 @@ class Main extends ImmutableComponent {
               passwords={this.props.appState.get('passwords')}
               siteSettings={this.props.appState.get('siteSettings')}
               enableAds={this.enableAds}
+              enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

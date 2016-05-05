@@ -40,7 +40,8 @@ AppStore
       pointerLockPermission: boolean,
       fullscreenPermission: boolean,
       openExternalPermission: boolean,
-      savePasswords: boolean // Only false or undefined/null
+      savePasswords: boolean, // Only false or undefined/null
+      noScript: boolean // Only false or undefined/null
     }
   },
   visits: [{
@@ -85,6 +86,9 @@ AppStore
   },
   cookieblock: {
     enabled: boolean // Enable 3p cookie/referer blocking
+  },
+  noScript: {
+    enabled: boolean // Enable noscript
   },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
@@ -167,6 +171,9 @@ WindowStore
       blocked: Array<string>
     },
     httpsEverywhere: Object.<string, Array.<string>>, // map of XML rulesets name to redirected resources
+    noScript: {
+      blocked: Array<string>
+    },
     security: {
       isSecure: boolean, // is using https
       certDetails: {
@@ -235,6 +242,9 @@ WindowStore
       expandTrackingProtection: boolean,
       expandAdblock: boolean,
       expandHttpse: boolean
+    },
+    noScriptInfo: {
+      isVisible: boolean, // Whether the noscript infobox is visible
     },
     downloadsToolbar: {
       isVisible: boolean, // Whether or not the downloads toolbar is visible

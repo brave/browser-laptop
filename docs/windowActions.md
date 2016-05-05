@@ -595,6 +595,28 @@ Similar to setBlockedBy but for httpse redirects
 
 
 
+### setNoScript(frameProps, source) 
+
+Sets which scripts were blocked on a page.
+
+**Parameters**
+
+**frameProps**: `Object`, The frame to set blocked info on
+
+**source**: `string`, Source of blocked js
+
+
+
+### setNoScriptVisible(isVisible) 
+
+Sets whether the noscript icon is visible.
+
+**Parameters**
+
+**isVisible**: `boolean`, Sets whether the noscript icon is visible.
+
+
+
 ### inspectElement(x, y) 
 
 Inspect the element for the active webview at the x, y content position

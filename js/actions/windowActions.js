@@ -842,6 +842,30 @@ const windowActions = {
   },
 
   /**
+   * Sets which scripts were blocked on a page.
+   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {string} source - Source of blocked js
+   */
+  setNoScript: function (frameProps, source) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_NOSCRIPT,
+      frameProps,
+      source
+    })
+  },
+
+  /**
+   * Sets whether the noscript icon is visible.
+   * @param {boolean} isVisible
+   */
+  setNoScriptVisible: function (isVisible) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE,
+      isVisible
+    })
+  },
+
+  /**
    * Inspect the element for the active webview at the x, y content position
    * @param {number} x - horizontal position of the element to inspect
    * @param {number} y - vertical position of the element to inspect

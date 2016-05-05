@@ -46,6 +46,7 @@ const windowConstants = {
   WINDOW_SET_SITE_INFO_VISIBLE: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE: _, // Whether or not to show the downloads toolbar
   WINDOW_SET_RELEASE_NOTES_VISIBLE: _, // Whether or not to show release notes
+  WINDOW_SET_NOSCRIPT_VISIBLE: _, // Whether or not to show noscript info
   WINDOW_SET_BLOCKED_BY: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_REDIRECTED_BY: _, // Whether or not to show site info like redirected resources
   WINDOW_SET_SECURITY_STATE: _,
