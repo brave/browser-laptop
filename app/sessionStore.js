@@ -123,6 +123,7 @@ module.exports.cleanSessionData = (sessionData) => {
     delete frame.trackingProtection
     delete frame.httpsEverywhere
     delete frame.adblock
+    delete frame.noScript
 
     // Guest instance ID's are not valid after restarting.
     // Electron won't know about them.
