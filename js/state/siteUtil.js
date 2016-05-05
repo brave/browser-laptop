@@ -348,8 +348,8 @@ module.exports.getOrigin = function (location) {
     return null
   }
   let parsed = urlParse(location)
-  if (parsed.host) {
-    return location.split(parsed.host)[0] + parsed.host
+  if (parsed.host && parsed.protocol) {
+    return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
   } else {
     return null
   }

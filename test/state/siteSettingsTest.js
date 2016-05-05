@@ -185,5 +185,8 @@ describe('siteUtil', function () {
     it('returns null for null URL', function () {
       assert.strictEqual(siteUtil.getOrigin(null), null)
     })
+    it('returns correct result for URL with hostname that is a scheme', function () {
+      assert.strictEqual(siteUtil.getOrigin('http://http/test'), 'http://http')
+    })
   })
 })
