@@ -87,7 +87,7 @@ AppStore
   cookieblock: {
     enabled: boolean // Enable 3p cookie/referer blocking
   },
-  cookieblock: {
+  noScript: {
     enabled: boolean // Enable noscript
   },
   defaultWindowHeight: number,
