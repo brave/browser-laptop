@@ -158,8 +158,9 @@ const DEFAULT_LANGUAGE = 'en-US'
 
 const availableLanguages = [
   'en-US',
-  'pr-BR',
-  'nl-NL'
+  'pt-BR',
+  'nl-NL',
+  'ja-JP'
 ]
 
 // Currently configured languages - TODO (make this dynamic)
