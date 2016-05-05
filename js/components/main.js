@@ -424,6 +424,7 @@ class Main extends ImmutableComponent {
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !releaseNotesIsVisible &&
+      !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
     return <div id='window'
