@@ -13,14 +13,18 @@ const messages = require('../js/constants/messages')
 
 module.exports.resourceName = 'noScript'
 
-// Resources that should be temporarily allowed. True = allow once,
-// false = allow until restart.
+// Resources that should be temporarily allowed. 1 = allow on next main frame
+// load, 0 = allow until restart, 2 = do not allow on next load
 let temporarilyAllowed = {}
+
+const ALLOW_UNTIL_RESTART = 0
+const ALLOW_NEXT_TIME = 1
+const DISALLOW_NEXT_TIME = 2
 
 function startNoScript () {
   Filtering.registerHeadersReceivedFilteringCB(onHeadersReceived)
   ipcMain.on(messages.TEMPORARY_ALLOW_SCRIPTS, (e, origin, allowOnce) => {
-    temporarilyAllowed[origin] = allowOnce
+    temporarilyAllowed[origin] = allowOnce ? ALLOW_NEXT_TIME : ALLOW_UNTIL_RESTART
   })
 }
 
@@ -37,10 +41,16 @@ function onHeadersReceived (details) {
 
   let origin = siteUtil.getOrigin(details.firstPartyUrl)
   if (details.resourceType.endsWith('Frame') && origin) {
-    // Ignore temporarily-whitelisted URLs.
-    if (origin in temporarilyAllowed) {
-      if (temporarilyAllowed[origin] === true) {
-        delete temporarilyAllowed[origin]
+    if (details.resourceType === 'mainFrame' &&
+        temporarilyAllowed[origin] === DISALLOW_NEXT_TIME) {
+      // This resource has been allowed once already. Un-whitelist it
+      delete temporarilyAllowed[origin]
+    } else if (origin in temporarilyAllowed) {
+      if (details.resourceType === 'mainFrame' &&
+          temporarilyAllowed[origin] === ALLOW_NEXT_TIME) {
+        // Mark this origin for removal from temporarilyAllowed on next
+        // mainFrame load
+        temporarilyAllowed[origin] = DISALLOW_NEXT_TIME
       }
       return result
     }
