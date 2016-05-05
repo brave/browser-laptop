@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.9.4](https://github.com/brave/browser-laptop/releases/v0.9.4dev)
+- Fixed startup problem if user data directory does not already exist.
+
 ## [0.9.3](https://github.com/brave/browser-laptop/releases/v0.9.3dev)
 - Dashlane support bundled.
 - Added permission handler for external protocols.
