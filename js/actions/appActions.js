@@ -261,13 +261,16 @@ const appActions = {
    * @param {string} hostPattern - The host pattern to update the config for
    * @param {string} key - The config key to update
    * @param {string|number} value - The value to update to
+   * @param {boolean} temp - Whether to change temporary or persistent
+   *   settings. defaults to false (persistent).
    */
-  changeSiteSetting: function (hostPattern, key, value) {
+  changeSiteSetting: function (hostPattern, key, value, temp) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
-      value
+      value,
+      temporary: temp || false
     })
   },
 

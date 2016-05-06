@@ -393,8 +393,9 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['settings', action.key], action.value)
       break
     case AppConstants.APP_CHANGE_SITE_SETTING:
-      appState = appState.set('siteSettings',
-        siteSettings.mergeSiteSetting(appState.get('siteSettings'), action.hostPattern, action.key, action.value))
+      let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+      appState = appState.set(propertyName,
+        siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
       break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')

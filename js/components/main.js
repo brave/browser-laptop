@@ -582,6 +582,7 @@ class Main extends ImmutableComponent {
                 : null}
               passwords={this.props.appState.get('passwords')}
               siteSettings={this.props.appState.get('siteSettings')}
+              temporarySiteSettings={this.props.appState.get('temporarySiteSettings')}
               enableAds={this.enableAds}
               enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

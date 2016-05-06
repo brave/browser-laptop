@@ -117,7 +117,7 @@ const messages = {
   // Extensions
   NEW_POPUP_WINDOW: _,
   // NoScript
-  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on, @arg {boolean} once - whether to only allow once*/
+  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on */
 }
 
 module.exports = mapValuesByKeys(messages)

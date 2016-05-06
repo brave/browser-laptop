@@ -25,19 +25,19 @@ class NoScriptInfo extends ImmutableComponent {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD)
   }
 
-  onAllowTemp (allowOnce) {
+  onAllowOnce () {
     if (!this.origin) {
       return
     }
-    ipc.send(messages.TEMPORARY_ALLOW_SCRIPTS, this.origin, allowOnce)
+    ipc.send(messages.TEMPORARY_ALLOW_SCRIPTS, this.origin)
     this.reload()
   }
 
-  onAllow () {
+  onAllow (temp) {
     if (!this.origin) {
       return
     }
-    appActions.changeSiteSetting(this.origin, 'noScript', false)
+    appActions.changeSiteSetting(this.origin, 'noScript', false, temp)
     this.reload()
   }
 
@@ -52,16 +52,20 @@ class NoScriptInfo extends ImmutableComponent {
           data-l10n-id={this.numberBlocked === 1 ? 'scriptBlocked' : 'scriptsBlocked'} />
         <div>
           <Button l10nId='allowScriptsOnce' className='wideButton'
-            onClick={this.onAllowTemp.bind(this, true)} />
+            onClick={this.onAllowOnce.bind(this)} />
         </div>
         <div>
           <Button l10nId='allowScriptsTemp' className='subtleButton'
-            onClick={this.onAllowTemp.bind(this, false)} />
+            onClick={this.onAllow.bind(this, true)} />
         </div>
-        <div>
-          <Button l10nId='allowScripts' className='subtleButton'
-            onClick={this.onAllow.bind(this)} />
-        </div>
+        {
+          this.props.frameProps.get('isPrivate')
+          ? null
+          : <div>
+            <Button l10nId='allowScripts' className='subtleButton'
+              onClick={this.onAllow.bind(this, false)} />
+          </div>
+        }
       </div>
     </Dialog>
   }

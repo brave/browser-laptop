@@ -44,6 +44,9 @@ AppStore
       noScript: boolean // Only false or undefined/null
     }
   },
+  temporarySiteSettings: {
+    // Same as above but never gets written to disk
+  },
   visits: [{
     location: string,
     startTime: number, // datetime.getTime()

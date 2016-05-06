@@ -229,8 +229,10 @@ function registerForHeadersReceived (session) {
 /**
  * Register permission request handler
  * @param {Object} session to add permission request handler on
+ * @param {string} partition name of the partition
  */
-function registerPermissionHandler (session) {
+function registerPermissionHandler (session, partition) {
+  const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
   // TODO: Localize strings
   let permissions = {
@@ -272,9 +274,20 @@ function registerPermissionHandler (session) {
     }
 
     // Check whether there is a persistent site setting for this host
-    const settings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), url)
+    const appState = AppStore.getState()
+    const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+    const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+    const permissionName = permission + 'Permission'
     if (settings) {
-      const isAllowed = settings.get(permission + 'Permission')
+      let isAllowed = settings.get(permissionName)
+      if (typeof isAllowed === 'boolean') {
+        cb(isAllowed)
+        return
+      }
+    }
+    // Private tabs inherit settings from normal tabs, but not vice versa.
+    if (isPrivate && tempSettings) {
+      let isAllowed = tempSettings.get(permissionName)
       if (typeof isAllowed === 'boolean') {
         cb(isAllowed)
         return
@@ -302,7 +315,7 @@ function registerPermissionHandler (session) {
       cb(result)
       if (persist) {
         // remember site setting for this host over http(s)
-        appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result)
+        appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result, isPrivate)
       }
     }
   })
@@ -380,7 +393,7 @@ function registerForDownloadListener (session) {
 function registerSession (partition, fn) {
   let ses = session.fromPartition(partition)
   registeredSessions[partition] = ses
-  fn(ses)
+  fn(ses, partition)
 }
 
 function initForPartition (partition) {

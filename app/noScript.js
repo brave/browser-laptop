@@ -14,17 +14,16 @@ const messages = require('../js/constants/messages')
 module.exports.resourceName = 'noScript'
 
 // Resources that should be temporarily allowed. 1 = allow on next main frame
-// load, 0 = allow until restart, 2 = do not allow on next load
+// load, 2 = do not allow on next load
 let temporarilyAllowed = {}
 
-const ALLOW_UNTIL_RESTART = 0
 const ALLOW_NEXT_TIME = 1
 const DISALLOW_NEXT_TIME = 2
 
 function startNoScript () {
   Filtering.registerHeadersReceivedFilteringCB(onHeadersReceived)
-  ipcMain.on(messages.TEMPORARY_ALLOW_SCRIPTS, (e, origin, allowOnce) => {
-    temporarilyAllowed[origin] = allowOnce ? ALLOW_NEXT_TIME : ALLOW_UNTIL_RESTART
+  ipcMain.on(messages.TEMPORARY_ALLOW_SCRIPTS, (e, origin) => {
+    temporarilyAllowed[origin] = ALLOW_NEXT_TIME
   })
 }
 
@@ -45,9 +44,8 @@ function onHeadersReceived (details) {
         temporarilyAllowed[origin] === DISALLOW_NEXT_TIME) {
       // This resource has been allowed once already. Un-whitelist it
       delete temporarilyAllowed[origin]
-    } else if (origin in temporarilyAllowed) {
-      if (details.resourceType === 'mainFrame' &&
-          temporarilyAllowed[origin] === ALLOW_NEXT_TIME) {
+    } else if (temporarilyAllowed[origin] === ALLOW_NEXT_TIME) {
+      if (details.resourceType === 'mainFrame') {
         // Mark this origin for removal from temporarilyAllowed on next
         // mainFrame load
         temporarilyAllowed[origin] = DISALLOW_NEXT_TIME
@@ -55,7 +53,12 @@ function onHeadersReceived (details) {
       return result
     }
     // Ignore persistently-whitelisted URLs.
-    let settings = siteSettings.getSiteSettingsForHostPattern(AppStore.getState().get('siteSettings'), origin)
+    let appState = AppStore.getState()
+    let settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
+    if (settings && settings.get('noScript') === false) {
+      return result
+    }
+    settings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
     if (settings && settings.get('noScript') === false) {
       return result
     }

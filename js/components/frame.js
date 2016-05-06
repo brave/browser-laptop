@@ -99,7 +99,8 @@ class Frame extends ImmutableComponent {
     } else if (stepSize === undefined) {
       newZoomLevel = config.zoom.defaultValue
     }
-    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel)
+    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel,
+                                 this.props.frame.get('isPrivate'))
   }
 
   zoomIn () {
@@ -557,7 +558,9 @@ class Frame extends ImmutableComponent {
     }
 
     const nextLocation = nextProps.frame.get('location')
-    const nextSiteSettings = siteSettings.getSiteSettingsForURL(nextProps.siteSettings, nextLocation)
+    const nextSiteSettings = this.props.frame.get('isPrivate')
+      ? siteSettings.getSiteSettingsForURL(nextProps.temporarySiteSettings, nextLocation)
+      : siteSettings.getSiteSettingsForURL(nextProps.siteSettings, nextLocation)
     if (nextSiteSettings) {
       const nextZoom = nextSiteSettings.get('zoomLevel')
       if (this.zoomLevel !== nextZoom) {
@@ -568,7 +571,9 @@ class Frame extends ImmutableComponent {
 
   get zoomLevel () {
     const location = this.props.frame.get('location')
-    const settings = siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
+    const settings = this.props.frame.get('isPrivate')
+      ? siteSettings.getSiteSettingsForURL(this.props.temporarySiteSettings, location)
+      : siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
     if (!settings) {
       return config.zoom.defaultValue
     }
