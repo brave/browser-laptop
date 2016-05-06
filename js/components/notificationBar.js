@@ -57,7 +57,7 @@ class NotificationBar extends ImmutableComponent {
 
     return <div className='notificationBar'>
     {
-      this.props.notifications.map((notificationDetail) =>
+      this.props.notifications.takeLast(3).map((notificationDetail) =>
         <NotificationItem detail={notificationDetail} />
       )
     }
