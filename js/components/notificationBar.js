@@ -18,6 +18,10 @@ class NotificationItem extends ImmutableComponent {
     ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, this.props.detail.get('options').get('advancedLink'))
   }
 
+  toggleCheckbox () {
+    this.checkbox.checked = !this.checkbox.checked
+  }
+
   render () {
     let i = 0
     const options = this.props.detail.get('options')
@@ -33,7 +37,10 @@ class NotificationItem extends ImmutableComponent {
       <span className='notificationOptions'>
         {
           options.get('persist')
-            ? <span><input type='checkbox' ref={(node) => { this.checkbox = node }} /><label data-l10n-id='rememberDecision' /></span>
+            ? <span>
+              <input type='checkbox' ref={(node) => { this.checkbox = node }} />
+              <label data-l10n-id='rememberDecision' onClick={this.toggleCheckbox.bind(this)} />
+            </span>
             : null
         }
         {
