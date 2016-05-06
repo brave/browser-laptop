@@ -288,5 +288,6 @@ WindowStore
     maxHeight: number, // the maximum height of the popup window
     src: string, // the src for the popup window webview
   },
+  cleanedOnShutdown: boolean // whether app data was successfully cleared on shutdown
 }
 ```

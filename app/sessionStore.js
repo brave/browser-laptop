@@ -54,9 +54,11 @@ module.exports.saveAppState = (payload) => {
       delete payload.perWindowState
     }
 
-    if (payload.settings) {
-      // useragent value gets recalculated on restart
-      payload.settings[settings.USERAGENT] = undefined
+    try {
+      module.exports.cleanAppData(payload)
+      payload.cleanedOnShutdown = true
+    } catch (e) {
+      payload.cleanedOnShutdown = false
     }
 
     fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
@@ -183,6 +185,25 @@ module.exports.cleanSessionData = (sessionData) => {
 }
 
 /**
+ * Cleans app data before it's written to disk.
+ * @param {Object} data - top-level app data
+ */
+module.exports.cleanAppData = (data) => {
+  if (data.settings) {
+    // useragent value gets recalculated on restart
+    data.settings[settings.USERAGENT] = undefined
+  }
+  // Don't show notifications from the last session
+  data.notifications = []
+  // We used to store a huge list of IDs but we didn't use them.
+  // Get rid of them here.
+  delete data.windows
+  if (data.perWindowState) {
+    data.perWindowState.forEach(module.exports.cleanSessionData)
+  }
+}
+
+/**
  * Loads the browser state from storage.
  *
  * @return a promise which resolves with the immutable browser state or
@@ -205,6 +226,11 @@ module.exports.loadAppState = () => {
         reject(e)
         return
       }
+      // Clean app data here if it wasn't cleared on shutdown
+      if (data.cleanedOnShutdown !== true) {
+        module.exports.cleanAppData(data)
+      }
+      data.cleanedOnShutdown = false
       // Always recalculate the update status
       if (data.updates) {
         const updateStatus = data.updates.status
@@ -220,11 +246,6 @@ module.exports.loadAppState = () => {
           return
         }
       }
-      // Don't show notifications from the last session
-      data.notifications = []
-      // We used to store a huge list of IDs but we didn't use them.
-      // Get rid of them here.
-      delete data.windows
       // Delete downloaded items older than a week
       if (data.downloads) {
         const dateOffset = 7 * 24 * 60 * 60 * 1000
@@ -239,9 +260,6 @@ module.exports.loadAppState = () => {
             }
           }
         })
-      }
-      if (data.perWindowState) {
-        data.perWindowState.forEach(module.exports.cleanSessionData)
       }
       // We used to store passwords with the form action full URL. Transition
       // to using origin + pathname for 0.9.0
