@@ -217,7 +217,7 @@ Changes an application level setting
 
 
 
-### changeSiteSetting(hostPattern, key, value) 
+### changeSiteSetting(hostPattern, key, value, temp) 
 
 Change a hostPattern's config
 
@@ -228,6 +228,9 @@ Change a hostPattern's config
 **key**: `string`, The config key to update
 
 **value**: `string | number`, The value to update to
+
+**temp**: `boolean`, Whether to change temporary or persistent
+  settings. defaults to false (persistent).
 
 
 
