@@ -16,7 +16,7 @@ describe('sessionStore', function () {
 
   describe('state is preserved', function () {
     Brave.beforeAllServerSetup(this)
-    before(function *() {
+    before(function * () {
       const page1Url = Brave.server.url('page1.html')
       this.timeout(30000)
       yield Brave.startApp()
@@ -39,11 +39,11 @@ describe('sessionStore', function () {
       yield setup(Brave.app.client)
     })
 
-    after(function *() {
+    after(function * () {
       yield Brave.stopApp()
     })
 
-    it('windowState by preserving open page', function *() {
+    it('windowState by preserving open page', function * () {
       const page1Url = Brave.server.url('page1.html')
       yield Brave.app.client
         .moveToObject(urlInput)
@@ -52,7 +52,7 @@ describe('sessionStore', function () {
         })
     })
 
-    it('appstate by preserving a bookmark', function *() {
+    it('appstate by preserving a bookmark', function * () {
       yield Brave.app.client.waitForExist(navigatorBookmarked)
     })
   })

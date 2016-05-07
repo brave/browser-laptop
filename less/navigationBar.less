@@ -186,7 +186,8 @@
 
   form {
     -webkit-app-region: drag;
-    input {
+    // Disable window dragging so that selecting text and dragging the favicon is possible.
+    input, .urlbarIcon {
       -webkit-app-region: no-drag;
     }
   }
@@ -251,6 +252,17 @@
     text-align: right;
     margin: 4px 0 0 0;
     top: 9px;
+  }
+
+  .noScript {
+    color: @braveOrange;
+    font-size: 17px;
+    cursor: pointer;
+    top: 10px;
+    margin-right: 5px;
+    &:hover {
+      opacity: 0.5;
+    }
   }
 
   /* Disable selection of button text */

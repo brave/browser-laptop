@@ -6,6 +6,7 @@
 require('../less/window.less')
 require('../less/button.less')
 require('../less/contextMenu.less')
+require('../less/popupWindow.less')
 require('../less/main.less')
 require('../less/navigationBar.less')
 require('../less/forms.less')
@@ -36,7 +37,7 @@ webFrame.setZoomLevelLimits(1, 1)
 ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
   appStoreRenderer.state = Immutable.fromJS(appState)
   ReactDOM.render(
-    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState}/>,
+    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
     document.getElementById('windowContainer'))
 })
 

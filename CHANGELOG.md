@@ -1,14 +1,20 @@
 # Changelog
 
+## [0.9.4](https://github.com/brave/browser-laptop/releases/v0.9.4dev)
+- Fixed startup problem if user data directory does not already exist.
+
 ## [0.9.3](https://github.com/brave/browser-laptop/releases/v0.9.3dev)
+- Dashlane support bundled.
 - Added permission handler for external protocols.
 - Permission prompts now save decisions between restarts.
 - Bookmark Toolbar favicons (can be turned on in about:preferences).
-- Downlooads remember last save location.
+- Downloads remember last save location.
 - More zoom fixes for page navigation.
-- More password autifill fixes.
+- More password autofill fixes.
 - More locales added.
-- Upgrade to libchromiumcontent 50.0.2661.86.
+- Added optional Home button.
+- Fixed various bugs.
+- Upgrade to libchromiumcontent 50.0.2661.94.
 - Upgrade to Electron 0.37.7.
 
 ## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.2dev)

@@ -157,7 +157,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       </span>
       {
         this.isFolder
-        ? <span className='bookmarkFolderChevron fa fa-chevron-down'/>
+        ? <span className='bookmarkFolderChevron fa fa-chevron-down' />
         : null
       }
     </span>
@@ -179,7 +179,7 @@ class BookmarksToolbar extends ImmutableComponent {
       if (droppedOn.selectedRef) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnSiteDetail = droppedOn.selectedRef.props.bookmark || droppedOn.selectedRef.props.bookmarkFolder
-        appActions.moveSite(bookmark, droppedOnSiteDetail, isLeftSide, droppedOnSiteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) && droppedOn.isDroppedOn)
+        appActions.moveSite(bookmark, droppedOnSiteDetail, isLeftSide, droppedOnSiteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) && droppedOn && droppedOn.isDroppedOn)
         windowActions.setIsBeingDraggedOverDetail()
       }
       return
@@ -254,7 +254,7 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   onContextMenu (e) {
     const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
-    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest.isDroppedOn, e)
+    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest && closest.isDroppedOn, e)
   }
   render () {
     let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
@@ -279,13 +279,13 @@ class BookmarksToolbar extends ImmutableComponent {
             draggingOverData={this.props.draggingOverData}
             activeFrame={this.props.activeFrame}
             bookmarks={this.props.bookmarks}
-            bookmark={bookmark}/>)
+            bookmark={bookmark} />)
     }
     {
       this.overflowBookmarkItems.size !== 0
       ? <Button iconClass='overflowIndicator fa-angle-double-right'
         onClick={this.onMoreBookmarksMenu.bind(this)}
-        className='bookmarkButton'/>
+        className='bookmarkButton' />
       : null
     }
     </div>

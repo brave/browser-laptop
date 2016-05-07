@@ -78,24 +78,24 @@ class LoginRequired extends React.Component {
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
       <div className='genericForm' onClick={this.onClick.bind(this)}>
-        <h2 data-l10n-id='basicAuthRequired'/>
-        <div className='genericFormSubtitle' data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)}/>
+        <h2 data-l10n-id='basicAuthRequired' />
+        <div className='genericFormSubtitle' data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
         <div className='genericFormTable'>
           <div id='loginUsername' className='formRow'>
-            <label data-l10n-id='basicAuthUsername' htmlFor='loginUsername'/>
-            <input onKeyDown={this.onKeyDown} onChange={this.onUsernameChange} value={this.state.username} ref={(loginUsername) => { this.loginUsername = loginUsername }}/>
+            <label data-l10n-id='basicAuthUsername' htmlFor='loginUsername' />
+            <input onKeyDown={this.onKeyDown} onChange={this.onUsernameChange} value={this.state.username} ref={(loginUsername) => { this.loginUsername = loginUsername }} />
           </div>
           {
             !this.isFolder
             ? <div id='loginPassword' className='formRow'>
-              <label data-l10n-id='basicAuthPassword' htmlFor='loginPassword'/>
+              <label data-l10n-id='basicAuthPassword' htmlFor='loginPassword' />
               <input type='password' onKeyDown={this.onKeyDown} onChange={this.onPasswordChange} value={this.state.password} />
             </div>
             : null
           }
           <div className='formRow'>
-            <span/>
-            <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)}/>
+            <span />
+            <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)} />
           </div>
         </div>
       </div>

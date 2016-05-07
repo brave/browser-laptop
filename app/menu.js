@@ -27,6 +27,7 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
+const noScript = appConfig.resourceNames.NOSCRIPT
 
 let menuArgs = {}
 let lastSettingsState, lastArgs
@@ -365,7 +366,10 @@ const init = (settingsState, args) => {
           label: locale.translation('home'),
           accelerator: 'CmdOrCtrl+Shift+H',
           click: function (item, focusedWindow) {
-            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, getSetting(settings.HOMEPAGE)])
+            getSetting(settings.HOMEPAGE).split('|').forEach((homepage, i) => {
+              CommonMenu.sendToFocusedWindow(focusedWindow,
+                  [i === 0 ? messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL : messages.SHORTCUT_NEW_FRAME, homepage])
+            })
           }
         }, {
           label: locale.translation('back'),
@@ -432,6 +436,7 @@ const init = (settingsState, args) => {
       adInsertion: Filtering.isResourceEnabled(adInsertion),
       trackingProtection: Filtering.isResourceEnabled(trackingProtection),
       httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere),
+      noScript: Filtering.isResourceEnabled(noScript),
       safeBrowsing: Filtering.isResourceEnabled(safeBrowsing)
     }, init.bind(this, settingsState, {bookmarked: bookmarkPageMenuItem.checked})),
     {

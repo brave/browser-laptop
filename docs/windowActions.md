@@ -423,6 +423,17 @@ If set, also indicates that the context menu is shown.
 
 
 
+### setPopupWindowDetail(detail) 
+
+Dispatches a message to set popup window detail.
+If set, also indicates that the popup window is shown.
+
+**Parameters**
+
+**detail**: `Object`, The popup window detail
+
+
+
 ### setAudioMuted(frameProps, muted) 
 
 Dispatches a message to indicate that the frame should be muted
@@ -432,6 +443,29 @@ Dispatches a message to indicate that the frame should be muted
 **frameProps**: `Object`, Properties of the frame in question
 
 **muted**: `boolean`, true if the frame is muted
+
+
+
+### muteAllAudio(framePropsList, muted) 
+
+Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
+
+**Parameters**
+
+**framePropsList**: `Object`, List of frame properties to consider
+
+**muted**: `boolean`, true if the frames should be muted
+
+
+
+### muteAllAudioExcept(frameToSkip) 
+
+Dispatches a mute call to all frames except the one provided.
+The provided frame will have its audio unmuted.
+
+**Parameters**
+
+**frameToSkip**: `Object`, Properties of the frame to keep audio
 
 
 
@@ -558,6 +592,28 @@ Similar to setBlockedBy but for httpse redirects
 **ruleset**: `string`, Name of the HTTPS Everywhere ruleset XML file
 
 **location**: `string`, URL that was redirected
+
+
+
+### setNoScript(frameProps, source) 
+
+Sets which scripts were blocked on a page.
+
+**Parameters**
+
+**frameProps**: `Object`, The frame to set blocked info on
+
+**source**: `string`, Source of blocked js
+
+
+
+### setNoScriptVisible(isVisible) 
+
+Sets whether the noscript icon is visible.
+
+**Parameters**
+
+**isVisible**: `boolean`, Sets whether the noscript icon is visible.
 
 
 

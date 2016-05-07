@@ -6,8 +6,9 @@ const settings = {
   // General tab
   STARTUP_MODE: 'general.startup-mode',
   HOMEPAGE: 'general.homepage',
+  SHOW_HOME_BUTTON: 'general.show-home-button',
   USERAGENT: 'general.useragent.value',
-  DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.defaultSavePath',
+  DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.default-save-path',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   // Tabs tab
@@ -25,6 +26,7 @@ const settings = {
   // Security Tab
   PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
+  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',

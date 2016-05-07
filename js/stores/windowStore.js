@@ -160,6 +160,7 @@ const doAction = (action) => {
         audioPlaybackActive: false,
         adblock: {},
         trackingProtection: {},
+        noScript: {},
         httpsEverywhere: locationChanged ? {} : lastHttpse,
         title: locationChanged ? '' : lastTitle,
         location: action.location
@@ -387,6 +388,15 @@ const doAction = (action) => {
       // Drag and drop bookmarks code expects this to be set sync
       windowStore.emitChanges()
       return
+    case WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
+      if (!action.detail) {
+        windowState = windowState.delete('popupWindowDetail')
+      } else {
+        windowState = windowState.set('popupWindowDetail', action.detail)
+      }
+      // Drag and drop bookmarks code expects this to be set sync
+      windowStore.emitChanges()
+      return
     case WindowConstants.WINDOW_SET_PINNED:
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
@@ -423,6 +433,9 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
+      break
+    case WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
+      windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)
       break
     case WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
       windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)

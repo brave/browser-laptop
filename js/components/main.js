@@ -30,6 +30,8 @@ const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
+const PopupWindow = require('./popupWindow')
+const NoScriptInfo = require('./noScriptInfo')
 
 // Constants
 const config = require('../constants/config')
@@ -150,6 +152,16 @@ class Main extends ImmutableComponent {
       }, openInForeground)
     })
 
+    ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
+      windowActions.setPopupWindowDetail(Immutable.fromJS({
+        left: props.offsetX,
+        top: props.offsetY + 100,
+        maxHeight: window.innerHeight - 100,
+        minHeight: 400,
+        src
+      }))
+    })
+
     ipc.on(messages.SHORTCUT_CLOSE_FRAME, (e, i) => typeof i !== 'undefined' && i !== null
       ? windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getFrameByKey(self.props.windowState, i))
       : windowActions.closeFrame(self.props.windowState.get('frames'), FrameStateUtil.getActiveFrame(this.props.windowState)))
@@ -259,7 +271,7 @@ class Main extends ImmutableComponent {
   }
 
   checkForTitleMode (pageY) {
-    const navigator = document.querySelector('#navigator')
+    const navigator = document.querySelector('.top')
     // Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
     if (!navigator) {
       return
@@ -307,6 +319,10 @@ class Main extends ImmutableComponent {
     windowActions.setSiteInfoVisible(false)
   }
 
+  onHideNoScript () {
+    windowActions.setNoScriptVisible(false)
+  }
+
   onHideReleaseNotes () {
     windowActions.setReleaseNotesVisible(false)
   }
@@ -315,6 +331,14 @@ class Main extends ImmutableComponent {
     let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
       enabled = appConfig.adInsertion.enabled
+    }
+    return enabled
+  }
+
+  get enableNoScript () {
+    let enabled = this.props.appState.getIn(['noScript', 'enabled'])
+    if (enabled === undefined) {
+      enabled = appConfig.noScript.enabled
     }
     return enabled
   }
@@ -353,12 +377,15 @@ class Main extends ImmutableComponent {
   onMouseDown (e) {
     let node = e.target
     while (node) {
-      if (node.classList && node.classList.contains('contextMenu')) {
+      if (node.classList &&
+          (node.classList.contains('popupWindow') || node.classList.contains('contextMenu'))) {
         return
       }
       node = node.parentNode
     }
+    // TODO(bridiver) combine context menu and popup window
     windowActions.setContextMenuDetail()
+    windowActions.setPopupWindowDetail()
   }
 
   onClickWindow (e) {
@@ -391,11 +418,13 @@ class Main extends ImmutableComponent {
     const tabsPerPage = getSetting(settings.TABS_PER_PAGE)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !releaseNotesIsVisible &&
+      !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
     return <div id='window'
@@ -409,7 +438,13 @@ class Main extends ImmutableComponent {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
           siteSettings={this.props.appState.get('siteSettings')}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}/>
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
+        : null
+      }
+      {
+        this.props.windowState.get('popupWindowDetail')
+        ? <PopupWindow
+          detail={this.props.windowState.get('popupWindowDetail')} />
         : null
       }
       <div className='top'>
@@ -436,6 +471,7 @@ class Main extends ImmutableComponent {
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
+            enableNoScript={this.enableNoScript}
           />
           {
             siteInfoIsVisible
@@ -446,7 +482,7 @@ class Main extends ImmutableComponent {
           }
           {
             activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
-            ? <LoginRequired frameProps={activeFrame}/>
+            ? <LoginRequired frameProps={activeFrame} />
             : null
           }
           {
@@ -454,8 +490,14 @@ class Main extends ImmutableComponent {
             ? <AddEditBookmark sites={this.props.appState.get('sites')}
               currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
               originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}/>
+              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
             : null
+          }
+          {
+            noScriptIsVisible
+              ? <NoScriptInfo frameProps={activeFrame}
+                onHide={this.onHideNoScript.bind(this)} />
+              : null
           }
           {
             releaseNotesIsVisible
@@ -482,7 +524,7 @@ class Main extends ImmutableComponent {
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
             bookmarks={this.props.appState.get('sites')
               .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
-            }/>
+            } />
           : null
         }
         <div className={cx({
@@ -495,7 +537,7 @@ class Main extends ImmutableComponent {
             nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
               tabsPerTabPage={tabsPerPage}
-              tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}/>
+              tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])} />
             : null
           }
         </div>
@@ -541,6 +583,7 @@ class Main extends ImmutableComponent {
               passwords={this.props.appState.get('passwords')}
               siteSettings={this.props.appState.get('siteSettings')}
               enableAds={this.enableAds}
+              enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)
@@ -551,7 +594,7 @@ class Main extends ImmutableComponent {
         this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
         ? <DownloadsBar
           windowWidth={this.props.appState.get('defaultWindowWidth')}
-          downloads={this.props.appState.get('downloads')}/>
+          downloads={this.props.appState.get('downloads')} />
         : null
       }
     </div>

@@ -113,7 +113,11 @@ const messages = {
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
   HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
   // Bookmarks
-  IMPORT_BOOKMARKS: _
+  IMPORT_BOOKMARKS: _,
+  // Extensions
+  NEW_POPUP_WINDOW: _,
+  // NoScript
+  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on, @arg {boolean} once - whether to only allow once*/
 }
 
 module.exports = mapValuesByKeys(messages)

@@ -68,11 +68,11 @@ class SiteInfo extends ImmutableComponent {
           fa: true,
           'fa-lock': true,
           extendedValidation: this.isExtendedValidation
-        })}/><span data-l10n-id='secureConnection'/></li>
+        })} /><span data-l10n-id='secureConnection' /></li>
     } else if (this.isMixedContent) {
-      secureIcon = <li><span className='fa fa-unlock-alt'/><span data-l10n-id='mixedConnection'/></li>
+      secureIcon = <li><span className='fa fa-unlock-alt' /><span data-l10n-id='mixedConnection' /></li>
     } else {
-      secureIcon = <li><span className='fa fa-unlock'/><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)}/></li>
+      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)} /></li>
     }
 
     // Figure out the partition info display
@@ -82,8 +82,8 @@ class SiteInfo extends ImmutableComponent {
 
     let partitionInfo
     if (this.partitionNumber) {
-      partitionInfo = <li><span className='fa fa-user'/>
-        <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id='sessionInfo'/></li>
+      partitionInfo = <li><span className='fa fa-user' />
+        <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id='sessionInfo' /></li>
     }
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
@@ -97,9 +97,9 @@ class SiteInfo extends ImmutableComponent {
       {
         this.isBlockingTrackedContent
         ? <li>
-          <a onClick={this.onToggleTPList.bind(this)}><span className='fa fa-shield'/>
+          <a onClick={this.onToggleTPList.bind(this)}><span className='fa fa-shield' />
             <span data-l10n-args={JSON.stringify({blockedTrackingElementsSize: this.blockedByTrackingList.size})}
-              data-l10n-id='blockedTrackingElements'/>
+              data-l10n-id='blockedTrackingElements' />
           </a>
         </li>
         : null
@@ -116,9 +116,9 @@ class SiteInfo extends ImmutableComponent {
       {
         this.isBlockingAds
         ? <li>
-          <a onClick={this.onToggleBlockedAds.bind(this)}><span className='fa fa-shield'/>
+          <a onClick={this.onToggleBlockedAds.bind(this)}><span className='fa fa-shield' />
             <span data-l10n-args={JSON.stringify({blockedAdsSize: this.blockedAds.size})}
-              data-l10n-id='blockedAds'/>
+              data-l10n-id='blockedAds' />
           </a>
         </li>
         : null
@@ -135,9 +135,9 @@ class SiteInfo extends ImmutableComponent {
       {
         this.isRedirectingResources
         ? <li>
-          <a onClick={this.onToggleHttpseList.bind(this)}><span className='fa fa-shield'/>
+          <a onClick={this.onToggleHttpseList.bind(this)}><span className='fa fa-shield' />
             <span data-l10n-args={JSON.stringify({redirectedResourcesSize: this.redirectedResources.size})}
-              data-l10n-id='redirectedResources'/>
+              data-l10n-id='redirectedResources' />
           </a>
         </li>
         : null

@@ -182,21 +182,21 @@ class Tab extends ImmutableComponent {
         style={activeTabStyle}>
         {
           this.props.frameProps.get('isPrivate')
-          ? <div className='privateIcon fa fa-eye'/>
+          ? <div className='privateIcon fa fa-eye' />
           : null
         }
         {
           this.props.frameProps.get('partitionNumber')
           ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.frameProps.get('partitionNumber') })}
             data-l10n-id='sessionInfoTab'
-            className='privateIcon fa fa-user'/>
+            className='privateIcon fa fa-user' />
           : null
         }
         <div className={cx({
           tabIcon: true,
           'fa fa-circle-o-notch fa-spin': this.loading
         })}
-          style={iconStyle}/>
+          style={iconStyle} />
         {playIcon}
         {
           !this.isPinned
@@ -209,7 +209,7 @@ class Tab extends ImmutableComponent {
           !this.isPinned
           ? <span onClick={this.onCloseFrame.bind(this)}
             data-l10n-id='closeTabButton'
-            className='closeTab fa fa-times-circle'/>
+            className='closeTab fa fa-times-circle' />
           : null
         }
       </div>

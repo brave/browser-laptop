@@ -8,7 +8,7 @@ const assert = require('assert')
 describe('findbar', function () {
   Brave.beforeAll(this)
 
-  before(function *() {
+  before(function * () {
     yield setup(this.app.client)
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
@@ -19,13 +19,13 @@ describe('findbar', function () {
       .waitForElementFocus('webview[data-frame-key="1"]')
   })
 
-  it('should focus findbar on show', function *() {
+  it('should focus findbar on show', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
   })
 
-  it('should ignore case by default', function *() {
+  it('should ignore case by default', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
@@ -50,7 +50,7 @@ describe('findbar', function () {
     assert.equal(match, '1 of 2')
   })
 
-  it('should display no results correctly', function *() {
+  it('should display no results correctly', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
@@ -63,7 +63,7 @@ describe('findbar', function () {
     assert.equal(match, '0 matches')
   })
 
-  it('should re-focus findbar if open after blur', function *() {
+  it('should re-focus findbar if open after blur', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
@@ -72,7 +72,7 @@ describe('findbar', function () {
       .waitForElementFocus(findBarInput)
   })
 
-  it('urlbar should be selectable if findbar is active', function *() {
+  it('urlbar should be selectable if findbar is active', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
@@ -89,7 +89,7 @@ describe('findbar', function () {
 describe('view source', function () {
   Brave.beforeAll(this)
 
-  before(function *() {
+  before(function * () {
     this.url = Brave.server.url('find_in_page.html')
     // todo: move to selectors
     this.webview1 = '.frameWrapper:nth-child(1) webview'
@@ -104,13 +104,13 @@ describe('view source', function () {
       .waitForExist(this.webview1)
   })
 
-  it('should open in new tab', function *() {
+  it('should open in new tab', function * () {
     yield this.app.client
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
       .waitForExist(this.webview2)
   })
 
-  it('open from pinned tab', function *() {
+  it('open from pinned tab', function * () {
     yield this.app.client
       .setPinned(this.url, true)
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)

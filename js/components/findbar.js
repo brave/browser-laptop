@@ -9,7 +9,7 @@ const keyCodes = require('../constants/keyCodes')
 const Button = require('./button.js')
 const windowActions = require('../actions/windowActions')
 
-export default class FindBar extends ImmutableComponent {
+class FindBar extends ImmutableComponent {
   constructor () {
     super()
     this.onBlur = this.onBlur.bind(this)
@@ -132,7 +132,7 @@ export default class FindBar extends ImmutableComponent {
       }
       findMatchText = <div className='foundResults'
         data-l10n-args={JSON.stringify(l10nArgs)}
-        data-l10n-id='findResults'/>
+        data-l10n-id='findResults' />
     } else if (this.numberOfMatches !== -1 && this.searchString) {
       const l10nArgs = {
         activeMatchOrdinal: this.activeMatchOrdinal,
@@ -140,7 +140,7 @@ export default class FindBar extends ImmutableComponent {
       }
       findMatchText = <div className='foundResults'
         data-l10n-args={JSON.stringify(l10nArgs)}
-        data-l10n-id='findResultMatches'/>
+        data-l10n-id='findResultMatches' />
     }
 
     return <div className='findBar' onBlur={this.onBlur}>
@@ -149,7 +149,7 @@ export default class FindBar extends ImmutableComponent {
           ref={(node) => { this.searchInput = node }}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
-          value={this.searchString}/>
+          value={this.searchString} />
           {findMatchText}
       </span>
       <Button iconClass='findButton fa-chevron-up'
@@ -178,3 +178,5 @@ export default class FindBar extends ImmutableComponent {
     </div>
   }
 }
+
+module.exports = FindBar

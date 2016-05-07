@@ -35,6 +35,7 @@ const windowConstants = {
   WINDOW_SET_FIND_DETAIL: _,
   WINDOW_SET_BOOKMARK_DETAIL: _, // If set, also indicates that add/edit is shown
   WINDOW_SET_CONTEXT_MENU_DETAIL: _, // If set, also indicates that the context menu is shown
+  WINDOW_SET_POPUP_WINDOW_DETAIL: _, // If set, also indicates that the popup window is shown
   WINDOW_SET_AUDIO_MUTED: _,
   WINDOW_SET_AUDIO_PLAYBACK_ACTIVE: _,
   WINDOW_SET_FAVICON: _,
@@ -45,6 +46,7 @@ const windowConstants = {
   WINDOW_SET_SITE_INFO_VISIBLE: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE: _, // Whether or not to show the downloads toolbar
   WINDOW_SET_RELEASE_NOTES_VISIBLE: _, // Whether or not to show release notes
+  WINDOW_SET_NOSCRIPT_VISIBLE: _, // Whether or not to show noscript info
   WINDOW_SET_BLOCKED_BY: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_REDIRECTED_BY: _, // Whether or not to show site info like redirected resources
   WINDOW_SET_SECURITY_STATE: _,

@@ -16,6 +16,7 @@ const appActions = require('./appActions')
 const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
 const siteUtil = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
+const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
   if (windowActions.dispatchToIPC) {
@@ -302,6 +303,15 @@ const windowActions = {
     frameOpts.location = frameOpts.location || config.defaultUrl
     if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
       frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
+    } else {
+      const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
+      if (defaultURL) {
+        frameOpts.location = defaultURL
+          .replace('{searchTerms}', encodeURIComponent(frameOpts.location))
+      } else {
+        // Bad URLs passed here can actually crash the browser
+        frameOpts.location = ''
+      }
     }
     dispatch({
       actionType: WindowConstants.WINDOW_NEW_FRAME,
@@ -628,6 +638,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to set popup window detail.
+   * If set, also indicates that the popup window is shown.
+   * @param {Object} detail - The popup window detail
+   */
+  setPopupWindowDetail: function (detail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
+      detail
+    })
+  },
+
+  /**
    * Dispatches a message to indicate that the frame should be muted
    *
    * @param {Object} frameProps - Properties of the frame in question
@@ -638,6 +660,40 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_AUDIO_MUTED,
       frameProps,
       muted
+    })
+  },
+
+  /**
+   * Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
+   *
+   * @param {Object} framePropsList - List of frame properties to consider
+   * @param {boolean} muted - true if the frames should be muted
+   */
+  muteAllAudio: function (framePropsList, mute) {
+    framePropsList.forEach((frameProps) => {
+      if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
+        this.setAudioMuted(frameProps, true)
+      } else if (!mute && frameProps.get('audioMuted')) {
+        this.setAudioMuted(frameProps, false)
+      }
+    })
+  },
+
+  /**
+   * Dispatches a mute call to all frames except the one provided.
+   * The provided frame will have its audio unmuted.
+   *
+   * @param {Object} frameToSkip - Properties of the frame to keep audio
+   */
+  muteAllAudioExcept: function (frameToSkip) {
+    let framePropsList = windowStore.getState().get('frames')
+
+    framePropsList.forEach((frameProps) => {
+      if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
+        this.setAudioMuted(frameProps, true)
+      } else {
+        this.setAudioMuted(frameProps, false)
+      }
     })
   },
 
@@ -782,6 +838,30 @@ const windowActions = {
       frameProps,
       ruleset,
       location
+    })
+  },
+
+  /**
+   * Sets which scripts were blocked on a page.
+   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {string} source - Source of blocked js
+   */
+  setNoScript: function (frameProps, source) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_NOSCRIPT,
+      frameProps,
+      source
+    })
+  },
+
+  /**
+   * Sets whether the noscript icon is visible.
+   * @param {boolean} isVisible
+   */
+  setNoScriptVisible: function (isVisible) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE,
+      isVisible
     })
   },
 

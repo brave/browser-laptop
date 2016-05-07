@@ -13,7 +13,7 @@ class FullScreenWarning extends ImmutableComponent {
     }
     return <div className='fullScreenModeWarning'
       data-l10n-id='fullScreenModeWarning'
-      data-l10n-args={JSON.stringify(l10nArgs)}/>
+      data-l10n-args={JSON.stringify(l10nArgs)} />
   }
 }
 

@@ -77,7 +77,7 @@ class TabPages extends ImmutableComponent {
           frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
           index={i}
           sourceDragFromPageIndex={sourceDragFromPageIndex}
-          active={this.props.tabPageIndex === i}/>)
+          active={this.props.tabPageIndex === i} />)
     }
     </div>
   }

@@ -52,7 +52,7 @@ class UpdateHello extends ImmutableComponent {
           'fa-spinner': this.loading,
           'fa-spin': this.loading
         })}
-        data-l10n-id={this.props.l10nId}/>
+        data-l10n-id={this.props.l10nId} />
     </span>
   }
 }
@@ -79,10 +79,10 @@ class UpdateLog extends ImmutableComponent {
 class UpdateAvailable extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello'/>
-      <span className='updateMessage' data-l10n-id='updateAvail'/>
-      <span className='updateRequiresRelaunch' data-l10n-id='updateRequiresRelaunch'/>
-      <span className='updateSpacer'/>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello' />
+      <span className='updateMessage' data-l10n-id='updateAvail' />
+      <span className='updateRequiresRelaunch' data-l10n-id='updateRequiresRelaunch' />
+      <span className='updateSpacer' />
       {
         this.props.metadata && this.props.metadata.get('notes')
         ? <Button className='updateButton updateDetails updateSecondaryButton'
@@ -103,11 +103,11 @@ class UpdateAvailable extends ImmutableComponent {
 class UpdateChecking extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus}/>
-      <span className='updateMessage' data-l10n-id='updateChecking'/>
-      <span className='updateSpacer'/>
-      <UpdateLog/>
-      <UpdateHide/>
+      <UpdateHello updateStatus={this.props.updateStatus} />
+      <span className='updateMessage' data-l10n-id='updateChecking' />
+      <span className='updateSpacer' />
+      <UpdateLog />
+      <UpdateHide />
     </div>
   }
 }
@@ -115,11 +115,11 @@ class UpdateChecking extends ImmutableComponent {
 class UpdateDownloading extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus}/>
-      <span className='updateMessage' data-l10n-id='updateDownloading'/>
-      <span className='updateSpacer'/>
-      <UpdateLog/>
-      <UpdateHide/>
+      <UpdateHello updateStatus={this.props.updateStatus} />
+      <span className='updateMessage' data-l10n-id='updateDownloading' />
+      <span className='updateSpacer' />
+      <UpdateLog />
+      <UpdateHide />
     </div>
   }
 }
@@ -127,11 +127,11 @@ class UpdateDownloading extends ImmutableComponent {
 class UpdateError extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops'/>
-      <span className='updateMessage' data-l10n-id='updateError'/>
-      <span className='updateSpacer'/>
-      <UpdateLog/>
-      <UpdateHide reset/>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops' />
+      <span className='updateMessage' data-l10n-id='updateError' />
+      <span className='updateSpacer' />
+      <UpdateLog />
+      <UpdateHide reset />
     </div>
   }
 }
@@ -139,10 +139,10 @@ class UpdateError extends ImmutableComponent {
 class UpdateNotAvailable extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet'/>
-      <span className='updateMessage' data-l10n-id='updateNotAvail'/>
-      <span className='updateSpacer'/>
-      <UpdateHide reset/>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet' />
+      <span className='updateMessage' data-l10n-id='updateNotAvail' />
+      <span className='updateSpacer' />
+      <UpdateHide reset />
     </div>
   }
 }
@@ -177,16 +177,16 @@ class UpdateBar extends ImmutableComponent {
         updateStatus === UpdateStatus.UPDATE_AVAILABLE ? <UpdateAvailable metadata={this.props.updates.get('metadata')} updateStatus={updateStatus} /> : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_CHECKING ? <UpdateChecking updateStatus={updateStatus}/> : null
+        updateStatus === UpdateStatus.UPDATE_CHECKING ? <UpdateChecking updateStatus={updateStatus} /> : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_DOWNLOADING ? <UpdateDownloading updateStatus={updateStatus}/> : null
+        updateStatus === UpdateStatus.UPDATE_DOWNLOADING ? <UpdateDownloading updateStatus={updateStatus} /> : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE ? <UpdateNotAvailable updateStatus={updateStatus}/> : null
+        updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE ? <UpdateNotAvailable updateStatus={updateStatus} /> : null
       }
       {
-        updateStatus === UpdateStatus.UPDATE_ERROR ? <UpdateError updateStatus={updateStatus}/> : null
+        updateStatus === UpdateStatus.UPDATE_ERROR ? <UpdateError updateStatus={updateStatus} /> : null
       }
     </div>
   }

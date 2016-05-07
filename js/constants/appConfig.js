@@ -16,10 +16,14 @@ module.exports = {
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
     AD_INSERTION: 'adInsertion',
+    NOSCRIPT: 'noScript',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
   },
   cookieblock: {
     enabled: true
+  },
+  noScript: {
+    enabled: false
   },
   adblock: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
@@ -67,8 +71,10 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
   defaultSettings: {
+    'general.language': 'en-US',
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
+    'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
@@ -85,6 +91,7 @@ module.exports = {
     'privacy.do-not-track': false,
     'security.passwords.manager-enabled': true,
     'security.passwords.one-password-enabled': false,
-    'general.downloads.defaultSavePath': null
+    'security.passwords.dashlane-enabled': false,
+    'general.downloads.default-save-path': null
   }
 }

@@ -111,7 +111,7 @@ class Tabs extends ImmutableComponent {
                 previewTabs={this.props.previewTabs}
                 isActive={this.props.activeFrame === frameProps}
                 isPrivate={frameProps.get('isPrivate')}
-                partOfFullPageSet={this.props.partOfFullPageSet}/>)
+                partOfFullPageSet={this.props.partOfFullPageSet} />)
         }
         {(() => {
           if (this.props.currentFrames.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {

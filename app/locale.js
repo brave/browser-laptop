@@ -23,6 +23,9 @@ var rendererIdentifiers = function () {
     'openImageInNewTab',
     'saveImage',
     'copyLinkAddress',
+    'copyEmailAddress',
+    'saveLinkAs',
+    'openInNewWindow',
     'openInNewSessionTab',
     'openInNewPrivateTab',
     'openInNewTab',
@@ -39,11 +42,14 @@ var rendererIdentifiers = function () {
     'editBookmark',
     'unmuteTabs',
     'muteTabs',
+    'muteOtherTabs',
     'addBookmark',
     'addFolder',
     'newTab',
     'closeTab',
+    'closeOtherTabs',
     'bookmarkPage',
+    'bookmarkLink',
     'openFile',
     'openLocation',
     'openSearch',
@@ -110,6 +116,7 @@ var rendererIdentifiers = function () {
     'reopenLastClosedTab',
     'print',
     'findOnPage',
+    'find',
     'checkForUpdates',
     'preferences',
     'bookmarksManager',
@@ -123,6 +130,7 @@ var rendererIdentifiers = function () {
     'allowAdsAndTracking',
     'block3rdPartyCookie',
     'blockPopups',
+    'noScript',
     'httpsEverywhere',
     // Other identifiers
     'urlCopied'
@@ -210,7 +218,7 @@ exports.init = function (language, cb) {
   })
 
   const propertyFiles = []
-  const appendLangProperties = (lang) => {
+  const appendLangProperties = function (lang) {
     // Property files to parse (only ones containing menu specific identifiers)
     propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),

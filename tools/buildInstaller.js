@@ -38,9 +38,9 @@ if (isDarwin) {
 
     // Package it into a dmg
     'cd ..',
-    'electron-builder \"' + buildDir + '/Brave.app\"' +
+    'electron-builder "' + buildDir + '/Brave.app"' +
       ' --platform=osx ' +
-      ' --out=\"' + outDir + '\" ' +
+      ' --out="' + outDir + '" ' +
       ' --config=res/builderConfig.json ' +
       ' --overwrite',
 

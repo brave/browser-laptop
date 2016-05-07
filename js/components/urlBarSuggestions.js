@@ -9,9 +9,9 @@ const windowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 
 const config = require('../constants/config.js')
-import top500 from './../data/top500.js'
+const top500 = require('./../data/top500.js')
 const {isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
-import Immutable from 'immutable'
+const Immutable = require('immutable')
 const debounce = require('../lib/debounce.js')
 const {getSiteIconClass} = require('../state/siteUtil.js')
 const settings = require('../constants/settings')
@@ -85,7 +85,7 @@ class UrlBarSuggestions extends ImmutableComponent {
           onClick={suggestion.onClick}
           key={suggestion.title}
           className={this.activeIndex === index + 1 ? 'selected' : ''}>
-          <span className={`suggestionIcon fa ${suggestion.iconClass}`}/>
+          <span className={`suggestionIcon fa ${suggestion.iconClass}`} />
           <span className='suggestionText'>{suggestion.title}</span>
         </li>
       )}

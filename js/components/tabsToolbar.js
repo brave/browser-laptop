@@ -40,7 +40,7 @@ class TabsToolbar extends ImmutableComponent {
           paintTabs={this.props.paintTabs}
           previewTabs={this.props.previewTabs}
           draggingOverData={this.props.draggingOverData}
-          tabs={this.props.tabs}/>
+          tabs={this.props.tabs} />
         : null
       }
       <Tabs tabs={this.props.tabs}
@@ -58,7 +58,7 @@ class TabsToolbar extends ImmutableComponent {
       />
       <TabsToolbarButtons
         noFrames={currentFrames.size === 0}
-        onMenu={this.props.onMenu}/>
+        onMenu={this.props.onMenu} />
     </div>
   }
 }

@@ -47,37 +47,37 @@ class DownloadItem extends ImmutableComponent {
       <div className='downloadActions'>
         {
           downloadUtil.shouldAllowPause(this.props.download)
-          ? <Button l10nId='downloadPause' iconClass='fa-pause' onClick={downloadActions.pauseDownload.bind(null, this.props.downloadId)}/>
+          ? <Button l10nId='downloadPause' iconClass='fa-pause' onClick={downloadActions.pauseDownload.bind(null, this.props.downloadId)} />
           : null
         }
         {
           downloadUtil.shouldAllowResume(this.props.download)
-          ? <Button l10nId='downloadResume' iconClass='fa-play' onClick={downloadActions.resumeDownload.bind(null, this.props.downloadId)}/>
+          ? <Button l10nId='downloadResume' iconClass='fa-play' onClick={downloadActions.resumeDownload.bind(null, this.props.downloadId)} />
           : null
         }
         {
           downloadUtil.shouldAllowCancel(this.props.download)
-          ? <Button l10nId='downloadCancel' iconClass='fa-times' onClick={downloadActions.cancelDownload.bind(null, this.props.downloadId)}/>
+          ? <Button l10nId='downloadCancel' iconClass='fa-times' onClick={downloadActions.cancelDownload.bind(null, this.props.downloadId)} />
           : null
         }
         {
           downloadUtil.shouldAllowRedownload(this.props.download)
-          ? <Button l10nId='downloadRedownload' iconClass='fa-repeat' onClick={downloadActions.redownloadURL.bind(null, this.props.download, this.props.downloadId)}/>
+          ? <Button l10nId='downloadRedownload' iconClass='fa-repeat' onClick={downloadActions.redownloadURL.bind(null, this.props.download, this.props.downloadId)} />
           : null
         }
         {
           downloadUtil.shouldAllowCopyLink(this.props.download)
-          ? <Button l10nId='downloadCopyLinkLocation' iconClass='fa-link' onClick={downloadActions.copyLinkToClipboard.bind(null, this.props.download)}/>
+          ? <Button l10nId='downloadCopyLinkLocation' iconClass='fa-link' onClick={downloadActions.copyLinkToClipboard.bind(null, this.props.download)} />
           : null
         }
         {
           downloadUtil.shouldAllowOpenDownloadLocation(this.props.download)
-          ? <Button l10nId='downloadOpenPath' iconClass='fa-folder-open-o' onClick={downloadActions.locateShellPath.bind(null, this.props.download)}/>
+          ? <Button l10nId='downloadOpenPath' iconClass='fa-folder-open-o' onClick={downloadActions.locateShellPath.bind(null, this.props.download)} />
           : null
         }
         {
           downloadUtil.shouldAllowDelete(this.props.download)
-          ? <Button l10nId='downloadDelete' iconClass='fa-trash-o' onClick={downloadActions.deleteDownload.bind(null, this.props.downloads, this.props.download, this.props.downloadId)}/>
+          ? <Button l10nId='downloadDelete' iconClass='fa-trash-o' onClick={downloadActions.deleteDownload.bind(null, this.props.downloads, this.props.download, this.props.downloadId)} />
           : null
         }
         {
@@ -88,7 +88,7 @@ class DownloadItem extends ImmutableComponent {
       </div>
       {
         (this.isInProgress || this.isPaused) && this.props.download.get('totalBytes')
-        ? <div className='downloadProgress' style={progressStyle}/>
+        ? <div className='downloadProgress' style={progressStyle} />
         : null
       }
       <div className='downloadInfo'>
@@ -100,11 +100,11 @@ class DownloadItem extends ImmutableComponent {
           </div>
         {
           this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
-          ? <div className='downloadState' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)}/>
+          ? <div className='downloadState' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
           : null
         }
         </span>
-        <span className='downloadArrow fa-caret-down fa'/>
+        <span className='downloadArrow fa-caret-down fa' />
       </div>
     </span>
   }
@@ -128,7 +128,7 @@ class DownloadsBar extends ImmutableComponent {
             <DownloadItem download={download}
               windowWidth={this.props.windowWidth}
               downloadId={downloadId}
-              downloadsSize={this.props.downloads.size}/>)
+              downloadsSize={this.props.downloads.size} />)
       }
       </div>
       <div className='downloadBarButtons'>

@@ -14,10 +14,12 @@ const windowActions = require('../actions/windowActions')
 const {isSiteInList} = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
+const settings = require('../constants/settings')
 const ipc = global.require('electron').ipcRenderer
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
+const getSetting = require('../settings').getSetting
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -46,6 +48,13 @@ class NavigationBar extends ImmutableComponent {
     } else {
       ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
     }
+  }
+
+  onHome () {
+    getSetting(settings.HOMEPAGE).split('|')
+      .forEach((homepage, i) => {
+        ipc.emit(i === 0 ? messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL : messages.SHORTCUT_NEW_FRAME, {}, homepage)
+      })
   }
 
   onStop () {
@@ -117,6 +126,14 @@ class NavigationBar extends ImmutableComponent {
         }
         </div>
       }
+      {
+        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+        ? <Button iconClass='fa-home'
+          l10nId='homeButton'
+          className='navbutton homeButton'
+          onClick={this.onHome} />
+        : null
+      }
       <UrlBar ref='urlBar'
         sites={this.props.sites}
         activeFrameProps={frameProps}
@@ -125,6 +142,7 @@ class NavigationBar extends ImmutableComponent {
         frames={this.props.frames}
         loading={this.loading}
         titleMode={this.titleMode}
+        enableNoScript={this.props.enableNoScript}
         urlbar={this.props.navbar.get('urlbar')}
         />
       {

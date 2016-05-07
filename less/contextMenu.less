@@ -16,6 +16,8 @@
   }
   // This is a reasonable max height and also solves problems for bookmarks menu
   // and bookmarks overflow menu reaching down too low.
+  height: 100%;
+  width: 100%;
   @usedUpChrome: @navbarHeight + @bookmarksToolbarWithFaviconsHeight;
   max-height: calc(~'100% - @{usedUpChrome}');
   overflow: auto;

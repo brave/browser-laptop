@@ -112,11 +112,11 @@ export default class ContextMenuItem extends ImmutableComponent {
 
     if (this.props.contextMenuItem.get('type') === 'separator') {
       return <div className='contextMenuItem contextMenuSeparator' role='listitem'>
-        <hr/>
+        <hr />
       </div>
     } else if (this.props.contextMenuItem.get('type') === 'multi') {
       return <div className='contextMenuItem multiContextMenuItem'>
-        <span className='multiItemTitle' data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}/>
+        <span className='multiItemTitle' data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')} />
       {
         this.props.contextMenuItem.get('submenu').map((subItem) =>
           <div className='contextMenuSubItem'
@@ -145,7 +145,7 @@ export default class ContextMenuItem extends ImmutableComponent {
       onClick={this.onClick.bind(this, this.props.contextMenuItem.get('click'), true)}>
       {
         this.props.contextMenuItem.get('checked')
-        ? <span className='fa fa-check contextMenuCheckIndicator'/>
+        ? <span className='fa fa-check contextMenuCheckIndicator' />
         : null
       }
       {
@@ -164,8 +164,8 @@ export default class ContextMenuItem extends ImmutableComponent {
       {
         this.hasSubmenu
         ? <span className='submenuIndicatorContainer'>
-          <span className='submenuIndicatorSpacer'/>
-          <span className='submenuIndicator fa fa-chevron-right'/>
+          <span className='submenuIndicatorSpacer' />
+          <span className='submenuIndicator fa fa-chevron-right' />
         </span>
         : null
       }
@@ -239,14 +239,14 @@ export default class ContextMenu extends ImmutableComponent {
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         siteSettings={this.props.siteSettings}
-        template={this.props.contextMenuDetail.get('template')}/>
+        template={this.props.contextMenuDetail.get('template')} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
             siteSettings={this.props.siteSettings}
             template={openedSubmenuDetail.get('template')}
-            y={openedSubmenuDetail.get('y')}/>)
+            y={openedSubmenuDetail.get('y')} />)
       }
     </div>
   }

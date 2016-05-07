@@ -22,8 +22,10 @@ const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
-import adInfo from '../data/adInfo.js'
-import FindBar from './findbar.js'
+const adInfo = require('../data/adInfo.js')
+const FindBar = require('./findbar.js')
+const consoleStrings = require('../constants/console')
+
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 
 class Frame extends ImmutableComponent {
@@ -241,6 +243,11 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
+    this.webview.addEventListener('set-active', (e) => {
+      if (e.active && !this.props.isActive) {
+        windowActions.setActiveFrame(this.props.frame)
+      }
+    })
     this.webview.addEventListener('focus', this.onFocus.bind(this))
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
@@ -428,6 +435,16 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('media-paused', ({title}) => {
       windowActions.setAudioPlaybackActive(this.props.frame, false)
     })
+    this.webview.addEventListener('console-message', (e) => {
+      if (this.props.enableNoScript && e.level === 2 &&
+          e.message && e.message.includes(consoleStrings.SCRIPT_BLOCKED)) {
+        // Note that the site was blocked
+        // TODO: Parse out the location of the script that was blocked and send
+        // it too
+        windowActions.setBlockedBy(this.props.frame,
+                                   'noScript', e.message)
+      }
+    })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       // Due to a bug in Electron, after navigating to a page with a theme color
       // to a page without a theme color, the background is sent to us as black
@@ -486,6 +503,7 @@ class Frame extends ImmutableComponent {
     windowActions.setTabPageIndexByFrame(this.props.frame)
     windowActions.setUrlBarActive(false)
     windowActions.setContextMenuDetail()
+    windowActions.setPopupWindowDetail()
     this.webview.setActive(this.props.isActive)
   }
 
@@ -566,7 +584,7 @@ class Frame extends ImmutableComponent {
       })}>
       {
         this.props.frame.get('isFullScreen') && this.props.frame.get('showFullScreenWarning')
-        ? <FullScreenWarning frameProps={this.props.frame}/>
+        ? <FullScreenWarning frameProps={this.props.frame} />
         : null
       }
       {
@@ -576,14 +594,14 @@ class Frame extends ImmutableComponent {
           onFindHide={this.onFindHide.bind(this)}
           frame={this.props.frame}
           selected={this.props.frame.get('findbarSelected')}
-          findDetail={this.props.frame.get('findDetail')}/>
+          findDetail={this.props.frame.get('findDetail')} />
         : null
       }
       <div ref={(node) => { this.webviewContainer = node }}
         className={cx({
           webviewContainer: true,
           isPreview: this.props.isPreview
-        })}/>
+        })} />
       {
         this.props.frame.get('hrefPreview')
         ? <div className={cx({

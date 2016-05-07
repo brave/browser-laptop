@@ -201,11 +201,7 @@ class UrlBar extends ImmutableComponent {
 
     if (startLoadTime && endLoadTime) {
       const loadMilliseconds = endLoadTime - startLoadTime
-      if (loadMilliseconds > 1000) {
-        loadTime = (loadMilliseconds / 1000).toFixed(2) + 's'
-      } else {
-        loadTime = loadMilliseconds + 'ms'
-      }
+      loadTime = (loadMilliseconds / 1000).toFixed(2) + 's'
     }
     return loadTime
   }
@@ -230,6 +226,10 @@ class UrlBar extends ImmutableComponent {
     windowActions.setSiteInfoVisible(true)
   }
 
+  onNoScript () {
+    windowActions.setNoScriptVisible(true)
+  }
+
   get shouldRenderUrlBarSuggestions () {
     return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
       this.props.urlbar.get('active')
@@ -241,6 +241,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
+    const scriptsBlocked = this.props.activeFrameProps.getIn(['noScript', 'blocked'])
     return <form
       className='urlbarForm'
       action='#'
@@ -283,11 +284,16 @@ class UrlBar extends ImmutableComponent {
             })}
             id='urlInput'
             readOnly={this.props.titleMode}
-            ref={(node) => { this.urlInput = node }}/>
+            ref={(node) => { this.urlInput = node }} />
         }
-      <legend/>
+      <legend />
         {
-          this.props.titleMode
+          !this.props.enableNoScript || this.props.titleMode || this.aboutPage || !scriptsBlocked || !scriptsBlocked.size
+          ? null
+          : <span className='noScript fa fa-ban' onClick={this.onNoScript}></span>
+        }
+        {
+          this.props.titleMode || this.aboutPage
           ? null
           : <span className='loadTime'>{this.loadTime}</span>
         }

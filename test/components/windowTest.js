@@ -17,7 +17,7 @@ describe('application window', function () {
   describe('application launch', function () {
     Brave.beforeAll(this)
 
-    it('opens a window and loads the UI', function *() {
+    it('opens a window and loads the UI', function * () {
       yield this.app.client
         .waitUntilWindowLoaded()
         .waitForUrl(Brave.newTabUrl)
@@ -51,7 +51,7 @@ describe('application window', function () {
     describe('default', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .newWindowAction()
@@ -65,7 +65,7 @@ describe('application window', function () {
           .waitUntil(requireIsAvailable)
       })
 
-      it('offsets from the focused window', function *() {
+      it('offsets from the focused window', function * () {
         yield this.app.client
           .windowByIndex(2).getWindowBounds().then((res) => res.x).should.eventually.be
           .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
@@ -74,7 +74,7 @@ describe('application window', function () {
           .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
-      it('has the default width and height', function *() {
+      it('has the default width and height', function * () {
         yield this.app.client
           .windowByIndex(2).getWindowWidth().should.eventually.be.getDefaultWindowWidth()
         yield this.app.client
@@ -85,7 +85,7 @@ describe('application window', function () {
     describe('after resize', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .resizeWindow(600, 700)
@@ -100,7 +100,7 @@ describe('application window', function () {
           .waitUntil(requireIsAvailable)
       })
 
-      it('offsets from the focused window', function *() {
+      it('offsets from the focused window', function * () {
         yield this.app.client
           .windowByIndex(2).getWindowBounds().then((res) => res.x).should.eventually.be
           .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
@@ -109,7 +109,7 @@ describe('application window', function () {
           .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
-      it('has the width and height of the last window resize', function *() {
+      it('has the width and height of the last window resize', function * () {
         yield this.app.client.windowByIndex(2)
           .getWindowWidth().should.become(600)
           .getWindowHeight().should.become(700)
@@ -119,7 +119,7 @@ describe('application window', function () {
     describe('after maximize', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .maximizeWindow()
@@ -134,14 +134,14 @@ describe('application window', function () {
           .waitForVisible(activeWebview)
       })
 
-      it('is maximized', function *() {
+      it('is maximized', function * () {
         yield this.app.client
           .getWindowWidth().should.eventually.be.getPrimaryDisplayWidth()
         yield this.app.client
           .getWindowHeight().should.eventually.be.getPrimaryDisplayHeight()
       })
 
-      it('opens without an offset', function *() {
+      it('opens without an offset', function * () {
         yield this.app.client
           .getWindowBounds().then((res) => res.x).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.x)
         yield this.app.client
@@ -154,7 +154,7 @@ describe('application window', function () {
     describe('with features', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
@@ -168,7 +168,7 @@ describe('application window', function () {
           .click('#trigger')
       })
 
-      it('opens in a new window', function *() {
+      it('opens in a new window', function * () {
         yield this.app.client
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
@@ -177,12 +177,12 @@ describe('application window', function () {
           })
       })
 
-      it('set the url', function *() {
+      it('set the url', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
       })
 
-      it('sets the width and height', function *() {
+      it('sets the width and height', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .getWindowHeight().should.eventually.be.equal(375) // height plus navbar
@@ -191,7 +191,7 @@ describe('application window', function () {
           .getWindowWidth().should.eventually.be.equal(480)
       })
 
-      it('sets the window position', function *() {
+      it('sets the window position', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .getWindowBounds().then((res) => res.x).should.eventually.be.equal(0)
@@ -204,7 +204,7 @@ describe('application window', function () {
     describe('with width and height below min', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
@@ -224,14 +224,14 @@ describe('application window', function () {
       })
 
       // Fails intermittently
-      it.skip('loads and is visible', function *() {
+      it.skip('loads and is visible', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
       })
 
-      it('has a min width of 480 and height of 300', function *() {
+      it('has a min width of 480 and height of 300', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
           .getWindowHeight().should.become(300)
@@ -245,7 +245,7 @@ describe('application window', function () {
     describe('without features', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         var page1 = Brave.server.url('page1.html')
 
         yield this.app.client
@@ -263,7 +263,7 @@ describe('application window', function () {
           .windowByIndex(0)
       })
 
-      it('opens in a new tab', function *() {
+      it('opens in a new tab', function * () {
         var selector = '.frameWrapper:nth-child(2) webview'
         var page1 = Brave.server.url('page1.html')
 
@@ -279,7 +279,7 @@ describe('application window', function () {
       describe('different document.domain', function () {
         Brave.beforeAll(this)
 
-        before(function *() {
+        before(function * () {
           this.window_open_page = Brave.server.url('window_open.html')
           this.page1 = Brave.server.urlWithIpAddress('page1.html')
 
@@ -303,7 +303,7 @@ describe('application window', function () {
             .waitForUrl(this.page1)
         })
 
-        it('has parent document.domain set to localhost', function *() {
+        it('has parent document.domain set to localhost', function * () {
           yield this.app.client
             .windowByUrl(this.window_open_page)
             .execute(function () {
@@ -311,7 +311,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.eventually.be.equal('localhost')
         })
 
-        it('has document.domain set to 127.0.0.1', function *() {
+        it('has document.domain set to 127.0.0.1', function * () {
           yield this.app.client
             .windowByUrl(this.page1)
             .execute(function () {
@@ -319,7 +319,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.eventually.be.equal('127.0.0.1')
         })
 
-        it('can communicate with the opener through postMessage', function *() {
+        it('can communicate with the opener through postMessage', function * () {
           yield this.app.client
             // make sure the child window has focus
             .windowByUrl(this.window_open_page)
@@ -345,7 +345,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.become(['any origin', 'target origin'])
         })
 
-        it('has restricted access in parent to child window', function *() {
+        it('has restricted access in parent to child window', function * () {
           yield this.app.client
             .windowByUrl(this.window_open_page)
             .execute(function () {
@@ -353,7 +353,7 @@ describe('application window', function () {
             }).should.be.rejectedWith(Error)
         })
 
-        it('has restricted access to parent window through the opener', function *() {
+        it('has restricted access to parent window through the opener', function * () {
           yield this.app.client
             .windowByUrl(this.page1)
             .execute(function () {
@@ -365,7 +365,7 @@ describe('application window', function () {
       describe('same document.domain', function () {
         Brave.beforeAll(this)
 
-        before(function *() {
+        before(function * () {
           this.window_open_page = Brave.server.url('window_open.html')
           this.page1 = Brave.server.url('page1.html')
           var page1 = this.page1 // for wait closure
@@ -390,7 +390,7 @@ describe('application window', function () {
             .windowByUrl(page1).getUrl().should.become(page1)
         })
 
-        it('has parent document.domain set to localhost', function *() {
+        it('has parent document.domain set to localhost', function * () {
           yield this.app.client
             .windowByUrl(this.window_open_page)
             .execute(function () {
@@ -398,7 +398,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.eventually.be.equal('localhost')
         })
 
-        it('has document.domain set to localhost', function *() {
+        it('has document.domain set to localhost', function * () {
           yield this.app.client
             .windowByUrl(this.page1)
             .execute(function () {
@@ -406,7 +406,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.eventually.be.equal('localhost')
         })
 
-        it('has urestricted access in parent to child window', function *() {
+        it('has urestricted access in parent to child window', function * () {
           yield this.app.client
             .windowByUrl(this.window_open_page)
             .execute(function () {
@@ -414,7 +414,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.eventually.be.equal(3)
         })
 
-        it('has urestricted access to parent window through the opener', function *() {
+        it('has urestricted access to parent window through the opener', function * () {
           yield this.app.client
             .windowByUrl(this.page1)
             .execute(function () {
@@ -424,7 +424,7 @@ describe('application window', function () {
             .should.eventually.be.equal(3)
         })
 
-        it.skip('focuses the opener', function *() {
+        it.skip('focuses the opener', function * () {
           yield this.app.client
             // make sure the child window has focus
             .windowByUrl(this.page1)
@@ -449,7 +449,7 @@ describe('application window', function () {
             }).then((response) => response.value).should.eventually.be.equal(true, 'expected opener to be focused, but was blurred')
         })
 
-        it.skip('blurs the opener', function *() {
+        it.skip('blurs the opener', function * () {
           yield this.app.client
             // make sure parent window has focus
             .windowByUrl(this.page1)
@@ -485,7 +485,7 @@ describe('application window', function () {
   describe('window.open with faked click', function () {
     Brave.beforeAll(this)
 
-    before(function *() {
+    before(function * () {
       this.window_open_page = Brave.server.url('window_open.html')
       this.page1 = Brave.server.urlWithIpAddress('page1.html')
 
@@ -502,7 +502,7 @@ describe('application window', function () {
         }, this.page1)
     })
 
-    it('does not open a new window or tab', function *() {
+    it('does not open a new window or tab', function * () {
       // this isn't a very good test because it could evaluate before the new
       // tab/window opens. Is there something else we can check?
       yield this.app.client
@@ -521,7 +521,7 @@ describe('application window', function () {
     describe('default', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
+      before(function * () {
         var page1 = Brave.server.url('page1.html')
 
         yield this.app.client
@@ -536,7 +536,7 @@ describe('application window', function () {
       })
 
       // https://app.asana.com/0/41575558488236/45343396929071
-      it('does not open a new window or tab', function *() {
+      it('does not open a new window or tab', function * () {
         // this isn't a very good test because it could evaluate before the new
         // tab/window opens. Is there something else we can check?
         yield this.app.client
@@ -561,8 +561,8 @@ describe('application window', function () {
     describe('with target', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
-        this.click_with_target_page = Brave.server.url('click_with_target.html')
+      before(function * () {
+        this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
         this.page2 = Brave.server.url('page2.html')
 
@@ -570,26 +570,26 @@ describe('application window', function () {
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
           .windowByIndex(1)
-          .url(this.click_with_target_page)
+          .url(this.clickWithTargetPage)
           .waitForVisible('#name')
           .click('#name')
       })
 
-      it('opens in a new tab', function *() {
-        let click_with_target_page = this.click_with_target_page
+      it('opens in a new tab', function * () {
+        let clickWithTargetPage = this.clickWithTargetPage
         let page1 = this.page1
 
         yield this.app.client
           .windowByIndex(0)
-          .getAttribute('.frameWrapper:nth-child(1) webview', 'src').should.become(click_with_target_page)
+          .getAttribute('.frameWrapper:nth-child(1) webview', 'src').should.become(clickWithTargetPage)
         yield this.app.client
           .windowByIndex(0)
           .getAttribute('.frameWrapper:nth-child(2) webview', 'src').should.become(page1)
       })
 
       // https://github.com/brave/browser-laptop/issues/143
-      it('loads in the tab with the target name', function *() {
-        let click_with_target_page = this.click_with_target_page
+      it('loads in the tab with the target name', function * () {
+        let clickWithTargetPage = this.clickWithTargetPage
         let page2 = this.page2
 
         yield this.app.client
@@ -602,7 +602,7 @@ describe('application window', function () {
 
         yield this.app.client
           .waitForVisible('.frameWrapper:nth-child(1) webview')
-          .getAttribute('.frameWrapper:nth-child(1) webview', 'src').should.become(click_with_target_page)
+          .getAttribute('.frameWrapper:nth-child(1) webview', 'src').should.become(clickWithTargetPage)
         yield this.app.client
           .getAttribute('.frameWrapper:nth-child(2) webview', 'src').should.become(page2)
         yield this.app.client
@@ -613,18 +613,18 @@ describe('application window', function () {
     describe('without target', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
-        this.click_with_target_page = Brave.server.url('click_with_target.html')
+      before(function * () {
+        this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .url(this.click_with_target_page)
+          .url(this.clickWithTargetPage)
           .waitForVisible('#none')
           .click('#none')
       })
 
-      it('loads in the current tab', function *() {
+      it('loads in the current tab', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
           .getWindowCount().should.become(2) // still just one window
@@ -638,18 +638,18 @@ describe('application window', function () {
     describe('with target _self', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
-        this.click_with_target_page = Brave.server.url('click_with_target.html')
+      before(function * () {
+        this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .url(this.click_with_target_page)
+          .url(this.clickWithTargetPage)
           .waitForVisible('#_self')
           .click('#_self')
       })
 
-      it('loads in the current tab', function *() {
+      it('loads in the current tab', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
           .getWindowCount().should.become(2) // still just one window
@@ -663,19 +663,19 @@ describe('application window', function () {
     describe('with target _parent', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
-        this.click_with_target_page = Brave.server.url('click_with_target.html')
+      before(function * () {
+        this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
-          .url(this.click_with_target_page)
+          .url(this.clickWithTargetPage)
           .frame('parent')
           .waitForVisible('#_parent')
           .click('#_parent')
       })
 
-      it('sets the url of the parent frame in the same domain', function *() {
+      it('sets the url of the parent frame in the same domain', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
           .getWindowCount().should.become(2) // still just one window
@@ -689,22 +689,22 @@ describe('application window', function () {
     describe('with target  _top', function () {
       Brave.beforeAll(this)
 
-      before(function *() {
-        this.click_with_target_page = Brave.server.url('click_with_target.html')
+      before(function * () {
+        this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
           .windowByUrl(Brave.newTabUrl)
-          .url(this.click_with_target_page)
+          .url(this.clickWithTargetPage)
           .frame('parent')
           .frame('top')
           .waitForVisible('#_top')
           .click('#_top')
       })
 
-      it('sets the url of the top-level frame in the same domain', function *() {
+      it('sets the url of the top-level frame in the same domain', function * () {
         var page1 = this.page1 // for wait closure
         yield this.app.client
           // page1 loaded
