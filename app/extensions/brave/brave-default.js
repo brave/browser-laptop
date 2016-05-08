@@ -614,11 +614,20 @@ if (typeof KeyEvent === 'undefined') {
         isMisspelled = info.isMisspelled
       }
 
+      let src = e.target.getAttribute ? e.target.getAttribute('src') : undefined
+      // If the src is not fully specified, then try to expand it
+      try {
+        if (src) {
+          src = new URL(src, window.location).href
+        }
+      } catch (e) {
+      }
+
       var nodeProps = {
         name: name,
         href: href,
         isContentEditable: e.target.isContentEditable || false,
-        src: e.target.getAttribute ? e.target.getAttribute('src') : undefined,
+        src,
         selection,
         suggestions,
         isMisspelled,
