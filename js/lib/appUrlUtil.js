@@ -15,12 +15,11 @@ module.exports.getAppUrl = function (relativeUrl) {
     relativeUrl = ''
   }
 
-  let url = 'chrome-extension://' + config.braveExtensionId + '/' + relativeUrl
   if (process.env.NODE_ENV === 'development') {
-    url += '?devServerPort=' + process.env.BRAVE_PORT
+    return 'http://localhost:' + process.env.BRAVE_PORT + '/' + relativeUrl
+  } else {
+    return 'chrome-extension://' + config.braveExtensionId + '/' + relativeUrl
   }
-
-  return url
 }
 
 module.exports.getExtensionsPath = function () {
