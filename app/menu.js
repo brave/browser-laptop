@@ -387,7 +387,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         CommonMenu.reopenLastClosedTabItem(),
         {
-          label: locale.translation('reopenLastClosedTab'),
+          label: locale.translation('reopenLastClosedWindow'),
           accelerator: 'Alt+Shift+CmdOrCtrl+T',
           click: function () {
             process.emit(messages.UNDO_CLOSED_WINDOW)
