@@ -244,6 +244,18 @@ const filterOutNonRecents = debounce(() => {
   emitChanges()
 }, 60 * 1000)
 
+function handleChangeSettingAction (settingKey, settingValue) {
+  switch (settingKey) {
+    case settings.AUTO_HIDE_MENU_BAR:
+      BrowserWindow.getAllWindows().forEach(function (wnd) {
+        wnd.setAutoHideMenuBar(settingValue)
+        wnd.setMenuBarVisibility(!settingValue)
+      })
+      break
+    default:
+  }
+}
+
 const handleAppAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
@@ -393,6 +405,7 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
+      handleChangeSettingAction(action.key, action.value)
       break
     case AppConstants.APP_CHANGE_SITE_SETTING:
       let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
