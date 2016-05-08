@@ -11,6 +11,7 @@ const remote = electron.remote
 
 // Actions
 const windowActions = require('../actions/windowActions')
+const webviewActions = require('../actions/webviewActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
@@ -260,7 +261,7 @@ class Main extends ImmutableComponent {
     window.addEventListener('focus', () => {
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
-        windowActions.setWebviewFocused()
+        webviewActions.setWebviewFocused()
       }
     })
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
@@ -580,8 +581,10 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
+              dictionaryLocale={this.props.appState.getIn(['dictionary', 'locale'])}
               passwords={this.props.appState.get('passwords')}
               siteSettings={this.props.appState.get('siteSettings')}
+              temporarySiteSettings={this.props.appState.get('temporarySiteSettings')}
               enableAds={this.enableAds}
               enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

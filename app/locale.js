@@ -132,6 +132,8 @@ var rendererIdentifiers = function () {
     'blockPopups',
     'noScript',
     'httpsEverywhere',
+    'learnSpelling',
+    'ignoreSpelling',
     // Other identifiers
     'urlCopied'
   ]

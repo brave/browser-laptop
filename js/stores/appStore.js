@@ -393,8 +393,9 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['settings', action.key], action.value)
       break
     case AppConstants.APP_CHANGE_SITE_SETTING:
-      appState = appState.set('siteSettings',
-        siteSettings.mergeSiteSetting(appState.get('siteSettings'), action.hostPattern, action.key, action.value))
+      let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+      appState = appState.set(propertyName,
+        siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
       break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')
@@ -404,6 +405,20 @@ const handleAppAction = (action) => {
       appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
         return notification.get('message') === action.message
       }))
+      break
+    case AppConstants.APP_ADD_WORD:
+      let listType = 'ignoredWords'
+      if (action.learn) {
+        listType = 'addedWords'
+      }
+      const path = ['dictionary', listType]
+      let wordList = appState.getIn(path)
+      if (!wordList.includes(action.word)) {
+        appState = appState.setIn(path, wordList.push(action.word))
+      }
+      break
+    case AppConstants.APP_SET_DICTIONARY:
+      appState = appState.setIn(['dictionary', 'locale'], action.locale)
       break
     default:
   }

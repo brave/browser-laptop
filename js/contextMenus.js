@@ -10,6 +10,7 @@ const clipboard = electron.clipboard
 const messages = require('./constants/messages')
 const WindowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
+const webviewActions = require('./actions/webviewActions')
 const bookmarkActions = require('./actions/bookmarkActions')
 const downloadActions = require('./actions/downloadActions')
 const appActions = require('./actions/appActions')
@@ -389,7 +390,45 @@ function tabTemplateInit (frameProps) {
   return items
 }
 
-function getEditableItems (hasSelection) {
+function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
+  const hasSelection = selection.length > 0
+  const items = []
+  if (hasSelection) {
+    if (suggestions.length > 0) {
+      // Map the first 3 suggestions to menu items that allows click
+      // to replace the text.
+      items.push(...suggestions.slice(0, 3).map((suggestion) => {
+        return {
+          label: suggestion,
+          click: () => {
+            webviewActions.replaceMisspelling(suggestion)
+          }
+        }
+      }), CommonMenu.separatorMenuItem)
+    }
+    if (isMisspelled) {
+      items.push({
+        label: locale.translation('learnSpelling'),
+        click: () => {
+          appActions.addWord(selection, true)
+          // This is needed so the underline goes away
+          webviewActions.replaceMisspelling(selection)
+        }
+      }, {
+        label: locale.translation('ignoreSpelling'),
+        click: () => {
+          appActions.addWord(selection, false)
+          // This is needed so the underline goes away
+          webviewActions.replaceMisspelling(selection)
+        }
+      }, CommonMenu.separatorMenuItem)
+    }
+  }
+  return items
+}
+
+function getEditableItems (selection) {
+  const hasSelection = selection.length > 0
   const items = []
   if (hasSelection) {
     items.push({
@@ -607,8 +646,9 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
-    const editableItems = getEditableItems(nodeProps.hasSelection)
-    template.push({
+    const misspelledSuggestions = getMisspelledSuggestions(nodeProps.selection, nodeProps.isMisspelled, nodeProps.suggestions)
+    const editableItems = getEditableItems(nodeProps.selection)
+    template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',
       role: 'undo'
@@ -701,7 +741,7 @@ function mainTemplateInit (nodeProps, frame) {
   template.push({
     label: locale.translation('inspectElement'),
     click: (item, focusedWindow) => {
-      windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
+      webviewActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
     }
   })
 

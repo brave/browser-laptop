@@ -57,6 +57,7 @@ const messages = {
   APP_INITIALIZED: _,
   // Webview page messages
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
+  INIT_SPELL_CHECK: _, /** @arg {string} lang */
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
   LINK_HOVERED: _, /** @arg {string} href of hovered link */
   APP_STATE_CHANGE: _,
@@ -74,6 +75,8 @@ const messages = {
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
   SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
+  IS_MISSPELLED: _, /** @arg {string} word, the word to check */
+  GET_MISSPELLING_INFO: _, /** @arg {string} word, the word to lookup */
   SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
   FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
@@ -117,7 +120,7 @@ const messages = {
   // Extensions
   NEW_POPUP_WINDOW: _,
   // NoScript
-  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on, @arg {boolean} once - whether to only allow once*/
+  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on */
 }
 
 module.exports = mapValuesByKeys(messages)

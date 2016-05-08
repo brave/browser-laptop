@@ -195,6 +195,8 @@ module.exports.cleanAppData = (data) => {
   }
   // Don't show notifications from the last session
   data.notifications = []
+  // Delete temp site settings
+  data.temporarySiteSettings = {}
   // We used to store a huge list of IDs but we didn't use them.
   // Get rid of them here.
   delete data.windows
@@ -302,6 +304,11 @@ module.exports.defaultAppState = () => {
     settings: {},
     siteSettings: {},
     passwords: [],
-    notifications: []
+    notifications: [],
+    temporarySiteSettings: {},
+    dictionary: {
+      addedWords: [],
+      ignoredWords: []
+    }
   }
 }

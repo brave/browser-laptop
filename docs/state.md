@@ -44,6 +44,9 @@ AppStore
       noScript: boolean // Only false or undefined/null
     }
   },
+  temporarySiteSettings: {
+    // Same as above but never gets written to disk
+  },
   visits: [{
     location: string,
     startTime: number, // datetime.getTime()
@@ -127,7 +130,12 @@ AppStore
     'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'general.downloads.defaultSavePath': string, // The default path to store files, this will be updated on each save until another pref is added to control that.
-  }]
+  }],
+  dictionary: {
+    locale: string, // en_US, en, or any other locale string
+    ignoredWords: Array<string>, // List of words to ignore
+    addedWords: Array<string> // List of words to add to the dictionary
+  }
 }
 ```
 
