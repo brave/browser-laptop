@@ -4,6 +4,12 @@
 
 (function () {
   var ipcRenderer = chrome.ipc;
+  ipcRenderer.on('language', (e, language) => {
+    const event = new window.CustomEvent('language', {
+      detail: language
+    })
+    window.dispatchEvent(event)
+  })
   ipcRenderer.on('settings-updated', (e, settings) => {
     const event = new window.CustomEvent('settings-updated', {
       detail: settings
@@ -91,5 +97,8 @@
   })
   window.addEventListener('clear-passwords', (e) => {
     ipcRenderer.send('clear-passwords')
+  })
+  window.addEventListener('request-language', (e) => {
+    ipcRenderer.send('request-language')
   })
 }).apply(this)

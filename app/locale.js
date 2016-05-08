@@ -160,9 +160,21 @@ exports.translation = function (token) {
 const DEFAULT_LANGUAGE = 'en-US'
 
 const availableLanguages = [
+  'bn-BD',
+  'bn-IN',
+  'cs',
+  'de-DE',
   'en-US',
-  'pr-BR',
-  'nl-NL'
+  'fr-FR',
+  'hi-IN',
+  'id-ID',
+  'ja-JP',
+  'nl-NL',
+  'pt-BR',
+  'sl',
+  'te',
+  'tr-TR',
+  'uk'
 ]
 
 // Currently configured languages - TODO (make this dynamic)
@@ -243,5 +255,13 @@ if (ipcMain) {
   ipcMain.on('translations', function (event, arg) {
     // Return the entire set of translations synchronously
     event.returnValue = translations
+  })
+
+  // Respond to requests for the currently configured language code
+  ipcMain.on('request-language', function (event) {
+    event.sender.send('language', {
+      langCode: lang,
+      languageCodes: availableLanguages
+    })
   })
 }
