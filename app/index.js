@@ -41,6 +41,7 @@ const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
+const spellCheck = require('./spellCheck')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -353,6 +354,7 @@ app.on('ready', () => {
     AdBlock.init()
     SiteHacks.init()
     NoScript.init()
+    spellCheck.init()
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.updateNowRequested()

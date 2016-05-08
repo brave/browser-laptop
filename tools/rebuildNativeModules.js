@@ -20,6 +20,8 @@ var cmds = [
   'cd ../../node_modules/keytar',
   rebuildCmd,
   'cd ../../node_modules/lru_cache',
+  rebuildCmd,
+  'cd ./node_modules/spellchecker',
   rebuildCmd
 ]
 

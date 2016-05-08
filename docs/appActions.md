@@ -254,6 +254,28 @@ Hides a message box in the notification bar
 
 
 
+### addWord(word, learn) 
+
+Adds a word to the dictionary
+
+**Parameters**
+
+**word**: `string`, The word to add
+
+**learn**: `boolean`, true if the word should be learned, false if ignored
+
+
+
+### setDictionary(locale) 
+
+Adds a word to the dictionary
+
+**Parameters**
+
+**locale**: `string`, The locale to set for the dictionary
+
+
+
 
 * * *
 

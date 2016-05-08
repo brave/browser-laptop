@@ -305,6 +305,10 @@ module.exports.defaultAppState = () => {
     siteSettings: {},
     passwords: [],
     notifications: [],
-    temporarySiteSettings: {}
+    temporarySiteSettings: {},
+    dictionary: {
+      addedWords: [],
+      ignoredWords: []
+    }
   }
 }

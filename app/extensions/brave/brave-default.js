@@ -243,6 +243,12 @@ if (typeof KeyEvent === 'undefined') {
     xhttp.send()
   }
 
+  ipcRenderer.on('init-spell-check', function (e, lang) {
+    chrome.webFrame.setSpellCheckProvider(lang, true, {
+      spellCheck: (word) => !ipcRenderer.sendSync('is-misspelled', word)
+    })
+  })
+
   // Fires when the browser has ad replacement information to give
   ipcRenderer.on('set-ad-div-candidates', function (e, adDivCandidates, placeholderUrl) {
     // Keep a lookup for skipped common elements
@@ -538,8 +544,8 @@ if (typeof KeyEvent === 'undefined') {
     return passwordNodes
   }
 
-  function hasSelection (node) {
-    return window.getSelection().toString().length > 0
+  function getSelection () {
+    return window.getSelection().toString()
   }
 
   /**
@@ -561,6 +567,10 @@ if (typeof KeyEvent === 'undefined') {
   function isPlatformOSX () {
     // TODO: navigator.platform is getting deprecated
     return window.navigator.platform.includes('Mac')
+  }
+
+  function hasWhitespace (text) {
+    return /\s/g.test(text);
   }
 
   document.addEventListener('contextmenu', (e/*: Event*/) => {
@@ -593,12 +603,26 @@ if (typeof KeyEvent === 'undefined') {
         maybeLink = maybeLink.parentNode
       }
 
+      const selection = getSelection()
+      let suggestions = []
+      let isMisspelled = false
+      if (selection.length > 0 && !hasWhitespace(selection)) {
+        // This is not very taxing, it only happens once on right click and only
+        // if it is on one word, and the check and result set are returned very fast.
+        const info = ipcRenderer.sendSync('get-misspelling-info', selection)
+        suggestions = info.suggestions
+        isMisspelled = info.isMisspelled
+      }
+
       var nodeProps = {
         name: name,
         href: href,
         isContentEditable: e.target.isContentEditable || false,
         src: e.target.getAttribute ? e.target.getAttribute('src') : undefined,
-        hasSelection: hasSelection(e.target),
+        selection,
+        suggestions,
+        isMisspelled,
+        hasSelection: selection.length > 0,
         offsetX: e.pageX,
         offsetY: e.pageY
       }

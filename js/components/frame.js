@@ -368,6 +368,9 @@ class Frame extends ImmutableComponent {
       if (this.props.enableAds) {
         this.insertAds(this.webview.getURL())
       }
+      if (this.props.dictionaryLocale) {
+        this.initSpellCheck()
+      }
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
       if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
         this.webview.send(messages.AUTOFILL_PASSWORD)
@@ -485,6 +488,10 @@ class Frame extends ImmutableComponent {
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
+  }
+
+  initSpellCheck () {
+    this.webview.send(messages.INIT_SPELL_CHECK, this.props.dictionaryLocale)
   }
 
   goBack () {

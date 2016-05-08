@@ -294,6 +294,30 @@ const appActions = {
       actionType: AppConstants.APP_HIDE_MESSAGE_BOX,
       message
     })
+  },
+
+  /**
+   * Adds a word to the dictionary
+   * @param {string} word - The word to add
+   * @param {boolean} learn - true if the word should be learned, false if ignored
+   */
+  addWord: function (word, learn) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_WORD,
+      word,
+      learn
+    })
+  },
+
+  /**
+   * Adds a word to the dictionary
+   * @param {string} locale - The locale to set for the dictionary
+   */
+  setDictionary: function (locale) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_DICTIONARY,
+      locale
+    })
   }
 }
 

@@ -406,6 +406,20 @@ const handleAppAction = (action) => {
         return notification.get('message') === action.message
       }))
       break
+    case AppConstants.APP_ADD_WORD:
+      let listType = 'ignoredWords'
+      if (action.learn) {
+        listType = 'addedWords'
+      }
+      const path = ['dictionary', listType]
+      let wordList = appState.getIn(path)
+      if (!wordList.includes(action.word)) {
+        appState = appState.setIn(path, wordList.push(action.word))
+      }
+      break
+    case AppConstants.APP_SET_DICTIONARY:
+      appState = appState.setIn(['dictionary', 'locale'], action.locale)
+      break
     default:
   }
 
