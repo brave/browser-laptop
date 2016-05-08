@@ -108,6 +108,8 @@ function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParen
     CommonMenu.bookmarksMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
+    CommonMenu.autoHideMenuBarMenuItem(),
+    CommonMenu.separatorMenuItem,
     addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
     addFolderMenuItem(closestDestinationDetail, isParent)
   ]

@@ -290,6 +290,18 @@ module.exports.bookmarksToolbarMenuItem = () => {
   }
 }
 
+module.exports.autoHideMenuBarMenuItem = () => {
+  const autoHideMenuBar = getSetting(settings.AUTO_HIDE_MENU_BAR)
+  return {
+    label: locale.translation('autoHideMenuBar'),
+    type: 'checkbox',
+    checked: autoHideMenuBar,
+    click: (item, focusedWindow) => {
+      appActions.changeSetting(settings.AUTO_HIDE_MENU_BAR, !autoHideMenuBar)
+    }
+  }
+}
+
 module.exports.aboutBraveMenuItem = () => {
   return {
     label: locale.translation('about') + ' ' + appConfig.name,
