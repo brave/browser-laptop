@@ -35,6 +35,9 @@ const changeSetting = (cb, key, e) => {
     cb(key, e.target.checked)
   } else {
     let value = e.target.value
+    if (e.target.dataset && e.target.dataset.type === 'number') {
+      value = parseInt(value, 10)
+    }
     if (e.target.type === 'number') {
       value = value.replace(/\D/g, '')
       value = parseInt(value, 10)
@@ -151,6 +154,7 @@ class TabsTab extends ImmutableComponent {
       <SettingItem dataL10nId='tabsPerTabPage'>
         <select
           value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
+          data-type='number'
           onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
           {
             // Sorry, Brad says he hates primes :'(
