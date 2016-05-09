@@ -20,6 +20,17 @@ const dndData = require('../dndData')
 const {isUrl} = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onActiveFrameStop = this.onActiveFrameStop.bind(this)
+    this.onDragStart = this.onDragStart.bind(this)
+    this.onFocus = this.onFocus.bind(this)
+    this.onBlur = this.onBlur.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onChange = this.onChange.bind(this)
+    this.onClick = this.onClick.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+  }
 
   isActive () {
     return this.props.urlbar.get('active')
@@ -165,7 +176,7 @@ class UrlBar extends ImmutableComponent {
       windowActions.setUrlBarSelected(true, forSearchMode)
     })
     // escape key handling
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop.bind(this))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop)
   }
 
   componentDidMount () {
@@ -240,6 +251,10 @@ class UrlBar extends ImmutableComponent {
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.props.activeFrameProps)
   }
 
+  onContextMenu () {
+    contextMenus.onUrlBarContextMenu()
+  }
+
   render () {
     const scriptsBlocked = this.props.activeFrameProps.getIn(['noScript', 'blocked'])
     return <form
@@ -248,7 +263,7 @@ class UrlBar extends ImmutableComponent {
       id='urlbar'
       ref='urlbar'>
       <span
-        onDragStart={this.onDragStart.bind(this)}
+        onDragStart={this.onDragStart}
         draggable
         onClick={this.onSiteInfo}
         className={cx({
@@ -269,12 +284,12 @@ class UrlBar extends ImmutableComponent {
           </div>
           : <input type='text'
             disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
-            onFocus={this.onFocus.bind(this)}
-            onBlur={this.onBlur.bind(this)}
-            onKeyDown={this.onKeyDown.bind(this)}
-            onChange={this.onChange.bind(this)}
-            onClick={this.onClick.bind(this)}
-            onContextMenu={contextMenus.onUrlBarContextMenu.bind(this)}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+            onKeyDown={this.onKeyDown}
+            onChange={this.onChange}
+            onClick={this.onClick}
+            onContextMenu={this.onContextMenu}
             value={this.locationValue}
             data-l10n-id='urlbar'
             className={cx({

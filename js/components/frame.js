@@ -33,6 +33,9 @@ class Frame extends ImmutableComponent {
     super()
     this.previousLocation = 'about:newtab'
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
+    this.onFind = this.onFind.bind(this)
+    this.onFindHide = this.onFindHide.bind(this)
+    this.onFocus = this.onFocus.bind(this)
   }
 
   updateWebview () {
@@ -249,7 +252,7 @@ class Frame extends ImmutableComponent {
         windowActions.setActiveFrame(this.props.frame)
       }
     })
-    this.webview.addEventListener('focus', this.onFocus.bind(this))
+    this.webview.addEventListener('focus', this.onFocus)
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
       e.preventDefault()
@@ -602,8 +605,8 @@ class Frame extends ImmutableComponent {
       {
         this.props.frame.get('findbarShown')
         ? <FindBar
-          onFind={this.onFind.bind(this)}
-          onFindHide={this.onFindHide.bind(this)}
+          onFind={this.onFind}
+          onFindHide={this.onFindHide}
           frame={this.props.frame}
           selected={this.props.frame.get('findbarSelected')}
           findDetail={this.props.frame.get('findDetail')} />

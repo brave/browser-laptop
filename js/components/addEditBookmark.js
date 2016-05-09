@@ -20,6 +20,8 @@ class AddEditBookmark extends ImmutableComponent {
     this.onParentFolderChange = this.onParentFolderChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onClose = this.onClose.bind(this)
+    this.onClick = this.onClick.bind(this)
+    this.onSave = this.onSave.bind(this)
   }
   get isBlankTab () {
     return ['about:blank', 'about:newtab'].includes(this.props.currentDetail.get('location'))
@@ -88,7 +90,7 @@ class AddEditBookmark extends ImmutableComponent {
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
-      <div className='genericForm' onClick={this.onClick.bind(this)}>
+      <div className='genericForm' onClick={this.onClick}>
         <div className='genericFormTable'>
           <div id='bookmarkName' className='formRow'>
             <label data-l10n-id='nameField' htmlFor='bookmarkName' />
@@ -114,7 +116,7 @@ class AddEditBookmark extends ImmutableComponent {
           </div>
           <div className='formRow'>
             <span />
-            <Button l10nId='save' className='primaryButton' onClick={this.onSave.bind(this)} />
+            <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
       </div>

@@ -21,6 +21,16 @@ const getSetting = require('../settings').getSetting
 const calculateTextWidth = require('../lib/textCalculator').calculateTextWidth
 
 class BookmarkToolbarButton extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+    this.onDragStart = this.onDragStart.bind(this)
+    this.onDragEnd = this.onDragEnd.bind(this)
+    this.onDragEnter = this.onDragEnter.bind(this)
+    this.onDragLeave = this.onDragLeave.bind(this)
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+  }
   onClick (e) {
     if (!bookmarkActions.clickBookmarkItem(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, e) &&
         this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
@@ -107,6 +117,10 @@ class BookmarkToolbarButton extends ImmutableComponent {
     return this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   }
 
+  onContextMenu () {
+    contextMenus.onBookmarkContextMenu(this.props.bookmark, this.props.activeFrame)
+  }
+
   render () {
     let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
     const iconSize = 16
@@ -138,13 +152,13 @@ class BookmarkToolbarButton extends ImmutableComponent {
       })}
       draggable
       ref={(node) => { this.bookmarkNode = node }}
-      onClick={this.onClick.bind(this)}
-      onDragStart={this.onDragStart.bind(this)}
-      onDragEnd={this.onDragEnd.bind(this)}
-      onDragEnter={this.onDragEnter.bind(this)}
-      onDragLeave={this.onDragLeave.bind(this)}
-      onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={contextMenus.onBookmarkContextMenu.bind(this, this.props.bookmark, this.props.activeFrame)}>
+      onClick={this.onClick}
+      onDragStart={this.onDragStart}
+      onDragEnd={this.onDragEnd}
+      onDragEnter={this.onDragEnter}
+      onDragLeave={this.onDragLeave}
+      onDragOver={this.onDragOver}
+      onContextMenu={this.onContextMenu}>
       {
         !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
       }
@@ -163,6 +177,14 @@ class BookmarkToolbarButton extends ImmutableComponent {
 }
 
 class BookmarksToolbar extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onDrop = this.onDrop.bind(this)
+    this.onDragEnter = this.onDragEnter.bind(this)
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+    this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
+  }
   onDrop (e) {
     e.preventDefault()
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
@@ -290,10 +312,10 @@ class BookmarksToolbar extends ImmutableComponent {
           showFavicon
         })
       }
-      onDrop={this.onDrop.bind(this)}
-      onDragEnter={this.onDragEnter.bind(this)}
-      onDragOver={this.onDragOver.bind(this)}
-      onContextMenu={this.onContextMenu.bind(this)}>
+      onDrop={this.onDrop}
+      onDragEnter={this.onDragEnter}
+      onDragOver={this.onDragOver}
+      onContextMenu={this.onContextMenu}>
     {
         this.bookmarksForToolbar.map((bookmark) =>
           <BookmarkToolbarButton
@@ -307,7 +329,7 @@ class BookmarksToolbar extends ImmutableComponent {
     {
       this.overflowBookmarkItems.size !== 0
       ? <Button iconClass='overflowIndicator fa-angle-double-right'
-        onClick={this.onMoreBookmarksMenu.bind(this)}
+        onClick={this.onMoreBookmarksMenu}
         className='bookmarkButton' />
       : null
     }
