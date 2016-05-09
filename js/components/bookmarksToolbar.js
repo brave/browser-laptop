@@ -18,9 +18,7 @@ const dnd = require('../dnd')
 const dndData = require('../dndData')
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
-
-// TODO: Obtain from the less file
-const bookmarkMaxWidth = 100
+const calculateTextWidth = require('../lib/textCalculator').calculateTextWidth
 
 class BookmarkToolbarButton extends ImmutableComponent {
   onClick (e) {
@@ -212,11 +210,36 @@ class BookmarksToolbar extends ImmutableComponent {
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
   updateBookmarkData (props) {
-    const maxItems = window.innerWidth / bookmarkMaxWidth | 0
     const noParentItems = props.bookmarks
       .filter((bookmark) => !bookmark.get('parentFolderId'))
-    this.bookmarksForToolbar = noParentItems.take(maxItems)
-    this.overflowBookmarkItems = noParentItems.skip(maxItems).take(100)
+    let widthAccountedFor = 0
+    const overflowButtonWidth = 24
+
+    // Dynamically calculate how many bookmark items should appear on the toolbar
+    // before it is actually rendered.
+    if (!this.root) {
+      this.root = window.getComputedStyle(document.querySelector(':root'))
+      this.maxWidth = Number.parseInt(this.root.getPropertyValue('--bookmark-item-max-width'), 10)
+      this.padding = Number.parseInt(this.root.getPropertyValue('--bookmark-item-padding'), 10) * 2
+      this.margin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-margin'), 10) * 2
+      this.fontSize = this.root.getPropertyValue('--bookmark-item-font-size')
+      this.fontFamily = this.root.getPropertyValue('--default-font-family')
+    }
+    const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+
+    // Loop through until we fill up the entire bookmark toolbar width
+    let i
+    for (i = 0; i < noParentItems.size; i++) {
+      const iconWidth = showFavicon && noParentItems.getIn([i, 'favicon']) ? 20 : 0
+      const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
+      widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth, this.maxWidth) + this.margin
+      if (widthAccountedFor >= window.innerWidth - overflowButtonWidth) {
+        break
+      }
+    }
+    this.bookmarksForToolbar = noParentItems.take(i)
+    // Show at most 100 items in the overflow menu
+    this.overflowBookmarkItems = noParentItems.skip(i).take(100)
   }
   componentWillMount () {
     this.updateBookmarkData(this.props)

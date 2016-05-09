@@ -4,6 +4,13 @@
 
 @import "variables.less";
 
+:root {
+  --bookmark-item-max-width: 100px;
+  --bookmark-item-padding: 5px;
+  --bookmark-item-margin: 3px;
+  --bookmark-item-font-size: 11px;
+}
+
 .bookmarksToolbar {
   background: @toolbarBackground;
   border-bottom: 1px solid #aaaaaa;
@@ -22,19 +29,25 @@
   &.showFavicon {
     height: @bookmarksToolbarWithFaviconsHeight;
   }
+  .overflowIndicator {
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-bottom: auto;
+    margin-top: auto;
+  }
   .bookmarkToolbarButton {
     border-radius: @borderRadius;
     color: black;
     cursor: default;
     font-size: 11px;
     line-height: 11px;
-    margin: auto 3px;
-    padding: 2px 5px;
+    margin: auto var(--bookmark-item-margin);
+    padding: 2px var(--bookmark-item-padding);
     text-overflow: ellipsis;
     overflow: hidden;
     user-select: none;
     white-space: nowrap;
-    max-width: 100px;
+    max-width: var(--bookmark-item-max-width);
     box-sizing: border-box;
     -webkit-user-select: none;
     align-items: center;
