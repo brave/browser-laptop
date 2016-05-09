@@ -28,6 +28,8 @@ const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
 const {isUrl} = require('./lib/appUrlUtil')
 
+const isDarwin = process.platform === 'darwin'
+
 /**
  * Obtains an add bookmark menu item
  * @param {object} Detail of the bookmark to initialize with
@@ -104,15 +106,21 @@ function urlBarTemplateInit (searchDetail, activeFrame, e) {
 }
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
-  return [
+  const menu = [
     CommonMenu.bookmarksMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
-    CommonMenu.separatorMenuItem,
-    CommonMenu.autoHideMenuBarMenuItem(),
-    CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
-    addFolderMenuItem(closestDestinationDetail, isParent)
+    CommonMenu.separatorMenuItem
   ]
+
+  if (!isDarwin) {
+    menu.push(CommonMenu.autoHideMenuBarMenuItem(),
+      CommonMenu.separatorMenuItem)
+  }
+
+  menu.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
+    addFolderMenuItem(closestDestinationDetail, isParent))
+
+  return menu
 }
 
 function downloadsToolbarTemplateInit (downloadId, downloadItem) {
