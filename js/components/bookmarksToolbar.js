@@ -32,14 +32,14 @@ class BookmarkToolbarButton extends ImmutableComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
   }
   onClick (e) {
-    if (!bookmarkActions.clickBookmarkItem(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, e) &&
+    if (!this.props.clickBookmarkItem(this.props.bookmark, e) &&
         this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
       if (this.props.contextMenuDetail) {
         windowActions.setContextMenuDetail()
         return
       }
       e.target = ReactDOM.findDOMNode(this)
-      contextMenus.onShowBookmarkFolderMenu(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, e)
+      this.props.showBookmarkFolderMenu(this.props.bookmark, e)
       return
     }
   }
@@ -58,7 +58,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       e.target = ReactDOM.findDOMNode(this)
       if (dnd.isMiddle(e.target, e.clientX)) {
         e.target.getBoundingClientRect
-        contextMenus.onShowBookmarkFolderMenu(this.props.bookmarks, this.props.bookmark, this.props.activeFrame, e)
+        this.props.showBookmarkFolderMenu(this.props.bookmark, e)
         windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
           expanded: true
         })
@@ -118,7 +118,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   onContextMenu () {
-    contextMenus.onBookmarkContextMenu(this.props.bookmark, this.props.activeFrame)
+    this.props.openContextMenu(this.props.bookmark)
   }
 
   render () {
@@ -184,6 +184,9 @@ class BookmarksToolbar extends ImmutableComponent {
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
+    this.openContextMenu = this.openContextMenu.bind(this)
+    this.clickBookmarkItem = this.clickBookmarkItem.bind(this)
+    this.showBookmarkFolderMenu = this.showBookmarkFolderMenu.bind(this)
   }
   onDrop (e) {
     e.preventDefault()
@@ -231,8 +234,19 @@ class BookmarksToolbar extends ImmutableComponent {
       .forEach((url) =>
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
+  openContextMenu (bookmark) {
+    contextMenus.onBookmarkContextMenu(bookmark, this.props.activeFrame)
+  }
+  clickBookmarkItem (bookmark, e) {
+    return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.props.activeFrame, e)
+  }
+  showBookmarkFolderMenu (bookmark, e) {
+    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.props.activeFrame, e)
+  }
   updateBookmarkData (props) {
-    const noParentItems = props.bookmarks
+    this.bookmarks = props.sites
+      .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+    const noParentItems = this.bookmarks
       .filter((bookmark) => !bookmark.get('parentFolderId'))
     let widthAccountedFor = 0
     const overflowButtonWidth = 24
@@ -267,7 +281,7 @@ class BookmarksToolbar extends ImmutableComponent {
     this.updateBookmarkData(this.props)
   }
   componentWillUpdate (nextProps) {
-    if (nextProps.bookmarks !== this.props.bookmarks ||
+    if (nextProps.sites !== this.props.sites ||
         nextProps.windowWidth !== this.props.windowWidth) {
       this.updateBookmarkData(nextProps)
     }
@@ -295,7 +309,7 @@ class BookmarksToolbar extends ImmutableComponent {
     }
   }
   onMoreBookmarksMenu (e) {
-    contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.props.bookmarks, this.overflowBookmarkItems, e)
+    contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.bookmarks, this.overflowBookmarkItems, e)
   }
   onContextMenu (e) {
     const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
@@ -322,8 +336,9 @@ class BookmarksToolbar extends ImmutableComponent {
             ref={(node) => this.bookmarkRefs.push(node)}
             contextMenuDetail={this.props.contextMenuDetail}
             draggingOverData={this.props.draggingOverData}
-            activeFrame={this.props.activeFrame}
-            bookmarks={this.props.bookmarks}
+            openContextMenu={this.openContextMenu}
+            clickBookmarkItem={this.clickBookmarkItem}
+            showBookmarkFolderMenu={this.showBookmarkFolderMenu}
             bookmark={bookmark} />)
     }
     {

@@ -541,9 +541,7 @@ class Main extends ImmutableComponent {
             activeFrame={activeFrame}
             windowWidth={this.props.appState.get('defaultWindowWidth')}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-            bookmarks={this.props.appState.get('sites')
-              .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
-            } />
+            sites={this.props.appState.get('sites')} />
           : null
         }
         <div className={cx({
