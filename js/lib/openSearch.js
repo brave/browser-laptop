@@ -8,7 +8,7 @@ const Immutable = require('immutable')
 /**
  * Loads the specified open search path and resolves the returned promise.
  */
-export function loadOpenSearch (path) {
+function loadOpenSearch (path) {
   return new Promise((resolve) => {
     const xhr = new window.XMLHttpRequest()
     xhr.open('GET', path || config.defaultOpenSearchPath, true)
@@ -40,4 +40,8 @@ export function loadOpenSearch (path) {
       }))
     }
   })
+}
+
+module.exports = {
+  loadOpenSearch
 }

@@ -9,7 +9,7 @@ const ImmutableComponent = require('./immutableComponent')
 /**
  * Represents a button in a Dialog
  */
-export class DialogButton extends ImmutableComponent {
+class DialogButton extends ImmutableComponent {
   get clickHandler () {
     let clickHandler = this.props.onClick.bind(this, this.props.returnValue)
     if (this.props.returnValue === undefined &&

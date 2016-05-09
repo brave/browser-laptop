@@ -9,7 +9,7 @@ const KeyCodes = require('../constants/keyCodes')
 /**
  * Represents a popup dialog
  */
-export default class Dialog extends ImmutableComponent {
+class Dialog extends ImmutableComponent {
   componentDidMount () {
     window.addEventListener('keydown', this.onKeyDown.bind(this))
     this.dialog.focus()
