@@ -7,6 +7,9 @@ const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-update
 const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
 
+// Windows specific configuration settings.
+const autoHideMenuBar = process.platform === 'win32' ? false : true;
+
 module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
@@ -76,7 +79,7 @@ module.exports = {
     'general.homepage': 'https://www.brave.com',
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
-    'general.autohide-menubar': true,
+    'general.autohide-menubar': autoHideMenuBar,
     'search.default-search-engine': 'content/search/google.xml',
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
