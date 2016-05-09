@@ -26,6 +26,7 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
+const isDarwin = process.platform === 'darwin'
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -109,7 +110,7 @@ const createWindow = (browserOpts, defaults) => {
   browserOpts.width = browserOpts.width < minWidth ? minWidth : browserOpts.width
   browserOpts.height = browserOpts.height < minHeight ? minHeight : browserOpts.height
 
-  const autoHideMenuBarSetting = getSetting(settings.AUTO_HIDE_MENU_BAR)
+  const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU_BAR)
 
   let mainWindow = new BrowserWindow(Object.assign({
     // smaller min size for "modal" windows

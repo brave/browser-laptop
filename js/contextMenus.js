@@ -26,6 +26,7 @@ const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
+const isDarwin = process.platform === 'darwin'
 
 /**
  * Obtains an add bookmark menu item
@@ -78,15 +79,21 @@ function inputTemplateInit (e) {
 }
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
-  return [
+  const menu = [
     CommonMenu.bookmarksMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
-    CommonMenu.separatorMenuItem,
-    CommonMenu.autoHideMenuBarMenuItem(),
-    CommonMenu.separatorMenuItem,
-    addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
-    addFolderMenuItem(closestDestinationDetail, isParent)
+    CommonMenu.separatorMenuItem
   ]
+
+  if (!isDarwin) {
+    menu.push(CommonMenu.autoHideMenuBarMenuItem(),
+      CommonMenu.separatorMenuItem)
+  }
+
+  menu.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), closestDestinationDetail, isParent),
+    addFolderMenuItem(closestDestinationDetail, isParent))
+
+  return menu
 }
 
 function downloadsToolbarTemplateInit (downloadId, downloadItem) {
