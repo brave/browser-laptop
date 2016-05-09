@@ -8,7 +8,7 @@ const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-downlo
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
 
 // Windows specific configuration settings.
-const autoHideMenuBar = process.platform === 'win32' ? false : true;
+const autoHideMenuBar = process.platform !== 'win32'
 
 module.exports = {
   name: 'Brave',
