@@ -11,7 +11,12 @@
 // On MacOS we need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .backforward {
-  margin-left: 70px;
+  margin-left: @navbarLeftMarginDarwin;
+
+  // Since we want to keep the navigator centered, we need to calculate the
+  // difference between the width of the left box and the width of the right box.
+  @centerOffset: @navbarLeftMarginDarwin + 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
+                 - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
 
@@ -20,34 +25,28 @@
 // box on its left has different size than the one on the right.
 // This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
-  @buttonSpacing: 4px;
-  @buttonWidth: 35px;
-  @braveButtonWidth: 23px;
-  @margin: 70px;
-
   // Since we want to keep the navigator centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
-  @centerOffset: @margin + 2 * (@buttonWidth + @buttonSpacing) // width area on the left
-                 - (@braveButtonWidth + 2 * @buttonSpacing);
+  @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
+                 - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 
   display: flex;
 
   // Buttons on the left
   .backforward {
     display: flex;
-    margin-left: @margin;
 
     .back,
     .forward {
-      width: @buttonWidth;
+      width: @navbarButtonWidth;
     }
 
     .back {
-      padding-right: @buttonSpacing;
+      padding-right: @navbarButtonSpacing;
     }
 
     .forward {
-      padding-left: @buttonSpacing;
+      padding-left: @navbarButtonSpacing;
     }
 
   }
@@ -83,9 +82,9 @@
   .topLevelEndButtons {
 
     .braveMenu {
-      width: @braveButtonWidth;
-      margin-left: @buttonSpacing;
-      margin-right: @buttonSpacing;
+      width: @navbarBraveButtonWidth;
+      margin-left: @navbarButtonSpacing;
+      margin-right: @navbarButtonSpacing;
     }
   }
 }
