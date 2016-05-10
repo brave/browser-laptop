@@ -48,6 +48,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 
 // Util
 const cx = require('../lib/classSet.js')
+const eventUtil = require('../lib/eventUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -70,13 +71,20 @@ class Main extends ImmutableComponent {
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
     const isDarwin = process.platform === 'darwin'
-    if (!isDarwin) {
-      document.addEventListener('keydown', (e) => {
-        if (e.which === keyCodes.F12) {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
-        }
-      })
-    }
+    document.addEventListener('keydown', (e) => {
+      switch (e.which) {
+        case keyCodes.F12:
+          if (!isDarwin) {
+            ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
+          }
+          break
+        case keyCodes.NUMPAD_PLUS:
+          if (eventUtil.isForSecondaryAction(e)) {
+            ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
+          }
+          break
+      }
+    })
   }
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
