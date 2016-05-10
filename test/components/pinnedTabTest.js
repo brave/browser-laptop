@@ -166,6 +166,8 @@ describe('pinnedTabs', function () {
       const page2Url = Brave.server.url('page2.html').replace('localhost', '127.0.0.1')
       yield this.app.client
         .loadUrl(page2Url)
+        .waitForUrl(page2Url)
+        .windowByUrl(Brave.browserWindowUrl)
       this.app.client.waitForExist('webview[data-frame-key="3"]')
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
