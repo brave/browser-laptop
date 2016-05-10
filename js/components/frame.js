@@ -371,9 +371,7 @@ class Frame extends ImmutableComponent {
       if (this.props.enableAds) {
         this.insertAds(this.webview.getURL())
       }
-      if (this.props.dictionaryLocale) {
-        this.initSpellCheck()
-      }
+      this.initSpellCheck()
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
       if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
         this.webview.send(messages.AUTOFILL_PASSWORD)
