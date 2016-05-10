@@ -251,8 +251,8 @@ class UrlBar extends ImmutableComponent {
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.props.activeFrameProps)
   }
 
-  onContextMenu () {
-    contextMenus.onUrlBarContextMenu()
+  onContextMenu (e) {
+    contextMenus.onUrlBarContextMenu(e)
   }
 
   render () {
