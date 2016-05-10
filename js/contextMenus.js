@@ -8,7 +8,7 @@ const Menu = remote.require('menu')
 const Immutable = require('immutable')
 const clipboard = electron.clipboard
 const messages = require('./constants/messages')
-const WindowStore = require('./stores/windowStore')
+const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
 const webviewActions = require('./actions/webviewActions')
 const bookmarkActions = require('./actions/bookmarkActions')
@@ -147,11 +147,10 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
-    menu.push(CommonMenu.separatorMenuItem)
   }
 
-  if (appStoreRenderer.state.getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
-    menu.push({
+  if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
+    menu.push(CommonMenu.separatorMenuItem, {
       label: 'Hide downloads bar',
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
@@ -384,7 +383,7 @@ function tabTemplateInit (frameProps) {
 
   items.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
-    { enabled: WindowStore.getState().get('closedFrames').size > 0 }
+    { enabled: windowStore.getState().get('closedFrames').size > 0 }
   ))
 
   return items
