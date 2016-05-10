@@ -53,6 +53,3 @@ buildConfig.js
 rulesets.json
 httpse.json
 httpse.sqlite
-
-# generated manifest
-app/extensions/brave/manifest.json
