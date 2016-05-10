@@ -10,7 +10,7 @@ const cx = require('../lib/classSet.js')
 /**
  * Represents a popup window
  */
-export default class PopupWindow extends ImmutableComponent {
+class PopupWindow extends ImmutableComponent {
 
   componentDidMount () {
     let src = this.props.detail.get('src')

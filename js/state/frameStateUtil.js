@@ -6,33 +6,33 @@ const Immutable = require('immutable')
 const config = require('../constants/config.js')
 const urlParse = require('url').parse
 
-export function isFrameKeyActive (windowState, frameKey) {
+function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
 }
 
-export function getFrameIndex (windowState, frame) {
+function getFrameIndex (windowState, frame) {
   return findIndexForFrameKey(windowState.get('frames'), frame)
 }
 
-export function getActiveFrameIndex (windowState) {
+function getActiveFrameIndex (windowState) {
   return getFrameIndex(windowState, windowState.get('activeFrameKey'))
 }
 
-export function getFrameByIndex (windowState, i) {
+function getFrameByIndex (windowState, i) {
   return windowState.getIn(['frames', i])
 }
 
-export function getFrameByKey (windowState, key) {
+function getFrameByKey (windowState, key) {
   const i = findIndexForFrameKey(windowState.get('frames'), key)
   return windowState.getIn(['frames', i])
 }
 
-export function getActiveFrame (windowState) {
+function getActiveFrame (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return windowState.get('frames').get(activeFrameIndex)
 }
 
-export function setActiveFrameIndex (windowState, i) {
+function setActiveFrameIndex (windowState, i) {
   const frame = getFrameByIndex(windowState, i)
   if (!frame) {
     return windowState
@@ -41,19 +41,19 @@ export function setActiveFrameIndex (windowState, i) {
   return setActiveFrameKey(windowState, frame.get('key'))
 }
 
-export function setActiveFrameKey (windowState, activeFrameKey) {
+function setActiveFrameKey (windowState, activeFrameKey) {
   return windowState.merge({
     activeFrameKey: activeFrameKey,
     previewFrameKey: null
   })
 }
 
-export function makeNextFrameActive (windowState) {
+function makeNextFrameActive (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return setActiveFrameIndex(windowState, (activeFrameIndex + 1) % windowState.get('frames').size)
 }
 
-export function makePrevFrameActive (windowState) {
+function makePrevFrameActive (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return setActiveFrameIndex(windowState, (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size)
 }
@@ -64,7 +64,7 @@ export function makePrevFrameActive (windowState) {
  * @param {String} propName
  * @return {Object} the value of the propName associated with frameProps
  */
-export function getFramePropValue (windowState, frameProps, propName) {
+function getFramePropValue (windowState, frameProps, propName) {
   return windowState.getIn(getFramePropPath(windowState, frameProps, propName))
 }
 
@@ -74,21 +74,21 @@ export function getFramePropValue (windowState, frameProps, propName) {
  * @param {String} propName
  * @return {Object} the path of the propName in windowState
  */
-export function getFramePropPath (windowState, frameProps, propName) {
+function getFramePropPath (windowState, frameProps, propName) {
   return ['frames', getFramePropsIndex(windowState.get('frames'), frameProps), propName]
 }
 
 /**
  * Obtains the index for the specified frame key
  */
-export function findIndexForFrameKey (frames, key) {
+function findIndexForFrameKey (frames, key) {
   return frames.findIndex((frame) => frame.get('key') === key)
 }
 
 /**
  * Obtains the frameProps index in the frames
  */
-export function getFramePropsIndex (frames, frameProps) {
+function getFramePropsIndex (frames, frameProps) {
   return frames.findIndex((found) => found.get('key') === frameProps.get('key'))
 }
 
@@ -96,7 +96,7 @@ export function getFramePropsIndex (frames, frameProps) {
  * Converts a feature string into an object.
  * @param {String} featureStr A string like, arg=val,arg2=val2
  */
-export function getFeatures (featureStr) {
+function getFeatures (featureStr) {
   return String(featureStr)
     .split(',')
     .reduce((acc, feature) => {
@@ -148,7 +148,7 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
+function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   const url = frameOpts.location || config.defaultUrl
   const navbarFocus = activeFrameKey === newKey &&
                       url === config.defaultUrl &&
@@ -222,7 +222,7 @@ export function addFrame (frames, frameOpts, newKey, partitionNumber, activeFram
  * Undoes a frame close and inserts it at the last index
  * @return Immutable top level application state ready to merge back in
  */
-export function undoCloseFrame (windowState, closedFrames) {
+function undoCloseFrame (windowState, closedFrames) {
   if (closedFrames.size === 0) {
     return {}
   }
@@ -242,7 +242,7 @@ export function undoCloseFrame (windowState, closedFrames) {
  * Removes a frame specified by frameProps
  * @return Immutable top level application state ready to merge back in
  */
-export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
+function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
   if (!frameProps.get('isPrivate')) {
     frameProps = frameProps.set('isFullScreen', false)
     closedFrames = closedFrames.push(frameProps)
@@ -279,7 +279,7 @@ export function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
  * Removes all but the specified frameProps
  * @return Immutable top level application state ready to merge back in
  */
-export function removeOtherFrames (frames, closedFrames, frameProps) {
+function removeOtherFrames (frames, closedFrames, frameProps) {
   closedFrames = closedFrames.concat(frames.filter((currentFrameProps) => !currentFrameProps.get('isPrivate') && currentFrameProps.get('key') !== frameProps.get('key')))
     .take(config.maxClosedFrames)
   closedFrames.forEach((currentFrameProps) => {
@@ -296,10 +296,33 @@ export function removeOtherFrames (frames, closedFrames, frameProps) {
   }
 }
 
-export function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
+function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
   const index = getFramePropsIndex(frames, frameProps)
   if (index === -1) {
     return -1
   }
   return Math.floor(index / tabsPerTabPage)
+}
+
+module.exports = {
+  isFrameKeyActive,
+  getFrameIndex,
+  getActiveFrameIndex,
+  getFrameByIndex,
+  getFrameByKey,
+  getActiveFrame,
+  setActiveFrameIndex,
+  setActiveFrameKey,
+  makeNextFrameActive,
+  makePrevFrameActive,
+  getFramePropValue,
+  getFramePropPath,
+  findIndexForFrameKey,
+  getFramePropsIndex,
+  getFeatures,
+  addFrame,
+  undoCloseFrame,
+  removeFrame,
+  removeOtherFrames,
+  getFrameTabPageIndex
 }

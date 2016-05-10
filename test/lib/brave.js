@@ -112,7 +112,8 @@ var exports = {
             var newHandles = []
             for (var i = 0; i < urls.length; i++) {
               // ignore extension urls unless they are "about" pages
-              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/))) {
+              // if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/))) {
+              if (urls[i].startsWith(exports.browserWindowUrl)) {
                 newHandles.push(handles[i])
               }
             }
@@ -122,9 +123,49 @@ var exports = {
         })
     }
 
+    this.app.client.addCommand('tabHandles', function (index) {
+      return windowHandlesOrig.apply(this)
+        .then(function (response) {
+          var handles = response.value
+          return promiseMapSeries(handles, (handle) => {
+            return this.window(handle).getUrl()
+          }).then((urls) => {
+            var newHandles = []
+            for (var i = 0; i < urls.length; i++) {
+              // ignore extension urls unless they are "about" pages
+              if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/)) &&
+                  // ignore window urls
+                  !urls[i].startsWith('file:')) {
+                newHandles.push(handles[i])
+              }
+            }
+            response.value = newHandles
+            return response
+          })
+        })
+    })
+
+    this.app.client.addCommand('tabByIndex', function (index) {
+      return this.tabHandles().then((response) => response.value).then(function (handles) {
+        return this.window(handles[index])
+      })
+    })
+
+    this.app.client.addCommand('getTabCount', function () {
+      return this.tabHandles().then((response) => response.value).then(function (handles) {
+        return handles.length
+      })
+    })
+
+    this.app.client.addCommand('waitForBrowserWindow', function () {
+      return this.waitUntil(function () {
+        return this.windowByUrl(exports.browserWindowUrl).then((response) => response, () => false)
+      })
+    })
+
     this.app.client.addCommand('waitForUrl', function (url) {
       return this.waitUntil(function () {
-        return this.windowByUrl(url).then((response) => response, () => false)
+        return this.tabByUrl(url).then((response) => response, () => false)
       })
     })
 
@@ -264,6 +305,22 @@ var exports = {
     this.app.client.addCommand('windowByUrl', function (url) {
       var context = this
       return this.windowHandles().then((response) => response.value).then(function (handles) {
+        return promiseMapSeries(handles, function (handle) {
+          return context.window(handle).getUrl()
+        }).then(function (response) {
+          let index = response.indexOf(url)
+          if (index !== -1) {
+            return context.window(handles[index])
+          } else {
+            return undefined
+          }
+        })
+      })
+    })
+
+    this.app.client.addCommand('tabByUrl', function (url) {
+      var context = this
+      return this.tabHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
           return context.window(handle).getUrl()
         }).then(function (response) {

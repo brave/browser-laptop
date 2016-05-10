@@ -3,16 +3,6 @@
 const Brave = require('../lib/brave')
 const {activeWebview} = require('../lib/selectors')
 
-const requireIsAvailable = function () {
-  return this.execute(function () {
-    try {
-      return (typeof require) !== 'undefined'
-    } catch (e) {
-      return false
-    }
-  })
-}
-
 describe('application window', function () {
   describe('application launch', function () {
     Brave.beforeAll(this)
@@ -25,7 +15,7 @@ describe('application window', function () {
         .waitForVisible(activeWebview)
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .getWindowCount().should.become(2) // main window and webview
+        .getWindowCount().should.become(1)
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .isWindowMinimized().should.eventually.be.false
@@ -57,28 +47,27 @@ describe('application window', function () {
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
-              return count === 4 // two windows with two views each
+              return count === 2
             })
           })
-          .windowByIndex(2)
+          .windowByIndex(1)
           .waitUntilWindowLoaded()
-          .waitUntil(requireIsAvailable)
       })
 
       it('offsets from the focused window', function * () {
         yield this.app.client
-          .windowByIndex(2).getWindowBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(1).getWindowBounds().then((res) => res.x).should.eventually.be
           .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
         yield this.app.client
-          .windowByIndex(2).getWindowBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(1).getWindowBounds().then((res) => res.y).should.eventually.be
           .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
       it('has the default width and height', function * () {
         yield this.app.client
-          .windowByIndex(2).getWindowWidth().should.eventually.be.getDefaultWindowWidth()
+          .windowByIndex(1).getWindowWidth().should.eventually.be.getDefaultWindowWidth()
         yield this.app.client
-          .windowByIndex(2).getWindowHeight().should.eventually.be.getDefaultWindowHeight()
+          .windowByIndex(1).getWindowHeight().should.eventually.be.getDefaultWindowHeight()
       })
     })
 
@@ -92,25 +81,24 @@ describe('application window', function () {
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
-              return count === 4 // two windows with two views each
+              return count === 2
             })
           })
-          .windowByIndex(2)
+          .windowByIndex(1)
           .waitUntilWindowLoaded()
-          .waitUntil(requireIsAvailable)
       })
 
       it('offsets from the focused window', function * () {
         yield this.app.client
-          .windowByIndex(2).getWindowBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(1).getWindowBounds().then((res) => res.x).should.eventually.be
           .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
         yield this.app.client
-          .windowByIndex(2).getWindowBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(1).getWindowBounds().then((res) => res.y).should.eventually.be
           .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
       })
 
       it('has the width and height of the last window resize', function * () {
-        yield this.app.client.windowByIndex(2)
+        yield this.app.client.windowByIndex(1)
           .getWindowWidth().should.become(600)
           .getWindowHeight().should.become(700)
       })
@@ -126,26 +114,28 @@ describe('application window', function () {
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
-              return count === 4 // two windows with two views each
+              return count === 2 // two windows with two views each
             })
           })
-          .windowByIndex(2) // the new browser window
+          .windowByIndex(1) // the new browser window
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
       })
 
       it('is maximized', function * () {
         yield this.app.client
-          .getWindowWidth().should.eventually.be.getPrimaryDisplayWidth()
+          .windowByIndex(1).getWindowWidth().should.eventually.be.getPrimaryDisplayWidth()
         yield this.app.client
-          .getWindowHeight().should.eventually.be.getPrimaryDisplayHeight()
+          .windowByIndex(1).getWindowHeight().should.eventually.be.getPrimaryDisplayHeight()
       })
 
       it('opens without an offset', function * () {
         yield this.app.client
-          .getWindowBounds().then((res) => res.x).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.x)
+          .windowByIndex(1).getWindowBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(0).getWindowBounds().then((res) => res.x)
         yield this.app.client
-          .getWindowBounds().then((res) => res.y).should.eventually.be.windowByIndex(0).getWindowBounds().then((res) => res.y)
+          .windowByIndex(1).getWindowBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(0).getWindowBounds().then((res) => res.y)
       })
     })
   })
@@ -172,7 +162,7 @@ describe('application window', function () {
         yield this.app.client
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
-              return count === 4 // two windows with two views each
+              return count === 2
             })
           })
       })
@@ -218,7 +208,7 @@ describe('application window', function () {
           .click('#trigger')
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
-              return count === 4 // two windows with two views each
+              return count === 2
             })
           })
       })
@@ -252,7 +242,7 @@ describe('application window', function () {
           .windowByIndex(0)
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .tabByIndex(0)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {
@@ -270,7 +260,8 @@ describe('application window', function () {
         yield this.app.client
           .waitForVisible(selector)
           .getAttribute(selector, 'src').should.become(page1)
-          .getWindowCount().should.become(3) // one window with 2 tabs
+          .getWindowCount().should.become(1)
+          .getTabCount().should.become(2)
       })
     })
 
@@ -296,7 +287,7 @@ describe('application window', function () {
             .click('#trigger')
             .waitUntil(function () {
               return this.getWindowCount().then((count) => {
-                return count === 4 // two windows with two views each
+                return count === 2
               })
             })
             // page1 loaded
@@ -305,7 +296,7 @@ describe('application window', function () {
 
         it('has parent document.domain set to localhost', function * () {
           yield this.app.client
-            .windowByUrl(this.window_open_page)
+            .tabByUrl(this.window_open_page)
             .execute(function () {
               return document.domain
             }).then((response) => response.value).should.eventually.be.equal('localhost')
@@ -313,7 +304,7 @@ describe('application window', function () {
 
         it('has document.domain set to 127.0.0.1', function * () {
           yield this.app.client
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               return document.domain
             }).then((response) => response.value).should.eventually.be.equal('127.0.0.1')
@@ -322,14 +313,14 @@ describe('application window', function () {
         it('can communicate with the opener through postMessage', function * () {
           yield this.app.client
             // make sure the child window has focus
-            .windowByUrl(this.window_open_page)
+            .tabByUrl(this.window_open_page)
             .execute(function () {
               global.events = []
               window.addEventListener('message', function (event) {
                 global.events.push(event.data)
               })
             })
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               window.opener.postMessage('any origin', '*')
             })
@@ -339,7 +330,7 @@ describe('application window', function () {
             .execute(function () {
               window.opener.postMessage('other origin', 'https://somedomain.com')
             })
-            .windowByUrl(this.window_open_page)
+            .tabByUrl(this.window_open_page)
             .execute(function () {
               return global.events
             }).then((response) => response.value).should.become(['any origin', 'target origin'])
@@ -347,7 +338,7 @@ describe('application window', function () {
 
         it('has restricted access in parent to child window', function * () {
           yield this.app.client
-            .windowByUrl(this.window_open_page)
+            .tabByUrl(this.window_open_page)
             .execute(function () {
               return window.WINDOW_REF.eval('1+2')
             }).should.be.rejectedWith(Error)
@@ -355,7 +346,7 @@ describe('application window', function () {
 
         it('has restricted access to parent window through the opener', function * () {
           yield this.app.client
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               return window.opener.eval('1+2')
             }).should.be.rejectedWith(Error)
@@ -373,7 +364,7 @@ describe('application window', function () {
           yield this.app.client
             .waitUntilWindowLoaded()
             .waitForVisible(activeWebview)
-            .windowByIndex(1)
+            .tabByIndex(0)
             .url(this.window_open_page)
             .execute(function (page1) {
               global.triggerFunction = function () {
@@ -383,16 +374,16 @@ describe('application window', function () {
             .click('#trigger')
             .waitUntil(function () {
               return this.getWindowCount().then((count) => {
-                return count === 4 // two windows with two views each
+                return count === 2
               })
             })
             // page1 loaded
-            .windowByUrl(page1).getUrl().should.become(page1)
+            .tabByUrl(page1).getUrl().should.become(page1)
         })
 
         it('has parent document.domain set to localhost', function * () {
           yield this.app.client
-            .windowByUrl(this.window_open_page)
+            .tabByUrl(this.window_open_page)
             .execute(function () {
               return document.domain
             }).then((response) => response.value).should.eventually.be.equal('localhost')
@@ -400,7 +391,7 @@ describe('application window', function () {
 
         it('has document.domain set to localhost', function * () {
           yield this.app.client
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               return document.domain
             }).then((response) => response.value).should.eventually.be.equal('localhost')
@@ -408,7 +399,7 @@ describe('application window', function () {
 
         it('has urestricted access in parent to child window', function * () {
           yield this.app.client
-            .windowByUrl(this.window_open_page)
+            .tabByUrl(this.window_open_page)
             .execute(function () {
               return window.WINDOW_REF.eval('1+2')
             }).then((response) => response.value).should.eventually.be.equal(3)
@@ -416,7 +407,7 @@ describe('application window', function () {
 
         it('has urestricted access to parent window through the opener', function * () {
           yield this.app.client
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               return window.opener.eval('1+2')
             })
@@ -427,7 +418,7 @@ describe('application window', function () {
         it.skip('focuses the opener', function * () {
           yield this.app.client
             // make sure the child window has focus
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .waitUntil(function () {
               return this.execute(function () {
                 return document.hasFocus() === true
@@ -452,7 +443,7 @@ describe('application window', function () {
         it.skip('blurs the opener', function * () {
           yield this.app.client
             // make sure parent window has focus
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               window.opener.focus()
             })
@@ -462,7 +453,7 @@ describe('application window', function () {
               })
             })
             // blur parent window
-            .windowByUrl(this.page1)
+            .tabByUrl(this.page1)
             .execute(function () {
               window.opener.blur()
             })
@@ -492,7 +483,7 @@ describe('application window', function () {
       yield this.app.client
         .waitUntilWindowLoaded()
         .waitForVisible(activeWebview)
-        .windowByIndex(1)
+        .tabByIndex(0)
         .url(this.window_open_page)
         .execute(function (page1) {
           global.triggerFunction = function () {
@@ -506,7 +497,7 @@ describe('application window', function () {
       // this isn't a very good test because it could evaluate before the new
       // tab/window opens. Is there something else we can check?
       yield this.app.client
-        .getWindowCount().should.become(2) // still just one window
+        .getWindowCount().should.become(1) // still just one window
 
       // still just one frame
       yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false
@@ -528,7 +519,7 @@ describe('application window', function () {
           .windowByIndex(0)
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .tabByIndex(0)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             window.open(page1, '_blank')
@@ -540,7 +531,7 @@ describe('application window', function () {
         // this isn't a very good test because it could evaluate before the new
         // tab/window opens. Is there something else we can check?
         yield this.app.client
-          .getWindowCount().should.become(2) // still just one window
+          .getWindowCount().should.become(1) // still just one window
         yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
       })
 
@@ -569,7 +560,7 @@ describe('application window', function () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
-          .windowByIndex(1)
+          .tabByIndex(0)
           .url(this.clickWithTargetPage)
           .waitForVisible('#name')
           .click('#name')
@@ -595,7 +586,7 @@ describe('application window', function () {
         yield this.app.client
           .windowByIndex(0)
           .click('.tabArea:nth-child(1)')
-          .windowByIndex(1)
+          .tabByIndex(0)
           .waitForVisible('#name2')
           .click('#name2')
           .windowByIndex(0)
@@ -627,7 +618,7 @@ describe('application window', function () {
       it('loads in the current tab', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
-          .getWindowCount().should.become(2) // still just one window
+          .getWindowCount().should.become(1) // still just one window
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
@@ -652,7 +643,7 @@ describe('application window', function () {
       it('loads in the current tab', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
-          .getWindowCount().should.become(2) // still just one window
+          .getWindowCount().should.become(1) // still just one window
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
@@ -678,7 +669,7 @@ describe('application window', function () {
       it('sets the url of the parent frame in the same domain', function * () {
         yield this.app.client
           .waitForUrl(this.page1)
-          .getWindowCount().should.become(2) // still just one window
+          .getWindowCount().should.become(1) // still just one window
 
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
@@ -696,7 +687,7 @@ describe('application window', function () {
         yield this.app.client
           .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
-          .windowByUrl(Brave.newTabUrl)
+          .tabByUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
           .frame('parent')
           .frame('top')
@@ -708,12 +699,12 @@ describe('application window', function () {
         var page1 = this.page1 // for wait closure
         yield this.app.client
           // page1 loaded
-          .windowByUrl(page1).getUrl().should.become(page1)
+          .tabByUrl(page1).getUrl().should.become(page1)
 
         // this isn't a very good test because it could evaluate before the new
         // tab/window opens. Is there something else we can check?
         yield this.app.client
-          .getWindowCount().should.become(2) // still just one window
+          .getWindowCount().should.become(1) // still just one window
 
         yield this.app.client.isExisting('.frameWrapper:nth-child(2) webview').should.eventually.be.false // still just one frame
       })
