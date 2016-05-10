@@ -26,6 +26,7 @@ const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
+const {isUrl} = require('./lib/appUrlUtil')
 
 /**
  * Obtains an add bookmark menu item
@@ -70,11 +71,28 @@ function tabPageTemplateInit (framePropsList) {
   }]
 }
 
-function inputTemplateInit (e) {
+function urlBarTemplateInit (activeFrame, e) {
   const hasSelection = e.target.selectionStart !== undefined &&
       e.target.selectionEnd !== undefined &&
       e.target.selectionStart !== e.target.selectionEnd
-  return getEditableItems(hasSelection)
+  const items = getEditableItems(hasSelection)
+  const clipboardText = clipboard.readText()
+  const hasClipboard = clipboardText && clipboardText.length > 0
+  const isLocationUrl = hasClipboard && isUrl(clipboardText)
+
+  if (isLocationUrl) {
+    items.push({
+      label: locale.translation('pasteAndGo'),
+      enabled: hasClipboard,
+      click: (item, focusedWindow) => {
+        windowActions.loadUrl(activeFrame, clipboardText)
+      }
+    })
+  } else {
+    // TODO: paste and search
+  }
+
+  return items
 }
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
@@ -428,25 +446,26 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
 
 function getEditableItems (selection) {
   const hasSelection = selection.length > 0
+  const hasClipboard = clipboard.readText().length > 0
   const items = []
-  if (hasSelection) {
-    items.push({
-      label: locale.translation('cut'),
-      enabled: hasSelection,
-      accelerator: 'CmdOrCtrl+X',
-      role: 'cut'
-    }, {
-      label: locale.translation('copy'),
-      enabled: hasSelection,
-      accelerator: 'CmdOrCtrl+C',
-      role: 'copy'
-    })
-  }
+
   items.push({
+    label: locale.translation('cut'),
+    enabled: hasSelection,
+    accelerator: 'CmdOrCtrl+X',
+    role: 'cut'
+  }, {
+    label: locale.translation('copy'),
+    enabled: hasSelection,
+    accelerator: 'CmdOrCtrl+C',
+    role: 'copy'
+  }, {
     label: locale.translation('paste'),
     accelerator: 'CmdOrCtrl+V',
+    enabled: hasClipboard,
     role: 'paste'
   })
+
   return items
 }
 
@@ -819,9 +838,9 @@ function onTabPageContextMenu (framePropsList, e) {
   tabPageMenu.popup(remote.getCurrentWindow())
 }
 
-function onUrlBarContextMenu (e) {
+function onUrlBarContextMenu (activeFrame, e) {
   e.stopPropagation()
-  const inputMenu = Menu.buildFromTemplate(inputTemplateInit(e))
+  const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(activeFrame, e))
   inputMenu.popup(remote.getCurrentWindow())
 }
 

@@ -63,6 +63,7 @@ var rendererIdentifiers = function () {
     'cut',
     'copy',
     'paste',
+    'pasteAndGo',
     'pasteWithoutFormatting',
     'delete',
     'selectAll',
