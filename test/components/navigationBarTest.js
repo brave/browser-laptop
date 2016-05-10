@@ -45,6 +45,28 @@ describe('urlbar', function () {
   }
 
   describe('navigation', function () {
+    describe.only('tabnapping', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = Brave.server.url('tabnapping.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+          .leftClick('#open_target')
+      })
+
+      it('updates the location in the navbar when changed by the opener', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
+          })
+      })
+    })
+
     describe('page with a title', function () {
       Brave.beforeAll(this)
 

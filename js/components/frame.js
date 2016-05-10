@@ -337,8 +337,9 @@ class Frame extends ImmutableComponent {
           this.props.frame)
         const key = this.props.frame.get('key')
         const parsedUrl = urlParse(event.url)
+        // don't change url for non-display protocols like mailto
         if (['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:',
-             'view-source:'].includes(parsedUrl.protocol)) {
+             'view-source:', 'ftp:', 'data:'].includes(parsedUrl.protocol)) {
           windowActions.setLocation(event.url, key)
         }
         const hack = siteHacks[parsedUrl.hostname]
