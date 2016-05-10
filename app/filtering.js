@@ -79,7 +79,6 @@ function registerForBeforeRequest (session) {
       return
     }
 
-    let redirectURL
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
       if (!module.exports.isResourceEnabled(results.resourceName)) {
@@ -101,16 +100,17 @@ function registerForBeforeRequest (session) {
         return
       }
       if (results.redirectURL) {
-        redirectURL = results.redirectURL
         // Show the ruleset that was applied and the URLs that were upgraded in
         // siteinfo
         if (results.ruleset) {
           BrowserWindow.getAllWindows().forEach((wnd) =>
             wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
         }
+        cb({redirectURL: results.redirectURL})
+        return
       }
     }
-    cb({redirectURL: redirectURL})
+    cb({})
   })
 }
 
