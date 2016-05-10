@@ -423,9 +423,9 @@ class Main extends ImmutableComponent {
     windowActions.setUrlBarActive(false)
   }
 
-  onTabContextMenu () {
+  onTabContextMenu (e) {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined)
+    contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
   }
 
   render () {

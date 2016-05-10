@@ -117,8 +117,8 @@ class BookmarkToolbarButton extends ImmutableComponent {
     return this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
   }
 
-  onContextMenu () {
-    this.props.openContextMenu(this.props.bookmark)
+  onContextMenu (e) {
+    this.props.openContextMenu(this.props.bookmark, e)
   }
 
   render () {
@@ -234,8 +234,8 @@ class BookmarksToolbar extends ImmutableComponent {
       .forEach((url) =>
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
-  openContextMenu (bookmark) {
-    contextMenus.onBookmarkContextMenu(bookmark, this.props.activeFrame)
+  openContextMenu (bookmark, e) {
+    contextMenus.onBookmarkContextMenu(bookmark, this.props.activeFrame, e)
   }
   clickBookmarkItem (bookmark, e) {
     return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.props.activeFrame, e)

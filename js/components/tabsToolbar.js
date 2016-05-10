@@ -26,8 +26,8 @@ class TabsToolbar extends ImmutableComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
   }
 
-  onContextMenu () {
-    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, undefined, undefined)
+  onContextMenu (e) {
+    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, undefined, undefined, e)
   }
 
   render () {
