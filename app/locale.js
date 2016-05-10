@@ -245,6 +245,7 @@ exports.init = function (language, cb) {
       translations[identifiers[idx]] = value
     })
     // Signal when complete
+    exports.initialized = true
     cb(translations)
   })
 }

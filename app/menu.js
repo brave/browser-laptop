@@ -32,6 +32,9 @@ const noScript = appConfig.resourceNames.NOSCRIPT
 let menuArgs = {}
 let lastSettingsState, lastArgs
 
+const menu = Menu.buildFromTemplate([])
+Menu.setApplicationMenu(menu)
+
 /**
  * Sets up the menu.
  * @param {Object} settingsState - Application settings state
@@ -40,6 +43,14 @@ let lastSettingsState, lastArgs
  *   bookmarked
  */
 const init = (settingsState, args) => {
+  // The menu will always be called once localization is done
+  // so don't bother loading anything until it is done.
+  // Save out menuArgs in the meantime since they shuld persist across calls.
+  if (!locale.initialized) {
+    menuArgs = Object.assign(menuArgs, args || {})
+    return
+  }
+
   // This needs to be within the init method to handle translations
   const CommonMenu = require('../js/commonMenu')
 
