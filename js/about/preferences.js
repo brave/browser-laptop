@@ -13,6 +13,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
+const isDarwin = process.platform === 'darwin'
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -131,7 +132,9 @@ class GeneralTab extends ImmutableComponent {
       </SettingsList>
       <SettingsList dataL10nId='appearanceSettings'>
         <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU_BAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        {
+          isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU_BAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        }
       </SettingsList>
     </SettingsList>
   }
