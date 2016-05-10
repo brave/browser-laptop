@@ -10,7 +10,7 @@ describe('pinnedTabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
-      .waitForUrl(Brave.browserWindowUrl)
+      .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
@@ -22,6 +22,8 @@ describe('pinnedTabs', function () {
       this.page1Url = Brave.server.url('page1.html')
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
+        .waitForUrl(this.page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(this.page1Url, true)
         .waitForExist(pinnedTabsTabs)
@@ -50,6 +52,8 @@ describe('pinnedTabs', function () {
     it('pinning the same site again combines it', function * () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
+        .waitForUrl(this.page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="3"]')
         .setPinned(this.page1Url, true)
         .waitUntil(function () {
@@ -62,6 +66,8 @@ describe('pinnedTabs', function () {
     it('pinning the same site again with a different session is allowed', function * () {
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url, { isPartitioned: true })
+        .waitForUrl(this.page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="4"]')
         .setPinned(this.page1Url, true)
         .waitUntil(function () {
@@ -135,6 +141,8 @@ describe('pinnedTabs', function () {
       const page1Url = Brave.server.url('page1.html')
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitForUrl(page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(page1Url, true)
         .waitForExist(pinnedTabsTabs)
@@ -176,10 +184,14 @@ describe('pinnedTabs', function () {
       const page2Url = Brave.server.url('page2.html')
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitForUrl(page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(page1Url, true)
         .waitForExist(pinnedTabsTabs)
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
+        .waitForUrl(page2Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="3"]')
         .setPinned(page2Url, true)
         .waitForExist(pinnedTabsTabs)

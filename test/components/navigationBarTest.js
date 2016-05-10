@@ -10,7 +10,7 @@ describe('urlbar', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
-      .waitForUrl(Brave.browserWindowUrl)
+      .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForEnabled(urlInput)
   }
@@ -137,7 +137,7 @@ describe('urlbar', function () {
             return this.getAttribute(activeWebview, 'src').then((src) => src === page)
           })
         yield this.app.client
-          .windowByUrl(this.page)
+          .tabByUrl(this.page)
           .leftClick('#top_link')
           .windowParentByUrl(this.page + '#top')
       })
