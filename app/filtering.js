@@ -210,6 +210,7 @@ function registerForHeadersReceived (session) {
   session.webRequest.onHeadersReceived(function (details, cb) {
     // Using an electron binary which isn't from Brave
     if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+      cb({})
       return
     }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
