@@ -13,7 +13,8 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
-const isDarwin = process.platform === 'darwin'
+
+const isDarwin = navigator.platform === 'MacIntel'
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -104,6 +105,7 @@ class GeneralTab extends ImmutableComponent {
       )
     })
 
+    console.log('isDrawin', isDarwin, process.platform)
     return <SettingsList>
       <SettingsList>
         <SettingItem dataL10nId='selectedLanguage'>
