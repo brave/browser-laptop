@@ -4,6 +4,7 @@
 - Added spell check.
 - Added NoScript like script blocking.
 - Added support for many more languages.
+- Various windows installer fixes.
 - Fix for nfl.com videos when blocking was enabled.
 - Fix bookmarks not filling up the complete bookmarks toolbar.
 - Fix crash when navigating while dev tools are open.
