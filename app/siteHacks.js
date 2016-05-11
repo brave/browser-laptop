@@ -39,8 +39,11 @@ module.exports.init = () => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
     let domain = URL.parse(details.url).hostname
     let hack = siteHacks[domain]
+
     let redirectURL
-    if (hack && hack.onBeforeRequest) {
+    if (hack && hack.onBeforeRequest &&
+        (hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK) ||
+         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION))) {
       const result = hack.onBeforeRequest.call(this, details)
       if (result && result.redirectURL) {
         redirectURL = result.redirectURL

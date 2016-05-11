@@ -59,6 +59,8 @@ module.exports = {
     $('.player-overlay, .player-loading').hide();`
   },
   'www.googletagmanager.com': {
+    enableForAdblock: true,
+    enableForTrackingProtection: true,
     onBeforeRequest: function(details) {
       if (urlParse(details.url).pathname !== '/gtm.js') {
         return
@@ -69,6 +71,8 @@ module.exports = {
     }
   },
   'www.googletagservices.com': {
+    enableForAdblock: true,
+    enableForTrackingProtection: true,
     onBeforeRequest: function(details) {
       if (urlParse(details.url).pathname !== '/tag/js/gpt.js') {
         return
