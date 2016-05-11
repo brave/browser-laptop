@@ -26,6 +26,7 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
+const isDarwin = process.platform === 'darwin'
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -109,6 +110,8 @@ const createWindow = (browserOpts, defaults) => {
   browserOpts.width = browserOpts.width < minWidth ? minWidth : browserOpts.width
   browserOpts.height = browserOpts.height < minHeight ? minHeight : browserOpts.height
 
+  const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU_BAR)
+
   let mainWindow = new BrowserWindow(Object.assign({
     // smaller min size for "modal" windows
     minWidth,
@@ -117,7 +120,7 @@ const createWindow = (browserOpts, defaults) => {
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden-inset',
-    autoHideMenuBar: true,
+    autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
     webPreferences: defaults.webPreferences
   }, browserOpts))
@@ -241,6 +244,18 @@ const filterOutNonRecents = debounce(() => {
   appState = appState.set('sites', siteUtil.filterOutNonRecents(appState.get('sites')))
   emitChanges()
 }, 60 * 1000)
+
+function handleChangeSettingAction (settingKey, settingValue) {
+  switch (settingKey) {
+    case settings.AUTO_HIDE_MENU_BAR:
+      BrowserWindow.getAllWindows().forEach(function (wnd) {
+        wnd.setAutoHideMenuBar(settingValue)
+        wnd.setMenuBarVisibility(!settingValue)
+      })
+      break
+    default:
+  }
+}
 
 const handleAppAction = (action) => {
   switch (action.actionType) {
@@ -391,6 +406,7 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
+      handleChangeSettingAction(action.key, action.value)
       break
     case AppConstants.APP_CHANGE_SITE_SETTING:
       let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'

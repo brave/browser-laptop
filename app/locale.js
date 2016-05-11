@@ -135,7 +135,8 @@ var rendererIdentifiers = function () {
     'learnSpelling',
     'ignoreSpelling',
     // Other identifiers
-    'urlCopied'
+    'urlCopied',
+    'autoHideMenuBar'
   ]
 }
 
