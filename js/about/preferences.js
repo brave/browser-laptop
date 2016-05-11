@@ -105,7 +105,6 @@ class GeneralTab extends ImmutableComponent {
       )
     })
 
-    console.log('isDrawin', isDarwin, process.platform)
     return <SettingsList>
       <SettingsList>
         <SettingItem dataL10nId='selectedLanguage'>
