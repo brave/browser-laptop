@@ -21,8 +21,10 @@ module.exports = {
   'www.cityam.com': {
     userAgent: 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 Googlebot'
   },
+  // For links like: https://player.twitch.tv/?channel=iwilldominate
   'player.twitch.tv': {
     allowRunningInsecureContent: true,
+    enableForAll: true,
     onBeforeRequest: function(details) {
       if (details.resourceType !== 'subFrame' && details.resourceType !== 'mainFrame' || details.url.includes('&html5')) {
         return
