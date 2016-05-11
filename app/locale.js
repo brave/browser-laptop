@@ -64,6 +64,7 @@ var rendererIdentifiers = function () {
     'copy',
     'paste',
     'pasteAndGo',
+    'pasteAndSearch',
     'pasteWithoutFormatting',
     'delete',
     'selectAll',

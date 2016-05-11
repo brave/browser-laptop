@@ -71,7 +71,7 @@ function tabPageTemplateInit (framePropsList) {
   }]
 }
 
-function urlBarTemplateInit (activeFrame, e) {
+function urlBarTemplateInit (searchDetail, activeFrame, e) {
   const hasSelection = e.target.selectionStart !== undefined &&
       e.target.selectionEnd !== undefined &&
       e.target.selectionStart !== e.target.selectionEnd
@@ -89,7 +89,15 @@ function urlBarTemplateInit (activeFrame, e) {
       }
     })
   } else {
-    // TODO: paste and search
+    let searchUrl = searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(clipboardText))
+
+    items.push({
+      label: locale.translation('pasteAndSearch'),
+      enabled: hasClipboard,
+      click: (item, focusedWindow) => {
+        windowActions.loadUrl(activeFrame, searchUrl)
+      }
+    })
   }
 
   return items
@@ -838,9 +846,9 @@ function onTabPageContextMenu (framePropsList, e) {
   tabPageMenu.popup(remote.getCurrentWindow())
 }
 
-function onUrlBarContextMenu (activeFrame, e) {
+function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   e.stopPropagation()
-  const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(activeFrame, e))
+  const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
   inputMenu.popup(remote.getCurrentWindow())
 }
 
