@@ -143,6 +143,7 @@ class NavigationBar extends ImmutableComponent {
         loading={this.loading}
         titleMode={this.titleMode}
         enableNoScript={this.props.enableNoScript}
+        noScriptIsVisible={this.props.noScriptIsVisible}
         urlbar={this.props.navbar.get('urlbar')}
         />
       {

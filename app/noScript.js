@@ -39,7 +39,7 @@ function onHeadersReceived (details) {
   }
 
   let origin = siteUtil.getOrigin(details.firstPartyUrl)
-  if (details.resourceType.endsWith('Frame') && origin) {
+  if (origin) {
     if (details.resourceType === 'mainFrame' &&
         temporarilyAllowed[origin] === DISALLOW_NEXT_TIME) {
       // This resource has been allowed once already. Un-whitelist it

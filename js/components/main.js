@@ -499,6 +499,7 @@ class Main extends ImmutableComponent {
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
             enableNoScript={this.enableNoScript}
+            noScriptIsVisible={noScriptIsVisible}
           />
           {
             siteInfoIsVisible
