@@ -244,7 +244,7 @@ if (typeof KeyEvent === 'undefined') {
   }
 
   ipcRenderer.on('init-spell-check', function (e, lang) {
-    chrome.webFrame.setSpellCheckProvider(lang, true, {
+    chrome.webFrame.setSpellCheckProvider(lang || '', true, {
       spellCheck: (word) => !ipcRenderer.sendSync('is-misspelled', word)
     })
   })

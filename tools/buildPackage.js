@@ -107,6 +107,8 @@ if (isLinux) {
 } else if (isWindows) {
   cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
+  cmds.push('mkdir -p ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
+  cmds.push('ncp ' + path.join('node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
 }
 
 execute(cmds, env, console.log.bind(null, 'done'))
