@@ -1,18 +1,17 @@
 # Changelog
 
 ## [0.9.5](https://github.com/brave/browser-laptop/releases/v0.9.5dev)
-- Added spell check.
-- Added NoScript like script blocking.
-- Added support for many more languages.
-- Various windows installer fixes.
-- Fix for nfl.com videos when blocking was enabled.
-- Fix bookmarks not filling up the complete bookmarks toolbar.
-- Fix crash when navigating while dev tools are open.
-- Fix for "tabnapping" phishing attempt.
-- Fix unneeded indent in Windows for navigation controls.
-- Fix for using numpad '+' for zoom.
-- Fix for changing tabs per page giving an uneven distribution of tabs.
-- Fix for opening and copying image context menus sometimes not giving the full URL.
+- Added spell check. ([#859](https://github.com/brave/browser-laptop/issues/859))
+- Added NoScript like script blocking. ([#231](https://github.com/brave/browser-laptop/issues/231))
+- Added support for many more languages. ([#1625](https://github.com/brave/browser-laptop/pull/1625))
+- Fix for nfl.com videos when blocking was enabled. ([#1528](https://github.com/brave/browser-laptop/issues/1528))
+- Fix bookmarks not filling up the complete bookmarks toolbar. ([#1567](https://github.com/brave/browser-laptop/issues/1567))
+- Fix crash when navigating while dev tools are open. ([#1588](https://github.com/brave/browser-laptop/issues/1588))
+- Fix for "tabnapping" phishing attempt. ([#1618](https://github.com/brave/browser-laptop/issues/1618))
+- Fix unneeded indent in Windows for navigation controls. ([#1638](https://github.com/brave/browser-laptop/pull/1638))
+- Fix for using numpad '+' for zoom. ([#1495](https://github.com/brave/browser-laptop/issues/1495))
+- Fix for changing tabs per page giving an uneven distribution of tabs. ([#1561](https://github.com/brave/browser-laptop/issues/1561))
+- Fix for opening and copying image context menus sometimes not giving the full URL. ([#1606](https://github.com/brave/browser-laptop/issues/1606))
 
 ## [0.9.4](https://github.com/brave/browser-laptop/releases/v0.9.4dev)
 - Fixed startup problem if user data directory does not already exist.
@@ -200,7 +199,7 @@
 
 ## [0.7.11](https://github.com/brave/browser-laptop/releases/v0.7.11dev)
 
-- Security fix (Severity: High): Prevent BrowserWindow from navigating to remote content ([#445](https://github.com/brave/browser-laptop/issues/445)). Impact: if the user is tricked into dragging and dropping a malicious link outside of the tab content area, the linked site is loaded outside the webview sandbox and can compromise the user's system.
+- Security fix (Severity: High): Prevent BrowserWindow from navigating to remote content ([#445]([#445](https://github.com/brave/browser-laptop/issues/445))). Impact: if the user is tricked into dragging and dropping a malicious link outside of the tab content area, the linked site is loaded outside the webview sandbox and can compromise the user's system.
 - Dropped URLs now open tabs instead of opening inside the whole window.
 - Fixed a tracking protection problem causing some top level sites to not load.
 - Bravery menu options are now easier to understand.
