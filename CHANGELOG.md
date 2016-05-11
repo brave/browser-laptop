@@ -4,6 +4,7 @@
 - Added spell check. ([#859](https://github.com/brave/browser-laptop/issues/859))
 - Added NoScript like script blocking. ([#231](https://github.com/brave/browser-laptop/issues/231))
 - Added support for many more languages. ([#1625](https://github.com/brave/browser-laptop/pull/1625))
+- Various windows installer fixes. ([#523](https://github.com/brave/browser-laptop/pull/523), [#1244](https://github.com/brave/browser-laptop/pull/1244), [#1400](https://github.com/brave/browser-laptop/pull/1400), [#565](https://github.com/brave/browser-laptop/pull/565))
 - Fix for nfl.com videos when blocking was enabled. ([#1528](https://github.com/brave/browser-laptop/issues/1528))
 - Fix bookmarks not filling up the complete bookmarks toolbar. ([#1567](https://github.com/brave/browser-laptop/issues/1567))
 - Fix crash when navigating while dev tools are open. ([#1588](https://github.com/brave/browser-laptop/issues/1588))
