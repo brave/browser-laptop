@@ -1,20 +1,20 @@
 # Changelog
 
 ## [0.9.5](https://github.com/brave/browser-laptop/releases/v0.9.5dev)
-- Added spell check.
-- Added NoScript like script blocking.
-- Added support for many more languages.
-- Various windows installer fixes.
-- Added Paste and Go and Paste and Search items in the URL bar context menu.
-- Added ability to autohide menu bar on Windows.
-- Fix for nfl.com videos when blocking was enabled.
-- Fix bookmarks not filling up the complete bookmarks toolbar.
-- Fix crash when navigating while dev tools are open.
-- Fix for "tabnapping" phishing attempt.
-- Fix unneeded indent in Windows for navigation controls.
-- Fix for using numpad '+' for zoom.
-- Fix for changing tabs per page giving an uneven distribution of tabs.
-- Fix for opening and copying image context menus sometimes not giving the full URL.
+- Added spell check. ([#859](https://github.com/brave/browser-laptop/issues/859))
+- Added NoScript like script blocking. ([#231](https://github.com/brave/browser-laptop/issues/231))
+- Added support for many more languages. ([#1625](https://github.com/brave/browser-laptop/pull/1625))
+- Various windows installer fixes. ([#523](https://github.com/brave/browser-laptop/pull/523), [#1244](https://github.com/brave/browser-laptop/pull/1244), [#1400](https://github.com/brave/browser-laptop/pull/1400), [#565](https://github.com/brave/browser-laptop/pull/565))
+- Added Paste and Go and Paste and Search items in the URL bar context menu. ([#1670](https://github.com/brave/browser-laptop/pull/1670))
+- Added ability to autohide menu bar on Windows. ([#1630](https://github.com/brave/browser-laptop/pull/1630))
+- Fix for nfl.com videos when blocking was enabled. ([#1528](https://github.com/brave/browser-laptop/issues/1528))
+- Fix bookmarks not filling up the complete bookmarks toolbar. ([#1567](https://github.com/brave/browser-laptop/issues/1567))
+- Fix crash when navigating while dev tools are open. ([#1588](https://github.com/brave/browser-laptop/issues/1588))
+- Fix for "tabnapping" phishing attempt. ([#1618](https://github.com/brave/browser-laptop/issues/1618))
+- Fix unneeded indent in Windows for navigation controls. ([#1638](https://github.com/brave/browser-laptop/pull/1638))
+- Fix for using numpad '+' for zoom. ([#1495](https://github.com/brave/browser-laptop/issues/1495))
+- Fix for changing tabs per page giving an uneven distribution of tabs. ([#1561](https://github.com/brave/browser-laptop/issues/1561))
+- Fix for opening and copying image context menus sometimes not giving the full URL. ([#1606](https://github.com/brave/browser-laptop/issues/1606))
 
 ## [0.9.4](https://github.com/brave/browser-laptop/releases/v0.9.4dev)
 - Fixed startup problem if user data directory does not already exist.
