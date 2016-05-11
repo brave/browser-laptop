@@ -25,7 +25,7 @@ Ensure you have the following installed:
 * [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)  
 
 ###  Linux
-* `apt-get install libgnome-keyring-dev`
+* `apt-get install libgnome-keyring-dev build-essential`
 
 ## Installation
 
@@ -50,13 +50,13 @@ After installing the prerequisites:
 
         npm install
 
-For now, newer versions of node (5.8) require you to `cd node_modules/abp-filter-parser-cpp` after the `npm install` and run `make`.
+For now, Node 5.8 requires you to `cd node_modules/abp-filter-parser-cpp` after the `npm install` and run `make`.
 
-If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.5 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
+If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.9 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
-Additional notes on troubleshooting installation issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
+Additional notes on troubleshooting installation issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
 
-Some platforms are available as pre-configured VMs. See the [readme](https://github.com/brave/browser-laptop/blob/master/test/vms/vagrant/README.md) for details
+Some platforms are available as pre-configured VMs. See the [readme](https://github.com/brave/browser-laptop/blob/master/test/vms/vagrant/README.md) for details.
 
 ## Development
 
@@ -74,13 +74,14 @@ To run the tests:
 
     npm test
 
-Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one. You will also have to have two terminal tabs up to run Brave. One for Brave to watch changes, and one to run Brave.
+Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
+
+You will also have to have two terminal tabs up to run Brave. One for Brave to watch changes, and one to run Brave.
 
 e.g.
 npm config set brave:port 9001
 
-Additional notes on troubleshooting development issues are in the [Troubleshooting] (https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki
-
+Additional notes on troubleshooting development issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
 
 ### Debugging
 
@@ -102,7 +103,6 @@ Build instructions:
 ### Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. 
-
 
 ## Packaging for bundles, installers, and updates
 
