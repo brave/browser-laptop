@@ -11,6 +11,7 @@ const remote = electron.remote
 
 // Actions
 const windowActions = require('../actions/windowActions')
+const webviewActions = require('../actions/webviewActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
@@ -31,6 +32,7 @@ const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
+const NoScriptInfo = require('./noScriptInfo')
 
 // Constants
 const config = require('../constants/config')
@@ -46,22 +48,43 @@ const FrameStateUtil = require('../state/frameStateUtil')
 
 // Util
 const cx = require('../lib/classSet.js')
+const eventUtil = require('../lib/eventUtil')
 
 class Main extends ImmutableComponent {
   constructor () {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
+    this.onBack = this.onBack.bind(this)
+    this.onForward = this.onForward.bind(this)
+    this.onMouseDown = this.onMouseDown.bind(this)
+    this.onClickWindow = this.onClickWindow.bind(this)
+    this.onDoubleClick = this.onDoubleClick.bind(this)
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onDrop = this.onDrop.bind(this)
+    this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
+    this.onHideNoScript = this.onHideNoScript.bind(this)
+    this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
+    this.onBraveMenu = this.onBraveMenu.bind(this)
+    this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
+    this.onTabContextMenu = this.onTabContextMenu.bind(this)
   }
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
     const isDarwin = process.platform === 'darwin'
-    if (!isDarwin) {
-      document.addEventListener('keydown', (e) => {
-        if (e.which === keyCodes.F12) {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
-        }
-      })
-    }
+    document.addEventListener('keydown', (e) => {
+      switch (e.which) {
+        case keyCodes.F12:
+          if (!isDarwin) {
+            ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
+          }
+          break
+        case keyCodes.NUMPAD_PLUS:
+          if (eventUtil.isForSecondaryAction(e)) {
+            ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
+          }
+          break
+      }
+    })
   }
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
@@ -209,8 +232,8 @@ class Main extends ImmutableComponent {
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
 
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack.bind(this))
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward.bind(this))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
 
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, (e, url) => {
       const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
@@ -259,7 +282,7 @@ class Main extends ImmutableComponent {
     window.addEventListener('focus', () => {
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
-        windowActions.setWebviewFocused()
+        webviewActions.setWebviewFocused()
       }
     })
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
@@ -318,6 +341,10 @@ class Main extends ImmutableComponent {
     windowActions.setSiteInfoVisible(false)
   }
 
+  onHideNoScript () {
+    windowActions.setNoScriptVisible(false)
+  }
+
   onHideReleaseNotes () {
     windowActions.setReleaseNotesVisible(false)
   }
@@ -326,6 +353,14 @@ class Main extends ImmutableComponent {
     let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
       enabled = appConfig.adInsertion.enabled
+    }
+    return enabled
+  }
+
+  get enableNoScript () {
+    let enabled = this.props.appState.getIn(['noScript', 'enabled'])
+    if (enabled === undefined) {
+      enabled = appConfig.noScript.enabled
     }
     return enabled
   }
@@ -388,6 +423,11 @@ class Main extends ImmutableComponent {
     windowActions.setUrlBarActive(false)
   }
 
+  onTabContextMenu (e) {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -402,14 +442,16 @@ class Main extends ImmutableComponent {
 
     this.frames = {}
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
-    const tabsPerPage = getSetting(settings.TABS_PER_PAGE)
+    const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !releaseNotesIsVisible &&
+      !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
 
     return <div id='window'
@@ -417,8 +459,8 @@ class Main extends ImmutableComponent {
         isFullScreen: activeFrame && activeFrame.get('isFullScreen')
       })}
       ref={(node) => { this.mainWindow = node }}
-      onMouseDown={this.onMouseDown.bind(this)}
-      onClick={this.onClickWindow.bind(this)}>
+      onMouseDown={this.onMouseDown}
+      onClick={this.onClickWindow}>
       {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
@@ -434,18 +476,18 @@ class Main extends ImmutableComponent {
       }
       <div className='top'>
         <div className='navigatorWrapper'
-          onDoubleClick={this.onDoubleClick.bind(this)}
-          onDragOver={this.onDragOver.bind(this)}
-          onDrop={this.onDrop.bind(this)}>
+          onDoubleClick={this.onDoubleClick}
+          onDragOver={this.onDragOver}
+          onDrop={this.onDrop}>
           <div className='backforward'>
             <span data-l10n-id='backButton'
               className='back fa fa-angle-left'
               disabled={!activeFrame || !activeFrame.get('canGoBack')}
-              onClick={this.onBack.bind(this)} />
+              onClick={this.onBack} />
             <span data-l10n-id='forwardButton'
               className='forward fa fa-angle-right'
               disabled={!activeFrame || !activeFrame.get('canGoForward')}
-              onClick={this.onForward.bind(this)} />
+              onClick={this.onForward} />
           </div>
           <NavigationBar
             ref={(node) => { this.navBar = node }}
@@ -456,12 +498,13 @@ class Main extends ImmutableComponent {
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
+            enableNoScript={this.enableNoScript}
           />
           {
             siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
               siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
-              onHide={this.onHideSiteInfo.bind(this)} />
+              onHide={this.onHideSiteInfo} />
             : null
           }
           {
@@ -478,16 +521,22 @@ class Main extends ImmutableComponent {
             : null
           }
           {
+            noScriptIsVisible
+              ? <NoScriptInfo frameProps={activeFrame}
+                onHide={this.onHideNoScript} />
+              : null
+          }
+          {
             releaseNotesIsVisible
             ? <ReleaseNotes
               metadata={this.props.appState.getIn(['updates', 'metadata'])}
-              onHide={this.onHideReleaseNotes.bind(this)} />
+              onHide={this.onHideReleaseNotes} />
             : null
           }
           <div className='topLevelEndButtons'>
             <Button iconClass='braveMenu'
               className='navbutton'
-              onClick={this.onBraveMenu.bind(this)} />
+              onClick={this.onBraveMenu} />
           </div>
         </div>
         <UpdateBar updates={this.props.appState.get('updates')} />
@@ -500,9 +549,7 @@ class Main extends ImmutableComponent {
             activeFrame={activeFrame}
             windowWidth={this.props.appState.get('defaultWindowWidth')}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-            bookmarks={this.props.appState.get('sites')
-              .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
-            } />
+            sites={this.props.appState.get('sites')} />
           : null
         }
         <div className={cx({
@@ -510,7 +557,7 @@ class Main extends ImmutableComponent {
           allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
-          onContextMenu={contextMenus.onTabsToolbarContextMenu.bind(this, activeFrame, undefined, undefined)}>
+          onContextMenu={this.onTabContextMenu}>
           {
             nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
@@ -530,7 +577,7 @@ class Main extends ImmutableComponent {
           sites={this.props.appState.get('sites')}
           key='tab-bar'
           activeFrame={activeFrame}
-          onMenu={this.onHamburgerMenu.bind(this)}
+          onMenu={this.onHamburgerMenu}
         />
       </div>
       <div className='mainContainer'>
@@ -558,9 +605,12 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
+              dictionaryLocale={this.props.appState.getIn(['dictionary', 'locale'])}
               passwords={this.props.appState.get('passwords')}
               siteSettings={this.props.appState.get('siteSettings')}
+              temporarySiteSettings={this.props.appState.get('temporarySiteSettings')}
               enableAds={this.enableAds}
+              enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

@@ -1,0 +1,21 @@
+<html>
+<body>
+<script>
+
+var target_html =
+  '<title>Tabnapping Target</title>'
+
+var w = null
+function open_target() {
+  w = window.open('tabnapping_target.html', 'target')
+  w.onload = update_target
+}
+
+function update_target() {
+  w.location.replace('data:text/html;,' + escape(target_html))
+}
+
+</script>
+<input id="open_target" type=submit onclick="open_target()" value="open">
+</body>
+</html>

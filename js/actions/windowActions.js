@@ -279,13 +279,6 @@ const windowActions = {
     })
   },
 
-  setWebviewFocused: function () {
-    const webview = document.querySelector('.frameWrapper.isActive webview')
-    if (webview) {
-      webview.focus()
-    }
-  },
-
   /**
    * Dispatches a message to the store to create a new frame
    *
@@ -842,15 +835,27 @@ const windowActions = {
   },
 
   /**
-   * Inspect the element for the active webview at the x, y content position
-   * @param {number} x - horizontal position of the element to inspect
-   * @param {number} y - vertical position of the element to inspect
+   * Sets which scripts were blocked on a page.
+   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {string} source - Source of blocked js
    */
-  inspectElement: function (x, y) {
-    const webview = document.querySelector('.frameWrapper.isActive webview')
-    if (webview) {
-      webview.inspectElement(x, y)
-    }
+  setNoScript: function (frameProps, source) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_NOSCRIPT,
+      frameProps,
+      source
+    })
+  },
+
+  /**
+   * Sets whether the noscript icon is visible.
+   * @param {boolean} isVisible
+   */
+  setNoScriptVisible: function (isVisible) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE,
+      isVisible
+    })
   }
 }
 

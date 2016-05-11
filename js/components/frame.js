@@ -24,6 +24,8 @@ const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
 const adInfo = require('../data/adInfo.js')
 const FindBar = require('./findbar.js')
+const consoleStrings = require('../constants/console')
+
 const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
 
 class Frame extends ImmutableComponent {
@@ -31,6 +33,9 @@ class Frame extends ImmutableComponent {
     super()
     this.previousLocation = 'about:newtab'
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
+    this.onFind = this.onFind.bind(this)
+    this.onFindHide = this.onFindHide.bind(this)
+    this.onFocus = this.onFocus.bind(this)
   }
 
   updateWebview () {
@@ -97,7 +102,8 @@ class Frame extends ImmutableComponent {
     } else if (stepSize === undefined) {
       newZoomLevel = config.zoom.defaultValue
     }
-    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel)
+    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel,
+                                 this.props.frame.get('isPrivate'))
   }
 
   zoomIn () {
@@ -246,7 +252,7 @@ class Frame extends ImmutableComponent {
         windowActions.setActiveFrame(this.props.frame)
       }
     })
-    this.webview.addEventListener('focus', this.onFocus.bind(this))
+    this.webview.addEventListener('focus', this.onFocus)
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
       e.preventDefault()
@@ -331,8 +337,9 @@ class Frame extends ImmutableComponent {
           this.props.frame)
         const key = this.props.frame.get('key')
         const parsedUrl = urlParse(event.url)
+        // don't change url for non-display protocols like mailto
         if (['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:',
-             'view-source:'].includes(parsedUrl.protocol)) {
+             'view-source:', 'ftp:', 'data:'].includes(parsedUrl.protocol)) {
           windowActions.setLocation(event.url, key)
         }
         const hack = siteHacks[parsedUrl.hostname]
@@ -365,6 +372,7 @@ class Frame extends ImmutableComponent {
       if (this.props.enableAds) {
         this.insertAds(this.webview.getURL())
       }
+      this.initSpellCheck()
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
       if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
         this.webview.send(messages.AUTOFILL_PASSWORD)
@@ -433,6 +441,16 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('media-paused', ({title}) => {
       windowActions.setAudioPlaybackActive(this.props.frame, false)
     })
+    this.webview.addEventListener('console-message', (e) => {
+      if (this.props.enableNoScript && e.level === 2 &&
+          e.message && e.message.includes(consoleStrings.SCRIPT_BLOCKED)) {
+        // Note that the site was blocked
+        // TODO: Parse out the location of the script that was blocked and send
+        // it too
+        windowActions.setBlockedBy(this.props.frame,
+                                   'noScript', e.message)
+      }
+    })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       // Due to a bug in Electron, after navigating to a page with a theme color
       // to a page without a theme color, the background is sent to us as black
@@ -472,6 +490,10 @@ class Frame extends ImmutableComponent {
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
     this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
+  }
+
+  initSpellCheck () {
+    this.webview.send(messages.INIT_SPELL_CHECK, this.props.dictionaryLocale)
   }
 
   goBack () {
@@ -545,7 +567,9 @@ class Frame extends ImmutableComponent {
     }
 
     const nextLocation = nextProps.frame.get('location')
-    const nextSiteSettings = siteSettings.getSiteSettingsForURL(nextProps.siteSettings, nextLocation)
+    const nextSiteSettings = this.props.frame.get('isPrivate')
+      ? siteSettings.getSiteSettingsForURL(nextProps.temporarySiteSettings, nextLocation)
+      : siteSettings.getSiteSettingsForURL(nextProps.siteSettings, nextLocation)
     if (nextSiteSettings) {
       const nextZoom = nextSiteSettings.get('zoomLevel')
       if (this.zoomLevel !== nextZoom) {
@@ -556,7 +580,9 @@ class Frame extends ImmutableComponent {
 
   get zoomLevel () {
     const location = this.props.frame.get('location')
-    const settings = siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
+    const settings = this.props.frame.get('isPrivate')
+      ? siteSettings.getSiteSettingsForURL(this.props.temporarySiteSettings, location)
+      : siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
     if (!settings) {
       return config.zoom.defaultValue
     }
@@ -578,8 +604,8 @@ class Frame extends ImmutableComponent {
       {
         this.props.frame.get('findbarShown')
         ? <FindBar
-          onFind={this.onFind.bind(this)}
-          onFindHide={this.onFindHide.bind(this)}
+          onFind={this.onFind}
+          onFindHide={this.onFindHide}
           frame={this.props.frame}
           selected={this.props.frame.get('findbarSelected')}
           findDetail={this.props.frame.get('findDetail')} />

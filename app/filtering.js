@@ -28,6 +28,7 @@ const path = require('path')
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
+const headersReceivedFilteringFns = []
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
@@ -61,6 +62,10 @@ module.exports.registerBeforeRedirectFilteringCB = (filteringFn) => {
   beforeRedirectFilteringFns.push(filteringFn)
 }
 
+module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
+  headersReceivedFilteringFns.push(filteringFn)
+}
+
 /**
  * Register for notifications for webRequest.onBeforeRequest for a particular
  * session.
@@ -74,7 +79,6 @@ function registerForBeforeRequest (session) {
       return
     }
 
-    let redirectURL
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
       if (!module.exports.isResourceEnabled(results.resourceName)) {
@@ -96,16 +100,17 @@ function registerForBeforeRequest (session) {
         return
       }
       if (results.redirectURL) {
-        redirectURL = results.redirectURL
         // Show the ruleset that was applied and the URLs that were upgraded in
         // siteinfo
         if (results.ruleset) {
           BrowserWindow.getAllWindows().forEach((wnd) =>
             wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
         }
+        cb({redirectURL: results.redirectURL})
+        return
       }
     }
-    cb({redirectURL: redirectURL})
+    cb({})
   })
 }
 
@@ -196,10 +201,39 @@ function registerForBeforeSendHeaders (session) {
 }
 
 /**
+ * Register for notifications for webRequest.onHeadersReceived for a particular
+ * session.
+ * @param {object} session Session to add webRequest filtering on
+ */
+function registerForHeadersReceived (session) {
+  // Note that onBeforeRedirect listener doesn't take a callback
+  session.webRequest.onHeadersReceived(function (details, cb) {
+    // Using an electron binary which isn't from Brave
+    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+      cb({})
+      return
+    }
+    for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
+      let results = headersReceivedFilteringFns[i](details)
+      if (!module.exports.isResourceEnabled(results.resourceName)) {
+        continue
+      }
+      if (results.responseHeaders) {
+        cb({responseHeaders: results.responseHeaders})
+        return
+      }
+    }
+    cb({})
+  })
+}
+
+/**
  * Register permission request handler
  * @param {Object} session to add permission request handler on
+ * @param {string} partition name of the partition
  */
-function registerPermissionHandler (session) {
+function registerPermissionHandler (session, partition) {
+  const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
   // TODO: Localize strings
   let permissions = {
@@ -241,9 +275,20 @@ function registerPermissionHandler (session) {
     }
 
     // Check whether there is a persistent site setting for this host
-    const settings = siteSettings.getSiteSettingsForURL(AppStore.getState().get('siteSettings'), url)
+    const appState = AppStore.getState()
+    const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+    const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+    const permissionName = permission + 'Permission'
     if (settings) {
-      const isAllowed = settings.get(permission + 'Permission')
+      let isAllowed = settings.get(permissionName)
+      if (typeof isAllowed === 'boolean') {
+        cb(isAllowed)
+        return
+      }
+    }
+    // Private tabs inherit settings from normal tabs, but not vice versa.
+    if (isPrivate && tempSettings) {
+      let isAllowed = tempSettings.get(permissionName)
       if (typeof isAllowed === 'boolean') {
         cb(isAllowed)
         return
@@ -271,7 +316,7 @@ function registerPermissionHandler (session) {
       cb(result)
       if (persist) {
         // remember site setting for this host over http(s)
-        appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result)
+        appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result, isPrivate)
       }
     }
   })
@@ -346,12 +391,21 @@ function registerForDownloadListener (session) {
   })
 }
 
+function registerSession (partition, fn) {
+  let ses = session.fromPartition(partition)
+  registeredSessions[partition] = ses
+  fn(ses, partition)
+}
+
 function initForPartition (partition) {
-  ;[registerPermissionHandler, registerForBeforeRequest, registerForBeforeRedirect, registerForBeforeSendHeaders].forEach((fn) => {
-    let ses = session.fromPartition(partition)
-    registeredSessions[partition] = ses
-    fn(ses)
-  })
+  let fns = [registerForBeforeRequest, registerForBeforeRedirect,
+    registerForBeforeSendHeaders, registerPermissionHandler]
+  if (partition !== 'main-1') {
+    // Don't block scripts in the background page
+    fns.push(registerForHeadersReceived)
+  }
+
+  fns.forEach(registerSession.bind(this, partition))
 }
 
 function shouldIgnoreUrl (url) {

@@ -30,8 +30,11 @@ class Window extends React.Component {
     if (this.props.initWindowState) {
       windowActions.setState(this.windowState)
     }
-    windowStore.addChangeListener(this.onChange.bind(this))
-    appStoreRenderer.addChangeListener(this.onAppStateChange.bind(this))
+
+    this.onChange = this.onChange.bind(this)
+    this.onAppStateChange = this.onAppStateChange.bind(this)
+    windowStore.addChangeListener(this.onChange)
+    appStoreRenderer.addChangeListener(this.onAppStateChange)
   }
 
   componentWillMount () {
@@ -64,8 +67,8 @@ class Window extends React.Component {
   }
 
   componentWillUnmount () {
-    windowStore.removeChangeListener(this.onChange.bind(this))
-    appStoreRenderer.removeChangeListener(this.onAppStateChange.bind(this))
+    windowStore.removeChangeListener(this.onChange)
+    appStoreRenderer.removeChangeListener(this.onAppStateChange)
   }
 
   shouldComponentUpdate (nextProps, nextState) {

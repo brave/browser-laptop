@@ -19,6 +19,14 @@ const dnd = require('../dnd')
 const dndData = require('../dndData')
 
 class Tabs extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onDrop = this.onDrop.bind(this)
+    this.onPrevPage = this.onPrevPage.bind(this)
+    this.onNextPage = this.onNextPage.bind(this)
+  }
+
   get activeFrameIndex () {
     return FrameStateUtil.getFramePropsIndex(this.props.frames, this.props.activeFrame)
   }
@@ -89,13 +97,13 @@ class Tabs extends ImmutableComponent {
         tabStripContainer: true,
         allowDragging: this.props.shouldAllowWindowDrag
       })}
-        onDragOver={this.onDragOver.bind(this)}
-        onDrop={this.onDrop.bind(this)}>
+        onDragOver={this.onDragOver}
+        onDrop={this.onDrop}>
         {(() => {
           if (this.props.tabPageIndex > 0) {
             return <span
               className='prevTab fa fa-caret-left'
-              onClick={this.onPrevPage.bind(this)} />
+              onClick={this.onPrevPage} />
           }
         })()}
         {
@@ -117,7 +125,7 @@ class Tabs extends ImmutableComponent {
           if (this.props.currentFrames.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
               className='nextTab fa fa-caret-right'
-              onClick={this.onNextPage.bind(this)} />
+              onClick={this.onNextPage} />
           }
         })()}
         <Button label='+'

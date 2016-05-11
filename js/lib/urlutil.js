@@ -64,6 +64,9 @@ const UrlUtil = {
   },
 
   canParseURL: function (input) {
+    if (typeof window === 'undefined') {
+      return true
+    }
     try {
       let url = new window.URL(input)
       return !!url

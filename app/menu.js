@@ -27,9 +27,13 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
+const noScript = appConfig.resourceNames.NOSCRIPT
 
 let menuArgs = {}
 let lastSettingsState, lastArgs
+
+const menu = Menu.buildFromTemplate([])
+Menu.setApplicationMenu(menu)
 
 /**
  * Sets up the menu.
@@ -39,6 +43,14 @@ let lastSettingsState, lastArgs
  *   bookmarked
  */
 const init = (settingsState, args) => {
+  // The menu will always be called once localization is done
+  // so don't bother loading anything until it is done.
+  // Save out menuArgs in the meantime since they shuld persist across calls.
+  if (!locale.initialized) {
+    menuArgs = Object.assign(menuArgs, args || {})
+    return
+  }
+
   // This needs to be within the init method to handle translations
   const CommonMenu = require('../js/commonMenu')
 
@@ -386,7 +398,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         CommonMenu.reopenLastClosedTabItem(),
         {
-          label: locale.translation('reopenLastClosedTab'),
+          label: locale.translation('reopenLastClosedWindow'),
           accelerator: 'Alt+Shift+CmdOrCtrl+T',
           click: function () {
             process.emit(messages.UNDO_CLOSED_WINDOW)
@@ -435,6 +447,7 @@ const init = (settingsState, args) => {
       adInsertion: Filtering.isResourceEnabled(adInsertion),
       trackingProtection: Filtering.isResourceEnabled(trackingProtection),
       httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere),
+      noScript: Filtering.isResourceEnabled(noScript),
       safeBrowsing: Filtering.isResourceEnabled(safeBrowsing)
     }, init.bind(this, settingsState, {bookmarked: bookmarkPageMenuItem.checked})),
     {

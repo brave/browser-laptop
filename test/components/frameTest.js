@@ -121,7 +121,7 @@ describe('view source', function () {
 function * setup (client) {
   yield client
     .waitUntilWindowLoaded()
-    .waitForUrl(Brave.browserWindowUrl)
+    .waitForBrowserWindow()
     .waitForVisible('#window')
     .waitForVisible(urlInput)
 }

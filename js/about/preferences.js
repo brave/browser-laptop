@@ -35,6 +35,9 @@ const changeSetting = (cb, key, e) => {
     cb(key, e.target.checked)
   } else {
     let value = e.target.value
+    if (e.target.dataset && e.target.dataset.type === 'number') {
+      value = parseInt(value, 10)
+    }
     if (e.target.type === 'number') {
       value = value.replace(/\D/g, '')
       value = parseInt(value, 10)
@@ -86,15 +89,26 @@ class SettingCheckbox extends ImmutableComponent {
 }
 
 class GeneralTab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.state = {
+      languageCodes: window.languageCodes
+    }
+  }
+
   render () {
+    var languageOptions = this.state.languageCodes.map(function (lc) {
+      return (
+        <option data-l10n-id={lc} value={lc} />
+      )
+    })
+
     return <SettingsList>
       <SettingsList>
         <SettingItem dataL10nId='selectedLanguage'>
           <select value={getSetting(settings.LANGUAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
-            <option data-l10n-id='en-US' value='en-US' />
-            <option data-l10n-id='nl-NL' value='nl-NL' />
-            <option data-l10n-id='pt-BR' value='pt-BR' />
+            {languageOptions}
           </select>
         </SettingItem>
         <SettingItem dataL10nId='startsWith'>
@@ -140,6 +154,7 @@ class TabsTab extends ImmutableComponent {
       <SettingItem dataL10nId='tabsPerTabPage'>
         <select
           value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
+          data-type='number'
           onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
           {
             // Sorry, Brad says he hates primes :'(

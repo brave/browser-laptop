@@ -15,6 +15,12 @@ const dnd = require('../dnd')
 const dndData = require('../dndData')
 
 class PinnedTabs extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onDragOver = this.onDragOver.bind(this)
+    this.onDrop = this.onDrop.bind(this)
+  }
+
   onDrop (e) {
     const clientX = e.clientX
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
@@ -47,8 +53,8 @@ class PinnedTabs extends ImmutableComponent {
   render () {
     this.tabRefs = []
     return <div className='pinnedTabs'
-      onDragOver={this.onDragOver.bind(this)}
-      onDrop={this.onDrop.bind(this)}>
+      onDragOver={this.onDragOver}
+      onDrop={this.onDrop}>
        {
           this.props.frames
             .filter((frameProps) => frameProps.get('pinnedLocation'))

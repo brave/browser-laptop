@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.9.5](https://github.com/brave/browser-laptop/releases/v0.9.5dev)
+- Added spell check.
+- Added NoScript like script blocking.
+- Added support for many more languages.
+- Fix for nfl.com videos when blocking was enabled.
+- Fix bookmarks not filling up the complete bookmarks toolbar.
+- Fix crash when navigating while dev tools are open.
+- Fix for "tabnapping" phishing attempt.
+- Fix unneeded indent in Windows for navigation controls.
+- Fix for using numpad '+' for zoom.
+- Fix for changing tabs per page giving an uneven distribution of tabs.
+- Fix for opening and copying image context menus sometimes not giving the full URL.
+
 ## [0.9.4](https://github.com/brave/browser-laptop/releases/v0.9.4dev)
 - Fixed startup problem if user data directory does not already exist.
 

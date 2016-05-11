@@ -28,6 +28,7 @@ const PackageLoader = require('./package-loader')
 const Extensions = require('./extensions')
 const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
+const NoScript = require('./noScript')
 const AdBlock = require('./adBlock')
 const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
@@ -40,10 +41,7 @@ const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
-
-let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
-  return SessionStore.defaultAppState()
-})
+const spellCheck = require('./spellCheck')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -171,6 +169,10 @@ const initiateSessionStateSave = debounce(() => {
 }, 5 * 60 * 1000)
 
 app.on('ready', () => {
+  let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
+    return SessionStore.defaultAppState()
+  })
+
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
@@ -351,6 +353,8 @@ app.on('ready', () => {
     TrackingProtection.init()
     AdBlock.init()
     SiteHacks.init()
+    NoScript.init()
+    spellCheck.init()
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.updateNowRequested()

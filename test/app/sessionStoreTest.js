@@ -9,7 +9,7 @@ describe('sessionStore', function () {
     Brave.addCommands()
     yield client
       .waitUntilWindowLoaded()
-      .waitForUrl(Brave.browserWindowUrl)
+      .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }

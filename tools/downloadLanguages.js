@@ -25,8 +25,17 @@ var languages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', '
 })
 
 // Support retrieving a single language
-if (process.env.LANG) {
-  languages = [process.env.LANG]
+if (process.env.LANG_CODE) {
+  languages = [process.env.LANG_CODE]
+}
+
+if (process.env.META) {
+  var localLanguages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales'))
+  console.log(`    <meta name="availableLanguages" content="${localLanguages.join(', ')}">`)
+  console.log(localLanguages.map(function (l) {
+    return `'${l}'`
+  }).join(',\n  '))
+  process.exit(0)
 }
 
 // Setup the credentials

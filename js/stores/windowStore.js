@@ -160,6 +160,7 @@ const doAction = (action) => {
         audioPlaybackActive: false,
         adblock: {},
         trackingProtection: {},
+        noScript: {},
         httpsEverywhere: locationChanged ? {} : lastHttpse,
         title: locationChanged ? '' : lastTitle,
         location: action.location
@@ -432,6 +433,9 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
+      break
+    case WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE:
+      windowState = windowState.setIn(['ui', 'noScriptInfo', 'isVisible'], action.isVisible)
       break
     case WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE:
       windowState = windowState.setIn(['ui', 'siteInfo', 'isVisible'], action.isVisible)

@@ -9,7 +9,7 @@ describe('tabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
-      .waitForUrl(Brave.browserWindowUrl)
+      .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
@@ -65,44 +65,44 @@ describe('tabs', function () {
   })
 
   describe('close tab', function () {
-    var windowCountBeforeTabClose = 3
-    var windowCountAfterTabClose = 2
+    var tabCountBeforeTabClose = 2
+    var tabCountAfterTabClose = 1
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
     })
     it('should close the tab', function * () {
       yield this.app.client
-        .waitForUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
         })
       yield this.app.client
-        .waitForUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountAfterTabClose)
+          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountAfterTabClose)
         })
     })
     it('should undo last closed tab', function * () {
       yield this.app.client
-        .waitForUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
         })
       yield this.app.client
-        .waitForUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountAfterTabClose)
+          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountAfterTabClose)
         })
       yield this.app.client
-        .waitForUrl(Brave.browserWindowUrl)
+        .waitForBrowserWindow()
         .ipcSend(messages.SHORTCUT_UNDO_CLOSED_FRAME)
         .waitUntil(function () {
-          return this.waitForUrl(Brave.browserWindowUrl).getWindowCount().then((count) => count === windowCountBeforeTabClose)
+          return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
         })
     })
   })

@@ -10,7 +10,7 @@ const config = require('../constants/config')
 const siteSettings = require('../state/siteSettings')
 const cx = require('../lib/classSet.js')
 
-export default class ContextMenuItem extends ImmutableComponent {
+class ContextMenuItem extends ImmutableComponent {
   get submenu () {
     return this.props.contextMenuItem.get('submenu')
   }
@@ -176,7 +176,7 @@ export default class ContextMenuItem extends ImmutableComponent {
 /**
  * Represents a single popup menu (not including submenu)
  */
-export default class ContextMenuSingle extends ImmutableComponent {
+class ContextMenuSingle extends ImmutableComponent {
   render () {
     const styles = {}
     if (this.props.y) {
@@ -201,7 +201,7 @@ export default class ContextMenuSingle extends ImmutableComponent {
 /**
  * Represents a context menu including all submenus
  */
-export default class ContextMenu extends ImmutableComponent {
+class ContextMenu extends ImmutableComponent {
   onClick () {
     windowActions.setContextMenuDetail()
   }

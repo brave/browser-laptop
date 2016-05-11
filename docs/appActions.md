@@ -217,7 +217,7 @@ Changes an application level setting
 
 
 
-### changeSiteSetting(hostPattern, key, value) 
+### changeSiteSetting(hostPattern, key, value, temp) 
 
 Change a hostPattern's config
 
@@ -228,6 +228,9 @@ Change a hostPattern's config
 **key**: `string`, The config key to update
 
 **value**: `string | number`, The value to update to
+
+**temp**: `boolean`, Whether to change temporary or persistent
+  settings. defaults to false (persistent).
 
 
 
@@ -248,6 +251,28 @@ Hides a message box in the notification bar
 **Parameters**
 
 **message**: `string`, Hides a message box in the notification bar
+
+
+
+### addWord(word, learn) 
+
+Adds a word to the dictionary
+
+**Parameters**
+
+**word**: `string`, The word to add
+
+**learn**: `boolean`, true if the word should be learned, false if ignored
+
+
+
+### setDictionary(locale) 
+
+Adds a word to the dictionary
+
+**Parameters**
+
+**locale**: `string`, The locale to set for the dictionary
 
 
 

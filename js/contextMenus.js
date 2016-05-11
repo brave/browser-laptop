@@ -8,8 +8,9 @@ const Menu = remote.require('menu')
 const Immutable = require('immutable')
 const clipboard = electron.clipboard
 const messages = require('./constants/messages')
-const WindowStore = require('./stores/windowStore')
+const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
+const webviewActions = require('./actions/webviewActions')
 const bookmarkActions = require('./actions/bookmarkActions')
 const downloadActions = require('./actions/downloadActions')
 const appActions = require('./actions/appActions')
@@ -146,11 +147,10 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
-    menu.push(CommonMenu.separatorMenuItem)
   }
 
-  if (appStoreRenderer.state.getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
-    menu.push({
+  if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
+    menu.push(CommonMenu.separatorMenuItem, {
       label: 'Hide downloads bar',
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
@@ -383,13 +383,51 @@ function tabTemplateInit (frameProps) {
 
   items.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
-    { enabled: WindowStore.getState().get('closedFrames').size > 0 }
+    { enabled: windowStore.getState().get('closedFrames').size > 0 }
   ))
 
   return items
 }
 
-function getEditableItems (hasSelection) {
+function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
+  const hasSelection = selection.length > 0
+  const items = []
+  if (hasSelection) {
+    if (suggestions.length > 0) {
+      // Map the first 3 suggestions to menu items that allows click
+      // to replace the text.
+      items.push(...suggestions.slice(0, 3).map((suggestion) => {
+        return {
+          label: suggestion,
+          click: () => {
+            webviewActions.replaceMisspelling(suggestion)
+          }
+        }
+      }), CommonMenu.separatorMenuItem)
+    }
+    if (isMisspelled) {
+      items.push({
+        label: locale.translation('learnSpelling'),
+        click: () => {
+          appActions.addWord(selection, true)
+          // This is needed so the underline goes away
+          webviewActions.replaceMisspelling(selection)
+        }
+      }, {
+        label: locale.translation('ignoreSpelling'),
+        click: () => {
+          appActions.addWord(selection, false)
+          // This is needed so the underline goes away
+          webviewActions.replaceMisspelling(selection)
+        }
+      }, CommonMenu.separatorMenuItem)
+    }
+  }
+  return items
+}
+
+function getEditableItems (selection) {
+  const hasSelection = selection.length > 0
   const items = []
   if (hasSelection) {
     items.push({
@@ -607,8 +645,9 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
-    const editableItems = getEditableItems(nodeProps.hasSelection)
-    template.push({
+    const misspelledSuggestions = getMisspelledSuggestions(nodeProps.selection, nodeProps.isMisspelled, nodeProps.suggestions)
+    const editableItems = getEditableItems(nodeProps.selection)
+    template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',
       role: 'undo'
@@ -701,7 +740,7 @@ function mainTemplateInit (nodeProps, frame) {
   template.push({
     label: locale.translation('inspectElement'),
     click: (item, focusedWindow) => {
-      windowActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
+      webviewActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
     }
   })
 
@@ -733,7 +772,7 @@ function mainTemplateInit (nodeProps, frame) {
   return template
 }
 
-export function onHamburgerMenu (braverySettings, location, e) {
+function onHamburgerMenu (braverySettings, location, e) {
   const menuTemplate = hamburgerTemplateInit(braverySettings, location, e)
   const rect = e.target.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -743,7 +782,7 @@ export function onHamburgerMenu (braverySettings, location, e) {
   }))
 }
 
-export function onMainContextMenu (nodeProps, frame, contextMenuType) {
+function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
   } else if (contextMenuType === 'download') {
@@ -754,19 +793,19 @@ export function onMainContextMenu (nodeProps, frame, contextMenuType) {
   }
 }
 
-export function onTabContextMenu (frameProps, e) {
+function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
+function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
   tabsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
-export function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
+function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
   if (e) {
     e.stopPropagation()
   }
@@ -774,19 +813,19 @@ export function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
   downloadsToolbarMenu.popup(remote.getCurrentWindow())
 }
 
-export function onTabPageContextMenu (framePropsList, e) {
+function onTabPageContextMenu (framePropsList, e) {
   e.stopPropagation()
   const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
   tabPageMenu.popup(remote.getCurrentWindow())
 }
 
-export function onUrlBarContextMenu (e) {
+function onUrlBarContextMenu (e) {
   e.stopPropagation()
   const inputMenu = Menu.buildFromTemplate(inputTemplateInit(e))
   inputMenu.popup(remote.getCurrentWindow())
 }
 
-export function onBookmarkContextMenu (siteDetail, activeFrame, e) {
+function onBookmarkContextMenu (siteDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
@@ -794,7 +833,7 @@ export function onBookmarkContextMenu (siteDetail, activeFrame, e) {
   menu.popup(remote.getCurrentWindow())
 }
 
-export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
+function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
   if (e && e.stopPropagation) {
     e.stopPropagation()
   }
@@ -815,7 +854,7 @@ export function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  * @param {Object} boundingRect - bounding rectangle of username input field
  * @param {number} topOffset - distance from webview to the top of window
  */
-export function onShowUsernameMenu (usernames, origin, action, boundingRect,
+function onShowUsernameMenu (usernames, origin, action, boundingRect,
                                     topOffset) {
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -825,7 +864,7 @@ export function onShowUsernameMenu (usernames, origin, action, boundingRect,
   }))
 }
 
-export function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
+function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
   const menuTemplate = moreBookmarksTemplateInit(allBookmarkItems, overflowItems, activeFrame)
   const rect = e.target.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -833,4 +872,18 @@ export function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItem
     top: rect.bottom,
     template: menuTemplate
   }))
+}
+
+module.exports = {
+  onHamburgerMenu,
+  onMainContextMenu,
+  onTabContextMenu,
+  onTabsToolbarContextMenu,
+  onDownloadsToolbarContextMenu,
+  onTabPageContextMenu,
+  onUrlBarContextMenu,
+  onBookmarkContextMenu,
+  onShowBookmarkFolderMenu,
+  onShowUsernameMenu,
+  onMoreBookmarksMenu
 }

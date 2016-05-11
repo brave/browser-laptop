@@ -261,13 +261,16 @@ const appActions = {
    * @param {string} hostPattern - The host pattern to update the config for
    * @param {string} key - The config key to update
    * @param {string|number} value - The value to update to
+   * @param {boolean} temp - Whether to change temporary or persistent
+   *   settings. defaults to false (persistent).
    */
-  changeSiteSetting: function (hostPattern, key, value) {
+  changeSiteSetting: function (hostPattern, key, value, temp) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
-      value
+      value,
+      temporary: temp || false
     })
   },
 
@@ -290,6 +293,30 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_HIDE_MESSAGE_BOX,
       message
+    })
+  },
+
+  /**
+   * Adds a word to the dictionary
+   * @param {string} word - The word to add
+   * @param {boolean} learn - true if the word should be learned, false if ignored
+   */
+  addWord: function (word, learn) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_WORD,
+      word,
+      learn
+    })
+  },
+
+  /**
+   * Adds a word to the dictionary
+   * @param {string} locale - The locale to set for the dictionary
+   */
+  setDictionary: function (locale) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_DICTIONARY,
+      locale
     })
   }
 }

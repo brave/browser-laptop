@@ -46,7 +46,7 @@ describe('urlutil', function () {
     })
 
     it('detects data URI', function * () {
-      assert.equal(UrlUtil.isURL('data:datauri'), true)
+      assert.equal(UrlUtil.isURL('data:text/html,hi'), true)
     })
   })
 })

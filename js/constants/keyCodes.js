@@ -14,7 +14,8 @@ const KeyCodes = {
   CMD2: 93,
   LEFT: 37,
   RIGHT: 39,
-  F12: 123
+  F12: 123,
+  NUMPAD_PLUS: 107
 }
 
 module.exports = KeyCodes
