@@ -625,6 +625,18 @@ const copyEmailAddressMenuItem = (location) => {
   }
 }
 
+const searchSelectionMenuItem = (location) => {
+  return {
+    label: locale.translation('openSearch'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow && location) {
+        let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
+        windowActions.newFrame({ location: searchUrl }, true)
+      }
+    }
+  }
+}
+
 function mainTemplateInit (nodeProps, frame) {
   const template = []
   const nodeName = nodeProps.name
@@ -660,8 +672,7 @@ function mainTemplateInit (nodeProps, frame) {
           focusedWindow.webContents.downloadURL(nodeProps.src)
         }
       }
-    })
-    template.push({
+    }, {
       label: locale.translation('openImageInNewTab'),
       click: (item, focusedWindow) => {
         if (focusedWindow && nodeProps.src) {
@@ -669,16 +680,14 @@ function mainTemplateInit (nodeProps, frame) {
           focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
         }
       }
-    })
-    template.push({
+    }, {
       label: locale.translation('copyImageAddress'),
       click: (item, focusedWindow) => {
         if (focusedWindow && nodeProps.src) {
           clipboard.writeText(nodeProps.src)
         }
       }
-    })
-    template.push(CommonMenu.separatorMenuItem)
+    }, CommonMenu.separatorMenuItem)
   }
 
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
@@ -694,33 +703,18 @@ function mainTemplateInit (nodeProps, frame) {
       role: 'redo'
     }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.hasSelection) {
-    template.push(
-    // {
-    //   label: locale.translation('openSearch'),
-    //   enabled: false,
-    //   click: (item, focusedWindow) => {
-    //     // TODO: ..
-    //   }
-    // },
-      {
-        label: locale.translation('copy'),
-        accelerator: 'CmdOrCtrl+C',
-        role: 'copy'
-      }, CommonMenu.separatorMenuItem)
+    template.push(searchSelectionMenuItem(nodeProps.selection), {
+      label: locale.translation('copy'),
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    }, CommonMenu.separatorMenuItem)
   } else {
     if (nodeProps.href) {
       template.push(addBookmarkMenuItem('bookmarkLink', {
         location: nodeProps.href,
         tags: [siteTags.BOOKMARK]
-      }, false)
-      // ,{
-      //   label: locale.translation('openSearch'),
-      //   enabled: false,
-      //   click: (item, focusedWindow) => {
-      //     // TODO: ..
-      //   }
-      // }
-      )
+      }, false),
+      searchSelectionMenuItem(nodeProps.href))
     } else {
       template.push(
         {
