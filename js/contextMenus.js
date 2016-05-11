@@ -436,7 +436,7 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
         return {
           label: suggestion,
           click: () => {
-            webviewActions.replaceMisspelling(suggestion)
+            webviewActions.replace(suggestion)
           }
         }
       }), CommonMenu.separatorMenuItem)
@@ -447,14 +447,14 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
         click: () => {
           appActions.addWord(selection, true)
           // This is needed so the underline goes away
-          webviewActions.replaceMisspelling(selection)
+          webviewActions.replace(selection)
         }
       }, {
         label: locale.translation('ignoreSpelling'),
         click: () => {
           appActions.addWord(selection, false)
           // This is needed so the underline goes away
-          webviewActions.replaceMisspelling(selection)
+          webviewActions.replace(selection)
         }
       }, CommonMenu.separatorMenuItem)
     }

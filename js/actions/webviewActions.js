@@ -34,10 +34,10 @@ const webviewActions = {
    * Repalces the selected text in an editable
    * @param {string} text - The text to replace with
    */
-  replaceMisspelling: function (text) {
+  replace: function (text) {
     const webview = getWebview()
     if (webview) {
-      webview.replaceMisspelling(text)
+      webview.replace(text)
     }
   }
 }
