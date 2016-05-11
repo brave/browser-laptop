@@ -54,7 +54,8 @@ let generateBraveManfiest = () => {
       'default-src': '\'self\'',
       'form-action': '\'none\'',
       'referrer': 'no-referrer',
-      'style-src': '\'self\' \'unsafe-inline\''
+      'style-src': '\'self\' \'unsafe-inline\'',
+      'img-src': '\'self\' data:'
     }
 
     if (process.env.NODE_ENV === 'development') {
