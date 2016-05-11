@@ -252,7 +252,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onContextMenu (e) {
-    contextMenus.onUrlBarContextMenu(e)
+    contextMenus.onUrlBarContextMenu(this.searchDetail, this.props.activeFrameProps, e)
   }
 
   render () {
