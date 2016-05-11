@@ -5,6 +5,8 @@
 - Added NoScript like script blocking.
 - Added support for many more languages.
 - Various windows installer fixes.
+- Added Paste and Go and Paste and Search items in the URL bar context menu.
+- Added ability to autohide menu bar on Windows.
 - Fix for nfl.com videos when blocking was enabled.
 - Fix bookmarks not filling up the complete bookmarks toolbar.
 - Fix crash when navigating while dev tools are open.
