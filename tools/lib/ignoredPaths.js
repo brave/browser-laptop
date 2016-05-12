@@ -23,6 +23,7 @@ module.exports = [
   'electron-builder',
   'electron-prebuilt',
   'electron-rebuild',
+  'mkdirp',
   'babel$',
   'babel-(?!polyfill|regenerator-runtime)'
 ]
