@@ -627,7 +627,7 @@ const copyEmailAddressMenuItem = (location) => {
 
 const searchSelectionMenuItem = (location) => {
   return {
-    label: locale.translation('openSearch'),
+    label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, location),
     click: (item, focusedWindow) => {
       if (focusedWindow && location) {
         let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
