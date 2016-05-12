@@ -92,7 +92,7 @@ module.exports.newTabMenuItem = () => {
 module.exports.newPrivateTabMenuItem = () => {
   return {
     label: locale.translation('newPrivateTab'),
-    accelerator: 'CmdOrCtrl+Alt+T',
+    accelerator: 'Shift+CmdOrCtrl+P',
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow(Immutable.fromJS({ isPrivate: true }))
       module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPrivate: true }])
@@ -103,7 +103,7 @@ module.exports.newPrivateTabMenuItem = () => {
 module.exports.newPartitionedTabMenuItem = () => {
   return {
     label: locale.translation('newSessionTab'),
-    accelerator: 'CmdOrCtrl+Alt+S',
+    accelerator: 'Shift+CmdOrCtrl+S',
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow(Immutable.fromJS({ isPartitioned: true }))
       module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { isPartitioned: true }])
