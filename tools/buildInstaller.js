@@ -76,10 +76,7 @@ if (isDarwin) {
   resultPromise.then(() => {
     cmds = [
       `mv ${outDir}/Setup.exe ${outDir}/BraveSetup-${arch}.exe`,
-      `mv ${outDir}/Setup.msi ${outDir}/BraveSetup-${arch}.msi`,
-      // Change the casing of the output file name, Windows won't allow this in a single mv
-      `mv ${outDir}/brave-${VersionInfo.braveVersion}-full.nupkg ${outDir}/Brave-${VersionInfo.braveVersion}-full.nupkg2`,
-      `mv ${outDir}/Brave-${VersionInfo.braveVersion}-full.nupkg2 ${outDir}/Brave-${VersionInfo.braveVersion}-full.nupkg`
+      `mv ${outDir}/Setup.msi ${outDir}/BraveSetup-${arch}.msi`
     ]
     execute(cmds, {}, console.log.bind(null, 'done'))
   }, (e) => console.log(`No dice: ${e.message}`))
