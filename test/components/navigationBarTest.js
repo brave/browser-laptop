@@ -45,7 +45,7 @@ describe('urlbar', function () {
   }
 
   describe('navigation', function () {
-    describe.only('tabnapping', function () {
+    describe('tabnapping', function () {
       Brave.beforeAll(this)
 
       before(function * () {
