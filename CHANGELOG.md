@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.9.6](https://github.com/brave/browser-laptop/releases/v0.9.6dev)
+- Upgrade to libchromiumcontent 50.0.2661.102. ([#1708](https://github.com/brave/browser-laptop/issues/1708))
+- Fix for disabling extensions without a browser restart. ([#1707](https://github.com/brave/browser-laptop/issues/1707))
+- Fix for URL bar context menu selection detection. ([#1709](https://github.com/brave/browser-laptop/issues/1709))
+
 ## [0.9.5](https://github.com/brave/browser-laptop/releases/v0.9.5dev)
 - Added spell check. ([#859](https://github.com/brave/browser-laptop/issues/859))
 - Added NoScript like script blocking. ([#231](https://github.com/brave/browser-laptop/issues/231))
