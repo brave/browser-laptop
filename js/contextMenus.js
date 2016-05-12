@@ -74,10 +74,7 @@ function tabPageTemplateInit (framePropsList) {
 }
 
 function urlBarTemplateInit (searchDetail, activeFrame, e) {
-  const hasSelection = e.target.selectionStart !== undefined &&
-      e.target.selectionEnd !== undefined &&
-      e.target.selectionStart !== e.target.selectionEnd
-  const items = getEditableItems(hasSelection)
+  const items = getEditableItems(window.getSelection().toString())
   const clipboardText = clipboard.readText()
   const hasClipboard = clipboardText && clipboardText.length > 0
   const isLocationUrl = hasClipboard && isUrl(clipboardText)
