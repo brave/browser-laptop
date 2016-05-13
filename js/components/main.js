@@ -465,6 +465,8 @@ class Main extends ImmutableComponent {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
           siteSettings={this.props.appState.get('siteSettings')}
+          temporarySiteSettings={this.props.appState.get('temporarySiteSettings')}
+          activeFrame={activeFrame}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
         : null
       }
