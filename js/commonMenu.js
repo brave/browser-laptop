@@ -295,7 +295,7 @@ module.exports.autoHideMenuBarMenuItem = () => {
   return {
     label: locale.translation('autoHideMenuBar'),
     type: 'checkbox',
-    checked: autoHideMenuBar,
+    checked: !autoHideMenuBar,
     click: (item, focusedWindow) => {
       appActions.changeSetting(settings.AUTO_HIDE_MENU_BAR, !autoHideMenuBar)
     }
