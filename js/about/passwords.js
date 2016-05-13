@@ -35,39 +35,17 @@ class PasswordItem extends React.Component {
   constructor () {
     super()
     this.state = {
-      shown: false,
       decrypted: null,
-      showAfterDecrypting: false,
       notification: null
     }
   }
 
-  decrypt (showAfterDecrypting) {
+  decrypt () {
     // Ask the main process to decrypt the password
     const password = this.props.password
     aboutActions.decryptPassword(password.get('encryptedPassword'),
                                  password.get('authTag'), password.get('iv'),
                                  this.props.id)
-    this.setState({
-      showAfterDecrypting
-    })
-  }
-
-  onShow () {
-    if (this.state.decrypted !== null) {
-      this.setState({
-        shown: true
-      })
-    } else {
-      this.decrypt(true)
-    }
-  }
-
-  onHide () {
-    this.setState({
-      shown: false,
-      decrypted: null
-    })
   }
 
   onDelete () {
@@ -100,16 +78,10 @@ class PasswordItem extends React.Component {
       return
     }
     e.stopPropagation()
-    if (!this.state.showAfterDecrypting) {
-      // If we aren't showing the password, the only reason to decrypt
-      // is to copy it to the clipboard
-      aboutActions.setClipboard(e.detail.decrypted)
-      this.showNotification('Copied!')
-    }
+    aboutActions.setClipboard(e.detail.decrypted)
+    this.showNotification('Copied!')
     this.setState({
-      decrypted: e.detail.decrypted,
-      shown: this.state.showAfterDecrypting,
-      showAfterDecrypting: false
+      decrypted: e.detail.decrypted
     })
   }
 
@@ -123,21 +95,12 @@ class PasswordItem extends React.Component {
       <td className='passwordOrigin'>{password.get('origin')}</td>
       <td className='passwordUsername'>{password.get('username')}</td>
       <td className='passwordPlaintext'>
-        {this.state.shown ? this.state.decrypted : '*'.repeat(password.get('encryptedPassword').length)}
+        {'*'.repeat(password.get('encryptedPassword').length)}
       </td>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
           onClick={this.onCopy.bind(this)}>
         </span>
-      {
-        this.state.shown
-        ? <span className='passwordAction fa fa-eye-slash'
-          title='Hide password'
-          onClick={this.onHide.bind(this)}></span>
-        : <span className='passwordAction fa fa-eye'
-          title='Show password'
-          onClick={this.onShow.bind(this)}></span>
-      }
         <span className='passwordAction fa fa-trash' title='Delete password'
           onClick={this.onDelete.bind(this)}>
         </span>
