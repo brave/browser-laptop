@@ -19,6 +19,7 @@ const app = electron.app
 const Menu = require('./menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
+const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
@@ -47,6 +48,7 @@ const spellCheck = require('./spellCheck')
 let perWindowState = []
 let sessionStateStoreCompleteOnQuit = false
 let beforeQuitSaveStarted = false
+let quitTimedOut = false
 let lastWindowState
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
@@ -115,7 +117,7 @@ const saveIfAllCollected = () => {
   if (beforeQuitSaveStarted && !AppStore.getState()) {
     app.exit(0)
   }
-  if (perWindowState.length === BrowserWindow.getAllWindows().length) {
+  if (quitTimedOut || perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
     appState.perWindowState = perWindowState
     if (perWindowState.length === 0 && lastWindowState) {
@@ -220,6 +222,13 @@ app.on('ready', () => {
       saveIfAllCollected()
       return
     }
+
+    // Just in case a window is not responsive, we don't want to wait forever.
+    // In this case just save session store for the windows that we have already.
+    setTimeout(() => {
+      quitTimedOut = true
+      saveIfAllCollected()
+    }, appConfig.quitTimeout)
 
     perWindowState.length = 0
     BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
