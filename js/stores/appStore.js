@@ -110,7 +110,7 @@ const createWindow = (browserOpts, defaults) => {
   browserOpts.width = browserOpts.width < minWidth ? minWidth : browserOpts.width
   browserOpts.height = browserOpts.height < minHeight ? minHeight : browserOpts.height
 
-  const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU_BAR)
+  const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU)
 
   let mainWindow = new BrowserWindow(Object.assign({
     // smaller min size for "modal" windows
@@ -247,7 +247,7 @@ const filterOutNonRecents = debounce(() => {
 
 function handleChangeSettingAction (settingKey, settingValue) {
   switch (settingKey) {
-    case settings.AUTO_HIDE_MENU_BAR:
+    case settings.AUTO_HIDE_MENU:
       BrowserWindow.getAllWindows().forEach(function (wnd) {
         wnd.setAutoHideMenuBar(settingValue)
         wnd.setMenuBarVisibility(!settingValue)

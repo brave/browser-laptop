@@ -9,7 +9,7 @@ const settings = {
   SHOW_HOME_BUTTON: 'general.show-home-button',
   USERAGENT: 'general.useragent.value',
   DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.default-save-path',
-  AUTO_HIDE_MENU_BAR: 'general.autohide-menubar',
+  AUTO_HIDE_MENU: 'general.autohide-menu',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   // Tabs tab
