@@ -6,6 +6,7 @@
 - Fix for URL bar context menu selection detection. ([#1709](https://github.com/brave/browser-laptop/issues/1709))
 - Fix for disabling extensions without a browser restart. ([#1707](https://github.com/brave/browser-laptop/issues/1707))
 - Fix zoom indicator in hamburger menu in private tabs. ([#1706](https://github.com/brave/browser-laptop/issues/1706))
+- Menu bar is now auto hidden by default unless turned on. ([#1730](https://github.com/brave/browser-laptop/issues/1730))
 
 ## [0.9.5](https://github.com/brave/browser-laptop/releases/v0.9.5dev)
 - Added spell check. ([#859](https://github.com/brave/browser-laptop/issues/859))

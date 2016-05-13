@@ -291,13 +291,13 @@ module.exports.bookmarksToolbarMenuItem = () => {
 }
 
 module.exports.autoHideMenuBarMenuItem = () => {
-  const autoHideMenuBar = getSetting(settings.AUTO_HIDE_MENU_BAR)
+  const autoHideMenuBar = getSetting(settings.AUTO_HIDE_MENU)
   return {
     label: locale.translation('autoHideMenuBar'),
     type: 'checkbox',
     checked: !autoHideMenuBar,
     click: (item, focusedWindow) => {
-      appActions.changeSetting(settings.AUTO_HIDE_MENU_BAR, !autoHideMenuBar)
+      appActions.changeSetting(settings.AUTO_HIDE_MENU, !autoHideMenuBar)
     }
   }
 }
