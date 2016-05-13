@@ -1,0 +1,15 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Notification</title>
+</head>
+<body>
+  <div id="result"></div>
+  <script type="text/javascript">
+    var result = document.getElementById('result');
+    Notification.requestPermission(function (permission) {
+        document.title = permission
+    })
+  </script>
+</body>
+</html>

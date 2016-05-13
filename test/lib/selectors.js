@@ -18,6 +18,7 @@ module.exports = {
   titleBar: '#titleBar',
   navigatorBookmarked: '#navigator .endButtons .remove-bookmark-button',
   navigatorNotBookmarked: '#navigator .endButtons .bookmark-button',
+  notificationBar: '.notificationBar',
   findBar: '.findBar',
   findBarInput: '.searchStringContainer input',
   findBarMatches: '.foundResults',
