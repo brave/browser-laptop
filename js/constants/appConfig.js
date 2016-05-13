@@ -13,6 +13,7 @@ const autoHideMenuBar = process.platform !== 'win32'
 module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
+  quitTimeout: 10 * 1000,
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',
