@@ -85,7 +85,8 @@ class ContextMenuItem extends ImmutableComponent {
       return label
     }
     if (item.get('labelDataBind') === 'zoomLevel') {
-      const settings = siteSettings.getSiteSettingsForURL(this.props.siteSettings, item.get('dataBindParam'))
+      const currentSiteSettings = this.props.activeFrame && this.props.activeFrame.get('isPrivate') ? this.props.temporarySiteSettings : this.props.siteSettings
+      const settings = siteSettings.getSiteSettingsForURL(currentSiteSettings, item.get('dataBindParam'))
       const zoomLevel = settings && settings.get('zoomLevel') || config.zoom.defaultValue
       return ((100 + zoomLevel * 10) | 0) + '%'
     }
@@ -191,6 +192,8 @@ class ContextMenuSingle extends ImmutableComponent {
         <ContextMenuItem contextMenuItem={contextMenuItem}
           submenuIndex={this.props.submenuIndex}
           siteSettings={this.props.siteSettings}
+          temporarySiteSettings={this.props.temporarySiteSettings}
+          activeFrame={this.props.activeFrame}
           contextMenuDetail={this.props.contextMenuDetail}
         />)
     }
@@ -239,12 +242,16 @@ class ContextMenu extends ImmutableComponent {
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         siteSettings={this.props.siteSettings}
+        activeFrame={this.props.activeFrame}
+        temporarySiteSettings={this.props.temporarySiteSettings}
         template={this.props.contextMenuDetail.get('template')} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
             siteSettings={this.props.siteSettings}
+            temporarySiteSettings={this.props.temporarySiteSettings}
+            activeFrame={this.props.activeFrame}
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')} />)
       }
