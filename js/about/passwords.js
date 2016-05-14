@@ -150,11 +150,20 @@ class AboutPasswords extends React.Component {
     }
   }
 
+  get isPasswordsEmpty () {
+    return !this.state.passwordDetails || !this.state.passwordDetails.size
+  }
+
+  get isSitesEmpty () {
+    return !this.state.disabledSiteDetails || !this.state.disabledSiteDetails.size
+  }
+
   render () {
     let counter = 0
-    return <div className='passwordsPage'>
-      <h1 data-l10n-id='passwordsTitle'></h1>
-      <div className='passwordInstructions' data-l10n-id='passwordDisableInstructions'></div>
+
+    var savedPasswordsPage = this.isPasswordsEmpty
+    ? null
+    : <div>
       <h2 data-l10n-id='savedPasswords'></h2>
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
@@ -167,12 +176,10 @@ class AboutPasswords extends React.Component {
           </thead>
           <tbody>
           {
-            this.state.passwordDetails
-              ? this.state.passwordDetails.sort((a, b) => {
-                return a.get('origin') > b.get('origin') ? 1 : -1
-              }).map((item) =>
-                <PasswordItem password={item} id={counter++} />)
-              : null
+            this.state.passwordDetails.sort((a, b) => {
+              return a.get('origin') > b.get('origin') ? 1 : -1
+            }).map((item) =>
+              <PasswordItem password={item} id={counter++} />)
           }
           </tbody>
         </table>
@@ -181,19 +188,32 @@ class AboutPasswords extends React.Component {
             onClick={this.onClear.bind(this)}></span>
         </div>
       </div>
+    </div>
+
+    var savedSitesPage = this.isSitesEmpty
+    ? null
+    : <div>
       <h2 data-l10n-id='passwordSites'></h2>
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
           <tbody>
           {
-            this.state.disabledSiteDetails
-              ? this.state.disabledSiteDetails.map((item, site) =>
-                <SiteItem site={site} />)
-              : null
+            this.state.disabledSiteDetails.map((item, site) =>
+              <SiteItem site={site} />)
           }
           </tbody>
         </table>
       </div>
+    </div>
+
+    return <div className='passwordsPage'>
+      <h1 data-l10n-id='passwordsTitle'></h1>
+      <div className='passwordInstructions' data-l10n-id='passwordDisableInstructions'></div>
+      {
+        this.isPasswordsEmpty && this.isSitesEmpty
+          ? <div data-l10n-id='noPasswordsSaved'></div>
+          : [savedPasswordsPage, savedSitesPage]
+      }
     </div>
   }
 }
