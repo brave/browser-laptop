@@ -71,6 +71,7 @@ const messages = {
   AUTOFILL_PASSWORD: _,
   BLOCK_CANVAS_FINGERPRINTING: _,
   GOT_CANVAS_FINGERPRINTING: _,
+  SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */

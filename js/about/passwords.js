@@ -17,12 +17,12 @@ class SiteItem extends React.Component {
 
   render () {
     return <tr className='passwordItem'>
-      <td className='passwordOrigin'>{this.props.site}</td>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-times' title='Remove site'
           onClick={this.onDelete.bind(this)}>
         </span>
       </td>
+      <td className='passwordOrigin'>{this.props.site}</td>
     </tr>
   }
 }
@@ -35,8 +35,7 @@ class PasswordItem extends React.Component {
   constructor () {
     super()
     this.state = {
-      decrypted: null,
-      notification: null
+      decrypted: null
     }
   }
 
@@ -55,22 +54,10 @@ class PasswordItem extends React.Component {
   onCopy () {
     if (this.state.decrypted !== null) {
       aboutActions.setClipboard(this.state.decrypted)
-      this.showNotification('Copied!')
+      aboutActions.showNotification('passwordCopied')
     } else {
       this.decrypt(false)
     }
-  }
-
-  showNotification (text) {
-    // Shows a notification message for a few seconds
-    this.setState({
-      notification: text
-    })
-    window.setTimeout(() => {
-      this.setState({
-        notification: null
-      })
-    }, 700)
   }
 
   onDecrypt (e) {
@@ -79,7 +66,7 @@ class PasswordItem extends React.Component {
     }
     e.stopPropagation()
     aboutActions.setClipboard(e.detail.decrypted)
-    this.showNotification('Copied!')
+    aboutActions.showNotification('passwordCopied')
     this.setState({
       decrypted: e.detail.decrypted
     })
@@ -92,6 +79,11 @@ class PasswordItem extends React.Component {
   render () {
     const password = this.props.password
     return <tr className='passwordItem'>
+      <td className='passwordActions'>
+        <span className='passwordAction fa fa-times' title='Delete password'
+          onClick={this.onDelete.bind(this)}>
+        </span>
+      </td>
       <td className='passwordOrigin'>{password.get('origin')}</td>
       <td className='passwordUsername'>{password.get('username')}</td>
       <td className='passwordPlaintext'>
@@ -101,15 +93,7 @@ class PasswordItem extends React.Component {
         <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
           onClick={this.onCopy.bind(this)}>
         </span>
-        <span className='passwordAction fa fa-trash' title='Delete password'
-          onClick={this.onDelete.bind(this)}>
-        </span>
       </td>
-      {
-        this.state.notification
-        ? <td className='passwordNotifications'>{this.state.notification}</td>
-        : null
-      }
     </tr>
   }
 }
@@ -169,6 +153,7 @@ class AboutPasswords extends React.Component {
         <table className='passwordsList'>
           <thead>
             <tr>
+              <th></th>
               <th data-l10n-id='passwordsSite'></th>
               <th data-l10n-id='passwordsUsername'></th>
               <th data-l10n-id='passwordsPassword'></th>

@@ -150,6 +150,15 @@ const AboutActions = {
   clearPasswords: function () {
     const event = new window.CustomEvent(messages.CLEAR_PASSWORDS)
     window.dispatchEvent(event)
+  },
+
+  showNotification: function (msg) {
+    // msg is l10n id of message to show
+    const event = new window.CustomEvent(messages.SHOW_NOTIFICATION, {
+      detail: msg
+    })
+    window.dispatchEvent(event)
   }
+
 }
 module.exports = AboutActions

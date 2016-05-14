@@ -15,6 +15,7 @@ var rendererIdentifiers = function () {
   return [
     'downloadsManager',
     'confirmClearPasswords',
+    'passwordCopied',
     'about',
     'quit',
     'addToReadingList',

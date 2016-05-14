@@ -89,6 +89,9 @@
   window.addEventListener('set-clipboard', (e) => {
     ipcRenderer.send('set-clipboard', e.detail)
   })
+  window.addEventListener('show-notification', (e) => {
+    ipcRenderer.send('show-notification', e.detail)
+  })
   window.addEventListener('delete-password', (e) => {
     ipcRenderer.send('delete-password', e.detail)
   })

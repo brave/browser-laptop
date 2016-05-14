@@ -321,6 +321,11 @@ app.on('ready', () => {
       electron.clipboard.writeText(text)
     })
 
+    ipcMain.on(messages.SHOW_NOTIFICATION, (e, msg) => {
+      BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
+                                                        locale.translation(msg))
+    })
+
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
       appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
     })

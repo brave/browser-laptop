@@ -232,6 +232,10 @@ class Main extends ImmutableComponent {
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
 
+    ipc.on(messages.SHOW_NOTIFICATION, (e, text) => {
+      void new window.Notification(text)
+    })
+
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
 
