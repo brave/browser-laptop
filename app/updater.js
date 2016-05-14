@@ -20,12 +20,13 @@ const Channel = require('./channel')
 const fs = require('fs')
 const path = require('path')
 const app = require('app')
+const os = require('os')
 const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
 
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
-  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + '\n')
+  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL)
 }
 
 // this maps the result of a call to process.platform to an update API identifier
