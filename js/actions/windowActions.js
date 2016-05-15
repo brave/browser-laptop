@@ -135,6 +135,33 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to set the frame tab id
+   * @param {Object} frameProps - The frame properties
+   * @param {Number} tabId - the tab id to set
+   */
+  setFrameTabId: function (frameProps, tabId) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FRAME_TAB_ID,
+      frameProps,
+      tabId
+    })
+  },
+
+  /**
+   * Dispatches a message to set the frame error state
+   * @param {Object} frameProps - The frame properties
+   * @param {Object} errorDetails - The error properties
+   *   changed.
+   */
+  setFrameError: function (frameProps, errorDetails) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FRAME_ERROR,
+      frameProps,
+      errorDetails
+    })
+  },
+
+  /**
    * Dispatches a message to set the login required detail.
    * @param {Object} frameProps - The frame where the login required prompt should be shown.
    * @param {Object} detail - Details of the login required operation.

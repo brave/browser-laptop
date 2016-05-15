@@ -184,14 +184,6 @@ WindowStore
     },
     security: {
       isSecure: boolean, // is using https
-      certDetails: {
-        url: string,
-        error: string,
-        cert: {
-            data: Uint8Array,
-            issuer: string
-        }
-      }, // the certificate details if any
       loginRequiredDetail: {
         isProxy: boolean,
         host: string,
@@ -296,6 +288,7 @@ WindowStore
     maxHeight: number, // the maximum height of the popup window
     src: string, // the src for the popup window webview
   },
-  cleanedOnShutdown: boolean // whether app data was successfully cleared on shutdown
+  cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
+  history: array // navigation history
 }
 ```

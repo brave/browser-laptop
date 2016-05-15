@@ -245,13 +245,14 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.CERT_ERROR, (e, details) => {
-      const frames = self.props.windowState.get('frames').filter((frame) => frame.get('location') === details.url)
-      frames.forEach((frame) => {
-        windowActions.setSecurityState(frame, {
-          certDetails: details
+      const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      if (frame) {
+        windowActions.setFrameError(frame, {
+          url: details.url,
+          error: details.error
         })
         windowActions.loadUrl(frame, 'about:certerror')
-      })
+      }
     })
 
     ipc.on(messages.SET_SECURITY_STATE, (e, frameKey, securityState) => {
@@ -263,10 +264,6 @@ class Main extends ImmutableComponent {
       const frames = self.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
       frames.forEach((frame) =>
         windowActions.setLoginRequiredDetail(frame, detail))
-    })
-
-    ipc.on(messages.CERT_ERROR_REJECTED, (e, previousLocation, frameKey) => {
-      windowActions.loadUrl(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey), previousLocation)
     })
 
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {

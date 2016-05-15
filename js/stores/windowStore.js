@@ -14,6 +14,8 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
+const { l10nErrorText } = require('../lib/errorUtil')
+const { aboutUrls } = require('../lib/appUrlUtil')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -175,6 +177,21 @@ const doAction = (action) => {
       // Since this value is bound we need to notify the control sync
       windowStore.emitChanges()
       return
+    case WindowConstants.WINDOW_SET_FRAME_TAB_ID:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        tabId: action.tabId
+      })
+      break
+    case WindowConstants.WINDOW_SET_FRAME_ERROR:
+      const frameKey = action.key || windowState.get('activeFrameKey')
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        aboutDetails: Object.assign({
+          title: action.errorDetails.title || l10nErrorText(action.errorDetails.errorCode),
+          previousLocation: (action.frameProps.get('history') || Immutable.fromJS([])).last(),
+          frameKey
+        }, action.errorDetails)
+      })
+      break
     case WindowConstants.WINDOW_SET_FRAME_TITLE:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         title: action.title
@@ -201,9 +218,17 @@ const doAction = (action) => {
       })
       break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
+      let history = action.frameProps.get('history') || Immutable.fromJS([])
+      if (!aboutUrls.get(action.frameProps.get('location'))) {
+        history = history.push(action.frameProps.get('location'))
+      }
+      // only keep the last 10 entries for now
+      history = history.slice(-10)
+
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
-        endLoadTime: new Date().getTime()
+        endLoadTime: new Date().getTime(),
+        history
       })
       break
     case WindowConstants.WINDOW_SET_FULL_SCREEN:
@@ -543,11 +568,9 @@ frameShortcuts.forEach((shortcut) => {
 })
 
 // Allows the parent process to send window level actions
-if (process.env.NODE_ENV === 'test') {
-  ipc.on('handle-action', (e, action) => {
-    action.frameProps = action.frameProps && Immutable.fromJS(action.frameProps)
-    doAction(action)
-  })
-}
+ipc.on('handle-action', (e, action) => {
+  action.frameProps = action.frameProps && Immutable.fromJS(action.frameProps)
+  doAction(action)
+})
 
 module.exports = windowStore

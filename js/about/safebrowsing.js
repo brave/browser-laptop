@@ -7,8 +7,7 @@ const Button = require('../components/button')
 
 require('../../less/button.less')
 require('../../less/window.less')
-// TODO: rename certerror.less to interstitial.less or something
-require('../../less/about/certerror.less')
+require('../../less/about/error.less')
 
 class SafebrowsingPage extends React.Component {
   constructor () {
