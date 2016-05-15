@@ -604,14 +604,21 @@ if (typeof KeyEvent === 'undefined') {
       }
 
       const selection = getSelection()
-      let suggestions = []
-      let isMisspelled = false
-      if (selection.length > 0 && !hasWhitespace(selection)) {
-        // This is not very taxing, it only happens once on right click and only
-        // if it is on one word, and the check and result set are returned very fast.
-        const info = ipcRenderer.sendSync('get-misspelling-info', selection)
-        suggestions = info.suggestions
-        isMisspelled = info.isMisspelled
+      let spellcheck = null
+      if (e.target.spellcheck && !e.target.readonly && !e.target.disabled) {
+        let suggestions = []
+        let isMisspelled = false
+        if (selection.length > 0 && !hasWhitespace(selection)) {
+          // This is not very taxing, it only happens once on right click and only
+          // if it is on one word, and the check and result set are returned very fast.
+          const info = ipcRenderer.sendSync('get-misspelling-info', selection)
+          suggestions = info.suggestions
+          isMisspelled = info.isMisspelled
+        }
+        spellcheck = {
+          suggestions,
+          isMisspelled
+        }
       }
 
       let src = e.target.getAttribute ? e.target.getAttribute('src') : undefined
@@ -629,9 +636,8 @@ if (typeof KeyEvent === 'undefined') {
         isContentEditable: e.target.isContentEditable || false,
         src,
         selection,
-        suggestions,
-        isMisspelled,
         hasSelection: selection.length > 0,
+        spellcheck,
         offsetX: e.pageX,
         offsetY: e.pageY
       }

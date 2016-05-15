@@ -688,7 +688,10 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
-    const misspelledSuggestions = getMisspelledSuggestions(nodeProps.selection, nodeProps.isMisspelled, nodeProps.suggestions)
+    let misspelledSuggestions = []
+    if (nodeProps.spellcheck) {
+      misspelledSuggestions = getMisspelledSuggestions(nodeProps.selection, nodeProps.spellcheck.isMisspelled, nodeProps.spellcheck.suggestions)
+    }
     const editableItems = getEditableItems(nodeProps.selection)
     template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
