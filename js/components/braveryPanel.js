@@ -4,7 +4,6 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet.js')
 const Dialog = require('./dialog')
 const windowActions = require('../actions/windowActions')
 
@@ -45,9 +44,6 @@ class BraveryPanel extends ImmutableComponent {
   get isRedirectingResources () {
     return this.redirectedResources && this.redirectedResources.size > 0
   }
-  get partitionNumber () {
-    return this.props.frameProps.getIn(['partitionNumber'])
-  }
   onToggleTPList (e) {
     windowActions.setBraveryPanelDetail({
       expandTrackingProtection: !this.isTPListShown
@@ -67,39 +63,8 @@ class BraveryPanel extends ImmutableComponent {
     e.stopPropagation()
   }
   render () {
-    let secureIcon
-    if (this.isSecure && !this.isMixedContent) {
-      secureIcon = <li><span
-        className={cx({
-          fa: true,
-          'fa-lock': true,
-          extendedValidation: this.isExtendedValidation
-        })} /><span data-l10n-id='secureConnection' /></li>
-    } else if (this.isMixedContent) {
-      secureIcon = <li><span className='fa fa-unlock-alt' /><span data-l10n-id='mixedConnection' /></li>
-    } else {
-      secureIcon = <li><span className='fa fa-unlock' /><span data-l10n-id='insecureConnection' data-l10n-args={JSON.stringify(l10nArgs)} /></li>
-    }
-
-    // Figure out the partition info display
-    let l10nArgs = {
-      partitionNumber: this.partitionNumber
-    }
-
-    let partitionInfo
-    if (this.partitionNumber) {
-      partitionInfo = <li><span className='fa fa-user' />
-        <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id='sessionInfo' /></li>
-    }
-
     return <Dialog onHide={this.props.onHide} className='braveryPanel' isClickDismiss>
       <ul onClick={(e) => e.stopPropagation()}>
-      {
-        secureIcon
-      }
-      {
-        partitionInfo
-      }
       {
         this.isBlockingTrackedContent
         ? <li>
