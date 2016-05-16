@@ -114,7 +114,7 @@ var paramsFromLastCheckDelta = (lastCheckYMD, lastCheckWOY, lastCheckMonth, firs
 }
 
 // Make a request to the update server to retrieve meta data
-var requestVersionInfo = (done) => {
+var requestVersionInfo = (done, pingOnly) => {
   if (!platformBaseUrl) throw new Error('platformBaseUrl not set')
 
   // Get the daily, week of year and month update checks
@@ -142,6 +142,9 @@ var requestVersionInfo = (done) => {
   debug(queryString)
 
   request(queryString, (err, response, body) => {
+    if (pingOnly) {
+      return
+    }
     appActions.setUpdateLastCheck()
     if (!err && response.statusCode === 204) {
       autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
@@ -186,6 +189,7 @@ exports.checkForUpdate = (verbose) => {
       updateStatus !== UpdateStatus.UPDATE_NOT_AVAILABLE &&
       updateStatus !== UpdateStatus.UPDATE_NONE) {
     debug('Already checking for updates...')
+    requestVersionInfo(undefined, true)
     appActions.setUpdateStatus(undefined, verbose)
     return
   }
@@ -194,7 +198,7 @@ exports.checkForUpdate = (verbose) => {
   appActions.setUpdateStatus(UpdateStatus.UPDATE_CHECKING, !!verbose)
   debug('checkForUpdates')
   try {
-    requestVersionInfo(downloadHandler)
+    requestVersionInfo(downloadHandler, false)
   } catch (err) {
     debug(err)
   }
