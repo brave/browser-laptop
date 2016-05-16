@@ -33,7 +33,7 @@ const headersReceivedFilteringFns = []
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 // Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'fiddle.jshell.net']
+const refererExceptions = ['use.typekit.net', 'webtoon.phinf.naver.net', 'cloud.typography.com', 'fiddle.jshell.net']
 
 /**
  * Maps downloadId to an electron download-item
