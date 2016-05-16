@@ -411,8 +411,21 @@ function tabTemplateInit (frameProps) {
         focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, true)
       }
     }
-  },
-  CommonMenu.separatorMenuItem)
+  }, {
+    label: locale.translation('closeTabsToRight'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, false)
+      }
+    }
+  }, {
+    label: locale.translation('closeTabsToLeft'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, false, true)
+      }
+    }
+  }, CommonMenu.separatorMenuItem)
 
   items.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
@@ -730,8 +743,7 @@ function mainTemplateInit (nodeProps, frame) {
               focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
             }
           }
-        },
-        CommonMenu.separatorMenuItem, {
+        }, {
           label: locale.translation('reloadPage'),
           click: (item, focusedWindow) => {
             if (focusedWindow) {
@@ -739,6 +751,7 @@ function mainTemplateInit (nodeProps, frame) {
             }
           }
         },
+        CommonMenu.separatorMenuItem,
         addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false), {
           label: locale.translation('find'),
           accelerator: 'CmdOrCtrl+F',

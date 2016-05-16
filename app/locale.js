@@ -49,6 +49,8 @@ var rendererIdentifiers = function () {
     'newTab',
     'closeTab',
     'closeOtherTabs',
+    'closeTabsToRight',
+    'closeTabsToLeft',
     'bookmarkPage',
     'bookmarkLink',
     'openFile',
