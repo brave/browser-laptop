@@ -93,6 +93,19 @@ const appActions = {
   },
 
   /**
+   * Removes all sites from a parent
+   * @param {Object} siteDetail - Properties of the site in question
+   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
+   */
+  emptySite: function (siteDetail, tag) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_EMPTY_SITE,
+      siteDetail,
+      tag
+    })
+  },
+
+  /**
    * Dispatches a message to move a site locations.
    *
    * @param {string} sourceDetail - the location, partitionNumber, etc of the source moved site

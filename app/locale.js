@@ -38,6 +38,7 @@ var rendererIdentifiers = function () {
     'pinTab',
     'unpinTab',
     'deleteFolder',
+    'emptyFolder',
     'deleteBookmark',
     'editFolder',
     'editBookmark',
