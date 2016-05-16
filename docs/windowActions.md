@@ -543,7 +543,7 @@ Dispatches a message to indicate if the mouse is in the titlebar
 
 
 
-### setSiteInfoVisible(isVisible, expandTrackingProtection, expandAdblock, expandHttpse) 
+### setSiteInfoVisible(isVisible) 
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -551,11 +551,16 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 
 **isVisible**: `boolean`, true if the site info should be shown
 
-**expandTrackingProtection**: `boolean`, If specified, indicates if the TP section should be expanded
 
-**expandAdblock**: `boolean`, If specified, indicates if the adblock section should be expanded
 
-**expandHttpse**: `boolean`, If specified, indicates if the httpse section should be expanded
+### setBraveryPanelDetail(braveryPanelDetail) 
+
+Dispatches a message to indicate the bravery panel should be shown
+
+**Parameters**
+
+**braveryPanelDetail**: `Object`, Details about how to show the bravery panel.
+  Set to undefined to hide the panel.  See state documentation for more info.
 
 
 

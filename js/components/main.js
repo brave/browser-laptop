@@ -515,7 +515,6 @@ class Main extends ImmutableComponent {
           {
             siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
-              siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
               onHide={this.onHideSiteInfo} />
             : null
           }

@@ -246,10 +246,7 @@ WindowStore
       tabPageIndex: number, // Index of the current tab page
     },
     siteInfo: {
-      isVisible: boolean, // Whether or not to show site info like # of blocked ads
-      expandTrackingProtection: boolean,
-      expandAdblock: boolean,
-      expandHttpse: boolean
+      isVisible: boolean // Whether or not to show site info like # of blocked ads
     },
     noScriptInfo: {
       isVisible: boolean, // Whether the noscript infobox is visible
