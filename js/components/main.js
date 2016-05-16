@@ -26,6 +26,7 @@ const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
+const BraveryPanel = require('./braveryPanel')
 const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
@@ -62,6 +63,7 @@ class Main extends ImmutableComponent {
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
+    this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onBraveMenu = this.onBraveMenu.bind(this)
@@ -321,7 +323,7 @@ class Main extends ImmutableComponent {
   }
 
   onBraveMenu () {
-    // TODO
+    windowActions.setBraveryPanelDetail({})
   }
 
   onHamburgerMenu (e) {
@@ -340,6 +342,10 @@ class Main extends ImmutableComponent {
 
   onHideSiteInfo () {
     windowActions.setSiteInfoVisible(false)
+  }
+
+  onHideBraveryPanel () {
+    windowActions.setBraveryPanelDetail()
   }
 
   onHideNoScript () {
@@ -446,11 +452,13 @@ class Main extends ImmutableComponent {
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
+    const braveryPanelIsVisible = this.props.windowState.get('braveryPanelDetail')
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
+      !braveryPanelIsVisible &&
       !releaseNotesIsVisible &&
       !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
@@ -509,6 +517,13 @@ class Main extends ImmutableComponent {
             ? <SiteInfo frameProps={activeFrame}
               siteInfo={this.props.windowState.getIn(['ui', 'siteInfo'])}
               onHide={this.onHideSiteInfo} />
+            : null
+          }
+          {
+            braveryPanelIsVisible
+            ? <BraveryPanel frameProps={activeFrame}
+              braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
+              onHide={this.onHideBraveryPanel} />
             : null
           }
           {

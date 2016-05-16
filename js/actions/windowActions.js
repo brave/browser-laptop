@@ -793,6 +793,19 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to indicate the bravery panel should be shown
+   *
+   * @param {Object} braveryPanelDetail - Details about how to show the bravery panel.
+   *   Set to undefined to hide the panel.  See state documentation for more info.
+   */
+  setBraveryPanelDetail: function (braveryPanelDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_BRAVERY_PANEL_DETAIL,
+      braveryPanelDetail
+    })
+  },
+
+  /**
    * Dispatches a message to indicate if the downloads toolbar is visible
    *
    * @param {boolean} isVisible - true if the site info should be shown

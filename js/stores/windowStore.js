@@ -478,6 +478,18 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'siteInfo', 'expandHttpse'], action.expandHttpse)
       }
       break
+    case WindowConstants.WINDOW_SET_BRAVERY_PANEL_DETAIL:
+      if (!action.braveryPanelDetail) {
+        windowState = windowState.delete('braveryPanelDetail')
+      } else {
+        windowState = windowState.mergeIn(['braveryPanelDetail'], {
+          advancedControls: action.braveryPanelDetail.advancedControls,
+          expandTrackingProtection: action.braveryPanelDetail.expandTrackingProtection,
+          expandAdblock: action.braveryPanelDetail.expandAdblock,
+          expandHttpse: action.braveryPanelDetail.expandHttpse
+        })
+      }
+      break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
       windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
       break

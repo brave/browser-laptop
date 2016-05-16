@@ -54,6 +54,37 @@
   }
 }
 
+.braveryPanel {
+  >ul {
+    .flyoutDialog;
+    margin-left: -250px;
+    text-align: left;
+    width: auto;
+    right: 0;
+
+    li {
+      list-style-type: none;
+      padding: 10px 0;
+
+      .fa {
+        padding-right: 10px;
+      }
+      &.extendedValidation {
+        color: green;
+      }
+
+      ul {
+        font-size: smaller;
+        max-height: 300px;
+        overflow-y: scroll;
+        margin-top: -20px;
+        padding: 0 10px;
+        max-width: 350px;
+      }
+    }
+  }
+}
+
 .noScriptInfo {
   >div {
     .flyoutDialog;
