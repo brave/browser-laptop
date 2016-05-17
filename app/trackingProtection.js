@@ -39,7 +39,7 @@ const startTrackingProtection = (wnd) => {
       !whitelistHosts.includes(urlHost) &&
       cachedFirstParty.get(firstPartyUrlHost) &&
       trackingProtection.matchesTracker(firstPartyUrlHost, urlHost) &&
-      urlHost !== firstPartyUrlHost &&
+      urlHost !== firstPartyUrl.hostname &&
       !cachedFirstParty.get(firstPartyUrlHost).find((baseHost) =>
         !Filtering.isThirdPartyHost(baseHost, urlHost))
 
