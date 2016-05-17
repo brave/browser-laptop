@@ -11,6 +11,11 @@ require('../../less/about/passwords.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 class SiteItem extends React.Component {
+  constructor () {
+    super()
+    this.onDelete = this.onDelete.bind(this)
+  }
+
   onDelete () {
     aboutActions.deletePasswordSite(this.props.site)
   }
@@ -19,7 +24,7 @@ class SiteItem extends React.Component {
     return <tr className='passwordItem'>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-times' title='Remove site'
-          onClick={this.onDelete.bind(this)}>
+          onClick={this.onDelete}>
         </span>
       </td>
       <td className='passwordOrigin'>{this.props.site}</td>
@@ -37,6 +42,9 @@ class PasswordItem extends React.Component {
     this.state = {
       decrypted: null
     }
+    this.onDelete = this.onDelete.bind(this)
+    this.onCopy = this.onCopy.bind(this)
+    this.onDecrypt = this.onDecrypt.bind(this)
   }
 
   decrypt () {
@@ -73,7 +81,7 @@ class PasswordItem extends React.Component {
   }
 
   componentDidMount () {
-    window.addEventListener('decrypted-password', this.onDecrypt.bind(this))
+    window.addEventListener('decrypted-password', this.onDecrypt)
   }
 
   render () {
@@ -81,7 +89,7 @@ class PasswordItem extends React.Component {
     return <tr className='passwordItem'>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-times' title='Delete password'
-          onClick={this.onDelete.bind(this)}>
+          onClick={this.onDelete}>
         </span>
       </td>
       <td className='passwordOrigin'>{password.get('origin')}</td>
@@ -91,7 +99,7 @@ class PasswordItem extends React.Component {
       </td>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
-          onClick={this.onCopy.bind(this)}>
+          onClick={this.onCopy}>
         </span>
       </td>
     </tr>
@@ -110,6 +118,7 @@ class AboutPasswords extends React.Component {
       passwordDetails: window.initPasswords ? Immutable.fromJS(window.initPasswords) : new Immutable.List(),
       disabledSiteDetails: window.initDisabledSites ? Immutable.fromJS(window.initDisabledSites) : new Immutable.Map()
     }
+    this.onClear = this.onClear.bind(this)
     window.addEventListener(messages.PASSWORD_DETAILS_UPDATED, (e) => {
       if (e.detail) {
         this.setState({
@@ -170,7 +179,7 @@ class AboutPasswords extends React.Component {
         </table>
         <div className='passwordsPageFooter'>
           <span data-l10n-id='clearPasswords'
-            onClick={this.onClear.bind(this)}></span>
+            onClick={this.onClear}></span>
         </div>
       </div>
     </div>
