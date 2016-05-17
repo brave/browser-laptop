@@ -1,9 +1,5 @@
 @import "./common.less";
 
-@prefTopBg: #999;
-@prefTopBgButtonSelected: #656565;
-@prefTopBgButtonHover: #444;
-
 .prefTabContainer {
   flex-grow: 1;
   padding: 60px 30px 30px 30px;
@@ -11,14 +7,24 @@
 
 .preferencesTopBar {
   background-color: @prefTopBg;
+  position: fixed;
+  min-width: @sideBarWidth;
+  width: 15%;
+  max-width: @sideBarWidth;
+  height: 100%;
+  z-index: 100;
   >div {
-    display: inline-block;
+    display: block;
+    width: 100%;
     &:hover {
       .topBarButton.fa {
         background-color: @prefTopBgButtonHover;
       }
     }
-
+    .topBarButton.fa {
+      display: block;
+      width: 100%;
+    }
     &.selected {
       .topBarButton.fa {
         background-color: @prefTopBgButtonSelected;
@@ -35,6 +41,7 @@
 }
 
 .topBarButton.fa {
+  box-sizing: border-box;
   color: white;
   cursor: default;
   display: inline-block;
@@ -42,17 +49,24 @@
   padding: 20px;
   position: relative;
   width: 40px;
-  text-align: center;
+  cursor: pointer;
 }
 
 .helpfulHints {
-  background-color: #f5f5f5;
-  color: #999;
+  background-color: #999;
+  color: white;
   cursor: default;
   flex-grow: 0;
   height: 100%;
   padding: 30px 0;
-  width: 200px;
+  min-width: @sideBarWidth;
+  width: 15%;
+  max-width: @sideBarWidth;
+  position: fixed;
+  z-index: 110;
+  bottom: 0;
+  left: 0;
+  height: 240px;
 
   .hintsTitleContainer {
     -webkit-user-select: none;
@@ -60,9 +74,12 @@
     font-size: inherit;
     font-weight: normal;
     margin: 10px;
+    * {
+      color: white;
+    }
   }
   > div {
-    color: @braveOrange;
+    color: white;
     font-size: smaller;
     margin: 10px;
   }
@@ -70,49 +87,57 @@
     position: absolute;
     bottom: 0;
     a {
-      color: @braveOrange;
+      color: white;
     }
     .loveToHear {
       color: initial;
       font-size: smaller;
       margin-top: 5px;
       margin-bottom: 30px;
+      color: white;
     }
   }
   .hintsRefresh {
     margin-left: 15px;
     font-size: smaller;
+    &:before {
+      cursor: pointer;
+    }
   }
 }
 
 .prefBody {
   display: flex;
   height: 100%;
+  margin-left: @sideBarWidth;
 }
-
-@markerSize: 6px;
 
 .tabMarkerContainer {
   position: relative;
 
   .tabMarker {
-    border-left: @markerSize solid transparent;
-    border-right: @markerSize solid transparent;
-    border-top: @markerSize solid @prefTopBg;
+    border-left: @carotRadius solid transparent;
+    border-right: @carotRadius solid transparent;
+    border-top: @carotRadius solid @prefTopBg;
     height: 0;
-    left: ~"calc(50% - 6px)";
+    left: ~"calc(97%)";
+    transform: rotateZ(-90deg);
     position: absolute;
+    z-index: 400;
     width: 0;
+    top: -34px;
   }
 }
 
 .tabMarkerText {
+  display: inline-block;
   color: white;
-  font-size: 10px;
-  left: 0;
-  position: absolute;
-  margin-top: 3px;
-  right: 0;
+  font-size: 0.7em;
+  margin-left: 15px;
+
+  &:before {
+    display: inline-block;
+  }
 }
 
 a {
