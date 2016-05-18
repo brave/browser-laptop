@@ -39,7 +39,11 @@ class Frame extends ImmutableComponent {
   }
 
   updateWebview () {
-    if (!this.webview && !this.props.isActive && !this.props.isPreview && !aboutUrls.get(this.props.frame.get('src'))) {
+    if (!this.webview && !this.props.isActive && !this.props.isPreview &&
+        // don't lazy load about pages
+        !aboutUrls.get(this.props.frame.get('src')) &&
+        // pinned tabs don't serialize their state so the icon is lost for lazy loading
+        !this.props.frame.get('pinnedLocation')) {
       return
     }
 
