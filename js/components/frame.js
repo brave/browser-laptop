@@ -26,7 +26,7 @@ const adInfo = require('../data/adInfo.js')
 const FindBar = require('./findbar.js')
 const consoleStrings = require('../constants/console')
 
-const { isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
+const { isSourceAboutUrl, getTargetAboutUrl, aboutUrls } = require('../lib/appUrlUtil')
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -39,6 +39,10 @@ class Frame extends ImmutableComponent {
   }
 
   updateWebview () {
+    if (!this.webview && !this.props.isActive && !this.props.isPreview && !aboutUrls.get(this.props.frame.get('src'))) {
+      return
+    }
+
     let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
     const hack = siteHacks[urlParse(location).hostname]
