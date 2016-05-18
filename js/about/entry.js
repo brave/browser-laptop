@@ -1,34 +1,44 @@
 const ReactDOM = require('react-dom')
 const { getSourceAboutUrl } = require('../lib/appUrlUtil')
 
-let rootComponent
+let element
+
 switch (getSourceAboutUrl(window.location.href)) {
   case 'about:newtab':
-    rootComponent = require('./newtab')
+    element = require('./newtab')
     break
   case 'about:about':
-    rootComponent = require('./about')
+    element = require('./about')
     break
   case 'about:preferences':
-    rootComponent = require('./preferences')
+    element = require('./preferences')
     break
   case 'about:bookmarks':
-    rootComponent = require('./bookmarks')
+    element = require('./bookmarks')
     break
   case 'about:downloads':
-    rootComponent = require('./downloads')
+    element = require('./downloads')
     break
   case 'about:certerror':
-    rootComponent = require('./certerror')
+    element = require('./certerror')
     break
   case 'about:passwords':
-    rootComponent = require('./passwords')
+    element = require('./passwords')
     break
   case 'about:safebrowsing':
-    rootComponent = require('./safebrowsing')
+    element = require('./safebrowsing')
+    break
+  case 'about:error':
+    element = require('./errorPage')
     break
 }
 
-if (rootComponent) {
-  ReactDOM.render(rootComponent, document.querySelector('#appContainer'))
+if (element) {
+  let component = ReactDOM.render(element, document.querySelector('#appContainer'))
+  window.aboutDetails && component.setState(window.aboutDetails)
+  delete window.aboutDetails
+  window.addEventListener('state-updated', function (e) {
+    component.setState(e.detail)
+  })
 }
+

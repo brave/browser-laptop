@@ -55,7 +55,8 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:config': module.exports.getAppUrl('about-config.html'),
   'about:certerror': module.exports.getAppUrl('about-certerror.html'),
   'about:safebrowsing': module.exports.getAppUrl('about-safebrowsing.html'),
-  'about:passwords': module.exports.getAppUrl('about-passwords.html')
+  'about:passwords': module.exports.getAppUrl('about-passwords.html'),
+  'about:error': module.exports.getAppUrl('about-error.html')
 })
 
 // Map of target URLs mapped to source about: URLs

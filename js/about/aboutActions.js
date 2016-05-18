@@ -6,6 +6,18 @@ const messages = require('../constants/messages')
 
 const AboutActions = {
   /**
+   * Dispatches a window action
+   * @param {string} key - The settings key to change the value on
+   * @param {string} value - The value of the setting to set
+   */
+  dispatchWindowAction: function (args) {
+    const event = new window.CustomEvent(messages.DISPATCH_WINDOW_ACTION, {
+      detail: args
+    })
+    window.dispatchEvent(event)
+  },
+
+  /**
    * Dispatches an event to the renderer process to change a setting
    *
    * @param {string} key - The settings key to change the value on
@@ -65,16 +77,6 @@ const AboutActions = {
         url
       }
     })
-    window.dispatchEvent(event)
-  },
-
-  /**
-   * Reject a certificate error.
-   *
-   * @param {Object} detail
-   */
-  rejectCertError: function (detail) {
-    const event = new window.CustomEvent(messages.CERT_ERROR_REJECTED, {detail})
     window.dispatchEvent(event)
   },
 

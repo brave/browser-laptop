@@ -27,6 +27,11 @@ function getFrameByKey (windowState, key) {
   return windowState.getIn(['frames', i])
 }
 
+function getFrameByTabId (windowState, tabId) {
+  const i = windowState.get('frames').findIndex((frame) => frame.get('tabId') === tabId)
+  return windowState.getIn(['frames', i])
+}
+
 function getActiveFrame (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return windowState.get('frames').get(activeFrameIndex)
@@ -159,7 +164,9 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     canGoBack: false,
     canGoForward: false,
     location: frameOpts.delayedLoadUrl || url, // page url
+    aboutDetails: undefined,
     src: url, // what the iframe src should be
+    tabId: -1,
     // if this is a delayed load then go ahead and start the loading indicator
     loading: !!frameOpts.delayedLoadUrl,
     startLoadTime: frameOpts.delayedLoadUrl ? new Date().getTime() : null,
@@ -196,7 +203,8 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     security: {
       isSecure: urlParse(url).protocol === 'https:',
       certDetails: null
-    }
+    },
+    history: []
   })
 
   // Find the closest index to the current frame's index which has
@@ -310,6 +318,7 @@ module.exports = {
   getActiveFrameIndex,
   getFrameByIndex,
   getFrameByKey,
+  getFrameByTabId,
   getActiveFrame,
   setActiveFrameIndex,
   setActiveFrameKey,

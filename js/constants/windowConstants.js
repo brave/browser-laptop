@@ -25,6 +25,8 @@ const windowConstants = {
   WINDOW_SET_URL_BAR_PREVIEW: _,
   WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS: _,
   WINDOW_WEBVIEW_LOAD_START: _,
+  WINDOW_SET_FRAME_ERROR: _,
+  WINDOW_SET_FRAME_TAB_ID: _,
   WINDOW_SET_FRAME_TITLE: _,
   WINDOW_SET_LOCATION: _, // sets location of a frame
   WINDOW_SET_URL_BAR_ACTIVE: _, // whether the URL bar is being typed in

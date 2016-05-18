@@ -230,7 +230,7 @@ describe('urlbar', function () {
         ))
     })
     it('Shows secure URL icon', function * () {
-      const page1Url = Brave.server.url('page1.html').replace('http', 'https')
+      const page1Url = 'https://badssl.com'
       yield this.app.client.loadUrl(page1Url)
       yield this.app.client
         .moveToObject(urlInput)

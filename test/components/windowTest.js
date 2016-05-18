@@ -677,7 +677,7 @@ describe('application window', function () {
       })
     })
 
-    describe('with target  _top', function () {
+    describe('with target _top', function () {
       Brave.beforeAll(this)
 
       before(function * () {
@@ -696,10 +696,9 @@ describe('application window', function () {
       })
 
       it('sets the url of the top-level frame in the same domain', function * () {
-        var page1 = this.page1 // for wait closure
         yield this.app.client
           // page1 loaded
-          .tabByUrl(page1).getUrl().should.become(page1)
+          .tabByUrl(this.page1).getUrl().should.eventually.be.equal(this.page1)
 
         // this isn't a very good test because it could evaluate before the new
         // tab/window opens. Is there something else we can check?

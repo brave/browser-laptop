@@ -183,16 +183,17 @@ app.on('ready', () => {
       cb(true)
       return
     }
+
     // Tell the page to show an unlocked icon. Note this is sent to the main
     // window webcontents, not the webview webcontents
-    BrowserWindow.getAllWindows().map((win) => {
-      win.webContents.send(messages.CERT_ERROR, {
-        url,
-        error,
-        cert
-      })
+    webContents.hostWebContents.send(messages.CERT_ERROR, {
+      url,
+      error,
+      cert,
+      tabId: webContents.getId()
     })
   })
+
   app.on('login', (e, webContents, request, authInfo, cb) => {
     e.preventDefault()
     authCallbacks[request.url] = cb
@@ -309,6 +310,10 @@ app.on('ready', () => {
       Menu.init(AppStore.getState().get('settings'), args)
     })
 
+    ipcMain.on(messages.DISPATCH_WINDOW_ACTION, (e, args) => {
+      e.sender.hostWebContents.send('handle-action', args)
+    })
+
     ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
       appActions.changeSetting(key, value)
     })
@@ -339,21 +344,16 @@ app.on('ready', () => {
       if (host) {
         acceptCertDomains[host] = true
       }
-      BrowserWindow.getFocusedWindow().webContents.send(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, url)
     })
 
     ipcMain.on(messages.CHECK_CERT_ERROR_ACCEPTED, (event, host, frameKey) => {
       // If the host is associated with a URL with a cert error, update the
       // security state to insecure
       if (acceptCertDomains[host]) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.SET_SECURITY_STATE, frameKey, {
+        event.sender.send(messages.SET_SECURITY_STATE, frameKey, {
           secure: false
         })
       }
-    })
-
-    ipcMain.on(messages.CERT_ERROR_REJECTED, (event, previousLocation, frameKey) => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.CERT_ERROR_REJECTED, previousLocation, frameKey)
     })
 
     AppStore.addChangeListener(() => {

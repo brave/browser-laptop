@@ -25,20 +25,66 @@ const settings = require('../constants/settings')
 const adInfo = require('../data/adInfo.js')
 const FindBar = require('./findbar.js')
 const consoleStrings = require('../constants/console')
-
-const { isSourceAboutUrl, getTargetAboutUrl, aboutUrls } = require('../lib/appUrlUtil')
+const { aboutUrls, isSourceAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
+const { isFrameError } = require('../lib/errorUtil')
 
 class Frame extends ImmutableComponent {
   constructor () {
     super()
-    this.previousLocation = 'about:newtab'
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
     this.onFind = this.onFind.bind(this)
     this.onFindHide = this.onFindHide.bind(this)
     this.onFocus = this.onFocus.bind(this)
   }
 
-  updateWebview () {
+  isAboutPage () {
+    return aboutUrls.get(this.props.frame.get('location'))
+  }
+
+  updateAboutDetails (prevProps) {
+    let location = this.props.frame.get('location')
+    if (location === 'about:preferences') {
+      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
+      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.siteSettings.toJS())
+    } else if (location === 'about:bookmarks') {
+      this.webview.send(messages.BOOKMARKS_UPDATED, {
+        bookmarks: this.props.bookmarks.toJS(),
+        bookmarkFolders: this.props.bookmarkFolders.toJS()
+      })
+    } else if (location === 'about:downloads') {
+      this.webview.send(messages.DOWNLOADS_UPDATED, {
+        downloads: this.props.downloads.toJS()
+      })
+    } else if (location === 'about:passwords') {
+      if (prevProps.passwords !== this.props.passwords) {
+        this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
+      }
+      if (prevProps.siteSettings !== this.props.siteSettings) {
+        if (this.props.siteSettings) {
+          this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
+                            this.props.siteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
+        }
+      }
+    }
+
+    // send state to about pages
+    let aboutDetails = this.props.frame.get('aboutDetails')
+    if (this.isAboutPage() && aboutDetails) {
+      this.webview.send('state-updated', aboutDetails.toJS())
+    }
+  }
+
+  shouldCreateWebview () {
+    return !this.webview || this.webview.isCrashed() || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent()
+  }
+
+  allowRunningInsecureContent () {
+    let hack = siteHacks[urlParse(this.props.frame.get('location')).hostname]
+    return !!(hack && hack.allowRunningInsecureContent)
+  }
+
+  updateWebview (cb) {
+    // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
         // don't lazy load about pages
         !aboutUrls.get(this.props.frame.get('src')) &&
@@ -49,14 +95,11 @@ class Frame extends ImmutableComponent {
 
     let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
-    const hack = siteHacks[urlParse(location).hostname]
-    const allowRunningInsecureContent = !!(hack && hack.allowRunningInsecureContent)
 
     // Create the webview dynamically because React doesn't whitelist all
-    // of the attributes we need.  Clear out old webviews if
-    // allowRunningInsecureContent changes because they cannot change after being added to the DOM.
+    // of the attributes we need
     let webviewAdded = false
-    if (!this.webview || this.webview.allowRunningInsecureContent !== allowRunningInsecureContent) {
+    if (this.shouldCreateWebview()) {
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
@@ -82,18 +125,26 @@ class Frame extends ImmutableComponent {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
 
+    const hack = siteHacks[urlParse(location).hostname]
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
-    if (allowRunningInsecureContent) {
+    if (this.allowRunningInsecureContent()) {
       this.webview.setAttribute('allowRunningInsecureContent', true)
       this.webview.allowRunningInsecureContent = true
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
     if (webviewAdded) {
-      this.webviewContainer.appendChild(this.webview)
+      let runOnDomReady = () => {
+        this.webview.removeEventListener('dom-ready', runOnDomReady)
+        cb && cb()
+      }
+      this.webview.addEventListener('dom-ready', runOnDomReady)
       this.addEventListeners()
+      this.webviewContainer.appendChild(this.webview)
+    } else {
+      cb && cb()
     }
   }
 
@@ -127,31 +178,23 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const location = this.props.frame.get('location')
-    const prevLocation = prevProps.frame.get('location')
-    const didSrcChange = this.props.frame.get('src') !== prevProps.frame.get('src')
-    const didLocationChange = location !== prevLocation
-    // When auto-redirecting to about:certerror, the frame location change and
-    // frame src change are emitted separately. Make sure updateWebview is
-    // called when the location changes.
-    const hack = siteHacks[urlParse(location).hostname]
-    const allowRunningInsecureContent = !!(hack && hack.allowRunningInsecureContent)
-    if (didSrcChange || didLocationChange && location === 'about:certerror' || !this.webview ||
-        allowRunningInsecureContent !== this.webview.allowRunningInsecureContent) {
-      this.updateWebview()
+    const cb = () => {
+      // give focus when switching tabs
+      if (this.props.isActive && !prevProps.isActive) {
+        this.webview.focus()
+      }
+      this.handleShortcut()
+      this.updateAboutDetails(prevProps)
     }
-    if (didLocationChange && location !== 'about:certerror' &&
-        prevLocation !== 'about:certerror' &&
-        urlParse(prevLocation).host !== urlParse(location).host) {
-      // Keep track of one previous location so the cert error page can return to
-      // it. Don't record same-origin location changes because these will
-      // often end up re-triggering the cert error.
-      this.previousLocation = prevLocation
+
+    if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
+      this.updateWebview(cb)
+    } else {
+      cb()
     }
-    // give focus when switching tabs
-    if (this.props.isActive && !prevProps.isActive) {
-      this.webview.focus()
-    }
+  }
+
+  handleShortcut () {
     const activeShortcut = this.props.frame.get('activeShortcut')
     const activeShortcutDetails = this.props.frame.get('activeShortcutDetails')
     switch (activeShortcut) {
@@ -159,24 +202,27 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
         break
       case 'reload':
-        if (['about:preferences', 'about:downloads', 'about:bookmarks', 'about:passwords', 'about:certerror'].includes(this.props.frame.get('location'))) {
+        if (this.isAboutPage()) {
           break
         }
         // Ensure that the webview thinks we're on the same location as the browser does.
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on frame.get('location').
-        if (this.webview.getURL() !== this.props.frame.get('location')) {
-          this.webview.loadURL(this.props.frame.get('location'))
+        if (this.webview.getURL() !== location) {
+          this.webview.loadURL(location)
         } else {
           this.webview.reload()
         }
         break
       case 'clean-reload':
+        if (this.isAboutPage()) {
+          break
+        }
         this.webview.reloadIgnoringCache()
         break
       case 'explicitLoadURL':
-        this.webview.loadURL(this.props.frame.get('location'))
+        this.webview.loadURL(location)
         break
       case 'zoom-in':
         this.zoomIn()
@@ -228,30 +274,6 @@ class Frame extends ImmutableComponent {
     if (activeShortcut) {
       windowActions.setActiveFrameShortcut(this.props.frame, null, null)
     }
-
-    if (this.props.frame.get('location') === 'about:preferences') {
-      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
-      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.siteSettings.toJS())
-    } else if (this.props.frame.get('location') === 'about:bookmarks') {
-      this.webview.send(messages.BOOKMARKS_UPDATED, {
-        bookmarks: this.props.bookmarks.toJS(),
-        bookmarkFolders: this.props.bookmarkFolders.toJS()
-      })
-    } else if (this.props.frame.get('location') === 'about:downloads') {
-      this.webview.send(messages.DOWNLOADS_UPDATED, {
-        downloads: this.props.downloads.toJS()
-      })
-    } else if (this.props.frame.get('location') === 'about:passwords') {
-      if (prevProps.passwords !== this.props.passwords) {
-        this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
-      }
-      if (prevProps.siteSettings !== this.props.siteSettings) {
-        if (this.props.siteSettings) {
-          this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
-                            this.props.siteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
-        }
-      }
-    }
   }
 
   addEventListeners () {
@@ -290,6 +312,10 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('dom-ready', (e) => {
+      let tabId = this.webview.getWebContents().getId()
+      if (this.props.frame.get('tabId') !== tabId) {
+        windowActions.setFrameTabId(this.props.frame, tabId)
+      }
       this.webview.setActive(this.props.isActive)
     })
     this.webview.addEventListener('destroyed', (e) => {
@@ -350,9 +376,7 @@ class Frame extends ImmutableComponent {
              'view-source:', 'ftp:', 'data:'].includes(parsedUrl.protocol)) {
           windowActions.setLocation(event.url, key)
         }
-        const hack = siteHacks[parsedUrl.hostname]
-        const isSecure = parsedUrl.protocol === 'https:' &&
-          (!hack || !hack.allowRunningInsecureContent)
+        const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
         windowActions.setSecurityState(this.props.frame, {
           secure: isSecure
         })
@@ -377,6 +401,7 @@ class Frame extends ImmutableComponent {
       windowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
+
       if (this.props.enableAds) {
         this.insertAds(this.webview.getURL())
       }
@@ -384,21 +409,6 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.POST_PAGE_LOAD_RUN)
       if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
         this.webview.send(messages.AUTOFILL_PASSWORD)
-      }
-      let security = this.props.frame.get('security')
-      if (this.props.frame.get('location') === 'about:certerror' &&
-          security && security.get('certDetails')) {
-        // Don't send certDetails.cert since it is big and crashes the page
-        this.webview.send(messages.CERT_DETAILS_UPDATED, {
-          url: security.get('certDetails').url,
-          error: security.get('certDetails').error,
-          previousLocation: this.previousLocation,
-          frameKey: this.props.frame.get('key')
-        })
-      } else if (this.props.frame.get('location') === 'about:passwords') {
-        this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
-        this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
-                          this.props.siteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
       }
 
       const parsedUrl = urlParse(this.props.frame.get('location'))
@@ -425,10 +435,23 @@ class Frame extends ImmutableComponent {
         this.webview.focus()
       }
     })
-    this.webview.addEventListener('did-fail-load', () => {
-      windowActions.onWebviewLoadEnd(
-        this.props.frame,
-        this.webview.getURL())
+    this.webview.addEventListener('crashed', (e) => {
+      windowActions.setFrameError(this.props.frame, {
+        event_type: 'crashed',
+        title: 'unexpectedError',
+        url: this.props.frame.get('location')
+      })
+      windowActions.loadUrl(this.props.frame, 'about:error')
+    })
+    this.webview.addEventListener('did-fail-load', (e) => {
+      if (e.isMainFrame && isFrameError(e.errorCode)) {
+        windowActions.setFrameError(this.props.frame, {
+          event_type: 'did-fail-load',
+          errorCode: e.errorCode,
+          url: e.validatedURL
+        })
+        windowActions.loadUrl(this.props.frame, 'about:error')
+      }
     })
     this.webview.addEventListener('did-finish-load', () => {
       loadEnd()
@@ -522,7 +545,6 @@ class Frame extends ImmutableComponent {
     windowActions.setUrlBarActive(false)
     windowActions.setContextMenuDetail()
     windowActions.setPopupWindowDetail()
-    this.webview.setActive(this.props.isActive)
   }
 
   onFindHide () {

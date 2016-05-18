@@ -64,6 +64,31 @@ Dispatches a message to set the security state.
 
 
 
+### setFrameTabId(frameProps, tabId) 
+
+Dispatches a message to set the frame tab id
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties
+
+**tabId**: `Number`, the tab id to set
+
+
+
+### setFrameError(frameProps, errorDetails) 
+
+Dispatches a message to set the frame error state
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties
+
+**errorDetails**: `Object`, The error properties
+  changed.
+
+
+
 ### setLoginRequiredDetail(frameProps, detail) 
 
 Dispatches a message to set the login required detail.

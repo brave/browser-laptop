@@ -3,39 +3,36 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const messages = require('../constants/messages')
-const Immutable = require('immutable')
 const Button = require('../components/button')
 const aboutActions = require('./aboutActions')
+const WindowConstants = require('../constants/windowConstants')
 
 require('../../less/button.less')
 require('../../less/window.less')
-require('../../less/about/certerror.less')
+require('../../less/about/error.less')
 
 class CertErrorPage extends React.Component {
   constructor () {
     super()
     this.state = {
-      advanced: false,
-      certDetails: window.initCertDetails ? Immutable.fromJS(window.initCertDetails) : Immutable.Map()
+      advanced: false
     }
-    window.addEventListener(messages.CERT_DETAILS_UPDATED, (e) => {
-      if (e.detail) {
-        this.setState({
-          certDetails: Immutable.fromJS(e.detail)
-        })
-      }
-    })
   }
 
   onAccept () {
-    aboutActions.acceptCertError(this.state.certDetails.get('url'))
+    aboutActions.acceptCertError(this.state.url)
+    aboutActions.dispatchWindowAction({
+      actionType: WindowConstants.WINDOW_SET_URL,
+      location: this.state.url,
+      key: this.state.frameKey
+    })
   }
 
   onSafety () {
-    aboutActions.rejectCertError({
-      previousLocation: this.state.certDetails.get('previousLocation'),
-      frameKey: this.state.certDetails.get('frameKey')
+    aboutActions.dispatchWindowAction({
+      actionType: WindowConstants.WINDOW_SET_URL,
+      location: this.state.previousLocation,
+      key: this.state.frameKey
     })
   }
 
@@ -50,8 +47,8 @@ class CertErrorPage extends React.Component {
       </svg>
       <div className='certErrorText'>
         <span data-l10n-id='certErrorText'></span>&nbsp;
-        <span className='errorUrl'>{this.state.certDetails.get('url') || ''}</span>
-        <span className='errorText'>{this.state.certDetails.get('error') || ''}</span>
+        <span className='errorUrl'>{this.state.url || ''}</span>
+        <span className='errorText'>{this.state.error || ''}</span>
       </div>
       <div className='buttons'>
         <Button l10nId='certErrorSafety' className='wideButton' onClick={this.onSafety.bind(this)} />

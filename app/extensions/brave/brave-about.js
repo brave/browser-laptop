@@ -4,6 +4,12 @@
 
 (function () {
   var ipcRenderer = chrome.ipc;
+  ipcRenderer.on('state-updated', (e, detail) => {
+    const event = new window.CustomEvent('state-updated', {
+      detail
+    })
+    window.dispatchEvent(event)
+  })
   ipcRenderer.on('language', (e, language) => {
     const event = new window.CustomEvent('language', {
       detail: language
@@ -34,12 +40,6 @@
     })
     window.dispatchEvent(event)
   })
-  ipcRenderer.on('cert-details-updated', (e, details) => {
-    const event = new window.CustomEvent('cert-details-updated', {
-      detail: details
-    })
-    window.dispatchEvent(event)
-  })
   ipcRenderer.on('password-details-updated', (e, details) => {
     const event = new window.CustomEvent('password-details-updated', {
       detail: details
@@ -59,6 +59,9 @@
     window.dispatchEvent(event)
   })
 
+  window.addEventListener('dispatch-window-action', (e) => {
+    ipcRenderer.send('dispatch-window-action', e.detail)
+  })
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)
   })
@@ -67,9 +70,6 @@
   })
   window.addEventListener('cert-error-accepted', (e) => {
     ipcRenderer.send('cert-error-accepted', e.detail.url)
-  })
-  window.addEventListener('cert-error-rejected', (e) => {
-    ipcRenderer.send('cert-error-rejected', e.detail.previousLocation, e.detail.frameKey)
   })
   window.addEventListener('new-frame', (e) => {
     ipcRenderer.sendToHost('new-frame', e.detail.frameOpts, e.detail.openInForeground)

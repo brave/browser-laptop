@@ -22,6 +22,7 @@ class Button extends ImmutableComponent {
     }
     return <span disabled={this.props.disabled}
       data-l10n-id={this.props.l10nId}
+      data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       className={cx({
         browserButton: true,
         [this.props.className]: !!this.props.className
