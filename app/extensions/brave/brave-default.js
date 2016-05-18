@@ -900,25 +900,56 @@ if (typeof KeyEvent === 'undefined') {
         return script_url.replace(/:\d+:\d+$/, '')
       }
 
+      function reportBlock (item) {
+        var script_url = getOriginatingScriptUrl()
+        var msg = {
+          obj: item.objName,
+          prop: item.propName,
+          scriptUrl: stripLineAndColumnNumbers(script_url)
+        }
+
+        // Block the read from occuring; send info to background page instead
+        console.log('blocking potential canvas fingerprint', msg)
+        send(msg)
+      }
+
       /**
        * Monitor the reads from a canvas instance
        * @param item special item objects
        */
       function trapInstanceMethod (item) {
-        item.obj[item.propName] = (function (orig) {
-          return function () {
-            var script_url = getOriginatingScriptUrl()
-            var msg = {
-              obj: item.objName,
-              prop: item.propName,
-              scriptUrl: stripLineAndColumnNumbers(script_url)
-            }
+        item.obj[item.propName] = reportBlock.bind(this, item)
+      }
 
-            // Block the read from occuring; send info to background page instead
-            console.log('blocking canvas read', msg)
-            send(msg)
+      /**
+       * Stubs iframe methods that can be used for canvas fingerprinting.
+       * @param {HTMLIFrameElement} frame
+       */
+      function trapIFrameMethods (frame) {
+        var items = [{
+          objName: 'contentDocument',
+          propName: 'createElement',
+          obj: frame.contentDocument
+        }, {
+          objName: 'contentDocument',
+          propName: 'createElementNS',
+          obj: frame.contentDocument
+        }]
+        items.forEach(function (item) {
+          var orig = item.obj[item.propName]
+          item.obj[item.propName] = function () {
+            var args = arguments
+            var lastArg = args[args.length - 1]
+            if (lastArg && lastArg.toLowerCase() === 'canvas') {
+              // Prevent fingerprinting using contentDocument.createElement('canvas'),
+              // which evades trapInstanceMethod when the iframe is sandboxed
+              reportBlock(item)
+            } else {
+              // Otherwise apply the original method
+              return orig.apply(this, args)
+            }
           }
-        }(item.obj[item.propName]))
+        })
       }
 
       var methods = []
@@ -955,6 +986,7 @@ if (typeof KeyEvent === 'undefined') {
       })
 
       methods.forEach(trapInstanceMethod)
+      Array.from(document.querySelectorAll('iframe')).forEach(trapIFrameMethods)
 
     // save locally to keep from getting overwritten by site code
     }) + '(Error));'
