@@ -1,10 +1,10 @@
-**Did you search for similar issues before submitting this one? **
+**Did you search for similar issues before submitting this one?**
 
-**Describe the issue you encountered: **
+**Describe the issue you encountered:**
 
-**Expected behavior: **
+**Expected behavior:**
 
-- Platform (Win7, 8, 10? OS X? Linux distro?:
+- Platform (Win7, 8, 10? OS X? Linux distro?):
 
 - Brave Version:
 
@@ -13,6 +13,6 @@
     2.
     3.
 
-- Screenshot (if needed):
+- Screenshot if needed:
 
 - Any related issues:
