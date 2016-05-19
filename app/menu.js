@@ -518,9 +518,8 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('sendUsFeedback'),
-          click: function (item, focusedWindow) {
-            CommonMenu.sendToFocusedWindow(focusedWindow,
-              [messages.SHORTCUT_NEW_FRAME, appConfig.contactUrl])
+          click: function () {
+            electron.shell.openExternal(appConfig.contactUrl)
           }
         },
         CommonMenu.separatorMenuItem,

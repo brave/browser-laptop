@@ -270,10 +270,8 @@ module.exports.reportAnIssueMenuItem = () => {
 module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
-    click: function (item, focusedWindow) {
-      module.exports.sendToFocusedWindow(focusedWindow,
-                                         [messages.SHORTCUT_NEW_FRAME,
-                                          appConfig.contactUrl])
+    click: function () {
+      electron.shell.openExternal(appConfig.contactUrl)
     }
   }
 }
