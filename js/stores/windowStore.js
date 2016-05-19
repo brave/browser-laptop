@@ -166,7 +166,7 @@ const doAction = (action) => {
           noScript: {},
           httpsEverywhere: {},
           audioPlaybackActive: false,
-          locationChanged: ''
+          title: ''
         })
       }
 
