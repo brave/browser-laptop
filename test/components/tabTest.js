@@ -111,13 +111,14 @@ describe('tabs', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
-    })
-    it('opens background tab', function * () {
       yield this.app.client
         .sendWebviewEvent(1, 'new-window', {}, 'new-window', 'http://www.brave.com', 'some-frame', 'background-tab')
     })
-    it('opens in a new active tab', function * () {
-      yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
+    it('opens in a new, but not active tab', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('.tab.active[data-frame-key="1"]')
+        .waitForExist('.tab:not(.active)[data-frame-key="2"]')
     })
   })
 
@@ -125,13 +126,13 @@ describe('tabs', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
-    })
-    it('opens foreground tab', function * () {
       yield this.app.client
         .sendWebviewEvent(1, 'new-window', {}, 'new-window', 'http://www.brave.com', 'some-frame', 'foreground-tab')
     })
-    it('opens in a new, but not active tab', function * () {
-      yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="2"]')
+    it('opens in a new active tab', function * () {
+      yield this.app.client
+        .waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="1"]')
+        .waitForExist('.frameWrapper.isActive webview[data-frame-key="2"]')
     })
   })
 
