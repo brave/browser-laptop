@@ -98,11 +98,11 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
     let webviewAdded = false
-    let guestInstanceId = this.props.frame.get('guestInstanceId')
+    let guestInstanceId = null
     if (this.shouldCreateWebview()) {
-      // don't reuse the guestInstanceId when replacing webviews
-      if (this.webview != null) {
-        guestInstanceId = null
+      // only set the guestInstanceId if this is a new frame
+      if (this.webview == null) {
+        guestInstanceId = this.props.frame.get('guestInstanceId')
       }
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
