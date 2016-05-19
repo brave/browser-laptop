@@ -36,7 +36,7 @@ but the location should. For user entered new URLs, both should be updated.
 
 
 
-### setLocation(location, key) 
+### setLocation(location, key, resetInfo) 
 
 Dispatches a message to the store to set the current navigated location.
 This differs from the above in that it will not change the webview's (iframe's) src.
@@ -48,6 +48,8 @@ This should be used for renderer initiated navigation but not user initiated loa
 
 **key**: `number`, The frame key to modify, it is checked against the active frame and if
 it is active the URL text will also be changed.
+
+**resetInfo**: `boolean`, true if information like title and bravery settings should be reset
 
 
 

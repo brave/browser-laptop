@@ -103,8 +103,9 @@ const windowActions = {
    * @param {string} location - The URL of the page to load
    * @param {number} key - The frame key to modify, it is checked against the active frame and if
    * it is active the URL text will also be changed.
+   * @param {boolean} resetInfo - true if information like title and bravery settings should be reset
    */
-  setLocation: function (location, key) {
+  setLocation: function (location, key, resetInfo) {
     location = location.trim()
     // For about: URLs, make sure we store the URL as about:something
     // and not what we map to.
@@ -116,7 +117,8 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_LOCATION,
       location,
-      key: key
+      key,
+      resetInfo
     })
   },
 

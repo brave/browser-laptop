@@ -383,7 +383,7 @@ class Frame extends ImmutableComponent {
       method.apply(this, e.args)
     })
 
-    const loadStart = (event) => {
+    const loadStart = (event, resetInfo) => {
       if (event.isMainFrame && !event.isErrorPage && !event.isFrameSrcDoc) {
         // TODO: These 3 events should be combined into one
         windowActions.onWebviewLoadStart(
@@ -393,7 +393,7 @@ class Frame extends ImmutableComponent {
         // don't change url for non-display protocols like mailto
         if (['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:',
              'view-source:', 'ftp:', 'data:'].includes(parsedUrl.protocol)) {
-          windowActions.setLocation(event.url, key)
+          windowActions.setLocation(event.url, key, resetInfo)
         }
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
         windowActions.setSecurityState(this.props.frame, {
@@ -442,7 +442,7 @@ class Frame extends ImmutableComponent {
       loadStart(event)
     })
     this.webview.addEventListener('load-start', (event) => {
-      loadStart(event)
+      loadStart(event, true)
     })
     this.webview.addEventListener('did-navigate', (e) => {
       // only give focus focus is this is not the initial default page load
