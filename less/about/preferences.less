@@ -5,20 +5,25 @@
   padding: 60px 30px 30px 30px;
 }
 
-.preferencesTopBar {
-  background-color: @prefTopBg;
+.prefAside {
+  background-color: @gray;
+  box-shadow: @insetShadow;
   position: fixed;
-  min-width: @sideBarWidth;
-  width: 15%;
-  max-width: @sideBarWidth;
+  width: @sideBarWidth;
   height: 100%;
   z-index: 100;
   >div {
     display: block;
     width: 100%;
+    &.prefAsideHeading {
+      margin: 20px auto;
+      text-align: center;
+      color: @white60;
+      font-size: 0.9em;
+    }
     &:hover {
       .topBarButton.fa {
-        background-color: @prefTopBgButtonHover;
+        background-color: @darkGray;
       }
     }
     .topBarButton.fa {
@@ -27,10 +32,10 @@
     }
     &.selected {
       .topBarButton.fa {
-        background-color: @prefTopBgButtonSelected;
+        background-color: @mediumGray;
       }
       .tabMarker {
-        border-top-color: @prefTopBgButtonSelected;
+        border-top-color: @mediumGray;
       }
     }
 
@@ -46,27 +51,22 @@
   cursor: default;
   display: inline-block;
   font-size: 22px;
-  padding: 20px;
+  padding: 12px;
   position: relative;
   width: 40px;
   cursor: pointer;
+
+  &:before {
+    vertical-align: middle;
+  }
+
 }
 
 .helpfulHints {
-  background-color: #999;
-  color: white;
+  color: @white60;
   cursor: default;
-  flex-grow: 0;
-  height: 100%;
   padding: 30px 0;
-  min-width: @sideBarWidth;
-  width: 15%;
-  max-width: @sideBarWidth;
-  position: fixed;
-  z-index: 110;
-  bottom: 0;
-  left: 0;
-  height: 240px;
+  margin-top: 20px;
 
   .hintsTitleContainer {
     -webkit-user-select: none;
@@ -75,11 +75,11 @@
     font-weight: normal;
     margin: 10px;
     * {
-      color: white;
+      color: @white60;
     }
   }
   > div {
-    color: white;
+    color: @white60;
     font-size: smaller;
     margin: 10px;
   }
@@ -87,14 +87,14 @@
     position: absolute;
     bottom: 0;
     a {
-      color: white;
+      color: @white60;
     }
     .loveToHear {
       color: initial;
       font-size: smaller;
       margin-top: 5px;
       margin-bottom: 30px;
-      color: white;
+      color: @white60;
     }
   }
   .hintsRefresh {
@@ -118,14 +118,14 @@
   .tabMarker {
     border-left: @carotRadius solid transparent;
     border-right: @carotRadius solid transparent;
-    border-top: @carotRadius solid @prefTopBg;
+    border-top: @carotRadius solid @gray;
     height: 0;
-    left: ~"calc(97%)";
+    left: ~"calc(100% - 6px)";
     transform: rotateZ(-90deg);
     position: absolute;
     z-index: 400;
     width: 0;
-    top: -34px;
+    top: -27px;
   }
 }
 

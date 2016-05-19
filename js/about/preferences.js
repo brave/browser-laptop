@@ -317,9 +317,26 @@ class TopBarButton extends ImmutableComponent {
   }
 }
 
+class HelpfulHints extends ImmutableComponent {
+  render () {
+    return <div className='helpfulHints'>
+      <span className='hintsTitleContainer'>
+        <span data-l10n-id='hintsTitle' />
+        <span className='hintsRefresh fa fa-refresh'
+          onClick={this.props.refreshHint} />
+      </span>
+      <div data-l10n-id={`hint${this.props.hintNumber}`} />
+      <div className='helpfulHintsBottom'>
+        <a data-l10n-id='sendUsFeedback' href={appConfig.contactUrl} />
+      </div>
+    </div>
+  }
+}
+
 class TopBar extends ImmutableComponent {
   render () {
-    return <div className='preferencesTopBar'>
+    return <div className='prefAside'>
+      <div className='prefAsideHeading'>Browser Settings</div>
       <TopBarButton icon='fa-list-alt'
         dataL10nId='general'
         onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}
@@ -356,23 +373,7 @@ class TopBar extends ImmutableComponent {
         className='notImplemented'
         selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
       />
-    </div>
-  }
-}
-
-class HelpfulHints extends ImmutableComponent {
-  render () {
-    return <div className='helpfulHints'>
-      <span className='hintsTitleContainer'>
-        <span data-l10n-id='hintsTitle' />
-        <span className='hintsRefresh fa fa-refresh'
-          onClick={this.props.refreshHint} />
-      </span>
-      <div data-l10n-id={`hint${this.props.hintNumber}`} />
-      <div className='helpfulHintsBottom'>
-        <a data-l10n-id='sendUsFeedback' href={appConfig.contactUrl} />
-        <div className='loveToHear' data-l10n-id='loveToHear' />
-      </div>
+      <HelpfulHints hintNumber={this.props.hintNumber} refreshHint={this.props.refreshHint} />
     </div>
   }
 }
@@ -460,13 +461,14 @@ class AboutPreferences extends React.Component {
         break
     }
     return <div>
-      <TopBar preferenceTab={this.state.preferenceTab}
-        changeTab={this.changeTab.bind(this)} />
+      <TopBar preferenceTab={this.state.preferenceTab} hintNumber={this.state.hintNumber}
+        changeTab={this.changeTab.bind(this)}
+        refreshHint={this.refreshHint.bind(this)}
+        getNextHintNumber={this.getNextHintNumber.bind(this)} />
       <div className='prefBody'>
         <div className='prefTabContainer'>
           {tab}
         </div>
-        <HelpfulHints hintNumber={this.state.hintNumber} refreshHint={this.refreshHint.bind(this)} />
       </div>
     </div>
   }
