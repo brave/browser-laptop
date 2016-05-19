@@ -74,7 +74,7 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview || this.webview.isCrashed() || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent()
+    return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent()
   }
 
   allowRunningInsecureContent () {
@@ -98,7 +98,12 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
     let webviewAdded = false
+    let guestInstanceId = this.props.frame.get('guestInstanceId')
     if (this.shouldCreateWebview()) {
+      // don't reuse the guestInstanceId when replacing webviews
+      if (this.webview != null) {
+        guestInstanceId = null
+      }
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
@@ -120,7 +125,7 @@ class Frame extends ImmutableComponent {
       ipc.send(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
     }
-    if (this.props.frame.get('guestInstanceId')) {
+    if (guestInstanceId) {
       this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
     }
 
@@ -452,6 +457,7 @@ class Frame extends ImmutableComponent {
         url: this.props.frame.get('location')
       })
       windowActions.loadUrl(this.props.frame, 'about:error')
+      this.webview = false
     })
     this.webview.addEventListener('did-fail-load', (e) => {
       if (e.isMainFrame && isFrameError(e.errorCode)) {
