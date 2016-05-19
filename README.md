@@ -102,7 +102,7 @@ Build instructions:
 
 ### Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. 
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for contribution guidelines. 
 
 ## Packaging for bundles, installers, and updates
 
