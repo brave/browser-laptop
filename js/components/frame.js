@@ -149,7 +149,23 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidMount () {
-    this.updateWebview()
+    const cb = () => {
+      this.webview.setZoomLevel(this.zoomLevel)
+      this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
+      this.updateAboutDetails({})
+    }
+    this.updateWebview(cb)
+  }
+
+  get zoomLevel () {
+    const location = this.props.frame.get('location')
+    const settings = this.props.frame.get('isPrivate')
+      ? siteSettings.getSiteSettingsForURL(this.props.temporarySiteSettings, location)
+      : siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
+    if (!settings || !settings.get('zoomLevel')) {
+      return config.zoom.defaultValue
+    }
+    return settings.get('zoomLevel')
   }
 
   zoom (stepSize) {
@@ -179,11 +195,13 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
+      this.handleShortcut()
+      this.webview.setZoomLevel(this.zoomLevel)
       // give focus when switching tabs
       if (this.props.isActive && !prevProps.isActive) {
         this.webview.focus()
       }
-      this.handleShortcut()
+      this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
       this.updateAboutDetails(prevProps)
     }
 
@@ -393,10 +411,6 @@ class Frame extends ImmutableComponent {
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
-      if (this.zoomLevel !== config.zoom.defaultValue) {
-        // Timeout to work around setting zoom too early not working in Electron
-        this.webview.setZoomLevel(this.zoomLevel)
-      }
     }
     const loadEnd = () => {
       windowActions.onWebviewLoadEnd(
@@ -506,12 +520,6 @@ class Frame extends ImmutableComponent {
       }
     })
 
-    // Ensure we mute appropriately, the initial value could be set
-    // from persisted state.
-    if (this.props.frame.get('audioMuted')) {
-      this.webview.setAudioMuted(true)
-    }
-
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
@@ -586,38 +594,6 @@ class Frame extends ImmutableComponent {
 
   onClearMatch () {
     this.webview.stopFindInPage('clearSelection')
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.frame.get('audioMuted') &&
-      this.props.frame.get('audioMuted') !== true) {
-      this.webview.setAudioMuted(true)
-    } else if (!nextProps.frame.get('audioMuted') &&
-      this.props.frame.get('audioMuted') === true) {
-      this.webview.setAudioMuted(false)
-    }
-
-    const nextLocation = nextProps.frame.get('location')
-    const nextSiteSettings = this.props.frame.get('isPrivate')
-      ? siteSettings.getSiteSettingsForURL(nextProps.temporarySiteSettings, nextLocation)
-      : siteSettings.getSiteSettingsForURL(nextProps.siteSettings, nextLocation)
-    if (nextSiteSettings) {
-      const nextZoom = nextSiteSettings.get('zoomLevel')
-      if (this.zoomLevel !== nextZoom) {
-        this.webview.setZoomLevel(nextZoom)
-      }
-    }
-  }
-
-  get zoomLevel () {
-    const location = this.props.frame.get('location')
-    const settings = this.props.frame.get('isPrivate')
-      ? siteSettings.getSiteSettingsForURL(this.props.temporarySiteSettings, location)
-      : siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
-    if (!settings) {
-      return config.zoom.defaultValue
-    }
-    return settings.get('zoomLevel')
   }
 
   render () {
