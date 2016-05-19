@@ -52,9 +52,9 @@ class CertErrorPage extends React.Component {
       </div>
       <div className='buttons'>
         <Button l10nId='certErrorSafety' className='wideButton' onClick={this.onSafety.bind(this)} />
-        {this.state.advanced && this.state.url
-          ? <Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)} />
-          : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)} />}
+        {this.state.url ? (this.state.advanced
+                  ? <Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)} />
+                  : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)} />) : null}
       </div>
     </div>
   }
