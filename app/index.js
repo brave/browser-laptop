@@ -186,7 +186,8 @@ app.on('ready', () => {
 
     // Tell the page to show an unlocked icon. Note this is sent to the main
     // window webcontents, not the webview webcontents
-    webContents.hostWebContents.send(messages.CERT_ERROR, {
+    let sender = webContents.hostWebContents || webContents
+    sender.send(messages.CERT_ERROR, {
       url,
       error,
       cert,
@@ -340,9 +341,13 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
-      let host = urlParse(url).host
-      if (host) {
-        acceptCertDomains[host] = true
+      try {
+        let host = urlParse(url).host
+        if (host) {
+          acceptCertDomains[host] = true
+        }
+      } catch (e) {
+        console.log('Cannot add url `' + url + '` to accepted domain list', e)
       }
     })
 

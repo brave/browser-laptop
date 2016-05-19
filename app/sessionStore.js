@@ -131,6 +131,9 @@ module.exports.cleanSessionData = (sessionData) => {
     // Electron won't know about them.
     delete frame.guestInstanceId
 
+    // Tab ids are per-session and should not be persisted
+    delete frame.tabId
+
     // Do not show the audio indicator until audio starts playing
     delete frame.audioMuted
     delete frame.audioPlaybackActive

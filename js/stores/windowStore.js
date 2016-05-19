@@ -5,6 +5,7 @@
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
+const config = require('../constants/config.js')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
@@ -184,10 +185,13 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_FRAME_ERROR:
       const frameKey = action.key || windowState.get('activeFrameKey')
+      // set the previous location to the most recent history item or the default url
+      let previousLocation = action.frameProps.get('history').unshift(config.defaultUrl).findLast((url) => url !== action.errorDetails.url)
+
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         aboutDetails: Object.assign({
           title: action.errorDetails.title || l10nErrorText(action.errorDetails.errorCode),
-          previousLocation: (action.frameProps.get('history') || Immutable.fromJS([])).last(),
+          previousLocation,
           frameKey
         }, action.errorDetails)
       })

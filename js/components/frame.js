@@ -197,6 +197,7 @@ class Frame extends ImmutableComponent {
   handleShortcut () {
     const activeShortcut = this.props.frame.get('activeShortcut')
     const activeShortcutDetails = this.props.frame.get('activeShortcutDetails')
+    const location = this.props.frame.get('location')
     switch (activeShortcut) {
       case 'stop':
         this.webview.stop()
@@ -241,8 +242,8 @@ class Frame extends ImmutableComponent {
         }
         break
       case 'view-source':
-        const location = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        windowActions.newFrame({location}, true)
+        const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
+        windowActions.newFrame({sourceLocation}, true)
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':

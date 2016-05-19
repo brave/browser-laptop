@@ -169,6 +169,7 @@ WindowStore
     startLoadTime: datetime,
     endtLoadTime: datetime,
     guestInstanceId: string, // not persisted
+    tabId: number, // session tab id not persisted
     closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
     activeShortcut: string, // Set by the application store when the component should react to a shortcut
     activeShortcutDetails: object, // Additional parameters for the active shortcut action if any
@@ -220,7 +221,9 @@ WindowStore
         active: boolean, // whether the user is typing in the urlbar
         selected: boolean, // is the urlbar text selected
       }
-    }
+    },
+    aboutDetails: object, // details for about pages
+    history: array // navigation history
   }],
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
@@ -289,6 +292,5 @@ WindowStore
     src: string, // the src for the popup window webview
   },
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
-  history: array // navigation history
 }
 ```
