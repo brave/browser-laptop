@@ -50,6 +50,8 @@ const FrameStateUtil = require('../state/frameStateUtil')
 // Util
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
+const siteSettings = require('../state/siteSettings')
+const urlParse = require('url').parse
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -323,7 +325,9 @@ class Main extends ImmutableComponent {
   }
 
   onBraveMenu () {
-    windowActions.setBraveryPanelDetail({})
+    if (!this.braveShieldsDisabled) {
+      windowActions.setBraveryPanelDetail({})
+    }
   }
 
   onHamburgerMenu (e) {
@@ -357,6 +361,16 @@ class Main extends ImmutableComponent {
   }
 
   get enableAds () {
+    if (this.activeSiteSettings) {
+      if (this.activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (this.activeSiteSettings && ['blockAds', 'allowAdsAndTracking'].includes(this.activeSiteSettings.get('adControl'))) {
+        return false
+      }
+    }
+
     let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
     if (enabled === undefined) {
       enabled = appConfig.adInsertion.enabled
@@ -365,6 +379,16 @@ class Main extends ImmutableComponent {
   }
 
   get enableNoScript () {
+    if (this.activeSiteSettings) {
+      if (this.activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (this.activeSiteSettings.get('noScript') !== undefined) {
+        return this.activeSiteSettings.get('noScript')
+      }
+    }
+
     let enabled = this.props.appState.getIn(['noScript', 'enabled'])
     if (enabled === undefined) {
       enabled = appConfig.noScript.enabled
@@ -435,6 +459,28 @@ class Main extends ImmutableComponent {
     contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
   }
 
+  get allSiteSettings () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    if (activeFrame && activeFrame.get('isPrivate')) {
+      return this.props.appState.get('temporarySiteSettings')
+    }
+    return this.props.appState.get('siteSettings')
+  }
+
+  get activeSiteSettings () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    if (!activeFrame) {
+      return undefined
+    }
+    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, activeFrame.get('location'))
+  }
+
+  get braveShieldsDisabled () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const parsedUrl = urlParse(activeFrame && activeFrame.get('location') || '')
+    return !(parsedUrl.protocol || '').startsWith('http')
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -444,17 +490,19 @@ class Main extends ImmutableComponent {
     // All frame operations work off of frame keys and not index though so unsorted frames
     // can be passed everywhere other than the Frame elements.
     const sortedFrames = this.props.windowState.get('frames').sort(comparatorByKeyAsc)
-
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-
     this.frames = {}
+    const allSiteSettings = this.allSiteSettings
+    const activeSiteSettings = this.activeSiteSettings
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
-    const braveryPanelIsVisible = this.props.windowState.get('braveryPanelDetail')
+    const braveShieldsDisabled = this.braveShieldsDisabled
+    const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
@@ -473,9 +521,7 @@ class Main extends ImmutableComponent {
       {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
-          siteSettings={this.props.appState.get('siteSettings')}
-          temporarySiteSettings={this.props.appState.get('temporarySiteSettings')}
-          activeFrame={activeFrame}
+          activeSiteSettings={activeSiteSettings}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
         : null
       }
@@ -522,6 +568,7 @@ class Main extends ImmutableComponent {
             braveryPanelIsVisible
             ? <BraveryPanel frameProps={activeFrame}
               braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
+              activeSiteSettings={activeSiteSettings}
               onHide={this.onHideBraveryPanel} />
             : null
           }
@@ -553,7 +600,11 @@ class Main extends ImmutableComponent {
           }
           <div className='topLevelEndButtons'>
             <Button iconClass='braveMenu'
-              className='navbutton'
+              className={cx({
+                navbutton: true,
+                braveShieldsDisabled,
+                braveShieldsDown: activeSiteSettings && activeSiteSettings.get('shieldsUp') === false
+              })}
               onClick={this.onBraveMenu} />
           </div>
         </div>
@@ -625,8 +676,8 @@ class Main extends ImmutableComponent {
                 : null}
               dictionaryLocale={this.props.appState.getIn(['dictionary', 'locale'])}
               passwords={this.props.appState.get('passwords')}
-              siteSettings={this.props.appState.get('siteSettings')}
-              temporarySiteSettings={this.props.appState.get('temporarySiteSettings')}
+              allSiteSettings={allSiteSettings}
+              activeSiteSettings={activeSiteSettings}
               enableAds={this.enableAds}
               enableNoScript={this.enableNoScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

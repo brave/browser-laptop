@@ -1,0 +1,76 @@
+@import "variables.less";
+
+
+.switchControl {
+  display: flex;
+  padding: 5px;
+
+  &.disabled {
+    .switchBackground {
+      opacity: 0.3;
+    }
+    .switchControlRightText, .switchControlLeftText {
+      opacity: 0.3;
+    }
+  }
+
+  &:not(.disabled) {
+    .switchBackground.switchedOn {
+      background-color: @braveOrange;
+      .switchIndicator {
+        left: auto;
+        right: 3px;
+      }
+    }
+  }
+
+  &.large {
+    .switchBackground {
+      height: 26px;
+      width: 60px;
+      .switchIndicator {
+        height: 22px;
+        width: 22px;
+      }
+    }
+  }
+
+  .switchControlText {
+    margin: auto 0;
+  }
+
+  .switchControlLeftText {
+    margin: auto 5px auto 0;
+  }
+
+  .switchControlRightText {
+    margin: auto 0 auto 5px;
+  }
+
+  .switchControlTopText {
+    margin: 0 auto 5px auto;
+  }
+
+  .switchMiddle {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .switchBackground {
+    background-color: #777;
+    border-radius: 12px;
+    height: 20px;
+    position: relative;
+    width: 45px;
+
+    .switchIndicator {
+      background-color: white;
+      border-radius: 100%;
+      height: 16px;
+      left: 2px;
+      position: absolute;
+      top: 2px;
+      width: 16px;
+    }
+  }
+}

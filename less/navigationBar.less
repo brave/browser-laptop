@@ -85,6 +85,15 @@
       width: @navbarBraveButtonWidth;
       margin-left: @navbarButtonSpacing;
       margin-right: @navbarButtonSpacing;
+
+      &.braveShieldsDown {
+        -webkit-filter: grayscale(100%);
+      }
+
+      &.braveShieldsDisabled {
+        -webkit-filter: grayscale(100%);
+        opacity: 0.4;
+      }
     }
   }
 }

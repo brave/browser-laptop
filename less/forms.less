@@ -54,13 +54,144 @@
   }
 }
 
-.braveryPanel {
-  >ul {
+.braveryPanelContainer {
+  .braveryPanel {
     .flyoutDialog;
+    border-radius: @borderRadius;
     margin-left: -250px;
+    padding: 0;
     text-align: left;
-    width: auto;
+    width: 468px;
     right: 0;
+    -webkit-user-select: none;
+    cursor: default;
+    color: #3B3B3B;
+
+    .braveryPanelHeader {
+      color: white;
+      display: flex;
+      background-color: #808080;
+      padding: 20px;
+      border-top-left-radius: @borderRadius;
+      border-top-right-radius: @borderRadius;
+
+      .switchControl {
+        padding: 0;
+        .switchControlTopText {
+          color: #444;
+        }
+      }
+
+      .braveryPanelHeaderLeft{
+        .braverySettingsFor {
+          font-size: 20px;
+          font-weight: bold;
+          vertical-align: middle;
+        }
+
+        .braverySiteIcon {
+          display: inline-block;
+          margin-right: 6px;
+          vertical-align: middle;
+        }
+      }
+
+      .braveryPanelHeaderRight {
+        margin-left: 130px;
+      }
+    }
+
+    .braveryPanelStats {
+      background-color: #f7f7f7;
+      display: flex;
+      justify-content: space-around;
+      padding: 20px;
+
+      .braveryStat {
+        font-size: 40px;
+        color: @chromeText;
+
+        &.adsBlockedStat {
+          color: #fe521d;
+        }
+        &.trackersBlockedStat {
+          color: #f39030;
+        }
+        &.redirectedResourcesStat {
+          color: #0796fa;
+        }
+      }
+    }
+
+    .braveryPanelBody {
+      background-color: #eee;
+      padding: 20px;
+      border-bottom-left-radius: @borderRadius;
+      border-bottom-right-radius: @borderRadius;
+
+      .braveryAdvanced {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .braveryAdvancedTitle {
+        display: flex;
+
+        &.disabled {
+          opacity: 0.3;
+        }
+
+        .braveryAdvancedIndicator {
+          margin-left: 5px;
+          margin-right: 5px;
+        }
+      }
+
+      .braveryControlGroup {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        margin: 5px 10px auto 10px;
+
+        .braverySelectTitle {
+          margin-bottom: 4px;
+          margin-left: 8px;
+          &.disabled {
+            opacity: 0.3;
+          }
+        }
+
+        select {
+          margin-bottom: 25px;
+        }
+      }
+
+      hr {
+        background-color: #ccc;
+        border: 0;
+        height: 1px;
+        margin: 10px 0;
+
+        &.braveryBottomSplitter {
+          margin-top: 30px;
+        }
+      }
+
+      .reloadButton {
+        display: flex;
+        float: right;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        .reloadText {
+          margin-right: 10px;
+        }
+      }
+    }
+
+    ul {
+      -webkit-user-select: initial;
+      cursor: text;
+    }
 
     li {
       list-style-type: none;
@@ -79,7 +210,6 @@
         overflow-y: scroll;
         margin-top: -20px;
         padding: 0 10px;
-        max-width: 350px;
       }
     }
   }

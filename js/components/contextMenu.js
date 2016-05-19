@@ -7,7 +7,6 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const config = require('../constants/config')
-const siteSettings = require('../state/siteSettings')
 const cx = require('../lib/classSet.js')
 
 class ContextMenuItem extends ImmutableComponent {
@@ -85,9 +84,7 @@ class ContextMenuItem extends ImmutableComponent {
       return label
     }
     if (item.get('labelDataBind') === 'zoomLevel') {
-      const currentSiteSettings = this.props.activeFrame && this.props.activeFrame.get('isPrivate') ? this.props.temporarySiteSettings : this.props.siteSettings
-      const settings = siteSettings.getSiteSettingsForURL(currentSiteSettings, item.get('dataBindParam'))
-      const zoomLevel = settings && settings.get('zoomLevel') || config.zoom.defaultValue
+      const zoomLevel = this.props.activeSiteSettings && this.props.activeSiteSettings.get('zoomLevel') || config.zoom.defaultValue
       return ((100 + zoomLevel * 10) | 0) + '%'
     }
     return ''
@@ -191,9 +188,7 @@ class ContextMenuSingle extends ImmutableComponent {
       this.props.template.map((contextMenuItem) =>
         <ContextMenuItem contextMenuItem={contextMenuItem}
           submenuIndex={this.props.submenuIndex}
-          siteSettings={this.props.siteSettings}
-          temporarySiteSettings={this.props.temporarySiteSettings}
-          activeFrame={this.props.activeFrame}
+          activeSiteSettings={this.props.activeSiteSettings}
           contextMenuDetail={this.props.contextMenuDetail}
         />)
     }
@@ -241,17 +236,13 @@ class ContextMenu extends ImmutableComponent {
       style={styles}>
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
-        siteSettings={this.props.siteSettings}
-        activeFrame={this.props.activeFrame}
-        temporarySiteSettings={this.props.temporarySiteSettings}
+        activeSiteSettings={this.props.activeSiteSettings}
         template={this.props.contextMenuDetail.get('template')} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
-            siteSettings={this.props.siteSettings}
-            temporarySiteSettings={this.props.temporarySiteSettings}
-            activeFrame={this.props.activeFrame}
+            activeSiteSettings={this.props.activeSiteSettings}
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')} />)
       }

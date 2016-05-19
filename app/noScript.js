@@ -29,7 +29,7 @@ function startNoScript () {
 
 function onHeadersReceived (details) {
   let result = { resourceName: module.exports.resourceName }
-  if (!Filtering.isResourceEnabled(module.exports.resourceName)) {
+  if (!Filtering.isResourceEnabled(module.exports.resourceName, details.firstPartyUrl)) {
     return result
   }
   // Ignore whitelisted URL schemes and non-applicable resource types

@@ -381,7 +381,7 @@ module.exports.buildBraveryMenu = function (settings, init) {
         }
       }, {
         type: 'checkbox',
-        label: 'Block Phishing and Malware',
+        label: locale.translation('safeBrowsing'),
         checked: useSafeBrowsing,
         click: function (item, focusedWindow) {
           appActions.setResourceEnabled(safeBrowsing, !useSafeBrowsing)

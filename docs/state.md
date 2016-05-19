@@ -41,12 +41,12 @@ AppStore
       fullscreenPermission: boolean,
       openExternalPermission: boolean,
       savePasswords: boolean, // Only false or undefined/null
-      noScript: boolean,
-      shieldsDown: boolean,
-      adControl: string, // (replaceAds | blockAds | allowAdsAndTracking)
-      clookieControl: string, // (block3rdParty | allowAll)
+      shieldsUp: boolean,
+      adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
+      cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
       safeBrowsing: boolean,
-      scriptBlock: boolean
+      noScript: boolean,
+      httpsEverywhere: boolean
     }
   },
   temporarySiteSettings: {

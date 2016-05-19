@@ -81,7 +81,7 @@ function registerForBeforeRequest (session) {
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
         continue
       }
       if (results.cancel) {
@@ -168,7 +168,7 @@ function registerForBeforeSendHeaders (session) {
 
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
         continue
       }
       if (results.cancel) {
@@ -181,7 +181,7 @@ function registerForBeforeSendHeaders (session) {
     }
 
     let hostname = urlParse(details.url || '').hostname
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK) &&
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl) &&
         module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
                                         hostname)) {
       // Clear cookie and referer on third-party requests
@@ -215,7 +215,7 @@ function registerForHeadersReceived (session) {
     }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
         continue
       }
       if (results.responseHeaders) {
@@ -468,7 +468,33 @@ module.exports.init = () => {
   })
 }
 
-module.exports.isResourceEnabled = (resourceName) => {
+module.exports.isResourceEnabled = (resourceName, url) => {
+  const appState = AppStore.getState()
+  const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+
+  // If full shields are down never enable extra protection
+  if (settings && settings.get('shieldsUp') === false) {
+    return false
+  }
+
+  // Check the resource vs the ad control setting
+  if ((resourceName === appConfig.resourceNames.ADBLOCK ||
+       resourceName === appConfig.resourceNames.TRACKING_PROTECTION) &&
+      settings && settings.get('adControl') === 'allowAdsAndTracking') {
+    return false
+  }
+
+  // Check the resource vs the cookie setting
+  if (resourceName === appConfig.resourceNames.COOKIEBLOCK &&
+      settings && settings.get('cookieControl') === 'allowAllCookies') {
+    return false
+  }
+
+  // If the particular resource we're checking is disabled then don't enable
+  if (settings && settings.get(resourceName) !== undefined) {
+    return settings.get(resourceName)
+  }
+
   const enabledFromState = AppStore.getState().getIn([resourceName, 'enabled'])
   if (enabledFromState === undefined) {
     return appConfig[resourceName].enabled
