@@ -12,14 +12,18 @@
   width: @sideBarWidth;
   height: 100%;
   z-index: 100;
+
   >div {
     display: block;
     width: 100%;
-    &.prefAsideHeading {
+
+    &:first-of-type {
+      box-sizing: border-box;
       margin: 20px auto;
-      text-align: center;
+      padding-left: 20px;
       color: @white60;
       font-size: 0.9em;
+      font-weight: 300;
     }
     &:hover {
       .topBarButton.fa {

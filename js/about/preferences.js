@@ -336,7 +336,7 @@ class HelpfulHints extends ImmutableComponent {
 class TopBar extends ImmutableComponent {
   render () {
     return <div className='prefAside'>
-      <div className='prefAsideHeading'>Browser Settings</div>
+      <div data-l10n-id='prefAsideTitle' />
       <TopBarButton icon='fa-list-alt'
         dataL10nId='general'
         onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}
