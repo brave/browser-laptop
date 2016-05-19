@@ -21,14 +21,6 @@ const isDarwin = process.platform === 'darwin'
 
 const aboutUrl = 'https://brave.com/'
 
-const adblock = appConfig.resourceNames.ADBLOCK
-const cookieblock = appConfig.resourceNames.COOKIEBLOCK
-const adInsertion = appConfig.resourceNames.AD_INSERTION
-const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
-const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
-const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
-const noScript = appConfig.resourceNames.NOSCRIPT
-
 let menuArgs = {}
 let lastSettingsState, lastArgs
 
@@ -440,17 +432,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         CommonMenu.importBookmarksMenuItem()
       ]
-    },
-    CommonMenu.buildBraveryMenu({
-      adblock: Filtering.isResourceEnabled(adblock),
-      cookieblock: Filtering.isResourceEnabled(cookieblock),
-      adInsertion: Filtering.isResourceEnabled(adInsertion),
-      trackingProtection: Filtering.isResourceEnabled(trackingProtection),
-      httpsEverywhere: Filtering.isResourceEnabled(httpsEverywhere),
-      noScript: Filtering.isResourceEnabled(noScript),
-      safeBrowsing: Filtering.isResourceEnabled(safeBrowsing)
-    }, init.bind(this, settingsState, {bookmarked: bookmarkPageMenuItem.checked})),
-    {
+    }, {
       label: locale.translation('window'),
       role: 'window',
       submenu: [
