@@ -61,7 +61,6 @@ const messages = {
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
   LINK_HOVERED: _, /** @arg {string} href of hovered link */
   APP_STATE_CHANGE: _,
-  APP_ACTION: _,
   STOP_LOAD: _,
   POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,

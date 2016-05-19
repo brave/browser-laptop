@@ -12,7 +12,10 @@ describe('findbar', function () {
     yield setup(this.app.client)
     const url = Brave.server.url('find_in_page.html')
     yield this.app.client
-      .loadUrl(url)
+      .tabByUrl(Brave.newTabUrl)
+      .url(url)
+      .waitForUrl(url)
+      .windowParentByUrl(url)
       .waitUntil(function () {
         return this.getAttribute('webview[data-frame-key="1"]', 'src').then((src) => src === url)
       })
@@ -99,7 +102,10 @@ describe('view source', function () {
     yield this.app.client
       .waitUntilWindowLoaded()
       .waitForVisible(activeWebview)
-      .loadUrl(this.url)
+      .tabByIndex(0)
+      .url(this.url)
+      .waitForUrl(this.url)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="1"]')
       .waitForExist(this.webview1)
   })
@@ -127,3 +133,4 @@ function * setup (client) {
     .waitForVisible('#window')
     .waitForVisible(urlInput)
 }
+

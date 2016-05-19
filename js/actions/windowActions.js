@@ -4,7 +4,7 @@
 
 'use strict'
 
-const WindowDispatcher = require('../dispatcher/windowDispatcher')
+const AppDispatcher = require('../dispatcher/appDispatcher')
 const WindowConstants = require('../constants/windowConstants')
 const appActions = require('../actions/appActions')
 const messages = require('../constants/messages')
@@ -13,16 +13,7 @@ const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
 
 function dispatch (action) {
-  if (windowActions.dispatchToIPC) {
-    // serialize immutable
-    if (action.frameProps && action.frameProps.toJS) {
-      action.frameProps = action.frameProps.toJS()
-    }
-    global.require('electron').remote.getCurrentWindow().webContents.send('handle-action', action)
-    windowActions.dispatchToIPC = false
-  } else {
-    WindowDispatcher.dispatch(action)
-  }
+  AppDispatcher.dispatch(action)
 }
 
 const windowActions = {
