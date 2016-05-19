@@ -10,7 +10,6 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const siteUtil = require('../state/siteUtil')
-const siteSettings = require('../state/siteSettings')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
@@ -45,7 +44,7 @@ class Frame extends ImmutableComponent {
     let location = this.props.frame.get('location')
     if (location === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
-      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.siteSettings.toJS())
+      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings.toJS())
     } else if (location === 'about:bookmarks') {
       this.webview.send(messages.BOOKMARKS_UPDATED, {
         bookmarks: this.props.bookmarks.toJS(),
@@ -59,10 +58,10 @@ class Frame extends ImmutableComponent {
       if (prevProps.passwords !== this.props.passwords) {
         this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
       }
-      if (prevProps.siteSettings !== this.props.siteSettings) {
-        if (this.props.siteSettings) {
+      if (prevProps.allSiteSettings !== this.props.allSiteSettings) {
+        if (this.props.allSiteSettings) {
           this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
-                            this.props.siteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
+                            this.props.allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
         }
       }
     }
@@ -158,14 +157,10 @@ class Frame extends ImmutableComponent {
   }
 
   get zoomLevel () {
-    const location = this.props.frame.get('location')
-    const settings = this.props.frame.get('isPrivate')
-      ? siteSettings.getSiteSettingsForURL(this.props.temporarySiteSettings, location)
-      : siteSettings.getSiteSettingsForURL(this.props.siteSettings, location)
-    if (!settings || !settings.get('zoomLevel')) {
+    if (!this.props.activeSiteSettings || !this.props.activeSiteSettings.get('zoomLevel')) {
       return config.zoom.defaultValue
     }
-    return settings.get('zoomLevel')
+    return this.props.activeSiteSettings.get('zoomLevel')
   }
 
   zoom (stepSize) {

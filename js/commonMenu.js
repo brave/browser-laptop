@@ -9,14 +9,6 @@ const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
 const Immutable = require('immutable')
 const locale = require('../js/l10n')
-
-const adblock = appConfig.resourceNames.ADBLOCK
-const cookieblock = appConfig.resourceNames.COOKIEBLOCK
-const adInsertion = appConfig.resourceNames.AD_INSERTION
-const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
-const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
-const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
-const noScript = appConfig.resourceNames.NOSCRIPT
 const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
@@ -310,92 +302,5 @@ module.exports.aboutBraveMenuItem = () => {
         electron.ipcRenderer.send(messages.SHOW_ABOUT)
       }
     }
-  }
-}
-
-module.exports.buildBraveryMenu = function (settings, init) {
-  const replaceAds = settings[adInsertion] || false
-  const blockAds = settings[adblock] || false
-  const blockTracking = settings[trackingProtection] || false
-  const blockCookies = settings[cookieblock] || false
-  const useHttps = settings[httpsEverywhere] || false
-  const useSafeBrowsing = settings[safeBrowsing] || false
-  const blockScripts = settings[noScript] || false
-  return {
-    label: locale.translation('bravery'),
-    submenu: [
-      {
-        type: 'radio',
-        label: locale.translation('replaceAds'),
-        checked: blockAds && replaceAds && blockTracking,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(adblock, true)
-          appActions.setResourceEnabled(adInsertion, true)
-          appActions.setResourceEnabled(trackingProtection, true)
-          init()
-        }
-      }, {
-        type: 'radio',
-        label: locale.translation('blockAds'),
-        checked: blockAds && !replaceAds && blockTracking,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(adblock, true)
-          appActions.setResourceEnabled(adInsertion, false)
-          appActions.setResourceEnabled(trackingProtection, true)
-          init()
-        }
-      }, {
-        type: 'radio',
-        label: locale.translation('allowAdsAndTracking'),
-        checked: !blockAds && !replaceAds && !blockTracking,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(adblock, false)
-          appActions.setResourceEnabled(adInsertion, false)
-          appActions.setResourceEnabled(trackingProtection, false)
-          init()
-        }
-      },
-      module.exports.separatorMenuItem,
-      {
-        type: 'checkbox',
-        label: locale.translation('block3rdPartyCookie'),
-        checked: blockCookies,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(cookieblock, !blockCookies)
-          init()
-        }
-      }, {
-        type: 'checkbox',
-        label: locale.translation('blockPopups'),
-        enabled: false,
-        checked: true
-      }, {
-        type: 'checkbox',
-        label: locale.translation('httpsEverywhere'),
-        checked: useHttps,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(httpsEverywhere, !useHttps)
-          init()
-        }
-      }, {
-        type: 'checkbox',
-        label: 'Block Phishing and Malware',
-        checked: useSafeBrowsing,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(safeBrowsing, !useSafeBrowsing)
-          init()
-        }
-      },
-      module.exports.separatorMenuItem,
-      {
-        type: 'checkbox',
-        label: locale.translation('noScript'),
-        checked: blockScripts,
-        click: function (item, focusedWindow) {
-          appActions.setResourceEnabled(noScript, !blockScripts)
-          init()
-        }
-      }
-    ]
   }
 }

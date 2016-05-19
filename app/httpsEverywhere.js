@@ -145,7 +145,7 @@ function startHttpsEverywhere () {
 
 function onBeforeHTTPRequest (details) {
   let result = { resourceName: module.exports.resourceName }
-  if (!Filtering.isResourceEnabled(module.exports.resourceName)) {
+  if (!Filtering.isResourceEnabled(module.exports.resourceName, details.firstPartyUrl)) {
     return result
   }
   // Ignore URLs that are not HTTP
@@ -167,7 +167,7 @@ function onBeforeHTTPRequest (details) {
 }
 
 function onBeforeRedirect (details) {
-  if (!Filtering.isResourceEnabled(module.exports.resourceName)) {
+  if (!Filtering.isResourceEnabled(module.exports.resourceName, details.firstPartyUrl)) {
     return
   }
 

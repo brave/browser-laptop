@@ -43,8 +43,8 @@ module.exports.init = () => {
     let redirectURL
     if (hack && hack.onBeforeRequest &&
         (hack.enableForAll ||
-         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK) ||
-         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION))) {
+         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, details.firstPartyUrl) ||
+         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, details.firstPartyUrl))) {
       const result = hack.onBeforeRequest.call(this, details)
       if (result && result.redirectURL) {
         redirectURL = result.redirectURL

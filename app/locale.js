@@ -136,6 +136,7 @@ var rendererIdentifiers = function () {
     'block3rdPartyCookie',
     'blockPopups',
     'noScript',
+    'safeBrowsing',
     'httpsEverywhere',
     'learnSpelling',
     'ignoreSpelling',

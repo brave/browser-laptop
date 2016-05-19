@@ -41,7 +41,12 @@ AppStore
       fullscreenPermission: boolean,
       openExternalPermission: boolean,
       savePasswords: boolean, // Only false or undefined/null
-      noScript: boolean // Only false or undefined/null
+      shieldsUp: boolean,
+      adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
+      cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
+      safeBrowsing: boolean,
+      noScript: boolean,
+      httpsEverywhere: boolean
     }
   },
   temporarySiteSettings: {
@@ -241,10 +246,7 @@ WindowStore
       tabPageIndex: number, // Index of the current tab page
     },
     siteInfo: {
-      isVisible: boolean, // Whether or not to show site info like # of blocked ads
-      expandTrackingProtection: boolean,
-      expandAdblock: boolean,
-      expandHttpse: boolean
+      isVisible: boolean // Whether or not to show site info like # of blocked ads
     },
     noScriptInfo: {
       isVisible: boolean, // Whether the noscript infobox is visible
@@ -263,6 +265,12 @@ WindowStore
   bookmarkDetail: {
     currentDetail: Object, // Detail of the current bookmark which is in add/edit mode
     originalDetails: Object // Detail of the original bookmark to edit
+  },
+  braveryPanelDetail: {
+    advancedControls: boolean, // If specified, indicates if advanced controls should be shown
+    expandTrackingProtection: boolean, // If specified, indicates if the TP section should be expanded
+    expandAdblock: boolean, // If specified, indicates if the adblock section should be expanded
+    expandHttpse: boolean // If specified, indicates if the httpse section should be expanded
   },
   contextMenuDetail: {
     left: number, // the left position of the context menu

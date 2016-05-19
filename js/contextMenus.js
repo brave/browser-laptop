@@ -535,10 +535,6 @@ function hamburgerTemplateInit (braverySettings, location, e) {
       }]
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.buildBraveryMenu(braverySettings, function () {
-      ipc.send(messages.UPDATE_APP_MENU, {bookmarked: braverySettings.bookmarked})
-    }),
-    CommonMenu.separatorMenuItem,
     CommonMenu.preferencesMenuItem(),
     {
       label: locale.translation('bookmarks'),
