@@ -4,10 +4,12 @@
 - Per site Bravery panel and per site settings. ([#1621](https://github.com/brave/browser-laptop/issues/1621))
 - Bravery setting defaults now in preferences. ([#1818](https://github.com/brave/browser-laptop/issues/1818))
 - Implemented error pages. ([#1611](https://github.com/brave/browser-laptop/issues/1611))
+- Lazy load tabs on startup. ([#470](https://github.com/brave/browser-laptop/issues/470))
 - Added search for selected text context menu. ([#1672](https://github.com/brave/browser-laptop/pull/1672))
 - Fixed various crashes. ([#1611](https://github.com/brave/browser-laptop/issues/1611), [#1772](https://github.com/brave/browser-laptop/issues/1772))
 - Fixed zoom not working in some cases. ([#1717](https://github.com/brave/browser-laptop/issues/1717))
 - Re-added close tabs left / right context menu on tabs. ([#1783](https://github.com/brave/browser-laptop/issues/1783))
+- Updated localization files and added Spanish and Tamil. ([#1828](https://github.com/brave/browser-laptop/pull/1828))
 - [Various other fixes.](https://github.com/brave/browser-laptop/issues?q=milestone%3A0.10.0dev+is%3Aclosed)
 
 ## [0.9.6](https://github.com/brave/browser-laptop/releases/v0.9.6dev)
