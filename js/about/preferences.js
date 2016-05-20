@@ -14,6 +14,14 @@ const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 
+const adblock = appConfig.resourceNames.ADBLOCK
+const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
+const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
+const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
+const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
+const noScript = appConfig.resourceNames.NOSCRIPT
+
 const isDarwin = navigator.platform === 'MacIntel'
 
 // TODO: Determine this from the l20n file automatically
@@ -82,8 +90,8 @@ class SettingCheckbox extends ImmutableComponent {
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
           disabled={this.props.disabled}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
-          checked={getSetting(this.props.prefKey, this.props.settings)} />
+          onChange={this.props.onChange ? this.props.onChange : changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
+          checked={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
     </div>
@@ -143,15 +151,22 @@ class GeneralTab extends ImmutableComponent {
 
 class SearchTab extends ImmutableComponent {
   render () {
-    return <SettingsList>
-      <SettingItem dataL10nId='defaultSearchEngine'>
-        <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_SEARCH_ENGINE)}>
-          <option value='content/search/google.xml'>Google</option>
-          <option value='content/search/duckduckgo.xml'>DuckDuckGo</option>
-        </select>
-      </SettingItem>
-    </SettingsList>
+    return <div>
+      <SettingsList>
+        <SettingItem dataL10nId='defaultSearchEngine'>
+          <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_SEARCH_ENGINE)}>
+            <option value='content/search/google.xml'>Google</option>
+            <option value='content/search/duckduckgo.xml'>DuckDuckGo</option>
+          </select>
+        </SettingItem>
+      </SettingsList>
+      <SettingsList dataL10nId='suggestionTypes'>
+        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
+    </div>
   }
 }
 
@@ -249,12 +264,54 @@ class SitePermissionsPage extends React.Component {
 }
 
 class PrivacyTab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onChangeAdControl = this.onChangeAdControl.bind(this)
+    this.onToggleHTTPSE = this.onToggleSetting.bind(this, httpsEverywhere)
+    this.onToggleSafeBrowsing = this.onToggleSetting.bind(this, safeBrowsing)
+    this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
+  }
+  onChangeAdControl (e) {
+    if (e.target.value === 'showBraveAds') {
+      aboutActions.setResourceEnabled(adblock, true)
+      aboutActions.setResourceEnabled(trackingProtection, true)
+      aboutActions.setResourceEnabled(adInsertion, true)
+    } else if (e.target.value === 'blockAds') {
+      aboutActions.setResourceEnabled(adblock, true)
+      aboutActions.setResourceEnabled(trackingProtection, true)
+      aboutActions.setResourceEnabled(adInsertion, false)
+    } else {
+      aboutActions.setResourceEnabled(adblock, false)
+      aboutActions.setResourceEnabled(trackingProtection, false)
+      aboutActions.setResourceEnabled(adInsertion, false)
+    }
+  }
+  onChangeCookieControl (e) {
+    aboutActions.setResourceEnabled(cookieblock, e.target.value === 'block3rdPartyCookie')
+  }
+  onToggleSetting (setting, e) {
+    aboutActions.setResourceEnabled(setting, e.target.checked)
+  }
   render () {
+    console.log('this.props.braveryDefaults', this.props.braveryDefaults.toJS())
     return <div>
-      <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <SettingsList dataL10nId='braveryDefaults'>
+        <SettingItem dataL10nId='adControl'>
+          <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
+            <option data-l10n-id='showBraveAds' value='showBraveAds' />
+            <option data-l10n-id='blockAds' value='blockAds' />
+            <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
+          </select>
+        </SettingItem>
+        <SettingItem dataL10nId='cookieControl'>
+          <select value={this.props.braveryDefaults.get('cookieControl')} onChange={this.onChangeCookieControl}>
+            <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
+            <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
+          </select>
+        </SettingItem>
+        <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
+        <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
+        <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScript' onChange={this.onToggleNoScript} />
       </SettingsList>
       <SettingsList dataL10nId='advancedPrivacySettings'>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -385,7 +442,8 @@ class AboutPreferences extends React.Component {
       preferenceTab: preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
       settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map(),
-      siteSettings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map()
+      siteSettings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map(),
+      braveryDefaults: window.initBraveryDefaults ? Immutable.fromJS(window.initBraveryDefaults) : Immutable.Map()
     }
     window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
       this.setState({
@@ -395,6 +453,11 @@ class AboutPreferences extends React.Component {
     window.addEventListener(messages.SITE_SETTINGS_UPDATED, (e) => {
       this.setState({
         siteSettings: Immutable.fromJS(e.detail || {})
+      })
+    })
+    window.addEventListener(messages.BRAVERY_DEFAULTS_UPDATED, (e) => {
+      this.setState({
+        braveryDefaults: Immutable.fromJS(e.detail || {})
       })
     })
     this.onChangeSetting = this.onChangeSetting.bind(this)
@@ -437,6 +500,7 @@ class AboutPreferences extends React.Component {
     let tab
     const settings = this.state.settings
     const siteSettings = this.state.siteSettings
+    const braveryDefaults = this.state.braveryDefaults
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} />
@@ -451,7 +515,7 @@ class AboutPreferences extends React.Component {
         tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab settings={settings} siteSettings={siteSettings} onChangeSetting={this.onChangeSetting} />
+        tab = <PrivacyTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting} />

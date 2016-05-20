@@ -28,6 +28,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('bravery-defaults-updated', (e, braveryDefaults) => {
+    const event = new window.CustomEvent('bravery-defaults-updated', {
+      detail: braveryDefaults
+    })
+    window.dispatchEvent(event)
+  })
   ipcRenderer.on('bookmarks-updated', (e, bookmarks) => {
     const event = new window.CustomEvent('bookmarks-updated', {
       detail: bookmarks
@@ -91,6 +97,9 @@
   })
   window.addEventListener('show-notification', (e) => {
     ipcRenderer.send('show-notification', e.detail)
+  })
+  window.addEventListener('set-resource-enabled', (e) => {
+    ipcRenderer.send('set-resource-enabled', e.detail.resourceName, e.detail.enabled)
   })
   window.addEventListener('delete-password', (e) => {
     ipcRenderer.send('delete-password', e.detail)

@@ -205,24 +205,24 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='adControl' />
-                  <select value={this.getSiteSetting('adControl', 'showBraveAds')} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                  <select value={this.getSiteSetting('adControl', this.props.braveryDefaults.adControl)} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
                     <option data-l10n-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </select>
-                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', true)} disabled={!shieldsUp} />
-                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={this.getSiteSetting('noScript', false)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', this.props.braveryDefaults.safeBrowsing)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)} disabled={!shieldsUp} />
                 </div>
                 <div className='braveryControlGroup'>
                   <div className={cx({
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='cookieControl' />
-                  <select value={this.getSiteSetting('cookieControl', 'block3rdPartyCookie')} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <select value={this.getSiteSetting('cookieControl', this.props.braveryDefaults.cookieControl)} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
-                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={this.getSiteSetting('httpsEverywhere', true)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)} disabled={!shieldsUp} />
                 </div>
               </div></span>
             : null

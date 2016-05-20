@@ -72,6 +72,7 @@ const messages = {
   BLOCK_CANVAS_FINGERPRINTING: _,
   GOT_CANVAS_FINGERPRINTING: _,
   SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
+  SET_RESOURCE_ENABLED: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
@@ -101,6 +102,7 @@ const messages = {
   // About pages to contentScripts
   SETTINGS_UPDATED: _,
   SITE_SETTINGS_UPDATED: _,
+  BRAVERY_DEFAULTS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   // About pages from contentScript

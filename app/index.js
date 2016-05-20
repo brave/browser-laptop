@@ -332,6 +332,11 @@ app.on('ready', () => {
                                                         locale.translation(msg))
     })
 
+    ipcMain.on(messages.SET_RESOURCE_ENABLED, (e, resourceName, enabled) => {
+      console.log('set resource eanbled', resourceName, enabled)
+      appActions.setResourceEnabled(resourceName, enabled)
+    })
+
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
       appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
     })

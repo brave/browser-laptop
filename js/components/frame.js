@@ -45,6 +45,8 @@ class Frame extends ImmutableComponent {
     if (location === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
       this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings.toJS())
+      console.log('sending bravery defaults of: ', this.props.braveryDefaults)
+      this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults)
     } else if (location === 'about:bookmarks') {
       this.webview.send(messages.BOOKMARKS_UPDATED, {
         bookmarks: this.props.bookmarks.toJS(),

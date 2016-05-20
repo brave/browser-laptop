@@ -160,7 +160,16 @@ const AboutActions = {
       detail: msg
     })
     window.dispatchEvent(event)
-  }
+  },
 
+  setResourceEnabled: function (resourceName, enabled) {
+    const event = new window.CustomEvent(messages.SET_RESOURCE_ENABLED, {
+      detail: {
+        resourceName,
+        enabled
+      }
+    })
+    window.dispatchEvent(event)
+  }
 }
 module.exports = AboutActions

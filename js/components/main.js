@@ -331,17 +331,8 @@ class Main extends ImmutableComponent {
   }
 
   onHamburgerMenu (e) {
-    let braverySettings = {}
-    Object.keys(appConfig.resourceNames).forEach((name) => {
-      let value = appConfig.resourceNames[name]
-      let enabled = this.props.appState.getIn([value, 'enabled'])
-      braverySettings[value] = enabled === undefined ? appConfig[value].enabled : enabled
-    })
-    // whether the current page is bookmarked. needed to re-initialize the
-    // application menu.
-    braverySettings.bookmarked = this.navBar.bookmarked
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    contextMenus.onHamburgerMenu(braverySettings, activeFrame && activeFrame.get('location') || '', e)
+    contextMenus.onHamburgerMenu(activeFrame && activeFrame.get('location') || '', e)
   }
 
   onHideSiteInfo () {
@@ -481,6 +472,27 @@ class Main extends ImmutableComponent {
     return !(parsedUrl.protocol || '').startsWith('http')
   }
 
+  get braveryDefaults () {
+    const braveryDefaults = {}
+    Object.keys(appConfig.resourceNames).forEach((name) => {
+      let value = appConfig.resourceNames[name]
+      let enabled = this.props.appState.getIn([value, 'enabled'])
+      braveryDefaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
+    })
+    const replaceAds = braveryDefaults[appConfig.resourceNames.AD_INSERTION] || false
+    const blockAds = braveryDefaults[appConfig.resourceNames.ADBLOCK] || false
+    const blockTracking = braveryDefaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
+    const blockCookies = braveryDefaults[appConfig.resourceNames.COOKIEBLOCK] || false
+    braveryDefaults.adControl = 'allowAdsAndTracking'
+    if (blockAds && replaceAds && blockTracking) {
+      braveryDefaults.adControl = 'showBraveAds'
+    } else if (blockAds && !replaceAds && blockTracking) {
+      braveryDefaults.adControl = 'blockAds'
+    }
+    braveryDefaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
+    return braveryDefaults
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -502,6 +514,7 @@ class Main extends ImmutableComponent {
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+    const braveryDefaults = this.braveryDefaults
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -568,6 +581,7 @@ class Main extends ImmutableComponent {
             braveryPanelIsVisible
             ? <BraveryPanel frameProps={activeFrame}
               braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
+              braveryDefaults={braveryDefaults}
               activeSiteSettings={activeSiteSettings}
               onHide={this.onHideBraveryPanel} />
             : null
@@ -658,6 +672,7 @@ class Main extends ImmutableComponent {
               ref={(node) => { this.frames[frame.get('key')] = node }}
               prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
               onCloseFrame={this.onCloseFrame}
+              braveryDefaults={braveryDefaults}
               frame={frame}
               key={frame.get('key')}
               settings={frame.get('location') === 'about:preferences'

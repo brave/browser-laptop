@@ -497,7 +497,7 @@ function getEditableItems (selection) {
   return items
 }
 
-function hamburgerTemplateInit (braverySettings, location, e) {
+function hamburgerTemplateInit (location, e) {
   const template = [
     {
       l10nLabelId: 'new',
@@ -812,8 +812,8 @@ function mainTemplateInit (nodeProps, frame) {
   return template
 }
 
-function onHamburgerMenu (braverySettings, location, e) {
-  const menuTemplate = hamburgerTemplateInit(braverySettings, location, e)
+function onHamburgerMenu (location, e) {
+  const menuTemplate = hamburgerTemplateInit(location, e)
   const rect = e.target.getBoundingClientRect()
   windowActions.setContextMenuDetail(Immutable.fromJS({
     right: 0,
