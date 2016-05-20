@@ -106,12 +106,6 @@ const init = (settingsState, args) => {
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
       }
-    }, {
-      label: locale.translation('openSearch'),
-      accelerator: 'CmdOrCtrl+K',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, true])
-      }
     },
     CommonMenu.separatorMenuItem,
     {
