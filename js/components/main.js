@@ -706,7 +706,6 @@ class Main extends ImmutableComponent {
               prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
               onCloseFrame={this.onCloseFrame}
               braveryDefaults={braveryDefaults}
-              activeRequestedLocation={activeRequestedLocation}
               frame={frame}
               key={frame.get('key')}
               settings={frame.get('location') === 'about:preferences'
