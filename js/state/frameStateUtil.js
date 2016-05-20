@@ -204,6 +204,7 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
       isSecure: urlParse(url).protocol === 'https:',
       certDetails: null
     },
+    unloaded: frameOpts.unloaded !== false,
     history: []
   })
 

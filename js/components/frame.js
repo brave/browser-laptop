@@ -84,6 +84,8 @@ class Frame extends ImmutableComponent {
   updateWebview (cb) {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
+        // allow force loading of new frames
+        this.props.frame.get('unloaded') === true &&
         // don't lazy load about pages
         !aboutUrls.get(this.props.frame.get('src')) &&
         // pinned tabs don't serialize their state so the icon is lost for lazy loading
@@ -318,7 +320,9 @@ class Frame extends ImmutableComponent {
         partitionNumber: this.props.frame.get('partitionNumber'),
         // use the delayed load url for the temporary title
         delayedLoadUrl,
-        guestInstanceId
+        guestInstanceId,
+        // never lazy load new frames that are renderer initiated
+        unloaded: false
       }
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
