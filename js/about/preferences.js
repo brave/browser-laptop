@@ -293,7 +293,6 @@ class PrivacyTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(setting, e.target.checked)
   }
   render () {
-    console.log('this.props.braveryDefaults', this.props.braveryDefaults.toJS())
     return <div>
       <SettingsList dataL10nId='braveryDefaults'>
         <SettingItem dataL10nId='adControl'>

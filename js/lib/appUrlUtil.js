@@ -59,6 +59,9 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:error': module.exports.getAppUrl('about-error.html')
 })
 
+module.exports.isIntermediateAboutPage = (location) =>
+  ['about:safebrowsing', 'about:error', 'about:certerror'].includes(location)
+
 // Map of target URLs mapped to source about: URLs
 const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj, v, k) => {
   obj[v] = k

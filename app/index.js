@@ -333,7 +333,6 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.SET_RESOURCE_ENABLED, (e, resourceName, enabled) => {
-      console.log('set resource eanbled', resourceName, enabled)
       appActions.setResourceEnabled(resourceName, enabled)
     })
 

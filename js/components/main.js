@@ -50,6 +50,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 // Util
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
+const { isIntermediateAboutPage } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 
@@ -226,8 +227,14 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
       const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
-      filteredFrameProps.forEach((frameProps) =>
-        windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank'))
+      filteredFrameProps.forEach((frameProps) => {
+        if (blockType === appConfig.resourceNames.SAFE_BROWSING) {
+          // Since Safe Browsing never actually loads the main frame we need to add history here.
+          // That way about:safebrowsing can figure out the correct location.
+          windowActions.addHistory(frameProps)
+        }
+        windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank')
+      })
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
@@ -314,6 +321,21 @@ class Main extends ImmutableComponent {
 
   get activeFrame () {
     return this.frames[this.props.windowState.get('activeFrameKey')]
+  }
+
+  // Returns the same as the active frame's location, but returns the requested
+  // URL if it's safe browsing, a cert error page or an error page.
+  get activeRequestedLocation () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    if (!activeFrame) {
+      return undefined
+    }
+    let location = activeFrame.get('location')
+    const history = activeFrame.get('history')
+    if (isIntermediateAboutPage(location) && history.size > 0) {
+      location = history.last()
+    }
+    return location
   }
 
   onBack () {
@@ -459,17 +481,21 @@ class Main extends ImmutableComponent {
   }
 
   get activeSiteSettings () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    if (!activeFrame) {
+    const activeRequestedLocation = this.activeRequestedLocation
+    if (!activeRequestedLocation) {
       return undefined
     }
-    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, activeFrame.get('location'))
+    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, activeRequestedLocation)
   }
 
   get braveShieldsDisabled () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    const parsedUrl = urlParse(activeFrame && activeFrame.get('location') || '')
-    return !(parsedUrl.protocol || '').startsWith('http')
+    const activeRequestedLocation = this.activeRequestedLocation
+    if (!activeRequestedLocation) {
+      return true
+    }
+
+    const parsedUrl = urlParse(activeRequestedLocation)
+    return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && activeRequestedLocation !== 'about:safebrowsing'
   }
 
   get braveryDefaults () {
@@ -512,6 +538,7 @@ class Main extends ImmutableComponent {
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
+    const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const braveryDefaults = this.braveryDefaults
@@ -580,6 +607,7 @@ class Main extends ImmutableComponent {
           {
             braveryPanelIsVisible
             ? <BraveryPanel frameProps={activeFrame}
+              activeRequestedLocation={activeRequestedLocation}
               braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
               braveryDefaults={braveryDefaults}
               activeSiteSettings={activeSiteSettings}
@@ -673,6 +701,7 @@ class Main extends ImmutableComponent {
               prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
               onCloseFrame={this.onCloseFrame}
               braveryDefaults={braveryDefaults}
+              activeRequestedLocation={activeRequestedLocation}
               frame={frame}
               key={frame.get('key')}
               settings={frame.get('location') === 'about:preferences'

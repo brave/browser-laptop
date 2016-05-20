@@ -892,6 +892,17 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE,
       isVisible
     })
+  },
+
+  /**
+   * Adds a history entry
+   * @param {Object} frameProps - The frame properties to change history for.
+   */
+  addHistory: function (frameProps) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_ADD_HISTORY,
+      frameProps
+    })
   }
 }
 

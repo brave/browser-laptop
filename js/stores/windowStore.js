@@ -16,7 +16,7 @@ const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
 const { l10nErrorText } = require('../lib/errorUtil')
-const { aboutUrls } = require('../lib/appUrlUtil')
+const { aboutUrls, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -99,6 +99,14 @@ class WindowStore extends EventEmitter {
   }
 }
 
+const addToHistory = (frameProps) => {
+  let history = frameProps.get('history') || Immutable.fromJS([])
+  if (!aboutUrls.get(frameProps.get('location'))) {
+    history = history.push(frameProps.get('location'))
+  }
+  return history
+}
+
 const windowStore = new WindowStore()
 const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
@@ -128,7 +136,8 @@ const doAction = (action) => {
       // explicitly set a new location via webview.loadURL.
         let activeShortcut
         if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') !== action.location &&
-            FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location) {
+            FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location &&
+            !isIntermediateAboutPage(action.location)) {
           activeShortcut = 'explicitLoadURL'
         }
 
@@ -224,17 +233,10 @@ const doAction = (action) => {
       })
       break
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
-      let history = action.frameProps.get('history') || Immutable.fromJS([])
-      if (!aboutUrls.get(action.frameProps.get('location'))) {
-        history = history.push(action.frameProps.get('location'))
-      }
-      // only keep the last 10 entries for now
-      history = history.slice(-10)
-
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: false,
         endLoadTime: new Date().getTime(),
-        history
+        history: addToHistory(action.frameProps)
       })
       break
     case WindowConstants.WINDOW_SET_FULL_SCREEN:
@@ -517,6 +519,11 @@ const doAction = (action) => {
       const redirectedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'httpsEverywhere', action.ruleset]
       let redirectedBy = windowState.getIn(redirectedByPath) || new Immutable.List()
       windowState = windowState.setIn(redirectedByPath, redirectedBy.push(action.location))
+      break
+    case WindowConstants.WINDOW_ADD_HISTORY:
+      windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
+        history: addToHistory(action.frameProps)
+      })
       break
     default:
   }

@@ -69,7 +69,7 @@ class BraveryPanel extends ImmutableComponent {
     return this.redirectedResources && this.redirectedResources.size > 0
   }
   get origin () {
-    const parsedUrl = urlParse(this.props.frameProps.get('location'))
+    const parsedUrl = urlParse(this.props.activeRequestedLocation)
     return `${parsedUrl.protocol}//${parsedUrl.host}`
   }
   onToggleTPList (e) {
@@ -96,7 +96,7 @@ class BraveryPanel extends ImmutableComponent {
     })
   }
   onReload () {
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.props.activeRequestedLocation)
   }
   getSiteSetting (setting, defaultValue) {
     if (!this.props.activeSiteSettings) {
@@ -110,18 +110,18 @@ class BraveryPanel extends ImmutableComponent {
   }
   onToggleSiteSetting (setting, e) {
     let ruleKey = this.origin
-    const parsedUrl = urlParse(this.props.frameProps.get('location'))
+    const parsedUrl = urlParse(this.props.activeRequestedLocation)
     if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
       ruleKey = `https?://${parsedUrl.host}`
     }
     appActions.changeSiteSetting(ruleKey, setting, e.target.value)
   }
   get displayHost () {
-    const parsedUrl = urlParse(this.props.frameProps.get('location'))
+    const parsedUrl = urlParse(this.props.activeRequestedLocation)
     if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
       return parsedUrl.host
     }
-    return this.props.frameProps.get('location')
+    return this.props.activeRequestedLocation
   }
   render () {
     const shieldsUp = this.getSiteSetting('shieldsUp', true)
