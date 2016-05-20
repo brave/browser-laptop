@@ -74,6 +74,7 @@ describe('tabs', function () {
     it('should close the tab', function * () {
       yield this.app.client
         .waitForBrowserWindow()
+        .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
@@ -88,6 +89,7 @@ describe('tabs', function () {
     it('should undo last closed tab', function * () {
       yield this.app.client
         .waitForBrowserWindow()
+        .waitForExist('.tab.active[data-frame-key="1"]')
         .ipcSend(messages.SHORTCUT_NEW_FRAME)
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
