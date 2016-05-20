@@ -379,8 +379,12 @@ class Main extends ImmutableComponent {
         return false
       }
 
-      if (this.activeSiteSettings && ['blockAds', 'allowAdsAndTracking'].includes(this.activeSiteSettings.get('adControl'))) {
-        return false
+      if (this.activeSiteSettings.get('adControl') !== undefined) {
+        if (['blockAds', 'allowAdsAndTracking'].includes(this.activeSiteSettings.get('adControl'))) {
+          return false
+        } else {
+          return true
+        }
       }
     }
 

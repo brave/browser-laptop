@@ -477,17 +477,25 @@ module.exports.isResourceEnabled = (resourceName, url) => {
     return false
   }
 
-  // Check the resource vs the ad control setting
-  if ((resourceName === appConfig.resourceNames.ADBLOCK ||
-       resourceName === appConfig.resourceNames.TRACKING_PROTECTION) &&
-      settings && settings.get('adControl') === 'allowAdsAndTracking') {
-    return false
+  if (settings && settings.get('adControl') !== undefined) {
+    // Check the resource vs the ad control setting
+    if ((resourceName === appConfig.resourceNames.ADBLOCK ||
+         resourceName === appConfig.resourceNames.TRACKING_PROTECTION) &&
+        settings.get('adControl') === 'allowAdsAndTracking') {
+      return false
+    } else {
+      return true
+    }
   }
 
   // Check the resource vs the cookie setting
-  if (resourceName === appConfig.resourceNames.COOKIEBLOCK &&
-      settings && settings.get('cookieControl') === 'allowAllCookies') {
-    return false
+  if (settings && settings.get('cookieControl') !== undefined) {
+    if (resourceName === appConfig.resourceNames.COOKIEBLOCK &&
+        settings.get('cookieControl') === 'allowAllCookies') {
+      return false
+    } else {
+      return true
+    }
   }
 
   // If the particular resource we're checking is disabled then don't enable
