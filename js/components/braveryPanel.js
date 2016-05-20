@@ -12,6 +12,7 @@ const appActions = require('../actions/appActions')
 const urlParse = require('url').parse
 const cx = require('../lib/classSet')
 const messages = require('../constants/messages')
+const siteUtil = require('../state/siteUtil')
 
 class BraveryPanel extends ImmutableComponent {
   constructor () {
@@ -29,17 +30,8 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
     this.onReload = this.onReload.bind(this)
   }
-  get isExtendedValidation () {
-    return this.props.frameProps.getIn(['security', 'isExtendedValidation'])
-  }
-  get isSecure () {
-    return this.props.frameProps.getIn(['security', 'isSecure'])
-  }
   get isBlockingTrackedContent () {
     return this.blockedByTrackingList && this.blockedByTrackingList.size > 0
-  }
-  get isMixedContent () {
-    return this.props.frameProps.getIn(['security', 'isMixedContent'])
   }
   get blockedByTrackingList () {
     return this.props.frameProps.getIn(['trackingProtection', 'blocked'])
@@ -67,10 +59,6 @@ class BraveryPanel extends ImmutableComponent {
   }
   get isRedirectingResources () {
     return this.redirectedResources && this.redirectedResources.size > 0
-  }
-  get origin () {
-    const parsedUrl = urlParse(this.props.activeRequestedLocation)
-    return `${parsedUrl.protocol}//${parsedUrl.host}`
   }
   onToggleTPList (e) {
     windowActions.setBraveryPanelDetail({
@@ -109,7 +97,7 @@ class BraveryPanel extends ImmutableComponent {
     return val
   }
   onToggleSiteSetting (setting, e) {
-    let ruleKey = this.origin
+    let ruleKey = siteUtil.getOrigin(this.props.activeRequestedLocation)
     const parsedUrl = urlParse(this.props.activeRequestedLocation)
     if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
       ruleKey = `https?://${parsedUrl.host}`
@@ -210,8 +198,8 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='blockAds' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </select>
+                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)} disabled={!shieldsUp} />
                   <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', this.props.braveryDefaults.safeBrowsing)} disabled={!shieldsUp} />
-                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)} disabled={!shieldsUp} />
                 </div>
                 <div className='braveryControlGroup'>
                   <div className={cx({
@@ -222,7 +210,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
-                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)} disabled={!shieldsUp} />
                 </div>
               </div></span>
             : null

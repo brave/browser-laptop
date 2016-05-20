@@ -397,7 +397,7 @@ class Main extends ImmutableComponent {
         return false
       }
 
-      if (this.activeSiteSettings.get('noScript') !== undefined) {
+      if (typeof this.activeSiteSettings.get('noScript') === 'boolean') {
         return this.activeSiteSettings.get('noScript')
       }
     }
@@ -489,6 +489,11 @@ class Main extends ImmutableComponent {
   }
 
   get braveShieldsDisabled () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    if (activeFrame && activeFrame.get('isPrivate')) {
+      return true
+    }
+
     const activeRequestedLocation = this.activeRequestedLocation
     if (!activeRequestedLocation) {
       return true
