@@ -466,8 +466,10 @@ class Frame extends ImmutableComponent {
       // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
       if (e.validatedURL === aboutUrls.get('about:newtab') ||
           e.validatedURL === aboutUrls.get('about:blank') ||
-          e.validatedURL === aboutUrls.get('about:certerror')) {
-        // this will just display a blank page for cert errors
+          e.validatedURL === aboutUrls.get('about:certerror') ||
+          e.validatedURL === aboutUrls.get('about:error') ||
+          e.validatedURL === aboutUrls.get('about:safebrowsing')) {
+        // this will just display a blank page for errors
         // but we don't want to take the user out of the private tab
         return
       } else if (isTargetAboutUrl(e.validatedURL)) {
