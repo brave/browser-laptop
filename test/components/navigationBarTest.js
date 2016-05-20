@@ -25,6 +25,7 @@ describe('urlbar', function () {
 
   function blur (client) {
     return client
+      .waitForExist(activeWebview)
       .leftClick(activeWebview) // clear focus from urlbar
       .waitUntil(function () {
         return this.getSelectedText().then(function (value) { return value === '' })
@@ -55,6 +56,7 @@ describe('urlbar', function () {
           .tabByUrl(Brave.newTabUrl)
           .url(page1)
           .waitForUrl(page1)
+          .waitForExist('#open_target')
           .leftClick('#open_target')
       })
 
@@ -160,6 +162,7 @@ describe('urlbar', function () {
           })
         yield this.app.client
           .tabByUrl(this.page)
+          .waitForExist('#top_link')
           .leftClick('#top_link')
           .windowParentByUrl(this.page + '#top')
       })
@@ -544,6 +547,7 @@ describe('urlbar', function () {
         })
         yield blur(this.app.client)
         yield this.app.client
+          .waitForExist(urlInput)
           .leftClick(urlInput)
       })
 
@@ -563,6 +567,7 @@ describe('urlbar', function () {
         yield setup(this.app.client)
         // type anything
         yield this.app.client.keys('a')
+          .waitForExist(urlInput)
           .leftClick(urlInput)
           // click when already focused
           .leftClick(urlInput)
