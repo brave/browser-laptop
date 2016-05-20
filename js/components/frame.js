@@ -320,9 +320,7 @@ class Frame extends ImmutableComponent {
         partitionNumber: this.props.frame.get('partitionNumber'),
         // use the delayed load url for the temporary title
         delayedLoadUrl,
-        guestInstanceId,
-        // never lazy load new frames that are renderer initiated
-        unloaded: false
+        guestInstanceId
       }
 
       if (e.disposition === 'new-window' || e.disposition === 'new-popup') {
