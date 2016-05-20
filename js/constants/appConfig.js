@@ -90,7 +90,7 @@ module.exports = {
     'privacy.block-canvas-fingerprinting': false,
     'bookmarks.toolbar.show': false,
     'bookmarks.toolbar.showFavicon': false,
-    'privacy.do-not-track': true,
+    'privacy.do-not-track': false,
     'security.passwords.manager-enabled': true,
     'security.passwords.one-password-enabled': false,
     'security.passwords.dashlane-enabled': false,
