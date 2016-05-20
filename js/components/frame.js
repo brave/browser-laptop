@@ -140,16 +140,13 @@ class Frame extends ImmutableComponent {
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
-    let windowEvent = isSourceAboutUrl(src) || this.props.frame.isActive ? 'dom-ready' : 'load-start'
     if (webviewAdded) {
       let runOnDomReady = (e) => {
-        if (e.isMainFrame !== false) {
-          this.webview.removeEventListener(windowEvent, runOnDomReady)
-          this.addEventListeners()
-          cb && cb()
-        }
+        this.webview.removeEventListener(e.type, runOnDomReady)
+        cb && cb()
       }
-      this.webview.addEventListener(windowEvent, runOnDomReady)
+      this.webview.addEventListener('load-start', runOnDomReady)
+      this.addEventListeners()
       this.webviewContainer.appendChild(this.webview)
     } else {
       cb && cb()
@@ -158,6 +155,7 @@ class Frame extends ImmutableComponent {
 
   componentDidMount () {
     const cb = () => {
+      this.webview.setActive(this.props.isActive)
       this.webview.setZoomLevel(this.zoomLevel)
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
       this.updateAboutDetails()
@@ -199,6 +197,7 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
+      this.webview.setActive(this.props.isActive)
       this.handleShortcut()
       this.webview.setZoomLevel(this.zoomLevel)
       // give focus when switching tabs
@@ -339,7 +338,6 @@ class Frame extends ImmutableComponent {
       if (this.props.frame.get('tabId') !== tabId) {
         windowActions.setFrameTabId(this.props.frame, tabId)
       }
-      this.webview.setActive(this.props.isActive)
     })
     this.webview.addEventListener('destroyed', (e) => {
       this.props.onCloseFrame(this.props.frame)
