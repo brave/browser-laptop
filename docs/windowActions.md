@@ -649,6 +649,16 @@ Sets whether the noscript icon is visible.
 
 
 
+### addHistory(frameProps) 
+
+Adds a history entry
+
+**Parameters**
+
+**frameProps**: `Object`, The frame properties to change history for.
+
+
+
 
 * * *
 
