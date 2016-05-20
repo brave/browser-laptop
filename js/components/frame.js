@@ -140,13 +140,14 @@ class Frame extends ImmutableComponent {
     }
     this.webview.setAttribute('src',
                               isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
+    let windowEvent = isSourceAboutUrl(src) || !this.props.frame.get('unloaded') ? 'dom-ready' : 'load-start'
     if (webviewAdded) {
-      let runOnDomReady = () => {
-        this.webview.removeEventListener('dom-ready', runOnDomReady)
+      let runOnDomReady = (e) => {
+        this.webview.removeEventListener(windowEvent, runOnDomReady)
+        this.addEventListeners()
         cb && cb()
       }
-      this.webview.addEventListener('dom-ready', runOnDomReady)
-      this.addEventListeners()
+      this.webview.addEventListener(windowEvent, runOnDomReady)
       this.webviewContainer.appendChild(this.webview)
     } else {
       cb && cb()
