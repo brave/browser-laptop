@@ -40,7 +40,7 @@ class Frame extends ImmutableComponent {
     return aboutUrls.get(this.props.frame.get('location'))
   }
 
-  updateAboutDetails (prevProps) {
+  updateAboutDetails () {
     let location = this.props.frame.get('location')
     if (location === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
@@ -56,14 +56,12 @@ class Frame extends ImmutableComponent {
         downloads: this.props.downloads.toJS()
       })
     } else if (location === 'about:passwords') {
-      if (prevProps.passwords !== this.props.passwords) {
+      if (this.props.passwords) {
         this.webview.send(messages.PASSWORD_DETAILS_UPDATED, this.props.passwords.toJS())
       }
-      if (prevProps.allSiteSettings !== this.props.allSiteSettings) {
-        if (this.props.allSiteSettings) {
-          this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
+      if (this.props.allSiteSettings) {
+        this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
                             this.props.allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
-        }
       }
     }
 
@@ -157,7 +155,7 @@ class Frame extends ImmutableComponent {
     const cb = () => {
       this.webview.setZoomLevel(this.zoomLevel)
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
-      this.updateAboutDetails({})
+      this.updateAboutDetails()
     }
     this.updateWebview(cb)
   }
@@ -203,7 +201,7 @@ class Frame extends ImmutableComponent {
         this.webview.focus()
       }
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
-      this.updateAboutDetails(prevProps)
+      this.updateAboutDetails()
     }
 
     if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
