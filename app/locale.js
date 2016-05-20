@@ -174,7 +174,9 @@ const availableLanguages = [
   'sl',
   'te',
   'tr-TR',
-  'uk'
+  'uk',
+  'es',
+  'ta'
 ]
 
 // Currently configured languages - TODO (make this dynamic)
