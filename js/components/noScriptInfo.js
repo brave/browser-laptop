@@ -55,17 +55,13 @@ class NoScriptInfo extends ImmutableComponent {
             onClick={this.onAllowOnce.bind(this)} />
         </div>
         <div>
-          <Button l10nId='allowScriptsTemp' className='subtleButton'
-            onClick={this.onAllow.bind(this, true)} />
-        </div>
         {
-          this.props.frameProps.get('isPrivate')
-          ? null
-          : <div>
-            <Button l10nId='allowScripts' className='subtleButton'
-              onClick={this.onAllow.bind(this, false)} />
-          </div>
+          // TODO: If this is a private tab, this should only allow scripts
+          // temporarily. Depends on #1824
+          <Button l10nId='allowScripts' className='subtleButton'
+            onClick={this.onAllow.bind(this, false)} />
         }
+        </div>
       </div>
     </Dialog>
   }

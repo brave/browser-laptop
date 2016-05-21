@@ -99,7 +99,7 @@ class BraveryPanel extends ImmutableComponent {
   onToggleSiteSetting (setting, e) {
     let ruleKey = siteUtil.getOrigin(this.props.activeRequestedLocation)
     const parsedUrl = urlParse(this.props.activeRequestedLocation)
-    if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
+    if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`
     }
     appActions.changeSiteSetting(ruleKey, setting, e.target.value)

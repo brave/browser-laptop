@@ -67,11 +67,6 @@ class UrlBar extends ImmutableComponent {
     return this.props.searchDetail
   }
 
-  get showNoScriptInfo () {
-    const scriptsBlocked = this.props.activeFrameProps.getIn(['noScript', 'blocked'])
-    return this.props.enableNoScript && !this.aboutPage && scriptsBlocked && scriptsBlocked.size
-  }
-
   // restores the url bar to the current location
   restore () {
     const location = this.props.activeFrameProps.get('location')
@@ -190,10 +185,6 @@ class UrlBar extends ImmutableComponent {
 
   componentDidUpdate () {
     this.updateDOM()
-    if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
-      // There are no blocked scripts, so hide the noscript dialog.
-      windowActions.setNoScriptVisible(false)
-    }
   }
 
   get hostValue () {
@@ -244,10 +235,6 @@ class UrlBar extends ImmutableComponent {
 
   onSiteInfo () {
     windowActions.setSiteInfoVisible(true)
-  }
-
-  onNoScript () {
-    windowActions.setNoScriptVisible(!this.props.noScriptIsVisible)
   }
 
   get shouldRenderUrlBarSuggestions () {
@@ -310,11 +297,6 @@ class UrlBar extends ImmutableComponent {
             ref={(node) => { this.urlInput = node }} />
         }
       <legend />
-        {
-          this.props.titleMode || !this.showNoScriptInfo
-          ? null
-          : <span className='noScript fa fa-ban' onClick={this.onNoScript.bind(this)}></span>
-        }
         {
           this.props.titleMode || this.aboutPage
           ? null

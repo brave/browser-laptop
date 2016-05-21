@@ -27,6 +27,7 @@ class NavigationBar extends ImmutableComponent {
     this.onToggleBookmark = this.onToggleBookmark.bind(this)
     this.onStop = this.onStop.bind(this)
     this.onReload = this.onReload.bind(this)
+    this.onNoScript = this.onNoScript.bind(this)
   }
 
   get loading () {
@@ -84,6 +85,15 @@ class NavigationBar extends ImmutableComponent {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
   }
 
+  get showNoScriptInfo () {
+    const scriptsBlocked = this.props.activeFrame.getIn(['noScript', 'blocked'])
+    return this.props.enableNoScript && scriptsBlocked && scriptsBlocked.size
+  }
+
+  onNoScript () {
+    windowActions.setNoScriptVisible(!this.props.noScriptIsVisible)
+  }
+
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
     const prevBookmarked = prevProps.activeFrame &&
@@ -94,6 +104,10 @@ class NavigationBar extends ImmutableComponent {
       }), siteTags.BOOKMARK)
     if (this.bookmarked !== prevBookmarked) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
+    }
+    if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
+      // There are no blocked scripts, so hide the noscript dialog.
+      windowActions.setNoScriptVisible(false)
     }
   }
 
@@ -142,14 +156,19 @@ class NavigationBar extends ImmutableComponent {
         frames={this.props.frames}
         loading={this.loading}
         titleMode={this.titleMode}
-        enableNoScript={this.props.enableNoScript}
-        noScriptIsVisible={this.props.noScriptIsVisible}
         urlbar={this.props.navbar.get('urlbar')}
         />
       {
         isSourceAboutUrl(frameProps.get('location'))
         ? null
         : <div className='endButtons'>
+          {
+            !this.showNoScriptInfo
+            ? null
+            : <Button iconClass='fa-ban' className={cx({
+              'noScript': true
+            })} onClick={this.onNoScript} />
+          }
           <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
             className={cx({
               'navbutton': true,

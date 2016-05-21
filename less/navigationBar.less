@@ -221,6 +221,14 @@
       top: -2px;
     }
 
+    .noScript {
+      font-size: 12px;
+      position: absolute;
+      left: -30px;
+      opacity: 1;
+      color: @braveOrange;
+    }
+
     .urlbarIcon {
       display: inline-block;
       opacity: 0.4;
@@ -264,14 +272,15 @@
   }
 
   .noScript {
-    color: @braveOrange;
-    font-size: 17px;
+    font-size: 16px;
     cursor: pointer;
-    top: 10px;
-    margin-right: 5px;
+    margin-left: 10px;
+    color: @braveOrange;
+    opacity: 0.6;
     &:hover {
-      opacity: 0.5;
+      opacity: 1;
     }
+    display: inline;
   }
 
   /* Disable selection of button text */
