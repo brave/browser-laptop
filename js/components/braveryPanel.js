@@ -136,7 +136,9 @@ class BraveryPanel extends ImmutableComponent {
             <div data-l10n-id='trackersBlocked' />
           </div>
           <div onClick={this.onToggleHttpseList}>
-            <div className='braveryStat redirectedResourcesStat'>{this.redirectedResources ? this.redirectedResources.size : 0}</div>
+            <div className='braveryStat redirectedResourcesStat'>{this.redirectedResources ? this.redirectedResources.reduce((reduction, value) => {
+              return reduction + value.size
+            }, 0) : 0}</div>
             <div data-l10n-id='httpReroutes' />
           </div>
         </div>
