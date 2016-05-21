@@ -17,7 +17,7 @@ let trackingProtection
 let cachedFirstParty = new LRUCache(50)
 
 // Temporary whitelist until we find a better solution
-const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticxx.facebook.com', 'www.facebook.com', 'scontent.xx.fbcdn.net']
+const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticxx.facebook.com', 'www.facebook.com', 'scontent.xx.fbcdn.net', 'pbs.twimg.com']
 
 const startTrackingProtection = (wnd) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
