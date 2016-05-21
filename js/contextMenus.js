@@ -563,11 +563,11 @@ function hamburgerTemplateInit (location, e) {
   return template
 }
 
-const openInNewTabMenuItem = (location, isPrivate, partitionNumber) => {
+const openInNewTabMenuItem = (location, isPrivate, partitionNumber, parentFrameKey) => {
   return {
     label: locale.translation('openInNewTab'),
     click: () => {
-      windowActions.newFrame({ location, isPrivate, partitionNumber }, false)
+      windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, false)
     }
   }
 }
@@ -581,13 +581,14 @@ const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
   }
 }
 
-const openInNewPrivateTabMenuItem = (location) => {
+const openInNewPrivateTabMenuItem = (location, parentFrameKey) => {
   return {
     label: locale.translation('openInNewPrivateTab'),
     click: () => {
       windowActions.newFrame({
         location,
-        isPrivate: true
+        isPrivate: true,
+        parentFrameKey
       }, false)
     }
   }
@@ -602,13 +603,14 @@ const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
   }
 }
 
-const openInNewSessionTabMenuItem = (location) => {
+const openInNewSessionTabMenuItem = (location, parentFrameKey) => {
   return {
     label: locale.translation('openInNewSessionTab'),
     click: (item, focusedWindow) => {
       windowActions.newFrame({
         location,
-        isPartitioned: true
+        isPartitioned: true,
+        parentFrameKey
       }, false)
     }
   }
@@ -650,11 +652,11 @@ function mainTemplateInit (nodeProps, frame) {
   const nodeName = nodeProps.name
 
   if (nodeProps.href) {
-    template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
-      openInNewPrivateTabMenuItem(nodeProps.href),
+    template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')),
+      openInNewPrivateTabMenuItem(nodeProps.href, frame.get('key')),
       openInNewWindowMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
       CommonMenu.separatorMenuItem,
-      openInNewSessionTabMenuItem(nodeProps.href),
+      openInNewSessionTabMenuItem(nodeProps.href, frame.get('key')),
       CommonMenu.separatorMenuItem)
 
     if (nodeProps.href.toLowerCase().startsWith('mailto:')) {
