@@ -257,7 +257,7 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.CERT_ERROR, (e, details) => {
       const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
-      if (frame) {
+      if (frame && frame.get('location') === details.url) {
         windowActions.setFrameError(frame, {
           url: details.url,
           error: details.error
