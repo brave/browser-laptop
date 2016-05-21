@@ -499,7 +499,9 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   }
 
   // If the particular resource we're checking is disabled then don't enable
-  if (settings && typeof settings.get(resourceName) === 'boolean') {
+  // The noScript resource handles its own site settings.
+  if (resourceName !== appConfig.resourceNames.NOSCRIPT &&
+      settings && typeof settings.get(resourceName) === 'boolean') {
     return settings.get(resourceName)
   }
 
