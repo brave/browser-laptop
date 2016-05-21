@@ -722,8 +722,7 @@ function mainTemplateInit (nodeProps, frame) {
       template.push(addBookmarkMenuItem('bookmarkLink', {
         location: nodeProps.href,
         tags: [siteTags.BOOKMARK]
-      }, false),
-      searchSelectionMenuItem(nodeProps.href))
+      }, false))
     } else {
       template.push(
         {
