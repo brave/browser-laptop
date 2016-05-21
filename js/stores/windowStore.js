@@ -104,7 +104,7 @@ const addToHistory = (frameProps) => {
   if (!aboutUrls.get(frameProps.get('location'))) {
     history = history.push(frameProps.get('location'))
   }
-  return history
+  return history.slice(-10)
 }
 
 const windowStore = new WindowStore()
