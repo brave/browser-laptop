@@ -26,6 +26,7 @@ const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
+const textUtils = require('./lib/text')
 const {isUrl} = require('./lib/appUrlUtil')
 
 const isDarwin = process.platform === 'darwin'
@@ -632,8 +633,9 @@ const copyEmailAddressMenuItem = (location) => {
 }
 
 const searchSelectionMenuItem = (location) => {
+  var searchText = textUtils.ellipse(location, 3)
   return {
-    label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, location),
+    label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
     click: (item, focusedWindow) => {
       if (focusedWindow && location) {
         let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
