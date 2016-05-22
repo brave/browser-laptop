@@ -63,7 +63,7 @@ module.exports.sendToFocusedWindow = (focusedWindow, message) => {
 module.exports.quitMenuItem = () => {
   return {
     label: locale.translation('quit') + ' ' + appConfig.name,
-    accelerator: 'Command+Q',
+    accelerator: 'CmdOrCtrl+Q',
     click: app.quit
   }
 }
