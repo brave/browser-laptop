@@ -88,6 +88,11 @@ class Main extends ImmutableComponent {
             ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN)
           }
           break
+        case keyCodes.NUMPAD_MINUS:
+          if (eventUtil.isForSecondaryAction(e)) {
+            ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
+          }
+          break
       }
     })
   }
