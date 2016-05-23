@@ -31,7 +31,8 @@
       }
     }
     .topBarButton.fa {
-      display: block;
+      display: flex;
+      align-items: center;
       width: 100%;
     }
     &.selected {
@@ -61,7 +62,9 @@
   cursor: pointer;
 
   &:before {
-    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    width: 20px;
   }
 
 }
