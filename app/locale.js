@@ -165,6 +165,7 @@ const availableLanguages = [
   'cs',
   'de-DE',
   'en-US',
+  'es',
   'fr-FR',
   'hi-IN',
   'id-ID',
@@ -172,11 +173,10 @@ const availableLanguages = [
   'nl-NL',
   'pt-BR',
   'sl',
+  'ta',
   'te',
   'tr-TR',
-  'uk',
-  'es',
-  'ta'
+  'uk'
 ]
 
 // Currently configured languages - TODO (make this dynamic)
