@@ -151,6 +151,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         isDragging: this.isDragging
       })}
       draggable
+      title={this.props.frameProps.get('location')}
       ref={(node) => { this.bookmarkNode = node }}
       onClick={this.onClick}
       onDragStart={this.onDragStart}
