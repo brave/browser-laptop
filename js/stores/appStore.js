@@ -294,6 +294,12 @@ const handleAppAction = (action) => {
       const whitelistedUrl = appUrlUtil.getIndexHTML()
       mainWindow.loadURL(whitelistedUrl)
       mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
+      mainWindow.webContents.on('did-navigate', (e, url) => {
+        if (url !== whitelistedUrl) {
+          console.log('Loaded un-whitelisted URL', url)
+          mainWindow.loadURL(whitelistedUrl)
+        }
+      })
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
           lastEmittedState = appState
