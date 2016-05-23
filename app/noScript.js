@@ -40,10 +40,13 @@ function onHeadersReceived (details) {
 
   let origin = siteUtil.getOrigin(details.firstPartyUrl)
   if (origin) {
-    if (details.resourceType === 'mainFrame' &&
-        temporarilyAllowed[origin] === DISALLOW_NEXT_TIME) {
-      // This resource has been allowed once already. Un-whitelist it
-      delete temporarilyAllowed[origin]
+    if (temporarilyAllowed[origin] === DISALLOW_NEXT_TIME) {
+      if (details.resourceType === 'mainFrame') {
+        // This resource has been allowed once already. Un-whitelist it
+        delete temporarilyAllowed[origin]
+      } else {
+        return result
+      }
     } else if (temporarilyAllowed[origin] === ALLOW_NEXT_TIME) {
       if (details.resourceType === 'mainFrame') {
         // Mark this origin for removal from temporarilyAllowed on next
