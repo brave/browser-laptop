@@ -657,17 +657,17 @@ if (typeof KeyEvent === 'undefined') {
         break
       case KeyEvent.DOM_VK_BACK_SPACE:
         if (!isEditable(document.activeElement)) {
-          e.shiftKey ? window.history.forward() : window.history.back()
+          e.shiftKey ? ipcRenderer.sendToHost('go-forward') : ipcRenderer.sendToHost('go-back')
         }
         break
       case KeyEvent.DOM_VK_LEFT:
         if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-          window.history.back()
+          ipcRenderer.sendToHost('go-back')
         }
         break
       case KeyEvent.DOM_VK_RIGHT:
         if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-          window.history.forward()
+          ipcRenderer.sendToHost('go-forward')
         }
         break
     }

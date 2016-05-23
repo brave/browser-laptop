@@ -371,6 +371,12 @@ class Frame extends ImmutableComponent {
         case messages.STOP_LOAD:
           method = () => this.webview.stop()
           break
+        case messages.GO_BACK:
+          method = () => this.webview.goBack()
+          break
+        case messages.GO_FORWARD:
+          method = () => this.webview.goForward()
+          break
         case messages.LINK_HOVERED:
           method = (href, position) => {
             position = position || {}
