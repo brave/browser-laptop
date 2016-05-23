@@ -125,7 +125,17 @@ const doAction = (action) => {
       // We should not emit here because the Window already know about the change on startup.
       return
     case WindowConstants.WINDOW_SET_URL:
-      if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') === action.location) {
+      const frame = FrameStateUtil.getFrameByKey(windowState, action.key)
+      const currentLocation = frame.get('location')
+      if (action.location.startsWith('javascript:')) {
+        if (!currentLocation.startsWith('about:')) {
+          windowState = windowState.mergeIn(frameStatePath(action.key), {
+            activeShortcut: 'bookmarklet',
+            bookmarklet: action.location
+          })
+        }
+        updateNavBarInput(frame.get('location'), frameStatePath(action.key))
+      } else if (currentLocation === action.location) {
         // reload if the url is unchanged
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           audioPlaybackActive: false,
@@ -135,15 +145,14 @@ const doAction = (action) => {
       // If the user is changing back to the original src and they already navigated away then we need to
       // explicitly set a new location via webview.loadURL.
         let activeShortcut
-        if (FrameStateUtil.getFrameByKey(windowState, action.key).get('location') !== action.location &&
-            FrameStateUtil.getFrameByKey(windowState, action.key).get('src') === action.location &&
+        if (frame.get('location') !== action.location &&
+            frame.get('src') === action.location &&
             !isIntermediateAboutPage(action.location)) {
           activeShortcut = 'explicitLoadURL'
         }
 
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
-          location: action.location,
           activeShortcut
         })
         // force a navbar update in case this was called from an app
