@@ -4,6 +4,7 @@
 
 const React = require('react')
 const ipc = require('electron').ipcRenderer
+const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const Dialog = require('./dialog')
 const SwitchControl = require('./switchControl')
@@ -57,6 +58,17 @@ class BraveryPanel extends ImmutableComponent {
   get redirectedResources () {
     return this.props.frameProps.get('httpsEverywhere')
   }
+  get redirectedResourcesSet () {
+    let result = new Immutable.Set([])
+    if (this.redirectedResources) {
+      this.redirectedResources.forEach((urls) => {
+        if (urls) {
+          result = result.union(urls)
+        }
+      })
+    }
+    return result
+  }
   get isRedirectingResources () {
     return this.redirectedResources && this.redirectedResources.size > 0
   }
@@ -73,6 +85,11 @@ class BraveryPanel extends ImmutableComponent {
     e.stopPropagation()
   }
   onToggleHttpseList (e) {
+    if (!this.isHttpseShown && this.redirectedResources &&
+        this.redirectedResources.size) {
+      // Display full list of rulesets in console for debugging
+      console.log('httpse rulesets', JSON.stringify(this.redirectedResources.toJS()))
+    }
     windowActions.setBraveryPanelDetail({
       expandHttpse: !this.isHttpseShown
     })
@@ -136,9 +153,7 @@ class BraveryPanel extends ImmutableComponent {
             <div data-l10n-id='trackersBlocked' />
           </div>
           <div onClick={this.onToggleHttpseList}>
-            <div className='braveryStat redirectedResourcesStat'>{this.redirectedResources ? this.redirectedResources.reduce((reduction, value) => {
-              return reduction + value.size
-            }, 0) : 0}</div>
+            <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
             <div data-l10n-id='httpReroutes' />
           </div>
         </div>
@@ -166,8 +181,8 @@ class BraveryPanel extends ImmutableComponent {
             this.isRedirectingResources && this.isHttpseShown
             ? <li><ul>
             {
-              this.redirectedResources.map((sites, ruleset) =>
-                <li key={ruleset}>{[ruleset, JSON.stringify(sites.toJS())].join(': ')}</li>)
+              this.redirectedResourcesSet.map((site) =>
+                <li key={site}>{site}</li>)
             }
             </ul></li>
             : null
