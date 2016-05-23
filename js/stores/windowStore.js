@@ -144,16 +144,6 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
           location: action.location,
-          audioPlaybackActive: false,
-          icon: undefined,
-          // We want theme colors reset here instead of in WINDOW_SET_LOCATION
-          // because intra-page navigation would make the tab color
-          // blink otherwise.  The theme color will be reset eventually
-          // once the page loads anyway though for the case of navigation change
-          // without src change.
-          themeColor: undefined,
-          computedThemeColor: undefined,
-          title: '',
           activeShortcut
         })
         // force a navbar update in case this was called from an app
@@ -161,28 +151,26 @@ const doAction = (action) => {
         updateNavBarInput(action.location, frameStatePath(action.key))
       }
       break
-    case WindowConstants.WINDOW_SET_LOCATION:
+    case WindowConstants.WINDOW_SET_NAVIGATED:
       const key = action.key || windowState.get('activeFrameKey')
-      const lastLocation = windowState.getIn(frameStatePath(key).concat(['location']))
       windowState = windowState.mergeIn(frameStatePath(key), {
         location: action.location
       })
-
-      if (action.resetInfo) {
+      if (!action.isNavigatedInPage) {
         windowState = windowState.mergeIn(frameStatePath(key), {
           adblock: {},
-          trackingProtection: {},
-          noScript: {},
-          httpsEverywhere: {},
           audioPlaybackActive: false,
-          title: ''
+          computedThemeColor: undefined,
+          httpsEverywhere: {},
+          icon: undefined,
+          location: action.location,
+          noScript: {},
+          themeColor: undefined,
+          title: '',
+          trackingProtection: {}
         })
       }
-
-      // include the url fragment when updating navbar input
-      if (action.location !== lastLocation) {
-        updateNavBarInput(action.location, frameStatePath(key))
-      }
+      updateNavBarInput(action.location, frameStatePath(key))
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
@@ -228,6 +216,8 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
+        // We may want to add this later to know which frame is loading
+        // provisionalLocation: action.frameProps.get('location'),
         startLoadTime: new Date().getTime(),
         endLoadTime: null
       })

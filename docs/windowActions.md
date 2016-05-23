@@ -36,20 +36,17 @@ but the location should. For user entered new URLs, both should be updated.
 
 
 
-### setLocation(location, key, resetInfo) 
+### setNavigated(location, key, isNavigatedInPage) 
 
-Dispatches a message to the store to set the current navigated location.
-This differs from the above in that it will not change the webview's (iframe's) src.
-This should be used for renderer initiated navigation but not user initiated loads.
+Dispatches a message to the store to let it know a page has been navigated.
 
 **Parameters**
 
-**location**: `string`, The URL of the page to load
+**location**: `string`, The URL of the page that was navigated to.
 
-**key**: `number`, The frame key to modify, it is checked against the active frame and if
-it is active the URL text will also be changed.
+**key**: `number`, The frame key to modify.
 
-**resetInfo**: `boolean`, true if information like title and bravery settings should be reset
+**isNavigatedInPage**: `boolean`, true if it was a navigation within the same page.
 
 
 

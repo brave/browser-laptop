@@ -96,17 +96,13 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to set the current navigated location.
-   * This differs from the above in that it will not change the webview's (iframe's) src.
-   * This should be used for renderer initiated navigation but not user initiated loads.
+   * Dispatches a message to the store to let it know a page has been navigated.
    *
-   * @param {string} location - The URL of the page to load
-   * @param {number} key - The frame key to modify, it is checked against the active frame and if
-   * it is active the URL text will also be changed.
-   * @param {boolean} resetInfo - true if information like title and bravery settings should be reset
+   * @param {string} location - The URL of the page that was navigated to.
+   * @param {number} key - The frame key to modify.
+   * @param {boolean} isNavigatedInPage - true if it was a navigation within the same page.
    */
-  setLocation: function (location, key, resetInfo) {
-    location = location.trim()
+  setNavigated: function (location, key, isNavigatedInPage) {
     // For about: URLs, make sure we store the URL as about:something
     // and not what we map to.
     location = getSourceAboutUrl(location) || location
@@ -115,10 +111,10 @@ const windowActions = {
       location = UrlUtil.getUrlFromInput(location)
     }
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_LOCATION,
+      actionType: WindowConstants.WINDOW_SET_NAVIGATED,
       location,
       key,
-      resetInfo
+      isNavigatedInPage
     })
   },
 
