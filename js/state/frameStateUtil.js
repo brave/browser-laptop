@@ -6,6 +6,18 @@ const Immutable = require('immutable')
 const config = require('../constants/config.js')
 const urlParse = require('url').parse
 
+const matchFrame = (queryInfo, frame) => {
+  return !Object.keys(queryInfo).map((queryKey) => (frame.get(queryKey) === queryInfo[queryKey])).includes(false)
+}
+
+function query (windowState, queryInfo) {
+  return windowState.get('frames').filter(matchFrame.bind(null, queryInfo))
+}
+
+function find (windowState, queryInfo) {
+  return windowState.get('frames').find(matchFrame.bind(null, queryInfo))
+}
+
 function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
 }
@@ -23,13 +35,11 @@ function getFrameByIndex (windowState, i) {
 }
 
 function getFrameByKey (windowState, key) {
-  const i = findIndexForFrameKey(windowState.get('frames'), key)
-  return windowState.getIn(['frames', i])
+  return find(windowState, {key})
 }
 
 function getFrameByTabId (windowState, tabId) {
-  const i = windowState.get('frames').findIndex((frame) => frame.get('tabId') === tabId)
-  return windowState.getIn(['frames', i])
+  return find(windowState, {tabId})
 }
 
 function getActiveFrame (windowState) {
@@ -87,14 +97,25 @@ function getFramePropPath (windowState, frameProps, propName) {
  * Obtains the index for the specified frame key
  */
 function findIndexForFrameKey (frames, key) {
-  return frames.findIndex((frame) => frame.get('key') === key)
+  return frames.findIndex(matchFrame.bind(null, {key}))
 }
 
 /**
  * Obtains the frameProps index in the frames
  */
 function getFramePropsIndex (frames, frameProps) {
-  return frames.findIndex((found) => found.get('key') === frameProps.get('key'))
+  let queryInfo = frameProps.toJS ? frameProps.toJS() : frameProps
+  if (queryInfo.tabId) {
+    queryInfo = {
+      tabId: queryInfo.tabId
+    }
+  }
+  if (queryInfo.key) {
+    queryInfo = {
+      key: queryInfo.key
+    }
+  }
+  return frames.findIndex(matchFrame.bind(null, queryInfo))
 }
 
 /**
@@ -314,6 +335,8 @@ function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
 }
 
 module.exports = {
+  query,
+  find,
   isFrameKeyActive,
   getFrameIndex,
   getActiveFrameIndex,

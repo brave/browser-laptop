@@ -87,16 +87,20 @@ describe('pinnedTabs', function () {
       const page2Url = Brave.server.url('page2.html')
       yield this.app.client
         .addSite({ location: page1Url }, siteTags.PINNED)
+        .waitForUrl(page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab.isPinned[data-frame-key="2"]')
         .addSite({ location: page2Url }, siteTags.PINNED)
+        .waitForUrl(page2Url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab.isPinned[data-frame-key="3"]')
     })
     it('creates when signaled', function * () {
       yield this.app.client.waitUntil(function () {
-        return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
+        return this.windowByUrl(Brave.browserWindowUrl).elements(pinnedTabsTabs).then((res) => res.value.length === 2)
       })
       .waitUntil(function () {
-        return this.elements(tabsTabs).then((res) => res.value.length === 1)
+        return this.windowByUrl(Brave.browserWindowUrl).elements(tabsTabs).then((res) => res.value.length === 1)
       })
     })
     it('disappears when signaled externally', function * () {
@@ -115,10 +119,10 @@ describe('pinnedTabs', function () {
       yield this.app.client
         .addSite({ location: page2Url }, siteTags.PINNED)
         .waitUntil(function () {
-          return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+          return this.windowByUrl(Brave.browserWindowUrl).elements(pinnedTabsTabs).then((res) => res.value.length === 1)
         })
         .waitUntil(function () {
-          return this.elements(tabsTabs).then((res) => res.value.length === 1)
+          return this.windowByUrl(Brave.browserWindowUrl).elements(tabsTabs).then((res) => res.value.length === 1)
         })
     })
     it('Adding a site with a diff session that already exists is allowed', function * () {
@@ -138,19 +142,22 @@ describe('pinnedTabs', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
-      const page1Url = Brave.server.url('page1.html')
+      this.page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
-        .waitForUrl(page1Url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
+        .waitForUrl(this.page1Url)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="2"]')
-        .setPinned(page1Url, true)
+        .setPinned(this.page1Url, true)
         .waitForExist(pinnedTabsTabs)
     })
     it('navigate within the same origin', function * () {
       const page2Url = Brave.server.url('page2.html')
       yield this.app.client
-        .loadUrl(page2Url)
+        .tabByUrl(this.page1Url)
+        .url(page2Url)
+        .waitForUrl(page2Url)
+        .windowByUrl(Brave.browserWindowUrl)
       yield this.app.client
         .waitUntil(function () {
           return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === page2Url)
@@ -165,7 +172,8 @@ describe('pinnedTabs', function () {
     it('navigating to a different origin opens a new tab', function * () {
       const page2Url = Brave.server.url('page2.html').replace('localhost', '127.0.0.1')
       yield this.app.client
-        .loadUrl(page2Url)
+        .tabByUrl(this.page1Url)
+        .url(page2Url)
         .waitForUrl(page2Url)
         .windowByUrl(Brave.browserWindowUrl)
       this.app.client.waitForExist('webview[data-frame-key="3"]')

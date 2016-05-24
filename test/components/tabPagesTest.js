@@ -13,6 +13,8 @@ describe('tab pages', function () {
       .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
+      .waitForUrl(Brave.newTabUrl)
+      .windowByUrl(Brave.browserWindowUrl)
   }
 
   describe('basic tab page functionality', function () {
@@ -46,7 +48,8 @@ describe('tab pages', function () {
     describe('allows changing to tab pages', function () {
       before(function * () {
         // Make sure there are 2 tab pages
-        yield this.app.client.click(newFrameButton)
+        yield this.app.client
+          .click(newFrameButton)
           .waitUntil(function () {
             return this.elements(tabPage).then((res) => res.value.length === 2)
           })

@@ -107,6 +107,7 @@ describe('view source', function () {
   it('should open in new tab', function * () {
     yield this.app.client
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(this.webview2)
   })
 
@@ -114,6 +115,7 @@ describe('view source', function () {
     yield this.app.client
       .setPinned(this.url, true)
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(this.webview2)
   })
 })
