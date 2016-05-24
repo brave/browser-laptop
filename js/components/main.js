@@ -454,7 +454,6 @@ class Main extends ImmutableComponent {
     while (node) {
       if (node.classList &&
           (node.classList.contains('popupWindow') || node.classList.contains('contextMenu'))) {
-
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
