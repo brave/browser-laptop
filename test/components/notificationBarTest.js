@@ -61,7 +61,8 @@ describe('notificationBar', function () {
       })
   })
 
-  it('shows notification for login form', function * () {
+  // https://travis-ci.org/brave/browser-laptop/builds/132700770
+  it.skip('shows notification for login form', function * () {
     yield this.app.client.loadUrl(this.loginUrl1)
       .waitForExist(notificationBar)
       .waitUntil(function () {
@@ -69,7 +70,8 @@ describe('notificationBar', function () {
       })
   })
 
-  it('does not show login notification if user turns it off for the site', function * () {
+  // https://travis-ci.org/brave/browser-laptop/builds/132700770
+  it.skip('does not show login notification if user turns it off for the site', function * () {
     yield this.app.client.loadUrl(this.loginUrl1)
       .waitForExist(notificationBar)
       .waitUntil(function () {
