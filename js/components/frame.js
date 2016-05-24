@@ -445,6 +445,9 @@ class Frame extends ImmutableComponent {
       loadStart(e)
     })
     this.webview.addEventListener('load-start', (e) => {
+      if (getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)) {
+        this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
+      }
     })
     this.webview.addEventListener('did-navigate', (e) => {
       // only give focus focus is this is not the initial default page load
