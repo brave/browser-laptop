@@ -3,6 +3,7 @@ const app = require('electron').app
 const dialog = electron.dialog
 const Channel = require('./channel')
 const path = require('path')
+const locale = require('./locale')
 
 module.exports.showAbout = function () {
   // The timeout is in case there's a call just after the modal to hide the menu.
@@ -16,9 +17,9 @@ Electron: ${process.versions['atom-shell']}
 libchromiumcontent: ${process.versions['chrome']}
 V8: ${process.versions.v8}
 Node.js: ${process.versions.node}
-Update channel: ${Channel.channel()}
+${locale.translation('updateChannel')}: ${Channel.channel()}
 
-This software uses libraries from the FFmpeg project under the LGPLv2.1`,
+${locale.translation('licenseText')}`,
       icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
       buttons: ['Ok']
     })
