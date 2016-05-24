@@ -49,7 +49,6 @@ describe('errorPage', function () {
         // still no back button for the url
         .waitForVisible(errorUrl)
         .getText(errorUrl).should.eventually.be.equal(this.url)
-        .debug()
         .isVisible('span[data-l10n-id=back]').should.eventually.be.false
     })
   })

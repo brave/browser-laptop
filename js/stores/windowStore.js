@@ -15,6 +15,9 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
+const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
+const UrlUtil = require('../lib/urlutil')
+
 const { l10nErrorText } = require('../lib/errorUtil')
 const { aboutUrls, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -161,6 +164,14 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
+      // For about: URLs, make sure we store the URL as about:something
+      // and not what we map to.
+      action.location = getSourceAboutUrl(action.location) || action.location
+
+      if (UrlUtil.isURL(action.location)) {
+        action.location = UrlUtil.getUrlFromInput(action.location)
+      }
+
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(frameStatePath(key), {
         location: action.location
@@ -253,6 +264,26 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_NEW_FRAME:
+      if (action.frameOpts === undefined) {
+        action.frameOpts = {}
+      }
+      if (action.openInForeground === undefined) {
+        action.openInForeground = true
+      }
+      action.frameOpts.location = action.frameOpts.location || config.defaultUrl
+      if (action.frameOpts.location && UrlUtil.isURL(action.frameOpts.location)) {
+        action.frameOpts.location = UrlUtil.getUrlFromInput(action.frameOpts.location)
+      } else {
+        const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
+        if (defaultURL) {
+          action.frameOpts.location = defaultURL
+            .replace('{searchTerms}', encodeURIComponent(action.frameOpts.location))
+        } else {
+          // Bad URLs passed here can actually crash the browser
+          action.frameOpts.location = ''
+        }
+      }
+
       const nextKey = incrementNextKey()
       let nextPartitionNumber = 0
       if (action.frameOpts.partitionNumber) {
@@ -292,6 +323,9 @@ const doAction = (action) => {
       focusWebview(activeFrameStatePath())
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
+      if (!action.frameProps) {
+        break
+      }
       windowState = windowState.merge({
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null

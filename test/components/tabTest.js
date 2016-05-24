@@ -36,10 +36,14 @@ describe('tabs', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
+      var url = Brave.server.url('page1.html')
+      yield this.app
+        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPrivate: true })
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
     })
-    it('creates a new private tab when signaled', function * () {
+    it('creates a new private tab', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPrivate: true })
         .waitForExist('.tab.private[data-frame-key="2"]')
     })
     it('makes the private webview visible', function * () {
@@ -52,10 +56,14 @@ describe('tabs', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
+      var url = Brave.server.url('page1.html')
+      yield this.app
+        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPartitioned: true })
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
     })
-    it('creates a new session tab when signaled', function * () {
+    it('creates a new session tab', function * () {
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'http://www.brave.com', { isPartitioned: true })
         .waitForExist('.tab[data-frame-key="2"]')
     })
     it('makes the new session webview visible', function * () {
@@ -114,7 +122,7 @@ describe('tabs', function () {
     before(function * () {
       yield setup(this.app.client)
       yield this.app.client
-        .sendWebviewEvent(1, 'new-window', {}, 'new-window', 'http://www.brave.com', 'some-frame', 'background-tab')
+        .sendWebviewEvent(1, 'new-window', {}, 'new-window', Brave.server.url('page1.html'), 'some-frame', 'background-tab')
     })
     it('opens in a new, but not active tab', function * () {
       yield this.app.client
@@ -129,7 +137,7 @@ describe('tabs', function () {
     before(function * () {
       yield setup(this.app.client)
       yield this.app.client
-        .sendWebviewEvent(1, 'new-window', {}, 'new-window', 'http://www.brave.com', 'some-frame', 'foreground-tab')
+        .sendWebviewEvent(1, 'new-window', {}, 'new-window', Brave.server.url('page1.html'), 'some-frame', 'foreground-tab')
     })
     it('opens in a new active tab', function * () {
       yield this.app.client
@@ -175,15 +183,21 @@ describe('tabs', function () {
       yield setup(this.app.client)
     })
     it('new tab opens in background by default', function * () {
+      var url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', {openInForeground: false})
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, url, {openInForeground: false})
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="2"]')
       yield this.app.client.waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
     })
     it('changing new tab default makes new tabs open in background by default', function * () {
+      var url = Brave.server.url('page2.html')
       yield this.app.client.changeSetting(settings.SWITCH_TO_NEW_TABS, true)
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', {openInForeground: false})
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, url, {openInForeground: false})
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="3"]')
       yield this.app.client.waitForExist('.frameWrapper.isActive webview[data-frame-key="3"]')
     })

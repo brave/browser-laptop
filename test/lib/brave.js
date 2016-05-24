@@ -175,7 +175,8 @@ var exports = {
         var windowActions = require('../../../js/actions/windowActions')
         windowActions.dispatchViaIPC()
         windowActions.loadUrl(Immutable.fromJS({
-          isPinned: false
+          isPinned: false,
+          key: 1
         }), url)
       }, url).then((response) => response.value)
     })

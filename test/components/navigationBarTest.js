@@ -19,6 +19,12 @@ describe('urlbar', function () {
     yield client
       .ipcSend('shortcut-new-frame')
       // wait for correct urlInput based on frameKey
+      .waitUntil(function () {
+        return this.getTabCount().then((count) => {
+          return count === frameKey
+        })
+      })
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
       .waitForElementFocus(urlInput)
   }
@@ -477,7 +483,11 @@ describe('urlbar', function () {
         })
       // tab with loaded url
       yield newFrame(this.app.client, 3)
-      yield this.app.client.loadUrl(Brave.server.url('page1.html'))
+      yield this.app.client
+        .tabByIndex(2)
+        .url(Brave.server.url('page1.html'))
+        .waitForUrl(Brave.server.url('page1.html'))
+        .windowByUrl(Brave.browserWindowUrl)
     })
 
     describe('switch to default state tab', function () {

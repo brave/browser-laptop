@@ -6,17 +6,11 @@
 
 const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const WindowConstants = require('../constants/windowConstants')
-const config = require('../constants/config')
-const UrlUtil = require('../lib/urlutil')
-const electron = global.require('electron')
-const ipc = electron.ipcRenderer
-const remote = electron.remote
+const appActions = require('../actions/appActions')
 const messages = require('../constants/messages')
-const appActions = require('./appActions')
-const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
-const siteUtil = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
-const windowStore = require('../stores/windowStore')
+const siteUtil = require('../state/siteUtil')
+const UrlUtil = require('../lib/urlutil')
 
 function dispatch (action) {
   if (windowActions.dispatchToIPC) {
@@ -24,7 +18,7 @@ function dispatch (action) {
     if (action.frameProps && action.frameProps.toJS) {
       action.frameProps = action.frameProps.toJS()
     }
-    remote.getCurrentWindow().webContents.send('handle-action', action)
+    global.require('electron').remote.getCurrentWindow().webContents.send('handle-action', action)
     windowActions.dispatchToIPC = false
   } else {
     WindowDispatcher.dispatch(action)
@@ -83,7 +77,7 @@ const windowActions = {
     }
 
     if (newFrame) {
-      windowActions.newFrame({
+      this.newFrame({
         location
       }, true)
     } else {
@@ -103,13 +97,6 @@ const windowActions = {
    * @param {boolean} isNavigatedInPage - true if it was a navigation within the same page.
    */
   setNavigated: function (location, key, isNavigatedInPage) {
-    // For about: URLs, make sure we store the URL as about:something
-    // and not what we map to.
-    location = getSourceAboutUrl(location) || location
-
-    if (UrlUtil.isURL(location)) {
-      location = UrlUtil.getUrlFromInput(location)
-    }
     dispatch({
       actionType: WindowConstants.WINDOW_SET_NAVIGATED,
       location,
@@ -277,13 +264,6 @@ const windowActions = {
    * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
    */
   setFullScreen: function (frameProps, isFullScreen, showFullScreenWarning) {
-    if (isFullScreen === false) {
-      // Make sure the associated webview is in sync with what we're doing
-      const webview = document.querySelector(`webview[data-frame-key="${frameProps.get('key')}"]`)
-      if (webview) {
-        webview.executeJavaScript('document.webkitExitFullscreen()')
-      }
-    }
     dispatch({
       actionType: WindowConstants.WINDOW_SET_FULL_SCREEN,
       frameProps,
@@ -312,25 +292,6 @@ const windowActions = {
    * @param {boolean} openInForeground - true if the new frame should become the new active frame
    */
   newFrame: function (frameOpts, openInForeground) {
-    if (frameOpts === undefined) {
-      frameOpts = {}
-    }
-    if (openInForeground === undefined) {
-      openInForeground = true
-    }
-    frameOpts.location = frameOpts.location || config.defaultUrl
-    if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
-      frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
-    } else {
-      const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
-      if (defaultURL) {
-        frameOpts.location = defaultURL
-          .replace('{searchTerms}', encodeURIComponent(frameOpts.location))
-      } else {
-        // Bad URLs passed here can actually crash the browser
-        frameOpts.location = ''
-      }
-    }
     dispatch({
       actionType: WindowConstants.WINDOW_NEW_FRAME,
       frameOpts: frameOpts,
@@ -358,6 +319,8 @@ const windowActions = {
    * @param {Object} frameProps - The properties of the frame to close
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
+    const ipc = global.require('electron').ipcRenderer
+    const remote = global.require('electron').remote
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {
       this.setFullScreen(frameProps, false)
@@ -410,21 +373,11 @@ const windowActions = {
   },
 
   /**
-   * Dispatches an event to the main process to quit the entire application
-   */
-  quitApplication: function () {
-    ipc.send(messages.QUIT_APPLICATION)
-  },
-
-  /**
    * Dispatches a message to the store to set a new frame as the active frame.
    *
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   setActiveFrame: function (frameProps) {
-    if (!frameProps) {
-      return
-    }
     dispatch({
       actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME,
       frameProps: frameProps
@@ -704,7 +657,7 @@ const windowActions = {
    * @param {Object} frameToSkip - Properties of the frame to keep audio
    */
   muteAllAudioExcept: function (frameToSkip) {
-    let framePropsList = windowStore.getState().get('frames')
+    let framePropsList = require('../stores/windowStore').getState().get('frames')
 
     framePropsList.forEach((frameProps) => {
       if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
