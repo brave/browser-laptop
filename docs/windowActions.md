@@ -246,12 +246,6 @@ The new frame is expected to appear at the index it was last closed at
 
 
 
-### quitApplication() 
-
-Dispatches an event to the main process to quit the entire application
-
-
-
 ### setActiveFrame(frameProps) 
 
 Dispatches a message to the store to set a new frame as the active frame.

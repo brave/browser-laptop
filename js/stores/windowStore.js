@@ -130,8 +130,8 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL:
       const frame = FrameStateUtil.getFrameByKey(windowState, action.key)
       const currentLocation = frame.get('location')
-      if (action.location.substring(0, 11).toLowerCase().startsWith('javascript:')) {
-        if (!currentLocation.substring(0, 6).toLowerCase().startsWith('about:')) {
+      if (action.location.substring(0, 11).toLowerCase() === 'javascript:') {
+        if (currentLocation.substring(0, 6).toLowerCase() !== 'about:') {
           windowState = windowState.mergeIn(frameStatePath(action.key), {
             activeShortcut: 'bookmarklet',
             bookmarklet: action.location
