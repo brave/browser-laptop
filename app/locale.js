@@ -18,6 +18,7 @@ var rendererIdentifiers = function () {
     'passwordCopied',
     'about',
     'quit',
+    'quitApp',
     'addToReadingList',
     'viewPageSource',
     'copyImageAddress',
