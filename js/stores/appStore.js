@@ -113,7 +113,6 @@ const createWindow = (browserOpts, defaults) => {
   const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU)
 
   let mainWindow = new BrowserWindow(Object.assign({
-    icon: __dirname + '/res/app.png',
     // smaller min size for "modal" windows
     minWidth,
     minHeight,
