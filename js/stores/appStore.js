@@ -130,7 +130,7 @@ const createWindow = (browserOpts, defaults) => {
     windowProps.icon = path.join(__dirname, '..', '..', 'res', 'app.png')
   }
 
-  let mainWindow = new BrowserWindow(Object.assign(windowProps))
+  let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
