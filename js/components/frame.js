@@ -445,6 +445,7 @@ class Frame extends ImmutableComponent {
       loadStart(e)
     })
     this.webview.addEventListener('load-start', (e) => {
+      loadStart(e)
       if (getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)) {
         this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
       }

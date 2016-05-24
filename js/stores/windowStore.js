@@ -237,8 +237,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
-        // We may want to add this later to know which frame is loading
-        // provisionalLocation: action.frameProps.get('location'),
+        provisionalLocation: action.frameProps.get('location'),
         startLoadTime: new Date().getTime(),
         endLoadTime: null
       })
