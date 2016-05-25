@@ -170,20 +170,7 @@ const createWindow = (browserOpts, defaults) => {
 
   LocalShortcuts.register(mainWindow)
 
-  const whitelistedUrl = appUrlUtil.getIndexHTML()
-  const willNavigateHandler = (whitelistedUrl, e, url) => {
-    if (url !== whitelistedUrl) {
-      e.preventDefault()
-    }
-  }
-  mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
-  mainWindow.webContents.on('did-navigate', (e, url) => {
-    if (url !== whitelistedUrl) {
-      console.log('Loaded un-whitelisted URL', url)
-      mainWindow.loadURL(whitelistedUrl)
-    }
-  })
-
+  mainWindow.loadURL(appUrlUtil.getIndexHTML())
   return mainWindow
 }
 
