@@ -168,6 +168,21 @@ const createWindow = (browserOpts, defaults) => {
   })
 
   LocalShortcuts.register(mainWindow)
+
+  const whitelistedUrl = appUrlUtil.getIndexHTML()
+  const willNavigateHandler = (whitelistedUrl, e, url) => {
+    if (url !== whitelistedUrl) {
+      e.preventDefault()
+    }
+  }
+  mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
+  mainWindow.webContents.on('did-navigate', (e, url) => {
+    if (url !== whitelistedUrl) {
+      console.log('Loaded un-whitelisted URL', url)
+      mainWindow.loadURL(whitelistedUrl)
+    }
+  })
+
   return mainWindow
 }
 
@@ -272,7 +287,7 @@ const handleAppAction = (action) => {
       const frameOpts = action.frameOpts && action.frameOpts.toJS()
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
 
-      const mainWindow = createWindow(browserOpts, windowDefaults())
+      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts)
       const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state
@@ -291,21 +306,6 @@ const handleAppAction = (action) => {
         })
       }
 
-      const willNavigateHandler = (whitelistedUrl, e, url) => {
-        if (url !== whitelistedUrl) {
-          e.preventDefault()
-        }
-      }
-
-      const whitelistedUrl = appUrlUtil.getIndexHTML()
-      mainWindow.loadURL(whitelistedUrl)
-      mainWindow.webContents.on('will-navigate', willNavigateHandler.bind(null, whitelistedUrl))
-      mainWindow.webContents.on('did-navigate', (e, url) => {
-        if (url !== whitelistedUrl) {
-          console.log('Loaded un-whitelisted URL', url)
-          mainWindow.loadURL(whitelistedUrl)
-        }
-      })
       mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
         if (isMainFrame) {
           lastEmittedState = appState
@@ -315,6 +315,18 @@ const handleAppAction = (action) => {
           }
         }
       })
+      mainWindow.webContents.on('crashed', (e) => {
+        console.error('Window crashed. Reloading...')
+        mainWindow.loadURL(appUrlUtil.getIndexHTML())
+        appActions.showMessageBox({
+          buttons: ['Ok'],
+          options: {
+            persist: false
+          },
+          message: 'An unexpected error has occured and the window has been reloaded'
+        })
+      })
+      mainWindow.loadURL(appUrlUtil.getIndexHTML())
       mainWindow.show()
       break
     case AppConstants.APP_CLOSE_WINDOW:
