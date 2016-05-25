@@ -1003,7 +1003,7 @@ if (typeof KeyEvent === 'undefined') {
 
       var analyserMethods = ['getFloatFrequencyData', 'getByteFrequencyData',
         'getFloatTimeDomainData', 'getByteTimeDomainData']
-      audioBufferMethods.forEach(function (method) {
+      analyserMethods.forEach(function (method) {
         var item = {
           objName: 'AnalyserNode.prototype',
           propName: method,
