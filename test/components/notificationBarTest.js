@@ -22,7 +22,10 @@ describe('notificationBar', function () {
 
   it('shows notification bar for geolocation', function * () {
     let notificationUrl = Brave.server.url('geolocation.html')
-    yield this.app.client.loadUrl(notificationUrl)
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('location'))
@@ -30,7 +33,10 @@ describe('notificationBar', function () {
   })
 
   it('can deny permission request', function * () {
-    yield this.app.client.loadUrl(this.notificationUrl)
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .element('.notificationItem:nth-Child(1) .notificationOptions')
       .click('button=Deny')
@@ -42,7 +48,10 @@ describe('notificationBar', function () {
   })
 
   it('can accept permission request persistently', function * () {
-    yield this.app.client.loadUrl(this.notificationUrl)
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .element('.notificationItem:nth-Child(1) .notificationOptions')
       .click('label*=Remember')
@@ -52,8 +61,12 @@ describe('notificationBar', function () {
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('granted'))
       })
-    yield this.app.client.loadUrl(Brave.newTabUrl)
-    yield this.app.client.loadUrl(this.notificationUrl)
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(Brave.newTabUrl)
+    yield this.app.client
+      .loadUrl(this.notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
       .moveToObject(activeWebview)
       .waitForExist(titleBar)
       .waitUntil(function () {
@@ -63,7 +76,10 @@ describe('notificationBar', function () {
 
   // https://travis-ci.org/brave/browser-laptop/builds/132700770
   it.skip('shows notification for login form', function * () {
-    yield this.app.client.loadUrl(this.loginUrl1)
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl1)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
@@ -72,14 +88,18 @@ describe('notificationBar', function () {
 
   // https://travis-ci.org/brave/browser-laptop/builds/132700770
   it.skip('does not show login notification if user turns it off for the site', function * () {
-    yield this.app.client.loadUrl(this.loginUrl1)
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl1)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
       })
       .click('button=Never for this site')
+      .tabByIndex(0)
       .loadUrl(this.loginUrl2)
-      .pause(2000)
-      .isExisting(notificationBar).then((exists) => !exists)
+      .windowByUrl(Brave.browserWindowUrl)
+      .isExisting(notificationBar).should.eventually.be.false
   })
 })

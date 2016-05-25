@@ -173,37 +173,28 @@ var exports = {
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
-      return this.execute(function (url) {
-        var Immutable = require('immutable')
-        var windowActions = require('../../../js/actions/windowActions')
-        windowActions.dispatchViaIPC()
-        windowActions.loadUrl(Immutable.fromJS({
-          isPinned: false,
-          key: 1
-        }), url)
-      }, url).then((response) => response.value)
+      return this.url(url).waitForUrl(url)
     })
 
-    this.app.client.addCommand('showFindbar', function () {
-      return this.execute(function () {
-        var Immutable = require('immutable')
+    this.app.client.addCommand('showFindbar', function (options = {}) {
+      return this.execute(function (options) {
         var windowActions = require('../../../js/actions/windowActions')
-        windowActions.dispatchViaIPC()
-        windowActions.setFindbarShown(Immutable.fromJS({
+        windowActions.setFindbarShown(Object.assign({
+          windowId: require('electron').remote.getCurrentWindow().id,
           key: 1
-        }), true)
-      })
+        }, options), true)
+      }, options)
     })
 
-    this.app.client.addCommand('setPinned', function (location, isPinned) {
-      return this.execute(function (location, isPinned) {
+    this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
+      return this.execute(function (location, isPinned, options) {
         var Immutable = require('immutable')
         var windowActions = require('../../../js/actions/windowActions')
-        windowActions.dispatchViaIPC()
-        windowActions.setPinned(Immutable.fromJS({
+        windowActions.setPinned(Immutable.fromJS(Object.assign({
+          windowId: require('electron').remote.getCurrentWindow().id,
           location
-        }), isPinned)
-      }, location, isPinned)
+        }, options)), isPinned)
+      }, location, isPinned, options)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
@@ -379,12 +370,22 @@ var exports = {
       env: {
         NODE_ENV: 'test'
       },
-      args: ['./', 'debug=5858']
+      args: ['./', '--debug=5858', '--enable-logging', '--v=0']
     })
     return this.app.start()
   },
 
   stopApp: function () {
+    // this.app.client.getMainProcessLogs().then(function (logs) {
+    //   logs.forEach(function (log) {
+    //     console.log(log)
+    //   })
+    // })
+    // this.app.client.getRenderProcessLogs().then(function (logs) {
+    //   logs.forEach(function (log) {
+    //     console.log(log)
+    //   })
+    // })
     return this.app.stop()
   }
 }
