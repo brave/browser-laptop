@@ -156,6 +156,7 @@ const doAction = (action) => {
 
         windowState = windowState.mergeIn(frameStatePath(action.key), {
           src: action.location,
+          location: action.location,
           activeShortcut
         })
         // force a navbar update in case this was called from an app
@@ -236,7 +237,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_START:
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         loading: true,
-        provisionalLocation: action.frameProps.get('location'),
+        provisionalLocation: action.location,
         startLoadTime: new Date().getTime(),
         endLoadTime: null
       })

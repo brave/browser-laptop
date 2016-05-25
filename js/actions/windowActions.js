@@ -236,11 +236,13 @@ const windowActions = {
    * Dispatches a message to the store to indicate that the webview is loading.
    *
    * @param {Object} frameProps - The frame properties for the webview in question.
+   * @param {string} location - The location being loaded.
    */
-  onWebviewLoadStart: function (frameProps) {
+  onWebviewLoadStart: function (frameProps, location) {
     dispatch({
       actionType: WindowConstants.WINDOW_WEBVIEW_LOAD_START,
-      frameProps
+      frameProps,
+      location
     })
   },
 

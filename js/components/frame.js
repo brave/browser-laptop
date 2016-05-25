@@ -396,7 +396,7 @@ class Frame extends ImmutableComponent {
 
     const loadStart = (e) => {
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
-        windowActions.onWebviewLoadStart(this.props.frame)
+        windowActions.onWebviewLoadStart(this.props.frame, e.url)
         const parsedUrl = urlParse(e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
         windowActions.setSecurityState(this.props.frame, {

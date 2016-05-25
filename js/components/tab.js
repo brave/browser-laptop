@@ -84,7 +84,7 @@ class Tab extends ImmutableComponent {
     return this.props.frameProps &&
     this.props.frameProps.get('loading') &&
     (!this.props.frameProps.get('provisionalLocation') ||
-    this.props.frameProps.get('provisionalLocation').startsWith('about:'))
+    !this.props.frameProps.get('provisionalLocation').startsWith('about:'))
   }
 
   onMouseLeave () {
