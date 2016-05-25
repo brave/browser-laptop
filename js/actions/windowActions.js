@@ -17,9 +17,6 @@ function dispatch (action) {
 }
 
 const windowActions = {
-  dispatchViaIPC: function () {
-    this.dispatchToIPC = true
-  },
 
   /**
    * Dispatches an event to the main process to replace the window state

@@ -113,7 +113,7 @@ const messages = {
   MOVE_SITE: _,
   OPEN_DOWNLOAD_PATH: _,
   RELOAD_URL: _,
-  DISPATCH_WINDOW_ACTION: _,
+  DISPATCH_ACTION: _,
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */

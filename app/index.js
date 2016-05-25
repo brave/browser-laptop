@@ -311,10 +311,6 @@ app.on('ready', () => {
       Menu.init(AppStore.getState().get('settings'), args)
     })
 
-    ipcMain.on(messages.DISPATCH_WINDOW_ACTION, (e, args) => {
-      e.sender.hostWebContents.send('handle-action', args)
-    })
-
     ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
       appActions.changeSetting(key, value)
     })

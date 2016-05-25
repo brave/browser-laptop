@@ -18,7 +18,7 @@ class ErrorPage extends React.Component {
   }
 
   reloadPrevious () {
-    aboutActions.dispatchWindowAction({
+    aboutActions.dispatchAction({
       actionType: WindowConstants.WINDOW_SET_URL,
       location: this.state.previousLocation,
       key: this.state.frameKey
@@ -26,7 +26,7 @@ class ErrorPage extends React.Component {
   }
 
   reload () {
-    aboutActions.dispatchWindowAction({
+    aboutActions.dispatchAction({
       actionType: WindowConstants.WINDOW_SET_URL,
       location: this.state.url,
       key: this.state.frameKey

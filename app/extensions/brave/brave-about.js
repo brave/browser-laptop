@@ -65,8 +65,8 @@
     window.dispatchEvent(event)
   })
 
-  window.addEventListener('dispatch-window-action', (e) => {
-    ipcRenderer.send('dispatch-window-action', e.detail)
+  window.addEventListener('dispatch-action', (e) => {
+    ipcRenderer.send('dispatch-action', e.detail)
   })
   window.addEventListener('change-setting', (e) => {
     ipcRenderer.send('change-setting', e.detail.key, e.detail.value)

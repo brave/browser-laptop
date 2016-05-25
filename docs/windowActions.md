@@ -160,13 +160,15 @@ Sets a frame as pinned
 
 
 
-### onWebviewLoadStart(frameProps) 
+### onWebviewLoadStart(frameProps, location) 
 
 Dispatches a message to the store to indicate that the webview is loading.
 
 **Parameters**
 
 **frameProps**: `Object`, The frame properties for the webview in question.
+
+**location**: `string`, The location being loaded.
 
 
 

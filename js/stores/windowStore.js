@@ -616,11 +616,14 @@ frameShortcuts.forEach((shortcut) => {
 })
 
 // Allows the parent process to dispatch window actions
-ipc.on('app-dispatcher-dispatch', (e, serializedPayload, caller) => {
+ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload, caller) => {
   let action = Serializer.deserialize(serializedPayload)
-  let queryInfo = action.frameProps || action.queryInfo || {}
+  let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   let win = require('electron').remote.getCurrentWindow()
+  if (queryInfo.windowId === -2 && win.isFocused()) {
+    queryInfo.windowId = win.id
+  }
   // handle any ipc dispatches that are targeted to this window
   if (queryInfo.windowId && queryInfo.windowId === win.id) {
     doAction(action)

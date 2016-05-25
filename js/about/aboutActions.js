@@ -3,6 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const messages = require('../constants/messages')
+const serializer = require('../dispatcher/serializer')
+
+function dispatch (action) {
+  const event = new window.CustomEvent(messages.DISPATCH_ACTION, {
+    detail: serializer.serialize(action)
+  })
+  window.dispatchEvent(event)
+}
 
 const AboutActions = {
   /**
@@ -10,11 +18,8 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    * @param {string} value - The value of the setting to set
    */
-  dispatchWindowAction: function (args) {
-    const event = new window.CustomEvent(messages.DISPATCH_WINDOW_ACTION, {
-      detail: args
-    })
-    window.dispatchEvent(event)
+  dispatchAction: function (action) {
+    dispatch(action)
   },
 
   /**

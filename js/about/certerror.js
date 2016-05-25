@@ -21,7 +21,7 @@ class CertErrorPage extends React.Component {
 
   onAccept () {
     aboutActions.acceptCertError(this.state.url)
-    aboutActions.dispatchWindowAction({
+    aboutActions.dispatchAction({
       actionType: WindowConstants.WINDOW_SET_URL,
       location: this.state.url,
       key: this.state.frameKey
@@ -29,7 +29,7 @@ class CertErrorPage extends React.Component {
   }
 
   onSafety () {
-    aboutActions.dispatchWindowAction({
+    aboutActions.dispatchAction({
       actionType: WindowConstants.WINDOW_SET_URL,
       location: this.state.previousLocation,
       key: this.state.frameKey
