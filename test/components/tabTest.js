@@ -149,11 +149,18 @@ describe('tabs', function () {
   describe('webview previews when tab is hovered', function () {
     Brave.beforeAll(this)
     before(function * () {
+      var page1 = Brave.server.url('page1.html')
+      var page2 = Brave.server.url('page2.html')
+
       yield setup(this.app.client)
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1)
+        .waitForUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="2"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page2)
+        .waitForUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('.tab[data-frame-key="3"]')
     })
     it('shows a tab preview', function * () {
