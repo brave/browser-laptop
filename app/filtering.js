@@ -236,31 +236,31 @@ function registerForHeadersReceived (session) {
 function registerPermissionHandler (session, partition) {
   const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
-  // TODO: Localize strings
-  let permissions = {
-    media: {
-      action: locale.translation('permissionCameraMicrophone')
-    },
-    geolocation: {
-      action: locale.translation('permissionLocation')
-    },
-    notifications: {
-      action: locale.translation('permissionNotifications')
-    },
-    midiSysex: {
-      action: locale.translation('permissionWebMidi')
-    },
-    pointerLock: {
-      action: locale.translation('permissionDisableCursor')
-    },
-    fullscreen: {
-      action: locale.translation('permissionFullscreen')
-    },
-    openExternal: {
-      action: locale.translation('permissionExternal')
-    }
-  }
+  let permissions = {}
   session.setPermissionRequestHandler((webContents, permission, cb) => {
+    permissions = {
+      media: {
+        action: locale.translation('permissionCameraMicrophone')
+      },
+      geolocation: {
+        action: locale.translation('permissionLocation')
+      },
+      notifications: {
+        action: locale.translation('permissionNotifications')
+      },
+      midiSysex: {
+        action: locale.translation('permissionWebMidi')
+      },
+      pointerLock: {
+        action: locale.translation('permissionDisableCursor')
+      },
+      fullscreen: {
+        action: locale.translation('permissionFullscreen')
+      },
+      openExternal: {
+        action: locale.translation('permissionExternal')
+      }
+    }
     const url = webContents.getURL()
     // Allow notifications for the main app
     if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||

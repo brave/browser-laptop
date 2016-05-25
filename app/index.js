@@ -279,14 +279,6 @@ app.on('ready', () => {
       Menu.init(AppStore.getState().get('settings'), {})
 
       // Initialize after localization strings async loaded
-      Filtering.init()
-      Extensions.init()
-      HttpsEverywhere.init()
-      TrackingProtection.init()
-      AdBlock.init()
-      SiteHacks.init()
-      NoScript.init()
-      spellCheck.init()
     })
 
     // Do this after loading the state
@@ -375,6 +367,15 @@ app.on('ready', () => {
       Menu.init(AppStore.getState().get('settings'))
       initiateSessionStateSave()
     })
+
+    Filtering.init()
+    Extensions.init()
+    HttpsEverywhere.init()
+    TrackingProtection.init()
+    AdBlock.init()
+    SiteHacks.init()
+    NoScript.init()
+    spellCheck.init()
 
     ipcMain.on(messages.UPDATE_REQUESTED, () => {
       Updater.updateNowRequested()
