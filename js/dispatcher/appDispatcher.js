@@ -105,10 +105,10 @@ if (process.type !== 'renderer') {
   })
 
   ipcMain.on(messages.DISPATCH_ACTION, (event, payload) => {
+    payload = Serializer.deserialize(payload)
     if (event.sender.hostWebContents) {
       // received from an extension
       // only extension messages will have a hostWebContents
-      payload = Serializer.deserialize(payload)
       let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
       queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
       let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
@@ -117,7 +117,7 @@ if (process.type !== 'renderer') {
       appDispatcher.dispatch(payload, event.sender.hostWebContents)
     } else {
       // received from a browser window
-      appDispatcher.dispatch(Serializer.deserialize(payload), event.sender)
+      appDispatcher.dispatch(payload, event.sender)
     }
   })
 }

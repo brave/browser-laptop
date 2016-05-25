@@ -61,7 +61,7 @@ class UpdateHide extends ImmutableComponent {
   render () {
     return <Button className='updateButton updateSecondaryButton'
       l10nId='updateHide'
-      onClick={appActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false)} />
+      onClick={appActions.setUpdateStatus.bind(null, this.props.reset ? UpdateStatus.UPDATE_NONE : undefined, false, undefined)} />
   }
 }
 
