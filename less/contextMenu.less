@@ -27,6 +27,11 @@
   -webkit-user-select: none;
   &.reverseExpand {
     flex-direction: row-reverse;
+    .fa {
+      font-size: 0;
+      width: 0;
+      margin: 0;
+    }
   }
 
   .contextMenuSingle {
@@ -133,5 +138,9 @@
       float: right;
       margin: auto 0 auto 5px;
     }
+  }
+
+  .fa {
+    font-size: @bookmarksIconSize;
   }
 }
