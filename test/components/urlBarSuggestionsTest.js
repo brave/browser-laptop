@@ -17,14 +17,8 @@ describe('urlbarSuggestions', function () {
   before(function * () {
     this.page1Url = Brave.server.url('page1.html')
     yield setup(this.app.client)
-    yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
-      .url(this.page1Url)
-      .waitForUrl(this.page1Url)
-      .windowByUrl(Brave.browserWindowUrl)
+    yield this.app.client.loadUrl(this.page1Url)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="2"].active')
       .waitForElementFocus(urlInput)
   })

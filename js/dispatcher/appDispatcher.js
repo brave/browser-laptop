@@ -2,110 +2,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Serializer = require('./serializer')
-const electron = process.type === 'renderer' ? global.require('electron') : require('electron')
 'use strict'
+const messages = require('../constants/messages')
+const Serializer = require('../dispatcher/serializer')
 
 class AppDispatcher {
-
-  constructor () {
-    this.callbacks = []
-    this.promises = []
-  }
-
-  /**
-   * Register a Store's callback so that it may be invoked by an action.
-   * If the registrant is a renderer process the callback will be stored
-   * locally and an `app-dispatcher-register` message will be sent to the
-   * main process using IPC.
-   * @param {function} callback The callback to be registered.
-   * @return {number} The index of the callback within the _callbacks array.
-   */
-  register (callback) {
-    if (process.type === 'renderer') {
-      const ipc = electron.ipcRenderer
-      ipc.send('app-dispatcher-register')
-    }
-    this.callbacks.push(callback)
-    return this.callbacks.length - 1 // index
-  }
-
-  unregister (callback) {
-    const index = this.callbacks.indexOf(callback)
-    if (index !== -1) {
-      this.callbacks.splice(index, 1)
-    }
-  }
-
   /**
    * dispatch
-   * Dispatches registered callbacks. If `dispatch` is called from the main process
-   * it will run all the registered callbacks. If `dispatch` is called from a renderer
-   * process it will run any local registered callbacks and then send `app-dispatcher-dispatch`
-   * to the main process where the all other registered callbacks will be run. The main
-   * process will not run any callbacks for the renderer process that send `app-dispatcher-dispatch`
-   * @param  {object} payload The data from the action.
-   * @param  {object} caller The webContents that triggered the dispatch
+   * @param  {object} action The action to dispatch
    */
-  dispatch (payload, caller) {
-    if (payload.actionType === undefined) {
-      throw new Error('Dispatcher: Undefined action for payload', payload)
-    }
-    // First create array of promises for callbacks to reference.
-    const resolves = []
-    const rejects = []
-    this.promises = this.callbacks.map(function (_, i) {
-      return new Promise(function (resolve, reject) {
-        resolves[i] = resolve
-        rejects[i] = reject
-      })
-    })
-    // Dispatch to callbacks and resolve/reject promises.
-    this.callbacks.forEach(function (callback, i) {
-      // Callback can return an obj, to resolve, or a promise, to chain.
-      // See waitFor() for why this might be useful.
-      Promise.resolve(callback(payload, caller)).then(function () {
-        resolves[i](payload)
-      }, function () {
-        rejects[i](new Error('Dispatcher callback unsuccessful'))
-      })
-    })
-    this.promises = []
-
+  dispatch (action) {
     if (process.type === 'renderer') {
-      const ipc = electron.ipcRenderer
-      ipc.send('app-dispatcher-dispatch', Serializer.serialize(payload))
+      global.require('electron').ipcRenderer.send(messages.APP_ACTION, Serializer.serialize(action))
+    } else {
+      process.emit(messages.APP_ACTION, action)
     }
   }
 }
 
 const appDispatcher = new AppDispatcher()
-
-if (process.type !== 'renderer') {
-  const electron = require('electron')
-  const ipcMain = electron.ipcMain
-  ipcMain.on('app-dispatcher-register', (event) => {
-    let registrant = event.sender
-    const callback = function (payload, caller) {
-      try {
-        registrant.send('app-dispatcher-dispatch', Serializer.serialize(payload), caller)
-      } catch (e) {
-        console.error('unregistering callback', e)
-        appDispatcher.unregister(callback)
-      }
-    }
-    event.sender.on('crashed', () => {
-      appDispatcher.unregister(callback)
-    })
-    event.sender.on('destroyed', () => {
-      appDispatcher.unregister(callback)
-    })
-    appDispatcher.register(callback)
-  })
-
-  ipcMain.on('app-dispatcher-dispatch', (event, serializedPayload) => {
-    appDispatcher.dispatch(Serializer.deserialize(serializedPayload), event.sender)
-  })
-}
-
 module.exports = appDispatcher

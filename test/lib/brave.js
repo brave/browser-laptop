@@ -173,28 +173,37 @@ var exports = {
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
-      return this.url(url).waitForUrl(url)
-    })
-
-    this.app.client.addCommand('showFindbar', function (options = {}) {
-      return this.execute(function (options) {
-        var windowActions = require('../../../js/actions/windowActions')
-        windowActions.setFindbarShown(Object.assign({
-          windowId: require('electron').remote.getCurrentWindow().id,
-          key: 1
-        }, options), true)
-      }, options)
-    })
-
-    this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
-      return this.execute(function (location, isPinned, options) {
+      return this.execute(function (url) {
         var Immutable = require('immutable')
         var windowActions = require('../../../js/actions/windowActions')
-        windowActions.setPinned(Immutable.fromJS(Object.assign({
-          windowId: require('electron').remote.getCurrentWindow().id,
+        windowActions.dispatchViaIPC()
+        windowActions.loadUrl(Immutable.fromJS({
+          isPinned: false,
+          key: 1
+        }), url)
+      }, url).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('showFindbar', function () {
+      return this.execute(function () {
+        var Immutable = require('immutable')
+        var windowActions = require('../../../js/actions/windowActions')
+        windowActions.dispatchViaIPC()
+        windowActions.setFindbarShown(Immutable.fromJS({
+          key: 1
+        }), true)
+      })
+    })
+
+    this.app.client.addCommand('setPinned', function (location, isPinned) {
+      return this.execute(function (location, isPinned) {
+        var Immutable = require('immutable')
+        var windowActions = require('../../../js/actions/windowActions')
+        windowActions.dispatchViaIPC()
+        windowActions.setPinned(Immutable.fromJS({
           location
-        }, options)), isPinned)
-      }, location, isPinned, options)
+        }), isPinned)
+      }, location, isPinned)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
@@ -370,22 +379,12 @@ var exports = {
       env: {
         NODE_ENV: 'test'
       },
-      args: ['./', '--debug=5858', '--enable-logging', '--v=0']
+      args: ['./', 'debug=5858']
     })
     return this.app.start()
   },
 
   stopApp: function () {
-    // this.app.client.getMainProcessLogs().then(function (logs) {
-    //   logs.forEach(function (log) {
-    //     console.log(log)
-    //   })
-    // })
-    // this.app.client.getRenderProcessLogs().then(function (logs) {
-    //   logs.forEach(function (log) {
-    //     console.log(log)
-    //   })
-    // })
     return this.app.stop()
   }
 }

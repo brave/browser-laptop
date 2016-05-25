@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const WindowDispatcher = require('../dispatcher/windowDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
 const config = require('../constants/config.js')
@@ -15,11 +15,11 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
+const getSourceAboutUrl = require('../lib/appUrlUtil').getSourceAboutUrl
 const UrlUtil = require('../lib/urlutil')
 
 const { l10nErrorText } = require('../lib/errorUtil')
-const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
-const Serializer = require('../dispatcher/serializer')
+const { aboutUrls, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -164,7 +164,6 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
-      action.location = action.location.trim()
       // For about: URLs, make sure we store the URL as about:something
       // and not what we map to.
       action.location = getSourceAboutUrl(action.location) || action.location
@@ -564,6 +563,8 @@ const doAction = (action) => {
   emitChanges()
 }
 
+WindowDispatcher.register(doAction)
+
 ipc.on(messages.SHORTCUT_NEXT_TAB, () => {
   windowState = FrameStateUtil.makeNextFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
@@ -614,18 +615,10 @@ frameShortcuts.forEach((shortcut) => {
   }
 })
 
-// Allows the parent process to dispatch window actions
-ipc.on('app-dispatcher-dispatch', (e, serializedPayload, caller) => {
-  let action = Serializer.deserialize(serializedPayload)
-  let queryInfo = action.frameProps || action.queryInfo || {}
-  queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-  let win = require('electron').remote.getCurrentWindow()
-  // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === win.id) {
-    doAction(action)
-  }
+// Allows the parent process to send window level actions
+ipc.on('handle-action', (e, action) => {
+  action.frameProps = action.frameProps && Immutable.fromJS(action.frameProps)
+  doAction(action)
 })
-
-AppDispatcher.register(doAction)
 
 module.exports = windowStore

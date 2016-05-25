@@ -21,11 +21,7 @@ describe('sessionStore', function () {
       this.timeout(30000)
       yield Brave.startApp()
       yield setup(Brave.app.client)
-      yield Brave.app.client
-        .tabByUrl(Brave.newTabUrl)
-        .url(page1Url)
-        .waitForUrl(page1Url)
-        .windowParentByUrl(page1Url)
+      yield Brave.app.client.loadUrl(page1Url)
         .moveToObject(navigator)
         .waitForExist(navigatorNotBookmarked)
       yield Brave.app.client.addSite({

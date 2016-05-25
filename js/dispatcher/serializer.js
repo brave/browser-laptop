@@ -11,18 +11,22 @@ const Immutable = require('immutable')
  * Immutable JS.
  */
 module.exports.serialize = (action) => {
-  return JSON.stringify(action)
+  for (let property in action) {
+    if (action.hasOwnProperty(property) && action[property] && action[property].toJS) {
+      action[property] = action[property].toJS()
+    }
+  }
+  return action
 }
 
 /**
  * Converts a serialized action in place to one using ImmutableJS where possible.
  */
 module.exports.deserialize = (action) => {
-  let newAction = JSON.parse(action)
-  for (let property in newAction) {
-    if (newAction.hasOwnProperty(property) && newAction[property] instanceof Object) {
-      newAction[property] = Immutable.fromJS(newAction[property])
+  for (let property in action) {
+    if (action.hasOwnProperty(property) && action[property] instanceof Object) {
+      action[property] = Immutable.fromJS(action[property])
     }
   }
-  return newAction
+  return action
 }

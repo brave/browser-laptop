@@ -4,7 +4,6 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
-const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
@@ -12,6 +11,7 @@ const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
 const app = electron.app
+const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const downloadStates = require('../constants/downloadStates')
@@ -19,6 +19,7 @@ const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
 const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
+const Serializer = require('../dispatcher/serializer')
 const dates = require('../../app/dates')
 const getSetting = require('../settings').getSetting
 const EventEmitter = require('events').EventEmitter
@@ -466,6 +467,11 @@ const handleAppAction = (action) => {
   emitChanges()
 }
 
-AppDispatcher.register(handleAppAction)
+// Register callback to handle all updates
+ipcMain.on(messages.APP_ACTION, (event, action) => {
+  handleAppAction(Serializer.deserialize(action))
+})
+
+process.on(messages.APP_ACTION, handleAppAction)
 
 module.exports = appStore

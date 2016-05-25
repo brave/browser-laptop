@@ -82,10 +82,9 @@ describe('urlbar', function () {
         this.page1Url = Brave.server.url('page1.html')
         this.host = urlParse(this.page1Url).host
         yield setup(this.app.client)
-        yield this.app.client.tabByUrl(Brave.newTabUrl).url(this.page1Url).waitForUrl(this.page1Url).windowParentByUrl(this.page1Url)
+        yield this.app.client.loadUrl(this.page1Url)
         yield this.app.client
           .moveToObject(navigator)
-          .waitForExist(urlInput)
           .waitForValue(urlInput)
       })
 
@@ -129,17 +128,13 @@ describe('urlbar', function () {
         this.pageNoTitle = Brave.server.url('page_no_title.html')
         yield setup(this.app.client)
         // Navigate to a page with a title first to ensure it gets reset
-        yield this.app.client.tabByUrl(Brave.newTabUrl).url(this.page1Url).waitForUrl(this.page1Url)
+        yield this.app.client.loadUrl(this.page1Url)
         yield this.app.client
-          .windowParentByUrl(this.page1Url)
           .moveToObject(navigator)
-          .waitForExist(urlInput)
           .waitForValue(urlInput)
-        yield this.app.client.tabByUrl(this.page1Url).url(this.pageNoTitle).waitForUrl(this.pageNoTitle)
+        yield this.app.client.loadUrl(this.pageNoTitle)
         yield this.app.client
-          .windowParentByUrl(this.pageNoTitle)
           .moveToObject(navigator)
-          .waitForExist(urlInput)
           .waitForValue(urlInput)
       })
 
@@ -162,9 +157,8 @@ describe('urlbar', function () {
         yield setup(this.app.client)
         // Navigate to a page with a title first to ensure it gets reset
         yield this.app.client
-          .tabByUrl(Brave.newTabUrl).url(this.page).waitForUrl(this.page).windowParentByUrl(this.page)
+          .loadUrl(this.page)
           .moveToObject(navigator)
-          .waitForExist(urlInput)
           .waitForValue(urlInput)
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === page)
@@ -210,7 +204,7 @@ describe('urlbar', function () {
 
     it('Uses the default favicon when one is not specified', function * () {
       const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client.loadUrl(page1Url)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTabFavicon, 'background-image').then((backgroundImage) =>
           backgroundImage.value === `url("${Brave.server.url('favicon.ico')}")`
@@ -219,7 +213,7 @@ describe('urlbar', function () {
 
     it('Parses favicon when one is present', function * () {
       const pageWithFavicon = Brave.server.url('favicon.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithFavicon).waitForUrl(pageWithFavicon).windowParentByUrl(pageWithFavicon)
+      yield this.app.client.loadUrl(pageWithFavicon)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTabFavicon, 'background-image').then((backgroundImage) =>
           backgroundImage.value === `url("${Brave.server.url('img/test.ico')}")`
@@ -236,21 +230,19 @@ describe('urlbar', function () {
 
     it('Shows insecure URL icon', function * () {
       const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client.loadUrl(page1Url)
       yield this.app.client.waitUntil(() =>
         this.app.client
-          .moveToObject(navigator)
-          .waitForExist(urlbarIcon)
+          .moveToObject(urlInput)
           .getAttribute(urlbarIcon, 'class').then((classes) =>
             classes.includes('fa-unlock')
         ))
     })
     it('Shows secure URL icon', function * () {
-      const page1Url = 'https://badssl.com/'
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      const page1Url = 'https://badssl.com'
+      yield this.app.client.loadUrl(page1Url)
       yield this.app.client
-        .moveToObject(navigator)
-        .waitForExist(urlbarIcon)
+        .moveToObject(urlInput)
         .waitUntil(() =>
           this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
             classes.includes('fa-lock')
@@ -267,7 +259,7 @@ describe('urlbar', function () {
 
     it('Uses the default tab color when one is not specified', function * () {
       const page1Url = Brave.server.url('page1.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
+      yield this.app.client.loadUrl(page1Url)
       let background = yield this.app.client.getCssProperty(activeTab, 'background')
       assert.equal(background.value, 'rgba(0,0,0,0)linear-gradient(rgb(255,255,255),rgb(243,243,243))repeatscroll0%0%/autopadding-boxborder-box')
     })
@@ -275,7 +267,7 @@ describe('urlbar', function () {
     // We need a newer electron build first
     it.skip('Parses theme-color meta tag when one is present', function * () {
       const pageWithFavicon = Brave.server.url('theme_color.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithFavicon).waitForUrl(pageWithFavicon).windowParentByUrl(pageWithFavicon)
+      yield this.app.client.loadUrl(pageWithFavicon)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then((backgroundColor) =>
           backgroundColor.parsed.hex === '#4d90fe'
@@ -283,14 +275,14 @@ describe('urlbar', function () {
     })
     it.skip('Obtains theme color from the background', function * () {
       const redPage = Brave.server.url('red_bg.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(redPage).waitForUrl(redPage).windowParentByUrl(redPage)
+      yield this.app.client.loadUrl(redPage)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then((backgroundColor) =>
           backgroundColor.parsed.hex === '#ff0000'))
     })
     it.skip('Obtains theme color from a top header and not background', function * () {
       const redPage = Brave.server.url('yellow_header.html')
-      yield this.app.client.tabByUrl(Brave.newTabUrl).url(redPage).waitForUrl(redPage).windowParentByUrl(redPage)
+      yield this.app.client.loadUrl(redPage)
       yield this.app.client.waitUntil(() =>
         this.app.client.getCssProperty(activeTab, 'background-color').then((backgroundColor) =>
           backgroundColor.parsed.hex === '#ffff66'))
@@ -486,7 +478,6 @@ describe('urlbar', function () {
       // tab with typing
       yield newFrame(this.app.client, 2)
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.keys('a').getValue(urlInput).then((val) => val === 'a')
         })
