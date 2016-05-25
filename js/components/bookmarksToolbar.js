@@ -215,19 +215,18 @@ class BookmarksToolbar extends ImmutableComponent {
       if (a && a.href) {
         appActions.addSite({
           title: a.innerText,
-          location: a.href
+          location: e.dataTransfer.getData('text/plain')
         }, siteTags.BOOKMARK)
         return
       }
     }
-    if (e.dataTransfer.files) {
+    if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) =>
         appActions.addSite({ location: file.path, title: file.name }, siteTags.BOOKMARK))
       return
     }
 
-    let urls = e.dataTransfer.getData('text/uri-list') ||
-      e.dataTransfer.getData('text/plain')
+    let urls = e.dataTransfer.getData('text/uri-list')
     urls = urls.split('\n')
       .map((x) => x.trim())
       .filter((x) => !x.startsWith('#') && x.length > 0)

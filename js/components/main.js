@@ -302,6 +302,27 @@ class Main extends ImmutableComponent {
         webviewActions.setWebviewFocused()
       }
     })
+
+    // disable dnd by default
+    window.addEventListener('dragover', function (event) {
+      // allow webviews to handle dnd
+      if (event.target.tagName === 'WEBVIEW') {
+        return true
+      }
+      event.dataTransfer.dropEffect = 'none'
+      event.preventDefault()
+      return false
+    }, true)
+
+    window.addEventListener('drop', function (event) {
+      // allow webviews to handle dnd
+      if (event.target.tagName === 'WEBVIEW') {
+        return true
+      }
+      event.preventDefault()
+      return false
+    }, true)
+
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
     const win = remote.getCurrentWindow()
     if (activeFrame && win) {
@@ -424,16 +445,21 @@ class Main extends ImmutableComponent {
 
   onDragOver (e) {
     let intersection = e.dataTransfer.types.filter((x) => ['Files'].includes(x))
-    if (intersection.length > 0) {
+    if (intersection.length > 0 || e.dataTransfer.getData('text/plain')) {
       e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
     }
   }
 
   onDrop (e) {
-    if (e.dataTransfer.files) {
+    if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.files).forEach((file) =>
         windowActions.newFrame({location: file.path, title: file.name}))
+    } else if (e.dataTransfer.getData('text/plain')) {
+      let activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+      if (activeFrame) {
+        windowActions.loadUrl(activeFrame, e.dataTransfer.getData('text/plain'))
+      }
     }
   }
 
