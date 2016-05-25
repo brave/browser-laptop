@@ -136,7 +136,8 @@ var rendererIdentifiers = function () {
     'ignoreSpelling',
     // Other identifiers
     'urlCopied',
-    'autoHideMenuBar'
+    'autoHideMenuBar',
+    'unexpectedErrorWindowReload'
   ]
 }
 
@@ -227,6 +228,7 @@ exports.init = function (language, cb) {
     // Property files to parse (only ones containing menu specific identifiers)
     propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'password.properties'))
   }
 

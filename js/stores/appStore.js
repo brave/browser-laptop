@@ -26,6 +26,7 @@ const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
 const isDarwin = process.platform === 'darwin'
+const locale = require('../../app/locale')
 const path = require('path')
 
 // Only used internally
@@ -319,11 +320,11 @@ const handleAppAction = (action) => {
         console.error('Window crashed. Reloading...')
         mainWindow.loadURL(appUrlUtil.getIndexHTML())
         appActions.showMessageBox({
-          buttons: ['Ok'],
+          buttons: [locale.translation('ok')],
           options: {
             persist: false
           },
-          message: 'An unexpected error has occured and the window has been reloaded'
+          message: locale.translation('unexpectedErrorWindowReload')
         })
       })
       mainWindow.loadURL(appUrlUtil.getIndexHTML())
