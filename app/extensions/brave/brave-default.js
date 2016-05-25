@@ -991,6 +991,27 @@ if (typeof KeyEvent === 'undefined') {
         methods.push(item)
       })
 
+      var audioBufferMethods = ['copyFromChannel', 'getChannelData']
+      audioBufferMethods.forEach(function (method) {
+        var item = {
+          objName: 'AudioBuffer.prototype',
+          propName: method,
+          obj: window.AudioBuffer.prototype
+        }
+        methods.push(item)
+      })
+
+      var analyserMethods = ['getFloatFrequencyData', 'getByteFrequencyData',
+        'getFloatTimeDomainData', 'getByteTimeDomainData']
+      audioBufferMethods.forEach(function (method) {
+        var item = {
+          objName: 'AnalyserNode.prototype',
+          propName: method,
+          obj: window.AnalyserNode.prototype
+        }
+        methods.push(item)
+      })
+
       methods.forEach(trapInstanceMethod)
       Array.from(document.querySelectorAll('iframe')).forEach(trapIFrameMethods)
 
