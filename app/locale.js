@@ -136,7 +136,18 @@ var rendererIdentifiers = function () {
     'ignoreSpelling',
     // Other identifiers
     'urlCopied',
-    'autoHideMenuBar'
+    'autoHideMenuBar',
+    'updateChannel',
+    'licenseText',
+    'allow',
+    'deny',
+    'permissionCameraMicrophone',
+    'permissionLocation',
+    'permissionNotifications',
+    'permissionWebMidi',
+    'permissionDisableCursor',
+    'permissionFullscreen',
+    'permissionExternal'
   ]
 }
 

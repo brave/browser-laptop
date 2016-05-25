@@ -19,6 +19,7 @@ const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
+const locale = require('./locale')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
 const app = electron.app
@@ -238,25 +239,25 @@ function registerPermissionHandler (session, partition) {
   // TODO: Localize strings
   let permissions = {
     media: {
-      action: 'use your camera and/or microphone'
+      action: locale.translation('permissionCameraMicrophone')
     },
     geolocation: {
-      action: 'see your location'
+      action: locale.translation('permissionLocation')
     },
     notifications: {
-      action: 'show you notifications'
+      action: locale.translation('permissionNotifications')
     },
     midiSysex: {
-      action: 'use web MIDI'
+      action: locale.translation('permissionWebMidi')
     },
     pointerLock: {
-      action: 'disable your mouse cursor'
+      action: locale.translation('permissionDisableCursor')
     },
     fullscreen: {
-      action: 'use fullscreen mode'
+      action: locale.translation('permissionFullscreen')
     },
     openExternal: {
-      action: 'open an external application'
+      action: locale.translation('permissionExternal')
     }
   }
   session.setPermissionRequestHandler((webContents, permission, cb) => {
@@ -303,7 +304,7 @@ function registerPermissionHandler (session, partition) {
     if (!(message in permissionCallbacks)) {
       // This notification is not shown yet
       appActions.showMessageBox({
-        buttons: ['Deny', 'Allow'],
+        buttons: [locale.translation('deny'), locale.translation('allow')],
         options: {
           persist: true
         },
