@@ -16,6 +16,7 @@ const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
 const UrlUtil = require('../lib/urlutil')
+const urlParse = require('url').parse
 
 const { l10nErrorText } = require('../lib/errorUtil')
 const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
@@ -130,11 +131,18 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL:
       const frame = FrameStateUtil.getFrameByKey(windowState, action.key)
       const currentLocation = frame.get('location')
-      if (action.location.substring(0, 11).toLowerCase() === 'javascript:') {
-        if (currentLocation.substring(0, 6).toLowerCase() !== 'about:') {
+      const parsedUrl = urlParse(action.location)
+
+      const navigatableTypes = ['http:', 'https:', 'about:', 'chrome:',
+        'chrome-extension:', 'file:', 'view-source:', 'ftp:', 'data:']
+
+      // For types that are not navigatable, just do a loadUrl on them
+      if (!navigatableTypes.includes(parsedUrl.protocol)) {
+        if (parsedUrl.protocol !== 'javascript:' ||
+            currentLocation.substring(0, 6).toLowerCase() !== 'about:') {
           windowState = windowState.mergeIn(frameStatePath(action.key), {
-            activeShortcut: 'bookmarklet',
-            bookmarklet: action.location
+            activeShortcut: 'load-non-navigatable-url',
+            activeShortcutDetails: action.location
           })
         }
         updateNavBarInput(frame.get('location'), frameStatePath(action.key))

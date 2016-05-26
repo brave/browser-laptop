@@ -292,8 +292,8 @@ class Frame extends ImmutableComponent {
       case 'focus-webview':
         setImmediate(() => this.webview.focus())
         break
-      case 'bookmarklet':
-        this.webview.loadURL(this.props.frame.get('bookmarklet'))
+      case 'load-non-navigatable-url':
+        this.webview.loadURL(this.props.frame.get('activeShortcutDetails'))
         break
     }
     if (activeShortcut) {
@@ -467,30 +467,33 @@ class Frame extends ImmutableComponent {
       this.webview = false
     })
     this.webview.addEventListener('did-fail-load', (e) => {
-      if (e.isMainFrame && isFrameError(e.errorCode)) {
-        // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
-        if (e.validatedURL === aboutUrls.get('about:newtab') ||
-            e.validatedURL === aboutUrls.get('about:blank') ||
-            e.validatedURL === aboutUrls.get('about:certerror') ||
-            e.validatedURL === aboutUrls.get('about:error') ||
-            e.validatedURL === aboutUrls.get('about:safebrowsing')) {
-          // this will just display a blank page for errors
-          // but we don't want to take the user out of the private tab
-          return
-        } else if (isTargetAboutUrl(e.validatedURL)) {
-          // open a new tab for other about urls
-          // and send this tab back to wherever it came from
-          this.goBack()
-          windowActions.newFrame({location: e.validatedURL}, true)
-          return
-        }
+      if (e.isMainFrame) {
+        loadEnd()
+        if (isFrameError(e.errorCode)) {
+          // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
+          if (e.validatedURL === aboutUrls.get('about:newtab') ||
+              e.validatedURL === aboutUrls.get('about:blank') ||
+              e.validatedURL === aboutUrls.get('about:certerror') ||
+              e.validatedURL === aboutUrls.get('about:error') ||
+              e.validatedURL === aboutUrls.get('about:safebrowsing')) {
+            // this will just display a blank page for errors
+            // but we don't want to take the user out of the private tab
+            return
+          } else if (isTargetAboutUrl(e.validatedURL)) {
+            // open a new tab for other about urls
+            // and send this tab back to wherever it came from
+            this.goBack()
+            windowActions.newFrame({location: e.validatedURL}, true)
+            return
+          }
 
-        windowActions.setFrameError(this.props.frame, {
-          event_type: 'did-fail-load',
-          errorCode: e.errorCode,
-          url: e.validatedURL
-        })
-        windowActions.loadUrl(this.props.frame, 'about:error')
+          windowActions.setFrameError(this.props.frame, {
+            event_type: 'did-fail-load',
+            errorCode: e.errorCode,
+            url: e.validatedURL
+          })
+          windowActions.loadUrl(this.props.frame, 'about:error')
+        }
       }
     })
     this.webview.addEventListener('did-finish-load', () => {
