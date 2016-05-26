@@ -5,7 +5,6 @@
 'use strict'
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppConstants = require('../constants/appConstants')
-const messages = require('../constants/messages')
 
 const appActions = {
   /**
@@ -43,13 +42,6 @@ const appActions = {
       actionType: AppConstants.APP_CLOSE_WINDOW,
       appWindowId
     })
-  },
-
-  /**
-   * Dispatches an event to the main process to update the browser
-   */
-  updateRequested: function () {
-    global.require('electron').ipcRenderer.send(messages.UPDATE_REQUESTED)
   },
 
   /**
