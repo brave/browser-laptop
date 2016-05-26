@@ -368,8 +368,8 @@ app.on('ready', () => {
       initiateSessionStateSave()
     })
 
-    Filtering.init()
     Extensions.init()
+    Filtering.init()
     HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()

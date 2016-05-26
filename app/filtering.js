@@ -236,29 +236,31 @@ function registerForHeadersReceived (session) {
 function registerPermissionHandler (session, partition) {
   const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
-  let permissions = {}
+  let permissions = null
   session.setPermissionRequestHandler((webContents, permission, cb) => {
-    permissions = {
-      media: {
-        action: locale.translation('permissionCameraMicrophone')
-      },
-      geolocation: {
-        action: locale.translation('permissionLocation')
-      },
-      notifications: {
-        action: locale.translation('permissionNotifications')
-      },
-      midiSysex: {
-        action: locale.translation('permissionWebMidi')
-      },
-      pointerLock: {
-        action: locale.translation('permissionDisableCursor')
-      },
-      fullscreen: {
-        action: locale.translation('permissionFullscreen')
-      },
-      openExternal: {
-        action: locale.translation('permissionExternal')
+    if (!permissions) {
+      permissions = {
+        media: {
+          action: locale.translation('permissionCameraMicrophone')
+        },
+        geolocation: {
+          action: locale.translation('permissionLocation')
+        },
+        notifications: {
+          action: locale.translation('permissionNotifications')
+        },
+        midiSysex: {
+          action: locale.translation('permissionWebMidi')
+        },
+        pointerLock: {
+          action: locale.translation('permissionDisableCursor')
+        },
+        fullscreen: {
+          action: locale.translation('permissionFullscreen')
+        },
+        openExternal: {
+          action: locale.translation('permissionExternal')
+        }
       }
     }
     const url = webContents.getURL()
