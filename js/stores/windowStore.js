@@ -213,7 +213,7 @@ const doAction = (action) => {
       })
       break
     case WindowConstants.WINDOW_SET_FRAME_ERROR:
-      const frameKey = action.key || windowState.get('activeFrameKey')
+      const frameKey = action.frameProps.get('key')
       // set the previous location to the most recent history item or the default url
       let previousLocation = action.frameProps.get('history').unshift(config.defaultUrl).findLast((url) => url !== action.errorDetails.url)
 
