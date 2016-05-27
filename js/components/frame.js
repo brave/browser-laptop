@@ -380,7 +380,8 @@ class Frame extends ImmutableComponent {
         case messages.LINK_HOVERED:
           method = (href, position) => {
             position = position || {}
-            let nearBottom = position.y > (window.innerHeight - 150) // todo: magic number
+            const downloadsBarHeight = 50
+            let nearBottom = position.y > (window.innerHeight - 150 - downloadsBarHeight) // todo: magic number
             let mouseOnLeft = position.x < (window.innerWidth / 2)
             let showOnRight = nearBottom && mouseOnLeft
             windowActions.setLinkHoverPreview(href, showOnRight)
