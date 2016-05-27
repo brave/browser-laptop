@@ -84,6 +84,8 @@ module.exports.cleanSessionData = (sessionData) => {
   delete sessionData.previewFrameKey
   // Don't restore add/edit dialog
   delete sessionData.bookmarkDetail
+  // Don't restore bravery panel
+  delete sessionData.braveryPanelDetail
   // Don't restore drag data
   if (sessionData.ui) {
     delete sessionData.ui.dragging
@@ -119,9 +121,6 @@ module.exports.cleanSessionData = (sessionData) => {
     }
 
     // Delete lists of blocked sites
-    delete frame.replacedAds
-    delete frame.blockedAds
-    delete frame.blockedByTracking
     delete frame.trackingProtection
     delete frame.httpsEverywhere
     delete frame.adblock

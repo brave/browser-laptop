@@ -19,8 +19,7 @@ class BraveryPanel extends ImmutableComponent {
   constructor () {
     super()
     this.onToggleSiteSetting = this.onToggleSiteSetting.bind(this)
-    this.onToggleBlockedAds = this.onToggleBlockedAds.bind(this)
-    this.onToggleTPList = this.onToggleTPList.bind(this)
+    this.onToggleAdsAndTracking = this.onToggleAdsAndTracking.bind(this)
     this.onToggleHttpseList = this.onToggleHttpseList.bind(this)
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this)
     this.onToggleShields = this.onToggleSiteSetting.bind(this, 'shieldsUp')
@@ -36,9 +35,6 @@ class BraveryPanel extends ImmutableComponent {
   }
   get blockedByTrackingList () {
     return this.props.frameProps.getIn(['trackingProtection', 'blocked'])
-  }
-  get isTPListShown () {
-    return this.props.braveryPanelDetail.get('expandTrackingProtection')
   }
   get isAdvancedExpanded () {
     return this.props.braveryPanelDetail.get('advancedControls') !== false
@@ -72,13 +68,7 @@ class BraveryPanel extends ImmutableComponent {
   get isRedirectingResources () {
     return this.redirectedResources && this.redirectedResources.size > 0
   }
-  onToggleTPList (e) {
-    windowActions.setBraveryPanelDetail({
-      expandTrackingProtection: !this.isTPListShown
-    })
-    e.stopPropagation()
-  }
-  onToggleBlockedAds (e) {
+  onToggleAdsAndTracking (e) {
     windowActions.setBraveryPanelDetail({
       expandAdblock: !this.isBlockedAdsShown
     })
@@ -144,13 +134,9 @@ class BraveryPanel extends ImmutableComponent {
           </div>
         </div>
         <div className='braveryPanelStats'>
-          <div onClick={this.onToggleBlockedAds}>
-            <div className='braveryStat adsBlockedStat'>{this.blockedAds ? this.blockedAds.size : 0}</div>
+          <div onClick={this.onToggleAdsAndTracking}>
+            <div className='braveryStat adsBlockedStat'>{(this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)}</div>
             <div data-l10n-id='adsBlocked' />
-          </div>
-          <div onClick={this.onToggleTPList}>
-            <div className='braveryStat trackersBlockedStat'>{this.blockedByTrackingList ? this.blockedByTrackingList.size : 0}</div>
-            <div data-l10n-id='trackersBlocked' />
           </div>
           <div onClick={this.onToggleHttpseList}>
             <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
@@ -160,19 +146,17 @@ class BraveryPanel extends ImmutableComponent {
         <div className='braveryPanelBody'>
           <ul>
           {
-            this.isTPListShown && this.blockedByTrackingList && this.blockedByTrackingList.size > 0
+            this.isBlockedAdsShown
             ? <li><ul>
             {
-              this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
+              this.isBlockingAds
+              ? this.blockedAds.map((site) => <li key={site}>{site}</li>)
+              : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isBlockingAds && this.isBlockedAdsShown
-            ? <li><ul>
             {
-              this.blockedAds.map((site) => <li key={site}>{site}</li>)
+              this.isBlockingTrackedContent
+              ? this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
+              : null
             }
             </ul></li>
             : null

@@ -268,8 +268,7 @@ WindowStore
   },
   braveryPanelDetail: {
     advancedControls: boolean, // If specified, indicates if advanced controls should be shown
-    expandTrackingProtection: boolean, // If specified, indicates if the TP section should be expanded
-    expandAdblock: boolean, // If specified, indicates if the adblock section should be expanded
+    expandAdblock: boolean, // If specified, indicates if the tracking protection and adblock section should be expanded
     expandHttpse: boolean // If specified, indicates if the httpse section should be expanded
   },
   contextMenuDetail: {
