@@ -47,9 +47,9 @@ const spellCheck = require('./spellCheck')
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
 let sessionStateStoreCompleteOnQuit = false
-let beforeQuitSaveStarted = false
-let quitTimedOut = false
+let shuttingDown = false
 let lastWindowState
+let lastWindowClosed = false
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
@@ -111,20 +111,17 @@ const getMasterKey = () => {
   }
 }
 
-const saveIfAllCollected = () => {
+const saveIfAllCollected = (forceSave) => {
   // If we're shutting down early and can't access the state, it's better
   // to not try to save anything at all and just quit.
-  if (beforeQuitSaveStarted && !AppStore.getState()) {
+  if (shuttingDown && !AppStore.getState()) {
     app.exit(0)
   }
-  if (quitTimedOut || perWindowState.length === BrowserWindow.getAllWindows().length) {
+  if (forceSave || perWindowState.length === BrowserWindow.getAllWindows().length) {
     const appState = AppStore.getState().toJS()
     appState.perWindowState = perWindowState
-    if (perWindowState.length === 0 && lastWindowState) {
-      appState.perWindowState.push(lastWindowState)
-    }
 
-    if (beforeQuitSaveStarted) {
+    if (shuttingDown) {
       // If the status is still UPDATE_AVAILABLE then the user wants to quit
       // and not restart
       if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_AVAILABLE ||
@@ -139,9 +136,11 @@ const saveIfAllCollected = () => {
       }
     }
 
-    const ignoreCatch = () => {}
-    SessionStore.saveAppState(appState).catch(ignoreCatch).then(() => {
-      if (beforeQuitSaveStarted) {
+    const logSaveAppStateError = (e) => {
+      console.error('Error saving app state: ', e)
+    }
+    SessionStore.saveAppState(appState).catch(logSaveAppStateError).then(() => {
+      if (shuttingDown) {
         sessionStateStoreCompleteOnQuit = true
         // If there's an update to apply, then do it here.
         // Otherwise just quit.
@@ -158,17 +157,22 @@ const saveIfAllCollected = () => {
 
 /**
  * Saves the session storage for all windows
- * This is debounced to every 5 minutes, the save is not particularly intensive but it does do IO
- * and there's not much gained if saved more frequently since it's also saved on shutdown.
  */
-const initiateSessionStateSave = debounce(() => {
-  if (beforeQuitSaveStarted) {
+const initiateSessionStateSave = (beforeQuit) => {
+  if (shuttingDown && !beforeQuit) {
     return
   }
+
   perWindowState.length = 0
-  saveIfAllCollected()
-  BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
-}, 5 * 60 * 1000)
+  // quit triggered by window-all-closed should save last window state
+  if (lastWindowClosed && lastWindowState) {
+    perWindowState.push(lastWindowState)
+    saveIfAllCollected(true)
+  } else {
+    BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
+    saveIfAllCollected()
+  }
+}
 
 app.on('ready', () => {
   let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
@@ -209,31 +213,26 @@ app.on('ready', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
-      setTimeout(app.quit, 0)
+      lastWindowClosed = true
+      app.quit()
     }
   })
 
   app.on('before-quit', (e) => {
-    beforeQuitSaveStarted = true
+    shuttingDown = true
     if (sessionStateStoreCompleteOnQuit) {
       return
     }
 
     e.preventDefault()
-    if (BrowserWindow.getAllWindows().length === 0) {
-      saveIfAllCollected()
-      return
-    }
+
+    initiateSessionStateSave(true)
 
     // Just in case a window is not responsive, we don't want to wait forever.
     // In this case just save session store for the windows that we have already.
     setTimeout(() => {
-      quitTimedOut = true
-      saveIfAllCollected()
+      saveIfAllCollected(true)
     }, appConfig.quitTimeout)
-
-    perWindowState.length = 0
-    BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE))
   })
 
   ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
@@ -363,7 +362,9 @@ app.on('ready', () => {
 
     AppStore.addChangeListener(() => {
       Menu.init(AppStore.getState().get('settings'))
-      initiateSessionStateSave()
+      // This is debounced to every 5 minutes, the save is not particularly intensive but it does do IO
+      // and there's not much gained if saved more frequently since it's also saved on shutdown.
+      debounce(initiateSessionStateSave, 5 * 60 * 1000)
     })
 
     Extensions.init()
@@ -374,10 +375,6 @@ app.on('ready', () => {
     SiteHacks.init()
     NoScript.init()
     spellCheck.init()
-
-    ipcMain.on(messages.UPDATE_REQUESTED, () => {
-      Updater.updateNowRequested()
-    })
 
     let masterKey
     ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {

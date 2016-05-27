@@ -92,10 +92,10 @@ class UpdateAvailable extends ImmutableComponent {
       }
       <Button className='updateButton updateLaterButton updateSecondaryButton'
         l10nId='updateLater'
-        onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false)} />
+        onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_AVAILABLE_DEFERRED, false, undefined)} />
       <Button className='updateButton updateNowButton'
         l10nId='updateNow'
-        onClick={appActions.updateRequested} />
+        onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_APPLYING_RESTART, false, undefined)} />
     </div>
   }
 }

@@ -33,12 +33,6 @@ Dispatches an event to the main process to create a new window.
 
 
 
-### updateRequested() 
-
-Dispatches an event to the main process to update the browser
-
-
-
 ### addSite(siteDetail, tag, originalSiteDetail, destinationIsParent) 
 
 Adds a site to the site list
