@@ -909,13 +909,14 @@ if (typeof KeyEvent === 'undefined') {
       function reportBlock (item) {
         var script_url = getOriginatingScriptUrl()
         var msg = {
+          type: item.type,
           obj: item.objName,
           prop: item.propName,
+          url: window.location.href,
           scriptUrl: stripLineAndColumnNumbers(script_url)
         }
 
         // Block the read from occuring; send info to background page instead
-        console.log('blocking potential canvas fingerprint', msg)
         send(msg)
       }
 
@@ -933,10 +934,12 @@ if (typeof KeyEvent === 'undefined') {
        */
       function trapIFrameMethods (frame) {
         var items = [{
+          type: 'Canvas',
           objName: 'contentDocument',
           propName: 'createElement',
           obj: frame.contentDocument
         }, {
+          type: 'Canvas',
           objName: 'contentDocument',
           propName: 'createElementNS',
           obj: frame.contentDocument
@@ -962,6 +965,7 @@ if (typeof KeyEvent === 'undefined') {
       var canvasMethods = ['getImageData', 'getLineDash', 'measureText']
       canvasMethods.forEach(function (method) {
         var item = {
+          type: 'Canvas',
           objName: 'CanvasRenderingContext2D.prototype',
           propName: method,
           obj: window.CanvasRenderingContext2D.prototype
@@ -973,6 +977,7 @@ if (typeof KeyEvent === 'undefined') {
       var canvasElementMethods = ['toDataURL', 'toBlob']
       canvasElementMethods.forEach(function (method) {
         var item = {
+          type: 'Canvas',
           objName: 'HTMLCanvasElement.prototype',
           propName: method,
           obj: window.HTMLCanvasElement.prototype
@@ -984,6 +989,7 @@ if (typeof KeyEvent === 'undefined') {
         'getShaderPrecisionFormat', 'getExtension']
       webglMethods.forEach(function (method) {
         var item = {
+          type: 'WebGL',
           objName: 'WebGLRenderingContext.prototype',
           propName: method,
           obj: window.WebGLRenderingContext.prototype
@@ -994,6 +1000,7 @@ if (typeof KeyEvent === 'undefined') {
       var audioBufferMethods = ['copyFromChannel', 'getChannelData']
       audioBufferMethods.forEach(function (method) {
         var item = {
+          type: 'AudioContext',
           objName: 'AudioBuffer.prototype',
           propName: method,
           obj: window.AudioBuffer.prototype
@@ -1005,6 +1012,7 @@ if (typeof KeyEvent === 'undefined') {
         'getFloatTimeDomainData', 'getByteTimeDomainData']
       analyserMethods.forEach(function (method) {
         var item = {
+          type: 'AudioContext',
           objName: 'AnalyserNode.prototype',
           propName: method,
           obj: window.AnalyserNode.prototype

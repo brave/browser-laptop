@@ -782,7 +782,7 @@ const windowActions = {
    * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
    *
    * @param {object} frameProps - The frame to set blocked info on
-   * @param {string} blockType - either 'adblock' or 'trackingProtection'
+   * @param {string} blockType - type of the block
    * @param {string} location - URL that was blocked
    */
   setBlockedBy: function (frameProps, blockType, location) {

@@ -248,6 +248,18 @@ class Main extends ImmutableComponent {
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
 
+    ipc.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {
+      if (!details.length) {
+        return
+      }
+      details.forEach((detail) => {
+        const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
+        const description = [detail.type, detail.scriptUrl || detail.url].join(': ')
+        filteredFrameProps.forEach((frameProps) =>
+          windowActions.setBlockedBy(frameProps, 'fingerprintingProtection', description))
+      })
+    })
+
     ipc.on(messages.SHOW_NOTIFICATION, (e, text) => {
       void new window.Notification(text)
     })
@@ -440,6 +452,20 @@ class Main extends ImmutableComponent {
     return enabled
   }
 
+  get enableFingerprintingProtection () {
+    if (this.activeSiteSettings) {
+      if (this.activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (typeof this.activeSiteSettings.get('fingerprintingProtection') === 'boolean') {
+        return this.activeSiteSettings.get('fingerprintingProtection')
+      }
+    }
+
+    return getSetting(settings.BLOCK_CANVAS_FINGERPRINTING) || false
+  }
+
   onCloseFrame (activeFrameProps) {
     windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
@@ -563,6 +589,7 @@ class Main extends ImmutableComponent {
       braveryDefaults.adControl = 'blockAds'
     }
     braveryDefaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
+    braveryDefaults.fingerprintingProtection = getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)
     return braveryDefaults
   }
 
@@ -770,6 +797,7 @@ class Main extends ImmutableComponent {
               activeSiteSettings={activeSiteSettings}
               enableAds={this.enableAds}
               enableNoScript={this.enableNoScript}
+              enableFingerprintingProtection={this.enableFingerprintingProtection}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

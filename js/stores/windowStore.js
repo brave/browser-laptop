@@ -197,7 +197,8 @@ const doAction = (action) => {
           noScript: {},
           themeColor: undefined,
           title: '',
-          trackingProtection: {}
+          trackingProtection: {},
+          fingerprintingProtection: {}
         })
       }
       updateNavBarInput(action.location, frameStatePath(key))
@@ -523,7 +524,8 @@ const doAction = (action) => {
           advancedControls: action.braveryPanelDetail.advancedControls,
           expandAdblock: action.braveryPanelDetail.expandAdblock,
           expandHttpse: action.braveryPanelDetail.expandHttpse,
-          expandNoScript: action.braveryPanelDetail.expandNoScript
+          expandNoScript: action.braveryPanelDetail.expandNoScript,
+          expandFp: action.braveryPanelDetail.expandFp
         })
       }
       break

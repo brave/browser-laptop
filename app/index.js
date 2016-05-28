@@ -558,7 +558,9 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {
-      console.log('got canvas fingerprint block', details)
+      BrowserWindow.getAllWindows().forEach((win) => {
+        win.webContents.send(messages.GOT_CANVAS_FINGERPRINTING, details)
+      })
     })
 
     // Setup the crash handling

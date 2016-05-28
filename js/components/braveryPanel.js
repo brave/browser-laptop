@@ -22,6 +22,7 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleAdsAndTracking = this.onToggleAdsAndTracking.bind(this)
     this.onToggleHttpseList = this.onToggleHttpseList.bind(this)
     this.onToggleNoScriptList = this.onToggleNoScriptList.bind(this)
+    this.onToggleFpList = this.onToggleFpList.bind(this)
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this)
     this.onToggleShields = this.onToggleSiteSetting.bind(this, 'shieldsUp')
     this.onToggleAdControl = this.onToggleSiteSetting.bind(this, 'adControl')
@@ -29,6 +30,7 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleNoScript = this.onToggleSiteSetting.bind(this, 'noScript')
     this.onToggleCookieControl = this.onToggleSiteSetting.bind(this, 'cookieControl')
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
+    this.onToggleFp = this.onToggleSiteSetting.bind(this, 'fingerprintingProtection')
     this.onReload = this.onReload.bind(this)
   }
   get isBlockingTrackedContent () {
@@ -58,8 +60,17 @@ class BraveryPanel extends ImmutableComponent {
   get isBlockedScriptsShown () {
     return this.props.braveryPanelDetail.get('expandNoScript')
   }
+  get isBlockingFingerprinting () {
+    return this.blockedFingerprinting && this.blockedFingerprinting.size > 0
+  }
+  get blockedFingerprinting () {
+    return this.props.frameProps.getIn(['fingerprintingProtection', 'blocked'])
+  }
   get isHttpseShown () {
     return this.props.braveryPanelDetail.get('expandHttpse')
+  }
+  get isFpShown () {
+    return this.props.braveryPanelDetail.get('expandFp')
   }
   get redirectedResources () {
     return this.props.frameProps.get('httpsEverywhere')
@@ -92,6 +103,12 @@ class BraveryPanel extends ImmutableComponent {
     }
     windowActions.setBraveryPanelDetail({
       expandHttpse: !this.isHttpseShown
+    })
+    e.stopPropagation()
+  }
+  onToggleFpList (e) {
+    windowActions.setBraveryPanelDetail({
+      expandFp: !this.isFpShown
     })
     e.stopPropagation()
   }
@@ -140,8 +157,10 @@ class BraveryPanel extends ImmutableComponent {
     const noScriptEnabled = this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)
     const httpseEnabled = this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)
     const adControl = this.getSiteSetting('adControl', this.props.braveryDefaults.adControl)
+    const fpEnabled = this.getSiteSetting('fingerprintingProtection', this.props.braveryDefaults.fingerprintingProtection)
     const adsBlockedStat = (this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)
     const scriptsBlockedStat = this.blockedScripts ? this.blockedScripts.size : 0
+    const fpBlockedStat = this.blockedFingerprinting ? this.blockedFingerprinting.size : 0
     return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' isClickDismiss>
       <div className='braveryPanel' onClick={(e) => e.stopPropagation()}>
         <div className='braveryPanelHeader'>
@@ -176,6 +195,13 @@ class BraveryPanel extends ImmutableComponent {
           })}>
             <div className='braveryStat noScriptStat'>{scriptsBlockedStat}</div>
             <div data-l10n-id='scriptsBlockedNumber' />
+          </div>
+          <div onClick={this.onToggleFpList} className={cx({
+            statClickable: !!fpBlockedStat,
+            statDisabled: !shieldsUp || !fpEnabled
+          })}>
+            <div className='braveryStat fpStat'>{fpBlockedStat}</div>
+            <div data-l10n-id='fingerprintingBlocked' />
           </div>
         </div>
         <div className='braveryPanelBody'>
@@ -216,6 +242,16 @@ class BraveryPanel extends ImmutableComponent {
             </ul></li>
             : null
           }
+          {
+            this.isBlockingFingerprinting && this.isFpShown
+            ? <li><ul>
+            {
+              this.blockedFingerprinting.map((site) =>
+                <li key={site}>{site}</li>)
+            }
+            </ul></li>
+            : null
+          }
           </ul>
           <div className={cx({
             braveryAdvancedTitle: true,
@@ -245,7 +281,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </select>
                   <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} />
-                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', this.props.braveryDefaults.safeBrowsing)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} />
                 </div>
                 <div className='braveryControlGroup'>
                   <div className={cx({
@@ -256,7 +292,8 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
-                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', this.props.braveryDefaults.safeBrowsing)} disabled={!shieldsUp} />
                 </div>
               </div></span>
             : null
