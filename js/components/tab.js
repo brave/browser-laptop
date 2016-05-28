@@ -183,7 +183,7 @@ class Tab extends ImmutableComponent {
         style={activeTabStyle}>
         {
           this.props.frameProps.get('isPrivate')
-          ? <div className='privateIcon fa fa-eye' />
+          ? <div className='privateIcon fa fa-user-secret' />
           : null
         }
         {
