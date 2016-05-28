@@ -60,7 +60,7 @@ module.exports.aboutUrls = new Immutable.Map({
 })
 
 module.exports.isIntermediateAboutPage = (location) =>
-  ['about:safebrowsing', 'about:error', 'about:certerror'].includes(location)
+  ['about:safebrowsing', 'about:error', 'about:certerror'].includes(getBaseUrl(location))
 
 // Map of target URLs mapped to source about: URLs
 const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj, v, k) => {
@@ -74,7 +74,9 @@ const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj,
  * about:blank -> http://localhost:8000/about-blank/index.html
  */
 module.exports.getTargetAboutUrl = function (input) {
-  return module.exports.aboutUrls.get(input)
+  const hash = getHash(input)
+  const url = module.exports.aboutUrls.get(getBaseUrl(input))
+  return hash ? [url, hash].join('#') : url
 }
 
 /**
@@ -83,7 +85,9 @@ module.exports.getTargetAboutUrl = function (input) {
  * http://localhost:8000/about-blank.html -> about:blank
  */
 module.exports.getSourceAboutUrl = function (input) {
-  return aboutUrlsReverse.get(input)
+  const hash = getHash(input)
+  const url = aboutUrlsReverse.get(getBaseUrl(input))
+  return hash ? [url, hash].join('#') : url
 }
 
 /**
@@ -91,7 +95,7 @@ module.exports.getSourceAboutUrl = function (input) {
  * Example: isSourceAboutUrl('about:blank') -> true
  */
 module.exports.isSourceAboutUrl = function (input) {
-  return !!module.exports.getTargetAboutUrl(input)
+  return !!module.exports.getTargetAboutUrl(getBaseUrl(input))
 }
 
 /**
@@ -99,7 +103,7 @@ module.exports.isSourceAboutUrl = function (input) {
  * Example: isTargetAboutUrl('http://localhost:8000/about-blank/index.html') -> true
  */
 module.exports.isTargetAboutUrl = function (input) {
-  return !!module.exports.getSourceAboutUrl(input)
+  return !!module.exports.getSourceAboutUrl(getBaseUrl(input))
 }
 
 /**
@@ -109,4 +113,19 @@ module.exports.isTargetAboutUrl = function (input) {
 module.exports.isUrl = function (input) {
   input = input.trim()
   return UrlUtil.isURL(input) && !input.includes(' ')
+}
+
+/**
+ * Gets base url from an about: url or its target mapping.
+ */
+function getBaseUrl (input) {
+  return (typeof input === 'string') ? input.split('#')[0] : ''
+}
+module.exports.getBaseUrl = getBaseUrl
+
+/**
+ * Gets hash part of a url
+ */
+function getHash (input) {
+  return (typeof input === 'string') ? input.split('#')[1] : ''
 }

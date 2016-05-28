@@ -1,5 +1,5 @@
 (function () {
-  var queryString = window.location.href.split('?')[1]
+  var queryString = window.location.search
   var devServerPort = queryString && queryString.match(/devServerPort=([^&]*)/)[1]
 
   let aboutEntryPage = 'gen/aboutPages.entry.js'
