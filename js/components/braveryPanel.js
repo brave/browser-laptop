@@ -138,6 +138,8 @@ class BraveryPanel extends ImmutableComponent {
   render () {
     const shieldsUp = this.getSiteSetting('shieldsUp', true)
     const noScriptEnabled = this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)
+    const httpseEnabled = this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)
+    const adControl = this.getSiteSetting('adControl', this.props.braveryDefaults.adControl)
     return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' isClickDismiss>
       <div className='braveryPanel' onClick={(e) => e.stopPropagation()}>
         <div className='braveryPanelHeader'>
@@ -152,21 +154,23 @@ class BraveryPanel extends ImmutableComponent {
           </div>
         </div>
         <div className='braveryPanelStats'>
-          <div onClick={this.onToggleAdsAndTracking}>
+          <div onClick={this.onToggleAdsAndTracking} className={cx({
+            statDisabled: adControl === 'allowAdsAndTracking'
+          })}>
             <div className='braveryStat adsBlockedStat'>{(this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)}</div>
             <div data-l10n-id='adsBlocked' />
           </div>
-          <div onClick={this.onToggleHttpseList}>
+          <div onClick={this.onToggleHttpseList} className={cx({
+            statDisabled: !httpseEnabled
+          })}>
             <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
             <div data-l10n-id='httpReroutes' />
           </div>
-          <div onClick={this.onToggleNoScriptList}>
-            <div className={cx({
-              'braveryStat': true,
-              'noScriptStat': true,
-              'statDisabled': !noScriptEnabled
-            })}>{this.blockedScripts ? this.blockedScripts.size : 0}</div>
-            <div className={cx({statDisabled: !noScriptEnabled})} data-l10n-id='scriptsBlockedNumber' />
+          <div onClick={this.onToggleNoScriptList} className={cx({
+            statDisabled: !noScriptEnabled
+          })}>
+            <div className='braveryStat noScriptStat'>{this.blockedScripts ? this.blockedScripts.size : 0}</div>
+            <div data-l10n-id='scriptsBlockedNumber' />
           </div>
         </div>
         <div className='braveryPanelBody'>
@@ -230,12 +234,12 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='adControl' />
-                  <select value={this.getSiteSetting('adControl', this.props.braveryDefaults.adControl)} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                  <select value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
                     <option data-l10n-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </select>
-                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} />
                   <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', this.props.braveryDefaults.safeBrowsing)} disabled={!shieldsUp} />
                 </div>
                 <div className='braveryControlGroup'>
