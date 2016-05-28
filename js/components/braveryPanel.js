@@ -126,6 +126,7 @@ class BraveryPanel extends ImmutableComponent {
       ruleKey = `https?://${parsedUrl.host}`
     }
     appActions.changeSiteSetting(ruleKey, setting, e.target.value)
+    this.onReload()
   }
   get displayHost () {
     const parsedUrl = urlParse(this.props.activeRequestedLocation)
