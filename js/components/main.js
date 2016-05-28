@@ -716,6 +716,7 @@ class Main extends ImmutableComponent {
           }
           <div className='topLevelEndButtons'>
             <Button iconClass='braveMenu'
+              l10nId='braveMenu'
               className={cx({
                 navbutton: true,
                 braveShieldsDisabled,
