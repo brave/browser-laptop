@@ -3,6 +3,7 @@
 
 .switchControl {
   display: flex;
+  align-items: center;
   padding: 5px;
 
   &.disabled {
@@ -43,8 +44,12 @@
     margin: auto 5px auto 0;
   }
 
-  .switchControlRightText {
-    margin: auto 0 auto 5px;
+  .switchControlRight {
+    display: flex;
+
+    .switchControlRightText {
+      margin: auto 0 auto 5px;
+    }
   }
 
   .switchControlTopText {
