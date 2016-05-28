@@ -155,19 +155,19 @@ class BraveryPanel extends ImmutableComponent {
         </div>
         <div className='braveryPanelStats'>
           <div onClick={this.onToggleAdsAndTracking} className={cx({
-            statDisabled: adControl === 'allowAdsAndTracking'
+            statDisabled: !shieldsUp || adControl === 'allowAdsAndTracking'
           })}>
             <div className='braveryStat adsBlockedStat'>{(this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)}</div>
             <div data-l10n-id='adsBlocked' />
           </div>
           <div onClick={this.onToggleHttpseList} className={cx({
-            statDisabled: !httpseEnabled
+            statDisabled: !shieldsUp || !httpseEnabled
           })}>
             <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
             <div data-l10n-id='httpReroutes' />
           </div>
           <div onClick={this.onToggleNoScriptList} className={cx({
-            statDisabled: !noScriptEnabled
+            statDisabled: !shieldsUp || !noScriptEnabled
           })}>
             <div className='braveryStat noScriptStat'>{this.blockedScripts ? this.blockedScripts.size : 0}</div>
             <div data-l10n-id='scriptsBlockedNumber' />
