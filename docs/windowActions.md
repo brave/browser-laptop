@@ -600,7 +600,7 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 
 **frameProps**: `object`, The frame to set blocked info on
 
-**blockType**: `string`, either 'adblock' or 'trackingProtection'
+**blockType**: `string`, type of the block
 
 **location**: `string`, URL that was blocked
 
