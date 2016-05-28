@@ -6,7 +6,9 @@
 
 const assert = require('assert')
 const request = require('request')
-const autoUpdater = require('auto-updater')
+const electron = require('electron')
+const autoUpdater = electron.autoUpdater
+const app = electron.app
 const appConfig = require('../js/constants/appConfig')
 const messages = require('../js/constants/messages')
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -19,7 +21,6 @@ const Channel = require('./channel')
 
 const fs = require('fs')
 const path = require('path')
-const app = require('app')
 const os = require('os')
 const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
 

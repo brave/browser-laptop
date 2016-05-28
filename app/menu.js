@@ -6,7 +6,7 @@
 
 const electron = require('electron')
 const appConfig = require('../js/constants/appConfig')
-const Menu = require('menu')
+const Menu = electron.Menu
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const dialog = electron.dialog

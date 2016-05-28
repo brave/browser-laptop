@@ -13,7 +13,8 @@
 
 const fs = require('fs')
 const path = require('path')
-const app = require('app')
+const electron = require('electron')
+const app = electron.app
 const urlParse = require('url').parse
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')

@@ -4,7 +4,7 @@
 
 const electron = global.require('electron')
 const remote = electron.remote
-const Menu = remote.require('menu')
+const Menu = remote.Menu
 const Immutable = require('immutable')
 const clipboard = electron.clipboard
 const messages = require('./constants/messages')
