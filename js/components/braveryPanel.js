@@ -21,6 +21,7 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleSiteSetting = this.onToggleSiteSetting.bind(this)
     this.onToggleAdsAndTracking = this.onToggleAdsAndTracking.bind(this)
     this.onToggleHttpseList = this.onToggleHttpseList.bind(this)
+    this.onToggleNoScriptList = this.onToggleNoScriptList.bind(this)
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this)
     this.onToggleShields = this.onToggleSiteSetting.bind(this, 'shieldsUp')
     this.onToggleAdControl = this.onToggleSiteSetting.bind(this, 'adControl')
@@ -47,6 +48,15 @@ class BraveryPanel extends ImmutableComponent {
   }
   get isBlockedAdsShown () {
     return this.props.braveryPanelDetail.get('expandAdblock')
+  }
+  get blockedScripts () {
+    return this.props.frameProps.getIn(['noScript', 'blocked'])
+  }
+  get isBlockingScripts () {
+    return this.blockedScripts && this.blockedScripts.size > 0
+  }
+  get isBlockedScriptsShown () {
+    return this.props.braveryPanelDetail.get('expandNoScript')
   }
   get isHttpseShown () {
     return this.props.braveryPanelDetail.get('expandHttpse')
@@ -85,6 +95,12 @@ class BraveryPanel extends ImmutableComponent {
     })
     e.stopPropagation()
   }
+  onToggleNoScriptList (e) {
+    windowActions.setBraveryPanelDetail({
+      expandNoScript: !this.isBlockedScriptsShown
+    })
+    e.stopPropagation()
+  }
   onToggleAdvanced () {
     windowActions.setBraveryPanelDetail({
       advancedControls: !this.isAdvancedExpanded
@@ -120,6 +136,7 @@ class BraveryPanel extends ImmutableComponent {
   }
   render () {
     const shieldsUp = this.getSiteSetting('shieldsUp', true)
+    const noScriptEnabled = this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)
     return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' isClickDismiss>
       <div className='braveryPanel' onClick={(e) => e.stopPropagation()}>
         <div className='braveryPanelHeader'>
@@ -141,6 +158,14 @@ class BraveryPanel extends ImmutableComponent {
           <div onClick={this.onToggleHttpseList}>
             <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
             <div data-l10n-id='httpReroutes' />
+          </div>
+          <div onClick={this.onToggleNoScriptList}>
+            <div className={cx({
+              'braveryStat': true,
+              'noScriptStat': true,
+              'statDisabled': !noScriptEnabled
+            })}>{this.blockedScripts ? this.blockedScripts.size : 0}</div>
+            <div className={cx({statDisabled: !noScriptEnabled})} data-l10n-id='scriptsBlockedNumber' />
           </div>
         </div>
         <div className='braveryPanelBody'>
@@ -166,6 +191,16 @@ class BraveryPanel extends ImmutableComponent {
             ? <li><ul>
             {
               this.redirectedResourcesSet.map((site) =>
+                <li key={site}>{site}</li>)
+            }
+            </ul></li>
+            : null
+          }
+          {
+            this.isBlockingScripts && this.isBlockedScriptsShown
+            ? <li><ul>
+            {
+              this.blockedScripts.map((site) =>
                 <li key={site}>{site}</li>)
             }
             </ul></li>
@@ -211,7 +246,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
-                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} />
                 </div>
               </div></span>
             : null

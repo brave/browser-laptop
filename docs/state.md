@@ -270,6 +270,7 @@ WindowStore
     advancedControls: boolean, // If specified, indicates if advanced controls should be shown
     expandAdblock: boolean, // If specified, indicates if the tracking protection and adblock section should be expanded
     expandHttpse: boolean // If specified, indicates if the httpse section should be expanded
+    expandNoScript: boolean // Whether noscript section should be expanded
   },
   contextMenuDetail: {
     left: number, // the left position of the context menu

@@ -4,7 +4,9 @@
 
 const strings = {
   // Noscript
-  SCRIPT_BLOCKED: 'violates the following Content Security Policy directive: "script-src \'none\'"'
+  SCRIPT_BLOCKED: 'violates the following Content Security Policy directive: "script-src \'none\'"',
+  INLINE_SCRIPT_BLOCKED: 'Refused to execute inline script ',
+  EXTERNAL_SCRIPT_BLOCKED: 'Refused to load the script '
 }
 
 module.exports = strings

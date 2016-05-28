@@ -521,9 +521,9 @@ const doAction = (action) => {
       } else {
         windowState = windowState.mergeIn(['braveryPanelDetail'], {
           advancedControls: action.braveryPanelDetail.advancedControls,
-          expandTrackingProtection: action.braveryPanelDetail.expandTrackingProtection,
           expandAdblock: action.braveryPanelDetail.expandAdblock,
-          expandHttpse: action.braveryPanelDetail.expandHttpse
+          expandHttpse: action.braveryPanelDetail.expandHttpse,
+          expandNoScript: action.braveryPanelDetail.expandNoScript
         })
       }
       break

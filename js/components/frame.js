@@ -528,10 +528,8 @@ class Frame extends ImmutableComponent {
       if (this.props.enableNoScript && e.level === 2 &&
           e.message && e.message.includes(consoleStrings.SCRIPT_BLOCKED)) {
         // Note that the site was blocked
-        // TODO: Parse out the location of the script that was blocked and send
-        // it too
         windowActions.setBlockedBy(this.props.frame,
-                                   'noScript', e.message)
+                                   'noScript', this.getScriptLocation(e.message))
       }
     })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
@@ -559,6 +557,16 @@ class Frame extends ImmutableComponent {
 
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
+  }
+
+  getScriptLocation (msg) {
+    const defaultMsg = '[Inline script]'
+    if (msg.includes(consoleStrings.EXTERNAL_SCRIPT_BLOCKED)) {
+      let match = /'.+?'/.exec(msg)
+      return match ? match[0].replace(/'/g, '') : defaultMsg
+    } else {
+      return defaultMsg
+    }
   }
 
   insertAds (currentLocation) {
