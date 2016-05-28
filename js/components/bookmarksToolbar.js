@@ -160,6 +160,11 @@ class BookmarkToolbarButton extends ImmutableComponent {
       onDragOver={this.onDragOver}
       onContextMenu={this.onContextMenu}>
       {
+        this.isFolder
+        ? <span className='bookmarkFavicon bookmarkFolder fa fa-folder-o' style={iconStyle} />
+        : null
+      }
+      {
         !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
       }
       <span className='bookmarkText'>
