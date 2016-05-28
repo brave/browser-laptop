@@ -140,6 +140,8 @@ class BraveryPanel extends ImmutableComponent {
     const noScriptEnabled = this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)
     const httpseEnabled = this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)
     const adControl = this.getSiteSetting('adControl', this.props.braveryDefaults.adControl)
+    const adsBlockedStat = (this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)
+    const scriptsBlockedStat = this.blockedScripts ? this.blockedScripts.size : 0
     return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' isClickDismiss>
       <div className='braveryPanel' onClick={(e) => e.stopPropagation()}>
         <div className='braveryPanelHeader'>
@@ -155,21 +157,24 @@ class BraveryPanel extends ImmutableComponent {
         </div>
         <div className='braveryPanelStats'>
           <div onClick={this.onToggleAdsAndTracking} className={cx({
+            statClickable: !!adsBlockedStat,
             statDisabled: !shieldsUp || adControl === 'allowAdsAndTracking'
           })}>
-            <div className='braveryStat adsBlockedStat'>{(this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)}</div>
+            <div className='braveryStat adsBlockedStat'>{adsBlockedStat}</div>
             <div data-l10n-id='adsBlocked' />
           </div>
           <div onClick={this.onToggleHttpseList} className={cx({
+            statClickable: !!this.redirectedResourcesSet.size,
             statDisabled: !shieldsUp || !httpseEnabled
           })}>
             <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
             <div data-l10n-id='httpReroutes' />
           </div>
           <div onClick={this.onToggleNoScriptList} className={cx({
+            statClickable: !!scriptsBlockedStat,
             statDisabled: !shieldsUp || !noScriptEnabled
           })}>
-            <div className='braveryStat noScriptStat'>{this.blockedScripts ? this.blockedScripts.size : 0}</div>
+            <div className='braveryStat noScriptStat'>{scriptsBlockedStat}</div>
             <div data-l10n-id='scriptsBlockedNumber' />
           </div>
         </div>
