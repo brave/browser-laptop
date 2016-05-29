@@ -16,9 +16,6 @@ class ContextMenuItem extends ImmutableComponent {
   get hasSubmenu () {
     return this.submenu && this.submenu.size > 0
   }
-  get isBookmarksToolbarSubmenu () {
-    return this.hasSubmenu && this.props.contextMenuItem.get('bookmark')
-  }
   onClick (clickAction, shouldHide, e) {
     e.stopPropagation()
     if (clickAction) {
@@ -150,20 +147,15 @@ class ContextMenuItem extends ImmutableComponent {
         : null
       }
       {
-        !this.hasSubmenu && (icon || faIcon)
-          ? <span className={cx({
-            contextMenuIcon: true,
-            hasFaIcon: !!faIcon,
-            fa: faIcon,
-            [faIcon]: !!faIcon
-          })}
-            style={iconStyle}></span>
-          : null
-      }
-      {
-        this.isBookmarksToolbarSubmenu
-          ? <span className='submenuIndicator contextMenuIcon bookmarkIcon fa fa-folder-o' style={iconStyle} />
-          : null
+        icon || faIcon
+        ? <span className={cx({
+          contextMenuIcon: true,
+          hasFaIcon: !!faIcon,
+          fa: faIcon,
+          [faIcon]: !!faIcon
+        })}
+          style={iconStyle}></span>
+        : null
       }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}>{this.props.contextMenuItem.get('label')}</span>

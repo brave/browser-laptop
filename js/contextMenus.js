@@ -268,12 +268,16 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
   const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
   return items.map((site) => {
     const isFolder = siteUtil.isFolder(site)
+    let faIcon
+    if (showFavicon && !site.get('favicon')) {
+      faIcon = isFolder ? 'fa-folder-o' : 'fa-file-o'
+    }
     const templateItem = {
       bookmark: site,
       draggable: true,
       label: site.get('customTitle') || site.get('title') || site.get('location'),
       icon: showFavicon ? site.get('favicon') : undefined,
-      faIcon: showFavicon && !site.get('favicon') ? 'fa-file-o' : undefined,
+      faIcon,
       contextMenu: function (e) {
         onBookmarkContextMenu(site, activeFrame, e)
       },
