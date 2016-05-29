@@ -254,6 +254,10 @@ const filterOutNonRecents = debounce(() => {
   emitChanges()
 }, 60 * 1000)
 
+/**
+ * Useful for updating non-react preferences (electron properties, etc).
+ * Called when any settings are modified (ex: via preferences).
+ */
 function handleChangeSettingAction (settingKey, settingValue) {
   switch (settingKey) {
     case settings.AUTO_HIDE_MENU:

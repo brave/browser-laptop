@@ -86,7 +86,7 @@ class SettingItem extends ImmutableComponent {
 
 class SettingCheckbox extends ImmutableComponent {
   render () {
-    return <div className='settingItem'>
+    return <div style={this.props.style} className='settingItem'>
       <span className='checkboxContainer'>
         <input type='checkbox' id={this.props.prefKey}
           disabled={this.props.disabled}
@@ -138,6 +138,7 @@ class GeneralTab extends ImmutableComponent {
       <SettingsList dataL10nId='bookmarkToolbarSettings'>
         <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ visibility: (getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, this.props.settings) === true ? 'visible' : 'hidden') }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SettingsList dataL10nId='appearanceSettings'>
         <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
