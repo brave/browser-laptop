@@ -155,7 +155,8 @@ class Frame extends ImmutableComponent {
 
   componentDidMount () {
     const cb = () => {
-      this.webview.setActive(this.props.isActive || this.props.isPreview)
+      this.webview.setActive(this.props.isActive)
+      this.webview.setHidden(!(this.props.isPreview || this.props.isActive))
       this.webview.setZoomLevel(this.zoomLevel)
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
       this.updateAboutDetails()
@@ -197,7 +198,8 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
-      this.webview.setActive(this.props.isActive || this.props.isPreview)
+      this.webview.setActive(this.props.isActive)
+      this.webview.setHidden(!(this.props.isPreview || this.props.isActive))
       this.handleShortcut()
       this.webview.setZoomLevel(this.zoomLevel)
       // give focus when switching tabs
