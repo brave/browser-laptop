@@ -760,6 +760,12 @@ function mainTemplateInit (nodeProps, frame) {
           click: function (item, focusedWindow) {
             focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
           }
+        }, {
+          label: locale.translation('print'),
+          accelerator: 'CmdOrCtrl+P',
+          click: function (item, focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_PRINT)
+          }
         }
         // CommonMenu.separatorMenuItem
         // TODO: bravery menu goes here
