@@ -137,7 +137,18 @@ var rendererIdentifiers = function () {
     // Other identifiers
     'urlCopied',
     'autoHideMenuBar',
-    'unexpectedErrorWindowReload'
+    'unexpectedErrorWindowReload',
+    'updateChannel',
+    'licenseText',
+    'allow',
+    'deny',
+    'permissionCameraMicrophone',
+    'permissionLocation',
+    'permissionNotifications',
+    'permissionWebMidi',
+    'permissionDisableCursor',
+    'permissionFullscreen',
+    'permissionExternal'
   ]
 }
 

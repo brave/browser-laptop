@@ -19,6 +19,7 @@ const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
+const locale = require('./locale')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
 const app = electron.app
@@ -235,31 +236,33 @@ function registerForHeadersReceived (session) {
 function registerPermissionHandler (session, partition) {
   const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
-  // TODO: Localize strings
-  let permissions = {
-    media: {
-      action: 'use your camera and/or microphone'
-    },
-    geolocation: {
-      action: 'see your location'
-    },
-    notifications: {
-      action: 'show you notifications'
-    },
-    midiSysex: {
-      action: 'use web MIDI'
-    },
-    pointerLock: {
-      action: 'disable your mouse cursor'
-    },
-    fullscreen: {
-      action: 'use fullscreen mode'
-    },
-    openExternal: {
-      action: 'open an external application'
-    }
-  }
+  let permissions = null
   session.setPermissionRequestHandler((webContents, permission, cb) => {
+    if (!permissions) {
+      permissions = {
+        media: {
+          action: locale.translation('permissionCameraMicrophone')
+        },
+        geolocation: {
+          action: locale.translation('permissionLocation')
+        },
+        notifications: {
+          action: locale.translation('permissionNotifications')
+        },
+        midiSysex: {
+          action: locale.translation('permissionWebMidi')
+        },
+        pointerLock: {
+          action: locale.translation('permissionDisableCursor')
+        },
+        fullscreen: {
+          action: locale.translation('permissionFullscreen')
+        },
+        openExternal: {
+          action: locale.translation('permissionExternal')
+        }
+      }
+    }
     const url = webContents.getURL()
     // Allow notifications for the main app
     if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||
@@ -303,7 +306,7 @@ function registerPermissionHandler (session, partition) {
     if (!(message in permissionCallbacks)) {
       // This notification is not shown yet
       appActions.showMessageBox({
-        buttons: ['Deny', 'Allow'],
+        buttons: [locale.translation('deny'), locale.translation('allow')],
         options: {
           persist: true
         },

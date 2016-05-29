@@ -276,6 +276,8 @@ app.on('ready', () => {
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
       Menu.init(AppStore.getState().get('settings'), {})
+
+      // Initialize after localization strings async loaded
     })
 
     // Do this after loading the state
