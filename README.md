@@ -18,11 +18,11 @@ source code, see below.
         sudo npm install -g node-gyp@3.2.1
 
 ### Windows
-Ensure you have the following installed:  
+Ensure you have the following installed:
 
 * [Node.js 5+](https://nodejs.org/en/)
-* [Python 2.7](https://www.python.org/downloads/)  
-* [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)  
+* [Python 2.7](https://www.python.org/downloads/)
+* [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)
 
 ###  Linux
 * `apt-get install libgnome-keyring-dev build-essential`
@@ -102,7 +102,7 @@ Build instructions:
 
 ### Contributing
 
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for contribution guidelines. 
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for contribution guidelines.
 
 ## Packaging for bundles, installers, and updates
 
@@ -119,16 +119,18 @@ After the .app file is built you can create a dmg and update zip with:
 Where XYZ is your signing identifier.
 
 ### Windows 7,8,10 x64:
+In order do run any build commands, you'll need an environment variable set for `CHANNEL` (set to `'dev'`, `'beta'`, or `'stable'`).
+You'll also need to set the `CERT` and `CERT_PASSWORD` environment variables with your [authenticode signing cert and password](https://blogs.msdn.microsoft.com/ieinternals/2011/03/22/everything-you-need-to-know-about-authenticode-code-signing/) if you want to build an installer.
 
-To create a folder with the app .exe and all dependencies:
+To set these values, you can either set the environment on a per-session basis (`$env:CHANNEL="dev"`) or update your [system/user environment variables](http://www.computerhope.com/issues/ch000549.htm).
+
+To create a folder with the app .exe and all dependencies you can run:
 
     npm run build-package
 
 After the above folder is created, you can create a setup (exe, msi, RELEASES file and update nupkg) with:
 
-    CERT_PASSWORD=‘XYZ’ npm run build-installer
-
-  Where XYZ is your authenticode signing password.
+    npm run build-installer
 
 ### Linux:
 

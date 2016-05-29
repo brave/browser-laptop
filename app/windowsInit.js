@@ -8,7 +8,7 @@ const childProcess = require('child_process')
 const spawn = childProcess.spawn
 const spawnSync = childProcess.spawnSync
 const app = electron.app
-const appUserModelId = 'BraveSoftware.Brave.browser'
+const appUserModelId = 'com.squirrel.brave.Brave'
 
 const getBraveDefaultsBinPath = () => {
   const appPath = app.getPath('exe')
