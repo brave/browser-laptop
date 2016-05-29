@@ -32,7 +32,8 @@ let generateBraveManifest = () => {
           '<all_urls>'
         ],
         include_globs: [
-          getAppUrl('about-*.html')
+          getAppUrl('about-*.html'),
+          getAppUrl('about-*.html') + '#*'
         ],
         exclude_globs: [
           getAppUrl('about-blank.html')

@@ -24,7 +24,7 @@ const settings = require('../constants/settings')
 const adInfo = require('../data/adInfo.js')
 const FindBar = require('./findbar.js')
 const consoleStrings = require('../constants/console')
-const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl } = require('../lib/appUrlUtil')
+const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
 
 class Frame extends ImmutableComponent {
@@ -37,14 +37,14 @@ class Frame extends ImmutableComponent {
   }
 
   isAboutPage () {
-    return aboutUrls.get(this.props.frame.get('location'))
+    return aboutUrls.get(getBaseUrl(this.props.frame.get('location')))
   }
 
   updateAboutDetails () {
-    let location = this.props.frame.get('location')
+    let location = getBaseUrl(this.props.frame.get('location'))
     if (location === 'about:preferences') {
-      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings.toJS())
-      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings.toJS())
+      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+      this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults)
     } else if (location === 'about:bookmarks') {
       this.webview.send(messages.BOOKMARKS_UPDATED, {
@@ -87,7 +87,7 @@ class Frame extends ImmutableComponent {
         // allow force loading of new frames
         this.props.frame.get('unloaded') === true &&
         // don't lazy load about pages
-        !aboutUrls.get(this.props.frame.get('src')) &&
+        !aboutUrls.get(getBaseUrl(this.props.frame.get('src'))) &&
         // pinned tabs don't serialize their state so the icon is lost for lazy loading
         !this.props.frame.get('pinnedLocation')) {
       return

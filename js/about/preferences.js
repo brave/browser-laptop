@@ -99,15 +99,8 @@ class SettingCheckbox extends ImmutableComponent {
 }
 
 class GeneralTab extends ImmutableComponent {
-  constructor () {
-    super()
-    this.state = {
-      languageCodes: window.languageCodes
-    }
-  }
-
   render () {
-    var languageOptions = this.state.languageCodes.map(function (lc) {
+    var languageOptions = this.props.languageCodes.map(function (lc) {
       return (
         <option data-l10n-id={lc} value={lc} />
       )
@@ -437,9 +430,11 @@ class TopBar extends ImmutableComponent {
 class AboutPreferences extends React.Component {
   constructor () {
     super()
+    let hash = window.location.hash ? window.location.hash.slice(1) : ''
     this.state = {
-      preferenceTab: preferenceTabs.GENERAL,
+      preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
+      languageCodes: window.languageCodes ? Immutable.fromJS(window.languageCodes) : Immutable.Map(),
       settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map(),
       siteSettings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map(),
       braveryDefaults: window.initBraveryDefaults ? Immutable.fromJS(window.initBraveryDefaults) : Immutable.Map()
@@ -500,9 +495,10 @@ class AboutPreferences extends React.Component {
     const settings = this.state.settings
     const siteSettings = this.state.siteSettings
     const braveryDefaults = this.state.braveryDefaults
+    const languageCodes = this.state.languageCodes
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
-        tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} languageCodes={languageCodes} />
         break
       case preferenceTabs.SEARCH:
         tab = <SearchTab settings={settings} onChangeSetting={this.onChangeSetting} />

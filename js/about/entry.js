@@ -1,9 +1,9 @@
 const ReactDOM = require('react-dom')
-const { getSourceAboutUrl } = require('../lib/appUrlUtil')
+const { getSourceAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
 
 let element
 
-switch (getSourceAboutUrl(window.location.href)) {
+switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:newtab':
     element = require('./newtab')
     break
