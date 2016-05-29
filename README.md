@@ -120,7 +120,7 @@ Where XYZ is your signing identifier.
 
 ### Windows 7,8,10 x64:
 In order do run any build commands, you'll need an environment variable set for `CHANNEL` (set to `'dev'`, `'beta'`, or `'stable'`).
-You'll also need to set the `CERT_PASSWORD` environment variable with your authenticode signing password if you want to build an installer.
+You'll also need to set the `CERT` and `CERT_PASSWORD` environment variables with your [authenticode signing cert and password](https://blogs.msdn.microsoft.com/ieinternals/2011/03/22/everything-you-need-to-know-about-authenticode-code-signing/) if you want to build an installer.
 
 To set these values, you can either set the environment on a per-session basis (`$env:CHANNEL="dev"`) or update your [system/user environment variables](http://www.computerhope.com/issues/ch000549.htm).
 
