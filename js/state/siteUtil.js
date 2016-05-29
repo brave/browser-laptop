@@ -136,6 +136,23 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
+/**
+ * Removes all sites from a siteDetail
+ *
+ * @param sites The application state's Immutable sites list
+ * @param siteDetail The siteDetail to remove
+ * @return The new sites Immutable object
+ */
+module.exports.emptySite = function (sites, siteDetail, tag) {
+  const index = module.exports.getSiteIndex(sites, siteDetail, tag)
+  if (index === -1) {
+    return sites
+  }
+  return sites.filter((site) => {
+    return site.get('parentFolderId') !== sites.get(index).get('folderId')
+  })
+}
+
 function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
   if (bookmarkFolder.get('parentFolderId')) {
     parentFolderIds.push(bookmarkFolder.get('parentFolderId'))

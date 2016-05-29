@@ -229,12 +229,25 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       })
 
     template.push(
-      CommonMenu.separatorMenuItem, {
+      CommonMenu.separatorMenuItem,
+      {
         label: isFolder ? locale.translation('deleteFolder') : locale.translation('deleteBookmark'),
         click: () => {
           appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
         }
-      }, CommonMenu.separatorMenuItem)
+      }
+    )
+
+    if (isFolder) {
+      template.push({
+        label: locale.translation('emptyFolder'),
+        click: () => {
+          appActions.emptySite(siteDetail, siteTags.BOOKMARK_FOLDER)
+        }
+      })
+    }
+
+    template.push(CommonMenu.separatorMenuItem)
   }
 
   template.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
