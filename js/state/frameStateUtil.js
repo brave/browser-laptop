@@ -179,12 +179,23 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   const navbarFocus = activeFrameKey === newKey &&
                       url === config.defaultUrl &&
                       frameOpts.delayedLoadUrl === undefined
+  const location = frameOpts.delayedLoadUrl || url // page url
+
+  // Only add pin requests if it's not already added
+  if (frameOpts.isPinned) {
+    const alreadyPinnedFrameProps = frames.find((frame) =>
+      frame.get('pinnedLocation') === location && frame.get('partitionNumber') === partitionNumber)
+    if (alreadyPinnedFrameProps) {
+      return {}
+    }
+  }
+
   const frame = Immutable.fromJS({
     zoomLevel: config.zoom.defaultValue,
     audioMuted: false, // frame is muted
     canGoBack: false,
     canGoForward: false,
-    location: frameOpts.delayedLoadUrl || url, // page url
+    location,
     aboutDetails: undefined,
     src: url, // what the iframe src should be
     tabId: -1,
