@@ -10,7 +10,7 @@
   color: black;
   cursor: default;
   display: flex;
-  font-size: 11px;
+  font-size: 14px;
   &.contextMenuScrollable {
     overflow-y: scroll;
   }
@@ -21,7 +21,7 @@
   @usedUpChrome: @navbarHeight + @bookmarksToolbarWithFaviconsHeight;
   max-height: calc(~'100% - @{usedUpChrome}');
   overflow: auto;
-  padding: 0px 0px;
+  padding: 4px 20px;
   position: absolute;
   z-index: 350;
   -webkit-user-select: none;
@@ -35,13 +35,14 @@
   }
 
   .contextMenuSingle {
-    background-color: @toolbarBackground;
-    border: 1px solid @toolbarBorderColor;
+    background-color: rgba(238, 238, 238, 0.97);
+    border: 1px solid rgba(204, 204, 204, 0.54);
+    box-shadow: 1px 4px 8px -3px rgba(0, 0, 0, 0.5);
     border-radius: @borderRadius;
     box-sizing: border-box;
     display: table;
-    min-width: 100px;
-    max-width: 300px;
+    min-width: 220px;
+    max-width: 400px;
 
     &.isSubmenu {
       position: relative;
@@ -82,8 +83,9 @@
     display: flex;
 
     .contextMenuSubItem {
-      border: 1px solid black;
+      border: 1px solid #aaaaaa;
       border-radius: @borderRadius;
+      background-color: rgba(255, 255, 255, 0.8);
       flex-grow: 1;
       margin: 1px;
       padding: 4px;
@@ -108,10 +110,11 @@
     }
   }
 
-  &:not([disabled]) {
+ &:not([disabled]) {
     &:not(.contextMenuSeparator) {
       &:hover {
         background-color: lighten(@menuSelectionColor, 5%);
+        color: white;
       }
     }
   }
