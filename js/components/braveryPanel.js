@@ -32,6 +32,7 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
     this.onToggleFp = this.onToggleSiteSetting.bind(this, 'fingerprintingProtection')
     this.onReload = this.onReload.bind(this)
+    this.onEditGlobal = this.onEditGlobal.bind(this)
   }
   get isBlockingTrackedContent () {
     return this.blockedByTrackingList && this.blockedByTrackingList.size > 0
@@ -125,6 +126,9 @@ class BraveryPanel extends ImmutableComponent {
   }
   onReload () {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.props.activeRequestedLocation)
+  }
+  onEditGlobal () {
+    ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, 'about:preferences#privacy')
   }
   getSiteSetting (setting, defaultValue) {
     if (!this.props.activeSiteSettings) {
@@ -299,8 +303,12 @@ class BraveryPanel extends ImmutableComponent {
             : null
           }
           <hr className='braveryBottomSplitter' />
-          <div className='reloadButton' onClick={this.onReload}>
-            <div className='reloadText'>Reload</div><div className='fa fa-repeat' />
+          <div className='braveryPanelFooter'>
+            <span className='clickable' onClick={this.onEditGlobal} data-l10n-id='editBraveryGlobalSettings' />
+            <span className='reloadButton clickable' onClick={this.onReload}>
+              <div className='reloadText' data-l10n-id='reload' />
+              <div className='fa fa-repeat' />
+            </span>
           </div>
         </div>
       </div>
