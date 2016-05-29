@@ -16,8 +16,6 @@ const Button = require('../components/button')
 const cx = require('../lib/classSet.js')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
-const settings = require('../constants/settings')
-const getSetting = require('../settings').getSetting
 const calculateTextWidth = require('../lib/textCalculator').calculateTextWidth
 
 class BookmarkToolbarButton extends ImmutableComponent {
@@ -122,7 +120,9 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   render () {
-    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+    let showFavicon = this.props.showFavicon
+    const showOnlyFavicon = this.props.showOnlyFavicon
+
     const iconSize = 16
     let iconStyle = {
       minWidth: iconSize,
@@ -148,7 +148,8 @@ class BookmarkToolbarButton extends ImmutableComponent {
         bookmarkToolbarButton: true,
         draggingOverLeft: this.isDraggingOverLeft && !this.isExpanded,
         draggingOverRight: this.isDraggingOverRight && !this.isExpanded,
-        isDragging: this.isDragging
+        isDragging: this.isDragging,
+        showOnlyFavicon: showFavicon && showOnlyFavicon
       })}
       draggable
       ref={(node) => { this.bookmarkNode = node }}
@@ -170,7 +171,9 @@ class BookmarkToolbarButton extends ImmutableComponent {
       }
       <span className='bookmarkText'>
       {
-        this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location')
+        !this.isFolder && showFavicon && showOnlyFavicon
+        ? ''
+        : this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location')
       }
       </span>
       {
@@ -266,12 +269,10 @@ class BookmarksToolbar extends ImmutableComponent {
       this.fontSize = this.root.getPropertyValue('--bookmark-item-font-size')
       this.fontFamily = this.root.getPropertyValue('--default-font-family')
     }
-    const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
-
     // Loop through until we fill up the entire bookmark toolbar width
     let i
     for (i = 0; i < noParentItems.size; i++) {
-      const iconWidth = showFavicon && noParentItems.getIn([i, 'favicon']) ? 20 : 0
+      const iconWidth = this.props.showFavicon && noParentItems.getIn([i, 'favicon']) ? 20 : 0
       const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
       widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth, this.maxWidth) + this.margin
       if (widthAccountedFor >= window.innerWidth - overflowButtonWidth) {
@@ -321,14 +322,17 @@ class BookmarksToolbar extends ImmutableComponent {
     contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest && closest.isDroppedOn, e)
   }
   render () {
-    let showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+    let showFavicon = this.props.showFavicon
+    let showOnlyFavicon = this.props.showOnlyFavicon
+
     this.bookmarkRefs = []
     return <div
       className={
         cx({
           bookmarksToolbar: true,
           allowDragging: this.props.shouldAllowWindowDrag,
-          showFavicon
+          showFavicon,
+          showOnlyFavicon
         })
       }
       onDrop={this.onDrop}
@@ -344,7 +348,9 @@ class BookmarksToolbar extends ImmutableComponent {
             openContextMenu={this.openContextMenu}
             clickBookmarkItem={this.clickBookmarkItem}
             showBookmarkFolderMenu={this.showBookmarkFolderMenu}
-            bookmark={bookmark} />)
+            bookmark={bookmark}
+            showFavicon={this.props.showFavicon}
+            showOnlyFavicon={this.props.showOnlyFavicon} />)
     }
     {
       this.overflowBookmarkItems.size !== 0
