@@ -72,9 +72,18 @@ To run the tests:
 
     npm test
 
-Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
-
 You will also have to have two terminal tabs up to run Brave. One for Brave to watch changes, and one to run Brave.
+
+Some errors related to [brave/electron](https://github.com/brave/electron) update can be fixed by doing a clean install:
+
+    rm -rf node_modules/
+    npm install
+
+If this does not work, please clear out your ~/.electron first and try again.
+
+### Port
+
+Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
 
 e.g.
 npm config set brave:port 9001
@@ -104,6 +113,8 @@ See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for contribution guidelines.
 
 ## Packaging for bundles, installers, and updates
 
+In order do run any build commands, you'll need an environment variable set for `CHANNEL` (set to `'dev'`, `'beta'`, or `'stable'`).
+
 ### OSX:
 
 From within brave-browser you can create a .app file for distribution:
@@ -117,7 +128,7 @@ After the .app file is built you can create a dmg and update zip with:
 Where XYZ is your signing identifier.
 
 ### Windows 7,8,10 x64:
-In order do run any build commands, you'll need an environment variable set for `CHANNEL` (set to `'dev'`, `'beta'`, or `'stable'`).
+
 You'll also need to set the `CERT` and `CERT_PASSWORD` environment variables with your [authenticode signing cert and password](https://blogs.msdn.microsoft.com/ieinternals/2011/03/22/everything-you-need-to-know-about-authenticode-code-signing/) if you want to build an installer.
 
 To set these values, you can either set the environment on a per-session basis (`$env:CHANNEL="dev"`) or update your [system/user environment variables](http://www.computerhope.com/issues/ch000549.htm).
@@ -135,3 +146,7 @@ After the above folder is created, you can create a setup (exe, msi, RELEASES fi
 To create a package:
 
     npm run build-package
+
+To create a dev package:
+
+    CHANNEL=dev npm run build-package
