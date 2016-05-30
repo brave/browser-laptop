@@ -72,9 +72,18 @@ To run the tests:
 
     npm test
 
-Note: Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
-
 You will also have to have two terminal tabs up to run Brave. One for Brave to watch changes, and one to run Brave.
+
+Some errors related to [brave/electron](https://github.com/brave/electron) update can be fixed by doing a clean install:
+
+    rm -rf node_modules/
+    npm install
+
+If this does not work, please clear out your ~/.electron first and try again.
+
+### Port
+
+Brave uses port 8080 to communicate between its client and server sides by default. If you are using port 8080 for something else (e.g. a web proxy) then you can set the node config to make it use a different one.
 
 e.g.
 npm config set brave:port 9001
