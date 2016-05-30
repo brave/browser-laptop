@@ -19,8 +19,8 @@
 - Fixed Fullscreen mode showing a black bar up top on OS X. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
 - Upgrade to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
 - Upgrade to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))
-- Upgrade to Electron 1.2.0. ([#1968])([#1968](https://github.com/brave/browser-laptop/issues/1968))
-- Upgrade to Node 6.1. ([#1969])([#1969](https://github.com/brave/browser-laptop/issues/1969))
+- Upgrade to Electron 1.2.0. ([#1968](https://github.com/brave/browser-laptop/issues/1968))
+- Upgrade to Node 6.1. ([#1969](https://github.com/brave/browser-laptop/issues/1969))
 - [Various other fixes.](https://github.com/brave/browser-laptop/milestones/0.10.1dev)
 
 ## [0.10.0](https://github.com/brave/browser-laptop/releases/v0.10.0dev)
