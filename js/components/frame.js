@@ -498,6 +498,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
+        loadEnd()
         loadFail(e)
       }
     })
