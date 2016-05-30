@@ -9,18 +9,18 @@ source code, see below.
 ## Build prerequisites
 
 ### All platforms
-1. `nodejs` **`>= 5.0`**
+1. `nodejs` **`>= 6.1`**
 
     Install from your package manager or download from https://nodejs.org
 
-2. `node-gyp` **`3.2.1`**
+2. `node-gyp` **`3.3.1`**
 
-        sudo npm install -g node-gyp@3.2.1
+        sudo npm install -g node-gyp@3.3.1
 
 ### Windows
 Ensure you have the following installed:
 
-* [Node.js 5+](https://nodejs.org/en/)
+* [Node.js 6.1+](https://nodejs.org/en/)
 * [Python 2.7](https://www.python.org/downloads/)
 * [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)
 
@@ -50,9 +50,7 @@ After installing the prerequisites:
 
         npm install
 
-For now, Node 5.8 requires you to `cd node_modules/abp-filter-parser-cpp` after the `npm install` and run `make`.
-
-If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 5.9 and `node-gyp` 3.2.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
+If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
 Additional notes on troubleshooting installation issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
 
