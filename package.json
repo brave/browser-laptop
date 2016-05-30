@@ -67,7 +67,7 @@
     "abp-filter-parser-cpp": "1.1.x",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
-    "electron-squirrel-startup": "^0.1.4",
+    "electron-squirrel-startup": "^1.0.0",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
