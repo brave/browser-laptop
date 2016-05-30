@@ -16,6 +16,7 @@
 - Fixed bookmark items middle click to open in a new tab on Windows 10. ([#1724](https://github.com/brave/browser-laptop/issues/1724))
 - Fixed redownloading files on session restore ([#1219](https://github.com/brave/browser-laptop/issues/1219))
 - Fixed pinned tabs sometimes duplicating. ([#1508](https://github.com/brave/browser-laptop/issues/1508))
+- Fixed Fullscreen mode showing a black bar up top on OS X. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
 - Upgrade to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
 - Upgrade to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))
 - Upgrade to Electron 1.2.0. ([#1968])([#1968](https://github.com/brave/browser-laptop/issues/1968))
@@ -133,7 +134,7 @@
 - Find in page now shows match ordinal.
 - Open all bookmarks in bookmark folder context menu added.
 - Improved bookmark import support (Safari, Pinboard).
-- Fixes for full screen mode.
+- Fixes for fullscreen mode.
 - Fixes for pinned sites not unpinning.
 - Upgraded to libchromiumcontent 49.0.2623.87.
 - Upgraded to Node v5.9.
