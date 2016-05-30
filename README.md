@@ -58,6 +58,10 @@ Some platforms are available as pre-configured VMs. See the [readme](https://git
 
 ## Development
 
+The team welcomes contributions to Brave of any kind including documentation, tutorials, bug reports, issues, feature requests, feature implementation, pull requests, helping to manage issues, etc.
+
+[![Throughput Graph](https://graphs.waffle.io/brave/browser-laptop/throughput.svg)](https://waffle.io/brave/browser-laptop/metrics/throughput)
+
 To start the server and file watchers run the following on the command line:
 
     npm run watch
