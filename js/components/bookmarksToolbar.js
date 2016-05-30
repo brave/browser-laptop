@@ -138,7 +138,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
           backgroundSize: iconSize,
           height: iconSize
         })
-      } else {
+      } else if (!this.isFolder) {
         showFavicon = false
       }
     }
