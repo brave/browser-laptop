@@ -101,7 +101,7 @@
     "chai-as-promised": "^5.1.0",
     "co-mocha": "^1.1.2",
     "css-loader": "^0.23.0",
-    "electron-builder": "^2.3.1",
+    "electron-builder": "^3.25.0",
     "electron-packager": "brave/electron-packager",
     "electron-rebuild": "^1.1.1",
     "electron-winstaller": "^2.3.0",
