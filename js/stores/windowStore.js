@@ -133,8 +133,10 @@ const doAction = (action) => {
       const currentLocation = frame.get('location')
       const parsedUrl = urlParse(action.location)
 
+      // Electron has the proper handling for data: and blob: URLs so no
+      // need to specify them here.
       const navigatableTypes = ['http:', 'https:', 'about:', 'chrome:',
-        'chrome-extension:', 'file:', 'view-source:', 'ftp:', 'data:']
+        'chrome-extension:', 'file:', 'view-source:', 'ftp:']
 
       // For types that are not navigatable, just do a loadUrl on them
       if (!navigatableTypes.includes(parsedUrl.protocol)) {
