@@ -27,6 +27,7 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_BOOKMARK: _,
   SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK: _,
   SHORTCUT_ACTIVE_FRAME_LOAD_URL: _, /** @arg {string} url to load */
+  SHORTCUT_ACTIVE_FRAME_COPY: _,
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */

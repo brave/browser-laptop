@@ -36,6 +36,12 @@ module.exports.register = (win) => {
       const focusedWindow = win || BrowserWindow.getFocusedWindow()
       focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
     })
+  } else {
+    // Workaround for #1060
+    simpleWebContentEvents.push([
+      'Cmd+C',
+      messages.SHORTCUT_ACTIVE_FRAME_COPY
+    ])
   }
 
   // Tab ordering shortcuts

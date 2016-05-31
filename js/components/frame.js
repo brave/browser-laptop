@@ -17,6 +17,7 @@ const contextMenus = require('../contextMenus')
 const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
+const clipboard = global.require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
@@ -296,6 +297,14 @@ class Frame extends ImmutableComponent {
         break
       case 'load-non-navigatable-url':
         this.webview.loadURL(this.props.frame.get('activeShortcutDetails'))
+        break
+      case 'copy':
+        let selection = window.getSelection()
+        if (selection && selection.toString()) {
+          clipboard.writeText(selection.toString())
+        } else {
+          this.webview.copy()
+        }
         break
     }
     if (activeShortcut) {
