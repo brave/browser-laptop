@@ -434,8 +434,26 @@ if (typeof KeyEvent === 'undefined') {
     return true
   }
 
+  function autofillPasswordListenerInit () {
+    if (autofillPasswordListener() !== true) {
+      // Some pages insert the password form into the DOM after it's loaded
+      var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          if (mutation.addedNodes.length) {
+            if (autofillPasswordListener() === true) {
+              observer.disconnect()
+            }
+          }
+        })
+      })
+      observer.observe(document.documentElement, {
+        childList: true
+      })
+    }
+  }
+
   // Fires when the page is loaded and the default pw manager is enabled
-  ipcRenderer.on('autofill-password', autofillPasswordListener)
+  ipcRenderer.on('autofill-password', autofillPasswordListenerInit)
 
   /**
    * Gets form fields.
@@ -537,6 +555,10 @@ if (typeof KeyEvent === 'undefined') {
       }
     }
     var passwordNodes = Array.from(form.querySelectorAll('input[type=password]'))
+    // Skip nodes that are invisible
+    passwordNodes = passwordNodes.filter((e) => {
+      return (e instanceof HTMLInputElement && e.clientHeight > 0 && e.clientWidth > 0)
+    })
     if (isSubmission) {
       // Skip empty fields
       passwordNodes = passwordNodes.filter((e) => { return (e instanceof HTMLInputElement && e.value) })
