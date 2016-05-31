@@ -76,7 +76,7 @@ const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj,
 module.exports.getTargetAboutUrl = function (input) {
   const hash = getHash(input)
   const url = module.exports.aboutUrls.get(getBaseUrl(input))
-  return hash ? [url, hash].join('#') : url
+  return hash && url ? [url, hash].join('#') : url
 }
 
 /**
@@ -87,7 +87,7 @@ module.exports.getTargetAboutUrl = function (input) {
 module.exports.getSourceAboutUrl = function (input) {
   const hash = getHash(input)
   const url = aboutUrlsReverse.get(getBaseUrl(input))
-  return hash ? [url, hash].join('#') : url
+  return hash && url ? [url, hash].join('#') : url
 }
 
 /**
