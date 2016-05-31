@@ -109,7 +109,9 @@ class Frame extends ImmutableComponent {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
       this.webview = document.createElement('webview')
-      src = location
+      if (guestInstanceId) {
+        this.webview.setAttribute('data-guest-instance-id', guestInstanceId)
+      }
       webviewAdded = true
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
@@ -126,9 +128,6 @@ class Frame extends ImmutableComponent {
       ipc.send(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
     }
-    if (guestInstanceId) {
-      this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
-    }
 
     const hack = siteHacks[urlParse(location).hostname]
     if (hack && hack.userAgent) {
@@ -138,14 +137,17 @@ class Frame extends ImmutableComponent {
       this.webview.setAttribute('allowRunningInsecureContent', true)
       this.webview.allowRunningInsecureContent = true
     }
-    this.webview.setAttribute('src',
-                              isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
+
+    if (!guestInstanceId) {
+      this.webview.setAttribute('src', isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
+    }
+
     if (webviewAdded) {
       let runOnDomReady = (e) => {
         this.webview.removeEventListener(e.type, runOnDomReady)
         cb && cb()
       }
-      this.webview.addEventListener('load-start', runOnDomReady)
+      this.webview.addEventListener('did-attach', runOnDomReady)
       this.addEventListeners()
       this.webviewContainer.appendChild(this.webview)
     } else {
@@ -156,7 +158,6 @@ class Frame extends ImmutableComponent {
   componentDidMount () {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
-      this.webview.setHidden(!(this.props.isPreview || this.props.isActive))
       this.webview.setZoomLevel(this.zoomLevel)
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
       this.updateAboutDetails()
@@ -199,7 +200,6 @@ class Frame extends ImmutableComponent {
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
-      this.webview.setHidden(!(this.props.isPreview || this.props.isActive))
       this.handleShortcut()
       this.webview.setZoomLevel(this.zoomLevel)
       // give focus when switching tabs
@@ -338,7 +338,7 @@ class Frame extends ImmutableComponent {
         windowActions.newFrame(frameOpts, openInForeground)
       }
     })
-    this.webview.addEventListener('dom-ready', (e) => {
+    this.webview.addEventListener('did-attach', (e) => {
       let tabId = this.webview.getWebContents().getId()
       if (this.props.frame.get('tabId') !== tabId) {
         windowActions.setFrameTabId(this.props.frame, tabId)
