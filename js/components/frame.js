@@ -99,19 +99,11 @@ class Frame extends ImmutableComponent {
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
     let webviewAdded = false
-    let guestInstanceId = null
     if (this.shouldCreateWebview()) {
-      // only set the guestInstanceId if this is a new frame
-      if (this.webview == null) {
-        guestInstanceId = this.props.frame.get('guestInstanceId')
-      }
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
       this.webview = document.createElement('webview')
-      if (guestInstanceId) {
-        this.webview.setAttribute('data-guest-instance-id', guestInstanceId)
-      }
       webviewAdded = true
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
@@ -138,13 +130,16 @@ class Frame extends ImmutableComponent {
       this.webview.allowRunningInsecureContent = true
     }
 
-    if (!guestInstanceId) {
+    if (this.props.frame.get('guestInstanceId')) {
+      this.webview.setAttribute('data-guest-instance-id', this.props.frame.get('guestInstanceId'))
+    } else {
+      src = location
       this.webview.setAttribute('src', isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
     }
-
     if (webviewAdded) {
       let runOnDomReady = (e) => {
         this.webview.removeEventListener(e.type, runOnDomReady)
+        delete this.webview.dataset.guestInstanceId
         cb && cb()
       }
       this.webview.addEventListener('did-attach', runOnDomReady)
