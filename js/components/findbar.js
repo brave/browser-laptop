@@ -144,14 +144,14 @@ class FindBar extends ImmutableComponent {
     }
 
     return <div className='findBar' onBlur={this.onBlur}>
-      <span className='searchStringContainer'>
+      <div className='searchStringContainer'>
         <input type='text'
           ref={(node) => { this.searchInput = node }}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
           value={this.searchString} />
           {findMatchText}
-      </span>
+      </div>
       <Button iconClass='findButton fa-chevron-up'
         className='findButton smallButton findPrev'
         disabled={this.numberOfMatches === 0}
