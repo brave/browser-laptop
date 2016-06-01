@@ -14,13 +14,13 @@
   height: @tabsToolbarHeight;
   position: relative;
   white-space: nowrap;
-  z-index: 310;
+  z-index: @zindexTabs;
 }
 
 .tabStripContainer {
   display: flex;
   flex: 1;
-  z-index: 2;
+  z-index: @zindexTabs;
   overflow-x: auto;
   overflow-y: hidden;
   &.allowDragging {
@@ -103,7 +103,7 @@
     padding: 10px;
     background: #fff;
     pointer-events: none;
-    z-index: 312;
+    z-index: @zindexTabsThumbnail;
   }
 
   &.active {
@@ -163,7 +163,7 @@
 
     border: 0px solid white;
     border-radius: 50%;
-    z-index: 3;
+    z-index: @zindexTabs;
   }
 }
 
@@ -204,7 +204,7 @@
     position: absolute;
     top: 0;
     left: -1px;
-    z-index: 100;
+    z-index: @zindexTabsDragIndicator;
     height: 100%;
     width: 1px;
 
@@ -246,7 +246,7 @@
   justify-content: center;
   position: relative;
   text-align: center;
-  z-index: 12;
+  z-index: @zindexTabs;
   &.allowDragging {
     -webkit-app-region: drag;
     >* {

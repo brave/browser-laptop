@@ -8,7 +8,6 @@
   --default-font-family: "Arial";
 }
 
-
 * {
   margin: 0;
   padding: 0;
@@ -60,7 +59,7 @@ html,
 .frameWrapper {
   height: 100%;
   width: 100%;
-  z-index: 2;
+  z-index: @zindexWindow;
   position: absolute;
   top: 0;
   left: 0;
@@ -97,10 +96,10 @@ html,
   }
 
   &:not(.isActive) {
-    z-index: 1;
+    z-index: @zindexWindowNotActive;
     &.isPreview {
       background: gray;
-      z-index: 3;
+      z-index: @zindexWindowIsPreview;
     }
 
     // Webviews can cause flickers w/ Chrome  v49 if left visible
@@ -139,13 +138,13 @@ html,
 }
 
 body.fullScreen .frameWrapper.isActive {
-  z-index: 10000;
+  z-index: @zindexWindowFullScreen;
 }
 
 /* The fullscreen notice is shown above the fullscreen element */
 body.fullScreen .banner {
   position: absolute;
-  z-index: 10001;
+  z-index: @zindexWindowFullScreenBanner;
   top: 0;
   opacity: 1;
   transition: opacity 2s ease-in-out;

@@ -117,7 +117,7 @@
    */
   .backforward {
     display: flex;
-    z-index: 10;
+    z-index: @zindexNavigationBar;
 
     transition: margin @transitionDuration ease-in-out;
 
@@ -158,7 +158,7 @@
   position: relative;
 
   *:not(legend) {
-    z-index: 1;
+    z-index: @zindexUrlbarNotLegend;
   }
 
   input:focus + legend:before {
@@ -175,7 +175,7 @@
     bottom: 0;
     right: 0;
     left: 0;
-    z-index: 0;
+    z-index: @zindexNavigationBar;
   }
 
   #navigator:not(.titleMode) & {
@@ -194,8 +194,7 @@
   padding: 0;
   position: relative;
   -webkit-user-select: none;
-
-  z-index: 312;
+  z-index: @zindexNavigationBar;
 
   form {
     -webkit-app-region: drag;
