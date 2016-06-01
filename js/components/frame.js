@@ -202,6 +202,17 @@ class Frame extends ImmutableComponent {
       if (this.props.isActive && !prevProps.isActive) {
         this.webview.focus()
       }
+
+      // make sure the webview content updates to
+      // match the fullscreen state of the frame
+      if (prevProps.frame.get('isFullScreen') !==
+         this.props.frame.get('isFullScreen')) {
+        if (this.props.frame.get('isFullScreen')) {
+          this.webview.executeJavaScript('document.webkitRequestFullscreen()')
+        } else {
+          this.webview.executeJavaScript('document.webkitExitFullscreen()')
+        }
+      }
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
       this.updateAboutDetails()
     }
@@ -521,6 +532,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
       windowActions.setFullScreen(this.props.frame, true, true)
+      // disable the fullscreen warning after 5 seconds
       setTimeout(windowActions.setFullScreen.bind(this, this.props.frame, undefined, false), 5000)
     })
     this.webview.addEventListener('leave-html-full-screen', () => {
