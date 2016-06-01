@@ -18,6 +18,7 @@
 - Fixed pinned tabs sometimes duplicating. ([#1508](https://github.com/brave/browser-laptop/issues/1508))
 - Fixed Fullscreen mode showing a black bar up top on OS X. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
 - Fixed contractions showing up as misspelled for spell check. ([#2015](https://github.com/brave/browser-laptop/issues/2015))
+- Fixed non-English spell checking dictionaries. ([#1788](https://github.com/brave/browser-laptop/issues/1788))
 - Possibly fixed intermittent problem with copy on OS X. ([#1060](https://github.com/brave/browser-laptop/issues/1060))
 - Upgrade to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
 - Upgrade to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))

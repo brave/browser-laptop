@@ -13,6 +13,9 @@ const app = electron.app
 const appStore = require('../js/stores/appStore')
 const appActions = require('../js/actions/appActions')
 const contractionSet = new Set()
+const getSetting = require('../js/settings').getSetting
+const settings = require('../js/constants/settings')
+
 let dictionaryLocale
 
 // Stores a reference to the last added immutable words
@@ -68,13 +71,15 @@ module.exports.init = () => {
   contractions.forEach((word) => contractionSet.add(word.replace(/'.*/, '')))
 
   const availableDictionaries = spellchecker.getAvailableDictionaries()
-  let dict = app.getLocale().replace('-', '_')
+  let dict = getSetting(settings.LANGUAGE) || app.getLocale().replace('-', '_')
   if (availableDictionaries.includes(dict)) {
     dictionaryLocale = dict
+    spellchecker.setDictionary(dict)
   } else {
-    dict = app.getLocale().split('-')[0]
+    dict = dict.split('-')[0]
     if (availableDictionaries.includes(dict)) {
       dictionaryLocale = dict
+      spellchecker.setDictionary(dict)
     }
   }
 

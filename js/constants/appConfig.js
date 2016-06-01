@@ -72,7 +72,7 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
   defaultSettings: {
-    'general.language': 'en-US',
+    'general.language': undefined,
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
     'general.show-home-button': false,
