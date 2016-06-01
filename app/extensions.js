@@ -15,7 +15,7 @@ let generateBraveManifest = () => {
       {
         run_at: 'document_start',
         all_frames: true,
-        matches: ['http://*/*', 'https://*/*'],
+        matches: ['<all_urls>'],
         js: [
           'brave-default.js'
         ],
