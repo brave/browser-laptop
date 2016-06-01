@@ -24,6 +24,8 @@ let mapFilterType = {
   other: FilterOptions.other
 }
 
+const whitelistHosts = ['disqus.com', 'a.disquscdn.com']
+
 const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
     const firstPartyUrl = URL.parse(details.firstPartyUrl)
@@ -34,7 +36,10 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
                                 urlHost !== firstPartyUrlHost)) &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
+      !whitelistHosts.includes(urlHost) &&
+      !urlHost.endsWith('.disqus.com') &&
       adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
+
     return {
       cancel,
       resourceName
