@@ -105,11 +105,11 @@ class GeneralTab extends ImmutableComponent {
         <option data-l10n-id={lc} value={lc} />
       )
     })
-
+    const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     return <SettingsList>
       <SettingsList>
         <SettingItem dataL10nId='selectedLanguage'>
-          <select value={getSetting(settings.LANGUAGE, this.props.settings)}
+          <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
             {languageOptions}
           </select>
