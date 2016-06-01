@@ -186,7 +186,8 @@ const doAction = (action) => {
 
       const key = action.key || windowState.get('activeFrameKey')
       windowState = windowState.mergeIn(frameStatePath(key), {
-        location: action.location
+        location: action.location,
+        guestInstanceId: undefined
       })
       if (!action.isNavigatedInPage) {
         windowState = windowState.mergeIn(frameStatePath(key), {
