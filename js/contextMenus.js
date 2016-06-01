@@ -568,10 +568,11 @@ function hamburgerTemplateInit (location, e) {
 }
 
 const openInNewTabMenuItem = (location, isPrivate, partitionNumber, parentFrameKey) => {
+  let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
   return {
     label: locale.translation('openInNewTab'),
     click: () => {
-      windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, false)
+      windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, openInForeground)
     }
   }
 }
@@ -586,6 +587,7 @@ const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
 }
 
 const openInNewPrivateTabMenuItem = (location, parentFrameKey) => {
+  let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
   return {
     label: locale.translation('openInNewPrivateTab'),
     click: () => {
@@ -593,7 +595,7 @@ const openInNewPrivateTabMenuItem = (location, parentFrameKey) => {
         location,
         isPrivate: true,
         parentFrameKey
-      }, false)
+      }, openInForeground)
     }
   }
 }
@@ -608,6 +610,7 @@ const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
 }
 
 const openInNewSessionTabMenuItem = (location, parentFrameKey) => {
+  let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
   return {
     label: locale.translation('openInNewSessionTab'),
     click: (item, focusedWindow) => {
@@ -615,7 +618,7 @@ const openInNewSessionTabMenuItem = (location, parentFrameKey) => {
         location,
         isPartitioned: true,
         parentFrameKey
-      }, false)
+      }, openInForeground)
     }
   }
 }
