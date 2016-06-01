@@ -12,6 +12,8 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const appStore = require('../js/stores/appStore')
 const appActions = require('../js/actions/appActions')
+const contractionSet = new Set()
+let dictionaryLocale
 
 // Stores a reference to the last added immutable words
 let lastAddedWords
@@ -24,6 +26,10 @@ const isMisspelled = (word) =>
 module.exports.init = () => {
   ipcMain.on(messages.IS_MISSPELLED, (e, word) => {
     e.returnValue = isMisspelled(word)
+    // If the word is misspelled and it's English, then make sure it's nt a contraction.
+    if (e.returnValue && (!dictionaryLocale || dictionaryLocale.includes('en'))) {
+      e.returnValue = !contractionSet.has(word)
+    }
   })
   ipcMain.on(messages.GET_MISSPELLING_INFO, (e, word) => {
     const misspelled = isMisspelled(word)
@@ -44,9 +50,25 @@ module.exports.init = () => {
     }
   })
 
+  // Thank you Slack team.
+  // NB: This is to work around tinyspeck/slack-winssb#267, where contractions
+  // are incorrectly marked as spelling errors. This lets people get away with
+  // incorrectly spelled contracted words, but it's the best we can do for now.
+  const contractions = [
+    "ain't", "aren't", "can't", "could've", "couldn't", "couldn't've", "didn't", "doesn't", "don't", "hadn't",
+    "hadn't've", "hasn't", "haven't", "he'd", "he'd've", "he'll", "he's", "how'd", "how'll", "how's", "I'd",
+    "I'd've", "I'll", "I'm", "I've", "isn't", "it'd", "it'd've", "it'll", "it's", "let's", "ma'am", "mightn't",
+    "mightn't've", "might've", "mustn't", "must've", "needn't", "not've", "o'clock", "shan't", "she'd", "she'd've",
+    "she'll", "she's", "should've", "shouldn't", "shouldn't've", "that'll", "that's", "there'd", "there'd've",
+    "there're", "there's", "they'd", "they'd've", "they'll", "they're", "they've", "wasn't", "we'd", "we'd've",
+    "we'll", "we're", "we've", "weren't", "what'll", "what're", "what's", "what've", "when's", "where'd",
+    "where's", "where've", "who'd", "who'll", "who're", "who's", "who've", "why'll", "why're", "why's", "won't",
+    "would've", "wouldn't", "wouldn't've", "y'all", "y'all'd've", "you'd", "you'd've", "you'll", "you're", "you've"
+  ]
+  contractions.forEach((word) => contractionSet.add(word.replace(/'.*/, '')))
+
   const availableDictionaries = spellchecker.getAvailableDictionaries()
   let dict = app.getLocale().replace('-', '_')
-  let dictionaryLocale
   if (availableDictionaries.includes(dict)) {
     dictionaryLocale = dict
   } else {
