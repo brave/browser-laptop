@@ -16,6 +16,7 @@ module.exports = [
   'electron-chromedriver',
   'node-notifier/vendor',
   'node-gyp',
+  'npm',
   '.brave-gyp',
   'electron-download',
   'electron-rebuild',
