@@ -132,9 +132,21 @@ const createWindow = (browserOpts, defaults) => {
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
 
+  if (appState.get('isWindowMaximized')) {
+    mainWindow.maximize()
+  }
+
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
     appActions.setDefaultWindowSize(evt.sender.getSize())
+  })
+
+  mainWindow.on('maximize', function (evt) {
+    appActions.setWindowMaximizeState(true)
+  })
+
+  mainWindow.on('unmaximize', function (evt) {
+    appActions.setWindowMaximizeState(false)
   })
 
   mainWindow.on('close', function () {
@@ -395,6 +407,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
       appState = appState.set('defaultWindowHeight', action.size[1])
+      break
+    case AppConstants.APP_SET_WINDOW_MAXIMIZE_STATE:
+      appState = appState.set('isWindowMaximized', action.isMaximized)
       break
     case AppConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)

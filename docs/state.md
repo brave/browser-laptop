@@ -101,6 +101,7 @@ AppStore
   },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
+  isWindowMaximized: boolean,
   updates: {
     status: string, // UpdateStatus from js/constants/updateStatus.js
     metadata: {
