@@ -674,8 +674,10 @@ if (typeof KeyEvent === 'undefined') {
     }
     switch (e.keyCode) {
       case KeyEvent.DOM_VK_ESCAPE:
-        e.preventDefault()
-        ipcRenderer.sendToHost('stop-load')
+        if (document.readyState !== 'complete') {
+          e.preventDefault()
+          ipcRenderer.sendToHost('stop-load')
+        }
         break
       case KeyEvent.DOM_VK_BACK_SPACE:
         if (!isEditable(document.activeElement)) {
