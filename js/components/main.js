@@ -78,6 +78,9 @@ class Main extends ImmutableComponent {
     const isDarwin = process.platform === 'darwin'
     document.addEventListener('keydown', (e) => {
       switch (e.which) {
+        case keyCodes.ESC:
+          this.exitFullScreen()
+          break
         case keyCodes.F12:
           if (!isDarwin) {
             ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS)
@@ -96,6 +99,14 @@ class Main extends ImmutableComponent {
       }
     })
   }
+
+  exitFullScreen () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    if (activeFrame && activeFrame.get('isFullScreen')) {
+      windowActions.setFullScreen(activeFrame, false)
+    }
+  }
+
   registerSwipeListener () {
     // Navigates back/forward on OS X two-finger swipe
     var trackingFingers = false
@@ -129,12 +140,7 @@ class Main extends ImmutableComponent {
       deltaY = 0
       startTime = 0
     })
-    ipc.on(messages.LEAVE_FULL_SCREEN, () => {
-      const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-      if (activeFrame && activeFrame.get('isFullScreen')) {
-        windowActions.setFullScreen(activeFrame, false)
-      }
-    })
+    ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
   }
 
   loadOpenSearch () {
