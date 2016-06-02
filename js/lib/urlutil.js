@@ -9,6 +9,7 @@ const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)/i
 const defaultScheme = 'http://'
 const fileScheme = 'file://'
 const os = require('os')
+const urlParse = require('url').parse
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -89,6 +90,11 @@ const UrlUtil = {
     const case3Reg = /^\w+:.*/
 
     let str = input.trim()
+
+    if (urlParse(input).protocol) {
+      input = encodeURI(input)
+    }
+
     if (case1Reg.test(str) || !case2Reg.test(str) ||
         this.getScheme(str) === str) {
       return true
