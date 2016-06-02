@@ -595,7 +595,11 @@ class Frame extends ImmutableComponent {
   }
 
   insertAds (currentLocation) {
-    const host = new window.URL(currentLocation).hostname.replace('www.', '')
+    var host = urlParse(currentLocation).hostname
+    if (!host) {
+      return
+    }
+    host = host.replace('www.', '')
     const adDivCandidates = adInfo[host] || []
     // Call this even when there are no matches because we have some logic
     // to replace common divs.
