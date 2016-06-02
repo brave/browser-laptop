@@ -114,6 +114,16 @@ Sets the default window size
 
 
 
+### setWindowMaximizeState(isMaximized) 
+
+Sets the last recorded maximize state of the browser window
+
+**Parameters**
+
+**isMaximized**: `boolean`
+
+
+
 ### setResourceETag(resourceName, etag) 
 
 Sets the etag value for a downloaded data file.

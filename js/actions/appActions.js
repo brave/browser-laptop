@@ -138,7 +138,7 @@ const appActions = {
   },
 
   /**
-   * Sets the last recorded state of the browser window
+   * Sets the last recorded maximize state of the browser window
    * @param {boolean} isMaximized - true if window is maximized
    */
   setWindowMaximizeState: function (isMaximized) {
