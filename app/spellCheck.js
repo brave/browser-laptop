@@ -28,11 +28,12 @@ const isMisspelled = (word) =>
 
 module.exports.init = () => {
   ipcMain.on(messages.IS_MISSPELLED, (e, word) => {
-    e.returnValue = isMisspelled(word)
+    let misspelled = isMisspelled(word)
     // If the word is misspelled and it's English, then make sure it's nt a contraction.
-    if (e.returnValue && (!dictionaryLocale || dictionaryLocale.includes('en'))) {
-      e.returnValue = !contractionSet.has(word)
+    if (misspelled && (!dictionaryLocale || dictionaryLocale.includes('en'))) {
+      misspelled = !contractionSet.has(word)
     }
+    e.returnValue = misspelled
   })
   ipcMain.on(messages.GET_MISSPELLING_INFO, (e, word) => {
     const misspelled = isMisspelled(word)
