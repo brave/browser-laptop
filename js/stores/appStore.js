@@ -46,7 +46,7 @@ function navbarHeight () {
   return 75
 }
 
-const createWindow = (browserOpts, defaults) => {
+const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   const parentWindowKey = browserOpts.parentWindowKey
 
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
@@ -58,6 +58,11 @@ const createWindow = (browserOpts, defaults) => {
   } else {
     // BrowserWindow height is window height so add navbar height
     browserOpts.height = browserOpts.height + navbarHeight()
+  }
+
+  if (windowState.ui && windowState.ui.position) {
+    browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
+    browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
   }
 
   browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
@@ -131,6 +136,10 @@ const createWindow = (browserOpts, defaults) => {
   }
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
+
+  if (windowState.ui && windowState.ui.isMaximized) {
+    mainWindow.maximize()
+  }
 
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
@@ -288,8 +297,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_NEW_WINDOW:
       const frameOpts = action.frameOpts && action.frameOpts.toJS()
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
+      const windowState = action.restoredState || {}
 
-      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts)
+      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts, windowState)
       const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state

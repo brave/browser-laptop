@@ -509,6 +509,12 @@ const doAction = (action) => {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       })
       break
+    case WindowConstants.WINDOW_SET_MAXIMIZE_STATE:
+      windowState = windowState.setIn(['ui', 'isMaximized'], action.isMaximized)
+      break
+    case WindowConstants.WINDOW_SAVE_POSITION:
+      windowState = windowState.setIn(['ui', 'position'], action.position)
+      break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break

@@ -42,6 +42,8 @@ const windowConstants = {
   WINDOW_SET_AUDIO_MUTED: _,
   WINDOW_SET_AUDIO_PLAYBACK_ACTIVE: _,
   WINDOW_SET_FAVICON: _,
+  WINDOW_SET_MAXIMIZE_STATE: _,
+  WINDOW_SAVE_POSITION: _,
   WINDOW_SET_MOUSE_IN_TITLEBAR: _,
   WINDOW_SET_FINDBAR_SHOWN: _, // whether the findbar is shown
   WINDOW_SET_FINDBAR_SELECTED: _, // whether the findbar is active

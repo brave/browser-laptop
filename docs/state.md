@@ -247,6 +247,8 @@ WindowStore
   }],
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
+    isMaximized: boolean, // true if window was maximized
+    position: array, // last known window position
     mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
     dragging: {
       dragType: string, // tab, bookmark

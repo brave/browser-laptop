@@ -405,6 +405,16 @@ class Main extends ImmutableComponent {
     if (activeFrame && win) {
       win.setTitle(activeFrame.get('title'))
     }
+
+    win.on('maximize', function () {
+      windowActions.setMaximizeState(true)
+    })
+    win.on('unmaximize', function () {
+      windowActions.setMaximizeState(false)
+    })
+    win.on('move', function (event) {
+      windowActions.savePosition(event.sender.getPosition())
+    })
   }
 
   checkForTitleMode (pageY) {
