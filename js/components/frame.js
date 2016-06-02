@@ -225,7 +225,12 @@ class Frame extends ImmutableComponent {
     if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
       this.updateWebview(cb)
     } else {
-      cb()
+      try {
+        cb()
+      } catch (e) {
+        // webview DOM may not be ready yet
+        this.webview.addEventListener('dom-ready', cb)
+      }
     }
   }
 
