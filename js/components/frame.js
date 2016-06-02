@@ -144,11 +144,15 @@ class Frame extends ImmutableComponent {
     }
 
     if (webviewAdded) {
-      let runOnDomReady = (e) => {
-        this.webview.removeEventListener(e.type, runOnDomReady)
-        cb && cb()
+      if (cb) {
+        this.runOnDomReady = cb
+        let eventCallback = (e) => {
+          this.webview.removeEventListener(e.type, eventCallback)
+          this.runOnDomReady()
+          delete this.runOnDomReady
+        }
+        this.webview.addEventListener('did-attach', eventCallback)
       }
-      this.webview.addEventListener('did-attach', runOnDomReady)
       this.addEventListeners()
       this.webviewContainer.appendChild(this.webview)
     } else {
@@ -225,11 +229,13 @@ class Frame extends ImmutableComponent {
     if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
       this.updateWebview(cb)
     } else {
-      try {
+      if (this.runOnDomReady) {
+        // there is already a callback waiting for did-attach
+        // so replace it with this callback because it might be a
+        // mount callback which is a subset of the update callback
+        this.runOnDomReady = cb
+      } else {
         cb()
-      } catch (e) {
-        // webview DOM may not be ready yet
-        this.webview.addEventListener('dom-ready', cb)
       }
     }
   }
