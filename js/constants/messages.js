@@ -71,6 +71,7 @@ const messages = {
   AUTOFILL_PASSWORD: _,
   BLOCK_CANVAS_FINGERPRINTING: _,
   GOT_CANVAS_FINGERPRINTING: _,
+  BLOCK_THIRD_PARTY_STORAGE: _,
   SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
   SET_RESOURCE_ENABLED: _,
   GO_BACK: _,

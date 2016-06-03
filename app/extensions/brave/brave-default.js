@@ -812,7 +812,7 @@ if (typeof KeyEvent === 'undefined') {
   /**
    * @return {string}
    */
-  function getPageScript () {
+  function getBlockFpPageScript () {
     return '(' + Function.prototype.toString.call(function (ERROR) {
       ERROR.stackTraceLimit = Infinity // collect all frames
       var event_id = document.currentScript ? document.currentScript.getAttribute('data-event-id') : ''
@@ -1054,8 +1054,8 @@ if (typeof KeyEvent === 'undefined') {
   /**
    * Executes a script in the page DOM context
    *
-   * @param text The content of the script to insert
-   * @param data attributes to set in the inserted script tag
+   * @param {string} text The content of the script to insert
+   * @param {Object=} data attributes to set in the inserted script tag
    */
   function insertScript (text, data) {
     var parent = document.documentElement
@@ -1064,8 +1064,10 @@ if (typeof KeyEvent === 'undefined') {
     script.text = text
     script.async = false
 
-    for (var key in data) {
-      script.setAttribute('data-' + key.replace('_', '-'), data[key])
+    if (data) {
+      for (var key in data) {
+        script.setAttribute('data-' + key.replace('_', '-'), data[key])
+      }
     }
 
     parent.insertBefore(script, parent.firstChild)
@@ -1084,9 +1086,73 @@ if (typeof KeyEvent === 'undefined') {
       ipcRenderer.send('got-canvas-fingerprinting', e.detail)
     })
 
-    insertScript(getPageScript(), {
+    insertScript(getBlockFpPageScript(), {
       event_id: event_id
     })
   })
   /* End canvas fingerprinting detection */
+
+  /* Begin block of third-party client-side storage */
+
+  /**
+   * Whether this is running in a third-party document.
+   */
+  function is3rdPartyDoc () {
+    try {
+      // Try accessing an element that cross-origin frames aren't supposed to
+      window.top.document
+    } catch (e) {
+      if (e.name === 'SecurityError') {
+        return true
+      } else {
+        console.log('got unexpected error accessing window.top.document', e)
+        // Err on the safe side and assume this is a third-party frame
+        return true
+      }
+    }
+    return false
+  }
+
+  function blockStorage () {
+    console.log('blocking 3rd party storage mechanisms', window.location.href)
+    // Block js cookie storage
+    Document.prototype.__defineGetter__('cookie', () => {return ""})
+    Document.prototype.__defineSetter__('cookie', () => {})
+    // Block websql
+    window.openDatabase = () => { return {} }
+    // Block FileSystem API
+    window.webkitRequestFileSystem = () => { return {} }
+    // Block indexeddb
+    window.indexedDB.open = () => { return {} }
+  }
+
+  function getBlockStoragePageScript () {
+    return '(' + Function.prototype.toString.call(blockStorage) + '());'
+  }
+
+  function clearStorage () {
+    // Clears HTML5 storage when the page is loaded/unloaded.
+    console.log('clearing 3rd party storage', window.location.href)
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+    // Clear IndexedDB
+    var indexedDB = window.indexedDB
+    indexedDB.webkitGetDatabaseNames().onsuccess = (sender) => {
+      var dbs = sender.target.result
+      for (var i = 0; i < dbs.length; i++) {
+        // Delete each DB
+        indexedDB.deleteDatabase(dbs[i])
+      }
+    }
+  }
+
+  // TODO: This should only run if ipcRenderer sends
+  // block-third-party-storage. Blocked by #2041.
+  if (is3rdPartyDoc()) {
+    insertScript(getBlockStoragePageScript())
+    clearStorage()
+    window.addEventListener('unload', clearStorage)
+  }
+
+  /* End block of 3rd party storage */
 }).apply(this)

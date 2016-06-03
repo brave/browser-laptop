@@ -472,6 +472,25 @@ class Main extends ImmutableComponent {
     return getSetting(settings.BLOCK_CANVAS_FINGERPRINTING) || false
   }
 
+  get block3rdPartyStorage () {
+    if (this.activeSiteSettings) {
+      if (this.activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (typeof this.activeSiteSettings.get('cookieControl') === 'string') {
+        return this.activeSiteSettings.get('cookieControl') === 'block3rdPartyCookie'
+      }
+    }
+
+    let enabled = this.props.appState.getIn(['cookieblock', 'enabled'])
+    if (typeof enabled !== 'boolean') {
+      enabled = appConfig.cookieblock.enabled
+    }
+
+    return enabled
+  }
+
   onCloseFrame (activeFrameProps) {
     windowActions.closeFrame(this.props.windowState.get('frames'), activeFrameProps)
   }
@@ -809,6 +828,7 @@ class Main extends ImmutableComponent {
               enableAds={this.enableAds}
               enableNoScript={this.enableNoScript}
               enableFingerprintingProtection={this.enableFingerprintingProtection}
+              block3rdPartyStorage={this.block3rdPartyStorage}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

@@ -444,6 +444,9 @@ class Frame extends ImmutableComponent {
       if (this.props.enableFingerprintingProtection) {
         this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
       }
+      if (this.props.block3rdPartyStorage) {
+        this.webview.send(messages.BLOCK_THIRD_PARTY_STORAGE)
+      }
       windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
@@ -507,9 +510,6 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('load-start', (e) => {
       loadStart(e)
-      if (this.props.enableFingerprintingProtection) {
-        this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
-      }
     })
     this.webview.addEventListener('did-navigate', (e) => {
       // only give focus focus is this is not the initial default page load
