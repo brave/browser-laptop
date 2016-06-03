@@ -300,7 +300,10 @@ class UrlBar extends ImmutableComponent {
         {
           this.props.titleMode || this.aboutPage
           ? null
-          : <span className='loadTime'>{this.loadTime}</span>
+          : <span className={cx({
+            'loadTime': true,
+            'onFocus': this.props.urlbar.get('active')
+            })}>{this.loadTime}</span>
         }
 
         {
