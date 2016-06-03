@@ -162,7 +162,9 @@ class Tab extends ImmutableComponent {
         isDragging: this.isDragging,
         isPinned: this.isPinned,
         partOfFullPageSet: this.props.partOfFullPageSet
-      })}>
+      })}
+      onMouseEnter={this.props.previewTabs ? this.onMouseEnter.bind(this) : null}
+      onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}>
       <div className={cx({
         tab: true,
         isPinned: this.isPinned,
@@ -173,8 +175,6 @@ class Tab extends ImmutableComponent {
         ref={(node) => { this.tab = node }}
         draggable
         title={this.props.frameProps.get('title')}
-        onMouseEnter={this.props.previewTabs ? this.onMouseEnter.bind(this) : null}
-        onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}
         onDragStart={this.onDragStart.bind(this)}
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
