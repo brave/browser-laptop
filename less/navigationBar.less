@@ -268,11 +268,18 @@
 
   .loadTime {
     color: @loadTimeColor;
+    background: @navigationBarBackground;
     font-size: 12px;
     right: 10px;
     text-align: right;
     margin: 4px 0 0 0;
     top: 9px;
+    cursor: default;
+    padding-top: 1px;
+
+    &.onFocus {
+        display: none;
+    }
   }
 
   .noScript {
@@ -313,7 +320,7 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 3px 10px 0 3px;
+    margin: 3px 0 0 3px;
     outline: none;
     text-overflow: ellipsis;
     flex-grow: 1;
