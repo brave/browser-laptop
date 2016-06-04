@@ -272,9 +272,14 @@ class BookmarksToolbar extends ImmutableComponent {
     // Loop through until we fill up the entire bookmark toolbar width
     let i
     for (i = 0; i < noParentItems.size; i++) {
-      const iconWidth = this.props.showFavicon && noParentItems.getIn([i, 'favicon']) ? 20 : 0
-      const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
-      widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth, this.maxWidth) + this.margin
+      const iconWidth = props.showFavicon && noParentItems.getIn([i, 'favicon']) ? 20 : 0
+      if (props.showFavicon && props.showOnlyFavicon) {
+        widthAccountedFor += this.padding + iconWidth
+      } else {
+        const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
+        widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth, this.maxWidth)
+      }
+      widthAccountedFor += this.margin
       if (widthAccountedFor >= window.innerWidth - overflowButtonWidth) {
         break
       }
@@ -288,7 +293,9 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   componentWillUpdate (nextProps) {
     if (nextProps.sites !== this.props.sites ||
-        nextProps.windowWidth !== this.props.windowWidth) {
+        nextProps.windowWidth !== this.props.windowWidth ||
+        nextProps.showFavicon !== this.props.showFavicon ||
+        nextProps.showOnlyFavicon !== this.props.showOnlyFavicon) {
       this.updateBookmarkData(nextProps)
     }
   }
