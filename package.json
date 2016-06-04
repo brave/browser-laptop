@@ -79,6 +79,7 @@
     "lru_cache": "^1.0.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
+    "react-stickynode": "^1.1.2",
     "spellchecker": "^3.3.1",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",

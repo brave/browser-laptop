@@ -5,6 +5,7 @@
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
 const Immutable = require('immutable')
+const Sticky = require('react-stickynode')
 const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
@@ -202,11 +203,13 @@ class AboutBookmarks extends React.Component {
     return <div className='bookmarksPage'>
       <h2 data-l10n-id='folders' />
       <div className='bookmarkPageContent'>
-        <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
-          bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
-          allBookmarkFolders={this.state.bookmarkFolders}
-          isRoot
-          selectedFolderId={this.state.selectedFolderId} />
+        <Sticky enabled={true} top={10}>
+          <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
+            bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
+            allBookmarkFolders={this.state.bookmarkFolders}
+            isRoot
+            selectedFolderId={this.state.selectedFolderId} />
+        </Sticky>
         <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />
       </div>
     </div>
