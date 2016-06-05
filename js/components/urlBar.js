@@ -303,7 +303,7 @@ class UrlBar extends ImmutableComponent {
           : <span className={cx({
             'loadTime': true,
             'onFocus': this.props.urlbar.get('active')
-            })}>{this.loadTime}</span>
+          })}>{this.loadTime}</span>
         }
 
         {
