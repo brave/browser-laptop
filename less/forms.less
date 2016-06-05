@@ -277,26 +277,30 @@
   }
 
   .genericFormTable {
-    display: table;
-    >div {
+    display: flex;
+    flex-flow: column nowrap;
+    min-width: 350px;
+
+    > div {
       &:not(.formHeader) {
-        display: table-row;
-        >* {
-          display: table-cell;
-        }
-      }
-      >label {
-        padding-right: 5px;
-       text-align: right;
-      }
-      >input {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
         margin: 2px;
-        min-width: 250px;
+      }
+
+      > label {
+        padding-right: 4px;
+        width: 20%;
+        text-align: right;
+      }
+
+      > input, select {
         padding: 2px;
+        margin: 0;
+        width: 80%;
       }
-      .primaryButton {
-        float: right;
-      }
+
     }
   }
 }
