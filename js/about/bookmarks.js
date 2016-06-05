@@ -203,7 +203,7 @@ class AboutBookmarks extends React.Component {
     return <div className='bookmarksPage'>
       <h2 data-l10n-id='folders' />
       <div className='bookmarkPageContent'>
-        <Sticky enabled={true} top={10}>
+        <Sticky enabled top={10}>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
             allBookmarkFolders={this.state.bookmarkFolders}
