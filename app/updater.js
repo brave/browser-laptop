@@ -143,10 +143,10 @@ var requestVersionInfo = (done, pingOnly) => {
   debug(queryString)
 
   request(queryString, (err, response, body) => {
+    appActions.setUpdateLastCheck()
     if (pingOnly) {
       return
     }
-    appActions.setUpdateLastCheck()
     if (!err && response.statusCode === 204) {
       autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
     } else if (!err && (response.statusCode === 200)) {
