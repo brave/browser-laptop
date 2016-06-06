@@ -153,8 +153,18 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
+  mainWindow.on('enter-full-screen', function () {
+    if (mainWindow.isMenuBarVisible()) {
+      mainWindow.setMenuBarVisibility(false)
+    }
+  })
+
   mainWindow.on('leave-full-screen', function () {
     mainWindow.webContents.send(messages.LEAVE_FULL_SCREEN)
+
+    if (getSetting(settings.AUTO_HIDE_MENU) === false) {
+      mainWindow.setMenuBarVisibility(true)
+    }
   })
 
   mainWindow.on('app-command', function (e, cmd) {
