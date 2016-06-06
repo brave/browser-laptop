@@ -77,7 +77,8 @@ class NavigationBar extends ImmutableComponent {
       !['about:blank', 'about:newtab'].includes(this.props.activeFrame.get('location')) &&
       !this.loading &&
       !this.props.navbar.getIn(['urlbar', 'focused']) &&
-      !this.props.navbar.getIn(['urlbar', 'active'])
+      !this.props.navbar.getIn(['urlbar', 'active']) &&
+      getSetting(settings.DISABLE_TITLE_MODE) === false
   }
 
   componentDidMount () {
