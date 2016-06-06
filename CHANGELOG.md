@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.10.3](https://github.com/brave/browser-laptop/releases/v0.10.3dev)
+- Upgrade to libchromiumcontent 51.0.2704.79. ([#2083](https://github.com/brave/browser-laptop/issues/2083))
+
 ## [0.10.2](https://github.com/brave/browser-laptop/releases/v0.10.2dev)
 - Fixed crash on Windows when clicking on certain link types. ([#2064](https://github.com/brave/browser-laptop/issues/2064))
 
