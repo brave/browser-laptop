@@ -121,7 +121,7 @@
     "node-uuid": "^1.4.7",
     "nsp": "^2.2.0",
     "pre-commit": "^1.1.3",
-    "spectron": "^1.37.0",
+    "spectron": "^3.2.2",
     "sqlite3": "^3.1.1",
     "standard": "^7.0.0",
     "style-loader": "^0.13.0",
