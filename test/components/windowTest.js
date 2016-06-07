@@ -44,6 +44,8 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitUntilWindowLoaded()
+          .waitForUrl(Brave.newTabUrl)
+          .windowByIndex(0)
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
@@ -77,6 +79,8 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitUntilWindowLoaded()
+          .waitForUrl(Brave.newTabUrl)
+          .windowByIndex(0)
           .resizeWindow(600, 700)
           .newWindowAction()
           .waitUntil(function () {
@@ -110,6 +114,8 @@ describe('application window', function () {
       before(function * () {
         yield this.app.client
           .waitUntilWindowLoaded()
+          .waitForUrl(Brave.newTabUrl)
+          .windowByIndex(0)
           .maximizeWindow()
           .newWindowAction()
           .waitUntil(function () {
