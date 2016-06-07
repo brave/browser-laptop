@@ -54,6 +54,8 @@ const messages = {
   CHECK_FOR_UPDATE: _,
   SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
+  SEND_XHR_REQUEST: _, /** @arg {string} url to request, @arg {number} nonce, @arg {Object=} headers if any */
+  GOT_XHR_RESPONSE: _, /** @arg {Object} response, @arg {string} body */
   // App state
   APP_INITIALIZED: _,
   // Webview page messages

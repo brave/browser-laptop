@@ -173,6 +173,23 @@ class Main extends ImmutableComponent {
   componentDidMount () {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
+
+    ipc.on(messages.SEND_XHR_REQUEST, (event, url, nonce, headers) => {
+      const xhr = new window.XMLHttpRequest()
+      xhr.open('GET', url)
+      if (headers) {
+        for (let name in headers) {
+          xhr.setRequestHeader(name, headers[name])
+        }
+      }
+      xhr.send()
+      xhr.onload = () => {
+        ipc.send(messages.GOT_XHR_RESPONSE + nonce,
+                 {statusCode: xhr.status},
+                 xhr.responseText)
+      }
+    })
+
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)

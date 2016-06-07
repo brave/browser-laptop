@@ -5,7 +5,7 @@
 'strict mode'
 
 const assert = require('assert')
-const request = require('request')
+const request = require('../js/lib/request').request
 const electron = require('electron')
 const autoUpdater = electron.autoUpdater
 const app = electron.app
