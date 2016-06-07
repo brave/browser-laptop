@@ -250,8 +250,8 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
       windowActions.setPopupWindowDetail(Immutable.fromJS({
-        left: props.offsetX,
-        top: props.offsetY + 100,
+        left: props.x,
+        top: props.y + 100,
         maxHeight: window.innerHeight - 100,
         minHeight: 400,
         src

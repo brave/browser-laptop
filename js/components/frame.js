@@ -335,6 +335,18 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
+    this.webview.addEventListener('context-menu', (e) => {
+      contextMenus.onMainContextMenu(e.params, this.props.frame)
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    this.webview.addEventListener('update-target-url', (e) => {
+      const downloadsBarHeight = 50
+      let nearBottom = e.y > (window.innerHeight - 150 - downloadsBarHeight) // todo: magic number
+      let mouseOnLeft = e.x < (window.innerWidth / 2)
+      let showOnRight = nearBottom && mouseOnLeft
+      windowActions.setLinkHoverPreview(e.url, showOnRight)
+    })
     this.webview.addEventListener('set-active', (e) => {
       if (e.active && !this.props.isActive) {
         windowActions.setActiveFrame(this.props.frame)
@@ -409,16 +421,6 @@ class Frame extends ImmutableComponent {
           break
         case messages.GO_FORWARD:
           method = () => this.webview.goForward()
-          break
-        case messages.LINK_HOVERED:
-          method = (href, position) => {
-            position = position || {}
-            const downloadsBarHeight = 50
-            let nearBottom = position.y > (window.innerHeight - 150 - downloadsBarHeight) // todo: magic number
-            let mouseOnLeft = position.x < (window.innerWidth / 2)
-            let showOnRight = nearBottom && mouseOnLeft
-            windowActions.setLinkHoverPreview(href, showOnRight)
-          }
           break
         case messages.NEW_FRAME:
           method = (frameOpts, openInForeground) => {

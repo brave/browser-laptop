@@ -128,79 +128,6 @@ if (typeof KeyEvent === 'undefined') {
 // KeyboardEventCode status=experimental
 // KeyboardEventKey status=test
 
-document.addEventListener('contextmenu', (e/*: Event*/) => {
-  window.setTimeout(() => {
-    if (!(e instanceof MouseEvent)) {
-      return
-    }
-    // there is another event being fired on contextmenu, don't show this one
-    if (e.defaultPrevented) {
-      return
-    }
-
-    if (!e.target.nodeName) {
-      return
-    }
-
-    var name = e.target.nodeName.toUpperCase()
-    var href
-    var maybeLink = e.target
-
-    while (maybeLink.parentNode) {
-      // Override for about: pages
-      if (!maybeLink.getAttribute || maybeLink.getAttribute('data-context-menu-disable')) {
-        return
-      }
-      if (maybeLink instanceof HTMLAnchorElement) {
-        href = maybeLink.href
-        break
-      }
-      maybeLink = maybeLink.parentNode
-    }
-
-    const selection = window.getSelection().toString()
-    let spellcheck = null
-    if (e.target.spellcheck && !e.target.readonly && !e.target.disabled) {
-      let suggestions = []
-      let isMisspelled = false
-      if (selection.length > 0 && !hasWhitespace(selection)) {
-        // This is not very taxing, it only happens once on right click and only
-        // if it is on one word, and the check and result set are returned very fast.
-        const info =chrome.ipc.sendSync('get-misspelling-info', selection)
-        suggestions = info.suggestions
-        isMisspelled = info.isMisspelled
-      }
-      spellcheck = {
-        suggestions,
-        isMisspelled
-      }
-    }
-
-    let src = e.target.getAttribute ? e.target.getAttribute('src') : undefined
-    // If the src is not fully specified, then try to expand it
-    try {
-      if (src) {
-        src = new URL(src, window.location).href
-      }
-    } catch (e) {
-    }
-
-    var nodeProps = {
-      name: name,
-      href: href,
-      isContentEditable: e.target.isContentEditable || false,
-      src,
-      selection,
-      hasSelection: selection.length > 0,
-      spellcheck,
-      offsetX: e.pageX,
-      offsetY: e.pageY
-    }
-   chrome.ipc.sendToHost('context-menu-opened', nodeProps)
-    e.preventDefault()
-  }, 0)
-}, false)
-
 document.addEventListener('keydown', (e /*: Event*/) => {
   if (!(e instanceof KeyboardEvent)) {
     return
@@ -209,7 +136,7 @@ document.addEventListener('keydown', (e /*: Event*/) => {
     case KeyEvent.DOM_VK_ESCAPE:
       if (document.readyState !== 'complete') {
         e.preventDefault()
-       chrome.ipc.sendToHost('stop-load')
+        chrome.ipc.sendToHost('stop-load')
       }
       break
     case KeyEvent.DOM_VK_BACK_SPACE:
@@ -219,70 +146,13 @@ document.addEventListener('keydown', (e /*: Event*/) => {
       break
     case KeyEvent.DOM_VK_LEFT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-       chrome.ipc.sendToHost('go-back')
+        chrome.ipc.sendToHost('go-back')
       }
       break
     case KeyEvent.DOM_VK_RIGHT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-       chrome.ipc.sendToHost('go-forward')
+        chrome.ipc.sendToHost('go-forward')
       }
       break
-  }
-})
-
-// shamelessly taken from https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
-function delegate (event, selector) {
-  var target = event.target
-  var related = event.relatedTarget
-
-  if (!(target instanceof Element && related instanceof Element)) {
-    return
-  }
-
-  var match
-
-  // search for a parent node matching the delegation selector
-  while (target && target !== document && target.matches && !(match = target.matches(selector))) {
-    target = target.parentNode
-  }
-
-  // exit if no matching node has been found
-  if (!match) {
-    return
-  }
-
-  // loop through the parent of the related target to make sure that it's not a child of the target
-  while (related && related !== target && related !== document) {
-    related = related.parentNode
-  }
-
-  // exit if this is the case
-  if (related === target) {
-    return
-  }
-
-  return target
-}
-
-document.addEventListener('mouseover', (event/*: Event*/) => {
-  if (!(event instanceof MouseEvent)) {
-    return
-  }
-  var target = delegate(event, 'a')
-  if (target) {
-    const pos = {
-      x: event.clientX,
-      y: event.clientY
-    }
-   chrome.ipc.sendToHost('link-hovered', target.href, pos)
-  }
-})
-
-document.addEventListener('mouseout', (event/*: Event*/) => {
-  if (!(event instanceof MouseEvent)) {
-    return
-  }
-  if (delegate(event, 'a')) {
-   chrome.ipc.sendToHost('link-hovered', null)
   }
 })

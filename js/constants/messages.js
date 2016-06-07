@@ -64,7 +64,6 @@ const messages = {
   WEB_CONTENTS_INITIALIZED: _,
   // Webview page messages
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
-  LINK_HOVERED: _, /** @arg {string} href of hovered link */
   APP_STATE_CHANGE: _,
   STOP_LOAD: _,
   THEME_COLOR_COMPUTED: _,
