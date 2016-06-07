@@ -477,21 +477,7 @@ class Main extends ImmutableComponent {
   }
 
   get enableNoScript () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (typeof this.activeSiteSettings.get('noScript') === 'boolean') {
-        return this.activeSiteSettings.get('noScript')
-      }
-    }
-
-    let enabled = this.props.appState.getIn(['noScript', 'enabled'])
-    if (enabled === undefined) {
-      enabled = appConfig.noScript.enabled
-    }
-    return enabled
+    return siteSettings.activeSettings(this.activeSiteSettings, this.props.appState, appConfig).noScript
   }
 
   onCloseFrame (activeFrameProps) {
@@ -576,12 +562,15 @@ class Main extends ImmutableComponent {
     return this.props.appState.get('siteSettings')
   }
 
-  get activeSiteSettings () {
-    const activeRequestedLocation = this.activeRequestedLocation
-    if (!activeRequestedLocation) {
+  frameSiteSettings (location) {
+    if (!location) {
       return undefined
     }
-    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, activeRequestedLocation)
+    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, location)
+  }
+
+  get activeSiteSettings () {
+    return this.frameSiteSettings(this.activeRequestedLocation)
   }
 
   get braveShieldsDisabled () {
@@ -824,9 +813,10 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
-              dictionaryLocale={this.props.appState.getIn(['dictionary', 'locale'])}
               passwords={this.props.appState.get('passwords')}
               allSiteSettings={allSiteSettings}
+              frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
+              enableNoScript={siteSettings.activeSettings(this.frameSiteSettings(frame.get('location')), this.props.appState, appConfig).noScript}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)
