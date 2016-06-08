@@ -4,7 +4,7 @@
 
 'use strict'
 
-const request = require('request')
+const request = require('../js/lib/request')
 const fs = require('fs')
 const path = require('path')
 const urlParse = require('url').parse
@@ -18,7 +18,6 @@ const storagePath = (url) =>
 const downloadPath = (url) => `${storagePath(url)}.temp`
 
 function downloadSingleFile (resourceName, url, version, force, resolve, reject) {
-  // console.log('downloading', url)
   let headers = {}
   const AppStore = require('../js/stores/appStore')
   const etag = AppStore.getState().getIn([resourceName, 'etag'])
@@ -27,36 +26,18 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
       'If-None-Match': etag
     }
   }
+  const tmpPath = downloadPath(url)
 
-  // console.log('doing a request.get', resourceName)
-  var req = request.get({
-    url,
-    headers
-  }).on('response', (response) => {
-    // console.log('response...', resourceName)
-    if (response.statusCode !== 200) {
-      // console.log(resourceName, 'status code: ', response.statusCode)
-      reject(`Got HTTP status code ${response.statusCode}`)
-      return
-    }
-    const etag = response.headers['etag']
-
-    // console.log('setting dwonloadPath...', resourceName)
-    req.pipe(fs.createWriteStream(downloadPath(url)).on('close', () => {
-      fs.rename(downloadPath(url), storagePath(url), (err) => {
-        if (err) {
-          // console.log('rjecting for download:', resourceName)
-          reject('could not rename downloaded file')
-        } else {
-          // console.log('resolving for download:', resourceName)
-          appActions.setResourceETag(resourceName, etag)
-          appActions.setResourceLastCheck(resourceName, version, new Date().getTime())
-          resolve()
-        }
-      })
-    })).on('error', reject)
-  }).on('error', () => {
-    reject()
+  request.requestDataFile(url, headers, tmpPath, reject, (newEtag) => {
+    fs.rename(tmpPath, storagePath(url), (err) => {
+      if (err) {
+        reject('could not rename downloaded file')
+      } else {
+        appActions.setResourceETag(resourceName, newEtag)
+        appActions.setResourceLastCheck(resourceName, version, new Date().getTime())
+        resolve()
+      }
+    })
   })
 }
 

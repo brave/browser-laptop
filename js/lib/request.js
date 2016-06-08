@@ -11,7 +11,7 @@ const messages = require('../constants/messages')
 
 const getWebContents = () => {
   try {
-    return BrowserWindow.getFocusedWindow().webContents
+    return BrowserWindow.getAllWindows()[0].webContents
   } catch (e) {
     return null
   }
@@ -36,6 +36,26 @@ module.exports.request = (url, callback) => {
     webContents.send(messages.SEND_XHR_REQUEST, url, nonce)
     ipcMain.once(messages.GOT_XHR_RESPONSE + nonce, (wnd, response, body) => {
       callback(null, response, body)
+    })
+  }
+}
+
+module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
+  const webContents = getWebContents()
+  if (!webContents) {
+    reject('Request failed, no webContents available')
+  } else {
+    // Send a message to the main webcontents to make an XHR to the URL
+    nonce++
+    webContents.send(messages.DOWNLOAD_DATAFILE, url, nonce, headers, path)
+    ipcMain.once(messages.DOWNLOAD_DATAFILE_DONE + nonce, (wnd, response, error) => {
+      if (response.statusCode === 200) {
+        resolve(response.etag)
+      } else if (response.statusCode && response.statusCode !== 200) {
+        reject(`Got HTTP status code ${response.statusCode}`)
+      } else {
+        reject('Got error fetching datafile: ' + error)
+      }
     })
   }
 }

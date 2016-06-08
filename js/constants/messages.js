@@ -56,8 +56,12 @@ const messages = {
   UPDATE_META_DATA_RETRIEVED: _,
   SEND_XHR_REQUEST: _, /** @arg {string} url to request, @arg {number} nonce, @arg {Object=} headers if any */
   GOT_XHR_RESPONSE: _, /** @arg {Object} response, @arg {string} body */
+  DOWNLOAD_DATAFILE: _, /** @arg {string} url, @arg {number} nonce, @arg {Object} headers, @arg {string} path */
+  DOWNLOAD_DATAFILE_DONE: _, /** @arg {Object} response */
   // App state
   APP_INITIALIZED: _,
+  // Web contents state
+  WEB_CONTENTS_INITIALIZED: _,
   // Webview page messages
   SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
   INIT_SPELL_CHECK: _, /** @arg {string} lang */

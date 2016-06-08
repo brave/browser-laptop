@@ -287,6 +287,12 @@ app.on('ready', () => {
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
+    // Wait for webcontents to be loaded before fetching data files
+    ipcMain.once(messages.WEB_CONTENTS_INITIALIZED, () => {
+      HttpsEverywhere.init()
+      TrackingProtection.init()
+      AdBlock.init()
+    })
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {
         appActions.newWindow()
@@ -371,9 +377,6 @@ app.on('ready', () => {
 
     Extensions.init()
     Filtering.init()
-    HttpsEverywhere.init()
-    TrackingProtection.init()
-    AdBlock.init()
     SiteHacks.init()
     NoScript.init()
     spellCheck.init()
