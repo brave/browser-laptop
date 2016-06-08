@@ -51,7 +51,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 // Util
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
-const { isIntermediateAboutPage } = require('../lib/appUrlUtil')
+const { isIntermediateAboutPage, getBaseUrl } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 
@@ -865,7 +865,7 @@ class Main extends ImmutableComponent {
               braveryDefaults={braveryDefaults}
               frame={frame}
               key={frame.get('key')}
-              settings={frame.get('location') === 'about:preferences'
+              settings={getBaseUrl(frame.get('location')) === 'about:preferences'
                 ? this.props.appState.get('settings') || new Immutable.Map()
                 : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
