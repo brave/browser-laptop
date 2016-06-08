@@ -43,6 +43,7 @@ const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
+const flash = require('./flash')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -60,6 +61,8 @@ let throttleKeytar = false
 
 // Map of password notification bar messages to their callbacks
 const passwordCallbacks = {}
+
+flash.init()
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.

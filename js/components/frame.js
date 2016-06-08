@@ -132,6 +132,9 @@ class Frame extends ImmutableComponent {
       this.webview.setAttribute('partition', partition)
     }
 
+    // TODO: Conditionally set
+    this.webview.setAttribute('plugins', true)
+
     const hack = siteHacks[urlParse(location).hostname]
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
