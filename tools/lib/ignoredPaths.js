@@ -24,6 +24,10 @@ module.exports = [
   'electron-builder',
   'electron-prebuilt',
   'electron-rebuild',
+  'electron-winstaller',
+  'electron-winstaller-fixed',
+  'electron-installer-redhat',
+  'flow-bin',
   'mkdirp',
   'babel$',
   'babel-(?!polyfill|regenerator-runtime)'
