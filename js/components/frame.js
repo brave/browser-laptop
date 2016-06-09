@@ -44,14 +44,14 @@ class Frame extends ImmutableComponent {
 
   adsEnabled (url) {
     url = url || this.props.frame.get('location')
-    const activeSiteSettings = this.getSiteSettings(url)
-    if (activeSiteSettings) {
-      if (activeSiteSettings.get('shieldsUp') === false) {
+    const currentSiteSettings = this.getSiteSettings(url)
+    if (currentSiteSettings) {
+      if (currentSiteSettings.get('shieldsUp') === false) {
         return false
       }
 
-      if (activeSiteSettings.get('adControl') !== undefined) {
-        if (['blockAds', 'allowAdsAndTracking'].includes(activeSiteSettings.get('adControl'))) {
+      if (currentSiteSettings.get('adControl') !== undefined) {
+        if (['blockAds', 'allowAdsAndTracking'].includes(currentSiteSettings.get('adControl'))) {
           return false
         } else {
           return true
@@ -63,14 +63,14 @@ class Frame extends ImmutableComponent {
 
   noScriptEnabled (url) {
     url = url || this.props.frame.get('location')
-    const activeSiteSettings = this.getSiteSettings(url)
-    if (activeSiteSettings) {
-      if (activeSiteSettings.get('shieldsUp') === false) {
+    const currentSiteSettings = this.getSiteSettings(url)
+    if (currentSiteSettings) {
+      if (currentSiteSettings.get('shieldsUp') === false) {
         return false
       }
 
-      if (typeof activeSiteSettings.get('noScript') === 'boolean') {
-        return activeSiteSettings.get('noScript')
+      if (typeof currentSiteSettings.get('noScript') === 'boolean') {
+        return currentSiteSettings.get('noScript')
       }
     }
     return this.props.braveryDefaults.noScript
@@ -78,14 +78,14 @@ class Frame extends ImmutableComponent {
 
   fpEnabled (url) {
     url = url || this.props.frame.get('location')
-    const activeSiteSettings = this.getSiteSettings(url)
-    if (activeSiteSettings) {
-      if (activeSiteSettings.get('shieldsUp') === false) {
+    const currentSiteSettings = this.getSiteSettings(url)
+    if (currentSiteSettings) {
+      if (currentSiteSettings.get('shieldsUp') === false) {
         return false
       }
 
-      if (typeof activeSiteSettings.get('fingerprintingProtection') === 'boolean') {
-        return activeSiteSettings.get('fingerprintingProtection')
+      if (typeof currentSiteSettings.get('fingerprintingProtection') === 'boolean') {
+        return currentSiteSettings.get('fingerprintingProtection')
       }
     }
 
@@ -94,14 +94,14 @@ class Frame extends ImmutableComponent {
 
   storageBlockEnabled (url) {
     url = url || this.props.frame.get('location')
-    const activeSiteSettings = this.getSiteSettings(url)
-    if (activeSiteSettings) {
-      if (activeSiteSettings.get('shieldsUp') === false) {
+    const currentSiteSettings = this.getSiteSettings(url)
+    if (currentSiteSettings) {
+      if (currentSiteSettings.get('shieldsUp') === false) {
         return false
       }
 
-      if (typeof activeSiteSettings.get('cookieControl') === 'string') {
-        return activeSiteSettings.get('cookieControl') === 'block3rdPartyCookie'
+      if (typeof currentSiteSettings.get('cookieControl') === 'string') {
+        return currentSiteSettings.get('cookieControl') === 'block3rdPartyCookie'
       }
     }
     return this.props.braveryDefaults.cookieControl === 'block3rdPartyCookie'
@@ -241,11 +241,11 @@ class Frame extends ImmutableComponent {
   }
 
   get zoomLevel () {
-    const activeSiteSettings = this.getSiteSettings(this.props.frame.get('location'))
-    if (!activeSiteSettings || !activeSiteSettings.get('zoomLevel')) {
+    const currentSiteSettings = this.getSiteSettings(this.props.frame.get('location'))
+    if (!currentSiteSettings || !currentSiteSettings.get('zoomLevel')) {
       return config.zoom.defaultValue
     }
-    return activeSiteSettings.get('zoomLevel')
+    return currentSiteSettings.get('zoomLevel')
   }
 
   zoom (stepSize) {
