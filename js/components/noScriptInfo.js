@@ -51,7 +51,7 @@ class NoScriptInfo extends ImmutableComponent {
         <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
           data-l10n-id={this.numberBlocked === 1 ? 'scriptBlocked' : 'scriptsBlocked'} />
         <div>
-          <Button l10nId='allowScriptsOnce' className='wideButton'
+          <Button l10nId='allowScriptsOnce' className='actionButton'
             onClick={this.onAllowOnce.bind(this)} />
         </div>
         <div>
