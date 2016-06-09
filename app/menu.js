@@ -490,7 +490,6 @@ const init = (settingsState, args) => {
         CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem(),
-        CommonMenu.bookmarksMenuItem(),
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('sendUsFeedback'),
