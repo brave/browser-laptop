@@ -27,6 +27,7 @@ const FindBar = require('./findbar.js')
 const consoleStrings = require('../constants/console')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
+const siteSettings = require('../state/siteSettings')
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -35,6 +36,75 @@ class Frame extends ImmutableComponent {
     this.onFind = this.onFind.bind(this)
     this.onFindHide = this.onFindHide.bind(this)
     this.onFocus = this.onFocus.bind(this)
+  }
+
+  getSiteSettings (url) {
+    return siteSettings.getSiteSettingsForURL(this.props.allSiteSettings, url)
+  }
+
+  adsEnabled (url) {
+    url = url || this.props.frame.get('location')
+    const activeSiteSettings = this.getSiteSettings(url)
+    if (activeSiteSettings) {
+      if (activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (activeSiteSettings.get('adControl') !== undefined) {
+        if (['blockAds', 'allowAdsAndTracking'].includes(activeSiteSettings.get('adControl'))) {
+          return false
+        } else {
+          return true
+        }
+      }
+    }
+    return !['blockAds', 'allowAdsAndTracking'].includes(this.props.braveryDefaults.adControl)
+  }
+
+  noScriptEnabled (url) {
+    url = url || this.props.frame.get('location')
+    const activeSiteSettings = this.getSiteSettings(url)
+    if (activeSiteSettings) {
+      if (activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (typeof activeSiteSettings.get('noScript') === 'boolean') {
+        return activeSiteSettings.get('noScript')
+      }
+    }
+    return this.props.braveryDefaults.noScript
+  }
+
+  fpEnabled (url) {
+    url = url || this.props.frame.get('location')
+    const activeSiteSettings = this.getSiteSettings(url)
+    if (activeSiteSettings) {
+      if (activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (typeof activeSiteSettings.get('fingerprintingProtection') === 'boolean') {
+        return activeSiteSettings.get('fingerprintingProtection')
+      }
+    }
+
+    return getSetting(settings.BLOCK_CANVAS_FINGERPRINTING) || false
+  }
+
+  storageBlockEnabled (url) {
+    url = url || this.props.frame.get('location')
+    const activeSiteSettings = this.getSiteSettings(url)
+    if (activeSiteSettings) {
+      if (activeSiteSettings.get('shieldsUp') === false) {
+        return false
+      }
+
+      if (typeof activeSiteSettings.get('cookieControl') === 'string') {
+        return activeSiteSettings.get('cookieControl') === 'block3rdPartyCookie'
+      }
+    }
+    return this.props.braveryDefaults.cookieControl === 'block3rdPartyCookie'
   }
 
   isAboutPage () {
@@ -171,10 +241,11 @@ class Frame extends ImmutableComponent {
   }
 
   get zoomLevel () {
-    if (!this.props.activeSiteSettings || !this.props.activeSiteSettings.get('zoomLevel')) {
+    const activeSiteSettings = this.getSiteSettings(this.props.frame.get('location'))
+    if (!activeSiteSettings || !activeSiteSettings.get('zoomLevel')) {
       return config.zoom.defaultValue
     }
-    return this.props.activeSiteSettings.get('zoomLevel')
+    return activeSiteSettings.get('zoomLevel')
   }
 
   zoom (stepSize) {
@@ -441,10 +512,10 @@ class Frame extends ImmutableComponent {
           ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frame.get('key'))
         }
       }
-      if (this.props.enableFingerprintingProtection) {
+      if (this.fpEnabled(e.url)) {
         this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
       }
-      if (this.props.block3rdPartyStorage) {
+      if (this.storageBlockEnabled(e.url)) {
         this.webview.send(messages.BLOCK_THIRD_PARTY_STORAGE)
       }
       windowActions.updateBackForwardState(
@@ -457,7 +528,7 @@ class Frame extends ImmutableComponent {
         this.props.frame,
         this.webview.getURL())
 
-      if (this.props.enableAds) {
+      if (this.adsEnabled()) {
         this.insertAds(this.webview.getURL())
       }
       this.initSpellCheck()
@@ -561,7 +632,7 @@ class Frame extends ImmutableComponent {
       windowActions.setAudioPlaybackActive(this.props.frame, false)
     })
     this.webview.addEventListener('console-message', (e) => {
-      if (this.props.enableNoScript && e.level === 2 &&
+      if (this.noScriptEnabled() && e.level === 2 &&
           e.message && e.message.includes(consoleStrings.SCRIPT_BLOCKED)) {
         // Note that the site was blocked
         windowActions.setBlockedBy(this.props.frame,
