@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.10.4](https://github.com/brave/browser-laptop/releases/v0.10.4dev)
+- Add Flash support via extra user approval. ([#1093](https://github.com/brave/browser-laptop/issues/1093))
+- Added option for disabling title mode (defaulted to on for Windows until we remove the title bar). ([#1984](https://github.com/brave/browser-laptop/issues/1984))
+- Added blocking for 3rd party client storage mechanisms. ([#313](https://github.com/brave/browser-laptop/issues/313))
+- Improved Bookmarks Manager folders so they stick when scrolling. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
+- Fixed Twitch.tv playing streams twice. ([#2119](https://github.com/brave/browser-laptop/issues/2119))
+- Fixed navigation controller sometimes making back button not function correctly. ([#2144](https://github.com/brave/browser-laptop/issues/2144))
+- Fixed Fullscreen mode on Windows so it hides menu bar. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
+
 ## [0.10.3](https://github.com/brave/browser-laptop/releases/v0.10.3dev)
 - Upgrade to libchromiumcontent 51.0.2704.84. ([#2122](https://github.com/brave/browser-laptop/issues/2122))
 
