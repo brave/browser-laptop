@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
+const urlParse = require('url').parse
 
 /**
  * Determines the path of a relative URL from the hosted app
@@ -112,6 +113,9 @@ module.exports.isTargetAboutUrl = function (input) {
  */
 module.exports.isUrl = function (input) {
   input = input.trim()
+  if (urlParse(input).protocol) {
+    input = encodeURI(input)
+  }
   return UrlUtil.isURL(input) && !input.includes(' ')
 }
 
