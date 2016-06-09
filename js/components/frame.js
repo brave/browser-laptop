@@ -500,9 +500,9 @@ class Frame extends ImmutableComponent {
     })
 
     const loadStart = (e) => {
+      const parsedUrl = urlParse(e.url)
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         windowActions.onWebviewLoadStart(this.props.frame, e.url)
-        const parsedUrl = urlParse(e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
         windowActions.setSecurityState(this.props.frame, {
           secure: isSecure
@@ -522,6 +522,10 @@ class Frame extends ImmutableComponent {
         this.props.frame,
         this.webview.canGoBack(),
         this.webview.canGoForward())
+      const hack = siteHacks[parsedUrl.hostname]
+      if (hack && hack.pageLoadStartScript) {
+        this.webview.executeJavaScript(hack.pageLoadStartScript)
+      }
     }
     const loadEnd = () => {
       windowActions.onWebviewLoadEnd(

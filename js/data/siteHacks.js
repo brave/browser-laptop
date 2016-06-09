@@ -39,6 +39,16 @@ module.exports = {
         };
     })();`
   },
+  'www.extremetech.com': {
+    pageLoadStartScript: `(function() {
+      var sto = window.setTimeout;
+      window.setTimeout = function(a, b) {
+          if ( b !== 250 ) {
+                sto(a, b);
+              }
+        };
+    })();`
+  },
   'www.twitch.tv': {
     allowRunningInsecureContent: true
   },
