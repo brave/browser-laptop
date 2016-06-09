@@ -115,7 +115,6 @@ class AddEditBookmark extends ImmutableComponent {
             </select>
           </div>
           <div className='formRow'>
-            <span />
             <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
