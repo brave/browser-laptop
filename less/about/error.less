@@ -1,42 +1,59 @@
 @import "./common.less";
 
-.errorLogo {
-  margin-bottom: 2rem;
-}
+#appContainer {
+  &.errorPageContainer {
+    overflow: auto;
+    height: 100%;
 
-.errorLogoInner {
-  fill: @braveOrange;
-}
+    .errorContent {
+      display: flex;
+      width: 40vw;
+      max-width: 600px;
+      margin: 20vh auto;
+      line-height: 1.6em;
+      flex-direction: column;
+      background-color: #FFF;
+      padding: 40px;
+      height: auto;
 
-.errorContent {
-  display: flex;
-  width: 40vw;
-  max-width: 600px;
-  margin: 20vh auto 0;
-  line-height: 1.6em;
-  flex-direction: column;
-  background-color: #FFF;
-  padding: 40px;
-}
+      .certErrorText, .errorTitle {
+        padding-bottom: 1rem;
+      }
 
-.certErrorText, .errorTitle {
-  padding-bottom: 1rem;
-}
+      .errorLogo {
+        margin-bottom: 2rem;
 
-.safebrowsingErrorText {
-  padding-bottom: 2rem;
-}
+        .errorLogoInner {
+          fill: @braveOrange;
+        }
+      }
 
-.subtleText {
-  color: #999;
-  padding-top: 20px;
-}
+      .errorUrl,
+      .errorText {
+        word-wrap: break-word;
+      }
 
-.errorText {
-  color: @errorTextColor;
-  display: block;
-}
+      .errorUrl {
+        font-weight: bolder;
+      }
 
-.errorUrl {
-  font-weight: bolder;
+      .errorText {
+        color: @chromeSecondary;
+        display: block;
+      }
+
+      .subtleText {
+        color: #999;
+        padding-top: 20px;
+      }
+    }
+
+    &.safeBrowsing {
+      background-color: red;
+
+     .safebrowsingErrorText {
+        padding-bottom: 2rem;
+      }
+    }
+  }
 }
