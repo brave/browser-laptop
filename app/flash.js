@@ -8,16 +8,32 @@ const app = electron.app
 const fs = require('fs')
 const path = require('path')
 
-module.exports.init = () => {
-  const pepperFlashSystemPluginPath = app.getPath('pepperFlashSystemPlugin')
-  const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
-  // TODO: This only works if sync currently
-  const data = fs.readFileSync(pepperFlashManifestPath)
-  if (!data) {
-    return
-  }
+const pepperFlashSystemPluginPath = app.getPath('pepperFlashSystemPlugin')
+const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
 
-  const pepperFlashManifest = JSON.parse(data)
-  app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
-  app.commandLine.appendSwitch('ppapi-flash-version', pepperFlashManifest.version)
+module.exports.init = () => {
+  // TODO: This only works if sync currently
+  try {
+    const data = fs.readFileSync(pepperFlashManifestPath)
+    if (!data) {
+      return false
+    }
+
+    const pepperFlashManifest = JSON.parse(data)
+    app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
+    app.commandLine.appendSwitch('ppapi-flash-version', pepperFlashManifest.version)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+module.exports.checkForFlash = () => {
+  // Check if Flash is installed by looking for the manifest path
+  try {
+    fs.accessSync(pepperFlashManifestPath)
+    return true
+  } catch (e) {
+    return false
+  }
 }

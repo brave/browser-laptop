@@ -13,6 +13,9 @@ var port = (function () {
       return
     }
 
+    // Currently there's no global setting to never block Flash
+    blockFlash()
+
     if (m.fingerprintingProtection) {
       blockCanvasFingerprinting()
     }

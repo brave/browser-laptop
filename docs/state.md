@@ -99,6 +99,9 @@ AppStore
   noScript: {
     enabled: boolean // Enable noscript
   },
+  flash: {
+    enabled: boolean // Enable flash
+  },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
   updates: {

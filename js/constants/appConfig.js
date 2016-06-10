@@ -19,12 +19,16 @@ module.exports = {
     TRACKING_PROTECTION: 'trackingProtection',
     AD_INSERTION: 'adInsertion',
     NOSCRIPT: 'noScript',
+    FLASH: 'flash',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
   },
   cookieblock: {
     enabled: true
   },
   noScript: {
+    enabled: false
+  },
+  flash: {
     enabled: false
   },
   adblock: {

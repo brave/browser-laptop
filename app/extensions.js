@@ -26,6 +26,7 @@ let generateBraveManifest = () => {
         ],
         js: [
           'content/scripts/util.js',
+          'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
           'content/scripts/block3rdPartyStorage.js',
           'content/scripts/brave-default.js',
@@ -51,6 +52,7 @@ let generateBraveManifest = () => {
           'content/scripts/adInfo.js',
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
+          'content/scripts/flashListener.js',
           'content/scripts/brave-default-end.js',
           'js/actions/extensionActions.js',
           'content/scripts/themeColor.js',

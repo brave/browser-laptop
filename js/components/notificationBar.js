@@ -10,8 +10,14 @@ const messages = require('../constants/messages')
 
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
-    ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'),
-             buttonIndex, this.checkbox ? this.checkbox.checked : false)
+    const nonce = this.props.detail.get('options').get('nonce')
+    if (nonce) {
+      ipc.emit(messages.NOTIFICATION_RESPONSE + nonce, {},
+               this.props.detail.get('message'), buttonIndex)
+    } else {
+      ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'),
+               buttonIndex, this.checkbox ? this.checkbox.checked : false)
+    }
   }
 
   openAdvanced () {

@@ -23,6 +23,7 @@ const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
+const flash = appConfig.resourceNames.FLASH
 
 const isDarwin = navigator.platform === 'MacIntel'
 
@@ -321,19 +322,25 @@ class PrivacyTab extends ImmutableComponent {
 }
 
 class SecurityTab extends ImmutableComponent {
+  onToggleFlash (e) {
+    aboutActions.setResourceEnabled(flash, e.target.checked)
+  }
   render () {
     return <div>
-      <SettingsList>
+      <SettingsList dataL10nId='passwordSettings'>
         <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useDashlane' prefKey={settings.DASHLANE_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <div classname='settingItem'>
+          <span className='linkText' data-l10n-id='managePasswords'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:passwords'
+            }, true)}></span>
+        </div>
       </SettingsList>
-      <div>
-        <span className='linkText' data-l10n-id='managePasswords'
-          onClick={aboutActions.newFrame.bind(null, {
-            location: 'about:passwords'
-          }, true)}></span>
-      </div>
+      <SettingsList dataL10nId='pluginSettings'>
+        <SettingCheckbox checked={this.props.braveryDefaults.get('flash')} dataL10nId='enableFlash' onChange={this.onToggleFlash} />
+      </SettingsList>
     </div>
   }
 }
@@ -546,7 +553,7 @@ class AboutPreferences extends React.Component {
         tab = <PrivacyTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <SecurityTab settings={settings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.BRAVERY:
         tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting} />

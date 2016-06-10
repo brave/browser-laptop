@@ -44,6 +44,10 @@ const messages = {
   LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
   LOGIN_RESPONSE: _,
   NOTIFICATION_RESPONSE: _, /** @arg {string} message, @arg {number} buttonId, @arg {boolean} persist */
+  // Flash
+  CHECK_FOR_FLASH: _, /** @arg {string} nonce */
+  GOT_FLASH: _, /** @arg {Object} args */
+  ALLOW_FLASH: _, /** @arg {string} host */
   // Downloads
   SHOW_DOWNLOADS_TOOLBAR: _, /** Ensures the downloads toolbar is visible */
   DOWNLOAD_ACTION: _, /** @arg {string} downloadId, @arg {string} action such as 'resume', 'pause', or 'cancel' */

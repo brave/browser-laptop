@@ -62,8 +62,6 @@ let throttleKeytar = false
 // Map of password notification bar messages to their callbacks
 const passwordCallbacks = {}
 
-flash.init()
-
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
@@ -186,6 +184,9 @@ loadAppStatePromise.then((initialState) => {
   const { HARDWARE_ACCELERATION_ENABLED } = require('../js/constants/settings')
   if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
     app.disableHardwareAcceleration()
+  }
+  if (initialState.flash && initialState.flash.enabled === true) {
+    flash.init()
   }
 })
 
@@ -378,6 +379,14 @@ app.on('ready', () => {
           secure: false
         })
       }
+    })
+
+    ipcMain.on(messages.CHECK_FOR_FLASH, (event, nonce) => {
+      const state = AppStore.getState()
+      const installed = state.getIn(['flash', 'enabled']) ? flash.checkForFlash() : false
+      event.sender.send(messages.GOT_FLASH + nonce, {
+        installed
+      })
     })
 
     AppStore.addChangeListener(() => {
