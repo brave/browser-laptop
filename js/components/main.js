@@ -287,6 +287,9 @@ class Main extends ImmutableComponent {
     ipc.on(messages.WINDOW_UNMAXIMIZED, () => {
       windowActions.setMaximizeState(false)
     })
+    ipc.on(messages.WINDOW_MOVED, (event, position) => {
+      windowActions.savePosition(position)
+    })
 
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>

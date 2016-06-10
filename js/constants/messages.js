@@ -78,6 +78,7 @@ const messages = {
   GO_FORWARD: _,
   WINDOW_MAXIMIZED: _,
   WINDOW_UNMAXIMIZED: _,
+  WINDOW_MOVED: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */

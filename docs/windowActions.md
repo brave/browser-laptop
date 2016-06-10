@@ -538,6 +538,16 @@ Sets the maximize state of the window
 
 
 
+### savePosition(position) 
+
+Saves the position of the window in the window state
+
+**Parameters**
+
+**position**: `Array`, [x, y]
+
+
+
 ### setMouseInTitlebar(mouseInTitlebar) 
 
 Dispatches a message to indicate if the mouse is in the titlebar

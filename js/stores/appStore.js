@@ -60,6 +60,11 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     browserOpts.height = browserOpts.height + navbarHeight()
   }
 
+  if (windowState.ui && windowState.ui.position) {
+    browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
+    browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
+  }
+
   browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
   browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
   delete browserOpts.left
@@ -147,6 +152,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   mainWindow.on('unmaximize', function () {
     mainWindow.webContents.send(messages.WINDOW_UNMAXIMIZED)
+  })
+
+  mainWindow.on('move', function (evt) {
+    mainWindow.webContents.send(messages.WINDOW_MOVED, evt.sender.getPosition())
   })
 
   mainWindow.on('close', function () {
