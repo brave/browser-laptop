@@ -9,7 +9,7 @@ describe('urlutil', function () {
       assert.equal(UrlUtil.getScheme('/file/path/to/file'), null)
     })
 
-    it('null for localhost', function * () {
+    it('localhost: for localhost', function * () {
       assert.equal(UrlUtil.getScheme('localhost://127.0.0.1'), 'localhost:')
     })
 
