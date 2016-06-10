@@ -10,11 +10,15 @@ describe('urlutil', function () {
     })
 
     it('null for localhost', function * () {
-      assert.equal(UrlUtil.getScheme('localhost://127.0.0.1'), null)
+      assert.equal(UrlUtil.getScheme('localhost://127.0.0.1'), 'localhost:')
     })
 
     it('gets scheme with :', function * () {
       assert.equal(UrlUtil.getScheme('data:datauri'), 'data:')
+    })
+
+    it('host:port is not recognized as a scheme', function * () {
+      assert.equal(UrlUtil.getScheme('localhost:8089'), null)
     })
 
     it('gets scheme with ://', function * () {
@@ -37,7 +41,7 @@ describe('urlutil', function () {
   })
 
   describe('isURL', function () {
-    it.skip('absolute file path without scheme', function * () {
+    it('absolute file path without scheme', function * () {
       assert.equal(UrlUtil.isURL('/file/path/to/file'), true)
     })
 
@@ -47,6 +51,14 @@ describe('urlutil', function () {
 
     it('detects data URI', function * () {
       assert.equal(UrlUtil.isURL('data:text/html,hi'), true)
+    })
+
+    it('someBraveServer:8089', function * () {
+      assert.equal(UrlUtil.isURL('someBraveServer:8089'), true)
+    })
+
+    it('localhost', function * () {
+      assert.equal(UrlUtil.isURL('localhost:8089'), true)
     })
   })
 })
