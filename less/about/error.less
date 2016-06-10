@@ -12,7 +12,7 @@
   display: flex;
   width: 40vw;
   max-width: 600px;
-  margin: 20vh auto 0;
+  margin: 20vh auto;
   line-height: 1.6em;
   flex-direction: column;
   background-color: #FFF;
@@ -23,8 +23,17 @@
   padding-bottom: 1rem;
 }
 
-.safebrowsingErrorText {
-  padding-bottom: 2rem;
+.safeBrowsingContainer {
+  background-color: red;
+  height: 100%;
+  overflow: auto;
+  #safebrowsingPage {
+    height: auto;
+
+   .safebrowsingErrorText {
+      padding-bottom: 2rem;
+    }
+  }
 }
 
 .subtleText {
