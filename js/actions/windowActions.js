@@ -704,6 +704,17 @@ const windowActions = {
   },
 
   /**
+   * Sets the maximize state of the window
+   * @param {boolean} isMaximized - true if window is maximized
+   */
+  setMaximizeState: function (isMaximized) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_MAXIMIZE_STATE,
+      isMaximized
+    })
+  },
+
+  /**
    * Dispatches a message to indicate if the mouse is in the titlebar
    *
    * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar

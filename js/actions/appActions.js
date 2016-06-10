@@ -138,17 +138,6 @@ const appActions = {
   },
 
   /**
-   * Sets the last recorded maximize state of the browser window
-   * @param {boolean} isMaximized - true if window is maximized
-   */
-  setWindowMaximizeState: function (isMaximized) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_WINDOW_MAXIMIZE_STATE,
-      isMaximized
-    })
-  },
-
-  /**
    * Sets the etag value for a downloaded data file.
    * This is used for keeping track of when to re-download adblock and tracking
    * protection data.

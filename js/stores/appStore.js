@@ -46,7 +46,7 @@ function navbarHeight () {
   return 75
 }
 
-const createWindow = (browserOpts, defaults) => {
+const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   const parentWindowKey = browserOpts.parentWindowKey
 
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
@@ -132,7 +132,7 @@ const createWindow = (browserOpts, defaults) => {
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
 
-  if (appState.get('isWindowMaximized')) {
+  if (windowState.ui && windowState.ui.isMaximized) {
     mainWindow.maximize()
   }
 
@@ -141,12 +141,12 @@ const createWindow = (browserOpts, defaults) => {
     appActions.setDefaultWindowSize(evt.sender.getSize())
   })
 
-  mainWindow.on('maximize', function (evt) {
-    appActions.setWindowMaximizeState(true)
+  mainWindow.on('maximize', function () {
+    mainWindow.webContents.send(messages.WINDOW_MAXIMIZED)
   })
 
-  mainWindow.on('unmaximize', function (evt) {
-    appActions.setWindowMaximizeState(false)
+  mainWindow.on('unmaximize', function () {
+    mainWindow.webContents.send(messages.WINDOW_UNMAXIMIZED)
   })
 
   mainWindow.on('close', function () {
@@ -300,8 +300,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_NEW_WINDOW:
       const frameOpts = action.frameOpts && action.frameOpts.toJS()
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
+      const windowState = action.restoredState || {}
 
-      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts)
+      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts, windowState)
       const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state
@@ -407,9 +408,6 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
       appState = appState.set('defaultWindowHeight', action.size[1])
-      break
-    case AppConstants.APP_SET_WINDOW_MAXIMIZE_STATE:
-      appState = appState.set('isWindowMaximized', action.isMaximized)
       break
     case AppConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)

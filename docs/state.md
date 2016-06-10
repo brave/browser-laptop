@@ -101,7 +101,6 @@ AppStore
   },
   defaultWindowHeight: number,
   defaultWindowWidth: number,
-  isWindowMaximized: boolean,
   updates: {
     status: string, // UpdateStatus from js/constants/updateStatus.js
     metadata: {
@@ -237,6 +236,7 @@ WindowStore
   }],
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
+    isMaximized: boolean, // true if window was maximized
     mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
     dragging: {
       dragType: string, // tab, bookmark

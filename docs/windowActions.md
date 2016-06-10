@@ -528,6 +528,16 @@ Dispatches a message to indicate that the favicon has changed
 
 
 
+### setMaximizeState(isMaximized) 
+
+Sets the maximize state of the window
+
+**Parameters**
+
+**isMaximized**: `boolean`, true if window is maximized
+
+
+
 ### setMouseInTitlebar(mouseInTitlebar) 
 
 Dispatches a message to indicate if the mouse is in the titlebar
