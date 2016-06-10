@@ -63,22 +63,15 @@ const messages = {
   // Web contents state
   WEB_CONTENTS_INITIALIZED: _,
   // Webview page messages
-  SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
-  INIT_SPELL_CHECK: _, /** @arg {string} lang */
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
-  LINK_HOVERED: _, /** @arg {string} href of hovered link */
   APP_STATE_CHANGE: _,
   STOP_LOAD: _,
-  POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
   HIDE_CONTEXT_MENU: _,
   LEAVE_FULL_SCREEN: _,
   ENTER_FULL_SCREEN: _,
   SET_CLIPBOARD: _,
-  AUTOFILL_PASSWORD: _,
-  BLOCK_CANVAS_FINGERPRINTING: _,
   GOT_CANVAS_FINGERPRINTING: _,
-  BLOCK_THIRD_PARTY_STORAGE: _,
   SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
   SET_RESOURCE_ENABLED: _,
   GO_BACK: _,
