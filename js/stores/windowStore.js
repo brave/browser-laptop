@@ -628,7 +628,12 @@ frameShortcuts.forEach((shortcut) => {
 })
 
 // Allows the parent process to dispatch window actions
-ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload, caller) => {
+ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload, callerId) => {
+  // ignore messages that came from this window
+  if (callerId === require('electron').remote.getCurrentWebContents().getId()) {
+    return
+  }
+
   let action = Serializer.deserialize(serializedPayload)
   let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo

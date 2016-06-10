@@ -7,6 +7,7 @@ const config = require('../constants/config.js')
 const urlParse = require('url').parse
 
 const matchFrame = (queryInfo, frame) => {
+  queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   return !Object.keys(queryInfo).map((queryKey) => (frame.get(queryKey) === queryInfo[queryKey])).includes(false)
 }
 

@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Immutable = require('immutable')
 const Serializer = require('./serializer')
 const messages = require('../constants/messages')
 const electron = process.type === 'renderer' ? global.require('electron') : require('electron')
@@ -89,7 +90,7 @@ if (process.type !== 'renderer') {
     let registrant = event.sender
     const callback = function (payload, caller) {
       try {
-        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload), caller)
+        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload), caller ? caller.getId() : -1)
       } catch (e) {
         console.error('unregistering callback', e)
         appDispatcher.unregister(callback)
@@ -106,19 +107,20 @@ if (process.type !== 'renderer') {
 
   ipcMain.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
-    if (event.sender.hostWebContents) {
-      // received from an extension
-      // only extension messages will have a hostWebContents
-      let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
-      queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-      let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
-      // default to the windowId of the hostWebContents
+    let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
+    queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
+    let sender = event.sender.hostWebContents || event.sender
+    let win = require('electron').BrowserWindow.fromWebContents(sender)
+    if (win) {
       queryInfo.windowId = queryInfo.windowId || win.id
-      appDispatcher.dispatch(payload, event.sender.hostWebContents)
-    } else {
-      // received from a browser window
-      appDispatcher.dispatch(payload, event.sender)
+      queryInfo = Immutable.fromJS(queryInfo)
     }
+    if (payload.queryInfo) {
+      payload.queryInfo = queryInfo
+    } else {
+      payload.frameProps = queryInfo
+    }
+    appDispatcher.dispatch(payload, sender)
   })
 }
 
