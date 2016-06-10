@@ -375,6 +375,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store when the frame is active and the window is focused
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   */
+  setFocusedFrame: function (frameProps) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
+      frameProps: frameProps
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set a preview frame.
    * This is done when hovering over a tab.
    *
