@@ -281,16 +281,6 @@ class Main extends ImmutableComponent {
       windowActions.setDownloadsToolbarVisible(true)
     })
 
-    ipc.on(messages.WINDOW_MAXIMIZED, () => {
-      windowActions.setMaximizeState(true)
-    })
-    ipc.on(messages.WINDOW_UNMAXIMIZED, () => {
-      windowActions.setMaximizeState(false)
-    })
-    ipc.on(messages.WINDOW_MOVED, (event, position) => {
-      windowActions.savePosition(position)
-    })
-
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
       windowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
@@ -415,6 +405,16 @@ class Main extends ImmutableComponent {
     if (activeFrame && win) {
       win.setTitle(activeFrame.get('title'))
     }
+
+    win.on('maximize', function () {
+      windowActions.setMaximizeState(true)
+    })
+    win.on('unmaximize', function () {
+      windowActions.setMaximizeState(false)
+    })
+    win.on('move', function (event) {
+      windowActions.savePosition(event.sender.getPosition())
+    })
   }
 
   checkForTitleMode (pageY) {

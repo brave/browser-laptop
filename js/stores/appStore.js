@@ -146,18 +146,6 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     appActions.setDefaultWindowSize(evt.sender.getSize())
   })
 
-  mainWindow.on('maximize', function () {
-    mainWindow.webContents.send(messages.WINDOW_MAXIMIZED)
-  })
-
-  mainWindow.on('unmaximize', function () {
-    mainWindow.webContents.send(messages.WINDOW_UNMAXIMIZED)
-  })
-
-  mainWindow.on('move', function (evt) {
-    mainWindow.webContents.send(messages.WINDOW_MOVED, evt.sender.getPosition())
-  })
-
   mainWindow.on('close', function () {
     LocalShortcuts.unregister(mainWindow)
   })
