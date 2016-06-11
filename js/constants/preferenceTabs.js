@@ -12,7 +12,8 @@ const preferenceTabs = {
   SYNC: _,
   PRIVACY: _,
   SECURITY: _,
-  BRAVERY: _
+  BRAVERY: _,
+  ADVANCED: _
 }
 
 module.exports = mapValuesByKeys(preferenceTabs)

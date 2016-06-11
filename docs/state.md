@@ -123,19 +123,30 @@ AppStore
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
     'general.homepage': string, // URL of the user's homepage
+    'general.show-home-button': boolean, // true if the home button should be shown
     'general.useragent.value': (undefined|string), // custom user agent value
+    'general.downloads.default-save-path': string, // default path for saving files
+    'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
+    'general.disable-title-mode': boolean, // true if title mode should always be disabled
     'search.default-search-engine': string, // path to the open search XML
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.tabs-per-page': number, // Number of tabs per tab page
     'tabs.show-tab-previews': boolean, // True to show tab previews
-    'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // Auto suggest for history enabled
     'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
     'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
+    'privacy.autocomplete.history-size': number, // Number of autocomplete entries to keep
+    'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
-    'general.downloads.defaultSavePath': string, // The default path to store files, this will be updated on each save until another pref is added to control that.
+    'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
+    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
+    'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
+    'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
+    'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
+    'general.language': string, // The language code to use for localization and spell check or null to use the system default
+    'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
   }],
   dictionary: {
     locale: string, // en_US, en, or any other locale string

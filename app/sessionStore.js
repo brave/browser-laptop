@@ -217,84 +217,88 @@ module.exports.cleanAppData = (data) => {
  */
 module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
-    fs.readFile(storagePath, (err, data) => {
-      if (err || !data) {
-        reject(err)
-        return
-      }
+    let data
+    try {
+      data = fs.readFileSync(storagePath)
+    } catch (e) {
+    }
 
-      try {
-        data = Object.assign(module.exports.defaultAppState(), JSON.parse(data))
-      } catch (e) {
-        // TODO: Session state is corrupted, maybe we should backup this
-        // corrupted value for people to report into support.
-        console.log('could not parse data: ', data)
-        reject(e)
+    if (!data) {
+      reject()
+      return
+    }
+
+    try {
+      data = Object.assign(module.exports.defaultAppState(), JSON.parse(data))
+    } catch (e) {
+      // TODO: Session state is corrupted, maybe we should backup this
+      // corrupted value for people to report into support.
+      console.log('could not parse data: ', data)
+      reject(e)
+      return
+    }
+    // Clean app data here if it wasn't cleared on shutdown
+    if (data.cleanedOnShutdown !== true) {
+      module.exports.cleanAppData(data)
+    }
+    data.cleanedOnShutdown = false
+    // Always recalculate the update status
+    if (data.updates) {
+      const updateStatus = data.updates.status
+      delete data.updates.status
+      // The process always restarts after an update so if the state
+      // indicates that a restart isn't wanted, close right away.
+      if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
+        module.exports.saveAppState(data).then(() => {
+          // Exit immediately without doing the session store saving stuff
+          // since we want the same state saved except for the update status
+          app.exit(0)
+        })
         return
       }
-      // Clean app data here if it wasn't cleared on shutdown
-      if (data.cleanedOnShutdown !== true) {
-        module.exports.cleanAppData(data)
-      }
-      data.cleanedOnShutdown = false
-      // Always recalculate the update status
-      if (data.updates) {
-        const updateStatus = data.updates.status
-        delete data.updates.status
-        // The process always restarts after an update so if the state
-        // indicates that a restart isn't wanted, close right away.
-        if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-          module.exports.saveAppState(data).then(() => {
-            // Exit immediately without doing the session store saving stuff
-            // since we want the same state saved except for the update status
-            app.exit(0)
-          })
-          return
+    }
+    // Delete downloaded items older than a week
+    if (data.downloads) {
+      const dateOffset = 7 * 24 * 60 * 60 * 1000
+      const lastWeek = new Date().getTime() - dateOffset
+      Object.keys(data.downloads).forEach((downloadId) => {
+        if (data.downloads[downloadId].startTime < lastWeek) {
+          delete data.downloads[downloadId]
+        } else {
+          const state = data.downloads[downloadId].state
+          if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
+            data.downloads[downloadId].state = downloadStates.INTERRUPTED
+          }
         }
-      }
-      // Delete downloaded items older than a week
-      if (data.downloads) {
-        const dateOffset = 7 * 24 * 60 * 60 * 1000
-        const lastWeek = new Date().getTime() - dateOffset
-        Object.keys(data.downloads).forEach((downloadId) => {
-          if (data.downloads[downloadId].startTime < lastWeek) {
-            delete data.downloads[downloadId]
-          } else {
-            const state = data.downloads[downloadId].state
-            if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
-              data.downloads[downloadId].state = downloadStates.INTERRUPTED
-            }
+      })
+    }
+    // We used to store passwords with the form action full URL. Transition
+    // to using origin + pathname for 0.9.0
+    if (data.passwords.length > 0) {
+      let newPasswords = []
+      data.passwords.forEach((entry) => {
+        if (typeof entry.action === 'string') {
+          let a = urlParse(entry.action)
+          if (a.path !== a.pathname) {
+            entry.action = [a.protocol, a.host].join('//') + a.pathname
           }
-        })
-      }
-      // We used to store passwords with the form action full URL. Transition
-      // to using origin + pathname for 0.9.0
-      if (data.passwords.length > 0) {
-        let newPasswords = []
-        data.passwords.forEach((entry) => {
-          if (typeof entry.action === 'string') {
-            let a = urlParse(entry.action)
-            if (a.path !== a.pathname) {
-              entry.action = [a.protocol, a.host].join('//') + a.pathname
-            }
-          } else {
-            entry.action = ''
+        } else {
+          entry.action = ''
+        }
+        // Deduplicate
+        for (let i = 0; i < newPasswords.length; i++) {
+          let newEntry = newPasswords[i]
+          if (entry.origin === newEntry.origin &&
+              entry.action === newEntry.action &&
+              entry.username === newEntry.username) {
+            return
           }
-          // Deduplicate
-          for (let i = 0; i < newPasswords.length; i++) {
-            let newEntry = newPasswords[i]
-            if (entry.origin === newEntry.origin &&
-                entry.action === newEntry.action &&
-                entry.username === newEntry.username) {
-              return
-            }
-          }
-          newPasswords.push(entry)
-        })
-        data.passwords = newPasswords
-      }
-      resolve(data)
-    })
+        }
+        newPasswords.push(entry)
+      })
+      data.passwords = newPasswords
+    }
+    resolve(data)
   })
 }
 

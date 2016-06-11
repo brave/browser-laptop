@@ -98,6 +98,7 @@ module.exports = {
     'security.passwords.one-password-enabled': false,
     'security.passwords.dashlane-enabled': false,
     'general.downloads.default-save-path': null,
-    'general.disable-title-mode': process.platform === 'win32'
+    'general.disable-title-mode': process.platform === 'win32',
+    'advanced.hardware-acceleration-enabled': true
   }
 }

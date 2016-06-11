@@ -174,11 +174,19 @@ const initiateSessionStateSave = (beforeQuit) => {
   }
 }
 
-app.on('ready', () => {
-  let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
-    return SessionStore.defaultAppState()
-  })
+let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
+  return SessionStore.defaultAppState()
+})
 
+// Some settings must be set right away on startup, those settings should be handled here.
+loadAppStatePromise.then((initialState) => {
+  const { HARDWARE_ACCELERATION_ENABLED } = require('../js/constants/settings')
+  if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
+    app.disableHardwareAcceleration()
+  }
+})
+
+app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {

@@ -334,6 +334,16 @@ class SecurityTab extends ImmutableComponent {
   }
 }
 
+class AdvancedTab extends ImmutableComponent {
+  render () {
+    return <div>
+      <SettingsList dataL10nId='renderingOptions'>
+        <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
+    </div>
+  }
+}
+
 class BraveryTab extends ImmutableComponent {
   render () {
     return <div>
@@ -423,6 +433,11 @@ class TopBar extends ImmutableComponent {
         dataL10nId='bravery'
         className='notImplemented'
         selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
+      />
+      <TopBarButton icon='fa-tasks'
+        dataL10nId='advanced'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.ADVANCED)}
+        selected={this.props.preferenceTab === preferenceTabs.ADVANCED}
       />
       <HelpfulHints hintNumber={this.props.hintNumber} refreshHint={this.props.refreshHint} />
     </div>
@@ -519,6 +534,9 @@ class AboutPreferences extends React.Component {
         break
       case preferenceTabs.BRAVERY:
         tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        break
+      case preferenceTabs.ADVANCED:
+        tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
     }
     return <div>

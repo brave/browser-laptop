@@ -33,7 +33,9 @@ const settings = {
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
-  LANGUAGE: 'general.language'
+  LANGUAGE: 'general.language',
+  // Advanced settings
+  HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled'
 }
 
 module.exports = settings
