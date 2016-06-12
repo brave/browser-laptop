@@ -138,7 +138,7 @@ class Frame extends ImmutableComponent {
       this.webview.allowRunningInsecureContent = true
     }
 
-    if (!guestInstanceId) {
+    if (!guestInstanceId || src !== 'about:blank') {
       this.webview.setAttribute('src', isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
     }
 
