@@ -52,7 +52,10 @@ module.exports.register = (win) => {
 
   simpleWebContentEvents.forEach((shortcutEventName) =>
     electronLocalshortcut.register(win, shortcutEventName[0], () => {
-      BrowserWindow.getFocusedWindow().webContents.send(shortcutEventName[1], shortcutEventName[2])
+      let win = BrowserWindow.getFocusedWindow()
+      if (win) {
+        win.webContents.send(shortcutEventName[1], shortcutEventName[2])
+      }
     }))
 }
 

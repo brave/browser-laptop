@@ -154,6 +154,8 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
+          .waitUntilWindowLoaded()
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
@@ -270,212 +272,212 @@ describe('application window', function () {
           .getTabCount().should.become(2)
       })
     })
+  })
 
-    // http://www.w3.org/TR/html51/browsers.html#security-window
-    describe('window.opener', function () {
-      describe('different document.domain', function () {
-        Brave.beforeAll(this)
+  // http://www.w3.org/TR/html51/browsers.html#security-window
+  describe('window.opener', function () {
+    describe('different document.domain', function () {
+      Brave.beforeAll(this)
 
-        before(function * () {
-          this.window_open_page = Brave.server.url('window_open.html')
-          this.page1 = Brave.server.urlWithIpAddress('page1.html')
+      before(function * () {
+        this.window_open_page = Brave.server.url('window_open.html')
+        this.page1 = Brave.server.urlWithIpAddress('page1.html')
 
-          yield this.app.client
-            .waitUntilWindowLoaded()
-            .waitForVisible(activeWebview)
-            .waitForUrl(Brave.newTabUrl)
-            .url(this.window_open_page)
-            .execute(function (page1) {
-              global.triggerFunction = function () {
-                return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
-              }
-            }, this.page1)
-            .click('#trigger')
-            .waitUntil(function () {
-              return this.getWindowCount().then((count) => {
-                return count === 2
-              })
+        yield this.app.client
+          .waitUntilWindowLoaded()
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForUrl(Brave.newTabUrl)
+          .url(this.window_open_page)
+          .execute(function (page1) {
+            global.triggerFunction = function () {
+              return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
+            }
+          }, this.page1)
+          .click('#trigger')
+          .waitUntil(function () {
+            return this.getWindowCount().then((count) => {
+              return count === 2
             })
-            // page1 loaded
-            .waitForUrl(this.page1)
-        })
-
-        it('has parent document.domain set to localhost', function * () {
-          yield this.app.client
-            .tabByUrl(this.window_open_page)
-            .execute(function () {
-              return document.domain
-            }).then((response) => response.value).should.eventually.be.equal('localhost')
-        })
-
-        it('has document.domain set to 127.0.0.1', function * () {
-          yield this.app.client
-            .tabByUrl(this.page1)
-            .execute(function () {
-              return document.domain
-            }).then((response) => response.value).should.eventually.be.equal('127.0.0.1')
-        })
-
-        it('can communicate with the opener through postMessage', function * () {
-          yield this.app.client
-            // make sure the child window has focus
-            .tabByUrl(this.window_open_page)
-            .execute(function () {
-              global.events = []
-              window.addEventListener('message', function (event) {
-                global.events.push(event.data)
-              })
-            })
-            .tabByUrl(this.page1)
-            .execute(function () {
-              window.opener.postMessage('any origin', '*')
-            })
-            .execute(function (origin) {
-              window.opener.postMessage('target origin', origin)
-            }, Brave.server.urlOrigin())
-            .execute(function () {
-              window.opener.postMessage('other origin', 'https://somedomain.com')
-            })
-            .tabByUrl(this.window_open_page)
-            .execute(function () {
-              return global.events
-            }).then((response) => response.value).should.become(['any origin', 'target origin'])
-        })
-
-        it('has restricted access in parent to child window', function * () {
-          yield this.app.client
-            .tabByUrl(this.window_open_page)
-            .execute(function () {
-              return window.WINDOW_REF.eval('1+2')
-            }).should.be.rejectedWith(Error)
-        })
-
-        it('has restricted access to parent window through the opener', function * () {
-          yield this.app.client
-            .tabByUrl(this.page1)
-            .execute(function () {
-              return window.opener.eval('1+2')
-            }).should.be.rejectedWith(Error)
-        })
+          })
+          // page1 loaded
+          .waitForUrl(this.page1)
       })
 
-      describe('same document.domain', function () {
-        Brave.beforeAll(this)
-
-        before(function * () {
-          this.window_open_page = Brave.server.url('window_open.html')
-          this.page1 = Brave.server.url('page1.html')
-          var page1 = this.page1 // for wait closure
-
-          yield this.app.client
-            .waitUntilWindowLoaded()
-            .waitForVisible(activeWebview)
-            .tabByIndex(0)
-            .url(this.window_open_page)
-            .execute(function (page1) {
-              global.triggerFunction = function () {
-                return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
-              }
-            }, this.page1)
-            .click('#trigger')
-            .waitUntil(function () {
-              return this.getWindowCount().then((count) => {
-                return count === 2
-              })
-            })
-            // page1 loaded
-            .tabByUrl(page1).getUrl().should.become(page1)
-        })
-
-        it('has parent document.domain set to localhost', function * () {
-          yield this.app.client
-            .tabByUrl(this.window_open_page)
-            .execute(function () {
-              return document.domain
-            }).then((response) => response.value).should.eventually.be.equal('localhost')
-        })
-
-        it('has document.domain set to localhost', function * () {
-          yield this.app.client
-            .tabByUrl(this.page1)
-            .execute(function () {
-              return document.domain
-            }).then((response) => response.value).should.eventually.be.equal('localhost')
-        })
-
-        it('has urestricted access in parent to child window', function * () {
-          yield this.app.client
-            .tabByUrl(this.window_open_page)
-            .execute(function () {
-              return window.WINDOW_REF.eval('1+2')
-            }).then((response) => response.value).should.eventually.be.equal(3)
-        })
-
-        it('has urestricted access to parent window through the opener', function * () {
-          yield this.app.client
-            .tabByUrl(this.page1)
-            .execute(function () {
-              return window.opener.eval('1+2')
-            })
-            .then((response) => response.value)
-            .should.eventually.be.equal(3)
-        })
-
-        it.skip('focuses the opener', function * () {
-          yield this.app.client
-            // make sure the child window has focus
-            .tabByUrl(this.page1)
-            .waitUntil(function () {
-              return this.execute(function () {
-                return document.hasFocus() === true
-              })
-            })
-            .execute(function () {
-              window.opener.focus()
-            })
-            // wait for focus
-            .windowParentByUrl(this.window_open_page)
-            .waitUntil(function () {
-              return this.execute(function () {
-                return (document.hasFocus() === true)
-              })
-            })
-            .windowParentByUrl(this.window_open_page)
-            .execute(function () {
-              return document.hasFocus()
-            }).then((response) => response.value).should.eventually.be.equal(true, 'expected opener to be focused, but was blurred')
-        })
-
-        it.skip('blurs the opener', function * () {
-          yield this.app.client
-            // make sure parent window has focus
-            .tabByUrl(this.page1)
-            .execute(function () {
-              window.opener.focus()
-            })
-            .waitUntil(function () {
-              return this.execute(function () {
-                return document.hasFocus() === false
-              })
-            })
-            // blur parent window
-            .tabByUrl(this.page1)
-            .execute(function () {
-              window.opener.blur()
-            })
-            .windowParentByUrl(this.window_open_page)
-            .waitUntil(function () {
-              return this.execute(function () {
-                return document.hasFocus() === false
-              })
-            })
-            .execute(function () {
-              return document.hasFocus()
-            }).then((response) => response.value).should.eventually.be.equal(false, 'expected opener to be blurred, but was focused')
-        })
-
-        it('can be focused/blurred/closed by the opener')
+      it('has parent document.domain set to localhost', function * () {
+        yield this.app.client
+          .tabByUrl(this.window_open_page)
+          .execute(function () {
+            return document.domain
+          }).then((response) => response.value).should.eventually.be.equal('localhost')
       })
+
+      it('has document.domain set to 127.0.0.1', function * () {
+        yield this.app.client
+          .tabByUrl(this.page1)
+          .execute(function () {
+            return document.domain
+          }).then((response) => response.value).should.eventually.be.equal('127.0.0.1')
+      })
+
+      it('can communicate with the opener through postMessage', function * () {
+        yield this.app.client
+          // make sure the child window has focus
+          .tabByUrl(this.window_open_page)
+          .execute(function () {
+            global.events = []
+            window.addEventListener('message', function (event) {
+              global.events.push(event.data)
+            })
+          })
+          .tabByUrl(this.page1)
+          .execute(function () {
+            window.opener.postMessage('any origin', '*')
+          })
+          .execute(function (origin) {
+            window.opener.postMessage('target origin', origin)
+          }, Brave.server.urlOrigin())
+          .execute(function () {
+            window.opener.postMessage('other origin', 'https://somedomain.com')
+          })
+          .tabByUrl(this.window_open_page)
+          .execute(function () {
+            return global.events
+          }).then((response) => response.value).should.become(['any origin', 'target origin'])
+      })
+
+      it('has restricted access in parent to child window', function * () {
+        yield this.app.client
+          .tabByUrl(this.window_open_page)
+          .execute(function () {
+            return window.WINDOW_REF.eval('1+2')
+          }).should.be.rejectedWith(Error)
+      })
+
+      it('has restricted access to parent window through the opener', function * () {
+        yield this.app.client
+          .tabByUrl(this.page1)
+          .execute(function () {
+            return window.opener.eval('1+2')
+          }).should.be.rejectedWith(Error)
+      })
+    })
+
+    describe('same document.domain', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        this.window_open_page = Brave.server.url('window_open.html')
+        this.page1 = Brave.server.url('page1.html')
+        var page1 = this.page1 // for wait closure
+
+        yield this.app.client
+          .waitUntilWindowLoaded()
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForUrl(Brave.newTabUrl)
+          .url(this.window_open_page)
+          .execute(function (page1) {
+            global.triggerFunction = function () {
+              return window.open(page1, 'page1', 'height=300, width=480, top=100, left=0')
+            }
+          }, this.page1)
+          .click('#trigger')
+          .waitUntil(function () {
+            return this.getWindowCount().then((count) => {
+              return count === 2
+            })
+          })
+          // page1 loaded
+          .tabByUrl(page1).getUrl().should.become(page1)
+      })
+
+      it('has parent document.domain set to localhost', function * () {
+        yield this.app.client
+          .tabByUrl(this.window_open_page)
+          .execute(function () {
+            return document.domain
+          }).then((response) => response.value).should.eventually.be.equal('localhost')
+      })
+
+      it('has document.domain set to localhost', function * () {
+        yield this.app.client
+          .tabByUrl(this.page1)
+          .execute(function () {
+            return document.domain
+          }).then((response) => response.value).should.eventually.be.equal('localhost')
+      })
+
+      it('has urestricted access in parent to child window', function * () {
+        yield this.app.client
+          .tabByUrl(this.window_open_page)
+          .execute(function () {
+            return window.WINDOW_REF.eval('1+2')
+          }).then((response) => response.value).should.eventually.be.equal(3)
+      })
+
+      it('has urestricted access to parent window through the opener', function * () {
+        yield this.app.client
+          .tabByUrl(this.page1)
+          .execute(function () {
+            return window.opener.eval('1+2')
+          })
+          .then((response) => response.value)
+          .should.eventually.be.equal(3)
+      })
+
+      it.skip('focuses the opener', function * () {
+        yield this.app.client
+          // make sure the child window has focus
+          .tabByUrl(this.page1)
+          .waitUntil(function () {
+            return this.execute(function () {
+              return document.hasFocus() === true
+            })
+          })
+          .execute(function () {
+            window.opener.focus()
+          })
+          // wait for focus
+          .windowParentByUrl(this.window_open_page)
+          .waitUntil(function () {
+            return this.execute(function () {
+              return (document.hasFocus() === true)
+            })
+          })
+          .windowParentByUrl(this.window_open_page)
+          .execute(function () {
+            return document.hasFocus()
+          }).then((response) => response.value).should.eventually.be.equal(true, 'expected opener to be focused, but was blurred')
+      })
+
+      it.skip('blurs the opener', function * () {
+        yield this.app.client
+          // make sure parent window has focus
+          .tabByUrl(this.page1)
+          .execute(function () {
+            window.opener.focus()
+          })
+          .waitUntil(function () {
+            return this.execute(function () {
+              return document.hasFocus() === false
+            })
+          })
+          // blur parent window
+          .tabByUrl(this.page1)
+          .execute(function () {
+            window.opener.blur()
+          })
+          .windowParentByUrl(this.window_open_page)
+          .waitUntil(function () {
+            return this.execute(function () {
+              return document.hasFocus() === false
+            })
+          })
+          .execute(function () {
+            return document.hasFocus()
+          }).then((response) => response.value).should.eventually.be.equal(false, 'expected opener to be blurred, but was focused')
+      })
+
+      it('can be focused/blurred/closed by the opener')
     })
   })
 
@@ -488,6 +490,8 @@ describe('application window', function () {
 
       yield this.app.client
         .waitUntilWindowLoaded()
+        .waitForUrl(Brave.newTabUrl)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(activeWebview)
         .tabByIndex(0)
         .url(this.window_open_page)
@@ -522,8 +526,9 @@ describe('application window', function () {
         var page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .windowByIndex(0)
           .waitUntilWindowLoaded()
+          .waitForUrl(Brave.newTabUrl)
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForVisible(activeWebview)
           .tabByIndex(0)
           .url(Brave.server.url('window_open.html'))
@@ -565,8 +570,8 @@ describe('application window', function () {
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .tabByIndex(0)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
           .waitForVisible('#name')
           .click('#name')
@@ -613,8 +618,11 @@ describe('application window', function () {
       before(function * () {
         this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
+        this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
+          .waitUntilWindowLoaded()
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
           .waitForVisible('#none')
@@ -638,8 +646,11 @@ describe('application window', function () {
       before(function * () {
         this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
+        this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
+          .waitUntilWindowLoaded()
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
           .waitForVisible('#_self')
@@ -663,8 +674,11 @@ describe('application window', function () {
       before(function * () {
         this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
+        this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
+          .waitUntilWindowLoaded()
+          .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
           .frame('parent')
@@ -689,11 +703,12 @@ describe('application window', function () {
       before(function * () {
         this.clickWithTargetPage = Brave.server.url('click_with_target.html')
         this.page1 = Brave.server.url('page1.html')
+        this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
           .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .tabByUrl(Brave.newTabUrl)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
           .frame('parent')
           .frame('top')

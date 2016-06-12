@@ -10,9 +10,8 @@ describe('pinnedTabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
-      .waitForBrowserWindow()
       .waitForUrl(Brave.newTabUrl)
-      .windowByIndex(0)
+      .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
