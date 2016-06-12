@@ -3,7 +3,7 @@
 ## Debugging the Render processes
 
 Most of the time you'll be debugging the render process and this can be done with the built in developer tools.
-To open the dev tools use `Command+Alt+J` on OS X or `Control+Alt+J` on Windows.
+To open the dev tools use `Command+Alt+J` on OS X or `Control+Alt+J` on Windows and Linux.
 
 If you've ever used the built in Chrome developer tools you'll be right at home with a DOM inspector, Network monitor, Sources debugging, Timeline, Resources, Audits, and Console.
 
