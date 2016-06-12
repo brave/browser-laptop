@@ -92,7 +92,7 @@ class ContextMenuItem extends ImmutableComponent {
       let zoomLevel
       if (!activeSiteSettings || activeSiteSettings.get('zoomLevel') === undefined) {
         const settingDefaultZoom = getSetting(settings.DEFAULT_ZOOM_LEVEL)
-        zoomLevel = settingDefaultZoom === undefined ? config.zoom.defaultValue : settingDefaultZoom
+        zoomLevel = settingDefaultZoom === undefined || settingDefaultZoom === null ? config.zoom.defaultValue : settingDefaultZoom
       } else {
         zoomLevel = activeSiteSettings.get('zoomLevel')
       }

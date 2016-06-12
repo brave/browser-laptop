@@ -345,7 +345,7 @@ class AdvancedTab extends ImmutableComponent {
       <SettingsList dataL10nId='contentRenderingOptions'>
         <SettingItem dataL10nId='defaultZoomLevel'>
           <select
-            value={defaultZoomSetting === undefined ? config.zoom.defaultValue : defaultZoomSetting}
+            value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
             data-type='float'
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
             {

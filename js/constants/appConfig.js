@@ -99,6 +99,7 @@ module.exports = {
     'security.passwords.dashlane-enabled': false,
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'win32',
-    'advanced.hardware-acceleration-enabled': true
+    'advanced.hardware-acceleration-enabled': true,
+    'advanced.default-zoom-level': null
   }
 }
