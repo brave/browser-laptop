@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Immutable = require('immutable')
 const Serializer = require('./serializer')
 const messages = require('../constants/messages')
 const electron = process.type === 'renderer' ? global.require('electron') : require('electron')
@@ -47,9 +46,8 @@ class AppDispatcher {
    * to the main process where the all other registered callbacks will be run. The main
    * process will not run any callbacks for the renderer process that send messages.DISPATCH_ACTION
    * @param  {object} payload The data from the action.
-   * @param  {object} caller The webContents that triggered the dispatch
    */
-  dispatch (payload, caller) {
+  dispatch (payload) {
     if (payload.actionType === undefined) {
       throw new Error('Dispatcher: Undefined action for payload', payload)
     }
@@ -66,7 +64,7 @@ class AppDispatcher {
     this.callbacks.forEach(function (callback, i) {
       // Callback can return an obj, to resolve, or a promise, to chain.
       // See waitFor() for why this might be useful.
-      Promise.resolve(callback(payload, caller)).then(function () {
+      Promise.resolve(callback(payload)).then(function () {
         resolves[i](payload)
       }, function () {
         rejects[i](new Error('Dispatcher callback unsuccessful'))
@@ -88,9 +86,9 @@ if (process.type !== 'renderer') {
   const ipcMain = electron.ipcMain
   ipcMain.on('app-dispatcher-register', (event) => {
     let registrant = event.sender
-    const callback = function (payload, caller) {
+    const callback = function (payload) {
       try {
-        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload), caller ? caller.getId() : -1)
+        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
       } catch (e) {
         console.error('unregistering callback', e)
         appDispatcher.unregister(callback)
@@ -107,20 +105,23 @@ if (process.type !== 'renderer') {
 
   ipcMain.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
-    let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
-    queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-    let sender = event.sender.hostWebContents || event.sender
-    let win = require('electron').BrowserWindow.fromWebContents(sender)
-    if (win) {
+
+    if (event.sender.hostWebContents) {
+      // received from an extension
+      // only extension messages will have a hostWebContents
+      let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
+      queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
+      let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
+      // default to the windowId of the hostWebContents
       queryInfo.windowId = queryInfo.windowId || win.id
-      queryInfo = Immutable.fromJS(queryInfo)
-    }
-    if (payload.queryInfo) {
+      // add queryInfo if we only had frameProps before
       payload.queryInfo = queryInfo
+
+      appDispatcher.dispatch(payload, event.sender.hostWebContents)
     } else {
-      payload.frameProps = queryInfo
+      // received from a browser window
+      appDispatcher.dispatch(payload, event.sender)
     }
-    appDispatcher.dispatch(payload, sender)
   })
 }
 
