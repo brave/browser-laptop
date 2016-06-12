@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function () {
-  function sendMessage() {
+var port = (function () {
+  function sendHello() {
     port.postMessage({url: window.location.href})
   }
 
   function onMessage(m) {
     if (m.msg === 'wait') {
-      setTimeout(sendMessage, 100)
+      setTimeout(sendHello, 100)
       return
     }
 
@@ -23,7 +23,11 @@
 
   var port = chrome.runtime.connect({name: "brave-default"})
   port.onMessage.addListener(onMessage)
-  sendMessage()
+  sendHello()
 
-  /* End block of 3rd party storage */
+  return port
 }).apply(this)
+
+function sendMessage (msg) {
+  port.postMessage(msg)
+}
