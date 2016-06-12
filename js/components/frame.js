@@ -11,6 +11,7 @@ const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
+const { getZoomValuePercentage, getNextZoomLevel } = require('../lib/zoom')
 const messages = require('../constants/messages.js')
 const remote = global.require('electron').remote
 const contextMenus = require('../contextMenus')
@@ -162,7 +163,7 @@ class Frame extends ImmutableComponent {
   componentDidMount () {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
-      this.webview.setZoomLevel(this.zoomLevel)
+      this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
       this.webview.setAudioMuted(this.props.frame.get('audioMuted') || false)
       this.updateAboutDetails()
     }
@@ -177,25 +178,19 @@ class Frame extends ImmutableComponent {
     return activeSiteSettings.get('zoomLevel')
   }
 
-  zoom (stepSize) {
-    let newZoomLevel = this.zoomLevel
-    if (stepSize !== undefined &&
-        config.zoom.max >= this.zoomLevel + stepSize &&
-      config.zoom.min <= this.zoomLevel + stepSize) {
-      newZoomLevel += stepSize
-    } else if (stepSize === undefined) {
-      newZoomLevel = config.zoom.defaultValue
-    }
+  zoom (zoomIn) {
+    const newZoomLevel =
+      zoomIn === undefined ? 0 : getNextZoomLevel(this.zoomLevel, zoomIn)
     appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel,
                                  this.props.frame.get('isPrivate'))
   }
 
   zoomIn () {
-    this.zoom(config.zoom.step)
+    this.zoom(true)
   }
 
   zoomOut () {
-    this.zoom(config.zoom.step * -1)
+    this.zoom(false)
   }
 
   zoomReset () {
@@ -206,7 +201,7 @@ class Frame extends ImmutableComponent {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
       this.handleShortcut()
-      this.webview.setZoomLevel(this.zoomLevel)
+      this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
       // give focus when switching tabs
       if (this.props.isActive && !prevProps.isActive) {
         this.webview.focus()
