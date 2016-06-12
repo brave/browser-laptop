@@ -35,7 +35,8 @@ const settings = {
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
   LANGUAGE: 'general.language',
   // Advanced settings
-  HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled'
+  HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
+  DEFAULT_ZOOM_LEVEL: 'advanced.default-zoom-level'
 }
 
 module.exports = settings

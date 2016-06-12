@@ -172,15 +172,16 @@ class Frame extends ImmutableComponent {
 
   get zoomLevel () {
     const activeSiteSettings = this.props.frameSiteSettings
-    if (!activeSiteSettings || !activeSiteSettings.get('zoomLevel')) {
-      return config.zoom.defaultValue
+    if (!activeSiteSettings || activeSiteSettings.get('zoomLevel') === undefined) {
+      const settingDefaultZoom = getSetting(settings.DEFAULT_ZOOM_LEVEL)
+      return settingDefaultZoom === undefined ? config.zoom.defaultValue : settingDefaultZoom
     }
     return activeSiteSettings.get('zoomLevel')
   }
 
   zoom (zoomIn) {
     const newZoomLevel =
-      zoomIn === undefined ? 0 : getNextZoomLevel(this.zoomLevel, zoomIn)
+      zoomIn === undefined ? undefined : getNextZoomLevel(this.zoomLevel, zoomIn)
     appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel,
                                  this.props.frame.get('isPrivate'))
   }

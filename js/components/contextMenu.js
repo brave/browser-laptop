@@ -8,6 +8,8 @@ const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const config = require('../constants/config')
 const cx = require('../lib/classSet.js')
+const getSetting = require('../settings').getSetting
+const settings = require('../constants/settings')
 const { getZoomValuePercentage } = require('../lib/zoom.js')
 
 class ContextMenuItem extends ImmutableComponent {
@@ -86,7 +88,14 @@ class ContextMenuItem extends ImmutableComponent {
     }
     if (item.get('labelDataBind') === 'zoomLevel') {
       // The original zoomLevel is 0 and each increment above or below represents zooming 20% larger or smaller
-      const zoomLevel = this.props.activeSiteSettings && this.props.activeSiteSettings.get('zoomLevel') || config.zoom.defaultValue
+      const activeSiteSettings = this.props.activeSiteSettings
+      let zoomLevel
+      if (!activeSiteSettings || activeSiteSettings.get('zoomLevel') === undefined) {
+        const settingDefaultZoom = getSetting(settings.DEFAULT_ZOOM_LEVEL)
+        zoomLevel = settingDefaultZoom === undefined ? config.zoom.defaultValue : settingDefaultZoom
+      } else {
+        zoomLevel = activeSiteSettings.get('zoomLevel')
+      }
       return `${getZoomValuePercentage(zoomLevel)}%`
     }
     return ''
