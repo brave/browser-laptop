@@ -258,6 +258,16 @@ Dispatches a message to the store to set a new frame as the active frame.
 
 
 
+### setFocusedFrame(frameProps) 
+
+Dispatches a message to the store when the frame is active and the window is focused
+
+**Parameters**
+
+**frameProps**: `Object`, the frame properties for the webview in question.
+
+
+
 ### setPreviewFrame(frameProps) 
 
 Dispatches a message to the store to set a preview frame.

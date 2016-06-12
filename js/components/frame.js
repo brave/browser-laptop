@@ -344,6 +344,9 @@ class Frame extends ImmutableComponent {
       windowActions.setLinkHoverPreview(e.url, showOnRight)
     })
     this.webview.addEventListener('set-active', (e) => {
+      if (e.active && remote.getCurrentWindow().isFocused()) {
+        windowActions.setFocusedFrame(this.props.frame)
+      }
       if (e.active && !this.props.isActive) {
         windowActions.setActiveFrame(this.props.frame)
       }

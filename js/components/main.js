@@ -374,6 +374,8 @@ class Main extends ImmutableComponent {
       self.checkForTitleMode(e.pageY)
     })
     window.addEventListener('focus', () => {
+      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+      windowActions.setFocusedFrame(activeFrame)
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
