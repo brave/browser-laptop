@@ -19,6 +19,10 @@ chrome.runtime.onConnect.addListener((port) => {
     if (!port.sender || !port.sender.tab)
       return
 
+    if (msg.type === 'action') {
+      chrome.ipc.send('dispatch-action', JSON.stringify(msg.action))
+    }
+
     // have not received state yet
     if (!appState || !appConfig) {
       port.postMessage({msg: 'wait'})
