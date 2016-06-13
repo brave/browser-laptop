@@ -234,7 +234,7 @@ function registerForHeadersReceived (session) {
  * @param {string} partition name of the partition
  */
 function registerPermissionHandler (session, partition) {
-  const isPrivate = !partition.startsWith('persist:') && partition !== ''
+  const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
   let permissions = null
   session.setPermissionRequestHandler((webContents, permission, cb) => {
@@ -403,10 +403,7 @@ function registerSession (partition, fn) {
 function initForPartition (partition) {
   let fns = [registerForBeforeRequest, registerForBeforeRedirect,
     registerForBeforeSendHeaders, registerPermissionHandler]
-  if (partition !== '') {
-    // Don't block scripts in the background page
-    fns.push(registerForHeadersReceived)
-  }
+  fns.push(registerForHeadersReceived)
 
   fns.forEach(registerSession.bind(this, partition))
 }
@@ -428,7 +425,7 @@ module.exports.init = () => {
   setTimeout(() => {
     registerForDownloadListener(session.defaultSession)
   }, 1000)
-  ;[''].forEach((partition) => {
+  ;['', 'main-1'].forEach((partition) => {
     initForPartition(partition)
   })
   let initializedPartitions = {}

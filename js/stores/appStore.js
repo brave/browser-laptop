@@ -239,7 +239,7 @@ function windowDefaults () {
     windowOffset: 20,
     webPreferences: {
       sharedWorker: true,
-      partition: ''
+      partition: 'main-1'
     }
   }
 }
