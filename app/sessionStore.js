@@ -15,7 +15,6 @@ const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
 const app = electron.app
-const urlParse = require('url').parse
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
@@ -182,8 +181,7 @@ module.exports.cleanSessionData = (sessionData) => {
   if (sessionData.frames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
     sessionData.frames = sessionData.frames
-      // TODO: frame.isPinned is the old storage format, remove that condition after the year 2016
-      .filter((frame) => !frame.isPinned && !frame.pinnedLocation)
+      .filter((frame) => !frame.pinnedLocation)
     sessionData.frames.forEach(cleanFrame)
   }
 }
@@ -271,32 +269,6 @@ module.exports.loadAppState = () => {
           }
         }
       })
-    }
-    // We used to store passwords with the form action full URL. Transition
-    // to using origin + pathname for 0.9.0
-    if (data.passwords.length > 0) {
-      let newPasswords = []
-      data.passwords.forEach((entry) => {
-        if (typeof entry.action === 'string') {
-          let a = urlParse(entry.action)
-          if (a.path !== a.pathname) {
-            entry.action = [a.protocol, a.host].join('//') + a.pathname
-          }
-        } else {
-          entry.action = ''
-        }
-        // Deduplicate
-        for (let i = 0; i < newPasswords.length; i++) {
-          let newEntry = newPasswords[i]
-          if (entry.origin === newEntry.origin &&
-              entry.action === newEntry.action &&
-              entry.username === newEntry.username) {
-            return
-          }
-        }
-        newPasswords.push(entry)
-      })
-      data.passwords = newPasswords
     }
     resolve(data)
   })
