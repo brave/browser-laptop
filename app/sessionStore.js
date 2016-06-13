@@ -206,12 +206,20 @@ module.exports.cleanAppData = (data) => {
   // Delete temp site settings
   data.temporarySiteSettings = {}
   // Delete Flash state since this is checked on startup
-  delete data.flashEnabled
+  delete data.flashInitialized
   // We used to store a huge list of IDs but we didn't use them.
   // Get rid of them here.
   delete data.windows
   if (data.perWindowState) {
     data.perWindowState.forEach(module.exports.cleanSessionData)
+  }
+  // Delete expired Flash approvals
+  let now = Date.now()
+  for (var host in data.siteSettings) {
+    let expireTime = data.siteSettings[host].flash
+    if (typeof expireTime === 'number' && expireTime < now) {
+      delete data.siteSettings[host].flash
+    }
   }
 }
 

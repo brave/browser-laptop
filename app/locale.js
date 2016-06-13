@@ -28,6 +28,8 @@ var rendererIdentifiers = function () {
     'copyLinkAddress',
     'copyEmailAddress',
     'saveLinkAs',
+    'allowFlashOnce',
+    'allowFlashAlways',
     'openInNewWindow',
     'openInNewSessionTab',
     'openInNewPrivateTab',

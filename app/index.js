@@ -180,7 +180,7 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
 })
 
-let flashEnabled = false
+let flashInitialized = false
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
@@ -191,7 +191,7 @@ loadAppStatePromise.then((initialState) => {
   if (initialState.flash && initialState.flash.enabled === true) {
     if (flash.init()) {
       // Flash was initialized successfully
-      flashEnabled = true
+      flashInitialized = true
       return
     }
   }
@@ -346,7 +346,7 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
-    initialState.flashEnabled = flashEnabled
+    initialState.flashInitialized = flashInitialized
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
@@ -392,8 +392,8 @@ app.on('ready', () => {
       appActions.changeSetting(key, value)
     })
 
-    ipcMain.on(messages.CHANGE_SITE_SETTING, (e, hostPattern, key, value) => {
-      appActions.changeSiteSetting(hostPattern, key, value)
+    ipcMain.on(messages.CHANGE_SITE_SETTING, (e, hostPattern, key, value, temp) => {
+      appActions.changeSiteSetting(hostPattern, key, value, temp)
     })
 
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {

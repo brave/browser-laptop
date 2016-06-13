@@ -29,6 +29,10 @@ const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBas
 const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
+const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
+
+// Hosts that strip the Flash URL param, causing an infinite redirect loops
+const flashRedirectExceptions = ['www.pandora.com']
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -39,8 +43,6 @@ class Frame extends ImmutableComponent {
     this.onFocus = this.onFocus.bind(this)
     // Maps notification message to its callback
     this.notificationCallbacks = {}
-    // Hosts for which Flash is allowed to be detected
-    this.flashAllowedHosts = {}
     // Change to DNT requires restart
     this.doNotTrack = getSetting(settings.DO_NOT_TRACK)
   }
@@ -72,6 +74,8 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.PASSWORD_SITE_DETAILS_UPDATED,
                             this.props.allSiteSettings.filter((setting) => setting.get('savePasswords') === false).toJS())
       }
+    } else if (location === 'about:flash') {
+      this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.props.braveryDefaults)
     }
 
     // send state to about pages
@@ -91,12 +95,44 @@ class Frame extends ImmutableComponent {
     return !!(hack && hack.allowRunningInsecureContent)
   }
 
-  allowRunningPlugins () {
-    let host = urlParse(this.props.frame.get('location')).host
-    return !!(host && this.flashAllowedHosts[host])
+  allowRunningPlugins (url) {
+    if (!this.props.flashInitialized) {
+      return false
+    }
+    const origin = url ? siteUtil.getOrigin(url) : this.origin
+    if (!origin) {
+      return false
+    }
+    // Check for at least one CtP allowed on this origin
+    if (!this.props.allSiteSettings) {
+      return false
+    }
+    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
+                                                             origin)
+    if (activeSiteSettings && typeof activeSiteSettings.get('flash') === 'number') {
+      return true
+    }
+    return false
   }
 
-  updateWebview (cb) {
+  expireFlash (origin) {
+    // Expired Flash settings should be deleted when the webview is
+    // navigated or closed.
+    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
+                                                             origin)
+    if (activeSiteSettings && typeof activeSiteSettings.get('flash') === 'number') {
+      if (activeSiteSettings.get('flash') < Date.now()) {
+        // Expired entry. Remove it.
+        appActions.removeSiteSetting(origin, 'flash')
+      }
+    }
+  }
+
+  componentWillUnmount () {
+    this.expireFlash(this.origin)
+  }
+
+  updateWebview (cb, newSrc) {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
         // allow force loading of new frames
@@ -110,6 +146,7 @@ class Frame extends ImmutableComponent {
 
     let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
+    newSrc = newSrc || src
 
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
@@ -161,8 +198,10 @@ class Frame extends ImmutableComponent {
       this.webview.allowRunningPlugins = true
     }
 
-    if (!guestInstanceId || src !== 'about:blank') {
-      this.webview.setAttribute('src', isSourceAboutUrl(src) ? getTargetAboutUrl(src) : src)
+    if (!guestInstanceId || newSrc !== 'about:blank') {
+      // XXX: Should webview src always be set to location, not src? Location
+      // works for flash CtP, src loads the wrong URL.
+      this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
     }
 
     if (webviewAdded) {
@@ -244,7 +283,16 @@ class Frame extends ImmutableComponent {
       this.updateAboutDetails()
     }
 
-    if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
+    // For cross-origin navigation, clear temp Flash approvals
+    const prevOrigin = siteUtil.getOrigin(prevProps.frame.get('location'))
+    if (this.origin !== prevOrigin) {
+      this.expireFlash(prevOrigin)
+    }
+
+    if (!!this.webview.allowRunningPlugins !== this.allowRunningPlugins()) {
+      // Flash has been allowed. The location should be reloaded, not the src.
+      this.updateWebview(cb, this.props.frame.get('location'))
+    } else if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
       this.updateWebview(cb)
     } else {
       if (this.runOnDomReady) {
@@ -465,18 +513,32 @@ class Frame extends ImmutableComponent {
       method.apply(this, e.args)
     })
 
-    const interceptFlash = (url) => {
+    const reloadWithFlashAllowed = (parsedUrl) => {
+      this.webview.stop()
+      parsedUrl.search = parsedUrl.search || 'brave_flash_allowed'
+      if (!parsedUrl.search.includes('brave_flash_allowed')) {
+        parsedUrl.search = (parsedUrl.search || '') + '&brave_flash_allowed'
+      }
+      windowActions.loadUrl(this.props.frame, parsedUrl.format())
+    }
+
+    const reloadWithFlashDisallowed = (parsedUrl) => {
+      this.webview.stop()
+      parsedUrl.search = parsedUrl.search.replace(/(\?|&)?brave_flash_allowed/, '')
+      windowActions.loadUrl(this.props.frame, parsedUrl.format())
+    }
+
+    const interceptFlash = (adobeUrl) => {
       this.webview.stop()
       // Generate a random string that is unlikely to collide. Not
       // cryptographically random.
       const nonce = Math.random().toString()
-      if (this.props.flashEnabled) {
+      if (this.props.flashInitialized) {
         const parsedUrl = urlParse(this.props.frame.get('location'))
-        const host = parsedUrl.host
-        if (!host) {
+        if (!this.origin) {
           return
         }
-        const message = `Allow ${host} to run Flash Player?`
+        const message = `Allow ${this.origin} to run Flash Player?`
         // Show Flash notification bar
         appActions.showMessageBox({
           buttons: [locale.translation('deny'), locale.translation('allow')],
@@ -487,19 +549,15 @@ class Frame extends ImmutableComponent {
         })
         this.notificationCallbacks[message] = (buttonIndex) => {
           if (buttonIndex === 1) {
-            this.flashAllowedHosts[host] = true
-            parsedUrl.search = parsedUrl.search || 'brave_flash_allowed'
-            if (!parsedUrl.search.includes('brave_flash_allowed')) {
-              parsedUrl.search = parsedUrl.search + '&brave_flash_allowed'
-            }
-            windowActions.loadUrl(this.props.frame, parsedUrl.format())
+            appActions.changeSiteSetting(this.origin, 'flash', 1)
+            reloadWithFlashAllowed(parsedUrl)
           } else {
             appActions.hideMessageBox(message)
           }
         }
       } else {
         ipc.send(messages.SHOW_FLASH_INSTALLED_MESSAGE)
-        windowActions.loadUrl(this.props.frame, url)
+        windowActions.loadUrl(this.props.frame, adobeUrl)
       }
       ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex) => {
         const cb = this.notificationCallbacks[msg]
@@ -513,22 +571,26 @@ class Frame extends ImmutableComponent {
       const parsedUrl = urlParse(e.url)
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
-      const currentUrl = urlParse(this.props.frame.get('location'))
-      if ((e.url.includes('//get.adobe.com/flashplayer') ||
-           e.url.includes('//www.adobe.com/go/getflashplayer')) &&
-          ['http:', 'https:'].includes(currentUrl.protocol) &&
-          !currentUrl.hostname.includes('.adobe.com')) {
-        interceptFlash(e.url)
-      }
-      // Make sure a page that is trying to run Flash is actually allowed
-      if (parsedUrl.search && parsedUrl.search.includes('brave_flash_allowed')) {
-        if (!(parsedUrl.host in this.flashAllowedHosts)) {
-          this.webview.stop()
-          parsedUrl.search = parsedUrl.search.replace(/(\?|&)?brave_flash_allowed/, '')
-          windowActions.loadUrl(this.props.frame, parsedUrl.format())
-        }
-      }
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
+        const currentUrl = urlParse(this.props.frame.get('location'))
+        if ((e.url.includes('//get.adobe.com/flashplayer') ||
+             e.url.includes('//www.adobe.com/go/getflashplayer')) &&
+            ['http:', 'https:'].includes(currentUrl.protocol) &&
+            !currentUrl.hostname.includes('.adobe.com')) {
+          interceptFlash(e.url)
+        }
+        // Make sure a page that is trying to run Flash is actually allowed
+        const pluginsAllowed = this.allowRunningPlugins(e.url)
+        if (parsedUrl.search && parsedUrl.search.includes('brave_flash_allowed')) {
+          if (!pluginsAllowed) {
+            reloadWithFlashDisallowed(parsedUrl)
+            return
+          }
+        } else if (parsedUrl.host && pluginsAllowed &&
+                   !flashRedirectExceptions.includes(parsedUrl.hostname)) {
+          reloadWithFlashAllowed(parsedUrl)
+          return
+        }
         windowActions.onWebviewLoadStart(this.props.frame, e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
         windowActions.setSecurityState(this.props.frame, {
@@ -601,6 +663,7 @@ class Frame extends ImmutableComponent {
       loadStart(e)
     })
     this.webview.addEventListener('load-start', (e) => {
+      // XXX: loadstart probably does not need to be called twice anymore.
       loadStart(e)
     })
     this.webview.addEventListener('did-navigate', (e) => {
@@ -710,8 +773,7 @@ class Frame extends ImmutableComponent {
   }
 
   get origin () {
-    const parsedUrl = urlParse(this.props.frame.get('location'))
-    return `${parsedUrl.protocol}//${parsedUrl.host}`
+    return siteUtil.getOrigin(this.props.frame.get('location'))
   }
 
   onFocus () {
