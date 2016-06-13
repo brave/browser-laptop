@@ -130,16 +130,6 @@ class BraveryPanel extends ImmutableComponent {
   onEditGlobal () {
     ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, 'about:preferences#privacy')
   }
-  getSiteSetting (setting, defaultValue) {
-    if (!this.props.activeSiteSettings) {
-      return defaultValue
-    }
-    const val = this.props.activeSiteSettings.get(setting)
-    if (val === undefined) {
-      return defaultValue
-    }
-    return val
-  }
   onToggleSiteSetting (setting, e) {
     let ruleKey = siteUtil.getOrigin(this.props.activeRequestedLocation)
     const parsedUrl = urlParse(this.props.activeRequestedLocation)
@@ -157,11 +147,11 @@ class BraveryPanel extends ImmutableComponent {
     return this.props.activeRequestedLocation
   }
   render () {
-    const shieldsUp = this.getSiteSetting('shieldsUp', true)
-    const noScriptEnabled = this.getSiteSetting('noScript', this.props.braveryDefaults.noScript)
-    const httpseEnabled = this.getSiteSetting('httpsEverywhere', this.props.braveryDefaults.httpsEverywhere)
-    const adControl = this.getSiteSetting('adControl', this.props.braveryDefaults.adControl)
-    const fpEnabled = this.getSiteSetting('fingerprintingProtection', this.props.braveryDefaults.fingerprintingProtection)
+    const shieldsUp = this.props.braverySettings.shieldsUp
+    const noScriptEnabled = this.props.braverySettings.noScript
+    const httpseEnabled = this.props.braverySettings.httpsEverywhere
+    const adControl = this.props.braverySettings.adControl
+    const fpEnabled = this.props.braverySettings.fingerprintingProtection
     const adsBlockedStat = (this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)
     const scriptsBlockedStat = this.blockedScripts ? this.blockedScripts.size : 0
     const fpBlockedStat = this.blockedFingerprinting ? this.blockedFingerprinting.size : 0
@@ -292,12 +282,12 @@ class BraveryPanel extends ImmutableComponent {
                     braverySelectTitle: true,
                     disabled: !shieldsUp
                   })} data-l10n-id='cookieControl' />
-                  <select value={this.getSiteSetting('cookieControl', this.props.braveryDefaults.cookieControl)} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
+                  <select value={this.props.braverySettings.cookieControl} onChange={this.onToggleCookieControl} disabled={!shieldsUp}>
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
                   <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} infoUrl='https://github.com/brave/browser-laptop/wiki/Fingerprinting-Protection-Mode' />
-                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.getSiteSetting('safeBrowsing', this.props.braveryDefaults.safeBrowsing)} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} />
                 </div>
               </div></span>
             : null

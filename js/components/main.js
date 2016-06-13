@@ -488,8 +488,8 @@ class Main extends ImmutableComponent {
     windowActions.setReleaseNotesVisible(false)
   }
 
-  get enableNoScript () {
-    return siteSettings.activeSettings(this.activeSiteSettings, this.props.appState, appConfig).noScript
+  enableNoScript (settings) {
+    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript
   }
 
   onCloseFrame (activeFrameProps) {
@@ -600,28 +600,6 @@ class Main extends ImmutableComponent {
     return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && activeRequestedLocation !== 'about:safebrowsing'
   }
 
-  get braveryDefaults () {
-    const braveryDefaults = {}
-    Object.keys(appConfig.resourceNames).forEach((name) => {
-      let value = appConfig.resourceNames[name]
-      let enabled = this.props.appState.getIn([value, 'enabled'])
-      braveryDefaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
-    })
-    const replaceAds = braveryDefaults[appConfig.resourceNames.AD_INSERTION] || false
-    const blockAds = braveryDefaults[appConfig.resourceNames.ADBLOCK] || false
-    const blockTracking = braveryDefaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
-    const blockCookies = braveryDefaults[appConfig.resourceNames.COOKIEBLOCK] || false
-    braveryDefaults.adControl = 'allowAdsAndTracking'
-    if (blockAds && replaceAds && blockTracking) {
-      braveryDefaults.adControl = 'showBraveAds'
-    } else if (blockAds && !replaceAds && blockTracking) {
-      braveryDefaults.adControl = 'blockAds'
-    }
-    braveryDefaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
-    braveryDefaults.fingerprintingProtection = getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)
-    return braveryDefaults
-  }
-
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -646,7 +624,8 @@ class Main extends ImmutableComponent {
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
-    const braveryDefaults = this.braveryDefaults
+    const braveryDefaults = siteSettings.braveryDefaults(this.props.appState, appConfig)
+    const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -700,7 +679,7 @@ class Main extends ImmutableComponent {
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
-            enableNoScript={this.enableNoScript}
+            enableNoScript={this.enableNoScript(activeSiteSettings)}
             noScriptIsVisible={noScriptIsVisible}
           />
           {
@@ -714,7 +693,7 @@ class Main extends ImmutableComponent {
             ? <BraveryPanel frameProps={activeFrame}
               activeRequestedLocation={activeRequestedLocation}
               braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
-              braveryDefaults={braveryDefaults}
+              braverySettings={braverySettings}
               activeSiteSettings={activeSiteSettings}
               onHide={this.onHideBraveryPanel} />
             : null
@@ -751,7 +730,7 @@ class Main extends ImmutableComponent {
               className={cx({
                 navbutton: true,
                 braveShieldsDisabled,
-                braveShieldsDown: activeSiteSettings && activeSiteSettings.get('shieldsUp') === false
+                braveShieldsDown: !braverySettings.shieldsUp
               })}
               onClick={this.onBraveMenu} />
           </div>
@@ -828,7 +807,7 @@ class Main extends ImmutableComponent {
               passwords={this.props.appState.get('passwords')}
               allSiteSettings={allSiteSettings}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
-              enableNoScript={siteSettings.activeSettings(this.frameSiteSettings(frame.get('location')), this.props.appState, appConfig).noScript}
+              enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

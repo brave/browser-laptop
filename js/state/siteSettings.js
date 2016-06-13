@@ -4,7 +4,7 @@
 
 const Immutable = require('immutable')
 const { getSiteSettingsForURL } = require('../../app/extensions/brave/js/state/getSiteSettings')
-const { activeSettings } = require('../../app/extensions/brave/js/state/activeSettings')
+const { activeSettings, braveryDefaults } = require('../../app/extensions/brave/js/state/activeSettings')
 /**
   * Obtains the site settings stored for a specific pattern.
   * @param {Object} siteSettings - The top level app state site settings indexed by hostPattern.
@@ -37,4 +37,5 @@ module.exports.removeSiteSettings = (siteSettings, hostPattern) =>
 
 module.exports.getSiteSettingsForURL = getSiteSettingsForURL
 module.exports.activeSettings = activeSettings
+module.exports.braveryDefaults = braveryDefaults
 

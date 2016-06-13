@@ -471,17 +471,17 @@ module.exports.init = () => {
 module.exports.isResourceEnabled = (resourceName, url) => {
   const appState = AppStore.getState()
   const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
 
   // If full shields are down never enable extra protection
-  if (settings && settings.get('shieldsUp') === false) {
+  if (braverySettings.shieldsUp === false) {
     return false
   }
 
   if ((resourceName === appConfig.resourceNames.ADBLOCK ||
-       resourceName === appConfig.resourceNames.TRACKING_PROTECTION) &&
-      settings && settings.get('adControl') !== undefined) {
+       resourceName === appConfig.resourceNames.TRACKING_PROTECTION)) {
     // Check the resource vs the ad control setting
-    if (settings.get('adControl') === 'allowAdsAndTracking') {
+    if (braverySettings.adControl === 'allowAdsAndTracking') {
       return false
     } else {
       return true
@@ -489,9 +489,8 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   }
 
   // Check the resource vs the cookie setting
-  if (resourceName === appConfig.resourceNames.COOKIEBLOCK &&
-      settings && settings.get('cookieControl') !== undefined) {
-    if (settings.get('cookieControl') === 'allowAllCookies') {
+  if (resourceName === appConfig.resourceNames.COOKIEBLOCK) {
+    if (braverySettings.cookieControl === 'allowAllCookies') {
       return false
     } else {
       return true
@@ -499,15 +498,11 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   }
 
   // If the particular resource we're checking is disabled then don't enable
-  if (settings && typeof settings.get(resourceName) === 'boolean') {
-    return settings.get(resourceName)
+  if (typeof braverySettings[resourceName] === 'boolean') {
+    return braverySettings[resourceName]
   }
 
-  const enabledFromState = AppStore.getState().getIn([resourceName, 'enabled'])
-  if (enabledFromState === undefined) {
-    return appConfig[resourceName].enabled
-  }
-  return enabledFromState
+  return false
 }
 
 module.exports.clearSessionData = () => {
