@@ -2,98 +2,116 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const braveryDefaults = (appState, appConfig) => {
+  let defaults = {}
+  Object.keys(appConfig.resourceNames).forEach((name) => {
+   let value = appConfig.resourceNames[name]
+   let enabled = appState.getIn([value, 'enabled'])
+   defaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
+  })
+  let replaceAds = defaults[appConfig.resourceNames.AD_INSERTION] || false
+  let blockAds = defaults[appConfig.resourceNames.ADBLOCK] || false
+  let blockTracking = defaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
+  let blockCookies = defaults[appConfig.resourceNames.COOKIEBLOCK] || false
+  defaults.adControl = 'allowAdsAndTracking'
+  if (blockAds && replaceAds && blockTracking) {
+   defaults.adControl = 'showBraveAds'
+  } else if (blockAds && !replaceAds && blockTracking) {
+   defaults.adControl = 'blockAds'
+  }
+  defaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
+
+  // TODO(bridiver) this should work just like the other bravery settings
+  let fingerprintingProtection = appState.get('settings').get('privacy.block-canvas-fingerprinting')
+  if (typeof fingerprintingProtection !== 'boolean') {
+    fingerprintingProtection = appConfig.defaultSettings['privacy.block-canvas-fingerprinting']
+  }
+  defaults.fingerprintingProtection = fingerprintingProtection
+  return defaults
+}
+
 const activeSettings = (siteSettings, appState, appConfig) => {
-  let settings = appState.get('settings')
+  let appSettings = appState.get('settings')
+  let defaults = braveryDefaults(appState, appConfig)
+  let settings = {}
 
-  let noScript = (() => {
+  settings.locale = appState.getIn(['dictionary', 'locale'])
+
+  settings.shieldsUp = (() => {
     if (siteSettings) {
-      if (siteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (typeof siteSettings.get('noScript') === 'boolean') {
-        return siteSettings.get('noScript')
+      if (typeof siteSettings.get('shieldsUp') === 'boolean') {
+        return siteSettings.get('shieldsUp')
       }
     }
 
-    return appConfig.noScript.enabled
+    return true
   })()
 
-  let adInsertion = (() => {
-      if (siteSettings) {
-        if (siteSettings.get('shieldsUp') === false) {
-          return false
-        }
+  Object.keys(appConfig.resourceNames).forEach((resourceName) => {
+    let name = appConfig.resourceNames[resourceName]
+    settings[name] = (() => {
+      if (settings.shieldsUp === false) {
+        return false
+      }
 
-        if (typeof siteSettings.get('adControl') === 'string') {
-          if (['blockAds', 'allowAdsAndTracking'].includes(siteSettings.get('adControl'))) {
-            return false
-          } else {
-            return true
-          }
+      if (siteSettings) {
+        if (typeof siteSettings.get(name) === 'boolean') {
+          return siteSettings.get(name)
         }
       }
 
-      return appConfig.adInsertion.enabled
+      return defaults[name]
+    })()
+  })
+
+  settings.adControl = (() => {
+      if (settings.shieldsUp === false) {
+        return 'allowAdsAndTracking'
+      }
+      if (siteSettings) {
+        if (typeof siteSettings.get('adControl') === 'string') {
+          return siteSettings.get('adControl')
+        }
+      }
+
+      return defaults.adControl
     })()
 
-  let passwordManager = (() => {
-      if (settings) {
-        if (typeof settings.get('security.passwords.manager-enabled') === 'boolean') {
-          return settings.get('security.passwords.manager-enabled')
+  settings.cookieControl = (() => {
+      if (settings.shieldsUp === false) {
+        return 'allowAllCookies'
+      }
+      if (siteSettings) {
+        if (typeof siteSettings.get('cookieControl') === 'string') {
+          return siteSettings.get('cookieControl')
+        }
+      }
+
+      return defaults.cookieControl
+    })()
+
+  settings.passwordManager = (() => {
+      if (appSettings) {
+        if (typeof appSettings.get('security.passwords.manager-enabled') === 'boolean') {
+          return appSettings.get('security.passwords.manager-enabled')
         }
       }
 
       return appConfig.defaultSettings['security.passwords.manager-enabled']
     })()
 
-  let fingerprintingProtection = (() => {
-      if (siteSettings) {
-        if (siteSettings.get('shieldsUp') === false) {
-          return false
-        }
-
-        if (typeof siteSettings.get('fingerprintingProtection') === 'boolean') {
-          return siteSettings.get('fingerprintingProtection')
-        }
-      }
-
-      return appConfig.defaultSettings['privacy.block-canvas-fingerprinting']
-    })()
-
-  let block3rdPartyStorage = (() => {
-      if (siteSettings) {
-        if (siteSettings.get('shieldsUp') === false) {
-          return false
-        }
-
-        if (typeof siteSettings.get('cookieControl') === 'string') {
-          return siteSettings.get('cookieControl') === 'block3rdPartyCookie'
-        }
-      }
-
-      let enabled = appState.getIn(['cookieblock', 'enabled'])
-      if (typeof enabled !== 'boolean') {
-        enabled = appConfig.cookieblock.enabled
-      }
-
-      return enabled
-    })()
-
-  return {
-    adInsertion: {
-      enabled: adInsertion,
-      url: appConfig.adInsertion.url
-    },
-    passwordManager,
-    fingerprintingProtection,
-    block3rdPartyStorage,
-    noScript,
-    locale: appState.getIn(['dictionary', 'locale'])
+  settings.adInsertion = {
+    enabled: settings.adControl === 'showBraveAds',
+    url: appConfig.adInsertion.url
   }
+
+  settings.block3rdPartyStorage = settings.cookieControl === 'block3rdPartyCookie'
+
+  return Object.assign(defaults, settings)
 }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports.activeSettings = activeSettings;
+  module.exports.braveryDefaults = braveryDefaults;
 }
 
