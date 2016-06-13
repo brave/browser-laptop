@@ -17,7 +17,7 @@ const dragTypes = require('../constants/dragTypes')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 
-const {isUrl} = require('../lib/appUrlUtil')
+const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -200,6 +200,10 @@ class UrlBar extends ImmutableComponent {
   }
 
   get locationValue () {
+    const history = this.props.activeFrameProps.get('history')
+    if (isIntermediateAboutPage(this.props.urlbar.get('location')) && history.size > 0) {
+      return history.last()
+    }
     return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
       ? '' : this.props.urlbar.get('location')
   }
