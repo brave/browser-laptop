@@ -4,6 +4,17 @@
 
 @import "variables.less";
 
+.buttonCommon {
+  color: #fff;
+  font-size: inherit;
+  height: 22px;
+  line-height: 22px;
+  margin-right: 0px;
+  margin-top: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 span.browserButton {
   cursor: default;
   display: inline-block;
@@ -34,51 +45,56 @@ span.browserButton {
     height: 18px;
     font-size: 12px;
   }
-}
 
-span.browserButton.newFrameButton {
-  font-family: helvetica;
-  font-weight: 100;
-  font-size: 26px;
-  line-height: 17px;
-  width: 16px;
-  vertical-align: middle;
-}
+  &.newFrameButton {
+    font-family: helvetica;
+    font-weight: 100;
+    font-size: 26px;
+    line-height: 17px;
+    width: 16px;
+    vertical-align: middle;
+  }
 
-span.browserButton.menuButton {
-  height: auto;
-}
+  &.primaryButton,
+  &.actionButton,
+  &.wideButton,
+  &.secondaryButton,
+  &.subtleButton {
+    .buttonCommon;
+  }
 
-.buttonCommon {
-  color: #fff;
-  font-size: inherit;
-  height: 22px;
-  line-height: 22px;
-  margin-right: 0px;
-  margin-top: 5px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
+  &.actionButton,
+  &.wideButton,
+  &.subtleButton {
+    width: auto;
+  }
 
-span.browserButton.primaryButton {
-  background-color: @braveOrange;
-  .buttonCommon;
-}
+  &.menuButton,
+  &.wideButton {
+    height: auto;
+  }
 
-span.browserButton.wideButton {
-  background-color: #4099FF;
-  width: auto;
-  .buttonCommon;
-}
+  &.actionButton,
+  &.wideButton {
+    background-color: #4099FF;
+  }
 
-span.browserButton.secondaryButton {
-  background-color: #eee;
-  .buttonCommon;
-}
+  &.primaryButton {
+    background-color: @braveOrange;
+  }
 
-span.browserButton.subtleButton {
-  width: auto;
-  font-size: 14px;
-  background-color: #ccc;
-  .buttonCommon;
+  &.secondaryButton {
+    background-color: #eee;
+  }
+
+  &.subtleButton {
+    background-color: #ccc;
+    font-size: 14px;
+  }
+
+  &.wideButton {
+    display: block;
+    margin-right: 0px;
+    margin-left: 0px;
+  }
 }
