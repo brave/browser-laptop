@@ -340,20 +340,6 @@
     opacity: 1;
   }
 
-  .urlbarIcon.fa-unlock-alt {
-    margin-top: 4px;
-    font-size: 16px;
-    min-height: 10px;
-    min-width: 16px;
-  }
-
-  .urlbarIcon.fa-lock {
-    margin-top: 4px;
-    font-size: 16px;
-    min-height: 10px;
-    min-width: 16px;
-  }
-
   .urlbarIcon {
     color: @focusUrlbarOutline;
     left: 14px;
@@ -361,6 +347,18 @@
     font-size: 13px;
     min-height: 10px;
     min-width: 16px;
+
+    &.fa-lock,
+    &.fa-unlock-alt {
+      margin-top: 4px;
+      font-size: 16px;
+      min-height: 10px;
+      min-width: 16px;
+    }
+
+    &.fa-unlock-alt {
+        color: @gray;
+    }
 
     &.extendedValidation {
       color: green;
