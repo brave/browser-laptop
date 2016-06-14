@@ -90,6 +90,19 @@ const activeSettings = (siteSettings, appState, appConfig) => {
       return defaults.cookieControl
     })()
 
+  settings.fingerprintingProtection = (() => {
+      if (settings.shieldsUp === false) {
+        return false
+      }
+      if (siteSettings) {
+        if (typeof siteSettings.get('fingerprintingProtection') === 'boolean') {
+          return siteSettings.get('fingerprintingProtection')
+        }
+      }
+
+      return defaults.fingerprintingProtection
+    })()
+
   settings.passwordManager = (() => {
       if (appSettings) {
         if (typeof appSettings.get('security.passwords.manager-enabled') === 'boolean') {
