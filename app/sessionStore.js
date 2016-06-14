@@ -150,7 +150,10 @@ module.exports.cleanSessionData = (sessionData) => {
     // Remove open search details
     delete frame.searchDetail
     // Remove find in page details
-    delete frame.findDetail
+    if (frame.findDetail) {
+      delete frame.findDetail.numberOfMatches
+      delete frame.findDetail.activeMatchOrdinal
+    }
     delete frame.findbarShown
     // Don't restore full screen state
     delete frame.isFullScreen

@@ -334,6 +334,12 @@ class Frame extends ImmutableComponent {
           this.webview.copy()
         }
         break
+      case 'find-next':
+        this.onFindAgain(true)
+        break
+      case 'find-prev':
+        this.onFindAgain(false)
+        break
     }
     if (activeShortcut) {
       windowActions.setActiveFrameShortcut(this.props.frame, null, null)
@@ -690,9 +696,18 @@ class Frame extends ImmutableComponent {
     windowActions.setPopupWindowDetail()
   }
 
+  onFindAgain (forward) {
+    if (!this.props.frame.get('findbarShown')) {
+      windowActions.setFindbarShown(this.props.frame, true)
+    }
+    const searchString = this.props.frame.getIn(['findDetail', 'searchString'])
+    if (searchString) {
+      this.onFind(searchString, this.props.frame.getIn(['findDetail', 'caseSensitivity']), forward)
+    }
+  }
+
   onFindHide () {
     windowActions.setFindbarShown(this.props.frame, false)
-    this.onClearMatch()
   }
 
   onUpdateWheelZoom () {

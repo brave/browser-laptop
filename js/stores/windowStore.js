@@ -610,7 +610,7 @@ ipc.on(messages.IMPORT_BOOKMARKS, () => {
   }
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev']
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {

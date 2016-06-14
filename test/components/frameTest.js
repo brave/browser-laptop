@@ -87,6 +87,28 @@ describe('findbar', function () {
       .waitForVisible(findBarInput)
       .waitForElementFocus(urlInput)
   })
+
+  it('should remember the position across findbar showing', function * () {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+       .waitUntil(function () {
+         return this.getValue(findBarInput).then((val) => val === 'test')
+       })
+      .waitForVisible(findBarMatches)
+    let match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '1 of 2')
+    yield this.app.client
+      .click(findBarNextButton)
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '2 of 2')
+
+    yield this.app.client.showFindbar(false)
+      .showFindbar()
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '2 of 2')
+  })
 })
 
 describe('view source', function () {
