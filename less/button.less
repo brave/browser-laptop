@@ -61,17 +61,12 @@ span.browserButton {
   &.secondaryButton,
   &.subtleButton {
     .buttonCommon;
-  }
-
-  &.actionButton,
-  &.wideButton,
-  &.subtleButton {
     width: auto;
+    height: auto;
   }
 
-  &.menuButton,
-  &.wideButton {
-    height: auto;
+  &.primaryButton {
+    background-color: @braveOrange;
   }
 
   &.actionButton,
@@ -79,8 +74,10 @@ span.browserButton {
     background-color: #4099FF;
   }
 
-  &.primaryButton {
-    background-color: @braveOrange;
+  &.wideButton {
+    display: block;
+    margin-right: 0px;
+    margin-left: 0px;
   }
 
   &.secondaryButton {
@@ -90,11 +87,5 @@ span.browserButton {
   &.subtleButton {
     background-color: #ccc;
     font-size: 14px;
-  }
-
-  &.wideButton {
-    display: block;
-    margin-right: 0px;
-    margin-left: 0px;
   }
 }
