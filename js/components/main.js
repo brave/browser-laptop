@@ -408,6 +408,7 @@ class Main extends ImmutableComponent {
       win.setTitle(activeFrame.get('title'))
     }
 
+    // Handlers for saving window state
     win.on('maximize', function () {
       windowActions.setMaximizeState(true)
     })
@@ -416,6 +417,12 @@ class Main extends ImmutableComponent {
     })
     win.on('move', function (event) {
       windowActions.savePosition(event.sender.getPosition())
+    })
+    win.on('enter-full-screen', function (event) {
+      windowActions.setFullscreenState(true)
+    })
+    win.on('leave-full-screen', function (event) {
+      windowActions.setFullscreenState(false)
     })
   }
 

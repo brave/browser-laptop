@@ -545,6 +545,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SAVE_POSITION:
       windowState = windowState.setIn(['ui', 'position'], action.position)
       break
+    case WindowConstants.WINDOW_SET_FULLSCREEN_STATE:
+      windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
+      break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break
