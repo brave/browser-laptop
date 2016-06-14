@@ -44,6 +44,9 @@ let generateBraveManifest = () => {
         include_globs: [
           'http://*/*', 'https://*/*', 'file://*', 'data:*'
         ],
+        exclude_globs: [
+          getIndexHTML()
+        ],
         js: [
           'content/scripts/adInfo.js',
           'content/scripts/adInsertion.js',
