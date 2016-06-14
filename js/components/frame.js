@@ -121,9 +121,11 @@ class Frame extends ImmutableComponent {
 
     let partition
     if (this.props.frame.get('isPrivate')) {
-      partition = 'private-1'
+      partition = 'default'
     } else if (this.props.frame.get('partitionNumber')) {
       partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
+    } else {
+      partition = 'persist:default'
     }
     if (partition) {
       ipc.send(messages.INITIALIZE_PARTITION, partition)
