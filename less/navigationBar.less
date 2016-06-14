@@ -86,6 +86,8 @@
       width: @navbarBraveButtonWidth;
       margin-left: @navbarButtonSpacing;
       margin-right: @navbarButtonSpacing;
+      -webkit-app-region: no-drag;
+      -webkit-user-select: none;
 
       &.braveShieldsDown {
         -webkit-filter: grayscale(100%);
@@ -118,10 +120,11 @@
   .backforward {
     display: flex;
     z-index: @zindexNavigationBar;
-
     transition: margin @transitionDuration ease-in-out;
 
     span {
+      -webkit-app-region: no-drag;
+      -webkit-user-select: none;
       color: @buttonColor;
       border-radius: 50%;
       font-weight: 300;
@@ -249,12 +252,12 @@
       }
     }
 
-    .bookmark-button {
+    .bookmarkButton {
       transform: scale(0.6);
       opacity: 0.6;
       text-align: left;
 
-      &:not(.remove-bookmark-button) {
+      &:not(.removeBookmarkButton) {
         display: none;
       }
     }
@@ -335,7 +338,7 @@
     }
   }
 
-  span.navbutton.remove-bookmark-button {
+  span.navbutton.removeBookmarkButton {
     color: @braveOrange;
     opacity: 1;
   }
