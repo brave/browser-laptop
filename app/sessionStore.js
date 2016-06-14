@@ -28,6 +28,7 @@ const storagePath = process.env.NODE_ENV !== 'test'
   ? path.join(app.getPath('userData'), sessionStorageName)
   : path.join(process.env.HOME, '.brave-test-session-store-1')
 const getSetting = require('../js/settings').getSetting
+const promisify = require('../js/lib/promisify')
 
 /**
  * Saves the specified immutable browser state to storage.
@@ -61,13 +62,15 @@ module.exports.saveAppState = (payload) => {
       payload.cleanedOnShutdown = false
     }
 
-    fs.writeFile(storagePath, JSON.stringify(payload), (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
+    const epochTimestamp = (new Date()).getTime().toString()
+    const tmpStoragePath = process.env.NODE_ENV !== 'test'
+      ? path.join(app.getPath('userData'), 'session-store-tmp-' + epochTimestamp)
+      : path.join(process.env.HOME, '.brave-test-session-store-tmp-' + epochTimestamp)
+
+    promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
+      .then(() => promisify(fs.rename, tmpStoragePath, storagePath))
+      .then(() => resolve())
+      .catch((err) => reject(err))
   })
 }
 
