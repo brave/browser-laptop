@@ -40,6 +40,8 @@ class Frame extends ImmutableComponent {
     this.notificationCallbacks = {}
     // Hosts for which Flash is allowed to be detected
     this.flashAllowedHosts = {}
+    // Change to DNT requires restart
+    this.doNotTrack = getSetting(settings.DO_NOT_TRACK)
   }
 
   isAboutPage () {
@@ -526,6 +528,9 @@ class Frame extends ImmutableComponent {
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadStartScript) {
         this.webview.executeJavaScript(hack.pageLoadStartScript)
+      }
+      if (this.doNotTrack) {
+        this.webview.executeJavaScript('Navigator.prototype.__defineGetter__("doNotTrack", () => {return 1});')
       }
     }
     const loadEnd = () => {
