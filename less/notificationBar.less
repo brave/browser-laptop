@@ -4,56 +4,62 @@
 
 @import "variables.less";
 
-.notificationItem {
+.notificationBar {
   background-color: #ffefc0;
   border-bottom: 1px solid #888;
   display: inline-block;
   width: 100%;
-  padding: 6px;
+  padding: 6px 0;
 
-  .notificationMessage {
-    color: #000;
-    font-size: 15px;
-    padding-left: 10px;
-    margin: auto 0;
-  }
+  .notificationItem {
+    padding: 0 12px;
+    line-height: 24px;
 
-  .notificationSecondaryButton {
-    background-color: #eee;
-  }
+    .notificationMessage {
+      color: #000;
+      font-size: 15px;
+      margin: auto 0;
+    }
 
-  .notificationButton {
-    padding: 2px 15px;
-    width: auto;
-    margin-right: 10px;
-  }
+    .notificationSecondaryButton {
+      background-color: #eee;
+    }
 
-  .notificationOptions {
-    float: right;
-  }
+    .notificationButton {
+      padding: 2px 15px;
+      width: auto;
+      margin-right: 10px;
+    }
 
-  .notificationSpacer {
-    flex-grow: 1;
-  }
+    .notificationOptions {
+      float: right;
+    }
 
-  label {
-    font-size: 15px;
-    padding: 0 10px 0 0;
-    color: #666;
-    cursor: pointer;
-  }
-  input[type="checkbox"] {
-    margin: 0 3px;
-  }
-  button {
-    font-size: 13px;
-  }
+    .notificationSpacer {
+      flex-grow: 1;
+    }
 
-  .notificationAdvanced {
-    color: grey;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 13px;
-    margin: 5px;
+    label {
+      font-size: 15px;
+      padding: 0 10px 0 0;
+      color: #666;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      margin: 0 3px;
+    }
+
+    button {
+      font-size: 13px;
+    }
+
+    .notificationAdvanced {
+      color: grey;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 13px;
+      margin: 5px;
+    }
   }
 }
