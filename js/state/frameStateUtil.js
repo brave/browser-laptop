@@ -23,8 +23,16 @@ function isFrameKeyActive (windowState, frameKey) {
   return windowState.get('activeFrameKey') === frameKey
 }
 
+function getFrameDisplayIndex (windowState, frame) {
+  return findDisplayIndexForFrameKey(windowState.get('frames'), frame)
+}
+
 function getFrameIndex (windowState, frame) {
   return findIndexForFrameKey(windowState.get('frames'), frame)
+}
+
+function getActiveFrameDisplayIndex (windowState) {
+  return getFrameDisplayIndex(windowState, windowState.get('activeFrameKey'))
 }
 
 function getActiveFrameIndex (windowState) {
@@ -33,6 +41,27 @@ function getActiveFrameIndex (windowState) {
 
 function getFrameByIndex (windowState, i) {
   return windowState.getIn(['frames', i])
+}
+
+function getFrameKeysByDisplayIndex (frames) {
+  let framesByDisplayIndex = [[], []]
+  frames.forEach((frame) => {
+    let key = frame.get('key')
+    if (frame.get('pinnedLocation')) {
+      framesByDisplayIndex[0].push(key)
+    } else {
+      framesByDisplayIndex[1].push(key)
+    }
+  })
+  return framesByDisplayIndex.reduce(function (a, b) {
+    return a.concat(b)
+  }, [])
+}
+
+function getFrameByDisplayIndex (windowState, i) {
+  let frames = getFrameKeysByDisplayIndex(windowState.get('frames'))
+  let key = frames[i]
+  return getFrameByKey(windowState, key)
 }
 
 function getFrameByKey (windowState, key) {
@@ -46,6 +75,15 @@ function getFrameByTabId (windowState, tabId) {
 function getActiveFrame (windowState) {
   const activeFrameIndex = getActiveFrameIndex(windowState)
   return windowState.get('frames').get(activeFrameIndex)
+}
+
+function setActiveFrameDisplayIndex (windowState, i) {
+  const frame = getFrameByDisplayIndex(windowState, i)
+  if (!frame) {
+    return windowState
+  }
+
+  return setActiveFrameKey(windowState, frame.get('key'))
 }
 
 function setActiveFrameIndex (windowState, i) {
@@ -65,13 +103,13 @@ function setActiveFrameKey (windowState, activeFrameKey) {
 }
 
 function makeNextFrameActive (windowState) {
-  const activeFrameIndex = getActiveFrameIndex(windowState)
-  return setActiveFrameIndex(windowState, (activeFrameIndex + 1) % windowState.get('frames').size)
+  const activeFrameIndex = getActiveFrameDisplayIndex(windowState)
+  return setActiveFrameDisplayIndex(windowState, (activeFrameIndex + 1) % windowState.get('frames').size)
 }
 
 function makePrevFrameActive (windowState) {
-  const activeFrameIndex = getActiveFrameIndex(windowState)
-  return setActiveFrameIndex(windowState, (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size)
+  const activeFrameIndex = getActiveFrameDisplayIndex(windowState)
+  return setActiveFrameDisplayIndex(windowState, (windowState.get('frames').size + activeFrameIndex - 1) % windowState.get('frames').size)
 }
 
 /**
@@ -99,6 +137,13 @@ function getFramePropPath (windowState, frameProps, propName) {
  */
 function findIndexForFrameKey (frames, key) {
   return frames.findIndex(matchFrame.bind(null, {key}))
+}
+
+/**
+ * Obtains the display index for the specified frame key
+ */
+function findDisplayIndexForFrameKey (frames, key) {
+  return getFrameKeysByDisplayIndex(frames).findIndex((displayKey) => displayKey === key)
 }
 
 /**
@@ -351,11 +396,15 @@ module.exports = {
   find,
   isFrameKeyActive,
   getFrameIndex,
+  getFrameDisplayIndex,
   getActiveFrameIndex,
+  getActiveFrameDisplayIndex,
   getFrameByIndex,
+  getFrameByDisplayIndex,
   getFrameByKey,
   getFrameByTabId,
   getActiveFrame,
+  setActiveFrameDisplayIndex,
   setActiveFrameIndex,
   setActiveFrameKey,
   makeNextFrameActive,
@@ -363,7 +412,9 @@ module.exports = {
   getFramePropValue,
   getFramePropPath,
   findIndexForFrameKey,
+  findDisplayIndexForFrameKey,
   getFramePropsIndex,
+  getFrameKeysByDisplayIndex,
   getFeatures,
   addFrame,
   undoCloseFrame,
