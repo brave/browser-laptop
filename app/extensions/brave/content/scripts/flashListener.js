@@ -28,12 +28,4 @@ function flashListenerInit () {
       childList: true
     })
   })()
-
-  chrome.ipc.on('allow-flash', function (e, host) {
-    if (host === window.location.host) {
-      window.location.search = window.location.search
-        ? window.location.search + '&brave_flash_allowed'
-        : '?brave_flash_allowed'
-    }
-  })
 }

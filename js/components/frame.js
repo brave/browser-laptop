@@ -81,12 +81,18 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent()
+    return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent() ||
+      this.webview.allowRunningPlugins !== this.allowRunningPlugins()
   }
 
   allowRunningInsecureContent () {
     let hack = siteHacks[urlParse(this.props.frame.get('location')).hostname]
     return !!(hack && hack.allowRunningInsecureContent)
+  }
+
+  allowRunningPlugins () {
+    let host = urlParse(this.props.frame.get('location')).host
+    return host && this.flashAllowedHosts[host]
   }
 
   updateWebview (cb) {
@@ -139,16 +145,18 @@ class Frame extends ImmutableComponent {
       this.webview.setAttribute('partition', partition)
     }
 
-    // TODO: Conditionally set
-    this.webview.setAttribute('plugins', true)
-
-    const hack = siteHacks[urlParse(location).hostname]
+    const parsedUrl = urlParse(location)
+    const hack = siteHacks[parsedUrl.hostname]
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
     if (this.allowRunningInsecureContent()) {
       this.webview.setAttribute('allowRunningInsecureContent', true)
       this.webview.allowRunningInsecureContent = true
+    }
+    if (this.allowRunningPlugins()) {
+      this.webview.setAttribute('plugins', true)
+      this.webview.allowRunningPlugins = true
     }
 
     if (!guestInstanceId || src !== 'about:blank') {
@@ -452,34 +460,36 @@ class Frame extends ImmutableComponent {
       // Generate a random string that is unlikely to collide. Not
       // cryptographically random.
       const nonce = Math.random().toString()
-      ipc.send(messages.CHECK_FOR_FLASH, nonce)
-      ipc.once(messages.GOT_FLASH + nonce, (e, args) => {
-        if (args.installed) {
-          const host = urlParse(this.props.frame.get('location')).host
-          if (!host) {
-            return
-          }
-          const message = `Allow ${host} to run Flash Player?`
-          // Show Flash notification bar
-          appActions.showMessageBox({
-            buttons: [locale.translation('deny'), locale.translation('allow')],
-            message,
-            options: {
-              nonce
-            }
-          })
-          this.notificationCallbacks[message] = (buttonIndex) => {
-            if (buttonIndex === 1) {
-              this.flashAllowedHosts[host] = true
-              this.webview.send(messages.ALLOW_FLASH, host)
-            } else {
-              appActions.hideMessageBox(message)
-            }
-          }
-        } else {
-          windowActions.loadUrl(this.props.frame, url)
+      if (this.props.flashInstalled) {
+        const parsedUrl = urlParse(this.props.frame.get('location'))
+        const host = parsedUrl.host
+        if (!host) {
+          return
         }
-      })
+        const message = `Allow ${host} to run Flash Player?`
+        // Show Flash notification bar
+        appActions.showMessageBox({
+          buttons: [locale.translation('deny'), locale.translation('allow')],
+          message,
+          options: {
+            nonce
+          }
+        })
+        this.notificationCallbacks[message] = (buttonIndex) => {
+          if (buttonIndex === 1) {
+            this.flashAllowedHosts[host] = true
+            parsedUrl.search = parsedUrl.search || 'brave_flash_allowed'
+            if (!parsedUrl.search.includes('brave_flash_allowed')) {
+              parsedUrl.search = parsedUrl.search + '&brave_flash_allowed'
+            }
+            windowActions.loadUrl(this.props.frame, parsedUrl.format())
+          } else {
+            appActions.hideMessageBox(message)
+          }
+        }
+      } else {
+        windowActions.loadUrl(this.props.frame, url)
+      }
       ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex) => {
         const cb = this.notificationCallbacks[msg]
         if (cb) {
@@ -501,12 +511,9 @@ class Frame extends ImmutableComponent {
       }
       // Make sure a page that is trying to run Flash is actually allowed
       if (parsedUrl.search && parsedUrl.search.includes('brave_flash_allowed')) {
-        if (parsedUrl.host in this.flashAllowedHosts) {
-          // Remove it so Flash only is allowed once
-          this.flashAllowedHosts[parsedUrl.host] === undefined
-        } else {
+        if (!(parsedUrl.host in this.flashAllowedHosts)) {
           this.webview.stop()
-          parsedUrl.search = parsedUrl.search.replace('brave_flash_allowed', 'brave_flash_blocked')
+          parsedUrl.search = parsedUrl.search.replace('brave_flash_allowed', '')
           windowActions.loadUrl(this.props.frame, parsedUrl.format())
         }
       }

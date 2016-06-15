@@ -202,6 +202,8 @@ module.exports.cleanAppData = (data) => {
   data.notifications = []
   // Delete temp site settings
   data.temporarySiteSettings = {}
+  // Delete Flash state since this is checked on startup
+  delete data.flashInstalled
   // We used to store a huge list of IDs but we didn't use them.
   // Get rid of them here.
   delete data.windows

@@ -179,6 +179,8 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
 })
 
+let flashInstalled = false
+
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
   const { HARDWARE_ACCELERATION_ENABLED } = require('../js/constants/settings')
@@ -186,7 +188,11 @@ loadAppStatePromise.then((initialState) => {
     app.disableHardwareAcceleration()
   }
   if (initialState.flash && initialState.flash.enabled === true) {
-    flash.init()
+    if (flash.init()) {
+      // Flash was initialized successfully
+      flashInstalled = true
+      return
+    }
   }
 })
 
@@ -297,6 +303,7 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
+    initialState.flashInstalled = flashInstalled
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
@@ -379,14 +386,6 @@ app.on('ready', () => {
           secure: false
         })
       }
-    })
-
-    ipcMain.on(messages.CHECK_FOR_FLASH, (event, nonce) => {
-      const state = AppStore.getState()
-      const installed = state.getIn(['flash', 'enabled']) ? flash.checkForFlash() : false
-      event.sender.send(messages.GOT_FLASH + nonce, {
-        installed
-      })
     })
 
     AppStore.addChangeListener(() => {
