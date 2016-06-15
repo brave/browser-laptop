@@ -303,18 +303,28 @@ function registerPermissionHandler (session, partition) {
       return
     }
     const message = `Allow ${host} to ${permissions[permission].action}?`
-    if (!(message in permissionCallbacks)) {
-      // This notification is not shown yet
-      appActions.showMessageBox({
-        buttons: [locale.translation('deny'), locale.translation('allow')],
-        options: {
-          persist: true
-        },
-        message
-      })
+
+    const clearCallback = () => {
+      if (permissionCallbacks[message]) {
+        permissionCallbacks[message](0, false)
+      }
     }
 
+    // If this is a duplicate, clear the previous callback and use the new one
+    clearCallback()
+
+    appActions.showMessageBox({
+      buttons: [locale.translation('deny'), locale.translation('allow')],
+      options: {
+        persist: true
+      },
+      message
+    })
+
     permissionCallbacks[message] = (buttonIndex, persist) => {
+      delete permissionCallbacks[message]
+      // hide the message box if this was triggered automatically
+      appActions.hideMessageBox(message)
       const result = !!(buttonIndex)
       cb(result)
       if (persist) {
@@ -322,6 +332,23 @@ function registerPermissionHandler (session, partition) {
         appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result, isPrivate)
       }
     }
+
+    // automatically clear on close or navigation
+    webContents.on('crashed', (e) => {
+      clearCallback()
+    })
+
+    webContents.on('close', (e) => {
+      clearCallback()
+    })
+
+    webContents.on('destroyed', (e) => {
+      clearCallback()
+    })
+
+    webContents.on('did-navigate', (e) => {
+      clearCallback()
+    })
   })
 }
 
@@ -462,7 +489,6 @@ module.exports.init = () => {
   ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
     if (permissionCallbacks[message]) {
       permissionCallbacks[message](buttonIndex, persist)
-      delete permissionCallbacks[message]
     }
     appActions.hideMessageBox(message)
   })
