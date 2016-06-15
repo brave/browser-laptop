@@ -69,8 +69,8 @@ module.exports.saveAppState = (payload) => {
 
     promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
       .then(() => promisify(fs.rename, tmpStoragePath, storagePath))
-      .then(() => resolve())
-      .catch((err) => reject(err))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
