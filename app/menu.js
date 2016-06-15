@@ -347,7 +347,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('toggleFullScreenView'),
-          accelerator: 'Shift+CmdOrCtrl+F',
+          accelerator: isDarwin ? 'Ctrl+Cmd+F' : 'F11',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
               // This doesn't seem to work but also doesn't throw errors...
