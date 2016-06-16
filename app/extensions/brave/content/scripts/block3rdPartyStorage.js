@@ -23,10 +23,11 @@ function block3rdPartyStorage () {
   }
 
   function blockStorage () {
-    console.log('blocking 3rd party storage mechanisms', window.location.href)
     // Block js cookie storage
     Document.prototype.__defineGetter__('cookie', () => {return ""})
     Document.prototype.__defineSetter__('cookie', () => {})
+    // Block referrer
+    Document.prototype.__defineGetter__('referrer', () => {return ""})
     // Block websql
     window.openDatabase = () => { return {} }
     // Block FileSystem API
@@ -41,7 +42,6 @@ function block3rdPartyStorage () {
 
   function clearStorage () {
     // Clears HTML5 storage when the page is loaded/unloaded.
-    console.log('clearing 3rd party storage', window.location.href)
     window.localStorage.clear()
     window.sessionStorage.clear()
     // Clear IndexedDB
