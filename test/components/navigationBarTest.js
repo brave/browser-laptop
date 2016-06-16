@@ -6,7 +6,7 @@ const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, 
 const urlParse = require('url').parse
 const assert = require('assert')
 
-describe('urlbar', function () {
+describe('navigationBar', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()

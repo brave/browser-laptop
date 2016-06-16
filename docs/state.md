@@ -237,8 +237,15 @@ WindowStore
         searchSuggestions: boolean, // true if search suggestions are enabled
         suggestions: {
           selectedIndex: number, // index of the item in focus
-          searchResults: array,
-          suggestionList: Object,
+          searchResults: array, // autocomplete server results if enabled
+          suggestionList: {
+            title: string, // The title of the autocomplete entry
+            iconClass: string, // The fa-icon to display for the suggestion
+            location: string, // The location represented by the autocomplete entry
+            onClick: function, // The onClick handler for suggestion clicks (e.g. URL load or tab switch)
+          },
+          urlSuffix: string, // autocomplete suffix
+          autocompleteEnabled: boolean // used to enable or disable autocomplete
         },
         focused: boolean, // whether the urlbar is focused
         active: boolean, // whether the user is typing in the urlbar

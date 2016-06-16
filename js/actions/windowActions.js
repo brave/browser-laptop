@@ -485,6 +485,22 @@ const windowActions = {
     })
   },
 
+  /**
+   * Enables or disables the urlbar autocomplete.
+   * Autocomplete is defined to be the action of inserting text into the urlbar itself
+   * to the first item's URL match if possible.  The inserted text is auto selected so
+   * that the next character inserted will replace it.
+   * This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
+   *
+   * @param {boolean} enabled - true if the urlbar should autocomplete
+   */
+  setUrlBarAutocompleteEnabled: function (enabled) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED,
+      enabled
+    })
+  },
+
   /*
    * Sets the URL bar preview value.
    * TODO: name this something better.

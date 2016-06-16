@@ -49,6 +49,30 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
 }
 
 /**
+ * Updates the active frame state with what the URL bar suffix should be.
+ * @param suggestionList - The suggestion list to use to figure out the suffix.
+ */
+const updateUrlSuffix = (suggestionList) => {
+  const suggestion = suggestionList && suggestionList.get(0)
+  let suffix = ''
+  if (suggestion) {
+    const selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
+    const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
+    if (!selectedIndex && autocompleteEnabled) {
+      const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
+      const index = suggestion.location.indexOf(location)
+      if (index !== -1) {
+        const beforePrefix = suggestion.location.substring(0, index)
+        if (beforePrefix.endsWith('://') || index === 0) {
+          suffix = suggestion.location.substring(index + location.length)
+        }
+      }
+    }
+  }
+  windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
+}
+
+/**
  * Updates the tab page index to the specified frameProps
  * @param frameProps Any frame belonging to the page
  */
@@ -207,6 +231,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
+      updateUrlSuffix(windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList))
       // Since this value is bound we need to notify the control sync
       windowStore.emitChanges()
       return
@@ -390,7 +415,10 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
+      if (action.suggestionList !== undefined) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
+      }
+      updateUrlSuffix(action.suggestionList)
       break
     case WindowConstants.WINDOW_SET_URL_BAR_PREVIEW:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), action.value)
@@ -409,9 +437,14 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       if (!action.isActive) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), null)
+        windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
+          selectedIndex: null,
+          suggestionList: null
+        })
       }
+      break
+    case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])

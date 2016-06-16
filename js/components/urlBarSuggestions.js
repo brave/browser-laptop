@@ -33,6 +33,13 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   nextSuggestion () {
+    // If the user presses down and don't have an explicit selected index, skip to the 2nd one
+    const hasUrlSuffix = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
+    if (hasUrlSuffix && this.props.suggestions.get('selectedIndex') === null && this.props.suggestions.get('suggestionList').size > 1) {
+      this.updateSuggestions(2)
+      return
+    }
+
     this.updateSuggestions(this.props.suggestions.get('selectedIndex') + 1)
   }
 
@@ -78,13 +85,16 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Add an event listener on the window to hide suggestions when they are shown.
     window.addEventListener('click', this)
 
+    // If there is a URL suffix that means there's an active autocomplete for the first element.
+    // We should show that as selected so the user knows what is being matched.
+    const hasUrlSuffix = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
     return <ul className='urlBarSuggestions'>
       {suggestions.map((suggestion, index) =>
         <li data-index={index + 1}
           onMouseOver={this.onMouseOver.bind(this)}
           onClick={suggestion.onClick}
           key={suggestion.title}
-          className={this.activeIndex === index + 1 ? 'selected' : ''}>
+          className={this.activeIndex === index + 1 || index === 0 && hasUrlSuffix ? 'selected' : ''}>
           <span className={`suggestionIcon fa ${suggestion.iconClass}`} />
           <span className='suggestionText'>{suggestion.title}</span>
         </li>
@@ -136,7 +146,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     let suggestions = new Immutable.List()
     const defaultme = (x) => x
     const mapListToElements = ({data, maxResults, classHandler, clickHandler = navigateClickHandler,
-        sortHandler = defaultme, formatTitle = defaultme,
+        sortHandler = defaultme, formatTitle = defaultme, formatUrl = defaultme,
         filterValue = (site) => site.toLowerCase().includes(urlLocationLower)
     }) => // Filter out things which are already in our own list at a smaller index
       data
@@ -151,6 +161,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         return {
           onClick: clickHandler.bind(null, site),
           title: formatTitle(site),
+          location: formatUrl(site),
           iconClass: classHandler(site)
         }
       })
@@ -164,6 +175,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         clickHandler: (frameProps) =>
           windowActions.setActiveFrame(frameProps),
         formatTitle: (frame) => frame.get('title') || frame.get('location'),
+        formatUrl: (frame) => frame.get('location'),
         filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
           (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
@@ -183,6 +195,7 @@ class UrlBarSuggestions extends ImmutableComponent {
           return site2.get('tags').size - site1.get('tags').size
         },
         formatTitle: (site) => site.get('title') || site.get('location'),
+        formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
@@ -206,6 +219,7 @@ class UrlBarSuggestions extends ImmutableComponent {
           return site2.get('tags').size - site1.get('tags').size
         },
         formatTitle: (site) => site.get('title') || site.get('location'),
+        formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''

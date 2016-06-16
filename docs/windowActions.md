@@ -353,6 +353,20 @@ Sets the URL bar suggestions and selected index.
 
 
 
+### setUrlBarAutocompleteEnabled(enabled) 
+
+Enables or disables the urlbar autocomplete.
+Autocomplete is defined to be the action of inserting text into the urlbar itself
+to the first item's URL match if possible.  The inserted text is auto selected so
+that the next character inserted will replace it.
+This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
+
+**Parameters**
+
+**enabled**: `boolean`, true if the urlbar should autocomplete
+
+
+
 ### setUrlBarSuggestionSearchResults(searchResults) 
 
 Sets the URL bar suggestion search results.
