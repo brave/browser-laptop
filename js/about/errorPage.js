@@ -45,8 +45,8 @@ class ErrorPage extends React.Component {
         <span className='errorText'>{this.state.message}</span>
       </div>
       <div className='buttons'>
-        {this.showBackButton() ? <Button l10nId='back' className='wideButton' onClick={this.reloadPrevious.bind(this)} /> : null}
-        {this.state.url ? <Button l10nId='errorReload' l10nArgs={{url: this.state.url}} className='wideButton' onClick={this.reload.bind(this)} /> : null}
+        {this.showBackButton() ? <Button l10nId='back' className='actionButton' onClick={this.reloadPrevious.bind(this)} /> : null}
+        {this.state.url ? <Button l10nId='errorReload' l10nArgs={{url: this.state.url}} className='actionButton' onClick={this.reload.bind(this)} /> : null}
       </div>
     </div>
   }
