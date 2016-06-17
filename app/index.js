@@ -228,7 +228,7 @@ app.on('ready', () => {
     })
   })
   app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
+    // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       lastWindowClosed = true

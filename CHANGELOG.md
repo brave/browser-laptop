@@ -31,10 +31,10 @@
 - Fixed bookmark items middle click to open in a new tab on Windows 10. ([#1724](https://github.com/brave/browser-laptop/issues/1724))
 - Fixed redownloading files on session restore ([#1219](https://github.com/brave/browser-laptop/issues/1219))
 - Fixed pinned tabs sometimes duplicating. ([#1508](https://github.com/brave/browser-laptop/issues/1508))
-- Fixed Fullscreen mode showing a black bar up top on OS X. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
+- Fixed Fullscreen mode showing a black bar up top on macOS. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
 - Fixed contractions showing up as misspelled for spell check. ([#2015](https://github.com/brave/browser-laptop/issues/2015))
 - Fixed non-English spell checking dictionaries. ([#1788](https://github.com/brave/browser-laptop/issues/1788))
-- Possibly fixed intermittent problem with copy on OS X. ([#1060](https://github.com/brave/browser-laptop/issues/1060))
+- Possibly fixed intermittent problem with copy on macOS. ([#1060](https://github.com/brave/browser-laptop/issues/1060))
 - Upgrade to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
 - Upgrade to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))
 - Upgrade to Electron 1.2.0. ([#1968](https://github.com/brave/browser-laptop/issues/1968))
@@ -101,7 +101,7 @@
 - Zoom is now persisted across sessions and remembered per origin.
 - Added menu item to clear all cookies and site data.
 - Multi language support.  Initially this includes: en-US, nl-NL, and pt-Br.
-- Ability to open html files when Brave is the default on OS X.
+- Ability to open html files when Brave is the default on macOS.
 - Block 'javascript:' URLs from being loaded when entered in URL bar.
 - Printing fixed.
 - Fixed various bugs.
@@ -247,7 +247,7 @@
 - Context menus copy link location works in more cases now.
 - about:newtab, about:about pages implemented.
 - Placeholder ads link to a page explaining what they are.
-- 2 finger navigation on OS X.
+- 2 finger navigation on macOS.
 - Cleaned up UI to remove unneeded elements for about: pages.
 
 ## [0.7.12](https://github.com/brave/browser-laptop/releases/v0.7.12dev)

@@ -4,7 +4,7 @@
 
 **Expected behavior:**
 
-- Platform (Win7, 8, 10? OS X? Linux distro?):
+- Platform (Win7, 8, 10? macOS? Linux distro?):
 
 - Brave Version:
 

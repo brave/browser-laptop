@@ -109,7 +109,7 @@ class Main extends ImmutableComponent {
   }
 
   registerSwipeListener () {
-    // Navigates back/forward on OS X two-finger swipe
+    // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
     var deltaX = 0
     var deltaY = 0

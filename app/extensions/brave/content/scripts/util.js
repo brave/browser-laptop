@@ -57,7 +57,7 @@ function isEditable (elem) {
 }
 
 /**
- * Whether we are on OS X
+ * Whether we are on macOS
  * @return {boolean}
  */
 function isPlatformOSX () {
