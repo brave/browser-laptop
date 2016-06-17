@@ -181,16 +181,22 @@ function registerForBeforeSendHeaders (session) {
       }
     }
 
-    let hostname = urlParse(details.url || '').hostname
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl) &&
-        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
-                                        hostname)) {
-      // Clear cookie and referer on third-party requests
-      if (requestHeaders['Cookie']) {
-        requestHeaders['Cookie'] = undefined
+    let parsedUrl = urlParse(details.url || '')
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl)) {
+      if (module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
+                                          parsedUrl.hostname)) {
+        // Clear cookie and referer on third-party requests
+        if (requestHeaders['Cookie']) {
+          requestHeaders['Cookie'] = undefined
+        }
       }
-      if (requestHeaders['Referer'] && !refererExceptions.includes(hostname)) {
-        requestHeaders['Referer'] = undefined
+      if (requestHeaders['Referer'] && !refererExceptions.includes(parsedUrl.hostname)) {
+        // Clear cross-origin referer always.
+        let parsedRef = urlParse(requestHeaders['Referer'])
+        if (parsedUrl.protocol !== parsedRef.protocol ||
+            parsedUrl.host !== parsedRef.host) {
+          requestHeaders['Referer'] = undefined
+        }
       }
     }
     if (sendDNT) {

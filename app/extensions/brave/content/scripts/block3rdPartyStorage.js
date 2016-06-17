@@ -36,8 +36,24 @@ function block3rdPartyStorage () {
     window.indexedDB.open = () => { return {} }
   }
 
-  function getBlockStoragePageScript () {
-    return '(' + Function.prototype.toString.call(blockStorage) + '());'
+  function blockReferer () {
+    // Blocks cross-origin referer
+    if (!document.referrer) {
+      return
+    }
+    var parser = document.createElement('a')
+    parser.href = document.referrer
+    if (parser.origin !== document.location.origin) {
+      Document.prototype.__defineGetter__('referrer', () => {return ""})
+    }
+  }
+
+  function getBlockStoragePageScript (isThirdParty) {
+    if (isThirdParty) {
+      return '(' + Function.prototype.toString.call(blockStorage) + '());'
+    } else {
+      return '(' + Function.prototype.toString.call(blockReferer) + '());'
+    }
   }
 
   function clearStorage () {
@@ -56,8 +72,10 @@ function block3rdPartyStorage () {
   }
 
   if (is3rdPartyDoc()) {
-    insertScript(getBlockStoragePageScript())
+    insertScript(getBlockStoragePageScript(true))
     clearStorage()
     window.addEventListener('unload', clearStorage)
+  } else {
+    insertScript(getBlockStoragePageScript(false))
   }
 }
