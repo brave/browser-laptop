@@ -71,6 +71,7 @@ describe('findbar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .click(activeWebview)
+      .windowByUrl(Brave.browserWindowUrl)
       .showFindbar()
       .waitForElementFocus(findBarInput)
   })
@@ -106,6 +107,7 @@ describe('findbar', function () {
 
     yield this.app.client.showFindbar(false)
       .showFindbar()
+      .waitForElementFocus(findBarInput)
     match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '2 of 2')
   })
@@ -122,8 +124,6 @@ describe('view source', function () {
 
     yield setup(this.app.client)
     yield this.app.client
-      .waitUntilWindowLoaded()
-      .waitForVisible(activeWebview)
       .tabByIndex(0)
       .url(this.url)
       .waitForUrl(this.url)
