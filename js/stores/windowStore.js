@@ -63,7 +63,7 @@ const updateUrlSuffix = (suggestionList) => {
       const index = suggestion.location.indexOf(location)
       if (index !== -1) {
         const beforePrefix = suggestion.location.substring(0, index)
-        if (beforePrefix.endsWith('://') || index === 0) {
+        if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
           suffix = suggestion.location.substring(index + location.length)
         }
       }
