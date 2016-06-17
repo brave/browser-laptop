@@ -195,10 +195,10 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentWillMount () {
-    ipc.on(messages.SHORTCUT_FOCUS_URL, (e, forSearchMode) => {
+    ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
       this.updateLocationToSuggestion()
-      windowActions.setUrlBarSelected(true, forSearchMode)
+      windowActions.setUrlBarSelected(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
       this.updateDOM()
     })
@@ -322,8 +322,7 @@ class UrlBar extends ImmutableComponent {
           'fa': true,
           'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
           'fa-unlock-alt': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
-          'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
-          'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+          'fa fa-file': this.props.urlbar.get('active') && this.props.loading === false,
           extendedValidation: this.extendedValidationSSL
         })} />
         {
@@ -370,7 +369,6 @@ class UrlBar extends ImmutableComponent {
             sites={this.props.sites}
             frames={this.props.frames}
             searchDetail={this.searchDetail}
-            searchSuggestions={this.props.searchSuggestions}
             activeFrameProps={this.props.activeFrameProps}
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}

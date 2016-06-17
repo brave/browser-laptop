@@ -161,8 +161,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         return {
           onClick: clickHandler.bind(null, site),
           title: formatTitle(site),
-          location: formatUrl(site),
-          iconClass: classHandler(site)
+          location: formatUrl(site)
         }
       })
 
@@ -231,7 +230,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     // Search suggestions
-    if (this.props.searchSuggestions) {
+    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.suggestions.get('searchResults'),
         maxResults: config.urlBarSuggestions.maxTopSites,
@@ -266,7 +265,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   searchXHR () {
-    if (!this.props.searchSuggestions) {
+    if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
       this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
       return
     }

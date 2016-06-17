@@ -677,7 +677,6 @@ class Main extends ImmutableComponent {
             sites={this.props.appState.get('sites')}
             activeFrame={activeFrame}
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
             enableNoScript={this.enableNoScript(activeSiteSettings)}
             noScriptIsVisible={noScriptIsVisible}

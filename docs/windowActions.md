@@ -379,15 +379,13 @@ Note: This should eventually be refactored outside of the component doing XHR an
 
 
 
-### setUrlBarSelected(isSelected, forSearchMode) 
+### setUrlBarSelected(isSelected) 
 
 Marks the URL bar text as selected or not
 
 **Parameters**
 
 **isSelected**: `boolean`, Whether or not the URL bar text input should be selected
-
-**forSearchMode**: `boolean`, Whether or not to enable auto-complete search suggestions
 
 
 

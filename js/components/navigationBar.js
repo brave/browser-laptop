@@ -153,7 +153,6 @@ class NavigationBar extends ImmutableComponent {
         sites={this.props.sites}
         activeFrameProps={frameProps}
         searchDetail={this.props.searchDetail}
-        searchSuggestions={this.props.searchSuggestions}
         frames={this.props.frames}
         loading={this.loading}
         titleMode={this.titleMode}

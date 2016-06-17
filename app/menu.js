@@ -104,7 +104,7 @@ const init = (settingsState, args) => {
       label: locale.translation('openLocation'),
       accelerator: 'CmdOrCtrl+L',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL])
       }
     },
     CommonMenu.separatorMenuItem,

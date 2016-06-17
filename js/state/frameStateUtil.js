@@ -258,7 +258,6 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     parentFrameKey: frameOpts.parentFrameKey,
     guestInstanceId: frameOpts.guestInstanceId,
     navbar: {
-      searchSuggestions: true,
       focused: navbarFocus,
       urlbar: {
         location: frameOpts.delayedLoadUrl || url,

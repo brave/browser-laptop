@@ -455,9 +455,6 @@ const doAction = (action) => {
       if (action.selected) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), true)
       }
-      if (action.forSearchMode !== undefined) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'searchSuggestions']), action.forSearchMode)
-      }
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
       const framePath = action.frameProps ? ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)] : activeFrameStatePath()
