@@ -26,6 +26,7 @@ describe('urlBar', function () {
       yield this.app.client
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
+        .addSite({ location: 'https://www.youtube.com' })
     })
 
     beforeEach(function * () {
@@ -49,6 +50,16 @@ describe('urlBar', function () {
         .waitUntil(function () {
           return this.getValue(urlInput)
             .then((val) => val === 'https://brave.com')
+        })
+    })
+
+    it('autocompletes without www.', function * () {
+      // now type something
+      yield this.app.client
+        .keys('you')
+        .waitUntil(function () {
+          return this.getValue(urlInput)
+            .then((val) => val === 'youtube.com')
         })
     })
 

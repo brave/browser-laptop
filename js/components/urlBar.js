@@ -79,8 +79,14 @@ class UrlBar extends ImmutableComponent {
         windowActions.setUrlBarActive(false)
         this.restore()
         e.preventDefault()
-        // The user pressed enter so make sure to include the autocomplete suffix which is shown as well.
-        let location = this.props.urlbar.get('location') + (this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || '')
+
+        let location = this.props.urlbar.get('location')
+
+        // If a suffix is present then the user wants the first suggestion instead
+        if (this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])) {
+          location = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', 0]).location
+        }
+
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
         } else {
