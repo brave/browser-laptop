@@ -501,6 +501,10 @@ module.exports.init = () => {
 }
 
 module.exports.isResourceEnabled = (resourceName, url) => {
+  if (resourceName === 'siteHacks') {
+    return true
+  }
+
   const appState = AppStore.getState()
   const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
   const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
