@@ -755,7 +755,7 @@ const windowActions = {
    * Sets the fullscreen state of the window
    * @param {boolean} isFullScreen - true if window is fullscreen
    */
-  setFullscreenState: function (isFullScreen) {
+  setWindowFullScreen: function (isFullScreen) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_FULLSCREEN_STATE,
       isFullScreen

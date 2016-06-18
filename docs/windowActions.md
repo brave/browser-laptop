@@ -570,7 +570,7 @@ Saves the position of the window in the window state
 
 
 
-### setFullscreenState(isFullScreen) 
+### setWindowFullScreen(isFullScreen) 
 
 Sets the fullscreen state of the window
 

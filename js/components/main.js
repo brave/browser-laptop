@@ -412,17 +412,27 @@ class Main extends ImmutableComponent {
     win.on('maximize', function () {
       windowActions.setMaximizeState(true)
     })
+
     win.on('unmaximize', function () {
       windowActions.setMaximizeState(false)
     })
+
+    let moveTimeout = null
     win.on('move', function (event) {
-      windowActions.savePosition(event.sender.getPosition())
+      if (moveTimeout) {
+        clearTimeout(moveTimeout)
+      }
+      moveTimeout = setTimeout(function () {
+        windowActions.savePosition(event.sender.getPosition())
+      }, 1000)
     })
+
     win.on('enter-full-screen', function (event) {
-      windowActions.setFullscreenState(true)
+      windowActions.setWindowFullScreen(true)
     })
+
     win.on('leave-full-screen', function (event) {
-      windowActions.setFullscreenState(false)
+      windowActions.setWindowFullScreen(false)
     })
   }
 
