@@ -1,11 +1,21 @@
 # Changelog
 
 ## [0.10.4](https://github.com/brave/browser-laptop/releases/v0.10.4dev)
-- Add Flash support via extra user approval. ([#1093](https://github.com/brave/browser-laptop/issues/1093))
-- Added option for disabling title mode (defaulted to on for Windows until we remove the title bar). ([#1984](https://github.com/brave/browser-laptop/issues/1984))
+- Added Flash support via extra user approval. ([#1093](https://github.com/brave/browser-laptop/issues/1093))
+- Added autocomplete support in the URL bar. ([#1596](https://github.com/brave/browser-laptop/issues/1596))
 - Added blocking for 3rd party client storage mechanisms. ([#313](https://github.com/brave/browser-laptop/issues/313))
+- Added blocking for 3rd party referrers. ([#2214](https://github.com/brave/browser-laptop/issues/2214))
+- Added default content zoom option. ([#1401](https://github.com/brave/browser-laptop/issues/1401))
+- Added option for disabling title mode (defaulted to on for Windows until we remove the title bar). ([#1984](https://github.com/brave/browser-laptop/issues/1984))
 - Improved Bookmarks Manager folders so they stick when scrolling. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
+- Improved session storage saving to write in a more safe way. ([#2067](https://github.com/brave/browser-laptop/issues/2067))
+- Improved zoom handling. ([#2165](https://github.com/brave/browser-laptop/issues/2165))
 - Fixed Twitch.tv playing streams twice. ([#2119](https://github.com/brave/browser-laptop/issues/2119))
+- Fixed crash when navigating with the notification bar open. ([#1726](https://github.com/brave/browser-laptop/issues/1726))
+- Fixed tab page ordering with pinned tabs. ([#149](https://github.com/brave/browser-laptop/issues/149))
+- Fixed window state not saving in session storage. ([#146](https://github.com/brave/browser-laptop/issues/146))
+- Fixed navigator.doNotTrack not reporting correctly. ([#2177](https://github.com/brave/browser-laptop/issues/2177))
+- Fixed window titles not showing up in the Window menu in macOS. ([#2192](https://github.com/brave/browser-laptop/issues/2192))
 - Fixed navigation controller sometimes making back button not function correctly. ([#2144](https://github.com/brave/browser-laptop/issues/2144))
 - Fixed Fullscreen mode on Windows so it hides menu bar. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
 
