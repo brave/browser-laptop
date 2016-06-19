@@ -17,7 +17,7 @@
 - Fixed navigator.doNotTrack not reporting correctly. ([#2177](https://github.com/brave/browser-laptop/issues/2177))
 - Fixed window titles not showing up in the Window menu in macOS. ([#2192](https://github.com/brave/browser-laptop/issues/2192))
 - Fixed navigation controller sometimes making back button not function correctly. ([#2144](https://github.com/brave/browser-laptop/issues/2144))
-- Fixed Fullscreen mode on Windows so it hides menu bar. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
+- Fixed Fullscreen mode on Windows so it hides menu bar. ([#2053](https://github.com/brave/browser-laptop/issues/2053))
 
 ## [0.10.3](https://github.com/brave/browser-laptop/releases/v0.10.3dev)
 - Upgrade to libchromiumcontent 51.0.2704.84. ([#2122](https://github.com/brave/browser-laptop/issues/2122))
