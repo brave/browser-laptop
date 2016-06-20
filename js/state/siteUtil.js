@@ -198,22 +198,6 @@ module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prep
   return sites.splice(newIndex, 0, sourceSite)
 }
 
-/**
- * Determines the icon class to use for the site
- *
- * @param site The site in question
- * @return the class of the fontawesome icon to use
- */
-module.exports.getSiteIconClass = function (site) {
-  if (site.get('tags').includes('bookmark')) {
-    return 'fa-star-o'
-  }
-  if (site.get('tags').includes('reader')) {
-    return 'fa-book'
-  }
-  return 'fa-file-o'
-}
-
 module.exports.getDetailFromFrame = function (frame, tag) {
   let location = frame.get('location')
   if (frame.get('pinnedLocation') && tag === siteTags.PINNED) {

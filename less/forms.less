@@ -309,16 +309,17 @@
   .urlBarSuggestions {
     .flyoutDialog;
     box-sizing: border-box;
-    width: 100%;
     left: 0;
+    padding: 0 0;
+    width: 100%;
     z-index: @zindexForms;
 
-    .suggestionIcon {
-      margin-right: 10px;
-    }
 
-    .suggestionText {
+    .suggestionTitle {
       display: inline-block;
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -326,22 +327,61 @@
       vertical-align: middle;
     }
 
+    .suggestionSection {
+      border-bottom: 1px solid @toolbarBorderColor;
+
+      .suggestionSectionTitle {
+        color: #abadae;
+        display: inline-block;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 60px;
+      }
+
+      .suggestionSectionIcon {
+        margin-left: 4px;
+        &.bookmarksTitle {
+          color: @braveOrange;
+        }
+        &.tabsTitle {
+          color: @highlightBlue;
+        }
+        &.topSiteTitle, &.historyTitle, &.searchTitle {
+          color: #333;
+        }
+      }
+    }
+
     li {
       list-style-type: none;
-      padding: 10px 0;
+      padding: 10px 20px;
       z-index: @zindexSuggestionText;
 
-      &.selected {
+      &.bookmarkSuggestion:not(.selected) .suggestionTitle {
+        color: @braveOrange;
+      }
+
+      &.tabSuggestion:not(.selected) .suggestionTitle {
         color: @highlightBlue;
+      }
+
+      &.topSiteSuggestion, &.searchSuggestion {
+        padding: 7px 20px;
+        .suggestionTitle {
+          font-size: inherit;
+          font-weight: inherit;
+        }
+      }
+
+      &.selected {
+        color: white;
+        background-color: @highlightBlue;
+        background: linear-gradient(#51A5F9, #2B78CA);
       }
       * {
         /* To allow for mouse listeners to work on the list items. */
         pointer-events: none;
       }
-    }
-
-    li + li {
-      border-top: 1px solid @chromeControlsBackground;
     }
   }
 }

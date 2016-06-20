@@ -23,10 +23,11 @@ module.exports = {
   defaultLocale: 'en-US',
   defaultUrl: 'about:newtab',
   urlBarSuggestions: {
-    maxTopSites: 5,
+    maxOpenedFrames: 2,
+    maxBookmarkSites: 2,
+    maxHistorySites: 2,
     maxSearch: 3,
-    maxSites: 2,
-    maxOpenedFrames: 2
+    maxTopSites: 5
   },
   navigationBar: {
     defaultSearchSuggestions: false

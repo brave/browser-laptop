@@ -7,6 +7,7 @@
 - Added blocking for 3rd party referrers. ([#2214](https://github.com/brave/browser-laptop/issues/2214))
 - Added default content zoom option. ([#1401](https://github.com/brave/browser-laptop/issues/1401))
 - Added option for disabling title mode (defaulted to on for Windows until we remove the title bar). ([#1984](https://github.com/brave/browser-laptop/issues/1984))
+- Improved URL bar suggestions and now include URL of suggestion. ([#2210](https://github.com/brave/browser-laptop/issues/2210))
 - Improved Bookmarks Manager folders so they stick when scrolling. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
 - Improved session storage saving to write in a more safe way. ([#2067](https://github.com/brave/browser-laptop/issues/2067))
 - Improved zoom handling. ([#2165](https://github.com/brave/browser-laptop/issues/2165))

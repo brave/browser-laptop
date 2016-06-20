@@ -38,7 +38,7 @@ describe('urlbarSuggestions', function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
       .waitForExist(urlBarSuggestions)
-      .click(urlBarSuggestions + ' li')
+      .click(urlBarSuggestions + ' li.suggestionItem')
       .waitForExist('.tab[data-frame-key="1"].active')
   })
 

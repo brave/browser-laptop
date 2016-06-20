@@ -148,7 +148,12 @@ var rendererIdentifiers = function () {
     'permissionWebMidi',
     'permissionDisableCursor',
     'permissionFullscreen',
-    'permissionExternal'
+    'permissionExternal',
+    'tabsSuggestionTitle',
+    'bookmarksSuggestionTitle',
+    'historySuggestionTitle',
+    'searchSuggestionTitle',
+    'topSiteSuggestionTitle'
   ]
 }
 
