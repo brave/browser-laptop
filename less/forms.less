@@ -310,6 +310,7 @@
     .flyoutDialog;
     box-sizing: border-box;
     left: 0;
+    overflow-y: auto;
     padding: 0 0;
     width: 100%;
     z-index: @zindexForms;
@@ -323,8 +324,15 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: calc(~'100% - 30px');
+      width: 100%;
       vertical-align: middle;
+    }
+
+    .suggestionLocation {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
     }
 
     .suggestionSection {
