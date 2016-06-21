@@ -222,6 +222,20 @@ class UrlBarSuggestions extends ImmutableComponent {
         }
       })
 
+    const sortBasedOnLocationPos = (s1, s2) => {
+      const pos1 = s1.get('location').indexOf(urlLocationLower)
+      const pos2 = s2.get('location').indexOf(urlLocationLower)
+      if (pos1 === -1 && pos2 === -1) {
+        return 0
+      } else if (pos1 === -1) {
+        return 1
+      } else if (pos2 === -1) {
+        return -1
+      } else {
+        return pos1 - pos2
+      }
+    }
+
     // opened frames
     if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
@@ -230,6 +244,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         type: suggestionTypes.TAB,
         clickHandler: (frameProps) =>
           windowActions.setActiveFrame(frameProps),
+        sortHandler: sortBasedOnLocationPos,
         formatTitle: (frame) => frame.get('title') || frame.get('location'),
         formatUrl: (frame) => frame.get('location'),
         filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
@@ -247,9 +262,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         clickHandler: navigateClickHandler((site) => {
           return site.get('location')
         }),
-        sortHandler: (site1, site2) => {
-          return site2.get('tags').size - site1.get('tags').size
-        },
+        sortHandler: sortBasedOnLocationPos,
         formatTitle: (site) => site.get('title') || site.get('location'),
         formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
@@ -271,9 +284,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         clickHandler: navigateClickHandler((site) => {
           return site.get('location')
         }),
-        sortHandler: (site1, site2) => {
-          return site2.get('tags').size - site1.get('tags').size
-        },
+        sortHandler: sortBasedOnLocationPos,
         formatTitle: (site) => site.get('title') || site.get('location'),
         formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
