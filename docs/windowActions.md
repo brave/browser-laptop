@@ -570,6 +570,16 @@ Saves the position of the window in the window state
 
 
 
+### setWindowFullScreen(isFullScreen) 
+
+Sets the fullscreen state of the window
+
+**Parameters**
+
+**isFullScreen**: `boolean`, true if window is fullscreen
+
+
+
 ### setMouseInTitlebar(mouseInTitlebar) 
 
 Dispatches a message to indicate if the mouse is in the titlebar

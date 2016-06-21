@@ -752,6 +752,17 @@ const windowActions = {
   },
 
   /**
+   * Sets the fullscreen state of the window
+   * @param {boolean} isFullScreen - true if window is fullscreen
+   */
+  setWindowFullScreen: function (isFullScreen) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FULLSCREEN_STATE,
+      isFullScreen
+    })
+  },
+
+  /**
    * Dispatches a message to indicate if the mouse is in the titlebar
    *
    * @param {boolean} mouseInTitlebar - true if the mouse is in the titlebar

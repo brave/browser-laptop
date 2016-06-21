@@ -141,6 +141,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     mainWindow.maximize()
   }
 
+  if (windowState.ui && windowState.ui.isFullScreen) {
+    mainWindow.setFullScreen(true)
+  }
+
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
     appActions.setDefaultWindowSize(evt.sender.getSize())
