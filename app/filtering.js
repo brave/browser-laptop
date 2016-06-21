@@ -31,6 +31,7 @@ const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
+let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
@@ -440,8 +441,10 @@ function initForPartition (partition) {
     registerForBeforeRedirect,
     registerForBeforeSendHeaders,
     registerPermissionHandler,
-    registerForHeadersReceived]
+    registerForHeadersReceived,
+    registerForDownloadListener]
 
+  initializedPartitions[partition] = true
   fns.forEach(registerSession.bind(this, partition))
 }
 
@@ -459,19 +462,14 @@ function shouldIgnoreUrl (url) {
 }
 
 module.exports.init = () => {
-  setTimeout(() => {
-    registerForDownloadListener(session.defaultSession)
-  }, 1000)
-  ;['persist:default', 'main-1'].forEach((partition) => {
+  ['persist:default', 'main-1'].forEach((partition) => {
     initForPartition(partition)
   })
-  let initializedPartitions = {}
   ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
     if (initializedPartitions[partition]) {
       return
     }
     initForPartition(partition)
-    initializedPartitions[partition] = true
   })
   ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
     const item = downloadMap[downloadId]
