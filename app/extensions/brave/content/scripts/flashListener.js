@@ -23,9 +23,11 @@ function flashListenerInit () {
         }
       })
     })
-    replaceAdobeLinks()
-    observer.observe(document.documentElement, {
-      childList: true
-    })
+    setTimeout(() => {
+      replaceAdobeLinks()
+      observer.observe(document.documentElement, {
+        childList: true
+      })
+    }, 1000)
   })()
 }

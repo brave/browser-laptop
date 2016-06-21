@@ -514,7 +514,7 @@ class Frame extends ImmutableComponent {
       if (parsedUrl.search && parsedUrl.search.includes('brave_flash_allowed')) {
         if (!(parsedUrl.host in this.flashAllowedHosts)) {
           this.webview.stop()
-          parsedUrl.search = parsedUrl.search.replace('brave_flash_allowed', '')
+          parsedUrl.search = parsedUrl.search.replace(/(\?|&)?brave_flash_allowed/, '')
           windowActions.loadUrl(this.props.frame, parsedUrl.format())
         }
       }
