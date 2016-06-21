@@ -13,9 +13,6 @@ var port = (function () {
       return
     }
 
-    if (m.adInsertion && m.adInsertion.enabled) {
-      adInsertion(m.adInsertion.url)
-    }
     if (m.passwordManager) {
       autofillPasswordListenerInit()
     }

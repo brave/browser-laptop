@@ -63,9 +63,8 @@ const setUserPref = (path, value, incognito = false) => {
 module.exports.init = (ses, partition) => {
   if (isPrivate(partition)) {
     registeredPrivateSessions[partition] = ses
-  } else {
-    registeredSessions[partition] = ses
   }
+  registeredSessions[partition] = ses
   registeredCallbacks.forEach((fn) => fn())
 }
 

@@ -41,7 +41,7 @@ const getBlock3rdPartyStorage = () => {
   ]
 }
 
-const getAllowAllCookies = () => {
+const getAllowAll = () => {
   return [
     {
       setting: 'allow',
@@ -55,7 +55,11 @@ const getContentSettingsFromSiteSettings = (appState) => {
   let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
 
   let contentSettings = {
-    cookies: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? getBlock3rdPartyStorage() : getAllowAllCookies(),
+    cookies: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? getBlock3rdPartyStorage() : getAllowAll(),
+    adInsertion: [{
+      setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
     javascript: [],
     canvasFingerprinting: [{
       setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
@@ -81,6 +85,9 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (setting.fingerprintingProtection) {
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', setting.fingerprintingProtection ? 'block' : 'allow')
     }
+    if (setting.adControl) {
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', setting.adControl === 'showBraveAds' ? 'allow' : 'block')
+    }
   }
   return { content_settings: contentSettings }
 }
@@ -97,9 +104,7 @@ const doAction = (action) => {
       break
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        if (action.resourceName === 'cookieblock' || action.resourceName === 'fingerprintingProtection') {
-          updateTrigger()
-        }
+        updateTrigger()
       })
       break
     default:
