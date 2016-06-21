@@ -6,6 +6,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
+const settings = require('../constants/settings')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const { registerUserPrefs } = require('./userPrefs')
@@ -26,38 +27,52 @@ const addContentSettings = (settingList, hostPattern, secondaryPattern = undefin
   })
 }
 
-const getBlock3rdPartyStorage = () => {
-  return [
-    {
-      setting: 'block',
-      primaryPattern: '*',
-      secondaryPattern: '*'
-    },
-    {
-      setting: 'allow',
-      primaryPattern: '*',
-      secondaryPattern: '[firstParty]'
+const getPasswordManagerEnabled = (appState) => {
+  let appSettings = appState.get('settings')
+  if (appSettings) {
+    if (typeof appSettings.get(settings.PASSWORD_MANAGER_ENABLED) === 'boolean') {
+      return appSettings.get(settings.PASSWORD_MANAGER_ENABLED)
     }
-  ]
+  }
+  return appConfig.defaultSettings[settings.PASSWORD_MANAGER_ENABLED]
 }
 
-const getAllowAll = () => {
-  return [
-    {
-      setting: 'allow',
-      primaryPattern: '*',
-      secondaryPattern: '*'
-    }
-  ]
+const getBlock3rdPartyStorage = (braveryDefaults) => {
+  if (braveryDefaults.cookieControl === 'block3rdPartyCookie') {
+    return [
+      {
+        setting: 'block',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      },
+      {
+        setting: 'allow',
+        primaryPattern: '*',
+        secondaryPattern: '[firstParty]'
+      }
+    ]
+  } else {
+    return [
+      {
+        setting: 'allow',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      }
+    ]
+  }
 }
 
 const getContentSettingsFromSiteSettings = (appState) => {
   let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
 
   let contentSettings = {
-    cookies: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? getBlock3rdPartyStorage() : getAllowAll(),
+    cookies: getBlock3rdPartyStorage(braveryDefaults),
     adInsertion: [{
       setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    passwordManager: [{
+      setting: getPasswordManagerEnabled(appState) ? 'allow' : 'block',
       primaryPattern: '*'
     }],
     javascript: [],
@@ -67,26 +82,26 @@ const getContentSettingsFromSiteSettings = (appState) => {
     }]
   }
 
-  let settings = appState.get('siteSettings').toJS()
-  for (var hostPattern in settings) {
-    let setting = settings[hostPattern]
-    if (setting.noScript) {
+  let hostSettings = appState.get('siteSettings').toJS()
+  for (var hostPattern in hostSettings) {
+    let hostSetting = hostSettings[hostPattern]
+    if (hostSetting.noScript) {
       // TODO(bridiver) - enable this when we support temporary overrides
       // addContentSettings(contentSettings.javascript, hostPattern)
     }
-    if (setting.cookieControl) {
-      if (setting.cookieControl === 'block3rdPartyCookie') {
+    if (hostSetting.cookieControl) {
+      if (hostSetting.cookieControl === 'block3rdPartyCookie') {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'block')
         addContentSettings(contentSettings.cookies, hostPattern, parseSiteSettingsPattern(hostPattern), 'allow')
       } else {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
       }
     }
-    if (setting.fingerprintingProtection) {
-      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', setting.fingerprintingProtection ? 'block' : 'allow')
+    if (hostSetting.fingerprintingProtection) {
+      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', hostSetting.fingerprintingProtection ? 'block' : 'allow')
     }
-    if (setting.adControl) {
-      addContentSettings(contentSettings.adInsertion, hostPattern, '*', setting.adControl === 'showBraveAds' ? 'allow' : 'block')
+    if (hostSetting.adControl) {
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
     }
   }
   return { content_settings: contentSettings }
@@ -103,6 +118,11 @@ const doAction = (action) => {
       })
       break
     case AppConstants.APP_SET_RESOURCE_ENABLED:
+      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+        updateTrigger()
+      })
+      break
+    case AppConstants.APP_CHANGE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         updateTrigger()
       })

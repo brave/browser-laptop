@@ -2,14 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-let passwordManagerInitialized = false
-
-function autofillPasswordListenerInit () {
-  if (passwordManagerInitialized) {
-    return
-  } else {
-    passwordManagerInitialized = true
-  }
+if (chrome.contentSettings.passwordManager == 'allow') {
 
   function savePassword(username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
     chrome.ipc.send('save-password', username, pw, origin, action)
