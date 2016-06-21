@@ -13,15 +13,11 @@ var port = (function () {
       return
     }
 
-    flashListenerInit()
     if (m.adInsertion && m.adInsertion.enabled) {
       adInsertion(m.adInsertion.url)
     }
     if (m.passwordManager) {
       autofillPasswordListenerInit()
-    }
-    if (m.locale) {
-      initSpellCheck(m.locale)
     }
   }
 
