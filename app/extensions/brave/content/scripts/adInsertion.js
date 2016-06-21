@@ -2,13 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-let adInsertionInitialized = false
-function adInsertion(url) {
-  if (adInsertionInitialized) {
-    return
-  } else {
-    adInsertionInitialized = true
-  }
+if (chrome.contentSettings.adInsertion == 'allow') {
   /**
    * Determines the ad size which should be shown
    * It will first check the node's size and try to infer that way.
@@ -162,10 +156,10 @@ function adInsertion(url) {
   }
 
   var host = document.location.hostname
-  if (!host) {
-    return
+  if (host) {
+    host = host.replace('www.', '')
+    const adDivCandidates = adInfo[host] || []
+    // TODO(bridiver) move ad url to chrome.storage
+    setAdDivCandidates(adDivCandidates, 'https://oip.brave.com')
   }
-  host = host.replace('www.', '')
-  const adDivCandidates = adInfo[host] || []
-  setAdDivCandidates(adDivCandidates, url)
 }
