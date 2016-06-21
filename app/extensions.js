@@ -193,10 +193,10 @@ module.exports.init = () => {
     installExtension('brave', getExtensionsPath(), {manifest_location: 'component', manifest: generateBraveManifest()})
 
     if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
-      installExtension('1password', getExtensionsPath())
-      enableExtension('1password')
+      installExtension('1Password', getExtensionsPath())
+      enableExtension('1Password')
     } else {
-      disableExtension('1password')
+      disableExtension('1Password')
     }
 
     if (getSetting(settings.DASHLANE_ENABLED)) {
