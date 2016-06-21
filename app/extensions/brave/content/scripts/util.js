@@ -2,25 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// hacky require so we can use the same code as the browser
-var immutable_ = typeof Immutable !== 'undefined' ? Immutable : null
-function require(module_name) {
-  switch (module_name) {
-    case 'immutable':
-      return immutable_;
-      break
-    case 'url':
-      return {
-        parse: (location) => {
-          let parser = document.createElement('a');
-          parser.href = location
-          return parser
-        }
-      }
-      break
-  }
-}
-
 /**
  * Executes a script in the page DOM context
  *
