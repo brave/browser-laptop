@@ -103,6 +103,13 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (hostSetting.adControl) {
       addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
     }
+
+    // these should always be the last rules so they take precendence over the others
+    if (hostSetting.shieldsUp === false) {
+      addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', 'block')
+    }
   }
   return { content_settings: contentSettings }
 }
