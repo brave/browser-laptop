@@ -159,6 +159,11 @@ const AboutActions = {
     window.dispatchEvent(event)
   },
 
+  checkFlashInstalled: function () {
+    const event = new window.CustomEvent(messages.CHECK_FLASH_INSTALLED)
+    window.dispatchEvent(event)
+  },
+
   showNotification: function (msg) {
     // msg is l10n id of message to show
     const event = new window.CustomEvent(messages.SHOW_NOTIFICATION, {
