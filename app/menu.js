@@ -291,6 +291,12 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
+          label: locale.translation('stop'),
+          accelerator: 'CmdOrCtrl+.',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_STOP])
+          }
+        }, {
           label: locale.translation('reloadPage'),
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {

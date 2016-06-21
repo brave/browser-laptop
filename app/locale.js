@@ -81,6 +81,7 @@ var rendererIdentifiers = function () {
     'zoomIn',
     'zoomOut',
     'toolbars',
+    'stop',
     'reloadPage',
     'reloadTab',
     'cleanReload',
