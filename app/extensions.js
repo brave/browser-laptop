@@ -19,18 +19,17 @@ let generateBraveManifest = () => {
         all_frames: true,
         matches: ['<all_urls>'],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*', 'data:*'
+          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
         ],
         exclude_globs: [
           getIndexHTML()
         ],
+        match_about_blank: true,
         js: [
           'content/scripts/util.js',
+          'js/actions/extensionActions.js',
           'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
-          'content/scripts/block3rdPartyStorage.js',
-          'content/scripts/brave-default.js',
-          'js/actions/extensionActions.js',
           'content/scripts/inputHandler.js',
           'content/scripts/spellCheck.js'
         ],
@@ -43,7 +42,7 @@ let generateBraveManifest = () => {
         all_frames: true,
         matches: ['<all_urls>'],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*', 'data:*'
+          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
         ],
         exclude_globs: [
           getIndexHTML()
@@ -91,7 +90,7 @@ let generateBraveManifest = () => {
       ]
     },
     permissions: [
-      'externally_connectable.all_urls'
+      'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings'
     ],
     externally_connectable: {
       matches: [
@@ -143,7 +142,9 @@ module.exports.init = () => {
   process.on('background-page-loaded', function (extensionId, backgroundPageWebContents) {
     if (extensionId === config.braveExtensionId) {
       backgroundPage = backgroundPageWebContents
-      backgroundPage.send('update-state', AppStore.getState().toJS(), appConfig)
+      backgroundPage.on('dom-ready', () => {
+        backgroundPage.send('update-state', AppStore.getState().toJS(), appConfig)
+      })
     }
   })
 

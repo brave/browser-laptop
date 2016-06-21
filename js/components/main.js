@@ -312,18 +312,6 @@ class Main extends ImmutableComponent {
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
 
-    ipc.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {
-      if (!details.length) {
-        return
-      }
-      details.forEach((detail) => {
-        const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
-        const description = [detail.type, detail.scriptUrl || detail.url].join(': ')
-        filteredFrameProps.forEach((frameProps) =>
-          windowActions.setBlockedBy(frameProps, 'fingerprintingProtection', description))
-      })
-    })
-
     ipc.on(messages.SHOW_NOTIFICATION, (e, text) => {
       void new window.Notification(text)
     })

@@ -27,21 +27,8 @@ function require(module_name) {
  * @param {string} text The content of the script to insert
  * @param {Object=} data attributes to set in the inserted script tag
  */
-function insertScript (text, data) {
-  var parent = document.documentElement
-  var script = document.createElement('script')
-
-  script.text = text
-  script.async = false
-
-  if (data) {
-    for (var key in data) {
-      script.setAttribute('data-' + key.replace('_', '-'), data[key])
-    }
-  }
-
-  parent.insertBefore(script, parent.firstChild)
-  parent.removeChild(script)
+function executeScript (code) {
+  chrome.webFrame.executeJavaScript(code)
 }
 
 /**

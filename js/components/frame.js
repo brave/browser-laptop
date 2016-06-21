@@ -123,16 +123,7 @@ class Frame extends ImmutableComponent {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
       this.webview = document.createElement('webview')
-      if (guestInstanceId) {
-        this.webview.setAttribute('data-guest-instance-id', guestInstanceId)
-      }
-      webviewAdded = true
-    }
-    this.webview.setAttribute('allowDisplayingInsecureContent', true)
-    this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
 
-    if (webviewAdded) {
       let partition
       if (this.props.frame.get('isPrivate')) {
         partition = 'default'
@@ -141,10 +132,17 @@ class Frame extends ImmutableComponent {
       } else {
         partition = 'persist:default'
       }
-
       ipc.send(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
+
+      if (guestInstanceId) {
+        this.webview.setAttribute('data-guest-instance-id', guestInstanceId)
+      }
+      webviewAdded = true
     }
+    this.webview.setAttribute('allowDisplayingInsecureContent', true)
+    this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
+    this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
 
     const parsedUrl = urlParse(location)
     const hack = siteHacks[parsedUrl.hostname]
@@ -358,6 +356,8 @@ class Frame extends ImmutableComponent {
   }
 
   addEventListeners () {
+    this.webview.addEventListener('content-blocked', (e) => {
+    })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.props.frame)
       e.preventDefault()
@@ -430,6 +430,12 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
+        case messages.GOT_CANVAS_FINGERPRINTING:
+          method = (detail) => {
+            const description = [detail.type, detail.scriptUrl || this.props.frame.get('location')].join(': ')
+            windowActions.setBlockedBy(this.props.frame, 'fingerprintingProtection', description)
+          }
+          break
         case messages.THEME_COLOR_COMPUTED:
           method = (computedThemeColor) =>
             windowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)

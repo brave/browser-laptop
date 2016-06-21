@@ -211,9 +211,10 @@ class AppStore extends EventEmitter {
           wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
         lastEmittedState = appState
       }
+      this.emit(CHANGE_EVENT, d.toJS())
+    } else {
+      this.emit(CHANGE_EVENT, [])
     }
-
-    this.emit(CHANGE_EVENT)
   }
 
   addChangeListener (callback) {
@@ -478,6 +479,6 @@ const handleAppAction = (action) => {
   emitChanges()
 }
 
-AppDispatcher.register(handleAppAction)
+appStore.dispatchToken = AppDispatcher.register(handleAppAction)
 
 module.exports = appStore

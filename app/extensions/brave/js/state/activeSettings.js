@@ -5,9 +5,9 @@
 const braveryDefaults = (appState, appConfig) => {
   let defaults = {}
   Object.keys(appConfig.resourceNames).forEach((name) => {
-   let value = appConfig.resourceNames[name]
-   let enabled = appState.getIn([value, 'enabled'])
-   defaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
+    let value = appConfig.resourceNames[name]
+    let enabled = appState.getIn([value, 'enabled'])
+    defaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
   })
   let replaceAds = defaults[appConfig.resourceNames.AD_INSERTION] || false
   let blockAds = defaults[appConfig.resourceNames.ADBLOCK] || false
@@ -117,8 +117,6 @@ const activeSettings = (siteSettings, appState, appConfig) => {
     enabled: settings.adControl === 'showBraveAds',
     url: appConfig.adInsertion.url
   }
-
-  settings.block3rdPartyStorage = settings.cookieControl === 'block3rdPartyCookie'
 
   return Object.assign(defaults, settings)
 }

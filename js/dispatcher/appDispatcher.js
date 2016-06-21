@@ -77,6 +77,11 @@ class AppDispatcher {
       ipc.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
     }
   }
+
+  waitFor (promiseIndexes, callback) {
+    var selectedPromises = promiseIndexes.map((index) => this.promises[index])
+    return Promise.all(selectedPromises).then(callback)
+  }
 }
 
 const appDispatcher = new AppDispatcher()

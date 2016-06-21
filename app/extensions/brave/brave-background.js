@@ -1,22 +1,22 @@
-var appState = null
-var appConfig = null
-var _empty_ = Immutable.Map()
+window.appState = null
+window.appConfig = null
+window._empty_ = Immutable.Map()
 
 chrome.ipc.on('update-state', (evt, newState, newConfig) => {
-  appState = Immutable.fromJS(newState)
-  appConfig = newConfig
+  window.appState = Immutable.fromJS(newState)
+  window.appConfig = newConfig
 })
 
 chrome.runtime.onConnect.addListener((port) => {
   sendMessage = () => {
-    let tabSettings = getSiteSettings(appState, port.sender.tab.incognito)
+    let tabSettings = getSiteSettings(window.appState, port.sender.tab.incognito)
     let locationSettings = getSiteSettingsForURL(tabSettings, port.sender.tab.url) || _empty_
 
-    port.postMessage(activeSettings(locationSettings, appState, appConfig))
+    port.postMessage(activeSettings(locationSettings, window.appState, window.appConfig))
   }
 
   port.onMessage.addListener((msg) => {
-    if (!port.sender || !port.sender.tab)
+    if (!port.sender || !port.sender.tab || port.sender.id !== chrome.runtime.id)
       return
 
     if (msg.type === 'action') {
@@ -24,7 +24,7 @@ chrome.runtime.onConnect.addListener((port) => {
     }
 
     // have not received state yet
-    if (!appState || !appConfig) {
+    if (!window.appState || !window.appConfig) {
       port.postMessage({msg: 'wait'})
       return
     }
@@ -32,4 +32,3 @@ chrome.runtime.onConnect.addListener((port) => {
     sendMessage()
   })
 })
-
