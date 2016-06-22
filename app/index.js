@@ -369,8 +369,9 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
-      const installed = flash.checkFlashInstalled()
-      e.sender.send(messages.FLASH_UPDATED, installed)
+      flash.checkFlashInstalled((installed) => {
+        e.sender.send(messages.FLASH_UPDATED, installed)
+      })
     })
 
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
