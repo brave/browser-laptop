@@ -38,7 +38,6 @@ const CmdLine = require('./cmdLine')
 const UpdateStatus = require('../js/constants/updateStatus')
 const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
-const debounce = require('../js/lib/debounce.js')
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
 const settings = require('../js/constants/settings')
@@ -58,7 +57,7 @@ let lastWindowClosed = false
 let acceptCertDomains = {}
 // URLs to callback for auth.
 let authCallbacks = {}
-// Don't show the keytar prompt more than once per 5 minutes
+// Don't show the keytar prompt more than once per 24 hours
 let throttleKeytar = false
 
 // Map of password notification bar messages to their callbacks
@@ -107,9 +106,9 @@ const getMasterKey = () => {
     return (new Buffer(masterKey, 'hex')).toString('binary')
   } else {
     throttleKeytar = true
-    debounce(() => {
+    setTimeout(() => {
       throttleKeytar = false
-    }, 1000 * 60 * 5)
+    }, 1000 * 60 * 60 * 24)
     return null
   }
 }
@@ -247,6 +246,7 @@ app.on('ready', () => {
 
     e.preventDefault()
 
+    clearTimeout(initiateSessionStateSave)
     initiateSessionStateSave(true)
 
     // Just in case a window is not responsive, we don't want to wait forever.
@@ -453,11 +453,10 @@ app.on('ready', () => {
       }
     })
 
+    // save app state every 5 minutes regardless of update frequency
+    setInterval(initiateSessionStateSave, 1000 * 60 * 5)
     AppStore.addChangeListener(() => {
       Menu.init(AppStore.getState().get('settings'))
-      // This is debounced to every 5 minutes, the save is not particularly intensive but it does do IO
-      // and there's not much gained if saved more frequently since it's also saved on shutdown.
-      debounce(initiateSessionStateSave, 5 * 60 * 1000)
     })
 
     let masterKey
