@@ -180,7 +180,7 @@ let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
   return SessionStore.defaultAppState()
 })
 
-let flashInstalled = false
+let flashEnabled = false
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
@@ -191,7 +191,7 @@ loadAppStatePromise.then((initialState) => {
   if (initialState.flash && initialState.flash.enabled === true) {
     if (flash.init()) {
       // Flash was initialized successfully
-      flashInstalled = true
+      flashEnabled = true
       return
     }
   }
@@ -305,7 +305,7 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
-    initialState.flashInstalled = flashInstalled
+    initialState.flashEnabled = flashEnabled
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
@@ -371,6 +371,15 @@ app.on('ready', () => {
     ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
       flash.checkFlashInstalled((installed) => {
         e.sender.send(messages.FLASH_UPDATED, installed)
+      })
+    })
+
+    ipcMain.on(messages.SHOW_FLASH_INSTALLED_MESSAGE, (e) => {
+      flash.checkFlashInstalled((installed) => {
+        if (installed) {
+          BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
+                                                            locale.translation('flashInstalled'))
+        }
       })
     })
 

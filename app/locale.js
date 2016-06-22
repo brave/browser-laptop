@@ -16,6 +16,7 @@ var rendererIdentifiers = function () {
     'downloadsManager',
     'confirmClearPasswords',
     'passwordCopied',
+    'flashInstalled',
     'about',
     'quit',
     'quitApp',
