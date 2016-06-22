@@ -82,7 +82,7 @@ class Frame extends ImmutableComponent {
 
   shouldCreateWebview () {
     return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent() ||
-      this.webview.allowRunningPlugins !== this.allowRunningPlugins()
+      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
   }
 
   allowRunningInsecureContent () {
@@ -92,7 +92,7 @@ class Frame extends ImmutableComponent {
 
   allowRunningPlugins () {
     let host = urlParse(this.props.frame.get('location')).host
-    return host && this.flashAllowedHosts[host]
+    return !!(host && this.flashAllowedHosts[host])
   }
 
   updateWebview (cb) {
