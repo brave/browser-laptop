@@ -133,6 +133,12 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
     return sites
   }
   const tags = sites.getIn([index, 'tags'])
+  // If there are no tags and the removeSite call was called without a specific tag
+  // then remove the entry completely.
+  if (tags.size === 0 && tag) {
+    sites = sites.splice(index, 1)
+    return sites
+  }
   return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 

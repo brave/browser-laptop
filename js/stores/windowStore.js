@@ -60,7 +60,7 @@ const updateUrlSuffix = (suggestionList) => {
     const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
     if (!selectedIndex && autocompleteEnabled) {
       const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
-      const index = suggestion.location.indexOf(location)
+      const index = suggestion.location.toLowerCase().indexOf(location.toLowerCase())
       if (index !== -1) {
         const beforePrefix = suggestion.location.substring(0, index)
         if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {

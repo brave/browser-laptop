@@ -121,7 +121,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         return <li data-index={currentIndex + 1}
           onMouseOver={this.onMouseOver.bind(this)}
           onClick={suggestion.onClick}
-          key={suggestion.title}
+          key={suggestion.location}
           ref={(node) => { selected && (this.selectedElement = node) }}
           className={cx({
             selected,
@@ -129,7 +129,7 @@ class UrlBarSuggestions extends ImmutableComponent {
             [suggestion.type]: true
           })}>
           {
-            suggestion.type !== suggestionTypes.TOP_SITE
+            suggestion.type !== suggestionTypes.TOP_SITE && suggestion.title
             ? <div className='suggestionTitle'>{suggestion.title}</div>
             : null
           }
@@ -232,7 +232,12 @@ class UrlBarSuggestions extends ImmutableComponent {
       } else if (pos2 === -1) {
         return -1
       } else {
-        return pos1 - pos2
+        if (pos1 - pos2 !== 0) {
+          return pos1 - pos2
+        } else {
+          // If there's a tie on the match location, use the shorter URL
+          return s1.get('location').length - s2.get('location').length
+        }
       }
     }
 
@@ -245,7 +250,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         clickHandler: (frameProps) =>
           windowActions.setActiveFrame(frameProps),
         sortHandler: sortBasedOnLocationPos,
-        formatTitle: (frame) => frame.get('title') || frame.get('location'),
+        formatTitle: (frame) => frame.get('title'),
         formatUrl: (frame) => frame.get('location'),
         filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
@@ -263,7 +268,7 @@ class UrlBarSuggestions extends ImmutableComponent {
           return site.get('location')
         }),
         sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title') || site.get('location'),
+        formatTitle: (site) => site.get('title'),
         formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
           const title = site.get('title') || ''
@@ -285,7 +290,7 @@ class UrlBarSuggestions extends ImmutableComponent {
           return site.get('location')
         }),
         sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title') || site.get('location'),
+        formatTitle: (site) => site.get('title'),
         formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
           const title = site.get('title') || ''
