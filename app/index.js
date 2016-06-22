@@ -14,6 +14,7 @@ var locale = require('./locale')
 const Immutable = require('immutable')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
+const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const app = electron.app
 const Menu = require('./menu')
@@ -267,6 +268,46 @@ app.on('ready', () => {
     if (data) {
       lastWindowState = data
     }
+  })
+
+  ipcMain.removeAllListeners('window-alert')
+  ipcMain.on('window-alert', function (event, message, title) {
+    var buttons
+    if (title == null) {
+      title = ''
+    }
+    buttons = ['OK']
+    message = message.toString()
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+      message: message,
+      title: title,
+      buttons: buttons
+    })
+    // Alert should always return undefined.
+  })
+
+  ipcMain.removeAllListeners('window-confirm')
+  ipcMain.on('window-confirm', function (event, message, title) {
+    var buttons, cancelId
+    if (title == null) {
+      title = ''
+    }
+    buttons = ['OK', 'Cancel']
+    cancelId = 1
+    event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+      message: message,
+      title: title,
+      buttons: buttons,
+      cancelId: cancelId
+    })
+    return event.returnValue
+  })
+
+  ipcMain.removeAllListeners('window-prompt')
+  ipcMain.on('window-prompt', function (event, text, defaultText) {
+    console.warn('window.prompt is not supported yet')
+    event.returnValue = null
+    return event.returnValue
   })
 
   ipcMain.on(messages.LOGIN_RESPONSE, (e, url, username, password) => {
