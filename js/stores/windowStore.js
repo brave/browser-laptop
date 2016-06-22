@@ -248,6 +248,7 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         aboutDetails: Object.assign({
           title: action.errorDetails.title || l10nErrorText(action.errorDetails.errorCode),
+          message: action.errorDetails.message,
           previousLocation,
           frameKey
         }, action.errorDetails)

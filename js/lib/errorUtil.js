@@ -13,8 +13,8 @@ module.exports.isFrameError = function (errorCode) {
   if (errorCode === 501 || (errorCode >= 200 && errorCode <= 299)) {
     return false
   }
-  // ignore cache errors
-  if (errorCode >= 400 && errorCode <= 499) {
+  // ignore cache errors except cache miss (form repost)
+  if (errorCode > 400 && errorCode <= 499) {
     return false
   }
 
@@ -46,6 +46,8 @@ module.exports.l10nErrorText = function (errorCode) {
       title = 'ftpError'
     } else if (errorCode >= 800 && errorCode <= 899) {
       title = 'dnsError'
+    } else if (errorCode === 400) {
+      title = 'cacheError'
     } else {
       title = 'unknownError'
     }
@@ -363,6 +365,7 @@ module.exports.errorMap = {
   // Request is throttled because of a Backoff header.
   // See: crbug.com/486891.,
   369: 'temporaryBackoff',
+  400: 'cacheMiss',
   // The server's response was insecure (e.g. there was a cert error).
   501: 'insecureResponse',
   // DNS error codes.
