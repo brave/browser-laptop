@@ -31,7 +31,7 @@ If you already have the repo checked out, it's recommended to `rm -Rf node_modul
 
 Then do the following per OS:
 
-**OS X:**
+**macOS:**
 
 ```
 CHANNEL=dev npm run build-package

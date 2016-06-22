@@ -9,6 +9,7 @@ describe('tabs', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
@@ -28,7 +29,7 @@ describe('tabs', function () {
 
     it('makes the non partitioned webview visible', function * () {
       yield this.app.client
-        .waitForVisible('webview:not([partition])')
+        .waitForVisible('webview[partition="persist:default"]')
     })
   })
 
@@ -48,7 +49,7 @@ describe('tabs', function () {
     })
     it('makes the private webview visible', function * () {
       yield this.app.client
-        .waitForVisible('webview[partition="private-1"]')
+        .waitForVisible('webview[partition="default"]')
     })
   })
 

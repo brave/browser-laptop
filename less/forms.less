@@ -277,26 +277,30 @@
   }
 
   .genericFormTable {
-    display: table;
-    >div {
+    display: flex;
+    flex-flow: column nowrap;
+    min-width: 350px;
+
+    > div {
       &:not(.formHeader) {
-        display: table-row;
-        >* {
-          display: table-cell;
-        }
-      }
-      >label {
-        padding-right: 5px;
-       text-align: right;
-      }
-      >input {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
         margin: 2px;
-        min-width: 250px;
+      }
+
+      > label {
+        padding-right: 4px;
+        width: 20%;
+        text-align: right;
+      }
+
+      > input, select {
         padding: 2px;
+        margin: 0;
+        width: 80%;
       }
-      .primaryButton {
-        float: right;
-      }
+
     }
   }
 }
@@ -305,39 +309,87 @@
   .urlBarSuggestions {
     .flyoutDialog;
     box-sizing: border-box;
-    width: 100%;
     left: 0;
-    z-index: 311;
+    overflow-y: auto;
+    padding: 0 0;
+    width: 100%;
+    z-index: @zindexForms;
 
-    .suggestionIcon {
-      margin-right: 10px;
-    }
 
-    .suggestionText {
+    .suggestionTitle {
       display: inline-block;
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: calc(~'100% - 30px');
+      width: 100%;
       vertical-align: middle;
+    }
+
+    .suggestionLocation {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .suggestionSection {
+      border-bottom: 1px solid @toolbarBorderColor;
+
+      .suggestionSectionTitle {
+        color: #abadae;
+        display: inline-block;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 60px;
+      }
+
+      .suggestionSectionIcon {
+        margin-left: 4px;
+        &.bookmarksTitle {
+          color: @braveOrange;
+        }
+        &.tabsTitle {
+          color: @highlightBlue;
+        }
+        &.topSiteTitle, &.historyTitle, &.searchTitle {
+          color: #333;
+        }
+      }
     }
 
     li {
       list-style-type: none;
-      padding: 10px 0;
-      z-index: 333;
+      padding: 10px 20px;
+      z-index: @zindexSuggestionText;
+
+      &.bookmarkSuggestion:not(.selected) .suggestionTitle {
+        color: @braveOrange;
+      }
+
+      &.tabSuggestion:not(.selected) .suggestionTitle {
+        color: @highlightBlue;
+      }
+
+      &.topSiteSuggestion, &.searchSuggestion {
+        padding: 7px 20px;
+        .suggestionTitle {
+          font-size: inherit;
+          font-weight: inherit;
+        }
+      }
 
       &.selected {
-        color: @highlightBlue;
+        color: white;
+        background-color: @highlightBlue;
+        background: linear-gradient(#51A5F9, #2B78CA);
       }
       * {
         /* To allow for mouse listeners to work on the list items. */
         pointer-events: none;
       }
-    }
-
-    li + li {
-      border-top: 1px solid @chromeControlsBackground;
     }
   }
 }

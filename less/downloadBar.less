@@ -21,7 +21,7 @@
   height: 50px;
   padding: 5px var(--download-bar-padding);
   width: 100%;
-  z-index: 3;
+  z-index: @zindexDownloadsBar;
 
   .downloadItems {
     display: flex;
@@ -87,7 +87,7 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          padding-right: 5px;
+          width: 150px;
         }
 
         .downloadArrow {
@@ -96,7 +96,8 @@
         }
 
         >span {
-          width: 100%;
+          width: 150px;
+          margin-right: 12px;
         }
       }
 

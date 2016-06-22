@@ -46,9 +46,8 @@ class AppDispatcher {
    * to the main process where the all other registered callbacks will be run. The main
    * process will not run any callbacks for the renderer process that send messages.DISPATCH_ACTION
    * @param  {object} payload The data from the action.
-   * @param  {object} caller The webContents that triggered the dispatch
    */
-  dispatch (payload, caller) {
+  dispatch (payload) {
     if (payload.actionType === undefined) {
       throw new Error('Dispatcher: Undefined action for payload', payload)
     }
@@ -65,7 +64,7 @@ class AppDispatcher {
     this.callbacks.forEach(function (callback, i) {
       // Callback can return an obj, to resolve, or a promise, to chain.
       // See waitFor() for why this might be useful.
-      Promise.resolve(callback(payload, caller)).then(function () {
+      Promise.resolve(callback(payload)).then(function () {
         resolves[i](payload)
       }, function () {
         rejects[i](new Error('Dispatcher callback unsuccessful'))
@@ -78,6 +77,11 @@ class AppDispatcher {
       ipc.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
     }
   }
+
+  waitFor (promiseIndexes, callback) {
+    var selectedPromises = promiseIndexes.map((index) => this.promises[index])
+    return Promise.all(selectedPromises).then(callback)
+  }
 }
 
 const appDispatcher = new AppDispatcher()
@@ -87,9 +91,9 @@ if (process.type !== 'renderer') {
   const ipcMain = electron.ipcMain
   ipcMain.on('app-dispatcher-register', (event) => {
     let registrant = event.sender
-    const callback = function (payload, caller) {
+    const callback = function (payload) {
       try {
-        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload), caller)
+        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
       } catch (e) {
         console.error('unregistering callback', e)
         appDispatcher.unregister(callback)
@@ -106,6 +110,7 @@ if (process.type !== 'renderer') {
 
   ipcMain.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
+
     if (event.sender.hostWebContents) {
       // received from an extension
       // only extension messages will have a hostWebContents
@@ -114,6 +119,9 @@ if (process.type !== 'renderer') {
       let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
       // default to the windowId of the hostWebContents
       queryInfo.windowId = queryInfo.windowId || win.id
+      // add queryInfo if we only had frameProps before
+      payload.queryInfo = queryInfo
+
       appDispatcher.dispatch(payload, event.sender.hostWebContents)
     } else {
       // received from a browser window

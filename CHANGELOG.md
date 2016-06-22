@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.10.4](https://github.com/brave/browser-laptop/releases/v0.10.4dev)
+- Added Flash support via extra user approval. ([#1093](https://github.com/brave/browser-laptop/issues/1093))
+- Added autocomplete support in the URL bar. ([#1596](https://github.com/brave/browser-laptop/issues/1596))
+- Added blocking for 3rd party client storage mechanisms. ([#313](https://github.com/brave/browser-laptop/issues/313))
+- Added blocking for 3rd party referrers. ([#2214](https://github.com/brave/browser-laptop/issues/2214))
+- Added default content zoom option. ([#1401](https://github.com/brave/browser-laptop/issues/1401))
+- Added option for disabling title mode (defaulted to on for Windows until we remove the title bar). ([#1984](https://github.com/brave/browser-laptop/issues/1984))
+- Improved URL bar suggestions and now include URL of suggestion. ([#2210](https://github.com/brave/browser-laptop/issues/2210))
+- Improved Bookmarks Manager folders so they stick when scrolling. ([#2076](https://github.com/brave/browser-laptop/issues/2076))
+- Improved session storage saving to write in a more safe way. ([#2067](https://github.com/brave/browser-laptop/issues/2067))
+- Improved zoom handling. ([#2165](https://github.com/brave/browser-laptop/issues/2165))
+- Fixed Twitch.tv playing streams twice. ([#2119](https://github.com/brave/browser-laptop/issues/2119))
+- Fixed crash when navigating with the notification bar open. ([#1726](https://github.com/brave/browser-laptop/issues/1726))
+- Fixed tab page ordering with pinned tabs. ([#149](https://github.com/brave/browser-laptop/issues/149))
+- Fixed window state not saving in session storage. ([#146](https://github.com/brave/browser-laptop/issues/146))
+- Fixed navigator.doNotTrack not reporting correctly. ([#2177](https://github.com/brave/browser-laptop/issues/2177))
+- Fixed window titles not showing up in the Window menu in macOS. ([#2192](https://github.com/brave/browser-laptop/issues/2192))
+- Fixed navigation controller sometimes making back button not function correctly. ([#2144](https://github.com/brave/browser-laptop/issues/2144))
+- Fixed Fullscreen mode on Windows so it hides menu bar. ([#2053](https://github.com/brave/browser-laptop/issues/2053))
+
 ## [0.10.3](https://github.com/brave/browser-laptop/releases/v0.10.3dev)
 - Upgrade to libchromiumcontent 51.0.2704.84. ([#2122](https://github.com/brave/browser-laptop/issues/2122))
 
@@ -22,10 +42,10 @@
 - Fixed bookmark items middle click to open in a new tab on Windows 10. ([#1724](https://github.com/brave/browser-laptop/issues/1724))
 - Fixed redownloading files on session restore ([#1219](https://github.com/brave/browser-laptop/issues/1219))
 - Fixed pinned tabs sometimes duplicating. ([#1508](https://github.com/brave/browser-laptop/issues/1508))
-- Fixed Fullscreen mode showing a black bar up top on OS X. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
+- Fixed Fullscreen mode showing a black bar up top on macOS. ([#1358](https://github.com/brave/browser-laptop/issues/1358))
 - Fixed contractions showing up as misspelled for spell check. ([#2015](https://github.com/brave/browser-laptop/issues/2015))
 - Fixed non-English spell checking dictionaries. ([#1788](https://github.com/brave/browser-laptop/issues/1788))
-- Possibly fixed intermittent problem with copy on OS X. ([#1060](https://github.com/brave/browser-laptop/issues/1060))
+- Possibly fixed intermittent problem with copy on macOS. ([#1060](https://github.com/brave/browser-laptop/issues/1060))
 - Upgrade to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
 - Upgrade to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))
 - Upgrade to Electron 1.2.0. ([#1968](https://github.com/brave/browser-laptop/issues/1968))
@@ -92,7 +112,7 @@
 - Zoom is now persisted across sessions and remembered per origin.
 - Added menu item to clear all cookies and site data.
 - Multi language support.  Initially this includes: en-US, nl-NL, and pt-Br.
-- Ability to open html files when Brave is the default on OS X.
+- Ability to open html files when Brave is the default on macOS.
 - Block 'javascript:' URLs from being loaded when entered in URL bar.
 - Printing fixed.
 - Fixed various bugs.
@@ -238,7 +258,7 @@
 - Context menus copy link location works in more cases now.
 - about:newtab, about:about pages implemented.
 - Placeholder ads link to a page explaining what they are.
-- 2 finger navigation on OS X.
+- 2 finger navigation on macOS.
 - Cleaned up UI to remove unneeded elements for about: pages.
 
 ## [0.7.12](https://github.com/brave/browser-laptop/releases/v0.7.12dev)

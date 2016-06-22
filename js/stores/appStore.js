@@ -46,7 +46,7 @@ function navbarHeight () {
   return 75
 }
 
-const createWindow = (browserOpts, defaults) => {
+const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   const parentWindowKey = browserOpts.parentWindowKey
 
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
@@ -58,6 +58,11 @@ const createWindow = (browserOpts, defaults) => {
   } else {
     // BrowserWindow height is window height so add navbar height
     browserOpts.height = browserOpts.height + navbarHeight()
+  }
+
+  if (windowState.ui && windowState.ui.position) {
+    browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
+    browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
   }
 
   browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
@@ -132,6 +137,14 @@ const createWindow = (browserOpts, defaults) => {
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
 
+  if (windowState.ui && windowState.ui.isMaximized) {
+    mainWindow.maximize()
+  }
+
+  if (windowState.ui && windowState.ui.isFullScreen) {
+    mainWindow.setFullScreen(true)
+  }
+
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
     appActions.setDefaultWindowSize(evt.sender.getSize())
@@ -153,8 +166,18 @@ const createWindow = (browserOpts, defaults) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
+  mainWindow.on('enter-full-screen', function () {
+    if (mainWindow.isMenuBarVisible()) {
+      mainWindow.setMenuBarVisibility(false)
+    }
+  })
+
   mainWindow.on('leave-full-screen', function () {
     mainWindow.webContents.send(messages.LEAVE_FULL_SCREEN)
+
+    if (getSetting(settings.AUTO_HIDE_MENU) === false) {
+      mainWindow.setMenuBarVisibility(true)
+    }
   })
 
   mainWindow.on('app-command', function (e, cmd) {
@@ -192,9 +215,10 @@ class AppStore extends EventEmitter {
           wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
         lastEmittedState = appState
       }
+      this.emit(CHANGE_EVENT, d.toJS())
+    } else {
+      this.emit(CHANGE_EVENT, [])
     }
-
-    this.emit(CHANGE_EVENT)
   }
 
   addChangeListener (callback) {
@@ -278,8 +302,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_NEW_WINDOW:
       const frameOpts = action.frameOpts && action.frameOpts.toJS()
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
+      const windowState = action.restoredState || {}
 
-      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts)
+      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts, windowState)
       const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state
@@ -458,6 +483,6 @@ const handleAppAction = (action) => {
   emitChanges()
 }
 
-AppDispatcher.register(handleAppAction)
+appStore.dispatchToken = AppDispatcher.register(handleAppAction)
 
 module.exports = appStore

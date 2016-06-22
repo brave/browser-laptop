@@ -112,7 +112,7 @@ module.exports.isTargetAboutUrl = function (input) {
  */
 module.exports.isUrl = function (input) {
   input = input.trim()
-  return UrlUtil.isURL(input) && !input.includes(' ')
+  return UrlUtil.isURL(input) && !/\s/g.test(input)
 }
 
 /**

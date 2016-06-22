@@ -176,14 +176,14 @@ var exports = {
       return this.url(url).waitForUrl(url)
     })
 
-    this.app.client.addCommand('showFindbar', function (options = {}) {
-      return this.execute(function (options) {
+    this.app.client.addCommand('showFindbar', function (show) {
+      return this.execute(function (show) {
         var windowActions = require('../../../js/actions/windowActions')
         windowActions.setFindbarShown(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
           key: 1
-        }, options), true)
-      }, options)
+        }), show !== false)
+      }, show)
     })
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {

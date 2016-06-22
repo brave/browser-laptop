@@ -12,9 +12,8 @@ const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 module.exports = {
   zoom: {
     defaultValue: 0,
-    min: -7,
-    max: 7,
-    step: 0.5
+    // Each zoomLevel is multiplied by 20 to get the percentage offset from 100. That's 0.05 per percentage offset.
+    zoomLevels: [-3.75, -3.35, -2.5, -1.65, -1.25, -0.5, -0.25, 0, 0.25, 0.5, 1.25, 2.5, 3.75, 5, 7.5, 10, 15, 20]
   },
   maxClosedFrames: 100,
   thumbnail: {
@@ -24,10 +23,11 @@ module.exports = {
   defaultLocale: 'en-US',
   defaultUrl: 'about:newtab',
   urlBarSuggestions: {
-    maxTopSites: 5,
+    maxOpenedFrames: 2,
+    maxBookmarkSites: 2,
+    maxHistorySites: 2,
     maxSearch: 3,
-    maxSites: 2,
-    maxOpenedFrames: 2
+    maxTopSites: 5
   },
   navigationBar: {
     defaultSearchSuggestions: false

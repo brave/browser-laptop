@@ -7,6 +7,8 @@ const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
+const { getZoomValuePercentage } = require('../lib/zoom')
+const config = require('../constants/config')
 const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
@@ -21,6 +23,7 @@ const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
+const flash = appConfig.resourceNames.FLASH
 
 const isDarwin = navigator.platform === 'MacIntel'
 
@@ -47,6 +50,8 @@ const changeSetting = (cb, key, e) => {
     let value = e.target.value
     if (e.target.dataset && e.target.dataset.type === 'number') {
       value = parseInt(value, 10)
+    } else if (e.target.dataset && e.target.dataset.type === 'float') {
+      value = parseFloat(value)
     }
     if (e.target.type === 'number') {
       value = value.replace(/\D/g, '')
@@ -138,6 +143,7 @@ class GeneralTab extends ImmutableComponent {
         {
           isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         }
+        <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
     </SettingsList>
   }
@@ -159,6 +165,7 @@ class SearchTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='offerSearchSuggestions' prefKey={settings.OFFER_SEARCH_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
     </div>
   }
@@ -305,10 +312,10 @@ class PrivacyTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScript' onChange={this.onToggleNoScript} />
+        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SettingsList dataL10nId='advancedPrivacySettings'>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings} />
     </div>
@@ -316,19 +323,54 @@ class PrivacyTab extends ImmutableComponent {
 }
 
 class SecurityTab extends ImmutableComponent {
+  onToggleFlash (e) {
+    aboutActions.setResourceEnabled(flash, e.target.checked)
+  }
   render () {
     return <div>
-      <SettingsList>
+      <SettingsList dataL10nId='passwordSettings'>
         <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useDashlane' prefKey={settings.DASHLANE_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <div classname='settingItem'>
+          <span className='linkText' data-l10n-id='managePasswords'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:passwords'
+            }, true)}></span>
+        </div>
       </SettingsList>
-      <div>
-        <span className='linkText' data-l10n-id='managePasswords'
-          onClick={aboutActions.newFrame.bind(null, {
-            location: 'about:passwords'
-          }, true)}></span>
+      <SettingsList dataL10nId='pluginSettings'>
+        <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
+      </SettingsList>
+      <div className='subtext'>
+        <span className='fa fa-info-circle' id='flashInfoIcon' />
+        <span data-l10n-id='enableFlashSubtext' />
+        <span className='linkText'onClick={aboutActions.newFrame.bind(null, {
+          location: 'https://get.adobe.com/flashplayer'
+        })}>{'Adobe'}</span>.
       </div>
+    </div>
+  }
+}
+
+class AdvancedTab extends ImmutableComponent {
+  render () {
+    const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
+    return <div>
+      <SettingsList dataL10nId='contentRenderingOptions'>
+        <SettingItem dataL10nId='defaultZoomLevel'>
+          <select
+            value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
+            data-type='float'
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_ZOOM_LEVEL)}>
+            {
+              config.zoom.zoomLevels.map((x) =>
+                <option value={x} key={x}>{getZoomValuePercentage(x) + '%'}</option>)
+            }
+          </select>
+        </SettingItem>
+        <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
     </div>
   }
 }
@@ -423,6 +465,11 @@ class TopBar extends ImmutableComponent {
         className='notImplemented'
         selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
       />
+      <TopBarButton icon='fa-tasks'
+        dataL10nId='advanced'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.ADVANCED)}
+        selected={this.props.preferenceTab === preferenceTabs.ADVANCED}
+      />
       <HelpfulHints hintNumber={this.props.hintNumber} refreshHint={this.props.refreshHint} />
     </div>
   }
@@ -436,10 +483,12 @@ class AboutPreferences extends React.Component {
       preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
       languageCodes: window.languageCodes ? Immutable.fromJS(window.languageCodes) : Immutable.Map(),
+      flashInstalled: false,
       settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map(),
       siteSettings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map(),
       braveryDefaults: window.initBraveryDefaults ? Immutable.fromJS(window.initBraveryDefaults) : Immutable.Map()
     }
+    aboutActions.checkFlashInstalled()
     window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
       this.setState({
         settings: Immutable.fromJS(e.detail || {})
@@ -453,6 +502,11 @@ class AboutPreferences extends React.Component {
     window.addEventListener(messages.BRAVERY_DEFAULTS_UPDATED, (e) => {
       this.setState({
         braveryDefaults: Immutable.fromJS(e.detail || {})
+      })
+    })
+    window.addEventListener(messages.FLASH_UPDATED, (e) => {
+      this.setState({
+        flashInstalled: e.detail
       })
     })
     this.onChangeSetting = this.onChangeSetting.bind(this)
@@ -514,10 +568,13 @@ class AboutPreferences extends React.Component {
         tab = <PrivacyTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <SecurityTab settings={settings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.BRAVERY:
         tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        break
+      case preferenceTabs.ADVANCED:
+        tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
     }
     return <div>

@@ -94,7 +94,6 @@ class LoginRequired extends React.Component {
             : null
           }
           <div className='formRow'>
-            <span />
             <Button l10nId='ok' className='primaryButton' onClick={this.onSave.bind(this)} />
           </div>
         </div>

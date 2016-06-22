@@ -2,7 +2,7 @@
 
 # Brave Browser
 
-Desktop browser for OS X, Windows and Linux. To download the latest release,
+Desktop browser for macOS, Windows and Linux. To download the latest release,
 go to https://github.com/brave/browser-laptop/releases. To build Brave from
 source code, see below.
 

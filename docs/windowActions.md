@@ -258,6 +258,16 @@ Dispatches a message to the store to set a new frame as the active frame.
 
 
 
+### setFocusedFrame(frameProps) 
+
+Dispatches a message to the store when the frame is active and the window is focused
+
+**Parameters**
+
+**frameProps**: `Object`, the frame properties for the webview in question.
+
+
+
 ### setPreviewFrame(frameProps) 
 
 Dispatches a message to the store to set a preview frame.
@@ -343,6 +353,20 @@ Sets the URL bar suggestions and selected index.
 
 
 
+### setUrlBarAutocompleteEnabled(enabled) 
+
+Enables or disables the urlbar autocomplete.
+Autocomplete is defined to be the action of inserting text into the urlbar itself
+to the first item's URL match if possible.  The inserted text is auto selected so
+that the next character inserted will replace it.
+This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
+
+**Parameters**
+
+**enabled**: `boolean`, true if the urlbar should autocomplete
+
+
+
 ### setUrlBarSuggestionSearchResults(searchResults) 
 
 Sets the URL bar suggestion search results.
@@ -355,15 +379,13 @@ Note: This should eventually be refactored outside of the component doing XHR an
 
 
 
-### setUrlBarSelected(isSelected, forSearchMode) 
+### setUrlBarSelected(isSelected) 
 
 Marks the URL bar text as selected or not
 
 **Parameters**
 
 **isSelected**: `boolean`, Whether or not the URL bar text input should be selected
-
-**forSearchMode**: `boolean`, Whether or not to enable auto-complete search suggestions
 
 
 
@@ -525,6 +547,36 @@ Dispatches a message to indicate that the favicon has changed
 **frameProps**: `Object`, Properties of the frame in question
 
 **favicon**: `string`, A url to the favicon to use
+
+
+
+### setMaximizeState(isMaximized) 
+
+Sets the maximize state of the window
+
+**Parameters**
+
+**isMaximized**: `boolean`, true if window is maximized
+
+
+
+### savePosition(position) 
+
+Saves the position of the window in the window state
+
+**Parameters**
+
+**position**: `Array`, [x, y]
+
+
+
+### setWindowFullScreen(isFullScreen) 
+
+Sets the fullscreen state of the window
+
+**Parameters**
+
+**isFullScreen**: `boolean`, true if window is fullscreen
 
 
 

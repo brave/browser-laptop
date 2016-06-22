@@ -477,28 +477,35 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
   return items
 }
 
-function getEditableItems (selection) {
+function getEditableItems (selection, editFlags) {
   const hasSelection = selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
   const items = []
 
-  items.push({
-    label: locale.translation('cut'),
-    enabled: hasSelection,
-    accelerator: 'CmdOrCtrl+X',
-    role: 'cut'
-  }, {
-    label: locale.translation('copy'),
-    enabled: hasSelection,
-    accelerator: 'CmdOrCtrl+C',
-    role: 'copy'
-  }, {
-    label: locale.translation('paste'),
-    accelerator: 'CmdOrCtrl+V',
-    enabled: hasClipboard,
-    role: 'paste'
-  })
-
+  if (!editFlags || editFlags.canCut) {
+    items.push({
+      label: locale.translation('cut'),
+      enabled: hasSelection,
+      accelerator: 'CmdOrCtrl+X',
+      role: 'cut'
+    })
+  }
+  if (!editFlags || editFlags.canCopy) {
+    items.push({
+      label: locale.translation('copy'),
+      enabled: hasSelection,
+      accelerator: 'CmdOrCtrl+C',
+      role: 'copy'
+    })
+  }
+  if (!editFlags || editFlags.canPaste) {
+    items.push({
+      label: locale.translation('paste'),
+      accelerator: 'CmdOrCtrl+V',
+      enabled: hasClipboard,
+      role: 'paste'
+    })
+  }
   return items
 }
 
@@ -656,24 +663,23 @@ const searchSelectionMenuItem = (location) => {
 
 function mainTemplateInit (nodeProps, frame) {
   const template = []
-  const nodeName = nodeProps.name
 
-  if (nodeProps.href) {
-    template.push(openInNewTabMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')),
-      openInNewPrivateTabMenuItem(nodeProps.href, frame.get('key')),
-      openInNewWindowMenuItem(nodeProps.href, frame.get('isPrivate'), frame.get('partitionNumber')),
+  if (nodeProps.linkURL !== '') {
+    template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')),
+      openInNewPrivateTabMenuItem(nodeProps.linkURL, frame.get('key')),
+      openInNewWindowMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber')),
       CommonMenu.separatorMenuItem,
-      openInNewSessionTabMenuItem(nodeProps.href, frame.get('key')),
+      openInNewSessionTabMenuItem(nodeProps.linkURL, frame.get('key')),
       CommonMenu.separatorMenuItem)
 
-    if (nodeProps.href.toLowerCase().startsWith('mailto:')) {
-      template.push(copyEmailAddressMenuItem(nodeProps.href))
+    if (nodeProps.linkURL.toLowerCase().startsWith('mailto:')) {
+      template.push(copyEmailAddressMenuItem(nodeProps.linkURL))
     } else {
-      template.push(copyLinkLocationMenuItem(nodeProps.href), {
+      template.push(copyLinkLocationMenuItem(nodeProps.linkURL), {
         label: locale.translation('saveLinkAs'),
         click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.href) {
-            focusedWindow.webContents.downloadURL(nodeProps.href)
+          if (focusedWindow && nodeProps.linkURL) {
+            focusedWindow.webContents.downloadURL(nodeProps.linkURL)
           }
         }
       },
@@ -681,38 +687,40 @@ function mainTemplateInit (nodeProps, frame) {
     }
   }
 
-  if (nodeName === 'IMG') {
+  if (nodeProps.mediaType === 'image') {
     template.push({
       label: locale.translation('saveImage'),
       click: (item, focusedWindow) => {
-        if (focusedWindow && nodeProps.src) {
-          focusedWindow.webContents.downloadURL(nodeProps.src)
+        if (focusedWindow && nodeProps.srcURL) {
+          focusedWindow.webContents.downloadURL(nodeProps.srcURL)
         }
       }
     }, {
       label: locale.translation('openImageInNewTab'),
       click: (item, focusedWindow) => {
-        if (focusedWindow && nodeProps.src) {
+        if (focusedWindow && nodeProps.srcURL) {
           // TODO: open this in the next tab instead of last tab
-          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.src)
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL)
         }
       }
     }, {
       label: locale.translation('copyImageAddress'),
       click: (item, focusedWindow) => {
-        if (focusedWindow && nodeProps.src) {
-          clipboard.writeText(nodeProps.src)
+        if (focusedWindow && nodeProps.srcURL) {
+          clipboard.writeText(nodeProps.srcURL)
         }
       }
     }, CommonMenu.separatorMenuItem)
   }
 
-  if (nodeName === 'TEXTAREA' || nodeName === 'INPUT' || nodeProps.isContentEditable) {
+  if (nodeProps.isEditable || nodeProps.inputFieldType !== 'none') {
     let misspelledSuggestions = []
-    if (nodeProps.spellcheck) {
-      misspelledSuggestions = getMisspelledSuggestions(nodeProps.selection, nodeProps.spellcheck.isMisspelled, nodeProps.spellcheck.suggestions)
+
+    const info = ipc.sendSync(messages.GET_MISSPELLING_INFO, nodeProps.selectionText)
+    if (info) {
+      misspelledSuggestions = getMisspelledSuggestions(nodeProps.selectionText, info.isMisspelled, info.suggestions)
     }
-    const editableItems = getEditableItems(nodeProps.selection)
+    const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags)
     template.push(...misspelledSuggestions, {
       label: locale.translation('undo'),
       accelerator: 'CmdOrCtrl+Z',
@@ -722,16 +730,16 @@ function mainTemplateInit (nodeProps, frame) {
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
     }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
-  } else if (nodeProps.hasSelection) {
-    template.push(searchSelectionMenuItem(nodeProps.selection), {
+  } else if (nodeProps.selectionText.length > 0) {
+    template.push(searchSelectionMenuItem(nodeProps.selectionText), {
       label: locale.translation('copy'),
       accelerator: 'CmdOrCtrl+C',
       role: 'copy'
     }, CommonMenu.separatorMenuItem)
   } else {
-    if (nodeProps.href) {
+    if (nodeProps.linkURL) {
       template.push(addBookmarkMenuItem('bookmarkLink', {
-        location: nodeProps.href,
+        location: nodeProps.linkURL,
         tags: [siteTags.BOOKMARK]
       }, false))
     } else {
@@ -781,7 +789,7 @@ function mainTemplateInit (nodeProps, frame) {
 
     template.push(CommonMenu.separatorMenuItem)
 
-    if (!nodeProps.href) {
+    if (!nodeProps.linkURL) {
       template.push({
         label: locale.translation('viewPageSource'),
         click: (item, focusedWindow) => {
@@ -796,7 +804,7 @@ function mainTemplateInit (nodeProps, frame) {
   template.push({
     label: locale.translation('inspectElement'),
     click: (item, focusedWindow) => {
-      webviewActions.inspectElement(nodeProps.offsetX, nodeProps.offsetY)
+      webviewActions.inspectElement(nodeProps.x, nodeProps.y)
     }
   })
 

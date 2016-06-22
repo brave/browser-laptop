@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function () {
-  var ipcRenderer = chrome.ipc;
+  var ipcRenderer = chrome.ipc
   ipcRenderer.on('state-updated', (e, detail) => {
     const event = new window.CustomEvent('state-updated', {
       detail
@@ -64,6 +64,12 @@
     })
     window.dispatchEvent(event)
   })
+  ipcRenderer.on('flash-updated', (e, details) => {
+    const event = new window.CustomEvent('flash-updated', {
+      detail: details
+    })
+    window.dispatchEvent(event)
+  })
 
   window.addEventListener('dispatch-action', (e) => {
     ipcRenderer.send('dispatch-action', e.detail)
@@ -112,5 +118,8 @@
   })
   window.addEventListener('request-language', (e) => {
     ipcRenderer.send('request-language')
+  })
+  window.addEventListener('check-flash-installed', (e) => {
+    ipcRenderer.send('check-flash-installed')
   })
 }).apply(this)

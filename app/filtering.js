@@ -19,6 +19,7 @@ const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
+const userPrefs = require('../js/state/userPrefs')
 const locale = require('./locale')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
@@ -30,6 +31,7 @@ const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
+let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
@@ -181,16 +183,22 @@ function registerForBeforeSendHeaders (session) {
       }
     }
 
-    let hostname = urlParse(details.url || '').hostname
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl) &&
-        module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
-                                        hostname)) {
-      // Clear cookie and referer on third-party requests
-      if (requestHeaders['Cookie']) {
-        requestHeaders['Cookie'] = undefined
+    let parsedUrl = urlParse(details.url || '')
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl)) {
+      if (module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
+                                          parsedUrl.hostname)) {
+        // Clear cookie and referer on third-party requests
+        if (requestHeaders['Cookie']) {
+          requestHeaders['Cookie'] = undefined
+        }
       }
-      if (requestHeaders['Referer'] && !refererExceptions.includes(hostname)) {
-        requestHeaders['Referer'] = undefined
+      if (requestHeaders['Referer'] && !refererExceptions.includes(parsedUrl.hostname)) {
+        // Clear cross-origin referer always.
+        let parsedRef = urlParse(requestHeaders['Referer'])
+        if (parsedUrl.protocol !== parsedRef.protocol ||
+            parsedUrl.host !== parsedRef.host) {
+          requestHeaders['Referer'] = undefined
+        }
       }
     }
     if (sendDNT) {
@@ -234,7 +242,7 @@ function registerForHeadersReceived (session) {
  * @param {string} partition name of the partition
  */
 function registerPermissionHandler (session, partition) {
-  const isPrivate = !partition.startsWith('persist:') && partition !== '' && partition !== 'main-1'
+  const isPrivate = !partition.startsWith('persist:') && partition !== 'main-1'
   // Keep track of per-site permissions granted for this session.
   let permissions = null
   session.setPermissionRequestHandler((webContents, permission, cb) => {
@@ -303,18 +311,28 @@ function registerPermissionHandler (session, partition) {
       return
     }
     const message = `Allow ${host} to ${permissions[permission].action}?`
-    if (!(message in permissionCallbacks)) {
-      // This notification is not shown yet
-      appActions.showMessageBox({
-        buttons: [locale.translation('deny'), locale.translation('allow')],
-        options: {
-          persist: true
-        },
-        message
-      })
+
+    const clearCallback = () => {
+      if (permissionCallbacks[message]) {
+        permissionCallbacks[message](0, false)
+      }
     }
 
+    // If this is a duplicate, clear the previous callback and use the new one
+    clearCallback()
+
+    appActions.showMessageBox({
+      buttons: [locale.translation('deny'), locale.translation('allow')],
+      options: {
+        persist: true
+      },
+      message
+    })
+
     permissionCallbacks[message] = (buttonIndex, persist) => {
+      delete permissionCallbacks[message]
+      // hide the message box if this was triggered automatically
+      appActions.hideMessageBox(message)
       const result = !!(buttonIndex)
       cb(result)
       if (persist) {
@@ -322,6 +340,23 @@ function registerPermissionHandler (session, partition) {
         appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result, isPrivate)
       }
     }
+
+    // automatically clear on close or navigation
+    webContents.on('crashed', (e) => {
+      clearCallback()
+    })
+
+    webContents.on('close', (e) => {
+      clearCallback()
+    })
+
+    webContents.on('destroyed', (e) => {
+      clearCallback()
+    })
+
+    webContents.on('did-navigate', (e) => {
+      clearCallback()
+    })
   })
 }
 
@@ -401,13 +436,15 @@ function registerSession (partition, fn) {
 }
 
 function initForPartition (partition) {
-  let fns = [registerForBeforeRequest, registerForBeforeRedirect,
-    registerForBeforeSendHeaders, registerPermissionHandler]
-  if (partition !== 'main-1') {
-    // Don't block scripts in the background page
-    fns.push(registerForHeadersReceived)
-  }
+  let fns = [userPrefs.init,
+    registerForBeforeRequest,
+    registerForBeforeRedirect,
+    registerForBeforeSendHeaders,
+    registerPermissionHandler,
+    registerForHeadersReceived,
+    registerForDownloadListener]
 
+  initializedPartitions[partition] = true
   fns.forEach(registerSession.bind(this, partition))
 }
 
@@ -425,19 +462,14 @@ function shouldIgnoreUrl (url) {
 }
 
 module.exports.init = () => {
-  setTimeout(() => {
-    registerForDownloadListener(session.defaultSession)
-  }, 1000)
-  ;['', 'main-1'].forEach((partition) => {
+  ['persist:default', 'main-1'].forEach((partition) => {
     initForPartition(partition)
   })
-  let initializedPartitions = {}
   ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
     if (initializedPartitions[partition]) {
       return
     }
     initForPartition(partition)
-    initializedPartitions[partition] = true
   })
   ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
     const item = downloadMap[downloadId]
@@ -465,26 +497,29 @@ module.exports.init = () => {
   ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
     if (permissionCallbacks[message]) {
       permissionCallbacks[message](buttonIndex, persist)
-      delete permissionCallbacks[message]
     }
     appActions.hideMessageBox(message)
   })
 }
 
 module.exports.isResourceEnabled = (resourceName, url) => {
+  if (resourceName === 'siteHacks') {
+    return true
+  }
+
   const appState = AppStore.getState()
   const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
 
   // If full shields are down never enable extra protection
-  if (settings && settings.get('shieldsUp') === false) {
+  if (braverySettings.shieldsUp === false) {
     return false
   }
 
   if ((resourceName === appConfig.resourceNames.ADBLOCK ||
-       resourceName === appConfig.resourceNames.TRACKING_PROTECTION) &&
-      settings && settings.get('adControl') !== undefined) {
+       resourceName === appConfig.resourceNames.TRACKING_PROTECTION)) {
     // Check the resource vs the ad control setting
-    if (settings.get('adControl') === 'allowAdsAndTracking') {
+    if (braverySettings.adControl === 'allowAdsAndTracking') {
       return false
     } else {
       return true
@@ -492,9 +527,8 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   }
 
   // Check the resource vs the cookie setting
-  if (resourceName === appConfig.resourceNames.COOKIEBLOCK &&
-      settings && settings.get('cookieControl') !== undefined) {
-    if (settings.get('cookieControl') === 'allowAllCookies') {
+  if (resourceName === appConfig.resourceNames.COOKIEBLOCK) {
+    if (braverySettings.cookieControl === 'allowAllCookies') {
       return false
     } else {
       return true
@@ -502,15 +536,11 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   }
 
   // If the particular resource we're checking is disabled then don't enable
-  if (settings && typeof settings.get(resourceName) === 'boolean') {
-    return settings.get(resourceName)
+  if (typeof braverySettings[resourceName] === 'boolean') {
+    return braverySettings[resourceName]
   }
 
-  const enabledFromState = AppStore.getState().getIn([resourceName, 'enabled'])
-  if (enabledFromState === undefined) {
-    return appConfig[resourceName].enabled
-  }
-  return enabledFromState
+  return false
 }
 
 module.exports.clearSessionData = () => {

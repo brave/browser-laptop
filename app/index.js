@@ -43,6 +43,8 @@ const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
+const flash = require('./flash')
+const contentSettings = require('../js/state/contentSettings')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -174,11 +176,29 @@ const initiateSessionStateSave = (beforeQuit) => {
   }
 }
 
-app.on('ready', () => {
-  let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
-    return SessionStore.defaultAppState()
-  })
+let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
+  return SessionStore.defaultAppState()
+})
 
+let flashEnabled = false
+
+// Some settings must be set right away on startup, those settings should be handled here.
+loadAppStatePromise.then((initialState) => {
+  const { HARDWARE_ACCELERATION_ENABLED } = require('../js/constants/settings')
+  if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
+    app.disableHardwareAcceleration()
+  }
+  if (initialState.flash && initialState.flash.enabled === true) {
+    if (flash.init()) {
+      // Flash was initialized successfully
+      flashEnabled = true
+      return
+    }
+  }
+  app.setLocale(initialState.settings[settings.LANGUAGE])
+})
+
+app.on('ready', () => {
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
@@ -210,7 +230,7 @@ app.on('ready', () => {
     })
   })
   app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
+    // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       lastWindowClosed = true
@@ -235,6 +255,7 @@ app.on('ready', () => {
     }, appConfig.quitTimeout)
   })
 
+  // User initiated exit using File->Quit
   ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
     if (data) {
       perWindowState.push(data)
@@ -284,9 +305,23 @@ app.on('ready', () => {
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
+    initialState.flashEnabled = flashEnabled
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
+    contentSettings.init()
+    Extensions.init()
+    Filtering.init()
+    SiteHacks.init()
+    NoScript.init()
+    spellCheck.init()
+
+    // Wait for webcontents to be loaded before fetching data files
+    ipcMain.once(messages.WEB_CONTENTS_INITIALIZED, () => {
+      HttpsEverywhere.init()
+      TrackingProtection.init()
+      AdBlock.init()
+    })
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {
         appActions.newWindow()
@@ -333,6 +368,21 @@ app.on('ready', () => {
       appActions.setResourceEnabled(resourceName, enabled)
     })
 
+    ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
+      flash.checkFlashInstalled((installed) => {
+        e.sender.send(messages.FLASH_UPDATED, installed)
+      })
+    })
+
+    ipcMain.on(messages.SHOW_FLASH_INSTALLED_MESSAGE, (e) => {
+      flash.checkFlashInstalled((installed) => {
+        if (installed) {
+          BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
+                                                            locale.translation('flashInstalled'))
+        }
+      })
+    })
+
     ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
       appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
     })
@@ -368,15 +418,6 @@ app.on('ready', () => {
       // and there's not much gained if saved more frequently since it's also saved on shutdown.
       debounce(initiateSessionStateSave, 5 * 60 * 1000)
     })
-
-    Extensions.init()
-    Filtering.init()
-    HttpsEverywhere.init()
-    TrackingProtection.init()
-    AdBlock.init()
-    SiteHacks.init()
-    NoScript.init()
-    spellCheck.init()
 
     let masterKey
     ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {
@@ -557,12 +598,6 @@ app.on('ready', () => {
         delete passwordCallbacks[message]
       }
       appActions.hideMessageBox(message)
-    })
-
-    ipcMain.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {
-      BrowserWindow.getAllWindows().forEach((win) => {
-        win.webContents.send(messages.GOT_CANVAS_FINGERPRINTING, details)
-      })
     })
 
     // Setup the crash handling

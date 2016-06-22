@@ -135,10 +135,6 @@ function applyRuleset (url, applicableRule) {
  * is downloaded and ready.
  */
 function startHttpsEverywhere () {
-  // Reset the recently-redirected counter every 100 ms
-  setTimeout(() => {
-    recent307Counter = {}
-  }, 100)
   Filtering.registerBeforeRequestFilteringCB(onBeforeHTTPRequest)
   Filtering.registerBeforeRedirectFilteringCB(onBeforeRedirect)
 }
@@ -197,7 +193,7 @@ function onBeforeRedirect (details) {
     if (canonicalUrl in recent307Counter) {
       recent307Counter[canonicalUrl] += 1
       if (recent307Counter[canonicalUrl] > 5) {
-        // If this URL has been internally-redirected more than 5 times in 100
+        // If this URL has been internally-redirected more than 5 times in 200
         // ms, it's probably an HTTPS-Everywhere redirect loop.
         console.log('blacklisting url from HTTPS Everywhere for too many 307s',
                     canonicalUrl)
@@ -206,6 +202,9 @@ function onBeforeRedirect (details) {
       }
     } else {
       recent307Counter[canonicalUrl] = 1
+      setTimeout(() => {
+        recent307Counter[canonicalUrl] = 0
+      }, 200)
     }
   }
 }

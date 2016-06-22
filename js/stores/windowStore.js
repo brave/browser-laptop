@@ -49,6 +49,30 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
 }
 
 /**
+ * Updates the active frame state with what the URL bar suffix should be.
+ * @param suggestionList - The suggestion list to use to figure out the suffix.
+ */
+const updateUrlSuffix = (suggestionList) => {
+  const suggestion = suggestionList && suggestionList.get(0)
+  let suffix = ''
+  if (suggestion) {
+    const selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
+    const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
+    if (!selectedIndex && autocompleteEnabled) {
+      const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
+      const index = suggestion.location.indexOf(location)
+      if (index !== -1) {
+        const beforePrefix = suggestion.location.substring(0, index)
+        if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
+          suffix = suggestion.location.substring(index + location.length)
+        }
+      }
+    }
+  }
+  windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'urlSuffix']), suffix)
+}
+
+/**
  * Updates the tab page index to the specified frameProps
  * @param frameProps Any frame belonging to the page
  */
@@ -207,6 +231,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
+      updateUrlSuffix(windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList))
       // Since this value is bound we need to notify the control sync
       windowStore.emitChanges()
       return
@@ -390,7 +415,10 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
-      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
+      if (action.suggestionList !== undefined) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
+      }
+      updateUrlSuffix(action.suggestionList)
       break
     case WindowConstants.WINDOW_SET_URL_BAR_PREVIEW:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'urlPreview']), action.value)
@@ -409,9 +437,14 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       if (!action.isActive) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), null)
+        windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
+          selectedIndex: null,
+          suggestionList: null
+        })
       }
+      break
+    case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
@@ -421,9 +454,6 @@ const doAction = (action) => {
       // selection implies focus
       if (action.selected) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), true)
-      }
-      if (action.forSearchMode !== undefined) {
-        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'searchSuggestions']), action.forSearchMode)
       }
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT:
@@ -508,6 +538,15 @@ const doAction = (action) => {
       getFavicon(action.frameProps, action.favicon).then((icon) => {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'icon'], action.favicon)
       })
+      break
+    case WindowConstants.WINDOW_SET_MAXIMIZE_STATE:
+      windowState = windowState.setIn(['ui', 'isMaximized'], action.isMaximized)
+      break
+    case WindowConstants.WINDOW_SAVE_POSITION:
+      windowState = windowState.setIn(['ui', 'position'], action.position)
+      break
+    case WindowConstants.WINDOW_SET_FULLSCREEN_STATE:
+      windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
       break
     case WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
@@ -604,7 +643,7 @@ ipc.on(messages.IMPORT_BOOKMARKS, () => {
   }
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev']
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {
@@ -628,7 +667,7 @@ frameShortcuts.forEach((shortcut) => {
 })
 
 // Allows the parent process to dispatch window actions
-ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload, caller) => {
+ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
   let action = Serializer.deserialize(serializedPayload)
   let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo

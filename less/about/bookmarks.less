@@ -10,19 +10,34 @@
     .bookmarkList {
       padding-top: 10px;
       overflow: hidden;
-    }
 
-    >.bookmarkFolderList {
-      border-right: 1px solid @chromeBorderColor;
-      padding-top: 10px;
+      .listItem {
+        display: flex;
+        height: 1rem;
+
+        .aboutListItem {
+          align-items: center;
+          min-width: 0;
+        }
+      }
     }
 
     .bookmarkFolderList {
       min-width: 220px;
 
+      .listItem {
+        border-right: 1px solid @chromeBorderColor;
+        height: 1rem;
+      }
+
       .bookmarkFolderIcon {
         margin-right: 5px;
       }
+    }
+
+    .sticky-outer-wrapper {
+      min-width: 220px;
+      padding-top: 10px;
     }
   }
 }

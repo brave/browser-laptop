@@ -17,7 +17,7 @@ const dragTypes = require('../constants/dragTypes')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 
-const {isUrl} = require('../lib/appUrlUtil')
+const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -79,7 +79,14 @@ class UrlBar extends ImmutableComponent {
         windowActions.setUrlBarActive(false)
         this.restore()
         e.preventDefault()
+
         let location = this.props.urlbar.get('location')
+
+        // If a suffix is present then the user wants the first suggestion instead
+        if (this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])) {
+          location = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', 0]).location
+        }
+
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
         } else {
@@ -138,7 +145,20 @@ class UrlBar extends ImmutableComponent {
         e.preventDefault()
         ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
         break
+      case KeyCodes.BACKSPACE:
+        // Temporarily disable the autocomplete when a user is pressing backspace.
+        // Otherwise, they'd have to hit backspace twice for each characater they wanted
+        // to delete.
+        if (this.autocompleteEnabled) {
+          windowActions.setUrlBarAutocompleteEnabled(false)
+        }
+        windowActions.setUrlBarSuggestions(undefined, null)
+        break
       default:
+        // Any other keydown is fair game for autocomplete to be enabled.
+        if (!this.autocompleteEnabled) {
+          windowActions.setUrlBarAutocompleteEnabled(true)
+        }
     }
   }
 
@@ -153,6 +173,15 @@ class UrlBar extends ImmutableComponent {
   onBlur (e) {
     windowActions.setNavBarFocused(false)
     windowActions.setUrlBarSelected(false)
+    // On blur, a user expects the text shown from the last autocomplete suffix
+    // to be auto entered as the new location.
+    this.updateLocationToSuggestion()
+  }
+
+  updateLocationToSuggestion () {
+    if (this.locationValueSuffix.length > 0) {
+      windowActions.setNavBarUserInput(this.locationValue + this.locationValueSuffix)
+    }
   }
 
   onChange (e) {
@@ -172,8 +201,12 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentWillMount () {
-    ipc.on(messages.SHORTCUT_FOCUS_URL, (e, forSearchMode) => {
-      windowActions.setUrlBarSelected(true, forSearchMode)
+    ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
+      // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
+      this.updateLocationToSuggestion()
+      windowActions.setUrlBarSelected(true)
+      // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
+      this.updateDOM()
     })
     // escape key handling
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_STOP, this.onActiveFrameStop)
@@ -185,6 +218,12 @@ class UrlBar extends ImmutableComponent {
 
   componentDidUpdate () {
     this.updateDOM()
+    // Select the part of the URL which was an autocomplete suffix.
+    if (this.urlInput && this.locationValueSuffix.length > 0) {
+      const len = this.urlInput.value.length
+      const suffixLen = this.locationValueSuffix.length
+      this.urlInput.setSelectionRange(len - suffixLen, len)
+    }
   }
 
   get hostValue () {
@@ -199,9 +238,32 @@ class UrlBar extends ImmutableComponent {
       ? '' : this.props.activeFrameProps.get('title')
   }
 
+  get autocompleteEnabled () {
+    return this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled'])
+  }
+
+  get locationValueSuffix () {
+    return this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
+  }
+
   get locationValue () {
+    // If there's a selected autocomplete entry, we just want to show its location
+    const selectedIndex = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+    if (selectedIndex) {
+      const suggestionLocation = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
+      if (suggestionLocation) {
+        return suggestionLocation
+      }
+    }
+
+    const location = this.props.urlbar.get('location')
+    const history = this.props.activeFrameProps.get('history')
+    if (isIntermediateAboutPage(location) && history.size > 0) {
+      return history.last()
+    }
+
     return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
-      ? '' : this.props.urlbar.get('location')
+      ? '' : location
   }
 
   get loadTime () {
@@ -266,8 +328,7 @@ class UrlBar extends ImmutableComponent {
           'fa': true,
           'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
           'fa-unlock-alt': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
-          'fa fa-search': this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
-          'fa fa-file': !this.props.searchSuggestions && this.props.urlbar.get('active') && this.props.loading === false,
+          'fa fa-file': this.props.urlbar.get('active') && this.props.loading === false,
           extendedValidation: this.extendedValidationSSL
         })} />
         {
@@ -285,7 +346,7 @@ class UrlBar extends ImmutableComponent {
             onChange={this.onChange}
             onClick={this.onClick}
             onContextMenu={this.onContextMenu}
-            value={this.locationValue}
+            value={this.locationValue + this.locationValueSuffix}
             data-l10n-id='urlbar'
             className={cx({
               insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
@@ -300,7 +361,10 @@ class UrlBar extends ImmutableComponent {
         {
           this.props.titleMode || this.aboutPage
           ? null
-          : <span className='loadTime'>{this.loadTime}</span>
+          : <span className={cx({
+            'loadTime': true,
+            'onFocus': this.props.urlbar.get('active')
+          })}>{this.loadTime}</span>
         }
 
         {
@@ -311,7 +375,6 @@ class UrlBar extends ImmutableComponent {
             sites={this.props.sites}
             frames={this.props.frames}
             searchDetail={this.searchDetail}
-            searchSuggestions={this.props.searchSuggestions}
             activeFrameProps={this.props.activeFrameProps}
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}

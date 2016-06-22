@@ -93,7 +93,8 @@ class DownloadItem extends ImmutableComponent {
       }
       <div className='downloadInfo'>
         <span>
-          <div className='downloadFilename'>
+          <div className='downloadFilename'
+            title={this.props.download.get('filename')}>
             {
               this.props.download.get('filename')
             }

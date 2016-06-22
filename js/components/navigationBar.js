@@ -77,7 +77,8 @@ class NavigationBar extends ImmutableComponent {
       !['about:blank', 'about:newtab'].includes(this.props.activeFrame.get('location')) &&
       !this.loading &&
       !this.props.navbar.getIn(['urlbar', 'focused']) &&
-      !this.props.navbar.getIn(['urlbar', 'active'])
+      !this.props.navbar.getIn(['urlbar', 'active']) &&
+      getSetting(settings.DISABLE_TITLE_MODE) === false
   }
 
   componentDidMount () {
@@ -152,7 +153,6 @@ class NavigationBar extends ImmutableComponent {
         sites={this.props.sites}
         activeFrameProps={frameProps}
         searchDetail={this.props.searchDetail}
-        searchSuggestions={this.props.searchSuggestions}
         frames={this.props.frames}
         loading={this.loading}
         titleMode={this.titleMode}
@@ -165,15 +165,18 @@ class NavigationBar extends ImmutableComponent {
           {
             !this.showNoScriptInfo
             ? null
-            : <Button iconClass='fa-ban' className={cx({
-              'noScript': true
-            })} onClick={this.onNoScript} />
+            : <Button iconClass='fa-ban'
+              l10nId='noScriptButton'
+              className={cx({
+                'noScript': true
+              })}
+              onClick={this.onNoScript} />
           }
           <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
             className={cx({
-              'navbutton': true,
-              'bookmark-button': true,
-              'remove-bookmark-button': this.bookmarked
+              navbutton: true,
+              bookmarkButton: true,
+              removeBookmarkButton: this.bookmarked
             })}
             l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
             onClick={() => this.onToggleBookmark(this.bookmarked)} />

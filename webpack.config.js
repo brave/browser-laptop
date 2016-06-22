@@ -20,8 +20,7 @@ function config () {
           exclude: [
             /node_modules/,
             /\.min.js$/,
-            path.resolve(__dirname, 'app'),
-            path.resolve(__dirname, 'app', 'extensions')
+            path.resolve(__dirname, 'app', 'extensions', '*')
           ],
           loader: 'babel'
         },

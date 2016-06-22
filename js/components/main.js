@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 const remote = electron.remote
+const fs = require('fs')
 
 // Actions
 const windowActions = require('../actions/windowActions')
@@ -50,7 +51,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 // Util
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
-const { isIntermediateAboutPage } = require('../lib/appUrlUtil')
+const { isIntermediateAboutPage, getBaseUrl } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 
@@ -108,7 +109,7 @@ class Main extends ImmutableComponent {
   }
 
   registerSwipeListener () {
-    // Navigates back/forward on OS X two-finger swipe
+    // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
     var deltaX = 0
     var deltaY = 0
@@ -171,8 +172,65 @@ class Main extends ImmutableComponent {
   }
 
   componentDidMount () {
+    ipc.send(messages.WEB_CONTENTS_INITIALIZED)
+
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
+
+    ipc.on(messages.DOWNLOAD_DATAFILE, (event, url, nonce, headers, path) => {
+      let msg = messages.DOWNLOAD_DATAFILE_DONE + nonce
+      let args = {}
+      let stream = fs.createWriteStream(path)
+      function pump (reader) {
+        return reader.read().then((result) => {
+          if (result.done) {
+            stream.end()
+          } else {
+            const chunk = result.value
+            // Convert Uint8Array to node buffer
+            const buf = Buffer.from(chunk.buffer)
+            stream.write(buf)
+            return pump(reader)
+          }
+        }).catch((e) => {
+          ipc.send(msg, args, e.message)
+          stream.end()
+        })
+      }
+      window.fetch(url, {headers: headers}).then((response) => {
+        args.statusCode = response.status
+        if (response.status !== 200) {
+          ipc.send(msg, args)
+          return
+        }
+        let reader = response.body.getReader()
+        args.etag = response.headers.get('etag')
+        stream.on('close', () => {
+          ipc.send(msg, args)
+        })
+        return pump(reader)
+      }).catch((e) => {
+        ipc.send(msg, {}, e.message)
+        stream.end()
+      })
+    })
+
+    ipc.on(messages.SEND_XHR_REQUEST, (event, url, nonce, headers) => {
+      const xhr = new window.XMLHttpRequest()
+      xhr.open('GET', url)
+      if (headers) {
+        for (let name in headers) {
+          xhr.setRequestHeader(name, headers[name])
+        }
+      }
+      xhr.send()
+      xhr.onload = () => {
+        ipc.send(messages.GOT_XHR_RESPONSE + nonce,
+                 {statusCode: xhr.status},
+                 xhr.responseText)
+      }
+    })
+
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
@@ -192,8 +250,8 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
       windowActions.setPopupWindowDetail(Immutable.fromJS({
-        left: props.offsetX,
-        top: props.offsetY + 100,
+        left: props.x,
+        top: props.y + 100,
         maxHeight: window.innerHeight - 100,
         minHeight: 400,
         src
@@ -225,7 +283,7 @@ class Main extends ImmutableComponent {
 
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
-      windowActions.setActiveFrame(FrameStateUtil.getFrameByIndex(self.props.windowState, i)))
+      windowActions.setActiveFrame(FrameStateUtil.getFrameByDisplayIndex(self.props.windowState, i)))
 
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST, () =>
       windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
@@ -252,18 +310,6 @@ class Main extends ImmutableComponent {
       const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
-    })
-
-    ipc.on(messages.GOT_CANVAS_FINGERPRINTING, (e, details) => {
-      if (!details.length) {
-        return
-      }
-      details.forEach((detail) => {
-        const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
-        const description = [detail.type, detail.scriptUrl || detail.url].join(': ')
-        filteredFrameProps.forEach((frameProps) =>
-          windowActions.setBlockedBy(frameProps, 'fingerprintingProtection', description))
-      })
     })
 
     ipc.on(messages.SHOW_NOTIFICATION, (e, text) => {
@@ -316,6 +362,8 @@ class Main extends ImmutableComponent {
       self.checkForTitleMode(e.pageY)
     })
     window.addEventListener('focus', () => {
+      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
+      windowActions.setFocusedFrame(activeFrame)
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
@@ -347,6 +395,33 @@ class Main extends ImmutableComponent {
     if (activeFrame && win) {
       win.setTitle(activeFrame.get('title'))
     }
+
+    // Handlers for saving window state
+    win.on('maximize', function () {
+      windowActions.setMaximizeState(true)
+    })
+
+    win.on('unmaximize', function () {
+      windowActions.setMaximizeState(false)
+    })
+
+    let moveTimeout = null
+    win.on('move', function (event) {
+      if (moveTimeout) {
+        clearTimeout(moveTimeout)
+      }
+      moveTimeout = setTimeout(function () {
+        windowActions.savePosition(event.sender.getPosition())
+      }, 1000)
+    })
+
+    win.on('enter-full-screen', function (event) {
+      windowActions.setWindowFullScreen(true)
+    })
+
+    win.on('leave-full-screen', function (event) {
+      windowActions.setWindowFullScreen(false)
+    })
   }
 
   checkForTitleMode (pageY) {
@@ -418,58 +493,8 @@ class Main extends ImmutableComponent {
     windowActions.setReleaseNotesVisible(false)
   }
 
-  get enableAds () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (this.activeSiteSettings.get('adControl') !== undefined) {
-        if (['blockAds', 'allowAdsAndTracking'].includes(this.activeSiteSettings.get('adControl'))) {
-          return false
-        } else {
-          return true
-        }
-      }
-    }
-
-    let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
-    if (enabled === undefined) {
-      enabled = appConfig.adInsertion.enabled
-    }
-    return enabled
-  }
-
-  get enableNoScript () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (typeof this.activeSiteSettings.get('noScript') === 'boolean') {
-        return this.activeSiteSettings.get('noScript')
-      }
-    }
-
-    let enabled = this.props.appState.getIn(['noScript', 'enabled'])
-    if (enabled === undefined) {
-      enabled = appConfig.noScript.enabled
-    }
-    return enabled
-  }
-
-  get enableFingerprintingProtection () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (typeof this.activeSiteSettings.get('fingerprintingProtection') === 'boolean') {
-        return this.activeSiteSettings.get('fingerprintingProtection')
-      }
-    }
-
-    return getSetting(settings.BLOCK_CANVAS_FINGERPRINTING) || false
+  enableNoScript (settings) {
+    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript
   }
 
   onCloseFrame (activeFrameProps) {
@@ -554,12 +579,15 @@ class Main extends ImmutableComponent {
     return this.props.appState.get('siteSettings')
   }
 
-  get activeSiteSettings () {
-    const activeRequestedLocation = this.activeRequestedLocation
-    if (!activeRequestedLocation) {
+  frameSiteSettings (location) {
+    if (!location) {
       return undefined
     }
-    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, activeRequestedLocation)
+    return siteSettings.getSiteSettingsForURL(this.allSiteSettings, location)
+  }
+
+  get activeSiteSettings () {
+    return this.frameSiteSettings(this.activeRequestedLocation)
   }
 
   get braveShieldsDisabled () {
@@ -575,28 +603,6 @@ class Main extends ImmutableComponent {
 
     const parsedUrl = urlParse(activeRequestedLocation)
     return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && activeRequestedLocation !== 'about:safebrowsing'
-  }
-
-  get braveryDefaults () {
-    const braveryDefaults = {}
-    Object.keys(appConfig.resourceNames).forEach((name) => {
-      let value = appConfig.resourceNames[name]
-      let enabled = this.props.appState.getIn([value, 'enabled'])
-      braveryDefaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
-    })
-    const replaceAds = braveryDefaults[appConfig.resourceNames.AD_INSERTION] || false
-    const blockAds = braveryDefaults[appConfig.resourceNames.ADBLOCK] || false
-    const blockTracking = braveryDefaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
-    const blockCookies = braveryDefaults[appConfig.resourceNames.COOKIEBLOCK] || false
-    braveryDefaults.adControl = 'allowAdsAndTracking'
-    if (blockAds && replaceAds && blockTracking) {
-      braveryDefaults.adControl = 'showBraveAds'
-    } else if (blockAds && !replaceAds && blockTracking) {
-      braveryDefaults.adControl = 'blockAds'
-    }
-    braveryDefaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
-    braveryDefaults.fingerprintingProtection = getSetting(settings.BLOCK_CANVAS_FINGERPRINTING)
-    return braveryDefaults
   }
 
   render () {
@@ -623,7 +629,8 @@ class Main extends ImmutableComponent {
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
-    const braveryDefaults = this.braveryDefaults
+    const braveryDefaults = siteSettings.braveryDefaults(this.props.appState, appConfig)
+    const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -675,9 +682,8 @@ class Main extends ImmutableComponent {
             sites={this.props.appState.get('sites')}
             activeFrame={activeFrame}
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchSuggestions={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'searchSuggestions'])}
             searchDetail={this.props.windowState.get('searchDetail')}
-            enableNoScript={this.enableNoScript}
+            enableNoScript={this.enableNoScript(activeSiteSettings)}
             noScriptIsVisible={noScriptIsVisible}
           />
           {
@@ -691,7 +697,7 @@ class Main extends ImmutableComponent {
             ? <BraveryPanel frameProps={activeFrame}
               activeRequestedLocation={activeRequestedLocation}
               braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
-              braveryDefaults={braveryDefaults}
+              braverySettings={braverySettings}
               activeSiteSettings={activeSiteSettings}
               onHide={this.onHideBraveryPanel} />
             : null
@@ -728,7 +734,7 @@ class Main extends ImmutableComponent {
               className={cx({
                 navbutton: true,
                 braveShieldsDisabled,
-                braveShieldsDown: activeSiteSettings && activeSiteSettings.get('shieldsUp') === false
+                braveShieldsDown: !braverySettings.shieldsUp
               })}
               onClick={this.onBraveMenu} />
           </div>
@@ -788,7 +794,7 @@ class Main extends ImmutableComponent {
               braveryDefaults={braveryDefaults}
               frame={frame}
               key={frame.get('key')}
-              settings={frame.get('location') === 'about:preferences'
+              settings={getBaseUrl(frame.get('location')) === 'about:preferences'
                 ? this.props.appState.get('settings') || new Immutable.Map()
                 : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
@@ -802,13 +808,11 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
-              dictionaryLocale={this.props.appState.getIn(['dictionary', 'locale'])}
               passwords={this.props.appState.get('passwords')}
+              flashEnabled={this.props.appState.get('flashEnabled')}
               allSiteSettings={allSiteSettings}
-              activeSiteSettings={activeSiteSettings}
-              enableAds={this.enableAds}
-              enableNoScript={this.enableNoScript}
-              enableFingerprintingProtection={this.enableFingerprintingProtection}
+              frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
+              enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)

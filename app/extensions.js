@@ -1,8 +1,10 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
-const { getAppUrl, getExtensionsPath } = require('../js/lib/appUrlUtil')
-const getSetting = require('../js/settings').getSetting
+const appConfig = require('../js/constants/appConfig')
+const config = require('../js/constants/config')
+const { getAppUrl, getExtensionsPath, getIndexHTML } = require('../js/lib/appUrlUtil')
+const { getSetting } = require('../js/settings')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 
@@ -16,22 +18,59 @@ let generateBraveManifest = () => {
         run_at: 'document_start',
         all_frames: true,
         matches: ['<all_urls>'],
+        include_globs: [
+          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
+        ],
+        exclude_globs: [
+          getIndexHTML()
+        ],
+        match_about_blank: true,
         js: [
-          'brave-default.js'
+          'content/scripts/util.js',
+          'js/actions/extensionActions.js',
+          'content/scripts/blockFlash.js',
+          'content/scripts/blockCanvasFingerprinting.js',
+          'content/scripts/inputHandler.js',
+          'content/scripts/spellCheck.js'
         ],
         css: [
           'brave-default.css'
         ]
       },
       {
+        run_at: 'document_end',
+        all_frames: true,
+        matches: ['<all_urls>'],
+        include_globs: [
+          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
+        ],
+        exclude_globs: [
+          getIndexHTML()
+        ],
+        js: [
+          'content/scripts/adInfo.js',
+          'content/scripts/adInsertion.js',
+          'content/scripts/passwordManager.js',
+          'content/scripts/flashListener.js',
+          'js/actions/extensionActions.js',
+          'content/scripts/themeColor.js',
+          'content/scripts/publisherIdentification.js'
+        ]
+      },
+      {
         run_at: 'document_start',
         js: [
-          'brave-about.js'
+          'content/scripts/util.js',
+          'content/scripts/spellCheck.js',
+          'content/scripts/inputHandler.js',
+          'content/scripts/themeColor.js',
+          'content/scripts/brave-about.js'
         ],
         matches: [
           '<all_urls>'
         ],
         include_globs: [
+          getIndexHTML(),
           getAppUrl('about-*.html'),
           getAppUrl('about-*.html') + '#*'
         ],
@@ -40,8 +79,14 @@ let generateBraveManifest = () => {
         ]
       }
     ],
+    background: {
+      scripts: [
+        'content/scripts/util.js',
+        'brave-background.js'
+      ]
+    },
     permissions: [
-      'externally_connectable.all_urls'
+      'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings'
     ],
     externally_connectable: {
       matches: [
@@ -81,7 +126,30 @@ let generateBraveManifest = () => {
   return baseManifest
 }
 
+let backgroundPage = null
+
+module.exports.sendToTab = (tabId, message) => {
+  if (backgroundPage) {
+    backgroundPage.send('tab-message', tabId, message, [].slice.call(arguments, 2))
+  }
+}
+
 module.exports.init = () => {
+  process.on('background-page-loaded', function (extensionId, backgroundPageWebContents) {
+    if (extensionId === config.braveExtensionId) {
+      backgroundPage = backgroundPageWebContents
+      backgroundPage.on('dom-ready', () => {
+        backgroundPage.send('update-state', AppStore.getState().toJS(), appConfig)
+      })
+    }
+  })
+
+  process.on('background-page-destroyed', function (extensionId, backgroundPageId) {
+    if (extensionId === config.braveExtensionId) {
+      backgroundPage = null
+    }
+  })
+
   process.on('chrome-browser-action-popup', function (extensionId, name, props, popup) {
     let win = BrowserWindow.getFocusedWindow()
     if (!win) {
@@ -121,17 +189,17 @@ module.exports.init = () => {
     installExtension('brave', getExtensionsPath(), {manifest_location: 'component', manifest: generateBraveManifest()})
 
     if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
-      installExtension('1password', getExtensionsPath())
-      enableExtension('1password')
+      installExtension('1Password', getExtensionsPath())
+      enableExtension('1Password')
     } else {
-      disableExtension('1password')
+      disableExtension('1Password')
     }
 
     if (getSetting(settings.DASHLANE_ENABLED)) {
-      installExtension('dashlane', getExtensionsPath())
-      enableExtension('dashlane')
+      installExtension('Dashlane', getExtensionsPath())
+      enableExtension('Dashlane')
     } else {
-      disableExtension('dashlane')
+      disableExtension('Dashlane')
     }
   }
 
@@ -139,5 +207,8 @@ module.exports.init = () => {
 
   AppStore.addChangeListener(() => {
     enableExtensions()
+    if (backgroundPage) {
+      backgroundPage.send('update-state', AppStore.getState().toJS(), appConfig)
+    }
   })
 }

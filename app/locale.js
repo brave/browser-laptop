@@ -16,6 +16,7 @@ var rendererIdentifiers = function () {
     'downloadsManager',
     'confirmClearPasswords',
     'passwordCopied',
+    'flashInstalled',
     'about',
     'quit',
     'quitApp',
@@ -81,6 +82,7 @@ var rendererIdentifiers = function () {
     'zoomIn',
     'zoomOut',
     'toolbars',
+    'stop',
     'reloadPage',
     'reloadTab',
     'cleanReload',
@@ -148,7 +150,12 @@ var rendererIdentifiers = function () {
     'permissionWebMidi',
     'permissionDisableCursor',
     'permissionFullscreen',
-    'permissionExternal'
+    'permissionExternal',
+    'tabsSuggestionTitle',
+    'bookmarksSuggestionTitle',
+    'historySuggestionTitle',
+    'searchSuggestionTitle',
+    'topSiteSuggestionTitle'
   ]
 }
 

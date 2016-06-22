@@ -13,11 +13,13 @@ const top500 = require('./../data/top500.js')
 const {isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 const Immutable = require('immutable')
 const debounce = require('../lib/debounce.js')
-const {getSiteIconClass} = require('../state/siteUtil.js')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
+const suggestionTypes = require('../constants/suggestionTypes')
 const getSetting = require('../settings').getSetting
 const eventUtil = require('../lib/eventUtil.js')
+const cx = require('../lib/classSet.js')
+const locale = require('../l10n')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
@@ -33,6 +35,13 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   nextSuggestion () {
+    // If the user presses down and don't have an explicit selected index, skip to the 2nd one
+    const hasUrlSuffix = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
+    if (hasUrlSuffix && this.props.suggestions.get('selectedIndex') === null && this.props.suggestions.get('suggestionList').size > 1) {
+      this.updateSuggestions(2)
+      return
+    }
+
     this.updateSuggestions(this.props.suggestions.get('selectedIndex') + 1)
   }
 
@@ -78,17 +87,71 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Add an event listener on the window to hide suggestions when they are shown.
     window.addEventListener('click', this)
 
-    return <ul className='urlBarSuggestions'>
-      {suggestions.map((suggestion, index) =>
-        <li data-index={index + 1}
+    // If there is a URL suffix that means there's an active autocomplete for the first element.
+    // We should show that as selected so the user knows what is being matched.
+    const hasUrlSuffix = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
+
+    const tabSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TAB)
+    const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
+    const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)
+    const searchSuggestions = suggestions.filter((s) => s.type === suggestionTypes.SEARCH)
+    const topSiteSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TOP_SITE)
+
+    let items = []
+    let index = 0
+    const addToItems = (suggestions, sectionKey, title, icon) => {
+      if (suggestions.size > 0) {
+        items.push(<li className='suggestionSection'>
+          <span className='suggestionSectionTitle'>{title}</span>
+          {
+            icon
+            ? <span className={cx({
+              suggestionSectionIcon: true,
+              [sectionKey]: true,
+              fa: true,
+              [icon]: true
+            })} />
+            : null
+          }
+        </li>)
+      }
+      items = items.concat(suggestions.map((suggestion, i) => {
+        const currentIndex = index + i
+        const selected = this.activeIndex === currentIndex + 1 || currentIndex === 0 && hasUrlSuffix
+        return <li data-index={currentIndex + 1}
           onMouseOver={this.onMouseOver.bind(this)}
           onClick={suggestion.onClick}
           key={suggestion.title}
-          className={this.activeIndex === index + 1 ? 'selected' : ''}>
-          <span className={`suggestionIcon fa ${suggestion.iconClass}`} />
-          <span className='suggestionText'>{suggestion.title}</span>
+          ref={(node) => { selected && (this.selectedElement = node) }}
+          className={cx({
+            selected,
+            suggestionItem: true,
+            [suggestion.type]: true
+          })}>
+          {
+            suggestion.type !== suggestionTypes.TOP_SITE
+            ? <div className='suggestionTitle'>{suggestion.title}</div>
+            : null
+          }
+          {
+            suggestion.type !== suggestionTypes.SEARCH
+            ? <div className='suggestionLocation'>{suggestion.location}</div>
+            : null
+          }
         </li>
-      )}
+      }))
+      index += suggestions.size
+    }
+    addToItems(tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
+    addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
+    addToItems(historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
+    addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
+    addToItems(topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
+    const documentHeight = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--navbar-height'), 10)
+    return <ul className='urlBarSuggestions' style={{
+      maxHeight: document.documentElement.offsetHeight - documentHeight - 2
+    }}>
+      {items}
     </ul>
   }
 
@@ -97,6 +160,9 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
+    if (this.selectedElement) {
+      this.selectedElement.scrollIntoView()
+    }
     if (this.props.urlLocation === prevProps.urlLocation) {
       return
     }
@@ -135,8 +201,8 @@ class UrlBarSuggestions extends ImmutableComponent {
     const urlLocationLower = this.props.urlLocation.toLowerCase()
     let suggestions = new Immutable.List()
     const defaultme = (x) => x
-    const mapListToElements = ({data, maxResults, classHandler, clickHandler = navigateClickHandler,
-        sortHandler = defaultme, formatTitle = defaultme,
+    const mapListToElements = ({data, maxResults, type, clickHandler = navigateClickHandler,
+        sortHandler = defaultme, formatTitle = defaultme, formatUrl = defaultme,
         filterValue = (site) => site.toLowerCase().includes(urlLocationLower)
     }) => // Filter out things which are already in our own list at a smaller index
       data
@@ -151,19 +217,36 @@ class UrlBarSuggestions extends ImmutableComponent {
         return {
           onClick: clickHandler.bind(null, site),
           title: formatTitle(site),
-          iconClass: classHandler(site)
+          location: formatUrl(site),
+          type
         }
       })
+
+    const sortBasedOnLocationPos = (s1, s2) => {
+      const pos1 = s1.get('location').indexOf(urlLocationLower)
+      const pos2 = s2.get('location').indexOf(urlLocationLower)
+      if (pos1 === -1 && pos2 === -1) {
+        return 0
+      } else if (pos1 === -1) {
+        return 1
+      } else if (pos2 === -1) {
+        return -1
+      } else {
+        return pos1 - pos2
+      }
+    }
 
     // opened frames
     if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.frames,
         maxResults: config.urlBarSuggestions.maxOpenedFrames,
-        classHandler: () => 'fa-file',
+        type: suggestionTypes.TAB,
         clickHandler: (frameProps) =>
           windowActions.setActiveFrame(frameProps),
+        sortHandler: sortBasedOnLocationPos,
         formatTitle: (frame) => frame.get('title') || frame.get('location'),
+        formatUrl: (frame) => frame.get('location'),
         filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
           frame.get('key') !== this.props.activeFrameProps.get('key') &&
           (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
@@ -174,15 +257,14 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
-        maxResults: config.urlBarSuggestions.maxSites,
-        classHandler: getSiteIconClass,
+        maxResults: config.urlBarSuggestions.maxBookmarkSites,
+        type: suggestionTypes.BOOKMARK,
         clickHandler: navigateClickHandler((site) => {
           return site.get('location')
         }),
-        sortHandler: (site1, site2) => {
-          return site2.get('tags').size - site1.get('tags').size
-        },
+        sortHandler: sortBasedOnLocationPos,
         formatTitle: (site) => site.get('title') || site.get('location'),
+        formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
@@ -197,15 +279,14 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (getSetting(settings.HISTORY_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.sites,
-        maxResults: config.urlBarSuggestions.maxSites,
-        classHandler: getSiteIconClass,
+        maxResults: config.urlBarSuggestions.maxHistorySites,
+        type: suggestionTypes.HISTORY,
         clickHandler: navigateClickHandler((site) => {
           return site.get('location')
         }),
-        sortHandler: (site1, site2) => {
-          return site2.get('tags').size - site1.get('tags').size
-        },
+        sortHandler: sortBasedOnLocationPos,
         formatTitle: (site) => site.get('title') || site.get('location'),
+        formatUrl: (site) => site.get('location'),
         filterValue: (site) => {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
@@ -217,11 +298,11 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     // Search suggestions
-    if (this.props.searchSuggestions) {
+    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.suggestions.get('searchResults'),
-        maxResults: config.urlBarSuggestions.maxTopSites,
-        classHandler: () => 'fa-search',
+        maxResults: config.urlBarSuggestions.maxSearch,
+        type: suggestionTypes.SEARCH,
         clickHandler: navigateClickHandler((searchTerms) => this.props.searchDetail.get('searchURL')
           .replace('{searchTerms}', encodeURIComponent(searchTerms)))}))
     }
@@ -229,8 +310,8 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Alexa top 500
     suggestions = suggestions.concat(mapListToElements({
       data: top500,
-      maxResults: config.urlBarSuggestions.maxSearch,
-      classHandler: () => 'fa-link',
+      maxResults: config.urlBarSuggestions.maxTopSites,
+      type: suggestionTypes.TOP_SITE,
       clickHandler: navigateClickHandler((x) => x)}))
 
     return suggestions
@@ -252,7 +333,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   searchXHR () {
-    if (!this.props.searchSuggestions) {
+    if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
       this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
       return
     }

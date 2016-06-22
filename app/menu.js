@@ -104,7 +104,7 @@ const init = (settingsState, args) => {
       label: locale.translation('openLocation'),
       accelerator: 'CmdOrCtrl+L',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL, false])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL])
       }
     },
     CommonMenu.separatorMenuItem,
@@ -291,6 +291,12 @@ const init = (settingsState, args) => {
         },
         CommonMenu.separatorMenuItem,
         {
+          label: locale.translation('stop'),
+          accelerator: 'CmdOrCtrl+.',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_STOP])
+          }
+        }, {
           label: locale.translation('reloadPage'),
           accelerator: 'CmdOrCtrl+R',
           click: function (item, focusedWindow) {
@@ -347,7 +353,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('toggleFullScreenView'),
-          accelerator: 'Shift+CmdOrCtrl+F',
+          accelerator: isDarwin ? 'Ctrl+Cmd+F' : 'F11',
           click: function (item, focusedWindow) {
             if (focusedWindow) {
               // This doesn't seem to work but also doesn't throw errors...
@@ -490,7 +496,6 @@ const init = (settingsState, args) => {
         CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem(),
-        CommonMenu.bookmarksMenuItem(),
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('sendUsFeedback'),

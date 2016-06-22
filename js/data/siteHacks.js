@@ -24,15 +24,7 @@ module.exports = {
   // For links like: https://player.twitch.tv/?channel=iwilldominate
   'player.twitch.tv': {
     allowRunningInsecureContent: true,
-    enableForAll: true,
-    onBeforeRequest: function(details) {
-      if (details.resourceType !== 'subFrame' && details.resourceType !== 'mainFrame' || details.url.includes('&html5')) {
-        return
-      }
-      return {
-        redirectURL: details.url + '&html5'
-      }
-    }
+    enableForAll: true
   },
   'www.wired.com': {
     // Site hack from
@@ -47,18 +39,18 @@ module.exports = {
         };
     })();`
   },
+  'www.extremetech.com': {
+    pageLoadStartScript: `(function() {
+      var sto = window.setTimeout;
+      window.setTimeout = function(a, b) {
+          if ( b !== 250 ) {
+                sto(a, b);
+              }
+        };
+    })();`
+  },
   'www.twitch.tv': {
-    allowRunningInsecureContent: true,
-    pageLoadEndScript: `$('.js-player').html(
-      $('<iframe>').attr({
-        src: 'https://player.twitch.tv/?branding=false&html5&showInfo=false&channel=' + $(location).attr('pathname'),
-        width: '100%',
-        height: '100%',
-        allowfullscreen: true,
-        webkitallowfullscreen: true
-      }).css('border', 0)
-    );
-    $('.player-overlay, .player-loading').hide();`
+    allowRunningInsecureContent: true
   },
   'www.googletagmanager.com': {
     enableForAdblock: true,

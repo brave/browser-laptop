@@ -375,6 +375,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store when the frame is active and the window is focused
+   *
+   * @param {Object} frameProps - the frame properties for the webview in question.
+   */
+  setFocusedFrame: function (frameProps) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
+      frameProps: frameProps
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set a preview frame.
    * This is done when hovering over a tab.
    *
@@ -473,6 +485,22 @@ const windowActions = {
     })
   },
 
+  /**
+   * Enables or disables the urlbar autocomplete.
+   * Autocomplete is defined to be the action of inserting text into the urlbar itself
+   * to the first item's URL match if possible.  The inserted text is auto selected so
+   * that the next character inserted will replace it.
+   * This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
+   *
+   * @param {boolean} enabled - true if the urlbar should autocomplete
+   */
+  setUrlBarAutocompleteEnabled: function (enabled) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED,
+      enabled
+    })
+  },
+
   /*
    * Sets the URL bar preview value.
    * TODO: name this something better.
@@ -504,13 +532,11 @@ const windowActions = {
    * Marks the URL bar text as selected or not
    *
    * @param {boolean} isSelected - Whether or not the URL bar text input should be selected
-   * @param {boolean} forSearchMode - Whether or not to enable auto-complete search suggestions
    */
-  setUrlBarSelected: function (selected, forSearchMode) {
+  setUrlBarSelected: function (selected) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_SELECTED,
-      selected,
-      forSearchMode
+      selected
     })
   },
 
@@ -700,6 +726,39 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_FAVICON,
       frameProps,
       favicon
+    })
+  },
+
+  /**
+   * Sets the maximize state of the window
+   * @param {boolean} isMaximized - true if window is maximized
+   */
+  setMaximizeState: function (isMaximized) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_MAXIMIZE_STATE,
+      isMaximized
+    })
+  },
+
+  /**
+   * Saves the position of the window in the window state
+   * @param {Array} position - [x, y]
+   */
+  savePosition: function (position) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SAVE_POSITION,
+      position
+    })
+  },
+
+  /**
+   * Sets the fullscreen state of the window
+   * @param {boolean} isFullScreen - true if window is fullscreen
+   */
+  setWindowFullScreen: function (isFullScreen) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_FULLSCREEN_STATE,
+      isFullScreen
     })
   },
 

@@ -28,6 +28,8 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK: _,
   SHORTCUT_ACTIVE_FRAME_LOAD_URL: _, /** @arg {string} url to load */
   SHORTCUT_ACTIVE_FRAME_COPY: _,
+  SHORTCUT_ACTIVE_FRAME_FIND_NEXT: _,
+  SHORTCUT_ACTIVE_FRAME_FIND_PREV: _,
   // Frame management shortcuts
   SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
@@ -44,6 +46,7 @@ const messages = {
   LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
   LOGIN_RESPONSE: _,
   NOTIFICATION_RESPONSE: _, /** @arg {string} message, @arg {number} buttonId, @arg {boolean} persist */
+  SHOW_FLASH_INSTALLED_MESSAGE: _,
   // Downloads
   SHOW_DOWNLOADS_TOOLBAR: _, /** Ensures the downloads toolbar is visible */
   DOWNLOAD_ACTION: _, /** @arg {string} downloadId, @arg {string} action such as 'resume', 'pause', or 'cancel' */
@@ -54,22 +57,23 @@ const messages = {
   CHECK_FOR_UPDATE: _,
   SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
+  SEND_XHR_REQUEST: _, /** @arg {string} url to request, @arg {number} nonce, @arg {Object=} headers if any */
+  GOT_XHR_RESPONSE: _, /** @arg {Object} response, @arg {string} body */
+  DOWNLOAD_DATAFILE: _, /** @arg {string} url, @arg {number} nonce, @arg {Object} headers, @arg {string} path */
+  DOWNLOAD_DATAFILE_DONE: _, /** @arg {Object} response */
   // App state
   APP_INITIALIZED: _,
+  // Web contents state
+  WEB_CONTENTS_INITIALIZED: _,
   // Webview page messages
-  SET_AD_DIV_CANDIDATES: _, /** @arg {Array} adDivCandidates, @arg {string} placeholderUrl */
-  INIT_SPELL_CHECK: _, /** @arg {string} lang */
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
-  LINK_HOVERED: _, /** @arg {string} href of hovered link */
   APP_STATE_CHANGE: _,
   STOP_LOAD: _,
-  POST_PAGE_LOAD_RUN: _,
   THEME_COLOR_COMPUTED: _,
   HIDE_CONTEXT_MENU: _,
   LEAVE_FULL_SCREEN: _,
+  ENTER_FULL_SCREEN: _,
   SET_CLIPBOARD: _,
-  AUTOFILL_PASSWORD: _,
-  BLOCK_CANVAS_FINGERPRINTING: _,
   GOT_CANVAS_FINGERPRINTING: _,
   SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
   SET_RESOURCE_ENABLED: _,
@@ -107,6 +111,7 @@ const messages = {
   BRAVERY_DEFAULTS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
   DOWNLOADS_UPDATED: _,
+  FLASH_UPDATED: _,
   // About pages from contentScript
   CHANGE_SETTING: _,
   CHANGE_SITE_SETTING: _,
@@ -115,6 +120,7 @@ const messages = {
   OPEN_DOWNLOAD_PATH: _,
   RELOAD_URL: _,
   DISPATCH_ACTION: _,
+  CHECK_FLASH_INSTALLED: _,
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */

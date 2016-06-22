@@ -86,6 +86,8 @@
       width: @navbarBraveButtonWidth;
       margin-left: @navbarButtonSpacing;
       margin-right: @navbarButtonSpacing;
+      -webkit-app-region: no-drag;
+      -webkit-user-select: none;
 
       &.braveShieldsDown {
         -webkit-filter: grayscale(100%);
@@ -117,11 +119,12 @@
    */
   .backforward {
     display: flex;
-    z-index: 10;
-
+    z-index: @zindexNavigationBar;
     transition: margin @transitionDuration ease-in-out;
 
     span {
+      -webkit-app-region: no-drag;
+      -webkit-user-select: none;
       color: @buttonColor;
       border-radius: 50%;
       font-weight: 300;
@@ -158,7 +161,7 @@
   position: relative;
 
   *:not(legend) {
-    z-index: 1;
+    z-index: @zindexUrlbarNotLegend;
   }
 
   input:focus + legend:before {
@@ -175,7 +178,7 @@
     bottom: 0;
     right: 0;
     left: 0;
-    z-index: 0;
+    z-index: @zindexNavigationBar;
   }
 
   #navigator:not(.titleMode) & {
@@ -194,8 +197,7 @@
   padding: 0;
   position: relative;
   -webkit-user-select: none;
-
-  z-index: 312;
+  z-index: @zindexNavigationBar;
 
   form {
     -webkit-app-region: drag;
@@ -250,12 +252,12 @@
       }
     }
 
-    .bookmark-button {
+    .bookmarkButton {
       transform: scale(0.6);
       opacity: 0.6;
       text-align: left;
 
-      &:not(.remove-bookmark-button) {
+      &:not(.removeBookmarkButton) {
         display: none;
       }
     }
@@ -268,16 +270,22 @@
 
   .loadTime {
     color: @loadTimeColor;
+    background: @navigationBarBackground;
     font-size: 12px;
     right: 10px;
     text-align: right;
     margin: 4px 0 0 0;
     top: 9px;
+    cursor: default;
+    padding-top: 1px;
+
+    &.onFocus {
+        display: none;
+    }
   }
 
   .noScript {
     font-size: 16px;
-    cursor: pointer;
     margin-left: 10px;
     color: @braveOrange;
     opacity: 0.6;
@@ -313,7 +321,7 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 3px 10px 0 3px;
+    margin: 3px 0 0 3px;
     outline: none;
     text-overflow: ellipsis;
     flex-grow: 1;
@@ -330,23 +338,9 @@
     }
   }
 
-  span.navbutton.remove-bookmark-button {
+  span.navbutton.removeBookmarkButton {
     color: @braveOrange;
     opacity: 1;
-  }
-
-  .urlbarIcon.fa-unlock-alt {
-    margin-top: 4px;
-    font-size: 16px;
-    min-height: 10px;
-    min-width: 16px;
-  }
-
-  .urlbarIcon.fa-lock {
-    margin-top: 4px;
-    font-size: 16px;
-    min-height: 10px;
-    min-width: 16px;
   }
 
   .urlbarIcon {
@@ -356,6 +350,18 @@
     font-size: 13px;
     min-height: 10px;
     min-width: 16px;
+
+    &.fa-lock,
+    &.fa-unlock-alt {
+      margin-top: 4px;
+      font-size: 16px;
+      min-height: 10px;
+      min-width: 16px;
+    }
+
+    &.fa-unlock-alt {
+        color: @gray;
+    }
 
     &.extendedValidation {
       color: green;

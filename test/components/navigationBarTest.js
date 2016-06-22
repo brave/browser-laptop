@@ -6,10 +6,11 @@ const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, 
 const urlParse = require('url').parse
 const assert = require('assert')
 
-describe('urlbar', function () {
+describe('navigationBar', function () {
   function * setup (client) {
     yield client
       .waitUntilWindowLoaded()
+      .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForEnabled(urlInput)
@@ -112,7 +113,7 @@ describe('urlbar', function () {
       it('exits title mode when focused', function * () {
         let page1Url = this.page1Url
         yield this.app.client
-          .ipcSend('shortcut-focus-url', false)
+          .ipcSend('shortcut-focus-url')
           .moveToObject(activeWebview)
           .waitUntil(function () {
             return this.isExisting(titleBar).then((exists) => exists === false)
@@ -412,7 +413,7 @@ describe('urlbar', function () {
     describe('shortcut-focus-url', function () {
       before(function * () {
         yield this.app.client
-          .ipcSend('shortcut-focus-url', false)
+          .ipcSend('shortcut-focus-url')
       })
 
       it('has focus', function * () {
@@ -425,25 +426,6 @@ describe('urlbar', function () {
 
       it('has the file icon', function * () {
         yield this.app.client.waitForExist('.urlbarIcon.fa-file')
-      })
-    })
-
-    describe('shortcut-focus-url for search', function () {
-      before(function * () {
-        yield this.app.client
-          .ipcSend('shortcut-focus-url', true)
-      })
-
-      it('has focus', function * () {
-        yield this.app.client.waitForElementFocus(urlInput)
-      })
-
-      it('selects the text', function * () {
-        yield selectsText(this.app.client, 'a')
-      })
-
-      it('has the search icon', function * () {
-        yield this.app.client.waitForExist('.urlbarIcon.fa-search')
       })
     })
 

@@ -6,6 +6,7 @@
 const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://laptop-updates.brave.com/1/crashes'
+const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
 module.exports = {
   name: 'Brave',
@@ -18,12 +19,16 @@ module.exports = {
     TRACKING_PROTECTION: 'trackingProtection',
     AD_INSERTION: 'adInsertion',
     NOSCRIPT: 'noScript',
+    FLASH: 'flash',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
   },
   cookieblock: {
     enabled: true
   },
   noScript: {
+    enabled: false
+  },
+  flash: {
     enabled: false
   },
   adblock: {
@@ -54,7 +59,8 @@ module.exports = {
     enabled: true
   },
   adInsertion: {
-    enabled: true
+    enabled: true,
+    url: adHost
   },
   crashes: {
     crashSubmitUrl: crashURL
@@ -79,6 +85,7 @@ module.exports = {
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,
     'search.default-search-engine': 'content/search/google.xml',
+    'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
     'tabs.tabs-per-page': 10,
@@ -95,6 +102,9 @@ module.exports = {
     'security.passwords.manager-enabled': true,
     'security.passwords.one-password-enabled': false,
     'security.passwords.dashlane-enabled': false,
-    'general.downloads.default-save-path': null
+    'general.downloads.default-save-path': null,
+    'general.disable-title-mode': process.platform === 'win32',
+    'advanced.hardware-acceleration-enabled': true,
+    'advanced.default-zoom-level': null
   }
 }

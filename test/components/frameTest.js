@@ -71,6 +71,7 @@ describe('findbar', function () {
       .showFindbar()
       .waitForElementFocus(findBarInput)
       .click(activeWebview)
+      .windowByUrl(Brave.browserWindowUrl)
       .showFindbar()
       .waitForElementFocus(findBarInput)
   })
@@ -87,6 +88,29 @@ describe('findbar', function () {
       .waitForVisible(findBarInput)
       .waitForElementFocus(urlInput)
   })
+
+  it('should remember the position across findbar showing', function * () {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+       .waitUntil(function () {
+         return this.getValue(findBarInput).then((val) => val === 'test')
+       })
+      .waitForVisible(findBarMatches)
+    let match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '1 of 2')
+    yield this.app.client
+      .click(findBarNextButton)
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '2 of 2')
+
+    yield this.app.client.showFindbar(false)
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+    match = yield this.app.client.getText(findBarMatches)
+    assert.equal(match, '2 of 2')
+  })
 })
 
 describe('view source', function () {
@@ -100,8 +124,6 @@ describe('view source', function () {
 
     yield setup(this.app.client)
     yield this.app.client
-      .waitUntilWindowLoaded()
-      .waitForVisible(activeWebview)
       .tabByIndex(0)
       .url(this.url)
       .waitForUrl(this.url)
@@ -129,6 +151,7 @@ describe('view source', function () {
 function * setup (client) {
   yield client
     .waitUntilWindowLoaded()
+    .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
     .waitForVisible('#window')
     .waitForVisible(urlInput)

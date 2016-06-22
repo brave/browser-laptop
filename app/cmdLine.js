@@ -55,7 +55,7 @@ const getUrlFromCommandLine = (argv) => {
   return undefined
 }
 
-// For OS X, there are events like open-url instead
+// For macOS, there are events like open-url instead
 if (!isDarwin) {
   const openUrl = getUrlFromCommandLine(process.argv)
   if (openUrl) {
@@ -81,7 +81,7 @@ app.on('ready', () => {
 
 app.on('will-finish-launching', () => {
   app.on('activate', () => {
-    // (OS X) open a new window when the user clicks on the app icon if there aren't any open
+    // (macOS) open a new window when the user clicks on the app icon if there aren't any open
     focusOrOpenWindow()
   })
 
@@ -95,7 +95,7 @@ app.on('will-finish-launching', () => {
     }
   })
 
-  // User clicked on a file or dragged a file to the dock on OS X
+  // User clicked on a file or dragged a file to the dock on macOS
   app.on('open-file', (event, path) => {
     event.preventDefault()
 
