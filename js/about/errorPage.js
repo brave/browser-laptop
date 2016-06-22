@@ -33,8 +33,8 @@ class ErrorPage extends React.Component {
     })
   }
 
-  showBackButton () {
-    this.state.previousLocation && this.state.previousLocation !== this.state.url
+  get showBackButton () {
+    return this.state.previousLocation && this.state.previousLocation !== this.state.url
   }
 
   render () {
@@ -42,10 +42,10 @@ class ErrorPage extends React.Component {
       <div className='errorTitle'>
         <span className='errorText' data-l10n-id={this.state.title}></span>
         <span className='errorUrl'>{this.state.url}</span>
-        <span className='errorText'>{this.state.message}</span>
+        <span className='errorText' data-l10n-id={this.state.message}></span>
       </div>
       <div className='buttons'>
-        {this.showBackButton() ? <Button l10nId='back' className='actionButton' onClick={this.reloadPrevious.bind(this)} /> : null}
+        {this.showBackButton ? <Button l10nId='back' className='actionButton' onClick={this.reloadPrevious.bind(this)} /> : null}
         {this.state.url ? <Button l10nId='errorReload' l10nArgs={{url: this.state.url}} className='actionButton' onClick={this.reload.bind(this)} /> : null}
       </div>
     </div>
