@@ -10,6 +10,8 @@ const app = electron.app
 const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
+const urlParse = require('url').parse
+const { navigatableTypes } = require('../js/lib/appUrlUtil')
 const isDarwin = process.platform === 'darwin'
 let appInitialized = false
 
@@ -45,11 +47,17 @@ const focusOrOpenWindow = function (url) {
 const getUrlFromCommandLine = (argv) => {
   if (argv) {
     if (argv.length === 2 && !argv[1].startsWith('-')) {
-      return argv[1]
+      const parsedUrl = urlParse(argv[1])
+      if (navigatableTypes.includes(parsedUrl.protocol)) {
+        return argv[1]
+      }
     }
     const index = argv.indexOf('--')
     if (index !== -1 && index + 1 < argv.length && !argv[index + 1].startsWith('-')) {
-      return argv[index + 1]
+      const parsedUrl = urlParse(argv[index + 1])
+      if (navigatableTypes.includes(parsedUrl.protocol)) {
+        return argv[index + 1]
+      }
     }
   }
   return undefined
@@ -59,7 +67,10 @@ const getUrlFromCommandLine = (argv) => {
 if (!isDarwin) {
   const openUrl = getUrlFromCommandLine(process.argv)
   if (openUrl) {
-    module.exports.newWindowURL = openUrl
+    const parsedUrl = urlParse(openUrl)
+    if (navigatableTypes.includes(parsedUrl.protocol)) {
+      module.exports.newWindowURL = openUrl
+    }
   }
 }
 
@@ -89,9 +100,11 @@ app.on('will-finish-launching', () => {
   // open -a Brave http://www.brave.com
   app.on('open-url', (event, path) => {
     event.preventDefault()
-
-    if (!focusOrOpenWindow(path)) {
-      module.exports.newWindowURL = path
+    const parsedUrl = urlParse(path)
+    if (navigatableTypes.includes(parsedUrl.protocol)) {
+      if (!focusOrOpenWindow(path)) {
+        module.exports.newWindowURL = path
+      }
     }
   })
 
