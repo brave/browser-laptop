@@ -555,7 +555,8 @@ class Frame extends ImmutableComponent {
 
       const parsedUrl = urlParse(this.props.frame.get('location'))
       const protocol = parsedUrl.protocol
-      if (!this.props.frame.get('isPrivate') && (protocol === 'http:' || protocol === 'https:')) {
+      const isError = this.props.frame.getIn(['aboutDetails', 'errorCode'])
+      if (!this.props.frame.get('isPrivate') && (protocol === 'http:' || protocol === 'https:') && !isError) {
         // Register the site for recent history for navigation bar
         appActions.addSite(siteUtil.getDetailFromFrame(this.props.frame))
       }
@@ -590,6 +591,7 @@ class Frame extends ImmutableComponent {
           url: e.validatedURL
         })
         windowActions.loadUrl(this.props.frame, 'about:error')
+        appActions.removeSite(siteUtil.getDetailFromFrame(this.props.frame))
       }
     }
     this.webview.addEventListener('load-commit', (e) => {

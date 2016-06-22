@@ -309,6 +309,7 @@
   .urlBarSuggestions {
     .flyoutDialog;
     box-sizing: border-box;
+    color: @chromeText;
     left: 0;
     overflow-y: auto;
     padding: 0 0;
@@ -319,7 +320,7 @@
     .suggestionTitle {
       display: inline-block;
       font-size: 15px;
-      font-weight: bold;
+      font-weight: 200;
       margin-bottom: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -335,14 +336,16 @@
       width: 100%;
     }
 
+    li+li.suggestionSection {
+      border-top: 1px solid @toolbarBorderColor;
+    }
+
     .suggestionSection {
-      border-bottom: 1px solid @toolbarBorderColor;
 
       .suggestionSectionTitle {
         color: #abadae;
         display: inline-block;
         font-size: 10px;
-        font-weight: bold;
         min-width: 60px;
       }
 

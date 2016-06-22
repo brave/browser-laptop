@@ -19,7 +19,7 @@ const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 
 const { l10nErrorText } = require('../lib/errorUtil')
-const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
+const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes } = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 
 let windowState = Immutable.fromJS({
@@ -60,7 +60,7 @@ const updateUrlSuffix = (suggestionList) => {
     const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
     if (!selectedIndex && autocompleteEnabled) {
       const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
-      const index = suggestion.location.indexOf(location)
+      const index = suggestion.location.toLowerCase().indexOf(location.toLowerCase())
       if (index !== -1) {
         const beforePrefix = suggestion.location.substring(0, index)
         if (beforePrefix.endsWith('://') || beforePrefix.endsWith('://www.') || index === 0) {
@@ -157,11 +157,6 @@ const doAction = (action) => {
       const currentLocation = frame.get('location')
       const parsedUrl = urlParse(action.location)
 
-      // Electron has the proper handling for data: and blob: URLs so no
-      // need to specify them here.
-      const navigatableTypes = ['http:', 'https:', 'about:', 'chrome:',
-        'chrome-extension:', 'file:', 'view-source:', 'ftp:']
-
       // For types that are not navigatable, just do a loadUrl on them
       if (!navigatableTypes.includes(parsedUrl.protocol)) {
         if (parsedUrl.protocol !== 'javascript:' ||
@@ -248,6 +243,7 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         aboutDetails: Object.assign({
           title: action.errorDetails.title || l10nErrorText(action.errorDetails.errorCode),
+          message: action.errorDetails.message,
           previousLocation,
           frameKey
         }, action.errorDetails)
