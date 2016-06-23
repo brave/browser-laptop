@@ -210,7 +210,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       .filter(filterValue)
       // Filter out things which are already in the suggestions list
       .filter((site) =>
-        suggestions.findIndex((x) => x.title.toLowerCase() === (formatTitle(site) || '').toLowerCase()) === -1)
+        suggestions.findIndex((x) => (x.location || '').toLowerCase() === (formatUrl(site) || '').toLowerCase()) === -1)
       .sort(sortHandler)
       .take(maxResults)
       .map((site) => {
