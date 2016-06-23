@@ -26,6 +26,7 @@ const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
 
 const isDarwin = navigator.platform === 'MacIntel'
+const isWindows = navigator.platform && navigator.platform.includes('Win')
 
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
@@ -344,10 +345,14 @@ class SecurityTab extends ImmutableComponent {
       </SettingsList>
       <div className='subtext'>
         <span className='fa fa-info-circle' id='flashInfoIcon' />
-        <span data-l10n-id='enableFlashSubtext' />
-        <span className='linkText'onClick={aboutActions.newFrame.bind(null, {
-          location: 'https://get.adobe.com/flashplayer'
-        })}>{'Adobe'}</span>.
+        {
+          isDarwin || isWindows
+            ? <span><span data-l10n-id='enableFlashSubtext' />
+              <span className='linkText'onClick={aboutActions.newFrame.bind(null, {
+                location: 'https://get.adobe.com/flashplayer'
+              })}>{'Adobe'}</span>.</span>
+            : <span data-l10n-id='enableFlashSubtextLinux' />
+        }
       </div>
     </div>
   }
