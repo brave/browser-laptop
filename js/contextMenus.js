@@ -715,10 +715,11 @@ function mainTemplateInit (nodeProps, frame) {
 
   if (nodeProps.isEditable || nodeProps.inputFieldType !== 'none') {
     let misspelledSuggestions = []
-
-    const info = ipc.sendSync(messages.GET_MISSPELLING_INFO, nodeProps.selectionText)
-    if (info) {
-      misspelledSuggestions = getMisspelledSuggestions(nodeProps.selectionText, info.isMisspelled, info.suggestions)
+    if (nodeProps.misspelledWord) {
+      const info = ipc.sendSync(messages.GET_MISSPELLING_INFO, nodeProps.selectionText)
+      if (info) {
+        misspelledSuggestions = getMisspelledSuggestions(nodeProps.selectionText, info.isMisspelled, info.suggestions)
+      }
     }
     const editableItems = getEditableItems(nodeProps.selectionText, nodeProps.editFlags)
     template.push(...misspelledSuggestions, {

@@ -37,7 +37,7 @@ const webviewActions = {
   replace: function (text) {
     const webview = getWebview()
     if (webview) {
-      webview.replace(text)
+      webview.replaceMisspelling(text)
     }
   }
 }
