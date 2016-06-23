@@ -350,13 +350,6 @@ app.on('ready', () => {
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
-    contentSettings.init()
-    Extensions.init()
-    Filtering.init()
-    SiteHacks.init()
-    NoScript.init()
-    spellCheck.init()
-
     // Wait for webcontents to be loaded before fetching data files
     ipcMain.once(messages.WEB_CONTENTS_INITIALIZED, () => {
       HttpsEverywhere.init()
@@ -373,6 +366,13 @@ app.on('ready', () => {
       })
     }
     process.emit(messages.APP_INITIALIZED)
+
+    contentSettings.init()
+    Extensions.init()
+    Filtering.init()
+    SiteHacks.init()
+    NoScript.init()
+    spellCheck.init()
 
     if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({
