@@ -31,11 +31,10 @@ describe('errorPage', function () {
         .waitForVisible(errorUrl)
         .getText(errorUrl).should.eventually.be.equal(this.url)
         .isVisible('span[data-l10n-id=errorReload]').should.eventually.be.true
-        .isVisible('span[data-l10n-id=back]').should.eventually.be.false
+        .isVisible('span[data-l10n-id=back]').should.eventually.be.true
     })
 
-    // TODO(bridiver) - need a better way to test this
-    it.skip('should go back to newtab when back is clicked', function * () {
+    it('should go back to newtab when back is clicked', function * () {
       yield this.app.client
         .leftClick('span[data-l10n-id=back]')
         .waitForUrl(Brave.newTabUrl)
