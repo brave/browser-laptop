@@ -7,6 +7,7 @@ const urlParse = require('url').parse
 
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
 const cx = require('../lib/classSet.js')
 const ipc = global.require('electron').ipcRenderer
@@ -141,6 +142,15 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ESC:
         e.preventDefault()
         ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+        break
+      case KeyCodes.DELETE:
+        if (e.shiftKey) {
+          const selectedIndex = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+          if (selectedIndex) {
+            const suggestionLocation = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
+            appActions.removeSite({ location: suggestionLocation })
+          }
+        }
         break
       case KeyCodes.BACKSPACE:
         // Temporarily disable the autocomplete when a user is pressing backspace.

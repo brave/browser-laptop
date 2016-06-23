@@ -163,7 +163,8 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (this.selectedElement) {
       this.selectedElement.scrollIntoView()
     }
-    if (this.props.urlLocation === prevProps.urlLocation) {
+    if (this.props.urlLocation === prevProps.urlLocation &&
+        this.props.suggestions !== prevProps.suggestions) {
       return
     }
     this.suggestionList = this.getNewSuggestionList()
