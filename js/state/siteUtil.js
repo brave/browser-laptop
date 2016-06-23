@@ -95,7 +95,9 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
-    title: siteDetail.get('title')
+    // We don't want bookmarks and other site info being renamed on users if they already exist
+    // The name should remain the same while it is bookmarked forever.
+    title: oldSite && tags.includes(siteTags.BOOKMARK) ? oldSite.get('title') : siteDetail.get('title')
   })
   if (folderId) {
     site = site.set('folderId', Number(folderId))
