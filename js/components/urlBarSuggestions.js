@@ -102,7 +102,6 @@ class UrlBarSuggestions extends ImmutableComponent {
     const addToItems = (suggestions, sectionKey, title, icon) => {
       if (suggestions.size > 0) {
         items.push(<li className='suggestionSection'>
-          <span className='suggestionSectionTitle'>{title}</span>
           {
             icon
             ? <span className={cx({
@@ -113,6 +112,7 @@ class UrlBarSuggestions extends ImmutableComponent {
             })} />
             : null
           }
+          <span className='suggestionSectionTitle'>{title}</span>
         </li>)
       }
       items = items.concat(suggestions.map((suggestion, i) => {
