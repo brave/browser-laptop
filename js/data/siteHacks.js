@@ -20,17 +20,6 @@ module.exports = {
       }
     }
   },
-  'nypost.com': {
-    enableForAdblock: true,
-    enableForTrackingProtection: true,
-    onBeforeRequest: function(details) {
-      if (urlParse(details.url).pathname !== '/content-control.html') {
-        return {
-          cancel: true
-        }
-      }
-    }
-  },
   'forbes.com': {
     onBeforeSendHeaders: function(details) {
       return {
