@@ -38,7 +38,7 @@ describe('urlbarSuggestions', function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
       .waitForExist(urlBarSuggestions)
-      .click(urlBarSuggestions + ' li.suggestionItem')
+      .click(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
       .waitForExist('.tab[data-frame-key="1"].active')
   })
 
@@ -52,6 +52,8 @@ describe('urlbarSuggestions', function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
       .waitForExist(urlBarSuggestions)
+      .keys('Down arrow')
+      .waitForExist(urlBarSuggestions + ' li.selected')
       .keys('Down arrow')
       .waitForExist(urlBarSuggestions + ' li.selected')
       .keys('Enter')
