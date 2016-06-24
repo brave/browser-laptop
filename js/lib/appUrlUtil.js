@@ -34,11 +34,11 @@ module.exports.getAppUrl = function (relativeUrl) {
   return url
 }
 
-module.exports.getExtensionsPath = function () {
+module.exports.getExtensionsPath = function (extensionDir) {
   return (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test')
     // the path is different for release builds because extensions are not in the asar file
-    ? path.join(__dirname, '..', '..', '..', 'extensions')
-    : path.join(__dirname, '..', '..', 'app', 'extensions')
+    ? path.join(__dirname, '..', '..', '..', 'extensions', extensionDir)
+    : path.join(__dirname, '..', '..', 'app', 'extensions', extensionDir)
 }
 
 module.exports.getIndexHTML = function () {

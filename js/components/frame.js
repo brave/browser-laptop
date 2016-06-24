@@ -132,7 +132,7 @@ class Frame extends ImmutableComponent {
       } else {
         partition = 'persist:default'
       }
-      ipc.send(messages.INITIALIZE_PARTITION, partition)
+      ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
 
       if (guestInstanceId) {
