@@ -210,6 +210,10 @@ module.exports.init = () => {
     }
   }
 
+  process.emit('load-extension-blacklist', [
+    getIndexHTML()
+  ])
+
   enableExtensions()
 
   AppStore.addChangeListener(() => {
