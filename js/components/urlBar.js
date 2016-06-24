@@ -75,10 +75,6 @@ class UrlBar extends ImmutableComponent {
   }
 
   onKeyDown (e) {
-    if (!this.props.urlbar.get('active')) {
-      return
-    }
-
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         windowActions.setUrlBarActive(false)
