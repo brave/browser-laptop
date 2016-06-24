@@ -30,11 +30,12 @@
       "128": "skin/icon/dashlane48.png",
       "48": "skin/icon/dashlane48.png"
    },
+   "incognito": "split",
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArf+Mb0ro41bJ+FURIhp7YhwTyaP1UbJY2pMApYFTnl1F++bW65Zf80pwIRFt4b6VUQ7qt3kNE3XWrN5VUpbO5pasQZLk4czaEJzFBGPsxFfe89guXb2Xd6CGAHpfdn+wPIU8hMie0ajoUqIC+YWjEZJ0vf3lP0r9EpEbPUSCdg1SjvLb/NzNzq2h/Eev/BfcrEZ7e3wEb9NgM2/pdP2tfowmBg6xLuoiUz2TaQbTVoBRgmkpik3gy4KojFaHgdidT7AVGIpmHZycEd491E9MG/mHuQ0nWZD9pJOp9n1dBHA4LAq5WxU6f/K+h+qhekWO7KVK0M3/mwxxGhizPbjpJQIDAQAB",
    "manifest_version": 2,
    "name": "Dashlane",
    "permissions": [ "cookies", "tabs", "privacy", "pageCapture", "nativeMessaging", "management", "http://*/*", "https://*/*", "\u003Call_urls>" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "3.6.7",
+   "version": "4.0.0",
    "web_accessible_resources": [ "content/webui/index.html" ]
 }

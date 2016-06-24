@@ -462,14 +462,17 @@ function shouldIgnoreUrl (url) {
 }
 
 module.exports.init = () => {
-  ['persist:default', 'main-1'].forEach((partition) => {
+  ['main-1'].forEach((partition) => {
     initForPartition(partition)
   })
   ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {
     if (initializedPartitions[partition]) {
-      return
+      e.returnValue = true
+      return e.returnValue
     }
     initForPartition(partition)
+    e.returnValue = true
+    return e.returnValue
   })
   ipcMain.on(messages.DOWNLOAD_ACTION, (e, downloadId, action) => {
     const item = downloadMap[downloadId]

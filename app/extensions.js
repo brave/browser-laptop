@@ -126,6 +126,11 @@ let generateBraveManifest = () => {
   return baseManifest
 }
 
+let defaultExtensions = {
+  OnePassword: 'aomjjhallfgjeglblehebfpbcfeobpgk',
+  Dashlane: 'fdjamakpfbbddfjaooikfcpapjohcfmg'
+}
+
 let backgroundPage = null
 
 module.exports.sendToTab = (tabId, message) => {
@@ -164,51 +169,54 @@ module.exports.init = () => {
     if (installInfo.error) {
       console.error(installInfo.error)
     }
-    installedExtensions[installInfo.name] = installInfo
+    installedExtensions[installInfo.id] = installInfo
   }
 
-  let installExtension = (name, path, options = {}) => {
-    process.emit('load-extension', name, path, options, extensionInstalled)
+  let installExtension = (extensionId, path, options = {}) => {
+    if (!installedExtensions[extensionId]) {
+      process.emit('load-extension', path, options, extensionInstalled)
+    }
   }
 
-  let enableExtension = (name) => {
-    var installInfo = installedExtensions[name]
+  let enableExtension = (extensionId) => {
+    var installInfo = installedExtensions[extensionId]
     if (installInfo) {
       process.emit('enable-extension', installInfo.id)
     }
   }
 
-  let disableExtension = (name) => {
-    var installInfo = installedExtensions[name]
+  let disableExtension = (extensionId) => {
+    var installInfo = installedExtensions[extensionId]
     if (installInfo) {
       process.emit('disable-extension', installInfo.id)
     }
   }
 
   let enableExtensions = () => {
-    installExtension('brave', getExtensionsPath(), {manifest_location: 'component', manifest: generateBraveManifest()})
+    installExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
 
     if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
-      installExtension('1Password', getExtensionsPath())
-      enableExtension('1Password')
+      installExtension(defaultExtensions.OnePassword, getExtensionsPath('1password'))
+      enableExtension(defaultExtensions.OnePassword)
     } else {
-      disableExtension('1Password')
+      disableExtension(defaultExtensions.OnePassword)
     }
 
     if (getSetting(settings.DASHLANE_ENABLED)) {
-      installExtension('Dashlane', getExtensionsPath())
-      enableExtension('Dashlane')
+      installExtension(defaultExtensions.Dashlane, getExtensionsPath('dashlane'))
+      enableExtension(defaultExtensions.Dashlane)
     } else {
-      disableExtension('Dashlane')
+      disableExtension(defaultExtensions.Dashlane)
     }
   }
+
+  process.emit('load-extension-blacklist', [
+    getIndexHTML()
+  ])
 
   enableExtensions()
 
   AppStore.addChangeListener(() => {
     enableExtensions()
-    if (backgroundPage) {
-      backgroundPage.send('update-state', AppStore.getState().toJS(), appConfig)
-    }
   })
 }
