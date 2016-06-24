@@ -375,7 +375,7 @@ if(e.status==="complete"){var f=KWTabsController.getControllerById(e.id);if(f){f
 }}}if(d.length>0&&b){a.checkScriptInjectionOnTabs()}})};KWController.checkScriptInjectionOnTabs=function checkScriptInjectionOnTabs(){for(var c=0,a=KWTabsController.registeredTabs.length;
 c<a;++c){var d=KWTabsController.registeredTabs[c];if(!d.scriptInjectedOnThePage){if(KW__DEBUG.general){KW__log("TabId: "+d.tabId+" - Manually injecting script since it was not done on launch.",1)
 }if(d.tabPanel.url.match("^chrome://")!==null||d.tabPanel.url.match("^http[s]*://chrome.google.com/webstore")!==null){continue
-}try{chrome.tabs.executeScript(d.tabId,{file:"content/contentScripts/kwift.CHROME.min.js",allFrames:true,runAt:"document_start"})
+}try{
 }catch(b){}}}};KWController.setCookiesForCoupons=function setCookiesForCoupons(c){try{console.log(c);
 var h=c.content;h=JSON.parse(h);var a=h.Url;var l=h.Cookies;var k=function(i){console.error(i);
 if(!i){console.error("Error in setting cookie");console.error(chrome.extension.lastError)
