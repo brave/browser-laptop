@@ -522,7 +522,7 @@ KW__CONFIG.DEBUG_DEBUGGER=DEBUG_DEBUGGER;KW__CONFIG.DEBUG_ONECLICKDEBUGGER=DEBUG
 KW__CONFIG.DEBUG_DEV=DEBUG_DEV;KW__CONFIG.DEBUG_RELEASE=DEBUG_GENERAL;KW__CONFIG.DEBUG_CPP=DEBUG_CPP;
 KW__CONFIG.DEBUG_SIMULATED=DEBUG_SIMULATED;KW__CONFIG.DEBUG_FIREFOX_CPP=DEBUG_FIREFOX_CPP;
 KW__CONFIG.DEBUG_FIREFOX_SIMULATED=DEBUG_FIREFOX_SIMULATED;KW__CONFIG.supportedLanguages=["en","fr","es","ja","de","pt","it"];
-var KWTranslations={};KW__CONFIG.version="3.6";KW__CONFIG.build="3.6.7";KW__CONFIG.os=PLATFORM_WINDOWS;
+var KWTranslations={};KW__CONFIG.version="4.0";KW__CONFIG.build="4.0.0";KW__CONFIG.os=PLATFORM_WINDOWS;
 KW__CONFIG.platform="extension";KW__CONFIG.debugMode=DEBUG_RELEASE;KW__CONFIG.serverRoot="http://127.0.0.1:";
 KW__CONFIG.serverPort=(KW__CONFIG.debugMode&DEBUG_NOCPP)?"80":false;KW__CONFIG.jsScriptsFolder=(KW__CONFIG.debugMode&DEBUG_DEV)?"/exports":"/min";
 KW__CONFIG.serverTestFile=function(){if(!KW__CONFIG.serverPort){throw"Local server not ready : waiting for port number from plugin."
