@@ -20,7 +20,7 @@
 - Fixed navigation controller sometimes making back button not function correctly. ([#2144](https://github.com/brave/browser-laptop/issues/2144))
 - Fixed Fullscreen mode on Windows so it hides menu bar. ([#2053](https://github.com/brave/browser-laptop/issues/2053))
 - Upgrade to libchromiumcontent 51.0.2704.103. ([#2211](https://github.com/brave/browser-laptop/issues/2211))
-
+- Upgrade to Electron 1.2.3. ([#2294](https://github.com/brave/browser-laptop/issues/2294))
 
 ## [0.10.3](https://github.com/brave/browser-laptop/releases/v0.10.3dev)
 - Upgrade to libchromiumcontent 51.0.2704.84. ([#2122](https://github.com/brave/browser-laptop/issues/2122))
