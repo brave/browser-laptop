@@ -163,8 +163,11 @@ class UrlBarSuggestions extends ImmutableComponent {
     if (this.selectedElement) {
       this.selectedElement.scrollIntoView()
     }
+
+    // If both the URL is the same and the number of sites to consider is
+    // the same then we don't need to regenerate the suggestions list.
     if (this.props.urlLocation === prevProps.urlLocation &&
-        this.props.suggestions !== prevProps.suggestions) {
+        this.props.sites.size === prevProps.sites.size) {
       return
     }
     this.suggestionList = this.getNewSuggestionList()

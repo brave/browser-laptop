@@ -145,8 +145,8 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.DELETE:
         if (e.shiftKey) {
-          const selectedIndex = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
-          if (selectedIndex) {
+          const selectedIndex = this.locationValueSuffix.length > 0 ? 1 : this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+          if (selectedIndex !== undefined) {
             const suggestionLocation = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
             appActions.removeSite({ location: suggestionLocation })
           }
