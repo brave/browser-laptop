@@ -10,7 +10,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const config = require('../constants/config.js')
 const top500 = require('./../data/top500.js')
-const {isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
+const {aboutUrls, isIntermediateAboutPage, isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 const Immutable = require('immutable')
 const debounce = require('../lib/debounce.js')
 const settings = require('../constants/settings')
@@ -93,6 +93,7 @@ class UrlBarSuggestions extends ImmutableComponent {
 
     const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
     const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)
+    const aboutPagesSuggestions = suggestions.filter((s) => s.type === suggestionTypes.ABOUT_PAGES)
     const tabSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TAB)
     const searchSuggestions = suggestions.filter((s) => s.type === suggestionTypes.SEARCH)
     const topSiteSuggestions = suggestions.filter((s) => s.type === suggestionTypes.TOP_SITE)
@@ -144,6 +145,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
     addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
     addToItems(historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
+    addToItems(aboutPagesSuggestions, 'aboutPagesTitle', locale.translation('aboutPagesSuggestionTitle'), null)
     addToItems(tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
     addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
     addToItems(topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
@@ -290,6 +292,13 @@ class UrlBarSuggestions extends ImmutableComponent {
         }
       }))
     }
+
+    // about pages
+    suggestions = suggestions.concat(mapListToElements({
+      data: aboutUrls.keySeq().filter((x) => !isIntermediateAboutPage(x)),
+      maxResults: config.urlBarSuggestions.maxAboutPages,
+      type: suggestionTypes.ABOUT_PAGES,
+      clickHandler: navigateClickHandler((x) => x)}))
 
     // opened frames
     if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {

@@ -6,6 +6,7 @@ const suggestionTypes = {
   TAB: 'tabSuggestion',
   BOOKMARK: 'bookmarkSuggestion',
   HISTORY: 'historySuggestion',
+  ABOUT_PAGES: 'aboutPagesSuggestion',
   SEARCH: 'searchSuggestion',
   TOP_SITE: 'topSiteSuggestion'
 }

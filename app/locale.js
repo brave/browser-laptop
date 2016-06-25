@@ -157,6 +157,7 @@ var rendererIdentifiers = function () {
     'tabsSuggestionTitle',
     'bookmarksSuggestionTitle',
     'historySuggestionTitle',
+    'aboutPagesSuggestionTitle',
     'searchSuggestionTitle',
     'topSiteSuggestionTitle'
   ]
