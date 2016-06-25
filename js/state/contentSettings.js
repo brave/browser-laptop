@@ -97,7 +97,7 @@ const getContentSettingsFromSiteSettings = (appState) => {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
       }
     }
-    if (hostSetting.fingerprintingProtection) {
+    if (typeof hostSetting.fingerprintingProtection === 'boolean') {
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', hostSetting.fingerprintingProtection ? 'block' : 'allow')
     }
     if (hostSetting.adControl) {
