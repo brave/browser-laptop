@@ -148,6 +148,25 @@ describe('view source', function () {
   })
 })
 
+describe('resource loading', function () {
+  Brave.beforeAll(this)
+  before(function * () {
+    yield setup(this.app.client)
+    yield this.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('.tab[data-frame-key="1"]')
+  })
+
+  it('loads an image', function * () {
+    let url = Brave.server.url('img/test.ico')
+    yield this.app.client
+      .tabByIndex(0)
+      .url(url)
+      .waitForUrl(url)
+      .waitForVisible('img')
+  })
+})
+
 function * setup (client) {
   yield client
     .waitUntilWindowLoaded()
