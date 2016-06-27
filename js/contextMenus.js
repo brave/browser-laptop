@@ -661,6 +661,16 @@ const searchSelectionMenuItem = (location) => {
   }
 }
 
+const showDefinitionMenuItem = (selectionText) => {
+  let lookupText = textUtils.ellipse(selectionText, 3)
+  return {
+    label: locale.translation('lookupSelection').replace(/{{\s*selectedVariable\s*}}/, lookupText),
+    click: (item, focusedWindow) => {
+      webviewActions.showDefinitionForSelection()
+    }
+  }
+}
+
 function mainTemplateInit (nodeProps, frame) {
   const template = []
 
@@ -732,6 +742,11 @@ function mainTemplateInit (nodeProps, frame) {
       role: 'redo'
     }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
   } else if (nodeProps.selectionText.length > 0) {
+    if (isDarwin) {
+      template.push(showDefinitionMenuItem(nodeProps.selectionText),
+        CommonMenu.separatorMenuItem
+      )
+    }
     template.push(searchSelectionMenuItem(nodeProps.selectionText), {
       label: locale.translation('copy'),
       accelerator: 'CmdOrCtrl+C',
