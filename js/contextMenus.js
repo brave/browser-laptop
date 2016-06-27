@@ -816,7 +816,7 @@ function mainTemplateInit (nodeProps, frame) {
         label: '1Password',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', '1Password', nodeProps)
+            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', frame.get('tabId'), '1Password', nodeProps)
           }
         }
       })
@@ -828,7 +828,7 @@ function mainTemplateInit (nodeProps, frame) {
         label: 'Dashlane',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'fdjamakpfbbddfjaooikfcpapjohcfmg', 'Dashlane', nodeProps)
+            ipc.send('chrome-browser-action-clicked', 'fdjamakpfbbddfjaooikfcpapjohcfmg', frame.get('tabId'), 'Dashlane', nodeProps)
           }
         }
       })

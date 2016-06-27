@@ -252,6 +252,8 @@ class Main extends ImmutableComponent {
       windowActions.setPopupWindowDetail(Immutable.fromJS({
         left: props.x,
         top: props.y + 100,
+        height: props.height,
+        width: props.width,
         maxHeight: window.innerHeight - 100,
         minHeight: 400,
         src

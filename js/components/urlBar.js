@@ -235,7 +235,9 @@ class UrlBar extends ImmutableComponent {
 
   get hostValue () {
     const parsed = urlParse(this.props.activeFrameProps.get('location'))
-    return parsed.host && parsed.protocol !== 'about:' ? parsed.host : ''
+    return parsed.host &&
+      parsed.protocol !== 'about:' &&
+      parsed.protocol !== 'chrome-extension:' ? parsed.host : ''
   }
 
   get titleValue () {
