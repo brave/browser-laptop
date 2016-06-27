@@ -28,5 +28,6 @@ module.exports = {
   findBarMatchCase: '#caseSensitivityCheckbox',
   findBarNextButton: '.findButton.findNext',
   findBarPrevButton: '.findButton.findPrev',
-  findBarHideButton: '.findButton.hideButton'
+  braveMenu: '.braveMenu:not(.braveShieldsDisabled)',
+  braveMenuDisabled: '.braveMenu.braveShieldsDisabled'
 }
