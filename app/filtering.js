@@ -158,6 +158,7 @@ function registerForBeforeSendHeaders (session) {
     }
 
     let requestHeaders = details.requestHeaders
+    let parsedUrl = urlParse(details.url || '')
 
     if (!spoofedUserAgent) {
       // To minimize fingerprintability, remove Brave from the UA string.
@@ -167,7 +168,9 @@ function registerForBeforeSendHeaders (session) {
       appActions.changeSetting(settings.USERAGENT, spoofedUserAgent)
     }
 
-    requestHeaders['User-Agent'] = spoofedUserAgent
+    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
+      requestHeaders['User-Agent'] = spoofedUserAgent
+    }
 
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
@@ -183,7 +186,6 @@ function registerForBeforeSendHeaders (session) {
       }
     }
 
-    let parsedUrl = urlParse(details.url || '')
     if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl)) {
       if (module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
                                           parsedUrl.hostname)) {

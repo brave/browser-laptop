@@ -106,5 +106,8 @@ module.exports = {
     'general.disable-title-mode': process.platform === 'win32',
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null
-  }
+  },
+  uaExceptionHosts: [
+    'get.adobe.com', 'adobe.com', 'www.adobe.com', 'helpx.adobe.com'
+  ] // hosts to send true UA to
 }

@@ -28,6 +28,7 @@ const consoleStrings = require('../constants/console')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
+const appConfig = require('../constants/appConfig')
 
 class Frame extends ImmutableComponent {
   constructor () {
@@ -142,9 +143,11 @@ class Frame extends ImmutableComponent {
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
-    this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
 
     const parsedUrl = urlParse(location)
+    if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
+      this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
+    }
     const hack = siteHacks[parsedUrl.hostname]
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
