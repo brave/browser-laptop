@@ -31,5 +31,6 @@ module.exports = {
   braveMenu: '.braveMenu:not(.braveShieldsDisabled)',
   braveMenuDisabled: '.braveMenu.braveShieldsDisabled',
   adsBlockedStat: '.braveryStat.adsBlockedStat',
-  braveryPanel: '.braveryPanel'
+  braveryPanel: '.braveryPanel',
+  httpsEverywhereStat: '.braveryStat.redirectedResourcesStat'
 }

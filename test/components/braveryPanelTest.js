@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel} = require('../lib/selectors')
+const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel, httpsEverywhereStat} = require('../lib/selectors')
 
 describe('Bravery Panel', function () {
   function * setup (client) {
@@ -51,6 +51,37 @@ describe('Bravery Panel', function () {
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
             .then((blocked) => blocked === '2')
+        })
+    })
+    it('detects adblock elements', function * () {
+      const url = Brave.server.url('adblock.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .url(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(braveMenu)
+        .waitForVisible(braveryPanel)
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => blocked === '1')
+        })
+    })
+    it('detects https upgrades', function * () {
+      const url = Brave.server.url('httpsEverywhere.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .url(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(braveMenu)
+        .waitForVisible(braveryPanel)
+        .waitUntil(function () {
+          return this.getText(httpsEverywhereStat)
+            .then((upgraded) => {
+              console.log(upgraded)
+              return upgraded === '1'
+            })
         })
     })
   })
