@@ -29,5 +29,7 @@ module.exports = {
   findBarNextButton: '.findButton.findNext',
   findBarPrevButton: '.findButton.findPrev',
   braveMenu: '.braveMenu:not(.braveShieldsDisabled)',
-  braveMenuDisabled: '.braveMenu.braveShieldsDisabled'
+  braveMenuDisabled: '.braveMenu.braveShieldsDisabled',
+  adsBlockedStat: '.braveryStat.adsBlockedStat',
+  braveryPanel: '.braveryPanel'
 }
