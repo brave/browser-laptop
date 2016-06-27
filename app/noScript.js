@@ -37,7 +37,7 @@ function onHeadersReceived (details) {
   let parsed = urlParse(details.firstPartyUrl)
   if (['about:', 'chrome:', 'chrome-extension:'].includes(parsed.protocol) ||
       ['stylesheet', 'script', 'image'].includes(details.resourceType) ||
-      parsed.hostname === 'localhost' ||
+      (parsed.hostname === 'localhost' && process.env.NODE_ENV !== 'test') ||
       details.firstPartyUrl === getIndexHTML()) {
     return result
   }

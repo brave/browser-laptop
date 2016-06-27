@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel, httpsEverywhereStat} = require('../lib/selectors')
+const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, noScriptNavButton} = require('../lib/selectors')
 
 describe('Bravery Panel', function () {
   function * setup (client) {
@@ -79,8 +79,25 @@ describe('Bravery Panel', function () {
         .waitUntil(function () {
           return this.getText(httpsEverywhereStat)
             .then((upgraded) => {
-              console.log(upgraded)
               return upgraded === '1'
+            })
+        })
+    })
+    it('blocks scripts with No Script', function * () {
+      const url = Brave.server.url('scriptBlock.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .url(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(braveMenu)
+        .waitForVisible(braveryPanel)
+        .click(noScriptSwitch)
+        .waitForVisible(noScriptNavButton)
+        .waitUntil(function () {
+          return this.getText(noScriptStat)
+            .then((stat) => {
+              return stat === '2'
             })
         })
     })

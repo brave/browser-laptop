@@ -32,6 +32,7 @@ class SwitchControl extends ImmutableComponent {
   render () {
     return <div className={cx({
       switchControl: true,
+      [this.props.className]: !!this.props.className,
       disabled: this.props.disabled,
       large: this.props.large,
       hasTopText: this.props.topl10nId

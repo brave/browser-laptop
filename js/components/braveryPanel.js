@@ -275,7 +275,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </select>
                   <SwitchControl onClick={this.onToggleHTTPSE} rightl10nId='httpsEverywhere' checkedOn={httpseEnabled} disabled={!shieldsUp} />
-                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} />
+                  <SwitchControl onClick={this.onToggleNoScript} rightl10nId='noScript' checkedOn={noScriptEnabled} disabled={!shieldsUp} className='noScriptSwitch' />
                 </div>
                 <div className='braveryControlGroup'>
                   <div className={cx({

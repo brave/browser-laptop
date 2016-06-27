@@ -245,6 +245,18 @@ var exports = {
       }, key, value).then((response) => response.value)
     })
 
+    /**
+     * Changes a site setting
+     *
+     * @param {string} key - the setting key to change
+     * @param value - The setting value to change to
+     */
+    this.app.client.addCommand('changeSiteSetting', function (hostPattern, key, value) {
+      return this.execute(function (hostPattern, key, value) {
+        return require('../../../js/actions/appActions').changeSiteSetting(hostPattern, key, value)
+      }, key, value).then((response) => response.value)
+    })
+
     this.app.client.addCommand('getDefaultWindowHeight', function () {
       return this.execute(function () {
         let screen = require('electron').screen
