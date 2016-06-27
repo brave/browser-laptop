@@ -1,0 +1,103 @@
+  .searchsites           {height:30px;padding-left:5px;}
+  .searchsites *         {vertical-align:middle;}
+  .searchsites div       {line-height:25px;font-size:10pt;text-align:left;}
+  .searchsites input     {font-size:10pt;width:300px;border:1px solid #9AC0DA;}
+  .searchsites img       {padding-bottom:2px;}
+  .searchsites a         {font-size:8pt;color:#275982;padding-left:5px;margin-bottom:10px;}
+  .searchsites a:link    {text-decoration:none;color:#275982;}
+  .searchsites a:visited {text-decoration:none;color:#275982;}
+  .searchsites a:hover   {text-decoration:underline;color:#453461;}
+  .searchsites a:active  {text-decoration:none;color:#bd1f29;}
+  
+
+  #gridsites                      {width:724px;margin-top:15px;color:#000;text-align:left;font-size:9pt;}
+  
+  #gridsites .header              {clear:both;}
+  #gridsites div.header div       {background:url(images/th_off.png) repeat-x;height:30px;float:left;}
+  #gridsites #headername          {width:275px;}
+  #gridsites #headerusername      {width:148px;}
+  #gridsites #headerpassword      {width:120px;}
+  #gridsites #headerfavorite      {width:20px;}
+  #gridsites #headernote          {width:20px;}
+  #gridsites #headerprotected     {width:20px;}
+  #gridsites #headerautologin     {width:20px;}
+  #gridsites #headeraction        {width:100px;}
+  #gridsites #headerimport        {width:80px;}
+  #gridsites .header .sort        {display:block;line-height:30px;font-weight:bold;padding:0px 10px;}
+  #gridsites .header .sort .title {display:block;line-height:30px;}
+  #gridsites #headername .sort,
+  #gridsites #headerusername .sort,
+  #gridsites #headerpassword .sort {border-right:1px solid #fff;}
+
+
+  #gridsites #headername:hover,
+  #gridsites #headerusername:hover {cursor:pointer;} 
+
+  #gridsites .group                 {clear:both;padding-top:7px;}
+  #gridsites .group .border         {border:1px solid #fff;background:#e0e9ef;}
+  #gridsites div.group div          {height:35px;float:left;font-size:8pt;}
+  #gridsites .groupname             {width:400px;}
+  #gridsites .groupaction           {width:271px;color:#bd1f29;text-align:right;}
+  #gridsites .group .sort           {display:block;line-height:35px;padding:0px 10px;}
+  #gridsites .group .sort .title    {display:block;line-height:35px;font-weight:bold;background:url(images/group_expanded.png) no-repeat 0px 10px;padding-left:14px;} /*initially expanded*/
+  #gridsites .group .sort .count    {font-weight:normal;padding:0 0 3px 5px;}
+  #gridsites .groupaction span      {line-height:35px;padding:0 5px 4px 5px;color:#aaaaaa;}
+  #gridsites .groupaction a         {line-height:35px;}
+  #gridsites .groupaction a:link    {text-decoration:none;color:#bd1f29;}
+  #gridsites .groupaction a:visited {text-decoration:none;color:#bd1f29;}
+  #gridsites .groupaction a:hover   {text-decoration:underline;color:#bd1f29;}
+  #gridsites .groupaction a:active  {text-decoration:none;color:#bd1f29;}
+
+
+  #gridsites .groupname:hover       {background:#f5faff;cursor:pointer;}
+
+
+  #gridsites .site                   {clear:both;}
+  #gridsites .site .border           {border:1px solid #fff;border-top:1px solid #fff;background:#f1f4f7;}
+  #gridsites div.site div            {height:20px;float:left;font-size:8pt;color:#222;}
+  #gridsites .site .content          {display:block;line-height:20px;}
+  #gridsites .sitename               {width:275px;font-weight:bold;}
+  #gridsites .sitename a             {line-height:20px;}
+  #gridsites .sitename a:link        {text-decoration:none;color:#222;}
+  #gridsites .sitename a:visited     {text-decoration:none;color:#222;}
+  #gridsites .sitename a:hover       {text-decoration:underline;color:#bd1f29;}
+  #gridsites .sitename a:active      {text-decoration:none;color:#bd1f29;}
+  #gridsites .sitename img           {padding-right:5px;}
+  #gridsites .siteusername           {width:148px;}
+  #gridsites .sitepassword           {width:120px;}
+  #gridsites .sitepassword a         {line-height:20px;}
+  #gridsites .sitepassword a:link    {text-decoration:none;color:#222;}
+  #gridsites .sitepassword a:visited {text-decoration:none;color:#222;}
+  #gridsites .sitepassword a:hover   {text-decoration:underline;color:#bd1f29;}
+  #gridsites .sitepassword a:active  {text-decoration:none;color:#bd1f29;}
+  #gridsites .sitefavorite           {width:20px;}
+  #gridsites .sitenote               {width:20px;}
+  #gridsites .siteprotected          {width:20px;}
+  #gridsites .siteautologin          {width:20px;}
+  #gridsites .siteaction             {width:80px;text-align:right;}
+  #gridsites .siteaction span        {line-height:20px;padding:0 5px 0px 5px;color:#aaaaaa;}
+  #gridsites .siteaction a           {line-height:20px;}
+  #gridsites .siteaction a:link      {text-decoration:none;color:#222;}
+  #gridsites .siteaction a:visited   {text-decoration:none;color:#222;}
+  #gridsites .siteaction a:hover     {text-decoration:underline;color:#bd1f29;}
+  #gridsites .siteaction a:active    {text-decoration:none;color:#bd1f29;}
+  #gridsites .siteimport             {width:80px;text-align:center;}
+  #gridsites .sitename .content      {padding:0px 10px;}
+  #gridsites .siteusername .content  {padding:0px 10px;}
+  #gridsites .sitepassword .content  {padding:0px 10px;text-align:center;}
+  #gridsites .sitefavorite .content  {}
+  #gridsites .sitenote .content      {}
+  #gridsites .siteprotected .content {}
+  #gridsites .siteautologin .content {}
+
+
+  #gridsites .site .border:hover     {border:1px solid #91D42A;;background:#fff;}
+  #gridsites .focus .border          {border:1px solid orange;background:#fff;}
+
+  .textbi             {font-weight:bold;font-style:italic;}
+  .texti              {font-style:italic;}
+  #askforpasswordtext {font-weight:bold;}
+  #askforpassword     {width:200px;}
+
+    #gridsite {height:400px;overflow:auto;clear:both;}
+

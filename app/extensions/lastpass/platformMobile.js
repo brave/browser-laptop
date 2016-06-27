@@ -1,0 +1,1 @@
+LPPlatform=function(){var b=function(a){return host.translate(a)},c=function(a){return a};return{translate:function(a){if("undefined"!==typeof host&&"function"===typeof host.translate)return LPPlatform.translate=b,b(a);LPPlatform.translate=c;return a}}}();

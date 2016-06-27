@@ -1,0 +1,48 @@
+#chooseProfileDialog {
+  max-width: 350px;
+  min-height: 400px;
+}
+
+.radioContainerPair {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  bottom: 35px;
+}
+
+.radioContainerPair > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 50%;
+}
+
+.radioContainerPair > div:last-child {
+  position: absolute;
+  top: 50%;
+  bottom: 0;
+}
+
+#chooseProfileDialog .checkboxContainer {
+  margin-bottom: 10px;
+  position: absolute;
+  bottom: 0;
+}
+
+.radioContainer {
+  border: 1px solid #B7B7B7;
+  background-color: #FFF;
+  overflow: auto;
+  padding-bottom: 10px;
+  position: absolute;
+  top: 43px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.radioContainer > div {
+  padding: 10px 10px 0 10px;
+}

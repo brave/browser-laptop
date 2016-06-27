@@ -1,0 +1,165 @@
+/* LOCKED */
+.tree-default .locked li a { color:gray; }
+/* DOTS */
+/*
+.tree-default ul { background-position:6px 1px; background-repeat:repeat-y; background-image:url(data:image/gif;base64,R0lGODlhAgACAIAAAB4dGf///yH5BAEAAAEALAAAAAACAAIAAAICRF4AOw==); _background-image:url("dot_for_ie.gif"); *background-image:url("dot_for_ie.gif"); }
+*/
+.tree-default li { background-position:-128px -32px; background-repeat:no-repeat; background-image:url('images/icons2.png'); overflow-x: hidden; }
+/* NO DOTS */
+.tree-default .no_dots, .tree-default .no_dots ul { background:transparent; }
+.tree-default .no_dots li.leaf { background-image:none; background-color:transparent; }
+/* OPEN or CLOSED */
+.tree-default li.open { background:url("images/icons2.png") -64px -88px no-repeat; } /*includes an 8px vertical offset*/
+.tree-default li.closed, #jstree-dragged.tree-default li li.open { background:url("images/icons2.png") -96px -56px no-repeat; }
+#jstree-marker { background-image:url("images/icons2.png"); }
+/* DEFAULT, HOVER, CLICKED, LOADING STATES */
+.tree-default li a,.tree-default li span { height: 18px;}
+.tree-default li li { border-top: 1px solid transparent !important; border-left: 1px solid transparent !important; }
+.tree-default li li li { border-top: 1px solid transparent !important; border-left: 1px solid transparent !important; }
+.tree-default li li li li { border-top: 1px solid transparent !important; border-left: 1px solid transparent !important; }
+.tree-default li li:nth-child(even) { background: #fff ; overflow-x: hidden; border-bottom:1px solid #c3c3c3;}
+.tree-default li li:nth-child(odd) { background: #fff ; overflow-x: hidden; border-bottom:1px solid #c3c3c3; }
+.tree-default li li li:nth-child(even) { background: #fff ; overflow-x: hidden; border-bottom:1px solid #c3c3c3;}
+.tree-default li li li:nth-child(odd) { background: #fff ; overflow-x: hidden; border-bottom:1px solid #c3c3c3;}
+.tree-default li li li li:nth-child(even) { background: #fff ; overflow-x: hidden; border-bottom:1px solid #c3c3c3;}
+.tree-default li li li li:nth-child(odd) { background: #fff ; overflow-x: hidden; border-bottom:1px solid #c3c3c3;}
+
+.tree-default .folder { border-bottom:1px solid transparent !important;}
+
+.leaf:hover {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border: 1px solid #d6d6d6;
+  -moz-box-shadow: -1px 1px 7px #d6d6d6;-webkit-box-shadow: -1px 1px 7px #d6d6d6;box-shadow: -1px 1px 7px #d6d6d6;
+  background:#eeeeee;
+}
+
+.leaf {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.leaf:active { 
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+.toolsimg{
+  background:url('images/tools.png') no-repeat;
+  background-position:center;
+  width:20px;
+  height:20px;
+  padding:0px;
+  opacity:0.2;
+}
+
+.leaf .shareimg{
+  background:url('images/share.png') no-repeat;
+  background-position:center;
+  width:20px;
+  height:20px;
+  padding:0px;
+  opacity:0.2;
+}
+.shareimggroup{
+  background:url('images/share.png') no-repeat;
+  background-position:center;
+  width:20px;
+  height:20px;
+  padding:0px;
+  opacity:0.2;
+}
+.leaf .sharesaf{
+  background:url('images/share.png') no-repeat !important;
+}
+.leaf .editimg{
+  background:url('images/edit.png') no-repeat;
+  background-position:center;
+  width:20px;
+  height:20px;
+  padding:0px;
+  opacity:0.2;
+}
+.leaf .chpwimg{
+  background:url('images/generate_red.png') no-repeat;
+  background-position:center;
+  width:20px;
+  height:20px;
+  padding:0px;
+  opacity:0.2;
+}
+
+.leaf .editsaf{
+  background:url('images/edit.png') no-repeat !important;
+}
+.leaf .delimg{
+  background:url('images/delete.png') no-repeat;
+  background-position:center;
+  width:20px;
+  height:20px;
+  padding:0px;
+  opacity:0.2;
+}
+.leaf .delsaf{
+  background:url('images/delete.png') no-repeat !important;
+  opacity:0.2;
+}
+.leaf .shareimg:hover{
+  opacity:1.0;
+}
+.shareimggroup:hover{
+  opacity:1.0;
+}
+.leaf .editimg:hover{
+  opacity:1.0;
+}
+.leaf .chpwimg:hover{
+  opacity:1.0;
+}
+.leaf .delimg:hover{
+  opacity:1.0;
+}
+
+
+.closed:hover { background: url("images/icons2.png") -96px -56px no-repeat rgb(206,220,231) !important;
+background: -moz-linear-gradient(top,  rgba(206,220,231,1) 0%, rgba(116,137,147,1) 100%) !important;
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(206,220,231,1)), color-stop(100%,rgba(116,137,147,1)));
+background: -webkit-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(116,137,147,1) 100%);
+background: -o-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(116,137,147,1) 100%);
+background: -ms-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(116,137,147,1) 100%);
+background: linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(116,137,147,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cedce7', endColorstr='#748993',GradientType=0 );
+}
+.leaf:hover a { text-decoration: underline; }
+.tree-default li a.clicked, .tree-default li a.clicked:hover, .tree-default li span.clicked {
+	background-color: #fffaeb !important;
+}
+.tree-default li.clicked {
+	background-color: #fffaeb !important;
+}
+.tree-default li.closed.clicked { background: url("images/icons2.png") no-repeat -96px -56px rgba(215, 226, 238, 0.95);}
+.tree-default li.open.clicked { background: url("images/icons2.png") no-repeat -64px -88px rgba(215, 226, 238, 0.95);}
+/* ICONS */
+.tree-default ins { background-image:url("images/icons2.png"); background-position:0 0; background-repeat:no-repeat; vertical-align: 20%;}
+.tree-default li.shared a ins { background-image:url("images/icons2.png"); background-position:0 -32px; background-repeat:no-repeat; vertical-align: 20%;}
+.tree-default li.shared li.leaf a ins { background:none; background-position:0 0; vertical-align: 20%;}
+.tree-default ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important; } /* UL is added to make selector stronger */
+.tree-default li a ins.forbidden { background-position:-32px -32px; }
+.tree-default .locked li a ins { background-position:0 -96px; }
+.tree-default li span ins { background-position:-16px 0; }
+#jstree-dragged.tree-default ins { background:url("images/icons2.png") -32px -64px no-repeat; }
+#jstree-dragged.tree-default ins.forbidden { background:url("images/icons2.png") -32px -32px no-repeat; }
+
+.tree-default li.recent a ins { background-position:-32px -96px; }
+.tree-default li.linked a ins { background-position:-32px -128px; }
+.tree-default li.favorite a ins { background-position:0 -128px; }
+
+/* CONTEXT MENU */
+.tree-default-context a ins { background-image:url("images/icons.png"); background-repeat:no-repeat; background-position:-64px -64px; }
+.tree-default-context a ins.create { background-position:0 -16px; }
+.tree-default-context a ins.rename { background-position:-16px 0px; }
+.tree-default-context a ins.remove { background-position:0 -32px; }
+.demo { font-size: 12px; }

@@ -1,0 +1,8 @@
+#confirmRememberPassword {
+  display: none;
+  text-align: center;
+}
+
+#loginDialogDisablePasswordManagerContainer {
+  display: none;
+}

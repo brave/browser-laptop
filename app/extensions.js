@@ -128,7 +128,8 @@ let generateBraveManifest = () => {
 
 let defaultExtensions = {
   OnePassword: 'aomjjhallfgjeglblehebfpbcfeobpgk',
-  Dashlane: 'fdjamakpfbbddfjaooikfcpapjohcfmg'
+  Dashlane: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
+  LastPass: 'hdokiejnpimakedhajhdlcegeplioahd'
 }
 
 let backgroundPage = null
@@ -155,7 +156,8 @@ module.exports.init = () => {
     }
   })
 
-  process.on('chrome-browser-action-popup', function (extensionId, name, props, popup) {
+  process.on('chrome-browser-action-popup', function (extensionId, tabId, name, props, popup) {
+    // TODO(bridiver) find window from tabId
     let win = BrowserWindow.getFocusedWindow()
     if (!win) {
       return
@@ -200,6 +202,13 @@ module.exports.init = () => {
       enableExtension(defaultExtensions.OnePassword)
     } else {
       disableExtension(defaultExtensions.OnePassword)
+    }
+
+    if (getSetting(settings.LAST_PASS_ENABLED)) {
+      installExtension(defaultExtensions.LastPass, getExtensionsPath('lastpass'))
+      enableExtension(defaultExtensions.LastPass)
+    } else {
+      disableExtension(defaultExtensions.LastPass)
     }
 
     if (getSetting(settings.DASHLANE_ENABLED)) {

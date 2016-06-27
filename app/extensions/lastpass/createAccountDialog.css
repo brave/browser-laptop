@@ -1,0 +1,28 @@
+#createAccountDialog {
+  max-width: 550px;
+}
+
+#createAccountDialog .dialogContent {
+  padding-top: 0;
+}
+
+#createAccountDialog .checkboxContainer {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+#confirmation p {
+  margin-top: 20px;
+}
+
+#confirmation .dialogError p {
+  margin-top: 0;
+}
+
+#createAccountDialog .emphasis {
+  font-weight: 600;
+}
+
+#confirmation {
+  display: none;
+}

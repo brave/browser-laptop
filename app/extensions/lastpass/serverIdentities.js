@@ -1,0 +1,2 @@
+LPServer.identities=function(){var b=function(a,b){var c={iid:a.params.identity.iid,iname:a.params.identity.iname,edit:"1",aids:a.params.identity.aids,ffids:a.params.identity.ffids,appaids:a.params.identity.appaids};a.params.identity.pw_prompt&&(c.pwprotect="on");LPServer.xmlRequest({url:"identity.php",data:c,success:b,userSupplied:a})};return{add:function(a){b(a,"identadded")},remove:function(a){LPServer.xmlRequest({url:"identity.php",data:{src:"website",deleteext:1,iid:a.params.id},success:"identdeleted",
+userSupplied:a})},update:function(a){b(a,"identupdated")}}}();

@@ -1,0 +1,1902 @@
+/* popup table css */
+/* was: td {  */
+.popuprow, #lptabpopup tr, #lptabpopupformfills tr, #lptabpopupmore tr, #lptabpopupmore html\:tr { 
+  font-size:14px; 
+  font-family: Arial, Helvetica sans-serif; font-weight:normal;   /* nolonger bold */
+  z-index:10000;
+  overflow:auto;
+  /* doesn't seem to work ?
+  overflow:hidden;
+  text-overflow:ellipsis;
+  */
+  margin:1px;
+  padding:0;
+}
+
+.popuprow td, #lptabpopup td, #lptabpopupformfills td, #lptabpopupmore td {
+  border: 1px solid transparent;
+}
+
+.tablerowfirefox {
+  line-height:20px;  /* override default firefox css */
+}
+.tablecellfirefox {
+  display:block; 
+}
+
+
+/* was td:hover {  */
+/* original, based on combobox.css:
+** #lptabpopup tr:hover, #lptabpopup html\:tr:hover, #lptabpopupformfills tr:hover, #lptabpopupformfills html\:tr:hover, #lptabpopupnever tr:hover, #lptabpopupnever html\:tr:hover, #lptabpopupmore tr:hover, #lptabpopupmore html\:tr:hover { 
+** background: #0399d4 !important;
+**         background: -webkit-gradient(linear, left top, left bottom, from(#04acec), to(#0186ba)) !important;
+**         color: #fff !important;
+**         -webkit-border-radius: 0;
+**         -moz-border-radius: 0;
+**         text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+** }
+*/
+/* implement the new, aseptic 29thdrive hover */ 
+#lptabpopup tr:hover, #lptabpopup html\:tr:hover, #lptabpopupformfills tr:hover, #lptabpopupformfills html\:tr:hover, #lptabpopupmore tr:hover, #lptabpopupmore html\:tr:hover { 
+background: #fff !important;
+        color: #000 !important;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+        border: 1px solid #d6d6d6;
+}
+/* turns out, you have to set outline on the td, not the tr */
+#lptabpopup td:hover, #lptabpopup html\:td:hover, #lptabpopupformfills td:hover, #lptabpopupformfills html\:td:hover, #lptabpopupmore td:hover, #lptabpopupmore html\:td:hover { 
+        outline: 1px solid gray;
+        outline-offset: 1px;
+}
+
+#lptabpopupmore{
+  padding-left: 10px;
+}
+
+
+#lptabpopupnavbar td:hover, #lptabpopupnavbar html\:td:hover {
+  background: #d32d27 !important;
+  opacity: .8;
+}
+
+#lptabpopupnavbar td, #lptabpopupnavbar html\:td {
+  opacity: .6;
+}
+#lptabpopupnavbar td.selected, #lptabpopupnavbar html\:td.selected {
+  background: #d32d27 !important;
+  opacity: 1;
+}
+
+
+#lptabpopup,#lptabpopupformfills, #lptabpopupmore{
+  width:100%;
+}
+
+
+
+table, html\:table {
+ padding:0px;
+ margin-left:2px; margin-top:2px;
+ margin-right:2px;
+}
+
+/* body */
+  /*  border:thin dotted; */
+  /* background: #919191 !important; /* for non-css3 browsers */
+  /* background: -webkit-gradient(linear, left top, left bottom, from(#a9a9a9), to(#7a7a7a)); /* for webkit browsers */
+  /* color: #e7e5e5; */
+/*
+body #main { margin:1px; 
+  background: #fff !important;
+  font-weight: bold;
+  color: #000 !important;
+  cursor:default;
+  text-align:left;
+  font-size:14px;
+
+  overflow:hidden;
+  border-color: #000 !important;
+  border-style: solid !important;
+  border-width: 2px; 
+}
+*/
+/* next rule for a:link, a:visited is required for overlap with IE-internal stylesheet.  I hate this. */
+a:link.tooltipsuper, a:visited.tooltipsuper, a:link.tooltipsuperlong, a:visited.tooltipsuperlong, a:focus.tooltipsuper, a:focus.tooltipsuperlong {
+  color: transparent;
+  text-decoration:none;
+  background: #ffffff !important;  /* 3.0 elements in title bar with white background */
+}
+a:link.tooltip40super, a:visited.tooltip40super, a:link.tooltip40superlong, a:visited.tooltip40superlong, a:focus.tooltip40super, a:focus.tooltip40superlong {
+  color: transparent;
+  text-decoration:none;
+  background: #d32d27 !important;  /* 4.0 elements in title bar with red background */
+}
+/* also needed this for IE */
+a:link.tooltipgen1, a:visited.tooltipgen1, a:link.tooltipgen2, a:visited.tooltipgen2, a:link.tooltipshowpassword, a:visited.tooltipshowpassword, a:link.tooltipgen3 a:visited.tooltipgen3 {
+  color: transparent;
+  text-decoration:none;
+  background: #e6e6e6 !important; /* elements inside tabs with grey background */    /* final */
+  vertical-align:middle;
+}
+
+/* input type=image vs img vs image */
+a:link.tooltip40showpassword, a:visited.tooltip40showpassword {
+  color: transparent;
+  text-decoration:none;
+  background: transparent;
+  vertical-align:middle;
+}
+
+/* need this for IE as well. gaaak */
+label[for="u"], label[for="p"], label[for="name"], label[for="group"] {
+  color: #000
+}
+/* for 4.0 */
+a:link.tooltipgen1_40, a:visited.tooltipgen1_40, a:link.tooltipgen2_40, a:visited.tooltipgen2_40, a:link.tooltipgen3_40 a:visited.tooltipgen3_40 {
+  color: transparent;
+  text-decoration:none;
+  background: #f2f4f5 !important; /* elements inside tabs with grey background */    /* final */
+  vertical-align:middle;
+}
+
+a {
+  color: #e7e5e5;
+  text-decoration:none;
+}
+a:focus { 
+background: #0399d4 !important; /* for non-css3 browsers */
+        background: -webkit-gradient(linear, left top, left bottom, from(#04acec), to(#0186ba)) !important; /* for webkit browsers */
+        color: #fff !important;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
+
+.tablerow_firstaction {
+border-top: solid 2px black;
+}
+
+.tablerow_sep {
+  height:4px; 
+  line-height:4px;
+  border-top: solid 2px black;
+  display:table-row;
+}
+
+#askMsgDiv {
+  margin:5px;  /* this seems right */
+}
+.divtext { font-size:14px; 
+  font-family: Arial, Helvetica, sans-serif; font-weight:normal;  /* bold looks like shouting */
+  z-index:10000;
+  overflow:auto;
+  margin-left:5px;
+  margin-right:1px;
+  margin-top:1px;
+  margin-bottom:1px;
+  padding:0;
+}
+.divtext:hover {
+/* keep in sync with 29th drive hover style
+** .divtext:hover {
+**      background: #0399d4 !important; 
+**      background: -webkit-gradient(linear, left top, left bottom, from(#04acec), to(#0186ba)) !important; 
+**      color: #fff !important;
+**      -webkit-border-radius: 0;
+**      -moz-border-radius: 0;
+**      text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+*/
+        background: #fff !important;
+        color: #000 !important;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .1);  /* may be un-necessary */
+        border: 1px solid #d6d6d6;
+        outline: 1px solid gray;
+        /* outline-offset: 1px;*/
+}
+
+.underline {
+  text-decoration:underline;  /* seems more useful to users, enable by setting g_underline_text_action */
+}
+.savegendiv {   /* extend divtext class */
+  vertical-align:top;
+  margin-left: 0px;
+}
+
+/* copied from lp_toolstrip.css to retain look/feel ?*/
+/* #generate {text-align:center;padding:0 20px;color:#123272;} */
+
+
+#popupcontainer, #popupcontainerff {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -ms-overflow-y: auto;
+  -ms-overflow-x: hidden;
+}
+
+/* use key events to replicate hover */
+/* original styling based on combobox.css
+**.showfocus {
+**        background: #0399d4 !important;
+**        background: -webkit-gradient(linear, left top, left bottom, from(#04acec), to(#0186ba)) !important;
+**        color: #fff !important;
+**        -webkit-border-radius: 0;
+**        -moz-border-radius: 0;
+**        text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+**}
+*/
+.showfocus {
+        background: #fff !important;
+        color: #000 !important;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+        outline: 1px solid gray;
+        outline-offset: 1px;
+}
+
+#exttable {
+  font-size:11px;  /* might be too small, but hard to squeeze everything in */
+}
+#exttable td, #exttable html\:td { font-size:11px; 
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  z-index:10000;
+  overflow: auto;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin:1px;
+  padding:0;
+}
+.popcell {
+  vertical-align:top;
+  padding-top:2px;
+  display:inline;
+}
+/* color reused from tooltip.  can't think of anything better
+** .highlight {  
+**   background: #9FDAEE !important;
+**   vertical-align:top;
+**   color: #000 !important;
+** }
+*/
+/* 29th drive mockup underlines instead of highlight */
+.highlight {  
+  text-decoration:underline !important;
+  vertical-align:top;
+}
+
+/************ next chunk of css rules are for tooltips  *************/
+/*originally from:
+** http://sixrevisions.com/css/css-only-tooltips/
+*/
+.tooltip {
+        border-bottom: 1px dotted #000; color: #000 !important; outline: none;
+        text-decoration: none;
+        position: relative;
+}
+
+.tiplabel {
+  color: #000 !important;
+  text-decoration: none;
+/* need this line due to conflict with IE internal stylesheet */
+  font-weight:normal; font-size:12px;  /* same as for .gendivtext */
+}
+.tooltip span, .tooltip html\:span {
+        margin-left: -999em;
+        position: absolute;
+        opacity:0;
+        top: 1.4em;
+        left: 0.5em;
+        width:200px;
+        text-decoration:none !important;
+        border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+        -moz-transition-property:opacity; -moz-transition-duration:1s; -webkit-transition-property:opacity; -webkit-transition-duration:1s; 
+        z-index: 100;
+}
+
+.tooltipright {
+        border-bottom: 1px dotted #000; color: #000 !important; outline: none;
+        text-decoration: none;
+        position: relative;
+}
+.tooltipright span, .tooltipright html\:span {
+        margin-left: -999em;
+        position: absolute;
+        opacity:0;
+        top: 1.4em;
+        left: -10em;
+        width:200px;
+        text-decoration:none !important;
+        border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+        -moz-transition-property:opacity; -moz-transition-duration:1s; -webkit-transition-property:opacity; -webkit-transition-duration:1s; 
+        z-index: 100;
+}
+
+/* this displays the triangle to latch onto tooltip box
+.tooltip:hover span:before, .tooltip:hover html\:span:before {
+  content:'';
+  width:0px;
+  height:0px;
+  position:absolute;
+  border-style: solid;
+  border-color: #2BB0D7 transparent transparent transparent;
+  border-width: 8px;
+  left: 20px;
+  bottom: 0px;
+}
+*/
+.tooltip:hover span, .tooltip:hover html\:span {
+        margin-left: 0;
+        font-family: Arial, Helvetica, sans serif;
+        font-weight: normal;
+        font-size:12px; 
+        opacity:1;
+}
+.tooltipright:hover span, .tooltipright:hover html\:span {
+        margin-left: 0;
+        font-family: Arial, Helvetica, sans serif;
+        font-weight: normal;
+        font-size:12px; 
+        opacity:1;
+}
+
+.classic { padding: 0.4em 0.4em; }
+/*.classic {background: #FFFFAA; border: 1px solid #FFAD33; color: #000 !important; }*/
+.classic { background: #9FDAEE; border: 1px solid #2BB0D7; color: #000 !important; }
+
+/* next class is for the SPAN container containing visual cue/arrow on site/formfill rows.  was originally 'expando' */
+.expander {
+  padding-left:2px; 
+  padding-right:2px; 
+  float:right;
+}
+/* can't figure out a good way to make this align vertically, otherwise */
+/* these numbers are only good for arrow.png
+.expander img {
+  padding-top: 5px;  
+  padding-bottom: 5px;
+} */
+.expander img {  /* for 16x16 */
+  padding-top: 1px;  
+}
+#lptabpopuptitlespan{
+  padding-left:10px;
+}
+.stdffopts{
+  padding-left:10px;
+}
+/*input#special{ */
+.specialnotadv{  /* assign to input#special only when g_special_is_advanced is true */
+  margin-left:15px;
+}
+input#mindigits{
+  margin-left:10px;
+}
+/* LPPopup is overall XUL container, for Firefox only */
+#LPPopup{
+  padding:0px;
+  background-color:transparent;
+  -moz-appearance: none;
+}
+.tooltiphelp {
+        border-bottom: 1px ; color: #000 !important; outline: none;
+        text-decoration: none;
+        font-size:13px;
+}
+.tooltiphelp #tthelp  {
+        margin-left: -999em;
+        position: absolute;
+        opacity:0;
+        top: 2em;
+        left: 2em;
+        width:220px;   /* case: popup could be thinner than 220 pixels, and this will not be good */
+        overflow:auto;
+        text-decoration:none !important;
+        border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+        -moz-transition-property:opacity; -moz-transition-duration:1s; -webkit-transition-property:opacity; -webkit-transition-duration:1s; 
+        z-index: 100;
+}
+.tooltiphelp:hover #tthelp {
+        margin-left: 0;
+        font-family: Arial, Helvetica, sans serif;
+        font-weight: normal;
+        font-size:12px; 
+        overflow:auto;
+        opacity:1;
+}
+.row{
+  display: table-row;
+  font-weight: normal;
+}
+.saveinput{
+  width: 300px;
+  height: 30px;
+  background-color:#fff !important;
+  color:#000 !important;
+  padding-left: 5px;
+/* 29th drive styling has squared off boxes...
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+*/
+  border-top-color:#a4a4a4;
+  border-left-color:#c3c3c3;
+  border-right-color:#c3c3c3;
+  border-bottom-color:#c3c3c3;
+}
+
+/* styling for the savesite_popupaction_iframe tab */
+#lptabpopupsave{
+  padding:5px;
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  /* height: 100%; */
+}
+#lptabpopupsave label{
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  font-weight:bold;
+  font-family: Arial, Helvetica, sans-serif; font-weight: bold;
+  font-size:12px;
+  margin:0px;
+}
+#lptabpopupsave p{
+  font-family: Arial, Helvetica, sans-serif; font-weight:normal;
+  font-size:12px;
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  margin:0px;
+  width:300px;  /* keep in sync with .saveinput width */
+  padding: 5px 0px;
+}
+#lptabpopupsave span, #lptabpopupsave html\:span{
+  display:block;
+}
+
+
+#lptabnavbarbtn { 
+  background: #bbb;
+  width:100%; position:absolute; left:0px; bottom:0px; margin: 0px; border-spacing: 0;
+}
+#lptabnavbarbtn:hover { 
+  background: #aaa;
+}
+#lptabnavbarbtn div {
+    margin:auto;
+}
+
+.shortenstr {  /* I hate CSS */
+  text-overflow:ellipsis;
+  overflow:hidden;
+  white-space:nowrap;
+  display:inline-block;
+}
+#lptabnavbarbtn span, #lptabnavbarbtn html\:span { 
+  color:white;
+  padding-left:10px;
+}
+
+#generatebutton{
+  margin-left:3px;  /* next 4 rules to try docking the button to the
+                    ** generate password input field, per Levi */
+  vertical-align:top;
+  height:34px;
+  min-width:34px!important;
+  width:34px!important;
+  padding-top:5px!important;
+  margin-top:0px;
+  margin-bottom:0px;
+}
+#copypwbutton{
+  margin-top:-1px;
+  cursor:pointer;
+  color:#d32d27;
+  font-size:12px;
+  font-family: Arial, Helvetica, sans-serif; 
+  font-weight:light;
+  
+}
+.genselectdiv{
+  padding-bottom:2px;
+}
+
+/* tooltips based against
+** http://www.spiceupyourblog.com/2011/05/simple-css-only-tooltip-descriptions.html
+*/
+.tooltipsuper,
+.tooltip40super
+{
+position: relative;
+/*background: #eaeaea;*/
+cursor: pointer;  /* was help */
+display: inline-block;
+text-decoration: none;
+/*color: #222;*/
+outline: none;
+height:30px;  /* needed for firefox? */
+}
+
+.tooltipsuper span, .tooltipsuper html\:span
+{
+visibility: hidden;
+position: absolute;
+top: 35px;
+left: 50%;
+text-align: center;
+z-index: 999;
+width: 100px;
+font-size:12px;
+font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+margin-left: -90px;
+padding: 2px;
+/*border: 1px solid #000;  this looks better when background-color gradient is set*/
+/*opacity: .9; */
+line-height:14px;
+color:#fff;
+background-color: #000;
+/*
+background-image: -webkit-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -moz-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -ms-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -o-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+*/
+-moz-border-radius: 4px;
+border-radius: 4px;
+-moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltip40super span, .tooltip40super html\:span
+{
+  visibility: hidden;
+  position: absolute;
+  top: 42px;  /* 35px; */
+  left: 50%;
+  text-align: center;
+  z-index: 999;
+  width: 100px;
+  font-size:12px;
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  margin-left: -90px;
+  padding: 2px;
+  line-height:14px;
+  color:#fff;
+  background-color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+  box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltipsuper:hover,
+.tooltip40super:hover
+{
+border: 0; /* IE6 fix */
+}
+
+.tooltipsuper:hover span, .tooltipsuper:hover html\:span,
+.tooltip40super:hover span, .tooltip40super:hover html\:span
+{
+/*visibility: visible;*/
+transition-delay:1s; visibility: visible;
+}
+
+.tooltipsuper span:before,
+.tooltipsuper html\:span:after,
+.tooltipsuper html\:span:before,
+.tooltipsuper span:after,
+.tooltip40super span:before,
+.tooltip40super html\:span:after,
+.tooltip40super html\:span:before,
+.tooltip40super span:after
+{
+content: "";
+position: absolute;
+z-index: 1000;
+top: -7px;
+left: 87%;  /* change tooltipsuper span margin-left & width if you change this */
+margin-left: -8px;
+border-bottom: 8px solid #000;
+border-left: 8px solid transparent;
+border-right: 8px solid transparent;
+border-top: 0;
+}
+
+.tooltipsuper span:before,
+.tooltipsuper html\:span:before,
+.tooltip40super span:before,
+.tooltip40super html\:span:before
+{
+border-top-color: #000;
+top: -7px;
+}
+
+/* take advantage of more space for the savesite div, which is needed
+** because the string is longer
+*/
+.tooltipsuperlong,
+.tooltip40superlong
+{
+position: relative;
+/*background: #eaeaea;*/
+/*cursor: help;*/
+cursor: pointer;
+display: inline-block;
+text-decoration: none;
+/*color: #222;*/
+outline: none;
+height:30px;  /* needed for firefox? */
+}
+
+.tooltipsuperlong span,
+.tooltipsuperlong html\:span
+{
+visibility: hidden;
+position: absolute;
+top: 35px;
+left: 50%;
+text-align: center;
+z-index: 999;
+width: 150px;
+font-size:12px;
+font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+margin-left: -14px;
+padding: 2px;
+/*border: 1px solid #000;  this looks better when background-color gradient is set*/
+/*opacity: .9; */
+line-height:14px;
+color:#fff;
+background-color: #000;
+/*
+background-image: -webkit-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -moz-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -ms-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -o-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+*/
+-moz-border-radius: 4px;
+border-radius: 4px;
+-moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltip40superlong span,
+.tooltip40superlong html\:span
+{
+  visibility: hidden;
+  position: absolute;
+  top: 42px; /* 35px */
+  left: 50%;
+  text-align: center;
+  z-index: 999;
+  width: 150px;
+  font-size:12px;
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  margin-left: -14px;
+  padding: 2px;
+  line-height:14px;
+  color:#fff;
+  background-color: #000;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+  box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltipsuperlong:hover,
+.tooltip40superlong:hover
+{
+border: 0; /* IE6 fix */
+}
+
+.tooltipsuperlong:hover span,
+.tooltip40superlong:hover span
+{
+/*visibility: visible; */
+transition-delay:1s; visibility: visible;
+}
+
+.tooltipsuperlong span:before,
+.tooltipsuperlong span:after,
+.tooltip40superlong span:before,
+.tooltip40superlong span:after
+{
+content: "";
+position: absolute;
+z-index: 1000;
+top: -7px;
+left: 10%;  /* change tooltipsuperlong span margin-left & width if you change this */
+margin-left: -8px;
+border-bottom: 8px solid #000;
+border-left: 8px solid transparent;
+border-right: 8px solid transparent;
+border-top: 0;
+border-top-color: #000;
+}
+
+
+/**************** for savesite iframe ****************/
+.tooltip40showpassword,
+.tooltipshowpassword
+{
+position: relative;
+/*background: #eaeaea;*/
+display: inline-block;
+text-decoration: none;
+/*color: #222;*/
+outline: none;
+}
+
+.tooltip40showpassword span,
+.tooltipshowpassword span
+{
+visibility: hidden;
+position: absolute;
+top:32px;
+text-align: center;
+z-index: 999;
+width: 150px;
+font-size:12px;
+font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+margin-left: -110px;
+padding: 2px;
+/* border: 1px solid #000;  */
+/*opacity: .9; */
+line-height:14px;
+color:#fff;
+background-color: #000;
+/*
+background-image: -webkit-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -moz-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -ms-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -o-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+*/
+-moz-border-radius: 4px;
+border-radius: 4px;
+-moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltip40showpassword:hover,
+.tooltipshowpassword:hover
+{
+border: 0; /* IE6 fix */
+}
+
+.tooltip40showpassword:hover span,
+.tooltipshowpassword:hover span
+{
+transition-delay:1s; visibility: visible;
+}
+
+.tooltip40showpassword span:after,
+.tooltipshowpassword span:after
+{
+content: "";
+position: absolute;
+z-index: 1000;
+top: -7px;
+left: 78%; /* change tooltipshowpassword span margin-left & width if you change this */
+margin-left: -10px;
+border-bottom: 8px solid #000;
+border-left: 8px solid transparent;
+border-right: 8px solid transparent;
+border-top: 0;
+}
+
+.tooltip40showpassword span:after,
+.tooltipshowpassword span:after
+{
+border-top-color: #000;
+}
+
+/**************** for generate and save-a-site iframe ****************/
+/* tooltipgen1 : show above and to the left-side of parent
+** tooltipgen2 : show below and to the right-side of parent
+** tooltipgen3: show to the right 
+*/
+.tooltipgen1, .tooltipgen2, .tooltipgen3,
+.tooltipgen1_40, .tooltipgen2_40, .tooltipgen3_40
+{
+position: relative;
+/*background: #eaeaea;*/
+display: inline-block;
+text-decoration: none;
+color: #000;
+outline: none;
+}
+
+.tooltipgen1 span, .tooltipgen1 html\:span,
+.tooltipgen1_40 span, .tooltipgen1_40 html\:span
+{
+visibility: hidden;
+position: absolute;
+bottom: 22px;
+text-align: center;
+z-index: 999;
+width: 200px;
+font-size:12px;
+font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+margin-left: 0px;  /* was -175px when the tooltip span follows the label.
+                   ** life is simpler when moving the tooltip span before it.
+                   */
+padding: 2px;
+/* border: 1px solid #000; */
+/*opacity: .9; */
+line-height:14px;
+color:#fff;
+background-color: #000;
+/*
+background-image: -webkit-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -moz-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -ms-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: -o-linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,0));
+*/
+-moz-border-radius: 4px;
+border-radius: 4px;
+-moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltipgen1:hover,
+.tooltipgen1_40:hover
+{
+border: 0; /* IE6 fix */
+}
+
+.tooltipgen1:hover span,
+.tooltipgen1:hover html\:span,
+.tooltipgen1_40:hover span,
+.tooltipgen1_40:hover html\:span
+{
+transition-delay:1s; visibility: visible;
+}
+
+.tooltipgen1 span:after,
+.tooltipgen1 html\:span:after,
+.tooltipgen1_40 span:after,
+.tooltipgen1_40 html\:span:after 
+{
+content: "";
+position: absolute;
+z-index: 1000;
+bottom: -8px;
+left: 15%; /* change tooltipgen1 span margin-left & width if you change this */
+margin-left: -8px;
+border-top: 8px solid #000;
+border-left: 8px solid transparent;
+border-right: 8px solid transparent;
+border-bottom: 0;
+}
+
+/* for delayed hover per Levi.  2sec appears better than 1sec to me */
+/* stackoverflow.com/questions/8566090/delay-hover-in-css3 */
+.tooltipgen2:hover span,
+.tooltipgen2:hover html\:span,
+.tooltipgen2_40:hover span,
+.tooltipgen2_40:hover html\:span
+{
+transition-delay:2s; visibility: visible;
+}
+
+.tooltipgen2 span:after,
+.tooltipgen2 html\:span:after,
+.tooltipgen2_40 span:after,
+.tooltipgen2_40 html\:span:after
+{
+content: "";
+position: absolute;
+z-index: 1000;
+top: -7px;
+left: 50%; /* change tooltipgen2 span margin-left & width if you change this */
+margin-left: -8px;
+border-bottom: 8px solid #000;
+border-left: 8px solid transparent;
+border-right: 8px solid transparent;
+border-top: 0;
+}
+
+.tooltipgen2 span,
+.tooltipgen2 html\:span,
+.tooltipgen2_40 span,
+.tooltipgen2_40 html\:span
+{
+visibility: hidden;
+position: absolute;
+top:38px;
+text-align: center;
+z-index: 999;
+width: 200px;
+font-size:12px;
+font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+margin-left: 80px;
+padding: 2px;
+/* border: 1px solid #000; */
+/*opacity: .9; */
+line-height:14px;
+color:#fff;
+background-color: #000;
+-moz-border-radius: 4px;
+border-radius: 4px;
+-moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+.tooltipgen3 span,
+.tooltipgen3 html\:span,
+.tooltipgen3_40 span,
+.tooltipgen3_40 html\:span
+{
+visibility: hidden;
+position: absolute;
+text-align: center;
+z-index: 999;
+width: 200px;
+font-size:12px;
+font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+margin-left: 111px;
+padding: 2px;
+line-height:14px;
+color:#fff;
+background-color: #000;
+-moz-border-radius: 4px;
+border-radius: 4px;
+-moz-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.5) inset;
+text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+.tooltipgen3:hover,
+.tooltipgen3_40:hover
+{
+border: 0; /* IE6 fix */
+}
+
+.tooltipgen3 span:after,
+.tooltipgen3 html\:span:after,
+.tooltipgen3_40 span:after,
+.tooltipgen3_40 html\:span:after
+{
+content: "";
+position: absolute;
+z-index: 1000;
+left: -7px;
+top: 1px;
+border-right: 8px solid #000;
+border-top: 8px solid transparent;
+border-bottom: 8px solid transparent;
+border-left: 0;
+}
+
+.tooltipgen3:hover span,
+.tooltipgen3:hover html\:span,
+.tooltipgen3_40:hover span,
+.tooltipgen3_40:hover html\:span
+{
+transition-delay:1s; visibility: visible;
+}
+
+/****** end tooltip rules ********/
+
+
+
+.moreMsg {
+  margin-left:8px;
+  margin-top:8px;
+  margin-bottom:0px;
+}
+
+.moreMsg p {
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  font-size:15px;
+  color:#000;
+  margin:2px;
+  text-align:left;
+}
+
+.cc{
+  padding-left: 6px;
+}
+
+/**** rules for the superbox  ******/
+#superbox_savesite_txt {
+  height:30px;
+  line-height:30px;
+  text-align:center;
+  position:absolute;
+  width: 320px;
+}
+#superbox_nav {
+  height:30px;
+  border: 1px solid #c3c3c3;  /* final */  
+}
+#superbox_savesite_txt_span {
+  padding-left:5px;
+  color: #000;
+  font-size:15px;
+  font-family: Arial, Helvetica sans-serif; font-weight:bold;   /* chelsea pointed out font discrepancy */
+}
+/* for the superbox, intended to be highlight effect */
+/* now, unusued.
+.shade
+{
+background-color: #d0d0d0;
+color:#404040;
+}
+*/
+#superbox {
+  width:100%;
+  border-bottom: 1px solid #c3c3c3 ;  /* final */
+}
+#superbox_arrow_icon {
+/* try this: next 2 rules replaces arrowimg_mouseover()/arrowimg_mouseblur().
+** and using a standardized 16x16 image than the last photoshopped 10x24 one */
+  /* opacity: 0.5;
+  /* background-color: #d21100; /* placeholder red */
+  background-color: #e0322d; /*from levi */
+
+/* padding with no border, this is ok
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+*/
+
+/* padding with 1px border as spec'd by 29th drive */
+  padding-top: 9px;
+  padding-bottom: 9px;
+  padding-left: 4px;
+
+  padding-right: 0px;
+  width:10px;
+  /* not sufficient... border-color:#af1510; /*final */
+  border-left: 0px;
+  border-right: 1px solid #af1510;
+  border-bottom: 1px solid #af1510;
+  border-top: 1px solid #af1510;
+  cursor: pointer;
+}
+#superbox_arrow_icon:hover {
+  opacity: 1;
+  /*background-color: #d0d0d0; grey */
+  /* background-color: #d21100; /* placeholder red */
+  background-color: #d12a25; /*final */
+}
+#superbox_active_icon {
+  /* padding: 5px;  /* for the 20x20 font, and no border */
+  padding: 4px;  /* for the 20x20 font and 1px borders */
+  background-color: #e0322d; /*from levi */
+  cursor: pointer;
+  /* not sufficient... border-color:#af1510; /*final */
+  border-right: 0px;
+  border-left: 1px solid #af1510;
+  border-bottom: 1px solid #af1510;
+  border-top: 1px solid #af1510;
+}
+#superbox_active_icon:hover {
+  background-color: #d12a25; /*final */
+}
+#superbox_emptymsg_txt_span {
+  text-align:left;
+  /*font-style:italic;  if g_short_empty_msg, this looks out of place*/
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  position:absolute;
+  top:0px;
+  left:33px;
+}
+
+/*** end rules for superbox *****/
+
+.savesitediv {
+  padding-left:10px;
+  padding-right:10px;
+}
+
+/****************  styling for the password generate tab ********/ 
+
+#normalwidth{width:90%;}
+
+/* styling for the generate_popupaction tab */
+#lpgenerate{
+  padding:5px;
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+}
+#lpgenerate label{
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  font-weight:normal;
+}
+#lpgenerate{
+  width: 100%;
+}
+#generate{
+  overflow: hidden;
+}
+#advancedoptions {  /* 250px width is ok in English. compute it dynamically to support other languages */
+  text-align:left;
+  background:#e6e6e6; /* final */
+  padding:5px;
+  border:1px solid #c3c3c3; /* final */
+  margin-top:5px;
+}
+#advancedoptions div{
+  padding: 2px;
+}
+
+/* next class is for label/descriptive text in the generate password subtab only */
+.gendivtab { 
+  overflow:auto;
+  padding-left:10px;
+  padding-right:10px;
+  margin:0px;
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+}
+.gendivtext { font-size:12px; 
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  font-family: Arial, Helvetica, sans-serif; font-weight:normal;
+  z-index:10000;
+}
+#maxpwlen{
+  color:#777777!important;
+  margin-left:10px!important;
+  display:inline-block!important;
+}
+.tipboldlabel, a.tipboldlabel, html\:a.tipboldlabel {
+  color: #000 !important;
+  text-decoration: none;
+/* need this line due to conflict with IE internal stylesheet */
+  font-weight:bold !important; 
+  font-size:12px;  /* same as for .gendivtext */
+  padding-top:4px;  /* spacing above the major text items */
+}
+.genselect {
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  font-size:12px; 
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  border-radius:0px;  /* this is not being honored */
+  width:100px;
+}
+/* can't figure out how to align this directly under the password
+** input field and to the left of the generate button w/o this
+** next rule.
+*/
+#ghettocontainer {
+  margin-top:-4px;
+}
+#password{
+  /* width: 300px; similar to .saveinput but width is dynamically computed on this element*/
+  height: 30px;
+  height:34px;
+  background-color:#fff !important;
+  color:#000 !important;
+}
+/****************  end styling for the password generate tab ********/ 
+
+/* turns out, you need the border after all to look right
+*/
+#password, #group, #name, #p, #u {
+  border-top-color:#a4a4a4;
+  border-left-color:#c3c3c3;
+  border-right-color:#c3c3c3;
+  border-bottom-color:#c3c3c3;
+}
+
+
+/************ styling for the delete/confirmation sub-tab ***********/
+#lpdelete{
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  padding-left:10px;
+  text-align:left;
+  font-size:14px; 
+  height:100%;
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+  width:100%;  /* for firefox */
+}
+#deletename{
+  height: 30px;
+  /*background-color:#fff !important;   */
+  background-color:#eeeeee !important;  /* shade this slightly to indicate to user that this is not editable. */
+  color:#000 !important;
+  border-top-color:#a4a4a4;
+  border-left-color:#c3c3c3;
+  border-right-color:#c3c3c3;
+  border-bottom-color:#c3c3c3;
+  margin-left:10px;
+  width:80%;
+}
+#deleteyes {
+  border-radius: 0px;
+  color:#fff;                 /* final */
+  background-color:#d0322d;   /* final */
+  font-weight:bold;
+  border-color:#af1510;     /* final */
+}
+#deleteyes:hover {
+  color:#fff;
+  background-color:#d12a25;   /* final */
+  font-weight:bold;
+}
+#deleteno {
+  border-radius: 0px;
+  color:#000;                 /* final */
+  background-color:#e6e6e6; /* final */
+  font-weight:bold;
+  border-color:#c3c3c3;     /* final */
+  margin-left:16px; padding:4px 10px;
+}
+#deleteno:hover {
+  color:#000;
+  background-color:#dddddd;   /* final */
+  font-weight:bold;
+}
+/*********** end delete/confirmation sub-tab ************/
+
+
+/* stylized scrolls inside the iframe */
+/* these rules are for webkit only.  firefox cannot style the scrollbar.
+** turns out, you can only change the colors with IE CSS rules.  
+** https://css-tricks.com/custom-scrollbars-in-webkit/
+*/
+
+  ::-webkit-scrollbar-track {
+    border-radius:0;
+  }
+  ::-webkit-scrollbar-track-piece {
+    border-radius:0;
+    background-color:#dddddd;  /* from levi */
+  }
+  ::-webkit-scrollbar-track:start {
+    border: 1px solid #000;
+  }
+  ::-webkit-scrollbar-track:end {
+    border: 1px solid #000;
+  }
+  ::-webkit-scrollbar {
+    width:8px;    /* for vertical scrollbar */
+    height:8px;   /* for horizontal scrollbar */
+    border-radius:0;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius:0;
+    background-color: #4c4c4c;  /* use this from levi */
+  }
+
+/************** styling for the new never/disable tab *************/
+#lptabpopupnever{
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+/*  padding-left:10px; */
+  text-align:left;
+  font-size:14px; 
+  height:100%;
+  width:100%;  /* firefox needs this */
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+}
+/**************** end rules for the never/disable tab **************/
+
+
+.headtext { 
+  font-size:14px; 
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;  /* vs font-weight:normal in .divtext, .bodytext */
+  overflow:auto;
+  margin-left:10px;
+  margin-right:10px;
+  margin-top:5px;
+  margin-bottom:5px;
+  padding:0;
+  text-align:left;
+}
+.bodytext { 
+  font-size:14px; 
+  font-family: Arial, Helvetica, sans-serif; font-weight:normal;
+  overflow:auto;
+  margin-left:10px;
+  margin-right:10px;
+  margin-top:5px;
+  margin-bottom:5px;
+  padding:0;
+  text-align:left;
+}
+
+
+/************* styling for the new askReplace tab ***************/
+
+/* copy from #lptabpopupnever, see how it looks */
+#lpaskreplace{
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  padding-left:10px;
+  text-align:left;
+  font-size:14px; 
+  height:100%;
+  width:100%;  /* firefox needs this */
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+}
+#replacechange {
+  border-radius: 0px;
+  color:#fff;                 /* final */
+  background-color:#d0322d;   /* final */
+  font-weight:bold;
+  font-size:11px;
+  border-color:#af1510;       /* final */
+  margin-top:2px;
+  margin-bottom:2px;
+}
+#replaceadd {
+  border-radius: 0px;
+  color:#000;                 /* final */
+  background-color:#e6e6e6;   /* final */
+  font-weight:bold;
+  font-size:11px;
+  border-color:#c3c3c3;     /* final */
+  margin-top:2px;
+  margin-bottom:2px;
+  margin-left:16px; padding:4px 10px;
+}
+#replacechange:hover {
+  color:#fff;                 /* final */
+  background-color:#d12a25;   /* final */
+  font-weight:bold;
+}
+#replaceadd:hover {
+  color:#000;                 /* final */
+  background-color:#dddddd;   /* final */
+  font-weight:bold;
+}
+#askReplacePasswordDiv{
+  width:100%;  /* firefox needs this */
+  background-color:#e6e6e6;  /* final */
+}
+#moreDiv{
+  width:100%;  /* firefox needs this */
+}
+/********** end of styling for the new askReplace tab **********/
+
+.subtext{
+  margin:0px 0px 3px 0px;
+  padding-left:21px;
+  font-size: 11px;
+  color: gray;
+}
+
+#transdiv {
+  background-color:transparent;
+  height:60px;
+  width:100%;
+  /* next rules are required for IE */
+  border:0;
+  opacity:0;
+  filter:alpha(opacity=0);
+}
+/* these contain styles from the original iframe */
+#contentdiv {
+  border-style:solid;
+  border-color:#4c4c4c; 
+  border-width:2px;   /* 1px loses corners? */
+  border-radius:4px 4px; 
+  -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+  box-shadow: 1px rgba(200, 200, 200, 0.5); 
+  -webkit-box-shadow: 1px 1px rgba(200, 200, 200, 0.5); 
+  -moz-box-shadow: 1px 1px rgba(200, 200, 200, 0.5);
+  /* these are from the old body style */
+  background: #fff !important;
+  font-weight: bold;
+  color: #000 !important;
+  cursor:default;
+  text-align:left;
+  font-size:14px;
+  overflow:hidden;
+}
+
+#main {  /* firefox specific */
+  border-style:solid;
+  border-color:#4c4c4c; 
+  border-width:2px;   /* 1px loses corners? */
+  border-radius:4px 4px; 
+  -moz-border-radius: 4px; 
+  -webkit-border-radius: 4px; 
+  box-shadow: 1px rgba(200, 200, 200, 0.5); 
+  -webkit-box-shadow: 1px 1px rgba(200, 200, 200, 0.5); 
+  -moz-box-shadow: 1px 1px rgba(200, 200, 200, 0.5);
+  /* these are from the old body style */
+  background: #fff !important;
+  font-weight: bold;
+  color: #000 !important;
+  cursor:default;
+  text-align:left;
+  font-size:14px;
+  /* overflow:hidden; breaks firefox */
+}
+
+
+body {
+  margin: 0px;    /* to defuse Browser supplied style sheet */
+  overflow: hidden;
+  /* next rules are required for IE */
+  background-color:transparent;
+  color:#000;
+  background-image:none;
+}
+#masterdiv {
+  margin: 0px;
+  overflow:hidden;
+}
+/* I can't remember if this next rule is still needed or not.
+** it was needed at one point in time for firefox */
+/*
+#moreDiv{
+  width:100%; 
+}
+*/
+
+/********** begin of styling for askSavePasswordConfirm tab **********/
+
+#lpasksavepwconfirm {
+  background-color:#e6e6e6;  /* final */
+  color:#000;
+  padding-left:10px;
+  text-align:left;
+  font-size:14px; 
+  height:100%;
+  width:100%;  /* firefox needs this */
+  font-family: Arial, Helvetica, sans-serif; font-weight:bold;
+}
+#confirmgen {
+  border-radius: 0px;
+  color:#000;                 /* final */
+  background-color:#e6e6e6;   /* final */
+  font-weight:bold;
+  font-size:11px;
+  border-color:#c3c3c3;     /* final */
+  margin-top:2px;
+  margin-bottom:2px;
+}
+#confirmgen:hover {
+  color:#000;                 /* final */
+  background-color:#dddddd;   /* final */
+  font-weight:bold;
+}
+#askSavePasswordConfirmDiv{
+  width:100%;  /* firefox needs this */
+  background-color:#e6e6e6;  /* final */
+}
+#askSavePasswordConfirmationDiv {
+  height:100%;  /* firefox needs this */
+  width:100%;  /* firefox needs this */
+  background-color:#e6e6e6;  /* final */
+}
+/********** end of styling for askSavePasswordConfirm tab **********/
+
+/* for dynamically creating an html:hr xul element ; it
+** will not inherit these from html.css if you create and append,
+** but they do if assign with innerHTML it seems.  so override
+** here.
+*/
+html\:hr {
+  display: block;
+  height: 2px;
+  border: 1px inset;
+  margin: 0.5em auto 0.5em auto;
+  color: gray;
+  -moz-float-edge: margin-box;
+  -moz-box-sizing: border-box;
+}
+
+html\:hr[size="1"] {
+  border-style: solid none none none;
+}
+html\:tr {
+  display:table-row;
+  vertical-align:inherit;
+}
+html\:td {
+ display:table-cell;
+ vertical-align:inherit;
+ text-align:inherit;
+ padding:1px;
+}
+html\:table {
+  display:table;
+  border-spacing:2px;
+  border-collapse:separate;
+  margin-top:0px;
+  margin-bottom:0px;
+  -moz-box-sizing: border-box;
+  text-indent:0;
+}
+html\:p {
+  display:block;
+  margin: 1em 0;
+}
+html\:span {
+
+}
+
+
+/* needed for firefox for dynamically created elements in xul dialog */
+.pigsty {
+  /* e.g. firefox */
+}
+/*
+.tablesty {
+  display:inline-table;
+  border-spacing:2px 2px;
+}
+.rowsty {
+  display:table-row;
+}
+.cellsty {
+  display:table-cell;
+  padding:1px;
+}
+*/
+.maintablesty {   /* for main only  */
+  display:block;
+  border-spacing:0px;
+/*  width:100%;  /* wtf */
+}
+
+#advbutton {
+  vertical-align:middle;
+}
+
+.whitespacenowrap {
+  white-space:nowrap;
+}
+
+.margin0px {
+  margin:0px;
+}
+
+.margintop15px {
+  margin-top:15px;
+}
+
+.width30px {
+  width:30px;
+}
+
+.paddingbottom10pxpaddingtop6px {
+  padding-bottom:10px;padding-top:6px;
+}
+
+.padding4px10px {
+  padding:4px 10px;
+}
+
+.paddingtop10px {
+  padding-top:10px;
+}
+
+.paddingbottom8px {
+  padding-bottom:8px;
+}
+
+.floatleft {
+  float: left;
+}
+
+#superbox_savesite_icon {
+  float: left; padding: 7px; opacity:0.5; filter:alpha(opacity=50); border:0px;
+}
+
+.displaynone {
+  display: none;
+}
+
+#superbox_sites_icon {
+  padding: 5px; opacity:0.8; filter:alpha(opacity=80); border:0px; display: none;
+}
+
+#superbox_ff_icon, #superbox_generate_icon, #superbox_never_icon {
+  padding: 5px; opacity:0.5; filter:alpha(opacity=50); border:0px; display: none;
+}
+
+.marginleft10px {
+  margin-left:10px;
+}
+
+.paddingright30px {
+  padding-right: 30px;
+}
+.btnlessmarg{
+  margin: 10px 0 0 0;
+}
+.btnnomargshift{
+  margin: 0 0 0 -20px;
+}
+
+/*from http://stackoverflow.com/questions/2326004/prevent-selection-in-html */
+*.unselectable {
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+
+   /*
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+   -ms-user-select: none;
+   user-select: none;
+}
+
+
+#lptabpopupzerostate {
+  background-color: #e6e6e6;  /* 3.0 background color */
+}
+
+.bg40header, .bh40error {
+  background-color: #d32d27;
+}
+/* hover
+   background-color: #af0809;
+ */
+.bg40notify {
+  background-color: #2ecc71;
+}
+.bg40warn {
+  background-color: #f39c12;
+}
+.bg40title,
+.bg40dialog {
+  background-color: #f2f4f5;
+}
+
+.super40lefticon {
+  float: left;
+  padding: 7px !important; 
+  opacity:1; 
+  filter:alpha(opacity=100);
+  border:0px;
+}
+.super40trayicon {
+  padding: 7px !important; 
+  opacity:1; 
+  filter:alpha(opacity=100);
+  border:0px;
+  display:block;
+}
+.super40righticon {
+  float: right; 
+  padding: 7px !important; 
+  opacity:1; 
+  filter:alpha(opacity=100);
+  border:0px;
+}
+
+/********** begin styling for zerostateDialog tab **********/
+
+.zerobtns {
+  width: 275px !important;   /* !important for IE */
+  margin-left: 10px;
+  margin-top: 0px !important; /* " "   "  "   " " */
+  font-size : 14px !important;/* " "   "  "   " " */
+  padding: 4px 4px 3px 4px;
+}
+
+/* override nbtn:active */
+.zerobtns:active {
+  padding: 4px 4px 3px 4px;
+}
+
+.lastzerobtn {
+  margin-bottom: 10px;
+}
+
+#lpzerohour {
+  min-height: 140px;
+  text-align: center;
+}
+
+/** redo title bar **/
+.super40height {
+  height:40px;
+}
+.super40icon {
+  height:40px;
+  width:40px;
+}
+a:visited.super40icon, 
+a:focus.super40icon {
+  /* likely replace with tooltip styles */
+  background: #d32d27 !important;
+  outline-style: none;
+}
+/* IE old box model 12px offset = 10+2*/
+
+.super40icon_icon {
+  /*padding:10px; */
+  border-color: transparent;
+  border-width:2px;
+  border-style:solid;
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 40px;
+  height: 40px;
+}
+.super40icon_icon:focus ,
+.super40icon_icon:active {
+  /* padding:10px; */
+  border-color: #e16c6a;
+  outline-color: #e16c6a;
+  /* outline-style: none; */
+}
+.super40icon_icon:hover {
+  padding:10px;
+  background-color: #af0809;
+  border-color: transparent;
+}
+.floatright {
+  float:right;
+}
+.floatleft {
+  float:left;
+}
+.super40title {
+  font-size : 15px;
+  font-weight: bold;
+  text-align: left;
+  font-family: Open Sans,Arial, Helvetica, sans-serif;
+  line-height: 40px;
+  margin-left: 10px;
+}
+
+/* gross hack for IE : image.src, without access to CSS background
+ * until res://iframe.dll reaches DOMContentLoaded
+ */
+.super40icon_icon_ie {
+  padding:10px;
+  border-color: transparent;
+  border-width:2px;
+  border-style:solid;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.super40icon_icon_ie:focus ,
+.super40icon_icon_ie:active {
+  border-color: #e16c6a;
+  outline-color: #e16c6a;
+  /* outline-style: none; */
+}
+.super40icon_icon_ie:hover {
+  padding:10px;
+  background-color: #af0809;
+  border-color: transparent;
+}
+
+/*
+ * following image specs are one line to facilitate string substitution
+ * during build time and suitable for injection into IE iframe
+ */
+
+.SB_addico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAADhJREFUOBFjYMAD1nNw/gdhPEoYmPBJEiM3agAD5YHISCiaCMUExbGA14LRhIQ3eOCSFMcCxQYAALUVCNdL7wJJAAAAAElFTkSuQmCC ); }
+.SB_addico_active,
+.SB_addico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAADhJREFUOBFjYMAD/kMBHiUMTPgkiZEbNYCB8kBkBMUUMaGNSw3FsYDLYLD4aELCGzxwSYpjgWIDANJ6FAhNN+7wAAAAAElFTkSuQmCC); }
+
+.SB_ffico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAXtJREFUOBHVUs1KQlEQnrlecWHWRrNchKSm/eAmF+EzBLXxDaJlqza9QLQIgh4gqPamy14goRYFIeVduIjaBAVZkpQ6fXPzhJcwaBM0cDjz+818cw7RvxcuJRJ5afO+kCR/w4aZbph41ZYOb5tiZm5Ab5HQqAGD7wq2GFtvYbJEJEMsuzZiYXUC7XAqGFiZrVbfjuLJDSRsqj86HpnPVyqvqhs5zmaDzafmiwiHuRhPOMBPWT5/drl+falJUij4SqfnLYDbmODZFPbfaBBC20fbOLvyvgDdBSifXeS0WGMi1NBL9T5h6AAg+gKgLm8V40lMw/dA3zPJY7FIahAFzXEpsFDYH/DlFh2nrs5yOh3qtNonUOeQcofbMwHaW5gwphQsLcAGD0yxmku1GnjzjhtiGsaTjfQf5Lvja/yTJ1vaxSNs0a103VeI/kgBT4ZRZRLcH7wIMoQFTgz6B9huBlM5NvtkvfcTZzwAPdZY6LTHrwZivZ+49i32544P9QGdy/vOe4oAAAAASUVORK5CYII=); }
+
+.SB_ffico_active,
+.SB_ffico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAQNJREFUOBHVkk1qAkEQhbuTIIhJ3OnOhSAkEFwZiG6y9EyewjvMYXKBIMIEBCFZjgEVkt34vU4XNIMo4kLy4E1Vv+qun5527v+jLMsR/ICnYsmBsefzxjUM41Wssb+wFdcyc1gma7lX8AHmjgR5LJ1ha4piJ1GTqUtLgdaI8UId5AR7sO+9f9dGtGuMOrmBG7gPd4grbTC84IQE2AG0mMaqjuDRlCBUsxEKKr/CRziDhoMjWJVvcj0zwiImVTe63CcY/pD0BLrEAHMyOywVX3NPww7n7rHNCv/aR7QOvuLm1HzGRZuEP2mA2Rqst9LsHXTxCwkJbvE78Og7OOslJgUv5O4ApfED6eatYT0AAAAASUVORK5CYII=); }
+
+.SB_nevico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAXxJREFUOBGlky1PA0EQhmeWtnf8gCKB4IBgcEhSECjEJZWICggJhl+CowGBQDapBVEIEkGCIaBJDQn9Ab29HjvMe+1ejoaPko7Zr3nemdnZZRqzVqWyUuKZfSbZFqJ5HDNRV4g7qXyc15PkpYjo2dDOiMrVYPaESA6Z2fj94igiTuWaPds/PiAa4CwTADwXhNfEXMOmOLlwLG1n7SPWJgjWjXDEhhtYk8jtu413IFLCOovMVNOU34RkL0riG+znZu1Vi+ihXAmXyfASAmWM7R/xsGbzhLSd1h3FY7CqKFwtBeGd+qySk3sV2UA5qbg1k12Ywkj7L1ih50ES78IXAcEa3DZSRc15yqNJMTLg1MabdaKe9wVrfKv8hXmRn2Cce1+w37brN9gH8KOWQF0s0CqMk8DeF6yWwJ1MQPs8Cex9MYL90kZ9IK/a48XihcGxaO0w3DIK5m0cvm1ujpwWIOJvuwhiDpiJLzHX6Kdgp37KmQAUp/pMEPD23+/8CTMwBl1sqWHBAAAAAElFTkSuQmCC); }
+.SB_nevico_active,
+.SB_nevico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAARZJREFUOBGlk01qwlAUhU3BJQiuIa5CcOTUjQnN1JUoOHMFZuxMCh06btPvC/cl5hltoQcO7/6e3PeTySRD0zQl3MIa3oLaxsqsvHdJTmEFv+AzmLNm2ndiGYAHmLDDWMN5UNtYgrW9CI6q4gpXA/VwiM/gCX5AUbUpDPecxn7VfLYLKCLsKR3fwxG7F19Oza5OkrazVcATFutcgJjFg2ZrrIWi1vGqxPxeAH+0OQQ8XHEbFSDxtHlMYLCF35pDoNvCG4G9QbCxmfUIF7CGy6IoPllzbCKwdwv313jBF+1p51365FZtRbrGCFYR/Ga9QCd5AHGbfWzivSvA+d9TVilEnCS9SswHmLOm/w+6McIg6Zn8+Xf+Ad+dWJZ2UKrGAAAAAElFTkSuQmCC); }
+
+
+.SB_closeico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAI5JREFUKBWlktENgCAMRInf/Lr/MK5g4jh4j9AEhVaNTRpKe9drCSnJSilZvhJHBgZsxTTSpnOn4BGpNQzYjJolFM7JLsYtSD6q2ciD8iPJ9roBD91xLNy/VzYCJOLh0RZT+3XSWc5Y2LtRBexJdadZ7jJZBHBrbqFrPcUoyT/9/uVo3MjDk3eiNWzK9ZOf3JF01u6vl/8AAAAASUVORK5CYII=); }
+/*.SB_closeico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAQRJREFUOBGtk70OAVEQhXf9JUKnU1DQaDyCN5VINHQqVCQUPASFQkGCR1jf2Zhk3Kz4iZMc98zMmd295t4oSZIi7MMtrEdvIA/cQPUUI36G0LBDNF89g1oDymMY5jDXXEMLvaLadrlUklNtDbUaavqCKlxCjyNBx1zSUDmPJUE19SDKcA49zgTdB0++gJa3bC+wh5RITgLjhVj0kKf01GwBhQIceXegx/KYP3PFkIeDoFGhcvmwSVP4H3jDuy1oe9lboPD7n0izxjiDHp+NkY4KXPhO9CcHST0VncRp0HwgzjzK5FXzmGoKVzeGPboXx/HO5VJJLq0RaDXc9AV2nXVFv77Od2uzJjYHs4fgAAAAAElFTkSuQmCC); }*/
+
+.SB_genico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAAAXNSR0IArs4c6QAAAipJREFUKBV9Uj1oVEEQntm3d7uPiD8RS+N/jI1WVyhRsEuhh54SUCRgY6NYqlgFDCQGbLQUwdgI4r3AVf4UggiiXSIIgnraiaRQMb59l7s3fnM/4kHIwO7OfPN9s7uzy/SfJUSbyfvLLFwWkt2aYuKPwlILIdw5S7TUo3PPqTpXZjIPmGlDGxOpt1fmHbqK0E+hfOJUltU0Njo9du44Ks8zyUBOMvUnpIMns7BTh/qKaU45ylUNPyIaLLj4E2qukxYfrTTTV8AiW4wrSmg20mScqJXYeJQjeQHJ75Us3WVs0V/CRTbmTDMqUrJ1bhqFxnTAn1FMc8I0q9yo6C8aNlzWxK8QbumqhiOVmoamMkM3iLnUQbF7CLO4rBhoDJw98D+fJ/qhhHnvL4B8wBLdd0RzKLK/jSGHI6NBVIdmWJsDDqUYHcvpIJxNEBzRoT7Ih7pZXZRrDcCvcEbQkFjRtazLGVGNRdWnuNQ+6/05CuFuzrIA7G1fAZEFjSPnJpjRW6En/ND77U7oA35CWMnCXtzjm5L0SfCLhsZDqHfieKjg5B12izOmYXMmhC9o+zW0uvae6HtXtMU6/9wK3dM4cW7MenqDpq0H96pqsFHHJvGLMPJqoVAyUVTFo2xFZgl/dhlH34ZOZvCvVLLstir+CTVQQ+tfAj7cidozPrY8a+X5zdONxmIP16fos+UQjg24eA4lT2CH14shjE7iJH2kNQKuFv31xMfo0er2F5Tb1EqVB1cvAAAAAElFTkSuQmCC); }
+.SB_genico_active,
+.SB_genico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAAAXNSR0IArs4c6QAAAVlJREFUKBV1kTtLQ0EQhaNJY+MjKlhJ0sXGzkIJ1jZJZycpUwbSCgoSbPQniJXY2Nhq46uwUEH8ARG1SSFEg4WPoOt3NrNkIdyBL3vmzJmb+0ilonLOTcIW3MOHIS1vKor2JYMyvEOoR4QIpVm5v4HCKMEvdKEBEyEgbZ5mypT8DJGFN9CgKJMzDatG2rwivTLKZhXaBFXDX6m3uEO/b+xG/raC1IYW77x0bjwKnOPlIQcXkT9G/we3WuxAMxpW6dtwaUhXo3mTvjOMkYHPMOBcBL2cZUN6CUIpm9HiMxS4ykiYJJ2WKWhH/3YKc7AGe/AANxCXPFUF9JZP9Ix6Ad+gZ53RVIXWJ8n3Ot/PWuaHM+d9RB0OQLeupWk4E9avoFugqvul8IMRlhbQL0pQr/DklXNfnLWQHzgZXlkwHFo+hPmBcGwQGIVjUF2Dv5M4k6gJD8E6HCWF/gGHK6mkFb3q7wAAAABJRU5ErkJggg==); }
+
+.SB_siteico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAALRJREFUOBHtk6EOwkAQRGcORFvdKgwKUwTwGwRSgSD8ZCEh4UeoQCCwDUGCoR3uqksuaQ2CEydu581OdnPcB9FZRAKhBDQF+SBwkzSH5xAsjKCU0DpbLWcWLmm4y17PhWWvHt72VDq03d6E2R6OpzGkGBU2eRSFrDWSx6FhrTiDOPFoW8sD6uISxECdtCo8jwLvzIOwsjrj0X4r1w7sCjtT0wduUv0N+m3gV4bovmSTpcPl2A8quC524P+T8AAAAABJRU5ErkJggg==); }
+.SB_siteico_active,
+.SB_siteico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAI1JREFUOBFj/P///xUGBgZRIH4FxDpA/A6IHwKxIRATAlcZgAaAgDkQMwPxSyB2B+kC0neAmCBgAar9A8QRQKwAxCJAHALUxQmkpYGYEPjDCFQcAFSlRkglDvmbIBeAbAWFATngDcgFf4E6mcjRDdTzD2TAfzI1g7WRazPczlEDyI++QRaIV+HuIZ1xFQDdXVb5nh06wwAAAABJRU5ErkJggg==); }
+
+
+.wrench_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAYJJREFUOBGFkr9PwkAUx22pEjfZNGGVwfgPmJBAXHAwqMGUshgnnU38MxwdHI1LSyOpGhN/TGIcWUyMA6wMbsQJoqX4KfGZo0K55PHuvvc+d997VJuZMgaDgW7b9pGmaRaly7quF8vl8rNgmkzG5UajMdtqtR45JM/+dyKRMIGv1FpDXUTnzWbzGC0f6ty8F4WHevgTMzZkjyd0ZC7Zdd2cLosJuSt6EATntVptSdbVanW73+9fx/bAcZxDwDOBcPHBU/bpSQr9gvXrxB5gb44bcgKHGXAR7V401s5YB57nLfR6Pe+3+1IfzfVKpbL+zwHvTAPfAa8KgVWbqGN7B22euM9kMidowYgDbK/4vv9AQVqBn/j/C6Zpfomm5r8DgLPAN2ympIAb3oCzwJ+iRfPwALq9iWWXCO3JaCeTybVSqdQWYVw2gLcALwm1Hx3DMArT4PBAg8achllOx3YX20Vsv4sWl0e+RGCfgDVf4iB1jw9LP0AI39kG3rUs61YtmDb/AeDIm5AAebXdAAAAAElFTkSuQmCC); }
+
+/*
+ * http://www.sitepoint.com/css-techniques-for-retina-displays/
+ *
+ */
+@media only screen and (min--moz-device-pixel-ratio: 2),
+       only screen and (-o-min-device-pixel-ratio: 2/1),
+       only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min-device-pixel-ratio: 2) {
+
+    .SB_addico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAF1JREFUWAljZCATrOfg/I+sNfDHd0ZkPrFsJmIV0krdqANGQ2A0BEZDYDQERkOAEb1Wo1Wlg8vc0SgY8BAgqxUDik/0tDPaIsKVygmJD3gaGHXAaAiMhsBoCIyGAAB3zAn98O2tJwAAAABJRU5ErkJggg==); 
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+    .SB_addico_active,
+    .SB_addico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAFhJREFUWAntlkEKACAIBLP//7nsJoIkgniZPZVYyLigsoo6KvtUVPaePe9sYlceBUAAAhCAAATET7WuoRP9SwvGCZS2mNdP7x02osjlv/i4BygAAhCAAAQuCNEMOupzrzUAAAAASUVORK5CYII=);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+
+    .SB_siteico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAXJJREFUWAntVz1LBDEQnUluvdsVLM5eEA78C6Ig1mLhdbY2FpYiWNhZCGIjaiGI9xe8a7T1A8R/cM2V2m91ml3c8Q3eeo3lkm0yEJKZLHlvXiZLwoMkOS4KOSSiGTSflhnDp3bbNh6A2kTLDdO5GO4x0Tz8BWWDsTDxLVtzhbFBaEnjFZgloWW+a8WiiwHkaOtrfKLj+06nmb1/DDGxiPgN4rsaFxGGYi8itKp+FaYZ/Rrbx3K4MRo5pP2mPgg8lXFmBgV+Lv0q+ikB+V4vF1QFGPKoLyR/cVUAFNbK76rodQvGWChGy5HuJbIcQusdyLyiAJMa6GH3XwuhLuY2NV6RffIgnt0vSA6woBaiT3NMcuYT8F8sKIyqb7fncud0G7xZEUWum6Yp9+PkAsW1B2TrDX0ChBN2zf1WnOO8N3yDT/ByUyO4coim/4GaJAgEggJBgaBAUCAoEBQICtSvAK7FrqbLkD56nCE8kUEgq4FEptg/potnXiWrY2UAAAAASUVORK5CYII=);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+    .SB_siteico_active,
+    .SB_siteico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAASFJREFUWAntl7FqAkEQhm+jKDY2PoFvIQRCXsDCRwjpLCUgWImd2FmFgO+iIpI3SJdnSHderji/X3Zgi3Qeeyn2h/9mdw5m5v6ZPe5cVVWrLMvmsANj4pdka0cBFxZdWMIt/IIv8BEKFdzBM5zAMawLRUYBhoVFxdGF3/7GR+BXwSfvr8U8WHDs3tbOuYL1p98fAr/UONq+DhsW8GwBeTS1ZOT3od/he/L+WkybKDnswSWJB1ibgSFr4RW/EtsM2Gzcbt55ydXTGUHeoJ46JtTmTcyEf+aStDoJfYzaEBMFw/6jFujsT2ErZnaf610F6AWkYWwCpQrQ2W4M4XugkSJSAUmBpEBSICmQFEgKJAX+hQL6Pm8KhRRYQ/0qx8bt9/wKUGuxgfWqn6cAAAAASUVORK5CYII=) ;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+    .SB_genico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAAAXNSR0IArs4c6QAABSZJREFUSA29V39oVVUc/37PfW3v3rc3mRq1aUEo/XBBTERnECQGmrLtBe6PJCGI7I8IKoLSKIxo6h9hSgQFCUpRkbA931pCglphSWJErIJSydzcwixy797nfPeePt/7du69723LjaQD953v9/P9dc73e8733sc0g5F3nDYdUAeRXqWJFsCkecLsAhMNEfERVlToct1vr+UO+tMPBOpEoB5NunV6rVjCxINK0YudrpuP0WpqyoAF217gE32gNd1XrT5DjunLeqKH13ne+VqLSQERbHmZuI+0NmmLbJjpN018ijVdEFAzNTPppVjYLZHSBMHMI9DI5TzvRFJWFVCC+ZqOoU7phBI2y/tSFu/pKBa/S+ARWchk7gl8/VRA+lGAlhHAeYmY7k8GjQIecpzmkqaTWusWY4BAP1op1d05NjYYY9NTfQ0NS6gcfIyaLzFa2OlwmmnZWtcNs6KMwAv0e8lgOACH6510+0yDiZ/c2NgPdU56JRb6mfErPkuBft/w4Q7zmczawA8+NaDsTIKtu3Tp7xgjGpg7t3Hc87aijg8IjvodrrPtnlq9/Pz52WDMRe30XcZeWerBrmLxULjDINCvGQFmX9JY62Rg8eL6K17pCA7I81hlGc9Voce90lGRJeyp6+LFy5xSG8SXwXWgXxVahXnXeqkRYN37pkrj1aGhTpzcpTipO3Ke245nJSvuQcraykMjXbF9hZL0oiz7DQ69ZQcbGloV+RodJB5s8RsxF1OB5juFU5YV10epkNY6iFIXW4CyeFeS9329XiHy6ghk+jVXLH4f8QkCuQ/TjxwFBrbKhBuESqmKzOBmFl/IyDnDI0OrxcnCCCCquqSC623bVG86swme24VnP9jQa9tPy+NzIHWSJawIdaAb8okf2H1tWByyW1NYQTOKPzFUeFcMJ3Nh587lmPYbFWTkyVheQXHv1mBpa/I7Xz8N2fFYLpT4nEgK880K24y6ClNQqlYGp62qEzhJngDY0pN0q3wilqRgxNhorMDQ123WfJPxhd47qvCDLVcGmvIdhr5uM1N4usUfrskFhZ+Txjnqs7yQzc43/H+dD2ez88Sn8YMOdQIdh/sNgFn55fLGBE9ovlG3SOJT0uW4s4i8WC4/gik6uSlFAzzY2lr385mzI1hJkyghwKjdmF20ZnS0KLzIfzl9dgtSP0/46QbK8cfiRbdtbx0cHBedQkuL4//51xn4rdSQ+VL9gpaWSvNOZ7YEFPTEzvidh0ruEzE/e6o37byNI77ZWDKrLTmvuCPcrpo7Z3flDW3EenPetrsNVzvLW6PPzrwwYNvJphGp9TkO7moyGI9aTXP2iEIYsGN42MXpeRx85YYyHVNNTZ9EHhKENPsrrvcN+uf2q1ptSohwpTX3pZ2X8WZ4M4EHaC6PSQzBooLiS6sfJ/YlCL9wGhvXG4WEIcmuddmX9nd7Bdd1Rn7QttvzTuY4us4rBpNZfOLzMVp8WMOkwvGFC+17z5/3kpju7rby/f070AKfS+IowwEcpp9wYNZjd21JmdCo2y7U7dkkPilgUij0QEPDjeNl/yN0zVW1sn/hx/GufCbnum/V6kQprRUYftwP3p1NMKTwUKruhrunCiY+U8bx9DN/KG8CyKN61eoitcPAei2mvR2uewofh9OOa6ZULAt2dqVP/gHUKfEJKRLeqyzeio+jUeFmMq6ZUnHS4V3+CjWR75nPk05hfG42wcR2RgFFURzPWbFiNbHaLfz/OtBlNvbazu/y72q2gf8B32D28f9UOesAAAAASUVORK5CYII=);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+    .SB_genico_active,
+    .SB_genico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAAAXNSR0IArs4c6QAAAylJREFUSA2tls1LVFEYxmcq0oyCqCiz3Ej04aKPRVq7cCNY1iJbWP0D9Q+oi1xEGARl0EbIdq3aREVBkoUtVDJb9AFtggwZDcpFRB9k0+8Zz7nzzr2n8Zq+8Mx53ud9znvunDtz7s1mUkQ+n9+H7Sg4DGpANVDkwCR4Au5ls9mXjP8fLNQKXoO0Ie+xBa/IpBowlHaVgO8Z2tbQwtm4iPEA2h3gt81aPpKMA22lQp79YJuSWEyRH2ebR2N6MdVi4Duw8ZukH+wpOkuZauAGkNeGejWUul1GoRpMWjf8LagPTgiIeHeDN8CGeiZ3C/GxdcEHwNpA37KS5oBHwMZgySQqzbYK1zdLLCYNXAJjDuIh3xp09bDRHC2K+sJUdB8S24hWYXwj8GGgGAcVUTNH0LS99p4+L5RcgSGK/vhk5VTbnKPH18kvOu2k1+xI7aar+6F+GQadIDZ6bWL4TscHjOb5LqNZetUm8BYt2GTED/xvXpncUnkVf+aGwmfecV8zpUzG9ZowYtMKEnsiJP6k7IWanQKNbuIJtL2O17mxAe0M/BaL2AtSeQTUihC1ujczwEdiOyk0+mKK8dBc3+Inc3rNvBldfWWxnPlhuKeJX6AvBMaQ1/as1IJTZuJmw5eKbjKNprVgzgg7DF8q6n/d6pfTgmOmsw7vDSZfFKXXehro6eNjVAve9xmj8naTi87G8nJp3Hsas3r6eJDlKlaS6T6uc+o0Yx0/72/KXb0TqqstF58p9jDvl0zMq2J4D/w9/ALfAgrFTgw2+gqFRXzQrM82hHdE7UiqQC5maIsMMYJPT40OYA+NyIV+DtiYItE3LgbCETDrXE8TBmdF11PgnfNpq6NA0y0672p+UM+WyGQJhS6gl6fVVvccXU+Mr8BHt6npRPKPLF/X2OU9wRHDqngBbTm4DOJxG+EC0DMxFFfivebN6bIRDIa6ldF+Ujs7b/OQgYl3yzQOlR4ibg/1SqUxuR3oisuF3syuA72jLj5odBDEXyGRCu+r/o+daiF77PxzAqfHMEVd/VDMNEFNJ1PqSLWgurnGeh25lrr7UhnZSt3XT6B1oT3/At6URZLVOOfFAAAAAElFTkSuQmCC);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+
+    .SB_closeico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAAAXNSR0IArs4c6QAAASRJREFUSA2t1s0NgkAQBWBasAI4e6QZCrADa7EYWvDg1Ro8WYAx4nvqsBPZDTszTDLhz32fSxZC06Cmadqhz+iBx9FCzh59RfdzFg6IXNCsJzqEYTyRG5p1R38x7HAmutwYQjQimcRa3rYBzXBdZgyDcwgzT/r2hbAqRDT82IWZEC/mQqxYCKnFNkEqsCMgeU6wO1daXRJSu0VEboG85ui040fkzxSwROjnRAZ5t0jl7crNZPRmLsYBKD3xnJX5DbIAeGIFIcSKYQgozWT8hROR8mEYXUI+qwvXc6vRhq0hco9DWC0SwqyIC/MiJiyKVGOA+LXyX653F0Jyq/GB8x0fyh7NDwgpF1KYGV9bB7mmsRAigQjnzDiThKiLrexvsQXS6Zw3RwhysFdvuHMAAAAASUVORK5CYII=);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+    .SB_nevico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAABFVJREFUWAnVWF1oXEUUPmdumribrdEWgzWoNVJKyYuSfVDxIQ1qjTZ/SEGh4IOCffJBCdFFcFFB8yI++BqIqKCCutk0ainYKmKRpqBCH2L/Yk21raDR7ObGZO8cz5kwm7nb/blJVqvzsGfOmTnffPecmTP3LsB/pOFaeBxKJFoXC9RDqHsIsJ19twFRKyL+SQQXGewC275EDw/25/PfrwU7EpFsLHaXJnyZgLoZXEVZgIFnUOFI265do8kTJ5Zr+VQlkm1puU0vLb9BRH21gKqMn0GEoQHf/7jKnMpPl00kuoOl5eMbJCFr385p+ygTi71G6XTFaJaNSCYefwo0vUkADaVPwfvhGyCY8ND7PIBNszvat106e/78tUh04zJREjXt5X3DewjiZXwnW7du2XfP7Kx/xVipYTwe7yNNGQYKk0T4AqEhNeDPf13qU6rLpl4IKIWkDzBOkzvOaXqP0/SYa5N+KFScjg4m8U4JiUChenbQ97uikBDQPbnc5YHhoWf4UbK88CWx2cZpenT8mubnrW5lkYjkTxf0+0xisx1kuaQ8tbffz7/u2Gp2BSszMvIWL7oPCGPs8IPrpEG/wpFPurZi+Jnl4zxhzB0EhU8OLiyMhmw1FEuC99F+OxWB6wxCgffOFmvjzB8eXFx4wOomIic7OhoJdNoaRbLzWD1ICBYh/a4UPi391Ub3jycSu61uiJw+d+5BTsl2a+QwLXpIL1g9iiwXCeOH8CM0NXVxpX2XH+4zF0sHwQGrGyJaw8PWsOKMo72+L+U6UqtFYnBubkaA+Mi/FAbEPUe6ukyJMER4Z4eIoKc+DDtU1qKSEIRef/4Y16Gfi2hELXNTU/eKrj5JJG7g6tlmBzkt8207d35l9WpyLSQsDhJ8avtGBsEdItUSV8TQAOJMlEtqPSRkHUI85a7HD27WV55c5U7js/+Lo5btrpeEASvFRzTrmz1SdrUKxg2RqIApZhVAOAK8cUMRcn3rQqIUn8hkQDUiXnQX4+q3faqzc1PIxkpdSDAO39I7XGyuX2Z99VAu9ysfqWLNkLvmwvS0OVLWoV4kBI9LfY/FNdLzvhVp9ghv0El3kAL9iNXrSWIitvluLhU3WWxA/OO6ZNKUipWCpuBgcVA6RE9MxGJt9SQhsAEFL4pcbXRo99GjBdH5GAPIpXfqzNnp8H2DY3xZNbi3qMxlD3N32LJtbBF+Ms3N93GkD7tTVYPX3Z/LHRGbISKdsq8BMuC2dZKYiF1/SwH+Os6Rbl2FK/MaIIN9zw29zbfjydWJJb11kpDXRiaRDZMArRSk3BWKERGjvCrqQnBMTk5oEuJv1NTYudZ08FvYnbw5x/kw3OziKVCp/sX8q64tREQGrtbL8xVEhEzUzwkPCj/d2t5++R/5nBAi0swHVqA/4NxuXbFs7JevjpH+4eEUptO6HFLZiNiJ/+YnZ1UiRUJX+yPcErEy6t8SnoeTvfn8d9bvfyX/BmPES+GWAmrwAAAAAElFTkSuQmCC);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+ 
+    .SB_nevico_active,
+    .SB_nevico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAyxJREFUWAm9mDtoFFEUhp0YND6RKJpFJeIDRSzEFzaKGBJ8RhRs0qmFdhYBEW1sFIQUItooCpJCxEZ8BAtBJFGwUlDUIGghmsVoIb4fyfqdMHf3ztk7M3dnlz3wc+89j//8Ozu7Z3aDcRVaoVCYSkk72AYWgRyYDb6DIfABDIDbQRAMstbWELAcXAe/ga8NkngAjK9aDSRzwBUwArLaKwp3ZhZD8WrwLmt3R90pfA0VCaJgL/jhIBPXC3AatINloBnMB+vAQXAL/AQuk9hkLzEkbgR/HCxP8MlNmmrk5cB54OK55kPQSvFHoO0kjsouK92ouQTymozz8UQxJDxURXKTdiUWxQSpOxNyfWGVG9a2UQ7rnaUEOu3McH/EmZzipNaIMJQi5pM5hOv9MhoCDeCZSrxRlujhgEOLEFp5u/fJRllHhJLgJpXwj/PSSJLHgZo4ESuknPhN1Sf6Ygn2qIRej76RFOoTRYRCVqk+3zhPLBJxeKkSdhWDHhtqU0UYGnLfqF5bxmI4J6mAzJMppjBtJddbhHCRf071O2a+F1pUs/dMTpmmqSYiSDqsEoc5b4bjufKbo57KLUaIjHLbZJynWkYRwptX5DkjxKwmPmo2cWsVIoRS8wdGgL4C+gpF9FQpQrj0rZA3QvSlmkuzpkj38FADEcK0WHGXLgQN9Edqq0qWu72iT4euN2d49NzpNDFpchbYdqEYZEOgViLkkdM2eW4pPZ9w6LCj7OW7pFXEsNZERMh1VfXpE3/RCDaC1yqpl3MtRayBT8a/bbuLIsyGaJedEbOXKTo2wEydz0rNLPAW2PbYWUtGAJ7amWqfVcR0ePoVlxzbnELESVBuJnmI0fYVR5YrsYQ6PVCFuydWhAmQtAO4fsfcw7/W5CWt5E0DJ4C8AG13cfj96CLxEJCHI5c9wNkNVoKZIoi1CSwAe8Bl8Bm4bADnjKQXURajoA3EEdpN/tqHhP1FYhPKGvk4KFwI+hLIfUJDJO336ZeaA9EGIG9JJTZM8lFQ+uaM6RTE+GPdkM4juB3ILJLhJZNU7pNfQIan/C3RD+6ARzwcjbDWxxDXWJ9OdejyH9r769nLftR/AAAAAElFTkSuQmCC);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+    .SB_ffico_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAwZJREFUWAntVktoE2EQntlNugkltYoKgtDYrMdasQpFPOjBS7WmisWDoOBFEBE8Ciql2IsXEREEwYPWi4U+RMV6aY+tGkWK0NS0RjQ+KsVIbdrS7P5+G7qb3WRTY00EsT8k/7x2vsm8skQrZyUD/3sG2EjAI1Wtmk+LdhK8n0jUCqKMvDzJ4Q9wPuBRpHPNY2MJHgju9iXp/VMhqK48gAW8Mk0q5KuXW6o9pwF+rIBZOcWVOmuVHiA0uqEw8zwJMQJdUjDXg17nZkfM9yGfd9XlCJF6nxCi2SZuRAAiYBNkSCZ+ICnyyXA0+tEQiNZWue/ZyzPI1GVBwgg6e3yeE4dGR6eygsJUf2jL+pn0zBfLQlDA6czQML9SPHS4KRq1fhV3dWnQXOmtUf1o0A7LQQmIvAAkpptNsZgFbseolFdd/6ElLzmmZHZhpLtGNQL85cGvl3ON8gLQmd/lGpn83onI956aUBL8alOGewOKZGN/j5RyzSVd7MiVmXyPqoYAZQc3Vcu+8zIAgLMAun0wFhu3e0X3cu8m9ZpdZtDo7Ofom4VcuSsvhBf+t9t13BMMPUR3NzmExFMYvfNM8mNMTpKkVANpejsmYKfdLkP7vWuXOwWYtlheCTJOmcZZoq+yItgb0Jh03WiyF/joGX0Jv/JKIElSR/j40Yvc1mYHGwTmYG9wcyey8ATlqDJj4NmF/u6gWlQJUukZr/mceTsCwPbrD0+MXcDt2tYt8TfDfbXqKU2jTtMBDBuwJU12ydvNylECZqmjELjpOTwRu8tMcZP/09ueAU1eE4jQ22Jc8jBmP7ho+QmzUNQiwjPGIsLeyB4rAHTkt+ZIJJVVLUExJazd4/fWLXcKDARHCZaALJsKGeBpY5UKpip0871ikDAFWy27ufQtPOf632HZLBIpLeVzyJimjRIM4XMEnVyBu9VhUAwjxIFizAwblykYkqpp4w10tfHi8XcPXskqSGmX9sQH5xQP70IQV9GI49jtLoGWMjZOAOeOt0Leti/++nMpPa/4+jcz8BPw4Pa6no/fzAAAAABJRU5ErkJggg==);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+    .SB_ffico_active,
+    .SB_ffico_img:hover { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAf9JREFUWAntls8rRFEUxz1DrCYShc2U9TQSZWFn7S/wD1iytZiVWSPJQln4sbEkhZWNBSFliSLJ79CUSDyfw9w6bveNNx4jNae+c849P+6555z73puyshKVOlDqAB3wfT8ORsABeAW/SSdsPg2apfkeQjV8EyRFUUS6JFeqnJ8+UOzkUmcDSFfw0ykrBz2h2wN3IAXqgYsWUIpvGJJu9yjHTpn/ErBpEUWTcUSOgQHwDGyqM35fcQIbrOB91wF2capybYZ+0NpAlpEOICOwadLzvKCWjuM8BDwVtMchXtQ6nxizja4DHNtOZs3B7kkmd6LW6OCNSi5YlKfApg5bYdYkb0HWyY3p29zVAbls01R7qHdFJ20f07qcvAV/duhdqkqU7Z8MbOx6Cq7R94EEqAHdYB24KNIldI1ADijVXwGpWiCXbAe8gh8l1wgyZEgzAp1sDd0a5c/CV0EcGFpBX8gITNwHJ1iPYJm1VBxI2HvBT9G+PYIMlfuB2TFgn4Md5fMpxKZHIHPeDhm8gV8i53sGl9gwJC+iT+8NfYBbqnsIsws+p8ovSdyNWgeKzE2+gBfawR6BthVFlg5kc5nkX9F8yKytym+KuKBvh3J7F+VzrCkr/4j60QxrbRHlib//S8YFeqTiLjAK5A2Y9zHEHpXkAs+ANnKfR92sFP//O/AGqVkU5DClxicAAAAASUVORK5CYII=);
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+    .wrench_img { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAxFJREFUWAmtl0toU0EUhs1NSDHgG/GNIm5EsVA3Itb4oAZX0RRiEkFcuuqiggvXrqQortqFC93kBaEEQSlRUbRFFxYE3YkoPipCfULQkIffaXtDvZ07yZ1k4GbunMf/nzkzZ+7Et6yLLZfLHa7X64lGo3EU2C0L0NOBQCAaj8d/qqh8KqFXWaFQ2FmpVMYgHnD4fmV8LJVKvXbIm8OOA8hkMv0Qj4O4rok6/9KSXMw6CiCbze4m5c/AWTnP2fxti1ysraaLwQszv4mbMblQGmeA1B8kgEln3D6f70AymXzulLuNjTMAeUQFSgB/VHKVLJ/PrzIOAKKNKlD2xA2V3Clj/+ytVqtF4wAAnHGCLozDLM9lF92cWMjJ4EMGfcYBkIH3GpIrkJxT6W1yAlgveuMALMsqEkRZRQK4j+eWMxNOcnw/GVeBEEMwCtEFVRCLZI95HyLY5fR37JmLHtmocQDFYnFFuVweB/C4gJk0v98fNgqAmW+G8C7kvSbE4sPsS5wXJwJeAdLp9B587kG+zavvIvvZYDA4t3SeNiEHRxiQpx2S/2L2pwcHB99KQG0HQNrP1Gq1CXxWi6OqAfyAZ4xHWR3Ip6geOaqf2P5t7QHKZ5hZj/C42gP+MhQK9Uej0d9kai0nYhT77RBtov+CfgLiKZvY7l0BxUAImfkIr8O2g6oH/ANymdlnlV4ncw2AWQQ5q2/jnNABoPvBc0h369H5K6vArnEctTXOzP9Sy6e477leuXTkoluSAcpsA8BS4306Z2wa6Ml6Mqeza6X7LwOs9w4cSpDvauWI/mKn5MLRLEP5UDCebJP8GuTXBaDTNrcEbLj9bDipcefNdgk+qc8kEomzC0uwRO9VYHGn3wp5qR1ybO6z6c53i1yCDfCH4ir9GhnoGqTTHDQxDpqKzs6rzmLNj7RygvxNT0/PSTnlWtl61Tc3oZsj5HK6DcRiMfmz0fVmQfBIgzqLPsKOf6ex6Uhl8V2+BMk3Bcp3/tVG2PGvFLquiSy+yx8JopcgMqDKVXtG3lnzfRyxL7rG5AL0DyIcLIQg027OAAAAAElFTkSuQmCC); 
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+    }
+
+
+}

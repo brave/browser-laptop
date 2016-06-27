@@ -1,0 +1,2 @@
+"undefined"==typeof g_message_shim_setup&&(g_message_shim_setup=!0,window.addEventListener("message",function(a){try{a.origin!=window.location.origin||("object"!=typeof a.data||"undefined"==typeof a.data.messagefrom||"htmlpage"!=a.data.messagefrom)||self.port.emit("message",a.data)}catch(b){}},!1),self.port.on("message",function(a){a.messagefrom="messageshim";document.defaultView?document.defaultView.postMessage(a,window.location.origin):window.postMessage(a,window.location?window.location.origin:
+"")}));

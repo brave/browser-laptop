@@ -1,0 +1,31 @@
+#urlDiv .tt-dropdown-menu {
+  width: 620px;
+  max-height: none;
+}
+
+#urlDiv .siteRecord {
+  height:30px;
+  line-height:30px;
+}
+
+#urlDiv .siteUrl {
+  float: left;
+  width:550px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+#urlDiv strong {
+  font-weight:bold;
+  color:inherit;
+}
+
+#urlDiv .favicon {
+  float: left;
+  background: white;
+  width:16px;
+  height:16px;
+  margin-top:7px;
+  margin-right:15px;
+}

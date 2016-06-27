@@ -1,0 +1,52 @@
+.dropStyle {
+  background: #fff !important;
+  color: #000 !important;
+  position:absolute;
+  cursor:default;
+  text-align:left;
+  font-size:14px;
+  z-index:10000;
+  height:120px;
+  overflow:auto;
+  border: 1px solid #000 !important;
+  padding: 4px 0px;
+  font-family: Arial, Helvetica, sans-serif; font-weight:normal;
+}
+.dropStyle div{
+  display:block;
+  padding: 1px 0px;
+  outline: none;  /* need this to disable webkit default glow */
+}
+
+.item {
+}
+.focus {
+      /* background: #d2d2d2 !important;*/
+        background: #dddddd;   /* final from levi */
+	color: #000 !important;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+  font-family: Arial, Helvetica, sans-serif; font-weight:normal;
+}
+
+.item[aria-disabled="true"] {
+  color: grey;
+}
+.offscreen {
+   position: absolute;
+  left: -9000px;
+  width: 0;
+  overflow: hidden;
+}
+
+.teardrop{
+  padding:1px!important;
+  opacity:0.5;
+  background-color: #fff;
+}
+.teardrop:hover, .teardrop:active{
+  opacity:1;
+  /*background-color: #d2d2d2;*/
+  background: #dddddd;   /* final from levi */
+}

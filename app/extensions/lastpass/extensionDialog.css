@@ -1,0 +1,14 @@
+/*
+* Make sure any dialogs show in the popover take up the whole page
+*/
+.dialog {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+}
+
+#dialogOverlay {
+  display: none !important;
+}

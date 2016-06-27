@@ -1,0 +1,78 @@
+body{
+    overflow:hidden;
+    width:300px;
+    height:212px;
+    padding:0;
+    margin:0;
+}
+#container{
+    height:auto;
+    left:0;
+    position:absolute;
+    top:0;
+    width:300px;
+}
+#arrow{
+    border-color:transparent transparent #000 transparent;
+    border-color:transparent transparent rgba(0,0,0,0.85) transparent;
+    border-style:solid;
+    border-width:0 10px 12px 10px;
+    height:0;
+    position:absolute;
+    right:12px;
+    top:0;
+    width:0;
+}
+#banner{
+    background:#000;
+    background:rgba(0,0,0,0.85);
+    height:19px;
+    position:absolute;
+    left:0;
+    top:12px;
+    width:100%;
+}
+#banner img{
+    height:15px;
+    margin:2px;
+    width:92px;
+}
+#scroller{
+    height:170px;
+    overflow:hidden;
+    position:absolute;
+    top:31px;
+}
+#inner{
+    background:rgba(0,0,0,0.85);
+    color:#fff;
+    height:170px;
+    overflow:hidden;
+    padding:2%;
+    position:relative;
+    top:0;
+}
+#inner p{
+    font-size:13px;
+    font-family:Helvetica, Arial, Tahoma, sans-serif;
+    margin-left:6px;
+}
+#inner button{
+    background-color:#e33;
+    background-image:-webkit-linear-gradient(top,rgb(224,50,50),rgb(195,20,20));
+    color:#fff;
+    font-size:18px;
+    font-weight:100;
+    height:32px;
+    margin-left:20%;
+    width:60%;
+}
+
+@-webkit-keyframes growdown{
+    from{ height:0px; }
+    to{ height:170px; }
+}
+#inner{
+    -webkit-animation-duration:2s;
+    -webkit-animation-name:growdown;
+}

@@ -1,0 +1,242 @@
+/* Classic Windows Theme (default) */
+/* =============================== */
+.context-menu-theme-default {
+	border:2px outset white;
+	background-color:#D4D0C8;
+}
+.context-menu-theme-default .context-menu-item {
+	text-align:left;
+	cursor:pointer;
+	padding:4px 28px 4px 16px;
+	color:black;
+	font-family:Tahoma,Arial;
+	font-size:11px;
+}
+.context-menu-theme-default .context-menu-separator {
+	margin:4px 2px;
+	font-size:0px;
+	border-top:1px solid #808080;
+	border-bottom:1px solid white;
+}
+.context-menu-theme-default .context-menu-item-disabled {
+	color:#808080;
+}
+.context-menu-theme-default .context-menu-item .context-menu-item-inner {
+	background:none no-repeat fixed 999px 999px; /* Make sure icons don't appear */
+}
+.context-menu-theme-default .context-menu-item-hover {
+	background-color:#0A246A;
+	color:white;
+}
+.context-menu-theme-default .context-menu-item-disabled-hover {
+	background-color:#0A246A;
+}
+
+/* Windows XP Theme */
+/* ================ */
+.context-menu-theme-xp {
+	border:1px solid #666;
+	padding:1px;
+	background:#F9F8F7 url(cmenu-xp-bg.gif) repeat-y top left;
+}
+.context-menu-theme-xp .context-menu-separator {
+	margin:4px 2px;
+	font-size:0px;
+	border-top:1px solid #808080;
+	border-bottom:1px solid white;
+}
+.context-menu-theme-xp .context-menu-item {
+	text-align:left;
+	color:black;
+	font-family:arial;
+	font-size:11px;
+	cursor:pointer;
+}
+.context-menu-theme-xp .context-menu-item .context-menu-item-inner {
+	background:none no-repeat 2px center;
+	padding:4px 10px 4px 30px;
+}
+.context-menu-theme-xp .context-menu-item-hover .context-menu-item-inner {
+	background:#B6BDD2 none no-repeat 2px center;
+	padding:3px 9px 3px 29px;
+	border:1px solid #0A246A;
+}
+
+/* Windows Vista Theme */
+/* =================== */
+.context-menu-theme-vista {
+	background:#FAFAFA url(cmenu-vista-bg.gif) repeat-y left top;
+	border:1px solid #868686;
+}
+.context-menu-theme-vista .context-menu-item {
+	text-align:left;
+	cursor:pointer;
+	color:black;
+	font-family:Tahoma,Arial;
+	font-size:11px;
+}
+.context-menu-theme-vista .context-menu-separator {
+	margin:0px 0px 0px 32px;
+	font-size:0px;
+	border-top:1px solid #C5C5C5;
+	border-bottom:1px solid #F5F5F5;
+}
+.context-menu-theme-vista .context-menu-item-hover {
+	background:transparent url(cmenu-vista-menu-item-hover.gif) repeat-x left center;
+	border:1px solid #D7D0B3;
+}
+.context-menu-theme-vista .context-menu-item .context-menu-item-inner {
+	padding:4px 16px 4px 35px;
+	margin-left:1px;
+	background-color:none;
+	background-repeat:no-repeat;
+	background-position:3px center;
+	background-image:none;
+}
+.context-menu-theme-vista .context-menu-item-hover .context-menu-item-inner {
+	padding:3px 15px 3px 35px;
+	margin-left:0px;
+}
+.context-menu-theme-vista .context-menu-item-disabled {
+	color:#A7A7A7;
+}
+
+/* OSX Theme */
+/* ========= */
+.context-menu-theme-osx {
+	background-color:white;
+	opacity: .93;
+	filter: alpha(opacity=93);
+	zoom:1.0;
+	border:1px solid #b2b2b2;
+}
+.context-menu-theme-osx .context-menu-item {
+	text-align:left;
+	cursor:pointer;
+	color:black;
+	font-family:Lucida Grande,Arial;
+	font-weight:700;
+	font-size:12px;
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+	z-index:1;
+}
+.context-menu-theme-osx .context-menu-separator {
+	margin:5px 1px 4px 1px;
+	font-size:0px;
+	border-top:1px solid #e4e4e4;
+}
+.context-menu-theme-osx .context-menu-item-hover {
+	background-color:#1C44F2;
+	color:white;
+}
+.context-menu-theme-osx .context-menu-item .context-menu-item-inner {
+	padding:2px 10px 2px 22px;
+	background-color:none;
+	background-repeat:no-repeat;
+	background-position:4px center;
+	background-image:none;
+}
+.context-menu-theme-osx .context-menu-item-disabled {
+	color:#939393;
+}
+
+/* Linux Human Theme */
+/* ================= */
+.context-menu-theme-human {
+	background:#F9F5F2;
+	border:1px solid #963;
+}
+.context-menu-theme-human .context-menu-item {
+	text-align:left;
+	cursor:pointer;
+	color:black;
+	font-family:Helvetica,DejaVu Sans,Arial;
+	font-size:12px;
+	line-height:20px;
+	height:28px;
+	border:1px solid #F9F5F2;
+	border-left:0;
+	border-right:0;
+}
+.context-menu-theme-human .context-menu-separator {
+	margin:0px 0px 0px 32px;
+	font-size:0px;
+	border-top:1px solid #C5C5C5;
+	border-bottom:1px solid #F5F5F5;
+}
+.context-menu-theme-human .context-menu-item-hover {
+	background:transparent url(cmenu-human-menu-item-hover.gif) repeat-x left center;
+	border-color:#963;
+}
+.context-menu-theme-human .context-menu-item .context-menu-item-inner {
+	padding:4px 16px 4px 35px;
+	margin-left:0px;
+	background-color:none;
+	background-repeat:no-repeat;
+	background-position:3px center;
+	background-image:none;
+}
+.context-menu-theme-human .context-menu-item-hover .context-menu-item-inner {
+}
+.context-menu-theme-human .context-menu-item-disabled {
+	color:#A7A7A7;
+}
+
+/* Gloss Theme */
+/* =========== */
+.context-menu-theme-gloss {
+	background:#f4f4f4 url(cmenu-gloss-bg.gif) repeat-y left center;
+	border:1px solid #f4f4f4;
+	padding:1px;
+	padding-right:0;
+}
+.context-menu-theme-gloss .context-menu-item {
+	text-align:left;
+	cursor:pointer;
+	color:black;
+	font-family:Helvetica,DejaVu Sans,Arial;
+	font-size:12px;
+	line-height:20px;
+	height:27px;
+	border:1px solid transparent;
+}
+.context-menu-theme-gloss .context-menu-separator {
+	margin:0px 0px 0px 32px;
+	font-size:0px;
+	border-top:1px solid #C5C5C5;
+	border-bottom:1px solid #F5F5F5;
+}
+.context-menu-theme-gloss .context-menu-item-hover {
+	background:transparent url(cmenu-gloss-menu-item-hover.gif) repeat-x left center;
+	color:#fff;
+	border-color:#000;
+  	border-radius: 3px;
+  	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+.context-menu-theme-gloss .context-menu-item .context-menu-item-inner {
+	padding:4px 16px 4px 35px;
+	margin-left:0px;
+	background-color:none;
+	background-repeat:no-repeat;
+	background-position:3px center;
+	background-image:none;
+}
+.context-menu-theme-gloss .context-menu-item-hover .context-menu-item-inner {
+}
+.context-menu-theme-gloss .context-menu-item-disabled {
+	color:#A7A7A7;
+}
+
+.context-menu-theme-gloss-cyan .context-menu-item-hover {
+	background-image:url(cmenu-gloss-cyan-menu-item-hover.gif);
+	border-color:#00c;
+}
+
+.context-menu-theme-gloss-semitransparent .context-menu-item-hover {
+	background-image:url(cmenu-item-gloss-semitransparent-menu-item-hover.png);
+	border-color:#00c;
+	background-color:#30f;
+}
+

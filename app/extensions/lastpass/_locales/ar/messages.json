@@ -1,0 +1,3530 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "12_hours": {
+      "message": "12 ساعة"
+   },
+   "15_minutes": {
+      "message": "15 دقيقة"
+   },
+   "1Password": {
+      "message": "1Password"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. ادخل قطعة YubiKey خاصتك في منفذ USB ووجهها المقابل لسطح تماس USB لأعلى"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. تشغيل تطبيق سمسم 'لاست باس' لإنشاء كلمة مرور لمرة واحدة ."
+   },
+   "1_hour": {
+      "message": "ساعة واحدة"
+   },
+   "24_hours": {
+      "message": "24 ساعة"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. أدخل رمز التحقق الحالي الخاص بك في المربع أدناه"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. ألصق كلمة المرور لمرة واحدة في مربع الإدخال في الأسفل و انقر على ' مصادقة ' ."
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. انتظر حتى تضيء YubiKey بضوء ثابت"
+   },
+   "30_minutes": {
+      "message": "30 دقيقة"
+   },
+   "30_seconds": {
+      "message": "30 ثانية"
+   },
+   "3__Click_Authenticate": {
+      "message": "3. انقر فوق مصادقة"
+   },
+   "3_hours": {
+      "message": "3 ساعات"
+   },
+   "5_minutes": {
+      "message": "5 دقائق"
+   },
+   "6_hours": {
+      "message": "6 ساعات"
+   },
+   "ACTION": {
+      "message": "حدث"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "تم إنشاء كلمة مرور جديدة!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "كلمة مرور مُنشئه بشكل عشوائي."
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "هناك تحديث مطلوب ل'لاست باس' . الرجاء الضغط على موافق للبدأ في عملية التنزيل و التثبيت ."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "عُثر على ملف إعادة محاولة. يعني هذا غالبًا أن التغييرات التي أجريتها لهذا الموقع ربما لم تحفظ كلها. هل تريد حذف ذاك الملف مع احتمال خسارة بعض التغييرات؟"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "حدث خطأ في الخادوم أثناء معالجة طلبك."
+   },
+   "A_site_that_has_been_previously_shared_cannot_be_moved_to_a_shared_folder___Would_you_like_to_make_a_copy_": {
+      "message": "الموقع المشارك مسبقاً لايمكن تحريكه لملف المشاركة\n\nهل ترغب في إجراء نسخة؟"
+   },
+   "About": {
+      "message": "حول"
+   },
+   "About___": {
+      "message": "من نحن"
+   },
+   "Accept": {
+      "message": "وافق"
+   },
+   "Account_Number": {
+      "message": "رقم الحساب"
+   },
+   "Account_Settings": {
+      "message": "إعدادات الحساب"
+   },
+   "Account_Type": {
+      "message": "نوع الحساب"
+   },
+   "Account_number": {
+      "message": "رقم الحساب"
+   },
+   "Actionproper": {
+      "message": "حدث"
+   },
+   "Actions": {
+      "message": "الإجراءات"
+   },
+   "Add": {
+      "message": "إضافة"
+   },
+   "Add_Attachment": {
+      "message": "إضافة مرفق"
+   },
+   "Add_Credit_Card": {
+      "message": "إضافة بطاقة ائتمان"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "أضف شخصية بطاقة الائتمان"
+   },
+   "Add_Field": {
+      "message": "أضف حقلاً"
+   },
+   "Add_Form_Fill_profile": {
+      "message": "إضافة ملف 'تعبئة نموذج'"
+   },
+   "Add_Identity": {
+      "message": "إضافة هوية"
+   },
+   "Add_New_Site": {
+      "message": "أضف موقعًا جديدًا"
+   },
+   "Add_Note": {
+      "message": "إضافة ملاحظة"
+   },
+   "Add_Profile": {
+      "message": "إضافة ملف تعريف"
+   },
+   "Add_Secure_Note": {
+      "message": "إضافة ملاحظة آمنة"
+   },
+   "Add_Site": {
+      "message": "إضافة موقع"
+   },
+   "Add_another_custom_field": {
+      "message": "إضافة حقل مخصص آخر"
+   },
+   "Address": {
+      "message": "عنوان"
+   },
+   "Address_1": {
+      "message": "العنوان 1"
+   },
+   "Address_2": {
+      "message": "العنوان 2"
+   },
+   "Address_3": {
+      "message": "العنوان 3"
+   },
+   "Adelaide": {
+      "message": "اديلايد"
+   },
+   "Admin_Console": {
+      "message": "وحدة الإدارة"
+   },
+   "Admin_Tools": {
+      "message": "أدوات الإدارة"
+   },
+   "Advanced": {
+      "message": "متقدم"
+   },
+   "Advanced_Options": {
+      "message": "خيارات متقدمة"
+   },
+   "Advanced_Tools": {
+      "message": "أدوات متقدمة"
+   },
+   "Afghanistan": {
+      "message": "أفغانستان"
+   },
+   "Agent_Name": {
+      "message": "اسم الوكيل"
+   },
+   "Agent_Phone": {
+      "message": "هاتف الوكيل"
+   },
+   "Aland_Islands": {
+      "message": "جزر آلاند"
+   },
+   "Alaska": {
+      "message": "ألاسكا"
+   },
+   "Albania": {
+      "message": "ألبانيا"
+   },
+   "Algeria": {
+      "message": "الجزائر"
+   },
+   "Alias": {
+      "message": "الاسم المستعار"
+   },
+   "All": {
+      "message": "الكل"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "أأسمح لبرنامج LastPass بأن يعثر على البيانات غير الآمنة على جهازك؟"
+   },
+   "Almaty": {
+      "message": "ألماتي"
+   },
+   "Alt": {
+      "message": "بَدَل"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "دائما اختار عضوية وبطاقة إئتمانية"
+   },
+   "American_Samoa": {
+      "message": "ساموا الأمريكية"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "عمان ، أثينا ، اسطنبول ، بيروت ، القاهرة ، القدس"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "أمستردام وبرلين وروما وفيينا وبراغ وبروكسل"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "يوجد تحديث متوفر. هل ترغب في تثبيته؟"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "حدث خطأ غير متوقع أثناء تحميل بيانات الموقع الخاصة بك. فضلا اعد محاولة تسجيل الدخلو."
+   },
+   "An_error_occurred": {
+      "message": "حدث خطأ"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "حدث خطأ أثناء إستيراد كلمات سر جوجل كروم الخاصة بك."
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "حدث خطأ أثناء إعادة تشفير البيانات الخاصة بك"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "حدث خطأ أثناء تحميل البيانات الخاصة بك. هل تريد إعادة المحاولة؟"
+   },
+   "Andorra": {
+      "message": "أندورا"
+   },
+   "Angola": {
+      "message": "أنغولا"
+   },
+   "Anguilla": {
+      "message": "أنغيلا"
+   },
+   "Antarctica": {
+      "message": "القارة القطبية الجنوبية"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "أنتيغوا وبربودا"
+   },
+   "Appearance": {
+      "message": "المظهر"
+   },
+   "Application_": {
+      "message": "تطبيق :"
+   },
+   "Applications": {
+      "message": "التطبيقات"
+   },
+   "April": {
+      "message": "أبريل"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذا؟"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذه الهوية؟"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذا الموقع؟"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "هل أنت متأكد من أنك تريد أن يقوم LastPass بتذكر كلمة السر الخاصة بك؟ هذا الخيار سوف يقلل كثيرا من عملية الأمان بحسابك في LastPass!"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "هل أنت متأكد من الحذف؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "هل أنت متأكد أنك تريد حذف العناصر المحددة؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "هل أنت متأكد أنك تريد حذف المواقع المختارة؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذا البرنامج؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذا الحقل ؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "هل أنت متأكد أنك تريد حذف نموذج البيانات الشخصي هذا؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "هل أنت متأكد أنك تريد حذف كلمة المرور المولدة؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_group_": {
+      "message": "هل أنت متأكد رغبتك في حذف هذا المجلد؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "هل أنت متأكد من حذف هذا الرابط الممنوع ؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذه المذكرة الآمنه؟"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "هل أنت متأكد أنك تريد حذف هذا الموقع؟"
+   },
+   "Argentina": {
+      "message": "الأرجنتين"
+   },
+   "Arizona": {
+      "message": "أريزونا"
+   },
+   "Armenia": {
+      "message": "أرمينيا"
+   },
+   "Arts": {
+      "message": "فنون"
+   },
+   "Aruba": {
+      "message": "أروبا"
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "التوقيت الأطلسي (كندا) ، مانوس ، سانتياغو"
+   },
+   "Auckland__Wellington": {
+      "message": "أوكلاند ، ولينغتون"
+   },
+   "August": {
+      "message": "أغسطس"
+   },
+   "Australia": {
+      "message": "أستراليا"
+   },
+   "Austria": {
+      "message": "النمسا"
+   },
+   "Authenticate": {
+      "message": "مصادقة"
+   },
+   "Authentication": {
+      "message": "المصادقة"
+   },
+   "Authentication_Failed_": {
+      "message": "فشل التحقق من الشخصية."
+   },
+   "AutoFill": {
+      "message": "التعبئه الآليه"
+   },
+   "AutoLogin": {
+      "message": "تسجيل الدخول تلقائي"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "تعبئة تلقائيه لمعلومات الدخول"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "تسجيل الخروج تلقائيا بعد خمول (دقائق)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "يتم الخروج تلقائياً إذا كانت جميع المتصفحات مغلقة و كروم مغلق لـ (بالدقائق)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "الدخول إلى المواقع تلقائيا إذا كان الوقت منذ آخر تسجيل دخول> (ثانية)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "تجنب التباس الأحرف"
+   },
+   "Azerbaijan": {
+      "message": "أذربيجان"
+   },
+   "Azores": {
+      "message": "الازور"
+   },
+   "Back": {
+      "message": "للخلف"
+   },
+   "Baghdad": {
+      "message": "بغداد"
+   },
+   "Bahamas": {
+      "message": "جزر البهاما"
+   },
+   "Bahrain": {
+      "message": "البحرين"
+   },
+   "Baku__Yerevan": {
+      "message": "باكو ، يريفان"
+   },
+   "Bangladesh": {
+      "message": "بنغلاديش"
+   },
+   "Bank_Account": {
+      "message": "الحساب المصرفي"
+   },
+   "Bank_Name": {
+      "message": "اسم البنك"
+   },
+   "Bank_accountformfill": {
+      "message": "الحساب المصرفي"
+   },
+   "Bank_name": {
+      "message": "اسم البنك"
+   },
+   "Barbados": {
+      "message": "بربادوس"
+   },
+   "Before_you_can_use_LastPass__you_must_first_connect_your_fingerprint_reader_and_enroll_one_or_more_fingers_": {
+      "message": "قبل أن تتمكن من استخدام LastPass ، يجب عليك أولا الاتصال قارئ البصمات وتسجيل واحد أو أكثر من الأصابع."
+   },
+   "Belarus": {
+      "message": "بيلاروس"
+   },
+   "Belgium": {
+      "message": "بلجيكا"
+   },
+   "Belize": {
+      "message": "بليز"
+   },
+   "Benin": {
+      "message": "بنين"
+   },
+   "Bermuda": {
+      "message": "برمودا"
+   },
+   "Bhutan": {
+      "message": "بوتان"
+   },
+   "Binary_Component_": {
+      "message": "مكون ثنائي :"
+   },
+   "Birthday": {
+      "message": "عيد ميلاد"
+   },
+   "Bit_Strength": {
+      "message": "قوة بت"
+   },
+   "Blacklist": {
+      "message": "وقد تم تعليق حسابك مؤقتا (لمدة 5 دقائق) وبسبب فشل عدد كبير جدا من محاولة الدخول."
+   },
+   "Blog": {
+      "message": "مدونه"
+   },
+   "Bolivia": {
+      "message": "بوليفيا"
+   },
+   "Bookmarklets": {
+      "message": "أوامر المفضلة"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "البوسنة والهرسك"
+   },
+   "Botswana": {
+      "message": "بوتسوانا"
+   },
+   "Bouvet_Island": {
+      "message": "جزيرة بوفيت"
+   },
+   "Branch_Address": {
+      "message": "عنوان الفرع"
+   },
+   "Branch_Phone": {
+      "message": "هاتف الفرع"
+   },
+   "Brazil": {
+      "message": "البرازيل"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "إقليم المحيط الهندي البريطاني"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "هل تصفح الويب كما تفعل عادة وLastPass يتذكر كلمات المرور تلقائيا عند إدخال عليها."
+   },
+   "Brunei_Darussalam": {
+      "message": "بروناي دار السلام"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "بوينس آيرس ، جورج تاون"
+   },
+   "Built_": {
+      "message": "بني:"
+   },
+   "Bulgaria": {
+      "message": "بلغاريا"
+   },
+   "Burkina_Faso": {
+      "message": "بوركينا فاسو"
+   },
+   "Burundi": {
+      "message": "بوروندي"
+   },
+   "Business": {
+      "message": "عمل"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "لكنني شخص أنسى دائماً... فماذا أفعل إذا نسيت كلمة السر؟ "
+   },
+   "CSV_Files": {
+      "message": "السيرة الذاتية"
+   },
+   "Cambodia": {
+      "message": "كمبوديا"
+   },
+   "Cameroon": {
+      "message": "الكاميرون"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "لا يمكن العثور على نافذة LastPass المخفية"
+   },
+   "Canada": {
+      "message": "كندا"
+   },
+   "Canary_Islands": {
+      "message": "جزر الكناري"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "كانبرا وملبورن وسيدني، هوبارت"
+   },
+   "Cancel": {
+      "message": "الغاء الامر"
+   },
+   "Cape_Verde": {
+      "message": "الرأس الأخضر"
+   },
+   "Cape_Verde_Is_": {
+      "message": "الرأس الأخضر."
+   },
+   "Caracas": {
+      "message": "كراكاس"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "الدار البيضاء ، مونروفيا ، ريكيافيك"
+   },
+   "Catalan": {
+      "message": "كاتالاني"
+   },
+   "Cayman_Islands": {
+      "message": "جزر كايمان"
+   },
+   "Central_African_Republic": {
+      "message": "جمهورية أفريقيا الوسطى"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "أمريكا الوسطى ، وساسكاتشوان"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "التوقيت المركزي (الولايات المتحدة وكندا) ، غوادالاخارا ، مكسيكو سيتي"
+   },
+   "Chad": {
+      "message": "تشاد"
+   },
+   "Change": {
+      "message": "تغيير"
+   },
+   "Change_Group_Name": {
+      "message": "تغيير اسم المجلد"
+   },
+   "Change_Password": {
+      "message": "تغيير كلمة السر"
+   },
+   "Change_Password_Now": {
+      "message": "تغيير كلمة المرور الآن"
+   },
+   "Check_For_Updates": {
+      "message": "تحقق من التحديثات"
+   },
+   "Checkbox": {
+      "message": "مربع"
+   },
+   "Checking_For_Updates___": {
+      "message": "التحقق من التحديثات..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "شيناي، كولكاتا، مومباي، نيو دلهي، سري جاياواردنبورا"
+   },
+   "Chile": {
+      "message": "شيلي"
+   },
+   "China": {
+      "message": "الصين"
+   },
+   "Chinese__Simplified_": {
+      "message": "الصينية (المبسطة)"
+   },
+   "Chinese__Traditional_": {
+      "message": "الصينية (التقليدية)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "اختر الملف الشخصي وبطاقات الائتمان"
+   },
+   "Christmas_Island": {
+      "message": "جزيرة كريسماس"
+   },
+   "City___Town": {
+      "message": "المدينة / البلدة"
+   },
+   "Clear": {
+      "message": "إفراغ"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "تفريغ الحافظة بعد الاستخدام لمدة (ثانية)"
+   },
+   "Clear_Forms": {
+      "message": "مسح النماذج"
+   },
+   "Clear_Local_Cache": {
+      "message": "امسح ذاكرة التخزين المؤقت المحلية"
+   },
+   "Clear_Recent": {
+      "message": "واضح في الآونة الأخيرة"
+   },
+   "Clear_Search": {
+      "message": "إزالة البحث"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "فرغ الحقول المملوءة عند الخروج"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "انقر فوق استمرار لبدأ استخدام لاست باس."
+   },
+   "Click_Icons_in_Fields": {
+      "message": "النقر على الرموز في الحقول"
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "انقر هنا لبدء إعدادات الحساب"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "انقر هنا لتشغيل الملاحظات"
+   },
+   "Click_here_to_view_the_LastPass_User_Manual": {
+      "message": "LastPass انقر هنا لعرض دليل المستخدم"
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "انقر لإخفاء الخيارات المتقدمة"
+   },
+   "Clipperz": {
+      "message": "كليبرز"
+   },
+   "Close": {
+      "message": "إغلاق"
+   },
+   "Close_this_window": {
+      "message": "إغلاق هذه النافذة"
+   },
+   "Co_pay": {
+      "message": "شارك في الأجر"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "(جزر كوكوس (كييلينجس"
+   },
+   "Collapse_All": {
+      "message": "طي الكل"
+   },
+   "Colombia": {
+      "message": "كولومبيا"
+   },
+   "Comoros": {
+      "message": "جزر القمر"
+   },
+   "Company": {
+      "message": "الشركة"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "تحظر سياسة الشركة هذه العملية."
+   },
+   "Company_Phone": {
+      "message": "هاتف الشركة"
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "سياسة الشركة تمنع تغيير بعض الإعدادات ، قد لا يتم حفظ كافة التغييرات."
+   },
+   "Configure_Form_Fill": {
+      "message": "تكوين ملأ الاستمارة"
+   },
+   "Confirm": {
+      "message": "تأكيد"
+   },
+   "Confirm_Password": {
+      "message": "تأكيد كلمة السر"
+   },
+   "Congo": {
+      "message": "الكونغو"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "الكونغو ، جمهورية الكونغو الديمقراطية"
+   },
+   "Congratulations": {
+      "message": "مبروك"
+   },
+   "Congratulations_": {
+      "message": "مبروك"
+   },
+   "Connection_Mode": {
+      "message": "نوع الإتصال"
+   },
+   "Connection_Type": {
+      "message": "نوع الاتصال"
+   },
+   "Contact": {
+      "message": "مراسل"
+   },
+   "Continue": {
+      "message": "أستمرار"
+   },
+   "Control_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "عُثر على حروف تحكم في اسم الملف المختار، لذا تقرر ألا يُعالج"
+   },
+   "Cook_Islands": {
+      "message": "جزر كوك"
+   },
+   "Copy": {
+      "message": "نسخ"
+   },
+   "Copy_Note": {
+      "message": "نسخ ملاحظة"
+   },
+   "Copy_Password": {
+      "message": "نسخ كلمة المرور"
+   },
+   "Copy_URL": {
+      "message": "نسخ الوصلة"
+   },
+   "Copy_Username": {
+      "message": "نسخ اسم المستخدم"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "حقوق الطبع و النشر 2008 'لـلاست باس' . جميع الحقوق محفوظة .\nأجزاء من هذا البرنامج مرخصة من أطراف ثالثة كما هو موضح أدناه :"
+   },
+   "Costa_Rica": {
+      "message": "كوستاريكا"
+   },
+   "Cote_D_ivoire": {
+      "message": "ساحل العاج"
+   },
+   "Country": {
+      "message": "الدولة"
+   },
+   "County": {
+      "message": "مقاطعة"
+   },
+   "Create_Account": {
+      "message": "إنشاء حساب"
+   },
+   "Create_Group": {
+      "message": "إنشاء مجلد"
+   },
+   "Create_Sub_Group": {
+      "message": "إنشاء مجلد فرعي"
+   },
+   "Create_an_Account": {
+      "message": "إنشاء حساب"
+   },
+   "Creating_Account___": {
+      "message": "جاري إنشاء الحساب..."
+   },
+   "Credit_Card": {
+      "message": "بطاقة الائتمان"
+   },
+   "Credit_Card_Number": {
+      "message": "رقم بطاقة الائتمان"
+   },
+   "Credit_Monitoring": {
+      "message": "مراقبة الائتمان"
+   },
+   "Credit_card_number": {
+      "message": "رقم بطاقة الائتمان"
+   },
+   "Credit_cardformfill": {
+      "message": "بطاقة الائتمان"
+   },
+   "Croatia": {
+      "message": "كرواتيا"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "كوبا"
+   },
+   "Custom_Value": {
+      "message": "قيمة مخصصة"
+   },
+   "Custom_field__": {
+      "message": "حقل مخصص #"
+   },
+   "Custom_fields": {
+      "message": "حقول مخصصة"
+   },
+   "Cyprus": {
+      "message": "قبرص"
+   },
+   "Czech_Republic": {
+      "message": "الجمهورية التشيكية"
+   },
+   "Danish": {
+      "message": "دانماركي"
+   },
+   "Darn__Passwords_": {
+      "message": "يا الاهي! كلمات السر!"
+   },
+   "Darwin": {
+      "message": "داروين"
+   },
+   "Database": {
+      "message": "قاعدة البيانات"
+   },
+   "Date": {
+      "message": "تاريخ"
+   },
+   "Date__EST_": {
+      "message": "التاريخ (بتوقيت شرق الولايات المتحدة"
+   },
+   "Date_of_Birth": {
+      "message": "تاريخ الميلاد"
+   },
+   "December": {
+      "message": "ديسمبر"
+   },
+   "Default": {
+      "message": "افتراضي"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "شخصية ملئ الاستمارات المرجعية"
+   },
+   "Delete": {
+      "message": "حذف"
+   },
+   "Delete_Cache": {
+      "message": "حذف البيانات الموجودة في  ذاكرة التخزين المؤقت"
+   },
+   "Delete_Group": {
+      "message": "حذف المجلد"
+   },
+   "Delete_Identity_": {
+      "message": "حذف الهوية؟"
+   },
+   "Delete_Selected": {
+      "message": "حذف المختار"
+   },
+   "Delete_Site": {
+      "message": "حذف الموقع"
+   },
+   "Delete_Site_": {
+      "message": "حذف الموقع؟"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "إحذف شخصية ملئ الاستمارة"
+   },
+   "Denmark": {
+      "message": "الدنمارك"
+   },
+   "Description": {
+      "message": "الوصف"
+   },
+   "Dining": {
+      "message": "الطعام"
+   },
+   "Disable": {
+      "message": "تعطيل"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "تعطيل مدير كلمات السر في متصفح كروم"
+   },
+   "Disable_LastPass": {
+      "message": "تعطيل LastPass"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "تعطيل LastPass لهذه الصفة أو هذا الموقع بأكملة"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "عطل التحقق من الشخصية متعدد العوامل"
+   },
+   "Disable_Page": {
+      "message": "تطيل في الصفحة"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "عطل التحقق من الشخصية ذو العامل الوحيد"
+   },
+   "Disable_Site": {
+      "message": "تعطيل في الموقع"
+   },
+   "Disable_alert___": {
+      "message": "أوقف التحذير..."
+   },
+   "Disable_alert_for_this_site": {
+      "message": "أوقف التحذير ضمن هذا الموقع"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "أوقف تحذيرات تكرار كلمات المرور وضعفها"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "تجاهل التغييرات وأغلق هذه النافذة"
+   },
+   "Djibouti": {
+      "message": "جيبوتي"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "لا تملأ الحقول التي تم ملؤها مسبقا"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "لا تعد التذكير"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "لا لإعادة المطالبة "
+   },
+   "Do_not_show_this_message_for_this_domain": {
+      "message": "لا تظهر هذه الرسالة لهذا المجال"
+   },
+   "Do_you_like_LastPass_": {
+      "message": "هل تحب لاست باس؟"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "هل تريد الانهاء؟ لن تستطيع استخدام لاست باس دون انشاء حساب."
+   },
+   "Dominica": {
+      "message": "دومينيكا"
+   },
+   "Dominican_Republic": {
+      "message": "جمهورية الدومينيكان"
+   },
+   "Down": {
+      "message": "أسفل"
+   },
+   "Dr": {
+      "message": "الدكتور"
+   },
+   "Driver_s_License": {
+      "message": "رخصة القيادة"
+   },
+   "Duplicate_password": {
+      "message": "كلمة مرور مكررة"
+   },
+   "Dutch": {
+      "message": "الهولندية"
+   },
+   "ERROR__Moving_sites_between_shared_folders_is_currently_not_supported_": {
+      "message": "خطأ : نقل المواقع بين المجلدات المشتركة في الوقت الحالي غير معتمد."
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "التوقيت الشرقي (الولايات المتحدة وكندا)"
+   },
+   "Ecuador": {
+      "message": "الاكوادور"
+   },
+   "Edit": {
+      "message": "تحرير"
+   },
+   "Edit_Application_Fields": {
+      "message": "تعديل حقول التطبيق"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "تحرير بطاقة الائتمان الشخصي"
+   },
+   "Edit_Form_Fields": {
+      "message": "تحرير حقول الإستماره"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "تعديل الاستمارة الشخصية"
+   },
+   "Edit_Secure_Note": {
+      "message": "تحرير ملاحظة آمنة"
+   },
+   "Edit_Secure_Notes": {
+      "message": "عدل ملاحظة أمنة"
+   },
+   "Edit_Site": {
+      "message": "تعديل الموقع"
+   },
+   "Edit_Site_Fields": {
+      "message": "تحرير حقول الموقع"
+   },
+   "Education": {
+      "message": "التعليم"
+   },
+   "Egypt": {
+      "message": "مصر"
+   },
+   "El_Salvador": {
+      "message": "السلفادور"
+   },
+   "Email": {
+      "message": "البريد الإلكتروني"
+   },
+   "Email_": {
+      "message": "البريد الإلكتروني :"
+   },
+   "Email_Account": {
+      "message": "حساب البريد الإلكتروني"
+   },
+   "Email_Address": {
+      "message": "عنوان البريد الإلكتروني"
+   },
+   "Email_Address_": {
+      "message": "عنوان البريد الإلكتروني :"
+   },
+   "Email_address": {
+      "message": "عنوان البريد الإلكتروني"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "البريد الالكتروني موجود بالفعل ، هل نسيت كلمة السر؟"
+   },
+   "Enable": {
+      "message": "تمكين"
+   },
+   "Enable_Credit_Monitoring": {
+      "message": "تمكين مراقبة بطاقة الائتمان"
+   },
+   "Encryption": {
+      "message": "التشفير"
+   },
+   "End": {
+      "message": "نهاية"
+   },
+   "English": {
+      "message": "إنجليزي"
+   },
+   "English__United_Kingdom_": {
+      "message": "الإنكليزية (المملكة المتحدة)"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "أدخل ملاحظة عشوائية"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "أدخل الرقم السري الخاص ببطاقتك الذكية"
+   },
+   "Enterprise": {
+      "message": "مشروع"
+   },
+   "Entertainment": {
+      "message": "تسلية"
+   },
+   "Equatorial_Guinea": {
+      "message": "غينيا الاستوائية"
+   },
+   "Eritrea": {
+      "message": "اريتريا"
+   },
+   "Error": {
+      "message": "خطأ"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "لقد حدث خطأ أثناء استرداد مواقعك. الرجاء حاول تسجيل الدخول مرة اخري لاسترداد مواقعك."
+   },
+   "ErrorLoginMsg": {
+      "message": "حدث خطأ أثناء تسجيل الدخول إلى 'لاست باس'. فضلا تأكد من اتصالك بالانترنت."
+   },
+   "ErrorSendingMsg": {
+      "message": "حدث خطأ أثناء محاولة الاتصال بالخادم. يرجى التحقق من الاتصال بالإنترنت."
+   },
+   "ErrorSessionMsg": {
+      "message": "يبدو أن جلسة حسابك في 'لاست باس' قد إنتهت . فضلاً أعد تسجيل الدخول ."
+   },
+   "Error_opening_attachment_": {
+      "message": "حدث خطأ أثناء فتح المرفقات."
+   },
+   "Estonia": {
+      "message": "استونيا"
+   },
+   "Ethiopia": {
+      "message": "اثيوبيا"
+   },
+   "Evening_Number": {
+      "message": "عدد المساء"
+   },
+   "Evening_number": {
+      "message": "عدد مساء"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "يستطيع لاست باس أن يحفظ محلياً كلمة سر مؤقتة (OTP) تستخدم لإستعادة حسابك في حال نسيان كلمة السر الرئيسية. ستبقى كلمة السر المؤقتة (OTP) معطلة لحين تنشيطها على الخادم.\nهل تريد تنشيط استعادة الحساب؟"
+   },
+   "Expand_All": {
+      "message": "عرض الكل"
+   },
+   "Expiration": {
+      "message": "الانتهاء"
+   },
+   "Expiration_Date": {
+      "message": "تاريخ انتهاء الصلاحية"
+   },
+   "Expiration_date": {
+      "message": "تاريخ انتهاء الصلاحية"
+   },
+   "Export": {
+      "message": "تصدير"
+   },
+   "Export_To": {
+      "message": "تصدير إلى"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "صدر لملف CSV الخاص بلاست باس"
+   },
+   "FIPS_Mode": {
+      "message": "FIPS الوضع"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "(جزر فوكلاند (مالفيناس"
+   },
+   "Faroe_Islands": {
+      "message": "جزر فارو"
+   },
+   "Favorite": {
+      "message": "المفضلة"
+   },
+   "Favoritesproper": {
+      "message": "المفضلة"
+   },
+   "Fax_Number": {
+      "message": "رقم الفاكس"
+   },
+   "Fax_number": {
+      "message": "رقم الفاكس"
+   },
+   "Features": {
+      "message": "الميزات"
+   },
+   "February": {
+      "message": "فبراير"
+   },
+   "Feedback": {
+      "message": "ملاحظات"
+   },
+   "Female": {
+      "message": "أنثى"
+   },
+   "Field_Type_": {
+      "message": "نوع الحقل"
+   },
+   "Fields_": {
+      "message": "حَقْل"
+   },
+   "Fiji": {
+      "message": "فيجي"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "فيجي ، كامتشاتكا ، مارشال."
+   },
+   "File": {
+      "message": "ملف"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "ملف كبير جدا، يجب أن يكون أقل من 10MB."
+   },
+   "Fill": {
+      "message": "ملء"
+   },
+   "Fill_Current": {
+      "message": "ملء الحالي"
+   },
+   "Fill_Form": {
+      "message": "ملء نموذج"
+   },
+   "Fill_Forms": {
+      "message": "ملء الاستمارات"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "أدخل شخصية ملئ الاستمارات المرجعية"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "ملء تسجيل الدخول التالي (عندما يكون تسجيل الدخول لعدة مرات)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "ملء تسجيل الدخول السابق (عندما يكون تسجيل الدخول لعدة مرات)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "أو ملء نموذج تحرير تعبئة البيانات"
+   },
+   "FillableFormDetected": {
+      "message": "اُكتشفت حقول يمكن ملؤها في هذه الصفحة."
+   },
+   "Filter": {
+      "message": "صفِّ"
+   },
+   "Finance": {
+      "message": "مالية"
+   },
+   "Find_a_site": {
+      "message": "بحث موقع"
+   },
+   "Finland": {
+      "message": "فنلندا"
+   },
+   "Finnish": {
+      "message": "فنلندية"
+   },
+   "Firefox": {
+      "message": "فايرفوكس"
+   },
+   "Firefox_Password_Manager": {
+      "message": "مدير كلمة السر في فايرفوكس"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "أول 3 أرقام من رقم هاتفك"
+   },
+   "First_Name": {
+      "message": "الإسم الشخصي"
+   },
+   "First_name": {
+      "message": "الإسم الشخصي"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "لكل احداثي مذكورة أدناه، اعثر على القيمة في الشبكة الخاصة بك وأدخل القيمة."
+   },
+   "Forgot_your_password_": {
+      "message": "هل نسيت كلمة السر؟"
+   },
+   "FormFill": {
+      "message": "ملأ الاستمارة"
+   },
+   "Form_Fill": {
+      "message": "ملئ الاستمارة."
+   },
+   "Form_Fill_Profiles": {
+      "message": "تشكيل ملامح التعبئة"
+   },
+   "Form_Fills": {
+      "message": "نماذج التعبئة"
+   },
+   "Form_Name_": {
+      "message": "إسم الاستمارة :"
+   },
+   "Format": {
+      "message": "شكل"
+   },
+   "Forums": {
+      "message": "منتدى"
+   },
+   "France": {
+      "message": "فرنسا"
+   },
+   "French": {
+      "message": "الفرنسية"
+   },
+   "French_Guiana": {
+      "message": "غيانا الفرنسية"
+   },
+   "French_Polynesia": {
+      "message": "بولينيزيا الفرنسية"
+   },
+   "French_Southern_Territories": {
+      "message": "الأقاليم الجنوبية الفرنسية"
+   },
+   "French__Canada_": {
+      "message": "الفرنسية (كندا)"
+   },
+   "GMT_5": {
+      "message": "GMT +5"
+   },
+   "GMT_7": {
+      "message": "GMT +7"
+   },
+   "GMT_9": {
+      "message": "GMT +9"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "بتوقيت جرينتش : دبلن ، أدنبرة ، لشبونة ، لندن"
+   },
+   "Gabon": {
+      "message": "غابون"
+   },
+   "Gambia": {
+      "message": "غامبيا"
+   },
+   "Games": {
+      "message": "ألعاب"
+   },
+   "Gender": {
+      "message": "النوع"
+   },
+   "General": {
+      "message": "عام"
+   },
+   "Generate": {
+      "message": "إنشاء"
+   },
+   "GeneratePassword": {
+      "message": "إذا كنت تقوم بإنشاء حساب أو تغيير لكلمة سر، إضغط لتكوين كلمة سر فريدة و آمنة بإستخدام لاست باس."
+   },
+   "Generate_Password": {
+      "message": "أنشاء كلمة السر"
+   },
+   "Generate_Secure_Password": {
+      "message": "ولّد كلمة سر"
+   },
+   "Generated_Password_for": {
+      "message": "إنشاء كلمة السر لـ"
+   },
+   "Generic": {
+      "message": "عام"
+   },
+   "Generic_CSV_File": {
+      "message": "ملف CSV عام"
+   },
+   "Georgia": {
+      "message": "جورجيا"
+   },
+   "German": {
+      "message": "الألمانية"
+   },
+   "Germany": {
+      "message": "ألمانيا"
+   },
+   "Ghana": {
+      "message": "غانا"
+   },
+   "Gibraltar": {
+      "message": "جبل طارق"
+   },
+   "Go_Back": {
+      "message": "عد"
+   },
+   "Go_Premium_": {
+      "message": "ترقية للأفضل"
+   },
+   "Go_to_URL": {
+      "message": "الذهاب إلى رابط"
+   },
+   "Google_Authenticator": {
+      "message": "موثق غوغل"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "مصادقة متعددة العوامل مصادقة Google"
+   },
+   "Google_Chrome": {
+      "message": "جوجل كروم"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "مدير كلمات السر لجوجل كروم"
+   },
+   "Google_Chrome_requires_that_extensions_use_the_same_language_as_the_browser__so_in_order_to_switch_LastPass_s_language__please_change_the_main_browser_language_under_Chrome_s_Options_": {
+      "message": "جوجل كروم يتطلب ملحقات استخدام اللغة نفس المتصفح ، وذلك من أجل تبديل لغة LastPass ، يرجى تغيير لغة المتصفح الرئيسي تحت خيارات كروم."
+   },
+   "Greece": {
+      "message": "اليونان"
+   },
+   "Greenland": {
+      "message": "جرينلاند"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "غرينلاند ، برازيليا ، مونتيفيديو"
+   },
+   "Grenada": {
+      "message": "غرينادا"
+   },
+   "Group_": {
+      "message": "مجلد:"
+   },
+   "Group_ID": {
+      "message": "معرف المجموعة"
+   },
+   "Group_Name": {
+      "message": "اسم المجلد"
+   },
+   "Guadeloupe": {
+      "message": "غواديلوب"
+   },
+   "Guam": {
+      "message": "غوام"
+   },
+   "Guatemala": {
+      "message": "غواتيمالا"
+   },
+   "Guernsey": {
+      "message": "غيرنسي"
+   },
+   "Guinea": {
+      "message": "غينيا"
+   },
+   "Guinea_Bissau": {
+      "message": "غينيا بيساو"
+   },
+   "Guyana": {
+      "message": "غيانا"
+   },
+   "Haiti": {
+      "message": "هايتي"
+   },
+   "Harare__Pretoria": {
+      "message": "هراري ، بريتوريا"
+   },
+   "Hawaii": {
+      "message": "هاواي"
+   },
+   "Health": {
+      "message": "صحة"
+   },
+   "Health_Insurance": {
+      "message": "التأمين الصحي"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "جزيرة هيرد وجزر ماكدونالد"
+   },
+   "Height": {
+      "message": "ارتفاع"
+   },
+   "Help": {
+      "message": "مساعدة"
+   },
+   "Help_Translate": {
+      "message": "ساعد في الترجمة"
+   },
+   "Help___": {
+      "message": "مساعدة..."
+   },
+   "Help_spread_the_word": {
+      "message": "ساعد في انتشار المقولة"
+   },
+   "Hide": {
+      "message": "إخفاء"
+   },
+   "Hide_Advanced_Options": {
+      "message": "إخفاء الخيارات المتقدمة"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "إخفاء خيارات قائمة السياق"
+   },
+   "Hide_Password": {
+      "message": "إخفاء كلمة السر"
+   },
+   "Hide_Passwords": {
+      "message": "إخفاء الأرقام السريه"
+   },
+   "Highlight_input_boxes": {
+      "message": "ميز مربعات الإدخال"
+   },
+   "History": {
+      "message": "السجل"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "(دولة الفاتيكان)"
+   },
+   "Home": {
+      "message": "الصفحة الرئيسية"
+   },
+   "Honduras": {
+      "message": "هندوراس"
+   },
+   "Hong_Kong": {
+      "message": "هونج كونج"
+   },
+   "Hostname": {
+      "message": "المضيف"
+   },
+   "HotKeys": {
+      "message": "اختصارات"
+   },
+   "Hungarian": {
+      "message": "مجري"
+   },
+   "Hungary": {
+      "message": "المجر"
+   },
+   "IBAN_Number": {
+      "message": "رقم الأيبان"
+   },
+   "IMPORT_": {
+      "message": "إستيراد؟"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "انه من الضروري أن لا تنسى ابدا كلمة سرك الجديدة في لاست باس."
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "لقد نسيت كلمة السر ، تعليمات"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "لقد قرأت وأتفق مع"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "أفهم أن بياناتي المشفرة سوف يتم إرسالها إلى سيرفر لاست باس"
+   },
+   "Iceland": {
+      "message": "أيسلندا"
+   },
+   "Icons": {
+      "message": "الأيقونات"
+   },
+   "Identities": {
+      "message": "الهويات"
+   },
+   "Identity": {
+      "message": "الهوية"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "إذا كان لديك حساب لاست باس تستطيع أن تغلق هذه النافذة و تقوم بالدخول."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "في نهاية المطاف إذا نسيت كلمة سر لاست باس الرئيسية ،"
+   },
+   "If_you_forgot_your_answer__click_here_to_reset_your_security_question": {
+      "message": "إن نسيت الإجابة، فاضغط هنا لإعادة تعيين سؤال الأمان"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "إذا كنت قد فقدت جهازك السمسم ، انقر هنا لتعطيل مصادقة جهاز السمسم ."
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "إذا كنت قد فقدت جهازك 'يوبي كي' ، انقر هنا لتعطيل مصادقة جهاز 'اليوبي كي' ."
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "إذا فقدت الشبكة الخاصة بك، اضغط هنا لتعطيل مصادقة الشبكة"
+   },
+   "Import": {
+      "message": "استيراد"
+   },
+   "Import_From": {
+      "message": "استورد من"
+   },
+   "Import_Your_Data": {
+      "message": "استيراد البيانات الخاصة بك"
+   },
+   "Importing_your_data_to_your_LastPass_vault_will_secure_it_and_protect_you_against_identity_theft__All_imported_data_remains_COMPLETELY_confidential__the_only_person_who_can_view_YOUR_data_is_YOU_": {
+      "message": "سوف استيراد البيانات إلى قبو LastPass الخاص تأمينها وحمايتك ضد سرقة الهوية. جميع البيانات المستوردة لا تزال سرية تماما : هو الشخص الوحيد الذي يستطيع عرض البيانات الخاصة بك أنت."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_enable_access_for_assistive_devices_": {
+      "message": "من أجل LastPass لملء مربعات الحوار في المصادقة الأساسية ، تحتاج إلى تمكين وصول المعينات."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_install_the_binary_version_of_LastPass_for_Chrome_": {
+      "message": "يجب تثبيت الإصدار الثنائي للاست باس لكروم، من أجل ملئ مربعات حوار الدخول الأساسية."
+   },
+   "India": {
+      "message": "الهند"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "إنديانا ، بوغوتا ، ليما ، كيتو ، وريو برانكو"
+   },
+   "Indonesia": {
+      "message": "اندونيسيا"
+   },
+   "Install": {
+      "message": "تثبيت"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "ثبت إصدار لاست باس الثنائي لكروم لتفعيل الخروج الأوتوماتيكي بعد الخمول"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_importing_passwords_from_Google_Chrome_password_manager": {
+      "message": "ثبت إصدار لاست باس الثنائي لكروم لتفعيل إستيراد كلمات السر من مدير كلمات السر لجوجل كروم"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "ثبت إصدار لاست باس الثنائي لكروم لتفعيل عرض حالة الدخول مع متصفحات أخرى"
+   },
+   "Instant_Messenger": {
+      "message": "المرسل الفوري"
+   },
+   "Instructions": {
+      "message": "تعليمات"
+   },
+   "Insurance": {
+      "message": "تأمين"
+   },
+   "International_Date_Line_West": {
+      "message": "خط التاريخ الدولي الغربي"
+   },
+   "Invalid_Password_": {
+      "message": "كلمة المرور غير صالحة."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "عنوان البريد الإلكتروني غير صالح ، حاول مرة أخرى"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "الجمهورية الايرانية الاسلامية"
+   },
+   "Iraq": {
+      "message": "العراق"
+   },
+   "Ireland": {
+      "message": "أيرلندا"
+   },
+   "Isle_of_Man": {
+      "message": "جزيرة مان"
+   },
+   "Israel": {
+      "message": "اسرائيل"
+   },
+   "Issue_Number": {
+      "message": "تاريخ الإصدار"
+   },
+   "Issue_number": {
+      "message": "رقم الإصدار"
+   },
+   "Issued_Date": {
+      "message": "تاريخ الإصدار"
+   },
+   "Issuing_Authority": {
+      "message": "الجهة المصدرة"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "من المستحسن أن تقوم بحذف الملف المرفق بعد استخدامه."
+   },
+   "Italian": {
+      "message": "الايطالية"
+   },
+   "Italy": {
+      "message": "إيطاليا"
+   },
+   "Jamaica": {
+      "message": "جامايكا"
+   },
+   "January": {
+      "message": "يناير"
+   },
+   "Japan": {
+      "message": "اليابان"
+   },
+   "Japanese": {
+      "message": "اليابانية"
+   },
+   "Jersey": {
+      "message": "جيرسي"
+   },
+   "Jordan": {
+      "message": "الأردن"
+   },
+   "July": {
+      "message": "يوليو"
+   },
+   "June": {
+      "message": "يونيو"
+   },
+   "Kabul": {
+      "message": "كابول"
+   },
+   "Kathmandu": {
+      "message": "كاتماندو"
+   },
+   "Kazakhstan": {
+      "message": "كازاخستان"
+   },
+   "KeePass": {
+      "message": "'كي باس'"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "الحفاظ على سجل تسجيلات دخولي وتعبة الاستمارات"
+   },
+   "Kenya": {
+      "message": "كينيا"
+   },
+   "Key_Index": {
+      "message": "مفتاح الفهرس"
+   },
+   "Key_Type": {
+      "message": "نوع المفتاح"
+   },
+   "Kiribati": {
+      "message": "كيريباتي"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "جمهورية كوريا الديمقراطية الشعبية"
+   },
+   "Korea__Republic_Of": {
+      "message": "جمهورية كوريا"
+   },
+   "Korean": {
+      "message": "الكورية"
+   },
+   "Kuwait": {
+      "message": "الكويت"
+   },
+   "Kyrgyzstan": {
+      "message": "قيرغيزستان"
+   },
+   "La_Paz": {
+      "message": "لاباز"
+   },
+   "Language": {
+      "message": "اللغة"
+   },
+   "Language_": {
+      "message": "اللغة :"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "جمهورية لاو الديمقراطية"
+   },
+   "LastPass": {
+      "message": "لاست باس"
+   },
+   "LastPass_CSV_File": {
+      "message": "ملف لاست باس قيمهُ مفصولةٌ بفواصل"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "شريط أدوات LastPass لكروم"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "ملف 'لاست باس' مشفر"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "مصادقة شبكة لاست باس متعددة العوامل"
+   },
+   "LastPass_Menu": {
+      "message": "قائمة لاست باس"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": "لاست باس يمكنه ملء الإستمارات تلقائيا في صفحات الويب بنقرة واحدة. استخدام 'ملء الإستمارات' التلقائي لن يوفر لك الوقت فقط ، ولكن سيؤدي أيضا إلى تعزيز الأمان عند التسوق عبر الإنترنت."
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "لاست باس لا يستطيع الدخول حتى يتم السماح لسجل التتبع (Cookies) من lastpass.com"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "إكتشف لاست باس عن نموذج دخول غير آمن .\\\n\\\nهل ترغب في الاستمرار ؟"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "إكتشف 'لاست باس' عن نموذج دخول غير آمن .\n\nلا تزال تريد أن يقوم 'لاس باس' بملء النموذج ؟"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "'لاست باس' اكتشف تغيير في كلمة السر لــ"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "'لاست باس' اكتشف تغيير في كلمة السر للنطاق :"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "'لاست باس' اكتشف تغيير في كلمة السر للمستخدم :"
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "كشف LastPass خطأ التثبيت. الرجاء إعادة تثبيت LastPass."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "وجد LastPass أنك تستعمل كلمة مرور ضعيفة على هذا الموقع. ننصحك بأن تتوجه إلى إعدادات الحساب في هذا الموقع، وتُنشئ كلمة مرور جديدة. استخدم LastPass لتوليد كلمة مرور قوية وفريدة خاصةٍ بهذا الحساب. بعدها يمكنك حفظ التغييرات على الموقع وفي LastPass."
+   },
+   "LastPass_has_detected_that_you_have_used_the_password_for_this_login_on_other_sites__too__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "وجد LastPass أنك تستعمل كلمة مرور على هذا الموقع مماثلة لكلمات مرور على مواقع أخرى. ننصحك بأن تتوجه إلى إعدادات الحساب في هذا الموقع، وتُنشئ كلمة مرور جديدة. استخدم LastPass لتوليد كلمة مرور قوية وفريدة خاصةٍ بهذا الحساب. بعدها يمكنك حفظ التغييرات على الموقع وفي LastPass."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "لقد ملأ لاست باس الاستمارة في هذه الصفحة بمعلومات دخولك."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "مثبت LastPass تماما! عند تثبيت LastPass على أجهزة كمبيوتر أخرى لن تضطر الى الذهاب من خلال هذه العملية مرة أخرى ، فسوف يكون مجرد القدرة على الدخول. لا نشاطركم ماستر كلمة السر مع أي شخص ، بمن فيهم الموظفون LastPass ، ونحن لن نسأل عن ذلك! LastPass تشفير البيانات الحساسة الخاصة بك حتى محليا حتى LastPass الموظفين لا يستطيعون الوصول إليها. يمكنك الحصول على المساعدة من خلال النقر على أيقونة LastPass والذهاب الى مساعدة."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "لاست باس هي كلمة السر الأخيرة التي عليك تذكرها . إذا كنت جديدا على لاست باس ، سنحتاج فقط بضع دقائق من وقتك لإعداد حسابك. ستكون قادرا على استخدام هذا الحساب على أي جهاز كمبيوتر أخر تستخدمه دائماً لحفظ و مزامنة بياناتك الشخصية .  أنشئ حسابك للبدأ."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "آخر 4 أرقام من رقم هاتفك"
+   },
+   "Last_Name": {
+      "message": "الإسم العائلي"
+   },
+   "Last_Name2": {
+      "message": "الإسم العائلي 2"
+   },
+   "Last_Touch": {
+      "message": "آخر وصول"
+   },
+   "Last_name": {
+      "message": "الإسم العائلي"
+   },
+   "Latvia": {
+      "message": "لاتفيا"
+   },
+   "Launch": {
+      "message": "بدء"
+   },
+   "Launch_Site": {
+      "message": "أطلق الموقع"
+   },
+   "Lebanon": {
+      "message": "لبنان"
+   },
+   "Left": {
+      "message": "يسار"
+   },
+   "Lesotho": {
+      "message": "ليسوتو"
+   },
+   "Liberia": {
+      "message": "ليبيريا"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "الجماهيرية العربية الليبية"
+   },
+   "License_Class": {
+      "message": "فئة الترخيص"
+   },
+   "License_Key": {
+      "message": "مفتاح الترخيص"
+   },
+   "Liechtenstein": {
+      "message": "ليختنشتاين"
+   },
+   "Link_Personal_Account": {
+      "message": "ربط حساب الشخصية"
+   },
+   "Lithuania": {
+      "message": "ليتوانيا"
+   },
+   "Local": {
+      "message": "محلي"
+   },
+   "Log_into_a_Site": {
+      "message": "سجل في الموقع"
+   },
+   "Login": {
+      "message": "دخول"
+   },
+   "LoginError": {
+      "message": "خطأ في تسجيل الدخول , يرجي المحاوله مره اخري"
+   },
+   "Login_to_LastPass": {
+      "message": "الدخول إلى 'لاست باس'"
+   },
+   "Logoff": {
+      "message": "خروج"
+   },
+   "Logoff_": {
+      "message": "خروج :"
+   },
+   "Logoff_after_logged_in_for_minutes": {
+      "message": "تسجيل الخروج بعد تسجيل الدخول لدقائق"
+   },
+   "Logoff_on_browser_close": {
+      "message": "تسجيل الخروج عند إغلاق المتصفح"
+   },
+   "Logout": {
+      "message": "تسجيل خروج"
+   },
+   "LoseChanges": {
+      "message": "هل أنت متأكد أنك تريد تحرير الحقول في هذا الموقع؟ القيام بذلك يؤدي إلى فقدان أي التغييرات التي أجريتها في هذا الموقع!"
+   },
+   "Luxembourg": {
+      "message": "لوكسمبورغ"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "حافظ كلمات السر MSI"
+   },
+   "Macao": {
+      "message": "ماكاو"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "مقدونيا ، الجمهورية اليوغوسلافية سابقا"
+   },
+   "Madagascar": {
+      "message": "مدغشقر"
+   },
+   "Malawi": {
+      "message": "ملاوي"
+   },
+   "Malaysia": {
+      "message": "ماليزيا"
+   },
+   "Maldives": {
+      "message": "جزر المالديف"
+   },
+   "Male": {
+      "message": "ذكر"
+   },
+   "Mali": {
+      "message": "مالي"
+   },
+   "Malta": {
+      "message": "مالطا"
+   },
+   "Manage_Shared_Folders": {
+      "message": "إدارة المجلدات المشتركة"
+   },
+   "March": {
+      "message": "مارس"
+   },
+   "Marshall_Islands": {
+      "message": "جزر مارشال"
+   },
+   "Martinique": {
+      "message": "مارتينيك"
+   },
+   "Master_Password": {
+      "message": "كلمة السر الرئيسية"
+   },
+   "Master_Password_": {
+      "message": "كلمة السر الرئيسية"
+   },
+   "Matching_Sites": {
+      "message": "مواقع متشابهة"
+   },
+   "Mauritania": {
+      "message": "موريتانيا"
+   },
+   "Mauritius": {
+      "message": "موريشيوس"
+   },
+   "May": {
+      "message": "مايو"
+   },
+   "Mayotte": {
+      "message": "مايوت"
+   },
+   "Member_ID": {
+      "message": "معرف العضو"
+   },
+   "Member_Name": {
+      "message": "اسم العضو"
+   },
+   "Membership": {
+      "message": "عضوية"
+   },
+   "Membership_Number": {
+      "message": "رقم العضوية"
+   },
+   "Message": {
+      "message": "رسالة"
+   },
+   "Meta": {
+      "message": "الفوقية"
+   },
+   "Mexico": {
+      "message": "المكسيك"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "ولايات ميكرونيزيا المتحدة"
+   },
+   "Mid_Atlantic": {
+      "message": "منتصف المحيط الأطلسي"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "٣ أرقام الوسطى من رقم هاتفك"
+   },
+   "Middle_Name": {
+      "message": "الاسم الأوسط"
+   },
+   "Middle_name": {
+      "message": "الاسم الأوسط"
+   },
+   "Midway_Island__Samoa": {
+      "message": "جزيرة ميدواي ، ساموا"
+   },
+   "Mobile_Email_Address": {
+      "message": "عنوان البريد الإلكتروني النقال"
+   },
+   "Mobile_Number": {
+      "message": "رقم الجوال"
+   },
+   "Mobile_number": {
+      "message": "رقم الجوال"
+   },
+   "Moldova__Republic_Of": {
+      "message": "مولدوفا ، جمهورية"
+   },
+   "Monaco": {
+      "message": "موناكو"
+   },
+   "Mongolia": {
+      "message": "منغوليا"
+   },
+   "Montenegro": {
+      "message": "الجبل الأسود"
+   },
+   "Montserrat": {
+      "message": "مونتسيرات"
+   },
+   "More": {
+      "message": "أكثر"
+   },
+   "More_Information": {
+      "message": "مزيد من المعلومات"
+   },
+   "More_Options": {
+      "message": "مزيدًا من الخيارات"
+   },
+   "Morocco": {
+      "message": "المغرب"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "التوقيت الجبلي (الولايات المتحدة وكندا)"
+   },
+   "Move_to_Group": {
+      "message": "نقل إلى مجلد"
+   },
+   "Move_to_Sub_Group": {
+      "message": "نقل إلى مجلد فرعي"
+   },
+   "Mozambique": {
+      "message": "موزامبيق"
+   },
+   "Mr": {
+      "message": "السيد"
+   },
+   "Mrs": {
+      "message": "السيدة"
+   },
+   "Ms": {
+      "message": "الآنسة"
+   },
+   "Multifactor_Authentication": {
+      "message": "مصادقة متعددة العوامل"
+   },
+   "MyPasswordSafe": {
+      "message": "خزنة كلمات السر"
+   },
+   "My_Account": {
+      "message": "حسابي"
+   },
+   "My_LastPass_Vault": {
+      "message": "خزنتي في لاست باس"
+   },
+   "Myanmar": {
+      "message": "ميانمار"
+   },
+   "NAME": {
+      "message": "الاسم"
+   },
+   "Name_": {
+      "message": "الاسم:"
+   },
+   "Name_on_Card": {
+      "message": "الإسم على البطاقة"
+   },
+   "Name_on_card": {
+      "message": "الاسم على بطاقة"
+   },
+   "Nameproper": {
+      "message": "الاسم"
+   },
+   "Namibia": {
+      "message": "ناميبيا"
+   },
+   "Nationality": {
+      "message": "الجنسية"
+   },
+   "Nauru": {
+      "message": "ناورو"
+   },
+   "Nepal": {
+      "message": "نيبال"
+   },
+   "Netherlands": {
+      "message": "هولندا"
+   },
+   "Netherlands_Antilles": {
+      "message": "جزر الأنتيل الهولندية"
+   },
+   "Never": {
+      "message": "أبدا"
+   },
+   "Never_Ask_Again": {
+      "message": "لا تسأل مرة أخرى"
+   },
+   "Never_Show_Again": {
+      "message": "لا تظهر مرة أخرى"
+   },
+   "Never___": {
+      "message": "أبداً ..."
+   },
+   "Never_show_me_this_message_again_": {
+      "message": "*عدم إظهار هذه الرسالة لي مرة آخرى مطلقًا"
+   },
+   "New_Caledonia": {
+      "message": "كاليدونيا الجديدة"
+   },
+   "New_Master_Password": {
+      "message": "كلمة سر رئيسية الجديدة"
+   },
+   "New_Zealand": {
+      "message": "نيوزيلندا"
+   },
+   "Newfoundland": {
+      "message": "نيوفاوندلاند"
+   },
+   "News_Reference": {
+      "message": "أخبار/مراجع"
+   },
+   "Nicaragua": {
+      "message": "نيكاراغوا"
+   },
+   "Niger": {
+      "message": "النيجر"
+   },
+   "Nigeria": {
+      "message": "نيجيريا"
+   },
+   "Niue": {
+      "message": "نيوي"
+   },
+   "No": {
+      "message": "لا"
+   },
+   "No_Matching_Sites_": {
+      "message": "لا يوجد موقع متطابق"
+   },
+   "No_Thanks": {
+      "message": "لا، شكرا"
+   },
+   "No_Updates_Are_Available": {
+      "message": "لا يوجد أي تحديثات متوفرة ."
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "لا ، أنا لا أريد الست باس مساعدتي في ملءالإاستمارات تلقائيا"
+   },
+   "No__Thanks": {
+      "message": "لا، شكرًا"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "لا، لا تستورد أيا من المعلومات غير الآمنة"
+   },
+   "None_Available": {
+      "message": "غير متوفر"
+   },
+   "Norfolk_Island": {
+      "message": "جزيرة نورفولك"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "جزر ماريانا الشمالية"
+   },
+   "Norway": {
+      "message": "النرويج"
+   },
+   "Norwegian": {
+      "message": "النرويجية"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "نينورسك النرويجية"
+   },
+   "Not_Now": {
+      "message": "ليس الآن"
+   },
+   "Note": {
+      "message": "ملاحظة"
+   },
+   "Note_Type": {
+      "message": "طبيعة الملاحظة"
+   },
+   "Note_Type_": {
+      "message": "نوع الملاحظة"
+   },
+   "Notes": {
+      "message": "الملاحظات"
+   },
+   "Notes_": {
+      "message": "ملاحظات :"
+   },
+   "Notifications": {
+      "message": "الإشعارات"
+   },
+   "November": {
+      "message": "نوفمبر"
+   },
+   "Nuku_alofa": {
+      "message": "نوكوالوفا"
+   },
+   "Number": {
+      "message": "عدد"
+   },
+   "Number_of_Licenses": {
+      "message": "عدد التراخيص"
+   },
+   "OK": {
+      "message": "موافق"
+   },
+   "October": {
+      "message": "أكتوبر"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "انصح لتكوين كلمات سر آمنة"
+   },
+   "Old_Password": {
+      "message": "كلمة السر القديمة"
+   },
+   "Oman": {
+      "message": "عمان"
+   },
+   "One_Time_Passwords": {
+      "message": "كلمات السر لمرة واحدة"
+   },
+   "Open_All": {
+      "message": "فتح الجميع"
+   },
+   "Open_Favorites": {
+      "message": "إفتح المفضلة"
+   },
+   "Open_File": {
+      "message": "افتح ملفًا"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "افتح خزانتي في لاست باس"
+   },
+   "Open_New_Pages_in": {
+      "message": "فتح صفحات جديدة في"
+   },
+   "Opera": {
+      "message": "أوبرا"
+   },
+   "Order_Number": {
+      "message": "رقم الطلب"
+   },
+   "Order_Total": {
+      "message": "مجموع الطلب"
+   },
+   "Organization": {
+      "message": "منظمة"
+   },
+   "Other": {
+      "message": "أخرى"
+   },
+   "Other_Sessions": {
+      "message": "جلسات أخرى"
+   },
+   "PASSWORDupper": {
+      "message": "كلمة السر"
+   },
+   "PINs_Password_Manager": {
+      "message": "PINs مدير كلمات المرور"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "توقيت المحيط الهادي (الولايات المتحدة وكندا)"
+   },
+   "Page_Down": {
+      "message": "صفحة للأسفل"
+   },
+   "Page_Up": {
+      "message": "صفحه لأعلي"
+   },
+   "Pakistan": {
+      "message": "باكستان"
+   },
+   "Palau": {
+      "message": "بالاو"
+   },
+   "Palestinian_Territories": {
+      "message": "الأراضي الفلسطينية"
+   },
+   "Panama": {
+      "message": "بنما"
+   },
+   "Papua_New_Guinea": {
+      "message": "بابوا غينيا الجديدة"
+   },
+   "Paraguay": {
+      "message": "باراغواي"
+   },
+   "Passpack": {
+      "message": "'باس باك'"
+   },
+   "Passport": {
+      "message": "جواز سفر"
+   },
+   "Password": {
+      "message": "كلمة السر"
+   },
+   "Password_": {
+      "message": "كلمة السر :"
+   },
+   "Password_Agent": {
+      "message": "عميل كلمات السر"
+   },
+   "Password_Corral": {
+      "message": "كلمة سر كورال"
+   },
+   "Password_Dragon": {
+      "message": "كلمة السر تنين"
+   },
+   "Password_Keeper": {
+      "message": "حافظ كلمات السر"
+   },
+   "Password_Length": {
+      "message": "طول كلمة السر"
+   },
+   "Password_Length_": {
+      "message": "مدى كلمة السر:"
+   },
+   "Password_Reminder": {
+      "message": "تذكير كلمة السر"
+   },
+   "Password_Reminder_": {
+      "message": "تذكير لكلمة السر :"
+   },
+   "Password_Safe": {
+      "message": "خزانة كلمات السر"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "لا يجب ان يكون التذكير لكلمة السر متطابق لكلمة السر"
+   },
+   "Password_updated_": {
+      "message": "تم تحديث كلمة السر"
+   },
+   "Passwords_Max": {
+      "message": "الحد الأقصى لي كلمات السر"
+   },
+   "Personal": {
+      "message": "خاص"
+   },
+   "Peru": {
+      "message": "بيرو"
+   },
+   "Philippines": {
+      "message": "الفلبين"
+   },
+   "Phone_Number": {
+      "message": "رقم الهاتف"
+   },
+   "Phone_number": {
+      "message": "رقم الهاتف"
+   },
+   "Physician_Name": {
+      "message": "اسم الطبيب"
+   },
+   "Pin": {
+      "message": "(بين (رقم التعريف الشخصي"
+   },
+   "Pitcairn": {
+      "message": "بيتكيرن"
+   },
+   "Please_Make_a_Selection": {
+      "message": "إختر من فضلك"
+   },
+   "Please_Wait___": {
+      "message": "يرجى الانتظار ..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "من فضلك أجب عن هذا السؤال:"
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": ".يرجى الاحتفاظ بهذه الصفحة مفتوحة حتى اكتمال العملية"
+   },
+   "Please_move_sites_from_only_one_shared_folder_at_a_time_": {
+      "message": "الرجاء نقل المواقع من مجلد مشترك واحد فقط في وقت واحد."
+   },
+   "Please_note_that_upgrading_from_LastPass_Local_to_LastPass_Online_will_result_in_your_password_data_being_uploaded_in_its_encrypted_format_to_LastPass_servers___You_will_be_able_to_access_your_data_from_anywhere__and_LastPass_will_not_be_able_to_read_it___Would_you_like_to_continue_": {
+      "message": "يرجى ملاحظة أن الترقية من المحلية إلى LastPass LastPass أون لاين ستؤدي في البيانات كلمة السر الخاصة بك يتم تحميله في شكلها مشفرة إلى ملقمات LastPass. هل سيكون قادرا على الوصول إلى البيانات من أي مكان ، وLastPass لن يكون قادرا على قراءتها. هل ترغب في الاستمرار؟"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "يرجى تقديم اسم هذا الكمبيوتر"
+   },
+   "Please_reload_the_page_to_view_your_changes_": {
+      "message": "يرجى تحديث الصفحة لعرض التغييرات."
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "الرجاء إعادة فتح كل برامج التصفح للبدء في استخدام لاست باس على الإنترنت"
+   },
+   "Please_select": {
+      "message": "الرجاء اختيار"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "الرجاء اختيار المواقع التي تريد تطبيق هذا التغييرعليها."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "يرجى زيارة https://lastpass.com لإنشاء حساب في أي وقت لاحق."
+   },
+   "Poland": {
+      "message": "بولندا"
+   },
+   "Policy_Number": {
+      "message": "عدد سياسة"
+   },
+   "Policy_Type": {
+      "message": "نوع السياسة"
+   },
+   "Polish": {
+      "message": "البولندية"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "(تحقق من التغييرات في الخادم كل (دقائق"
+   },
+   "Port": {
+      "message": "ميناء"
+   },
+   "Portugal": {
+      "message": "البرتغال"
+   },
+   "Portuguese": {
+      "message": "البرتغالية"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "البرتغالية (البرازيل)"
+   },
+   "Preferences": {
+      "message": "تفضيلات"
+   },
+   "Price": {
+      "message": "السعر"
+   },
+   "Print": {
+      "message": "طباعة"
+   },
+   "Print_Screen": {
+      "message": "طباعة الشاشة"
+   },
+   "Print_Secure_Notes": {
+      "message": "إطبع ملاحظة آمنة"
+   },
+   "Print_Sites": {
+      "message": "طباعة المواقع"
+   },
+   "Privacy": {
+      "message": "الخصوصية"
+   },
+   "Private_Key": {
+      "message": "المفتاح خااص"
+   },
+   "Product": {
+      "message": "المنتج"
+   },
+   "Productivity_Tools": {
+      "message": "أدوات الإنتاجية"
+   },
+   "Profile": {
+      "message": "ملف التعريف"
+   },
+   "Profile_language": {
+      "message": "لغة الشخصية"
+   },
+   "Profile_name": {
+      "message": "إسم الشخصية"
+   },
+   "Pronounceable": {
+      "message": "نطق"
+   },
+   "Protected": {
+      "message": "محمي"
+   },
+   "Public_Key": {
+      "message": "المفتاح العام"
+   },
+   "Publisher": {
+      "message": "الناشر"
+   },
+   "Puerto_Rico": {
+      "message": "بورتوريكو"
+   },
+   "Purchase_Date": {
+      "message": "تاريخ الشراء"
+   },
+   "Qatar": {
+      "message": "قطر"
+   },
+   "Reason": {
+      "message": "سبب"
+   },
+   "Recently_Used": {
+      "message": "استخدمت مؤخراً"
+   },
+   "Recently_Used_list_size": {
+      "message": "حجم لائحة ' المستخدمة أخيرا '"
+   },
+   "Recheck_Page": {
+      "message": "إعادة فحص الصفحة"
+   },
+   "Reencrypting_Data___": {
+      "message": "إعادة تشفير البيانات..."
+   },
+   "Refresh": {
+      "message": "تحديث"
+   },
+   "Refresh_Sites": {
+      "message": "تحديث مواقع"
+   },
+   "Reject": {
+      "message": "رفض"
+   },
+   "Remember_Email": {
+      "message": "تذكر البريد الالكتروني"
+   },
+   "Remember_Password": {
+      "message": "تذكر كلمة السر"
+   },
+   "Remove_Personal_Account": {
+      "message": "إزالة حساب شخصي"
+   },
+   "Rename_Group": {
+      "message": "إعادة تسمية المجلد"
+   },
+   "Replace_Existing_Site": {
+      "message": "إستبدل الموقع الموجود"
+   },
+   "Require_Every_Character_Type": {
+      "message": "يتطلب جميع انواع الأحرف"
+   },
+   "Require_Password_Reprompt": {
+      "message": "يتطلب إعادة ادخال كلمة السر"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "تتطلب reprompt الأمن في الحالات التالية :"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "احترم إلغاء الملء الآلي إذا كان = ملغى : السماح للمواقع بإلغاء خاصية الملء الآلي"
+   },
+   "Restore__General__Defaults": {
+      "message": "إستعادة 'عام' الإفتراضي"
+   },
+   "Reunion": {
+      "message": "ريونيون"
+   },
+   "Right": {
+      "message": "اليمين"
+   },
+   "RoboForm": {
+      "message": "'روبوفورم'"
+   },
+   "Romania": {
+      "message": "رومانيا"
+   },
+   "Routing_Number": {
+      "message": "رقم التوجيه"
+   },
+   "Routing_number": {
+      "message": "رقم التوجيه"
+   },
+   "Russian": {
+      "message": "الروسية"
+   },
+   "Russian_Federation": {
+      "message": "الاتحاد الروسي"
+   },
+   "Rwanda": {
+      "message": "رواندا"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "موقع"
+   },
+   "SMTP_Port": {
+      "message": "ميناء بروتوكول نقل البريد الإلكتروني"
+   },
+   "SMTP_Server": {
+      "message": "خادم بروتوكول نقل البريد الإلكتروني"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SWIFT_Code": {
+      "message": "رمز السويفت"
+   },
+   "Safari": {
+      "message": "سفاري"
+   },
+   "Saint_Barthelemy": {
+      "message": "سانت بارتيليمي"
+   },
+   "Saint_Helena": {
+      "message": "سانت هيلانة"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "سانت كيتس ونيفيس"
+   },
+   "Saint_Lucia": {
+      "message": "سانت لوسيا"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "سانت مارتن (الجزء الفرنسي"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "سان بيار وميكلون"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "سانت فنسنت وغرينادين"
+   },
+   "Samoa": {
+      "message": "ساموا"
+   },
+   "San_Marino": {
+      "message": "سان مارينو"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "ساو تومي وبرينسيبي"
+   },
+   "Saudi_Arabia": {
+      "message": "المملكة العربية السعودية"
+   },
+   "Save": {
+      "message": "حفظ"
+   },
+   "Save_All_Entered_Data": {
+      "message": "حفظ جميع البيانات المدخلة"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "حفظ الملف بطاقة الائتمان"
+   },
+   "Save_File": {
+      "message": "احفظ"
+   },
+   "Save_New_Site": {
+      "message": "حفظ الموقع الجديد"
+   },
+   "Save_Password_to_Vault": {
+      "message": "حفظ كلمة المرور إلى الخزنة"
+   },
+   "Save_Site": {
+      "message": "حفظ الموقع"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "إحفظ كلمة السر المؤقتة و المعطلة محليا لأجل إسترداد الحساب"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "إحفظ التغييرات و أغلق النافذة"
+   },
+   "Save_your_password_to_your_LastPass_Vault_": {
+      "message": "هل ترغب في حفظ كلمة المرور في خزنة LastPass ؟"
+   },
+   "Saved_Passwords": {
+      "message": "كلمات المرور المحفوظة"
+   },
+   "Screen_Keyboard": {
+      "message": "لوحة المفاتيح على الشاشة"
+   },
+   "Search_All_Data": {
+      "message": "بحث فى كل البيانات"
+   },
+   "Search_All_Notes": {
+      "message": "بحث فى كل الملاحظات"
+   },
+   "Search_All_Sites": {
+      "message": "بحث فى كل المواقع"
+   },
+   "Search_LastPass_Vault": {
+      "message": "البحث في خزنة LastPass "
+   },
+   "Search_Vault": {
+      "message": "البحث في الخزنة"
+   },
+   "Search_within_secure_notes": {
+      "message": "بحث في الملاحظات الآمنه"
+   },
+   "Searchproper": {
+      "message": "بحث"
+   },
+   "Secure_Note": {
+      "message": "المذكرة الامنة"
+   },
+   "Secure_Notes": {
+      "message": "ملاحظات آمنة"
+   },
+   "Security": {
+      "message": "الأمان"
+   },
+   "Security_Check": {
+      "message": "تأكد من الحماية"
+   },
+   "Security_Code": {
+      "message": "الكود السري"
+   },
+   "Security_Question_Multifactor_Authentication": {
+      "message": "تصديق سؤال الأمان متعدد العوامل"
+   },
+   "Security_code": {
+      "message": "رقم الحماية"
+   },
+   "Select": {
+      "message": "حدد"
+   },
+   "Select_All": {
+      "message": "حدد الكل"
+   },
+   "Select_Identity": {
+      "message": "اختر الهوية"
+   },
+   "Select_or_enter_a_new_group_name": {
+      "message": "تحديد أو إدخال اسم مجلد جديد"
+   },
+   "Send": {
+      "message": "إرسال"
+   },
+   "Send_Email": {
+      "message": "إرسل بريد إلكتروني"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "أرسل خطأ مجهول إبلاغ البيانات للمساعدة في تحسين LastPass"
+   },
+   "Senegal": {
+      "message": "السنغال"
+   },
+   "September": {
+      "message": "سبتمبر"
+   },
+   "Serbia": {
+      "message": "صربيا"
+   },
+   "Server": {
+      "message": "الخادم"
+   },
+   "SesameWrongButton": {
+      "message": "لإستعراض بياناتك عندما تكون غير متصل بالشبكة يجب تشغيل تطبيق السمسم و إختيار الزر ' إنسخ كلمة السر لوضع دون إتصال '  بدلاً من زر 'ولد كلمة سر لإستخدامها لمرة واحدة' ."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "مصادقة العدة عوامل في تطبيق السمسم"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "تعيين حقول النموذج المخصص بالتسجيل"
+   },
+   "Settings": {
+      "message": "الإعدادات"
+   },
+   "Sex": {
+      "message": "الجنس"
+   },
+   "Seychelles": {
+      "message": "سيشيل"
+   },
+   "Share": {
+      "message": "مشاركة"
+   },
+   "Share_Folder": {
+      "message": "نشر المجلد"
+   },
+   "Share_Selected": {
+      "message": "حصة مختارة"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "مشاركة حالة تسجيل الدخول بين المتصفحات الأخرى"
+   },
+   "Share_offer_from": {
+      "message": "أنشر إستمارة العرض"
+   },
+   "Shares": {
+      "message": "المشاركات"
+   },
+   "Shift": {
+      "message": "ٍاهبف"
+   },
+   "Shopping": {
+      "message": "تسوق"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "هل تريد من 'لاست باس' حفظ كلمة السر ؟"
+   },
+   "Show": {
+      "message": "عرض"
+   },
+   "Show_Advanced_Options": {
+      "message": "عرض خيارات متقدمة"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "أظهر شريط الإعلام في حالة تغيير كلمة السر"
+   },
+   "Show_Deleted_Items": {
+      "message": "عرض العناصر المحذوفة"
+   },
+   "Show_Deleted_Sites": {
+      "message": "أظهر المواقع المحذوفة"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "أظهر شريط إعلام التعبئة"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "أظهر إشعارات ملئ الاستمارة"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "أظهر خزانتي في 'لاست باس' بعد الدخول ."
+   },
+   "Show_Notifications": {
+      "message": "عرض إشعارات"
+   },
+   "Show_Password": {
+      "message": "اظهار كلمة السر"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "أظهر شريط إعلام حفظ الموقع"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "عرض إشعارات حفظ الموقع"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "عرض المواقع في المجلدات"
+   },
+   "Show_Vault_After_Login": {
+      "message": "إظهار خازنة كلمات السر بعد تسجيل الدخول"
+   },
+   "Show_all_sites": {
+      "message": "عرض كل المواقع"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "أظهر بعض الإشعارات فقط بعد الضغط على الزر"
+   },
+   "Show_notifications_below_browser": {
+      "message": "إظهار إشعارات بأسفل المتصفح"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "ويبين آخر دخول حقل مخصص"
+   },
+   "Sierra_Leone": {
+      "message": "سيراليون"
+   },
+   "Sign_In": {
+      "message": "تسجيل الدخول"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "بسط حياتك : إستخدم لاست باس لملئ معلومات الدخول أوتوماتيكيا في هذا الموقع !"
+   },
+   "Singapore": {
+      "message": "سنغافورة"
+   },
+   "Site": {
+      "message": "الموقع"
+   },
+   "Site_Search": {
+      "message": "بحث عن موقع"
+   },
+   "Sites": {
+      "message": "المواقع"
+   },
+   "Slovak": {
+      "message": "السلوفاكية"
+   },
+   "Slovakia": {
+      "message": "سلوفاكيا"
+   },
+   "Slovenia": {
+      "message": "سلوفينيا"
+   },
+   "Social": {
+      "message": "شبكات اجتماعية"
+   },
+   "Social_Security": {
+      "message": "الضمان الاجتماعي"
+   },
+   "Social_Security_Number": {
+      "message": "رقم الضمان الاجتماعي"
+   },
+   "Social_security_number": {
+      "message": "رقم الضمان الاجتماعي"
+   },
+   "Software_License": {
+      "message": "ترخيص البرنامج"
+   },
+   "Solomon_Islands": {
+      "message": "جزر سليمان"
+   },
+   "Somalia": {
+      "message": "الصومال"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "عذرا، هذا المجلد المشترك هو للقراءة فقط."
+   },
+   "Sorry__you_cannot_perform_this_operation_on_a_mix_of_shared_and_non_shared_folders__or_multiple_shared_folders_at_once_": {
+      "message": "آسف، لا يمكنك إجراء هذه العملية على مزيج من المجلدات المشتركة وغير المشتركة، أو متعددة المجلدات المشتركة في وقت واحد."
+   },
+   "Source": {
+      "message": "مصدر"
+   },
+   "South_Africa": {
+      "message": "جنوب أفريقيا"
+   },
+   "South_Georgia": {
+      "message": "جورجيا الجنوبية"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "جورجيا الجنوبية وجزر ساندويتش الجنوبية"
+   },
+   "Spain": {
+      "message": "اسبانيا"
+   },
+   "Spanish": {
+      "message": "الاسبانية"
+   },
+   "Spanish__Mexico_": {
+      "message": "الأسبانية (المكسيك)"
+   },
+   "Special": {
+      "message": "خاص"
+   },
+   "SplashID": {
+      "message": "سبلاش أيدي"
+   },
+   "Sports": {
+      "message": "رياضة"
+   },
+   "Sri_Lanka": {
+      "message": "سري لانكا"
+   },
+   "Start_Date": {
+      "message": "تاريخ البدء"
+   },
+   "Start_date": {
+      "message": "تاريخ البدء"
+   },
+   "State": {
+      "message": "الولاية"
+   },
+   "State___Province": {
+      "message": "الدولة / المقاطعة"
+   },
+   "Sticky_Password": {
+      "message": "كلمة سر لزجة"
+   },
+   "Submit_Form": {
+      "message": "قدم النموذج"
+   },
+   "Submitting___": {
+      "message": "...إرسال"
+   },
+   "Sudan": {
+      "message": "السودان"
+   },
+   "Support_Email": {
+      "message": "البريد الالكتروني للدعم"
+   },
+   "Suriname": {
+      "message": "سورينام"
+   },
+   "Suspicious_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "عُثر على حروف مشبوهة في اسم الملف المختار، لذا تقرر ألا يُعالج"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "سفالبارد وجان ماين"
+   },
+   "Swaziland": {
+      "message": "سوازيلاند"
+   },
+   "Sweden": {
+      "message": "السويد"
+   },
+   "Swedish": {
+      "message": "السويدية"
+   },
+   "Swipe_current_user_s_finger": {
+      "message": "انتقد مستخدم الحالي الاصبع"
+   },
+   "Swipe_finger": {
+      "message": "حركة الإصبع"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "انتقد إصبعك على استشعار بصمات الأصابع"
+   },
+   "Switzerland": {
+      "message": "سويسرا"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "الجمهورية العربية السورية"
+   },
+   "Tabs": {
+      "message": "الألسنة"
+   },
+   "Taiwan": {
+      "message": "تايوان"
+   },
+   "Tajikistan": {
+      "message": "طاجيكستان"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "تنزانيا ، جمهورية تنزانيا المتحدة."
+   },
+   "Tehran": {
+      "message": "طهران"
+   },
+   "Telecom": {
+      "message": "الاتصالات"
+   },
+   "Telephone": {
+      "message": "الهاتف"
+   },
+   "Tell_a_friend_": {
+      "message": "أخبر صديقا"
+   },
+   "Text": {
+      "message": "النص"
+   },
+   "Text_to_find": {
+      "message": "إبحث عن النص"
+   },
+   "Thailand": {
+      "message": "تايلاند"
+   },
+   "That_group_already_exists_": {
+      "message": "هذا المجلد موجود مسبقا."
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "السنة 4 أرقام صدرت بطاقة الائتمان"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "كلمة سر 'لاست باس' الرئيسية التي دخلتها ليست متطابقة"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "في 'كلمة المرور القديمة' الذي أدخلته غير سيدك LastPass الصحيح كلمة المرور"
+   },
+   "The_binary_version_of_the_LastPass_plugin_is_required_for_this_operation__It_can_be_downloaded_from_lastpass_com_": {
+      "message": "للقيام بي هذه العملية يرجى تثبيت الإصدار الثنائي للاست باس. يمكن تحميل هذا لإصدار من lastpass.com"
+   },
+   "The_credit_card_number": {
+      "message": "رقم بطاقة الائتمان"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "بطاقة الائتمان وأرقام انقضاء 4 سنوات"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "شهر إنتهاء صالحية بطاقة الائتمان"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "بطاقة الائتمان في مسألة تطبيق number.\nOnly لماركات أوروبية معينة من بطاقات السحب الآلي ، مثل مايسترو."
+   },
+   "The_credit_card_s_security_code__For_most_credit_cards__this_is_the_last_3_digits_of_a_number_printed_on_the_back_of_the_card__For_American_Express_credit_cards__it_is_the_last_4_digits_of_a_number_printed_in_small_print_on_the_front_of_the_card_": {
+      "message": "code.\nFor بطاقة الائتمان الأمنية معظم بطاقات الائتمان ، وهذا هو آخر 3 أرقام من عدد مطبوعة على الجزء الخلفي من card.\nFor بطاقات أميركان اكسبريس الائتمان ، هو آخر 4 أرقام من عدد المطبوعة بحروف صغيرة على الجبهة للبطاقة."
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "الاسم الكامل المطبوعة على بطاقات الائتمان"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "الشهر صدر بطاقة الائتمان"
+   },
+   "The_name_of_your_bank": {
+      "message": "اسم البنك الذي تتعامل معه"
+   },
+   "The_notes_field_contains_too_much_data___You_may_store_a_maximum_of_45_000_characters_per_note___Would_you_like_us_to_truncate_the_note_for_you___You_will_lose_some_of_your_data_": {
+      "message": "حقل الملاحظات يحتوي على بيانات أكثر من اللازم. يمكنك تخزين45000 حرف كحد أقصى لكل ملاحظة.\n\nهل يمكننا تقصير هذه الملاحظة؟ ستفقد بعض البيانات التي تم ادخالها."
+   },
+   "The_number_of_characters_in_the_generated_password_": {
+      "message": "عدد الأحرف في كلمة المرور التي تم إنشاؤها."
+   },
+   "The_value_to_be_filled": {
+      "message": "القيمة المراد ملؤها"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "إن النسخه التي تستخدمها حالياً من كروم لا تدعم قواعد بيانات HTML5. مثلاً، صفحة الدخول هذه لن تتذكر بريدك الإلكتروني و كلمة السر، و خدمات أخرى كالدخول التلقائي لن تعمل عند إعادة تشغيل المتصفح. قد تستطيع أن تحل هذه المشكلة بإضافة --تمكين- قواعد بيانات كعامل متغير لإختصار متصفح جوجل كروم."
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "لا يمكن التعامل معها إلا من خلال صفحة ويب"
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "هذا موقع مشترك . غير مسموح لك عرض كلمة السر ."
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "هذا هو إسم أو رابط صفحة الويب."
+   },
+   "This_may_take_a_while___": {
+      "message": "...قد يستغرق هذا بعض الوقت"
+   },
+   "Time_Zone": {
+      "message": "المنطقة الزمنية"
+   },
+   "Timor_Leste": {
+      "message": "تيمور الشرقية"
+   },
+   "Title": {
+      "message": "اللقب"
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "لتبدأ مع LastPass ، وسوف تحتاج لإضافة المواقع إلى حسابك."
+   },
+   "To_import_your_MSI_PasswordKeeper_logins__open_the_program___Click__Txt___and_then__Open____Import_the_resulting_file_": {
+      "message": "لإستيراد تسجيلات الدخول من MSI PasswordKeeper، إفتح البرنامج وأنقر على 'TXT'، ومن ثم على 'Open'. استيراد الملف الناتج."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "لحماية خصوصيتك والحفاظ على سرية البيانات الخاصة بك ،"
+   },
+   "Togo": {
+      "message": "توغو"
+   },
+   "Tokelau": {
+      "message": "توكيلاو"
+   },
+   "Tonga": {
+      "message": "تونغا"
+   },
+   "Tools": {
+      "message": "أدوات"
+   },
+   "Travel": {
+      "message": "سفر"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "ترينيداد وتوباغو"
+   },
+   "Try_Again": {
+      "message": "حاول مرة أخرى"
+   },
+   "Tunisia": {
+      "message": "تونس"
+   },
+   "TurboPasswords": {
+      "message": "'تيربو باسوردز'"
+   },
+   "Turkey": {
+      "message": "تركيا"
+   },
+   "Turkmenistan": {
+      "message": "تركمانستان"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "جزر تركس وكايكوس"
+   },
+   "Tutorials": {
+      "message": "الدروس"
+   },
+   "Tuvalu": {
+      "message": "توفالو"
+   },
+   "Type": {
+      "message": "نوع"
+   },
+   "Type_": {
+      "message": "النوع :"
+   },
+   "URL": {
+      "message": "عنوان الموقع"
+   },
+   "URL_": {
+      "message": "العنوان :"
+   },
+   "USERNAME": {
+      "message": "اسم المستخدم"
+   },
+   "Uganda": {
+      "message": "أوغندا"
+   },
+   "Ukraine": {
+      "message": "أوكرانيا"
+   },
+   "United_Arab_Emirates": {
+      "message": "الامارات"
+   },
+   "United_Kingdom": {
+      "message": "المملكة المتحدة"
+   },
+   "United_States": {
+      "message": "الولايات المتحدة"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "الولايات المتحدة الجزر الصغيرة النائية"
+   },
+   "Unselect_All": {
+      "message": "إلغاء تحديد الكل"
+   },
+   "Up": {
+      "message": "فوق"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "! ارتقي للاست باس على الانترنت"
+   },
+   "Uploading_Data___": {
+      "message": "تحميل البيانات..."
+   },
+   "Uruguay": {
+      "message": "أوروغواي"
+   },
+   "Use_802_1X": {
+      "message": "استخدم 802.1X"
+   },
+   "Use_Password": {
+      "message": "استخدام كلمة المرور"
+   },
+   "Use_Special_Characters": {
+      "message": "استخدام أحرف خاصة"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "استخدام كلمة المرور هذه الآن (لهذا الموقع)؟"
+   },
+   "User_Manual": {
+      "message": "دليل المستخدم"
+   },
+   "User_name": {
+      "message": "اسم المستخدم"
+   },
+   "Username_": {
+      "message": "اسم المستخدم:"
+   },
+   "Usernameproper": {
+      "message": "اسم المستخدم"
+   },
+   "Uzbekistan": {
+      "message": "أوزبكستان"
+   },
+   "Value": {
+      "message": "القيمة"
+   },
+   "Value_to_fill": {
+      "message": "القيمة الواجب ملؤها"
+   },
+   "Vanuatu": {
+      "message": "فانواتو"
+   },
+   "Vault": {
+      "message": "الخزنة"
+   },
+   "Venezuela": {
+      "message": "فنزويلا"
+   },
+   "Version": {
+      "message": "الإصدار"
+   },
+   "Version_": {
+      "message": "الاصدار:"
+   },
+   "Viet_Nam": {
+      "message": "فيتنام"
+   },
+   "View_History": {
+      "message": "عرض السجل"
+   },
+   "View_Passwords": {
+      "message": "عرض كلمات السر"
+   },
+   "Virgin_Islands__British_": {
+      "message": "جزر فيرجن (البريطانية)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "جزر فيرجن (الأمريكية"
+   },
+   "Wallis_and_Futuna": {
+      "message": "واليس وفوتونا"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "حذرني قبل تعبأة النماذج الغير آمنة"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "شاهد فيديو حول الاستخدام الأساسي"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "كما أننا لا تبقي نسخة أو النسخ الاحتياطي منه."
+   },
+   "Weak_Password": {
+      "message": "كلمة مرور ضعيفة"
+   },
+   "Website": {
+      "message": "الموقع"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "مرحبا بكم في LastPass!"
+   },
+   "West_Central_Africa": {
+      "message": "غرب أفريقيا الوسطى"
+   },
+   "Western_Sahara": {
+      "message": "الصحراء الغربية"
+   },
+   "Wi_Fi_Password": {
+      "message": "كلمة سر الواي فاي"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "كلمات سر الواي فاي"
+   },
+   "Windows": {
+      "message": "نوافذ"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "هل ترغب في إقامة شخصية لتعبئة النماذج الآن؟"
+   },
+   "XML_Files": {
+      "message": "ملفات إكس إم إل"
+   },
+   "Yangon__Rangoon_": {
+      "message": "يانغون (رانغون سابقا)"
+   },
+   "Yemen": {
+      "message": "اليمن"
+   },
+   "Yes": {
+      "message": "نعم"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "نعم، استخدام لهذا الموقع"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "نعم، أريد إختيار المعلومات المستوردة للاست باس"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "نعم، اسمحو لي أن أدخل و استعرض البيانات التي سيتم استخدامها عند ملئ الاستمارات"
+   },
+   "You_are_moving_sites_to_a_different_shared_folder__This_may_change_who_has_access_to_the_sites____Do_you_want_to_continue_": {
+      "message": "انت تنقل عدة مواقع لملفات مشاركة مختلفة. قد يتغير من هم قادرون على الوصول لهذه المواقع.\n\nهل ترغب في الإستمرار؟"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "لا يمكنك تعيين أكثر من اختصار لنفس القيمة"
+   },
+   "You_cannot_move_individually_shared_sites_into_a_shared_folder_": {
+      "message": "لا يمكنك نقل المواقع المشتركة بشكل فردي إلى مجلد مشترك."
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "حالياً لاست باس معد لكي يتذكر كلماتك السرية . القيام بذالك يجعل إعداد تسجيل الخروج التلقائي في لاست باس عديم الفائدة . هل تريد من لاست باس أن يتوقف عن تذكر كلماتك السرية ؟"
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "لازلت لم تختر الشخصية الأولية لملئ الإستمارات. هل تريد إختيار شخصية الآن؟"
+   },
+   "You_may_also_be_blocking_all_cookies__which_causes_Chrome_to_disallow_HTML5_database_access_": {
+      "message": "من الممكن أن تكون قد حظرت جميع الكوكيز، مما يجعل كروم يمنع الوصول إلى قاعدة البيانات باستخدام HTML5."
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "يجب أن توافق على إرسال البيانات المشفرة إلى موقع لاست باس LastPass.com.\n\nموقع LastPass.com يشفر البيانات الخاصة بك ويرسله إلى واحدة من خوادمنا الآمنة .\nلا أحد في لاست باس يمكنه قراءة بياناتك السرية الخاصة بك لأنه يتم تشفيرها بكلمة السر الخاصة بك وأنت الوحيد الذي يعرف كلمة السر الخاصة بك."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "يجب عليك أن توافق على الشروط للاستمرار"
+   },
+   "You_must_enter_a_name_": {
+      "message": "يجب عليك إدخال اسم."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "يجب إدخال اسم فريد :"
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "يجب عليك إعادة تشغيل كروم أو تسجيل الخروج و العودة ، لتسجيل الخروج من المتصفح أغلقه لكي تتم التغييرات ."
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "يتوجب إعادة تشغيل المتصفح لتفعيل كافة التغييرات."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "(سنة الازدياد (٤ أرقام"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "تم إستيراد كلمات السر الخاصة بك من جوجل كروم بنجاح."
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "الرمز البريدي الخاص بك"
+   },
+   "Your_address_information": {
+      "message": "معلومات عنوانك"
+   },
+   "Your_bank_account_information": {
+      "message": "معلومات الحساب المصرفي الخاص بك"
+   },
+   "Your_bank_account_number__This_number_can_typically_be_found_to_the_right_of_the_routing_number_on_your_personal_checks_": {
+      "message": "يمكن عادة لديك عدد number.\nThis حساب البنك يمكن العثور على يمين الرقم التوجيه على الشيكات الشخصية."
+   },
+   "Your_bank_s_routing_number__This_9_digit_number_can_typically_be_found_on_your_personal_checks_in_the_bottom_left_corner_": {
+      "message": "يمكن عادة البنك الذي تتعامل معه توجيه number.\nThis 9 الخانة يمكن العثور على الشيكات الشخصية الخاصة بك في أسفل الزاوية اليسرى."
+   },
+   "Your_birth_day": {
+      "message": "يوم ميلادك"
+   },
+   "Your_birth_month": {
+      "message": "شهر ميلادك"
+   },
+   "Your_city_name": {
+      "message": "اسم مدينتك"
+   },
+   "Your_company_s_name": {
+      "message": "اسم شركتك"
+   },
+   "Your_contact_information": {
+      "message": "معلومات الاتصال الخاصة بك"
+   },
+   "Your_country_name": {
+      "message": "اسم بلدك"
+   },
+   "Your_county_name": {
+      "message": "اسم مقاطعتك"
+   },
+   "Your_credit_card_information": {
+      "message": "معلومات بطاقة الائتمان الخاصة بك"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "إعداداتك الحالية تتطلب منك إدخال كلمة السر الخاصة بك لإستكمال هذا الإجراء ."
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "تم تصدير البيانات الخاصة بك إلى"
+   },
+   "Your_email_address": {
+      "message": "عنوان البريد الإلكتروني الخاص بك"
+   },
+   "Your_first_name": {
+      "message": "الإسم الأول"
+   },
+   "Your_government_ID_number": {
+      "message": "رقم البطاقة الشخصية"
+   },
+   "Your_last_name": {
+      "message": "الإسم العائلي"
+   },
+   "Your_middle_name": {
+      "message": "الإسم الأوسط"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "كلمة السر الخاصة بك لا يمكن أن تكون نفس البريد الإلكتروني الخاص بك."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "كلمة السر الخاصة بك سهلة التخمين"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "كلمة السر الخاصة بك قصيرة جدا. يجب أن لا تقل عن 6 احرف"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "كلمة السر الخاصة بك قصيرة جدا. ويجب أن تكون 8 أحرف على الأقل."
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "تذكير كلمة السر الخاصة بك يذكرك ماهي"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "كلمات المرور غير متطابقة."
+   },
+   "Your_personal_information": {
+      "message": "معلوماتك الشخصية"
+   },
+   "Your_phone_number": {
+      "message": "رقم الهاتف الخاص بك"
+   },
+   "Your_phone_number_extension": {
+      "message": "ملحق رقم الهاتف الخاص بك"
+   },
+   "Your_prefix_or_title": {
+      "message": "بادئة أو العنوان الخاص"
+   },
+   "Your_selected_Identity_no_longer_exists__Defaulting_to__All__and_logging_off_": {
+      "message": "هويتك المحدد لم يعد موجودا. تعثر على 'كل' وتسجيل الخروج."
+   },
+   "Your_sex": {
+      "message": "جنسك"
+   },
+   "Your_state_or_province_name": {
+      "message": "إسم الولاية أو المقاطعة"
+   },
+   "Your_street_address": {
+      "message": "عنوان الشارع الخاص بك"
+   },
+   "Your_time_zone": {
+      "message": "منطقة وقتك"
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "الإسم المستخدم عند الدخول للمواقع"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "مصادقة يوبيكي متعددة العوامل"
+   },
+   "Yugoslavia": {
+      "message": "يوغوسلافيا"
+   },
+   "ZIP___Postal_Code": {
+      "message": "الرمز البريدي"
+   },
+   "ZIP___Postal_code": {
+      "message": "الرمز البريدي"
+   },
+   "Zambia": {
+      "message": "زامبيا"
+   },
+   "Zimbabwe": {
+      "message": "زيمبابوي"
+   },
+   "_Hide_": {
+      "message": "[إخفاء]"
+   },
+   "_History_": {
+      "message": "[التاريخ]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(يوجد عروض مشاركة جديدة)"
+   },
+   "_Show_": {
+      "message": "[إظهار]"
+   },
+   "_domain_": {
+      "message": "(مجال)"
+   },
+   "_none_": {
+      "message": "(فارغ)"
+   },
+   "a_zlower": {
+      "message": "أ-ي"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "كلمة السر ، مع الحفاظ على سريتها ."
+   },
+   "ago": {
+      "message": "قبل"
+   },
+   "and": {
+      "message": "و"
+   },
+   "appName": {
+      "message": "إدارة كلمة السر مجانية"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "اتصل بنا ونحن سوف نرسلها إلى  البريد الإلكتروني الخاص بك."
+   },
+   "day": {
+      "message": "يوم"
+   },
+   "days": {
+      "message": "أيام"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "المحفظة الإلكترونية"
+   },
+   "ext_": {
+      "message": "تحويل"
+   },
+   "false": {
+      "message": "زائف"
+   },
+   "favorites": {
+      "message": "المفضلة"
+   },
+   "hour": {
+      "message": "ساعة"
+   },
+   "hours": {
+      "message": "ساعات"
+   },
+   "just_now": {
+      "message": "فقط الآن"
+   },
+   "minute": {
+      "message": "دقيقة"
+   },
+   "minutes": {
+      "message": "دقائق"
+   },
+   "month": {
+      "message": "أشهر"
+   },
+   "months": {
+      "message": "أشهر"
+   },
+   "privacy_statement": {
+      "message": "بيان الخصوصية"
+   },
+   "recently_usedlower": {
+      "message": "مستخدمة مؤخرا"
+   },
+   "search": {
+      "message": "بحث"
+   },
+   "second": {
+      "message": "الثانية"
+   },
+   "seconds": {
+      "message": "ثواني"
+   },
+   "send_more": {
+      "message": "إرسال المزيد"
+   },
+   "terms_of_service": {
+      "message": "شروط الخدمة"
+   },
+   "the_current_tab": {
+      "message": "التبويب الحالي"
+   },
+   "true": {
+      "message": "صحيح"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "نحن لا نعرف ما هي كلمة السر الخاصة بك لاست باس."
+   },
+   "week": {
+      "message": "الأسبوع"
+   },
+   "weeks": {
+      "message": "أسابيع"
+   },
+   "year": {
+      "message": "السنة"
+   },
+   "years": {
+      "message": "سنوات"
+   }
+}

@@ -1,0 +1,103 @@
+/* Background Image Styles */
+.login-background {
+  background-image: url('images/login-background.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #28353E;
+  box-shadow: inset 0 -36px 15px -10px #28353E;
+}
+.dialogHeader {
+  background-color: transparent;
+  padding: 10px 20px;
+}
+.login-background .dialogBlurOverlay {
+  background-color: transparent;
+}
+#alertDialog,
+#confirmationDialog {
+  background-color: white;
+  z-index: 2 !important;
+}
+#alertDialog {
+  max-width: 350px;
+}
+#alertDialog .dialogHeaderTitle,
+#confirmationDialog .dialogHeaderTitle {
+  color: #3C4A54;
+  font-size: 20px;
+}
+#alertDialog, #confirmationText
+#confirmationDialog #confirmationText {
+  color: #3F3F3A;
+  font-size: 13px;
+}
+#alertDialog .dialogContent,
+#confirmationDialog .dialogContent {
+  padding-top: 0;
+}
+#alertDialog .nbtn.btn_midi.wbtn,
+#confirmationDialog .nbtn.btn_midi.wbtn {
+  background-color: #3C4A54;
+  color: white !important;
+}
+#confirmationDialog .nbtn.btn_midi {
+  height: 50px;
+  padding: 0;
+  width: 100%;
+  margin: 10px 15px;
+}
+#alertDialog .nbtn.btn_midi {
+  height: 50px;
+  width: 140px;
+  padding: 0;
+  margin: 10px 15px;
+}
+.dropdownMenu {
+  z-index: 2;
+}
+#alertDialog,
+#confirmationDialog {
+  z-index: 99 !important;
+}
+
+#alertDialog .dialogHeaderTitle,
+#confirmationDialog .dialogHeaderTitle {
+  font-weight: 300;
+}
+#alertDialog .dialogContent,
+#confirmationDialog .dialogContent {
+  padding-bottom: 10px;
+  color: #3F3F3A;
+  font-size: 13px;
+}
+
+/* Overrides */
+.dialog .hr:before,
+.dialog .hr:after {
+  background-color: #8C969D;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+.dialog .hr {
+  overflow: hidden;
+  text-align: center;
+  color: #8C969D;
+}
+.dialog .validation-img {
+  width: 20px;
+  height: 20px;
+  background-position: center center;
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  margin-top: -1px;
+}
+.dialog .rbtn {
+  width:100%;
+  height: 50px;
+  padding: 0;
+}

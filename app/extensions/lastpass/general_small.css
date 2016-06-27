@@ -1,0 +1,88 @@
+body { font-family: Helvetica,Arial; min-width: 200px; min-height: 200px; }
+
+.fullpage{
+  max-width:250px;
+}
+#lp_docwrite_login_small7 { white-space:normal; width:258px !important; }
+#showvault { vertical-align: top; }
+
+#loginbody hr{
+  width:150%;
+  margin-left:-15%;
+  display: block; height: 1px;
+  border: 0; border-top: 1px solid #ccc;
+  margin-top: 15px; 
+}
+
+#loginbody{
+  height:300px;
+  color:#4c4c4c;
+  overflow:hidden;
+}
+
+#loginbody #deleteicon, #logincontainer #deleteicon{
+  margin-top:-2px;
+}
+/*
+#loginbody .teardrop{
+  margin-right:30px;
+}
+*/
+
+#rememberemailrow, #rememberpasswordrow, #showvaultrow{
+  padding:3px 0px;
+}
+.logininput { width:228px; height: 27px;
+  padding-right: 40px;
+  padding-left: 5px;
+ }
+.inputdiv input{ margin-top:2px; }
+
+#loginheader img{
+  float:right;
+  padding:5px 5px 0 0;
+  opacity:0.6;
+}
+#logintitletxt{
+  font-size:19px;
+}
+
+.inputdiv { padding-bottom:12px;}
+
+#forgotcontainer{
+  display:inline-block;
+  vertical-align:top;
+  margin-top:1px;
+  float:right;
+}
+
+#screenkeyboard{
+  margin-left:-40px;
+}
+
+#screenkeyboard img{
+  opacity:0.6;
+}
+#screenkeyboard img:hover{
+  opacity:1.0;
+}
+
+#screenkeyboardcontainer{
+  position:relative;
+  top:4px;
+}
+
+#deleteicon{
+  opacity:0.6;
+  margin-left:-22px;
+}
+#deleteicon:hover{
+  opacity:1.0;
+}
+#u_button{
+  left:190px !important;
+}
+
+#loginbody {
+  width:236px;min-width:236px;
+}

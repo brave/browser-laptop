@@ -1,0 +1,28 @@
+/* simpler slider */
+.slider {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	position: relative;
+	width: 210px;
+	height: 15px;
+	background: url(images/ghettoslider-bg.png) 50% 50% repeat-x;
+}
+.slider img {
+	position: absolute;
+	top: 0px;
+	left: 85px;
+}
+.slider .left, .slider .right {
+	height: 12px;
+	width: 2px;
+	position: absolute;
+	top: 0px;
+}
+.slider .left {
+	left: 0px;
+	background: url(images/ghettoslider-left.png) 0px 1px no-repeat;
+}
+.slider .right {
+	right: 0px;
+	background: url(images/ghettoslider-right.png) 0px 1px no-repeat;
+}

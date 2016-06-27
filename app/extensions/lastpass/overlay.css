@@ -1,0 +1,29 @@
+/*------scrollbar css --------*/
+
+::-webkit-scrollbar {
+        width: 10px;
+        height: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+        width: 10px;
+        background: hsla(0,0%,0%,0.15);
+        -webkit-border-radius: 5px;
+        -webkit-box-shadow:inset -2px 0px 5px hsla(0,0%,0%,0.3), inset 1px 0 0 hsla(0,0%,0%,0.2), inset -1px 0 0 hsla(0,0%,0%,0.2), inset 2px 0 0 hsla(0,0%,100%,0.4);
+}
+
+::-webkit-scrollbar-track {
+        width: 10px;
+        border-style: none;
+        -webkit-box-shadow:inset 2px 0px 5px hsla(0,0%,0%,0.15), inset 1px 0 0 hsla(0,0%,0%,0.2);
+        background-color: hsl(0,0%,93%);
+}
+
+.lppopupextended td, .lppopupextended th {
+  white-space:nowrap;
+  padding-right:5px;
+}
+
+body {
+  overflow:hidden;
+}

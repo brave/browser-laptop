@@ -1,0 +1,3386 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "12_hours": {
+      "message": "12 hodín"
+   },
+   "15_minutes": {
+      "message": "15 minút"
+   },
+   "1Password": {
+      "message": "1Password"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. Pripojte YubiKey k USB-portu tak aby kontaktná plocha smerovala nahor."
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. Spustite aplikáciu Google Authenticator na vašom mobilnom zariadení."
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. Spustite 'LastPass Sesame' aplikáciu pre vygenerovanie jednorazového hesla"
+   },
+   "1_hour": {
+      "message": "1 hodina"
+   },
+   "24_hours": {
+      "message": "24 hodín"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. Zadajte svoj aktuálny overovací kód do nasledujúceho rámčeka."
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. Vložte jednorazové heslo do vstupného poľa nižšie a stlačte  'Overtiť'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. Počkajte, pokým dotykové tlačítko na YubiKey nesvieti stálym svetlom."
+   },
+   "30_minutes": {
+      "message": "30 minút"
+   },
+   "30_seconds": {
+      "message": "30 sekúnd"
+   },
+   "3__Click_Authenticate": {
+      "message": "3. Kliknite na Overiť"
+   },
+   "3_hours": {
+      "message": "3 hodiny"
+   },
+   "5_minutes": {
+      "message": "5 minút"
+   },
+   "6_hours": {
+      "message": "6 hodín"
+   },
+   "ACTION": {
+      "message": "AKCIA"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "Nové heslo bolo vygenerované!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "Náhodne vygenerované heslo."
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "Dôležitá aktualizácia LastPass je k dispozícii. Prosím, stlačte OK pre začatie sťahovania a inštaláciu."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "Bol nájdený záložný súbor. Pravdepodobne neboli uložené všetky Vaše zmeny. Chcete zmazať tento záložný súbor a prípadne prísť o posledné zmeny?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "Pri spracovaní vašej požiadavky sa vyskytla chyba servera."
+   },
+   "About": {
+      "message": "O programe"
+   },
+   "About___": {
+      "message": "O aplikácii..."
+   },
+   "Accept": {
+      "message": "Prijať"
+   },
+   "Account_Number": {
+      "message": "Číslo účtu"
+   },
+   "Account_Settings": {
+      "message": "Nastavenie účtu"
+   },
+   "Account_Status": {
+      "message": "Stav účtu"
+   },
+   "Account_Type": {
+      "message": "Typ konta"
+   },
+   "Account_number": {
+      "message": "Číslo účtu"
+   },
+   "Actionproper": {
+      "message": "Akcia"
+   },
+   "Actions": {
+      "message": "Akcie"
+   },
+   "Add": {
+      "message": "Pridať"
+   },
+   "Add_Attachment": {
+      "message": "Pridať prílohu"
+   },
+   "Add_Credit_Card": {
+      "message": "Pridať kreditnú kartu"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "Pridať kreditnú kartu"
+   },
+   "Add_Field": {
+      "message": "Pridať pole"
+   },
+   "Add_Identity": {
+      "message": "Pridať totožnosť"
+   },
+   "Add_New_Site": {
+      "message": "Pridať novú lokalitu"
+   },
+   "Add_Note": {
+      "message": "Pridať poznámku"
+   },
+   "Add_Profile": {
+      "message": "Pridať profil"
+   },
+   "Add_Secure_Note": {
+      "message": "Pridať zabezpečenú poznámku"
+   },
+   "Add_Site": {
+      "message": "Pridať stránku"
+   },
+   "Add_another_custom_field": {
+      "message": "Pridať ďalšie vlastné pole"
+   },
+   "Address": {
+      "message": "Adresa"
+   },
+   "Address_1": {
+      "message": "Adresa 1"
+   },
+   "Address_2": {
+      "message": "Adresa 2"
+   },
+   "Address_3": {
+      "message": "Adresa 3"
+   },
+   "Adelaide": {
+      "message": "Adelaide"
+   },
+   "Admin_Tools": {
+      "message": "Nástroje administrátora"
+   },
+   "Administrator": {
+      "message": "Administrátor"
+   },
+   "Advanced": {
+      "message": "Rozšírené"
+   },
+   "Advanced_Options": {
+      "message": "Rozšírené možnosti"
+   },
+   "Advanced_Tools": {
+      "message": "Pokročilé nástroje"
+   },
+   "Afghanistan": {
+      "message": "Afganistan"
+   },
+   "Aland_Islands": {
+      "message": "Alandské ostrovy"
+   },
+   "Alaska": {
+      "message": "Aljaška"
+   },
+   "Albania": {
+      "message": "Albánsko"
+   },
+   "Algeria": {
+      "message": "Alžírsko"
+   },
+   "Alias": {
+      "message": "Prezývka"
+   },
+   "All": {
+      "message": "Všetko"
+   },
+   "Allow_All_Character_Types": {
+      "message": "Povoliť všetky typy znakov"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "Chcete, aby LastPass vyhľadal nezabezpečené údaje vo Vašom počítači?"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "Vždy vybrať profil a kreditnú kartu"
+   },
+   "American_Samoa": {
+      "message": "Americká Samoa"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "Amman, Atény, Istanbul, Beirut, Cairo, Jeruzalem"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "Amsterdam, Berlín, Rím, Viedeň, Praha, bratislava, Brusel"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "Aktualizácia je k dispozícii. Nainštalovať teraz?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "Pri načítaní lokalít sa vyskytla chyba. Znova sa prihláste."
+   },
+   "An_error_occurred": {
+      "message": "Vyskytla sa chyba"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "Nastala chyba pri importe Google Chrome hesiel."
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "Došlo k chybe opätovnom šifrovaní dát"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "Došlo k chybe pri nahrávaní dát. Chceli by ste skúsiť znova?"
+   },
+   "Andorra": {
+      "message": "Andorra"
+   },
+   "Angola": {
+      "message": "Angola"
+   },
+   "Anguilla": {
+      "message": "Anguilla"
+   },
+   "Antarctica": {
+      "message": "Antarktída"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "Antigua a Barbuda"
+   },
+   "Appearance": {
+      "message": "Vzhľad"
+   },
+   "Applications": {
+      "message": "Aplikácie"
+   },
+   "April": {
+      "message": "Apríl"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "Ste si istý, že to chcete odstrániť?"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "Naozaj chcete aby si LastPass pamätal heslo? Výrazne tým znížite bezpečnosť svojho LastPass účtu!"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "Ste si istí, že chcete zmazať?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "Ste si istý, že chcete odstrániť zvolené položky?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "Naozaj chcete odstrániť vybrané lokality?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "Naozaj chcete odstrániť túto aplikáciu?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "Naozaj chcete odstrániť toto pole?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "Naozaj chcete odstrániť tento profil na vypĺňanie formulárov?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "Naozaj chcete odstrániť toto vygenerované heslo?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_group_": {
+      "message": "Ste si istý, že chcete odstrániť tento priečinok?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "Skutočne chcete zmazať tento novší URL odkaz?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "Naozaj chcete odstrániť túto zabezpečenú poznámku?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "Naozaj chcete odstrániť túto lokalitu?"
+   },
+   "Argentina": {
+      "message": "Argentína"
+   },
+   "Arizona": {
+      "message": "Arizona"
+   },
+   "Armenia": {
+      "message": "Arménsko"
+   },
+   "Aruba": {
+      "message": "Aruba"
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "Atlantický čas (Kanada), Manaus, Santiago"
+   },
+   "Auckland__Wellington": {
+      "message": "Auckland, Wellington"
+   },
+   "August": {
+      "message": "August"
+   },
+   "Australia": {
+      "message": "Austrália"
+   },
+   "Austria": {
+      "message": "Rakúsko"
+   },
+   "Authenticate": {
+      "message": "Overiť"
+   },
+   "Authentication": {
+      "message": "Autentifikácia"
+   },
+   "Authentication_Failed_": {
+      "message": "Autentifikácia zlyhala."
+   },
+   "AutoFill": {
+      "message": "Automaticky vyplniť"
+   },
+   "AutoLogin": {
+      "message": "Automaticky prihlásiť"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "Automaticky vyplniť prihlasovacie údaje"
+   },
+   "Automatically_Log_out_after_idle__mins_": {
+      "message": "Automatické odhlásenie pri nečinnosti (minút)"
+   },
+   "Automatically_Log_out_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Automatické odhlásenie keď sú všetky prehliadače zatvorené a Chrome bude zatvorený po dobu (minút)"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "Automaticky Odhlásiť po nečinnosti (v minútach)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Automaticky odhlásiť keď boli všetky prehliadače ukončené a Chrome bolo ukončené po (min)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "Automatické prihlásenie na stránky, ak doba od posledného prihlásenia je > (sekúnd)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "vyhnite sa nejednoznačným znakom"
+   },
+   "Azerbaijan": {
+      "message": "Azerbajdžan"
+   },
+   "Azores": {
+      "message": "Azory"
+   },
+   "BACKUPPER": {
+      "message": "Naspäť"
+   },
+   "Back": {
+      "message": "Naspäť"
+   },
+   "Baghdad": {
+      "message": "Bagdad"
+   },
+   "Bahamas": {
+      "message": "Bahamy"
+   },
+   "Bahrain": {
+      "message": "Bahrajn"
+   },
+   "Baku__Yerevan": {
+      "message": "Baku, Yerevan"
+   },
+   "Bangladesh": {
+      "message": "Bangladéš"
+   },
+   "Bank_Account": {
+      "message": "Bankový účet"
+   },
+   "Bank_Name": {
+      "message": "Názov banky"
+   },
+   "Bank_accountformfill": {
+      "message": "Bankový účet"
+   },
+   "Bank_name": {
+      "message": "Názov banky"
+   },
+   "Barbados": {
+      "message": "Barbados"
+   },
+   "Before_you_can_use_LastPass__you_must_first_connect_your_fingerprint_reader_and_enroll_one_or_more_fingers_": {
+      "message": "Skôr, ako budete môcť používať LastPass, musíte pripojiť čítačku odtlačkov prstov a zosnímať jeden alebo viac prstov."
+   },
+   "Belarus": {
+      "message": "Bielorusko"
+   },
+   "Belgium": {
+      "message": "Belgicko"
+   },
+   "Belize": {
+      "message": "Belize"
+   },
+   "Benin": {
+      "message": "Benin"
+   },
+   "Bermuda": {
+      "message": "Bermudy"
+   },
+   "Bhutan": {
+      "message": "Bhután"
+   },
+   "Binary_Component_": {
+      "message": "Binárny plugin Chrome:"
+   },
+   "Birthday": {
+      "message": "Narodený"
+   },
+   "Bit_Strength": {
+      "message": "Pomerne silné"
+   },
+   "Blacklist": {
+      "message": "Z dôvodu veľkého počtu zlyhaní prihlásenia bola platnosť účtu na 5 minút pozastavená"
+   },
+   "Blog": {
+      "message": "Blog"
+   },
+   "Bolivia": {
+      "message": "Bolívia"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "Bosna a Hercegovina"
+   },
+   "Botswana": {
+      "message": "Botswana"
+   },
+   "Bouvet_Island": {
+      "message": "Bouvetov ostrov"
+   },
+   "Branch_Address": {
+      "message": "Adresa pobočky"
+   },
+   "Branch_Phone": {
+      "message": "Telefónne číslo pobočky"
+   },
+   "Brazil": {
+      "message": "Brazília"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "Britské územie v Indickom oceáne"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "Prehliadajte si stránky ako obvykle a LastPass si automaticky uloží heslá, keď ich zadáte."
+   },
+   "Brunei_Darussalam": {
+      "message": "Brunej"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "Buenos Aires, Georgetown"
+   },
+   "Built_": {
+      "message": "Vstavaný:"
+   },
+   "Bulgaria": {
+      "message": "Bulharsko"
+   },
+   "Burkina_Faso": {
+      "message": "Burkina Faso"
+   },
+   "Burundi": {
+      "message": "Burundi"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "Som zábudlivá osoba...čo by som mal spraviť, keď zabudnem svoje heslo?"
+   },
+   "CSV_Files": {
+      "message": "Súbory vo formáte CSV"
+   },
+   "Cambodia": {
+      "message": "Kambodža"
+   },
+   "Cameroon": {
+      "message": "Kamerun"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "Nemôžem nájsť skryté LastPass okno"
+   },
+   "Canada": {
+      "message": "Kanada"
+   },
+   "Canary_Islands": {
+      "message": "Kanárske ostrovy"
+   },
+   "Cancel": {
+      "message": "Zrušiť"
+   },
+   "Cape_Verde": {
+      "message": "Cape Verde"
+   },
+   "Cape_Verde_Is_": {
+      "message": "Cape Verde Is."
+   },
+   "Caracas": {
+      "message": "Caracas"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "Casablanca, Monrovia, Reykjavik"
+   },
+   "Catalan": {
+      "message": "Catalan"
+   },
+   "Cayman_Islands": {
+      "message": "Kajmanské ostrovy"
+   },
+   "Central_African_Republic": {
+      "message": "Stredoafrická republika"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "Central America, Saskatchewan"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "Central Time (US & Canada), Guadalajara, Mexico City"
+   },
+   "Chad": {
+      "message": "Čad"
+   },
+   "Change": {
+      "message": "Zmeniť"
+   },
+   "Change_Group_Name": {
+      "message": "Zmeniť názov priečinku"
+   },
+   "Change_Password": {
+      "message": "Zmeniť heslo"
+   },
+   "Check_For_Updates": {
+      "message": "Vyhľadať aktualizácie"
+   },
+   "Checkbox": {
+      "message": "Zaškrtávacie políčko"
+   },
+   "Checking_For_Updates___": {
+      "message": "Kontrola aktualizácií..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "Chennai, Kolkata, Mumbai, New Delhi, Sri Jayawardenepura"
+   },
+   "Chile": {
+      "message": "Čile"
+   },
+   "China": {
+      "message": "Čína"
+   },
+   "Chinese__Simplified_": {
+      "message": "Čínština (zjednodušená)"
+   },
+   "Chinese__Traditional_": {
+      "message": "Čínština (tradičná)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "Vyberte profil a kreditnú kartu"
+   },
+   "Christmas_Island": {
+      "message": "Vianočný ostrov"
+   },
+   "City___Town": {
+      "message": "Mesto / Obec"
+   },
+   "Clear": {
+      "message": "Vymazať"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "Po použití vyčistiť schránky (v sekundách)"
+   },
+   "Clear_Forms": {
+      "message": "Vymazať formuláre"
+   },
+   "Clear_Local_Cache": {
+      "message": "Vymazať lokálnu vyrovnávaciu pamäť"
+   },
+   "Clear_Recent": {
+      "message": "Vymazať posledné"
+   },
+   "Clear_filled_fields_on_log_out": {
+      "message": "Zmazať vyplnené polia po odhlásení"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "Vymazať vyplnené údaje po odhlásení"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "Pre začatie používania služby LastPass kliknite sem."
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "Klikni sem pre nastavenie účtu"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "Kliknite sem pre odovzdanie spätnej väzby"
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "Kliknutím skryjete rozšírené možnosti."
+   },
+   "Clipperz": {
+      "message": "Clipperz"
+   },
+   "Close": {
+      "message": "Zavrieť"
+   },
+   "Close_this_window": {
+      "message": "Zavrieť okno"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "Kokosové ostrovy"
+   },
+   "Collapse_All": {
+      "message": "Zbaliť všetko"
+   },
+   "Colombia": {
+      "message": "Kolumbia"
+   },
+   "Comoros": {
+      "message": "Comoros"
+   },
+   "Company": {
+      "message": "Spoločnosť"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "Firemná politika zakazuje túto operáciu."
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "Firemné smernice bránia zmene niektorých nastavení, nie všetky úpravy boli uložené."
+   },
+   "Configure_Form_Fill": {
+      "message": "Nastaviť vyplnenie žiadosti."
+   },
+   "Confirm": {
+      "message": "Potvrdiť"
+   },
+   "Confirm_Password": {
+      "message": "Potvrdiť heslo"
+   },
+   "Congo": {
+      "message": "Kongo"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "Kongo, demokratická republika"
+   },
+   "Congratulations": {
+      "message": "Gratulujeme"
+   },
+   "Connection_Mode": {
+      "message": "Režim pripojenia"
+   },
+   "Connection_Type": {
+      "message": "Typ pripojenia"
+   },
+   "Contact": {
+      "message": "Kontakt"
+   },
+   "Continue": {
+      "message": "Pokračovať"
+   },
+   "Cook_Islands": {
+      "message": "Cookove ostrovy"
+   },
+   "Copy": {
+      "message": "Kopírovať"
+   },
+   "Copy_Password": {
+      "message": "Kopírovať heslo"
+   },
+   "Copy_URL": {
+      "message": "Kopírovať URL"
+   },
+   "Copy_Username": {
+      "message": "Kopírovať používateľské meno"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "Copyright 2008 LastPass. Všetky práva vyhradené.\nČasti tejto aplikácie sú pod licenciou tretích strán, čo je vysvetlené na:"
+   },
+   "Costa_Rica": {
+      "message": "Kostarika"
+   },
+   "Cote_D_ivoire": {
+      "message": "Pobrežie Slonoviny"
+   },
+   "Country": {
+      "message": "Krajina"
+   },
+   "County": {
+      "message": "Oblasť"
+   },
+   "Create_Account": {
+      "message": "Vytvoriť účet"
+   },
+   "Create_Group": {
+      "message": "Vytvoriť priečinok"
+   },
+   "Create_Sub_Group": {
+      "message": "Vytvoriť podpriečinok"
+   },
+   "Create_an_Account": {
+      "message": "Vytvoriť účet"
+   },
+   "Creating_Account___": {
+      "message": "Vytváram účet..."
+   },
+   "Credit_Card": {
+      "message": "Kreditná karta"
+   },
+   "Credit_Card_Number": {
+      "message": "Číslo kreditnej karty"
+   },
+   "Credit_card_number": {
+      "message": "Číslo kreditnej karty"
+   },
+   "Credit_cardformfill": {
+      "message": "Kreditná karta"
+   },
+   "Croatia": {
+      "message": "Chorvátsko"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "Kuba"
+   },
+   "Custom_Value": {
+      "message": "Vlastná hodnota"
+   },
+   "Custom_field__": {
+      "message": "Vlastné pole #"
+   },
+   "Custom_fields": {
+      "message": "Vlastné polia"
+   },
+   "Cyprus": {
+      "message": "Cyprus"
+   },
+   "Czech_Republic": {
+      "message": "Česká republika"
+   },
+   "Danish": {
+      "message": "Dánština"
+   },
+   "Darn__Passwords_": {
+      "message": "Darn! Passwords!"
+   },
+   "Darwin": {
+      "message": "Darwin"
+   },
+   "Database": {
+      "message": "Databáza"
+   },
+   "Date": {
+      "message": "Dátum"
+   },
+   "Date_of_Birth": {
+      "message": "Dátum narodenia"
+   },
+   "December": {
+      "message": "December"
+   },
+   "Default": {
+      "message": "Predvolený"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "Predvolený profil pre formulár."
+   },
+   "Delete": {
+      "message": "Odstrániť"
+   },
+   "Delete_Group": {
+      "message": "Odstrániť priečinok"
+   },
+   "Delete_Selected": {
+      "message": "Odstrániť vybrané"
+   },
+   "Delete_Site": {
+      "message": "Odstrániť stránku"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "Vymazať tento formulár"
+   },
+   "Deleted_Items": {
+      "message": "Zmazané položky"
+   },
+   "Denmark": {
+      "message": "Dánsko"
+   },
+   "Description": {
+      "message": "Popis"
+   },
+   "Disable": {
+      "message": "Zakázať"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "Vypnúť nezabezpečeného správcu hesiel v prehliadači Chrome"
+   },
+   "Disable_LastPass": {
+      "message": "Vypnúť LastPass"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "Zakázať LastPass pre túto stránku alebo celý web?"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "Zakázať viacnásobné overenie"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "Zakázať jednoduché overovanie"
+   },
+   "Disable_alert_for_this_site": {
+      "message": "Vypnúť upozornenia pre túto stránku"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "Zakáže všetky upozornenia pre slabé heslo alebo duplikované stránky "
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "Zrušiť zmeny a zavrieť okno"
+   },
+   "Djibouti": {
+      "message": "Džibuti"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "Neprepisovať polia, ktoré sú už vyplnené"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "Nezadávajte opätovnú výzvu pre.."
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "Neponúkať opäť pre "
+   },
+   "Do_not_show_this_message_for_this_domain": {
+      "message": "Nezobrazovať túto správu na tejto stránke"
+   },
+   "Do_you_like_LastPass_": {
+      "message": "Páči sa Vám LastPass?"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "Naozaj chcete aplikáciu ukončiť? Bez vytvorenia účtu nemôžete používať LastPass."
+   },
+   "Dominica": {
+      "message": "Dominika"
+   },
+   "Dominican_Republic": {
+      "message": "Dominikánska republika"
+   },
+   "Down": {
+      "message": "Nadol"
+   },
+   "Dr": {
+      "message": "Dr."
+   },
+   "Driver_s_License": {
+      "message": "Vodičský preukaz"
+   },
+   "Duplicate_password": {
+      "message": "Duplicitné hesla"
+   },
+   "Dutch": {
+      "message": "Holandský"
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "Eastern Time (US & Canada)"
+   },
+   "Ecuador": {
+      "message": "Ekvádor"
+   },
+   "Edit": {
+      "message": "Upraviť"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "Upraviť profil kreditnej karty"
+   },
+   "Edit_Form_Fields": {
+      "message": "Upraviť polia formulára"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "Upraviť profil na vypĺňanie formulárov"
+   },
+   "Edit_Secure_Note": {
+      "message": "Upraviť zabezpečenú poznámku"
+   },
+   "Edit_Secure_Notes": {
+      "message": "Upraviť zabezpečené poznámky"
+   },
+   "Edit_Site": {
+      "message": "Upraviť stránku"
+   },
+   "Edit_Site_Fields": {
+      "message": "Upraviť polia lokality"
+   },
+   "Egypt": {
+      "message": "Egypt"
+   },
+   "El_Salvador": {
+      "message": "El Salvador"
+   },
+   "Email": {
+      "message": "E-mail"
+   },
+   "Email_": {
+      "message": "E-mail:"
+   },
+   "Email_Account": {
+      "message": "E-mailové konto"
+   },
+   "Email_Address": {
+      "message": "Adresa elektronickej pošty"
+   },
+   "Email_Address_": {
+      "message": "E-mailová adresa:"
+   },
+   "Email_address": {
+      "message": "E-mailová adresa"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "E-mail je už použitý, zabudli ste heslo?"
+   },
+   "Enable_Native_Messaging": {
+      "message": "Povoliť natívne správy"
+   },
+   "Enable_new_login_screen": {
+      "message": "Povoliť novú prihlasovaciu obrazovku"
+   },
+   "Encryption": {
+      "message": "Šifrovanie"
+   },
+   "End": {
+      "message": "Koniec"
+   },
+   "English": {
+      "message": "Anglický"
+   },
+   "English__United_Kingdom_": {
+      "message": "Anglicky (Spojené kráľovstvo)"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "Zadajte doplnkové poznámky"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "Zadajte svoj PIN čipovej karty:"
+   },
+   "Enterprise": {
+      "message": "Enterprise"
+   },
+   "Equatorial_Guinea": {
+      "message": "Rovníková Guinea"
+   },
+   "Eritrea": {
+      "message": "Eritrea"
+   },
+   "Error": {
+      "message": "Chyba"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "Nastala chyba pri načítaní stránok na LastPass. Pokúste sa prosím opätovne prihlásiť."
+   },
+   "ErrorLoginMsg": {
+      "message": "Pri prihlasovaní k LastPass sa vyskytla chyba. Skontrolujte internetové spojenie."
+   },
+   "ErrorSendingMsg": {
+      "message": "Pri pokuse o spojenie so serverom sa vyskytla chyba. Skontrolujte internetové pripojenie."
+   },
+   "ErrorSessionMsg": {
+      "message": "Pravdepodobne platnosť LastPass relácie vypršala. Prihláste sa znova."
+   },
+   "Error_opening_attachment_": {
+      "message": "Chyba pri otváraní prílohy."
+   },
+   "Estonia": {
+      "message": "Estónsko"
+   },
+   "Ethiopia": {
+      "message": "Etiópia"
+   },
+   "Evening_Number": {
+      "message": "Číslo mimo dennej doby"
+   },
+   "Evening_number": {
+      "message": "Večerné číslo"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "LastPass teraz môže lokálne uložiť jednorazové heslo (OTP), ktoré možno použiť na obnovenie Vášho účtu v prípade, ak zabudnete Vaše hlavné heslo. Jednorazové heslo zostane zablokované do doby, než bude aktivované na serveri.\n\nChcete aktivovať obnovu účtu?"
+   },
+   "Expand_All": {
+      "message": "Rozbaliť všetko"
+   },
+   "Expiration": {
+      "message": "Vypršanie"
+   },
+   "Expiration_Date": {
+      "message": "Dátum skončenia platnosti"
+   },
+   "Expiration_date": {
+      "message": "Dátum spotreby"
+   },
+   "Export": {
+      "message": "Export"
+   },
+   "Export_To": {
+      "message": "Exportovať do"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "Export do CSV súboru LastPass"
+   },
+   "FIPS_Mode": {
+      "message": "Režim FIPS"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "Falklandské ostrovy (Malvíny)"
+   },
+   "Faroe_Islands": {
+      "message": "Faerské ostrovy"
+   },
+   "Favorite": {
+      "message": "Obľúbené"
+   },
+   "Favoritesproper": {
+      "message": "Obľúbené položky"
+   },
+   "Fax_Number": {
+      "message": "Fax"
+   },
+   "Fax_number": {
+      "message": "Číslo faxu"
+   },
+   "Features": {
+      "message": "Funkcie"
+   },
+   "February": {
+      "message": "Február"
+   },
+   "Feedback": {
+      "message": "Spätná väzba"
+   },
+   "Female": {
+      "message": "Žena"
+   },
+   "Field_Type_": {
+      "message": "Typ poľa"
+   },
+   "Fields_": {
+      "message": "Polia:"
+   },
+   "Fiji": {
+      "message": "Fidži"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "Fiji, Kamchatka, Marshall Is."
+   },
+   "File": {
+      "message": "Súbor"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "Súbor je príliš veľký, musí byť menší ako 10MB."
+   },
+   "Fill": {
+      "message": "Vyplňte"
+   },
+   "Fill_Current": {
+      "message": "Vyplniť súčasné"
+   },
+   "Fill_Form": {
+      "message": "Vyplniť formulár"
+   },
+   "Fill_Forms": {
+      "message": "Vyplniť formuláre"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "Vyplniť v predvolenom formulári"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "Vyplňte pri ďalšom prihlásení (ak viackrát)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "Vyplňte pri predchádzajúcom prihlásení (Keď viackrát)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "Vyplňte alebo upravte formulár s vyplnenými údajmi"
+   },
+   "FillableFormDetected": {
+      "message": "Na stránke sa nachádza formulár na vyplnenie."
+   },
+   "Filter": {
+      "message": "Filter"
+   },
+   "Find_a_site": {
+      "message": "nájsť stránku"
+   },
+   "Finland": {
+      "message": "Fínsko"
+   },
+   "Finnish": {
+      "message": "Fínština"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "Pôvodný správca hesiel v prehliadači Firefox."
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "Prvé 3 číslice Vášho telefónneho čísla"
+   },
+   "First_Name": {
+      "message": "Meno"
+   },
+   "First_name": {
+      "message": "Krstné meno"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "Pre každú položku uvedenú nižšie, nájdite hodnotu na Vašej bezpečnostnej karte  a zadajte ju."
+   },
+   "Forgot_Password_": {
+      "message": "Zabudli ste heslo?"
+   },
+   "Forgot_your_password_": {
+      "message": "Zabudli ste heslo?"
+   },
+   "Form_Fill": {
+      "message": "Vyplňovací formulár"
+   },
+   "Form_Name_": {
+      "message": "Meno formulára:"
+   },
+   "Forums": {
+      "message": "Fóra"
+   },
+   "France": {
+      "message": "Francúzsko"
+   },
+   "French": {
+      "message": "Francúzsky"
+   },
+   "French_Guiana": {
+      "message": "Francúzska Guyana"
+   },
+   "French_Polynesia": {
+      "message": "Francúzska Polynézia"
+   },
+   "French_Southern_Territories": {
+      "message": "Francúzske južné územia"
+   },
+   "French__Canada_": {
+      "message": "Francúzsky (Kanada)"
+   },
+   "GMT_5": {
+      "message": "GMT+5"
+   },
+   "GMT_7": {
+      "message": "GMT+7"
+   },
+   "GMT_9": {
+      "message": "GMT+9"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT: Dublin, Edinburgh, Lisbon, London"
+   },
+   "Gabon": {
+      "message": "Gabon"
+   },
+   "Gambia": {
+      "message": "Gambia"
+   },
+   "Gender": {
+      "message": "Pohlavie"
+   },
+   "General": {
+      "message": "Všeobecný"
+   },
+   "Generate": {
+      "message": "Generovať"
+   },
+   "GeneratePassword": {
+      "message": "Ak vytvárate účet, alebo meníte heslo, stlačte Generovať na vytvorenie unikátneho, bezpečného heslo s LastPass."
+   },
+   "Generate_Password": {
+      "message": "Generovanie hesla"
+   },
+   "Generate_Secure_Password": {
+      "message": "Generovať zabezpečné heslo"
+   },
+   "Generated_Password_for": {
+      "message": "Vygenerované heslo pre"
+   },
+   "Generic": {
+      "message": "Všeobecné"
+   },
+   "Generic_CSV_File": {
+      "message": "Nechránený súbor vo formáte CSV"
+   },
+   "Georgia": {
+      "message": "Gruzínsko"
+   },
+   "German": {
+      "message": "Nemecky"
+   },
+   "Germany": {
+      "message": "Nemecko"
+   },
+   "Ghana": {
+      "message": "Ghana"
+   },
+   "Gibraltar": {
+      "message": "Gibraltár"
+   },
+   "Go_Back": {
+      "message": "Naspäť"
+   },
+   "Go_Back_": {
+      "message": "Ísť späť?"
+   },
+   "Go_Premium_": {
+      "message": "Prejsť na Premium!"
+   },
+   "Go_to_URL": {
+      "message": "Prejsť na URL"
+   },
+   "Google_Authenticator": {
+      "message": "Google Authenticator"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "Viacprvkové overenie Google Authenticator"
+   },
+   "Google_Chrome": {
+      "message": "Google Chrome"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "Google Chrome správca hesiel"
+   },
+   "Google_Chrome_requires_that_extensions_use_the_same_language_as_the_browser__so_in_order_to_switch_LastPass_s_language__please_change_the_main_browser_language_under_Chrome_s_Options_": {
+      "message": "Google Chrome vyžaduje, aby rozšírenia používali rovnaký jazyk ako prehliadač, takže aby bolo možné prepnúť LastPass jazyk, prosím, zmeňte hlavný jazyk prehliadača v Chrome Options."
+   },
+   "Greece": {
+      "message": "Grécko"
+   },
+   "Greenland": {
+      "message": "Grónsko"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "Greenland, Brasilia, Montevideo"
+   },
+   "Grenada": {
+      "message": "Grenada"
+   },
+   "Group_": {
+      "message": "Priečinok:"
+   },
+   "Group_Name": {
+      "message": "Názov priečinku"
+   },
+   "Guadeloupe": {
+      "message": "Guadeloupe"
+   },
+   "Guam": {
+      "message": "Guam"
+   },
+   "Guatemala": {
+      "message": "Guatemala"
+   },
+   "Guernsey": {
+      "message": "Guernsey"
+   },
+   "Guinea": {
+      "message": "Guinea"
+   },
+   "Guinea_Bissau": {
+      "message": "Guinea-Bissau"
+   },
+   "Guyana": {
+      "message": "Guyana"
+   },
+   "HP_Password_Safe": {
+      "message": "HP Password Safe"
+   },
+   "Haiti": {
+      "message": "Haiti"
+   },
+   "Harare__Pretoria": {
+      "message": "Harare, Pretoria"
+   },
+   "Hawaii": {
+      "message": "Hawaii"
+   },
+   "Health_Insurance": {
+      "message": "Zdravotné poistenie"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "Heard Island and Mcdonald Islands"
+   },
+   "Height": {
+      "message": "Výška"
+   },
+   "Help": {
+      "message": "Pomoc"
+   },
+   "Help_Translate": {
+      "message": "Pomôc s prekladom"
+   },
+   "Help___": {
+      "message": "Pomoc..."
+   },
+   "Help_spread_the_word": {
+      "message": "Pomôžte šíriť informácie"
+   },
+   "Hide": {
+      "message": "Skryť"
+   },
+   "Hide_Advanced_Options": {
+      "message": "Skryť rozšírené možnosti"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "Skryť kontextové menu volieb"
+   },
+   "Hide_Password": {
+      "message": "Skryť heslo"
+   },
+   "Hide_Passwords": {
+      "message": "Skryť heslá"
+   },
+   "Highlight_input_boxes": {
+      "message": "Zvýrazniť vstupné polia"
+   },
+   "History": {
+      "message": "História"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "Holy See (Vatican City State)"
+   },
+   "Home": {
+      "message": "Úvod"
+   },
+   "Honduras": {
+      "message": "Honduras"
+   },
+   "Hong_Kong": {
+      "message": "Hong Kong"
+   },
+   "Hostname": {
+      "message": "Hostname"
+   },
+   "HotKeys": {
+      "message": "Klávesové skratky"
+   },
+   "Hungarian": {
+      "message": "Maďarčina"
+   },
+   "Hungary": {
+      "message": "Maďarsko"
+   },
+   "IBAN_Number": {
+      "message": "IBAN číslo"
+   },
+   "IMPORT_": {
+      "message": "IMPORTOVAŤ?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "JE NESMIERNE DÔLEŽITÉ, ABY STE NIKDY, ZA ŽIADNYCH OKOLNOSTÍ, NEZABUDLI VAŠE NOVÉ LASTPASS HESLO."
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "Zabudol som svoje heslo, Pomocník"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "Čítal som a súhlasím s"
+   },
+   "I_have_read_and_agree_with_the__0terms_of_service_0_and__1privacy_statement_1": {
+      "message": "Čítal som a súhlasím s %0Podmienky služby%0 a %1Vyhlásenie o ochrane súkromia%1"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "Rozumiem, že všetky moje šifrované údaje budú poslané do LastPass"
+   },
+   "Iceland": {
+      "message": "Island"
+   },
+   "Icons": {
+      "message": "Ikony"
+   },
+   "Identities": {
+      "message": "Totožnosti"
+   },
+   "Identity": {
+      "message": "Totožnosť"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "Ak už máte účet LastPass môžete zatvoriť toto okno a prihlásiť sa."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "Ak ste zabudli svoje LastPass hlavné heslo,"
+   },
+   "If_you_forgot_your_answer__click_here_to_reset_your_security_question": {
+      "message": "Ak ste zabudli odpoveď, kliknite sem pre obnovenie bezpečnostnej otázky"
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "Ak stratíte Vaše zariadenie pre Google Authenticator, kliknite sem na zakázanie overenia v Google Authenticator"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "Ak stratíte vaše 'Sesame' zariadenie, kliknite sem pre vypnutie overenia."
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "Ak ste stratili Vaše YubiKey zariadenie, kliknite sem pre vypnutie overovania pomocou YubiKey"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "Ak si nemôžete spomenúť na mriežku, kliknite sem pre vypnutie autentifikácie mriežky."
+   },
+   "Import": {
+      "message": "Import"
+   },
+   "Import_From": {
+      "message": "Importovať z"
+   },
+   "Import_Your_Data": {
+      "message": "Importovať svoje údaje"
+   },
+   "Importing_your_data_to_your_LastPass_vault_will_secure_it_and_protect_you_against_identity_theft__All_imported_data_remains_COMPLETELY_confidential__the_only_person_who_can_view_YOUR_data_is_YOU_": {
+      "message": "Import Vašich dát do LastPass trezoru Vás bude zabezpečovať a chrániť pred krádežou identity. Všetky importované dáta zostávajú CELKOM dôverné: jediný, kto môže prezerať VAŠE dáta ste VY."
+   },
+   "India": {
+      "message": "India"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "Indiana, Bogota, Lima, Quito, Rio Branco"
+   },
+   "Indonesia": {
+      "message": "Indonézia"
+   },
+   "Install": {
+      "message": "Nainštalovať"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "Inštalácia binárnej verzie LastPass pre Chrome umožní automatické odhlásenie pri nečinnosti"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_importing_passwords_from_Google_Chrome_password_manager": {
+      "message": "Nainštalujte binárnu verziu LastPass pre Chrome pre povolenie importu hesiel z Google Chrome správcu hesiel"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "Inštalácia binárnej verzie LastPass pre Chrome umožní zdieľať stav prihlásenia medzi ostatnými prehliadačmi"
+   },
+   "Instant_Messenger": {
+      "message": "Instant Messenger"
+   },
+   "Instructions": {
+      "message": "Návod"
+   },
+   "Insurance": {
+      "message": "Poistenie"
+   },
+   "Invalid_Password_": {
+      "message": "Neplatné heslo."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "Neplatná emailová adresa, skúste znova"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "Irán (Islamská republika)"
+   },
+   "Iraq": {
+      "message": "Irak"
+   },
+   "Ireland": {
+      "message": "Írsko"
+   },
+   "Isle_of_Man": {
+      "message": "Ostrov Man"
+   },
+   "Israel": {
+      "message": "Izrael"
+   },
+   "Issue_Number": {
+      "message": "Číslo vydania"
+   },
+   "Issue_number": {
+      "message": "Číslo vydania"
+   },
+   "Issued_Date": {
+      "message": "Dátum vydania"
+   },
+   "Issuing_Authority": {
+      "message": "Vydané kým"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "Odporúčame Vám, aby ste odstránili prílohu po tom, ako tento súbor použijete."
+   },
+   "Italian": {
+      "message": "Taliansky"
+   },
+   "Italy": {
+      "message": "Taliansko"
+   },
+   "Jamaica": {
+      "message": "Jamajka"
+   },
+   "January": {
+      "message": "Január"
+   },
+   "Japan": {
+      "message": "Japonsko"
+   },
+   "Japanese": {
+      "message": "Japončina"
+   },
+   "Jersey": {
+      "message": "Jersey"
+   },
+   "Jordan": {
+      "message": "Jordánsko"
+   },
+   "July": {
+      "message": "Júl"
+   },
+   "June": {
+      "message": "Jún"
+   },
+   "Kabul": {
+      "message": "Kabul"
+   },
+   "Kathmandu": {
+      "message": "Kathmandu"
+   },
+   "Kazakhstan": {
+      "message": "Kazachstan"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "Uchovať históriu prihlásení a vyplňovaných žiadostí."
+   },
+   "Kenya": {
+      "message": "Keňa"
+   },
+   "Kiribati": {
+      "message": "Jersey"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "Severná Kórea"
+   },
+   "Korea__Republic_Of": {
+      "message": "Južná Kórea"
+   },
+   "Korean": {
+      "message": "Kórejčina"
+   },
+   "Kuwait": {
+      "message": "Kuvajt"
+   },
+   "Kyrgyzstan": {
+      "message": "Kirgizsko"
+   },
+   "Language": {
+      "message": "Jazyk"
+   },
+   "Language_": {
+      "message": "Jazyk:"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "Laoská ľudovodemokratická republika"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "LastPass súbor vo formáte CSV"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "LastPass lišta nástrojov v prehliadači Chrome"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "Zašifrovaný súbor LastPass"
+   },
+   "LastPass_Enterprise": {
+      "message": "LastPass Enterprise"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "LastPass viacnásobné overovanie bezpečnostnou kartou"
+   },
+   "LastPass_Menu": {
+      "message": "LastPass Menu"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": "LastPass môže automaticky vypĺňať formuláre webovej stránky pomocou jediného kliknutia. Pomocou automatického 'Vyplňovanie formulárov' Vám nielen ušetrí čas, ale tiež zvýši vašu bezpečnosť pri nakupovaní online."
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "LastPass sa nemôže prihlásiť, pokým nebudú cookies v LastPass povolené."
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass zaznamenal vyplňovací formulár, ktorý je nezabezpečený.\n\nChcete pokračovať?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass zaznamenal vyplňovací formulár, ktorý je nezabezpečený.\n\nChcete aby LastPass vyplnil formulár?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass zistil zmenu hesla pre"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass zistil zmenu hesla pre doménu:"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass zistil zmenu hesla pre používateľa:"
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "LastPass zistil chybu pri inštalácii. Prosím, nainštalujte LastPass znova."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass zistil, že používate slabé heslo pre stránku nižšie. Odporúčame Vám, aby ste vytvorili nové heslo pre túto stránku v nastaveniach účtu. Použite LastPass k vygenerovaniu jedinečného a silného hesla pre túto stránku. Následne môžete uložiť zmeny na tejto stránke a v LastPass účte."
+   },
+   "LastPass_has_detected_that_you_have_used_the_password_for_this_login_on_other_sites__too__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass zistil, že používate rovnaké heslo pre túto stránku a tiež pre nejakú inú. Odporúčame Vám, aby ste vytvorili nové heslo pre túto stránku v nastaveniach účtu. Použite LastPass k vygenerovaniu jedinečného a silného hesla pre túto stránku. Následne môžete uložiť zmeny na tejto stránke a v LastPass účte."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass vyplnil vaše prihlasovacie údaje do formulára na tejto stránke."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "LastPass je plne nainštalovaný! Pri inštalácii LastPass na iných počítačoch nebudete musieť prejsť tento proces znova, jednoducho sa prihlásite na váš účet.Za žiadnych okolností nezdieľajte vaše hlavné heslo s kýmkoľvek, vrátane zamestnancov LastPass, na vaše heslo sa pýtať nebudú! LastPass šifruje vaše citlivé údaje lokálne, takže zamestnanci aplikácie LastPass k nemu nemajú prístup. Pre pomoc s aplikáciou kliknite na LastPass ikonku a vyberte položku 'Pomoc'."
+   },
+   "LastPass_is_loading___": {
+      "message": "LastPass na načítava..."
+   },
+   "LastPass_is_loading_website___": {
+      "message": "LastPass načítava webstránku..."
+   },
+   "LastPass_is_logging_in": {
+      "message": "LastPass sa prihlasuje"
+   },
+   "LastPass_is_logging_in___": {
+      "message": "LastPass sa prihlasuje"
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "Heslo na váš LastPass účet je to posledné, ktoré si vám stačí zapamätať.\nAk ste na LastPass nový, dajte nám pár minút a pomôžeme vám s nastavením účtu.\nBudete môcť využívať váš účet na akomkoľvek počítači, pomocou ktorého budete mať vaše údaje vždy prístupné. Pre vytvorenie účtu kliknite na tlačítko 'vytvoriť účet'"
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "Posledné 4 číslice Vášho telefónneho čísla"
+   },
+   "Last_Name": {
+      "message": "Priezvisko"
+   },
+   "Last_Name2": {
+      "message": "Priezvisko2"
+   },
+   "Last_Touch": {
+      "message": "Naposledy použité"
+   },
+   "Last_name": {
+      "message": "Priezvisko"
+   },
+   "Latvia": {
+      "message": "Lotyšsko"
+   },
+   "Launch": {
+      "message": "Spustiť"
+   },
+   "Lebanon": {
+      "message": "Libanon"
+   },
+   "Left": {
+      "message": "Vľavo"
+   },
+   "Lesotho": {
+      "message": "Lesotho"
+   },
+   "Liberia": {
+      "message": "Libéria"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "Líbyjská arabská džamahírija"
+   },
+   "License_Class": {
+      "message": "Licenčná trieda"
+   },
+   "License_Key": {
+      "message": "Licenčný kľúč"
+   },
+   "Liechtenstein": {
+      "message": "Lichtenštajnsko"
+   },
+   "Lithuania": {
+      "message": "Litva"
+   },
+   "Local": {
+      "message": "miestny"
+   },
+   "Log_Out": {
+      "message": "Odhlásiť"
+   },
+   "Log_Out_": {
+      "message": "Odhlásiť"
+   },
+   "Log_into_a_Site": {
+      "message": "Prihlásiť sa na stránku"
+   },
+   "Login": {
+      "message": "Prihlásiť"
+   },
+   "LoginError": {
+      "message": "Chyba pri prihlásovaní do LastPass. Prosím skúste znova."
+   },
+   "Login_to_LastPass": {
+      "message": "Prihlásenie do LastPass"
+   },
+   "Logoff": {
+      "message": "Odhlásiť"
+   },
+   "Logoff_": {
+      "message": "Odhlásiť:"
+   },
+   "Logoff_on_browser_close": {
+      "message": "Odhlásiť po zatvorení prehliadača"
+   },
+   "Logout": {
+      "message": "Odhlásiť"
+   },
+   "LoseChanges": {
+      "message": "Naozaj chcete upraviť polia pre túto lokalitu? Ak tak urobíte, prídete o zmeny, ktoré ste pre túto lokalitu vykonali."
+   },
+   "LoseChangesApp": {
+      "message": "Naozaj chcete upraviť polia pre túto aplikáciu? Ak tak urobíte, prídete o zmeny, ktoré ste v aplikácii urobili."
+   },
+   "Luxembourg": {
+      "message": "Luxembursko"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "Macao"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "Macedónsko, Bývalá juhoslovanská republika"
+   },
+   "Madagascar": {
+      "message": "Madagaskar"
+   },
+   "Make_Pronounceable": {
+      "message": "Vytvoriť vysloviteľné"
+   },
+   "Malawi": {
+      "message": "Malawi"
+   },
+   "Malaysia": {
+      "message": "Malajzia"
+   },
+   "Maldives": {
+      "message": "Maledivy"
+   },
+   "Male": {
+      "message": "Muž"
+   },
+   "Mali": {
+      "message": "Mali"
+   },
+   "Malta": {
+      "message": "Malta"
+   },
+   "March": {
+      "message": "Marec"
+   },
+   "Marshall_Islands": {
+      "message": "Marshallove ostrovy"
+   },
+   "Martinique": {
+      "message": "Martinik"
+   },
+   "Master_Password": {
+      "message": "Hlavné heslo"
+   },
+   "Master_Password_": {
+      "message": "Hlavné heslo:"
+   },
+   "Mauritania": {
+      "message": "Mauritánia"
+   },
+   "Mauritius": {
+      "message": "Maurícius"
+   },
+   "May": {
+      "message": "Máj"
+   },
+   "Mayotte": {
+      "message": "Mayotte"
+   },
+   "Member_Name": {
+      "message": "Meno člena"
+   },
+   "Membership": {
+      "message": "Členstvo"
+   },
+   "Membership_Number": {
+      "message": "Členské číslo"
+   },
+   "Message": {
+      "message": "Správa"
+   },
+   "Meta": {
+      "message": "Meta"
+   },
+   "Mexico": {
+      "message": "Mexiko"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "Mikronézia, Federálne štáty"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "Prostredné 3 číslice Vášho telefónneho čísla"
+   },
+   "Middle_Name": {
+      "message": "Prostredné meno"
+   },
+   "Middle_name": {
+      "message": "Druhé meno"
+   },
+   "Minimum_Digit_Count": {
+      "message": "Minimálny počet číslic"
+   },
+   "Mobile_Email_Address": {
+      "message": "Mobilná e-mailová adresa"
+   },
+   "Mobile_Number": {
+      "message": "Číslo na mobilný telefón"
+   },
+   "Mobile_number": {
+      "message": "Číslo mobilu"
+   },
+   "Moldova__Republic_Of": {
+      "message": "Moldavská republika"
+   },
+   "Monaco": {
+      "message": "Monako"
+   },
+   "Mongolia": {
+      "message": "Mongolsko"
+   },
+   "Montenegro": {
+      "message": "Čierna Hora"
+   },
+   "Montserrat": {
+      "message": "Montserrat"
+   },
+   "More": {
+      "message": "Viac"
+   },
+   "More_Information": {
+      "message": "Viac informácií"
+   },
+   "More_Options": {
+      "message": "Viac možností"
+   },
+   "Morocco": {
+      "message": "Maroko"
+   },
+   "Move_Selected_to_Group": {
+      "message": "Premiestniť vybraté do priečinka"
+   },
+   "Move_to_Group": {
+      "message": "Premiestniť do priečinka"
+   },
+   "Move_to_Sub_Group": {
+      "message": "Premiestniť do podpriečinka"
+   },
+   "Mozambique": {
+      "message": "Mozambik"
+   },
+   "Mr": {
+      "message": "Pán"
+   },
+   "Mrs": {
+      "message": "Pani"
+   },
+   "Ms": {
+      "message": "Slečna"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_Account": {
+      "message": "Môj účet"
+   },
+   "My_LastPass_Vault": {
+      "message": "Môj LastPass trezor"
+   },
+   "Myanmar": {
+      "message": "Mjanmarsko"
+   },
+   "NAME": {
+      "message": "NÁZOV"
+   },
+   "Name_": {
+      "message": "Názov:"
+   },
+   "Name_on_Card": {
+      "message": "Meno na karte"
+   },
+   "Name_on_card": {
+      "message": "Meno na karte"
+   },
+   "Nameproper": {
+      "message": "Názov"
+   },
+   "Namibia": {
+      "message": "Namíbia"
+   },
+   "Nationality": {
+      "message": "Štátna príslušnosť"
+   },
+   "Nauru": {
+      "message": "Nauru"
+   },
+   "Nepal": {
+      "message": "Nepál"
+   },
+   "Netherlands": {
+      "message": "Holandsko"
+   },
+   "Netherlands_Antilles": {
+      "message": "Holandské Antily"
+   },
+   "Never": {
+      "message": "Nikdy"
+   },
+   "Never_Ask_Again": {
+      "message": "Viac sa nepýtať"
+   },
+   "Never_Show_Again": {
+      "message": "Nikdy viac nezobraziť"
+   },
+   "Never___": {
+      "message": "Nikdy..."
+   },
+   "Never_show_me_this_message_again_": {
+      "message": "Nezobrazovať mi viac túto správu"
+   },
+   "New_Caledonia": {
+      "message": "Nová Kaledónia"
+   },
+   "New_Master_Password": {
+      "message": "Nové hlavné heslo"
+   },
+   "New_Zealand": {
+      "message": "Nový Zéland"
+   },
+   "Nicaragua": {
+      "message": "Nikaragua"
+   },
+   "Niger": {
+      "message": "Niger"
+   },
+   "Nigeria": {
+      "message": "Nigéria"
+   },
+   "Niue": {
+      "message": "Niue"
+   },
+   "No": {
+      "message": "Nie"
+   },
+   "No_Matching_Sites_": {
+      "message": "K dispozícii nie sú žiadne zodpovedajúce stránky!"
+   },
+   "No_Thanks": {
+      "message": "Vďaka, nie"
+   },
+   "No_Updates_Are_Available": {
+      "message": "Žiadne aktualizácie nie sú k dispozícii"
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "Nie, neprajem si, aby LastPass vypĺňal formuláre automaticky."
+   },
+   "No__Save_as_New_Entry": {
+      "message": "Nie, uložiť ako nový záznam"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "Nie, neimportovať žiadnu z mojich nezabezpečených položiek"
+   },
+   "No_matches_found__Please_search_again_": {
+      "message": "Nenašla sa žiadna zhoda. Prosím skúste iný výraz"
+   },
+   "None_Available": {
+      "message": "Žiadne nie sú k dispozícii"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "Severné Mariány"
+   },
+   "Norway": {
+      "message": "Nórsko"
+   },
+   "Norwegian": {
+      "message": "Nórština"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "Nórština"
+   },
+   "Not_Now": {
+      "message": "Teraz nie"
+   },
+   "Note": {
+      "message": "Poznámka"
+   },
+   "Note_Type": {
+      "message": "Typ poznámky"
+   },
+   "Note_Type_": {
+      "message": "Typ poznámky:"
+   },
+   "Notes": {
+      "message": "Poznámky"
+   },
+   "Notes_": {
+      "message": "Poznámky:"
+   },
+   "Notifications": {
+      "message": "Oznámenia"
+   },
+   "November": {
+      "message": "November"
+   },
+   "Number": {
+      "message": "Číslo"
+   },
+   "Number_of_Licenses": {
+      "message": "Počet licencií"
+   },
+   "OK": {
+      "message": "OK"
+   },
+   "October": {
+      "message": "Október"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "Ponuka generovať bezpečné heslá"
+   },
+   "Old_Password": {
+      "message": "Staré heslo"
+   },
+   "Oman": {
+      "message": "Omán"
+   },
+   "One_Time_Passwords": {
+      "message": "Jednorazové heslá"
+   },
+   "Open_All": {
+      "message": "Otvoriť všetko"
+   },
+   "Open_Favorites": {
+      "message": "Otvoriť obľúbené"
+   },
+   "Open_Favorites_in_Tabs": {
+      "message": "Otvoriť obľúbené v záložke"
+   },
+   "Open_File": {
+      "message": "Otvoriť súbor"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "Otvoriť môj LastPass trezor"
+   },
+   "Open_New_Pages_in": {
+      "message": "Otvoriť nové stránky v"
+   },
+   "Open_login_dialog_when_browser_starts": {
+      "message": "Otvoriť prihlasovacie okno pri spustení prehliadača"
+   },
+   "Opera": {
+      "message": "Opera"
+   },
+   "Order_Number": {
+      "message": "Číslo objednávky"
+   },
+   "Order_Total": {
+      "message": "Objednávka celkom"
+   },
+   "Organization": {
+      "message": "Organizácia"
+   },
+   "Other": {
+      "message": "Iné"
+   },
+   "Other_Sessions": {
+      "message": "Ostatné sedenia"
+   },
+   "Overall_Progress_": {
+      "message": "Celkový priebeh:"
+   },
+   "PASSWORDupper": {
+      "message": "HESLO"
+   },
+   "PINs_Password_Manager": {
+      "message": "Správca hesiel pre PIN-y"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "Pacifický čas (US & Canada)"
+   },
+   "Page_Down": {
+      "message": "Stránka nadol"
+   },
+   "Page_Up": {
+      "message": "Stránka nahor"
+   },
+   "Pakistan": {
+      "message": "Pakistan"
+   },
+   "Palau": {
+      "message": "Palau"
+   },
+   "Palestinian_Territories": {
+      "message": "Palestínske územia"
+   },
+   "Panama": {
+      "message": "Panama"
+   },
+   "Papua_New_Guinea": {
+      "message": "Papua-Nová Guinea"
+   },
+   "Paraguay": {
+      "message": "Paraguaj"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passport": {
+      "message": "Cestovný pas"
+   },
+   "Password": {
+      "message": "Heslo"
+   },
+   "Password_": {
+      "message": "Heslo:"
+   },
+   "Password_Agent": {
+      "message": "Password Agent"
+   },
+   "Password_Copied": {
+      "message": "Heslo kopírované"
+   },
+   "Password_Corral": {
+      "message": "Password Corral"
+   },
+   "Password_Dragon": {
+      "message": "Password Dragon"
+   },
+   "Password_Keeper": {
+      "message": "Password Keeper"
+   },
+   "Password_Length": {
+      "message": "Dĺžka hesla"
+   },
+   "Password_Length_": {
+      "message": "Dĺžka hesla:"
+   },
+   "Password_Reminder": {
+      "message": "Pripomenutie hesla"
+   },
+   "Password_Safe": {
+      "message": "Password Safe"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "Heslo pomocou 'pripomínača hesiel' sa nezhoduje."
+   },
+   "Password_updated_": {
+      "message": "Heslo aktualizované!"
+   },
+   "Passwords_Max": {
+      "message": "Passwords Max"
+   },
+   "Personal": {
+      "message": "Osobné"
+   },
+   "Peru": {
+      "message": "Peru"
+   },
+   "Philippines": {
+      "message": "Filipíny"
+   },
+   "Phone_Number": {
+      "message": "Telefón"
+   },
+   "Phone_number": {
+      "message": "Telefónne číslo"
+   },
+   "Pin": {
+      "message": "PIN"
+   },
+   "Pitcairn": {
+      "message": "Pitcairn"
+   },
+   "Please_Make_a_Selection": {
+      "message": "Vyberte"
+   },
+   "Please_answer_the_following_question_": {
+      "message": "Prosím, odpovedzte na nasledujúcu otázku:"
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": "Prosím ponechajte stránku otvorenú pokým operácia neskončí."
+   },
+   "Please_note_that_upgrading_from_LastPass_Local_to_LastPass_Online_will_result_in_your_password_data_being_uploaded_in_its_encrypted_format_to_LastPass_servers___You_will_be_able_to_access_your_data_from_anywhere__and_LastPass_will_not_be_able_to_read_it___Would_you_like_to_continue_": {
+      "message": "Vezmite na vedomie, že upgrade z lokálneho LastPass na LastPass Online bude mať za následok, že heslá budú zaslané na servery LastPass v zašifrovanej podobe. Vy budete  mať pristup k dátam odkiaľkoľvek a zároveň nik z LastPass ich nebude môcť prečítať. Prajete si pokračovať?"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "Uveďte prosím meno, pre tento počítač"
+   },
+   "Please_reload_the_page_to_view_your_changes_": {
+      "message": "Prosím, obnovte stránku na zobrazenie vašich zmien."
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "Prosím reštartujte všetky vaše prehliadače ak chcete začať používať LastPass Online."
+   },
+   "Please_select": {
+      "message": "Prosím, vyberte"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "Prosím, vyberte si pre ktoré webové stránky chcete použiť túto zmenu."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "Prosím navštívte https://lastpass.com , aby ste si mohli vytvoriť účet neskôr."
+   },
+   "Poland": {
+      "message": "Poľsko"
+   },
+   "Polish": {
+      "message": "Poľština"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "Dotazovať sa Servera na zmeny účtu (min)"
+   },
+   "Port": {
+      "message": "Port"
+   },
+   "Portugal": {
+      "message": "Portugalsko"
+   },
+   "Portuguese": {
+      "message": "Portugalsky"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "Portugalsky (Brazília)"
+   },
+   "Preferences": {
+      "message": "Predvoľby"
+   },
+   "Price": {
+      "message": "Cena"
+   },
+   "Print": {
+      "message": "Tlačiť"
+   },
+   "Print_Screen": {
+      "message": "Snímka obrazovky"
+   },
+   "Print_Secure_Notes": {
+      "message": "Tlač Bezpečných poznámok"
+   },
+   "Print_Sites": {
+      "message": "Tlač stránok"
+   },
+   "Privacy": {
+      "message": "Súkromie"
+   },
+   "Profile": {
+      "message": "Profil"
+   },
+   "Profile_language": {
+      "message": "Profil jazyk"
+   },
+   "Profile_name": {
+      "message": "Názov profilu"
+   },
+   "Progress": {
+      "message": "Priebeh"
+   },
+   "Protected": {
+      "message": "Zabezpečené"
+   },
+   "Publisher": {
+      "message": "Vydavateľ"
+   },
+   "Puerto_Rico": {
+      "message": "Portoriko"
+   },
+   "Purchase_Date": {
+      "message": "Dátum nákupu"
+   },
+   "Qatar": {
+      "message": "Katar"
+   },
+   "Reason": {
+      "message": "Dôvod"
+   },
+   "Recently_Used": {
+      "message": "Naposledy použité"
+   },
+   "Recently_Used_list_size": {
+      "message": "Veľkosť zoznamu Naposledy použitých"
+   },
+   "Recheck_Page": {
+      "message": "Prekontrolovať stránku"
+   },
+   "Reencrypting_Data___": {
+      "message": "Opäovné šifrovanie dát ..."
+   },
+   "Refresh": {
+      "message": "Aktualizovať"
+   },
+   "Refresh_Sites": {
+      "message": "Obnoviť stránky"
+   },
+   "Reject": {
+      "message": "Odmietnuť"
+   },
+   "Remember_Email": {
+      "message": "Zapamätať e-mail"
+   },
+   "Remember_Password": {
+      "message": "Zapamätať heslo"
+   },
+   "Remove": {
+      "message": "Odstrániť"
+   },
+   "Remove_Personal_Account": {
+      "message": "Odstrániť osobný účet"
+   },
+   "Rename_Group": {
+      "message": "Premenovať priečinok"
+   },
+   "Replace_Existing_Site": {
+      "message": "Nahradiť existujúcu stránku"
+   },
+   "Request_failed__is_your_Internet_connection_down_": {
+      "message": "Požiadavka zlyhala. Je vaše internetové pripojenie v poriadku?"
+   },
+   "Require_All_Character_Types": {
+      "message": "Vyždovať všetky typy znakov"
+   },
+   "Require_Every_Character_Type": {
+      "message": "Vyžaduje každý znak"
+   },
+   "Require_Password_Reprompt": {
+      "message": "Vyžadovať znovuzadanie hesla"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "Vyžadovať zopakovanie zabezpečenia keď:"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "Umožnite serverom zakázať automatické vypĺňanie, dodržiavajte nastavenie AutoComplete=off"
+   },
+   "Reunion": {
+      "message": "Reunion"
+   },
+   "Right": {
+      "message": "Vpravo"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "Rumunsko"
+   },
+   "Routing_Number": {
+      "message": "Smerové číslo"
+   },
+   "Routing_number": {
+      "message": "Smerovacie číslo"
+   },
+   "Russian": {
+      "message": "Ruština"
+   },
+   "Russian_Federation": {
+      "message": "Ruská federácia"
+   },
+   "Rwanda": {
+      "message": "Rwanda"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "STRÁNKA"
+   },
+   "SMTP_Port": {
+      "message": "SMTP port"
+   },
+   "SMTP_Server": {
+      "message": "SMTP server"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SWIFT_Code": {
+      "message": "SWIFT kód"
+   },
+   "Saint_Barthelemy": {
+      "message": "Saint Barthelemy"
+   },
+   "Saint_Helena": {
+      "message": "Svätá Helena"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "Saint Kitts a Nevis"
+   },
+   "Saint_Lucia": {
+      "message": "Svätá Lucia"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "Saint Martin (francúzska časť)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "Saint Pierre a Miquelon"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "Svätý Vincent a Grenadíny"
+   },
+   "Samoa": {
+      "message": "Samoa"
+   },
+   "San_Marino": {
+      "message": "San Maríno"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "Sao Tome a Principe"
+   },
+   "Saudi_Arabia": {
+      "message": "Saudská Arábia"
+   },
+   "Save": {
+      "message": "Uložiť"
+   },
+   "Save_All_Entered_Data": {
+      "message": "Uložiť všetky zadané údaje"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "Uložiť profil kreditnej karty"
+   },
+   "Save_File": {
+      "message": "Uložiť súbor"
+   },
+   "Save_New_Site": {
+      "message": "Uložiť novú stránku"
+   },
+   "Save_Site": {
+      "message": "Uložiť stránku"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "Uložiť lokálne jednorazové heslo pre obnovenie účtu"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "Uložte zmeny a zavrite okno"
+   },
+   "Saved_Passwords": {
+      "message": "Uložené heslá"
+   },
+   "Screen_Keyboard": {
+      "message": "Klávesnica na obrazovke"
+   },
+   "Search_All_Data": {
+      "message": "Hľadať všetky údaje"
+   },
+   "Search_All_Groups": {
+      "message": "Hľadať všetky priečinky"
+   },
+   "Search_All_Notes": {
+      "message": "Hľadať všetky poznámky"
+   },
+   "Search_All_Sites": {
+      "message": "Hľadať všetky stránky"
+   },
+   "Search_LastPass_Vault": {
+      "message": "Vyhľadávanie v LastPass trezore"
+   },
+   "Search_Vault": {
+      "message": "Prehľadať Trezor"
+   },
+   "Search_within_secure_notes": {
+      "message": "Prehliadať zabezpečené poznámky"
+   },
+   "Searchproper": {
+      "message": "Hľadať"
+   },
+   "Secure_Notes": {
+      "message": "Zabezpečené poznámky"
+   },
+   "Security": {
+      "message": "Bezpečnosť"
+   },
+   "Security_Alert__This_site_has_the_same_password_as_your_LastPass_account__To_protect_all_of_your_online_accounts__it_is_recommended_that_you_change_your_LastPass_Master_Password_": {
+      "message": "Bezpečnostné upozornenie: Táto stránka má rovnaké heslo ako Vaše Master heslo pre LastPass. Pre zachovanie ochrany všetkých účtov je odporúčané zmeniť Vaše Master heslo pre LastPass."
+   },
+   "Security_Check": {
+      "message": "Bezpečnostná kontrola"
+   },
+   "Security_Code": {
+      "message": "Bezpečnostný kód"
+   },
+   "Security_code": {
+      "message": "Bezpečnostný kód"
+   },
+   "Select": {
+      "message": "Vybrať"
+   },
+   "Select_All": {
+      "message": "Vybrať všetko"
+   },
+   "Select_or_enter_a_new_group_name": {
+      "message": "Vyberte alebo napíšte nový názov priečinku"
+   },
+   "Send": {
+      "message": "Odoslať"
+   },
+   "Send_Email": {
+      "message": "Odoslať e-mail"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "Poslať anonymné hlásenia chýb, ktoré pomôžu zlepšiť funkcie LastPass."
+   },
+   "Senegal": {
+      "message": "Senegal"
+   },
+   "September": {
+      "message": "September"
+   },
+   "Serbia": {
+      "message": "Srbsko"
+   },
+   "Server": {
+      "message": "Server"
+   },
+   "SesameWrongButton": {
+      "message": "Ak chcete zobrazovať údaje offline, musíte spustiť Sesame\nand použiť 'Kopírovať Offline Heslo' tlačidlo namiesto tlačidla 'Vygenerovať jednorazové heslo'."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "Viacprvkové overenie Sesame"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "Nastavenie vlastných polí formulára"
+   },
+   "Settings": {
+      "message": "Nastavenia"
+   },
+   "Sex": {
+      "message": "Pohlavie"
+   },
+   "Seychelles": {
+      "message": "Seychely"
+   },
+   "Share": {
+      "message": "Zdieľať"
+   },
+   "Share_Selected": {
+      "message": "Zdielať vybrané"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "Zdieľať prihlásenia medzi ostatnými webovými prehliadačmi"
+   },
+   "Share_offer_from": {
+      "message": "Zdielať ponuku od"
+   },
+   "Shares": {
+      "message": "Zdieľa"
+   },
+   "Shift": {
+      "message": "Posunúť"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "Má si LastPass zapamätať toto heslo?"
+   },
+   "Show": {
+      "message": "Zobraziť"
+   },
+   "Show_Advanced_Options": {
+      "message": "Zobraziť rozšírené možnosti"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "Zobraziť oznamovací panel pre zmenu hesla"
+   },
+   "Show_Deleted_Items": {
+      "message": "Zobraziť vymazané položky"
+   },
+   "Show_Deleted_Sites": {
+      "message": "Zobraziť odstránené lokality"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "Zobraziť oznamovací panel pre vyplňovanie"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "Zobraziť upozornenia pre vypĺňanie formulárov"
+   },
+   "Show_Matching_Sites": {
+      "message": "Zobraziť nájdené stránky"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "Zobraziť LastPass trezor hneď po prihlásení"
+   },
+   "Show_Notifications": {
+      "message": "Zobraziť upozornenia"
+   },
+   "Show_Password": {
+      "message": "Ukázať heslo"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "Zobraziť oznamovací panel pre ukladanie stránok"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "Zobraziť upozornenia pri ukladaní lokalít"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "Zobraziť stránky v priečinkoch"
+   },
+   "Show_all_sites": {
+      "message": "Zobraziť všetky stránky"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "Niektoré oznámenia budú zobrazené až po kliknutí"
+   },
+   "Show_notifications_below_browser": {
+      "message": "Zobraziť upozornenia pod prehliadačom"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "Zobraziť ďalšiu vlastnú položku"
+   },
+   "Sierra_Leone": {
+      "message": "Sierra Leone"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "Zjednodušte si život! Používajte LastPass na predvyplnenie vstupnej procedúry(login) pre túto stránku."
+   },
+   "Singapore": {
+      "message": "Singapúr"
+   },
+   "Site": {
+      "message": "Lokalita"
+   },
+   "Site_Search": {
+      "message": "Hľadať lokalitu"
+   },
+   "Sites": {
+      "message": "Lokality"
+   },
+   "Slovak": {
+      "message": "Slovenčina"
+   },
+   "Slovakia": {
+      "message": "Slovensko"
+   },
+   "Slovenia": {
+      "message": "Slovinsko"
+   },
+   "Social_Security": {
+      "message": "Rodné číslo"
+   },
+   "Social_Security_Number": {
+      "message": "Číslo sociálneho poistenia"
+   },
+   "Social_security_number": {
+      "message": "Rodné číslo"
+   },
+   "Software_License": {
+      "message": "Softvérová licencia"
+   },
+   "Solomon_Islands": {
+      "message": "Šalamúnove ostrovy"
+   },
+   "Somalia": {
+      "message": "Somálsko"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "Prepáčte, tento zdieľaný priečinok je iba na čítanie."
+   },
+   "Source": {
+      "message": "Zdroj"
+   },
+   "South_Africa": {
+      "message": "Južná Afrika"
+   },
+   "Spain": {
+      "message": "Španielsko"
+   },
+   "Spanish": {
+      "message": "Španielčina"
+   },
+   "Spanish__Mexico_": {
+      "message": "Španielsky (Mexiko)"
+   },
+   "Special": {
+      "message": "Špeciálne"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sri_Lanka": {
+      "message": "Srí Lanka"
+   },
+   "Start_Date": {
+      "message": "Počiatočný dátum"
+   },
+   "Start_date": {
+      "message": "Dátum začiatku"
+   },
+   "State": {
+      "message": "Štát"
+   },
+   "State___Province": {
+      "message": "Štát"
+   },
+   "Status": {
+      "message": "Stav"
+   },
+   "Sticky_Password": {
+      "message": "Sticky Password"
+   },
+   "Submit_Form": {
+      "message": "Odoslať formulár"
+   },
+   "Sudan": {
+      "message": "Sudán"
+   },
+   "Support_Email": {
+      "message": "E-mail technickej podpory"
+   },
+   "Suriname": {
+      "message": "Surinam"
+   },
+   "Suspicious_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "Vo zvolenom názve súboru boli nájdené podozrivé znaky. Nebude spracovaný"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "Svalbard a Jan Mayen"
+   },
+   "Swaziland": {
+      "message": "Svazijsko"
+   },
+   "Sweden": {
+      "message": "Švédsko"
+   },
+   "Swedish": {
+      "message": "Švédština"
+   },
+   "Swipe_finger": {
+      "message": "Snímať otlačok prsta"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "Nasnímajte Váš prst na snímači otlačkov"
+   },
+   "Switzerland": {
+      "message": "Švajčiarsko"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "Sýrska arabská republika"
+   },
+   "Tabs": {
+      "message": "Záložky"
+   },
+   "Taiwan": {
+      "message": "Tchaj-wan"
+   },
+   "Tajikistan": {
+      "message": "Tadžikistan"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "Tanzánia, Zjednotená republika"
+   },
+   "Tehran": {
+      "message": "Teherán"
+   },
+   "Telephone": {
+      "message": "Telefón"
+   },
+   "Tell_a_friend_": {
+      "message": "Odporučte priateľom!"
+   },
+   "Text": {
+      "message": "Text"
+   },
+   "Text_to_find": {
+      "message": "Text k nájdeniu"
+   },
+   "Thailand": {
+      "message": "Thajsko"
+   },
+   "That_group_already_exists_": {
+      "message": "Takýto priečinok už existuje."
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "4 číslice roku, kedy bola kreditná karta vydaná"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "Hlavné heslo pre LastPass, ktoré ste práve zadali, sa nezhoduje."
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "'Staré heslo', ktoré ste zadali, nie je Vaše správne LastPass hlavné heslo"
+   },
+   "The_credit_card_number": {
+      "message": "Číslo kreditnej karty"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "4-miestny dátum platnosti kreditnej karty"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "Mesiac dátumu platnosti kreditnej karty"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "Číslo vydania kreditnej karty.\nPlatné iba pre určité európske značky debetných kariet, ako je Maestro."
+   },
+   "The_credit_card_s_security_code__For_most_credit_cards__this_is_the_last_3_digits_of_a_number_printed_on_the_back_of_the_card__For_American_Express_credit_cards__it_is_the_last_4_digits_of_a_number_printed_in_small_print_on_the_front_of_the_card_": {
+      "message": "Bezpečnostný kód kreditnej karty.\nPre väčšinu kreditných kariet sú to posledné 3 číslice z čísla vytlačeného na zadnej strane karty.\nPre karty American Express sú to posledné 4 číslice z čísla vytlačeného malým písmom na prednej strane karty."
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "Celé meno vytlačené na kreditnej karte"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "Mesiac vydania kreditnej karty"
+   },
+   "The_name_of_your_bank": {
+      "message": "Názov banky"
+   },
+   "The_notes_field_contains_too_much_data___You_may_store_a_maximum_of_45_000_characters_per_note___Would_you_like_us_to_truncate_the_note_for_you___You_will_lose_some_of_your_data_": {
+      "message": "Pole s poznámkami obsahuje nadmerné množstvo údajov. Maximálne môžete uložiť 45000 znakov do poznámky.\n\nAk povolíte skrátenie poznámky prídete o časť aktuálnych údajov. Naozaj pokračovať?"
+   },
+   "The_number_of_characters_in_the_generated_password_": {
+      "message": "Počet znakov vo vygenerovanom hesle."
+   },
+   "The_password_that_you_use_to_log_into_this_website_": {
+      "message": "Heslo, ktoré používate k prihláseniu na tejto stránke."
+   },
+   "The_random_password_that_was_generated_has_been_saved_to_your_vault_": {
+      "message": "Náhodné heslo bolo vygenerované a uložené do Vášho trezora."
+   },
+   "The_value_to_be_filled": {
+      "message": "Hodnota na vyplnenie"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work_": {
+      "message": "Verzia Chrome, ktorý práve beží nemá povolenú podporu HTML5 databázy. V tomto prípade prihlasovacia stránka nepamätá svoj e-mail a heslo, taktiež ďalšie funkcie, ako je automatické prihlásenie po reštarte prehliadača nebudú fungovať."
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "Spustená verzia Chrome nemá zapnutú podporu HTML5 databázy. Preto si táto prihlasovacia stránka nebude pamätať Vašu emailovú adresu a heslo a ďalšie funkcie, ako automatické prihlásenie sa pri reštarte prehliadača nebudú fungovať. Môžete to opraviť pridaním parametra -enable-databases do zástupcu prehliadača Google Chrome."
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "Toto je možné riešiť len z webovej stránky"
+   },
+   "This_is_a_potential_security_risk__because_anyone_who_learns_the_password_for_that_site_may_gain_access_to_all_of_your_accounts__LastPass_strongly_recommends_that_your_Master_Password_should_not_be_used_on_any_other_website_": {
+      "message": "Toto je potenciálne bezpečnostné riziko, nakoľko každý kto vie heslo pre túto stránku môže získať prístup ku všetkým Vašim účtom. LastPass dôrazne odporúča, aby Vaše Master heslo nikdy nebolo použité na iných stránkach."
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "Jedná sa o zdieľanú stránku. Nie ste oprávnený prezerať heslá."
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "Toto je názov alebo URL adresa tejto stránky."
+   },
+   "Time_Zone": {
+      "message": "Časové pásmo"
+   },
+   "Timed_out": {
+      "message": "Čas vypršal"
+   },
+   "Timor_Leste": {
+      "message": "Timor-Leste"
+   },
+   "Title": {
+      "message": "Názov"
+   },
+   "To_export_1Password_logins__login_to_1Password__Select_all_or_just_passwords_that_you_want_to_export__Then_select__File_menu___Export_All___Text_file_____Or____File_menu___Export_Selected___Text_file____Click_Export_button_and_Save_password_file__and_Import_the_resulting_file_": {
+      "message": "Ak chcete exportovať 1Password prihlásenia, prihláste sa do 1Password. Vyberte všetky alebo len heslá, ktoré chcete exportovať. Potom vyberte: Menu Súbor / Export Všetky / Textový súbor ... Alebo menu Súbor / Exportovať vybrané / Textový súbor ... Kliknite na tlačidlo Export a uložte súbor s heslami, a importujte výsledný súbor."
+   },
+   "To_export_Clipperz_cards__login_to_www_clipperz_com__Click_on_data__then_Export__then_Export_to_JSON__Copy_all_of_the_text_and_save_it_to_a_file_using_a_text_editor__then_import_it__Please_note_that_this_import_may_not_work_properly_if_you_ve_changed_field_names_from_their_defaults_": {
+      "message": "Ak chcete exportovať Clipperz karty, prihláste sa na www.clipperz.com. Kliknite na dáta, potom Export a potom Export do JSON. Skopírujte celý text a uložte ho do súboru pomocou textového editora, potom ho importujte. Upozorňujeme, že tento import nemusí fungovať správne, ak ste zmenili názvy polí z východiskovej hodnoty."
+   },
+   "To_export_passwords_from_Passpack__Login__go_to_the_Tools_screen__and_click_Export__Under__What_Type_of_Format_Would_You_Like_To_Export___Select__Comma_Separated_Values___and_on__Which_Entries_Would_You_Like_To_Export___Select__All_of_my_entries___then_hit__Continue___Select_all_of_the_text_in_the_text_box_on_the_next_screen__copy_it_to_the_clipboard__create_a_new_file_with_notepad_called_passpack_csv__paste_the_contents_into_this_file__Import_this_file_": {
+      "message": "Exportovanie hesiel z Passpack: prihláste sa, prejdite na obrazovku Nástroje a kliknite na Exportovať. Pod položkou _Aký typ formátu by ste chceli exportovať?_ vyberte _Čiarkou oddelené hodnoty_, a pod _Ktoré položky by ste chceli exportovať?_ vyberte _Všetky moje položky_, potom stlačte _Pokračovať_. Vyberte všetok text v rámčeku na ďalšej obrazovke, skopírujte ho do schránky, vytvorte nový súbor s poznámok s názvom passpack.csv, vložte obsah do tohto súboru. Importujte tento súbor."
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "Ak chcete začať naplno využívať LastPass, budete si musieť do svojho úctu pridať stránky."
+   },
+   "To_import_from_PINs_Password_Manager_Export_in_Tab_Separated_format___Then__import_the_resulting_file_": {
+      "message": "Ak chcete importovať z programu PINs Password Manager, exportujte z neho vo formáte oddelenom tabulátorom. Potom naimportujte výsledný súbor."
+   },
+   "To_import_your_MSI_PasswordKeeper_logins__open_the_program___Click__Txt___and_then__Open____Import_the_resulting_file_": {
+      "message": "Ak chcete importovať vaše 'MSI PasswordKeeper' prihlásenia, otvorte program. Kliknite na 'txt', a potom 'Otvoriť'. Importujte výsledný súbor."
+   },
+   "To_import_your_TurboPasswords_logins__open_the_program__and_the_password_file_to_be_exported__If_you_want_to_restrict_the_export_to_a_particular_category_or_type__filter_the_entries_displayed_using_the_Category_and_Type_drop_downs_above_the_main_window__Click_File_Export_Category__This_opens_a_standard_Windows_Save_dialog__so_enter_a_file_name_and_location__and_select_Comma_Separated_Values___csv__from_the_Save_as_Type_box_": {
+      "message": "Ak chcete importovať vaše prihlasovacie údaje z TurboPasswords, otvorte program a súbor s heslami, ktorý chcete exportovať. Ak chcete obmedziť export do konkrétnej kategórie alebo typu, pretrieďte zobrazené  záznamy pomocou voľby Kategórie a Typu drop-zostrelí v hlavnom okne. Kliknite na ponuku Súbor|Exportovať kategóriu. Tým sa otvorí štandardný Windows dialóg Uložiť, tak zadajte názov a umiestnenie súboru, a vyberte položku Hodnoty oddelené čiarkou (. CSV) z Uložiť ako typ poľa."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "Pre ochranu súkromia a dôverné uchovanie vašich údajov,"
+   },
+   "Togo": {
+      "message": "Togo"
+   },
+   "Tokelau": {
+      "message": "Tokelau"
+   },
+   "Tonga": {
+      "message": "Tonga"
+   },
+   "Tools": {
+      "message": "Nástroje"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "Trinidad a Tobago"
+   },
+   "Try_Again": {
+      "message": "Skúsiť znova"
+   },
+   "Tunisia": {
+      "message": "Tunisko"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "Turecko"
+   },
+   "Turkmenistan": {
+      "message": "Turkménsko"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "Turks a Caicos"
+   },
+   "Tutorials": {
+      "message": "Návody"
+   },
+   "Tuvalu": {
+      "message": "Tuvalu"
+   },
+   "Type": {
+      "message": "Typ"
+   },
+   "Type_": {
+      "message": "Typ:"
+   },
+   "URL": {
+      "message": "URL"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "UŽÍVATEĽSKÉ MENO"
+   },
+   "Uganda": {
+      "message": "Uganda"
+   },
+   "Ukraine": {
+      "message": "Ukrajina"
+   },
+   "United_Arab_Emirates": {
+      "message": "Spojené arabské emiráty"
+   },
+   "United_Kingdom": {
+      "message": "Veľká Británia"
+   },
+   "United_States": {
+      "message": "Spojené štáty americké"
+   },
+   "Unselect_All": {
+      "message": "Zrušiť výber"
+   },
+   "Up": {
+      "message": "Nahor"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "Povýšte na LastPass on-line!"
+   },
+   "Uploading_Data___": {
+      "message": "Nahrávanie dát..."
+   },
+   "Uruguay": {
+      "message": "Uruguaj"
+   },
+   "Use_802_1X": {
+      "message": "Použiť 802.1X"
+   },
+   "Use_Password": {
+      "message": "Použiť heslo"
+   },
+   "Use_Special_Characters": {
+      "message": "Použiť špeciálne znaky"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "Použiť toto heslo teraz (na tejto stránke)?"
+   },
+   "User_Manual": {
+      "message": "Používateľská príručka"
+   },
+   "User_name": {
+      "message": "Užívateľské meno"
+   },
+   "Username_": {
+      "message": "Užívateľské meno:"
+   },
+   "Usernameproper": {
+      "message": "Meno používateľa"
+   },
+   "Uzbekistan": {
+      "message": "Uzbekistan"
+   },
+   "Value": {
+      "message": "Hodnota"
+   },
+   "Value_to_fill": {
+      "message": "Hodnotu vyplniť"
+   },
+   "Vanuatu": {
+      "message": "Vanuatu"
+   },
+   "Vault": {
+      "message": "Trezor"
+   },
+   "Venezuela": {
+      "message": "Venezuela"
+   },
+   "Version": {
+      "message": "Verzia"
+   },
+   "Version_": {
+      "message": "Verzia:"
+   },
+   "Viet_Nam": {
+      "message": "Vietnam"
+   },
+   "View_History": {
+      "message": "Zobraziť históriu"
+   },
+   "View_Passwords": {
+      "message": "Zobraziť heslá"
+   },
+   "Virgin_Islands__British_": {
+      "message": "Panenské ostrovy (Britské)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "Panenské ostrovy (USA)"
+   },
+   "Wallis_and_Futuna": {
+      "message": "Wallis a Futuna"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "Upozorniť pred vyplnením nezabezpečených formulárov"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "Prezerajte video v bežnom formáte."
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "Taktiež NEUCHOVÁVAME kópiu alebo zálohu."
+   },
+   "Weak_Password": {
+      "message": "Slabé heslo"
+   },
+   "Website": {
+      "message": "Webová lokalita"
+   },
+   "Welcome_back_to_LastPass_": {
+      "message": "Vitajte späť v LastPass,"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "Vitajte na LastPass!"
+   },
+   "Western_Sahara": {
+      "message": "Západná Sahara"
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used_": {
+      "message": "Keď je toto políčko zaškrtnuté, použité budú minimálne jedno malé písmeno, jedno veľké písmeno a jeden špeciálny znak."
+   },
+   "When_this_box_is_checked__characters_like___and___will_be_used_when_randomly_generating_a_password_": {
+      "message": "Keď je toto políčko zaškrtnuté, pri náhodne vygenerovanom hesle budú použité znaky ako '#' a '!'."
+   },
+   "When_this_box_is_checked__confusing_characters__1_I_L_0_O__are_not_used_": {
+      "message": "Keď je toto políčko zaškrtnuté, zameniteľné znaky (1,I,L,0,O) nebudú použité."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce_": {
+      "message": "Keď je toto políčko zaškrtnuté, vygeneruje sa ľahko vysloviteľné heslo."
+   },
+   "Wi_Fi_Password": {
+      "message": "Heslo Wi-Fi"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "Heslá Wi-Fi"
+   },
+   "Windows": {
+      "message": "Okná"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "Chceli by ste nastaviť profil pre vyplňovanie formulárov?"
+   },
+   "XML_Files": {
+      "message": "súbory formátu XML"
+   },
+   "Yemen": {
+      "message": "Jemen"
+   },
+   "Yes": {
+      "message": "Áno"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "Áno, použiť na tejto stránke"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "Áno, dovoľ mi vybrať, ktoré položky budú importované na LastPass"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "Áno, umožni mi vkladať a prezerať údaje, ktoré budú použité pri vyplňovaní formulárov"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "Nemôžete priradiť pre viac ako jednu 'hotkey' rovnakú hodnotu."
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "Teraz je LastPass nastavený tak, aby si pamätal heslo. Pri tomto nastavení je zvolené automatické odhlasovanie nefunkčné. Chceli by ste zrušiť pamätanie si hesla?"
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "Nevybrali ste si predvolený vyplňovací formulár. Chceli by ste si ho vybrať teraz?"
+   },
+   "You_may_also_be_blocking_all_cookies__which_causes_Chrome_to_disallow_HTML5_database_access_": {
+      "message": "Možno sú blokované všetky cookies, čo spôsobuje, že Chrome znemožnuje HTML5 prístup k databázam."
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "Musíte súhlasiť s odoslaním zašifrovaných údajov do LastPass.com.\n\nLastPass.com šifruje dáta a posiela ich na jeho bezpečné servre.\nNikto v LastPass nemôže čítať vaše dôverné dáta, pretože sú šifrované pomocou Vášho\ntajného hesla a vy ste jediný, kto ho pozná."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "Pre pokračovanie musíte súhlasiť s podmienkami"
+   },
+   "You_must_enter_a_name_": {
+      "message": "Musíte zadať názov."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "Musíte zadať jedinečný názov."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "Musíte reštartovať Chrome alebo sa odhlásiť a prihlásiť späť, aby sa zmeny zobrazili"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "Zmeny sa prejavia až po reštartovaní prehliadača."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "4 číslice Vášho roku narodenia"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "Vaše Google Chrome heslá boli úspešne naimportované."
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "PSČ"
+   },
+   "Your_address_information": {
+      "message": "Údaje o adrese"
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "Vaša príloha je umiestnená tu:"
+   },
+   "Your_bank_account_information": {
+      "message": "Údaje o Vašom bankovom účte"
+   },
+   "Your_bank_account_number__This_number_can_typically_be_found_to_the_right_of_the_routing_number_on_your_personal_checks_": {
+      "message": "Číslo Vášho bankového účtu.\nToto číslo možno zvyčajne nájsť na osobných šekoch vpravo od smerového čísla."
+   },
+   "Your_bank_s_routing_number__This_9_digit_number_can_typically_be_found_on_your_personal_checks_in_the_bottom_left_corner_": {
+      "message": "Smerové číslo Vašej banky.\nToto 9 miestne číslo možno zvyčajne nájsť na osobných šekoch v ľavom dolnom rohu."
+   },
+   "Your_birth_day": {
+      "message": "Deň narodenia"
+   },
+   "Your_birth_month": {
+      "message": "Mesiac narodenia"
+   },
+   "Your_city_name": {
+      "message": "Mesto"
+   },
+   "Your_company_s_name": {
+      "message": "Meno firmy"
+   },
+   "Your_contact_information": {
+      "message": "Vaše kontaktné informácie"
+   },
+   "Your_country_name": {
+      "message": "Krajina"
+   },
+   "Your_county_name": {
+      "message": "Názov kraja"
+   },
+   "Your_credit_card_information": {
+      "message": "Informácie o Vašej kreditnej karte"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "Vaše aktuálne nastavenia vyžadujú zadanie LastPass hesla pre dokončenie tejto akcie."
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "Vaše údaje boli exportované do"
+   },
+   "Your_email_address": {
+      "message": "E-mailová adresa"
+   },
+   "Your_first_name": {
+      "message": "Krstné meno"
+   },
+   "Your_government_ID_number": {
+      "message": "Identifikačné číslo"
+   },
+   "Your_last_name": {
+      "message": "Priezvisko"
+   },
+   "Your_middle_name": {
+      "message": "Vaše druhé meno"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "Vaše heslo nemôže byť rovnaké ako váš email."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "Vaše heslo je ľahko odhalitelné."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "Vaše heslo je príliš krátke. Musí mať minimálne 6 znakov"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "Vaše heslo je prikrátke. Heslo musí mať aspoň 8 znakov"
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "Váš 'pripomínač hesla' má slúžiť na pripomenutie hesla"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "Vaše heslá nesúhlasia."
+   },
+   "Your_personal_information": {
+      "message": "Vaše osobné údaje"
+   },
+   "Your_phone_number": {
+      "message": "Telefónne číslo"
+   },
+   "Your_phone_number_extension": {
+      "message": "Klapka telefónneho čísla"
+   },
+   "Your_prefix_or_title": {
+      "message": "Titul"
+   },
+   "Your_selected_Identity_no_longer_exists__Defaulting_to__All__and_logging_off_": {
+      "message": "Zvolená totožnosť už neexistuje. Vykonáva sa predvolené nastavenie na 'ALL' a odhlásenie."
+   },
+   "Your_sex": {
+      "message": "Pohlavie"
+   },
+   "Your_state_or_province_name": {
+      "message": "Štát"
+   },
+   "Your_street_address": {
+      "message": "Ulica"
+   },
+   "Your_time_zone": {
+      "message": "Časové pásmo"
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "Vaše užívateľské meno pri prihlasovaní na webové stránky"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "Viacprvkové overenie YubiKey"
+   },
+   "Yugoslavia": {
+      "message": "Juhoslávia"
+   },
+   "ZIP___Postal_Code": {
+      "message": "PSČ"
+   },
+   "ZIP___Postal_code": {
+      "message": "PSČ"
+   },
+   "Zambia": {
+      "message": "Zambia"
+   },
+   "Zimbabwe": {
+      "message": "Zimbabwe"
+   },
+   "_Hide_": {
+      "message": "[Skryť]"
+   },
+   "_History_": {
+      "message": "[História]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(Čakajú nové ponuky zdieľania)"
+   },
+   "_Not_applicable_when_the_Pronounceable_box_is_checked__": {
+      "message": "(Nepoužiteľné, keď je políčko pre výslovnosť začiarknuté)."
+   },
+   "_Show_": {
+      "message": "[Zobraziť]"
+   },
+   "_domain_": {
+      "message": "(doména)"
+   },
+   "_none_": {
+      "message": "(Bez zatriedenia)"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "aktuálne heslo je, pokiaľ si stále uchováva tajnosť."
+   },
+   "ago": {
+      "message": "pred"
+   },
+   "and": {
+      "message": "a"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "Kontaktujte nás a my vám na e-mail odošleme vašu pripomienku k heslu"
+   },
+   "day": {
+      "message": "deň"
+   },
+   "days": {
+      "message": "dni"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "Online peňaženka"
+   },
+   "ext_": {
+      "message": "klapka"
+   },
+   "false": {
+      "message": "Nie"
+   },
+   "favorites": {
+      "message": "Obľúbené položky"
+   },
+   "hour": {
+      "message": "hodina"
+   },
+   "hours": {
+      "message": "hodiny"
+   },
+   "just_now": {
+      "message": "práve teraz"
+   },
+   "minute": {
+      "message": "minúta"
+   },
+   "minutes": {
+      "message": "minúty"
+   },
+   "month": {
+      "message": "mesiac"
+   },
+   "months": {
+      "message": "mesiace"
+   },
+   "privacy_statement": {
+      "message": "Vyhlásenie o ochrane súkromia"
+   },
+   "recently_usedlower": {
+      "message": "naposledy použité"
+   },
+   "second": {
+      "message": "sekunda"
+   },
+   "seconds": {
+      "message": "sekúnd"
+   },
+   "terms_of_service": {
+      "message": "Podmienky služby"
+   },
+   "the_current_tab": {
+      "message": "Aktuálne karta"
+   },
+   "true": {
+      "message": "Áno"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "NEPOZNÁME vaše LastPass heslo."
+   },
+   "week": {
+      "message": "týždeň"
+   },
+   "weeks": {
+      "message": "týždňov"
+   },
+   "year": {
+      "message": "rok"
+   },
+   "years": {
+      "message": "rokov"
+   }
+}

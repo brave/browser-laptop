@@ -1,0 +1,73 @@
+#fieldHistoryDialog {
+  max-width: 500px;
+}
+
+#fieldHistoryDialog .dialogContent {
+  padding: 0 0 20px 0;
+}
+
+#fieldHistoryDialog.empty .dialogContent {
+  padding: 20px;
+}
+
+#fieldHistoryDialog.empty .historyTable, #fieldHistoryDialog.empty .noteContainer {
+  display: none;
+}
+
+#fieldHistoryEmpty {
+  display: none;
+}
+
+#fieldHistoryDialog.empty #fieldHistoryEmpty {
+  display: block;
+}
+
+#fieldHistoryDialog.noteHistory {
+  max-width: 800px;
+}
+
+#fieldHistoryDialog.dialog textarea.dialogInput {
+  min-height: 0;
+}
+
+#fieldHistoryDialog tbody td {
+  padding-bottom: 10px;
+}
+
+.noteHistory .buttons {
+  display: none;
+}
+
+.noteHistory .historyTable {
+  width: 50%;
+}
+
+.noteContainer {
+  display: none;
+}
+
+.noteHistory .noteContainer {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+}
+
+.noteContainer > div {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+}
+
+.fieldHistoryDate {
+  white-space: nowrap;
+}
+
+.fieldHistoryWhom {
+  color: #666;
+  font-size: 12px;
+}

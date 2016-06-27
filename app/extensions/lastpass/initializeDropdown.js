@@ -1,0 +1,1 @@
+bg=chrome.extension.getBackgroundPage();document.addEventListener("DOMContentLoaded",function(){ExtensionDropdown.translate();bg.get_selected_tab(null,function(a){bg.setcurrenttabid(a.id);bg.setcurrenturl(bg.gettaburl(a));LPPlatform.openDropdownPopover()})});

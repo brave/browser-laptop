@@ -1,0 +1,4394 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "12_hours": {
+      "message": "12 ώρες"
+   },
+   "15_minutes": {
+      "message": "15 λεπτά"
+   },
+   "1Password": {
+      "message": "1Κωδικός Πρόσβασης"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. Τοποθετήστε το YubiKey στην θύρα USB με τις μεταλλικές επαφές USB προς τα πάνω"
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. Εκτέλεση του Google Authenticator στο κινητό σας"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. Εκτελέστε την εφαρμογή LastPass Sesame για τη δημιουργία κωδικού μιας χρήσης"
+   },
+   "1_hour": {
+      "message": "1 ώρα"
+   },
+   "24_hours": {
+      "message": "24 ώρες"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. Εισαγωγή του τρέχοντος κωδικού επαλήθευσης στο ακόλουθο πεδίο"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. Επικολλήστε τον κωδικό μίας χρήσης στο παρακάτω πλαίσιο κειμένου και κάντε κλικ στο κουμπί 'Επικύρωση'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. Περιμένετε μέχρι το πλήκτρο αφής του YubiKey παραμείνει σταθερά αναμένο"
+   },
+   "30_minutes": {
+      "message": "30 λεπτά"
+   },
+   "30_seconds": {
+      "message": "30 δευτερόλεπτα"
+   },
+   "3__Click_Authenticate": {
+      "message": "3. Κλικ για Πιστοποίηση"
+   },
+   "3__Hold_your_fingertip_on_the_touch_button_for_1_second": {
+      "message": "3. Κρατήστε το δάκτυλό σας στο touch-button για 1 δευτερόλεπτο"
+   },
+   "3_hours": {
+      "message": "3 ώρες"
+   },
+   "5_minutes": {
+      "message": "5 λεπτά"
+   },
+   "6_hours": {
+      "message": "6 ώρες"
+   },
+   "ACTION": {
+      "message": "Ενέργεια"
+   },
+   "A_Zupper": {
+      "message": "Α-Ω"
+   },
+   "A_batch_of_SMS_passcodes_have_been_sent_to_your_mobile_device_": {
+      "message": "Μία σειρά από SMS κωδικούς έχει σταλεί στο κινητό σας τηλέφωνο."
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_as_a_password_change_for_this_site_": {
+      "message": "Ένας νέος κωδικός πρόσβασης έχει δημιουργηθεί. Θέλατε ο LastPass να θυμάται αυτή την αλλαγή του κωδικού πρόσβασης για αυτόν τον ιστότοπο;"
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_password_change_for_this_site_": {
+      "message": "Ένας νέος κωδικός πρόσβασης έχει δημιουργηθεί. Θα θέλατε το LastPass να θυμάται αυτή την αλλαγή κωδικού πρόσβασης για αυτή την ιστοσελίδα;"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "Ένας νέος κωδικός πρόσβασης έχει δημιουργηθεί!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "Ένας τυχαίος κωδικός."
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "Μια απαιτούμενη ενημέρωση είναι διαθέσιμη για το LastPass. Παρακαλώ πατήστε το πλήκτρο OK για να ξεκινήσει η λήψη και εγκατάσταση."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "'Έχει βρεθεί ένα αρχείο επανάληψης της ενέργειας. Αυτό πιθανόν να σημαίνει ότι δεν έχουν αποθηκευθεί όλες οι αλλαγές που έχετε κάνει. Θα θέλατε να διαγραφεί αυτό το αρχείο αλλά ενδεχομένως να χάσετε κάποιες αλλαγές που έγιναν;"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "Παρουσιάστηκε σφάλμα κατά την επεξεργασία του αιτήματός σας."
+   },
+   "A_site_that_has_been_previously_shared_cannot_be_moved_to_a_shared_folder___Would_you_like_to_make_a_copy_": {
+      "message": "Μια σελίδα που έχει προηγουμένως μοιραστεί δεν μπορεί να μετακινηθεί σε έναν κοινόχρηστο φάκελο.\n\nΘα θέλατε να κάνετε ένα αντίγραφο;"
+   },
+   "About": {
+      "message": "Σχετικά"
+   },
+   "About_LastPass": {
+      "message": "Σχετικά με το LastPass"
+   },
+   "About___": {
+      "message": "Σχετικά..."
+   },
+   "Accept": {
+      "message": "Αποδοχή"
+   },
+   "Account_Number": {
+      "message": "Αριθμός Λογαριασμού"
+   },
+   "Account_Settings": {
+      "message": "Ρυθμίσεις λογαριασμού."
+   },
+   "Account_Status": {
+      "message": "Κατάσταση Λογαρισμού"
+   },
+   "Account_Type": {
+      "message": "Τύπος Λογαριασμού"
+   },
+   "Account_number": {
+      "message": "Αριθμός λογαριασμού"
+   },
+   "Actionproper": {
+      "message": "Ενέργεια"
+   },
+   "Actions": {
+      "message": "Ενέργειες"
+   },
+   "Add": {
+      "message": "Προσθήκη"
+   },
+   "Add_Attachment": {
+      "message": "Προσθήκη Συνημμένου"
+   },
+   "Add_Credit_Card": {
+      "message": "Προσθήκη Πιστωτικής Κάρτας"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "Προσθήκη Προφίλ Πιστωτικής Κάρτας"
+   },
+   "Add_Field": {
+      "message": "Προσθήκη Πεδίου"
+   },
+   "Add_Form_Fill_profile": {
+      "message": "Προσθήκη Προφίλ Φόρμας Συμπλήρωσής"
+   },
+   "Add_Identity": {
+      "message": "Προσθήκη Ταυτότητας"
+   },
+   "Add_New_Site": {
+      "message": "Προσθήκη Νέου Ιστότοπου."
+   },
+   "Add_Note": {
+      "message": "Προσθήκη Σημείωσης"
+   },
+   "Add_Profile": {
+      "message": "Προσθήκη Προφίλ"
+   },
+   "Add_Secure_Note": {
+      "message": "Προσθήκη Ασφαλούς Σημείωσης"
+   },
+   "Add_Site": {
+      "message": "Προσθήκη Ιστότοπου"
+   },
+   "Add_another_custom_field": {
+      "message": "Προσθήκη άλλου προσαρμοσμένου πεδίου"
+   },
+   "Address": {
+      "message": "Διεύθυνση"
+   },
+   "Address_1": {
+      "message": "Διεύθυνση 1"
+   },
+   "Address_2": {
+      "message": "Διεύθυνση 2"
+   },
+   "Address_3": {
+      "message": "Διεύθυνση 3"
+   },
+   "Adelaide": {
+      "message": "Αδελαΐδα"
+   },
+   "Admin_Console": {
+      "message": "Κονσόλα διαχειριστή"
+   },
+   "Admin_Tools": {
+      "message": "Εργαλεία Διαχείρισης"
+   },
+   "Administrator": {
+      "message": "Διαχειριστής"
+   },
+   "Advanced": {
+      "message": "Για Προχωρημένους"
+   },
+   "Advanced_Options": {
+      "message": "Προχωρημένες Επιλογές"
+   },
+   "Advanced_Settings": {
+      "message": "Προχωρημένες Ρυθμίσεις"
+   },
+   "Advanced_Tools": {
+      "message": "Εργαλεία για προχωρημένους"
+   },
+   "Afghanistan": {
+      "message": "Αφγανιστάν"
+   },
+   "Agent_Name": {
+      "message": "Όνομα Εκπροσώπου"
+   },
+   "Agent_Phone": {
+      "message": "Τηλέφωνο Εκπροσώπου"
+   },
+   "Aland_Islands": {
+      "message": "Νησιά Άλαντ"
+   },
+   "Alaska": {
+      "message": "Αλάσκα"
+   },
+   "Albania": {
+      "message": "Αλβανία"
+   },
+   "Alert": {
+      "message": "Ειδοποίηση"
+   },
+   "Alerts": {
+      "message": "Ειδοποιήσεις"
+   },
+   "Algeria": {
+      "message": "Αλγερία"
+   },
+   "Alias": {
+      "message": "Ψευδώνυμο"
+   },
+   "All": {
+      "message": "Όλα"
+   },
+   "Allow_All_Character_Types": {
+      "message": "Επιτρέπονται Όλοι Οι Τύποι Χαρακτήρων"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "Επιτρέπετε στο LastPass να βρει μη ασφαλή δεδομένα στον υπολογιστή σας;"
+   },
+   "Almaty": {
+      "message": "Αλμάτι"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below": {
+      "message": "Εναλλακτικά, εισαγάγετε έναν κωδικό στο παρακάτω πλαίσιο"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below_": {
+      "message": "Εναλλακτικά, εισαγάγετε έναν κωδικό στο παρακάτω πλαίσιο:"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "Πάντα Επιλογή Προφίλ και Πιστωτικής Κάρτας"
+   },
+   "American_Samoa": {
+      "message": "Αμερικανική Σαμόα"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "Αμάν, Αθήνα, Κωνσταντινούπολη, Βηρυτός, Κάιρο, Ιερουσαλήμ"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "Άμστερνταμ, Βερολίνο, Ρώμη, Βιέννη, Πράγα, Βρυξέλλες"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "Υπάρχει διαθέσιμη ενημέρωση. Θέλετε να την εγκαταστήσετε;"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "Προέκυψε ένα σφάλμα κατά την φόρτωση των ιστότοπων σας.\nΠαρακαλώ επανασυνδεθείτε."
+   },
+   "An_error_occurred": {
+      "message": "Παρουσιάστηκε σφάλμα"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "Ένα λάθος προέκυψε κατά την εισαγωγή των κωδικών του Google Chrome."
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "Σφάλμα κατά την επανακρυπτογράφηση δεδομένων"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "Σφάλμα κατα την μεταφόρτωση των δεδομένων σας. Επανάληψη;"
+   },
+   "Andorra": {
+      "message": "Ανδόρα"
+   },
+   "Angola": {
+      "message": "Αγκόλα"
+   },
+   "Anguilla": {
+      "message": "Ανγκουίλα"
+   },
+   "Antarctica": {
+      "message": "Ανταρκτική"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "Αντίγκουα και Μπαρμπούντα"
+   },
+   "Appearance": {
+      "message": "Εμφάνιση"
+   },
+   "Application_": {
+      "message": "Εφαρμογή:"
+   },
+   "Applications": {
+      "message": "Εφαρμογές"
+   },
+   "April": {
+      "message": "Απρίλιος"
+   },
+   "Are_you_sure_you_do_not_want_LastPass_to_tell_you_when_your_Master_Password_is_at_risk_": {
+      "message": "Είστε βέβαιοι ότι δεν θέλετε ο LastPass να σας γνωστοποιεί πότε ο Κύριος Κωδικό σας βρίσκεται σε κίνδυνο υποκλοπής;"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "Είστε βέβαιοι ότι θέλετε να διαγραφεί;"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτήν την ταυτότητα;"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "Είστε σίγουροι ότι θέλετε να διαγράψετε αυτήν τη σελίδα;"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "Είστε σίγουροι ότι θέλετε το LastPass να αποθηκεύσετε τον κωδικό σας; Αυτό θα μειώσει σημαντικά την ασφάλεια του LastPass λογαριασμού σας!"
+   },
+   "Are_you_sure_you_want_to_share_this_item___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "Είστε βέβαιοι ότι θέλετε να μοιραστείτε αυτό το στοιχείο; Θα χαθούν τυχόν αλλαγές που έχετε κάνει σε αυτό!"
+   },
+   "Are_you_sure_you_want_to_view_history___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "Είστε βέβαιοι ότι θέλετε να δείτε το ιστορικό; Θα χαθούν τυχόν αλλαγές που έχετε κάνει σε αυτό!"
+   },
+   "Are_you_sure_you_would_like_to_change_your_LastPass_password_for_this_site_": {
+      "message": "Είστε σίγουροι ότι θέλετε να αλλάξετε τον LastPass κωδικό πρόσβασης για αυτόν τον ιστότοπο;"
+   },
+   "Are_you_sure_you_would_like_to_copy_your_LastPass_site_s_URL_to_the_clipboard_": {
+      "message": "Είστε σίγουροι ότι θέλετε να αντιγράψετε το LastPass URL της σελίδας στο πρόχειρο;"
+   },
+   "Are_you_sure_you_would_like_to_copy_your_LastPass_site_s_password_to_the_clipboard_": {
+      "message": "Είστε σίγουροι ότι θέλετε να αντιγράψετε τον LastPass κωδικό πρόσβασης γι' αυτή τη σελίδα στο πρόχειρο;"
+   },
+   "Are_you_sure_you_would_like_to_copy_your_LastPass_site_s_username_to_the_clipboard_": {
+      "message": "Είστε σίγουροι ότι θέλετε να αντιγράψετε το LastPass όνομα χρήστη γι' αυτή τη σελίδα στο πρόχειρο;"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "Είστε σίγουροι ότι θέλετε να διαγράψετε;"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "Είστε σίγουροι ότι θέλετε να διαγράψετε τα επιλεγμένα στοιχεία;"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "Είστε σίγουρος/η ότι θέλετε να διαγράψετε τους επιλεγμένους ιστότοπους;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την εφαρμογή;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "Είστε σίγουρος/η ότι θέλετε να διαγράψετε αυτό το πεδίο;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "Είστε σίγουρος/η ότι θέλετε να διαγράψετε το προφίλ αυτής της φόρμας;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "Είστε σίγουρος/η ότι θέλετε να διαγράψετε τον κωδικό που δημιουργήθηκε;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_group_": {
+      "message": "Είστε σίγουροι ότι θέλετε να διαγράψετε αυτόν τον φάκελο;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "Είστε σίγουροι ότι θέλετε να διαγράψετε αυτό το URL;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "Είστε σίγουρος/η ότι θέλετε να διαγράψετε την ασφαλή σημείωση;"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "Είστε σίγουρος/η ότι θέλετε να διαγράψετε τον ιστότοπο;"
+   },
+   "Are_you_sure_you_would_like_to_remove_this_attachment_": {
+      "message": "Είστε βέβαιος πως θέλετε να διαγράψετε αυτό το συνημμένο;"
+   },
+   "Are_you_sure_you_would_like_to_save_a_new_site_to_your_LastPass_vault_": {
+      "message": "Είστε σίγουροι ότι θέλετε να σώσετε ένα νέο ιστότοπο στο LastPass θησαυροφυλάκιό σας;"
+   },
+   "Are_you_sure_you_would_like_your_LastPass_Form_Fill_information_to_be_filled_into_the_following_site_": {
+      "message": "Είστε σίγουροι ότι θέλετε να συμπληρωθεί η LastPass Φόρμα Συμπλήρωσης πληροφοριών στον ακόλουθο ιστότοπο;"
+   },
+   "Are_you_sure_you_would_like_your_LastPass_site_information_to_be_filled_into_the_following_site_": {
+      "message": "Είστε σίγουροι ότι θέλετε οι LastPass πληροφορίες σελίδας σας να συμπληρωθούν στην ακόλουθη σελίδα;"
+   },
+   "Argentina": {
+      "message": "Αργεντινή"
+   },
+   "Arizona": {
+      "message": "Αριζόνα"
+   },
+   "Armenia": {
+      "message": "Αρμενία"
+   },
+   "Arts": {
+      "message": "Τέχνες"
+   },
+   "Aruba": {
+      "message": "Αρούμπα"
+   },
+   "At_least_this_many_numbers_will_be_in_a_generated_password_": {
+      "message": "Τουλάχιστον αυτό οι πολλοί αριθμοί θα περιέχονται σε έναν κωδικό πρόσβασης."
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "Ώρα Ατλαντικού (Καναδάς), Μανάους, Σαντιάγο"
+   },
+   "Auckland__Wellington": {
+      "message": "Ώκλαντ, Ουέλλινγκτον"
+   },
+   "August": {
+      "message": "Αύγουστος"
+   },
+   "Australia": {
+      "message": "Αυστραλία"
+   },
+   "Austria": {
+      "message": "Αυστρία"
+   },
+   "Authenticate": {
+      "message": "Επικύρωση"
+   },
+   "Authentication": {
+      "message": "Πιστοποίηση"
+   },
+   "Authentication_Failed_": {
+      "message": "Αποτυχία Αυθεντικοποίησης"
+   },
+   "AutoFill": {
+      "message": "Αυτόματη Συμπλήρωση"
+   },
+   "AutoLogin": {
+      "message": "Αυτόματη είσοδος"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "Αυτόματη Συμπλήρωση στοιχείων εισόδου"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "Αυτόματη Αποσύνδεση μετά από αδράνεια (λεπτά)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Αυτόματη Αποσύνδεση όταν όλα τα προγράμματα περιήγησης κλείσουν και το Chrome έχει κλείσει για (λεπτά)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "Αυτόματη σύνδεση σε ιστοτόπους αν ο χρόνος από την τελευταία σύνδεση υπερβαίνει τα (δευτερόλεπτα)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "Αποφυγή διφορούμενων χαρακτήρων"
+   },
+   "Azerbaijan": {
+      "message": "Αζερμπαϊτζάν"
+   },
+   "Azores": {
+      "message": "Αζόρες"
+   },
+   "BACKUPPER": {
+      "message": "ΠΙΣΩ"
+   },
+   "BEGIN": {
+      "message": "ΕΝΑΡΞΗ"
+   },
+   "Back": {
+      "message": "Πίσω"
+   },
+   "Baghdad": {
+      "message": "Βαγδάτη"
+   },
+   "Bahamas": {
+      "message": "Μπαχάμες"
+   },
+   "Bahrain": {
+      "message": "Μπαχρέιν"
+   },
+   "Baku__Yerevan": {
+      "message": "Μπακού, Ερεβάν"
+   },
+   "Bangladesh": {
+      "message": "Μπαγκλαντές"
+   },
+   "Bank_Account": {
+      "message": "Τραπεζικός Λογαριασμός"
+   },
+   "Bank_Name": {
+      "message": "Όνομα Τράπεζας"
+   },
+   "Bank_accountformfill": {
+      "message": "Τραπεζικός λογαριασμός"
+   },
+   "Bank_name": {
+      "message": "Όνομα τράπεζας"
+   },
+   "Barbados": {
+      "message": "Μπαρμπάντος"
+   },
+   "Before_you_can_use_LastPass__you_must_first_connect_your_fingerprint_reader_and_enroll_one_or_more_fingers_": {
+      "message": "Για να μπορέσετε να χρησιμοποιήσετε το LastPass, πρέπει πρώτα να συνδέσετε αναγνώστη δακτυλικών αποτυπωμάτων και να αποτυπώσετε περνώντας από πάνω ένα ή περισσότερα δάχτυλα."
+   },
+   "Belarus": {
+      "message": "Λευκορωσία"
+   },
+   "Belgium": {
+      "message": "Βέλγιο"
+   },
+   "Belize": {
+      "message": "Μπελίζ"
+   },
+   "Benin": {
+      "message": "Μπενίν"
+   },
+   "Bermuda": {
+      "message": "Βερμούδες"
+   },
+   "Bhutan": {
+      "message": "Μπουτάν"
+   },
+   "Binary_Component_": {
+      "message": "Δυαδικό Συστατικό:"
+   },
+   "Birthday": {
+      "message": "Γενέθλια"
+   },
+   "Bit_Strength": {
+      "message": "Ασφάλεια Δυαδικών Ψηφίων"
+   },
+   "Blacklist": {
+      "message": "Λόγω των πολλών αποτυχημένων προσπαθειών εισόδου, ο λογαριασμός αυτός έχει κλειδωθεί προσωρινά (για 5 λεπτά)."
+   },
+   "Blog": {
+      "message": "Ιστολόγιο"
+   },
+   "Bolivia": {
+      "message": "Βολιβία"
+   },
+   "Bookmarklets": {
+      "message": "Bookmarklets"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "Βοσνία-Ερζεγοβίνη"
+   },
+   "Botswana": {
+      "message": "Μποτσουάνα"
+   },
+   "Bouvet_Island": {
+      "message": "Νήσος Μπουβέ"
+   },
+   "Branch_Address": {
+      "message": "Διεύθυνση Υποκαταστήματος"
+   },
+   "Branch_Phone": {
+      "message": "Τηλ. Υποκαταστήματος"
+   },
+   "Brazil": {
+      "message": "Βραζιλία"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "Βρετανικό Έδαφος Ινδικού Ωκεανού"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "Περιηγηθείτε στο διαδίκτυο όπως συνήθως και το LastPass θα συλλέγει αυτόματα τους κωδικούς πρόσβασης καθώς τους εισάγετε."
+   },
+   "Brunei_Darussalam": {
+      "message": "Μπρουνέι Νταρουσαλάμ"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "Μπουένος Άιρες, Τζόρτζταουν"
+   },
+   "Built_": {
+      "message": "Κατασκευής (Built):"
+   },
+   "Bulgaria": {
+      "message": "Βουλγαρία"
+   },
+   "Burkina_Faso": {
+      "message": "Μπουρκίνα Φάσο"
+   },
+   "Burundi": {
+      "message": "Μπουρούντι"
+   },
+   "Business": {
+      "message": "Εργασία"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "Αλλά είμαι ξεχασιάρης/α... τι πρέπει να κάνω αν ξεχάσω τον κωδικό μου;"
+   },
+   "CSV_Files": {
+      "message": "Αρχεία CSV"
+   },
+   "Cambodia": {
+      "message": "Καμπότζη"
+   },
+   "Cameroon": {
+      "message": "Καμερούν"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "Δε μπορεί να εντοπιστεί το κρυφό παράθυρο του LastPass"
+   },
+   "Canada": {
+      "message": "Καναδάς"
+   },
+   "Canary_Islands": {
+      "message": "Κανάριοι Νήσοι"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "Καμπέρα, Μελβούρνη, Σίδνεϊ, Χόμπαρτ"
+   },
+   "Cancel": {
+      "message": "Άκυρο"
+   },
+   "Cape_Verde": {
+      "message": "Πράσινο Ακρωτήρι"
+   },
+   "Cape_Verde_Is_": {
+      "message": "Πράσινο Ακρωτήριο"
+   },
+   "Caracas": {
+      "message": "Καράκας"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "Καζαμπλάνκα, Μονρόβια, Ρέικιαβικ"
+   },
+   "Catalan": {
+      "message": "Καταλανικά"
+   },
+   "Cayman_Islands": {
+      "message": "Νησιά Κέιμαν"
+   },
+   "Central_African_Republic": {
+      "message": "Κεντροαφρικανική Δημοκρατία"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "Κεντρική Αμερική, Σασκάτσουαν"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "Κεντρική ώρα (ΗΠΑ & Καναδάς), Γκουανταλαχάρα, Πόλη του Μεξικού"
+   },
+   "Chad": {
+      "message": "Τσαντ"
+   },
+   "Change": {
+      "message": "Αλλαγή"
+   },
+   "Change_Group_Name": {
+      "message": "Αλλαγή Ονόματος Φακέλου"
+   },
+   "Change_Password": {
+      "message": "Αλλαγή Κωδικού Πρόσβασης"
+   },
+   "Change_Password_Now": {
+      "message": "Αλλάξτε τον κωδικό πρόσβασης τώρα"
+   },
+   "Change_Your_Password": {
+      "message": "Αλλαγή Κωδικού Πρόσβασης"
+   },
+   "Check_For_Updates": {
+      "message": "Έλεγχος Για Ενημερώσεις"
+   },
+   "Check_this_box_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Επιλέξτε αυτό το πλαίσιο για να τελειοποιηθεί ο τρόπος δημιουργίας ενός κωδικού."
+   },
+   "Checkbox": {
+      "message": "Πλαίσιο Ελέγχου"
+   },
+   "Checking_For_Updates___": {
+      "message": "Έλεγχος Για Ενημερώσεις..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "Τσεννάι, Καλκούτα, Βομβάη, Νέο Δελχί, Κότε"
+   },
+   "Chile": {
+      "message": "Χιλή"
+   },
+   "China": {
+      "message": "Κίνα"
+   },
+   "Chinese__Simplified_": {
+      "message": "Κινέζικα (Απλοποιημένα)"
+   },
+   "Chinese__Traditional_": {
+      "message": "Κινέζικα (Παραδοσιακά)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "Επιλέξτε Προφίλ και Πιστωτική Κάρτα"
+   },
+   "Choose_a_source_above_": {
+      "message": "Επιλέξτε πηγή παραπάνω."
+   },
+   "Christmas_Island": {
+      "message": "Νήσοι των Χριστουγέννων"
+   },
+   "Chrome": {
+      "message": "Chrome"
+   },
+   "City___Town": {
+      "message": "Δήμος / Πόλη"
+   },
+   "Clear": {
+      "message": "Απαλοιφή"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "Καθαρισμός Πρόχειρου μετά από χρήση (δευτερόλεπτα)"
+   },
+   "Clear_Forms": {
+      "message": "Απαλοιφή Φορμών"
+   },
+   "Clear_Local_Cache": {
+      "message": "Απαλοιφή Τοπικής Cache"
+   },
+   "Clear_Recent": {
+      "message": "Καθαρισμός Προσφάτων"
+   },
+   "Clear_Search": {
+      "message": "Καθαρισμός Αναζήτησης"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "Κατά την αποσύνδεση να γίνει απαλοιφή των συμπληρωμένων πεδίων"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "Κάντε κλικ στο κουμπί 'Συνέχεια' για να αρχίσετε να χρησιμοποιείτε το LastPass."
+   },
+   "Click_Icons_in_Fields": {
+      "message": "Κάντε κλικ στα Εικονίδια των Πεδίων"
+   },
+   "Click_here_for_instructions_on_importing_from_RoboForm_": {
+      "message": "Κάντε κλικ εδώ για οδηγίες σχετικά με την εισαγωγή από τον RoboForm."
+   },
+   "Click_here_for_instructions_on_importing_from_a_generic_CSV_file_": {
+      "message": "Κάντε κλικ εδώ για οδηγίες σχετικά με την εισαγωγή από ένα γενικό αρχείο CSV."
+   },
+   "Click_here_to_initiate_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "Κάντε κλικ εδώ για πολυπαραγοντικό έλεγχο ταυτότητας στο κινητό τηλέφωνο ή την κινητή συσκευή σας."
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "Κάντε κλικ εδώ για τις ρυθμίσεις λογαριασμού"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "Κάντε κλικ εδώ για να υποβάλλετε σχόλια σχετικά με την εφαρμογή"
+   },
+   "Click_here_to_view_the_LastPass_User_Manual": {
+      "message": "Κάντε κλικ εδώ για να δείτε το Εγχειρίδιο Χρήσης του LastPass"
+   },
+   "Click_on_a_username_or_formfill_profile_row_to_choose_how_LastPass_will_auto_fill_the_current_web_page_": {
+      "message": "Κάντε κλικ σε ένα προφίλ χρήστη ή συμπλήρωσης φόρμας για να επιλέξετε πώς ο LastPass θα συμπληρώσει αυτόματα την τρέχουσα ιστοσελίδα."
+   },
+   "Click_on_the_icons_at_the_bottom_for_additional_actions_": {
+      "message": "Κάντε κλικ στα εικονίδια στο κάτω μέρος για πρόσθετες ενέργειες."
+   },
+   "Click_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Κάντε κλικ για να τελειοποιήσετε τον τρόπο δημιουργίας του κωδικού σας."
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "Κάντε κλικ για να αποκρύψετε τις επιλογές για προσωρημένους."
+   },
+   "Clipperz": {
+      "message": "Clipperz"
+   },
+   "Close": {
+      "message": "Κλείσιμο"
+   },
+   "Close_this_window": {
+      "message": "Κλείστε αυτό το παράθυρο"
+   },
+   "Co_pay": {
+      "message": "Συμμετοχή στη πληρωμή"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "Κόκος (Κίλινγκ)"
+   },
+   "Collapse_All": {
+      "message": "Σύμπτυξη όλων"
+   },
+   "Colombia": {
+      "message": "Κολομβία"
+   },
+   "Comoros": {
+      "message": "Κομόρες"
+   },
+   "Company": {
+      "message": "Εταιρεία"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "Η εταιρική πολιτική απαγορεύει αυτή τη λειτουργία."
+   },
+   "Company_Phone": {
+      "message": "Τηλέφωνο Εταιρείας"
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "Η πολιτική της εταιρίας αποτρέπει την αλλαγή ορισμένων ρυθμίσεων, δεν έχουν αποθηκευτεί όλες οι ενημερώσεις."
+   },
+   "Configure_Form_Fill": {
+      "message": "Ρύθμιση Συμπλήρωσης Φόρμας"
+   },
+   "Confirm": {
+      "message": "Επιβεβαίωση"
+   },
+   "Confirm_Master_Password": {
+      "message": "Επιβεβαίωση Κύριου Κωδικού"
+   },
+   "Confirm_Password": {
+      "message": "Επιβεβαίωση Κωδικού"
+   },
+   "Congo": {
+      "message": "Κονγκό"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "Λαϊκή Δημοκρατία του Κονγκό"
+   },
+   "Congratulations": {
+      "message": "Συγχαρητήρια"
+   },
+   "Congratulations_": {
+      "message": "Συγχαρητήρια!"
+   },
+   "Connection_Mode": {
+      "message": "Τύπος σύνδεσης"
+   },
+   "Connection_Type": {
+      "message": "Τύπος σύνδεσης"
+   },
+   "Contact": {
+      "message": "Επαφή"
+   },
+   "Continue": {
+      "message": "Συνέχεια"
+   },
+   "Control_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "Χαρακτήρες ελέγχου βρέθηκαν στο επιλεγμένο όνομα αρχείου, δε θα γίνει επεξεργασία"
+   },
+   "Cook_Islands": {
+      "message": "Νησιά Κουκ"
+   },
+   "Copy": {
+      "message": "Αντιγραφή"
+   },
+   "Copy_Note": {
+      "message": "Αντιγραφή Σημείωσης"
+   },
+   "Copy_Password": {
+      "message": "Αντιγραφή Κωδικού Πρόσβασης"
+   },
+   "Copy_URL": {
+      "message": "Αντιγραφή URL"
+   },
+   "Copy_Username": {
+      "message": "Αντιγραφή Ονόματος Χρήστη"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "Copyright 2008 LastPass. Με την επιφύλαξη όλων των δικαιωμάτων.\nΤμήματα από αυτό το λογισμικό έχουν αδειοδότηση από τρίτους, όπως περιγράφεται στη διεύθυνση:"
+   },
+   "Costa_Rica": {
+      "message": "Κόστα Ρίκα"
+   },
+   "Cote_D_ivoire": {
+      "message": "Ακτή Ελεφαντοστού"
+   },
+   "Country": {
+      "message": "Χώρα"
+   },
+   "County": {
+      "message": "Περιφέρεια"
+   },
+   "Create_Account": {
+      "message": "Δημιουργία Λογαριασμού"
+   },
+   "Create_Group": {
+      "message": "Δημιουργία φακέλου"
+   },
+   "Create_Sub_Group": {
+      "message": "Δημιουργία υποφακέλου"
+   },
+   "Create_Your_LastPass_Account": {
+      "message": "Δημιουργήστε το λογαριασμό σας LastPass"
+   },
+   "Create_an_Account": {
+      "message": "Δημιουργία λογαριασμού"
+   },
+   "Creating_Account___": {
+      "message": "Δημιουργία Λογαριασμού..."
+   },
+   "Credit_Card": {
+      "message": "Πιστωτική Κάρτα"
+   },
+   "Credit_Card_Number": {
+      "message": "Αριθμός Πιστωτικής Κάρτας"
+   },
+   "Credit_Monitoring": {
+      "message": "Παρακολούθηση Πίστωσής"
+   },
+   "Credit_card_number": {
+      "message": "Αριθμός της πιστωτικής κάρτας"
+   },
+   "Credit_cardformfill": {
+      "message": "Πιστωτική κάρτα"
+   },
+   "Croatia": {
+      "message": "Κροατία"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "Κούβα"
+   },
+   "Custom_Value": {
+      "message": "Προσαρμοσμένη Τιμή"
+   },
+   "Custom_field__": {
+      "message": "Προσαρμοσμένο Πεδίο #"
+   },
+   "Custom_fields": {
+      "message": "Προσαρμοσμένα Πεδία"
+   },
+   "Cyprus": {
+      "message": "Κύπρος"
+   },
+   "Czech_Republic": {
+      "message": "Δημοκρατία της Τσεχίας"
+   },
+   "Danish": {
+      "message": "Δανική"
+   },
+   "Darn__Passwords_": {
+      "message": "Darn! Κωδικοί!"
+   },
+   "Darwin": {
+      "message": "Ντάρβιν"
+   },
+   "Dashlane": {
+      "message": "Dashlane"
+   },
+   "Database": {
+      "message": "Βάση δεδομένων"
+   },
+   "Date": {
+      "message": "Ημερομηνία"
+   },
+   "Date_of_Birth": {
+      "message": "Ημερομηνία γέννησης"
+   },
+   "Debug": {
+      "message": "Ανίχνευση σφαλμάτων"
+   },
+   "Debug_Console": {
+      "message": "Ανίχνευση σφαλμάτων κονσόλας"
+   },
+   "December": {
+      "message": "Δεκέμβριος"
+   },
+   "Default": {
+      "message": "Προεπιλογή"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "Εξορισμού Φόρμα Συμπλήρωσής Προφίλ"
+   },
+   "Delete": {
+      "message": "Διαγραφή"
+   },
+   "Delete_Cache": {
+      "message": "Διαγραφή Cache"
+   },
+   "Delete_Formfill_Profile": {
+      "message": "Διαγραφή Προφίλ Συμπλήρωσης Φόρμας"
+   },
+   "Delete_Group": {
+      "message": "Διαγραφή φακέλου"
+   },
+   "Delete_Identity_": {
+      "message": "Διαγραφή Ταυτότητας;"
+   },
+   "Delete_Selected": {
+      "message": "Διαγραφή Επιλεγμένων"
+   },
+   "Delete_Site": {
+      "message": "Διαγραφή Ιστοσελίδας"
+   },
+   "Delete_Site_": {
+      "message": "Διαγραφή Ιστοσελίδας;"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "Διαγράψτε αυτό το προφίλ συμπλήρωσης φόρμας"
+   },
+   "Deleted": {
+      "message": "Διαγράφηκε"
+   },
+   "Denmark": {
+      "message": "Δανία"
+   },
+   "Description": {
+      "message": "Περιγραφή"
+   },
+   "Dining": {
+      "message": "Φαγητό"
+   },
+   "Disable": {
+      "message": "Απενεργοποίηση"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "Απενεργοποίηση του μη ασφαλούς Διαχειριστή Κωδικών του Chrome"
+   },
+   "Disable_LastPass": {
+      "message": "Απενεργοποίηση LastPass"
+   },
+   "Disable_LastPass_Master_Password_risk_warning_on_this_site_": {
+      "message": "Απενεργοποίηση προειδοποίησης κινδύνου υποκλοπής τους Κύριου LastPass κωδικού σας σε αυτό τον ιστότοπο;"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "Απενεργοποίηση του LastPass για αυτή τη σελίδα ή ολόκληρο τον ιστότοπο;"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "Απενεργοποίηση Πολυπαραγοντικής Αυθεντικοποίησης"
+   },
+   "Disable_Page": {
+      "message": "Απενεργοποίηση Σελίδας"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "Απενεργοποίηση Αυθεντικοποίησης Ενιαίου-Συντελεστή"
+   },
+   "Disable_Site": {
+      "message": "Απενεργοποίηση Ιστότοπου"
+   },
+   "Disable_alert___": {
+      "message": "Απενεργοποίηση ειδοποίησης..."
+   },
+   "Disable_alert_for_this_site": {
+      "message": "Απενεργοποίηση προειδοποίησης για αυτή την ιστοσελίδα"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "Απενεργοποιήστε όλες τις ειδοποιήσεις για αδύναμα/διπλά κλειδιά της ιστοσελίδας"
+   },
+   "Disable_for_all_sites": {
+      "message": "Απενεργοποίηση για όλους τους ιστότοπους"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "Απόρριψη αλλαγών και κλείσιμο αυτού του παραθύρου."
+   },
+   "Dismiss": {
+      "message": "Απόρριψη"
+   },
+   "Djibouti": {
+      "message": "Τζιμπουτί"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "Να μην ερωτηθώ ξανά για"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "Να μην ερωτηθώ ξανά για "
+   },
+   "Do_not_show_this_message_for_this_domain": {
+      "message": "Να μην εμφανίζεται αυτό το μήνυμα για αυτόν τον τομέα"
+   },
+   "Do_you_like_LastPass_": {
+      "message": "Σας αρέσει ο LastPass;"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "Θέλετε πραγματικά να εγκαταλείψετε; Δεν μπορείτε να χρησιμοποιήσετε το LastPass χωρίς τη δημιουργία λογαριασμού."
+   },
+   "Dominica": {
+      "message": "Ντομίνικα"
+   },
+   "Dominican_Republic": {
+      "message": "Δομινικανή Δημοκρατία"
+   },
+   "Down": {
+      "message": "Κάτω"
+   },
+   "Dr": {
+      "message": "Δρ."
+   },
+   "Driver_s_License": {
+      "message": "Άδεια Οδήγησης"
+   },
+   "Duplicate_password": {
+      "message": "Διπλή χρήση κωδικού"
+   },
+   "Dutch": {
+      "message": "Ολλανδικά"
+   },
+   "ERROR__Moving_sites_between_shared_folders_is_currently_not_supported_": {
+      "message": "ΣΦΑΛΜΑ: Μετακίνηση ιστοσελίδων μεταξύ των κοινόχρηστων φακέλων δεν υποστηρίζεται αυτήν τη στιγμή."
+   },
+   "ERROR__You_are_not_allowed_to_move_sites_out_of_shared_folders__Delete_is_the_only_supported_operation_": {
+      "message": "ΣΦΑΛΜΑ: Δεν σας επιτρέπεται να μεταφέρετε τις ιστοσελίδες έξω από τους κοινόχρηστους φακέλους. Η Διαγραφή είναι η μοναδική υποστηριζόμενη λειτουργία."
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "Ανατολική ώρα (ΗΠΑ & Καναδάς)"
+   },
+   "Ecuador": {
+      "message": "Εκουαδόρ"
+   },
+   "Edit": {
+      "message": "Επεξεργασία"
+   },
+   "Edit_Application": {
+      "message": "Επεξεργασία Εφαρμογής"
+   },
+   "Edit_Application_Fields": {
+      "message": "Επεξεργασία πεδίων εφαρμογής"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "Επεξεργασία προφίλ Πιστωτικής Κάρτας"
+   },
+   "Edit_Form_Fields": {
+      "message": "Επεξεργασία πεδίων φόρμας"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "Επεξεργασία Προφίλ Φορμών Συμπλήρωσης"
+   },
+   "Edit_Note": {
+      "message": "Επεξεργασία σημείωσης"
+   },
+   "Edit_Secure_Note": {
+      "message": "Επεξεργασία Ασφαλούς Σημείωσης"
+   },
+   "Edit_Secure_Notes": {
+      "message": "Επεξεργασία Secure Notes"
+   },
+   "Edit_Site": {
+      "message": "Επεξεργασία Ιστοτόπου"
+   },
+   "Edit_Site_Fields": {
+      "message": "Επεξεργασία Πεδίων Ιστότοπων"
+   },
+   "Edit_your_site_to_see_old_passwords_": {
+      "message": "Επεξεργασία Ιστότοπου για να δείτε παλιούς κωδικούς."
+   },
+   "Education": {
+      "message": "Εκπαίδευση"
+   },
+   "Egypt": {
+      "message": "Αίγυπτος"
+   },
+   "El_Salvador": {
+      "message": "Ελ Σαλβαδόρ"
+   },
+   "Email": {
+      "message": "Email"
+   },
+   "Email_": {
+      "message": "Email:"
+   },
+   "Email_Account": {
+      "message": "Λογαριασμός Email"
+   },
+   "Email_Address": {
+      "message": "Ηλεκτρονική Διεύθυνση"
+   },
+   "Email_Address_": {
+      "message": "Ηλεκτρονική διεύθυνση:"
+   },
+   "Email_address": {
+      "message": "Διεύθυνση ηλεκτρονικού ταχυδρομείου"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "Το Email αυτό χρησιμοποιείται, έχετε ξεχάσει τον κωδικό σας;"
+   },
+   "Enable_Credit_Monitoring": {
+      "message": "Ενεργοποίηση Παρακολούθησης Πίστωσης"
+   },
+   "Enable_Free_Credit_Monitoring": {
+      "message": "Ενεργοποιήστε την Ελεύθερη Παρακολούθηση Πίστωσης"
+   },
+   "Enable_Native_Messaging": {
+      "message": "Ενεργοποίηση Μυνημάτων Συστήματος"
+   },
+   "Enable_new_login_screen": {
+      "message": "Ενεργοποίηση νέας οθόνης εισόδου"
+   },
+   "Enabled": {
+      "message": "Ενεργοποιημένο"
+   },
+   "Encryption": {
+      "message": "Κρυπτογράφηση"
+   },
+   "End": {
+      "message": "Τέλος"
+   },
+   "English": {
+      "message": "Αγγλικά"
+   },
+   "English__United_Kingdom_": {
+      "message": "Αγγλικά (Ηνωμένο Βασίλειο)"
+   },
+   "Enter_PIN": {
+      "message": "Εισάγετε το PIN"
+   },
+   "Enter_a_passcode_in_the_box_below_": {
+      "message": "Πληκτρολογήστε έναν κωδικό στο παρακάτω πλαίσιο:"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "Εισάγετε επιπρόσθετες σημειώσεις"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "Πληκτρολογήστε το PIN της Smart Card σας"
+   },
+   "Enterprise": {
+      "message": "Επιχείρηση"
+   },
+   "Entertainment": {
+      "message": "Διασκέδαση"
+   },
+   "Equatorial_Guinea": {
+      "message": "Ισημερινή Γουινέα"
+   },
+   "Eritrea": {
+      "message": "Ερυθραία"
+   },
+   "Error": {
+      "message": "Σφάλμα"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "Προέκυψε ένα σφάλμα κατά την επαναφορά των ιστότοπων σας στο LastPass. Παρακαλώ δοκιμάστε να συνδεθείτε ξανά για να επαναφέρετε τους ιστότοπους σας."
+   },
+   "ErrorLoginMsg": {
+      "message": "Προέκυψε ένα σφάλμα κατά την είσοδό σας στο LastPass. Παρακαλώ ελέγξτε τη σύνδεσή σας στο διαδίκτυο."
+   },
+   "ErrorSendingMsg": {
+      "message": "Προέκυψε ένα σφάλμα κατά την προσπάθεια επικοινωνίας με τον διακομιστή. Παρακαλούμε ελέγξτε τη σύνδεσή σας στο διαδίκτυο."
+   },
+   "ErrorSessionMsg": {
+      "message": "Η συνεδρία στον LastPass φαίνεται να έχει λήξει. Παρακαλώ επανασυνδεθείτε."
+   },
+   "Error__This_folder_has_already_been_moved_": {
+      "message": "Σφάλμα: Μήπως ο φάκελος έχει ήδη μετακινηθεί;"
+   },
+   "Error_opening_attachment_": {
+      "message": "Σφάλμα κατά το άνοιγμα του συνημμένου."
+   },
+   "Estonia": {
+      "message": "Εσθονία"
+   },
+   "Ethiopia": {
+      "message": "Αιθιοπία"
+   },
+   "Evening_Number": {
+      "message": "Εσπερινός Αριθμός"
+   },
+   "Evening_number": {
+      "message": "Εσπερινός αριθμός"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "Το LastPass δύναται να αποθηκεύσει ένα κωδικό μιας χρήσης τοπικά (στον υπολογιστή σας) που μπορεί να χρησιμοποιηθεί για την ανάκτηση του λογαριασμού σας αν ξεχάσετε τον κύριο κωδικό σας. Αυτός ο κωδικός θα παραμείνει ανενεργός μέχρι να ενεργοποιηθεί από τον κεντρικό υπολογιστή.\n\nΘα θέλατε να ενεργοποιήσετε την ανάκτηση λογαριασμού;"
+   },
+   "Expand_All": {
+      "message": "Ανάπτυξη όλων"
+   },
+   "Expiration": {
+      "message": "Λήξη"
+   },
+   "Expiration_Date": {
+      "message": "Ημερομηνία λήξης"
+   },
+   "Expiration_date": {
+      "message": "Ημερομηνία λήξης"
+   },
+   "Export": {
+      "message": "Εξαγωγή"
+   },
+   "Export_To": {
+      "message": "Εξαγωγή σε"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "Εξαγωγή σε LastPass Αρχείο CSV"
+   },
+   "FIPS_Mode": {
+      "message": "Λειτουργία FIPS"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "Νησιά Φώκλαντ"
+   },
+   "Faroe_Islands": {
+      "message": "Νησιά Φερόε"
+   },
+   "Favorite": {
+      "message": "Αγαπημένο"
+   },
+   "Favoritesproper": {
+      "message": "Αγαπημένα"
+   },
+   "Fax_Number": {
+      "message": "Αριθμός Fax"
+   },
+   "Fax_number": {
+      "message": "Αριθμός FAX"
+   },
+   "Features": {
+      "message": "Χαρακτηριστικά"
+   },
+   "February": {
+      "message": "Φεβρουάριος"
+   },
+   "Feedback": {
+      "message": "Παροχή Πληροφοριών"
+   },
+   "Female": {
+      "message": "Γυναίκα"
+   },
+   "Field_Type_": {
+      "message": "Τύπος Πεδίου:"
+   },
+   "Fields_": {
+      "message": "Πεδία:"
+   },
+   "Fiji": {
+      "message": "Φίτζι"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "Φίτζι, Καμτσάτκα, Νήσοι Μάρσαλ"
+   },
+   "File": {
+      "message": "Αρχείο"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "Μεγάλο αρχείο, θα πρέπει να είναι λιγότερο από 10MB."
+   },
+   "File_too_large__it_must_be_less_than_5MB_": {
+      "message": "Μεγάλο αρχείο, θα πρέπει να είναι λιγότερο από 5MB."
+   },
+   "Files": {
+      "message": "Αρχεία"
+   },
+   "Fill": {
+      "message": "Συμπλήρωση"
+   },
+   "Fill_Current": {
+      "message": "Συμπλήρωση Τρέχοντος"
+   },
+   "Fill_Form": {
+      "message": "Συμπλήρωση Φόρμας"
+   },
+   "Fill_Forms": {
+      "message": "Συμπλήρωση Φορμών"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "Συμπληρώστε το Προφίλ για την προεπιλεγμένη φόρμα Συμπλήρωσης"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "Συμπληρώστε την Επόμενη Σύνδεση (Ύπαρξη Πολλαπλών)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "Συμπληρώστε την Προηγούμενη Σύνδεση (Ύπαρξη Πολλαπλών)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "Συμπλήρωση ή Επεξεργασία Δεδομένων Συμπλήρωσης Φόρμας"
+   },
+   "Fill_with": {
+      "message": "Συμπλήρωση με"
+   },
+   "FillableFormDetected": {
+      "message": "Σε αυτή την σελίδα υπάρχει μια φόρμα που μπορεί να συμπληρωθεί."
+   },
+   "Filter": {
+      "message": "Φίλτρο"
+   },
+   "Finance": {
+      "message": "Οικονομία"
+   },
+   "Find_a_site": {
+      "message": "Αναζήτηση ιστοτόπου"
+   },
+   "Finland": {
+      "message": "Φινλανδία"
+   },
+   "Finnish": {
+      "message": "Φινλανδικά"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "Διαχειριστής Κωδικών Πρόσβασης Firefox"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "Τα πρώτα 3 ψηφία του τηλεφωνικού σας αριθμού"
+   },
+   "First_Name": {
+      "message": "Όνομα"
+   },
+   "First_name": {
+      "message": "Μικρό όνομα"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "Για κάθε συντεταγμένη που αναφέρεται παρακάτω, βρείτε την τιμή στο πλαίσιο σας και πληκτρολογήστε την."
+   },
+   "Forgot_Password_": {
+      "message": "Ξεχάσατε τον κωδικό σας;"
+   },
+   "Forgot_your_password_": {
+      "message": "Ξεχάσατε τον κωδικό σας;"
+   },
+   "FormFill": {
+      "message": "Συμπλήρωση Φόρμας"
+   },
+   "FormFill_Profiles": {
+      "message": "Προφίλ Συμπλήρωσης Φόρμας"
+   },
+   "Form_Fill": {
+      "message": "Συμπλήρωση φόρμας"
+   },
+   "Form_Fill_Profile": {
+      "message": "Προφίλ Συμπλήρωσης Φορμών"
+   },
+   "Form_Fill_Profiles": {
+      "message": "Προφίλ Συμπλήρωσης Φορμών"
+   },
+   "Form_Fills": {
+      "message": "Συμπλήρωση Φορμών"
+   },
+   "Form_Name_": {
+      "message": "Όνομα φόρμας:"
+   },
+   "Format": {
+      "message": "Μορφή"
+   },
+   "Forums": {
+      "message": "Ομάδες Συζήτησης"
+   },
+   "France": {
+      "message": "Γαλλία"
+   },
+   "French": {
+      "message": "Γαλλικά"
+   },
+   "French_Guiana": {
+      "message": "Γαλλική Γουιάνα"
+   },
+   "French_Polynesia": {
+      "message": "Γαλλική Πολυνησία"
+   },
+   "French_Southern_Territories": {
+      "message": "Γαλλικά Νότια Εδάφη"
+   },
+   "French__Canada_": {
+      "message": "Γαλλικά (Καναδά)"
+   },
+   "Full_path_of_file_to_import_": {
+      "message": "Πλήρης διαδρομή αρχείου που θα εισαχθεί:"
+   },
+   "Full_path_of_the_file_to_import_": {
+      "message": "Πλήρης διαδρομή του αρχείου προς εισαγωγή:"
+   },
+   "GET_FREE_PREMIUM": {
+      "message": "ΑΠΟΚΤΗΣΤΕ ΔΩΡΕΑΝ PREMIUM"
+   },
+   "GMT_5": {
+      "message": "GMT+5"
+   },
+   "GMT_7": {
+      "message": "GMT+7"
+   },
+   "GMT_9": {
+      "message": "GMT+9"
+   },
+   "GMT_Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT Δουβλίνο, Εδιμβούργο, Λισαβόνα, Λονδίνο"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "ΜΧΤ: Δουβλίνο, Εδιμβούργο, Λισαβόνα, Λονδίνο"
+   },
+   "Gabon": {
+      "message": "Γκαμπόν"
+   },
+   "Gambia": {
+      "message": "Γκάμπια"
+   },
+   "Games": {
+      "message": "Παιχνίδια"
+   },
+   "Gender": {
+      "message": "Γένος"
+   },
+   "General": {
+      "message": "Γενικά"
+   },
+   "Generate": {
+      "message": "Παραγωγή"
+   },
+   "GeneratePassword": {
+      "message": "Αν δημιουργείτε ένα λογαριασμό ή αλλάζετε τον κωδικό σας, πατήστε 'Δημιουργία' ώστε το LastPass να δημιουργήσει ένα μοναδικό, ασφαλή κωδικό."
+   },
+   "Generate_Another_Password": {
+      "message": "Παραγωγή νέου κωδικού"
+   },
+   "Generate_Password": {
+      "message": "Δημιουργία Κωδικού"
+   },
+   "Generate_Secure_Password": {
+      "message": "Δημιουργία Ασφαλούς Κωδικού"
+   },
+   "Generate_Sharing_Keys": {
+      "message": "Δημιουργία Κλειδιών Διανομής"
+   },
+   "Generated_Password_for": {
+      "message": "Παραγόμενος Κωδικός για"
+   },
+   "Generic": {
+      "message": "Γενικός"
+   },
+   "Generic_CSV_File": {
+      "message": "Αρχείο CSV"
+   },
+   "Georgia": {
+      "message": "Γεωργία"
+   },
+   "German": {
+      "message": "Γερμανικά"
+   },
+   "Germany": {
+      "message": "Γερμανία"
+   },
+   "Ghana": {
+      "message": "Γκάνα"
+   },
+   "Gibraltar": {
+      "message": "Γιβραλτάρ"
+   },
+   "Go_Back": {
+      "message": "Επιστροφή"
+   },
+   "Go_Back_": {
+      "message": "Επιστροφή;"
+   },
+   "Go_Premium_": {
+      "message": "Γίνε Premium!"
+   },
+   "Go_to_URL": {
+      "message": "Μετάβαση στο URL"
+   },
+   "Google_Authenticator": {
+      "message": "Google Authenticator"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "Πολυεπίπεδη Πιστοποίηση Google Authenticator"
+   },
+   "Google_Chrome": {
+      "message": "Google Chrome"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "Διαχειριστής Κωδικών του Google Chrome"
+   },
+   "Google_Chrome_requires_that_extensions_use_the_same_language_as_the_browser__so_in_order_to_switch_LastPass_s_language__please_change_the_main_browser_language_under_Chrome_s_Options_": {
+      "message": "Το Google Chrome απαιτεί οι επεκτάσεις του να χρησιμοποιούν την ίδια γλώσσα με το πρόγραμμα περιήγησης, έτσι για να αλλάξετε την γλώσσα του LastPass, παρακαλούμε να αλλάξετε πρώτα την κύρια γλώσσα του προγράμματος κάτω από τις Επιλογές του Chrome."
+   },
+   "Greece": {
+      "message": "Ελλάδα"
+   },
+   "Greenland": {
+      "message": "Γροιλανδία"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "Γροιλανδία, Μπραζίλια, Μοντεβιδέο"
+   },
+   "Grenada": {
+      "message": "Γρενάδα"
+   },
+   "Group_": {
+      "message": "Φάκελος:"
+   },
+   "Group_Actions": {
+      "message": "Ομάδικές δράσεις"
+   },
+   "Group_ID": {
+      "message": "Αναγνωριστικό ID Ομάδας"
+   },
+   "Group_Name": {
+      "message": "Όνομα φακέλου"
+   },
+   "Group_will_be_created_under": {
+      "message": "Θα δημιουργηθεί φάκελος ή ο ήδη υπάρχων με"
+   },
+   "Groups": {
+      "message": "Φάκελοι"
+   },
+   "Guadeloupe": {
+      "message": "Γουαδελούπη"
+   },
+   "Guam": {
+      "message": "Γκουάμ"
+   },
+   "Guatemala": {
+      "message": "Γουατεμάλα"
+   },
+   "Guernsey": {
+      "message": "Γκέρνσεϊ"
+   },
+   "Guinea": {
+      "message": "Γουινέα"
+   },
+   "Guinea_Bissau": {
+      "message": "Γουινέα-Μπισάου"
+   },
+   "Guyana": {
+      "message": "Γουιάνα"
+   },
+   "HP_Password_Safe": {
+      "message": "HP Password Safe"
+   },
+   "Haiti": {
+      "message": "Αϊτή"
+   },
+   "Harare__Pretoria": {
+      "message": "Χαράρε, Πρετόρια"
+   },
+   "Hawaii": {
+      "message": "Χαβάη"
+   },
+   "Health": {
+      "message": "Υγεία"
+   },
+   "Health_Insurance": {
+      "message": "Ασφάλισης Υγείας"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "Νήσοι Χερντ και Μακντόναλντ"
+   },
+   "Height": {
+      "message": "Ύψος"
+   },
+   "Help": {
+      "message": "Βοήθεια"
+   },
+   "Help_Center": {
+      "message": "Κέντρο Βοήθειας"
+   },
+   "Help_Translate": {
+      "message": "Βοηθήστε στη μετάφραση"
+   },
+   "Help___": {
+      "message": "Βοήθεια..."
+   },
+   "Help_spread_the_word": {
+      "message": "Βοηθήστε μας να γίνει γνωστό"
+   },
+   "Hide": {
+      "message": "Απόκρυψη"
+   },
+   "Hide_Advanced_Options": {
+      "message": "Απόκρυψη επιλογών για προχωρημένους"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "Απόκρυψη Πλαισίου Μενού Επιλογών"
+   },
+   "Hide_Password": {
+      "message": "Απόκρυψη Κωδικού"
+   },
+   "Hide_Passwords": {
+      "message": "Απόκρυψη Κωδικών"
+   },
+   "Highlight_input_boxes": {
+      "message": "Επισήμανση πεδίων εισαγωγής"
+   },
+   "History": {
+      "message": "Ιστορικό"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "Αγία Έδρα (Πόλη του Βατικανού)"
+   },
+   "Home": {
+      "message": "Αρχική Σελίδα"
+   },
+   "Honduras": {
+      "message": "Ονδούρα"
+   },
+   "Hong_Kong": {
+      "message": "Χονγκ Κονγκ"
+   },
+   "Hostname": {
+      "message": "Hostname"
+   },
+   "HotKeys": {
+      "message": "Συντομεύσεις"
+   },
+   "Hungarian": {
+      "message": "Ουγγρικά"
+   },
+   "Hungary": {
+      "message": "Ουγγαρία"
+   },
+   "IBAN_Number": {
+      "message": "Αριθμός ΙΒΑΝ"
+   },
+   "IMPORT_": {
+      "message": "ΕΙΣΑΓΩΓΗ;"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "ΕΙΝΑΙ ΜΕΓΙΣΤΟΥ ΣΗΜΑΣΙΑΣ ΝΑ ΜΗΝ ΞΕΧΑΣΕΤΕ ΠΟΤΕ ΤΟ ΝΕΟ ΣΑΣ LASTPASS ΚΩΔΙΚΟ."
+   },
+   "I_Forgot_my_Password": {
+      "message": "Ξέχασα τον Κωδικό μου"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "Ξέχασα τον κωδικό μου, Βοήθεια"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "Έχω διαβάσει και συμφωνώ με το"
+   },
+   "I_have_read_and_agree_with_the__0terms_of_service_0_and__1privacy_statement_1": {
+      "message": "Έχω διαβάσει και συμφωνώ με το %0όροι χρήσης της υπηρεσίας%0 και %1δήλωση απορρήτου%1"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "Καταλαβαίνω ότι τα κρυπτογραφημένα δεδομένα μου θα αποσταλούν στο LastPass"
+   },
+   "I_ve_forgot_the_answer": {
+      "message": "Εχω ξεχάσει την απάντηση"
+   },
+   "I_ve_forgotten_my_password_": {
+      "message": "Έχω ξεχάσει τον κωδικό μου"
+   },
+   "I_ve_lost_my_Google_Authenticator_device": {
+      "message": "Έχω χάσει τη συσκευή μου εξακρίßωσης γνησιότητας Google"
+   },
+   "I_ve_lost_my_Sesame_device": {
+      "message": "Έχω χάσει την συσκευή Sesame"
+   },
+   "I_ve_lost_my_YubiKey_device": {
+      "message": "Έχω χάσει τη συσκευή YubiKey"
+   },
+   "I_ve_lost_my_device": {
+      "message": "Έχω χάσει τη συσκευή μου"
+   },
+   "I_ve_lost_my_grid": {
+      "message": "Έχω χάσει το πλέγμα μου"
+   },
+   "Iceland": {
+      "message": "Ισλανδία"
+   },
+   "Icons": {
+      "message": "Εικονίδια"
+   },
+   "Identities": {
+      "message": "Ταυτότητες"
+   },
+   "Identity": {
+      "message": "Ταυτότητα"
+   },
+   "If_checked__your_credit_report_will_be_regularly_monitored_and_you_will_be_alerted_if_any_suspicious_activity_occurs_": {
+      "message": "Επιλέγοντας το, η πιστωτική σας αναφορά θα παρακολουθείτε και αν κάποια περίεργη κίνηση εντοπιστεί, θα ειδοποιηθείτε."
+   },
+   "If_not_specified__will_use_a_file_extension_of_": {
+      "message": "Αν δεν καθοριστεί, θα χρησιμοποιηθεί η επέκταση αρχείου:"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "Αν έχετε ήδη λογαριασμό στο LastPass, μπορείτε να κλείσετε αυτό το παράθυρο και να συνδεθείτε."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "Αν παρόλα αυτά ξεχνάτε τον κύριο LastPass κωδικό σας,"
+   },
+   "If_you_forgot_your_answer__click_here_to_reset_your_security_question": {
+      "message": "Αν έχετε ξεχάσει την απάντησή σας, κάντε κλικ εδώ για να επαναφέρετε την ερώτηση ασφαλείας σας"
+   },
+   "If_you_have_another_format_that_LastPass_doesn_t_currently_support_you_can_attempt_to_save_your_data_as_a_CSV_file__YOU_MUST_MODIFY_THE_FIRST_ROW_OF_THE_CSV_FILE_FOR_LASTPASS_TO_RECOGNIZE_IT__The_first_row_s_column_names_should_be_properly_setup_for_the_data_in_the_columns_Possible_first_row_names___url_username_password_extra_name_grouping___extra__means__notes__and__grouping__is_what_group_it_should_be_in___You_do_not_have_to_use_all_the_column_names_and_they_don_t_need_to_be_in_any_order___For_example_your_file_s_first_row_might_be_like___name_username_password_url__If_you_want_to_import_a_Secure_Note_instead_of_a_Site__simply_ensure_the__url____username___and__password__columns_are_left_blank__or_omit_the__url____username___and_or__password__columns_entirely___and_ensure_the__extra__column_is_not_blank___As_long_as_these_two_things_have_been_done__the_record_will_automatically_be_imported_as_a_Secure_Note_instead_of_a_Site___This_should_be_very_simple__just_open_your_saved_CSV_file_in_Excel_and_make_sure_the_top_row_has_the_appropriate_name_from_above_for_what_it_is___Save_it__then_import_the_resulting_file_": {
+      "message": "Αν έχετε άλλη μορφή που δεν υποστηρίζεται προς το παρόν από τον LastPass, μπορείτε να προσπαθήσετε να αποθηκεύσετε τα δεδομένα σας ως αρχείο CSV \n\nΘΑ ΠΡΕΠΕΙ ΝΑ ΤΡΟΠΟΠΟΙΗΣΤΕΤΕ ΚΑΤΑΛΛΗΛΑ ΤΗΝ ΠΡΩΤΗ ΓΡΑΜΜΗ ΤΟΥ ΑΡΧΕΙΟΥ CSV ΠΡΟΚΕΙΜΕΝΟΥ ΝΑ ΑΝΑΓΝΩΡΙΣΤΕΙ ΑΠΟ ΤΟΝ LASTPASS\n\nΤα ονόματα των στηλών της πρώτης σειράς θα πρέπει να έχουν ρυθμιστεί σωστά για τα δεδομένα στις στήλες \nΠιθανά ονόματα πρώτη σειρά: \n\nurl,username,password,extra,name,grouping\n\nΤο 'extra' υποδεικνύει σε ποιον φάκελο θα πρέπει να βρίσκονται τα 'notes' και 'grouping'. Δεν χρειάζεται να χρησιμοποιήσετε όλα τα ονόματα των στηλών και δεν χρειάζεται να είναι με κάποια σειρά. Για παράδειγμα, την πρώτη σειρά του αρχείου σας θα μπορούσε να είναι: \n\nname,username,password,url\n\nΕάν θέλετε να εισαγάγετε μια Ασφαλή Σημείωση αντί κάποιου ιστότοπου, βεβαιωθείτε ότι οι στήλες 'url', 'username', και 'password' είναι κενές (ή παραλείψτε εξ ολοκλήρου τις στήλες  'url', 'username', ή/και 'password'), και βεβαιωθείτε ότι η στήλη 'extra' δεν είναι κενή. Όσο αυτά τα δύο πράγματα που έχουν γίνει, το αρχείο αυτόματα θα εισαχθεί ως Ασφαλή Σημείωση αντί ιστότοπου. \n\nΑυτή η διαδικασία είναι πολύ απλή, απλά ανοίξτε το αποθηκευμένο αρχείο CSV στο Excel και βεβαιωθείτε ότι η επάνω σειρά έχει το κατάλληλο όνομα για τα περιεχόμενα της κάθε στήλης. Πατήστε αποθήκευση και στη συνέχεια εισαγάγετε το αρχείο που προκύπτει."
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "Αν χάσατε την Google Authenticator συσκευή, κάντε κλικ εδώ για απενεργοποίηση του Google Authenticator."
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "Αν έχετε χάσει τη συσκευή Sesame, κάντε κλικ εδώ για να απενεργοποιήσετε την πιστοποίησή της"
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "Αν έχετε χάσει την YubiKey συσκευή σας, κάντε κλικ εδώ για να απενεργοποιήσετε την πιστοποίηση YubiKey"
+   },
+   "If_you_lost_your_device__click_here_to_disable_multifactor_authentication": {
+      "message": "Αν έχετε χάσει τη συσκευή σας, κάντε κλικ εδώ για να απενεργοποιήσετε την πολυπαραγοντική ταυτοποίηση"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "Αν έχετε χάσει το πλαίσιο σας, κάντε κλικ εδώ για να απενεργοποιήσετε την πιστοποίηση πλαισίου"
+   },
+   "Import": {
+      "message": "Εισαγωγή"
+   },
+   "Import_From": {
+      "message": "Εισαγωγή Από"
+   },
+   "Import_Your_Data": {
+      "message": "Εισαγωγή των Δεδομένων σας"
+   },
+   "Importing_your_data_to_your_LastPass_vault_will_secure_it_and_protect_you_against_identity_theft__All_imported_data_remains_COMPLETELY_confidential__the_only_person_who_can_view_YOUR_data_is_YOU_": {
+      "message": "Εισαγωγή των δεδομένων σας για να LastPass θησαυροφυλάκιο σας θα είναι ασφαλής και να σας προστατεύει από την κλοπή ταυτότητας. Όλα τα εισαγόμενα στοιχεία παραμένουν απολύτως εμπιστευτικά: το μόνο άτομο που μπορεί να δει τα δεδομένα ΣΑΣ είναι ΕΣΕΙΣ."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_enable_access_for_assistive_devices_": {
+      "message": "Για να μπορέσει το LastPass να συμπληρώνει βασικούς διάλογους αυθεντικοποίησης, θα πρέπει να ενεργοποιήσετε την πρόσβαση των βοηθητικών συσκευών."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_install_the_binary_version_of_LastPass_for_Chrome_": {
+      "message": "Για να μπορέσει το LastPass να συμπληρώνει βασικούς διάλογους αυθεντικοποίησης, θα πρέπει να εγκαταστήσετε τη δυαδική έκδοση του LastPass για το Chrome."
+   },
+   "In_order_to_complete_the_process___s_will_have_to_log_in_to__s_and_navigate_through_a_number_of_windows_quickly__It_is_normal_to_see_windows_flashing_and_changing_quickly__and_may_take_several_moments__We_ll_let_you_know_when_you_re_all_set_": {
+      "message": "Για να ολοκληρώσετε αυτή τη διαδικασία, %s θα πρέπει να συνδεθείτε στο %s και να πλοηγηθείτε μέσα από έναν αριθμό παραθύρων γρήγορα. Είναι φυσιολογικό να δείτε παράθυρα να αναβοσβήνουν και να αλλάζουν γρήγορα, και μπορεί να πάρει λίγη ώρα. Θα σας το γνωστοποιήσουμε όταν είναι έτοιμο."
+   },
+   "India": {
+      "message": "Ινδία"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "Ιντιάνα, Μπογκοτά, Λίμα, Κίτο, Ρίο Μπράνκο"
+   },
+   "Indonesia": {
+      "message": "Ινδονησία"
+   },
+   "Install": {
+      "message": "Εγκατάσταση"
+   },
+   "Install_Binary_Component": {
+      "message": "Εγκατάσταση δυαδικής συνιστώσας"
+   },
+   "Install_the_LastPass_Library_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "Εγκαταστήστε την δυαδική έκδοση LastPass για τον Chrome προκειμένου να ενεργοποιήσετε την αυτόματη αποσύνδεση μετά από αδράνεια"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "Εγκαταστήστε τη δυαδική έκδοση του LastPass για το Chrome ώστε να γίνεται αυτόματη αποσύνδεση μετά από αδράνεια"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_importing_passwords_from_Google_Chrome_password_manager": {
+      "message": "Εγκαταστήστε τη δυαδική έκδοση του LastPass για το Chrome για να ενεργοποιήσετε την εισαγωγή των κωδικών από το διαχειριστή κωδικών πρόσβασης του Google Chrome"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "Εγκαταστήστε τη δυαδική έκδοση του LastPass για το Chrome για να ενεργοποιήσετε την σύνδεση κοινής χρήσης μεταξύ άλλων φυλλομετρητών"
+   },
+   "Instant_Messenger": {
+      "message": "Messenger"
+   },
+   "Instructions": {
+      "message": "Οδηγίες"
+   },
+   "Insurance": {
+      "message": "Ασφάλιση"
+   },
+   "International_Date_Line_West": {
+      "message": "Διεθνής Γραμμή Ημερομηνίας Δύση"
+   },
+   "Invalid_Password_": {
+      "message": "Λανθασμένος Κωδικός."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "Λανθασμένη διεύθυνση ηλεκτρονικού ταχυδρομείου, δοκιμάστε ξανά"
+   },
+   "Invalid_file_type__it_must_be_an_image_that_can_be_displayed_by_your_browser_": {
+      "message": "Μη αποδεκτός τύπος αρχείου, πρέπει να είναι εικόνα που να μπορεί να προβληθεί από τον φυλλομετρητή."
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "Ισλαμική Δημοκρατία του Ιράν"
+   },
+   "Iraq": {
+      "message": "Ιράκ"
+   },
+   "Ireland": {
+      "message": "Ιρλανδία"
+   },
+   "Isle_of_Man": {
+      "message": "Νήσος του Μαν"
+   },
+   "Israel": {
+      "message": "Ισραήλ"
+   },
+   "Issue_Number": {
+      "message": "Αριθμός Έκδοσης"
+   },
+   "Issue_number": {
+      "message": "Αριθμός έκδοσης"
+   },
+   "Issued_Date": {
+      "message": "Ημερομηνία Έκδοσης"
+   },
+   "Issuing_Authority": {
+      "message": "Εκδούσα Αρχή"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "Προτείνεται η διαγραφή του συνημμένου μετά την χρήση του."
+   },
+   "Italian": {
+      "message": "Ιταλικά"
+   },
+   "Italy": {
+      "message": "Ιταλία"
+   },
+   "IterationsReduction": {
+      "message": "Ο αριθμός των επαναλήψεων που απαιτούνται για τη δημιουργία του κύριου LastPass κωδικού σας φαίνεται να έχει μειωθεί από την αποθηκευμένη έκδοση. Θέλετε να συνεχίσετε με τη σύνδεση;"
+   },
+   "Jamaica": {
+      "message": "Ιαμαϊκή"
+   },
+   "January": {
+      "message": "Ιανουάριος"
+   },
+   "Japan": {
+      "message": "Ιαπωνία"
+   },
+   "Japanese": {
+      "message": "Ιαπωνικά"
+   },
+   "Jersey": {
+      "message": "Τζέρσεϊ"
+   },
+   "Jordan": {
+      "message": "Ιορδανία"
+   },
+   "July": {
+      "message": "Ιούλιος"
+   },
+   "June": {
+      "message": "Ιούνιος"
+   },
+   "Kabul": {
+      "message": "Καμπούλ"
+   },
+   "Kathmandu": {
+      "message": "Κατμαντού"
+   },
+   "Kazakhstan": {
+      "message": "Καζακστάν"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "Αποθήκευση ιστορικού των συνδέσεών μου και των φορμών σύνδεσης"
+   },
+   "Kenya": {
+      "message": "Κένυα"
+   },
+   "Key_Index": {
+      "message": "Ευρετήριο Κλειδιού"
+   },
+   "Key_Type": {
+      "message": "Τύπος Κλειδιού"
+   },
+   "Kiribati": {
+      "message": "Κιριμπάτι"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "Λαϊκή Δημοκρατία της Κορέας"
+   },
+   "Korea__Republic_Of": {
+      "message": "Δημοκρατία της Κορέα"
+   },
+   "Korean": {
+      "message": "Κορεάτικα"
+   },
+   "Kuwait": {
+      "message": "Κουβέιτ"
+   },
+   "Kyrgyzstan": {
+      "message": "Κιργιστάν"
+   },
+   "La_Paz": {
+      "message": "Λα Παζ"
+   },
+   "Language": {
+      "message": "Γλώσσα"
+   },
+   "Language_": {
+      "message": "Γλώσσα:"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "Λαϊκή Δημοκρατία του Λάος"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "Αρχείο CSV LastPass"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "Εργαλειοθήκη LastPass στον Chrome"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "Κρυπτογραφημένο Αρχείο LastPass"
+   },
+   "LastPass_Enterprise": {
+      "message": "LastPass Enterprise"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "Πολυπαραγοντικό Πλαίσιο Πιστοποίησης LastPass"
+   },
+   "LastPass_Legacy": {
+      "message": "Κληροδότηση LastPass"
+   },
+   "LastPass_Menu": {
+      "message": "LastPass Μενού"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": "Ο LastPass μπορεί να συμπληρώσει αυτόματα τις φόρμες σε ιστοσελίδες με ένα μόνο κλικ. Χρησιμοποιώντας την αυτόματη 'Συμπλήρωση Φόρμας', όχι μόνο θα εξοικονομήσετε χρόνο, αλλά θα ενισχύσει επίσης και την ασφάλεια σας, όταν ψωνίζετε ηλεκτρονικά."
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "Το LastPass δεν μπορεί να συνδεθεί μέχρι να επιτραπούν τα cookies από το lastpass.com"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "Το LastPass εντόπισε μια μη ασφαλή φόρμα σύνδεσης.\n\nΘέλετε να συνεχίσετε;"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "Το LastPass εντόπισε μια μη ασφαλή φόρμα σύνδεσης.\n\nΘέλετε παρόλα αυτά το LastPass να συμπληρώσει τη φόρμα;"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "Το LastPass εντόπισε μεταβολή κωδικού για"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "Το LastPass εντόπισε μεταβολή κωδικού στο τομέα:"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "Το LastPass εντόπισε μεταβολή κωδικού στο χρήστη:"
+   },
+   "LastPass_detected_that_the_password_for_the_site_on_which_you_received_the_alert_has_the_same_password_as_your_LastPass_account_Master_Password_": {
+      "message": "Ο LastPass διαπίστωσε ότι η ιστοσελίδα που ενεργοποίησε αυτήν την ειδοποίηση ασφαλείας έχει τον ίδιο κωδικό πρόσβασης με τον κύριο LastPass κωδικό σας."
+   },
+   "LastPass_detected_that_the_site_that_triggered_this_security_alert_has_the_same_password_as_your_LastPass_account_Master_Password_": {
+      "message": "Ο LastPass διαπίστωσε ότι η ιστοσελίδα που ενεργοποίησε αυτήν την ειδοποίηση ασφαλείας έχει τον ίδιο κωδικό πρόσβασης με τον κύριο LastPass κωδικό σας."
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "Το LastPass εντόπισε ένα σφάλμα εγκατάστασης. Παρακαλώ εγκαταστήστε ξανά το LastPass."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "Το LastPass εντόπισε χρήση αδύναμου κωδικού πρόσβασης για την ακόλουθη ιστοσελίδα. Συνιστάτε να πάτε για αυτή την ιστοσελίδα στις ρυθμίσεις του λογαριασμού σας και εκεί να αλλάξετε τον κωδικό σας. Χρησιμοποιήστε τότε το LastPass για να δημιουργήσει ένα μοναδικό, ισχυρό κωδικό πρόσβασης για αυτόν το λογαριασμό. Μπορείτε να αποθηκεύσετε τις αλλαγές στην ιστοσελίδα και φυσικά στο Lastpass."
+   },
+   "LastPass_has_detected_that_you_have_used_the_password_for_this_login_on_other_sites__too__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "Το LastPass εντόπισε ότι χρησιμοποιείτε τον ίδιο κωδικό πρόσβασης αυτής της σύνδεσης και σε άλλους δικτυακούς τόπους. Συνιστάτε να πάτε για αυτή την ιστοσελίδα στις ρυθμίσεις του λογαριασμού σας και εκεί να αλλάξετε τον κωδικό σας. Χρησιμοποιήστε τότε το LastPass για να δημιουργήσει ένα μοναδικό, ισχυρό κωδικό πρόσβασης για αυτόν το λογαριασμό. Μπορείτε να αποθηκεύσετε τις αλλαγές στην ιστοσελίδα και φυσικά στο Lastpass."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "Το LastPass έχει συμπληρώσει τα στοιχεία σύνδεσής σας σε αυτή την ιστοσελίδα."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "Το LastPass έχει εγκατασταθεί πλήρως! Όταν εγκαθιστάτε το LastPass σε άλλους υπολογιστές δεν χρειάζεται να επαναλάβετε αυτή τη διαδικασία, απλά θα έχετε τη δυνατότητα να συνδεθείτε. Μην μοιράζεστε τον Κύριο Κωδικό σας με κανένα, συμπεριλαμβανομένων των εργαζομένων στο LastPass, ποτέ δεν θα σας ζητηθεί κάτι τέτοιο! Το LastPass κρυπτογραφεί τα ευαίσθητα δεδομένα σας τοπικά (στον υπολογιστή σας), ώστε ακόμη και οι εργαζόμενοι στο LastPass να μην έχουν πρόσβαση σε αυτά. Μπορείτε να λάβετε βοήθεια κάνοντας κλικ στο εικονίδιο LastPass."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember_": {
+      "message": "Το LastPass είναι ο τελευταίος κωδικός πρόσβασης που θα πρέπει να θυμάστε"
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "Ο κωδικός του LastPass είναι ο τελευταίος κωδικός που θα χρειαστεί ποτέ να θυμάστε. Αν είστε νέος να LastPass, θα χρειαστούν μόνο μερικά λεπτά από το χρόνο σας για να ρυθμίσετε το λογαριασμό σας. Θα έχετε τη δυνατότητα να χρησιμοποιείται αυτό το λογαριασμό σε οποιοδήποτε υπολογιστή ώστε τα προσωπικά σας δεδομένα να είναι πάντα συγχρονισμένα. Πατήστε δημιουργία λογαριασμού για να ξεκινήσετε."
+   },
+   "LastPass_is_the_last_password_you_will_ever_have_to_remember": {
+      "message": "Το LastPass είναι ο τελευταίος κωδικός πρόσβασης που θα πρέπει να θυμάστε"
+   },
+   "LastPass_must_reencrypt_all_of_your_data_because_of_a_key_change_": {
+      "message": "Το LastPass πρέπει επανακρυπτογραφήσει όλα τα δεδομένα εξαιτίας μιας βασικής αλλαγής."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "Τα τελευταία 4 ψηφία του τηλεφωνικού σας αριθμού"
+   },
+   "Last_Name": {
+      "message": "Επώνυμο"
+   },
+   "Last_Name2": {
+      "message": "Επίθετο2"
+   },
+   "Last_Touch": {
+      "message": "Τελευταία Επαφή"
+   },
+   "Last_name": {
+      "message": "Επώνυμο"
+   },
+   "Latvia": {
+      "message": "Λετονία"
+   },
+   "Launch": {
+      "message": "Εκκίνηση"
+   },
+   "Launch_Site": {
+      "message": "Φόρτωση Ιστότοπου"
+   },
+   "Lebanon": {
+      "message": "Λίβανος"
+   },
+   "Left": {
+      "message": "Αριστερά"
+   },
+   "Lesotho": {
+      "message": "Λεσόθο"
+   },
+   "Liberia": {
+      "message": "Λιβερία"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "Αραβική Λιβυκή Σοσιαλιστική Λαϊκή Δημοκρατία"
+   },
+   "License_Class": {
+      "message": "Κατηγορία Άδειας"
+   },
+   "License_Key": {
+      "message": "Αριθμός Άδειας"
+   },
+   "Liechtenstein": {
+      "message": "Λιχτενστάιν"
+   },
+   "Link_Personal_Account": {
+      "message": "Σύνδεση Προσωπικού Λογαριασμού"
+   },
+   "Linked_Personal_Account": {
+      "message": "Συνδεδεμένος προσωπικός λογαριασμός"
+   },
+   "Lithuania": {
+      "message": "Λιθουανία"
+   },
+   "Local": {
+      "message": "Local"
+   },
+   "Log_In_with_a_Different_Username": {
+      "message": "Συνδεθείτε με ένα διαφορετικό όνομα χρήστη"
+   },
+   "Log_into_a_Site": {
+      "message": "Σύνδεση σε Ιστοσελίδα"
+   },
+   "LoggedInOffline": {
+      "message": "Το LastPass δεν μπόρεσε να επικοινωνήσει με τον διακομιστή εισόδου, έτσι βρίσκεστε σε λειτουργία χωρίς σύνδεση.\n\nΠεριορισμένη λειτουργικότητα."
+   },
+   "Login": {
+      "message": "Είσοδος"
+   },
+   "LoginError": {
+      "message": "Σφάλμα κατά την είσοδο στο LastPass. Παρακαλώ ξαναδοκιμάστε."
+   },
+   "Login_to_LastPass": {
+      "message": "Είσοδος στο LastPass"
+   },
+   "Logoff": {
+      "message": "Έξοδος"
+   },
+   "Logoff_": {
+      "message": "Έξοδος:"
+   },
+   "Logoff_after_logged_in_for_minutes": {
+      "message": "Αποσύνδεση μετά τη σύνδεση για λεπτά"
+   },
+   "Logoff_on_browser_close": {
+      "message": "Αποσύνδεση με το κλείσιμο του φυλλομετρητή (browser)"
+   },
+   "Logout": {
+      "message": "Αποσύνδεση"
+   },
+   "LoseChanges": {
+      "message": "Είστε σίγουροι ότι θέλετε να επεξεργαστείτε τα πεδία αυτού του ιστότοπου; Κάτι τέτοιο θα προκαλέσει απώλεια τυχόν αλλαγών που κάνατε σε αυτόν τον ιστότοπο!"
+   },
+   "LoseChangesApp": {
+      "message": "Είστε σίγουροι ότι θέλετε να επεξεργαστείτε αυτά τα πεδία της εφαρμογής; Αυτή η ενέργεια θα ακυρώσει όλες τις αλλαγές που έχετε κάνει σ' αυτή την εφαρμογή!"
+   },
+   "Luxembourg": {
+      "message": "Λουξεμβούργο"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "Μακάο"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "ΠΓΔΜ"
+   },
+   "Madagascar": {
+      "message": "Μαδαγασκάρη"
+   },
+   "Make_Pronounceable": {
+      "message": "Δημιουργία προφερτού"
+   },
+   "Malawi": {
+      "message": "Μαλάουι"
+   },
+   "Malaysia": {
+      "message": "Μαλαισία"
+   },
+   "Maldives": {
+      "message": "Μαλδίβες"
+   },
+   "Male": {
+      "message": "Άνδρας"
+   },
+   "Mali": {
+      "message": "Μάλι"
+   },
+   "Malta": {
+      "message": "Μάλτα"
+   },
+   "Manage_Shared_Folder": {
+      "message": "Διαχείριση κοινόχρηστου φακέλου"
+   },
+   "Manage_Shared_Folders": {
+      "message": "Διαχείριση κοινόχρηστων φακέλων"
+   },
+   "March": {
+      "message": "Μάρτιος"
+   },
+   "Marshall_Islands": {
+      "message": "Νησιά Μάρσαλ"
+   },
+   "Martinique": {
+      "message": "Μαρτινίκα"
+   },
+   "Master_Password": {
+      "message": "Κύριος Κωδικός"
+   },
+   "Master_Password_": {
+      "message": "Κύριος Κωδικός:"
+   },
+   "Matching_Sites": {
+      "message": "Αντίστοιχες Σελίδες"
+   },
+   "Mauritania": {
+      "message": "Μαυριτανία"
+   },
+   "Mauritius": {
+      "message": "Μαυρίκιος"
+   },
+   "Maxthon": {
+      "message": "Maxthon"
+   },
+   "May": {
+      "message": "Μάιος"
+   },
+   "Mayotte": {
+      "message": "Μαγιότ"
+   },
+   "Member_ID": {
+      "message": "Αναγνωριστικό ID Mέλους"
+   },
+   "Member_Name": {
+      "message": "Όνομα Μέλους"
+   },
+   "Membership": {
+      "message": "Συνδρομή"
+   },
+   "Membership_Number": {
+      "message": "Αριθμός Συνδρομής"
+   },
+   "Message": {
+      "message": "Μήνυμα"
+   },
+   "Message_": {
+      "message": "Μήνυμα:"
+   },
+   "Meta": {
+      "message": "Μετά"
+   },
+   "Mexico": {
+      "message": "Μεξικό"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "Μικρονησία, Ομόσπονδες Πολιτείες της"
+   },
+   "Mid_Atlantic": {
+      "message": "Μεσοδυτικά"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "Τα 3 μεσαία ψηφία του αριθμού τηλεφώνου σας"
+   },
+   "Middle_Name": {
+      "message": "Πατρώνυμο"
+   },
+   "Middle_name": {
+      "message": "Πατρόνυμα"
+   },
+   "Midway_Island__Samoa": {
+      "message": "Ατόλλη Μίντγουαιη, Σαμόα"
+   },
+   "Minimum_Digit_Count": {
+      "message": "Ελάχιστοι Αριθμητικοί Χαρακτήρες"
+   },
+   "Mobile_Email_Address": {
+      "message": "Email Κινητού"
+   },
+   "Mobile_Number": {
+      "message": "Αριθμός κινητού"
+   },
+   "Mobile_number": {
+      "message": "Αριθμός κινητού τηλεφώνου"
+   },
+   "Moldova__Republic_Of": {
+      "message": "Μολδαβία, Δημοκρατία της"
+   },
+   "Monaco": {
+      "message": "Μονακό"
+   },
+   "Mongolia": {
+      "message": "Μογγολία"
+   },
+   "Montenegro": {
+      "message": "Μαυροβούνιο"
+   },
+   "Montserrat": {
+      "message": "Μοντσερράτ"
+   },
+   "More": {
+      "message": "Περισσότερα"
+   },
+   "More_Information": {
+      "message": "Περισσότερες πληροφορίες"
+   },
+   "More_Options": {
+      "message": "Περισσότερες επιλογές"
+   },
+   "Morocco": {
+      "message": "Μαρόκο"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "Ορεινή ώρα (ΗΠΑ & Καναδάς)"
+   },
+   "Move_Selected_to_Group": {
+      "message": "Μετακίνηση στον Επιλεγμένο Φάκελο"
+   },
+   "Move_matching_sites_to_top_menu": {
+      "message": "Μετακίνηση ιστοτόπων που ταιριάζουν στο αρχικό μενού"
+   },
+   "Move_to_Group": {
+      "message": "Μετακίνηση στο φάκελο"
+   },
+   "Move_to_Sub_Group": {
+      "message": "Μετακίνηση στον υποφάκελο"
+   },
+   "Mozambique": {
+      "message": "Μοζαμβίκη"
+   },
+   "Mr": {
+      "message": "Κος"
+   },
+   "Mrs": {
+      "message": "Κα"
+   },
+   "Ms": {
+      "message": "Δις"
+   },
+   "Multifactor_Authentication": {
+      "message": "Πολυπαραγοντική Ταυτοποίησή"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_Account": {
+      "message": "Ο Λογαριασμός Μου"
+   },
+   "My_LastPass_Vault": {
+      "message": "Το LastPass θησαυροφυλάκιο μου"
+   },
+   "My_Vault": {
+      "message": "Το θησαυροφυλάκιό μου"
+   },
+   "Myanmar": {
+      "message": "Μιανμάρ"
+   },
+   "NAME": {
+      "message": "ΟΝΟΜΑ"
+   },
+   "Name_": {
+      "message": "Όνομα:"
+   },
+   "Name_on_Card": {
+      "message": "Όνομα στην κάρτα"
+   },
+   "Name_on_card": {
+      "message": "Όνομα στην κάρτα"
+   },
+   "Nameproper": {
+      "message": "Όνομα"
+   },
+   "Namibia": {
+      "message": "Ναμίμπια"
+   },
+   "Nationality": {
+      "message": "Εθνικότητα"
+   },
+   "Native_Client_only": {
+      "message": "Τοπικός πελάτης μόνο"
+   },
+   "Native_Messaging": {
+      "message": "Μυνήματα Συστήματος"
+   },
+   "Nauru": {
+      "message": "Ναουρού"
+   },
+   "Nepal": {
+      "message": "Νεπάλ"
+   },
+   "Netherlands": {
+      "message": "Ολλανδία"
+   },
+   "Netherlands_Antilles": {
+      "message": "Ολλανδικές Αντίλλες"
+   },
+   "Never": {
+      "message": "Ποτέ"
+   },
+   "Never_Add_Site": {
+      "message": "Απενεργοποίηση Προσθήκης Ιστότοπου"
+   },
+   "Never_Ask_Again": {
+      "message": "Να Μην Ερωτηθώ Ξανά"
+   },
+   "Never_AutoFill": {
+      "message": "Απενεργοποίηση Αυτόματης Συμπλήρωσης"
+   },
+   "Never_AutoLogin": {
+      "message": "Απενεργοποίηση Αυτόματης Σύνδεσης"
+   },
+   "Never_Fill_Forms": {
+      "message": "Απενεργοποίηση Συμπλήρωσης Φόρμας"
+   },
+   "Never_For_This_Domain": {
+      "message": "Απενεργοποίηση Για Αυτόν τον Τομέα"
+   },
+   "Never_For_This_Page": {
+      "message": "Απενεργοποίηση για αυτήν τη σελίδα"
+   },
+   "Never_For_This_Site": {
+      "message": "Απενεργοποίηση για αυτό το site"
+   },
+   "Never_Generate_Password": {
+      "message": "Απενεργοποίηση Δημιουργίας Κωδικού"
+   },
+   "Never_Show_Again": {
+      "message": "Μη το εμφανίσετε ξανά"
+   },
+   "Never_Show_Context_Icons": {
+      "message": "Ποτέ Προβολή Εικονιδίων Περιεχομένου"
+   },
+   "Never___": {
+      "message": "Ποτέ..."
+   },
+   "Never_show_me_this_message_again_": {
+      "message": "Να μην εμφανιστεί αυτό το μήνυμα ξανά*"
+   },
+   "New_Caledonia": {
+      "message": "Νέα Καληδονία"
+   },
+   "New_Master_Password": {
+      "message": "Νέος Κύριος Κωδικός"
+   },
+   "New_Zealand": {
+      "message": "Νέα Ζηλανδία"
+   },
+   "New_here__Create_an_Account_": {
+      "message": "Είστε νέος εδώ; Δημιουργήστε ένα Λογαριασμό."
+   },
+   "New_to_LastPass_": {
+      "message": "Καινούριος στο LastPass;"
+   },
+   "Newfoundland": {
+      "message": "Νέα Γη"
+   },
+   "News_Reference": {
+      "message": "Νέα/Αναφορές"
+   },
+   "Next_SMS_passcode_starts_with": {
+      "message": "Ο επόμενος κωδικός SMS ξεκινά με"
+   },
+   "Nicaragua": {
+      "message": "Νικαράγουα"
+   },
+   "Niger": {
+      "message": "Νίγηρας"
+   },
+   "Nigeria": {
+      "message": "Νιγηρία"
+   },
+   "Niue": {
+      "message": "Νιούε"
+   },
+   "No": {
+      "message": "Όχι"
+   },
+   "NoFavorites": {
+      "message": "Δεν έχετε ακόμα κάποια Αγαπημένα."
+   },
+   "No_Form_Fill_Profiles_": {
+      "message": "Κανένα Προφίλ Συμπλήρωσης Φόρμας!"
+   },
+   "No_Matching_Sites_": {
+      "message": "Δεν ευρέθη Σχετικός Ιστότοπος!"
+   },
+   "No_Thanks": {
+      "message": "Όχι Ευχαριστώ"
+   },
+   "No_Updates_Are_Available": {
+      "message": "Δεν Υπάρχουν Διαθέσιμες Ενημερώσεις"
+   },
+   "No_Wi_Fi_adapter_was_detected_on_this_computer___This_feature_requires_a_Wi_Fi_adapter_": {
+      "message": "Δεν βρέθηκε αντάπτορας ασύρματου δικτύου σε αυτόν τον υπολογιστή. Αυτό το χαρακτηριστικό απαιτεί την ύπαρξη του."
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "Όχι, δεν θέλω τη βοήθεια του LastPass για αυτόματη συμπλήρωση πεδίων φόρμας"
+   },
+   "No__Save_as_New_Entry": {
+      "message": "Όχι, αποθήκευση ως νέα εγγραφή"
+   },
+   "No__Thanks": {
+      "message": "Όχι, ευχαριστώ"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "Όχι, να μην εισαχθεί κανένα από τα επισφαλή μου στοιχεία"
+   },
+   "No_matches_found__Please_search_again_": {
+      "message": "Δεν βρέθηκαν εγγραφές. Παρακαλώ αναζητήστε ξανά."
+   },
+   "None_Available": {
+      "message": "Τίποτα Διαθέσιμο"
+   },
+   "Norfolk_Island": {
+      "message": "Νησί Νόρφολκ"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "Βόρειες Μαριάνες"
+   },
+   "Norway": {
+      "message": "Νορβηγία"
+   },
+   "Norwegian": {
+      "message": "Νορβηγικά"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "Νορβηγικά Nynorsk"
+   },
+   "Not_Now": {
+      "message": "Όχι αυτή τη στιγμή"
+   },
+   "Note": {
+      "message": "Σημείωση"
+   },
+   "Note_History": {
+      "message": "Σημείωση ιστορικού"
+   },
+   "Note_Type": {
+      "message": "Είδος Σημείωσης"
+   },
+   "Note_Type_": {
+      "message": "Τύπος Σημείωσης:"
+   },
+   "Notes": {
+      "message": "Σημειώσεις"
+   },
+   "Notes_": {
+      "message": "Σημειώσεις:"
+   },
+   "Notifications": {
+      "message": "Ειδοποιήσεις"
+   },
+   "November": {
+      "message": "Νοέμβριος"
+   },
+   "Nuku_alofa": {
+      "message": "Νουκουαλόφα"
+   },
+   "Number": {
+      "message": "Αριθμός"
+   },
+   "Number_of_Licenses": {
+      "message": "Αριθμός αδειών"
+   },
+   "OK": {
+      "message": "ΟΚ"
+   },
+   "October": {
+      "message": "Οκτώβριος"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "Να Προτείνεται η Δημιουργία Ασφαλών Κωδικών"
+   },
+   "Old_Password": {
+      "message": "Παλιός Κωδικός"
+   },
+   "Oman": {
+      "message": "Ομάν"
+   },
+   "One_Time_Passwords": {
+      "message": "Κωδικοί Μιας Χρήσης"
+   },
+   "Open": {
+      "message": "Άνοιγμα"
+   },
+   "Open_All": {
+      "message": "Άνοιγμα Όλων"
+   },
+   "Open_Dashlane___File___Export___CSV___Import_the_resulting_file_": {
+      "message": "Άνοιγμα Dashlane - Αρχείο - Εξαγωγή - CSV. Εισάγετε το παραγώμενο αρχείο."
+   },
+   "Open_Favorites": {
+      "message": "Άνοιγμα Αγαπημένων"
+   },
+   "Open_Favorites_in_Tabs": {
+      "message": "Άνοιγμα Αγαπημένων σε καρτέλες"
+   },
+   "Open_File": {
+      "message": "Άνοιγμα αρχείου"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "Άνοιγμα του LastPass θησαυροφυλακίου μου"
+   },
+   "Open_New_Pages_in": {
+      "message": "Ανοίγει τις Νέες Σελίδες στο"
+   },
+   "Open_Popover": {
+      "message": "Ανοίξτε το Popover"
+   },
+   "Open_Security_Challenge": {
+      "message": "Άνοιγμα Δοκιμής Ασφαλείας"
+   },
+   "Open_Sticky_Password___Manage_Database___Export___Export_as_text__Import_this_file": {
+      "message": "Άνοιγμα επισημασμένου κωδικού – Διαχείριση Βάσης Δεδομένων – Εξαγωγή – Εξαγωγή ως κείμενο. Εισαγωγή αυτού του αρχείου"
+   },
+   "Open_extension_pages_in_dialogs": {
+      "message": "Άνοιγμα επεκτάσιμων σελίδων σε διαλόγους"
+   },
+   "Open_login_dialog_when_browser_starts": {
+      "message": "Άνοιγμα παράθυρου διαλόγου σύνδεσης με την εκκίνηση του προγράμματος περιήγησης"
+   },
+   "Open_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Ανοίξτε για να ρυθμίσετε τον τρόπο δημιουργίας του κωδικού σας."
+   },
+   "Opera": {
+      "message": "Opera"
+   },
+   "Opera_Password_Manager": {
+      "message": "Όπερα Password Manager"
+   },
+   "Or__would_you_like_LastPass_to_save_a_new_user_password_for_this_site_": {
+      "message": "Ή, θα θέλατε το LastPass να αποθηκεύσει ένα νέο όνομα χρήστη / κωδικό πρόσβασης, για αυτή την ιστοσελίδα;"
+   },
+   "Order_Number": {
+      "message": "Αριθμός Παραγγελίας"
+   },
+   "Order_Total": {
+      "message": "Σύνολο Παραγγελίας"
+   },
+   "Organization": {
+      "message": "Οργάνωση"
+   },
+   "Other": {
+      "message": "Άλλο"
+   },
+   "Other_Sessions": {
+      "message": "Άλλες Συνεδρίες"
+   },
+   "Overall_Progress_": {
+      "message": "Συνολική Πρόοδος:"
+   },
+   "PASSWORDupper": {
+      "message": "ΚΩΔΙΚΟΣ ΠΡΟΣΒΑΣΗΣ"
+   },
+   "PINs_Password_Manager": {
+      "message": "Διαχειριστής κωδικών PIN"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "Ώρα Ειρηνικού (Η.Π.Α. & Καναδάς)"
+   },
+   "Page_Down": {
+      "message": "Επόμενη Σελίδα"
+   },
+   "Page_Up": {
+      "message": "Προηγούμενη Σελίδα"
+   },
+   "Pakistan": {
+      "message": "Πακιστάν"
+   },
+   "Palau": {
+      "message": "Παλάου"
+   },
+   "Palestinian_Territories": {
+      "message": "Παλαιστινιακά Εδάφη"
+   },
+   "Panama": {
+      "message": "Παναμάς"
+   },
+   "Papua_New_Guinea": {
+      "message": "Παπούα Νέα Γουινέα"
+   },
+   "Paraguay": {
+      "message": "Παραγουάη"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passphrase": {
+      "message": "Φράση Πρόσβασης"
+   },
+   "Passport": {
+      "message": "Διαβατήριο"
+   },
+   "Password": {
+      "message": "Κωδικός Πρόσβασης"
+   },
+   "Password_": {
+      "message": "Κωδικός πρόσβασης:"
+   },
+   "Password_Agent": {
+      "message": "Password Agent"
+   },
+   "Password_Corral": {
+      "message": "Password Corral"
+   },
+   "Password_Depot": {
+      "message": "Password Depot"
+   },
+   "Password_Dragon": {
+      "message": "Password Dragon"
+   },
+   "Password_History": {
+      "message": "Ιστορικό Κωδικού"
+   },
+   "Password_Keeper": {
+      "message": "Αποθηκευτής Κωδικών Πρόσβασης"
+   },
+   "Password_Length": {
+      "message": "Μέγεθος κωδικού"
+   },
+   "Password_Length_": {
+      "message": "Μέγεθος Κωδικού:"
+   },
+   "Password_Reminder": {
+      "message": "Υπενθυμητής Κωδικού Πρόσβασης"
+   },
+   "Password_Reminder_": {
+      "message": "Υπενθύμιση Password:"
+   },
+   "Password_Safe": {
+      "message": "Password Safe"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "Ο υπενθυμητής κωδικού δε μπορεί να επιβεβαιώσει τον κωδικό"
+   },
+   "Password_updated_": {
+      "message": "Ο κωδικός πρόσβασης ενημερώθηκε!"
+   },
+   "Passwords_Max": {
+      "message": "Κωδικοί Max"
+   },
+   "Personal": {
+      "message": "Προσωπικά"
+   },
+   "Peru": {
+      "message": "Περού"
+   },
+   "Philippines": {
+      "message": "Φιλιππίνες"
+   },
+   "Phone_Number": {
+      "message": "Τηλέφωνο"
+   },
+   "Phone_number": {
+      "message": "Τηλέφωνο επικοινωνίας"
+   },
+   "Physician_Address": {
+      "message": "Διεύθυνση Ιατρού"
+   },
+   "Physician_Name": {
+      "message": "Όνομα Ιατρού"
+   },
+   "Physician_Phone": {
+      "message": "Τηλέφωνο Ιατρού"
+   },
+   "Pin": {
+      "message": "Pin"
+   },
+   "Pitcairn": {
+      "message": "Πίτκερν"
+   },
+   "Please_Make_a_Selection": {
+      "message": "Παρακαλώ Κάντε μια Επιλογή"
+   },
+   "Please_Wait___": {
+      "message": "Παρακαλώ Περιμένετε..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "Παρακαλούμε απαντήστε στην ακόλουθη ερώτηση:"
+   },
+   "Please_choose_the_type_of_export_you_would_like_to_perform_": {
+      "message": "Παρακαλούμε επιλέξτε τον τύπο της εξαγωγής που επιθυμείτε:"
+   },
+   "Please_choose_the_type_of_print_you_would_like_to_perform_": {
+      "message": "Παρακαλώ επιλέξτε το είδος της εκτύπωσης που θέλετε να εκτελέσετε:"
+   },
+   "Please_close_this_window": {
+      "message": "Παρακαλώ κλείστε αυτό το παράθυρο"
+   },
+   "Please_complete_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "Παρακαλούμε ολοκληρώστε τον πολυπαραγοντικό έλεγχο ταυτότητας στο τηλέφωνό ή την κινητή συσκευή σας."
+   },
+   "Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "Παρακαλούμε εισάγετε την πλήρη διαδρομή του αρχείου προς εισαγωγή."
+   },
+   "Please_enter_your_multifactor_authentication_code_": {
+      "message": "Παρακαλώ εισάγετε τον multifactor κωδικό αυθεντικοποίησης"
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": "Κρατήστε αυτήν την σελίδα ανοικτή έως ότου ολοκληρωθεί η διαδικασία."
+   },
+   "Please_move_sites_from_only_one_shared_folder_at_a_time_": {
+      "message": "Παρακαλώ μετακινήστε ιστότοπους από ένα μόνο κοινόχρηστο φάκελο τη φορά."
+   },
+   "Please_note_that_upgrading_from_LastPass_Local_to_LastPass_Online_will_result_in_your_password_data_being_uploaded_in_its_encrypted_format_to_LastPass_servers___You_will_be_able_to_access_your_data_from_anywhere__and_LastPass_will_not_be_able_to_read_it___Would_you_like_to_continue_": {
+      "message": "Παρακαλώ σημειώστε ότι η αναβάθμιση από LastPass Local προς LastPass Online θα έχει ως αποτέλεσμα οι κωδικοί πρόσβασής σας να φορτωθούν σε κρυπτογραφημένη μορφή στους διακομιστές του LastPass. Θα είστε σε θέση να έχετε πρόσβαση στα δεδομένα σας από οπουδήποτε, και το LastPass δεν θα είναι σε θέση να τα διαβάσει. Θέλετε να συνεχίσετε;"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "Παρακαλούμε δώστε ένα όνομα γι' αυτό τον  υπολογιστή"
+   },
+   "Please_reload_the_page_to_view_your_changes_": {
+      "message": "Παρακαλούμε ξαναφορτώστε τη σελίδα για να δείτε τις αλλαγές σας."
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "Παρακαλούμε να ξεκινήσετε πάλι όλα τα προγράμματα περιήγησης σας ώστε να αρχίσετε να χρησιμοποιείτε το LastPass Online."
+   },
+   "Please_restart_your_browser_to_finish_enabling_history_": {
+      "message": "Παρακαλώ κάντε επανεκκίνηση του προγράμματος περιήγησής σας για να ολοκληρώσετε την ενεργοποίηση του ιστορικού"
+   },
+   "Please_restart_your_browser_to_finish_enabling_native_messaging_": {
+      "message": "Ξεκινήστε πάλι το πρόγραμμα περιήγησής σας για να ολοκληρώσετε την ενεργοποίηση εγγενούς ανταλλαγής μηνυμάτων."
+   },
+   "Please_select": {
+      "message": "Παρακαλώ επιλέξτε"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "Παρακαλώ επιλέξτε τους ιστοτόπους που επιθυμείτε να εφαρμοστεί αυτή η αλλαγή."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "Παρακαλούμε επισκεφθείτε τη διεύθυνση https://lastpass.com για τη δημιουργία ενός λογαριασμού στο μέλλον."
+   },
+   "Poland": {
+      "message": "Πολωνία"
+   },
+   "Policy_Number": {
+      "message": "Αριθμός Πολιτικής"
+   },
+   "Policy_Type": {
+      "message": "Τύπος Πολιτικής"
+   },
+   "Polish": {
+      "message": "Πολωνικά"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "Ερώτημα στο διακομιστή για αλλαγές στο λογαριασμό (λεπτά)"
+   },
+   "Port": {
+      "message": "Θύρα"
+   },
+   "Portugal": {
+      "message": "Πορτογαλία"
+   },
+   "Portuguese": {
+      "message": "Πορτογαλικά"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "Πορτογαλικά (Βραζιλίας)"
+   },
+   "Preferences": {
+      "message": "Προτιμήσεις"
+   },
+   "Price": {
+      "message": "Τιμή"
+   },
+   "Print": {
+      "message": "Εκτύπωση"
+   },
+   "Print_Screen": {
+      "message": "Εκτύπωση Οθόνης"
+   },
+   "Print_Secure_Notes": {
+      "message": "Εκτύπωση των Ασφαλών Σημειώσεων"
+   },
+   "Print_Sites": {
+      "message": "Εκτύπωση των Ιστοσελίδων"
+   },
+   "Privacy": {
+      "message": "Προστασία Προσωπικών Δεδομένων"
+   },
+   "Private_Key": {
+      "message": "Ιδιωτικό Κλειδί"
+   },
+   "Productivity_Tools": {
+      "message": "Εργαλεία παραγωγικότητας"
+   },
+   "Profile": {
+      "message": "Προφίλ"
+   },
+   "Profile_language": {
+      "message": "Γλώσσα προφίλ"
+   },
+   "Profile_name": {
+      "message": "Όνομα προφίλ"
+   },
+   "Pronounceable": {
+      "message": "Προφερτός"
+   },
+   "Protected": {
+      "message": "Προστατευμένο"
+   },
+   "Public_Key": {
+      "message": "Δημόσιο Κλειδί"
+   },
+   "Publisher": {
+      "message": "Εκδότης"
+   },
+   "Puerto_Rico": {
+      "message": "Πουέρτο Ρίκο"
+   },
+   "Purchase_Date": {
+      "message": "Ημερομηνία Αγοράς"
+   },
+   "Purge": {
+      "message": "Εκκαθάριση"
+   },
+   "Qatar": {
+      "message": "Κατάρ"
+   },
+   "Re_Enter_Password": {
+      "message": "Πληκτρολογήστε ξανά τον κωδικό"
+   },
+   "Reason": {
+      "message": "Αιτία"
+   },
+   "Recent_Sites": {
+      "message": "Πρόσφατες Σελίδες"
+   },
+   "Recently_Used": {
+      "message": "Έγινε χρήση πρόσφατα"
+   },
+   "Recently_Used_list_size": {
+      "message": "Μέγεθος Πρόσφατα Χρησιμοποιημένης Λίστας"
+   },
+   "Recheck_Page": {
+      "message": "Επανέλεγχος Σελίδας"
+   },
+   "Recommended": {
+      "message": "Συνιστάται"
+   },
+   "Recommended_Options": {
+      "message": "Συνιστώμενες επιλογές"
+   },
+   "Reencrypting_Data___": {
+      "message": "Επανακρυπτογράφηση των δεδομένων..."
+   },
+   "Refresh": {
+      "message": "Ανανέωση"
+   },
+   "Refresh_Sites": {
+      "message": "Ανανέωση Ιστότοπων"
+   },
+   "Reject": {
+      "message": "Απόρριψη"
+   },
+   "Remember_Email": {
+      "message": "Απομνημόνευση email"
+   },
+   "Remember_Password": {
+      "message": "Απομνημόνευση κωδικού"
+   },
+   "Remove": {
+      "message": "Κατάργηση"
+   },
+   "Remove_Favorite": {
+      "message": "Αφαίρεση Αγαπημένου"
+   },
+   "Remove_Linked_Personal_Account": {
+      "message": "Αφαιρέση Συνδεδεμένου Προσωπικού Λογαριασμού"
+   },
+   "Remove_Personal_Account": {
+      "message": "Αφαίρεση Προσωπικού Λογαριασμού"
+   },
+   "Remove_Site_from_Favorites": {
+      "message": "Αφαίρεση ιστοτόπων από τα Αγαπημένα"
+   },
+   "Rename_Group": {
+      "message": "Μετονομασία Φακέλου"
+   },
+   "Replace_Existing_Site": {
+      "message": "Αντικατάσταση Υπάρχοντος Ιστοτόπου"
+   },
+   "Reprompt": {
+      "message": "Επανυποβολή"
+   },
+   "Request_failed__is_your_Internet_connection_down_": {
+      "message": "Το αίτημα απέτυχε. Μήπως δε λειτουργεί η σύνδεση στο internet;"
+   },
+   "Require_All_Character_Type": {
+      "message": "Απαίτηση Παντός Τύπου Χαρακτήρων"
+   },
+   "Require_All_Character_Types": {
+      "message": "Απαίτηση Παντός Τύπου Χαρακτήρων"
+   },
+   "Require_Every_Character_Type": {
+      "message": "Απαίτηση χαρακτήρων όλων των τύπων"
+   },
+   "Require_Password_Reprompt": {
+      "message": "Απαίτηση Επανυποβολής Κωδικού"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "Αίτηση επανεισαγωγής κωδικού ασφαλείας όταν:"
+   },
+   "Required_to_Create_Account": {
+      "message": "Απαιτείται να δημιουργήσετε λογαριασμό"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "Respect AutoComplete=off: επιτρέπει στους ιστότοπους να απενεργοποιούν την Αυτόματη Συμπλήρωση Στοιχείων"
+   },
+   "Reunion": {
+      "message": "Ρεουνιόν"
+   },
+   "Revelation_Password_Manager": {
+      "message": "Revelation Password Manager"
+   },
+   "Right": {
+      "message": "Δεξιά"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "Ρουμανία"
+   },
+   "Routing_Number": {
+      "message": "Αριθμός Δρομολόγησης"
+   },
+   "Routing_number": {
+      "message": "Αριθμός δρομολόγησης"
+   },
+   "Run_the_Google_Authenticator_application_on_your_mobile_device_and_enter_the_verification_code_in_the_input_box_below_": {
+      "message": "Εκτελέστε την εφαρμογή εξακρίβωσης γνησιότητας της Google στην κινητή σας συσκευή και εισάγετε τον κωδικό επαλήθευσης στο παρακάτω πεδίο."
+   },
+   "Russian": {
+      "message": "Ρωσικά"
+   },
+   "Russian_Federation": {
+      "message": "Ρωσική Ομοσπονδία"
+   },
+   "Rwanda": {
+      "message": "Ρουάντα"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "ΙΣΤΟΣΕΛΙΔΑ"
+   },
+   "SMTP_Port": {
+      "message": "Θύρα SMTP"
+   },
+   "SMTP_Server": {
+      "message": "SMTP Server"
+   },
+   "SPB_Wallet": {
+      "message": "SPB Wallet"
+   },
+   "SSH_Key": {
+      "message": "SSH Κλειδί"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SWIFT_Code": {
+      "message": "Κωδικός SWIFT"
+   },
+   "Safari": {
+      "message": "Safari"
+   },
+   "Safari_Password_Manager": {
+      "message": "Safari Password Manager"
+   },
+   "Saint_Barthelemy": {
+      "message": "Άγιος Βαρθολομαίος"
+   },
+   "Saint_Helena": {
+      "message": "Αγία Ελένη"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "Άγιος Χριστόφορος και Νέβις"
+   },
+   "Saint_Lucia": {
+      "message": "Αγία Λουκία"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "Άγιος Μαρτίνος"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "Σεν Πιερ και Μικελόν"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "Άγιος Βικέντιος και Γρεναδίνες"
+   },
+   "Samoa": {
+      "message": "Σαμόα"
+   },
+   "San_Marino": {
+      "message": "Σαν Μαρίνο"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "Σάο Τομέ και Πρίνσιπε"
+   },
+   "Saudi_Arabia": {
+      "message": "Σαουδική Αραβία"
+   },
+   "Save": {
+      "message": "Αποθήκευση"
+   },
+   "Save_All_Entered_Data": {
+      "message": "Αποθήκευση Όλων των Καταχωρημένων Δεδομένων"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "Αποθήκευση προφίλ Πιστωτικής Κάρτας"
+   },
+   "Save_File": {
+      "message": "Αποθήκευση αρχείου"
+   },
+   "Save_New_Site": {
+      "message": "Αποθήκευση Νέου Ιστοτόπου"
+   },
+   "Save_Password_to_Vault": {
+      "message": "Αποθήκευση κωδικού στην Κρύπτη"
+   },
+   "Save_Password_to_Vault_": {
+      "message": "Αποθήκευση Κωδικού στο Θησαυροφυλάκιο;"
+   },
+   "Save_Site": {
+      "message": "Αποθήκευση Ιστοτόπου"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "Αποθήκευση ενός απενεργοποιημένο κωδικού Μιας Χρήσης για Ανάκτηση του Λογαριασμού, τοπικά"
+   },
+   "Save_the_password_to_your_LastPass_Vault_": {
+      "message": "Να αποθηκευθεί ο κωδικός στο LastPass θησαυροφυλάκιό σας;"
+   },
+   "Save_this_password_as_a_new_entry": {
+      "message": "Αποθήκευση αυτού του κωδικού ως νέα καταχώρηση"
+   },
+   "Save_this_password_as_a_new_entry_": {
+      "message": "Αποθήκευση αυτού του κωδικού ως νέα καταχώρηση;"
+   },
+   "Save_this_website_into_your_LastPass_Vault_": {
+      "message": "Αποθήκευση αυτού του ιστότοπου στο LastPass Θησαυροφυλάκιό σας!"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "Αποθήκευση των αλλαγών και κλείσιμο του παράθυρου"
+   },
+   "Save_your_password_to_your_LastPass_Vault_": {
+      "message": "Αποθήκευση κωδικού στην Κρύπτη LastPass σας;"
+   },
+   "Saved_Passwords": {
+      "message": "Αποθηκευμένοι κωδικοί πρόσβασης"
+   },
+   "Screen_Keyboard": {
+      "message": "Πληκτρολόγιο οθόνης"
+   },
+   "Search_All_Data": {
+      "message": "Αναζήτηση Όλων των Δεδομένων"
+   },
+   "Search_All_Groups": {
+      "message": "Αναζήτηση Φακέλων"
+   },
+   "Search_All_Notes": {
+      "message": "Αναζήτηση Όλων των Σημειώσεων"
+   },
+   "Search_All_Sites": {
+      "message": "Αναζήτηση Όλων των Σελίδων"
+   },
+   "Search_LastPass_Vault": {
+      "message": "Αναζήτηση Θησαυροφυλακίου LastPass"
+   },
+   "Search_Vault": {
+      "message": "Αναζήτηση θησαυροφυλακίου"
+   },
+   "Search_within_secure_notes": {
+      "message": "Αναζήτηση εντός των ασφαλών σημειώσεων"
+   },
+   "Searchproper": {
+      "message": "Αναζήτηση"
+   },
+   "Secure_Note": {
+      "message": "Ασφαλής Σημείωση"
+   },
+   "Secure_Notes": {
+      "message": "Ασφαλείς Σημειώσεις"
+   },
+   "Security": {
+      "message": "Ασφάλεια"
+   },
+   "Security_Alert": {
+      "message": "Μύνημα ασφαλείας"
+   },
+   "Security_Alert__Master_Password_Reused": {
+      "message": "Προειδοποίηση ασφαλείας: Το Master Password έχει χρησιμοποιηθεί ξανά"
+   },
+   "Security_Alert__This_site_has_the_same_password_as_your_LastPass_account__To_protect_all_of_your_online_accounts__it_is_recommended_that_you_change_your_LastPass_Master_Password_": {
+      "message": "Προειδοποίηση ασφαλείας: Αυτή η ιστοσελίδα έχει τον ίδιο κωδικό πρόσβασης με αυτόν του λογαριασμού σας στην LastPass. Για να προστατεύσετε όλους τους ηλεκτρονικούς λογαριασμούς σας, συνιστάται  να αλλάξετε τον Κύριο LastPass Κωδικό σας."
+   },
+   "Security_Challenge": {
+      "message": "Δοκιμή Ασφαλείας"
+   },
+   "Security_Check": {
+      "message": "Έλεγχος Ασφάλειας"
+   },
+   "Security_Code": {
+      "message": "Κωδικός Ασφαλείας"
+   },
+   "Security_Notice": {
+      "message": "Υπόδειξη Ασφαλείας"
+   },
+   "Security_Question_Multifactor_Authentication": {
+      "message": "Ερώτηση ασφαλείας ταυτοποίησης πολλαπλών παραγόντων"
+   },
+   "Security_code": {
+      "message": "Κωδικός ασφαλείας"
+   },
+   "Select": {
+      "message": "Επιλογή"
+   },
+   "Select_All": {
+      "message": "Επιλογή Όλων"
+   },
+   "Select_Identity": {
+      "message": "Επιλογή Ταυτότητας"
+   },
+   "Select_a_group_in_your_LastPass_Vault_to_place_this_website___Optional_": {
+      "message": "Μετονομασία φακέλου"
+   },
+   "Select_a_preference_to_edit__then_tap_OK_": {
+      "message": "Επιλέξτε μια προτίμηση για να επεξεργαστείτε και πιέστε OK."
+   },
+   "Select_or_enter_a_new_group_name": {
+      "message": "Επιλέξτε ή εισάγετε νέο όνομα φακέλου"
+   },
+   "Send": {
+      "message": "Αποστολή"
+   },
+   "Send_Email": {
+      "message": "Αποστολή Email"
+   },
+   "Send_SMS_passcodes": {
+      "message": "Αποστολή κωδικού πρόσβασης SMS"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "Αποστολή ανώνυμων δεδομένων αναφοράς σφάλματος για να συμβάλλετε στη βελτίωση του LastPass"
+   },
+   "Senegal": {
+      "message": "Σενεγάλη"
+   },
+   "September": {
+      "message": "Σεπτέμβριος"
+   },
+   "Serbia": {
+      "message": "Σερβία"
+   },
+   "Server": {
+      "message": "Server"
+   },
+   "SesameWrongButton": {
+      "message": "Για να δείτε τα δεδομένα σας όταν βρίσκεστε εκτός σύνδεσης θα πρέπει να εκτελέσετε το Sesame και να χρησιμοποιήσετε το κουμπί 'Αντιγραφή Εκτός Σύνδεσης Κωδικού' αντί του κουμπιού 'Δημιουργία Κωδικού Μιας Χρήσης'."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "Πιστοποίηση Sesame"
+   },
+   "Sessions": {
+      "message": "Συνεδρίες"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "Ρύθμιση προσαρμοσμένων πεδία φόρμας"
+   },
+   "Settings": {
+      "message": "Ρυθμίσεις"
+   },
+   "Sex": {
+      "message": "Φύλο"
+   },
+   "Seychelles": {
+      "message": "Σεϋχέλλες"
+   },
+   "Share": {
+      "message": "Μοιραστείτε"
+   },
+   "Share_Folder": {
+      "message": "Κοινόχρηστος Φάκελος"
+   },
+   "Share_Item": {
+      "message": "Κοινή χρήση αντικειμένου"
+   },
+   "Share_Selected": {
+      "message": "Διαμοιρασμός Επιλεγμένων"
+   },
+   "Share_Site": {
+      "message": "Κοινοποίηση ιστοτόπου"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "Μοιραστείτε την κατάσταση σύνδεσης μεταξύ άλλων browsers"
+   },
+   "Share_offer_from": {
+      "message": "Προσφορά διανομής από"
+   },
+   "Shared_Folders": {
+      "message": "Κοινόχρηστοι Φάκελοι"
+   },
+   "Shares": {
+      "message": "Διαμοιρασμοί"
+   },
+   "Shift": {
+      "message": "Shift"
+   },
+   "Shopping": {
+      "message": "Αγορές"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "Να θυμάται το LastPass αυτόν τον κωδικό;"
+   },
+   "Show": {
+      "message": "Εμφάνιση"
+   },
+   "Show_Advanced_Options": {
+      "message": "Προβολή Επιλογών για Προχωρημένους"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "Εμφάνιση Μπάρας Αλλαγής Κωδικού"
+   },
+   "Show_Deleted_Items": {
+      "message": "Προβολή Διαγραμμένων Αντικειμένων"
+   },
+   "Show_Deleted_Sites": {
+      "message": "Εμφάνιση Διαγραμμένων Ιστοτόπων"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "Εμφάνιση Μπάρας Ανακοίνωσης Συμπλήρωσης"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "Εμφάνιση Ειδοποιήσεων Φόρμας Εισαγωγής"
+   },
+   "Show_Matching_Sites": {
+      "message": "Εμφάνιση Ιστότοπων που Ταιριάζουν"
+   },
+   "Show_Matching_Sites_Count_in_Toolbar": {
+      "message": "Εμφάνιση του αριθμού ιστοτόπων που ταιριάζουν στην εργαλειοθήκη"
+   },
+   "Show_Matching_Sites_in_top_level_menu": {
+      "message": "Εμφάνιση του αριθμού ιστοτόπων που ταιριάζουν στο αρχικό μενού"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "Εμφάνιση της LastPass Κρύπτης μου μετά Την Σύνδεση"
+   },
+   "Show_Notifications": {
+      "message": "Εμφάνιση Ειδοποιήσεων"
+   },
+   "Show_Password": {
+      "message": "Εμφάνιση Κωδικού"
+   },
+   "Show_Password_History": {
+      "message": "Προβολή ιστορικού κωδικών"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "Εμφάνιση Μπάρας Ανακοίνωσης Αποθήκευσης Ιστοσελίδας"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "Εμφάνιση Ειδοποιήσεων Αποθήκευσης Ιστοτόπου"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "Εμφάνιση Ιστοτόπων σε Φακέλους"
+   },
+   "Show_Username_History": {
+      "message": "Προβολή ιστορικού ονόματος χρήστη"
+   },
+   "Show_Vault_After_Log_in": {
+      "message": "Προβολή αποθήκης μετά τη σύνδεση"
+   },
+   "Show_Vault_After_Login": {
+      "message": "Εμφάνιση Κρύπτης Μετά την Σύνδεση"
+   },
+   "Show_all_sites": {
+      "message": "Εμφάνιση όλων των ιστοτόπων"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "Εμφάνιση συγκεκριμένων ειδοποιήσεων μόνο μετά από κλικ"
+   },
+   "Show_notifications_below_browser": {
+      "message": "Εμφάνιση ειδοποιήσεων κάτω από το φυλλομετρητή"
+   },
+   "Show_or_Hide_Password": {
+      "message": "Εμφάνιση ή Απόκρυψη κωδικού πρόσβασης"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "Εμφάνιση άλλου προσαρμοσμένου πεδίου"
+   },
+   "Sierra_Leone": {
+      "message": "Σιέρα Λεόνε"
+   },
+   "Sign_In": {
+      "message": "Σύνδεση"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "Απλοποιήστε τη ζωή σας: Χρησιμοποιήστε το LastPass για να συμπληρώσει αυτόματα τα στοιχεία σύνδεσης αυτού του ιστότοπου!"
+   },
+   "Singapore": {
+      "message": "Σιγκαπούρη"
+   },
+   "Site": {
+      "message": "Ιστοσελίδα"
+   },
+   "Site_Search": {
+      "message": "Αναζήτηση Ιστοσελίδας"
+   },
+   "Sites": {
+      "message": "Ιστοσελίδες"
+   },
+   "Slovak": {
+      "message": "Σλοβακικά"
+   },
+   "Slovakia": {
+      "message": "Σλοβακία"
+   },
+   "Slovenia": {
+      "message": "Σλοβενία"
+   },
+   "Social": {
+      "message": "Κοινωνικά"
+   },
+   "Social_Security": {
+      "message": "Κοινωνική Ασφάλιση"
+   },
+   "Social_Security_Number": {
+      "message": "Αριθμός Κοινωνικής Ασφάλισης"
+   },
+   "Social_security_number": {
+      "message": "Αριθμός κοινωνικής ασφάλισης"
+   },
+   "Software_License": {
+      "message": "Άδεια Λογισμικού"
+   },
+   "Solomon_Islands": {
+      "message": "Νησιά Σολομώντα"
+   },
+   "Somalia": {
+      "message": "Σομαλία"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "Συγγνώμη, αυτός ο κοινόχρηστος φάκελος είναι μόνο για ανάγνωση."
+   },
+   "Sorry__you_cannot_perform_this_operation_on_a_mix_of_shared_and_non_shared_folders__or_multiple_shared_folders_at_once_": {
+      "message": "Λυπούμαστε, αλλά δεν μπορείτε να εκτελέσετε αυτή την λειτουργία σε ένα συνδυασμό των κοινών και μη κοινόχρηστων φακέλων ή κατευθείαν σε πολλαπλούς κοινόχρηστους φακέλους."
+   },
+   "Sorry__your_password_can_not_be_the_same_as_your_email_address_": {
+      "message": "Λυπούμαστε, αλλά ο κωδικός σας δεν μπορεί να είναι ίδιος με αυτόν της ηλεκτρονικής σας διεύθυνσης."
+   },
+   "Sorry__your_password_is_too_short__It_must_be_a_minimum_of_8_characters_long_for_security_reasons_": {
+      "message": "Λυπούμαστε, αλλά ο κωδικός σας είναι πολύ μικρός. Πρέπει να αποτελείται από τουλάχιστον 8 χαρακτήρες για λόγους ασφαλείας."
+   },
+   "Source": {
+      "message": "Πηγή"
+   },
+   "Source_": {
+      "message": "Πηγή:"
+   },
+   "South_Africa": {
+      "message": "Νότια Αφρική"
+   },
+   "South_Georgia": {
+      "message": "Νότια Γεωργία"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "Νότια Γεωργία και Νότια Νησιά Σάντουιτς"
+   },
+   "Spain": {
+      "message": "Ισπανία"
+   },
+   "Spanish": {
+      "message": "Ισπανικά"
+   },
+   "Spanish__Mexico_": {
+      "message": "Ισπανικά (Μεξικό)"
+   },
+   "Special": {
+      "message": "Ειδικό"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sports": {
+      "message": "Αθλητικά"
+   },
+   "Sri_Lanka": {
+      "message": "Σρι Λάνκα"
+   },
+   "Start_Date": {
+      "message": "Αρχική Ημερομηνία"
+   },
+   "Start_Trial": {
+      "message": "Έναρξη Δοκιμαστικής Περιόδου"
+   },
+   "Start_date": {
+      "message": "Ημερομηνία έναρξης"
+   },
+   "State": {
+      "message": "Πολιτεία"
+   },
+   "State___Province": {
+      "message": "Πολιτεία / Επαρχία"
+   },
+   "Status": {
+      "message": "Κατάσταση"
+   },
+   "Sticky_Password": {
+      "message": "Sticky Κωδικός"
+   },
+   "Submit_Form": {
+      "message": "Υποβολή Φόρμας"
+   },
+   "Submitting___": {
+      "message": "Υποβολή αιτήματος..."
+   },
+   "Success__Your_Password_Is_Updated": {
+      "message": "Επιτυχία! Ο κωδικός πρόσβασής σας ενημερώθηκε"
+   },
+   "Sudan": {
+      "message": "Σουδάν"
+   },
+   "Support_Email": {
+      "message": "Υποστήριξη Email"
+   },
+   "Suriname": {
+      "message": "Σουρινάμ"
+   },
+   "Suspicious_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "Ύποπτοι χαρακτήρες βρέθηκαν στο επιλεγμένο όνομα αρχείου, δε θα γίνει επεξεργασία"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "Σβάλμπαρντ και Γιαν Μαγιέν"
+   },
+   "Swaziland": {
+      "message": "Σουαζιλάνδη"
+   },
+   "Sweden": {
+      "message": "Σουηδία"
+   },
+   "Swedish": {
+      "message": "Σουηδικά"
+   },
+   "Swipe_current_user_s_finger": {
+      "message": "Περάστε το δάχτυλό του τρέχοντος χρήστη"
+   },
+   "Swipe_finger": {
+      "message": "Πέρασμα δάχτυλου"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "Περάστε το δάχτυλό σας στον αισθητήρα δακτυλικών αποτυπωμάτων"
+   },
+   "Switzerland": {
+      "message": "Ελβετία"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "Αραβική Δημοκρατία της Συρίας"
+   },
+   "Tabs": {
+      "message": "Καρτέλες"
+   },
+   "Taiwan": {
+      "message": "Ταϊβάν"
+   },
+   "Tajikistan": {
+      "message": "Τατζικιστάν"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "Τανζανία, Ενωμένη Δημοκρατία της"
+   },
+   "Tehran": {
+      "message": "Τεχεράνη"
+   },
+   "Telecom": {
+      "message": "Τηλεπικοινωνίες"
+   },
+   "Telephone": {
+      "message": "Τηλέφωνο"
+   },
+   "Tell_a_friend_": {
+      "message": "Πέστε το σε έναν φίλο σας!"
+   },
+   "Text": {
+      "message": "Κείμενο"
+   },
+   "Text_to_find": {
+      "message": "Κείμενο για εύρεση"
+   },
+   "Thailand": {
+      "message": "Ταϊλάνδη"
+   },
+   "That_file_is_missing_or_empty___Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "Το αρχείο αυτό λείπει ή είναι κενό. Παρακαλούμε εισάγετε την πλήρη διαδρομή του αρχείου προς εισαγωγή."
+   },
+   "That_group_already_exists_": {
+      "message": "Αυτός ο φάκλεος υπάρχει ήδη."
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "Το έτος έκδοσης της πιστωτικής με 4 ψηφία"
+   },
+   "The_LastPass_Wi_Fi_utility_was_not_detected_on_this_computer___Would_you_like_to_run_the_LastPass_Universal_Installer_in_order_to_install_it_": {
+      "message": "Δεν εντοπίστηκε το εργαλείο ασύρματων δικτύων σε αυτόν τον υπολογιστή.  Θα θέλατε να εκτελέσετε την εγκατάσταση του LastPass ώστε να τον εγκαταστήσετε;"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "Ο κύριος LastPass κωδικός δεν είναι αυτός που εισάγατε"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "Ο «Παλιός Κωδικός» που εισάγατε δεν είναι ο σωστός κύριος κωδικός πρόσβασης του LastPass"
+   },
+   "The_binary_version_of_the_LastPass_plugin_is_required_for_this_operation__It_can_be_downloaded_from_lastpass_com_": {
+      "message": "Απαιτείται η δυαδική έκδοση του LastPass plugin για αυτή την λειτουργία. Μπορείτε να την κατεβάσετε από την διεύθυνση lastpass.com."
+   },
+   "The_credit_card_number": {
+      "message": "Ο αριθμός της πιστωτικής κάρτας"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "Το έτος λήξης της πιστωτικής με 4 ψηφία"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "Ο μήνας λήξης της πιστωτικής κάρτας"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "Ο αριθμός έκδοσης της πιστωτικής κάρτας.\nΕφαρμόζεται μόνο σε συγκεκριμένες Ευρωπαϊκές κάρτες ανάληψης, όπως η Maestro."
+   },
+   "The_credit_card_s_security_code__For_most_credit_cards__this_is_the_last_3_digits_of_a_number_printed_on_the_back_of_the_card__For_American_Express_credit_cards__it_is_the_last_4_digits_of_a_number_printed_in_small_print_on_the_front_of_the_card_": {
+      "message": "Ο κωδικός ασφαλείας της πιστωτικής κάρτας.\nΓια τις περισσότερες πιστωτικές, αυτός είναι τα τελευταία 3 ψηφία του αριθμού που είναι τυπωμένος στην πίσω πλευρά της κάρτας.\nΣτις κάρτες American Express, είναι τα τελευταία 4 ψηφία του αριθμού που είναι τυπωμένος με μικρά γραμματα στη μπροστινή πλευρά της κάρτας."
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "Το πλήρες όνομα όπως αναγράφεται στην πιστωτική κάρτα"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "Ο μήνας έκδοσης της πιστωτικής κάρτας"
+   },
+   "The_name_of_your_bank": {
+      "message": "Το όνομα της τράπεζας σας"
+   },
+   "The_notes_field_contains_too_much_data___You_may_store_a_maximum_of_45_000_characters_per_note___Would_you_like_us_to_truncate_the_note_for_you___You_will_lose_some_of_your_data_": {
+      "message": "Το πεδίο σημειώσεων περιέχει πάρα πολλά δεδομένα. Μπορείτε να αποθηκεύσετε έως 45.000 χαρακτήρες ανά σημείωση.\n\nθέλετε να περικόψουμε τη σημείωση για λογαριασμό σας; Θα χάσετε μερικά από τα δεδομένα σας."
+   },
+   "The_number_of_characters_in_the_generated_password_": {
+      "message": "Ο αριθμός των χαρακτήρων στον δημιουργούμενο κωδικό πρόσβασης."
+   },
+   "The_password_that_you_use_to_log_into_this_website_": {
+      "message": "Ο κωδικός πρόσβασης που χρησιμοποιείτε για να συνδεθείτε στο site αυτό."
+   },
+   "The_text_beside__the_name_of__or_the_ID_of_the_form_field_to_be_filled__If_multiple_items_are_to_be_matched__specify_each_match_on_a_separate_line_": {
+      "message": "Το κείμενο εκτός από, το όνομα, ή την ταυτότητα του πεδίου φόρμας να είναι συμπληρωμένα.\nΑν θέλετε να αντιστοιχούν πολλαπλά στοιχεία, πρέπει να ορίσετε μια αντιστοίχηση για κάθε ξεχωριστή γραμμή."
+   },
+   "The_value_to_be_filled": {
+      "message": "Η τιμή που θα συμπληρωθεί"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work_": {
+      "message": "Η έκδοση του Chrome που τρέχει αυτή την στιγμή δεν έχει την HTML5 υποστήριξη βάσης δεδομένων ενεργοποιημένη. Ως εκ τούτου, αυτή η σελίδα σύνδεσης δεν θα θυμάται το e-mail και τον κωδικό πρόσβασης σας, επίσης άλλα χαρακτηριστικά όπως η αυτόματη σύνδεση κατά την επανεκκίνηση του προγράμματος περιήγησης δεν θα λειτουργήσει."
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "Η έκδοση του Chrome που τρέχει αυτή την στιγμή δεν έχει ενεργοποιημένη την υποστήριξη βάσης δεδομένων HTML5. Ως εκ τούτου, αυτή η σελίδα σύνδεσης δεν θα θυμάται το email και τον κωδικό πρόσβασής σας, αλλά και άλλα χαρακτηριστικά όπως την αυτόματη σύνδεση στο πρόγραμμα σε μια επανεκκίνηση του περιηγητή. Ίσως να μπορέσετε να to διορθώσετε αυτό με το να προσθέσετε --enable-databases ως παράμετρο στην συντόμευση εκκίνησης του Google Chrome φυλλομετρητή."
+   },
+   "This_attachment_needs_to_be_saved_first_": {
+      "message": "Αυτό το συννημένο πρέπει να αποθηκευτεί πρώτα."
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "Αυτό μπορεί να διαχειρισθεί μόνο μέσω μιας ιστοσελίδας"
+   },
+   "This_feature_is_not_available_in_this_version__Please_install_the_binary_extension_by_going_to_https___lastpass_com_dl": {
+      "message": "Το χαρακτηριστικό αυτό δεν είναι διαθέσιμο σε αυτήν την έκδοση. Παρακαλούμε εγκαταστήστε την binary έκδοση από το https://lastpass.com/dl"
+   },
+   "This_feature_requires_the_binary_version_of_this_browser_extension___Would_you_like_to_install_it_now_": {
+      "message": "Το χαρακτηριστικό αυτό απαιτεί την binary έκδοση αυτής της επέκτασης. Θα θέλατε να την εγκαταστήσετε τώρα;"
+   },
+   "This_feature_still_needs_to_be_implemented__to_read_directly_from_": {
+      "message": "Αυτή η λειτουργία χρίζει υλοποίησης, να γίνεται απευθείας ανάγνωση από "
+   },
+   "This_is_a_potential_security_risk__because_anyone_who_learns_the_password_for_that_site_may_gain_access_to_all_of_your_accounts__LastPass_strongly_recommends_that_your_Master_Password_should_not_be_used_on_any_other_website_": {
+      "message": "Αυτό αποτελεί ένα δυνητικό κίνδυνο ασφάλειας, διότι όποιος γνωρίζει τον κωδικό πρόσβασης για αυτόν τον ιστότοπο μπορεί να αποκτήσει πρόσβαση σε όλους τους λογαριασμούς σας. Ο LastPass συνιστά με έμφαση ότι ο Κύριος Κωδικός σας δεν θα πρέπει να χρησιμοποιείτε για οποιονδήποτε άλλο ιστότοπο."
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "Αυτός είναι ένας κοινόχρηστος ιστότοπος. Δεν επιτρέπεται να προβάλλετε τον κωδικό."
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "Αυτό είναι το όνομα ή η διεύθυνση URL της ιστοσελίδας."
+   },
+   "This_may_take_a_while___": {
+      "message": "Αυτό μπορεί να πάρει λίγο χρόνο..."
+   },
+   "This_page_failed_to_load_properly___Please_ensure_you_are_running_the_latest_version_of_Maxthon__LastPass_requires_at_least_Maxthon_4_0_3_2000____Otherwise__this_may_have_happened_to_due_a_bug_in_Maxthon___Please_try_opening_this_page_again_": {
+      "message": "Αυτή η σελίδα δεν έχει φορτώσει σωστά. Παρακαλούμε βεβαιωθείτε ότι χρησιμοποιείτε την τελευταία έκδοση του Maxthon (το LastPass απαιτεί τουλάχιστον Maxthon 4.0.3.2000). Διαφορετικά, αυτό μπορεί να συμβεί λόγω ενός bug στο Maxthon. Παρακαλώ δοκιμάστε να ανοίξετε αυτήν τη σελίδα ξανά."
+   },
+   "This_page_failed_to_load_properly___Please_ensure_you_are_running_the_latest_version_of_Maxthon__LastPass_requires_at_least_Maxthon_4_0_3_3000____Otherwise__this_may_have_happened_to_due_a_bug_in_Maxthon___Please_try_opening_this_page_again_": {
+      "message": "Αυτή η σελίδα δεν έχει φορτώσει σωστά. Παρακαλούμε βεβαιωθείτε ότι χρησιμοποιείτε την τελευταία έκδοση του Maxthon (το LastPass απαιτεί τουλάχιστον Maxthon 4.0.3.3000). Σε αντίθετη περίπτωση, αυτό μπορεί να συμβεί λόγω ενός bug στο Maxthon. Παρακαλώ δοκιμάστε ξανά να ανοίξετε αυτήν τη σελίδα."
+   },
+   "This_password_you_use_to_log_into_this_website_": {
+      "message": "Ο κωδικός πρόσβασης που χρησιμοποιείτε για να συνδεθείτε σε αυτήν την ιστοσελίδα."
+   },
+   "This_site_has_the_same_password_as_your_LastPass_account__To_protect_all_of_your_online_accounts__it_is_recommended_that_you_change_your_LastPass_Master_Password_": {
+      "message": "Αυτή η ιστοσελίδα έχει τον ίδιο κωδικό πρόσβασης με το λογαριασμό σας LastPass. Για την προστασία όλων των ηλεκτρονικών λογαριασμών σας, συνιστάται να αλλάξετε το LastPass Master Password."
+   },
+   "Time_Zone": {
+      "message": "Ζώνη Ώρας"
+   },
+   "Timor_Leste": {
+      "message": "Ανατολικό Τιμόρ"
+   },
+   "Title": {
+      "message": "Τίτλος"
+   },
+   "To_create_your_account__please_re_enter_your_LastPass_master_password": {
+      "message": "Για να δημιουργήσετε το λογαριασμό σας, παρακαλούμε να εισάγετε ξανά τον κύριο LastPass κωδικό σας."
+   },
+   "To_export_1Password_logins__login_to_1Password__Select_all_or_just_passwords_that_you_want_to_export__Then_select__File_menu___Export_All___Text_file_____Or____File_menu___Export_Selected___Text_file____Click_Export_button_and_Save_password_file__and_Import_the_resulting_file_": {
+      "message": "Για την εξαγωγή των συνδέσεων 1Password, συνδεθείτε με τον 1Password. Επιλέξτε όλους ή μόνο τους κωδικούς πρόσβασης που θέλετε να εξαγάγετε. Στη συνέχεια επιλέξτε: File menu / Export All / Text file... Ή  File menu / Export Selected / Text file... Κάντε κλικ στο κουμπί Export και Save password file, και τέλος Import το αρχείο που προκύπτει."
+   },
+   "To_export_Clipperz_cards__login_to_www_clipperz_com__Click_on_data__then_Export__then_Export_to_JSON__Copy_all_of_the_text_and_save_it_to_a_file_using_a_text_editor__then_import_it__Please_note_that_this_import_may_not_work_properly_if_you_ve_changed_field_names_from_their_defaults_": {
+      "message": "Για την εξαγωγή καρτών Clipperz, συνδεθείτε στο www.clipperz.com. Κάντε κλικ στο data, στη συνέχεια Export,  και εξαγωγή σε JSON. Αντιγράψτε όλο το κείμενο και αποθηκεύσετέ το σε ένα αρχείο χρησιμοποιώντας ένα πρόγραμμα επεξεργασίας κειμένου, και στη συνέχεια εισάγετέ το. Παρακαλώ σημειώστε ότι αυτή η εισαγωγή δεν μπορεί να λειτουργήσει σωστά αν έχετε αλλάξει τα ονόματα των πεδίων από τις προεπιλεγμένες τιμές τους."
+   },
+   "To_export_FireForm_profiles__right_click_the_FireForm_icon__then_choose_Simple_setup___Go_to_the_General_options_tab__click_Export_all_profiles__and_save_an_XML_file___Import_the_resulting_file_": {
+      "message": "Για την εξαγωγή προφίλ FireForm, κάντε δεξί κλικ στο εικονίδιο FireForm, στη συνέχεια, επιλέξτε απλή εγκατάσταση. Πηγαίνετε στην καρτέλα Γενικές επιλογές, κάντε κλικ στο κουμπί Εξαγωγή όλων των προφίλ, και να αποθηκεύσετε ένα αρχείο XML. Εισαγάγετε το αρχείο που προκύπτει."
+   },
+   "To_export_HP_Password_Safe_save_to_an_HTML_file__Import_the_resulting_file_": {
+      "message": "Για την εξαγωγή του HP Password Safe σε ένα αρχείο HTML. Εισαγάγετε το αρχείο που προκύπτει."
+   },
+   "To_export_KeePass_logins__open_your_KeePass_database__and_click_on_File___Export_To___XML_File___Choose_a_file_location_and_press_the_Save_button___Then__press_the_OK_button___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή κωδικών από KeePass, ανοίξτε την βάση δεδομένων του KeePass, Αρχείο – Εξαγωγή Σε – Αρχείο XML. Επιλογή προορισμού, κλικ στο Αποθήκευση και στο Εντάξει. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_LastPass_logins__open_your_browser_with_the_LastPass_plugin_installed__and_click_on_LastPass___Tools___Export_To___CSV_File___Choose_a_file_location_and_press_the_Save_button___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή κωδικών από το LastPass, ανοίγουμε τον φυλλομετρητή με εγκατεστημένο το Πρόσθετο LastPass και κλικ στο LastPass – Εργαλεία – Εξαγωγή Σε – Αρχείο CSV. Επιλέγουμε προορισμό και Αποθήκευση. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_Password_Agent_logins__open_your_Password_Agent_database__and_click_on_File___Print_and_Export___Change_the_output_format_to_XML_File__make_sure__Group__is_checked___Choose_a_file_location_and_press_the_Save_button___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή κωδικών από το Password Agent, ανοίγουμε την βάση δεδομένων του Password Agent και πάμε Αρχείο – Εκτύπωση – Εξαγωγή – Αλλαγή του εξαγώγιμου αρχείου σε XML και επιλέγουμε το ‘Ομάδα’. Επιλέγουμε προορισμού και Αποθήκευση. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_Passwords_Max_passwords__click_File___Database___Export___Text___Click_OK__and_save_a_CSV_file___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή Κωδικών Μέγιστων Κωδικών, κλικ στο Αρχείο – Βάση Δεδομένων – Κείμενο. Κλικ στο Εντάξει και αποθήκευση ως CSV αρχείου. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_RoboForm_logins__click_on_RoboForm_Logins____Print_List__Click_on_the_Full_URL_check_box_and_press_the_save_button__Import_the_resulting_file___To_export_RoboForm_SafeNotes__click_on_RoboForm_SafeNotes_Print_List__Press_the_save_button__Import_the_resulting_file___To_export_RoboForm_Identities__click_on_RoboForm_Identities_Print_List__Press_the_save_button__Import_the_resulting_file_": {
+      "message": "Για εξαγωγή κωδικών από το RoboForm, κλικ στο RoboForm-Κωδικοί…-Εκτύπωση Λίστας. Επιλογή του Πλήρης Διεύθυνση και Αποθήκευση. Εισαγωγή του τελικού αρχείου.\n\nΓια εξαγωγή RoboForm SafeNotes, κλικ στο RoboForm-SafeNotes-Εκτύπωση Λίστας. Κλικ στο Αποθήκευση και εισαγωγή του τελικού αρχείου.\n\nΓια εξαγωγή ταυτοτήτων από το RoboForm, κλικ στο RoboForm-Εκτύπωση Λίστας. Κλικ στο Αποθήκευση και εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_eWallet_cards__go_to_eWallet___Tools___Export__Save_as_a_text_file__Import_the_resulting_file_": {
+      "message": "Για εξαγωγή eWallet καρτών, κλικ στο eWallet – Εργαλεία – Εξαγωγή. Αποθήκευση Ως αρχείο κειμένου και εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_from_MyPasswordSafe__Click_on_File___Save_As___Select_type_of_UNENCRYPTED_XML___Save_the_file___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή από το MyPasswordSafe, Κλικ στο Αρχείο – Αποθήκευση Ως – Επιλογή του τύπου Μη Κρυπτογραφημένο XML. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_from_Password_Safe__Click_on_File___Export_To___XML___Save_the_file___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή από το Password Safe, κλικ στο Αρχείο – Εξαγωγή Σε – XML – Αποθήκευση του αρχείου. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_passwords__login_to_the_desktop_application_and_go_to_File___Export___CSV___All_Entries___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή κωδικών, κάντε είσοδο στην desktop εφαρμογή και πηγαίνετε Αρχείο – Εξαγωγή – CSV – Όλες οι καταχωρίσεις. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_passwords_from_Darn__Passwords___click_Tools___Print___Click_Settings__and_check_Include_Notes_in_Export___Click_Print__and_click_the_Export_to_File_icon_that_looks_like_a_blue_disk___Name_the_file__and_click_Open___Import_the_resulting_file_": {
+      "message": "Για εξαγωγή κωδικών από το Darn! Passwords!, κλικ στο Εργαλεία – Εκτύπωση. Κλικ στο Ρυθμίσεις και επιλογή του Συμπερίληψη Σημειώσεων στην Εξαγωγή και κλικ στο εικονίδιο Εξαγωγή Αρχείου που μοιάζει με μπλε δίσκο. Ονομασία του αρχείου και μετά Άνοιγμα. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_passwords_from_Passpack__Login__go_to_the_Tools_screen__and_click_Export__Under__What_Type_of_Format_Would_You_Like_To_Export___Select__Comma_Separated_Values___and_on__Which_Entries_Would_You_Like_To_Export___Select__All_of_my_entries___then_hit__Continue___Select_all_of_the_text_in_the_text_box_on_the_next_screen__copy_it_to_the_clipboard__create_a_new_file_with_notepad_called_passpack_csv__paste_the_contents_into_this_file__Import_this_file_": {
+      "message": "Για την εξαγωγή των κωδικών από τον Passpack: Συνδεθείτε, μεταβείτε στο Tools screen, και κάντε κλικ στο κουμπί Export. Στην ερώτηση _What Type of Format Would You Like To Export? _ Επιλέξτε _Comma Separated Values_, και στην ερώτηση _Which Entries Would You Like To Export?_ Επιλέξτε  _All of my entries_, και μετά _Continue_. Στο κείμενο πλαισίου στο επόμενο παράθυρο διαλόγου κάντε Επιλογή όλων, και αντιγραφή στο πρόχειρο, στη συνέχεια δημιουργήστε ένα νέο αρχείο με το σημειωματάριο, ονομάστε το passpack.csv και επικολλήστε το περιεχόμενο του πρόχειρου σε αυτό. Εισαγάγετε αυτό το αρχείο."
+   },
+   "To_export_passwords_from_Password_Corral__Login__go_to_the_File___Export_Password___Create_a_plaintext_export_of_all_your_password___Import_this_file_": {
+      "message": "Για εξαγωγή κωδικών από το Password Corral: Είσοδος στην υπηρεσία, Αρχείο – Εξαγωγή Κωδικών π Δημιουργία αρχείου κειμένου με όλους τους κωδικούς. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_passwords_from_Password_Depot__click_on_the__Tools__tab_and_select__Export___Select_the__Extensible_Markup_Language_format____xml____specify_a_target_file_and_select_the_folder_you_want_to_export_": {
+      "message": "Για εξαγωγή κωδικών από το Password Depot, κάντε κλικ στην καρτέλα ‘Εργαλεία’ και επιλέξτε ‘Εξαγωγή’. Επιλέξτε 'Extensible Markup Language format (*.xml)', ορίστε αρχείο προορισμού και διαλέξτε φάκελο εξαγωγής."
+   },
+   "To_export_passwords_from_Password_Dragon__Login__go_to_the_File___Export___Text_File__make_sure_you_check__Password___it_defaults_off___Import_the_saved_file_": {
+      "message": "Για εξαγωγή κωδικών από το Password Dragon: Είσοδος, Αρχείο – Εξαγωγή – Αρχείο Κειμένου, επιλέξετε ‘Κωδικοί’, αν είναι απενεργοποιημένες οι προκαθορισμένες ρυθμίσεις. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_export_passwords_from_Revelation_Password_Manager__export_the_data_as_XML_": {
+      "message": "Για εξαγωγή κωδικών από τον Revelation Password Manager, κάντε εξαγωγή ως XML."
+   },
+   "To_export_passwords_from_SPB_Wallet__open_the_wallet__click_File__Export__select_file_destination_in_the_dialog_box_and_click_Save__Then__paste_the_data_into_the_box_on_this_page_": {
+      "message": "Για εξαγωγή κωδικών από το SPB Wallet, ανοίξτε το wallet, κλικ στο Αρχείο, Εξαγωγή, επιλέξτε προορισμό και κλικ στο Αποθήκευση. Μετά, επικολλήστε τα δεδομένα στο κουτί αυτής της σελίδας."
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "Για να ξεκινήσετε με τον LastPass, θα πρέπει να προσθέσετε ιστοτόπους στο λογαριασμό σας."
+   },
+   "To_import_Wi_Fi_passwords__simply_click_Import_below_": {
+      "message": "Για εισαγωγή κωδικών Ασύρματων Δικτύων, κάντε κλικ στο Εισαγωγή."
+   },
+   "To_import_from_PINs_Password_Manager_Export_in_Tab_Separated_format___Then__import_the_resulting_file_": {
+      "message": "Για εισαγωγή από τον Διαχειριστή Κωδικών PIN κάντε Εξαγωγή σε μορφή με διαχωρισμό στηλοθέτη. Στη συνέχεια, εισαγάγετε το αρχείο που προκύπτει."
+   },
+   "To_import_passwords_from_Opera_Password_Manager__simply_click_Import_below_": {
+      "message": "Για εισαγωγή κωδικών από τον Opera Password Manager, κάντε κλικ στο Εισαγωγή παρακάτω."
+   },
+   "To_import_passwords_from_Safari_Password_Manager__simply_click_Import_below_": {
+      "message": "Για εισαγωγή κωδικών από τον Safari Password Manager, κάντε κλικ στο Εισαγωγή παρακάτω."
+   },
+   "To_import_your_MSI_PasswordKeeper_logins__open_the_program___Click__Txt___and_then__Open____Import_the_resulting_file_": {
+      "message": "Για την εισαγωγή των συνδέσεών σας από τον MSI PasswordKeeper, ανοίξτε το πρόγραμμα. Κάντε κλικ στο κουμπί 'Txt', και στη συνέχεια 'Open'. Εισαγάγετε το αρχείο που προκύπτει."
+   },
+   "To_import_your_Password_Keeper_logins__open_the_program__and_the_password_file_to_be_exported___Click_File___Export_File___Click_Yes__enter_your_password__and_click_OK___This_opens_a_standard_Windows_Save_dialog__so_enter_a_file_name_and_location___Import_the_resulting_file_": {
+      "message": "Για εισαγωγή κωδικών από το Password Keeper, εκτέλεση της εφαρμογής και του αρχείου κωδικών προς εξαγωγή. Κλικ στο Αρχείο – Εξαγωγή Αρχείου. Κλικ στο Ναι, εισαγωγή κωδικού και Εντάξει. Στο παράθυρο που θα εμφανιστεί εισάγουμε όνομα αρχείου και προορισμό. Εισαγωγή του τελικού αρχείου."
+   },
+   "To_import_your_TurboPasswords_logins__open_the_program__and_the_password_file_to_be_exported__If_you_want_to_restrict_the_export_to_a_particular_category_or_type__filter_the_entries_displayed_using_the_Category_and_Type_drop_downs_above_the_main_window__Click_File_Export_Category__This_opens_a_standard_Windows_Save_dialog__so_enter_a_file_name_and_location__and_select_Comma_Separated_Values___csv__from_the_Save_as_Type_box_": {
+      "message": "Για την εισαγωγή των συνδέσεών σας από τον TurboPasswords, ανοίξτε το πρόγραμμα και το αρχείο κωδικών που πρόκειται να εξαχθεί. Αν θέλετε να περιορίσετε τις εξαγωγές σε μια συγκεκριμένη κατηγορία ή είδος, φιλτράρετε τις καταχωρήσεις που εμφανίζονται χρησιμοποιώντας τις αναπτυσσόμενες λίστες (drop-downs) στο κύριο παράθυρο. Επιλέξτε File|Export Category. Αυτό ανοίγει ένα παράθυρο διαλόγου Αποθήκευσης, ώστε να εισάγετε όνομα και θέση αρχείου, και επιλέξτε Comma Separated Values (.csv) από το πλαίσιο Αποθήκευση Ως."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "Για την προστασία του απορρήτου σας και να διατηρείτε τα δεδομένα σας εμπιστευτικά,"
+   },
+   "Togo": {
+      "message": "Τόγκο"
+   },
+   "Tokelau": {
+      "message": "Τοκελάου"
+   },
+   "Tonga": {
+      "message": "Τόνγκα"
+   },
+   "Tools": {
+      "message": "Εργαλεία"
+   },
+   "Travel": {
+      "message": "Ταξίδια"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "Τρινιντάντ και Τομπάγκο"
+   },
+   "Try_Again": {
+      "message": "Δοκιμάστε ξανά"
+   },
+   "Try_LastPass_Enterprise": {
+      "message": "Δοκιμάστε το LastPass για Επιχειρήσεις"
+   },
+   "Tunisia": {
+      "message": "Τυνησία"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "Τουρκία"
+   },
+   "Turkmenistan": {
+      "message": "Τουρκμενιστάν"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "Τερκς και Κέικος"
+   },
+   "Tutorials": {
+      "message": "Εκπαιδευτικά"
+   },
+   "Tuvalu": {
+      "message": "Τουβαλού"
+   },
+   "Type": {
+      "message": "Είδος"
+   },
+   "Type_": {
+      "message": "Τύπος:"
+   },
+   "URL": {
+      "message": "URL"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "ΟΝΟΜΑ ΧΡΗΣΤΗ"
+   },
+   "Uganda": {
+      "message": "Ουγκάντα"
+   },
+   "Ukraine": {
+      "message": "Ουκρανία"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "Ουλάν Μπατόρ, Περθ"
+   },
+   "Unexpected_data_type__": {
+      "message": "Απροσδόκητος τύπος δεδομένων:"
+   },
+   "United_Arab_Emirates": {
+      "message": "Ηνωμένα Αραβικά Εμιράτα"
+   },
+   "United_Kingdom": {
+      "message": "Ηνωμένο Βασίλειο"
+   },
+   "United_States": {
+      "message": "Ηνωμένες Πολιτείες"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "Ηνωμένες Πολιτείες Μικρά απομονωμένα νησιά"
+   },
+   "Unknown": {
+      "message": "Άγνωστο"
+   },
+   "Unselect_All": {
+      "message": "Αποεπιλογή Όλων"
+   },
+   "Untitled": {
+      "message": "Χωρίς Τίτλο"
+   },
+   "Up": {
+      "message": "Πάνω"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "Αναβάθμιση σε LastPass Online!"
+   },
+   "Upgrade_to_Premium": {
+      "message": "Αναβάθμιση σε Premium"
+   },
+   "Uploading_Data___": {
+      "message": "Αποστολή δεδομένων ..."
+   },
+   "Uruguay": {
+      "message": "Ουρουγουάη"
+   },
+   "Use": {
+      "message": "Χρήση"
+   },
+   "Use_802_1X": {
+      "message": "Χρησιμοποιήστε 802.1X"
+   },
+   "Use_Password": {
+      "message": "Χρήση κωδικού πρόσβασης"
+   },
+   "Use_Special_Characters": {
+      "message": "Χρήση ειδικών χαρακτήρων"
+   },
+   "Use_Special_Characters_": {
+      "message": "Χρήση ειδικών χαρακτήρων;"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "Χρήση αυτού του κωδικό πρόσβασης τώρα (για αυτή τη σελίδα);"
+   },
+   "User": {
+      "message": "Χρήστης"
+   },
+   "User_Manual": {
+      "message": "Εγχειρίδιο Χρήσης"
+   },
+   "User_name": {
+      "message": "Όνομα χρήστη"
+   },
+   "Username_": {
+      "message": "Όνομα χρήστη:"
+   },
+   "Username_History": {
+      "message": "Ιστορικό Χρήστη"
+   },
+   "Usernameproper": {
+      "message": "Όνομα χρήστη"
+   },
+   "Uzbekistan": {
+      "message": "Ουζμπεκιστάν"
+   },
+   "Value": {
+      "message": "Τιμή"
+   },
+   "Value_to_fill": {
+      "message": "Τιμή για την συμπλήρωση"
+   },
+   "Vanuatu": {
+      "message": "Βανουάτου"
+   },
+   "Vault": {
+      "message": "Θησαυροφυλάκιο"
+   },
+   "Venezuela": {
+      "message": "Βενεζουέλα"
+   },
+   "Version": {
+      "message": "Έκδοση"
+   },
+   "Version_": {
+      "message": "Αρ. Έκδοσης:"
+   },
+   "Viet_Nam": {
+      "message": "Βιετνάμ"
+   },
+   "View_Deleted_Shared_Folders": {
+      "message": "Προβολή διαγραμμένων κοινόχρηστων φακέλων"
+   },
+   "View_History": {
+      "message": "Προβολή ιστορικού"
+   },
+   "View_Image": {
+      "message": "Προβολή εικόνας"
+   },
+   "View_Passwords": {
+      "message": "Προβολή Κωδικών Πρόσβασης"
+   },
+   "Virgin_Islands__British_": {
+      "message": "Παρθένες Νήσοι (Βρετανίας)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "Παρθένες Νήσοι (ΗΠΑ)"
+   },
+   "Wallis_and_Futuna": {
+      "message": "Γουάλις και Φουτούνα"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "Προειδοποίηση πριν τη συμπλήρωση μη ασφαλών φορμών"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "Παρακολουθήστε ένα βίντεο σχετικά με τη βασική χρήση"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "Επίσης, ΔΕΝ διατηρούμε αντίγραφο ή αντίγραφο ασφαλείας για αυτό."
+   },
+   "Weak_Password": {
+      "message": "Αδύναμος Κωδικό Πρόσβασης"
+   },
+   "Website": {
+      "message": "Ιστοσελίδα"
+   },
+   "Welcome_back_to_LastPass_": {
+      "message": "Καλώς ήλθατε πίσω στο LastPass,"
+   },
+   "Welcome_back_to_Last__Pass_": {
+      "message": "Καλώς ήλθατε πίσω στο Last Pass,"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "Καλώς ήλθατε στο LastPass!"
+   },
+   "West_Central_Africa": {
+      "message": "Δυτική Κεντρική Αφρική"
+   },
+   "Western_Sahara": {
+      "message": "Δυτική Σαχάρα"
+   },
+   "What_you_use_to_log_into_this_website_": {
+      "message": "Τι χρησιμοποιείτε για να συνδεθείτε σε αυτή την ιστοσελίδα."
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, τουλάχιστον ένας μικρός χαρακτήρας (γράμμα), ένας κεφαλαίος χαρακτήρας (γράμμα), και ένα ιδιαίτερο σύμβολο θα χρησιμοποιηθεί"
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used_": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, τουλάχιστον ένα πεζός χαρακτήρας (γράμμα), έναν κεφαλαίος χαρακτήρας (γράμμα), και ένα ιδιαίτερος χαρακτήρας (σύμβολο) θα χρησιμοποιηθεί."
+   },
+   "When_this_box_is_checked__characters_like___and___will_be_used_when_randomly_generating_a_password_": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, χαρακτήρες όπως  # και! θα πρέπει να χρησιμοποιούνται κατά την δημιουργία ενός τυχαίου κωδικού πρόσβασης."
+   },
+   "When_this_box_is_checked__confusing_characters__1_I_L_0_O__are_not_used_": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, δεν χρησιμοποιούνται χαρακτήρες που μπορεί να δημιουργήσουν σύγχυση π.χ.(1, I, L, 0, Ο)."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, δημιουργείται ένας κωδικός πρόσβασης που είναι εύκολος στο να προφερθεί."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce_": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, δημιουργείται ένας κωδικός πρόσβασης που είναι εύκολο να προφερθεί."
+   },
+   "When_this_box_is_checked__potentially_confusing_characters__1_I_L_0_O__are_not_used": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, δεν χρησιμοποιούνται χαρακτήρες που μπορεί πιθανόν να δημιουργήσουν σύγχυση π.χ.(1, I, L, 0, Ο)."
+   },
+   "When_this_box_is_checked__use_characters_like___and___in_the_password": {
+      "message": "Όταν αυτό το πλαίσιο είναι επιλεγμένο, χρησιμοποιήστε χαρακτήρες όπως  #και!, στον κωδικό πρόσβασης"
+   },
+   "Wi_Fi_Password": {
+      "message": "Κωδικός Ασύρματου Δικτύου"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "Κωδικοί Ασύρματων Δικτύων"
+   },
+   "Windows": {
+      "message": "Windows"
+   },
+   "Would_you_like_LastPass_to_generate_a_secure_password_for_you_": {
+      "message": "Θα Θέλατε το LastPass να δημιουργήσει έναν ασφαλή κωδικό πρόσβασης για λογαριασμό σας;"
+   },
+   "Would_you_like_LastPass_to_save_your_site_information_": {
+      "message": "Θα Θέλατε το LastPass να αποθηκεύσει τις πληροφορίες της ιστοσελίδας σας;"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "Θέλετε να δημιουργήσετε ένα Προφίλ Συμπλήρωσης Φόρμας τώρα;"
+   },
+   "XML_Files": {
+      "message": "Αρχεία XML"
+   },
+   "Yangon__Rangoon_": {
+      "message": "Γιανγκόν (Ρανγκούν)"
+   },
+   "Yemen": {
+      "message": "Υεμένη"
+   },
+   "Yes": {
+      "message": "Ναι"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "Ναι, Χρήση για αυτό τον Ιστότοπο"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "Ναι, άφησε να επιλέξω εγώ ποια στοιχεία θα εισαχθούν στον LastPass"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "Ναι, άφησε να εισάγω και να επιβεβαιώσω τα δεδομένα που θα χρησιμοποιηθούν κατά τη συμπλήρωση φορμών"
+   },
+   "You_are_moving_sites_from_a_shared_folder_into_your_general_vault__This_will_potentially_make_them_unavailable_to_others____Do_you_want_to_continue_": {
+      "message": "Μεταφέρετε ιστοσελίδες από έναν κοινόχρηστο φάκελο στην Κρύπτη. Αυτό μπορεί να απαγόρευση την πρόσβαση σε αυτές από άλλους.\n\nΘέλετε να συνεχίσετε;"
+   },
+   "You_are_moving_sites_to_a_different_shared_folder__This_may_change_who_has_access_to_the_sites____Do_you_want_to_continue_": {
+      "message": "Μεταφέρετε ιστοσελίδες σε έναν διαφορετικό κοινόχρηστο φάκελο. Αυτό μπορεί να μεταβάλει το ποιος έχει πρόσβαση σε αυτές.\n\nΘέλετε να συνεχίσετε;"
+   },
+   "You_are_moving_sites_to_a_shared_folder__This_will_potentially_make_them_available_to_others___Are_you_sure_you_would_like_to_continue_": {
+      "message": "Μετακινείτε σελίδες σε έναν κοινόχρηστο φάκελο. Αυτό αυτόματος τις κάνει διαθέσιμες σε άλλους.\n\nΕίστε σίγουροι ότι θέλετε να συνεχίσετε;"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "Δεν μπορείτε να ορίσετε περισσότερα από ένα Ενεργά Πλήκτρα την ίδια ενέργεια."
+   },
+   "You_cannot_move_individually_shared_sites_into_a_shared_folder_": {
+      "message": "Δεν μπορείτε να μετακινήσετε μεμονωμένες κοινόχρηστες σελίδες μέσα σε έναν κοινόχρηστο φάκελο."
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "Έχετε επιλέξει ο LastPass να θυμάται τον κωδικό πρόσβασής σας. Με αυτόν τον τρόπο ουσιαστικά καθίσταται άχρηστες τις ρυθμίσεις αυτόματης αποσύνδεσης που έχετε επιλέξει. Θα θέλατε ο LastPass να σταματήσει να θυμάται τον κωδικό σας;"
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "Δεν έχετε επιλέξει ακόμα μια προεπιλεγμένη φόρμα συμπλήρωσης προφίλ. Θέλετε να επιλέξετε μια τώρα;"
+   },
+   "You_have_saved_your_password_to_your_LastPass_Vault_": {
+      "message": "Έχετε αποθηκεύσει τον κωδικό σας για το LastPass θησαυροφυλάκιό σας."
+   },
+   "You_may_also_be_blocking_all_cookies__which_causes_Chrome_to_disallow_HTML5_database_access_": {
+      "message": "Μπορείτε επίσης να αποκλείσετε όλα τα cookies, γεγονός που επιτάσει τον Chrome να απορρίπτει την πρόσβαση σε βάσεις δεδομένων HTML5."
+   },
+   "You_may_change_your_Master_Password_through_the_LastPass_website_by_clicking_the_button_below__or_turn_off_Master_Password_security_alerts_using_the_links_at_the_bottom_of_this_page_": {
+      "message": "Μπορείτε να αλλάξετε τον Κύριο Κωδικό σας μέσω της ιστοσελίδας LastPass κάνοντας κλικ στο παρακάτω κουμπί, ή να απενεργοποιήσετε τις ειδοποιήσεις ασφαλείας του Κύριου Κωδικού χρησιμοποιώντας τις συνδέσεις στο κάτω μέρος αυτής της σελίδας."
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "Πρέπει να συμφωνήσετε να αποσταλούν τα κρυπτογραφημένα δεδομένα σας στο LastPass.com.\n\nΤο LastPass.com κρυπτογραφεί τα δεδομένα σας και τα αποστέλλει στους ασφαλής του κεντρικούς υπολογιστές.\nΚανένας στο LastPass δεν μπορεί να δει τα εμπιστευτικά σας δεδομένα, καθώς είναι κρυπτογραφημένα με τη χρήση του κωδικού σας και είστε ο μόνος που τον γνωρίζει."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "Πρέπει να συμφωνήσετε με τους όρους για να συνεχίσετε"
+   },
+   "You_must_enter_a_name_": {
+      "message": "Πρέπει να εισάγετε όνομα."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "Πρέπει να εισάγετε ένα μοναδικό όνομα."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get__Logoff_on_Browser_Close__changes_to_take_effect": {
+      "message": "Πρέπει να επανεκκκινήσετε το Chrome και να επανακάμψετε, προκειμένου να τεθεί σε λειτουργία η εντολή 'Αποσύνδεση κατά το κλείσιμο του προγράμματος περιήγησης'"
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "Πρέπει να επανεκκινήσετε το Chrome ή να αποσυνδεθείτε και να επανασυνδεθείτε για να ισχύσουν οι αλλαγές στο 'Έξοδος με το κλείσιμο του φυλλομετρητή'"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "Πρέπει να κάνετε επανεκκίνηση του φυλλομετρητή σας, για να τεθούν σε ισχύ όλες οι αλλαγές."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "Το έτος γέννησής σας με 4 ψηφία"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "Οι κωδικοί του Google Chrome έχουν εισαχθεί επιτυχώς."
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "Ο ταχυδρομικός σας κώδικας"
+   },
+   "Your_address_information": {
+      "message": "Οι πληροφορίες διεύθυνσή σας"
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "Το συνηρημένο σας βρίσκεται στην διεύθυνση:"
+   },
+   "Your_bank_account_information": {
+      "message": "Τα στοιχεία του τραπεζικού σας λογαριασμού"
+   },
+   "Your_bank_account_number__This_number_can_typically_be_found_to_the_right_of_the_routing_number_on_your_personal_checks_": {
+      "message": "Ο αριθμός του τραπεζικού σας λογαριασμού.\nΑυτός ο αριθμός συνήθως αναγράφεται στα δεξιά του αριθμού δρομολόγησης των προσωπικών σας επταγών."
+   },
+   "Your_bank_s_routing_number__This_9_digit_number_can_typically_be_found_on_your_personal_checks_in_the_bottom_left_corner_": {
+      "message": "Ο αριθμός δρομολόγησης της τράπεζάς σας.\nΑυτός ο εννεαψήφιος αριθμός συνήθως βρίσκεται στη κάτω αριστερή γωνία της προσωπικής σας επιταγής."
+   },
+   "Your_birth_day": {
+      "message": "Η ημέρα που γεννηθήκατε"
+   },
+   "Your_birth_month": {
+      "message": "Ο μήνας που γεννηθήκατε"
+   },
+   "Your_city_name": {
+      "message": "Το όνομα της πόλης σας"
+   },
+   "Your_company_s_name": {
+      "message": "Το όνομα της εταιρίας σας"
+   },
+   "Your_contact_information": {
+      "message": "Τα στοιχεία επικοινωνίας σας"
+   },
+   "Your_country_name": {
+      "message": "Το όνομα της χώρας σας"
+   },
+   "Your_county_name": {
+      "message": "Το όνομα του νομού σας"
+   },
+   "Your_credit_card_information": {
+      "message": "Τα στοιχεία της πιστωτικής κάρτας σας"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "Οι ρυθμίσεις σας, απαιτούν να εισάγετε τον κωδικό σας για να ολοκληρωθεί αυτή η ενέργεια."
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "Τα δεδομένα σας έχουν εξαχθεί σε"
+   },
+   "Your_email_address": {
+      "message": "Η ηλεκτρονική διεύθυνσή σας"
+   },
+   "Your_first_name": {
+      "message": "Το όνομά σας"
+   },
+   "Your_government_ID_number": {
+      "message": "Ο αριθμός ταυτότητάς σας"
+   },
+   "Your_last_name": {
+      "message": "Το επώνυμό σας"
+   },
+   "Your_middle_name": {
+      "message": "Το μεσαίο όνομά σας"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "Ο κωδικός σας δεν μπορεί να είναι ο ίδιος με το email σας."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "Ο κωδικός σας είναι εύκολα εικάσιμος."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "Ο κωδικός σας είναι πολύ μικρός. Πρέπει να είναι τουλάχιστον 6 χαρακτήρες"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "Ο κωδικός είναι πολύ σύντομος. Θα πρέπει να έχει 8 χαρακτήρες το λιγότερο."
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "Ο υπενθυμητής κωδικού εξυπηρετεί την υπενθύμιση του"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "Οι κωδικοί σας δεν ταιριάζουν."
+   },
+   "Your_personal_information": {
+      "message": "Τα προσωπικά σας στοιχεία"
+   },
+   "Your_phone_number": {
+      "message": "Ο αριθμός τηλεφώνου σας"
+   },
+   "Your_phone_number_extension": {
+      "message": "Το πρόθεμα τηλ. αριθμού της περιοχής"
+   },
+   "Your_prefix_or_title": {
+      "message": "Το πρόθεμα ή τον τίτλο σας"
+   },
+   "Your_selected_Identity_no_longer_exists__Defaulting_to__All__and_logging_off_": {
+      "message": "Η επιλεγμένη ταυτότητά σας δεν υπάρχει πλέον. Επαναφορά στο 'Όλα' και αποσύνδεση."
+   },
+   "Your_sex": {
+      "message": "Το φύλο σας"
+   },
+   "Your_state_or_province_name": {
+      "message": "Πολιτεία ή το όνομα της επαρχία σας"
+   },
+   "Your_street_address": {
+      "message": "Ταχυδρομική διεύθυνση σας"
+   },
+   "Your_time_zone": {
+      "message": "Η ζώνη ώρας σας"
+   },
+   "Your_trust_token_has_expired_": {
+      "message": "Το πειστήριο εμπιστοσύνης σας έχει λήξει."
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "Το όνομα χρήστη που κάνετε χρήση σε ιστοσελίδες"
+   },
+   "YubiKey": {
+      "message": "YubiKey"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "Πιστοποίηση YubiKey"
+   },
+   "Yugoslavia": {
+      "message": "Γιουγκοσλαβία"
+   },
+   "ZIP___Postal_Code": {
+      "message": "Τ.Κ. / Ταχυδρομικός Κώδικας"
+   },
+   "ZIP___Postal_code": {
+      "message": "Τ.Κ. / Ταχυδρομικός Κώδικας"
+   },
+   "Zambia": {
+      "message": "Ζάμπια"
+   },
+   "Zimbabwe": {
+      "message": "Ζιμπάμπουε"
+   },
+   "_Chrome_Only_Toolstrip_": {
+      "message": "[με εικονίδιο της εργαλειοθήκης του Chrome]"
+   },
+   "_Hide_": {
+      "message": "[Απόκρυψη]"
+   },
+   "_History_": {
+      "message": "[Ιστορικό]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(Εκκρεμούν Νέες Προσκλήσεις Κοινής Χρήσης)"
+   },
+   "_Not_applicable_when_the_Pronounceable_box_is_checked__": {
+      "message": "(Δεν ισχύει όταν το  πλαίσιο προφοράς είναι επιλεγμένο)."
+   },
+   "_Optional_": {
+      "message": "(προαιρετικά)"
+   },
+   "_Show_": {
+      "message": "[Εμφάνιση]"
+   },
+   "_domain_": {
+      "message": "διαδίκτυο (domain)"
+   },
+   "_none_": {
+      "message": "(κενό)"
+   },
+   "_s_Password_One_Click_Change": {
+      "message": "%s Αλλαγή κωδικού πρόσβσης με ένα κλικ"
+   },
+   "_s_will_now_attempt_to_change_your_password_to_a_strong__generated_password_that_will_be_saved_in_your_vault_and_known_only_to_you_": {
+      "message": "%s θα προσπαθήσει να αλλάξει τον κωδικό πρόσβασής σας σε ένα δυνατό, παραγόμενο κωδικό πρόσβασης που θα αποθηκευτεί στο θησαυροφυλάκιό σας και θα είναι γνωστό μόνο σε εσάς."
+   },
+   "_unknown_": {
+      "message": "[Άγνωστο]"
+   },
+   "a_zlower": {
+      "message": "α-ω"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "είναι ο πραγματικός κωδικός, ενώ εξακολουθεί να τηρείται το απόρρητο τους."
+   },
+   "ago": {
+      "message": "προ"
+   },
+   "and": {
+      "message": "και"
+   },
+   "built": {
+      "message": "έκδοση"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "επικοινωνήστε μαζί μας και θα σας αποστείλουμε με email την υπενθύμιση του κωδικού σας."
+   },
+   "ctypes": {
+      "message": "cτύποι"
+   },
+   "day": {
+      "message": "ημέρα"
+   },
+   "days": {
+      "message": "ημέρες"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "eWallet"
+   },
+   "ext_": {
+      "message": "ext."
+   },
+   "false": {
+      "message": "Ψευδές"
+   },
+   "favorites": {
+      "message": "αγαπημένα"
+   },
+   "hour": {
+      "message": "ώρα"
+   },
+   "hours": {
+      "message": "ώρες"
+   },
+   "just_now": {
+      "message": "μόλις τώρα"
+   },
+   "minute": {
+      "message": "λεπτό"
+   },
+   "minutes": {
+      "message": "λεπτά"
+   },
+   "month": {
+      "message": "μήνας"
+   },
+   "months": {
+      "message": "μήνες"
+   },
+   "privacy_statement": {
+      "message": "δήλωση απορρήτου"
+   },
+   "recently_usedlower": {
+      "message": "πρόσφατα χρησιμοποιούμενα"
+   },
+   "search": {
+      "message": "αναζήτηση"
+   },
+   "second": {
+      "message": "δευτερόλεπτο"
+   },
+   "seconds": {
+      "message": "δευτερόλεπτα"
+   },
+   "send_more": {
+      "message": "στείλε περισσότερα"
+   },
+   "shared": {
+      "message": "κοινόχρηστο"
+   },
+   "terms_of_service": {
+      "message": "όροι χρήσης της υπηρεσίας"
+   },
+   "the_current_tab": {
+      "message": "η τρέχουσα καρτέλα"
+   },
+   "true": {
+      "message": "αληθές"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "ΔΕΝ γνωρίζουμε τον LastPass κωδικό σας."
+   },
+   "week": {
+      "message": "εβδομάδα"
+   },
+   "weeks": {
+      "message": "εβδομάδες"
+   },
+   "year": {
+      "message": "έτος"
+   },
+   "years": {
+      "message": "έτη"
+   }
+}
