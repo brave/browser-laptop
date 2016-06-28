@@ -229,7 +229,7 @@ class SitePermissionsPage extends React.Component {
 
   render () {
     return this.isPermissionsNonEmpty()
-    ? <div>
+    ? <div id='sitePermissionsPage'>
       <div data-l10n-id='sitePermissions'></div>
       <ul className='sitePermissions'>
         {
@@ -318,7 +318,6 @@ class PrivacyTab extends ImmutableComponent {
       <SettingsList dataL10nId='advancedPrivacySettings'>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <SitePermissionsPage siteSettings={this.props.siteSettings} />
     </div>
   }
 }
@@ -354,6 +353,7 @@ class SecurityTab extends ImmutableComponent {
             : <span data-l10n-id='enableFlashSubtextLinux' />
         }
       </div>
+      <SitePermissionsPage siteSettings={this.props.siteSettings} />
     </div>
   }
 }
@@ -570,10 +570,10 @@ class AboutPreferences extends React.Component {
         tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
+        tab = <PrivacyTab settings={settings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
-        tab = <SecurityTab settings={settings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />
+        tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.BRAVERY:
         tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting} />

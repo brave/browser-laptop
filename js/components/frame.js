@@ -289,7 +289,7 @@ class Frame extends ImmutableComponent {
       this.expireFlash(prevOrigin)
     }
 
-    if (!!this.webview.allowRunningPlugins !== this.allowRunningPlugins()) {
+    if (this.webview && !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()) {
       // Flash has been allowed. The location should be reloaded, not the src.
       this.updateWebview(cb, this.props.frame.get('location'))
     } else if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
