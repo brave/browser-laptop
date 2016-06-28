@@ -1,0 +1,29 @@
+<html>
+<head>
+<script>
+function init() {
+  // Canvas
+  var canvas = document.createElement("canvas");
+  canvas.width = 2000;
+  canvas.height = 200;
+  canvas.style.display = "inline";
+  var ctx = canvas.getContext("2d");
+  ctx.rect(0, 0, 10, 10);
+  ctx.rect(2, 2, 6, 6);
+  document.getElementById('canvas').innerText = canvas.toDataURL()
+  // WebGL
+  canvas = document.createElement("canvas");
+  var gl = canvas.getContext("webgl")
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  document.getElementById('gl').innerText = gl.getSupportedExtensions().join(";") + gl.getParameter(gl.ALPHA_BITS);
+}
+</script>
+</head>
+<body onload="init()">
+<div>
+fingerprinting test
+<div id='canvas'></div>
+<div id='gl'></div>
+</div>
+</body>
+</html>

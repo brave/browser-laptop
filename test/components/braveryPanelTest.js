@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, noScriptNavButton} = require('../lib/selectors')
+const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton} = require('../lib/selectors')
 
 describe('Bravery Panel', function () {
   function * setup (client) {
@@ -78,12 +78,10 @@ describe('Bravery Panel', function () {
         .waitForVisible(braveryPanel)
         .waitUntil(function () {
           return this.getText(httpsEverywhereStat)
-            .then((upgraded) => {
-              return upgraded === '1'
-            })
+            .then((upgraded) => upgraded === '1')
         })
     })
-    it('blocks scripts with No Script', function * () {
+    it('blocks scripts', function * () {
       const url = Brave.server.url('scriptBlock.html')
       yield this.app.client
         .tabByIndex(0)
@@ -96,10 +94,48 @@ describe('Bravery Panel', function () {
         .waitForVisible(noScriptNavButton)
         .waitUntil(function () {
           return this.getText(noScriptStat)
-            .then((stat) => {
-              return stat === '2'
-            })
+            .then((stat) => stat === '2')
         })
+        .click(noScriptSwitch)
+    })
+    it('blocks fingerprinting', function * () {
+      const url = Brave.server.url('fingerprinting.html')
+      yield this.app.client
+        .click(fpSwitch)
+        .tabByIndex(0)
+        .loadUrl(url)
+        .url(url)
+        .waitUntil(function () {
+          return this.getText('body')
+            .then((text) => text === 'fingerprinting test')
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(braveMenu)
+        .waitForVisible(braveryPanel)
+        .waitUntil(function () {
+          return this.getText(fpStat)
+            .then((stat) => stat === '1')
+        })
+        .click(fpSwitch)
+    })
+    it('allows fingerprinting when setting is off', function * () {
+      const url = Brave.server.url('fingerprinting.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .url(url)
+        .waitUntil(function () {
+          return this.getText('body')
+            .then((text) => text !== 'fingerprinting test')
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(braveMenu)
+        .waitForVisible(braveryPanel)
+        .waitUntil(function () {
+          return this.getText(fpStat)
+            .then((stat) => stat === '0')
+        })
+        .click(fpSwitch)
     })
   })
 })

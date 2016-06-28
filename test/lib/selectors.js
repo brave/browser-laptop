@@ -34,6 +34,8 @@ module.exports = {
   braveryPanel: '.braveryPanel',
   httpsEverywhereStat: '.braveryStat.redirectedResourcesStat',
   noScriptStat: '.braveryStat.noScriptStat',
+  fpStat: '.braveryStat.fpStat',
+  fpSwitch: '.fingerprintingProtectionSwitch .switchMiddle',
   noScriptSwitch: '.noScriptSwitch .switchMiddle',
   noScriptNavButton: '#navigator .noScript'
 }
