@@ -104,6 +104,7 @@ module.exports = {
     'security.passwords.manager-enabled': true,
     'security.passwords.one-password-enabled': false,
     'security.passwords.dashlane-enabled': false,
+    'security.passwords.last-pass-enabled': false,
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'win32',
     'advanced.hardware-acceleration-enabled': true,
