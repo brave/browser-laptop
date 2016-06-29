@@ -67,6 +67,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:certerror': module.exports.getAppUrl('about-certerror.html'),
   'about:safebrowsing': module.exports.getAppUrl('about-safebrowsing.html'),
   'about:passwords': module.exports.getAppUrl('about-passwords.html'),
+  'about:flash': module.exports.getAppUrl('about-flash.html'),
   'about:error': module.exports.getAppUrl('about-error.html')
 })
 

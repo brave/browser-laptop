@@ -811,7 +811,7 @@ class Main extends ImmutableComponent {
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
               passwords={this.props.appState.get('passwords')}
-              flashEnabled={this.props.appState.get('flashEnabled')}
+              flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}

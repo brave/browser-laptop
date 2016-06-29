@@ -674,6 +674,22 @@ const showDefinitionMenuItem = (selectionText) => {
 
 function mainTemplateInit (nodeProps, frame) {
   const template = []
+  if (nodeProps.frameURL && nodeProps.frameURL.startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-flash.html')) {
+    const pageOrigin = siteUtil.getOrigin(nodeProps.pageURL)
+    template.push({
+      label: locale.translation('allowFlashOnce'),
+      click: () => {
+        appActions.changeSiteSetting(pageOrigin, 'flash', 1)
+      }
+    }, {
+      label: locale.translation('allowFlashAlways'),
+      click: () => {
+        const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
+        appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
+      }
+    })
+    return template
+  }
 
   if (nodeProps.linkURL !== '') {
     template.push(openInNewTabMenuItem(nodeProps.linkURL, frame.get('isPrivate'), frame.get('partitionNumber'), frame.get('key')),

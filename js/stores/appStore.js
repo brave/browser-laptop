@@ -454,6 +454,11 @@ const handleAppAction = (action) => {
       appState = appState.set(propertyName,
         siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
       break
+    case AppConstants.APP_REMOVE_SITE_SETTING:
+      let newSiteSettings = siteSettings.removeSiteSetting(appState.get('siteSettings'),
+                                                           action.hostPattern, action.key)
+      appState = appState.set('siteSettings', newSiteSettings)
+      break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')
       appState = appState.set('notifications', notifications.push(Immutable.fromJS(action.detail)))

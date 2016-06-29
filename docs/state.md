@@ -47,7 +47,8 @@ AppStore
       safeBrowsing: boolean,
       noScript: boolean,
       httpsEverywhere: boolean,
-      fingerprintingProtection: boolean
+      fingerprintingProtection: boolean,
+      flash: number, // approval expiration time
     }
   },
   temporarySiteSettings: {
@@ -328,7 +329,7 @@ WindowStore
     maxHeight: number, // the maximum height of the popup window
     src: string, // the src for the popup window webview
   },
-  flashEnabled: boolean, // Whether flash is installed and enabled. Cleared on shutdown.
+  flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
 }
 ```

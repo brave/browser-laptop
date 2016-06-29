@@ -200,3 +200,17 @@ module.exports.mergeSiteSetting = (siteSettings, hostPattern, key, value) =>
   */
 module.exports.removeSiteSettings = (siteSettings, hostPattern) =>
   siteSettings.delete(hostPattern)
+
+/**
+  * Removes one site setting for the specified hostPattern.
+  * @param {Object} siteSettings - The top level app state site settings indexed by hostPattern.
+  * @param {string} hostPattern - The host pattern to remove all settings for.
+  * @param {string} key - The site setting name
+  */
+module.exports.removeSiteSetting = (siteSettings, hostPattern, key) => {
+  if (siteSettings.get(hostPattern)) {
+    return siteSettings.set(hostPattern, siteSettings.get(hostPattern).delete(key))
+  } else {
+    return siteSettings
+  }
+}

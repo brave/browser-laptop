@@ -228,6 +228,18 @@ Change a hostPattern's config
 
 
 
+### removeSiteSetting(hostPattern, key) 
+
+Removes a site setting
+
+**Parameters**
+
+**hostPattern**: `string`, The host pattern to update the config for
+
+**key**: `string`, The config key to update
+
+
+
 ### showMessageBox(detail) 
 
 Shows a message box in the notification bar

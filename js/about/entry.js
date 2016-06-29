@@ -31,6 +31,8 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:error':
     element = require('./errorPage')
     break
+  case 'about:flash':
+    element = require('./flashPlaceholder')
 }
 
 if (element) {
@@ -41,4 +43,3 @@ if (element) {
     component.setState(e.detail)
   })
 }
-

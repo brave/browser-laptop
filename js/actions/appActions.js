@@ -267,6 +267,19 @@ const appActions = {
   },
 
   /**
+   * Removes a site setting
+   * @param {string} hostPattern - The host pattern to update the config for
+   * @param {string} key - The config key to update
+   */
+  removeSiteSetting: function (hostPattern, key) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_SITE_SETTING,
+      hostPattern,
+      key
+    })
+  },
+
+  /**
    * Shows a message box in the notification bar
    * @param {{message: string, buttons: Array.<string>, options: Object}} detail
    */
