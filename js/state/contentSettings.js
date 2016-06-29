@@ -79,6 +79,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
     canvasFingerprinting: [{
       setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
       primaryPattern: '*'
+    }],
+    flash: [{
+      setting: braveryDefaults.flash ? 'allow' : 'block',
+      primaryPattern: '*'
     }]
   }
 

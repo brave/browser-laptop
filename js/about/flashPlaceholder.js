@@ -14,8 +14,10 @@ class FlashPlaceholder extends ImmutableComponent {
   // TODO: Show placeholder telling user how to enable flash if it's not
   constructor () {
     super()
+    const braveryDefaults = window.initBraveryDefaults
+    this.onContextMenu = this.onContextMenu.bind(this)
     this.state = {
-      flashEnabled: null
+      flashEnabled: braveryDefaults && braveryDefaults.flash ? braveryDefaults.flash.enabled : this.flashEnabled
     }
     window.addEventListener(messages.BRAVERY_DEFAULTS_UPDATED, (e) => {
       this.setState({
@@ -36,13 +38,32 @@ class FlashPlaceholder extends ImmutableComponent {
     }
   }
 
+  get flashEnabled () {
+    // messages.BRAVERY_DEFAULTS_UPDATED is not received if this is loaded in an
+    // iframe, which it usually is. as a workaround, get the flash enabled
+    // state from the parent via an anchor string.
+    let parts = window.location.href.split('#')
+    if (parts && parts[2]) {
+      return parts[2] === 'flashEnabled'
+    } else {
+      return false
+    }
+  }
+
+  onContextMenu (e) {
+    if (!this.state.flashEnabled) {
+      e.preventDefault()
+    }
+  }
+
   render () {
+    const flashEnabled = this.state.flashEnabled
     // TODO: Localization doesn't work due to CORS error from inside iframe
     const cmd = isDarwin ? 'Control-Click' : 'Right-Click'
-    const flashRightClick = `${cmd} to run Adobe Flash Player`
-    const flashExpirationText = 'For your security, approvals are limited to 1 week.'
-    const flashSubtext = `on ${this.origin || 'this site'}.`
-    return <div>
+    const flashRightClick = flashEnabled ? `${cmd} to run Adobe Flash Player` : 'Adobe Flash has been blocked.'
+    const flashExpirationText = flashEnabled ? 'For your security, approvals are limited to 1 week.' : null
+    const flashSubtext = flashEnabled ? `on ${this.origin || 'this site'}.` : 'To run Flash, enable it in Preferences > Security.'
+    return <div onContextMenu={this.onContextMenu}>
       <div className='flashMainContent'>
         <img src='img/bravePluginAlert.png' />
         <div id='flashRightClick'>{flashRightClick}</div>
