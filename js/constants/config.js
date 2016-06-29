@@ -26,6 +26,7 @@ module.exports = {
     maxOpenedFrames: 2,
     maxBookmarkSites: 2,
     maxHistorySites: 2,
+    maxAboutPages: 2,
     maxSearch: 3,
     maxTopSites: 5
   },
