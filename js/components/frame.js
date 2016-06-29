@@ -555,8 +555,7 @@ class Frame extends ImmutableComponent {
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         const currentUrl = urlParse(this.props.frame.get('location'))
         if ((e.url.includes('//get.adobe.com/flashplayer') ||
-             e.url.includes('//www.adobe.com/go/getflashplayer')) ||
-             e.url.includes('//www.adobe.com/go/getflash') &&
+             e.url.includes('//www.adobe.com/go/getflash')) &&
             ['http:', 'https:'].includes(currentUrl.protocol) &&
             !currentUrl.hostname.includes('.adobe.com')) {
           interceptFlash(e.url)
