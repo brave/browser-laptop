@@ -136,6 +136,7 @@ var rendererIdentifiers = function () {
     'blockPopups',
     'learnSpelling',
     'ignoreSpelling',
+    'lookupSelection',
     // Other identifiers
     'urlCopied',
     'autoHideMenuBar',

@@ -31,13 +31,23 @@ const webviewActions = {
   },
 
   /**
-   * Repalces the selected text in an editable
+   * Replaces the selected text in an editable
    * @param {string} text - The text to replace with
    */
   replace: function (text) {
     const webview = getWebview()
     if (webview) {
       webview.replaceMisspelling(text)
+    }
+  },
+
+  /**
+   * Shows the definition of the selected text in a pop-up window (macOS only)
+   */
+  showDefinitionForSelection: function () {
+    const webview = getWebview()
+    if (webview) {
+      webview.showDefinitionForSelection()
     }
   }
 }
