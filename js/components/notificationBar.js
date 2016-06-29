@@ -13,7 +13,8 @@ class NotificationItem extends ImmutableComponent {
     const nonce = this.props.detail.get('options').get('nonce')
     if (nonce) {
       ipc.emit(messages.NOTIFICATION_RESPONSE + nonce, {},
-               this.props.detail.get('message'), buttonIndex)
+               this.props.detail.get('message'),
+               buttonIndex, this.checkbox ? this.checkbox.checked : false)
     } else {
       ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'),
                buttonIndex, this.checkbox ? this.checkbox.checked : false)

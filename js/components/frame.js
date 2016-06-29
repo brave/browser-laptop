@@ -525,24 +525,32 @@ class Frame extends ImmutableComponent {
           buttons: [locale.translation('deny'), locale.translation('allow')],
           message,
           options: {
-            nonce
+            nonce,
+            persist: true
           }
         })
-        this.notificationCallbacks[message] = (buttonIndex) => {
+        this.notificationCallbacks[message] = (buttonIndex, persist) => {
           if (buttonIndex === 1) {
-            appActions.changeSiteSetting(this.origin, 'flash', 1)
+            if (persist) {
+              appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
+            } else {
+              appActions.changeSiteSetting(this.origin, 'flash', 1)
+            }
           } else {
             appActions.hideMessageBox(message)
+            if (persist) {
+              // TODO: Never show this message again on this domain?
+            }
           }
         }
       } else {
         ipc.send(messages.SHOW_FLASH_INSTALLED_MESSAGE)
         windowActions.loadUrl(this.props.frame, adobeUrl)
       }
-      ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex) => {
+      ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
         const cb = this.notificationCallbacks[msg]
         if (cb) {
-          cb(buttonIndex)
+          cb(buttonIndex, persist)
         }
       })
     }
