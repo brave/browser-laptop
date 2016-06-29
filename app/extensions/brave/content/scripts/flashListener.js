@@ -125,7 +125,7 @@ function insertFlashPlaceholders (elem) {
       let iframe = document.createElement('iframe')
       iframe.setAttribute('sandbox', 'allow-scripts')
       let hash = window.location.origin
-      if (chrome.contentSettings.flash == 'allow') {
+      if (chrome.contentSettings.flashEnabled == 'allow') {
         hash = hash + '#flashEnabled'
       }
       iframe.setAttribute('src', [placeholderUrl, hash].join('#'))
@@ -148,9 +148,8 @@ var observer = new window.MutationObserver(function (mutations) {
   })
 })
 
-// XXX: brave_flash_allowed is a hack, replace it with contentSettings
-if (!window.location.search ||
-    !window.location.search.includes('brave_flash_allowed')) {
+if (chrome.contentSettings.flashActive != 'allow' ||
+    chrome.contentSettings.flashEnabled != 'allow') {
   setTimeout(() => {
     insertFlashPlaceholders(document.documentElement)
     observer.observe(document.documentElement, {

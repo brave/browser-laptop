@@ -31,9 +31,6 @@ const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
 
-// Hosts that strip the Flash URL param, causing an infinite redirect loops
-const flashRedirectExceptions = ['www.pandora.com']
-
 class Frame extends ImmutableComponent {
   constructor () {
     super()
@@ -513,28 +510,12 @@ class Frame extends ImmutableComponent {
       method.apply(this, e.args)
     })
 
-    const reloadWithFlashAllowed = (parsedUrl) => {
-      this.webview.stop()
-      parsedUrl.search = parsedUrl.search || 'brave_flash_allowed'
-      if (!parsedUrl.search.includes('brave_flash_allowed')) {
-        parsedUrl.search = (parsedUrl.search || '') + '&brave_flash_allowed'
-      }
-      windowActions.loadUrl(this.props.frame, parsedUrl.format())
-    }
-
-    const reloadWithFlashDisallowed = (parsedUrl) => {
-      this.webview.stop()
-      parsedUrl.search = parsedUrl.search.replace(/(\?|&)?brave_flash_allowed/, '')
-      windowActions.loadUrl(this.props.frame, parsedUrl.format())
-    }
-
     const interceptFlash = (adobeUrl) => {
       this.webview.stop()
       // Generate a random string that is unlikely to collide. Not
       // cryptographically random.
       const nonce = Math.random().toString()
       if (this.props.flashInitialized) {
-        const parsedUrl = urlParse(this.props.frame.get('location'))
         if (!this.origin) {
           return
         }
@@ -550,7 +531,6 @@ class Frame extends ImmutableComponent {
         this.notificationCallbacks[message] = (buttonIndex) => {
           if (buttonIndex === 1) {
             appActions.changeSiteSetting(this.origin, 'flash', 1)
-            reloadWithFlashAllowed(parsedUrl)
           } else {
             appActions.hideMessageBox(message)
           }
@@ -578,18 +558,6 @@ class Frame extends ImmutableComponent {
             ['http:', 'https:'].includes(currentUrl.protocol) &&
             !currentUrl.hostname.includes('.adobe.com')) {
           interceptFlash(e.url)
-        }
-        // Make sure a page that is trying to run Flash is actually allowed
-        const pluginsAllowed = this.allowRunningPlugins(e.url)
-        if (parsedUrl.search && parsedUrl.search.includes('brave_flash_allowed')) {
-          if (!pluginsAllowed) {
-            reloadWithFlashDisallowed(parsedUrl)
-            return
-          }
-        } else if (parsedUrl.host && pluginsAllowed &&
-                   !flashRedirectExceptions.includes(parsedUrl.hostname)) {
-          reloadWithFlashAllowed(parsedUrl)
-          return
         }
         windowActions.onWebviewLoadStart(this.props.frame, e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()

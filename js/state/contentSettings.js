@@ -80,8 +80,12 @@ const getContentSettingsFromSiteSettings = (appState) => {
       setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
       primaryPattern: '*'
     }],
-    flash: [{
+    flashEnabled: [{
       setting: braveryDefaults.flash ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    flashActive: [{
+      setting: 'block',
       primaryPattern: '*'
     }]
   }
@@ -107,6 +111,9 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (hostSetting.adControl) {
       addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
     }
+    if (typeof hostSetting.flash === 'number') {
+      addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
+    }
 
     // these should always be the last rules so they take precendence over the others
     if (hostSetting.shieldsUp === false) {
@@ -124,6 +131,11 @@ let updateTrigger
 const doAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_CHANGE_SITE_SETTING:
+      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+        updateTrigger('content_settings', action.temporary)
+      })
+      break
+    case AppConstants.APP_REMOVE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         updateTrigger('content_settings', action.temporary)
       })

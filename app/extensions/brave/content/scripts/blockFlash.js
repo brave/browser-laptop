@@ -17,7 +17,7 @@ function getBlockFlashPageScript () {
   return '(' + Function.prototype.toString.call(blockFlashDetection) + '());'
 }
 
-if (!window.location.search ||
-    !window.location.search.includes('brave_flash_allowed')) {
+if (chrome.contentSettings.flashActive != 'allow' ||
+    chrome.contentSettings.flashEnabled != 'allow') {
   executeScript(getBlockFlashPageScript())
 }
