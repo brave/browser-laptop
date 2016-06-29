@@ -35,14 +35,16 @@ const hintCount = 3
 require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const permissionNames = ['mediaPermission',
-  'geolocationPermission',
-  'notificationsPermission',
-  'midiSysexPermission',
-  'pointerLockPermission',
-  'fullscreenPermission',
-  'openExternalPermission'
-]
+const permissionNames = {
+  'mediaPermission': 'boolean',
+  'geolocationPermission': 'boolean',
+  'notificationsPermission': 'boolean',
+  'midiSysexPermission': 'boolean',
+  'pointerLockPermission': 'boolean',
+  'fullscreenPermission': 'boolean',
+  'openExternalPermission': 'boolean',
+  'flash': 'number'
+}
 
 const changeSetting = (cb, key, e) => {
   if (e.target.type === 'checkbox') {
@@ -205,7 +207,7 @@ class SyncTab extends ImmutableComponent {
 class SitePermissionsPage extends React.Component {
   hasEntryForPermission (name) {
     return this.props.siteSettings.some((value) => {
-      return value.get ? typeof value.get(name) === 'boolean' : false
+      return value.get ? typeof value.get(name) === permissionNames[name] : false
     })
   }
 
@@ -213,8 +215,8 @@ class SitePermissionsPage extends React.Component {
     // Check whether there is at least one permission set
     return this.props.siteSettings.some((value) => {
       if (value && value.get) {
-        for (let i = 0; i < permissionNames.length; i++) {
-          if (typeof value.get(permissionNames[i]) === 'boolean') {
+        for (let name in permissionNames) {
+          if (typeof value.get(name) === permissionNames[name]) {
             return true
           }
         }
@@ -224,7 +226,7 @@ class SitePermissionsPage extends React.Component {
   }
 
   deletePermission (name, hostPattern) {
-    aboutActions.changeSiteSetting(hostPattern, name, null)
+    aboutActions.removeSiteSetting(hostPattern, name)
   }
 
   render () {
@@ -233,7 +235,7 @@ class SitePermissionsPage extends React.Component {
       <div data-l10n-id='sitePermissions'></div>
       <ul className='sitePermissions'>
         {
-          permissionNames.map((name) =>
+          Object.keys(permissionNames).map((name) =>
             this.hasEntryForPermission(name)
             ? <li>
               <div data-l10n-id={name} className='permissionName'></div>
@@ -244,12 +246,30 @@ class SitePermissionsPage extends React.Component {
                     return null
                   }
                   const granted = value.get(name)
-                  if (typeof granted === 'boolean') {
+                  if (typeof granted === permissionNames[name]) {
+                    let statusText
+                    let statusArgs
+                    if (name === 'flash') {
+                      // Show the number of days/hrs/min til expiration
+                      if (granted === 1) {
+                        // Flash is allowed just one time
+                        statusText = 'flashAllowOnce'
+                      } else {
+                        statusText = 'flashAllowAlways'
+                        statusArgs = {
+                          time: new Date(granted).toLocaleString()
+                        }
+                      }
+                    } else {
+                      statusText = granted ? 'alwaysAllow' : 'alwaysDeny'
+                    }
                     return <div className='permissionItem'>
                       <span className='fa fa-times permissionAction'
                         onClick={this.deletePermission.bind(this, name, hostPattern)}></span>
                       <span className='permissionHost'>{hostPattern + ': '}</span>
-                      <span className='permissionStatus' data-l10n-id={granted ? 'alwaysAllow' : 'alwaysDeny'}></span>
+                      <span className='permissionStatus'
+                        data-l10n-id={statusText}
+                        data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null}></span>
                     </div>
                   }
                   return null

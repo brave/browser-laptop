@@ -115,6 +115,7 @@ const messages = {
   // About pages from contentScript
   CHANGE_SETTING: _,
   CHANGE_SITE_SETTING: _,
+  REMOVE_SITE_SETTING: _,
   NEW_FRAME: _,
   MOVE_SITE: _,
   OPEN_DOWNLOAD_PATH: _,

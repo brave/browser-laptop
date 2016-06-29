@@ -40,7 +40,7 @@ class FlashPlaceholder extends ImmutableComponent {
     // TODO: Localization doesn't work due to CORS error from inside iframe
     const cmd = isDarwin ? 'Control-Click' : 'Right-Click'
     const flashRightClick = `${cmd} to run Adobe Flash Player`
-    const flashExpirationText = 'Approvals expire 7 days after last site visit.'
+    const flashExpirationText = 'For your security, approvals are limited to 1 week.'
     const flashSubtext = `on ${this.origin || 'this site'}.`
     return <div>
       <div className='flashMainContent'>

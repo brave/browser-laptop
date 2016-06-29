@@ -455,8 +455,9 @@ const handleAppAction = (action) => {
         siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
       break
     case AppConstants.APP_REMOVE_SITE_SETTING:
-      appState = appState.set('siteSettings',
-        siteSettings.removeSiteSetting(appState.get('siteSettings'), action.hostPattern, action.key))
+      let newSiteSettings = siteSettings.removeSiteSetting(appState.get('siteSettings'),
+                                                           action.hostPattern, action.key)
+      appState = appState.set('siteSettings', newSiteSettings)
       break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')

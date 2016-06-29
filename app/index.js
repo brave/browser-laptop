@@ -396,6 +396,10 @@ app.on('ready', () => {
       appActions.changeSiteSetting(hostPattern, key, value, temp)
     })
 
+    ipcMain.on(messages.REMOVE_SITE_SETTING, (e, hostPattern, key) => {
+      appActions.removeSiteSetting(hostPattern, key)
+    })
+
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
     })

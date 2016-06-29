@@ -209,7 +209,7 @@ module.exports.removeSiteSettings = (siteSettings, hostPattern) =>
   */
 module.exports.removeSiteSetting = (siteSettings, hostPattern, key) => {
   if (siteSettings.get(hostPattern)) {
-    return siteSettings.get(hostPattern).delete(key)
+    return siteSettings.set(hostPattern, siteSettings.get(hostPattern).delete(key))
   } else {
     return siteSettings
   }
