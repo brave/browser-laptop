@@ -1,0 +1,3 @@
+StringUtils={};
+(function(f){f.translate=function(c){if(c){var a=c.trim();if(0<a.length){var b=LPPlatform.translate(a);if(a.length!==c.length)var d=c.indexOf(a),b=c.substring(0,d)+b+c.substring(d+a.length);if(1<arguments.length){a=1;for(d=arguments.length;a<d;++a){var e=arguments[a];"object"!==typeof e&&(b=b.replace("%"+a,e.toString()))}}else if(-1===a.indexOf(" "))switch(a.toUpperCase()===a?1:a.toLowerCase()===a?2:a.charAt(0).toUpperCase()===a.charAt(0)?3:null){case 1:b=b.toUpperCase();break;case 2:b=b.toLowerCase();
+break;case 3:b=b.charAt(0).toUpperCase()+b.substring(1).toLowerCase()}return b}}return c}})(StringUtils);

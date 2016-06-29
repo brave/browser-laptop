@@ -1,0 +1,4037 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "12_hours": {
+      "message": "12 ore"
+   },
+   "15_minutes": {
+      "message": "15 minute"
+   },
+   "1Password": {
+      "message": "1Parolă"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. Inseraţi YubiKey-ul dumneavoastră în portul USB cu contactul USB în sus"
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. Rulaţi aplicaţia Google Authenticator pe dispozitivul dumneavoastră mobil"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. Rulaţi aplicaţia LastPass Sesame pentru a genera o parolă de unică folosinţă"
+   },
+   "1_hour": {
+      "message": "1 oră"
+   },
+   "24_hours": {
+      "message": "24 ore"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. Introduceţi codul de verificare curent în caseta de mai jos"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. Lipiţi parola de unică folosinţă în caseta de intrare de mai jos şi faceţi clic pe 'Autentificare'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. Asteptaţi până când butonul YubiKey-ului e luminat cu o lumină constantă"
+   },
+   "30_minutes": {
+      "message": "30 minute"
+   },
+   "30_seconds": {
+      "message": "30 secunde"
+   },
+   "3__Click_Authenticate": {
+      "message": "3. Faceţi clic pe Autentificați"
+   },
+   "3__Hold_your_fingertip_on_the_touch_button_for_1_second": {
+      "message": "3. Țineți degetul pe butonul de atingere timp de 1 secundă"
+   },
+   "3_hours": {
+      "message": "3 ore"
+   },
+   "5_minutes": {
+      "message": "5 minute"
+   },
+   "6_hours": {
+      "message": "6 ore"
+   },
+   "ACTION": {
+      "message": "ACTIUNE"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_batch_of_SMS_passcodes_have_been_sent_to_your_mobile_device_": {
+      "message": "Mai multe coduri de acces SMS au fost trimise către mobilul dumneavoastră."
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_password_change_for_this_site_": {
+      "message": "O noua parola a fost creata. Doresti ca LastPass sa memoreze aceasta schimbare pentru acest site?"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "O nouă parolă a fost generată!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "O parolă generată aleator."
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "O actualizare necesară este disponibilă pentru LastPass. Vă rugăm să apăsaţi pe OK pentru a începe descărcarea şi instalarea."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "Un fişier a fost găsit aşteptând să fie reîncărcat. Aceasta înseamnă cel mai probabil că nu toate schimbările dvs au fost salvate. Doriţi să stergeţi acest fisier şi probabil să pierdeţi unele schimbări?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "O eroare a serverului a intervenit în timp ce procesam cererea dvs."
+   },
+   "A_site_that_has_been_previously_shared_cannot_be_moved_to_a_shared_folder___Would_you_like_to_make_a_copy_": {
+      "message": "Un site care a fost partajat anterior nu poate fi mutat într-un folder partajat.\n\nVDoriți să faceți o copie?"
+   },
+   "About": {
+      "message": "Despre"
+   },
+   "About_LastPass": {
+      "message": "Despre LastPass"
+   },
+   "About___": {
+      "message": "Despre..."
+   },
+   "Accept": {
+      "message": "Acceptă"
+   },
+   "Account_Number": {
+      "message": "Numărul de cont"
+   },
+   "Account_Settings": {
+      "message": "Setările Contului"
+   },
+   "Account_Type": {
+      "message": "Tipul de cont"
+   },
+   "Account_number": {
+      "message": "Numărul contului"
+   },
+   "Actionproper": {
+      "message": "Acţiune"
+   },
+   "Actions": {
+      "message": "Acţiuni"
+   },
+   "Add": {
+      "message": "Adaugă"
+   },
+   "Add_Attachment": {
+      "message": "Adaugă Ataşament"
+   },
+   "Add_Credit_Card": {
+      "message": "Adaugă card de credit"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "Adăugați profil pentru cartea de credit"
+   },
+   "Add_Field": {
+      "message": "Adaugă câmp"
+   },
+   "Add_Form_Fill_profile": {
+      "message": "Adăugați la completarea profilului"
+   },
+   "Add_Identity": {
+      "message": "Adaugă identitate"
+   },
+   "Add_New_Site": {
+      "message": "Adaugă site nou"
+   },
+   "Add_Note": {
+      "message": "Adaugă notă"
+   },
+   "Add_Profile": {
+      "message": "Adaugă profil"
+   },
+   "Add_Secure_Note": {
+      "message": "Adaugă notă securizată"
+   },
+   "Add_Site": {
+      "message": "Adaugă site"
+   },
+   "Add_another_custom_field": {
+      "message": "Adaugă un alt câmp particularizat"
+   },
+   "Address": {
+      "message": "Adresă"
+   },
+   "Address_1": {
+      "message": "Adresa 1"
+   },
+   "Address_2": {
+      "message": "Adresa 2"
+   },
+   "Address_3": {
+      "message": "Adresa 3"
+   },
+   "Adelaide": {
+      "message": "Adelaide"
+   },
+   "Admin_Console": {
+      "message": "Consola de administrare"
+   },
+   "Admin_Tools": {
+      "message": "Unelte de administrare"
+   },
+   "Advanced": {
+      "message": "Avansat"
+   },
+   "Advanced_Options": {
+      "message": "Opţiuni avansate"
+   },
+   "Advanced_Tools": {
+      "message": "Instrumente avansate"
+   },
+   "Afghanistan": {
+      "message": "Afghanistan"
+   },
+   "Agent_Name": {
+      "message": "Numele agentului"
+   },
+   "Agent_Phone": {
+      "message": "Numărul de telefon al agentului"
+   },
+   "Aland_Islands": {
+      "message": "Insulele Aland"
+   },
+   "Alaska": {
+      "message": "Alaska"
+   },
+   "Albania": {
+      "message": "Albania"
+   },
+   "Alerts": {
+      "message": "Alerte"
+   },
+   "Algeria": {
+      "message": "Algeria"
+   },
+   "Alias": {
+      "message": "Alias"
+   },
+   "All": {
+      "message": "Toate"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "Permiteţi LastPass să caute datele nesigure din calculatorul dvs?"
+   },
+   "Almaty": {
+      "message": "Almaty"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below": {
+      "message": "Sau, introdu un cod in casuta de mai jos"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below_": {
+      "message": "Alternativ, introduceți o parolă în caseta de mai jos:"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "Intotdeauna alege Profilul si Cardul de credit"
+   },
+   "American_Samoa": {
+      "message": "Samoa Americană"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "Amman, Atena, Istanbul, Beirut, Cairo, Ierusalim"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "Amsterdam, Berlin, Roma, Viena, Praga, Bruxelles"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "O actualizare este disponibilă. Doriți să o instalați?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "O eroare a intervenit în timpul încărcării site-urilor dvs. Vă rugăm să vă autentificați din nou."
+   },
+   "An_error_occurred": {
+      "message": "A apărut o eroare"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "A avut loc o eroare in timpul importarii parolelor Dvs. Google Chrome."
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "A apărut o eroare în timp ce recriptam datele dvs."
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "A apărut o eroare în timpul încărcării datelor. Doriţi să încercaţi din nou?"
+   },
+   "Andorra": {
+      "message": "Andorra"
+   },
+   "Angola": {
+      "message": "Angola"
+   },
+   "Anguilla": {
+      "message": "Anguilla"
+   },
+   "Antarctica": {
+      "message": "Antarctica"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "Antigua și Barbuda"
+   },
+   "Appearance": {
+      "message": "Aspect"
+   },
+   "Application_": {
+      "message": "Aplicația:"
+   },
+   "Applications": {
+      "message": "Aplicaţii"
+   },
+   "April": {
+      "message": "Aprilie"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "Sunteți sigur că doriți să ștergeți aceasta?"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "Sunteţi sigur că doriţi să ştergeţi această identitate?"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "Sunteţi sigur că doriţi să ştergeţi acest site?"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "Sunteți sigur că doriți ca LastPass să țină minte parola dumneavoastră? Aceasta va diminua semnificativ securitatea contului dumneavoastră!"
+   },
+   "Are_you_sure_you_want_to_share_this_item___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "Sunteţi sigur că doriţi să partajaţi acest articol? Continuând veți pierde toate modificările pe care le-aţi făcut la acest articol!"
+   },
+   "Are_you_sure_you_want_to_view_history___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "Sunteţi sigur că doriţi să vizualizaţi istoricul? Acest lucru va determina pierderea oricaror modificări care le-aţi făcut acestui articol!"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "Sunteţi sigur că doriţi să ştergeţi?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "Sunteţi sigur că doriţi să ştergeţi elementele selectate?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "Sunteți sigur că doriți să ștergeți site-urile selectate?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "Sunteţi sigur că doriţi să ştergeţi această aplicaţie?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "Sunteți sigur că doriți să ștergeți acest câmp?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "Sunteți sigur că doriți să ștergeți acest profil de autocompletare a formularelor?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "Sunteți sigur că doriți să ștergeți această parolă generată?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_group_": {
+      "message": "Sunteți sigur că vreți să ștergeți acest dosar?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "Sunteți sigur că vreți să ștergeți acest URL?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "Sunteți sigur că doriți să ștergeți această notă securizată?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "Sunteți sigur că doriți să ștergeți acest site?"
+   },
+   "Are_you_sure_you_would_like_to_remove_this_attachment_": {
+      "message": "Sunteți sigur că doriți să eliminați acest atașament?"
+   },
+   "Argentina": {
+      "message": "Argentina"
+   },
+   "Arizona": {
+      "message": "Arizona"
+   },
+   "Armenia": {
+      "message": "Armenia"
+   },
+   "Arts": {
+      "message": "Arta"
+   },
+   "Aruba": {
+      "message": "Aruba"
+   },
+   "At_least_this_many_numbers_will_be_in_a_generated_password_": {
+      "message": "Cel puțin mai multe numere vor fi într-o parola generata."
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "Ora Atlanticului (Canada), Manaus, Santiago"
+   },
+   "Auckland__Wellington": {
+      "message": "Auckland, Wellington"
+   },
+   "August": {
+      "message": "August"
+   },
+   "Australia": {
+      "message": "Australia"
+   },
+   "Austria": {
+      "message": "Austria"
+   },
+   "Authenticate": {
+      "message": "Autentificare"
+   },
+   "Authentication": {
+      "message": "Autentificarea"
+   },
+   "Authentication_Failed_": {
+      "message": "Autentificarea a eşuat."
+   },
+   "AutoFill": {
+      "message": "Autocompletare"
+   },
+   "AutoLogin": {
+      "message": "Autentificare automată"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "Completați automat datele de autentificare"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "Deconectare automată după inactivitate (minute)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Log off automat atunci când toate browserele sunt închise şi Chrome a fost închis pentru (mins)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "Conectare automată la site-uri dacă timpul de la ultima conectare > (secunde)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "Evitaţi caracterele ambigue"
+   },
+   "Azerbaijan": {
+      "message": "Azerbaijan"
+   },
+   "Azores": {
+      "message": "Azore"
+   },
+   "Back": {
+      "message": "Înapoi"
+   },
+   "Baghdad": {
+      "message": "Bagdad"
+   },
+   "Bahamas": {
+      "message": "Bahamas"
+   },
+   "Bahrain": {
+      "message": "Bahrain"
+   },
+   "Baku__Yerevan": {
+      "message": "Baku, Erevan"
+   },
+   "Bangladesh": {
+      "message": "Bangladesh"
+   },
+   "Bank_Account": {
+      "message": "Cont bancar"
+   },
+   "Bank_Name": {
+      "message": "Numele băncii"
+   },
+   "Bank_accountformfill": {
+      "message": "Contul bancar"
+   },
+   "Bank_name": {
+      "message": "Numele băncii"
+   },
+   "Barbados": {
+      "message": "Barbados"
+   },
+   "Before_you_can_use_LastPass__you_must_first_connect_your_fingerprint_reader_and_enroll_one_or_more_fingers_": {
+      "message": "Înainte de a folosi LastPass, trebuie să conectați cititorul de amprente și să scanați unul sau mai multe degete."
+   },
+   "Belarus": {
+      "message": "Belarus"
+   },
+   "Belgium": {
+      "message": "Belgia"
+   },
+   "Belize": {
+      "message": "Belize"
+   },
+   "Benin": {
+      "message": "Benin"
+   },
+   "Bermuda": {
+      "message": "Bermuda"
+   },
+   "Bhutan": {
+      "message": "Bhutan"
+   },
+   "Binary_Component_": {
+      "message": "Componenta binara:"
+   },
+   "Birthday": {
+      "message": "Data nașterii"
+   },
+   "Bit_Strength": {
+      "message": "Complexitate"
+   },
+   "Blacklist": {
+      "message": "Contul dvs. a fost suspendat temporar (pentru 5 minute), din cauza prea multor încercări de logare eşuate."
+   },
+   "Blog": {
+      "message": "Blog"
+   },
+   "Bolivia": {
+      "message": "Bolivia"
+   },
+   "Bookmarklets": {
+      "message": "Bookmarklets"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "Bosnia şi Herţegovina"
+   },
+   "Botswana": {
+      "message": "Botswana"
+   },
+   "Bouvet_Island": {
+      "message": "Insula Bouvet"
+   },
+   "Branch_Address": {
+      "message": "Adresă sucursală"
+   },
+   "Branch_Phone": {
+      "message": "Telefon sucursală"
+   },
+   "Brazil": {
+      "message": "Brazilia"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "Teritoriul Britanic din Oceanul Indian"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "Navigați pe internet în mod normal și LastPass va memora automat parolele imediat ce le introduceți."
+   },
+   "Brunei_Darussalam": {
+      "message": "Brunei Darussalam"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "Buenos Aires, Georgetown"
+   },
+   "Built_": {
+      "message": "Construit:"
+   },
+   "Bulgaria": {
+      "message": "Bulgaria"
+   },
+   "Burkina_Faso": {
+      "message": "Burkina Faso"
+   },
+   "Burundi": {
+      "message": "Burundi"
+   },
+   "Business": {
+      "message": "Afaceri"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "Dar eu sunt o persoana uitucă... ce ar trebui să fac daca îmi uit parola?"
+   },
+   "CSV_Files": {
+      "message": "Fișiere(le) CSV"
+   },
+   "Cambodia": {
+      "message": "Cambodia"
+   },
+   "Cameroon": {
+      "message": "Camerun"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "Nu poate fi găsită fereastra ascunsă LastPass"
+   },
+   "Canada": {
+      "message": "Canada"
+   },
+   "Canary_Islands": {
+      "message": "Insulele Canare"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "Canberra, Melbourne, Sydney, Hobart"
+   },
+   "Cancel": {
+      "message": "Anulare"
+   },
+   "Cape_Verde": {
+      "message": "Capul Verde"
+   },
+   "Cape_Verde_Is_": {
+      "message": "Insula Capul Verde"
+   },
+   "Caracas": {
+      "message": "Caracas"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "Casablanca, Monrovia, Reykjavik"
+   },
+   "Catalan": {
+      "message": "Catalană"
+   },
+   "Cayman_Islands": {
+      "message": "Insulele Cayman"
+   },
+   "Central_African_Republic": {
+      "message": "Republica Centrafricană"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "America Centrală, Saskatchewan"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "Ora centrală (Statele Unite și Canada), Guadalajara, Mexico City"
+   },
+   "Chad": {
+      "message": "Ciad"
+   },
+   "Change": {
+      "message": "Schimbă"
+   },
+   "Change_Group_Name": {
+      "message": "Schimbă numele dosarului"
+   },
+   "Change_Password": {
+      "message": "Schimbă parola"
+   },
+   "Change_Password_Now": {
+      "message": "Schimba parola acum"
+   },
+   "Check_For_Updates": {
+      "message": "Verifică update-uri"
+   },
+   "Check_this_box_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Marcati aceasta casuta pentru a ajusta modul cum este generata parola."
+   },
+   "Checkbox": {
+      "message": "Caseta de selectare"
+   },
+   "Checking_For_Updates___": {
+      "message": "Se verifică actualizările ..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "Chennai, Kolkata, Mumbai, New Delhi, Sri Jayawardenepura"
+   },
+   "Chile": {
+      "message": "Chile"
+   },
+   "China": {
+      "message": "China"
+   },
+   "Chinese__Simplified_": {
+      "message": "Chineză (Simplificată)"
+   },
+   "Chinese__Traditional_": {
+      "message": "Chineză (Tradițională)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "Alege profil și card de credit"
+   },
+   "Choose_a_source_above_": {
+      "message": "Alege o sursă de mai sus."
+   },
+   "Christmas_Island": {
+      "message": "Insula Christmas"
+   },
+   "Chrome": {
+      "message": "Chrome"
+   },
+   "City___Town": {
+      "message": "Oraş"
+   },
+   "Clear": {
+      "message": "Şterge tot"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "Curăță clipboard-ul după utilizare (secunde)"
+   },
+   "Clear_Forms": {
+      "message": "Șterge formularele"
+   },
+   "Clear_Local_Cache": {
+      "message": "Curăță memoria cache locală"
+   },
+   "Clear_Recent": {
+      "message": "Golește recente"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "Goliţi câmpurile completate la deconectare"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "Faceti click pe Continuă pentru a începe să utilizați LastPass."
+   },
+   "Click_Icons_in_Fields": {
+      "message": "Daţi click pe Iconiţe în Fields"
+   },
+   "Click_here_to_initiate_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "Click aici pentru a iniția autentificarea multifactor pe telefonul sau dispozitivul mobil."
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "Click aici pentru a deschide fereastra cu setările contului"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "Click aici pentru a deschide fereastra de feedback"
+   },
+   "Click_here_to_view_the_LastPass_User_Manual": {
+      "message": "Click aici pentru a vizualiza Manualul de utilizare LastPass"
+   },
+   "Click_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Faceți click pentru a ajusta modul în care este generată parola."
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "Faceți click pentru a ascunde opțiunile avansate."
+   },
+   "Clipperz": {
+      "message": "Clipperz"
+   },
+   "Close": {
+      "message": "Închide"
+   },
+   "Close_this_window": {
+      "message": "Închide această fereastră"
+   },
+   "Co_pay": {
+      "message": "Co-plata"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "Insulele Cocos (Keeling)"
+   },
+   "Collapse_All": {
+      "message": "Restrânge toate"
+   },
+   "Colombia": {
+      "message": "Columbia"
+   },
+   "Comoros": {
+      "message": "Comore"
+   },
+   "Company": {
+      "message": "Companie"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "Politica firmei interzice această operaţiune."
+   },
+   "Company_Phone": {
+      "message": "Telefonul companiei"
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "Politica companiei nu permite schimbarea unor setări, așadar nu toate schimbările au fost salvate."
+   },
+   "Configure_Form_Fill": {
+      "message": "Configurați completarea formularelor"
+   },
+   "Confirm": {
+      "message": "Confirmă"
+   },
+   "Confirm_Master_Password": {
+      "message": "Confirmați parola de administrator"
+   },
+   "Confirm_Password": {
+      "message": "Confirmă parola"
+   },
+   "Congo": {
+      "message": "Congo"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "Republica Democrată Congo"
+   },
+   "Congratulations": {
+      "message": "Felicitări"
+   },
+   "Congratulations_": {
+      "message": "Felicitări!"
+   },
+   "Connection_Mode": {
+      "message": "Modul de conectare"
+   },
+   "Connection_Type": {
+      "message": "Tipul conexiunii"
+   },
+   "Contact": {
+      "message": "Contact"
+   },
+   "Continue": {
+      "message": "Continuă"
+   },
+   "Control_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "Caractere de control găsite în numele fișierului selectat, nu se va procesa"
+   },
+   "Cook_Islands": {
+      "message": "Insulele Cook"
+   },
+   "Copy": {
+      "message": "Copiază"
+   },
+   "Copy_Note": {
+      "message": "Copie nota"
+   },
+   "Copy_Password": {
+      "message": "Copiază parola"
+   },
+   "Copy_URL": {
+      "message": "Copie URL"
+   },
+   "Copy_Username": {
+      "message": "Copiază nume utilizator"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "Copyright 2008 LastPass. Toate drepturile rezervate.\nPortiuni ale acestui software au fost licentiate de la terti asa cum este descris la:"
+   },
+   "Costa_Rica": {
+      "message": "Costa Rica"
+   },
+   "Cote_D_ivoire": {
+      "message": "Coasta de Fildeş"
+   },
+   "Country": {
+      "message": "Țara"
+   },
+   "County": {
+      "message": "Județ"
+   },
+   "Create_Account": {
+      "message": "Creează cont"
+   },
+   "Create_Group": {
+      "message": "Creează dosar"
+   },
+   "Create_New_Profile": {
+      "message": "Creeaza un nou profil"
+   },
+   "Create_Sub_Group": {
+      "message": "Creează sub-dosar"
+   },
+   "Create_an_Account": {
+      "message": "Creează un cont nou"
+   },
+   "Creating_Account___": {
+      "message": "Creare cont..."
+   },
+   "Credit_Card": {
+      "message": "Card de credit"
+   },
+   "Credit_Card_": {
+      "message": "Card de credit:"
+   },
+   "Credit_Card_Number": {
+      "message": "Numarul cardului de credit"
+   },
+   "Credit_Monitoring": {
+      "message": "Monitorizarea creditului"
+   },
+   "Credit_card_number": {
+      "message": "Numărul de card de credit"
+   },
+   "Credit_cardformfill": {
+      "message": "Card de credit"
+   },
+   "Croatia": {
+      "message": "Croaţia"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "Cuba"
+   },
+   "Custom_Value": {
+      "message": "Valoare personalizata"
+   },
+   "Custom_field__": {
+      "message": "Câmp personalizat #"
+   },
+   "Custom_fields": {
+      "message": "Câmpuri personalizate"
+   },
+   "Cyprus": {
+      "message": "Cipru"
+   },
+   "Czech_Republic": {
+      "message": "Republica Cehă"
+   },
+   "Danish": {
+      "message": "Daneză"
+   },
+   "Darn__Passwords_": {
+      "message": "Darn! Passwords!"
+   },
+   "Darwin": {
+      "message": "Darwin"
+   },
+   "Dashlane": {
+      "message": "Dashlane"
+   },
+   "Database": {
+      "message": "Baza de date"
+   },
+   "Date": {
+      "message": "Dată"
+   },
+   "Date__EST_": {
+      "message": "Data (EST)"
+   },
+   "Date_of_Birth": {
+      "message": "Data nașterii"
+   },
+   "December": {
+      "message": "Decembrie"
+   },
+   "Declined_Offers": {
+      "message": "Oferte refuzate"
+   },
+   "Default": {
+      "message": "Implicit"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "Profilul de autocompletare predefinit"
+   },
+   "Delete": {
+      "message": "Şterge"
+   },
+   "Delete_Cache": {
+      "message": "Ştergeţi Cache-ul"
+   },
+   "Delete_Formfill_Profile": {
+      "message": "Ștergeți profilul de completare"
+   },
+   "Delete_Group": {
+      "message": "Șterge dosarul"
+   },
+   "Delete_Identity_": {
+      "message": "Ștergeți identitatea?"
+   },
+   "Delete_Selected": {
+      "message": "Șterge selecția"
+   },
+   "Delete_Site": {
+      "message": "Șterge site-ul"
+   },
+   "Delete_Site_": {
+      "message": "Şterge site?"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "Ştergeţi acest profil de completare formular"
+   },
+   "Deleted": {
+      "message": "Sters"
+   },
+   "Denmark": {
+      "message": "Danemarca"
+   },
+   "Deny_Access": {
+      "message": "Interzice accesul"
+   },
+   "Description": {
+      "message": "Descriere"
+   },
+   "Disable": {
+      "message": "Dezactivați"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "Dezactivează managerul nesecurizat de parole al Chrome"
+   },
+   "Disable_LastPass": {
+      "message": "Dezactivează LastPass"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "Dezactivați LastPass pentru această pagină sau pentru tot site-ul?"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "Dezactivează autentificarea multifactor"
+   },
+   "Disable_Page": {
+      "message": "Dezactivați pagina"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "Dezactivați autentificarea cu un singur factor de protecție"
+   },
+   "Disable_Site": {
+      "message": "Dezactivați site-ului"
+   },
+   "Disable_alert___": {
+      "message": "Dezactivați alerta..."
+   },
+   "Disable_alert_for_this_site": {
+      "message": "Dezactivează alertele pentru acest site"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "Dezactivati toate alertele pentru parole slabe și site-uri dublate"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "Renunţare la modificări şi închide această fereastră"
+   },
+   "Dismiss": {
+      "message": "Revocare"
+   },
+   "Djibouti": {
+      "message": "Djibouti"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "Nu suprascrie câmpuri care sunt deja completate"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "Nu mă mai întreba să"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "Nu ma mai intreba "
+   },
+   "Do_you_like_LastPass_": {
+      "message": "Vă place LastPass?"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "Sigur doriţi să renunţaţi? Nu puteţi utiliza LastPass fără a crea un cont."
+   },
+   "Dominica": {
+      "message": "Dominica"
+   },
+   "Dominican_Republic": {
+      "message": "Republica Dominicană"
+   },
+   "Down": {
+      "message": "Jos"
+   },
+   "Dr": {
+      "message": "Dr."
+   },
+   "Driver_s_License": {
+      "message": "Permis de conducere"
+   },
+   "Duplicate_Password": {
+      "message": "Parola duplicata"
+   },
+   "Duplicate_password": {
+      "message": "Duplicaţi parola"
+   },
+   "Dutch": {
+      "message": "Olandeză"
+   },
+   "ERROR__Moving_sites_between_shared_folders_is_currently_not_supported_": {
+      "message": "EROARE: Mutarea siturilor între dosarele partajate nu este susţinută în prezent."
+   },
+   "ERROR__You_are_not_allowed_to_move_sites_out_of_shared_folders__Delete_is_the_only_supported_operation_": {
+      "message": "EROARE: Nu vă este permis să mutați situri în afara dosarelor partajate. Ștergerea este unica operațiune suportată."
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "Ora de est (Statele Unite și Canada)"
+   },
+   "Ecuador": {
+      "message": "Ecuador"
+   },
+   "Edit": {
+      "message": "Editare"
+   },
+   "Edit_Application": {
+      "message": "Editează aplicația"
+   },
+   "Edit_Application_Fields": {
+      "message": "Editare Câmpuri Aplicație"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "Editare profil card de credit"
+   },
+   "Edit_Form_Fields": {
+      "message": "Editați câmpurile formularului"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "Editare profil de autocompletare a formularelor"
+   },
+   "Edit_Secure_Note": {
+      "message": "Editare notă securizată"
+   },
+   "Edit_Secure_Notes": {
+      "message": "Editare notă sigură"
+   },
+   "Edit_Site": {
+      "message": "Editare site"
+   },
+   "Edit_Site_Fields": {
+      "message": "Editați câmpurile site-ului"
+   },
+   "Education": {
+      "message": "Educatie"
+   },
+   "Egypt": {
+      "message": "Egipt"
+   },
+   "El_Salvador": {
+      "message": "El Salvador"
+   },
+   "Email": {
+      "message": "E-mail"
+   },
+   "Email_": {
+      "message": "Email:"
+   },
+   "Email_Account": {
+      "message": "Contul de email"
+   },
+   "Email_Address": {
+      "message": "Adresă e-mail"
+   },
+   "Email_Address_": {
+      "message": "Adresa de email:"
+   },
+   "Email_address": {
+      "message": "Adresa de email"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "E-mail folosit deja, v-aţi uitat parola?"
+   },
+   "Emergency_Access": {
+      "message": "Acces de urgenta"
+   },
+   "Emergency_Access_Request": {
+      "message": "Cerere de acces de urgenta"
+   },
+   "Enable": {
+      "message": "Activare"
+   },
+   "Enable_Credit_Monitoring": {
+      "message": "Activează monitorizarea creditului"
+   },
+   "Enable_Free_Credit_Monitoring": {
+      "message": "Activează monitorizarea gratuita a creditului"
+   },
+   "Enable_new_login_screen": {
+      "message": "Activați noul ecran de conectare"
+   },
+   "Enabled": {
+      "message": "Activat"
+   },
+   "Encryption": {
+      "message": "Criptarea"
+   },
+   "End": {
+      "message": "Sfârşit"
+   },
+   "English": {
+      "message": "Engleză"
+   },
+   "English__United_Kingdom_": {
+      "message": "Engleză (Regatul Unit)"
+   },
+   "Enter_PIN": {
+      "message": "Introduce PIN-ul"
+   },
+   "Enter_a_passcode_in_the_box_below_": {
+      "message": "Introduceți o parolă în caseta de mai jos:"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "Introduce note arbitrare"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "Introduceţi PIN-ul:"
+   },
+   "Enterprise": {
+      "message": "Întreprindere"
+   },
+   "Entertainment": {
+      "message": "Divertisment"
+   },
+   "Equatorial_Guinea": {
+      "message": "Guineea Ecuatorială"
+   },
+   "Eritrea": {
+      "message": "Eritreea"
+   },
+   "Error": {
+      "message": "Eroare"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "O eroare a intervenit în timp ce recuperam site-urile dvs LastPass. Vă rugăm încercați să vă autentificați din nou pentru a vă recupera site-urile."
+   },
+   "ErrorLoginMsg": {
+      "message": "O eroare a intervenit în timpul autentificării la LastPass. Vă rugăm verificați conexiunea la internet."
+   },
+   "ErrorSendingMsg": {
+      "message": "O eroare a intervenit în timpul conectării la server. Vă rugăm verificați conexiunea la internet."
+   },
+   "ErrorSessionMsg": {
+      "message": "Sesiunea dvs. LastPass pare să fi expirat. Vă rugăm să vă re-logaţi."
+   },
+   "Error__This_folder_has_already_been_moved_": {
+      "message": "Eroare: Acest dosar a fost deja mutat?"
+   },
+   "Error_opening_attachment_": {
+      "message": "Eroare de deschidere a ataşamentului."
+   },
+   "Estonia": {
+      "message": "Estonia"
+   },
+   "Ethiopia": {
+      "message": "Etiopia"
+   },
+   "Evening_Number": {
+      "message": "Numărul de seară"
+   },
+   "Evening_number": {
+      "message": "Număr de seara"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "LastPass poate stoca acum o parolă de unică folosinţă la nivel local, care poate fi utilizată pentru a recupera contul dvs. dacă uitaţi parola de administrator. Această parolă de unică folosinţă va rămâne dezactivată până când este activată pe server.\n\nDoriţi să activaţi recuperarea contului?"
+   },
+   "Expand_All": {
+      "message": "Extinde tot"
+   },
+   "Expiration": {
+      "message": "Expirare"
+   },
+   "Expiration_Date": {
+      "message": "Data de expirare"
+   },
+   "Expiration_date": {
+      "message": "Dată de expirare"
+   },
+   "Export": {
+      "message": "Export"
+   },
+   "Export_To": {
+      "message": "Exportă către"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "Exportă fișier CSV LastPass"
+   },
+   "FIPS_Mode": {
+      "message": "Modul FIPS"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "Insulele Falkland (Malvine)"
+   },
+   "Faroe_Islands": {
+      "message": "Insulele Feroe"
+   },
+   "Favorite": {
+      "message": "Favorite"
+   },
+   "Favoritesproper": {
+      "message": "Favorite"
+   },
+   "Fax_Number": {
+      "message": "Număr de fax"
+   },
+   "Fax_number": {
+      "message": "Număr de fax"
+   },
+   "Features": {
+      "message": "Caracteristici"
+   },
+   "February": {
+      "message": "Februarie"
+   },
+   "Feedback": {
+      "message": "Feedback"
+   },
+   "Female": {
+      "message": "Femeie"
+   },
+   "Field_Name_": {
+      "message": "Numele campului:"
+   },
+   "Field_Type_": {
+      "message": "Tipul campului:"
+   },
+   "Field_Value_": {
+      "message": "Valoarea campului:"
+   },
+   "Fields_": {
+      "message": "Câmpuri:"
+   },
+   "Fiji": {
+      "message": "Fiji"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "Fiji, Kamchatka, Insulele Marshall"
+   },
+   "File": {
+      "message": "Fişier"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "Fișierul este prea mare, acesta trebuie să fie mai mic de 10MB."
+   },
+   "File_too_large__it_must_be_less_than_5MB_": {
+      "message": "Fişier prea mare, trebuie să fie mai mic de 5MB."
+   },
+   "Files": {
+      "message": "Fișiere"
+   },
+   "Fill": {
+      "message": "Completează"
+   },
+   "Fill_Current": {
+      "message": "Completează formularul curent"
+   },
+   "Fill_Every_Form": {
+      "message": "Completeaza fiecare formular"
+   },
+   "Fill_Form": {
+      "message": "Completează formular"
+   },
+   "Fill_Forms": {
+      "message": "Completează formulare"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "Completați formularul cu datele profilului predefinit de autocompletare"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "Completeaza autentificarea urmatoare (pentru valori multiple)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "Completeaza autentificarea anterioara(pentru valori multiple)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "Completează sau editează datele de autocompletare a formularelor"
+   },
+   "Fill_with": {
+      "message": "Completează cu"
+   },
+   "FillableFormDetected": {
+      "message": "Un formular care poate fi completat a fost detectat pe această pagină."
+   },
+   "Filter": {
+      "message": "Filtrare"
+   },
+   "Finance": {
+      "message": "Finante"
+   },
+   "Find_a_site": {
+      "message": "Găseşte un site"
+   },
+   "Finland": {
+      "message": "Finlanda"
+   },
+   "Finnish": {
+      "message": "Finlandeză"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "Administratorul de parole Firefox"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "Primele 3 cifre ale numărului dvs. de telefon"
+   },
+   "First_Name": {
+      "message": "Nume"
+   },
+   "First_name": {
+      "message": "Prenume"
+   },
+   "Folder_Name__": {
+      "message": "Numele dosarului:"
+   },
+   "Folder_must_be_downloaded_in_order_to_edit_a_member_s_access__Would_you_like_to_download_now_": {
+      "message": "Dosarul trebuie sa fie descarcat pentru a putea edita accesul membrilor. Doresti sa il descarci acum?"
+   },
+   "Folder_name_cannot_contain_backslashes_": {
+      "message": "Numele dosarului nu poate contine caracterul backslash ( \\ )."
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "Pentru fiecare coordonată afişată mai jos, găsiţi valoarea pe grila dvs. şi introduceţi-o."
+   },
+   "Forgot_Password_": {
+      "message": "Aţi uitat parola?"
+   },
+   "Forgot_your_password_": {
+      "message": "Ai uitat parola?"
+   },
+   "FormFill": {
+      "message": "Completarea formularelor"
+   },
+   "FormFill_Profiles": {
+      "message": "Profil de completare a formularelor"
+   },
+   "Form_Fill": {
+      "message": "Autocompletare"
+   },
+   "Form_Fill_Profile": {
+      "message": "Profilul pentru completare formulare"
+   },
+   "Form_Fill_Profiles": {
+      "message": "Profiluri de completare a formularelor"
+   },
+   "Form_Fills": {
+      "message": "Completează din"
+   },
+   "Form_Name_": {
+      "message": "Denumire formular:"
+   },
+   "Format": {
+      "message": "Format"
+   },
+   "Forums": {
+      "message": "Forumuri"
+   },
+   "France": {
+      "message": "Franţa"
+   },
+   "French": {
+      "message": "Franceză"
+   },
+   "French_Guiana": {
+      "message": "Guyana franceză"
+   },
+   "French_Polynesia": {
+      "message": "Polinezia franceză"
+   },
+   "French_Southern_Territories": {
+      "message": "Teritoriile Sudice Franceze"
+   },
+   "French__Canada_": {
+      "message": "Franceză (Canada)"
+   },
+   "Full_path_of_file_to_import_": {
+      "message": "Calea completă către fișierul de importat:"
+   },
+   "Full_path_of_the_file_to_import_": {
+      "message": "Calea completă către fișierul de importat:"
+   },
+   "GET_FREE_PREMIUM": {
+      "message": "Obțineți Premium GRATUIT"
+   },
+   "GMT_5": {
+      "message": "GMT+5"
+   },
+   "GMT_7": {
+      "message": "GMT+7"
+   },
+   "GMT_9": {
+      "message": "GMT+9"
+   },
+   "GMT_Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT Dublin, Edinburgh, Lisabona, Londra"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT: Dublin, Edinburgh, Lisabona, Londra"
+   },
+   "Gabon": {
+      "message": "Gabon"
+   },
+   "Gambia": {
+      "message": "Gambia"
+   },
+   "Games": {
+      "message": "Jocuri"
+   },
+   "Gender": {
+      "message": "Sex"
+   },
+   "General": {
+      "message": "General"
+   },
+   "Generate": {
+      "message": "Generează"
+   },
+   "GeneratePassword": {
+      "message": "Dacă creați un cont sau vă schimbați parola, dați click pe Generare pentru a crea o parolă unică și sigură cu LastPass."
+   },
+   "Generate_Password": {
+      "message": "Generează parolă"
+   },
+   "Generate_Secure_Password": {
+      "message": "Generează parolă sigură"
+   },
+   "Generate_Sharing_Keys": {
+      "message": "Genereaza chei de partajare"
+   },
+   "Generated_Password_for": {
+      "message": "Generează parolă pentru"
+   },
+   "Generic": {
+      "message": "Generic"
+   },
+   "Generic_CSV_File": {
+      "message": "Fișier CSV generic"
+   },
+   "Georgia": {
+      "message": "Georgia"
+   },
+   "German": {
+      "message": "Germană"
+   },
+   "Germany": {
+      "message": "Germania"
+   },
+   "Ghana": {
+      "message": "Ghana"
+   },
+   "Gibraltar": {
+      "message": "Gibraltar"
+   },
+   "Gift_LastPass": {
+      "message": "Daruieste LastPass"
+   },
+   "Go_Back": {
+      "message": "Înapoi"
+   },
+   "Go_Premium_": {
+      "message": "Alege Premium!"
+   },
+   "Go_to_URL": {
+      "message": "Salt la URL"
+   },
+   "Google_Authenticator": {
+      "message": "Autentificator Google"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "Google Authenticator autentificare multifactor"
+   },
+   "Google_Chrome": {
+      "message": "Google Chrome"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "Managerul de Parole Google Chrome"
+   },
+   "Google_Chrome_requires_that_extensions_use_the_same_language_as_the_browser__so_in_order_to_switch_LastPass_s_language__please_change_the_main_browser_language_under_Chrome_s_Options_": {
+      "message": "Google Chrome necesită ca extensiile să folosească aceeaşi limbă ca browser-ul, deci pentru a comuta limba LastPass, vă rugăm să schimbaţi limba principală a browserului Chrome sub meniul Opţiuni."
+   },
+   "Greece": {
+      "message": "Grecia"
+   },
+   "Greenland": {
+      "message": "Groenlanda"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "Groenlanda, Brasilia, Montevideo"
+   },
+   "Grenada": {
+      "message": "Grenada"
+   },
+   "Group_": {
+      "message": "Dosar:"
+   },
+   "Group_ID": {
+      "message": "Identitate grup"
+   },
+   "Group_Name": {
+      "message": "Nume dosar"
+   },
+   "Guadeloupe": {
+      "message": "Guadelupa"
+   },
+   "Guam": {
+      "message": "Guam"
+   },
+   "Guatemala": {
+      "message": "Guatemala"
+   },
+   "Guernsey": {
+      "message": "Guernsey"
+   },
+   "Guinea": {
+      "message": "Guineea"
+   },
+   "Guinea_Bissau": {
+      "message": "Guineea-Bissau"
+   },
+   "Guyana": {
+      "message": "Guyana"
+   },
+   "HP_Password_Safe": {
+      "message": "HP Password Safe"
+   },
+   "Haiti": {
+      "message": "Haiti"
+   },
+   "Harare__Pretoria": {
+      "message": "Harare, Pretoria"
+   },
+   "Hawaii": {
+      "message": "Hawaii"
+   },
+   "Health": {
+      "message": "Sanatate"
+   },
+   "Health_Insurance": {
+      "message": "Asigurare de sănătate"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "Insula Heard şi Insulele McDonald"
+   },
+   "Height": {
+      "message": "Înălțime"
+   },
+   "Help": {
+      "message": "Ajutor"
+   },
+   "Help_Center": {
+      "message": "Centrul de Ajutor"
+   },
+   "Help_Translate": {
+      "message": "Ajutați traducerea"
+   },
+   "Help___": {
+      "message": "Ajutor ..."
+   },
+   "Help_spread_the_word": {
+      "message": "Ajutați spunând altora"
+   },
+   "Hide": {
+      "message": "Ascunde"
+   },
+   "Hide_Advanced_Options": {
+      "message": "Ascundeți opțiunile avansate"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "Ascunde opțiunile pentru meniul de context"
+   },
+   "Hide_Password": {
+      "message": "Ascunde Parola"
+   },
+   "Hide_Passwords": {
+      "message": "Ascunde parole"
+   },
+   "Highlight_input_boxes": {
+      "message": "Evidenţiază casetele de intrare"
+   },
+   "History": {
+      "message": "Istoric"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "Sfântul Scaun (Cetatea Vaticanului)"
+   },
+   "Home": {
+      "message": "Acasă"
+   },
+   "Honduras": {
+      "message": "Honduras"
+   },
+   "Hong_Kong": {
+      "message": "Hong Kong"
+   },
+   "Hostname": {
+      "message": "Nume HOST"
+   },
+   "HotKeys": {
+      "message": "Taste rapide"
+   },
+   "Hungarian": {
+      "message": "Maghiară"
+   },
+   "Hungary": {
+      "message": "Ungaria"
+   },
+   "IBAN_Number": {
+      "message": "Cod IBAN"
+   },
+   "IMPORT_": {
+      "message": "IMPORT?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "Este esenţial să nu uitaţi niciodată noua dumneavoastră parolă LastPass."
+   },
+   "I_Forgot_my_Password": {
+      "message": "Am uitat parola"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "Mi-am uitat parola, Ajutor"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "Am citit şi sunt de acord cu"
+   },
+   "I_have_read_and_agree_with_the__0terms_of_service_0_and__1privacy_statement_1": {
+      "message": "Am citit şi sunt de acord cu %0condiţii de utilizare a serviciului%0 şi %1declaraţie de confidenţialitate%1"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "Înţeleg că datele mele criptate vor fi trimise la LastPass"
+   },
+   "I_ve_forgotten_my_password_": {
+      "message": "Mi-am uitat parola."
+   },
+   "Iceland": {
+      "message": "Islanda"
+   },
+   "Icons": {
+      "message": "Pictograme"
+   },
+   "Identities": {
+      "message": "Identități"
+   },
+   "Identity": {
+      "message": "Identitate"
+   },
+   "If_checked__your_credit_report_will_be_regularly_monitored_and_you_will_be_alerted_if_any_suspicious_activity_occurs_": {
+      "message": "Dacă este bifat, raportul dvs. de credit va fi monitorizat periodic și veți fi alertat în cazul în care apare orice activitate suspectă."
+   },
+   "If_not_specified__will_use_a_file_extension_of_": {
+      "message": "Dacă nu e specificat, foloseste extensia:"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "Dacă aveţi deja un cont LastPass puteţi să închideţi această fereastră şi să vă logaţi."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "Daca sfârşiţi prin a uita parola dumneavoastră de administrator LastPass,"
+   },
+   "If_you_forgot_your_answer__click_here_to_reset_your_security_question": {
+      "message": "Dacă ați uitat răspunsul dvs., faceți clic aici pentru a reseta întrebarea dvs. de securitate"
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "Daca ti-ai pierdut device-ul Google Authenticator apasa aici pentru a dezactiva autentificarea bazata pe Google Authenticator"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "Dacă aţi pierdut dispozitivul Sesame, faceţi clic aici pentru a dezactiva autentificarea Sesame"
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "Dacă aţi pierdut dispozitivul dumneavoastră YubiKey, faceţi clic aici pentru a dezactiva autentificarea YubiKey"
+   },
+   "If_you_lost_your_device__click_here_to_disable_multifactor_authentication": {
+      "message": "Dacă ați pierdut dispozitivul dvs., faceți clic aici pentru a dezactiva autentificarea multifactor"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "Dacă aţi pierdut grila dumneavoastră, faceţi clic aici pentru a dezactiva autentificarea grilă"
+   },
+   "Import": {
+      "message": "Importă"
+   },
+   "Import_From": {
+      "message": "Importă de la"
+   },
+   "Import_Your_Data": {
+      "message": "Importați datele dvs"
+   },
+   "Importing_your_data_to_your_LastPass_vault_will_secure_it_and_protect_you_against_identity_theft__All_imported_data_remains_COMPLETELY_confidential__the_only_person_who_can_view_YOUR_data_is_YOU_": {
+      "message": "Importarea datelor în seiful LastPass le va securiza și vă vor proteja de furtul de identitate. Toate datele importate rămân TOTAL confidențiale: sunteți singura persoană care poate vedea datele DUMNEAVOASTRĂ."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_enable_access_for_assistive_devices_": {
+      "message": "Pentru a umple LastPass  dialogurile de autentificare de bază, trebuie sa activati  accesul pentru dispozitive de asistenţă."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_install_the_binary_version_of_LastPass_for_Chrome_": {
+      "message": "Pentru a umple LastPass  dialogurile de autentificare de bază, trebuie să instalaţi versiunea binară a LastPass pentru Chrome."
+   },
+   "India": {
+      "message": "India"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "Indiana, Bogota, Lima, Quito, Rio Branco"
+   },
+   "Indonesia": {
+      "message": "Indonezia"
+   },
+   "Install": {
+      "message": "Instalează"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "Instalează versiunea binară a LastPass pentru Chrome, pentru a permite ieșirea automată când calculatorul este inactiv"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_importing_passwords_from_Google_Chrome_password_manager": {
+      "message": "Instalează versiunea binară a LastPass pentru Chrome pentru a permite importul de parole de la managerul de parole Google Chrome"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "Instalează versiunea binară a LastPass pentru Chrome, pentru a permite partajarea  autentificării între alte browsere"
+   },
+   "Instant_Messenger": {
+      "message": "Mesagerie instant"
+   },
+   "Instructions": {
+      "message": "Instrucțiuni"
+   },
+   "Insurance": {
+      "message": "Asigurare"
+   },
+   "International_Date_Line_West": {
+      "message": "International Date Line West"
+   },
+   "Invalid_Password_": {
+      "message": "Parolă incorectă."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "Adresa de email invalidă, încercaţi din nou"
+   },
+   "Invalid_file_type__it_must_be_an_image_that_can_be_displayed_by_your_browser_": {
+      "message": "Tip de fișier invalid, acesta trebuie să fie o imagine care poate fi afișată de către browser-ul dumneavoastră."
+   },
+   "Invitation_sent_": {
+      "message": "Invitatie trimisa"
+   },
+   "Invite": {
+      "message": "Invita"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "Iran (Republica Islamică)"
+   },
+   "Iraq": {
+      "message": "Irak"
+   },
+   "Ireland": {
+      "message": "Irlanda"
+   },
+   "Isle_of_Man": {
+      "message": "Insula Man"
+   },
+   "Israel": {
+      "message": "Israel"
+   },
+   "Issue_Number": {
+      "message": "Numărul problemei"
+   },
+   "Issue_number": {
+      "message": "Problema numărul"
+   },
+   "Issued_Date": {
+      "message": "Data emiterii"
+   },
+   "Issuing_Authority": {
+      "message": "Autoritatea emitentă"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "Este recomandat să ştergeţi fişierul ataşat după ce-l utilizaţi."
+   },
+   "Italian": {
+      "message": "Italiană"
+   },
+   "Italy": {
+      "message": "Italia"
+   },
+   "IterationsReduction": {
+      "message": "Numărul de iterații necesare pentru generarea parolei principale LastPass pare să fie redusă față de versiunea înregistrata. Doriți să continuați cu autentificarea?"
+   },
+   "Jamaica": {
+      "message": "Jamaica"
+   },
+   "January": {
+      "message": "Ianuarie"
+   },
+   "Japan": {
+      "message": "Japonia"
+   },
+   "Japanese": {
+      "message": "Japoneză"
+   },
+   "Jersey": {
+      "message": "Jersey"
+   },
+   "Jordan": {
+      "message": "Iordania"
+   },
+   "July": {
+      "message": "Iulie"
+   },
+   "June": {
+      "message": "Iunie"
+   },
+   "Kabul": {
+      "message": "Kabul"
+   },
+   "Kathmandu": {
+      "message": "Kathmandu"
+   },
+   "Kazakhstan": {
+      "message": "Kazahstan"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "Păstrează o istorie a conectărilor mele şi a formularelor completate"
+   },
+   "Kenya": {
+      "message": "Kenia"
+   },
+   "Key_Index": {
+      "message": "Indicele cheie"
+   },
+   "Key_Type": {
+      "message": "Tipul cheii"
+   },
+   "Kiribati": {
+      "message": "Kiribati"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "Coreea, Republica Populară Democrată"
+   },
+   "Korea__Republic_Of": {
+      "message": "Republica Coreea"
+   },
+   "Korean": {
+      "message": "Coreeană"
+   },
+   "Kuwait": {
+      "message": "Kuweit"
+   },
+   "Kyrgyzstan": {
+      "message": "Kârgâzstan"
+   },
+   "La_Paz": {
+      "message": "La Paz"
+   },
+   "Language": {
+      "message": "Limbă"
+   },
+   "Language_": {
+      "message": "Limba:"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "Republica Populară Democrată Laos"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "Fișier CSV LastPass"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "Bară de instrumente LastPass pentru Chrome"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "Fișier criptat LastPass"
+   },
+   "LastPass_Enterprise": {
+      "message": "LastPass Enterprise"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "Autentificare LastPass Grid Multifactor"
+   },
+   "LastPass_Menu": {
+      "message": "Meniul LastPass"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": "LastPass poate completa automat formularele paginilor web cu un singur click. Utilizarea 'Autocompletarii Formularelor' va va salva timpul si va spori securitatea in timpul cumparaturilor online."
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "LastPass nu se poate autentifica până când cookie-urile de la lastpass.com nu sunt acceptate"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass a detectat un formular de autentificare nesigur.\n\nDoriţi să continuaţi?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass a detectat un formular de autentificare nesigur.\n\nDoriţi ca LastPass să completeze totuşi formularul?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass a detectat o schimbare de parolă pentru"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass a detectat o schimbare de parolă pentru domeniul:"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass a detectat o schimbare de parolă pentru utilizatorul:"
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "LastPass a detectat o eroare de instalare. Vă rugăm să reinstalaţi LastPass."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass a detectat ca folostiti o parola slaba pentru acest site. Va recomandam sa mergem in setarile contului de pe acest site si sa schimbati parola. Utilizati LastPass sa generati o parola unica, puternica pentru acest cont. Apoi puteti salva schimbarile pe site si in LastPass."
+   },
+   "LastPass_has_detected_that_you_have_used_the_password_for_this_login_on_other_sites__too__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass a detectat că ați folosit parola pentru această autentificare pe alte site-uri, de asemenea. Vă recomandăm să creaţi o noua parolă pentru acest site. Utilizați LastPass pentru a genera o parola unică, puternică pentru acest cont. Puteți salva apoi schimbările în acest site, și în LastPass."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass a completat formularul de pe această pagină cu informația dvs. de autentificare."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "LastPass este complet instalat! Când instalaţi LastPass pe alte computere nu va trebui să treceți prin acest proces din nou, veţi putea pur şi simplu să vă autentificați. Nu spuneți parola de administrator nimănui, nici măcar angajaţilor LastPass, niciodată nu o vom cere! LastPass criptează datele dvs. la nivel local astfel încât nici angajaţii LastPass nu au acces la acestea. Puteţi obţine ajutor făcând clic pe iconița LastPass şi accesând opțiunea Ajutor."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "LastPass este ultima parolă pe care va trebui să v-o amintiţi vreodată. Dacă sunteţi nou la LastPass, vom avea nevoie doar de câteva minute din timpul dvs. pentru configurarea contului. Veţi avea posibilitatea de a folosi acest cont pe orice alt PC pe care îl utilizaţi pentru a menţine întotdeauna datele dumneavoastră personale sincronizate. Apăsaţi Creează cont pentru a începe."
+   },
+   "LastPass_must_reencrypt_all_of_your_data_because_of_a_key_change_": {
+      "message": "LastPass trebuie să recripteze toate datele dvs. din cauza modificării cheii."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "Ultimele 4 cifre ale numărului dvs. de telefon"
+   },
+   "Last_Name": {
+      "message": "Nume"
+   },
+   "Last_Name2": {
+      "message": "Nume2"
+   },
+   "Last_Touch": {
+      "message": "Ultima utilizare"
+   },
+   "Last_name": {
+      "message": "Nume"
+   },
+   "Latvia": {
+      "message": "Letonia"
+   },
+   "Launch": {
+      "message": "Lansează"
+   },
+   "Lebanon": {
+      "message": "Liban"
+   },
+   "Left": {
+      "message": "Stânga"
+   },
+   "Lesotho": {
+      "message": "Lesotho"
+   },
+   "Liberia": {
+      "message": "Liberia"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "Jamahiriya Arabă Libiană"
+   },
+   "License_Class": {
+      "message": "Clasa de licență"
+   },
+   "License_Key": {
+      "message": "Cheie de licență"
+   },
+   "Liechtenstein": {
+      "message": "Liechtenstein"
+   },
+   "Link_Personal_Account": {
+      "message": "Adresa web a contului personal"
+   },
+   "Lithuania": {
+      "message": "Lituania"
+   },
+   "Local": {
+      "message": "Locală"
+   },
+   "Log_into_a_Site": {
+      "message": "Autentifică pe un site"
+   },
+   "LoggedInOffline": {
+      "message": "LastPass nu a putut contacta serverul de conectare, astfel încât sunteți acum în modul offline. Funcționarea poate fi limitată."
+   },
+   "Login": {
+      "message": "Autentificare"
+   },
+   "LoginError": {
+      "message": "Eroare de logare în LastPass. Vă rugăm să încercaţi din nou."
+   },
+   "Login_to_LastPass": {
+      "message": "Autentificare LastPass"
+   },
+   "Logoff": {
+      "message": "Deconectare"
+   },
+   "Logoff_": {
+      "message": "Deconectare:"
+   },
+   "Logoff_after_logged_in_for_minutes": {
+      "message": "Deloghează-te după ce ai fost conectat pentru minute"
+   },
+   "Logoff_on_browser_close": {
+      "message": "Deloga"
+   },
+   "Logout": {
+      "message": "Deconectare"
+   },
+   "LoseChanges": {
+      "message": "Sunteți sigur că doriți să editați câmpurile acestui site? Făcând acest lucru, veți pierde toate modificările pe care le-ați făcut la acest site!"
+   },
+   "LoseChangesApp": {
+      "message": "Sunteți sigur că vreți să modificați câmpurile acestei aplicații? Aceasta va duce la pierderea oricăror modificări făcute!"
+   },
+   "Luxembourg": {
+      "message": "Luxemburg"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "Macao"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "Macedonia, fosta Republică Iugoslavă"
+   },
+   "Madagascar": {
+      "message": "Madagascar"
+   },
+   "Make_Pronounceable": {
+      "message": "Să fie pronunțabil"
+   },
+   "Malawi": {
+      "message": "Malawi"
+   },
+   "Malaysia": {
+      "message": "Malaezia"
+   },
+   "Maldives": {
+      "message": "Maldive"
+   },
+   "Male": {
+      "message": "Bărbat"
+   },
+   "Mali": {
+      "message": "Mali"
+   },
+   "Malta": {
+      "message": "Malta"
+   },
+   "Manage_Shared_Folders": {
+      "message": "Gestionarea folderelor partajate"
+   },
+   "March": {
+      "message": "Martie"
+   },
+   "Marshall_Islands": {
+      "message": "Insulele Marshall"
+   },
+   "Martinique": {
+      "message": "Martinica"
+   },
+   "Master_Password": {
+      "message": "Parola de administrator"
+   },
+   "Master_Password_": {
+      "message": "Parola de administrator:"
+   },
+   "Matching_Sites": {
+      "message": "Site-uri potrivite"
+   },
+   "Mauritania": {
+      "message": "Mauritania"
+   },
+   "Mauritius": {
+      "message": "Mauritius"
+   },
+   "Maxthon": {
+      "message": "Maxthon"
+   },
+   "May": {
+      "message": "Mai"
+   },
+   "Mayotte": {
+      "message": "Mayotte"
+   },
+   "Meet_the_Sharing_Center": {
+      "message": "Fa cunostinta cu Centrul de Partajare"
+   },
+   "Member_ID": {
+      "message": "Identitate membru"
+   },
+   "Member_Name": {
+      "message": "Nume membru"
+   },
+   "Membership": {
+      "message": "Membru"
+   },
+   "Membership_Number": {
+      "message": "Număr membru"
+   },
+   "Message": {
+      "message": "Mesaj"
+   },
+   "Meta": {
+      "message": "Meta"
+   },
+   "Mexico": {
+      "message": "Mexic"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "Statele Federale ale Microneziei"
+   },
+   "Mid_Atlantic": {
+      "message": "Atlanticul de mijloc"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "Cele 3 cifre din mijloc din numărul dvs. de telefon"
+   },
+   "Middle_Name": {
+      "message": "Al doilea nume"
+   },
+   "Middle_name": {
+      "message": "Al doilea prenume"
+   },
+   "Midway_Island__Samoa": {
+      "message": "Insula Midway, Samoa"
+   },
+   "Minimum_Digit_Count": {
+      "message": "Caractere numerice minime"
+   },
+   "Mobile_Email_Address": {
+      "message": "Adresa de email mobilă"
+   },
+   "Mobile_Number": {
+      "message": "Numărul de mobil"
+   },
+   "Mobile_number": {
+      "message": "Număr de mobil"
+   },
+   "Moldova__Republic_Of": {
+      "message": "Republica Moldova"
+   },
+   "Monaco": {
+      "message": "Monaco"
+   },
+   "Mongolia": {
+      "message": "Mongolia"
+   },
+   "Montenegro": {
+      "message": "Muntenegru"
+   },
+   "Montserrat": {
+      "message": "Montserrat"
+   },
+   "More": {
+      "message": "Mai mult"
+   },
+   "More_Information": {
+      "message": "Mai mult informaţii"
+   },
+   "More_Options": {
+      "message": "Mai multe opțiuni"
+   },
+   "Morocco": {
+      "message": "Maroc"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "Mountain Time (Statele Unite și Canada)"
+   },
+   "Move_Selected_to_Group": {
+      "message": "Mută selectatele în dosar"
+   },
+   "Move_matching_sites_to_top_menu": {
+      "message": "Mută siteurile potrivite către vârful meniului"
+   },
+   "Move_to_Group": {
+      "message": "Mută în dosar"
+   },
+   "Move_to_Sub_Group": {
+      "message": "Muta în sub-dosar"
+   },
+   "Mozambique": {
+      "message": "Mozambic"
+   },
+   "Mr": {
+      "message": "Dl"
+   },
+   "Mrs": {
+      "message": "Dna"
+   },
+   "Ms": {
+      "message": "Dra"
+   },
+   "Multifactor_Authentication": {
+      "message": "autentificare multifactor"
+   },
+   "MyPasswordSafe": {
+      "message": "Seiful meu LastPass"
+   },
+   "My_Account": {
+      "message": "Contul meu"
+   },
+   "My_LastPass_Vault": {
+      "message": "Seiful meu LastPass"
+   },
+   "Myanmar": {
+      "message": "Myanmar"
+   },
+   "NAME": {
+      "message": "NUME"
+   },
+   "Name_": {
+      "message": "Nume:"
+   },
+   "Name_on_Card": {
+      "message": "Numele de pe Card"
+   },
+   "Name_on_card": {
+      "message": "Numele de pe card"
+   },
+   "Nameproper": {
+      "message": "Nume"
+   },
+   "Namibia": {
+      "message": "Namibia"
+   },
+   "Nationality": {
+      "message": "Naționalitate"
+   },
+   "Nauru": {
+      "message": "Nauru"
+   },
+   "Nepal": {
+      "message": "Nepal"
+   },
+   "Netherlands": {
+      "message": "Olanda"
+   },
+   "Netherlands_Antilles": {
+      "message": "Antilele Olandeze"
+   },
+   "Never": {
+      "message": "Niciodată"
+   },
+   "Never_Ask_Again": {
+      "message": "Nu mai întreba niciodată"
+   },
+   "Never_AutoFill": {
+      "message": "Dezactivează AutoInregistrarea"
+   },
+   "Never_For_This_Page": {
+      "message": "Dezactivează pentru pagina asta"
+   },
+   "Never_For_This_Site": {
+      "message": "Dezactivează pentru site-ul acesta"
+   },
+   "Never_Show_Again": {
+      "message": "Nu mai arată niciodată din nou"
+   },
+   "Never_Show_Context_Icons": {
+      "message": "Nu arăta niciodată iconițele de context"
+   },
+   "Never___": {
+      "message": "Niciodată ..."
+   },
+   "New_Caledonia": {
+      "message": "Noua Caledonie"
+   },
+   "New_Master_Password": {
+      "message": "Parolă de administrator nouă"
+   },
+   "New_Zealand": {
+      "message": "Noua Zeelandă"
+   },
+   "Newfoundland": {
+      "message": "Newfoundland"
+   },
+   "News_Reference": {
+      "message": "Stiri/Referinte"
+   },
+   "Next_SMS_passcode_starts_with": {
+      "message": "Următorul cod de acces SMS începe cu"
+   },
+   "Nicaragua": {
+      "message": "Nicaragua"
+   },
+   "Niger": {
+      "message": "Nigeria"
+   },
+   "Nigeria": {
+      "message": "Nigeria"
+   },
+   "Niue": {
+      "message": "Niue"
+   },
+   "No": {
+      "message": "Nu"
+   },
+   "NoFavorites": {
+      "message": "Nu aveți nimic in lista de preferințe."
+   },
+   "No_Form_Fill_Profiles_": {
+      "message": "Nici un profil pentru completat formulare!"
+   },
+   "No_Matching_Sites_": {
+      "message": "Niciun site nu se potriveşte!"
+   },
+   "No_Thanks": {
+      "message": "Nu, mulţumesc"
+   },
+   "No_Updates_Are_Available": {
+      "message": "Nu sunt disponibile actualizări"
+   },
+   "No_Wi_Fi_adapter_was_detected_on_this_computer___This_feature_requires_a_Wi_Fi_adapter_": {
+      "message": "Nu a fost detectat un adaptor Wi-Fi pe acest calculator. Această caracteristică necesită un adaptor Wi-Fi."
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "Nu, nu vreau ca LastPass să mă ajute să completez formulare în mod automat"
+   },
+   "No__Save_as_New_Entry": {
+      "message": "Nu, salvați ca o nouă intrare"
+   },
+   "No__Thanks": {
+      "message": "Nu, multumesc"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "Nu, nu importa niciun element nesigur"
+   },
+   "None_Available": {
+      "message": "Nici unul disponibil"
+   },
+   "Norfolk_Island": {
+      "message": "Insula Norfolk"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "Insulele Mariane de Nord"
+   },
+   "Norway": {
+      "message": "Norvegia"
+   },
+   "Norwegian": {
+      "message": "Norvegiană"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "Norvegiană Nynorsk"
+   },
+   "Not_Now": {
+      "message": "Nu acum"
+   },
+   "Note": {
+      "message": "Notă"
+   },
+   "Note_Type": {
+      "message": "Tipul notei"
+   },
+   "Note_Type_": {
+      "message": "Tip Notă:"
+   },
+   "Notes": {
+      "message": "Notițe"
+   },
+   "Notes_": {
+      "message": "Note:"
+   },
+   "Notifications": {
+      "message": "Notificări"
+   },
+   "November": {
+      "message": "Noiembrie"
+   },
+   "Nuku_alofa": {
+      "message": "Nuku'alofa"
+   },
+   "Number": {
+      "message": "Număr"
+   },
+   "Number_of_Licenses": {
+      "message": "Număr de licențe"
+   },
+   "OK": {
+      "message": "Ok"
+   },
+   "October": {
+      "message": "Octombrie"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "Oferă posibilitatea de a genera parole sigure"
+   },
+   "Old_Password": {
+      "message": "Parola veche"
+   },
+   "Oman": {
+      "message": "Oman"
+   },
+   "One_Time_Passwords": {
+      "message": "Parole de unică folosinţă"
+   },
+   "Open": {
+      "message": "Deschide"
+   },
+   "Open_All": {
+      "message": "Deschide toate"
+   },
+   "Open_Dashlane___File___Export___CSV___Import_the_resulting_file_": {
+      "message": "Deschidețo Dashlane - Fișiere - Exportează - CSV. Importa fișierul rezultat."
+   },
+   "Open_Favorites": {
+      "message": "Deschide favoritele"
+   },
+   "Open_File": {
+      "message": "Deschide fişierul"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "Deschide seiful meu LastPass"
+   },
+   "Open_New_Pages_in": {
+      "message": "Deschide pagini noi în"
+   },
+   "Open_Popover": {
+      "message": "Deschide Popover"
+   },
+   "Open_Sticky_Password___Manage_Database___Export___Export_as_text__Import_this_file": {
+      "message": "Deschideți Sticky Password - Gestionarea baza de date - Export - Export ca text. Importă acest fişier"
+   },
+   "Open_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Deschide pentru a ajusta modul cum parola este generata."
+   },
+   "Opera": {
+      "message": "Opera"
+   },
+   "Opera_Password_Manager": {
+      "message": "Managerul de parole Opera"
+   },
+   "Or__would_you_like_LastPass_to_save_a_new_user_password_for_this_site_": {
+      "message": "Sau, doresti ca LastPass sa salveze un nou cont utilizator/parola pentru acest site?"
+   },
+   "Order_Number": {
+      "message": "Număr comandă"
+   },
+   "Order_Total": {
+      "message": "Total comandă"
+   },
+   "Organization": {
+      "message": "Organizație"
+   },
+   "Other": {
+      "message": "Altele"
+   },
+   "Other_Sessions": {
+      "message": "Alte sesiuni"
+   },
+   "Overall_Progress_": {
+      "message": "Progres total:"
+   },
+   "PASSWORDupper": {
+      "message": "PAROLA"
+   },
+   "PINs_Password_Manager": {
+      "message": "PINs Password Manager"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "Ora coastei Pacificului (SUA și Canada)"
+   },
+   "Page_Down": {
+      "message": "Page Down"
+   },
+   "Page_Up": {
+      "message": "Page Up"
+   },
+   "Pakistan": {
+      "message": "Pakistan"
+   },
+   "Palau": {
+      "message": "Palau"
+   },
+   "Palestinian_Territories": {
+      "message": "Teritoriile palestiniene"
+   },
+   "Panama": {
+      "message": "Panama"
+   },
+   "Papua_New_Guinea": {
+      "message": "Papua Noua Guinee"
+   },
+   "Paraguay": {
+      "message": "Paraguay"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passphrase": {
+      "message": "Propoyitie de acces"
+   },
+   "Passport": {
+      "message": "Pașaport"
+   },
+   "Password": {
+      "message": "Parola"
+   },
+   "Password_": {
+      "message": "Parola:"
+   },
+   "Password_Agent": {
+      "message": "Password Agent"
+   },
+   "Password_Corral": {
+      "message": "Password Corral"
+   },
+   "Password_Depot": {
+      "message": "Password Depot"
+   },
+   "Password_Dragon": {
+      "message": "Password Dragon"
+   },
+   "Password_Keeper": {
+      "message": "Password Keeper"
+   },
+   "Password_Length": {
+      "message": "Lungime parolă"
+   },
+   "Password_Length_": {
+      "message": "Lungime parolă"
+   },
+   "Password_Reminder": {
+      "message": "Memento parolă"
+   },
+   "Password_Reminder_": {
+      "message": "Memento parolă:"
+   },
+   "Password_Safe": {
+      "message": "Seiful cu Parole"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "Mementoul parolei nu poate fi identic cu parola"
+   },
+   "Password_updated_": {
+      "message": "Parolă actualizată!"
+   },
+   "Passwords_Max": {
+      "message": "Passwords Max"
+   },
+   "Personal": {
+      "message": "Personal"
+   },
+   "Peru": {
+      "message": "Peru"
+   },
+   "Philippines": {
+      "message": "Filipine"
+   },
+   "Phone_Number": {
+      "message": "Numărul de telefon"
+   },
+   "Phone_number": {
+      "message": "Număr de telefon"
+   },
+   "Physician_Address": {
+      "message": "Adresa medicului"
+   },
+   "Physician_Name": {
+      "message": "Numele medicului"
+   },
+   "Physician_Phone": {
+      "message": "Numărul de telefon al medicului"
+   },
+   "Pin": {
+      "message": "Pin"
+   },
+   "Pitcairn": {
+      "message": "Pitcairn"
+   },
+   "Please_Make_a_Selection": {
+      "message": "Vă rugăm să faceţi o selecţie"
+   },
+   "Please_Wait___": {
+      "message": "Vă rugăm aşteptaţi ..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "Vă rugăm să răspundeţi la întrebarea următoare:"
+   },
+   "Please_choose_the_type_of_export_you_would_like_to_perform_": {
+      "message": "Va rugam sa alegeti tipul de export pe care doriți să efectuați:"
+   },
+   "Please_choose_the_type_of_print_you_would_like_to_perform_": {
+      "message": "Va rugam sa alegeti tipul de imprimare pe care doriți să efectuați:"
+   },
+   "Please_close_this_window": {
+      "message": "Vă rugăm să închideți această fereastră"
+   },
+   "Please_complete_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "Vă rugăm să completați autentificarea multifactor pe telefonul sau dispozitivul mobil."
+   },
+   "Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "Vă rugăm să introduceți calea completă către fișierul de importat."
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": "Vă rugăm să păstraţi această pagină deschisă până la finalizarea operaţiunii."
+   },
+   "Please_move_sites_from_only_one_shared_folder_at_a_time_": {
+      "message": "Vă rugăm să mutaţi site-uri din cate un singur folder partajat pe rand."
+   },
+   "Please_note_that_upgrading_from_LastPass_Local_to_LastPass_Online_will_result_in_your_password_data_being_uploaded_in_its_encrypted_format_to_LastPass_servers___You_will_be_able_to_access_your_data_from_anywhere__and_LastPass_will_not_be_able_to_read_it___Would_you_like_to_continue_": {
+      "message": "Vă rugăm să rețineți că trecerea de la LastPass Local la LastPass Online va face ca parolele dvs. să fie stocate în format criptat pe serverele LastPass. Veți avea astfel acces la datele dvs. de oriunde, iar LastPass nu le va putea citi. Doriți să continuați?"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "Vă rugăm să furnizaţi un nume acestui calculator"
+   },
+   "Please_reload_the_page_to_view_your_changes_": {
+      "message": "Vă rugăm să reîncărcaţi pagina pentru a vedea modificările."
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "Vă rugăm să reporniți toate browserele dvs. pentru a începe să utilizați LastPass Online."
+   },
+   "Please_select": {
+      "message": "Vă rugăm să selectaţi"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "Vă rog selectați site-urile pentru care vreți să aplicați această schimbare."
+   },
+   "Please_try_again_": {
+      "message": "Vă rugăm să încercați din nou."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "Vă rugăm să vizitaţi https://lastpass.com pentru a crea un cont mai încolo."
+   },
+   "Poland": {
+      "message": "Polonia"
+   },
+   "Policy_Number": {
+      "message": "Regula numarul"
+   },
+   "Policy_Type": {
+      "message": "Regula de tipul"
+   },
+   "Polish": {
+      "message": "Poloneză"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "Sondaj Server pentru modificări de cont (min)"
+   },
+   "Port": {
+      "message": "Port"
+   },
+   "Portugal": {
+      "message": "Portugalia"
+   },
+   "Portuguese": {
+      "message": "Portugheză"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "Portugheză (Brazilia)"
+   },
+   "Preferences": {
+      "message": "Preferinţe"
+   },
+   "Price": {
+      "message": "Preț"
+   },
+   "Print": {
+      "message": "Imprimă"
+   },
+   "Print_Screen": {
+      "message": "Print screen"
+   },
+   "Print_Secure_Notes": {
+      "message": "Listează Note Securizate"
+   },
+   "Print_Sites": {
+      "message": "Listează Site-uri"
+   },
+   "Private_Key": {
+      "message": "Cheie privată"
+   },
+   "Product": {
+      "message": "Produs"
+   },
+   "Productivity_Tools": {
+      "message": "Instrumente de productivitate"
+   },
+   "Profile": {
+      "message": "Profil"
+   },
+   "Profile_language": {
+      "message": "Limbă profil"
+   },
+   "Profile_name": {
+      "message": "Nume profil"
+   },
+   "Pronounceable": {
+      "message": "Pronunțabil"
+   },
+   "Protected": {
+      "message": "Protejat"
+   },
+   "Public_Key": {
+      "message": "Cheie publică"
+   },
+   "Publisher": {
+      "message": "Editor"
+   },
+   "Puerto_Rico": {
+      "message": "Puerto Rico"
+   },
+   "Purchase_Date": {
+      "message": "Dată cumpărare"
+   },
+   "Qatar": {
+      "message": "Qatar"
+   },
+   "Reason": {
+      "message": "Motiv"
+   },
+   "Recent_Sites": {
+      "message": "Site-uri recente"
+   },
+   "Recently_Used": {
+      "message": "Recent utilizate"
+   },
+   "Recently_Used_list_size": {
+      "message": "Mărimea listei 'Recent folosite'"
+   },
+   "Recheck_Page": {
+      "message": "Pagină de reverificare"
+   },
+   "Reencrypting_Data___": {
+      "message": "Re-criptarea datelor ..."
+   },
+   "Refresh": {
+      "message": "Reîncarcă"
+   },
+   "Refresh_Sites": {
+      "message": "Reîmprospătare site-uri"
+   },
+   "Reject": {
+      "message": "Respinge"
+   },
+   "Remember_Email": {
+      "message": "Reţine e-mail"
+   },
+   "Remember_Password": {
+      "message": "Reţine parola"
+   },
+   "Remove_Personal_Account": {
+      "message": "Ștergere cont personal"
+   },
+   "Rename_Group": {
+      "message": "Redenumește dosarul"
+   },
+   "Replace_Existing_Site": {
+      "message": "Înlocuieşte site existent"
+   },
+   "Request_failed__is_your_Internet_connection_down_": {
+      "message": "Solicitarea a eșuat; conexiunea la Internet nu funcționează?"
+   },
+   "Require_All_Character_Type": {
+      "message": "Sunt necesare toate tipurile de caractere"
+   },
+   "Require_All_Character_Types": {
+      "message": "Sunt necesare toate tipurile de caractere"
+   },
+   "Require_Every_Character_Type": {
+      "message": "Necesită tipărirea fiecărui caracter"
+   },
+   "Require_Password_Reprompt": {
+      "message": "Solicită reconfirmare parolă"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "Intreabă-mă când:"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "Respectă AutoComplete = off: permite site-urilor web să dezactiveze completarea automată"
+   },
+   "Reunion": {
+      "message": "Reunion"
+   },
+   "Revelation_Password_Manager": {
+      "message": "Revelation Password Manager"
+   },
+   "Revoked": {
+      "message": "Revocat"
+   },
+   "Right": {
+      "message": "Dreapta"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "România"
+   },
+   "Routing_Number": {
+      "message": "Număr de rutare"
+   },
+   "Routing_number": {
+      "message": "Numărul de rutare"
+   },
+   "Russian": {
+      "message": "Rusă"
+   },
+   "Russian_Federation": {
+      "message": "Federaţia Rusă"
+   },
+   "Rwanda": {
+      "message": "Rwanda"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "SITE"
+   },
+   "SMTP_Port": {
+      "message": "Port SMTP"
+   },
+   "SMTP_Server": {
+      "message": "Server SMTP"
+   },
+   "SPB_Wallet": {
+      "message": "SPB Wallet"
+   },
+   "SSH_Key": {
+      "message": "Cheie SSH"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SWIFT_Code": {
+      "message": "Cod SWIFT"
+   },
+   "Safari": {
+      "message": "Safari"
+   },
+   "Safari_Password_Manager": {
+      "message": "Managerul de parole Safari"
+   },
+   "Saint_Barthelemy": {
+      "message": "Saint Barthelemy"
+   },
+   "Saint_Helena": {
+      "message": "Saint Helena"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "Saint Kitts şi Nevis"
+   },
+   "Saint_Lucia": {
+      "message": "Saint Lucia"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "Saint Martin (partea franceză)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "Saint Pierre şi Miquelon"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "Sfântul Vincent şi Grenadine"
+   },
+   "Samoa": {
+      "message": "Samoa"
+   },
+   "San_Marino": {
+      "message": "San Marino"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "Sao Tome şi Principe"
+   },
+   "Saudi_Arabia": {
+      "message": "Arabia Saudită"
+   },
+   "Save": {
+      "message": "Salvează"
+   },
+   "Save_All_Entered_Data": {
+      "message": "Salvați toate datele introduse"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "Salvează profilul cărții de credit"
+   },
+   "Save_File": {
+      "message": "Salvează fişierul"
+   },
+   "Save_New_Site": {
+      "message": "Salvează site nou"
+   },
+   "Save_Password_to_Vault": {
+      "message": "Salvați parola în seif"
+   },
+   "Save_Password_to_Vault_": {
+      "message": "Salvez parola in seif?"
+   },
+   "Save_Site": {
+      "message": "Salvează site"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "Salvează local o parolă singulară dezactivată pentru recuperarea contului"
+   },
+   "Save_this_password_as_a_new_entry_": {
+      "message": "Salvează parola asta ca o intrare nouă?"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "Salvați modificările şi a închideți această fereastră"
+   },
+   "Save_your_password_to_your_LastPass_Vault_": {
+      "message": "Salvați parola pentru seiful LastPass?"
+   },
+   "Saved_Passwords": {
+      "message": "Parolele salvate"
+   },
+   "Screen_Keyboard": {
+      "message": "Tastatură ecran"
+   },
+   "Search_All_Data": {
+      "message": "Cauta printre toate datele"
+   },
+   "Search_All_Notes": {
+      "message": "Caută în toate notele"
+   },
+   "Search_All_Sites": {
+      "message": "Cauta toate site-urile"
+   },
+   "Search_LastPass_Vault": {
+      "message": "Caută in seiful LastPass"
+   },
+   "Search_Vault": {
+      "message": "Căutare in seif"
+   },
+   "Search_within_secure_notes": {
+      "message": "Caută in notele sigure"
+   },
+   "Searchproper": {
+      "message": "Caută"
+   },
+   "Secure_Note": {
+      "message": "Notiță sigură"
+   },
+   "Secure_Notes": {
+      "message": "Note securizate"
+   },
+   "Security": {
+      "message": "Securitate"
+   },
+   "Security_Check": {
+      "message": "Verificare de securitate"
+   },
+   "Security_Code": {
+      "message": "Cod de securitate"
+   },
+   "Security_Question_Multifactor_Authentication": {
+      "message": "Autentificare tip Multifactor cu intrebare de siguranta"
+   },
+   "Security_code": {
+      "message": "Cod de securitate"
+   },
+   "Select": {
+      "message": "Selectează"
+   },
+   "Select_All": {
+      "message": "Selectează tot"
+   },
+   "Select_a_group_in_your_LastPass_Vault_to_place_this_website___Optional_": {
+      "message": "Selectează un dosar în seiful LastPass pentru a plasa acest site. [Opțional]"
+   },
+   "Select_a_preference_to_edit__then_tap_OK_": {
+      "message": "Selectați o preferință pentru a o modifica, apoi apăsați OK."
+   },
+   "Select_or_enter_a_new_group_name": {
+      "message": "Selectează sau introdu un nou nume pentru dosar"
+   },
+   "Send": {
+      "message": "Trimite"
+   },
+   "Send_Email": {
+      "message": "Trimite e-mail"
+   },
+   "Send_Invite": {
+      "message": "Trimite invitatie"
+   },
+   "Send_SMS_passcodes": {
+      "message": "Se trimite cod de acces SMS"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "Trimite rapoarte anonime cu date de erori pentru a ajuta la îmbunătățirea LastPass"
+   },
+   "Senegal": {
+      "message": "Senegal"
+   },
+   "September": {
+      "message": "Septembrie"
+   },
+   "Serbia": {
+      "message": "Serbia"
+   },
+   "Server": {
+      "message": "Server"
+   },
+   "SesameWrongButton": {
+      "message": "Pentru a vizualiza datele Dvs. când sunteţi deconectat trebuie să executaţi Sesame și să utilizați butonul 'Copiere parolă offline' în loc de 'Generare parolă pentru o singură dată'."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "Autentificare multifactor Sesame"
+   },
+   "Sessions": {
+      "message": "Sesiuni"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "Personalizează câmpurile de completare"
+   },
+   "Settings": {
+      "message": "Setări"
+   },
+   "Sex": {
+      "message": "Sex"
+   },
+   "Seychelles": {
+      "message": "Seychelles"
+   },
+   "Share": {
+      "message": "Partajează"
+   },
+   "Share_Folder": {
+      "message": "Partajează folderul"
+   },
+   "Share_Selected": {
+      "message": "Partajează selectate"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "Partajează starea de autentificare cu alte navigatoare"
+   },
+   "Share_offer_from": {
+      "message": "Împărțiți oferta de la"
+   },
+   "Shared_Folders": {
+      "message": "Folderele partajate"
+   },
+   "Shares": {
+      "message": "Partajări"
+   },
+   "Shift": {
+      "message": "Shift"
+   },
+   "Shopping": {
+      "message": "Cumparaturi"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "Să reţină LastPass această parolă?"
+   },
+   "Show": {
+      "message": "Arată"
+   },
+   "Show_Advanced_Options": {
+      "message": "Arată opţiuni avansate"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "Afişare notificare la schimbarea parolei"
+   },
+   "Show_Deleted_Sites": {
+      "message": "Arată site-uri şterse"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "Afișează bara de autocompletare"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "Arată notificările pentru completarea de formulare"
+   },
+   "Show_Matching_Sites": {
+      "message": "Arată site-uri care se potrivesc"
+   },
+   "Show_Matching_Sites_in_top_level_menu": {
+      "message": "Arată site-uri care se potrivesc în meniul de sus"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "Arată seiful LastPass după login"
+   },
+   "Show_Notifications": {
+      "message": "Arată notificări"
+   },
+   "Show_Password": {
+      "message": "Arata Parola"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "Afişează notificare la salvarea sitului"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "Arată notificările pentru salvare site"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "Afişează siteurile în dosare"
+   },
+   "Show_Vault_After_Login": {
+      "message": "Arată seif după autentificare"
+   },
+   "Show_all_sites": {
+      "message": "Arată toate site-urile"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "Arată anumite notificări doar după clic"
+   },
+   "Show_notifications_below_browser": {
+      "message": "Arată notificările sub browser"
+   },
+   "Show_or_Hide_Password": {
+      "message": "Ascunde sau arată parola"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "Arată o altă intrare de câmp particularizat"
+   },
+   "Sierra_Leone": {
+      "message": "Sierra Leone"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "Simplifică-ți viața: folosește LastPass pentru a completa automat datele de login ale acestui site!"
+   },
+   "Singapore": {
+      "message": "Singapore"
+   },
+   "Site": {
+      "message": "Site"
+   },
+   "Site_Search": {
+      "message": "Căutare pe site"
+   },
+   "Sites": {
+      "message": "Site-uri"
+   },
+   "Slovak": {
+      "message": "Slovacă"
+   },
+   "Slovakia": {
+      "message": "Slovacia"
+   },
+   "Slovenia": {
+      "message": "Slovenia"
+   },
+   "Social": {
+      "message": "Social"
+   },
+   "Social_Security": {
+      "message": "Securitate socială"
+   },
+   "Social_Security_Number": {
+      "message": "Număr de identificare fiscală"
+   },
+   "Social_security_number": {
+      "message": "Număr de securitate socială"
+   },
+   "Software_License": {
+      "message": "Licență software"
+   },
+   "Solomon_Islands": {
+      "message": "Insulele Solomon"
+   },
+   "Somalia": {
+      "message": "Somalia"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "Ne pare rău, acest folder partajat este protejat la scriere."
+   },
+   "Sorry__you_cannot_perform_this_operation_on_a_mix_of_shared_and_non_shared_folders__or_multiple_shared_folders_at_once_": {
+      "message": "Ne pare rău, nu puteţi efectua această operaţie pe o combinaţie de foldere partajate şi non-partajate, sau mai multe foldere partajateo dată."
+   },
+   "Source": {
+      "message": "Sursă"
+   },
+   "Source_": {
+      "message": "Sursa:"
+   },
+   "South_Africa": {
+      "message": "Africa de Sud"
+   },
+   "South_Georgia": {
+      "message": "Georgia de Sud"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "Georgia de Sud şi Insulele Sandwich de Sud"
+   },
+   "Spain": {
+      "message": "Spania"
+   },
+   "Spanish": {
+      "message": "Spaniolă"
+   },
+   "Spanish__Mexico_": {
+      "message": "Spaniolă (Mexic)"
+   },
+   "Special": {
+      "message": "Special"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sports": {
+      "message": "Sporturi"
+   },
+   "Sri_Lanka": {
+      "message": "Sri Lanka"
+   },
+   "Start_Date": {
+      "message": "Dată început"
+   },
+   "Start_Trial": {
+      "message": "Incepere Perioada de Proba"
+   },
+   "Start_date": {
+      "message": "Data începerii"
+   },
+   "State": {
+      "message": "Stat"
+   },
+   "State___Province": {
+      "message": "Stat / Provincie"
+   },
+   "Status": {
+      "message": "Starea"
+   },
+   "Sticky_Password": {
+      "message": "Parolă lipicioasă"
+   },
+   "Store_Every_Note": {
+      "message": "Salveaza fiecare Nota"
+   },
+   "Submit_Form": {
+      "message": "Trimite formularul"
+   },
+   "Submitting___": {
+      "message": "Trimitem ..."
+   },
+   "Sudan": {
+      "message": "Sudan"
+   },
+   "Support_Email": {
+      "message": "E-mail asistență"
+   },
+   "Suriname": {
+      "message": "Surinam"
+   },
+   "Suspicious_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "În numele fişierului selectat au fost găsite caractere suspecte, nu se va procesa"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "Svalbard şi Jan Mayen"
+   },
+   "Swaziland": {
+      "message": "Swaziland"
+   },
+   "Sweden": {
+      "message": "Suedia"
+   },
+   "Swedish": {
+      "message": "Suedeză"
+   },
+   "Swipe_current_user_s_finger": {
+      "message": "Scanați degetul utilizatorului curent"
+   },
+   "Swipe_finger": {
+      "message": "Scanează deget"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "Scanați degetul cu scanerul de amprente"
+   },
+   "Switzerland": {
+      "message": "Elveţia"
+   },
+   "Symantec_VIP": {
+      "message": "VIP Symantec"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "Republica Arabă Siriană"
+   },
+   "Tabs": {
+      "message": "File"
+   },
+   "Taiwan": {
+      "message": "Taiwan"
+   },
+   "Tajikistan": {
+      "message": "Tadjikistan"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "Tanzania, Republica Unită"
+   },
+   "Tehran": {
+      "message": "Teheran"
+   },
+   "Telecom": {
+      "message": "Telecomunicatii"
+   },
+   "Telephone": {
+      "message": "Telefon"
+   },
+   "Tell_a_friend_": {
+      "message": "Spune-i unui prieten!"
+   },
+   "Text": {
+      "message": "Text"
+   },
+   "Text_to_find": {
+      "message": "Text de găsit"
+   },
+   "Thailand": {
+      "message": "Thailanda"
+   },
+   "That_file_is_missing_or_empty___Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "Acest fişier lipseşte sau este gol. Vă rugăm să introduceţi calea completă către fişierulu de importat."
+   },
+   "That_group_already_exists_": {
+      "message": "Dosarul există deja."
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "Anul în care a fost eliberat cardul de credit din 4 cifre"
+   },
+   "The_LastPass_Wi_Fi_utility_was_not_detected_on_this_computer___Would_you_like_to_run_the_LastPass_Universal_Installer_in_order_to_install_it_": {
+      "message": "Utilitarul LastPass Wi-Fi nu a fost detectat pe acest computer. Doriți să porniti Instalatorul Universal LastPass, pentru a-l instala?"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "Parola de administrator LastPass pe care aţi reintrodus-o nu se potriveşte"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "'Parola veche' pe care ați introdus-o nu este parola dvs. LastPass de administrator corectă"
+   },
+   "The_binary_version_of_the_LastPass_plugin_is_required_for_this_operation__It_can_be_downloaded_from_lastpass_com_": {
+      "message": "Versiunea binară a plugin-ului LastPass este necesară pentru această operaţiune. Acesta poate fi descărcat de pe lastpass.com."
+   },
+   "The_credit_card_number": {
+      "message": "Numărul de card de credit"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "Anul în care expiră cardul de credit din 4 cifre"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "Luna în care expiră cardul de credit"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "Numărul de eliberare al cardului de credit.\nAplicabil doar anumitor mărci europene de carduri de debit, cum ar fi Maestro."
+   },
+   "The_credit_card_s_security_code__For_most_credit_cards__this_is_the_last_3_digits_of_a_number_printed_on_the_back_of_the_card__For_American_Express_credit_cards__it_is_the_last_4_digits_of_a_number_printed_in_small_print_on_the_front_of_the_card_": {
+      "message": "Codul de securitate al cardului de credit.\nPentru cele mai multe carduri de credit, acest lucru este reprezentat de ultimele 3 cifre ale unui număr imprimat pe partea din spate a cardului.\nPentru carduri de credit American Express, codul este format din ultimele 4 cifre ale unui număr tipărit în caractere mici pe partea din faţă a cardului."
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "Numele complet imprimat pe cardul de credit"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "Luna în care a fost eliberat cardul de credit"
+   },
+   "The_name_of_your_bank": {
+      "message": "Numele băncii dvs."
+   },
+   "The_notes_field_contains_too_much_data___You_may_store_a_maximum_of_45_000_characters_per_note___Would_you_like_us_to_truncate_the_note_for_you___You_will_lose_some_of_your_data_": {
+      "message": "Câmpul 'note' conține prea multe caractere. Puteți introduce un maxim de 45.000 de caractere per notă.\n\nVreți să micșorăm nota pentru dumneavoastră? Veți pierde o parte din date."
+   },
+   "The_number_of_characters_in_the_generated_password_": {
+      "message": "Numărul de caractere din parola generată."
+   },
+   "The_password_that_you_use_to_log_into_this_website_": {
+      "message": "Parola pe care o utilizați pentru a vă conecta la acest site."
+   },
+   "The_text_beside__the_name_of__or_the_ID_of_the_form_field_to_be_filled__If_multiple_items_are_to_be_matched__specify_each_match_on_a_separate_line_": {
+      "message": "Textul de lângă numele sau id-ul campului din formularul care trebuie completat. Daca mai multe elemente se potrivesc, specificați-le pe fiecare pe cate o linie noua."
+   },
+   "The_value_to_be_filled": {
+      "message": "Valoarea care urmează să fie completată"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work_": {
+      "message": "Versiunea dvs a browserului Chrome nu are activat suportul pentru baze de date HTML5. Ca atare, aceasta pagina de autentificare nu va reține adresa dvs. de email și parola, precum și alte caracteristici, cum ar fi autentificarea automată la repornirea browser-ului nu va funcționa."
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "Versiunea de Chrome pe care o folosiți nu are activat suportul pentru baze de date HTML5. Ca atare, aceasta pagina de login nu va reține e-mail-ul şi parola dvs., iar alte caracteristici, cum ar fi autentificarea automată la pornirea browser-ului, nu vor funcţiona. Aţi putea fi în măsură să corectați acest lucru adăugând --enable-databases ca parametru la shortcutul browser-ului Google Chrome."
+   },
+   "This_attachment_needs_to_be_saved_first_": {
+      "message": "Acest atașament trebuie mai întâi să fie salvat."
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "Acest lucru poate fi manipulat numai de pe o pagină Web"
+   },
+   "This_feature_is_not_available_in_this_version__Please_install_the_binary_extension_by_going_to_https___lastpass_com_dl": {
+      "message": "Această opțiune nu este disponibilă în această versiune. Vă rugăm să instalaţi extensiunea binară mergând pe următoarea adresă https://lastpass.com/dl"
+   },
+   "This_feature_requires_the_binary_version_of_this_browser_extension___Would_you_like_to_install_it_now_": {
+      "message": "Această opțiune necesită versiunea binară a acestei extensiuni de browser. Doriţi să o instalaţi acum?"
+   },
+   "This_feature_still_needs_to_be_implemented__to_read_directly_from_": {
+      "message": "Această caracteristică trebuie încă să fie implementată, pentru a citi direct de la "
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "Acesta este un site partajat. Nu aveţi permisiunea de a vizualiza parola."
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "Acesta este numele sau adresa URL a acestei pagini web."
+   },
+   "This_may_take_a_while___": {
+      "message": "Acest lucru poate dura ceva timp ..."
+   },
+   "This_page_failed_to_load_properly___Please_ensure_you_are_running_the_latest_version_of_Maxthon__LastPass_requires_at_least_Maxthon_4_0_3_2000____Otherwise__this_may_have_happened_to_due_a_bug_in_Maxthon___Please_try_opening_this_page_again_": {
+      "message": "Aceasta pagina nu s-a incarcat corect. Va rugam sa va asigurati ca rulati ultima versiune de Maxthon (LastPass necesita minim Maxthon 4.0.3.2000). Altfel, asta s-ar putea intampla din cauza vreunui bug in Maxthon. Va rugam incercati sa deschideti aceasta pagina din nou."
+   },
+   "This_page_failed_to_load_properly___Please_ensure_you_are_running_the_latest_version_of_Maxthon__LastPass_requires_at_least_Maxthon_4_0_3_3000____Otherwise__this_may_have_happened_to_due_a_bug_in_Maxthon___Please_try_opening_this_page_again_": {
+      "message": "Aceasta pagina nu s-a incarcat corect. Va rugam sa va asigurati ca rulati ultima versiune de Maxthon (LastPass necesita minim Maxthon 4.0.3.2000). Altfel, asta s-ar putea intampla din cauza vreunui bug in Maxthon. Va rugam incercati sa deschideti aceasta pagina din nou."
+   },
+   "Time_Zone": {
+      "message": "Fus orar"
+   },
+   "Timor_Leste": {
+      "message": "Timorul de Est"
+   },
+   "Title": {
+      "message": "Titlu"
+   },
+   "To_export_1Password_logins__login_to_1Password__Select_all_or_just_passwords_that_you_want_to_export__Then_select__File_menu___Export_All___Text_file_____Or____File_menu___Export_Selected___Text_file____Click_Export_button_and_Save_password_file__and_Import_the_resulting_file_": {
+      "message": "Pentru a exporta datele de autentificare din 1Password, selectați toate parolele sau doar pe cele pe care le doriți exportate. Apoi selectați meniul File / Export All / Text file... sau meniul File / Export Selected / Text file... Faceți clic pe butonul Export și Save password file, apoi importați fișierul rezultat."
+   },
+   "To_export_Clipperz_cards__login_to_www_clipperz_com__Click_on_data__then_Export__then_Export_to_JSON__Copy_all_of_the_text_and_save_it_to_a_file_using_a_text_editor__then_import_it__Please_note_that_this_import_may_not_work_properly_if_you_ve_changed_field_names_from_their_defaults_": {
+      "message": "Pentru a exporta carduri Clipperz, autentificați-vă pe www.clipperz.com. Faceţi clic pe date, apoi Export, apoi Export pentru a JSON. Copiați tot textul şi salvaţi-l într-un fişier folosind un editor de text, apoi importați-l. Vă rugăm să reţineţi că acest import nu poate să funcţioneze corect dacă aţi schimbat numele de domeniu de la forma lor initiala."
+   },
+   "To_export_FireForm_profiles__right_click_the_FireForm_icon__then_choose_Simple_setup___Go_to_the_General_options_tab__click_Export_all_profiles__and_save_an_XML_file___Import_the_resulting_file_": {
+      "message": "Pentru a exporta profile din FireForm, faceți clic dreapta pe iconița FireForm și alegeți Simple setup. Mergeți la fila General options, faceți clic pe Export all profiles apoi salvați în format XML. Importați fișierul rezultat."
+   },
+   "To_export_HP_Password_Safe_save_to_an_HTML_file__Import_the_resulting_file_": {
+      "message": "Pentru a exporta parole din HP Password Safe, salvați-le într-un fișier HTML.\nImportați fișierul rezultat."
+   },
+   "To_export_KeePass_logins__open_your_KeePass_database__and_click_on_File___Export_To___XML_File___Choose_a_file_location_and_press_the_Save_button___Then__press_the_OK_button___Import_the_resulting_file_": {
+      "message": "Pentru a exporta credenţialele din KeePass, deschide baza de date KeePass şi dă clic pe File - Export To (Exporta către) - XML File (fişier XML). Alege o locaţie a fişierului şi apasă butonul Salvează. Apoi, apasă butonul OK. Importă fişierul rezultat."
+   },
+   "To_export_LastPass_logins__open_your_browser_with_the_LastPass_plugin_installed__and_click_on_LastPass___Tools___Export_To___CSV_File___Choose_a_file_location_and_press_the_Save_button___Import_the_resulting_file_": {
+      "message": "Pentru a exporta credenţialele LastPass, deschide navigatorul (browserul) cu extensia LastPass instalată şi dă clic pe LastPass - unelte - Exportă către - fişier CSV. Selectează o locaţie pentru fişier şi apasă butonul Salvează. Importă fişierul rezultat."
+   },
+   "To_export_passwords_from_Passpack__Login__go_to_the_Tools_screen__and_click_Export__Under__What_Type_of_Format_Would_You_Like_To_Export___Select__Comma_Separated_Values___and_on__Which_Entries_Would_You_Like_To_Export___Select__All_of_my_entries___then_hit__Continue___Select_all_of_the_text_in_the_text_box_on_the_next_screen__copy_it_to_the_clipboard__create_a_new_file_with_notepad_called_passpack_csv__paste_the_contents_into_this_file__Import_this_file_": {
+      "message": "Pentru a exporta parole din PassPack: Autentificati-va, selectati meniul Tools, apoi faceti click pe Export. Sub _What Type of Format Would You Like To Export?_ Selectati _"
+   },
+   "To_export_passwords_from_Password_Depot__click_on_the__Tools__tab_and_select__Export___Select_the__Extensible_Markup_Language_format____xml____specify_a_target_file_and_select_the_folder_you_want_to_export_": {
+      "message": "Pentru a exporta parolele din Depozitul de Parole, faceți clic pe fila 'Instrumente' și selectați 'Export'. Selectați 'Extensible Markup Language formatul (*. Xml)', specificați un fișier țintă și selectați folderul pe care doriți să exportați."
+   },
+   "To_export_passwords_from_Revelation_Password_Manager__export_the_data_as_XML_": {
+      "message": "Pentru a exporta parolele din 'Revelation Password Manager', exportați datele in format XML."
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "Pentru a începe să folosiți LastPass, trebuie să adăugați site-uri în contul dumneavoastră."
+   },
+   "To_import_Wi_Fi_passwords__simply_click_Import_below_": {
+      "message": "Pentru a importa parolele Wi-Fi, faceţi clic pe butonul Import de mai jos."
+   },
+   "To_import_from_PINs_Password_Manager_Export_in_Tab_Separated_format___Then__import_the_resulting_file_": {
+      "message": "Pentru a importa din PINs Password Manager, exportați în formatul Tab Separated. Apoi importați fișierul rezultat."
+   },
+   "To_import_passwords_from_Opera_Password_Manager__simply_click_Import_below_": {
+      "message": "Pentru a importa parolele de la Managerul de Parole Opera, pur si simplu faceți clic pe butonul Import de mai jos."
+   },
+   "To_import_passwords_from_Safari_Password_Manager__simply_click_Import_below_": {
+      "message": "Pentru a importa parolele de la Managerul de Parole Safari, pur si simplu faceți clic pe butonul Import de mai jos."
+   },
+   "To_import_your_MSI_PasswordKeeper_logins__open_the_program___Click__Txt___and_then__Open____Import_the_resulting_file_": {
+      "message": "Pentru a importa login-uri din MSI PasswordKeeper, deschideți programul, faceți click pe Txt, apoi Open. Importați fișierul rezultat."
+   },
+   "To_import_your_TurboPasswords_logins__open_the_program__and_the_password_file_to_be_exported__If_you_want_to_restrict_the_export_to_a_particular_category_or_type__filter_the_entries_displayed_using_the_Category_and_Type_drop_downs_above_the_main_window__Click_File_Export_Category__This_opens_a_standard_Windows_Save_dialog__so_enter_a_file_name_and_location__and_select_Comma_Separated_Values___csv__from_the_Save_as_Type_box_": {
+      "message": "Pentru a importa parole din TurboPasswords, deschideți programul și fișierul de parolă care va fi exportat. Dacă vreți să vă rezumați la a exporta o anumită categorie sau un anumit tip, filtrați intrările folosind meniurile Category și Type deasupra ferestrei principale. Faceți clic pe File - Export Category. Aceasta deschide o fereastră de salvare, deci introduceți un nume pentru fișier și o locație apoi selectați Comma Separated Values (.csv) din dialogul Save as Type."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "Pentru a vă proteja intimitatea şi păstra datele confidenţiale,"
+   },
+   "Togo": {
+      "message": "Togo"
+   },
+   "Tokelau": {
+      "message": "Tokelau"
+   },
+   "Tonga": {
+      "message": "Tonga"
+   },
+   "Tools": {
+      "message": "Unelte"
+   },
+   "Travel": {
+      "message": "Turism"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "Trinidad şi Tobago"
+   },
+   "Try_Again": {
+      "message": "Incearcă din nou"
+   },
+   "Tunisia": {
+      "message": "Tunisia"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "Turcia"
+   },
+   "Turkmenistan": {
+      "message": "Turkmenistan"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "Insulele Turks şi Caicos"
+   },
+   "Tutorials": {
+      "message": "Tutoriale"
+   },
+   "Tuvalu": {
+      "message": "Tuvalu"
+   },
+   "Type": {
+      "message": "Tip"
+   },
+   "Type_": {
+      "message": "Tasteaza:"
+   },
+   "URL": {
+      "message": "URL"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "NUME UTILIZATOR"
+   },
+   "Uganda": {
+      "message": "Uganda"
+   },
+   "Ukraine": {
+      "message": "Ucraina"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "Ulaan Bataar, Perth"
+   },
+   "United_Arab_Emirates": {
+      "message": "Emiratele Arabe Unite"
+   },
+   "United_Kingdom": {
+      "message": "Marea Britanie"
+   },
+   "United_States": {
+      "message": "Statele Unite ale Americii"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "Insulele Îndepărtate ale Statelor Unite"
+   },
+   "Unknown": {
+      "message": "Necunoscut"
+   },
+   "Unselect_All": {
+      "message": "Deselectați totul"
+   },
+   "Up": {
+      "message": "Sus"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "Upgrade la LastPass Online!"
+   },
+   "Upgrade_to_Premium": {
+      "message": "Treceți la versiunea premium"
+   },
+   "Uploading_Data___": {
+      "message": "Încărcare date ..."
+   },
+   "Uruguay": {
+      "message": "Uruguay"
+   },
+   "Use": {
+      "message": "Folosește"
+   },
+   "Use_802_1X": {
+      "message": "Utilizaţi 802.1X"
+   },
+   "Use_Password": {
+      "message": "Folosiți parola"
+   },
+   "Use_Special_Characters": {
+      "message": "Folosiți caractere speciale"
+   },
+   "Use_Special_Characters_": {
+      "message": "Folosește caractere speciale?"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "Folosiți această parolă acum (pentru acest site)?"
+   },
+   "User_Manual": {
+      "message": "Manual de utilizare"
+   },
+   "User_name": {
+      "message": "Nume utilizator"
+   },
+   "Username_": {
+      "message": "Nume utilizator:"
+   },
+   "Usernameproper": {
+      "message": "Nume de utilizator"
+   },
+   "Uzbekistan": {
+      "message": "Uzbekistan"
+   },
+   "Value": {
+      "message": "Valoare"
+   },
+   "Value_to_fill": {
+      "message": "Valoare de completat"
+   },
+   "Vanuatu": {
+      "message": "Vanuatu"
+   },
+   "Vault": {
+      "message": "Seif"
+   },
+   "Venezuela": {
+      "message": "Venezuela"
+   },
+   "Version": {
+      "message": "Versiune"
+   },
+   "Version_": {
+      "message": "Versiunea:"
+   },
+   "Viet_Nam": {
+      "message": "Vietnam"
+   },
+   "View_Image": {
+      "message": "Vizualizează imaginea"
+   },
+   "View_Passwords": {
+      "message": "Vezi parolele"
+   },
+   "Virgin_Islands__British_": {
+      "message": "Insulele Virgine (Britanice)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "Insulele Virgine (SUA)"
+   },
+   "Wait_Time_": {
+      "message": "Timp de asteptare:"
+   },
+   "Wallis_and_Futuna": {
+      "message": "Wallis şi Futuna"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "Avertizează înainte de a completa formulare nesigure"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "Urmăriți un video despre utilizarea de bază"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "De asemenea, noi NU păstrăm o copie de rezervă."
+   },
+   "Weak_Password": {
+      "message": "Parolă slabă"
+   },
+   "Website": {
+      "message": "Website"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "Bine aţi venit la LastPass!"
+   },
+   "West_Central_Africa": {
+      "message": "Africa Central-Vestică"
+   },
+   "Western_Sahara": {
+      "message": "Sahara Occidentală"
+   },
+   "What_you_use_to_log_into_this_website_": {
+      "message": "Ce utilizați pentru a vă conecta la acest site."
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used_": {
+      "message": "Când această casetă este bifată, cel puțin un caracter literă mică, o majusculă, și un caracter special vor fi utilizate."
+   },
+   "When_this_box_is_checked__characters_like___and___will_be_used_when_randomly_generating_a_password_": {
+      "message": "Când această casetă este bifată, caracterle ca # și ! vor fi utilizate la generarea parolei aleatori."
+   },
+   "When_this_box_is_checked__confusing_characters__1_I_L_0_O__are_not_used_": {
+      "message": "Când această casetă este bifată, nu sunt utilizate caractere confuze (1, I, L, 0, O)."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce_": {
+      "message": "Când această casetă este bifată, generază o parolă care este ușor de pronunțat."
+   },
+   "Wi_Fi_Password": {
+      "message": "Parola Wi-Fi"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "Parolele Wi-Fi"
+   },
+   "Windows": {
+      "message": "Ferestre"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "Doriți să creați un profil de autocompletare a formularelor acum?"
+   },
+   "XML_Files": {
+      "message": "fişiere XML"
+   },
+   "Yangon__Rangoon_": {
+      "message": "Yangon (Rangoon)"
+   },
+   "Yemen": {
+      "message": "Yemen"
+   },
+   "Yes": {
+      "message": "Da"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "Da, Utilizați pentru acest site"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "Da, lasă-mă să aleg elementele pe care le vreau importate în LastPass"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "Da, vreau să introduc și să analizez datele care vor fi introduse la autocompletarea formularelor"
+   },
+   "You_are_moving_sites_from_a_shared_folder_into_your_general_vault__This_will_potentially_make_them_unavailable_to_others____Do_you_want_to_continue_": {
+      "message": "Esti pe cale de a muta site-urile dintr-un dosar partajat in seiful tau general. Aceasta va face parolele indisponibile celorlalti.\n\nDoresti sa continui?"
+   },
+   "You_are_moving_sites_to_a_different_shared_folder__This_may_change_who_has_access_to_the_sites____Do_you_want_to_continue_": {
+      "message": "Sunteţi pe cale să mutaţi siteurile către un director partajat diferit. Această acţiune poate schimba persoanele care au acces la siteuri.\n\n Continuaţi?"
+   },
+   "You_are_moving_sites_to_a_shared_folder__This_will_potentially_make_them_available_to_others___Are_you_sure_you_would_like_to_continue_": {
+      "message": "Sunteți pe cale de a muta site-urile intr-un folder partajat. Asta e posibil sa le faca disponibile altora. \n\nSunteți sigur ca doriti sa continuați?"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "Nu puteţi aloca aceeaşi valoare mai multor taste rapide."
+   },
+   "You_cannot_move_individually_shared_sites_into_a_shared_folder_": {
+      "message": "Nu puteţi să mutaţi site-uri individuale comune într-un folder partajat."
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "Momentan, LastPass este setat să vă rețină parola. In cazul acesta, opțiunile de deconectare automată selectate de dvs. sunt, în esenţă, inutile. Doriţi ca LastPass să nu vă mai rețină parola?"
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "Nu ați ales un profil pentru formulare încă.\nDoriți să alegeți unul acum?"
+   },
+   "You_have_saved_your_password_to_your_LastPass_Vault_": {
+      "message": "Ați salvat parola în seiful LastPass."
+   },
+   "You_may_also_be_blocking_all_cookies__which_causes_Chrome_to_disallow_HTML5_database_access_": {
+      "message": "Puteți de asemenea să blocați modulele cookie, care determină Chrome sa anuleze accesul la baza de date HTML5."
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "Trebuie să fiți de acord să trimiteți datele dvs. criptate către LastPass.com\n\nLastPass.com vă criptează datele și le trimite spre serverele sale sigure.\nNimeni de la LastPass nu poate citi datele dvs. confidențiale deoarece sunt criptate folosind parola dvs. secretă, dumneavoastră fiind singura persoană care cunoaște această parolă."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "Trebuie să fiţi de acord cu termenii pentru a continua"
+   },
+   "You_must_enter_a_name_": {
+      "message": "Trebuie să introduceţi un nume."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "Trebuie să introduceţi un nume unic."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "Trebuie sa restartezi Chrome sau sa te deloghezi si sa te autentifici inapoi pentru ca schimbarile sa aiba loc"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "Trebuie să reporniţi browser-ul pentru ca toate schimbările să aibă loc."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "Anul dvs. de nastere din 4 cifre"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "Parolele dumneavoastră Google Chrome au fost importate cu succes."
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "Codul dvs. poştal"
+   },
+   "Your_address_information": {
+      "message": "Adresa dvs."
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "Ataşamentul tău se află la:"
+   },
+   "Your_bank_account_information": {
+      "message": "Informaţiile contului dvs. bancar"
+   },
+   "Your_bank_account_number__This_number_can_typically_be_found_to_the_right_of_the_routing_number_on_your_personal_checks_": {
+      "message": "Numărul dumneavoastră de cont bancar.\nAcesta pot fi de obicei găsit în partea dreaptă a numărului de rutare pe cecurile dvs. personale."
+   },
+   "Your_bank_s_routing_number__This_9_digit_number_can_typically_be_found_on_your_personal_checks_in_the_bottom_left_corner_": {
+      "message": "Banca dvs. de dirijare a numerelor.\nAceste 9 cifre pot fi de obicei găsite pe cecurile dvs. personale în colţul din stânga jos."
+   },
+   "Your_birth_day": {
+      "message": "Ziua nașterii dvs."
+   },
+   "Your_birth_month": {
+      "message": "Luna nașterii dvs."
+   },
+   "Your_city_name": {
+      "message": "Numele orașului dvs."
+   },
+   "Your_company_s_name": {
+      "message": "Numele companiei dvs."
+   },
+   "Your_contact_information": {
+      "message": "Date de contact"
+   },
+   "Your_country_name": {
+      "message": "Numele ţării dvs."
+   },
+   "Your_county_name": {
+      "message": "Numele județului dvs."
+   },
+   "Your_credit_card_information": {
+      "message": "Informaţiile cardului dvs. de credit"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "Setările dumneavoastră curente impun introducerea parolei dumneavoastră LastPass pentru a finaliza această acţiune."
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "Datele dvs. a fost exportate către"
+   },
+   "Your_email_address": {
+      "message": "Adresa dvs. de email"
+   },
+   "Your_first_name": {
+      "message": "Prenumele dvs."
+   },
+   "Your_government_ID_number": {
+      "message": "ID-ul numarului de  guvern"
+   },
+   "Your_last_name": {
+      "message": "Numele dvs. de familie"
+   },
+   "Your_middle_name": {
+      "message": "Al doilea numele al dvs."
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "Parola dvs. nu poate fi aceeaşi cu adresa dumneavoastră de email."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "Parola dvs. este uşor de intuit."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "Parola dumneavoastră este prea scurtă. Aceasta trebuie să conţină cel puţin 6 caractere"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "Parola dumneavoastră este prea scurtă. Aceasta trebuie să fie de cel puţin 8 caractere"
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "Memento-ul parolei dumneavoastră servește la reamintirea"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "Parolele dvs. nu se potrivesc."
+   },
+   "Your_personal_information": {
+      "message": "Datele dvs. personale"
+   },
+   "Your_phone_number": {
+      "message": "Numarul dvs. de telefon"
+   },
+   "Your_phone_number_extension": {
+      "message": "Prefixul numărului de telefon"
+   },
+   "Your_prefix_or_title": {
+      "message": "Prefixul dvs."
+   },
+   "Your_selected_Identity_no_longer_exists__Defaulting_to__All__and_logging_off_": {
+      "message": "Identitatea selectată nu mai există."
+   },
+   "Your_sex": {
+      "message": "Sexul dvs."
+   },
+   "Your_state_or_province_name": {
+      "message": "Judeţul sau sectorul dvs."
+   },
+   "Your_street_address": {
+      "message": "Strada dvs."
+   },
+   "Your_time_zone": {
+      "message": "Fus orarul dvs."
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "Numele de utilizator când va înscrieți pe site-uri Web"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "Autentificare multifactor YubiKey"
+   },
+   "Yugoslavia": {
+      "message": "Iugoslavia"
+   },
+   "ZIP___Postal_Code": {
+      "message": "Cod poştal"
+   },
+   "ZIP___Postal_code": {
+      "message": "Cod poştal"
+   },
+   "Zambia": {
+      "message": "Zambia"
+   },
+   "Zimbabwe": {
+      "message": "Zimbabwe"
+   },
+   "_Hide_": {
+      "message": "[Ascunde]"
+   },
+   "_History_": {
+      "message": "[Istoric]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(Oferte noi de partajare în aşteptare)"
+   },
+   "_Not_applicable_when_the_Pronounceable_box_is_checked__": {
+      "message": "(Nu se aplică în cazul în care căsuța Pronunțabil este bifată)"
+   },
+   "_Show_": {
+      "message": "[Arată]"
+   },
+   "_domain_": {
+      "message": "(domeniu)"
+   },
+   "_none_": {
+      "message": "(niciunul)"
+   },
+   "_unknown_": {
+      "message": "[Necunoscut]"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "parolei actuale, menținând în același timp caracterul secret al acesteia."
+   },
+   "added_to_Favorites": {
+      "message": "adaugat la Favorite"
+   },
+   "ago": {
+      "message": "în urmă"
+   },
+   "and": {
+      "message": "şi"
+   },
+   "by": {
+      "message": "de"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "Contactați-ne și vă vom trimite un email cu mementoul parolei."
+   },
+   "day": {
+      "message": "ziua"
+   },
+   "days": {
+      "message": "zile"
+   },
+   "delete": {
+      "message": "sterge"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "eWallet"
+   },
+   "ext_": {
+      "message": "ext."
+   },
+   "false": {
+      "message": "fals"
+   },
+   "favorites": {
+      "message": "favorite"
+   },
+   "hour": {
+      "message": "oră"
+   },
+   "hours": {
+      "message": "ore"
+   },
+   "just_now": {
+      "message": "chiar acum"
+   },
+   "minute": {
+      "message": "minut"
+   },
+   "minutes": {
+      "message": "minute"
+   },
+   "month": {
+      "message": "lună"
+   },
+   "months": {
+      "message": "luni"
+   },
+   "privacy_statement": {
+      "message": "declaraţie de confidenţialitate"
+   },
+   "recently_usedlower": {
+      "message": "utilizate recent"
+   },
+   "search": {
+      "message": "căutare"
+   },
+   "search_people_I_trust": {
+      "message": "cauta persoane de incredere"
+   },
+   "search_people_who_trust_me": {
+      "message": "cauta persoane care au incredere in mine"
+   },
+   "second": {
+      "message": "secundă"
+   },
+   "seconds": {
+      "message": "secunde"
+   },
+   "send_more": {
+      "message": "trimite mai mult"
+   },
+   "terms_of_service": {
+      "message": "condiţii de utilizare a serviciului"
+   },
+   "the_current_tab": {
+      "message": "fila curentă"
+   },
+   "true": {
+      "message": "adevărat"
+   },
+   "unnamed_site": {
+      "message": "pagina fara nume"
+   },
+   "very": {
+      "message": "foarte"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "noi NU ȘTIM care este parola ta LastPass."
+   },
+   "week": {
+      "message": "săptămână"
+   },
+   "weeks": {
+      "message": "săptămâni"
+   },
+   "year": {
+      "message": "an"
+   },
+   "years": {
+      "message": "ani"
+   }
+}

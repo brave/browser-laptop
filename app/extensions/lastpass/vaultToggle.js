@@ -1,0 +1,2 @@
+var VaultToggle=function(){var c=function(){return!g_ismaxthon&&!g_isopera},b=function(){return 1===parseInt(lpGetPref("useVault4_0",1))&&c()},d=function(a){lpPutUserPref("useVault4_0",a?1:0);lpPutGblPref("useVault4_0",a?1:0);lpWriteAllPrefs()};return{getVaultPage:function(){return b()?"vault.html":"homelocal2.html"},useVault4_0:function(){return b()},toggleVault4_0:function(a){b()||(d(!0),drawIconAtRotation(0),a&&a.close(),openvault())},toggleVault3_0:function(a){b()&&(d(!1),drawIconAtRotation(0),
+a&&a.close(),openvault())},supportsVault4_0:c}}();

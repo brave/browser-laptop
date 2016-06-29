@@ -1,0 +1,3146 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "1Password": {
+      "message": "1Password"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. Ievietojiet savu YubiKey  USB-portā ar USB kontaktu vērstu uz augšu"
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. Palaidiet Google Authenticator savā mobilajā ierīcē"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. Palaidiet LastPass Sesame aplikāciju, lai ģenerētu vienreizējo paroli"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. Ievadiet savu pašreizējo apstiprinājuma kodu laukā zemāk"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. Ielīmējiet vienreizējo paroli ievades laukā zemāk un noklikšķiniet uz 'Autentificēties'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. Sagaidiet, kamēr Jūsu YubiKey pogas gaisma spīd pastāvīgi"
+   },
+   "3__Click_Authenticate": {
+      "message": "Noklikšķiniet 'Autentificēties'"
+   },
+   "ACTION": {
+      "message": "DARBĪBA"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "Ir pieejams svarīgs LastPass atjauninājums. Lūdzu, nospiediet OK, lai sāktu lejupielādi un instalēšanu."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "Otrreiz izskatīšanas fails atrasts. Tas nozīmē, ka ne visas izmaiņas tiks saglabātas.  Vai vēlaties izdzēst šo failu un, iespējams, pazaudēt dažas izmaiņas?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "Servera kļūda, apstrādājot jūsu pieprasījumu."
+   },
+   "About": {
+      "message": "Par"
+   },
+   "About___": {
+      "message": "Par ..."
+   },
+   "Accept": {
+      "message": "Apstiprināt"
+   },
+   "Account_Number": {
+      "message": "Konta numurs"
+   },
+   "Account_Settings": {
+      "message": "Konta uzstādījumi"
+   },
+   "Account_Type": {
+      "message": "Konta tips"
+   },
+   "Account_number": {
+      "message": "Konta numurs"
+   },
+   "Actionproper": {
+      "message": "Darbība"
+   },
+   "Actions": {
+      "message": "Darbības"
+   },
+   "Add": {
+      "message": "Pievienot"
+   },
+   "Add_Credit_Card": {
+      "message": "Pievienot kredītkarti"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "Pievienot kredītkartes profilu"
+   },
+   "Add_Field": {
+      "message": "Pievienot lauku"
+   },
+   "Add_Identity": {
+      "message": "Pievienot identitāti"
+   },
+   "Add_New_Site": {
+      "message": "Pievienot jaunu vietni"
+   },
+   "Add_Note": {
+      "message": "Pievienot piezīmes"
+   },
+   "Add_Profile": {
+      "message": "Pievienot profilu"
+   },
+   "Add_Secure_Note": {
+      "message": "Pievienot drošo piezīmi"
+   },
+   "Add_Site": {
+      "message": "Pievienot vietni"
+   },
+   "Add_another_custom_field": {
+      "message": "Pievienot citu pielāgotu lauku"
+   },
+   "Address": {
+      "message": "Adrese"
+   },
+   "Address_1": {
+      "message": "Adrese 1"
+   },
+   "Address_2": {
+      "message": "Adrese 2"
+   },
+   "Address_3": {
+      "message": "Adrese 3"
+   },
+   "Adelaide": {
+      "message": "Adelaide"
+   },
+   "Admin_Tools": {
+      "message": "Administratora rīki"
+   },
+   "Advanced": {
+      "message": "Papildus"
+   },
+   "Advanced_Options": {
+      "message": "Papildus iespējas"
+   },
+   "Advanced_Tools": {
+      "message": "Papildrīki"
+   },
+   "Afghanistan": {
+      "message": "Afganistāna"
+   },
+   "Agent_Name": {
+      "message": "Aģenta vārds"
+   },
+   "Agent_Phone": {
+      "message": "Aģenta tālruņa nr."
+   },
+   "Aland_Islands": {
+      "message": "Ālandu salas"
+   },
+   "Alaska": {
+      "message": "Aļaska"
+   },
+   "Albania": {
+      "message": "Albānija"
+   },
+   "Algeria": {
+      "message": "Alžīrija"
+   },
+   "All": {
+      "message": "Viss"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "Ļaut LastPass atrast nedrošus datus jūsu datorā?"
+   },
+   "Almaty": {
+      "message": "Almaata"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "Vienmēr Izvēlieties profilu un kredītkarti"
+   },
+   "American_Samoa": {
+      "message": "Amerikāņu Samoa"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "Ammāna, Atēnas, Stambula, Beirūta, Kaira, Jeruzaleme"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "Amsterdama, Berlīne, Roma, Vīne, Prāga, Brisele"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "Pieejams atjauninājums. Vai vēlaties instalēt?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "Ielādējot Jūsu lapas, radusies kļūda. Lūdzu pieslēdzieties no jauna."
+   },
+   "An_error_occurred": {
+      "message": "Radusies kļūda"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "Radusies kļūda, importējot Google Chrome paroles."
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "Radusies kļūda, atkārtoti šifrējot  jūsu datus"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "Radusies kļūda augšuplādējot jūsu datus. Vai vēlaties mēģināt vēlreiz?"
+   },
+   "Andorra": {
+      "message": "Andora"
+   },
+   "Angola": {
+      "message": "Angola"
+   },
+   "Anguilla": {
+      "message": "Angilja"
+   },
+   "Antarctica": {
+      "message": "Antarktika"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "Antigva un Barbuda"
+   },
+   "Appearance": {
+      "message": "Izskats"
+   },
+   "Application_": {
+      "message": "Aplikācija:"
+   },
+   "Applications": {
+      "message": "Aplikācijas"
+   },
+   "April": {
+      "message": "Aprīlis"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "Vai tiešām vēlaties dzēst šo identitāti?"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "Vai tiešām vēlaties dzēst šo vietni?"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "Vai tiešām vēlaties, lai LastPass atcerētos Jūsu paroli? Tas ievērojami samazinās Jūsu LastPass konta drošību!"
+   },
+   "Are_you_sure_you_want_to_view_history___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "Vai tiešām vēlaties apskatīt vēsturi? To darot, tiks zaudētas visas veiktās izmaiņas!"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "Vai tiešām vēlaties dzēst?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "Vai tiešām vēlaties dzēst atlasītos vienumus?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "Vai tiešām vēlaties dzēst izvēlētās vietnes?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "Vai tiešām vēlaties dzēst šo aplikāciju?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "Vai tiešām vēlaties dzēst šo lauku?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "Vai tiešām vēlaties dzēst šo formas šablonu?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "Vai tiešām vēlaties dzēst šo ģenerēto paroli?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "Vai tiešām vēlaties dzēst šo drošo piezīmi?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "Vai tiešām vēlaties dzēst šo vietni?"
+   },
+   "Are_you_sure_you_would_like_to_remove_this_attachment_": {
+      "message": "Vai tiešām vēlaties noņemt šo pielikumu?"
+   },
+   "Argentina": {
+      "message": "Argentīna"
+   },
+   "Arizona": {
+      "message": "Arizona"
+   },
+   "Armenia": {
+      "message": "Armēnija"
+   },
+   "Aruba": {
+      "message": "Aruba"
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "Atlantijas laiks (Kanāda), Manausa, Santjago"
+   },
+   "Auckland__Wellington": {
+      "message": "Oklenda, Velingtona"
+   },
+   "August": {
+      "message": "Augusts"
+   },
+   "Australia": {
+      "message": "Austrālija"
+   },
+   "Austria": {
+      "message": "Austrija"
+   },
+   "Authenticate": {
+      "message": "Autentificēties"
+   },
+   "Authentication": {
+      "message": "Autentifikācija"
+   },
+   "Authentication_Failed_": {
+      "message": "Autentifikācija neizdevās."
+   },
+   "AutoFill": {
+      "message": "Automātiskā aizpildīšana"
+   },
+   "AutoLogin": {
+      "message": "Automātiskā pieslēgšanās"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "Automātiski aizpildīt pieslēgšanās informāciju"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "Automātiski iziet pēc (min)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Automātiski iziet, ja pārējie pārlūki ir aizvērti un Chrome ir aizvērts pirms (min)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "Automātiski pieslēgties, ja laiks kopš pēdējās pieslēgšanās > (sekundes)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "Neizmantot pārprotamas rakstzīmes"
+   },
+   "Azerbaijan": {
+      "message": "Azerbaidžāna"
+   },
+   "Azores": {
+      "message": "Azoru salas"
+   },
+   "BACKUPPER": {
+      "message": "ATPAKAĻ"
+   },
+   "Back": {
+      "message": "Atpakaļ"
+   },
+   "Baghdad": {
+      "message": "Bagdāde"
+   },
+   "Bahamas": {
+      "message": "Bahamu salas"
+   },
+   "Bahrain": {
+      "message": "Bahreina"
+   },
+   "Baku__Yerevan": {
+      "message": "Baku, Erevāna"
+   },
+   "Bangladesh": {
+      "message": "Bangladeša"
+   },
+   "Bank_Account": {
+      "message": "Bankas konts"
+   },
+   "Bank_Name": {
+      "message": "Bankas nosaukums"
+   },
+   "Bank_accountformfill": {
+      "message": "Bankas konts"
+   },
+   "Bank_name": {
+      "message": "Bankas nosaukums"
+   },
+   "Barbados": {
+      "message": "Barbadosa"
+   },
+   "Belarus": {
+      "message": "Baltkrievija"
+   },
+   "Belgium": {
+      "message": "Beļģija"
+   },
+   "Belize": {
+      "message": "Beliza"
+   },
+   "Benin": {
+      "message": "Benina"
+   },
+   "Bermuda": {
+      "message": "Bermudu salas"
+   },
+   "Bhutan": {
+      "message": "Butāna"
+   },
+   "Binary_Component_": {
+      "message": "Bināra sastāvdaļa:"
+   },
+   "Birthday": {
+      "message": "Dzimšanas diena"
+   },
+   "Blacklist": {
+      "message": "Jūsu konts ir īslaicīgi bloķēts (uz 5 minūtēm) dēļ daudziem neveiksmīgiem pieslēgšanās mēģinājumiem."
+   },
+   "Blog": {
+      "message": "Emuārs"
+   },
+   "Bolivia": {
+      "message": "Bolīvija"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "Bosnija un Hercegovina"
+   },
+   "Botswana": {
+      "message": "Botsvāna"
+   },
+   "Bouvet_Island": {
+      "message": "Buvē sala"
+   },
+   "Branch_Address": {
+      "message": "Filiāles adrese"
+   },
+   "Branch_Phone": {
+      "message": "Filiāles tālruņa nr."
+   },
+   "Brazil": {
+      "message": "Brazīlija"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "Britu Indijas okeāna teritorija"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "Pārlūkojiet tīmekli, kā jūs parasti to darāt un LastPass automātiski atcerēsies jūsu paroles, kad ievadīsiet tās."
+   },
+   "Brunei_Darussalam": {
+      "message": "Bruneja Darusalama"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "Buenosairesa, Džordžtauna"
+   },
+   "Built_": {
+      "message": "Izveidots:"
+   },
+   "Bulgaria": {
+      "message": "Bulgārija"
+   },
+   "Burkina_Faso": {
+      "message": "Burkinafaso"
+   },
+   "Burundi": {
+      "message": "Burundi"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "Bet es esmu aizmāršīgs ... ko man darīt, ja esmu aizmirsis savu paroli?"
+   },
+   "CSV_Files": {
+      "message": "CSV faili"
+   },
+   "Cambodia": {
+      "message": "Kambodža"
+   },
+   "Cameroon": {
+      "message": "Kamerūna"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "Nevar atrast slēpto LastPass logu"
+   },
+   "Canada": {
+      "message": "Kanāda"
+   },
+   "Canary_Islands": {
+      "message": "Kanāriju salas"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "Kanbera, Melburna, Sidneja, Hobarta"
+   },
+   "Cancel": {
+      "message": "Atcelt"
+   },
+   "Cape_Verde": {
+      "message": "Kaboverde"
+   },
+   "Cape_Verde_Is_": {
+      "message": "Kaboverde salas"
+   },
+   "Caracas": {
+      "message": "Karakasa"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "Kasablanka, Monrovija, Reikjavīka"
+   },
+   "Catalan": {
+      "message": "Katalāņu"
+   },
+   "Cayman_Islands": {
+      "message": "Kaimanu salas"
+   },
+   "Central_African_Republic": {
+      "message": "Centrālāfrikas Republika"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "Centrālamerika, Saskačevana"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "Centrālais laiks (ASV un Kanāda), Guadalajara, Mehiko"
+   },
+   "Chad": {
+      "message": "Čada"
+   },
+   "Change": {
+      "message": "Mainīt"
+   },
+   "Change_Password": {
+      "message": "Mainīt paroli"
+   },
+   "Check_For_Updates": {
+      "message": "Pārbaudīt atjauninājumus"
+   },
+   "Checkbox": {
+      "message": "Izvēles rūtiņa"
+   },
+   "Checking_For_Updates___": {
+      "message": "Pārbauda atjauninājumus..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "Čenaja, Kalkuta, Mumbaja, Deli, Sri Jayawardenepura"
+   },
+   "Chile": {
+      "message": "Čīle"
+   },
+   "China": {
+      "message": "Ķīna"
+   },
+   "Chinese__Simplified_": {
+      "message": "Ķīniešu (vienkāršotā)"
+   },
+   "Chinese__Traditional_": {
+      "message": "Ķīniešu (tradicionālā)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "Izvēlieties profilu un kredītkarti"
+   },
+   "Choose_a_source_above_": {
+      "message": "Izvēlieties avotu augstāk."
+   },
+   "Christmas_Island": {
+      "message": "Ziemassvētku sala"
+   },
+   "Chrome": {
+      "message": "Chrome"
+   },
+   "City___Town": {
+      "message": "Pilsēta"
+   },
+   "Clear": {
+      "message": "Notīrīt"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "Izmest datus no kopēšanas atmiņas (sek)"
+   },
+   "Clear_Forms": {
+      "message": "Attīrīt formas"
+   },
+   "Clear_Local_Cache": {
+      "message": "Notīrīt vietējo kešatmiņu"
+   },
+   "Clear_Recent": {
+      "message": "Dzēst sarakstu"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "Izejot attīrīt aizpildītos laukus"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "Noklikšķiniet uz Turpināt, lai sāktu lietot LastPass."
+   },
+   "Click_Icons_in_Fields": {
+      "message": "Rādīt klikšķināmas ikonas formu laukos"
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "Klikšķiniet šeit, lai atvērtu konta uzstādījumus"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "Klikšķiniet šeit, lai atstātu atsauksmes"
+   },
+   "Click_here_to_view_the_LastPass_User_Manual": {
+      "message": "Klikšķiniet šeit, lai apskatītu LastPass lietotāja rokasgrāmatu"
+   },
+   "Click_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Atveriet papildiespējas paroles ģenerēšanai"
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "Noklikšķiniet, lai paslēptu papildiespējas."
+   },
+   "Clipperz": {
+      "message": "Clipperz"
+   },
+   "Close": {
+      "message": "Aizvērt"
+   },
+   "Close_this_window": {
+      "message": "Aizvērt šo logu"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "Kokosu (Kīlinga) salas"
+   },
+   "Collapse_All": {
+      "message": "Sakļaut visu"
+   },
+   "Colombia": {
+      "message": "Kolumbija"
+   },
+   "Comoros": {
+      "message": "Komoru salas"
+   },
+   "Company": {
+      "message": "Uzņēmums"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "Uzņēmuma politika aizliedz šo darbību."
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "Uzņēmuma politika neļauj mainīt dažus iestatījumus, ne visi atjauninājumi ir saglabāti."
+   },
+   "Configure_Form_Fill": {
+      "message": "Pielāgot formas šablonu"
+   },
+   "Confirm": {
+      "message": "Apstiprināt"
+   },
+   "Confirm_Password": {
+      "message": "Apstiprināt paroli"
+   },
+   "Congo": {
+      "message": "Kongo"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "Kongo Demokrātiskā Republika"
+   },
+   "Congratulations": {
+      "message": "Apsveicam"
+   },
+   "Congratulations_": {
+      "message": "Apsveicam!"
+   },
+   "Connection_Mode": {
+      "message": "Savienojuma režīms"
+   },
+   "Connection_Type": {
+      "message": "Savienojuma tips"
+   },
+   "Contact": {
+      "message": "Kontakti"
+   },
+   "Continue": {
+      "message": "Turpināt"
+   },
+   "Cook_Islands": {
+      "message": "Kuka salas"
+   },
+   "Copy": {
+      "message": "Kopēt"
+   },
+   "Copy_Note": {
+      "message": "Kopēt piezīmi"
+   },
+   "Copy_Password": {
+      "message": "Kopēt paroli"
+   },
+   "Copy_URL": {
+      "message": "Kopēt URL"
+   },
+   "Copy_Username": {
+      "message": "Kopēt lietotājvārdu"
+   },
+   "Costa_Rica": {
+      "message": "Kostarika"
+   },
+   "Cote_D_ivoire": {
+      "message": "Kotdivuāra"
+   },
+   "Country": {
+      "message": "Valsts"
+   },
+   "County": {
+      "message": "Novads"
+   },
+   "Create_Account": {
+      "message": "Izveidot kontu"
+   },
+   "Create_an_Account": {
+      "message": "Izveidot kontu"
+   },
+   "Creating_Account___": {
+      "message": "Izveido kontu ..."
+   },
+   "Credit_Card": {
+      "message": "Kredītkarte"
+   },
+   "Credit_Card_Number": {
+      "message": "Kredītkartes numurs"
+   },
+   "Credit_Monitoring": {
+      "message": "Kredītu uzraudzība"
+   },
+   "Credit_card_number": {
+      "message": "Kredītkartes numurs"
+   },
+   "Credit_cardformfill": {
+      "message": "Kredītkarte"
+   },
+   "Croatia": {
+      "message": "Horvātija"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "Kuba"
+   },
+   "Custom_Value": {
+      "message": "Pielāgota vērtība"
+   },
+   "Custom_field__": {
+      "message": "Pielāgots lauks #"
+   },
+   "Custom_fields": {
+      "message": "Pielāgoti lauki"
+   },
+   "Cyprus": {
+      "message": "Kipra"
+   },
+   "Czech_Republic": {
+      "message": "Čehija"
+   },
+   "Danish": {
+      "message": "Dāņu"
+   },
+   "Darn__Passwords_": {
+      "message": "Nolāpīts! Paroles!"
+   },
+   "Darwin": {
+      "message": "Darvins"
+   },
+   "Database": {
+      "message": "Datubāze"
+   },
+   "Date": {
+      "message": "Datums"
+   },
+   "Date__EST_": {
+      "message": "Datums (EST)"
+   },
+   "Date_of_Birth": {
+      "message": "Dzimšanas datums"
+   },
+   "December": {
+      "message": "Decembris"
+   },
+   "Default": {
+      "message": "Noklusējums"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "Noklusētais formu aizpildes šablons"
+   },
+   "Delete": {
+      "message": "Dzēst"
+   },
+   "Delete_Cache": {
+      "message": "Dzēst kešatmiņu"
+   },
+   "Delete_Identity_": {
+      "message": "Dzēst identitāti?"
+   },
+   "Delete_Selected": {
+      "message": "Dzēst iezīmētos"
+   },
+   "Delete_Site": {
+      "message": "Dzēst vietni"
+   },
+   "Delete_Site_": {
+      "message": "Dzēst vietni?"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "Dzēst šo formas šablonu"
+   },
+   "Denmark": {
+      "message": "Dānija"
+   },
+   "Description": {
+      "message": "Apraksts"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "Atslēgt nedrošo Chrome Password Manager"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "Atslēgt daudzfaktoru autentifikāciju"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "Atslēgt viena faktora autentifikāciju"
+   },
+   "Disable_alert___": {
+      "message": "Atslēgt brīdinājumu..."
+   },
+   "Disable_alert_for_this_site": {
+      "message": "Atslēgt brīdinājumu šai vietnei"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "Atslēgt brīdinājumus par visām vājām/dublikātu vietnēm"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "Izmest izmaiņas un aizvērt šo logu"
+   },
+   "Djibouti": {
+      "message": "Džibutija"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "Nepārrakstīt laukus, kuri jau ir aizpildīti"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "Nepārprasīt"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "Neprasīt paroli "
+   },
+   "Do_you_like_LastPass_": {
+      "message": "Vai jums patīk LastPass?"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "Vai jūs tiešām vēlaties aizvērt? Jūs nevarat izmantot LastPass bez konta."
+   },
+   "Dominica": {
+      "message": "Dominika"
+   },
+   "Dominican_Republic": {
+      "message": "Dominikānas Republika"
+   },
+   "Down": {
+      "message": "Lejup"
+   },
+   "Dr": {
+      "message": "Dr"
+   },
+   "Driver_s_License": {
+      "message": "Vadītāja apliecība"
+   },
+   "Duplicate_password": {
+      "message": "Atkārtota parole"
+   },
+   "Dutch": {
+      "message": "Nīderlandiešu"
+   },
+   "ERROR__Moving_sites_between_shared_folders_is_currently_not_supported_": {
+      "message": "KĻŪDA: Vietnes pārvietošana starp koplietojamām mapēm pašlaik netiek atbalstīta."
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "Austrumu laiks (ASV un Kanāda)"
+   },
+   "Ecuador": {
+      "message": "Ekvadora"
+   },
+   "Edit": {
+      "message": "Rediģēt"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "Rediģēt kredītkarti profilu"
+   },
+   "Edit_Form_Fields": {
+      "message": "Rediģēt formas laukus"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "Rediģēt formas šablonu"
+   },
+   "Edit_Secure_Note": {
+      "message": "Rediģēt drošo piezīmi"
+   },
+   "Edit_Secure_Notes": {
+      "message": "Rediģēt drošās piezīmes"
+   },
+   "Edit_Site": {
+      "message": "Rediģēt vietni"
+   },
+   "Edit_Site_Fields": {
+      "message": "Rediģēt vietnes laukus"
+   },
+   "Egypt": {
+      "message": "Ēģipte"
+   },
+   "El_Salvador": {
+      "message": "Salvadora"
+   },
+   "Email": {
+      "message": "E-pasts"
+   },
+   "Email_": {
+      "message": "Epasts:"
+   },
+   "Email_Account": {
+      "message": "E-pasta konts"
+   },
+   "Email_Address": {
+      "message": "E-pasta adrese"
+   },
+   "Email_address": {
+      "message": "E-pasta adrese"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "E-pastu jau izmanto, vai jūs esat aizmirsis savu paroli?"
+   },
+   "Enable_Credit_Monitoring": {
+      "message": "Iespējot kredīta uzraudzību"
+   },
+   "Enable_Free_Credit_Monitoring": {
+      "message": "Iespējot kredīta bezmaksas uzraudzību"
+   },
+   "Enable_new_login_screen": {
+      "message": "Iespējot jauno pieteikšanās formu"
+   },
+   "Encryption": {
+      "message": "Šifrēšana"
+   },
+   "End": {
+      "message": "Beigas"
+   },
+   "English": {
+      "message": "Angļu"
+   },
+   "English__United_Kingdom_": {
+      "message": "Angļu (Apvienotā Karaliste)"
+   },
+   "Enter_Code_": {
+      "message": "Ievadiet kodu:"
+   },
+   "Enter_PIN": {
+      "message": "Ievadiet PIN"
+   },
+   "Enterprise": {
+      "message": "Uzņēmumiem"
+   },
+   "Equatorial_Guinea": {
+      "message": "Ekvatoriālā Gvineja"
+   },
+   "Eritrea": {
+      "message": "Eritreja"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "Radusies kļūda, ielādējot Jūsu LastPass vietnes. Lūdzu, mēģiniet ieiet atpakaļ, lai ielādētu jūsu vietnes."
+   },
+   "ErrorLoginMsg": {
+      "message": "Radusies kļūda, pieslēdzoties LastPass. Lūdzu, pārbaudiet jūsu interneta savienojumu."
+   },
+   "ErrorSendingMsg": {
+      "message": "Radusies kļūda, sazinoties ar serveri. Lūdzu, pārbaudiet jūsu interneta savienojumu."
+   },
+   "ErrorSessionMsg": {
+      "message": "Jūsu LastPass sesija ir beigusies. Lūdzu, pieslēdzieties atkārtoti."
+   },
+   "Error__This_folder_has_already_been_moved_": {
+      "message": "Kļūda: Šī mape jau ir pārvietota?"
+   },
+   "Error_opening_attachment_": {
+      "message": "Kļūda atverot pielikumu."
+   },
+   "Estonia": {
+      "message": "Igaunija"
+   },
+   "Ethiopia": {
+      "message": "Etiopija"
+   },
+   "Evening_Number": {
+      "message": "Vakara numurs"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "LastPass tagad var lokāli uzglabāt vienreizēju paroli, kuru var izmantot, lai atgūtu savu kontu, ja esat aizmirsis savu galveno paroli. Vienreizējā parole būs atspējota līdz bīdim, kad tā tiks aktivizēta uz servera.\n\nVai jūs vēlaties aktivizēt konta atgūšanu?"
+   },
+   "Expand_All": {
+      "message": "Izvērst visu"
+   },
+   "Expiration": {
+      "message": "Beigas"
+   },
+   "Expiration_Date": {
+      "message": "Derīguma termiņa beigu datums"
+   },
+   "Expiration_date": {
+      "message": "Beigu datums"
+   },
+   "Export": {
+      "message": "Eksportēt"
+   },
+   "Export_To": {
+      "message": "Eksportēt uz"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "Eksports uz LastPass CSV failu"
+   },
+   "FIPS_Mode": {
+      "message": "FIPS režīms"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "Folklenda salas (Malvinu)"
+   },
+   "Faroe_Islands": {
+      "message": "Fēru salas"
+   },
+   "Favorite": {
+      "message": "Favorīts"
+   },
+   "Favoritesproper": {
+      "message": "Favorīti"
+   },
+   "Fax_Number": {
+      "message": "Faksa numurs"
+   },
+   "Fax_number": {
+      "message": "Faksa numurs"
+   },
+   "February": {
+      "message": "Februāris"
+   },
+   "Feedback": {
+      "message": "Atsauksmes"
+   },
+   "Female": {
+      "message": "Sieviete"
+   },
+   "Fields_": {
+      "message": "Lauki:"
+   },
+   "Fiji": {
+      "message": "Fidži"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "Fidži, Kamčatka, Maršala salas"
+   },
+   "File": {
+      "message": "Fails"
+   },
+   "File_too_large__it_must_be_less_than_5MB_": {
+      "message": "Fails ir pārāk liels, tam jābūt mazākam par 5 MB."
+   },
+   "Files": {
+      "message": "Faili"
+   },
+   "Fill": {
+      "message": "Aizpildīt"
+   },
+   "Fill_Current": {
+      "message": "Aizpildīt esošos"
+   },
+   "Fill_Form": {
+      "message": "Aizpildīt formu"
+   },
+   "Fill_Forms": {
+      "message": "Formu aizpildīšana"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "Aizpildīt ar noklusēto formas šablonu"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "Aizpildīt nākošā konta datus (ja vairāki)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "Aizpildīt iepriekšējā konta datus (ja vairāki)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "Aizpildīt vai rediģēt datus no formas šablona"
+   },
+   "FillableFormDetected": {
+      "message": "Šajā lapā tika konstatēta aizpildāma forma."
+   },
+   "Filter": {
+      "message": "Filtrs"
+   },
+   "Find_a_site": {
+      "message": "Atrast vietni"
+   },
+   "Finland": {
+      "message": "Somija"
+   },
+   "Finnish": {
+      "message": "Somu"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "Firefox Password Manager"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "Tālruņa numura pirmie 3 cipari"
+   },
+   "First_Name": {
+      "message": "Vārds"
+   },
+   "First_name": {
+      "message": "Vārds"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "Katrai zemāk norādītai koordinātei atrodiet vērtību režģī un ievadiet to."
+   },
+   "Forgot_Password_": {
+      "message": "Aizmirsi paroli?"
+   },
+   "FormFill": {
+      "message": "Formu šabloni"
+   },
+   "FormFill_Profiles": {
+      "message": "Formu šablonu profili"
+   },
+   "Form_Fill": {
+      "message": "Formu aizpildīšana"
+   },
+   "Form_Fill_Profile": {
+      "message": "Formas šablons"
+   },
+   "Form_Fill_Profiles": {
+      "message": "Formu šabloniem"
+   },
+   "Form_Fills": {
+      "message": "Formu šabloni"
+   },
+   "Form_Name_": {
+      "message": "Formas nosaukums:"
+   },
+   "Format": {
+      "message": "Formāts"
+   },
+   "Forums": {
+      "message": "Forumi"
+   },
+   "France": {
+      "message": "Francija"
+   },
+   "French": {
+      "message": "Franču"
+   },
+   "French_Guiana": {
+      "message": "Franču Gviāna"
+   },
+   "French_Polynesia": {
+      "message": "Franču Polinēzija"
+   },
+   "French_Southern_Territories": {
+      "message": "Franču Dienvidu teritorijas"
+   },
+   "French__Canada_": {
+      "message": "Franču (Kanāda)"
+   },
+   "Full_path_of_file_to_import_": {
+      "message": "Pilns ceļš uz importējamo failu:"
+   },
+   "Full_path_of_the_file_to_import_": {
+      "message": "Pilns ceļš uz importējamo failu:"
+   },
+   "GET_FREE_PREMIUM": {
+      "message": "SAŅEMIET BEZMAKSAS PREMIUM"
+   },
+   "GMT_5": {
+      "message": "GMT +5"
+   },
+   "GMT_7": {
+      "message": "GMT +7"
+   },
+   "GMT_9": {
+      "message": "GMT +9"
+   },
+   "GMT_Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT Dublina, Edinburga, Lisabona, Londona"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT: Dublina, Edinburga, Lisabona, Londona"
+   },
+   "Gabon": {
+      "message": "Gabona"
+   },
+   "Gambia": {
+      "message": "Gambija"
+   },
+   "Gender": {
+      "message": "Dzimums"
+   },
+   "General": {
+      "message": "Vispārēji"
+   },
+   "Generate": {
+      "message": "Ģenerēt"
+   },
+   "GeneratePassword": {
+      "message": "Ja jūs veidojat kontu vai maināt savu paroli, spiediet ģenerēt, lai LastPass izveidotu unikālu, drošu paroli."
+   },
+   "Generate_Password": {
+      "message": "Ģenerēt paroli"
+   },
+   "Generate_Secure_Password": {
+      "message": "Ģenerēt drošu paroli"
+   },
+   "Generated_Password_for": {
+      "message": "Ģenerēta parole priekš"
+   },
+   "Generic": {
+      "message": "Vispārējs"
+   },
+   "Generic_CSV_File": {
+      "message": "Standarta CSV failu"
+   },
+   "Georgia": {
+      "message": "Gruzija"
+   },
+   "German": {
+      "message": "Vācu"
+   },
+   "Germany": {
+      "message": "Vācija"
+   },
+   "Ghana": {
+      "message": "Gana"
+   },
+   "Gibraltar": {
+      "message": "Gibraltārs"
+   },
+   "Go_Back": {
+      "message": "Iet atpakaļ"
+   },
+   "Go_Premium_": {
+      "message": "Izvēlies Premium!"
+   },
+   "Go_to_URL": {
+      "message": "Iet uz URL"
+   },
+   "Google_Authenticator": {
+      "message": "Google Autentifikators"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "Google Authenticator daudzfaktoru autentifikācija"
+   },
+   "Google_Chrome": {
+      "message": "Google Chrome"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "Google Chrome Password Manager"
+   },
+   "Greece": {
+      "message": "Grieķija"
+   },
+   "Greenland": {
+      "message": "Grenlande"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "Grenlande, Brazilja, Montevideo"
+   },
+   "Grenada": {
+      "message": "Grenāda"
+   },
+   "Guadeloupe": {
+      "message": "Gvadelupa"
+   },
+   "Guam": {
+      "message": "Guama"
+   },
+   "Guatemala": {
+      "message": "Gvatemala"
+   },
+   "Guernsey": {
+      "message": "Gērnsija"
+   },
+   "Guinea": {
+      "message": "Gvineja"
+   },
+   "Guinea_Bissau": {
+      "message": "Gvineja-Bisava"
+   },
+   "Guyana": {
+      "message": "Gajāna"
+   },
+   "HP_Password_Safe": {
+      "message": "HP Password Safe"
+   },
+   "Haiti": {
+      "message": "Haiti"
+   },
+   "Harare__Pretoria": {
+      "message": "Harare, Pretorija"
+   },
+   "Hawaii": {
+      "message": "Havajas"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "Hērda sala un Makdonalda salas"
+   },
+   "Height": {
+      "message": "Augstums"
+   },
+   "Help": {
+      "message": "Palīdzība"
+   },
+   "Help_Center": {
+      "message": "Atbalsta centrs"
+   },
+   "Help_Translate": {
+      "message": "Palīdzēt tulkot"
+   },
+   "Help___": {
+      "message": "Palīdzība ..."
+   },
+   "Hide": {
+      "message": "Slēpt"
+   },
+   "Hide_Advanced_Options": {
+      "message": "Paslēpt papildiespējas"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "Paslēpt LastPass kontekstizvēlni"
+   },
+   "Hide_Password": {
+      "message": "Paslēpt paroli"
+   },
+   "Hide_Passwords": {
+      "message": "Slēpt paroles"
+   },
+   "Highlight_input_boxes": {
+      "message": "Izcelt ievades laukus"
+   },
+   "History": {
+      "message": "Vēsture"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "Svētais Krēsls (Vatikāns)"
+   },
+   "Home": {
+      "message": "Mājas"
+   },
+   "Honduras": {
+      "message": "Hondurasa"
+   },
+   "Hong_Kong": {
+      "message": "Honkonga"
+   },
+   "HotKeys": {
+      "message": "Karstie taustiņi"
+   },
+   "Hungarian": {
+      "message": "Ungāru"
+   },
+   "Hungary": {
+      "message": "Ungārija"
+   },
+   "IBAN_Number": {
+      "message": "IBAN numurs"
+   },
+   "IMPORT_": {
+      "message": "IMPORTĒT?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "IR ĻOTI SVARĪGI, LAI JŪS NEKAD NEAIZMIRSTU SAVU JAUNO LASTPASS PAROLI."
+   },
+   "I_Forgot_my_Password": {
+      "message": "Es aizmirsu savu paroli"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "Esmu aizmirsis savu paroli, palīdziet"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "Esmu izlasījis un piekrītu"
+   },
+   "I_have_read_and_agree_with_the__0terms_of_service_0_and__1privacy_statement_1": {
+      "message": "Esmu izlasījis un piekrītu %0pakalpojuma noteikumi%0 un %1privātuma paziņojums%1"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "Es saprotu, ka mani šifrētie dati tiks nosūtīti LastPass"
+   },
+   "I_ve_forgot_the_answer": {
+      "message": "Es aizmirsu atbildi"
+   },
+   "I_ve_lost_my_Sesame_device": {
+      "message": "Es esmu pazaudējis savu Sesame ierīci"
+   },
+   "I_ve_lost_my_YubiKey_device": {
+      "message": "Es esmu pazaudējis savu YubiKey ierīci"
+   },
+   "I_ve_lost_my_device": {
+      "message": "Es esmu pazaudējis savu ierīci"
+   },
+   "Iceland": {
+      "message": "Islande"
+   },
+   "Identities": {
+      "message": "Identitātes"
+   },
+   "Identity": {
+      "message": "Identitāte"
+   },
+   "If_not_specified__will_use_a_file_extension_of_": {
+      "message": "Ja nav norādīts, izmanto failu paplašināšanu:"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "Ja Jums jau ir LastPass konts, Jūs varat aizvērt šo logu un autorizēties."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "Ja Jūs aizmirsīsiet savu LastPass galveno paroli,"
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "Ja esat pazaudējis savu Google Authenticator ierīci, noklikšķiniet šeit, lai izslēgtu Google Authenticator autentifikāciju"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "Ja esat pazaudējis Sesame ierīci, noklikšķiniet šeit, lai izslēgtu Sesame autentifikāciju"
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "Ja esat pazaudējis savu YubiKey ierīci, uzklikšķiniet šeit, lai izslēgtu YubiKey autentifikāciju"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "Ja esat pazaudējis režģi, noklikšķiniet šeit, lai izslēgtu režģa autentifikāciju"
+   },
+   "Import": {
+      "message": "Importēt"
+   },
+   "Import_From": {
+      "message": "Importēt no"
+   },
+   "Import_Your_Data": {
+      "message": "Importēt Jūsu datus"
+   },
+   "India": {
+      "message": "Indija"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "Indiāna, Bogota, Lima, Quito, Rio Branco"
+   },
+   "Indonesia": {
+      "message": "Indonēzija"
+   },
+   "Install": {
+      "message": "Instalēt"
+   },
+   "Instructions": {
+      "message": "Palīdzība"
+   },
+   "Invalid_Password_": {
+      "message": "Nepareiza parole."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "Nederīga e-pasta adrese, mēģiniet vēlreiz"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "Irāna (Islāma Republika)"
+   },
+   "Iraq": {
+      "message": "Irāka"
+   },
+   "Ireland": {
+      "message": "Īrija"
+   },
+   "Isle_of_Man": {
+      "message": "Menas sala"
+   },
+   "Israel": {
+      "message": "Izraēla"
+   },
+   "Issue_Number": {
+      "message": "Kartes drošības kods"
+   },
+   "Issued_Date": {
+      "message": "Izdošanas datums"
+   },
+   "Issuing_Authority": {
+      "message": "Izdevējiestāde"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "Ir ieteicams, ka jūs izdzēšat pielikuma failu, kad būsiet to izmantojis."
+   },
+   "Italian": {
+      "message": "Itāļu"
+   },
+   "Italy": {
+      "message": "Itālija"
+   },
+   "Jamaica": {
+      "message": "Jamaika"
+   },
+   "January": {
+      "message": "Janvāris"
+   },
+   "Japan": {
+      "message": "Japāna"
+   },
+   "Japanese": {
+      "message": "Japāņu"
+   },
+   "Jersey": {
+      "message": "Džērsija"
+   },
+   "Jordan": {
+      "message": "Jordānija"
+   },
+   "July": {
+      "message": "Jūlijs"
+   },
+   "June": {
+      "message": "Jūnijs"
+   },
+   "Kabul": {
+      "message": "Kabula"
+   },
+   "Kathmandu": {
+      "message": "Katmandu"
+   },
+   "Kazakhstan": {
+      "message": "Kazahstāna"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "Saglabāt manu autorizāciju un formu aizpildes vēsturi"
+   },
+   "Kenya": {
+      "message": "Kenija"
+   },
+   "Key_Index": {
+      "message": "Key Index"
+   },
+   "Key_Type": {
+      "message": "Atslēgas tips"
+   },
+   "Kiribati": {
+      "message": "Kiribati"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "Korejas Tautas Demokrātiskā Republika"
+   },
+   "Korea__Republic_Of": {
+      "message": "Korejas Republika"
+   },
+   "Korean": {
+      "message": "Korejiešu"
+   },
+   "Kuwait": {
+      "message": "Kuveita"
+   },
+   "Kyrgyzstan": {
+      "message": "Kirgizstāna"
+   },
+   "La_Paz": {
+      "message": "La Paz"
+   },
+   "Language": {
+      "message": "Valoda"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "Laosas Tautas Demokrātiskā Republika"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "LastPass CSV failu"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "LastPass Chrome rīkjosla"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "LastPass šifrēto failu"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "LastPass Grid (režģa) daudzfaktoru autentifikācija"
+   },
+   "LastPass_Menu": {
+      "message": "LastPass izvēlne"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": "LastPass var automātiski aizpildīt web lapas formas ar vienu klikšķi. Izmantojot formu šablonus automātiska formu aizpildīšana ļauj ne tikai ietaupīt laiku, bet arī uzlabot savu drošību, iepērkoties internetā."
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "LastPass nevar autorizēties, kamēr 'cookies' priekš lastpass.com nav atļauti"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass konstatēja nedrošu autorizēšanās formu.\n\nVai Jūs vēlaties turpināt?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass konstatēja nedrošu autorizēšanās formu.\n\nVai Jūs joprojām vēlaties, lai LastPass aizpilda formu?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass atklāja paroļu izmaiņas"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass konstatēja paroles maiņu domēnam:"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass konstatēja paroles izmaiņas lietotājam:"
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "LastPass ir konstatējis instalācijas kļūda. Lūdzu pārinstalējiet LastPass."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass ir konstatējis, ka zemāk minētajai vietnei ir vāja parole. Mēs iesakām doties uz šīs vietnes konta iestatījumiem un izveidot jaunu paroli. Izmantojiet LastPass, lai ģenerētu unikālu, spēcīgu paroli šim kontam. Jūs varat saglabāt izmaiņas vietnē un LastPass."
+   },
+   "LastPass_has_detected_that_you_have_used_the_password_for_this_login_on_other_sites__too__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass ir konstatējis, ka šīs vietnes konta parole ir izmantota arī citās vietnēs. Mēs iesakām doties uz šīs vietnes konta iestatījumiem un izveidot jaunu paroli. Izmantojiet LastPass, lai ģenerētu unikālu, spēcīgu paroli šim kontam. Jūs varat saglabāt izmaiņas vietnē un LastPass."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass ir aizpildījis Jūsu pieteikšanās informāciju šīs vietnes veidlapā."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "LastPass tika pilnībā uzstādīts! Ja instalēsiet LastPass uz citiem datoriem, Jums nevajadzēs iet caur šo procesu vēlreiz, Jūs vienkārši varēsiet autorizēties. Nedodiet savu Galveno Paroli nevienam, tajā skaitā LastPass darbiniekiem, mēs Jums to nekad nejautāsim! LastPass šifrē Jūsu datus lokāli, pat LastPass darbiniekiem tie nav pieejami. Jums ir pieejama palīdzība, ko varat saņemt, nospiežot uz LastPass ikonas."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "Jūsu tālruņa numura pēdējie 4 cipari"
+   },
+   "Last_Name": {
+      "message": "Uzvārds"
+   },
+   "Last_Name2": {
+      "message": "Uzvārds2"
+   },
+   "Last_Touch": {
+      "message": "Pēdējā reize"
+   },
+   "Last_name": {
+      "message": "Uzvārds"
+   },
+   "Latvia": {
+      "message": "Latvija"
+   },
+   "Lebanon": {
+      "message": "Libāna"
+   },
+   "Left": {
+      "message": "Pa kreisi"
+   },
+   "Lesotho": {
+      "message": "Lesoto"
+   },
+   "Liberia": {
+      "message": "Libērija"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "Lībija"
+   },
+   "License_Class": {
+      "message": "Licences klase"
+   },
+   "License_Key": {
+      "message": "Licences numurs"
+   },
+   "Liechtenstein": {
+      "message": "Lihtenšteina"
+   },
+   "Lithuania": {
+      "message": "Lietuva"
+   },
+   "Log_into_a_Site": {
+      "message": "Pieslēgties vietnei"
+   },
+   "Login": {
+      "message": "Pieslēgties"
+   },
+   "LoginError": {
+      "message": "Kļūda ieejot LastPass. Lūdzu mēģiniet vēlreiz."
+   },
+   "Login_to_LastPass": {
+      "message": "Pieslēgties LastPass"
+   },
+   "Logoff": {
+      "message": "Atslēgties"
+   },
+   "Logoff_": {
+      "message": "Atslēgties:"
+   },
+   "LoseChanges": {
+      "message": "Vai tiešām vēlaties rediģēt šīs lapas laukus? To darot, Jūs varat zaudēt jebkuras izmaiņas, kas veiktas šajā vietnē."
+   },
+   "Luxembourg": {
+      "message": "Luksemburga"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "Makao"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "Maķedonija, Bijusī Dienvidslāvijas Maķedonijas Republika"
+   },
+   "Madagascar": {
+      "message": "Madagaskara"
+   },
+   "Make_Pronounceable": {
+      "message": "Padarīt izrunājamu"
+   },
+   "Malawi": {
+      "message": "Malāvija"
+   },
+   "Malaysia": {
+      "message": "Malaizija"
+   },
+   "Maldives": {
+      "message": "Maldīvija"
+   },
+   "Male": {
+      "message": "Vīrietis"
+   },
+   "Mali": {
+      "message": "Mali"
+   },
+   "Malta": {
+      "message": "Malta"
+   },
+   "March": {
+      "message": "Marts"
+   },
+   "Marshall_Islands": {
+      "message": "Māršala salas"
+   },
+   "Martinique": {
+      "message": "Martinika"
+   },
+   "Master_Password": {
+      "message": "Galvenā parole"
+   },
+   "Matching_Sites": {
+      "message": "Atbilstošas vietnes"
+   },
+   "Mauritania": {
+      "message": "Mauritānija"
+   },
+   "Mauritius": {
+      "message": "Maurīcija"
+   },
+   "Maxthon": {
+      "message": "Maxthon"
+   },
+   "May": {
+      "message": "Maijs"
+   },
+   "Mayotte": {
+      "message": "Majota"
+   },
+   "Member_Name": {
+      "message": "Biedra vārds"
+   },
+   "Membership": {
+      "message": "Biedrība"
+   },
+   "Membership_Number": {
+      "message": "Biedra numurs"
+   },
+   "Meta": {
+      "message": "Meta"
+   },
+   "Mexico": {
+      "message": "Meksika"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "Mikronēzijas Federatīvās Valstis"
+   },
+   "Mid_Atlantic": {
+      "message": "Vidusatlantija"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "Jūsu tālruņa numura vidējie 3 cipari"
+   },
+   "Middle_Name": {
+      "message": "Otrais vārds"
+   },
+   "Middle_name": {
+      "message": "Otrais vārds"
+   },
+   "Midway_Island__Samoa": {
+      "message": "Pusceļā sala, Samoa"
+   },
+   "Mobile_Email_Address": {
+      "message": "Mobilā e-pasta adrese"
+   },
+   "Mobile_Number": {
+      "message": "Mobilais"
+   },
+   "Mobile_number": {
+      "message": "Mobilā tālruņa numurs"
+   },
+   "Moldova__Republic_Of": {
+      "message": "Moldovas Republika"
+   },
+   "Monaco": {
+      "message": "Monako"
+   },
+   "Mongolia": {
+      "message": "Mongolija"
+   },
+   "Montenegro": {
+      "message": "Melnkalne"
+   },
+   "Montserrat": {
+      "message": "Montserrata"
+   },
+   "More": {
+      "message": "Vairāk"
+   },
+   "More_Information": {
+      "message": "Vairāk informācijas"
+   },
+   "Morocco": {
+      "message": "Maroka"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "Kalnu laiks (ASV un Kanāda)"
+   },
+   "Move_matching_sites_to_top_menu": {
+      "message": "Pārvietot atbilstošās ​​vietnes uz galveno izvēlni"
+   },
+   "Mozambique": {
+      "message": "Mozambika"
+   },
+   "Mr": {
+      "message": "Kungs"
+   },
+   "Mrs": {
+      "message": "Kundze"
+   },
+   "Ms": {
+      "message": "Jaunkundze"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_Account": {
+      "message": "Mans konts"
+   },
+   "My_LastPass_Vault": {
+      "message": "Mans LastPass seifs"
+   },
+   "Myanmar": {
+      "message": "Mjanma"
+   },
+   "NAME": {
+      "message": "NOSAUKUMS"
+   },
+   "Name_": {
+      "message": "Vārds:"
+   },
+   "Name_on_Card": {
+      "message": "Vārds uz kartes"
+   },
+   "Name_on_card": {
+      "message": "Vārds uz kartes"
+   },
+   "Nameproper": {
+      "message": "Nosaukums"
+   },
+   "Namibia": {
+      "message": "Namībija"
+   },
+   "Nationality": {
+      "message": "Tautība"
+   },
+   "Nauru": {
+      "message": "Nauru"
+   },
+   "Nepal": {
+      "message": "Nepāla"
+   },
+   "Netherlands": {
+      "message": "Nīderlande"
+   },
+   "Netherlands_Antilles": {
+      "message": "Nīderlandes Antiļas"
+   },
+   "Never": {
+      "message": "Nekad"
+   },
+   "Never_Ask_Again": {
+      "message": "Nekad vairs nejautāt"
+   },
+   "Never_AutoFill": {
+      "message": "Neaizpildīt automātiski"
+   },
+   "Never_AutoLogin": {
+      "message": "Neautorizēties automātiski"
+   },
+   "Never_Show_Again": {
+      "message": "Nekad vairs nerādīt"
+   },
+   "Never___": {
+      "message": "Nekad..."
+   },
+   "New_Caledonia": {
+      "message": "Jaunkaledonija"
+   },
+   "New_Master_Password": {
+      "message": "Jauna galvenā parole"
+   },
+   "New_Zealand": {
+      "message": "Jaunzēlande"
+   },
+   "New_here__Create_an_Account_": {
+      "message": "Jauns lietotājs? Izveidojiet kontu."
+   },
+   "Newfoundland": {
+      "message": "Ņūfaundlenda"
+   },
+   "Nicaragua": {
+      "message": "Nikaragva"
+   },
+   "Niger": {
+      "message": "Nigēra"
+   },
+   "Nigeria": {
+      "message": "Nigērija"
+   },
+   "Niue": {
+      "message": "Niue"
+   },
+   "No": {
+      "message": "Nē"
+   },
+   "No_Matching_Sites_": {
+      "message": "Neviena mājaslapa neatbilst!"
+   },
+   "No_Thanks": {
+      "message": "Nē, paldies!"
+   },
+   "No_Updates_Are_Available": {
+      "message": "Pašlaik nav atjauninājumu"
+   },
+   "No_Wi_Fi_adapter_was_detected_on_this_computer___This_feature_requires_a_Wi_Fi_adapter_": {
+      "message": "Šajā datorā netika atrasts Wi-Fi adapteris. Šai funkcijai ir nepieciešams Wi-Fi adapteris."
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "Nē, es nevēlos, lai LastPass palīdzētu man aizpildīt formas automātiski"
+   },
+   "No_matches_found__Please_search_again_": {
+      "message": "Nekas nav atrasts. Lūdzu, meklējiet vēlreiz."
+   },
+   "None_Available": {
+      "message": "Nav pieejams"
+   },
+   "Norfolk_Island": {
+      "message": "Norfolkas sala"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "Ziemeļu Marianas salas"
+   },
+   "Norway": {
+      "message": "Norvēģija"
+   },
+   "Norwegian": {
+      "message": "Norvēģu"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "Norvēģu jaunnorvēģu"
+   },
+   "Not_Now": {
+      "message": "Citreiz"
+   },
+   "Note_Type": {
+      "message": "Piezīmes tips"
+   },
+   "Notes": {
+      "message": "Piezīmes"
+   },
+   "Notes_": {
+      "message": "Piezīmes:"
+   },
+   "Notifications": {
+      "message": "Paziņojumi"
+   },
+   "November": {
+      "message": "Novembris"
+   },
+   "Nuku_alofa": {
+      "message": "Nukualofa"
+   },
+   "Number": {
+      "message": "Numurs"
+   },
+   "Number_of_Licenses": {
+      "message": "Licenču skaits"
+   },
+   "OK": {
+      "message": "OK"
+   },
+   "October": {
+      "message": "Oktobris"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "Piedāvāt ģenerēt drošas paroles"
+   },
+   "Old_Password": {
+      "message": "Vecā parole"
+   },
+   "Oman": {
+      "message": "Omāna"
+   },
+   "Open_All": {
+      "message": "Atvērt visus"
+   },
+   "Open_Favorites": {
+      "message": "Atvērt favorītus"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "Atvērt LastPass seifu"
+   },
+   "Open_New_Pages_in": {
+      "message": "Jaunu lapu atvērt"
+   },
+   "Open_Sticky_Password___Manage_Database___Export___Export_as_text__Import_this_file": {
+      "message": "Atveriet Sticky Password - Manage Database - Export - Export as text. Importējiet šo failu"
+   },
+   "Open_login_dialog_when_browser_starts": {
+      "message": "Atvērt pieslēgšanās formu, startējot pārlūkprogrammu"
+   },
+   "Opera": {
+      "message": "Opera"
+   },
+   "Opera_Password_Manager": {
+      "message": "Opera Password Manager"
+   },
+   "Order_Number": {
+      "message": "Pasūtījuma numurs"
+   },
+   "Order_Total": {
+      "message": "Pasūtījuma kopsumma"
+   },
+   "Organization": {
+      "message": "Organizācija"
+   },
+   "Other": {
+      "message": "Citiem avotiem"
+   },
+   "Other_Sessions": {
+      "message": "Citas sesijas"
+   },
+   "PASSWORDupper": {
+      "message": "PAROLE"
+   },
+   "PINs_Password_Manager": {
+      "message": "PINs Password Manager"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "Klusā okeāna laiks (ASV un Kanāda)"
+   },
+   "Page_Down": {
+      "message": "Page Down"
+   },
+   "Page_Up": {
+      "message": "Page Up"
+   },
+   "Pakistan": {
+      "message": "Pakistāna"
+   },
+   "Palau": {
+      "message": "Palau"
+   },
+   "Palestinian_Territories": {
+      "message": "Palestīniešu teritorijas"
+   },
+   "Panama": {
+      "message": "Panama"
+   },
+   "Papua_New_Guinea": {
+      "message": "Papua Jaungvineja"
+   },
+   "Paraguay": {
+      "message": "Paragvaja"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passport": {
+      "message": "Pase"
+   },
+   "Password": {
+      "message": "Parole"
+   },
+   "Password_": {
+      "message": "Parole:"
+   },
+   "Password_Agent": {
+      "message": "Paroļu aģents"
+   },
+   "Password_Corral": {
+      "message": "Password Corral"
+   },
+   "Password_Depot": {
+      "message": "Password Depot"
+   },
+   "Password_Dragon": {
+      "message": "Password Dragon"
+   },
+   "Password_Keeper": {
+      "message": "Password Keeper"
+   },
+   "Password_Length": {
+      "message": "Paroles garums"
+   },
+   "Password_Length_": {
+      "message": "Paroles garums:"
+   },
+   "Password_Reminder": {
+      "message": "Paroles atgādinājums"
+   },
+   "Password_Safe": {
+      "message": "Password Safe"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "Paroles atgādinājums nevar sakrist ar paroli"
+   },
+   "Password_updated_": {
+      "message": "Parole atjaunota!"
+   },
+   "Passwords_Max": {
+      "message": "Passwords Max"
+   },
+   "Personal": {
+      "message": "Personisks"
+   },
+   "Peru": {
+      "message": "Peru"
+   },
+   "Philippines": {
+      "message": "Filipīnas"
+   },
+   "Phone_Number": {
+      "message": "Telefona numurs"
+   },
+   "Phone_number": {
+      "message": "Tālruņa numurs"
+   },
+   "Pin": {
+      "message": "PIN kods"
+   },
+   "Pitcairn": {
+      "message": "Pitkērna"
+   },
+   "Please_Make_a_Selection": {
+      "message": "Lūdzu, izdariet izvēli"
+   },
+   "Please_Wait___": {
+      "message": "Lūdzu uzgaidiet..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "Lūdzu atbildiet uz sekojošu jautājumu:"
+   },
+   "Please_choose_the_type_of_export_you_would_like_to_perform_": {
+      "message": "Lūdzu izvēlēties, kādu veidu eksporta vēlaties veikt:"
+   },
+   "Please_close_this_window": {
+      "message": "Lūdzu, aizveriet šo logu"
+   },
+   "Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "Lūdzu, ievadiet pilnu ceļu uz importējamo failu."
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "Lūdzu, dodiet nosaukumu šim datoram"
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "Lūdzu, restartējiet visas pārlūkprogrammas, lai sāktu izmantot LastPass Online."
+   },
+   "Please_select": {
+      "message": "Izvēieties"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "Lūdzu, izvēlieties, uz kurām vietnēm attiecināt šīs izmaiņas."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "Lūdzu apmeklējiet https://lastpass.com izveidotu kontu vēlāk."
+   },
+   "Poland": {
+      "message": "Polija"
+   },
+   "Polish": {
+      "message": "Poļu"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "Pieprasīt no servera izmaiņas kontā ik pēc (min)"
+   },
+   "Port": {
+      "message": "Ports"
+   },
+   "Portugal": {
+      "message": "Portugāle"
+   },
+   "Portuguese": {
+      "message": "Portugāļu"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "Portugāļu (Brazīlijas)"
+   },
+   "Preferences": {
+      "message": "Uzstādījumi"
+   },
+   "Price": {
+      "message": "Cena"
+   },
+   "Print": {
+      "message": "Drukāt"
+   },
+   "Print_Secure_Notes": {
+      "message": "Drukāt drošās piezīmes"
+   },
+   "Print_Sites": {
+      "message": "Drukāt vietnes"
+   },
+   "Product": {
+      "message": "Produkts"
+   },
+   "Profile": {
+      "message": "Profils"
+   },
+   "Profile_language": {
+      "message": "Profila valoda"
+   },
+   "Profile_name": {
+      "message": "Profila nosaukums"
+   },
+   "Pronounceable": {
+      "message": "Izrunājama"
+   },
+   "Protected": {
+      "message": "Aizsargāts"
+   },
+   "Publisher": {
+      "message": "Izdevējs"
+   },
+   "Puerto_Rico": {
+      "message": "Puertoriko"
+   },
+   "Purchase_Date": {
+      "message": "Pirkuma datums"
+   },
+   "Qatar": {
+      "message": "Katara"
+   },
+   "Recently_Used": {
+      "message": "Nesen lietots"
+   },
+   "Recently_Used_list_size": {
+      "message": "'Nesen lietots' saraksta garums"
+   },
+   "Recheck_Page": {
+      "message": "Vēlreiz pārbaudīt lapu"
+   },
+   "Reencrypting_Data___": {
+      "message": "Atkārtota datu šifrēšana..."
+   },
+   "Refresh": {
+      "message": "Atjaunot"
+   },
+   "Refresh_Sites": {
+      "message": "Atjaunināt vietnes"
+   },
+   "Reject": {
+      "message": "Noraidīt"
+   },
+   "Remember_Email": {
+      "message": "Atcerēties e-pastu"
+   },
+   "Remember_Password": {
+      "message": "Atcerēties paroli"
+   },
+   "Replace_Existing_Site": {
+      "message": "Aizstāt esošo vietni"
+   },
+   "Require_All_Character_Types": {
+      "message": "Izmantot visus rakstzīmju veidus"
+   },
+   "Require_Every_Character_Type": {
+      "message": "Jāsatur katrs rakstzīmju veids"
+   },
+   "Require_Password_Reprompt": {
+      "message": "Atkārtoti pieprasīt paroli"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "Atkārtoti pieprasīt paroli, kad:"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "Ievērot AutoComplete=off:, ļaujot vietnēm atspējot automātisko aizpildīšanu"
+   },
+   "Reunion": {
+      "message": "Atkalapvienošanās"
+   },
+   "Revelation_Password_Manager": {
+      "message": "Revelation Password Manager"
+   },
+   "Right": {
+      "message": "Pa labi"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "Rumānija"
+   },
+   "Russian": {
+      "message": "Krievu"
+   },
+   "Russian_Federation": {
+      "message": "Krievijas Federācija"
+   },
+   "Rwanda": {
+      "message": "Ruanda"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "VIETNE"
+   },
+   "SMTP_Port": {
+      "message": "SMTP ports"
+   },
+   "SMTP_Server": {
+      "message": "SMTP serveris"
+   },
+   "SPB_Wallet": {
+      "message": "SPB Wallet"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SWIFT_Code": {
+      "message": "SWIFT kods"
+   },
+   "Safari": {
+      "message": "Safari"
+   },
+   "Safari_Password_Manager": {
+      "message": "Safari Password Manager"
+   },
+   "Saint_Barthelemy": {
+      "message": "Saint Barthelemy"
+   },
+   "Saint_Helena": {
+      "message": "Svētās Helēnas sala"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "Sentkitsa un Nevisa"
+   },
+   "Saint_Lucia": {
+      "message": "Sentlūsija"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "Senmartēna (franču daļa)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "Senpjēra un Mikelona"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "Sentvinsenta un Grenadīnas"
+   },
+   "Samoa": {
+      "message": "Samoa"
+   },
+   "San_Marino": {
+      "message": "Sanmarīno"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "Santome un Prinsipi"
+   },
+   "Saudi_Arabia": {
+      "message": "Saūda Arābija"
+   },
+   "Save": {
+      "message": "Saglabāt"
+   },
+   "Save_All_Entered_Data": {
+      "message": "Saglabāt visus ievadītos datus"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "Saglabāt kredītkartes profilu"
+   },
+   "Save_New_Site": {
+      "message": "Saglabāt jaunu vietni"
+   },
+   "Save_Site": {
+      "message": "Saglabāt paroli"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "Saglabājiet izmaiņas un aizveriet šo logu"
+   },
+   "Saved_Passwords": {
+      "message": "Saglabātās paroles"
+   },
+   "Screen_Keyboard": {
+      "message": "Ekrāna klaviatūra"
+   },
+   "Search_All_Data": {
+      "message": "Meklēt visos datos"
+   },
+   "Search_All_Notes": {
+      "message": "Meklēt visās piezīmēs"
+   },
+   "Search_All_Sites": {
+      "message": "Meklēt visās vietnēs"
+   },
+   "Search_LastPass_Vault": {
+      "message": "Meklēt LastPass seifā"
+   },
+   "Search_Vault": {
+      "message": "Meklēt seifā"
+   },
+   "Search_within_secure_notes": {
+      "message": "Meklēšana drošajās piezīmēs"
+   },
+   "Searchproper": {
+      "message": "Meklēt"
+   },
+   "Secure_Notes": {
+      "message": "Drošās piezīmes"
+   },
+   "Security": {
+      "message": "Drošība"
+   },
+   "Security_Check": {
+      "message": "Drošības līmeņa pārbaude"
+   },
+   "Security_Question_Multifactor_Authentication": {
+      "message": "Drošības jautājuma daudzfaktoru autentifikācija"
+   },
+   "Security_code": {
+      "message": "Drošības kods"
+   },
+   "Select": {
+      "message": "Atlasīt"
+   },
+   "Select_All": {
+      "message": "Izvēlēties visu"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "Nosūtīt anonīmus kļūdu ziņojumus, lai palīdzētu uzlabot LastPass"
+   },
+   "Senegal": {
+      "message": "Senegāla"
+   },
+   "September": {
+      "message": "Septembris"
+   },
+   "Serbia": {
+      "message": "Serbija"
+   },
+   "Server": {
+      "message": "Serveris"
+   },
+   "SesameWrongButton": {
+      "message": "Lai skatītu savus datus bezsaistē jāpalaiž Sesame\nand jāizmanto 'Kopēt bezsaistes paroli' poga\n'Ģenerēt vienreizējo paroli' pogas vietā."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "Sesame daudzfaktoru autentifikācija"
+   },
+   "Settings": {
+      "message": "Uzstādījumi"
+   },
+   "Sex": {
+      "message": "Dzimums"
+   },
+   "Seychelles": {
+      "message": "Seišelu salas"
+   },
+   "Share": {
+      "message": "Koplietot"
+   },
+   "Share_Selected": {
+      "message": "Koplietot izvēlēto"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "Koplietot autoeizācijas stāvokli starp pārlūkprogrammām"
+   },
+   "Share_offer_from": {
+      "message": "Koplietošanas piedāvājums no"
+   },
+   "Shift": {
+      "message": "Shift"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "Vai LastPass atcerēties šo paroli?"
+   },
+   "Show": {
+      "message": "Parādīt"
+   },
+   "Show_Advanced_Options": {
+      "message": "Rādīt papildus iespējas"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "Rādīt paziņojumus par paroles maiņu"
+   },
+   "Show_Deleted_Sites": {
+      "message": "Rādīt dzēstās vietnes"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "Rādīt formu aizpildīšanas paziņojumu joslu"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "Rādīt paziņojumus par formu aizpildīšanu"
+   },
+   "Show_Matching_Sites": {
+      "message": "Rādīt atbilstošas vietnes"
+   },
+   "Show_Matching_Sites_Count_in_Toolbar": {
+      "message": "Rādīt atbilstošu vietņu skaitu rīkjoslā"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "Atvērt LastPass seifu pēc pieslēgšanās"
+   },
+   "Show_Notifications": {
+      "message": "Rādīt paziņojumus"
+   },
+   "Show_Password": {
+      "message": "Rādīt paroli"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "Rādīt vietnes saglabāšanas paziņojumu joslu"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "Rādīt aicinājumu saglabāt vietni"
+   },
+   "Show_Vault_After_Login": {
+      "message": "Pēc pieslēgšanās rādīt seifu"
+   },
+   "Show_all_sites": {
+      "message": "Rādīt visas vietnes"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "Rādīt atsevišķus paziņojumus tikai pēc ieklikšķināšanas laukā"
+   },
+   "Show_or_Hide_Password": {
+      "message": "Rādīt vai paslēpt paroli"
+   },
+   "Sierra_Leone": {
+      "message": "Sjerraleone"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "Atvieglojiet dzīvi: Izmantojiet LastPass, lai automātiski aizpildītu vietnes autorizācijas datus!"
+   },
+   "Singapore": {
+      "message": "Singapūra"
+   },
+   "Site_Search": {
+      "message": "Vietņu meklētājs"
+   },
+   "Sites": {
+      "message": "Vietnes"
+   },
+   "Slovak": {
+      "message": "Slovāku"
+   },
+   "Slovakia": {
+      "message": "Slovākija"
+   },
+   "Slovenia": {
+      "message": "Slovēnija"
+   },
+   "Software_License": {
+      "message": "Programmatūras licence"
+   },
+   "Solomon_Islands": {
+      "message": "Zālamana salas"
+   },
+   "Somalia": {
+      "message": "Somālija"
+   },
+   "Source_": {
+      "message": "Avots:"
+   },
+   "South_Africa": {
+      "message": "Dienvidāfrika"
+   },
+   "South_Georgia": {
+      "message": "Dienviddžordžija"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "Dienviddžordžija un Dienvidsendviču salas"
+   },
+   "Spain": {
+      "message": "Spānija"
+   },
+   "Spanish": {
+      "message": "Spāņu"
+   },
+   "Spanish__Mexico_": {
+      "message": "Spāņu (Meksika)"
+   },
+   "Special": {
+      "message": "Specsimboli"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sri_Lanka": {
+      "message": "Šrilanka"
+   },
+   "State": {
+      "message": "Valsts"
+   },
+   "Status": {
+      "message": "Statuss"
+   },
+   "Sticky_Password": {
+      "message": "Sticky Password"
+   },
+   "Sudan": {
+      "message": "Sudāna"
+   },
+   "Support_Email": {
+      "message": "Atbalsta e-pasts"
+   },
+   "Suriname": {
+      "message": "Surinama"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "Svalbāra un Jana Majena"
+   },
+   "Swaziland": {
+      "message": "Svazilenda"
+   },
+   "Sweden": {
+      "message": "Zviedrija"
+   },
+   "Swedish": {
+      "message": "Zviedru"
+   },
+   "Switzerland": {
+      "message": "Šveice"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "Sīrijas Arābu Republika"
+   },
+   "Tabs": {
+      "message": "jaunā cilnē"
+   },
+   "Taiwan": {
+      "message": "Taivāna"
+   },
+   "Tajikistan": {
+      "message": "Tadžikistāna"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "Tanzānijas Apvienotā Republika"
+   },
+   "Tehran": {
+      "message": "Teherāna"
+   },
+   "Telephone": {
+      "message": "Tālrunis"
+   },
+   "Text": {
+      "message": "Teksts"
+   },
+   "Thailand": {
+      "message": "Taizeme"
+   },
+   "That_file_is_missing_or_empty___Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "Fails nav atrodams vai ir tukšs. Lūdzu, ievadiet pilnu ceļu uz importējamo failu."
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "Atkārtoti ievadītā LastPass galvenā parole nesakrīt"
+   },
+   "The_name_of_your_bank": {
+      "message": "Bankas nosaukums"
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "To var izdarīt tikai no LastPass lapas"
+   },
+   "This_feature_is_not_available_in_this_version__Please_install_the_binary_extension_by_going_to_https___lastpass_com_dl": {
+      "message": "Šī funkcija nav pieejama šajā versijā. Lūdzu instalējiet bināro papildinājumu no https://lastpass.com/dl"
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "Šī vietne ir koplietota. Jums nav tiesību skatīt paroli."
+   },
+   "This_may_take_a_while___": {
+      "message": "Tas var aizņemt kādu laiku..."
+   },
+   "Time_Zone": {
+      "message": "Laika josla"
+   },
+   "Timor_Leste": {
+      "message": "Austrumtimora"
+   },
+   "Title": {
+      "message": "Nosaukums"
+   },
+   "To_import_passwords_from_Opera_Password_Manager__simply_click_Import_below_": {
+      "message": "Lai importētu paroles no Opera Password Manager, noklikšķiniet uz Importēt."
+   },
+   "To_import_passwords_from_Safari_Password_Manager__simply_click_Import_below_": {
+      "message": "Lai importētu paroles no Safari Password Manager, noklikšķiniet uz Importēt."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "Lai aizsargātu savu privātumu un saglabāt jūsu datu konfidencialitāti,"
+   },
+   "Togo": {
+      "message": "Togo"
+   },
+   "Tokelau": {
+      "message": "Tokelau"
+   },
+   "Tonga": {
+      "message": "Tonga"
+   },
+   "Tools": {
+      "message": "Rīki"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "Trinidāda un Tobāgo"
+   },
+   "Try_Again": {
+      "message": "Mēģiniet vēlreiz"
+   },
+   "Tunisia": {
+      "message": "Tunisija"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "Turcija"
+   },
+   "Turkmenistan": {
+      "message": "Turkmenistāna"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "Tērksas un Kaikosas salas"
+   },
+   "Tuvalu": {
+      "message": "Tuvalu"
+   },
+   "Type": {
+      "message": "Tips"
+   },
+   "Type_": {
+      "message": "Tips:"
+   },
+   "URL": {
+      "message": "URL"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "LIETOTĀJVĀRDS"
+   },
+   "Uganda": {
+      "message": "Uganda"
+   },
+   "Ukraine": {
+      "message": "Ukraina"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "Ulaanbatora, Pērta"
+   },
+   "United_Arab_Emirates": {
+      "message": "Apvienotie Arābu Emirāti"
+   },
+   "United_Kingdom": {
+      "message": "Lielbritānija"
+   },
+   "United_States": {
+      "message": "Amerikas Savienotās Valstis"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "ASV Mazās Aizjūras Salas"
+   },
+   "Unknown": {
+      "message": "Nezināms"
+   },
+   "Unselect_All": {
+      "message": "Atcelt visu"
+   },
+   "Up": {
+      "message": "Augšup"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "Jaunināt uz LastPass Online!"
+   },
+   "Upgrade_to_Premium": {
+      "message": "Pāriet uz Premium"
+   },
+   "Uploading_Data___": {
+      "message": "Augšupielādē datus..."
+   },
+   "Uruguay": {
+      "message": "Urugvaja"
+   },
+   "Use": {
+      "message": "Izmantot"
+   },
+   "Use_802_1X": {
+      "message": "Izmantot 802.1x"
+   },
+   "Use_Password": {
+      "message": "Lietot paroli"
+   },
+   "Use_Special_Characters": {
+      "message": "Izmantot speciālās rakstzīmes"
+   },
+   "Use_Special_Characters_": {
+      "message": "Izmantot speciālās rakstzīmes?"
+   },
+   "User_Manual": {
+      "message": "Rokasgrāmata"
+   },
+   "Username_": {
+      "message": "Lietotājvārds:"
+   },
+   "Usernameproper": {
+      "message": "Lietotājvārds"
+   },
+   "Uzbekistan": {
+      "message": "Uzbekistāna"
+   },
+   "Vanuatu": {
+      "message": "Vanuatu"
+   },
+   "Vault": {
+      "message": "Seifs"
+   },
+   "Venezuela": {
+      "message": "Venecuēla"
+   },
+   "Version": {
+      "message": "Versija"
+   },
+   "Version_": {
+      "message": "Versija:"
+   },
+   "Viet_Nam": {
+      "message": "Vjetnama"
+   },
+   "View_Image": {
+      "message": "Skatīt attēlu"
+   },
+   "View_Passwords": {
+      "message": "Skatīt paroles"
+   },
+   "Virgin_Islands__British_": {
+      "message": "Virdžīnu salas (Britu)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "Virdžīnu salas (ASV)"
+   },
+   "Wallis_and_Futuna": {
+      "message": "Volisa un Futuna"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "Brīdināt pirms nedrošu formu aizpildīšanas"
+   },
+   "Weak_Password": {
+      "message": "Vāja parole"
+   },
+   "Website": {
+      "message": "Vietne"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "Laipni lūdzam LastPass!"
+   },
+   "West_Central_Africa": {
+      "message": "Rietumu Centrālāfrika"
+   },
+   "Western_Sahara": {
+      "message": "Rietumsahāra"
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used": {
+      "message": "Ja šī iespēja ir atzīmēta, parole saturēs vismaz vienu mazo burts, vienu lielo burtu un vienu īpašu rakstzīmi"
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used_": {
+      "message": "Ja šī iespēja ir atzīmēta, parole saturēs vismaz vienu mazo burts, vienu lielo burtu un vienu īpašu rakstzīmi."
+   },
+   "When_this_box_is_checked__characters_like___and___will_be_used_when_randomly_generating_a_password_": {
+      "message": "Ja šī iespēja ir atzīmēta, saģenerētā parole saturēs arī # un ! rakstzīmes."
+   },
+   "When_this_box_is_checked__confusing_characters__1_I_L_0_O__are_not_used_": {
+      "message": "Ja šī iespēja ir atzīmēta, parole nesaturēs viegli pārprotamas rakstzīmes, kā piemēram 1, I, L, 0, O."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce": {
+      "message": "Ja šī iespēja ir atzīmēta, parole būs viegli izrunājama"
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce_": {
+      "message": "Ja šī iespēja ir atzīmēta, parole nesaturēs viegli pārprotamas rakstzīmes, kā piemēram 1, I, L, 0, O."
+   },
+   "When_this_box_is_checked__potentially_confusing_characters__1_I_L_0_O__are_not_used": {
+      "message": "Ja šī iespēja ir atzīmēta, parole nesaturēs viegli pārprotamas rakstzīmes, kā piemēram 1, I, L, 0, O"
+   },
+   "When_this_box_is_checked__use_characters_like___and___in_the_password": {
+      "message": "Ja šī iespēja ir atzīmēta, parole saturēs arī # un ! rakstzīmes"
+   },
+   "Wi_Fi_Password": {
+      "message": "Wi-Fi Parole"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "Wi-Fi paroles"
+   },
+   "Windows": {
+      "message": "jaunā logā"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "Vai jūs vēlaties izveidot formas šablonu jau tagad?"
+   },
+   "XML_Files": {
+      "message": "XML faili"
+   },
+   "Yangon__Rangoon_": {
+      "message": "Yangon (Rangoon)"
+   },
+   "Yemen": {
+      "message": "Jemena"
+   },
+   "Yes": {
+      "message": "Jā"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "Jā, ļaujiet man izvēlēties, kurus vienumus importēt LastPass"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "Jā, ļaujiet man ievadīt un pārskatīt datus, kas tiks izmantoti formu šabloniem"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "Jūs nevarat piešķirt vienu vērtību vairākiem karstajiem taustiņiem."
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "Jūs vēl neesat izvēlējies noklusēto formu aizpildīšanas šablonu. Vai vēlaties uzstādīt tagad?"
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "Jums jāpiekrīt noteikumiem, lai turpinātu"
+   },
+   "You_must_enter_a_name_": {
+      "message": "Jums ir jāievada nosaukums."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "Jums ir jāievada unikāls nosaukums."
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "Jūsu Google Chrome paroles ir veiksmīgi importētas."
+   },
+   "Your_address_information": {
+      "message": "Jūsu adreses informācija"
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "Jūsu pielikums atrodas:"
+   },
+   "Your_birth_day": {
+      "message": "Jūsu dzimšanas diena"
+   },
+   "Your_birth_month": {
+      "message": "Jūsu dzimšanas mēnesis"
+   },
+   "Your_city_name": {
+      "message": "Jūsu pilsētas nosaukums"
+   },
+   "Your_company_s_name": {
+      "message": "Jūsu uzņēmuma nosaukums"
+   },
+   "Your_contact_information": {
+      "message": "Jūsu kontaktinformācija"
+   },
+   "Your_country_name": {
+      "message": "Jūsu valsts nosaukums"
+   },
+   "Your_county_name": {
+      "message": "Jūsu novada nosaukums"
+   },
+   "Your_credit_card_information": {
+      "message": "Jūsu kredītkartes informācija"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "Jūsu pašreizējie iestatījumi pieprasa ievadīt LastPass paroli, lai pabeigtu šo darbību."
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "Jūsu dati ir eksportēti uz"
+   },
+   "Your_email_address": {
+      "message": "Jūsu e-pasta adrese"
+   },
+   "Your_first_name": {
+      "message": "Jūsu vārds"
+   },
+   "Your_last_name": {
+      "message": "Jūsu uzvārds"
+   },
+   "Your_middle_name": {
+      "message": "Jūsu otrais vārds"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "Jūsu parole nevar būt tāda pati kā e-pasts."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "Jūsu parole ir viegli uzminama."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "Jūsu parole ir pārāk īsa, tai ir jāsatur vismaz 6 rakstzīmes"
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "Paroles atgādinājums kalpo, lai atgādinātu par to, kāda ir jūsu"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "Jūsu paroles nesakrīt."
+   },
+   "Your_personal_information": {
+      "message": "Jūsu personīgā informācija"
+   },
+   "Your_phone_number": {
+      "message": "Jūsu tālruņa numurs"
+   },
+   "Your_phone_number_extension": {
+      "message": "Jūsu tālruņa numura paplašinājums"
+   },
+   "Your_prefix_or_title": {
+      "message": "Jūsu prefikss vai nosaukums"
+   },
+   "Your_sex": {
+      "message": "Jūsu dzimums"
+   },
+   "Your_state_or_province_name": {
+      "message": "Jūsu valsts vai provinces nosaukums"
+   },
+   "Your_street_address": {
+      "message": "Jūsu adrese"
+   },
+   "Your_time_zone": {
+      "message": "Jūsu laika josla"
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "Jūsu lietotājvārds piesakoties tīmekļa vietnēs"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "YubiKey daudzfaktoru autentifikācija"
+   },
+   "Yugoslavia": {
+      "message": "Dienvidslāvija"
+   },
+   "ZIP___Postal_Code": {
+      "message": "Pasta indekss"
+   },
+   "ZIP___Postal_code": {
+      "message": "Pasta kods"
+   },
+   "Zambia": {
+      "message": "Zambija"
+   },
+   "Zimbabwe": {
+      "message": "Zimbabve"
+   },
+   "_Chrome_Only_Toolstrip_": {
+      "message": "[uz Chrome rīkjoslas ikonas]"
+   },
+   "_Hide_": {
+      "message": "[Slēpt]"
+   },
+   "_History_": {
+      "message": "[Vēsture]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(Jauni koplietošanas piedāvājumi)"
+   },
+   "_Show_": {
+      "message": "[Parādīt]"
+   },
+   "_domain_": {
+      "message": "(nozare)"
+   },
+   "_none_": {
+      "message": "(tukšs)"
+   },
+   "_unknown_": {
+      "message": "[nezināms]"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "pašreizējā parole, vienlaikus nodrošinot tās neizpaušanu."
+   },
+   "ago": {
+      "message": "atpakaļ"
+   },
+   "and": {
+      "message": "un"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "sazinieties ar mums un mēs jums nosūtīsim e-pastu ar jūsu paroles atgādinājumu."
+   },
+   "day": {
+      "message": "diena"
+   },
+   "days": {
+      "message": "dienas"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "eWallet"
+   },
+   "ext_": {
+      "message": "ext."
+   },
+   "false": {
+      "message": "atspējota"
+   },
+   "favorites": {
+      "message": "favorīti"
+   },
+   "hour": {
+      "message": "stunda"
+   },
+   "hours": {
+      "message": "stundas"
+   },
+   "just_now": {
+      "message": "nupat"
+   },
+   "minute": {
+      "message": "minūte"
+   },
+   "minutes": {
+      "message": "minūtes"
+   },
+   "month": {
+      "message": "mēnesis"
+   },
+   "months": {
+      "message": "mēneši"
+   },
+   "privacy_statement": {
+      "message": "privātuma paziņojums"
+   },
+   "recently_usedlower": {
+      "message": "nesen lietots"
+   },
+   "search": {
+      "message": "meklēt"
+   },
+   "second": {
+      "message": "sekunde"
+   },
+   "seconds": {
+      "message": "sekundes"
+   },
+   "terms_of_service": {
+      "message": "pakalpojuma noteikumi"
+   },
+   "the_current_tab": {
+      "message": "pašreizējā cilnē"
+   },
+   "true": {
+      "message": "iespējota"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "mēs NEZINĀM, kāda ir jūsu LastPass parole."
+   },
+   "week": {
+      "message": "nedēļu"
+   },
+   "weeks": {
+      "message": "nedēļas"
+   },
+   "year": {
+      "message": "gads"
+   },
+   "years": {
+      "message": "gadi"
+   }
+}

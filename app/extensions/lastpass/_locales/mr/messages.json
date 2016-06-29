@@ -1,0 +1,62 @@
+{
+   "1Password": {
+      "message": "1. पासवर्ड"
+   },
+   "AutoLogin": {
+      "message": "स्वचालित लॉगइन"
+   },
+   "Cancel": {
+      "message": "रद्द"
+   },
+   "Close": {
+      "message": "बंद करा."
+   },
+   "Edit": {
+      "message": "संपादित करा"
+   },
+   "Email": {
+      "message": "इ-मेल"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "लास्ट पास आता एक समाईक पासवर्ड स्थानिक पातळीवर साठवू शकतो, जो तुम्हाला तुमचे खाते जर तुमचा मुख्य पासवर्ड हरवला तर परत लॉग इन करण्यासाठी उपयोगी ठरू शकतो.हा एक समाईक पासवर्ड वापरण्यापूर्वी सर्वरवर अॅक्टिव्हेट केला नाहीतर वापरता येणार नाही.\nतुम्हाला अॉक्टिव्हेट करायचा आहे का?"
+   },
+   "Feedback": {
+      "message": "अभिप्राय"
+   },
+   "Fields_": {
+      "message": "रकाने:"
+   },
+   "Fill_Forms": {
+      "message": "फॉर्मस् भरा"
+   },
+   "Help_Translate": {
+      "message": "भाषांतरास मदत करा."
+   },
+   "Help___": {
+      "message": "मदत"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "मी पासवर्ड विसरलो आहे. मदत करा."
+   },
+   "Identities": {
+      "message": "अोळख"
+   },
+   "Invalid_Password_": {
+      "message": "चुकीचा पासवर्ड"
+   },
+   "LastPass": {
+      "message": "लास्ट पास"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "लास्ट पास क्रोम टूल बार"
+   },
+   "LoginError": {
+      "message": "कास्ट पास लॉग इन मधे काहीतरी अडचण आहे. पुन्हा प्रयत्न करा."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "पुढे जाण्यासाठी अटींची मान्यता आवश्यक आहे."
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   }
+}

@@ -1,0 +1,102 @@
+body { padding:10px 20px; font:13px Helvetica, Arial, Tahoma, sans-serif; }
+
+.graybody {
+  background: #e6e6e6;
+}
+
+.logintitle{
+  font-size:12px; font-weight:bold; 
+}
+
+.css3button {
+	font-family: Helvetica, Arial, sans-serif; font-weight:bold;
+	font-size: 14px;
+	color: #ffffff;
+	padding: 2px 15px;
+	background: -webkit-linear-gradient(top, rgba(32,188,232,1) 0%,rgba(0,119,232,1) 100%);
+	-webkit-border-radius: 30px;
+	border: 2px solid #ffffff;
+	-webkit-box-shadow:
+		0px 3px 11px rgba(000,000,000,0.5),
+		inset 0px 0px 1px rgba(005,000,004,1);
+	text-shadow:
+		0px -1px 0px rgba(000,000,000,0.2),
+		0px 1px 0px rgba(255,255,255,0.3);
+}
+
+.css3button:hover {
+	cursor:hand;
+	 background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#158aff), color-stop(44%,#0b7ef1), color-stop(100%,#126eca));
+}
+
+/** text area input with shadow **/
+
+
+
+checkbox {
+	padding: 4px;
+	}
+
+
+/** input focus darkening **/
+
+
+.form label { 
+	margin-left: 10px; 
+	color: #999999;
+	font-weight:bold; 
+	}
+/*
+a:link, a:active {
+	font-size : 11px;
+	font-family : helvetica;
+	text-decoration : none;
+	padding-left:10px
+	}
+	
+	a:hover {
+		font-family : helvetica;
+		color : #09F;
+		text-decoration : none;
+		}
+*/
+button{
+  min-width:110px;
+  padding:6px 15px;
+}
+
+.okbutton{
+  border-radius: 0px !important;
+  color:#fff !important;                /* final */
+  background-color:#e0322d !important;  /* final */
+  /*font-weight:bold !important;*/
+  background-image: none !important;
+  text-shadow:none !important;
+  min-width: 110px;
+}
+
+.okbutton:hover{
+  background-color: #d12a25 !important;
+}
+
+#loginbody a, #loginbodyfull a{
+  text-decoration:none;
+}
+
+#logincontainer{
+  background:#e6e6e6;
+  margin:50px auto;
+  width: 300px;
+  border-radius: 1px;
+  border: 1px solid #c0c0c0;
+  -webkit-box-shadow: 3px 4px 5px rgba(0,0,0,.11);
+  -moz-box-shadow: 3px 4px 5px rgba(0,0,0,.11);
+  box-shadow: 3px 4px 5px rgba(0,0,0,.11);
+}
+
+#logininner{
+  padding:20px;
+}
+#donotrepromptfor{
+  vertical-align:middle;
+}

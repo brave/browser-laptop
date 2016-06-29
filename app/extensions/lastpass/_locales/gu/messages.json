@@ -1,0 +1,128 @@
+{
+   "0_9": {
+      "message": "(0-૯) (શૂન્ય-નવ)"
+   },
+   "1Password": {
+      "message": "૧પાસવર્ડ"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "૧. આપની યુબીકી ને યુએસબી-સંપર્ક ઉપરની બાજુ રહે તેમ યુએસબી-પોર્ટમાં જોડો"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "૨. જ્યાં સુધી આપની યુબીકીના ટચ-બટનની લાઈટ સ્થિર થાય ત્યાં સુધી રાહ જુઓ"
+   },
+   "ACTION": {
+      "message": "ક્રિયા"
+   },
+   "A_Zupper": {
+      "message": "એ-ઝેડ"
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "ફાઇલ ફરી પ્રયાસ મળી ગયેલ છે. આ સંભવિત અર્થ એ થાય કે તમારી સાઇટ બધા ફેરફારો નથી સાચવવામાં આવી છે. તમે આ ફાઈલ કાઢી નાખો અને સંભવિત કેટલાક ફેરફારો ગુમાવી માંગો છો?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "આપનું આવેદન સ્વીકારતા સમયે સર્વરમાં એક ખામી સર્જાયી છે."
+   },
+   "About___": {
+      "message": "સં. વિષયે..."
+   },
+   "Accept": {
+      "message": "સ્વીકાર્ય"
+   },
+   "Account_Number": {
+      "message": "એકાઉન્ટ નંબર"
+   },
+   "Account_Settings": {
+      "message": "એકાઉન્ટ સેટિંગ્સ"
+   },
+   "Actionproper": {
+      "message": "પ્રક્રિયા"
+   },
+   "Add_Credit_Card": {
+      "message": "ક્રેડિટ કાર્ડ ઉમેરો"
+   },
+   "Add_Field": {
+      "message": "વિગત ઉમેરો"
+   },
+   "Add_Identity": {
+      "message": "ઓળખ ઉમેરો"
+   },
+   "Add_New_Site": {
+      "message": "નવી વેબસાઈટ ઉમેરો"
+   },
+   "Add_Profile": {
+      "message": "રૂપરેખા ઉમેરો"
+   },
+   "Add_Secure_Note": {
+      "message": "સુરક્ષિત નોંધ ઉમેરો"
+   },
+   "Add_Site": {
+      "message": "વેબસાઇટ ઉમેરો"
+   },
+   "Address_1": {
+      "message": "સરનામું લાઈન૧"
+   },
+   "Address_2": {
+      "message": "સરનામું લાઈન૨"
+   },
+   "Address_3": {
+      "message": "સરનામું લાઈન૩"
+   },
+   "Admin_Tools": {
+      "message": "પ્રબંધ સાધનો"
+   },
+   "Advanced": {
+      "message": "ઉન્નત"
+   },
+   "All": {
+      "message": "તમામ"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "હંમેશા રૂપરેખા અને ક્રેડિટકાર્ડ પસંદ કરો"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "સુધારા ઉપલબ્ધ છે. તમે સ્થાપિત કરવા માંગો છો?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "આપની સાઈટોને લાદતી વખતે એક ખામી સર્જાયેલ છે. કૃપયા ફરી પ્રવેશ પ્રક્રિયા કરો."
+   },
+   "Appearance": {
+      "message": "હાજરી"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "શું આપ ચોક્કસપણે આ ફોર્મ ભરવાની રૂપરેખાને રદ કરવા માંગો છો?"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "રૂપરેખા અને ક્રેડિટકાર્ડ પસંદ કરો"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "ફોર્મ ભરવાની રૂપરેખા સુધારો"
+   },
+   "ErrorSendingMsg": {
+      "message": "વખતે એક ભૂલ આવી સર્વર સંપર્ક કરવાનો પ્રયાસ. તમારું ઇન્ટરનેટ કનેક્શન તપાસો."
+   },
+   "FillableFormDetected": {
+      "message": "આ પાનાંપર ભરી શકાય એવું ફોર્મ મળેલ છે."
+   },
+   "Profile": {
+      "message": "રૂપરેખા"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "શું આપ ફોર્મ ભરવાની રૂપરેખા બનાવવા ઈચ્છો છો?"
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "તમે આગળ વધવા શરતોને સંમત થવું પડશે"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(બાકીનુ નવું શેર ધરાવવું)"
+   },
+   "_none_": {
+      "message": "(કશું નહીં)"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   }
+}

@@ -1,0 +1,96 @@
+.stdbg{
+   background:#e6e6e6;
+  padding:0 20px;
+}
+
+.clearfix:before,
+.clearfix:after { content: " "; display: table; }
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; }
+
+.okbutton{
+  border-radius: 2px !important;
+  color:#fff !important;                /* final */
+  background-color:#e0322d !important;  /* final */
+  /*font-weight:bold !important;*/
+  border-color:#af1510 !important;     /* final */
+  background-image: none !important;
+  text-shadow:none !important;
+  min-width: 110px;
+  padding:6px 0px;
+}
+
+.okbutton:hover{
+  background-color: #d12a25 !important;
+}
+
+
+.stdtext{
+  color:#4c4c4c;
+  font-family:Helvetica, Arial, sans-serif;
+  font-size:14px;
+}
+
+
+.stdbtn {
+background-color: #eeeeee;
+background-image: -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#cccccc));
+background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+background-image: linear-gradient(top, #eeeeee, #cccccc);
+border: 1px solid #ccc;
+border-bottom: 1px solid #bbb;
+-webkit-border-radius: 3px;
+color: #333;
+line-height: 1;
+font-weight: bold;
+padding: 8px 0;
+text-align: center;
+text-shadow: 0 1px 0 #eee;
+min-width: 110px;
+margin: 4px;
+}
+#prefsheader{
+  height:65px;
+  border-bottom:1px solid #c3c3c3;
+  background-color:white;
+}
+#prefsheader img{
+  padding:22px 0 0 32px;
+}
+
+@media all and (max-width:500px){
+  body{ padding:0; margin:0; }
+  #logincontainer{ margin:0; width:100%; }
+  #logininner{ width:260px;margin:0 auto;}
+}
+
+.displaynone {
+  display: none;
+}
+
+.clearboth {
+  clear: both;
+}
+
+.floatright {
+  float: right;
+}
+
+.floatleft {
+  float: left;
+}
+
+#changeyourpassword {
+  background-color:#E33;background-image:-webkit-linear-gradient(top,rgb(224,50,50),rgb(195,20,20));font-size:150%;color:white;font-weight:100;width:auto;height:auto;padding:8px;
+}
+
+#loginbodyfull{
+  overflow:hidden;
+}
+#icon_breach{
+  width:18px;
+  height:18px;
+}

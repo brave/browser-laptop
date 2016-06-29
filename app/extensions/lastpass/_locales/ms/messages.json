@@ -1,0 +1,4217 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "1Password": {
+      "message": "1Katalaluan"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. Masukkan YubiKey anda ke dalam port USB dengan penghubung-USB menghadap ke atas"
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. Jalankan aplikasi Pengesahan Google pada peranti mudah alih anda"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. Jalankan Aplikasi LastPass Sesame untuk menjana katalaluan sekali guna"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. Masukkan kod pengesahan semasa anda dalam kotak di bawah"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. Tampalkan katalaluan sekali guna di dalam kotak masukan di bawah dan klik 'Pengesahan'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. Sila tunggu sehingga YubiKey anda bersinar dengan stabil."
+   },
+   "3__Click_Authenticate": {
+      "message": "3. Klik Ketulenan"
+   },
+   "3__Hold_your_fingertip_on_the_touch_button_for_1_second": {
+      "message": "3. Sentuhkan hujung jari anda pada butang sentuh selama 1 saat"
+   },
+   "ACTION": {
+      "message": "TINDAKAN"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "Katalaluan baharu telah dijana!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "Katalaluan yang dijana secara rawak."
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "Kemaskini yang diperlukan tersedia untuk LastPass. Sila tekan OK untuk mulakan muat turun dan pemasangan."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "Fail mencuba semula telah dijumpai. Ini bermakna kemungkinan bahawa bukan semua perubahan tapak anda telah disimpan. Adakah anda ingin memadam fail ini dan berpotensi kehilangan beberapa perubahan?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "Suatu ralat pelayan telah berlaku semasa memproses permintaan anda."
+   },
+   "A_site_that_has_been_previously_shared_cannot_be_moved_to_a_shared_folder___Would_you_like_to_make_a_copy_": {
+      "message": "Laman web yang telah dikongsi sebelum ini tidak boleh dipindahkan ke folder berkongsi.\n\nAdakah anda ingin membuat salinan?"
+   },
+   "About": {
+      "message": "Perihal"
+   },
+   "About_LastPass": {
+      "message": "Tentang LastPass"
+   },
+   "About___": {
+      "message": "Perihal..."
+   },
+   "Abu_Dhabi__Muscat__Tbilisi__Izhevsk": {
+      "message": "Abu Dhabi, Muscat, Tbilisi, Izhevsk"
+   },
+   "Accept": {
+      "message": "Terima"
+   },
+   "Accepted": {
+      "message": "Telah Diterima"
+   },
+   "Access_a_Secure_Note": {
+      "message": "Akses Nota Selamat"
+   },
+   "Access_a_Site": {
+      "message": "Akses Laman"
+   },
+   "Access_a_Site_s_Password": {
+      "message": "Akses Katalaluan Laman"
+   },
+   "Access_an_Identity": {
+      "message": "Akses Identiti"
+   },
+   "Access_denied_": {
+      "message": "Akses ditolak."
+   },
+   "Access_granted": {
+      "message": "Akses diterima"
+   },
+   "Account_Email": {
+      "message": "E-mel Akaun"
+   },
+   "Account_Number": {
+      "message": "Nombor Akaun"
+   },
+   "Account_Settings": {
+      "message": "Tetapan Akaun"
+   },
+   "Account_Status": {
+      "message": "Status Akaun"
+   },
+   "Account_Type": {
+      "message": "Jenis Akaun"
+   },
+   "Account_number": {
+      "message": "Nombor akaun"
+   },
+   "Actionproper": {
+      "message": "Tindakan"
+   },
+   "Actions": {
+      "message": "Tindakan"
+   },
+   "Add": {
+      "message": "Tambah"
+   },
+   "Add_Attachment": {
+      "message": "Tambah Lampiran"
+   },
+   "Add_Credit_Card": {
+      "message": "Tambah Kad Kredit"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "Tambah profil Kad Kredit"
+   },
+   "Add_Field": {
+      "message": "Tambah Medan"
+   },
+   "Add_File": {
+      "message": "Tambah Fail"
+   },
+   "Add_Form_Fill_profile": {
+      "message": "Tambah Profil Isian Borang"
+   },
+   "Add_Identity": {
+      "message": "Tambah Identiti"
+   },
+   "Add_New_Folder": {
+      "message": "Tambah Folder Baru"
+   },
+   "Add_New_Site": {
+      "message": "Tambah Laman Baharu"
+   },
+   "Add_New_folder": {
+      "message": "Tambah Folder Baru"
+   },
+   "Add_Note": {
+      "message": "Tambah Nota"
+   },
+   "Add_Profile": {
+      "message": "Tambah Profil"
+   },
+   "Add_Secure_Note": {
+      "message": "Tambah Nota Selamat"
+   },
+   "Add_Shared_Folder": {
+      "message": "Tambah Folder Berkongsi"
+   },
+   "Add_Site": {
+      "message": "Tambah Laman"
+   },
+   "Add_an_Identity": {
+      "message": "Tambah Identiti"
+   },
+   "Add_another_custom_field": {
+      "message": "Tambah satu lagi ruangan tersuai"
+   },
+   "Additional_Options": {
+      "message": "Pilihan Tambahan"
+   },
+   "Address": {
+      "message": "Alamat"
+   },
+   "Address_1": {
+      "message": "Alamat 1"
+   },
+   "Address_2": {
+      "message": "Alamat 2"
+   },
+   "Address_3": {
+      "message": "Alamat 3"
+   },
+   "Adelaide": {
+      "message": "Adelaide"
+   },
+   "Admin_Console": {
+      "message": "Konsol Pentadbiran"
+   },
+   "Admin_Tools": {
+      "message": "Peralatan Pentadbir"
+   },
+   "Administrator": {
+      "message": "Pentadbir"
+   },
+   "Advanced": {
+      "message": "Lanjutan"
+   },
+   "Advanced_Options": {
+      "message": "Pilihan Lanjut"
+   },
+   "Advanced_Options_": {
+      "message": "Pilihan Lanjut: "
+   },
+   "Advanced_Settings": {
+      "message": "Tetapan Lanjut"
+   },
+   "Advanced_Settings_": {
+      "message": "Tetapan Lanjut: "
+   },
+   "Advanced_Tools": {
+      "message": "Alat Lanjutan"
+   },
+   "Afghanistan": {
+      "message": "Afghanistan"
+   },
+   "Agent_Name": {
+      "message": "Nama Ejen"
+   },
+   "Agent_Phone": {
+      "message": "Nombor Ejen"
+   },
+   "Aland_Islands": {
+      "message": "Kepulauan Aland"
+   },
+   "Alaska": {
+      "message": "Alaska"
+   },
+   "Albania": {
+      "message": "Albania"
+   },
+   "Alerts": {
+      "message": "Amaran"
+   },
+   "Algeria": {
+      "message": "Algeria"
+   },
+   "Alias": {
+      "message": "Alias"
+   },
+   "All": {
+      "message": "Semua"
+   },
+   "Allow_Access": {
+      "message": "Benarkan Akses"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "Benarkan LastPass untuk mencari data tidak selamat pada komputer anda?"
+   },
+   "Almaty": {
+      "message": "Almaty"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below_": {
+      "message": "Sebagai pilihan, masukkan kod laluan di dalam kotak di bawah:"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "Sentiasa Pilih Profil dan Kad Kredit"
+   },
+   "American_Samoa": {
+      "message": "Samoa Amerika"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "Amman, Athens, Istanbul, Beirut, Kaherah, Jerusalem"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "Amsterdam, Berlin, Rom, Vienna, Prague, Brussels"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "Satu Kemaskini telah Tersedia. Adakah anda ingin memasangnya?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "Suatu ralat telah dikesan semasa memuatkan laman web anda. Sila daftar masuk semula."
+   },
+   "An_error_occurred": {
+      "message": "Suatu ralat telah berlaku"
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "Ralat berlaku semasa menyulitkan semula data anda"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "Ralat berlaku semasa memuat naik data anda. Adakah anda ingin mencuba semula?"
+   },
+   "Andorra": {
+      "message": "Andorra"
+   },
+   "Angola": {
+      "message": "Angola"
+   },
+   "Anguilla": {
+      "message": "Anguilla"
+   },
+   "Antarctica": {
+      "message": "Antartika"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "Antigua dan Barbuda"
+   },
+   "Appearance": {
+      "message": "Penampilan"
+   },
+   "Application_": {
+      "message": "Aplikasi:"
+   },
+   "Applications": {
+      "message": "Aplikasi"
+   },
+   "April": {
+      "message": "April"
+   },
+   "Are_you_sure_": {
+      "message": "Anda pasti?"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "Adakah anda pasti anda mahu memadam ini?"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "Adakah anda pasti ingin memadam identiti ini?"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "Adakah anda pasti mahu LastPass mengingati katalaluan anda? Ini akan dengan ketaranya mengurangkan keselamatan akaun LastPass anda!"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "Adakah anda pasti anda mahu memadam item yang dipilih?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "Adakah anda pasti anda mahu memadam laman yang dipilih?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "Adakah anda pasti anda mahu memadam aplikasi ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "Adakah anda pasti anda ingin memadam medan ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "Adakah anda pasti anda mahu memadam profil isian borang ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "Adakah anda pasti mahu memadam katalaluan yang dihasilkan ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_group_": {
+      "message": "Adakah anda pasti ingin memadam pelipat ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "Adakah anda pasti ingin memadam URL tidak pernah ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "Adakah anda pasti mahu memadam nota selamat ini?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "Adakah anda pasti mahu memadam laman ini?"
+   },
+   "Argentina": {
+      "message": "Argentina"
+   },
+   "Arizona": {
+      "message": "Arizona"
+   },
+   "Armenia": {
+      "message": "Armenia"
+   },
+   "Arts": {
+      "message": "Seni"
+   },
+   "Aruba": {
+      "message": "Aruba"
+   },
+   "Astana__Dhaka__Nobosibirsk": {
+      "message": "Astana, Dhaka, Novosibirsk"
+   },
+   "At_least_this_many_numbers_will_be_in_a_generated_password_": {
+      "message": "Sekurang-kurangnya nombor-nombor ini akan berada di dalam katalaluan yang dijana."
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "Waktu Atlantik (Kanada), Manaus, Santiago"
+   },
+   "Auckland__Wellington": {
+      "message": "Auckland, Wellington"
+   },
+   "August": {
+      "message": "Ogos"
+   },
+   "Australia": {
+      "message": "Australia"
+   },
+   "Austria": {
+      "message": "Austria"
+   },
+   "Authenticate": {
+      "message": "Pengesahan"
+   },
+   "Authentication": {
+      "message": "Pengesahan"
+   },
+   "Authentication_Failed_": {
+      "message": "Pengesahan Gagal."
+   },
+   "AutoFill": {
+      "message": "Isi Automatik"
+   },
+   "AutoLogin": {
+      "message": "Log Masuk Automatik"
+   },
+   "Auto_Fill": {
+      "message": "Isi Automatik"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "Isi Maklumat Daftar Masuk Secara Automatik"
+   },
+   "Automatically_Log_out_after_idle__mins_": {
+      "message": "Daftar keluar secara automatik selepas terbiar (minit) "
+   },
+   "Automatically_Log_out_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Daftar keluar secara automatik apabila semua pelayar web ditutup dan Chrome telah ditutup selama (minit) "
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "Log Keluar Secara Automatik selepas terbiar (minit)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "Log keluar secara automatik apabila semua pelayar ditutup dan Chrome telah ditutup selama (minit)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "Daftar Masuk ke halaman secara automatik jika masa sejak daftar masuk terakhir > (saat) "
+   },
+   "Automatically_logoff_devices_when_logging_in_from_a_different_device": {
+      "message": "Daftar keluar peranti secara automatik semasa mendaftar masuk daripada peranti yang berbeza"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "Elakkan Aksara Yang Tidak Jelas"
+   },
+   "Azerbaijan": {
+      "message": "Azerbaijan"
+   },
+   "Azores": {
+      "message": "Azores"
+   },
+   "BACKUPPER": {
+      "message": "KEMBALI"
+   },
+   "BEGIN": {
+      "message": "MULA"
+   },
+   "Back": {
+      "message": "Kembali"
+   },
+   "Baghdad": {
+      "message": "Baghdad"
+   },
+   "Bahamas": {
+      "message": "Bahamas"
+   },
+   "Bahrain": {
+      "message": "Bahrain"
+   },
+   "Baku__Yerevan": {
+      "message": "Baku, Yerevan"
+   },
+   "Bangkok__Hanoi__Jakarta__Krasnoyarsk": {
+      "message": "Bangkok, Hanoi, Jakarta, Krasnoyarsk"
+   },
+   "Bangladesh": {
+      "message": "Bangladesh"
+   },
+   "Bank_Account": {
+      "message": "Akaun Bank"
+   },
+   "Bank_Name": {
+      "message": "Nama Bank"
+   },
+   "Bank_accountformfill": {
+      "message": "Akaun Bank"
+   },
+   "Bank_name": {
+      "message": "Nama Bank"
+   },
+   "Barbados": {
+      "message": "Barbados"
+   },
+   "Beijing__Hong_Kong__Singapore__Taipei__Irkutsk": {
+      "message": "Beijing, Hong Kong, Singapura, Taipei, Irkutsk"
+   },
+   "Belarus": {
+      "message": "Belarus"
+   },
+   "Belgium": {
+      "message": "Belgium"
+   },
+   "Belize": {
+      "message": "Belize"
+   },
+   "Benin": {
+      "message": "Benin"
+   },
+   "Bermuda": {
+      "message": "Bermuda"
+   },
+   "Bhutan": {
+      "message": "Bhutan"
+   },
+   "Binary_Component_": {
+      "message": "Komponen Perduaan:"
+   },
+   "Birthday": {
+      "message": "Tarikh Lahir"
+   },
+   "Bit_Strength": {
+      "message": "Kekuatan Bit"
+   },
+   "Blacklist": {
+      "message": "Akaun anda telah digantung sementara (selama 5 minit) kerana terlalu banyak cubaan daftar masuk yang gagal."
+   },
+   "Blog": {
+      "message": "Blog"
+   },
+   "Bolivia": {
+      "message": "Bolivia"
+   },
+   "Bookmarklets": {
+      "message": "Bookmarklets"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "Bosnia dan Herzegovina"
+   },
+   "Botswana": {
+      "message": "Botswana"
+   },
+   "Bouvet_Island": {
+      "message": "Pulau Bouvet"
+   },
+   "Branch_Address": {
+      "message": "Alamat Cawangan"
+   },
+   "Branch_Phone": {
+      "message": "Telefon Cawangan"
+   },
+   "Brazil": {
+      "message": "Brazil"
+   },
+   "Brisbane__Guam__Port_Moresby__Vladivostok": {
+      "message": "Brisbane, Guam, Pelabuhan Moresby, Vladivostok"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "Wilayah Lautan India British"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "Layari laman web seperti biasa dan LastPass akan mengingati katalaluan secara automatik sebaik sahaja anda masukkannya."
+   },
+   "Brunei_Darussalam": {
+      "message": "Brunei Darussalam"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "Buenos Aires, Georgetown"
+   },
+   "Built_": {
+      "message": "Dibina:"
+   },
+   "Bulgaria": {
+      "message": "Bulgaria"
+   },
+   "Burkina_Faso": {
+      "message": "Burkina Faso"
+   },
+   "Burundi": {
+      "message": "Burundi"
+   },
+   "Business": {
+      "message": "Perniagaan"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "Tapi saya seorang yang pelupa...apa yang patut saya lakukan jika saya terlupa katalaluan saya?"
+   },
+   "CSV_Files": {
+      "message": "Fail CSV"
+   },
+   "Cambodia": {
+      "message": "Kemboja"
+   },
+   "Cameroon": {
+      "message": "Cameroon"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "Tidak dapat mencari tetingkap LastPass tersembunyi"
+   },
+   "Canada": {
+      "message": "Kanada"
+   },
+   "Canary_Islands": {
+      "message": "Kepulauan Canary"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "Canberra, Melbourne, Sydney, Hobart"
+   },
+   "Cancel": {
+      "message": "Batal"
+   },
+   "Cancel_Invitation": {
+      "message": "Batal Jemputan"
+   },
+   "Cape_Verde": {
+      "message": "Cape Verde"
+   },
+   "Cape_Verde_Is_": {
+      "message": "Kepulauan Cape Verde"
+   },
+   "Caracas": {
+      "message": "Caracas"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "Casablanca, Monrovia, Reykjavik"
+   },
+   "Catalan": {
+      "message": "Catalan"
+   },
+   "Cayman_Islands": {
+      "message": "Kepulauan Cayman"
+   },
+   "Central_African_Republic": {
+      "message": "Republik Afrika Tengah"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "Amerika Tengah, Saskatchewan"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "Waktu Tengah (US & Kanada), Guadalajara, Mexico City"
+   },
+   "Chad": {
+      "message": "Chad"
+   },
+   "Change": {
+      "message": "Tukar"
+   },
+   "Change_Group_Name": {
+      "message": "Tukar Nama Folder"
+   },
+   "Change_Master_Password": {
+      "message": "Tukar Katalaluan Induk"
+   },
+   "Change_Password": {
+      "message": "Tukar Katalaluan"
+   },
+   "Change_Password_Automatically": {
+      "message": "Tukar Katalaluan Secara Automatik"
+   },
+   "Change_Password_Now": {
+      "message": "Tukar Katalaluan Sekarang"
+   },
+   "Change_Passwords_Now": {
+      "message": "Tukar Katalaluan Sekarang"
+   },
+   "Check_For_Updates": {
+      "message": "Semak Untuk Kemaskini"
+   },
+   "Checkbox": {
+      "message": "Kotak semakan"
+   },
+   "Checking_For_Updates___": {
+      "message": "Sedang Menyemak Untuk Kemaskini..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "Chennai, Kolkata, Mumbai, New Delhi, Sri Jayawardenepura"
+   },
+   "Chile": {
+      "message": "Chile"
+   },
+   "China": {
+      "message": "China"
+   },
+   "Chinese__Simplified_": {
+      "message": "Cina (Ringkas)"
+   },
+   "Chinese__Traditional_": {
+      "message": "Cina (Tradisional)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "Pilih Profil dan Kad Kredit"
+   },
+   "Choose_a_source_above_": {
+      "message": "Pilih sumber yang di atas."
+   },
+   "Christmas_Island": {
+      "message": "Pulau Krismas"
+   },
+   "Chrome": {
+      "message": "Chrome"
+   },
+   "City___Town": {
+      "message": "Bandar / Pekan"
+   },
+   "Clear": {
+      "message": "Kosongkan"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "Kosongkan Papan klip selepas guna (saat)"
+   },
+   "Clear_Forms": {
+      "message": "Kosongkan Borang"
+   },
+   "Clear_Local_Cache": {
+      "message": "Kosongkan Cache Tempatan"
+   },
+   "Clear_Most_Recent": {
+      "message": "Padam Senarai Baharu Digunakan"
+   },
+   "Clear_Recent": {
+      "message": "Kosongkan Yang Terkini"
+   },
+   "Clear_Search": {
+      "message": "Kosongkan Carian"
+   },
+   "Clear_filled_fields_on_log_out": {
+      "message": "Kosongkan medan diisi semasa mendaftar keluar"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "Kosongkan ruangan diisi semasa log keluar"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "Klik Teruskan untuk mula menggunakan LastPass."
+   },
+   "Click_Icons_in_Fields": {
+      "message": "Klik Ikon di Medan"
+   },
+   "Click_here_to_initiate_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "Klik di sini untuk memulakan pengesahan multifactor pada telefon anda atau peranti mudah alih."
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "Klik di sini untuk memulakan tetapan akaun"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "Klik di sini untuk memulakan maklum balas"
+   },
+   "Click_to_fine_tune_how_your_password_is_generated_": {
+      "message": "Klik untuk menetapkan bagaimana katalaluan anda dihasilkan."
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "Klik untuk menyembunyikan pilihan lanjutan."
+   },
+   "Clipperz": {
+      "message": "Clipperz"
+   },
+   "Close": {
+      "message": "Tutup"
+   },
+   "Close_this_window": {
+      "message": "Tutup tetingkap ini"
+   },
+   "Co_pay": {
+      "message": "Co-pay"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "Kepulauan Cocos (Keeling)"
+   },
+   "Collapse_All": {
+      "message": "Runtuhkan Semua"
+   },
+   "Colombia": {
+      "message": "Colombia"
+   },
+   "Comoros": {
+      "message": "Comoros"
+   },
+   "Company": {
+      "message": "Syarikat"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "Polisi syarikat melarang operasi ini."
+   },
+   "Company_Phone": {
+      "message": "Telefon Syarikat"
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "Polisi syarikat menghalang mengubah beberapa tetapan, tidak semua kemas kini telah disimpan."
+   },
+   "Complete_": {
+      "message": "Selesai!"
+   },
+   "Configure_Form_Fill": {
+      "message": "Penetapan Isian Borang"
+   },
+   "Confirm": {
+      "message": "Sahkan"
+   },
+   "Confirm_Password": {
+      "message": "Sahkan Katalaluan"
+   },
+   "Congo": {
+      "message": "Congo"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "Congo, Republik Demokratik"
+   },
+   "Congratulations": {
+      "message": "Tahniah"
+   },
+   "Congratulations_": {
+      "message": "Tahniah!"
+   },
+   "Connection_Mode": {
+      "message": "Mod Sambungan"
+   },
+   "Connection_Type": {
+      "message": "Jenis Sambungan"
+   },
+   "Contact": {
+      "message": "Hubungi"
+   },
+   "Continue": {
+      "message": "Teruskan"
+   },
+   "Control_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "Aksara terkawal ditemui pada nama fail dipilih, ia tidak akan diproses"
+   },
+   "Cook_Islands": {
+      "message": "Kepulauan Cook"
+   },
+   "Copy": {
+      "message": "Salin"
+   },
+   "Copy_Note": {
+      "message": "Salin Nota"
+   },
+   "Copy_Password": {
+      "message": "Salin Katalaluan"
+   },
+   "Copy_URL": {
+      "message": "Salin URL"
+   },
+   "Copy_Username": {
+      "message": "Salin Nama Pengguna"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "Hakcipta 2008 LastPass. Semua Hakcipta Terpelihara. \nSebahagian dari perisian ini telah dilesenkan dari pihak ketiga seperti yang dinyatakan di:"
+   },
+   "Cost": {
+      "message": "Harga"
+   },
+   "Costa_Rica": {
+      "message": "Costa Rica"
+   },
+   "Cote_D_ivoire": {
+      "message": "Ivory Coast"
+   },
+   "Country": {
+      "message": "Negara"
+   },
+   "County": {
+      "message": "Daerah"
+   },
+   "Create_Account": {
+      "message": "Cipta Akaun"
+   },
+   "Create_Group": {
+      "message": "Cipta Folder"
+   },
+   "Create_New_Profile": {
+      "message": "Cipta Profil Baharu"
+   },
+   "Create_Sub_Group": {
+      "message": "Cipta Sub-Folder"
+   },
+   "Create_an_Account": {
+      "message": "Cipta satu Akaun"
+   },
+   "Creating_Account___": {
+      "message": "Mencipta Akaun..."
+   },
+   "Credit_Card": {
+      "message": "Kad Kredit"
+   },
+   "Credit_Card_": {
+      "message": "Kad Kredit:"
+   },
+   "Credit_Card_Number": {
+      "message": "Nombor Kad Kredit"
+   },
+   "Credit_Monitoring": {
+      "message": "Pemantauan Kredit"
+   },
+   "Credit_card_number": {
+      "message": "Nombor kad kredit"
+   },
+   "Credit_cardformfill": {
+      "message": "Kad kredit"
+   },
+   "Croatia": {
+      "message": "Croatia"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "Cuba"
+   },
+   "Custom_Value": {
+      "message": "Nilai Tersuai"
+   },
+   "Custom_field__": {
+      "message": "Ruang Tersuai #"
+   },
+   "Custom_fields": {
+      "message": "Ruangan Tersuai"
+   },
+   "Cyprus": {
+      "message": "Cyprus"
+   },
+   "Czech_Republic": {
+      "message": "Republik Czech"
+   },
+   "Danish": {
+      "message": "Danish"
+   },
+   "Darn__Passwords_": {
+      "message": "Darn! Katalaluan!"
+   },
+   "Darwin": {
+      "message": "Darwin"
+   },
+   "Dashlane": {
+      "message": "Dashlane"
+   },
+   "Database": {
+      "message": "Pangkalan Data"
+   },
+   "Date": {
+      "message": "Tarikh"
+   },
+   "Date__EST_": {
+      "message": "Tarikh (EST)"
+   },
+   "Date_of_Birth": {
+      "message": "Tarikh Lahir"
+   },
+   "December": {
+      "message": "Disember"
+   },
+   "Decline": {
+      "message": "Ditolak"
+   },
+   "Declined_Offers": {
+      "message": "Tawaran Ditolak"
+   },
+   "Default": {
+      "message": "Lalai"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "Profil Isian Borang Lalai "
+   },
+   "Delete": {
+      "message": "Padam"
+   },
+   "Delete_Cache": {
+      "message": "Padam Cache"
+   },
+   "Delete_Formfill_Profile": {
+      "message": "Padam Profil IsiBorang"
+   },
+   "Delete_Group": {
+      "message": "Padam Folder"
+   },
+   "Delete_Identity_": {
+      "message": "Padam Identiti?"
+   },
+   "Delete_Selected": {
+      "message": "Padam Yang Terpilih"
+   },
+   "Delete_Site": {
+      "message": "Padam Website"
+   },
+   "Delete_Site_": {
+      "message": "Padam Laman?"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "Padam profil isian borang ini"
+   },
+   "Deleted": {
+      "message": "Dipadam"
+   },
+   "Denmark": {
+      "message": "Denmark"
+   },
+   "Deny_Access": {
+      "message": "Tolak Akses"
+   },
+   "Description": {
+      "message": "Keterangan"
+   },
+   "Dining": {
+      "message": "Makan"
+   },
+   "Disable": {
+      "message": "Lumpuhkan"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "Matikan Pengurus Katalaluan tidak selamat Chrome"
+   },
+   "Disable_LastPass": {
+      "message": "Lumpuhkan LastPass"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "Lumpuhkan LastPass bagi laman ini atau keseluruhan laman?"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "Lumpuhkan Pengesahan Pelbagai-Faktor"
+   },
+   "Disable_Page": {
+      "message": "Lumpuhkan Laman"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "Lumpuhkan Pengesahan Satu-faktor"
+   },
+   "Disable_Site": {
+      "message": "Lumpuhkan Website"
+   },
+   "Disable_alert___": {
+      "message": "Mematikan amaran..."
+   },
+   "Disable_alert_for_this_site": {
+      "message": "Matikan amaran untuk laman web ini"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "Mematikan semua amaran website yang lemah/pendua"
+   },
+   "Disable_for_all_sites": {
+      "message": "Lumpuhkan untuk semua laman web"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "Batal perubahan dan tutup tetingkap ini"
+   },
+   "Dismiss": {
+      "message": "Abaikan"
+   },
+   "Djibouti": {
+      "message": "Djibouti"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "Jangan menulis tindan ruangan yang telah diisi"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "Jangan dorong semula untuk"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "Jangan arah semula untuk "
+   },
+   "Do_you_like_LastPass_": {
+      "message": "Adakah anda suka LastPass?"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "Adakah anda benar-benar mahu berhenti? Anda tidak boleh menggunakan LastPass tanpa membuat akaun."
+   },
+   "Do_you_want_to_continue_": {
+      "message": "Adakah anda ingin teruskan?"
+   },
+   "Dominica": {
+      "message": "Dominica"
+   },
+   "Dominican_Republic": {
+      "message": "Republik Dominica"
+   },
+   "Down": {
+      "message": "Bawah"
+   },
+   "Dr": {
+      "message": "Dr"
+   },
+   "Driver_s_License": {
+      "message": "Lesen Pemandu"
+   },
+   "Duplicate_Password": {
+      "message": "Katalaluan Pendua"
+   },
+   "Duplicate_password": {
+      "message": "Katalaluan pendua"
+   },
+   "Duration": {
+      "message": "Tempoh"
+   },
+   "Dutch": {
+      "message": "Belanda"
+   },
+   "ERROR": {
+      "message": "RALAT"
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "Waktu Timur (US & Kanada)"
+   },
+   "Ecuador": {
+      "message": "Ecuador"
+   },
+   "Edit": {
+      "message": "Ubah"
+   },
+   "Edit_Application": {
+      "message": "Sunting Aplikasi"
+   },
+   "Edit_Application_Fields": {
+      "message": "Sunting Medan Aplikasi"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "Sunting profil Kad Kredit"
+   },
+   "Edit_Form_Fields": {
+      "message": "Ubah Medan Borang"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "Ubah Profil Isian Borang"
+   },
+   "Edit_Note": {
+      "message": "Sunting Nota"
+   },
+   "Edit_Secure_Note": {
+      "message": "Sunting Nota Selamat"
+   },
+   "Edit_Secure_Notes": {
+      "message": "Ubah Nota Selamat"
+   },
+   "Edit_Site": {
+      "message": "Ubah Laman"
+   },
+   "Edit_Site_Fields": {
+      "message": "Sunting ruangan Laman"
+   },
+   "Education": {
+      "message": "Pendidikan"
+   },
+   "Egypt": {
+      "message": "Mesir"
+   },
+   "El_Salvador": {
+      "message": "El Salvador"
+   },
+   "Email": {
+      "message": "E-mel"
+   },
+   "Email_": {
+      "message": "E-mel:"
+   },
+   "Email_Account": {
+      "message": "Akaun E-mel"
+   },
+   "Email_Address": {
+      "message": "Alamat E-mel"
+   },
+   "Email_Address_": {
+      "message": "Alamat Emel:"
+   },
+   "Email_address": {
+      "message": "Alamat e-mel"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "E-mel ini telah sedia digunakan, adakah anda terlupa katalaluan anda?"
+   },
+   "Emergency_Access": {
+      "message": "Akses Kecemasan"
+   },
+   "Enable": {
+      "message": "Hidupkan"
+   },
+   "Enable___Edit": {
+      "message": "Dayakan | Sunting"
+   },
+   "Enable_new_login_screen": {
+      "message": "Hidupkan skrin daftar masuk baharu"
+   },
+   "Enabled": {
+      "message": "Dihidupkan"
+   },
+   "Encryption": {
+      "message": "Penyulitan"
+   },
+   "End": {
+      "message": "Akhir"
+   },
+   "English": {
+      "message": "Bahasa Inggeris"
+   },
+   "English__United_Kingdom_": {
+      "message": "Inggeris (United Kingdom)"
+   },
+   "Enter_Code_": {
+      "message": "Masukkan Kod:"
+   },
+   "Enter_PIN": {
+      "message": "Masukkan PIN"
+   },
+   "Enter_a_passcode_in_the_box_below_": {
+      "message": "Masukkan kod laluan di dalam kotak di bawah:"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "Masukkan PIN kad pintar anda:"
+   },
+   "Enterprise": {
+      "message": "Pertubuhan"
+   },
+   "Entertainment": {
+      "message": "Hiburan"
+   },
+   "Equatorial_Guinea": {
+      "message": "Equatorial Guinea"
+   },
+   "Eritrea": {
+      "message": "Eritrea"
+   },
+   "Error": {
+      "message": "Ralat"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "Suatu ralat telah berlaku semasa mendapatkan semula laman-laman LastPass anda. Sila cuba untuk daftar masuk semula untuk mendapatkan semula laman-laman anda."
+   },
+   "ErrorLoginMsg": {
+      "message": "Ralat telah berlaku semasa daftar masuk ke LastPass. Sila semak sambungan Internet anda."
+   },
+   "ErrorSendingMsg": {
+      "message": "Ralat berlaku ketika cuba menghubungi pelayan. Sila semak sambungan Internet anda."
+   },
+   "ErrorSessionMsg": {
+      "message": "Sesi LastPass anda nampaknya telah tamat. Sila log masuk semula."
+   },
+   "Error_opening_attachment_": {
+      "message": "Ralat semasa membuka lampiran."
+   },
+   "Estonia": {
+      "message": "Estonia"
+   },
+   "Ethiopia": {
+      "message": "Ethiopia"
+   },
+   "Evening_Number": {
+      "message": "Nombor Malam"
+   },
+   "Evening_number": {
+      "message": "Nombor petang"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "LastPass kini boleh menyimpan Katalaluan Sekali Guna (OTP) secara tempatan yang boleh digunakan untuk mendapatkan semula akaun anda jika anda terlupa Katalaluan Induk. OTP ini akan kekal dilumpuhkan sehingga ia diaktifkan pada server.\n\nAdakah anda ingin mengaktifkan akaun pemulihan?"
+   },
+   "Expand_All": {
+      "message": "Kembangkan Semua"
+   },
+   "Expiration": {
+      "message": "Tamat Tempoh"
+   },
+   "Expiration_Date": {
+      "message": "Tarikh Luput"
+   },
+   "Expiration_date": {
+      "message": "Tarikh tamat"
+   },
+   "Export": {
+      "message": "Eksport"
+   },
+   "Export_To": {
+      "message": "Ekspot Ke"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "Eksport Ke Fail CSV LastPass"
+   },
+   "FIPS_Mode": {
+      "message": "Mod FIPS"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "Kepulauan Falkland (Malvinas)"
+   },
+   "Faroe_Islands": {
+      "message": "Kepulauan Faroe"
+   },
+   "Favorite": {
+      "message": "Kegemaran"
+   },
+   "Favoritesproper": {
+      "message": "Kegemaran"
+   },
+   "Fax_Number": {
+      "message": "Nombor Faks"
+   },
+   "Fax_number": {
+      "message": "Nombor faks"
+   },
+   "Features": {
+      "message": "Ciri-ciri"
+   },
+   "February": {
+      "message": "Februari"
+   },
+   "Feedback": {
+      "message": "Maklum balas"
+   },
+   "Female": {
+      "message": "Perempuan"
+   },
+   "Field": {
+      "message": "Medan"
+   },
+   "Field_Name_": {
+      "message": "Medan Nama:"
+   },
+   "Field_Type_": {
+      "message": "Jenis Medan:"
+   },
+   "Field_Value_": {
+      "message": "Nilai Medan:"
+   },
+   "Fields_": {
+      "message": "Medan:"
+   },
+   "Fiji": {
+      "message": "Fiji"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "Fiji, Kamchatka, Marshall Is."
+   },
+   "File": {
+      "message": "Fail"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "Fail terlalu besar, ia mesti kurang daripada 10MB."
+   },
+   "Files": {
+      "message": "Fail"
+   },
+   "Fill": {
+      "message": "Isi"
+   },
+   "Fill_Current": {
+      "message": "Isikan Semasa"
+   },
+   "Fill_Every_Form": {
+      "message": "Isi Setiap Borang"
+   },
+   "Fill_Form": {
+      "message": "Isikan Borang"
+   },
+   "Fill_Forms": {
+      "message": "Isikan Borang"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "Isikan Dalam Profil Isian Borang Lalai"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "Isikan Pada Log Masuk Seterusnya (Semasa Pelbagai)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "Isikan Pada Log Masuk Sebelumnya (Semasa Pelbagai)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "Isi atau Sunting Data Pengisian Borang"
+   },
+   "Fill_with": {
+      "message": "Isikan dengan"
+   },
+   "FillableFormDetected": {
+      "message": "Borang boleh-isi telah dikesan pada laman ini."
+   },
+   "Filter": {
+      "message": "Penapis"
+   },
+   "Finance": {
+      "message": "Kewangan"
+   },
+   "Find_a_site": {
+      "message": "Cari laman"
+   },
+   "Finland": {
+      "message": "Finland"
+   },
+   "Finnish": {
+      "message": "Finland"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "Pengurus Katalaluan Firefox"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "3 digit pertama nombor telefon anda"
+   },
+   "First_Name": {
+      "message": "Nama Pertama"
+   },
+   "First_name": {
+      "message": "Nama pertama"
+   },
+   "Folder_Name_": {
+      "message": "Nama Folder: "
+   },
+   "Folder_Name__": {
+      "message": "Nama Folder:"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "Bagi setiap koordinat yang disenaraikan di bawah, carikan nilai dari grid anda dan masukkan nilai itu."
+   },
+   "Forgot_Password_": {
+      "message": "Terlupa Katalaluan?"
+   },
+   "Forgot_your_password_": {
+      "message": "Terlupa kata laluan anda?"
+   },
+   "FormFill": {
+      "message": "IsiBorang"
+   },
+   "FormFill_Profiles": {
+      "message": "Profil IsiBorang"
+   },
+   "Form_Fill": {
+      "message": "Pengisian Borang"
+   },
+   "Form_Fill_Profile": {
+      "message": "Profil Isian Borang"
+   },
+   "Form_Fill_Profiles": {
+      "message": "Profil Isian Borang"
+   },
+   "Form_Fill_Profiles_": {
+      "message": "Profil Isian Borang: "
+   },
+   "Form_Fills": {
+      "message": "Isikan Borang"
+   },
+   "Form_Name_": {
+      "message": "Nama Borang:"
+   },
+   "Format": {
+      "message": "Format"
+   },
+   "Forums": {
+      "message": "Forum"
+   },
+   "France": {
+      "message": "Perancis"
+   },
+   "Free_User": {
+      "message": "Pengguna Percuma"
+   },
+   "French": {
+      "message": "Perancis"
+   },
+   "French_Guiana": {
+      "message": "Guiana Perancis"
+   },
+   "French_Polynesia": {
+      "message": "Polynesia Perancis"
+   },
+   "French_Southern_Territories": {
+      "message": "Wilayah Selatan Perancis"
+   },
+   "French__Canada_": {
+      "message": "Perancis (Kanada)"
+   },
+   "GET_FREE_PREMIUM": {
+      "message": "DAPATKAN PREMIUM PERCUMA"
+   },
+   "GMT_5": {
+      "message": "GMT+5"
+   },
+   "GMT_7": {
+      "message": "GMT+7"
+   },
+   "GMT_9": {
+      "message": "GMT+9"
+   },
+   "GMT_Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT Dublin, Edinburgh, Lisbon, London"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT: Dublin, Edinburgh, Lisbon, London"
+   },
+   "Gabon": {
+      "message": "Gabon"
+   },
+   "Gambia": {
+      "message": "Gambia"
+   },
+   "Games": {
+      "message": "Permainan"
+   },
+   "Gender": {
+      "message": "Jantina"
+   },
+   "General": {
+      "message": "Umum"
+   },
+   "Generate": {
+      "message": "Jana"
+   },
+   "GeneratePassword": {
+      "message": "Jika anda sedang mencipta akaun atau menukar katalaluan anda, klik jana untuk mencipta katalaluan yang unik dan selamat dengan LastPass."
+   },
+   "Generate_Another_Password": {
+      "message": "Jana Katalaluan Lain"
+   },
+   "Generate_Password": {
+      "message": "Jana Katalaluan"
+   },
+   "Generate_Secure_Password": {
+      "message": "Jana Katalaluan Selamat"
+   },
+   "Generated_Password_for": {
+      "message": "Katalaluan Terjana untuk"
+   },
+   "Generic": {
+      "message": "Am"
+   },
+   "Generic_CSV_File": {
+      "message": "Fail CSV Am"
+   },
+   "Georgia": {
+      "message": "Georgia"
+   },
+   "German": {
+      "message": "Jerman"
+   },
+   "Germany": {
+      "message": "Jerman"
+   },
+   "Get_Started": {
+      "message": "Ayuh Bermula"
+   },
+   "Ghana": {
+      "message": "Ghana"
+   },
+   "Gibraltar": {
+      "message": "Gibraltar"
+   },
+   "Go_Back": {
+      "message": "Kembali"
+   },
+   "Go_Back_": {
+      "message": "Kembali?"
+   },
+   "Go_Premium": {
+      "message": "Dapatkan Premium"
+   },
+   "Go_Premium_": {
+      "message": "Dapatkan Premium!"
+   },
+   "Go_to_URL": {
+      "message": "Pergi ke URL"
+   },
+   "Google_Authenticator": {
+      "message": "Pengesah Google"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "Pengesahan Pelbagai Faktor Pengesah Google"
+   },
+   "Google_Chrome": {
+      "message": "Google Chrome"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "Pengurus Katalaluan Google Chrome"
+   },
+   "Greece": {
+      "message": "Greece"
+   },
+   "Greenland": {
+      "message": "Greenland"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "Greenland, Brasilia, Montevideo"
+   },
+   "Grenada": {
+      "message": "Grenada"
+   },
+   "Grid": {
+      "message": "Grid"
+   },
+   "Grid_View": {
+      "message": "Paparan Grid"
+   },
+   "Grid_or_List___You_Choose_": {
+      "message": "Grid atau Senarai - Anda Pilih!"
+   },
+   "Group_": {
+      "message": "Folder:"
+   },
+   "Group_Actions": {
+      "message": "Tindakan Kumpulan"
+   },
+   "Group_ID": {
+      "message": "ID Kumpulan"
+   },
+   "Group_Name": {
+      "message": "Nama Folder"
+   },
+   "Groups": {
+      "message": "Folder"
+   },
+   "Guadeloupe": {
+      "message": "Guadeloupe"
+   },
+   "Guam": {
+      "message": "Guam"
+   },
+   "Guatemala": {
+      "message": "Guatemala"
+   },
+   "Guernsey": {
+      "message": "Guernsey"
+   },
+   "Guinea": {
+      "message": "Guinea"
+   },
+   "Guinea_Bissau": {
+      "message": "Guinea-Bissau"
+   },
+   "Guyana": {
+      "message": "Guyana"
+   },
+   "HP_Password_Safe": {
+      "message": "Katalaluan Selamat HP"
+   },
+   "Haiti": {
+      "message": "Haiti"
+   },
+   "Harare__Pretoria": {
+      "message": "Harare, Pretoria"
+   },
+   "Hawaii": {
+      "message": "Hawaii"
+   },
+   "Health": {
+      "message": "Kesihatan"
+   },
+   "Health_Insurance": {
+      "message": "Insuran Kesihatan"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "Pulau Heard dan Kepulauan McDonald"
+   },
+   "Height": {
+      "message": "Ketinggian"
+   },
+   "Help": {
+      "message": "Bantuan"
+   },
+   "Help_Center": {
+      "message": "Pusat Bantuan"
+   },
+   "Help_Translate": {
+      "message": "Bantu Terjemahkan"
+   },
+   "Help___": {
+      "message": "Bantuan..."
+   },
+   "Help_spread_the_word": {
+      "message": "Bantu sebarkan"
+   },
+   "Hide": {
+      "message": "Sembunyi"
+   },
+   "Hide_Advanced_Options": {
+      "message": "Sembunyi Pilihan Lanjutan"
+   },
+   "Hide_All": {
+      "message": "Sembunyi Semua"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "Sembunyi Pilihan Menu Konteks"
+   },
+   "Hide_Password": {
+      "message": "Sembunyikan Katalaluan"
+   },
+   "Hide_Passwords": {
+      "message": "Sembunyi Katalaluan"
+   },
+   "Highlight_input_boxes": {
+      "message": "Serlahkan kotak input"
+   },
+   "History": {
+      "message": "Sejarah"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "Holy See (Negeri Vatican City)"
+   },
+   "Home": {
+      "message": "Laman Utama"
+   },
+   "Honduras": {
+      "message": "Honduras"
+   },
+   "Hong_Kong": {
+      "message": "Hong Kong"
+   },
+   "Hostname": {
+      "message": "Nama host"
+   },
+   "HotKeys": {
+      "message": "HotKeys"
+   },
+   "Hungarian": {
+      "message": "Hungary"
+   },
+   "Hungary": {
+      "message": "Hungary"
+   },
+   "IBAN_Number": {
+      "message": "Nombor IBAN"
+   },
+   "IMPORT_": {
+      "message": "IMPORT?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "ADALAH SANGAT PENTING BAHAWA ANDA TIDAK AKAN SEKALI-KALI MELUPAI KATALALUAN LASTPASS BAHARU ANDA."
+   },
+   "I_Agree": {
+      "message": "Saya Setuju"
+   },
+   "I_Do_Not_Agree": {
+      "message": "Saya Tidak Setuju"
+   },
+   "I_Forgot_my_Password": {
+      "message": "Saya Lupa Katalaluan saya"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "Saya terlupa katalaluan, Tolong"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "Saya telah baca dan setuju dengan"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "Saya faham bahawa data disulitkan saya akan dihantar ke LastPass"
+   },
+   "I_ve_forgot_the_answer": {
+      "message": "Saya terlupa jawapannya"
+   },
+   "I_ve_forgotten_my_password_": {
+      "message": "Saya terlupa katalaluan saya."
+   },
+   "I_ve_lost_my_Google_Authenticator_device": {
+      "message": "Saya telah kehilangan peranti Pengesah Google saya"
+   },
+   "I_ve_lost_my_Sesame_device": {
+      "message": "Saya telah kehilangan peranti Sesame saya"
+   },
+   "I_ve_lost_my_YubiKey_device": {
+      "message": "Saya telah kehilangan peranti YubiKey saya"
+   },
+   "I_ve_lost_my_device": {
+      "message": "Saya telah kehilangan peranti saya"
+   },
+   "I_ve_lost_my_grid": {
+      "message": "Saya telah kehilangan grid saya"
+   },
+   "Iceland": {
+      "message": "Iceland"
+   },
+   "Icons": {
+      "message": "Ikon"
+   },
+   "Identities": {
+      "message": "Identiti-Identiti"
+   },
+   "Identity": {
+      "message": "Identiti"
+   },
+   "If_not_specified__will_use_a_file_extension_of_": {
+      "message": "Jika tidak dinyatakan, akan menggunakan sambungan fail:"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "Jika anda sudah ada akaun LastPass, anda boleh tutup tetingkap dan daftar masuk ini."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "Jika anda terlupa juga katalaluan induk LastPass anda,"
+   },
+   "If_you_forgot_your_answer__click_here_to_reset_your_security_question": {
+      "message": "Jika anda terlupa jawapan anda, klik di sini untuk menetapkan semula soalan keselamatan anda"
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "Jika anda kehilangan peranti Pengesah Google, klik di sini untuk melumpuhkan pengesahan Pengesah Google"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "Jika anda menghilang peranti Sesame anda, klik di sini untuk mematikan pengasahan Sesame"
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "Jika anda menghilang peranti Yubikey anda, klik di sini untuk mematikan pengasahan Yubikey"
+   },
+   "If_you_lost_your_device__click_here_to_disable_multifactor_authentication": {
+      "message": "Jika anda kehilangan peranti, klik di sini untuk mematikan pengesahan pelbagai faktor"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "Jika anda kehilangan grid anda, klik di sini untuk mematikan pengesahan grid"
+   },
+   "Immediately": {
+      "message": "Serta merta"
+   },
+   "Import": {
+      "message": "Import"
+   },
+   "Import_From": {
+      "message": "Import Dari"
+   },
+   "Import_Your_Data": {
+      "message": "Import Data Anda"
+   },
+   "India": {
+      "message": "India"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "Indiana, Bogota, Lima, Quito, Rio Branco"
+   },
+   "Indonesia": {
+      "message": "Indonesia"
+   },
+   "Install": {
+      "message": "Pasang"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "Pasang versi perduaan LastPass untuk Chrome bagi membolehkan perkongsian nyata daftar masuk antara pelayar yang lain"
+   },
+   "Instant_Messenger": {
+      "message": "Instant Messenger"
+   },
+   "Instructions": {
+      "message": "Arahan"
+   },
+   "Insurance": {
+      "message": "Insuran"
+   },
+   "International_Date_Line_West": {
+      "message": "Tarikh Garis Barat Antarabangsa"
+   },
+   "Invalid_Password_": {
+      "message": "Katalaluan Tidak Sah."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "Alamat e-mel tidak sah, cuba lagi"
+   },
+   "Invitation_sent_": {
+      "message": "Jemputan dihantar."
+   },
+   "Invite": {
+      "message": "Jemput"
+   },
+   "Invite_Accepted": {
+      "message": "Jemputan Diterima"
+   },
+   "Invite_Friends_To_Try_LastPass": {
+      "message": "Jemput Rakan Untuk Mencuba LastPass"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "Iran (Republik Islam)"
+   },
+   "Iraq": {
+      "message": "Iraq"
+   },
+   "Ireland": {
+      "message": "Ireland"
+   },
+   "Islamabad__Karachi__Tashkent__Ekaterinburg": {
+      "message": "Islamabad, Karachi, Tashkent, Ekaterinburg"
+   },
+   "Isle_of_Man": {
+      "message": "Isle of Man"
+   },
+   "Israel": {
+      "message": "Israel"
+   },
+   "Issue_Number": {
+      "message": "Bilangan isu"
+   },
+   "Issue_number": {
+      "message": "Nombor penerbitan"
+   },
+   "Issued_Date": {
+      "message": "Tarikh Dikeluarkan"
+   },
+   "Issuing_Authority": {
+      "message": "Pihak Pengeluar"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "Adalah disyorkan agar anda memadam fail lampiran selepas anda menggunakannya."
+   },
+   "Italian": {
+      "message": "Itali"
+   },
+   "Italy": {
+      "message": "Itali"
+   },
+   "Items_to_Share_": {
+      "message": "Item untuk Dikongsi:"
+   },
+   "IterationsReduction": {
+      "message": "Bilangan lelaran yang diperlukan untuk menjana katalaluan induk LastPass anda nampaknya telah dikurangkan daripada versi cache. Adakah anda ingin meneruskan daftar masuk?"
+   },
+   "Jamaica": {
+      "message": "Jamaica"
+   },
+   "January": {
+      "message": "Januari"
+   },
+   "Japan": {
+      "message": "Jepun"
+   },
+   "Japanese": {
+      "message": "Jepun"
+   },
+   "Jersey": {
+      "message": "Jersey"
+   },
+   "Jordan": {
+      "message": "Jordan"
+   },
+   "July": {
+      "message": "Julai"
+   },
+   "June": {
+      "message": "Jun"
+   },
+   "Kabul": {
+      "message": "Kabul"
+   },
+   "Kathmandu": {
+      "message": "Kathmandu"
+   },
+   "Kazakhstan": {
+      "message": "Kazakhstan"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "Simpan sejarah daftar masuk dan isian borang saya"
+   },
+   "Kenya": {
+      "message": "Kenya"
+   },
+   "Key_Index": {
+      "message": "Indeks Kunci"
+   },
+   "Key_Type": {
+      "message": "Jenis Kunci"
+   },
+   "Kiribati": {
+      "message": "Kiribati"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "Korea, Republik Demokratik Rakyat"
+   },
+   "Korea__Republic_Of": {
+      "message": "Korea, Republik"
+   },
+   "Korean": {
+      "message": "Korea"
+   },
+   "Kuwait": {
+      "message": "Kuwait"
+   },
+   "Kuwait__Riyadh__Nairobi__Moscow__St__Petersburg__Volgograd": {
+      "message": "Kuwait, Riyadh, Nairobi, Moscow, St. Petersburg, Volgograd"
+   },
+   "Kyrgyzstan": {
+      "message": "Kyrgyzstan"
+   },
+   "La_Paz": {
+      "message": "La Paz"
+   },
+   "Language": {
+      "message": "Bahasa "
+   },
+   "Language_": {
+      "message": "Bahasa: "
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "Republik Demokratik Rakyat Lao"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "Fail CSV LastPass"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "Bar Alatan LastPass Chrome"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "Fail Disulitkan LastPass"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "Pengesahan Pelbagai-Faktor Grid LastPass"
+   },
+   "LastPass_Menu": {
+      "message": "Menu LastPass"
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "LastPass tidak boleh daftar masuk sehingga cookies dari lastpass.com dibenarkan."
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass telah mengesan borang daftar masuk yang tidak selamat.\n\nAdakah anda ingin teruskan?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass telah mengesan borang log masuk yang tidak selamat.\n\nAdakah anda masih mahu LastPass mengisi borang tersebut?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass mengesan perubahan katalaluan bagi"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass mengesan perubahan katalaluan bagi domain:"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass mengesan perubahan katalaluan bagi pengguna:"
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "LastPass telah mengesan kesilapan pemasangan. Sila pasang semula LastPass."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass telah mengesan bahawa anda menggunakan katalaluan yang lemah untuk laman web di bawah. Kami mencadangkan anda pergi ke tetapan akaun anda untuk laman web ini, dan mencipta katalaluan baharu. Gunakan LastPass untuk menjana katalaluan yang unik dan kuat untuk akaun ini. Kemudian anda boleh simpan perubahan di laman web dan ke LastPass."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass telah mengisi maklumat daftar masuk anda ke dalam borang di halaman ini."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "LastPass telah berjaya dipasang! Apabila anda memasang LastPass pada komputer lain, anda tidak perlu melakukan proses ini sekali lagi, anda cuma akan terus daftar masuk. Jangan kongsi Katalaluan Induk anda dengan sesiapa sahaja, termasuk pekerja LastPass, kami tidak akan sekali-kali memintanya! LastPass menyulitkan data sensitif anda dalam pemacu tempatan oleh itu pekerja LastPass tidak mempunyai akses kepada maklumat berkenaan. Anda boleh mendapatkan bantuan dengan mengklik pada ikon LastPass dan pergi ke Bantuan."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "LastPass adalah satu-satunya katalaluan yang anda perlu ingat. Jika anda baru dengan LastPass, kita hanya perlukan beberapa minit masa anda untuk membuat tetapan akaun anda. Anda akan dapat menggunakan akaun ini pada mana-mana PC lain yang anda gunakan untuk sentiasa menyimpan data peribadi anda secara selari. Tekan cipta akaun untuk memulakan."
+   },
+   "LastPass_must_reencrypt_all_of_your_data_because_of_a_key_change_": {
+      "message": "LastPass mesti menyulitkan semula semua data anda kerana perubahan kekunci."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "4 digit terakhir nombor telefon anda"
+   },
+   "Last_Name": {
+      "message": "Nama Akhir"
+   },
+   "Last_Name2": {
+      "message": "Nama Akhir2"
+   },
+   "Last_Touch": {
+      "message": "Sentuhan Akhir"
+   },
+   "Last_name": {
+      "message": "Nama akhir"
+   },
+   "Last_used": {
+      "message": "Diguna kali terakhir"
+   },
+   "Latvia": {
+      "message": "Latvia"
+   },
+   "Launch": {
+      "message": "Jalankan"
+   },
+   "Launch_Site": {
+      "message": "Mulakan Laman"
+   },
+   "Lebanon": {
+      "message": "Lubnan"
+   },
+   "Left": {
+      "message": "Kiri"
+   },
+   "Lesotho": {
+      "message": "Lesotho"
+   },
+   "Liberia": {
+      "message": "Liberia"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "Jumhuriah Arab Libya"
+   },
+   "License_Class": {
+      "message": "Kelas Lesen"
+   },
+   "License_Key": {
+      "message": "Kekunci Lesen"
+   },
+   "Liechtenstein": {
+      "message": "Liechtenstein"
+   },
+   "Link_Personal_Account": {
+      "message": "Pautkan Akaun Peribadi"
+   },
+   "List_View": {
+      "message": "Paparan Senarai"
+   },
+   "Lithuania": {
+      "message": "Lithuania"
+   },
+   "Local": {
+      "message": "Tempatan"
+   },
+   "Log_Out": {
+      "message": "Daftar Keluar"
+   },
+   "Log_Out_": {
+      "message": "Daftar Keluar:"
+   },
+   "Log_into_a_Site": {
+      "message": "Log masuk ke Laman"
+   },
+   "Login": {
+      "message": "Daftar Masuk"
+   },
+   "LoginError": {
+      "message": "Ralat daftar masuk ke LastPass. Sila cuba lagi."
+   },
+   "Login_to_LastPass": {
+      "message": "Daftar Masuk ke LastPass"
+   },
+   "Logoff": {
+      "message": "Daftar Keluar"
+   },
+   "Logoff_": {
+      "message": "Daftar Keluar:"
+   },
+   "Logoff_after_logged_in_for_minutes": {
+      "message": "Log keluar selepas log masuk selama minit"
+   },
+   "Logoff_on_browser_close": {
+      "message": "Log keluar semasa pelayar ditutup"
+   },
+   "Logout": {
+      "message": "Log Keluar"
+   },
+   "LoseChanges": {
+      "message": "Adakah anda pasti anda mahu mengubah lapangan laman ini? Berbuat demikian akan menyebabkan anda kehilangan apa-apa perubahan yang anda telah buat pada laman ini!"
+   },
+   "LoseChangesApp": {
+      "message": "Adakah anda pasti anda mahu mengubah lapangan permohonan ini? Berbuat demikian akan menyebabkan anda kehilangan sebarang perubahan yang telah dibuat terhadap aplikasi ini!"
+   },
+   "Luxembourg": {
+      "message": "Luxembourg"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "Penyimpan Katalaluan MSI"
+   },
+   "Macao": {
+      "message": "Macao"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "Macedonia, Bekas Republik Yugoslav"
+   },
+   "Madagascar": {
+      "message": "Madagascar"
+   },
+   "Magadan__Solomon_Is___New_Caledonia": {
+      "message": "Magadan, Pulau Solomon, New Caledonia"
+   },
+   "Make_Pronounceable": {
+      "message": "Jadikan Boleh Disebut"
+   },
+   "Malawi": {
+      "message": "Malawi"
+   },
+   "Malaysia": {
+      "message": "Malaysia"
+   },
+   "Maldives": {
+      "message": "Maldives"
+   },
+   "Male": {
+      "message": "Lelaki"
+   },
+   "Mali": {
+      "message": "Mali"
+   },
+   "Malta": {
+      "message": "Malta"
+   },
+   "Manage_Shared_Folders": {
+      "message": "Uruskan Folder Dikongsi"
+   },
+   "March": {
+      "message": "Mac"
+   },
+   "Marshall_Islands": {
+      "message": "Kepulauan Marshall"
+   },
+   "Martinique": {
+      "message": "Martinique"
+   },
+   "Master_Password": {
+      "message": "Katalaluan Induk"
+   },
+   "Master_Password_": {
+      "message": "Katalaluan Induk:"
+   },
+   "Matching_Sites": {
+      "message": "Laman Sepadan"
+   },
+   "Mauritania": {
+      "message": "Mauritania"
+   },
+   "Mauritius": {
+      "message": "Mauritius"
+   },
+   "Maximize": {
+      "message": "Besarkan"
+   },
+   "Maxthon": {
+      "message": "Maxthon"
+   },
+   "May": {
+      "message": "Mei"
+   },
+   "Mayotte": {
+      "message": "Mayotte"
+   },
+   "Member_ID": {
+      "message": "ID Ahli"
+   },
+   "Member_Name": {
+      "message": "Nama Ahli"
+   },
+   "Membership": {
+      "message": "Keahlian"
+   },
+   "Membership_Number": {
+      "message": "Nombor Keahlian"
+   },
+   "Message": {
+      "message": "Mesej"
+   },
+   "Message_": {
+      "message": "Mesej:"
+   },
+   "Meta": {
+      "message": "Meta"
+   },
+   "Mexico": {
+      "message": "Mexico"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "Micronesia, Negara Persekutuan"
+   },
+   "Mid_Atlantic": {
+      "message": "Atlantik-Tengah"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "3 digit tengah nombor telefon anda"
+   },
+   "Middle_Name": {
+      "message": "Nama Tengah"
+   },
+   "Middle_name": {
+      "message": "Nama tengah"
+   },
+   "Midway_Island__Samoa": {
+      "message": "Pulau Midway, Samoa"
+   },
+   "Minimize": {
+      "message": "Kecilkan"
+   },
+   "Mobile_Devices": {
+      "message": "Peranti Mudah Alih"
+   },
+   "Mobile_Email_Address": {
+      "message": "Alamat E-mel Mobile"
+   },
+   "Mobile_Number": {
+      "message": "Nombor Telefon Bimbit"
+   },
+   "Mobile_number": {
+      "message": "Nombor telefon bimbit"
+   },
+   "Moldova__Republic_Of": {
+      "message": "Moldova, Republik"
+   },
+   "Monaco": {
+      "message": "Monaco"
+   },
+   "Mongolia": {
+      "message": "Mongolia"
+   },
+   "Montenegro": {
+      "message": "Montenegro"
+   },
+   "Montserrat": {
+      "message": "Montserrat"
+   },
+   "More": {
+      "message": "Lagi"
+   },
+   "More_Information": {
+      "message": "Maklumat Lanjut"
+   },
+   "More_Options": {
+      "message": "Pilihan Lain"
+   },
+   "Morocco": {
+      "message": "Morocco"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "Waktu Pergunungan (US & Kanada)"
+   },
+   "Move_Selected_to_Group": {
+      "message": "Pindah Yang Terpilih ke Folder"
+   },
+   "Move_matching_sites_to_top_menu": {
+      "message": "Pindah laman sepadan ke menu atas"
+   },
+   "Move_to_Group": {
+      "message": "Pindah ke Folder"
+   },
+   "Move_to_Sub_Group": {
+      "message": "Pindah ke Sub-Folder"
+   },
+   "Mozambique": {
+      "message": "Mozambique"
+   },
+   "Mr": {
+      "message": "Encik"
+   },
+   "Mrs": {
+      "message": "Puan"
+   },
+   "Ms": {
+      "message": "Cik"
+   },
+   "Multifactor_Authentication": {
+      "message": "Pengesahan Pelbagai Faktor"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_Account": {
+      "message": "Akaun Saya"
+   },
+   "My_LastPass_Vault": {
+      "message": "Vault LastPass Saya"
+   },
+   "My_Vault": {
+      "message": "Bilik Kebal Saya"
+   },
+   "Myanmar": {
+      "message": "Myanmar"
+   },
+   "NAME": {
+      "message": "NAMA"
+   },
+   "Name_": {
+      "message": "Nama:"
+   },
+   "Name__a_z_": {
+      "message": "Nama (a-z)"
+   },
+   "Name__z_a_": {
+      "message": "Nama (z-a)"
+   },
+   "Name_on_Card": {
+      "message": "Nama pada Kad"
+   },
+   "Name_on_card": {
+      "message": "Nama pada kad"
+   },
+   "Nameproper": {
+      "message": "Nama"
+   },
+   "Namibia": {
+      "message": "Namibia"
+   },
+   "Nationality": {
+      "message": "Warganegara"
+   },
+   "Native_Messaging": {
+      "message": "Pesanan Asal"
+   },
+   "Nauru": {
+      "message": "Nauru"
+   },
+   "Nepal": {
+      "message": "Nepal"
+   },
+   "Netherlands": {
+      "message": "Belanda"
+   },
+   "Netherlands_Antilles": {
+      "message": "Antillen Belanda"
+   },
+   "Never": {
+      "message": "Jangan sekali-kali"
+   },
+   "Never_Ask_Again": {
+      "message": "Jangan Tanya Lagi"
+   },
+   "Never_AutoFill": {
+      "message": "Batalkan Pengisi Auto"
+   },
+   "Never_AutoLogin": {
+      "message": "Matikan Daftar masuk Auto"
+   },
+   "Never_Show_Again": {
+      "message": "Jangan Tunjuk Lagi"
+   },
+   "Never_Show_Context_Icons": {
+      "message": "Jangan sekali-kali Papar Ikon Konteks"
+   },
+   "Never___": {
+      "message": "Jangan..."
+   },
+   "Never_show_me_this_message_again_": {
+      "message": "Jangan tunjukkan mesej ini lagi*"
+   },
+   "New_Caledonia": {
+      "message": "New Caledonia"
+   },
+   "New_Master_Password": {
+      "message": "Katalaluan Induk Baharu"
+   },
+   "New_Zealand": {
+      "message": "New Zealand"
+   },
+   "New_here__Create_an_Account_": {
+      "message": "Baru di sini? Buat Akaun."
+   },
+   "Newfoundland": {
+      "message": "Newfoundland"
+   },
+   "News": {
+      "message": "Berita"
+   },
+   "News_Reference": {
+      "message": "Berita / Rujukan"
+   },
+   "Next_SMS_passcode_starts_with": {
+      "message": "Kod laluan SMS seterusnya bermula dengan"
+   },
+   "Nicaragua": {
+      "message": "Nicaragua"
+   },
+   "Niger": {
+      "message": "Niger"
+   },
+   "Nigeria": {
+      "message": "Nigeria"
+   },
+   "Niue": {
+      "message": "Niue"
+   },
+   "No": {
+      "message": "Tidak"
+   },
+   "NoFavorites": {
+      "message": "Anda tidak mempunyai sebarang Kegemaran."
+   },
+   "No_Changes": {
+      "message": "Tiada Perubahan"
+   },
+   "No_Email": {
+      "message": "Tiada E-mel"
+   },
+   "No_Form_Fill_Profiles_": {
+      "message": "Tiada Profil Isian Borang!"
+   },
+   "No_Matching_Sites_": {
+      "message": "Tiada Laman yang Sepadan"
+   },
+   "No_Thanks": {
+      "message": "Tidak, Terima Kasih"
+   },
+   "No_Updates_Are_Available": {
+      "message": "Tiada Kemaskini Didapati"
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "Tidak, saya tidak mahu LastPass membantu saya mengisi borang secara automatik"
+   },
+   "No__Save_as_New_Entry": {
+      "message": "Tidak, Simpan sebagai Masukan Baharu"
+   },
+   "No__Thanks": {
+      "message": "Tidak, Terima kasih"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "Tidak, jangan import apa-apa butiran saya yang tidak selamat"
+   },
+   "No_changes_were_made_to__1": {
+      "message": "Tiada perubahan dilakukan kepada %1"
+   },
+   "No_matches_found__Please_search_again_": {
+      "message": "Tiada padanan ditemui. Sila cari lagi."
+   },
+   "Non_Administrator": {
+      "message": "Bukan-Pentadbir"
+   },
+   "None_Available": {
+      "message": "Tidak Didapati"
+   },
+   "Norfolk_Island": {
+      "message": "Kepulauan Norfolk"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "Kepulauan Mariana Utara"
+   },
+   "Norway": {
+      "message": "Norway"
+   },
+   "Norwegian": {
+      "message": "Norwegian"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "Nynorsk Norway"
+   },
+   "Not_Now": {
+      "message": "Bukan Sekarang"
+   },
+   "Note": {
+      "message": "Nota"
+   },
+   "Note_History": {
+      "message": "Sejarah Nota"
+   },
+   "Note_Type": {
+      "message": "Jenis Nota"
+   },
+   "Note_Type_": {
+      "message": "Jenis Nota:"
+   },
+   "Notes": {
+      "message": "Nota"
+   },
+   "Notes_": {
+      "message": "Nota:"
+   },
+   "Notifications": {
+      "message": "Pemberitahuan"
+   },
+   "November": {
+      "message": "November"
+   },
+   "Nuku_alofa": {
+      "message": "Nuku'alofa"
+   },
+   "Number": {
+      "message": "Nombor"
+   },
+   "Number_of_Licenses": {
+      "message": "Bilangan Lesen"
+   },
+   "OK": {
+      "message": "OK"
+   },
+   "October": {
+      "message": "Oktober"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "Tawarkan untuk Menjana Katalaluan Yang Selamat"
+   },
+   "Old_Password": {
+      "message": "Katalaluan Lama"
+   },
+   "Oman": {
+      "message": "Oman"
+   },
+   "One_Time_Passwords": {
+      "message": "Katalaluan Sekali Guna"
+   },
+   "Open_All": {
+      "message": "Buka Semua"
+   },
+   "Open_Dashlane___File___Export___CSV___Import_the_resulting_file_": {
+      "message": "Dashlane Terbuka - Fail - Eksport - CSV. Import fail yang terhasil."
+   },
+   "Open_Favorites": {
+      "message": "Buka Kegemaran"
+   },
+   "Open_File": {
+      "message": "Buka Fail"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "Buka Bilik Kebal LastPass Saya"
+   },
+   "Open_My_Vault": {
+      "message": "Buka Bilik Kebal Saya"
+   },
+   "Open_New_Pages_in": {
+      "message": "Buka Halaman Baharu dalam"
+   },
+   "Open_Popover": {
+      "message": "Buka Popover"
+   },
+   "Opera": {
+      "message": "Opera"
+   },
+   "Opera_Password_Manager": {
+      "message": "Pengurus Katalaluan Opera"
+   },
+   "Order_Number": {
+      "message": "Nombor Pesanan"
+   },
+   "Order_Total": {
+      "message": "Jumlah Pesanan"
+   },
+   "Organization": {
+      "message": "Organisasi"
+   },
+   "Other": {
+      "message": "Lain-lain"
+   },
+   "Other_Sessions": {
+      "message": "Sessi Lain"
+   },
+   "Overall_Progress_": {
+      "message": "Kemajuan Keseluruhan:"
+   },
+   "PASSWORDupper": {
+      "message": "KATALALUAN"
+   },
+   "PINs_Password_Manager": {
+      "message": "Pengurus Katalaluan PIN"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "Waktu Pasifik (US & Kanada)"
+   },
+   "Page_Down": {
+      "message": "Page Down"
+   },
+   "Page_Up": {
+      "message": "Page Up"
+   },
+   "Pakistan": {
+      "message": "Pakistan"
+   },
+   "Palau": {
+      "message": "Palau"
+   },
+   "Palestinian_Territories": {
+      "message": "Wilayah Palestin"
+   },
+   "Panama": {
+      "message": "Panama"
+   },
+   "Papua_New_Guinea": {
+      "message": "Papua New Guinea"
+   },
+   "Paraguay": {
+      "message": "Paraguay"
+   },
+   "Passpack": {
+      "message": "Pek Laluan"
+   },
+   "Passphrase": {
+      "message": "Frasa laluan"
+   },
+   "Passport": {
+      "message": "Pasport"
+   },
+   "Password": {
+      "message": "Katalaluan"
+   },
+   "Password_": {
+      "message": "Katalaluan:"
+   },
+   "Password_Agent": {
+      "message": "Agen Katalaluan"
+   },
+   "Password_Copied": {
+      "message": "Katalaluan Disalin"
+   },
+   "Password_Corral": {
+      "message": "Katalaluan Corral"
+   },
+   "Password_Dragon": {
+      "message": "Katalaluan Dragon"
+   },
+   "Password_Keeper": {
+      "message": "Penyimpan Katalaluan"
+   },
+   "Password_Length": {
+      "message": "Panjang Katalaluan"
+   },
+   "Password_Length_": {
+      "message": "Panjang Katalaluan:"
+   },
+   "Password_Reminder": {
+      "message": "Pengingat Katalaluan"
+   },
+   "Password_Reminder_": {
+      "message": "Pengingat Katalaluan:"
+   },
+   "Password_Safe": {
+      "message": "Keselamatan Katalaluan"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "Pengingat katalaluan tidak boleh sama dengan katalaluan"
+   },
+   "Password_updated_": {
+      "message": "Katalaluan telah dikemaskini!"
+   },
+   "Passwords_Max": {
+      "message": "Katalaluan Max"
+   },
+   "People_I_Trust": {
+      "message": "Orang Saya Percayai"
+   },
+   "People_Who_Trust_Me": {
+      "message": "Orang Yang Percayai Saya"
+   },
+   "Permissions_": {
+      "message": "Kebenaran: "
+   },
+   "Personal": {
+      "message": "Peribadi"
+   },
+   "Personal_Account_Master_Password_": {
+      "message": "Katalaluan Induk Akaun Peribadi: "
+   },
+   "Peru": {
+      "message": "Peru"
+   },
+   "Philippines": {
+      "message": "Filipina"
+   },
+   "Phone_Number": {
+      "message": "Nombor Telefon"
+   },
+   "Phone_number": {
+      "message": "Nombor telefon"
+   },
+   "Physician_Address": {
+      "message": "Alamat Tetap"
+   },
+   "Physician_Name": {
+      "message": "Nama Doktor"
+   },
+   "Physician_Phone": {
+      "message": "Telefon Doktor"
+   },
+   "Pin": {
+      "message": "Pin"
+   },
+   "Pitcairn": {
+      "message": "Pitcairn"
+   },
+   "Please_Make_a_Selection": {
+      "message": "Sila Buat Pilihan"
+   },
+   "Please_Wait___": {
+      "message": "Sila Tunggu..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "Sila jawab soalan berikut:"
+   },
+   "Please_close_this_window": {
+      "message": "Sila tutup tetingkap ini"
+   },
+   "Please_complete_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "Sila lengkapkan pengesahan pelbagai faktor pada telefon atau peranti mudah alih anda."
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": "Sila biarkan laman ini terbuka sehingga operasi selesai."
+   },
+   "Please_move_sites_from_only_one_shared_folder_at_a_time_": {
+      "message": "Sila alihkan laman dari hanya satu folder yang dikongsi pada satu masa."
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "Sila berikan nama untuk komputer ini"
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "Sila mulakan semula semua pelayar anda untuk mula menggunakan LastPass Atas Talian."
+   },
+   "Please_select": {
+      "message": "Sila pilih"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "Sila pilih laman web yang anda ingin terapkan perubahan ini."
+   },
+   "Please_try_again_": {
+      "message": "Sila cuba lagi."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "Sila layar ke laman web https://lastpass.com untuk membuat akaun baharu pada masa akan datang."
+   },
+   "Poland": {
+      "message": "Poland"
+   },
+   "Policy_Number": {
+      "message": "Nombor Polisi"
+   },
+   "Policy_Type": {
+      "message": "Jenis Polisi"
+   },
+   "Policy_Update": {
+      "message": "Kemaskini Polisi"
+   },
+   "Polish": {
+      "message": "Poland"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "Pelayan Undian untuk perubahan akaun (minit) "
+   },
+   "Port": {
+      "message": "Port"
+   },
+   "Portugal": {
+      "message": "Portugal"
+   },
+   "Portuguese": {
+      "message": "Portugis"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "Portugis (Brazil)"
+   },
+   "Preferences": {
+      "message": "Pilihan Utama"
+   },
+   "Premium_User": {
+      "message": "Pengguna Premium"
+   },
+   "Price": {
+      "message": "Harga"
+   },
+   "Print": {
+      "message": "Cetak"
+   },
+   "Print_Screen": {
+      "message": "Cetak Skrin"
+   },
+   "Print_Secure_Notes": {
+      "message": "Cetak Nota Selamat"
+   },
+   "Print_Sites": {
+      "message": "Cetak Laman"
+   },
+   "Privacy": {
+      "message": "Privasi"
+   },
+   "Private_Key": {
+      "message": "Kunci Peribadi"
+   },
+   "Product": {
+      "message": "Produk"
+   },
+   "Profile": {
+      "message": "Profil"
+   },
+   "Profile_": {
+      "message": "Profil:"
+   },
+   "Profile_ID": {
+      "message": "ID Profil"
+   },
+   "Profile_language": {
+      "message": "Bahasa Profil"
+   },
+   "Profile_name": {
+      "message": "Nama profil"
+   },
+   "Progress": {
+      "message": "Kemajuan"
+   },
+   "Pronounceable": {
+      "message": "Boleh disebut"
+   },
+   "Protected": {
+      "message": "Dilindungi"
+   },
+   "Public_Key": {
+      "message": "Kunci Umum"
+   },
+   "Publisher": {
+      "message": "Penerbit"
+   },
+   "Puerto_Rico": {
+      "message": "Puerto Rico"
+   },
+   "Purchase_Date": {
+      "message": "Tarikh Pembelian"
+   },
+   "Purge": {
+      "message": "Penyingkiran"
+   },
+   "Qatar": {
+      "message": "Qatar"
+   },
+   "Read_Only": {
+      "message": "Baca Sahaja"
+   },
+   "Reason": {
+      "message": "Sebab"
+   },
+   "Recent_Sites": {
+      "message": "Laman Terbaharu"
+   },
+   "Recently_Used": {
+      "message": "Baru Digunakan"
+   },
+   "Recently_Used_list_size": {
+      "message": "Saiz Senarai Baru Digunakan "
+   },
+   "Recheck_Page": {
+      "message": "Semak Semula Laman"
+   },
+   "Recipients_": {
+      "message": "Penerima: "
+   },
+   "Recommended": {
+      "message": "Disyorkan"
+   },
+   "Recommended_Options": {
+      "message": "Pilihan Disyorkan"
+   },
+   "Reencrypting_Data___": {
+      "message": "Menyulitkan semula Data..."
+   },
+   "Refresh": {
+      "message": "Refresh"
+   },
+   "Refresh_Sites": {
+      "message": "Muat Semula Laman"
+   },
+   "Reject": {
+      "message": "Tolak"
+   },
+   "Remember_Email": {
+      "message": "Ingat E-mel"
+   },
+   "Remember_Password": {
+      "message": "Ingat Katalaluan"
+   },
+   "Remember_every_password": {
+      "message": "Ingat setiap katalaluan"
+   },
+   "Remove": {
+      "message": "Hapus"
+   },
+   "Remove_Personal_Account": {
+      "message": "Buang Akaun Peribadi"
+   },
+   "Rename": {
+      "message": "Namakan semula"
+   },
+   "Rename_Group": {
+      "message": "Namakan Folder"
+   },
+   "Replace": {
+      "message": "Ganti"
+   },
+   "Replace_Existing_Site": {
+      "message": "Gantikan Laman Sedia Ada"
+   },
+   "Replace_Site": {
+      "message": "Ganti Laman"
+   },
+   "Request_failed__is_your_Internet_connection_down_": {
+      "message": "Permintaan gagal; adakah sambungan Internet anda terputus?"
+   },
+   "Require_All_Character_Type": {
+      "message": "Memerlukan Semua Jenis Aksara"
+   },
+   "Require_All_Character_Types": {
+      "message": "Memerlukan Semua Jenis Aksara"
+   },
+   "Require_Every_Character_Type": {
+      "message": "Memerlukan Setiap Jenis Abjad"
+   },
+   "Require_Password_Reprompt": {
+      "message": "Memerlukan Gesaan Katalaluan"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "Memerlukan gesaan keselamatan apabila:"
+   },
+   "Resend_Invitation": {
+      "message": "Hantar semula Jemputan"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "Hormati AutoComplete=tutup: membenarkan laman web untuk melumpuhkan Isi Automatik"
+   },
+   "Restore": {
+      "message": "Pasang semula"
+   },
+   "Restore__General__Defaults": {
+      "message": "Pasang semula 'Umum' lalai"
+   },
+   "Reunion": {
+      "message": "Reunion"
+   },
+   "Revoked": {
+      "message": "Ditarik balik"
+   },
+   "Right": {
+      "message": "Kanan"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "Romania"
+   },
+   "Routing_Number": {
+      "message": "Bilangan Routing"
+   },
+   "Routing_number": {
+      "message": "Bilangan routing"
+   },
+   "Run_the_Google_Authenticator_application_on_your_mobile_device_and_enter_the_verification_code_in_the_input_box_below_": {
+      "message": "Jalankan aplikasi Pengesah Google pada peranti mudah alih anda dan masukkan kod pengesahan dalam kotak input di bawah."
+   },
+   "Russian": {
+      "message": "Russia"
+   },
+   "Russian_Federation": {
+      "message": "Persekutuan Rusia"
+   },
+   "Rwanda": {
+      "message": "Rwanda"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "LAMAN"
+   },
+   "SMTP_Port": {
+      "message": "Port SMTP"
+   },
+   "SMTP_Server": {
+      "message": "Pelayan SMTP"
+   },
+   "SPB_Wallet": {
+      "message": "Dompet SPB"
+   },
+   "SSH_Key": {
+      "message": "Kunci SSH"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SUCCESS": {
+      "message": "BERJAYA"
+   },
+   "SWIFT_Code": {
+      "message": "Kod SWIFT"
+   },
+   "Safari": {
+      "message": "Safari"
+   },
+   "Safari_Password_Manager": {
+      "message": "Pengurus Katalaluan Safari"
+   },
+   "Saint_Barthelemy": {
+      "message": "Saint Barthelemy"
+   },
+   "Saint_Helena": {
+      "message": "Saint Helena"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "Saint Kitts dan Nevis"
+   },
+   "Saint_Lucia": {
+      "message": "Saint Lucia"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "Saint Martin (Bahagian Perancis)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "Saint Pierre dan Miquelon"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "Saint Vincent dan Grenadines"
+   },
+   "Samoa": {
+      "message": "Samoa"
+   },
+   "San_Marino": {
+      "message": "San Marino"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "Sao Tome dan Principe"
+   },
+   "Saudi_Arabia": {
+      "message": "Arab Saudi"
+   },
+   "Save": {
+      "message": "Simpan"
+   },
+   "Save_All_Entered_Data": {
+      "message": "Simpan Semua Data Dimasukkan"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "Simpan profil Kad Kredit"
+   },
+   "Save_File": {
+      "message": "Simpan Fail"
+   },
+   "Save_Form_Fill_profile": {
+      "message": "Simpan Profil Isian Borang"
+   },
+   "Save_New_Site": {
+      "message": "Simpan Laman Baharu"
+   },
+   "Save_Password_to_Vault": {
+      "message": "Simpan Katalaluan ke Bilik Kebal"
+   },
+   "Save_Site": {
+      "message": "Simpan Laman"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "Simpan Katalaluan Sekali Guna yang dilumpuhkan secara tempatan untuk Pemulihan Akaun"
+   },
+   "Save_this_password_as_a_new_entry": {
+      "message": "Simpan katalaluan ini sebagai kemasukan baharu"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "Simpan perubahan anda dan tutup tetingkap ini"
+   },
+   "Save_your_password_to_your_LastPass_Vault_": {
+      "message": "Simpan katalaluan anda ke Bilik Kebal LastPass anda?"
+   },
+   "Saved_Passwords": {
+      "message": "Katalaluan Disimpan"
+   },
+   "Screen_Keyboard": {
+      "message": "Skrin Papan Kekunci"
+   },
+   "Search_All_Data": {
+      "message": "Cari Semua Data"
+   },
+   "Search_All_Notes": {
+      "message": "Cari Semua Nota"
+   },
+   "Search_All_Sites": {
+      "message": "Cari Semua Laman"
+   },
+   "Search_LastPass_Vault": {
+      "message": "Carian Bilik Kebal LastPass"
+   },
+   "Search_Vault": {
+      "message": "Carian Bilik Kebal"
+   },
+   "Search_within_secure_notes": {
+      "message": "Cari dalam nota selamat"
+   },
+   "Searchproper": {
+      "message": "Cari"
+   },
+   "Secure_Note": {
+      "message": "Nota Selamat"
+   },
+   "Secure_Notes": {
+      "message": "Nota Selamat"
+   },
+   "Security": {
+      "message": "Keselamatan"
+   },
+   "Security_Challenge": {
+      "message": "Cabaran Keselamatan"
+   },
+   "Security_Check": {
+      "message": "Pemeriksaan Keselamatan"
+   },
+   "Security_Code": {
+      "message": "Kod Keselamatan"
+   },
+   "Security_Notice": {
+      "message": "Notis Keselamatan"
+   },
+   "Security_Question_Multifactor_Authentication": {
+      "message": "Soalan Keselamatan Pengesahan Pelbagai Faktor"
+   },
+   "Security_code": {
+      "message": "Kod keselamatan"
+   },
+   "Select": {
+      "message": "Pilih"
+   },
+   "Select_All": {
+      "message": "Pilih Semua"
+   },
+   "Select_Identity": {
+      "message": "Pilih Identiti"
+   },
+   "Select_a_preference_to_edit__then_tap_OK_": {
+      "message": "Pilih keutamaan untuk disunting, kemudian klik OK."
+   },
+   "Select_or_enter_a_new_group_name": {
+      "message": "Pilih atau masukkan nama folder baharu"
+   },
+   "Selected_Items": {
+      "message": "Item Terpilih"
+   },
+   "Send": {
+      "message": "Hantar"
+   },
+   "Send_Email": {
+      "message": "Hantar E-mel"
+   },
+   "Send_Invite": {
+      "message": "Hantar Jemputan"
+   },
+   "Send_SMS_passcodes": {
+      "message": "Hantar kod laluan SMS"
+   },
+   "Send_Test_Email": {
+      "message": "Hantar E-mel Ujian"
+   },
+   "Send_Verification_Email": {
+      "message": "Hantar E-mel Pengesahan"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "Hantar data laporan ralat tanpa nama untuk membantu meningkatkan LastPass"
+   },
+   "Senegal": {
+      "message": "Senegal"
+   },
+   "Seoul__Osaka__Sapporo__Tokyo__Yakutsk": {
+      "message": "Seoul, Osaka, Sapporo, Tokyo, Yakutsk"
+   },
+   "September": {
+      "message": "September"
+   },
+   "Serbia": {
+      "message": "Serbia"
+   },
+   "Server": {
+      "message": "Pelayan"
+   },
+   "SesameWrongButton": {
+      "message": "Untuk melihat data anda ketika luar-talian anda mesti jalankan Sesame dan gunakan butang 'Salin Katalaluan Luar-talian' berbanding butang 'Jana Kataluan Sekali Guna'."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "Pengesahan Pelbagai-Faktor Sesame"
+   },
+   "Sessions": {
+      "message": "Sesi"
+   },
+   "Settings": {
+      "message": "Tetapan"
+   },
+   "Sex": {
+      "message": "Jantina"
+   },
+   "Seychelles": {
+      "message": "Seychelles"
+   },
+   "Share": {
+      "message": "Kongsi"
+   },
+   "Share_Folder": {
+      "message": "Pelipat Berkongsi"
+   },
+   "Share_Item": {
+      "message": "Kongsi Item"
+   },
+   "Share_Selected": {
+      "message": "Kongsi Yang Terpilih"
+   },
+   "Share_Site": {
+      "message": "Kongsi Laman"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "Kongsi kenyataan daftar masuk antara pelayar yang lain"
+   },
+   "Share_offer_from": {
+      "message": "Kongsi tawaran daripada"
+   },
+   "Shared_with_Me": {
+      "message": "Dikongsi dengan Saya"
+   },
+   "Shared_with_Others": {
+      "message": "Dikongsi dengan Orang lain"
+   },
+   "Shares": {
+      "message": "Perkongsian"
+   },
+   "Shift": {
+      "message": "Shift"
+   },
+   "Shopping": {
+      "message": "Membeli Belah"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "Perlukah LastPass ingati katalaluan ini?"
+   },
+   "Show": {
+      "message": "Papar"
+   },
+   "Show_Advanced_Options": {
+      "message": "Papar Pilihan Lanjutan"
+   },
+   "Show_All": {
+      "message": "Tunjuk Semua"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "Tunjukkan Bar Pemberitahuan Pertukaran Katalaluan"
+   },
+   "Show_Deleted_Items": {
+      "message": "Tunjuk Item Dipadam"
+   },
+   "Show_Deleted_Sites": {
+      "message": "Tunjuk Laman Telah Dipadam"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "Paparkan Bar Pemberitahuan Pengisian"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "Paparkan Pemberitahuan Isian Borang"
+   },
+   "Show_Matching_Sites": {
+      "message": "Tunjukkan Laman Sepadan"
+   },
+   "Show_Matching_Sites_Count_in_Toolbar": {
+      "message": "Tunjukkan Bilangan Laman Sepadan dalam Bar Alatan"
+   },
+   "Show_Matching_Sites_in_top_level_menu": {
+      "message": "Paparkan Laman Sepadan di bahagian atas menu"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "Tunjuk Bilik Kebal LastPass Saya Selepas Log Masuk"
+   },
+   "Show_Notifications": {
+      "message": "Papar Pemberitahuan"
+   },
+   "Show_Password": {
+      "message": "Papar Katalaluan"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "Paparkan Bar Pemberitahuan Simpan Laman"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "Papar Pemberitahuan Simpan Laman"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "Tunjukkan Laman dalam Folder"
+   },
+   "Show_Vault_After_Login": {
+      "message": "Papar Bilik Kebal Selepas Masuk"
+   },
+   "Show_all_sites": {
+      "message": "Papar semua laman"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "Paparkan pemberitahuan tertentu hanya selepas klik"
+   },
+   "Show_notifications_below_browser": {
+      "message": "Tunjukkan pemberitahuan di bawah pelayar"
+   },
+   "Show_or_Hide_Password": {
+      "message": "Papar atau Sembunyi Katalaluan"
+   },
+   "Sierra_Leone": {
+      "message": "Sierra Leone"
+   },
+   "Sign_In": {
+      "message": "Daftar Masuk"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "Mudahkan hidup anda: Gunakan LastPass untuk mengisi automatik maklumat daftar masuk pada halaman ini!"
+   },
+   "Singapore": {
+      "message": "Singapura"
+   },
+   "Site": {
+      "message": "Laman"
+   },
+   "Site_Search": {
+      "message": "Carian Laman"
+   },
+   "Sites": {
+      "message": "Laman"
+   },
+   "Slovak": {
+      "message": "Slovakia"
+   },
+   "Slovakia": {
+      "message": "Slovakia"
+   },
+   "Slovenia": {
+      "message": "Slovenia"
+   },
+   "Social": {
+      "message": "Sosial"
+   },
+   "Social_Security": {
+      "message": "Keselamatan Sosial"
+   },
+   "Social_Security_Number": {
+      "message": "Nombor Keselamatan Sosial"
+   },
+   "Social_security_number": {
+      "message": "Nombor keselamatan sosial"
+   },
+   "Software_License": {
+      "message": "Lesen Perisian"
+   },
+   "Solomon_Islands": {
+      "message": "Kepulauan Solomon"
+   },
+   "Somalia": {
+      "message": "Somalia"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "Maaf, folder yang dikongsi ini boleh dibaca sahaja."
+   },
+   "Sort_By_": {
+      "message": "Susun Mengikut: "
+   },
+   "Source": {
+      "message": "Sumber"
+   },
+   "Source_": {
+      "message": "Sumber:"
+   },
+   "South_Africa": {
+      "message": "Afrika Selatan"
+   },
+   "South_Georgia": {
+      "message": "Georgia Selatan"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "Georgia Selatan dan Kepulauan Sandwich Selatan"
+   },
+   "Spain": {
+      "message": "Sepanyol"
+   },
+   "Spanish": {
+      "message": "Sepanyol"
+   },
+   "Spanish__Mexico_": {
+      "message": "Sepanyol (Mexico)"
+   },
+   "Special": {
+      "message": "Istimewa"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sports": {
+      "message": "Sukan"
+   },
+   "Sri_Lanka": {
+      "message": "Sri Lanka"
+   },
+   "Start_Date": {
+      "message": "Tarikh Mula"
+   },
+   "Start_date": {
+      "message": "Tarikh Mula"
+   },
+   "State": {
+      "message": "Negeri"
+   },
+   "State___Province": {
+      "message": "Negeri / Wilayah"
+   },
+   "Status": {
+      "message": "Status"
+   },
+   "Sticky_Password": {
+      "message": "Katalaluan Melekat"
+   },
+   "Store_every_note": {
+      "message": "Simpan setiap nota"
+   },
+   "Sub_Total": {
+      "message": "Jumlah Kecil"
+   },
+   "Submit_Form": {
+      "message": "Hantar Borang"
+   },
+   "Submitting___": {
+      "message": "Sedang Menghantar..."
+   },
+   "Sudan": {
+      "message": "Sudan"
+   },
+   "Support_Email": {
+      "message": "E-mel Sokongan"
+   },
+   "Suriname": {
+      "message": "Surinam"
+   },
+   "Suspicious_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "Aksara-aksara yang mencurigakan ditemui dalam nama fail yang dipilih, ia tidak akan diproses"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "Svalbard dan Jan Mayen"
+   },
+   "Swaziland": {
+      "message": "Swaziland"
+   },
+   "Sweden": {
+      "message": "Sweden"
+   },
+   "Swedish": {
+      "message": "Sweden"
+   },
+   "Swipe_current_user_s_finger": {
+      "message": "Leretkan jari pengguna semasa"
+   },
+   "Swipe_finger": {
+      "message": "Leret jari"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "Leretkan jari anda pada pengesan cap jari"
+   },
+   "Switzerland": {
+      "message": "Switzerland"
+   },
+   "Symantec_VIP": {
+      "message": "VIP Symantec"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "Republik Arab Syria"
+   },
+   "Tabs": {
+      "message": "Tabs"
+   },
+   "Taiwan": {
+      "message": "Taiwan"
+   },
+   "Tajikistan": {
+      "message": "Tajikistan"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "Tanzania, Republik Bersatu"
+   },
+   "Tehran": {
+      "message": "Tehran"
+   },
+   "Telecom": {
+      "message": "Telekom"
+   },
+   "Telephone": {
+      "message": "Telefon"
+   },
+   "Tell_a_friend_": {
+      "message": "Beritahu rakan!"
+   },
+   "Text": {
+      "message": "Teks"
+   },
+   "Text_to_Find": {
+      "message": "Teks untuk dicari"
+   },
+   "Text_to_find": {
+      "message": "Teks untuk dicari"
+   },
+   "Thailand": {
+      "message": "Thailand"
+   },
+   "That_group_already_exists_": {
+      "message": "Folder berkenaan telah sedia ada."
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "4 digit Tahun kad kredit dikeluarkan"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "Katalaluan induk LastPass yang anda masukkan semula tidak sepadan"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "'Katalaluan Lama' yang anda masukkan bukanlah katalaluan induk LastPass anda yang betul"
+   },
+   "The_credit_card_number": {
+      "message": "Nombor kad kredit"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "4 digit tahun tamat kad kredit"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "Bulan tamat tempoh kad kredit"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "Nombor kad kredit yang dikeluarkan.\nHanya terpakai untuk sesetengah jenama kad debit Eropah tertentu, seperti Maestro."
+   },
+   "The_name_of_the_Form_Fill_profile": {
+      "message": "Nama Profil Isian Borang"
+   },
+   "The_number_of_characters_in_the_generated_password_": {
+      "message": "Bilangan aksara katalaluan yang dijana."
+   },
+   "The_password_that_you_use_to_log_into_this_website_": {
+      "message": "Katalaluan yang anda gunakan untuk log masuk ke laman web ini."
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work_": {
+      "message": "Versi Chrome yang anda sedang gunakan tidak mempunyai sokongan pangkalan data HTML5 yang aktif. Oleh itu, halaman daftar masuk ini tidak akan mengingati e-mel dan katalaluan anda, dan ciri-ciri lain seperti daftar masuk automatik apabila pelayar dimulakan semula tidak akan berfungsi."
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "Versi Chrome yang anda gunakan tidak mempunyai sokongan database HTML5. Oleh itu, halaman daftar masuk ini tidak akan mengingati e-mel dan katalaluan anda, dan ciri-ciri lain seperti daftar masuk automatik semasa memulakan semula pelayar tidak akan berfungsi. Anda mungkin boleh memperbaikinya dengan menambah --enable-databases sebagai parameter kepada pintasan pelayar Google Chrome anda."
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "Ini hanya boleh dikendalikan dari laman web"
+   },
+   "This_feature_is_not_available_in_this_version__Please_install_the_binary_extension_by_going_to_https___lastpass_com_dl": {
+      "message": "Ciri ini tidak terdapat dalam versi ini. Sila pasang lanjutan perduaan dengan pergi ke https://lastpass.com/dl"
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "Ini adalah laman yang dikongsi. Anda tidak dibenarkan untuk melihat katalaluan."
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "Ini adalah nama atau URL laman web ini."
+   },
+   "This_may_take_a_while___": {
+      "message": "Ini mungkin akan mengambil sedikit masa..."
+   },
+   "Time_Zone": {
+      "message": "Zon Masa"
+   },
+   "Timor_Leste": {
+      "message": "Timor-Leste"
+   },
+   "Title": {
+      "message": "Tajuk"
+   },
+   "To_create_your_account__please_re_enter_your_LastPass_master_password": {
+      "message": "Untuk membuat akaun anda, sila masukkan semula katalaluan induk LastPass anda."
+   },
+   "To_export_FireForm_profiles__right_click_the_FireForm_icon__then_choose_Simple_setup___Go_to_the_General_options_tab__click_Export_all_profiles__and_save_an_XML_file___Import_the_resulting_file_": {
+      "message": "Untuk mengeksport profil FireForm, klik-kanan ikon FireForm, kemudian pilih penetapan Simple. Pergi ke tab pilihan General, klik Eksport semua profil, dan simpan fail XML. Import fail yang terhasil."
+   },
+   "To_export_Password_Agent_logins__open_your_Password_Agent_database__and_click_on_File___Print_and_Export___Change_the_output_format_to_XML_File__make_sure__Group__is_checked___Choose_a_file_location_and_press_the_Save_button___Import_the_resulting_file_": {
+      "message": "Untuk mengeksport daftar masuk Agen Katalaluan, buka pangkalan data Agen Katalaluan anda, dan klik pada Fail - Cetak dan Eksport - Tukar format output kepada Fail XML, pastikan 'Kumpulan' ditanda. Pilih lokasi fail dan tekan butang Simpan. Import fail yang terhasil."
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "Untuk bermula dengan LastPass, anda perlu menambah halaman ke akaun anda."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "Untuk melindungi privasi anda dan memastikan kerahsiaan data anda"
+   },
+   "Togo": {
+      "message": "Togo"
+   },
+   "Tokelau": {
+      "message": "Tokelau"
+   },
+   "Tonga": {
+      "message": "Tonga"
+   },
+   "Tools": {
+      "message": "Alatan"
+   },
+   "Travel": {
+      "message": "Pengembaraan"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "Trinidad dan Tobago"
+   },
+   "Trust_this_computer_for_30_days": {
+      "message": "Percaya komputer ini selama 30 hari"
+   },
+   "Trust_this_computer_for_30_days_": {
+      "message": "Percayakan komputer ini selama 30 hari."
+   },
+   "Try_Again": {
+      "message": "Cuba Lagi"
+   },
+   "Try_Free_for_14_Days": {
+      "message": "Cuba secara Percuma selama 14 Hari"
+   },
+   "Tunisia": {
+      "message": "Tunisia"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "Turki"
+   },
+   "Turkmenistan": {
+      "message": "Turkmenistan"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "Kepulauan Turks dan Caicos"
+   },
+   "Tutorials": {
+      "message": "Tutorial"
+   },
+   "Tuvalu": {
+      "message": "Tuvalu"
+   },
+   "Type": {
+      "message": "Jenis"
+   },
+   "Type_": {
+      "message": "Jenis:"
+   },
+   "URL": {
+      "message": "URL"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "NAMA PENGGUNA"
+   },
+   "Uganda": {
+      "message": "Uganda"
+   },
+   "Ukraine": {
+      "message": "Ukraine"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "Ulaan Bataar, Perth"
+   },
+   "Unexpected_data_type__": {
+      "message": "Jenis data yang tidak diduga:"
+   },
+   "United_Arab_Emirates": {
+      "message": "Emiriah Arab Bersatu"
+   },
+   "United_Kingdom": {
+      "message": "United Kingdom"
+   },
+   "United_States": {
+      "message": "Amerika Syarikat"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "Kepulauan Kecil Terluar Amerika Syarikat"
+   },
+   "Units": {
+      "message": "Unit-unit"
+   },
+   "Unknown": {
+      "message": "Tidak diketahui"
+   },
+   "Unselect_All": {
+      "message": "Nyahpilih Semua"
+   },
+   "Up": {
+      "message": "Atas"
+   },
+   "Updated": {
+      "message": "Telah dikemaskini"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "Naik taraf ke LastPass Atas Talian!"
+   },
+   "Upgrade_to_Premium": {
+      "message": "Naik Taraf ke Premium"
+   },
+   "Uploading_Data___": {
+      "message": "Memuat Naik Data ..."
+   },
+   "Uruguay": {
+      "message": "Uruguay"
+   },
+   "Use": {
+      "message": "Guna"
+   },
+   "Use_802_1X": {
+      "message": "Gunakan 802.1x"
+   },
+   "Use_Password": {
+      "message": "Guna Katalaluan"
+   },
+   "Use_Special_Characters": {
+      "message": "Gunakan Aksara Khas"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "Gunakan katalaluan ini sekarang (untuk laman web ini)?"
+   },
+   "User": {
+      "message": "Pengguna"
+   },
+   "User_Group": {
+      "message": "Kumpulan Pengguna"
+   },
+   "User_Manual": {
+      "message": "Panduan Pengguna"
+   },
+   "User_name": {
+      "message": "Nama pengguna"
+   },
+   "Username_": {
+      "message": "Nama Pengguna:"
+   },
+   "Username_History": {
+      "message": "Sejarah Nama Pengguna"
+   },
+   "Usernameproper": {
+      "message": "Nama pengguna"
+   },
+   "Uzbekistan": {
+      "message": "Uzbekistan"
+   },
+   "Value": {
+      "message": "Nilai"
+   },
+   "Value_to_Fill": {
+      "message": "Nilai untuk diisi"
+   },
+   "Value_to_fill": {
+      "message": "Nilai untuk diisi"
+   },
+   "Vanuatu": {
+      "message": "Vanuatu"
+   },
+   "Vault": {
+      "message": "Bilik Kebal"
+   },
+   "Venezuela": {
+      "message": "Venezuela"
+   },
+   "Verify_Your_Email_Address": {
+      "message": "Sahkah Alamat E-mel Anda"
+   },
+   "Version": {
+      "message": "Versi"
+   },
+   "Version_": {
+      "message": "Versi:"
+   },
+   "Viet_Nam": {
+      "message": "Vietnam"
+   },
+   "View_Image": {
+      "message": "Lihat Imej"
+   },
+   "View_Passwords": {
+      "message": "Lihat Katalaluan"
+   },
+   "Virgin_Islands__British_": {
+      "message": "Kepulauan Virgin (British)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "Kepulauan Virgin (U.S.)"
+   },
+   "Wait_Time_": {
+      "message": "Waktu Menunggu: "
+   },
+   "Wallis_and_Futuna": {
+      "message": "Wallis dan Futuna"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "Beri amaran sebelum mengisi borang-borang tidak selamat"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "Tonton video pada penggunaan asas"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "Kami juga TIDAK menyimpan salinan atau sandarannya."
+   },
+   "Weak_Password": {
+      "message": "Katalaluan lemah"
+   },
+   "Website": {
+      "message": "Laman Web"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "Selamat Datang ke LastPass!"
+   },
+   "West_Central_Africa": {
+      "message": "Barat Afrika Tengah"
+   },
+   "Western_Sahara": {
+      "message": "Sahara Barat"
+   },
+   "What_you_use_to_log_into_this_website_": {
+      "message": "Apa yang anda gunakan untuk log masuk ke laman web ini."
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used_": {
+      "message": "Apabila kotak ini ditanda, sekurang-kurangnya satu aksara huruf kecil, satu aksara huruf besar dan satu aksara khas akan digunakan."
+   },
+   "When_this_box_is_checked__characters_like___and___will_be_used_when_randomly_generating_a_password_": {
+      "message": "Apabila kotak ini ditanda, aksara seperti # dan ! akan digunakan semasa menjana katalaluan secara rawak."
+   },
+   "When_this_box_is_checked__confusing_characters__1_I_L_0_O__are_not_used_": {
+      "message": "Apabila kotak ini ditanda, aksara yang mengelirukan (1,I,L,0,O) tidak akan diguna."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce_": {
+      "message": "Apabila kotak ini ditanda, katalaluan yang mudah disebut akan dijana."
+   },
+   "Wi_Fi_Password": {
+      "message": "Katalaluan WiFi"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "Katalaluan WiFi"
+   },
+   "Windows": {
+      "message": "Tetingkap"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "Adakah anda ingin tetapkan Profil Pengisian Borang sekarang?"
+   },
+   "XML_Files": {
+      "message": "Fail XML"
+   },
+   "Yangon__Rangoon_": {
+      "message": "Yangon (Rangoon)"
+   },
+   "Yemen": {
+      "message": "Yaman"
+   },
+   "Yes": {
+      "message": "Ya"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "Ya, Gunakan untuk laman ini"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "Ya, biarkan saya memilih item yang ingin diimport ke LastPass"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "Ya, biar saya masukkan dan semak data yang akan digunakan ketika mengisi borang"
+   },
+   "You_are_moving_sites_to_a_different_shared_folder__This_may_change_who_has_access_to_the_sites____Do_you_want_to_continue_": {
+      "message": "Anda memindahkan laman ke folder dikongsi yang berbeza. Ini mungkin mengubah siapa yang mempunyai akses kepada laman.\n\nAdakah anda mahu teruskan?"
+   },
+   "You_are_moving_sites_to_a_shared_folder__This_will_potentially_make_them_available_to_others___Are_you_sure_you_would_like_to_continue_": {
+      "message": "Anda sedang memindahkan laman ke folder yang dikongsi. Ini berpotensi untuk menjadikannya terbuka kepada orang lain. \n\nAdakah anda pasti anda ingin teruskan?"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "Anda tidak boleh menetapkan lebih daripada satu Hotkey dengan nilai yang sama."
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "Anda kini mempunyai LastPass yang bersedia untuk mengingati katalaluan anda. Berbuat demikian pada dasarnya menyebabkan pilihan daftar keluar secara automatik yang anda pilih tidak berfungsi. Anda mahu LastPass untuk berhenti mengingati katalaluan anda?"
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "Anda masih belum memilih profil isian borang lalai. Adakah anda ingin memilih salah satu sekarang?"
+   },
+   "You_have_saved_your_password_to_your_LastPass_Vault_": {
+      "message": "Anda telah menyimpan katalaluan ke Bilik Kebal LastPass anda."
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "Anda mesti bersetuju untuk menghantar data disulitkan anda ke LastPass.com.\n\nLastPass.com menyulitkan data anda dan menghantarnya ke server selamat.\nTiada sesiapa di LastPass boleh membaca data sulit anda kerana ia adalah disulitkan menggunakan katalaluan rahsia anda dan anda adalah satu-satunya orang yang mengetahui katalaluan anda."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "Anda mesti bersetuju dengan terma untuk meneruskan"
+   },
+   "You_must_enter_a_name_": {
+      "message": "Anda mesti masukkan nama."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "Anda mesti masukkan nama yang unik."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "Anda perlu memulakan semula Chrome atau daftar keluar dan masuk semula bagi membolehkan perubahan daftar keluar dengan menutup pelayar diterapkan"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "Anda perlu mulakan semula pelayar anda sebelum semua perubahan akan berkuatkuasa."
+   },
+   "You_must_select_an_item_": {
+      "message": "Anda mesti memilih item."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "4 digit tahun lahir anda"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "Katalaluan Google Chrome anda telah berjaya diimport."
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "ZIP atau poskod anda"
+   },
+   "Your_address_information": {
+      "message": "Maklumat alamat anda"
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "Lampiran anda terletak di:"
+   },
+   "Your_bank_account_information": {
+      "message": "Maklumat akaun bank anda"
+   },
+   "Your_birth_day": {
+      "message": "Hari lahir anda"
+   },
+   "Your_birth_month": {
+      "message": "Bulan kelahiran anda"
+   },
+   "Your_city_name": {
+      "message": "Nama bandar anda"
+   },
+   "Your_company_s_name": {
+      "message": "Nama syarikat anda"
+   },
+   "Your_contact_information": {
+      "message": "Maklumat hubungan anda"
+   },
+   "Your_country_name": {
+      "message": "Nama negara anda"
+   },
+   "Your_county_name": {
+      "message": "Nama daerah anda"
+   },
+   "Your_credit_card_information": {
+      "message": "Maklumat kad kredit anda"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "Tetapan semasa anda memerlukan anda untuk memasukkan katalaluan LastPass anda untuk melakukan tindakan ini."
+   },
+   "Your_email_address": {
+      "message": "Alamat e-mel anda"
+   },
+   "Your_first_name": {
+      "message": "Nama pertama anda"
+   },
+   "Your_government_ID_number": {
+      "message": "Nombor ID kerajaan anda"
+   },
+   "Your_last_name": {
+      "message": "Nama akhir anda"
+   },
+   "Your_middle_name": {
+      "message": "Nama tengah anda"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "Katalaluan anda tidak boleh sama dengan e-mel anda."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "Katalaluan anda sangat mudah untuk diteka."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "Katalaluan anda terlalu pendek. Ia mestilah sekurang-kurangnya 6 aksara"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "Katalaluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara"
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "Pengingat katalaluan anda berfungsi untuk mengingatkan anda tentang apa yang anda"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "Katalaluan anda tidak sepadan."
+   },
+   "Your_personal_information": {
+      "message": "Maklumat peribadi anda"
+   },
+   "Your_phone_number": {
+      "message": "Nombor telefon anda"
+   },
+   "Your_phone_number_extension": {
+      "message": "Nombor telefon sambungan anda"
+   },
+   "Your_prefix_or_title": {
+      "message": "Pangkat atau gelaran anda"
+   },
+   "Your_sex": {
+      "message": "Jantina anda"
+   },
+   "Your_state_or_province_name": {
+      "message": "Nama negeri atau wilayah anda"
+   },
+   "Your_street_address": {
+      "message": "Alamat jalan anda"
+   },
+   "Your_time_zone": {
+      "message": "Zon masa anda"
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "Nama pengguna anda apabila mendaftar masuk ke laman web"
+   },
+   "YubiKey": {
+      "message": "YubiKey"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "Pengesahan Pelbagai-Faktor YubiKey"
+   },
+   "Yugoslavia": {
+      "message": "Yugoslavia"
+   },
+   "ZIP___Postal_Code": {
+      "message": "ZIP / Poskod"
+   },
+   "ZIP___Postal_code": {
+      "message": "ZIP / Poskod"
+   },
+   "Zambia": {
+      "message": "Zambia"
+   },
+   "Zimbabwe": {
+      "message": "Zimbabwe"
+   },
+   "_Hide_": {
+      "message": "[Sorok]"
+   },
+   "_History_": {
+      "message": "[Sejarah]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(Tawaran Perkongsian Tergantung Baru)"
+   },
+   "_Not_applicable_when_the_Pronounceable_box_is_checked__": {
+      "message": "(Tidak terpakai apabila kotak Boleh Disebut ditanda)."
+   },
+   "_Optional_": {
+      "message": "(Pilihan)"
+   },
+   "_Show_": {
+      "message": "[Papar]"
+   },
+   "_domain_": {
+      "message": "(domain)"
+   },
+   "_none_": {
+      "message": "(tiada)"
+   },
+   "_s_Password_One_Click_Change": {
+      "message": "Tukar Katalaluan 1-Klik %s"
+   },
+   "_unknown_": {
+      "message": "[Tidak diketahui]"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "katalaluan sebenar, sementara masih mengekalkan kerahsiaannya."
+   },
+   "ago": {
+      "message": "lalu"
+   },
+   "and": {
+      "message": "dan"
+   },
+   "appName": {
+      "message": "Pengurus Katalaluan Percuma"
+   },
+   "built": {
+      "message": "dibina"
+   },
+   "by": {
+      "message": "oleh"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "hubungi kami dan kami akan e-melkan anda pengingat katalaluan anda."
+   },
+   "day": {
+      "message": "hari"
+   },
+   "days": {
+      "message": "hari"
+   },
+   "delete": {
+      "message": "padam"
+   },
+   "delete_items_from": {
+      "message": "padam item dari"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "eWallet"
+   },
+   "ext_": {
+      "message": "ext."
+   },
+   "false": {
+      "message": "palsu"
+   },
+   "favorites": {
+      "message": "kegemaran"
+   },
+   "hour": {
+      "message": "jam"
+   },
+   "hours": {
+      "message": "jam"
+   },
+   "just_now": {
+      "message": "sebentar tadi"
+   },
+   "minute": {
+      "message": "minit"
+   },
+   "minutes": {
+      "message": "minit"
+   },
+   "month": {
+      "message": "bulan"
+   },
+   "months": {
+      "message": "bulan"
+   },
+   "move_items_from": {
+      "message": "pindah item dari"
+   },
+   "move_items_to": {
+      "message": "pindah item ke"
+   },
+   "privacy_statement": {
+      "message": "penyataan privasi"
+   },
+   "recently_usedlower": {
+      "message": "baru digunakan"
+   },
+   "search": {
+      "message": "cari"
+   },
+   "second": {
+      "message": "kedua"
+   },
+   "seconds": {
+      "message": "saat"
+   },
+   "send_more": {
+      "message": "hantar lagi"
+   },
+   "shared": {
+      "message": "dikongsi"
+   },
+   "shared_with_you": {
+      "message": "Dikongsi dengan Anda"
+   },
+   "terms_of_service": {
+      "message": "terma perkhidmatan"
+   },
+   "the_current_tab": {
+      "message": "tab semasa"
+   },
+   "the_selected_items": {
+      "message": "item terpilih"
+   },
+   "true": {
+      "message": "benar"
+   },
+   "very": {
+      "message": "sangat"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "kami TIDAK mengetahui katalaluan LastPass anda."
+   },
+   "week": {
+      "message": "minggu"
+   },
+   "weeks": {
+      "message": "minggu"
+   },
+   "year": {
+      "message": "tahun"
+   },
+   "years": {
+      "message": "tahun"
+   }
+}

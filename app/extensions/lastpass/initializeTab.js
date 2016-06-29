@@ -1,0 +1,1 @@
+var bg=chrome.extension.getBackgroundPage();Strings.translateStrings(Strings.Vault);document.addEventListener("DOMContentLoaded",function(){processURLParams()});chrome.runtime.onMessage.addListener(function(a,c,b){LPTools.callFunction(a.name,a.params);a.tabId&&(window.tabId=a.tabId,b())});

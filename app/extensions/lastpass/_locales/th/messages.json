@@ -1,0 +1,4214 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "1Password": {
+      "message": "1Password"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. ใส่ YubiKey ของคุณที่ช่อง USB โดยให้หน้าสัมผัสของ YubiKey หงายขึ้นด้านบน"
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. เปิดโปรแกรมยืนยันตัวตนของกูเกิล บนอุปกรณ์ของคุณ"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. เริ่มโปรแกรม LastPass Sesame เพื่อสร้างรหัสผ่านที่ใช้ครั้งเดียว"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. กรอกรหัสยืนยันลงในช่องด้านล่างนี้"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. วางรหัสผ่านที่ใช้ครั้งเดียวลงในกล่องใ่ส่ด้านล่างและคลิก 'ยืนยันตัวตน'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. รอจนกว่าไฟที่ touch-button จะส่องสว่างและคงที่"
+   },
+   "3__Click_Authenticate": {
+      "message": "3 คลิก ยืนยันตัวตน"
+   },
+   "3__Hold_your_fingertip_on_the_touch_button_for_1_second": {
+      "message": "3. วางนิ้วของคุณบนปุ่มสัมผัสประมาณ 1 - 10 วินาที"
+   },
+   "ACTION": {
+      "message": "ทำ"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_batch_of_SMS_passcodes_have_been_sent_to_your_mobile_device_": {
+      "message": "รหัส SMS ได้ถูกส่งไปยังอุปกรณ์เคลื่อนที่ของคุณ"
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_as_a_password_change_for_this_site_": {
+      "message": "รหัสผ่านใหม่ได้ถูกสร้างขึ้นแล้ว คุณต้องการให้ LastPass จำการเปลี่ยนรหัสผ่านนี้สำหรับเว็บไซต์นี้ไหม?"
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_password_change_for_this_site_": {
+      "message": "รหัสผ่านใหม่ได้ถูกสร้างขึ้นแล้ว คุณต้องการให้ LastPass จำการเปลี่ยนรหัสผ่านนี้สำหรับเว็บไซต์นี้ไหม?"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "รหัสผ่านใหม่ได้ถูกสร้างขึ้นแล้ว!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "สุ่มรหัสผ่าน"
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "อัปเดตที่จำเป็นสำหรับ LastPass สามารถจะใช้ได้แล้ว กรุณากด OK เพื่อเริ่มต้นการดาวน์โหลดและติดตั้ง"
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "ตรวจพบไฟล์แบ็คอัพ  นี่อาจหมายถึงมีการเปลี่ยนแปลงการตั้งค่าเว็บไซต์ของคุณบางส่วนไม่ได้รับการบันทึก ต้องการลบไฟล์นี้? (การเปลี่ยนแปลงเว็บไซต์บางอย่างอาจไม่เป็นผล)"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "เกิดข้อผิดพลาดของเซิร์ฟเวอร์ขึ้นระหว่างการประมวลผลคำขอของคุณ"
+   },
+   "About": {
+      "message": "เกี่ยวกับ"
+   },
+   "About_LastPass": {
+      "message": "เกี่ยวกับ LastPass"
+   },
+   "About___": {
+      "message": "เกี่ยวกับ ..."
+   },
+   "Accept": {
+      "message": "ยอมรับ"
+   },
+   "Account_Number": {
+      "message": "หมายเลขบัญชี"
+   },
+   "Account_Settings": {
+      "message": "การตั้งค่าบัญชี"
+   },
+   "Account_Status": {
+      "message": "สถานะบัญชี"
+   },
+   "Account_Type": {
+      "message": "ประเภทแอกเคาท์"
+   },
+   "Account_number": {
+      "message": "เลขที่บัญชี"
+   },
+   "Actionproper": {
+      "message": "กระทำ"
+   },
+   "Actions": {
+      "message": "การกระทำ"
+   },
+   "Add": {
+      "message": "เพิ่ม"
+   },
+   "Add_Credit_Card": {
+      "message": "เพิ่มบัตรเครดิต"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "เพิ่มโปรไฟล์บัตรเครดิต"
+   },
+   "Add_Field": {
+      "message": "เพิ่มฟิลด์"
+   },
+   "Add_File": {
+      "message": "เพิ่มไฟล์"
+   },
+   "Add_Identity": {
+      "message": "เพิ่มเอกลักษณ์"
+   },
+   "Add_New_Site": {
+      "message": "เพิ่มเว็บไซต์ใหม่"
+   },
+   "Add_Note": {
+      "message": "เพิ่มโน๊ต"
+   },
+   "Add_Profile": {
+      "message": "เพิ่มประวัติ"
+   },
+   "Add_Secure_Note": {
+      "message": "เพิ่มข้อความในสมุดโน๊ต"
+   },
+   "Add_Site": {
+      "message": "เพิ่มเว็บไซต์"
+   },
+   "Add_Site_to_Favorites": {
+      "message": "เพิ่มเว็บไซต์ไปยังรายการโปรด"
+   },
+   "Add_another_custom_field": {
+      "message": "เพิ่มช่องใส่ข้อความอีก"
+   },
+   "Address": {
+      "message": "ที่อยู่"
+   },
+   "Address_1": {
+      "message": "ที่อยู่ 1"
+   },
+   "Address_2": {
+      "message": "ที่อยู่ 2"
+   },
+   "Address_3": {
+      "message": "ที่อยู่ 3"
+   },
+   "Adelaide": {
+      "message": "แอดิเลด"
+   },
+   "Admin_Console": {
+      "message": "แผงควบคุมของผู้ดูแล"
+   },
+   "Admin_Tools": {
+      "message": "เครื่องมือผู้ดูแลระบบ"
+   },
+   "Administrator": {
+      "message": "แอดมิน"
+   },
+   "Advanced": {
+      "message": "ขั้นสูง"
+   },
+   "Advanced_Options": {
+      "message": "ตัวเลือกขั้นสูง"
+   },
+   "Advanced_Settings": {
+      "message": "การตั้งค่าขั้นสูง"
+   },
+   "Advanced_Tools": {
+      "message": "เครื่องมือขั้นสูง"
+   },
+   "Afghanistan": {
+      "message": "อัฟกานิสถาน"
+   },
+   "Agent_Name": {
+      "message": "ชื่อตัวแทน"
+   },
+   "Agent_Phone": {
+      "message": "เบอร์โทรเจ้าหน้าที่"
+   },
+   "Aland_Islands": {
+      "message": "หมู่เกาะอลัน"
+   },
+   "Alaska": {
+      "message": "อลาสก้า"
+   },
+   "Albania": {
+      "message": "แอลบาเนีย"
+   },
+   "Algeria": {
+      "message": "แอลจีเรีย"
+   },
+   "Alias": {
+      "message": "นามแฝง"
+   },
+   "All": {
+      "message": "ทั้งหมด"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "ยินยอมให้ LastPass หาข้อมูล(รหัสผ่าน)ที่ไม่ปลอดภัยในคอมพิวเตอร์ของคุณหรือไม่?"
+   },
+   "Almaty": {
+      "message": "อัลมาตี"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below": {
+      "message": "อีกทางเลือกหนึ่ง, ใส่รหัสในกล่องด้านล่างนี้"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below_": {
+      "message": "อีกทางเลือกหนึ่ง, ใส่รหัสในกล่องด้านล่างนี้:"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "เลือกข้อมูลโปรไฟล์และบัตรเครดิตเสมอ"
+   },
+   "American_Samoa": {
+      "message": "หมู่เกาะซามัว"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "อัมมาน, เอเธนส์, อิสตันบูล, เบรุต, ไคโร, เยรูซาเล็ม"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "อัมสเตอร์ดัม, เบอร์ลิน, โรม, เวียนนา, ปราก, บรัสเซลส์"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "มีอัพเดตใหม่ คุณต้องการจะติดตั้งหรือไม่?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "เกิดข้อผิดพลาดขณะโหลดเว็บไซด์ของคุณ กรุณาล็อกอินใหม่"
+   },
+   "An_error_occurred": {
+      "message": "เกิดข้อผิดพลาด"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "เกิดข้อผิดพลาดในขณะที่กำลังนำเข้ารหัสผ่านของคุณจาก Google Chrome"
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "เกิดข้อผิดพลาดในขณะที่เข้ารหัสข้อมูลของคุณซ้ำ"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "เกิดข้อผิดพลาดขณะอัพโหลดข้อมูลของคุณ คุณต้องการลองใหม่อีกครั้งหรือไม่?"
+   },
+   "Andorra": {
+      "message": "อันดอร์รา"
+   },
+   "Angola": {
+      "message": "แองโกลา"
+   },
+   "Anguilla": {
+      "message": "แองกวิลลา"
+   },
+   "Antarctica": {
+      "message": "แอนตาร์กติกา"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "แอนติกา และบาร์บูดา"
+   },
+   "Appearance": {
+      "message": "การแสดงผล"
+   },
+   "Application_": {
+      "message": "แอพพลิเคชั่น:"
+   },
+   "Applications": {
+      "message": "แอพพลิเคชัน"
+   },
+   "April": {
+      "message": "เมษายน"
+   },
+   "Are_you_sure_you_do_not_want_LastPass_to_tell_you_when_your_Master_Password_is_at_risk_": {
+      "message": "คุณแน่ใจหรือว่าไม่ต้องการให้ LastPass บอกคุณเมื่อรหัสผ่านหลักของคุณตกอยู่ในความเสี่ยง?"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "แน่ใจหรือยังที่คุณจะลบสิ่งนี้?"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "แน่ใจหรือว่าจะลบเว็บนี้"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "คุณแน่ใจหรือว่าต้องการให้ LastPass จำรหัสผ่าน?  นี่จะทำให้ความปลอดภัยของบัญชี LastPass ของคุณลดลงอย่างมาก!"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "แน่ใจหรือว่าต้องการลบ?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "แน่ใจหรือว่าต้องการลบรายการที่เลือก?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบเว็บไซต์ที่เลือก?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "แน่ใจหรือว่าต้องการลบโปรแกรมนี้?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบฟิลด์นี้?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบข้อมูลของแบบฟอร์มนี้?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบรหัสผ่านที่สร้างขึ้น?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบ URL นี้"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "คุณแน่ใจหรือ ว่าต้องการที่จะลบ ข้อความที่เข้ารหัส อันนี้?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบเว็บไซต์นี้?"
+   },
+   "Are_you_sure_you_would_like_to_remove_this_attachment_": {
+      "message": "คุณแน่ใจหรือว่าต้องการลบสิ่งที่แนบมานี้หรือไม่?"
+   },
+   "Argentina": {
+      "message": "อาร์เจนตินา"
+   },
+   "Arizona": {
+      "message": "อาริโซน่า"
+   },
+   "Armenia": {
+      "message": "อาร์เมเนีย"
+   },
+   "Aruba": {
+      "message": "อารูบา"
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "เวลาแอตแลนติก (แคนาดา), มาเนาส์, ซันติอาโก"
+   },
+   "Auckland__Wellington": {
+      "message": "โอ๊คแลนด์, เวลลิงตัน"
+   },
+   "August": {
+      "message": "สิงหาคม"
+   },
+   "Australia": {
+      "message": "ออสเตรเลีย"
+   },
+   "Austria": {
+      "message": "ออสเตรีย"
+   },
+   "Authenticate": {
+      "message": "ยืนยันตัวตน"
+   },
+   "Authentication": {
+      "message": "การรับรอง"
+   },
+   "Authentication_Failed_": {
+      "message": "การยืนยันตัวตนล้มเหลว"
+   },
+   "AutoFill": {
+      "message": "ป้อนข้อมูลอัตโนมัติ"
+   },
+   "AutoLogin": {
+      "message": "ล็อกอินอัตโนมัติ"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "กรอกข้อมูลล็อกอินอัตโนมัติ"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "ออกจากระบบโดยอัตโนมัติหลังจาก (นาที) ไม่ได้ใช้งาน"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "ออกจากระบบโดยอัตโนมัติเมื่อเบราว์เซอร์ทั้งหมดจะถูกปิดและ Chrome ปิดไปเป็นเวลา (นาที)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "ล็อกอินโดยอัตโนมัติเข้าสู่เว็บไซต์หากการล็อกอินครั้งสุดท้ายมากกว่า (วินาที)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "หลีกเลี่ยงตัวอักษรคลุมเครือ"
+   },
+   "Azerbaijan": {
+      "message": "อาเซอร์ไบจาน"
+   },
+   "Azores": {
+      "message": "อาโซเรส"
+   },
+   "BACKUPPER": {
+      "message": "กลับ"
+   },
+   "Back": {
+      "message": "กลับ"
+   },
+   "Baghdad": {
+      "message": "แบกแดด"
+   },
+   "Bahamas": {
+      "message": "บาฮามาส"
+   },
+   "Bahrain": {
+      "message": "บาห์เรน"
+   },
+   "Baku__Yerevan": {
+      "message": "บากู, เยเรวาน"
+   },
+   "Bangladesh": {
+      "message": "บังคลาเทศ"
+   },
+   "Bank_Account": {
+      "message": "บัญชีธนาคาร"
+   },
+   "Bank_Name": {
+      "message": "ชื่อธนาคาร"
+   },
+   "Bank_accountformfill": {
+      "message": "บัญชีธนาคาร"
+   },
+   "Bank_name": {
+      "message": "ชื่อบัญชีธนาคาร"
+   },
+   "Barbados": {
+      "message": "เกาะบาร์เบโดส"
+   },
+   "Before_you_can_use_LastPass__you_must_first_connect_your_fingerprint_reader_and_enroll_one_or_more_fingers_": {
+      "message": "ก่อนที่คุณจะสามารถใช้ LastPass ได้ คุณต้องเชื่อมต่อกับเครื่องอ่านลายนิ้วมือข​​องคุณและลงทะเบียนอย่างน้อยหนึ่งนิ้ว"
+   },
+   "Belarus": {
+      "message": "เบลารุส"
+   },
+   "Belgium": {
+      "message": "เบลเยี่ยม"
+   },
+   "Belize": {
+      "message": "เบลีซ"
+   },
+   "Benin": {
+      "message": "เบนิน"
+   },
+   "Bermuda": {
+      "message": "เบอร์มิวดา"
+   },
+   "Bhutan": {
+      "message": "ภูฏาน"
+   },
+   "Binary_Component_": {
+      "message": "ส่วนประกอบเลขฐานสอง:"
+   },
+   "Birthday": {
+      "message": "วันเกิด"
+   },
+   "Bit_Strength": {
+      "message": "ความแข็งแรงของบิท"
+   },
+   "Blacklist": {
+      "message": "บัญชีของคุณถูกระงับชั่วคราว (5 นาที) เนื่องจากความพยายามเข้าสู่ระบบมากเกินไป"
+   },
+   "Blog": {
+      "message": "บล็อก"
+   },
+   "Bolivia": {
+      "message": "โบลิเวีย"
+   },
+   "Bookmarklets": {
+      "message": "บุคมาร์ค"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "บอสเนียและ เฮอร์เซโกวินา"
+   },
+   "Botswana": {
+      "message": "บอตสวานา"
+   },
+   "Bouvet_Island": {
+      "message": "เกาะบูเวต"
+   },
+   "Branch_Address": {
+      "message": "ที่อยู่ของสาขา"
+   },
+   "Branch_Phone": {
+      "message": "หมายเลขโทรศัพท์ของสาขา"
+   },
+   "Brazil": {
+      "message": "บราซิล"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "มณฑล บริติช มหาสมุทรอินเดีย"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "ใช้งานเว็บไซต์ตามปกติแล้ว LastPass จะจดจำรหัสผ่านให้คุณโดยอัตโนมัติ"
+   },
+   "Brunei_Darussalam": {
+      "message": "บรูไน ดารุสซาลาม"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "บัวโนสไอเรส, จอร์จทาวน์"
+   },
+   "Built_": {
+      "message": "รุ่น:"
+   },
+   "Bulgaria": {
+      "message": "บัลแกเรีย"
+   },
+   "Burkina_Faso": {
+      "message": "บูร์กิ นาฟาโซ"
+   },
+   "Burundi": {
+      "message": "บุรุนดี"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "แต่ฉันเป็นคนขี้ลืม ... ฉันควรทำอย่างไรถ้าฉันลืมรหัสผ่านของฉัน"
+   },
+   "CSV_Files": {
+      "message": "ไฟล์ CSV"
+   },
+   "Cambodia": {
+      "message": "กัมพูชา"
+   },
+   "Cameroon": {
+      "message": "แคเมอรูน"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "ไม่พบหน้าต่าง LastPass ที่ซ่อนอยู่"
+   },
+   "Canada": {
+      "message": "แคนาดา"
+   },
+   "Canary_Islands": {
+      "message": "หมู่เกาะคานารี"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "แคนเบอร์รา, เมลเบิร์น, ซิดนีย์, โฮบาร์ต"
+   },
+   "Cancel": {
+      "message": "ยกเลิก"
+   },
+   "Cape_Verde": {
+      "message": "เคปเวิร์ด"
+   },
+   "Cape_Verde_Is_": {
+      "message": "เกาะเคปเวิร์ด"
+   },
+   "Caracas": {
+      "message": "การากัส"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "คาซาบลังกา, มอนโรเวีย, เรคยาวิก"
+   },
+   "Catalan": {
+      "message": "ภาษาคาตาลัน"
+   },
+   "Cayman_Islands": {
+      "message": "เกาะเคย์แมน"
+   },
+   "Central_African_Republic": {
+      "message": "แอฟริกากลาง, สาธารณรัฐ"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "อเมริกากลาง, รัฐซัสแคตเชวัน"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "เวลากลาง (อเมริกา & แคนาดา), กวาดาลาฮารา, เม็กซิโกซิตี"
+   },
+   "Chad": {
+      "message": "ชาด"
+   },
+   "Change": {
+      "message": "เปลี่ยน"
+   },
+   "Change_Group_Name": {
+      "message": "เปลี่ยนชื่อโฟลเดอร์"
+   },
+   "Change_Password": {
+      "message": "เปลี่ยนรหัสผ่าน"
+   },
+   "Change_Password_Automatically": {
+      "message": "เปลี่ยนรหัสผ่านอัตโนมัติ"
+   },
+   "Change_Password_Now": {
+      "message": "เปลี่ยนรหัสผ่านตอนนี้"
+   },
+   "Change_Your_Password": {
+      "message": "เปลี่ยนรหัสผ่านของคุณ"
+   },
+   "Check_For_Updates": {
+      "message": "ตรวจสอบอัพเดต"
+   },
+   "Checkbox": {
+      "message": "ช่องทำเครื่องหมาย"
+   },
+   "Checking_For_Updates___": {
+      "message": "ตรวจหาการอัพเดท ..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "เชนไน, กัลกาตา, มุมไบ, นิวเดลี, ศรีชัยวรเทนปุระ"
+   },
+   "Chile": {
+      "message": "ชิลี"
+   },
+   "China": {
+      "message": "จีน"
+   },
+   "Chinese__Simplified_": {
+      "message": "จีน (ประยุกต์)"
+   },
+   "Chinese__Traditional_": {
+      "message": "ภาษาจีน (ดั้งเดิม)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "เลือกโปรไฟล์และหมายเลขบัตรเครดิต"
+   },
+   "Choose_a_source_above_": {
+      "message": "เลือกที่มาด้านบน"
+   },
+   "Christmas_Island": {
+      "message": "คริสต์มาส, เกาะ"
+   },
+   "Chrome": {
+      "message": "โครม"
+   },
+   "City___Town": {
+      "message": "เมือง / จังหวัด"
+   },
+   "Clear": {
+      "message": "ล้างข้อมูล"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "ล้างคลิปบอร์ดหลังจากใช้งานแล้ว (วินาที)"
+   },
+   "Clear_Forms": {
+      "message": "ล้างแบบฟอร์ม"
+   },
+   "Clear_Local_Cache": {
+      "message": "เคลียร์แคชในหน่วยความจำ"
+   },
+   "Clear_Recent": {
+      "message": "ล้างข้อมูลล่าสุด"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "คลิก 'ดำเนินการต่อ' เพื่อเริ่มใช้งาน LastPass"
+   },
+   "Click_Icons_in_Fields": {
+      "message": "คลิกไอคอนในช่องข้อมูล"
+   },
+   "Click_here_for_instructions_on_importing_from_a_generic_CSV_file_": {
+      "message": "คลิกที่นี้เพื่อดูคำแนะนำในการนำเข้าจากไฟล์แบบ CSV"
+   },
+   "Click_here_to_initiate_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "คลิกที่นี่เพื่อเริ่มต้นใช้งานการยืนยนตัวตนแบบหลายชั้นบนโทรศัพท์หรืออุปกรณ์เคลื่อนที่."
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "คลิกที่นี่เพื่อเปิดการตั้งค่าบัญชี"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "คลิกที่นี่เพื่อเปิดข้อเสนอแนะ"
+   },
+   "Click_here_to_view_the_LastPass_User_Manual": {
+      "message": "คลิกที่นี่เพื่อดูคู่มือการใช้งาน LastPass"
+   },
+   "Click_on_the_icons_at_the_bottom_for_additional_actions_": {
+      "message": "คลิกบนไอคอนด้านล่างสำหรับการทำงานเพิ่มเติม"
+   },
+   "Click_to_fine_tune_how_your_password_is_generated_": {
+      "message": "คลิกเพื่อปรับแต่งรหัสผ่านของคุณที่จะถูกสุ่มขึ้นมา"
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "คลิกเพื่อซ่อนตัวเลือกขั้นสูง"
+   },
+   "Close": {
+      "message": "ปิด"
+   },
+   "Close_this_window": {
+      "message": "ปิดหน้าต่างนี้"
+   },
+   "Co_pay": {
+      "message": "จ่ายร่วม"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "เกาะโคโคส (คีลิง)"
+   },
+   "Collapse_All": {
+      "message": "ยุบรายการทั้งหมด"
+   },
+   "Collapse_All_Folders": {
+      "message": "ยุบโฟลเดอร์ทั้งหมด"
+   },
+   "Colombia": {
+      "message": "โคลอมเบีย"
+   },
+   "Comoros": {
+      "message": "คอโมโรส"
+   },
+   "Company": {
+      "message": "บริษัท"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "นโยบายขององค์กรห้ามไม่ให้การดำเนินการนี้"
+   },
+   "Company_Phone": {
+      "message": "โทรศัพท์องค์กร"
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "นโยบายขององค์กรมีการป้องกันไม่ให้เปลี่ยนการตั้งค่าบางอย่าง การอัปเดตไม่ได้รับการบันทึกทั้งหมด"
+   },
+   "Complete_": {
+      "message": "เรียบร้อย!"
+   },
+   "Configure_Form_Fill": {
+      "message": "ตั้งค่าการกรอกแบบฟอร์ม"
+   },
+   "Confirm": {
+      "message": "ยืนยัน"
+   },
+   "Confirm_Master_Password": {
+      "message": "ยืนยันรหัสผ่านหลัก"
+   },
+   "Confirm_Password": {
+      "message": "ยืนยันรหัสผ่าน"
+   },
+   "Congo": {
+      "message": "คองโก"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "คองโก, สาธารณรัฐประชาธิปไตย"
+   },
+   "Congratulations": {
+      "message": "ขอแสดงความยินดี"
+   },
+   "Congratulations_": {
+      "message": "ขอแสดงความยินดี!"
+   },
+   "Connection_Mode": {
+      "message": "โหมดการเชื่อมต่อ"
+   },
+   "Connection_Type": {
+      "message": "ประเภทการเชื่อมต่อ"
+   },
+   "Contact": {
+      "message": "ติดต่อ"
+   },
+   "Continue": {
+      "message": "ดำเนินการต่อ"
+   },
+   "Cook_Islands": {
+      "message": "หมู่เกาะคุก"
+   },
+   "Copy": {
+      "message": "คัดลอก"
+   },
+   "Copy_Note": {
+      "message": "คัดลอกบันทึก"
+   },
+   "Copy_Password": {
+      "message": "คัดลอกรหัสผ่าน"
+   },
+   "Copy_URL": {
+      "message": "คัดลอก URL"
+   },
+   "Copy_Username": {
+      "message": "คัดลอกชื่อผู้ใช้"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "สงวนลิขสิทธิ์  2008, LastPass. \nบางส่วนของซอฟต์แวร์นี้ได้รับอนุญาตการใช้งานจากบุคคลที่สาม (third party)ตามที่ได้อธิบายไว้บน https://lastpass.com/docs/licenses.php"
+   },
+   "Cost": {
+      "message": "ราคา"
+   },
+   "Costa_Rica": {
+      "message": "คอสตาริกา"
+   },
+   "Cote_D_ivoire": {
+      "message": "โกตดิวัว"
+   },
+   "Country": {
+      "message": "ประเทศ"
+   },
+   "County": {
+      "message": "มณฑล"
+   },
+   "Create_Account": {
+      "message": "สร้างบัญชีผู้ใช้ใหม่"
+   },
+   "Create_Group": {
+      "message": "สร้างโฟลเดอร์"
+   },
+   "Create_Sub_Group": {
+      "message": "สร้างโฟลเดอร์ย่อย"
+   },
+   "Create_Your_LastPass_Account": {
+      "message": "สร้างบัญชี LastPass ของคุณ"
+   },
+   "Create_an_Account": {
+      "message": "สร้างบัญชีผู้ใช้"
+   },
+   "Create_an_account_now_": {
+      "message": "สร้างบัญชีตอนนี้"
+   },
+   "Creating_Account___": {
+      "message": "กำลังสร้างบัญชีผู้ใช้ ..."
+   },
+   "Credit_Card": {
+      "message": "เครดิต"
+   },
+   "Credit_Card_Number": {
+      "message": "หมายเลขบัตรเครดิต"
+   },
+   "Credit_Monitoring": {
+      "message": "ตรวจสอบเครดิต"
+   },
+   "Credit_card_number": {
+      "message": "หมายเลขบัตรเครดิต"
+   },
+   "Credit_cardformfill": {
+      "message": "บัตรเครดิต"
+   },
+   "Croatia": {
+      "message": "โครเอเชีย"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "คิวบา"
+   },
+   "Custom_Value": {
+      "message": "ค่าที่กำหนดเอง"
+   },
+   "Custom_field__": {
+      "message": "ลำดับฟิลด์ที่กำหนดเอง #"
+   },
+   "Custom_fields": {
+      "message": "ฟิลด์ที่กำหนดเอง"
+   },
+   "Cyprus": {
+      "message": "ไซปรัส"
+   },
+   "Czech_Republic": {
+      "message": "เช็ก, สาธารณรัฐ"
+   },
+   "Danish": {
+      "message": "ภาษาเดนมาร์ก"
+   },
+   "Darn__Passwords_": {
+      "message": "Darn! Passwords!"
+   },
+   "Darwin": {
+      "message": "ดาร์วิน"
+   },
+   "Dashlane": {
+      "message": "Dashlane"
+   },
+   "Database": {
+      "message": "ฐานข้อมูล"
+   },
+   "Date": {
+      "message": "วันที่"
+   },
+   "Date_of_Birth": {
+      "message": "วันเกิด"
+   },
+   "December": {
+      "message": "ธันวาคม"
+   },
+   "Default": {
+      "message": "ค่าเริ่มต้น"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "โปรไฟล์การกรอกแบบฟอร์มมาตรฐาน"
+   },
+   "Delete": {
+      "message": "ลบ"
+   },
+   "Delete_Cache": {
+      "message": "ลบแคช"
+   },
+   "Delete_Formfill_Profile": {
+      "message": "ลบโปรไฟล์แบบฟอร์ม"
+   },
+   "Delete_Group": {
+      "message": "ลบโฟลเดอร์"
+   },
+   "Delete_Identity_": {
+      "message": "ลบอัตลักษณ์?"
+   },
+   "Delete_Selected": {
+      "message": "ลบส่วนที่เลือก"
+   },
+   "Delete_Site": {
+      "message": "ลบเว็บไซต์"
+   },
+   "Delete_Site_": {
+      "message": "ลบเว็บ?"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "ลบรายละเอียดของแบบฟอร์มนี้"
+   },
+   "Deleted_Items": {
+      "message": "ลบไปแล้ว"
+   },
+   "Denmark": {
+      "message": "เดนมาร์ก"
+   },
+   "Description": {
+      "message": "รายละเอียด"
+   },
+   "Disable": {
+      "message": "ปิดการใช้งาน"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "ปิดการใช้งาน ระบบจัดการรหัสผ่านของ Chrome ที่ไม่ปลอดภัย"
+   },
+   "Disable_LastPass": {
+      "message": "ปิดใช้งาน LastPass"
+   },
+   "Disable_LastPass_Master_Password_risk_warning_on_this_site_": {
+      "message": "ปิดใช้งานการแจ้งเตือนความเสี่ยงของรหัสผ่านหลัก LastPass บนเว็บไซต์นี้?"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "ปิดการใช้งาน LastPass ในเว็บไซต์นี้หรือทุกเว็บไซต์?"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "ปิดการทำงานการยืนยันตัวตนแบบหลายปัจจัย"
+   },
+   "Disable_Page": {
+      "message": "ยกเว้นหน้า"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "ปิดการใช้งานการยืนยันตัวตนแบบปัจจัยเดียว"
+   },
+   "Disable_Site": {
+      "message": "ยกเว้นเว็บไซต์"
+   },
+   "Disable_alert___": {
+      "message": "ปิดการแจ้งเตือน"
+   },
+   "Disable_alert_for_this_site": {
+      "message": "ปิดใช้งานการแจ้งเตือนสำหรับเว็บไซต์นี้"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "ปิดใช้งานการแจ้งเตือนรหัสผ่านอ่อนแอ/ซ้ำทั้งหมด"
+   },
+   "Disable_for_all_sites": {
+      "message": "ยกเว้นสำหรับทุกเว็บไซต์"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "ยกเลิกการเปลี่ยนแปลงและปิดหน้าต่างนี้"
+   },
+   "Dismiss": {
+      "message": "ปิด"
+   },
+   "Djibouti": {
+      "message": "จิบูตี"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "ไม่ต้องแทนที่ฟิลด์ที่เคยถูกกรอกไปแล้ว"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "ไม่ต้องล็อกอินใหม่เป็นเวลา"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "ไม่ต้องถามรหัสผ่านเป็นเวลา "
+   },
+   "Do_not_show_this_message_for_this_domain": {
+      "message": "ห้ามโชว์ข้อความนี้บนโดเมนนี้"
+   },
+   "Do_you_like_LastPass_": {
+      "message": "คุณชอบ LastPass ไหม?"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "คุณต้องการจะยกเิลิกจริงๆหรือ? คุณจะไม่สามารถใช้ LastPass โดยไม่ต้องสร้างบัญชีได้"
+   },
+   "Dominica": {
+      "message": "โดมินิกา"
+   },
+   "Dominican_Republic": {
+      "message": "โดมินิกัน, สาธารณรัฐ"
+   },
+   "Down": {
+      "message": "Down"
+   },
+   "Dr": {
+      "message": "ด็อกเตอร์"
+   },
+   "Driver_s_License": {
+      "message": "เลขที่ใบอนุญาตขับขี่"
+   },
+   "Duplicate_password": {
+      "message": "รหัสผ่านซ้ำกัน"
+   },
+   "Dutch": {
+      "message": "ดัตช์"
+   },
+   "ERROR__Moving_sites_between_shared_folders_is_currently_not_supported_": {
+      "message": "ผิดพลาด: ยังไม่รองรับการย้ายเว็บไซต์ระหว่างโฟลเดอร์ที่แบ่งปัน"
+   },
+   "ERROR__You_are_not_allowed_to_move_sites_out_of_shared_folders__Delete_is_the_only_supported_operation_": {
+      "message": "ERROR: คุณไม่สามารถย้ายเว็บไซต์ออกจากแชร์โฟลเดอร์ได้ คุณสามารถลบได้เท่านั้น"
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "เวลาตะวันออก (อเมริกา & แคนาดา)"
+   },
+   "Ecuador": {
+      "message": "เอกวาดอร์"
+   },
+   "Edit": {
+      "message": "แก้ไข"
+   },
+   "Edit_Application": {
+      "message": "แก้ไข้แบบฟอร์ม"
+   },
+   "Edit_Application_Fields": {
+      "message": "แก้ไขช่องแบบฟอร์ม"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "แก้ไขรายละเอียดบัตรเครดิต"
+   },
+   "Edit_Form_Fields": {
+      "message": "แก้ไขฟอร์มฟิลด์"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "แก้ไขโปรไฟล์การกรอกแบบฟอร์ม"
+   },
+   "Edit_Note": {
+      "message": "แก้ไขบันทึก"
+   },
+   "Edit_Secure_Note": {
+      "message": "แก้ไขบันทึกเข้ารหัส"
+   },
+   "Edit_Secure_Notes": {
+      "message": "แก้ไข Secure Notes"
+   },
+   "Edit_Site": {
+      "message": "แก้ไขเว็บไซต์"
+   },
+   "Edit_Site_Fields": {
+      "message": "แก้ไขฟิลด์ของเว็บไซต์"
+   },
+   "Egypt": {
+      "message": "อียิปต์"
+   },
+   "El_Salvador": {
+      "message": "เอลซัลวาดอร์"
+   },
+   "Email": {
+      "message": "อีเมล"
+   },
+   "Email_": {
+      "message": "อีเมล์:"
+   },
+   "Email_Account": {
+      "message": "ที่อยู่อีเมล"
+   },
+   "Email_Address": {
+      "message": "ที่อยู่อีเมล"
+   },
+   "Email_Address_": {
+      "message": "ที่อยู่อีเมล์:"
+   },
+   "Email_address": {
+      "message": "ที่อยู่อีเมล์"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "อีเมล์นี้ถูกใช้แล้ว หรือว่าคุณจะลืมรหัสผ่าน?"
+   },
+   "Emergency_Access": {
+      "message": "เข้าถึงการช่วยเหลือ"
+   },
+   "Enable_new_login_screen": {
+      "message": "เปิดใช้งานหน้าลงชื่อเข้าใช้ใหม่"
+   },
+   "Encryption": {
+      "message": "การเข้ารหัส"
+   },
+   "End": {
+      "message": "เสร็จสิ้น"
+   },
+   "English": {
+      "message": "ภาษาอังกฤษ"
+   },
+   "English__United_Kingdom_": {
+      "message": "ภาษาอังกฤษ (บริเตน)"
+   },
+   "Enter_Code_": {
+      "message": "ใส่รหัส:"
+   },
+   "Enter_PIN": {
+      "message": "กรอก PIN"
+   },
+   "Enter_a_passcode_in_the_box_below_": {
+      "message": "ใส่รหัสในกล่องด้านล่างนี้"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "หมายเหตุ"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "กรอกรหัสพินของสมาร์ทการ์ดของคุณ"
+   },
+   "Enterprise": {
+      "message": "องค์กร"
+   },
+   "Equatorial_Guinea": {
+      "message": "อิเควทอเรียลกินี"
+   },
+   "Eritrea": {
+      "message": "อีริเทรีย"
+   },
+   "Error": {
+      "message": "เกิดข้อผิดพลาด"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "เกิดข้อผิดพลาดขณะเรียกข้อมูลเว็บไซต์ LastPass ของคุณ โปรดลองลงชื่อเข้าใช้ใหม่เพื่อเรียกข้อมูลเว็บไซต์ของคุณ"
+   },
+   "ErrorLoginMsg": {
+      "message": "เกิดข้อผิดพลาดในขณะที่เข้าสู่ระบบของ LastPass. โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ."
+   },
+   "ErrorSendingMsg": {
+      "message": "เกิดข้อผิดพลาดขณะพยายามติดต่อกับเซิร์ฟเวอร์  โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ"
+   },
+   "ErrorSessionMsg": {
+      "message": "เซสชั่น LastPass ของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่."
+   },
+   "Error__This_folder_has_already_been_moved_": {
+      "message": "Error: โฟลเดอร์ถูกย้าย?"
+   },
+   "Error_opening_attachment_": {
+      "message": "ผิดพลาดในการเปิดไฟล์แนบ"
+   },
+   "Estonia": {
+      "message": "เอสโตเนีย"
+   },
+   "Ethiopia": {
+      "message": "เอธิโอเปีย, สาธารณรัฐ"
+   },
+   "Evening_Number": {
+      "message": "เบอร์โทรติดต่อตอนกลางคืน"
+   },
+   "Evening_number": {
+      "message": "เบอร์โทรสำหรับตอนกลางคืน"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "ขณะนี้ LastPass สามารถจัดเก็บรหัสผ่านแบบใช้ครั้งเดียว (OTP) ในเครื่องของคุณเพื่อใช้สำหรับกู้คืนบัญชีของคุณหากคุณลืมรหัสผ่านของคุณโดย OTP นี้จะยังคงปิดการใช้งานจนกว่าจะมีการเปิดใช้งานบนเครื่องเซิฟเวอร์.\n\nคุณต้องการเปิดใช้งานการกู้คืนบัญชีได้หรือไม่?"
+   },
+   "Expand_All": {
+      "message": "คลี่รายการทั้งหมด"
+   },
+   "Expand_All_Folders": {
+      "message": "ขยายโฟลเดอร์ทั้งหมด"
+   },
+   "Expiration": {
+      "message": "หมดอายุ"
+   },
+   "Expiration_Date": {
+      "message": "วันหมดอายุ"
+   },
+   "Expiration_date": {
+      "message": "วันหมดอายุ"
+   },
+   "Export": {
+      "message": "ส่งออก"
+   },
+   "Export_To": {
+      "message": "ส่งออกไปยัง"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "ส่งออกเป็นไฟล์ LastPass CSV"
+   },
+   "FIPS_Mode": {
+      "message": "โหมด FIPS"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "หมู่เกาะฟอล์คแลนด์ (มัลวินาส์)"
+   },
+   "Faroe_Islands": {
+      "message": "หมู่เกาะแฟโร"
+   },
+   "Favorite": {
+      "message": "รายการโปรด"
+   },
+   "Favoritesproper": {
+      "message": "รายการโปรด"
+   },
+   "Fax_Number": {
+      "message": "หมายเลขโทรสาร"
+   },
+   "Fax_number": {
+      "message": "หมายเลขโทรสาร"
+   },
+   "Features": {
+      "message": "ฟังชั่นการใช้งาน"
+   },
+   "February": {
+      "message": "กุมภาพันธ์"
+   },
+   "Feedback": {
+      "message": "ข้อคิดเห็น"
+   },
+   "Female": {
+      "message": "ผู้หญิง"
+   },
+   "Fields_": {
+      "message": "ฟิลด์ :"
+   },
+   "Fiji": {
+      "message": "เกาะฟิจิ"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "ฟิจิ, คามชัตกา, หมู่เกาะมาร์แชล"
+   },
+   "File": {
+      "message": "ไฟล์"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "ไฟล์ใหญ่เกินไป ขนาดต้องน้อยกว่า 10MB"
+   },
+   "File_too_large__it_must_be_less_than_5MB_": {
+      "message": "ไฟล์ใหญ่เกินไป มันต้องน้อยกว่า  5MB"
+   },
+   "Files": {
+      "message": "ไฟล์"
+   },
+   "Fill": {
+      "message": "ใส่"
+   },
+   "Fill_Current": {
+      "message": "กรอกข้อมูลในเฟรมปัจจุบัน"
+   },
+   "Fill_Form": {
+      "message": "กรอกแบบฟอร์ม"
+   },
+   "Fill_Forms": {
+      "message": "กรอกแบบฟอร์ม"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "กรอกแบบฟอร์มโดยใช้โปรไฟล์มาตรฐาน"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "กรอกข้อมูลเข้าสู่ระบบถัดไป (เมื่อมีหลายที่)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "กรอกข้อมูลเข้าสู่ระบบก่อนหน้า (เมื่อมีหลายที่)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "กรอกหรือแก้ไขข้อมูลการกรอกแบบฟอร์ม"
+   },
+   "Fill_with": {
+      "message": "เติมด้วย"
+   },
+   "FillableFormDetected": {
+      "message": "ตรวจพบแบบฟอร์มที่สามารถกรอกได้ในหน้านี้"
+   },
+   "Filter": {
+      "message": "ตัวกรอง"
+   },
+   "Find_a_site": {
+      "message": "ค้นหาเว็บไซต์"
+   },
+   "Finland": {
+      "message": "ฟินแลนด์"
+   },
+   "Finnish": {
+      "message": "ภาษาฟินแลนด์"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "ระบบจัดการรหัสผ่านของไฟร์ฟอกซ์"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "เลข 3 หลักแรกของหมายเลขโทรศัพท์ของคุณ"
+   },
+   "First_Name": {
+      "message": "ชื่อจริง"
+   },
+   "First_name": {
+      "message": "ชื่อ"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "สำหรับพิกัดที่ระบุด้านล่างแต่ละค้นหาค่าในตารางของคุณและป้อนค่า"
+   },
+   "Forgot_Password_": {
+      "message": "ลืมรหัสผ่าน?"
+   },
+   "Forgot_your_password_": {
+      "message": "ลืมรหัสผ่าน"
+   },
+   "FormFill": {
+      "message": "แบบฟอร์ม"
+   },
+   "FormFill_Profiles": {
+      "message": "ชนิดแบบฟอร์ม"
+   },
+   "Form_Fill": {
+      "message": "กรอกแบบฟอร์ม"
+   },
+   "Form_Fill_Profile": {
+      "message": "โปรไฟล์แบบฟอร์ม"
+   },
+   "Form_Fill_Profiles": {
+      "message": "โปรไฟล์ของแบบฟอร์ม"
+   },
+   "Form_Fills": {
+      "message": "ช่องกรอกข้อมูล"
+   },
+   "Form_Name_": {
+      "message": "ชื่อแบบฟอร์ม:"
+   },
+   "Format": {
+      "message": "รูปแบบ"
+   },
+   "Forums": {
+      "message": "กระดานสนทนา"
+   },
+   "France": {
+      "message": "ฝรั่งเศส"
+   },
+   "French": {
+      "message": "ภาษาฝรั่งเศส"
+   },
+   "French_Guiana": {
+      "message": "กิอานา ฝรั่งเศส"
+   },
+   "French_Polynesia": {
+      "message": "โปลินีเซีย ฝรั่งเศส"
+   },
+   "French_Southern_Territories": {
+      "message": "ดินแดนทางใต้ของฝรั่งเศส"
+   },
+   "French__Canada_": {
+      "message": "ภาษาฝรั่งเศส (แคนาดา)"
+   },
+   "Full_path_of_file_to_import_": {
+      "message": "พาธแบบเต็มๆของไฟล์ที่จะส่งออก"
+   },
+   "GET_FREE_PREMIUM": {
+      "message": "รับระดับพรีเมี่ยมฟรี"
+   },
+   "GMT_5": {
+      "message": "GMT+5"
+   },
+   "GMT_7": {
+      "message": "GMT+7"
+   },
+   "GMT_9": {
+      "message": "GMT+9"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT: ดับลิน, เอดินเบอระ, ลิสบอน, ลอนดอน"
+   },
+   "Gabon": {
+      "message": "กาบอง"
+   },
+   "Gambia": {
+      "message": "แกมเบีย"
+   },
+   "Gender": {
+      "message": "เพศ"
+   },
+   "General": {
+      "message": "ทั่วไป"
+   },
+   "Generate": {
+      "message": "สร้าง"
+   },
+   "GeneratePassword": {
+      "message": "หากคุณทำการสร้างบัญชีผู้ใช้ใหม่หรือทำการเปลี่ยนรหัสผ่าน กดปุ่ม 'สร้าง' เพื่อสร้างรหัสผ่านที่ปลอดภัย ยากต่อการคาดเดาด้วย LastPass"
+   },
+   "Generate_Another_Password": {
+      "message": "สร้างรหัสผ่านอื่น"
+   },
+   "Generate_Password": {
+      "message": "สร้างรหัสผ่าน"
+   },
+   "Generate_Secure_Password": {
+      "message": "สุ่มสร้างรหัสผ่านที่ปลอดภัย"
+   },
+   "Generated_Password_for": {
+      "message": "สร้างรหัสผ่านสำหรับ"
+   },
+   "Generic": {
+      "message": "ทั่วไป"
+   },
+   "Generic_CSV_File": {
+      "message": "ไฟล์ CSV ทั่วไป"
+   },
+   "Georgia": {
+      "message": "จอร์เจีย"
+   },
+   "German": {
+      "message": "ภาษาเยอรมัน"
+   },
+   "Germany": {
+      "message": "เยอรมนี"
+   },
+   "Get_Started": {
+      "message": "มาใช้งานสิ"
+   },
+   "Ghana": {
+      "message": "กานา"
+   },
+   "Gibraltar": {
+      "message": "ยิบรอลตา"
+   },
+   "Give_the_Gift_of_LastPass": {
+      "message": "ส่ง LastPass เป็นของขวัญ"
+   },
+   "Give_the_Gift_of_LastPass_Premium": {
+      "message": "ส่ง LastPass Premium เป็นของขวัญ"
+   },
+   "Go_Back": {
+      "message": "ย้อนกลับ"
+   },
+   "Go_Back_": {
+      "message": "กลับไป?"
+   },
+   "Go_Premium_": {
+      "message": "สมัครพรีเมี่ยม!"
+   },
+   "Go_to_URL": {
+      "message": "ไปที่ URL"
+   },
+   "Google_Authenticator": {
+      "message": "Google Authenticator"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "การยืนยันตัวตน แบบหลายเงื่อนไข ของกูเกล"
+   },
+   "Google_Chrome": {
+      "message": "กูเกิล โครม"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "ตัวจัดการรหัสผ่านของกูเกิลโครม"
+   },
+   "Google_Chrome_requires_that_extensions_use_the_same_language_as_the_browser__so_in_order_to_switch_LastPass_s_language__please_change_the_main_browser_language_under_Chrome_s_Options_": {
+      "message": "Google Chrome บังคับให้ส่วนขยายใช้ภาษาเดียวกับเบราว์เซอร์ ในการเปลี่ยนภาษาของ LastPass กรุณาเปลี่ยนภาษาหลักของเบราว์เซอร์ในตัวเลือกของ Chrome"
+   },
+   "Greece": {
+      "message": "กรีก"
+   },
+   "Greenland": {
+      "message": "เกาะกรีนแลนด์"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "กรีนแลนด์, บราซิลเลีย, มอนเตวิเดโว"
+   },
+   "Grenada": {
+      "message": "เกรนาดา"
+   },
+   "Group_": {
+      "message": "โฟลเดอร์:"
+   },
+   "Group_ID": {
+      "message": "รหัสกลุ่ม"
+   },
+   "Group_Name": {
+      "message": "ชื่อแฟ้ม"
+   },
+   "Groups": {
+      "message": "โฟลเดอร์"
+   },
+   "Guadeloupe": {
+      "message": "กัวเดอลุป"
+   },
+   "Guam": {
+      "message": "กวม"
+   },
+   "Guatemala": {
+      "message": "กัวเตมาลา"
+   },
+   "Guernsey": {
+      "message": "เกิร์นซี"
+   },
+   "Guinea": {
+      "message": "กินี"
+   },
+   "Guinea_Bissau": {
+      "message": "กินีบิสเซา"
+   },
+   "Guyana": {
+      "message": "กายอานา"
+   },
+   "HP_Password_Safe": {
+      "message": "HP Password Safe"
+   },
+   "Haiti": {
+      "message": "เฮตี"
+   },
+   "Harare__Pretoria": {
+      "message": "ฮาราเร, พริทอเรีย"
+   },
+   "Hawaii": {
+      "message": "ฮาวาย"
+   },
+   "Health_Insurance": {
+      "message": "ประกันสุขภาพ"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "เกาะเฮิร์ดและเกาะแมคโดนัล"
+   },
+   "Height": {
+      "message": "ส่วนสูง"
+   },
+   "Help": {
+      "message": "ช่วยเหลือ"
+   },
+   "Help_Center": {
+      "message": "ศูนย์ขอความช่วยเหลือ"
+   },
+   "Help_Translate": {
+      "message": "ช่วยแปล"
+   },
+   "Help___": {
+      "message": "ช่วยเหลือ ..."
+   },
+   "Help_spread_the_word": {
+      "message": "ช่วยบอกต่อโลกนี้"
+   },
+   "Hide": {
+      "message": "ซ่อน"
+   },
+   "Hide_Advanced_Options": {
+      "message": "ซ่อนตัวเลือกขั้นสูง"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "ซ่อนเมนูสำหรับติดต่อผู้ใช้"
+   },
+   "Hide_Password": {
+      "message": "ซ่อนรหัสผ่าน"
+   },
+   "Hide_Passwords": {
+      "message": "ซ่อนรหัสผ่าน"
+   },
+   "Highlight_input_boxes": {
+      "message": "เน้นกล่องใส่"
+   },
+   "History": {
+      "message": "ประวัติ"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "นครรัฐวาติกัน"
+   },
+   "Home": {
+      "message": "หน้าแรก"
+   },
+   "Honduras": {
+      "message": "ฮอนดูรัส"
+   },
+   "Hong_Kong": {
+      "message": "ฮ่องกง"
+   },
+   "Hostname": {
+      "message": "ชื่อโฮส"
+   },
+   "HotKeys": {
+      "message": "คีย์ลัด"
+   },
+   "Hungarian": {
+      "message": "ภาษาฮังการี"
+   },
+   "Hungary": {
+      "message": "ฮังการี"
+   },
+   "IBAN_Number": {
+      "message": "หมายเลข IBAN"
+   },
+   "IMPORT_": {
+      "message": "นำเข้า?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "มัน 'สำคัญมาก' ที่คุณจะต้องไม่ลืมรหัสผ่านใหม่ของคุณ!!"
+   },
+   "I_Forgot_my_Password": {
+      "message": "ฉันลืมรหัสผ่านของฉัน"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "ฉันลืมรหัสผ่าน, ช่วยด้วย"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "ฉันได้อ่านและตกลงกับ"
+   },
+   "I_have_read_and_agree_with_the__0terms_of_service_0_and__1privacy_statement_1": {
+      "message": "ฉันได้อ่านและตกลงกับ %0เงื่อนไขการบริการ%0 และ %1ชี้แจงสิทธิส่วนบุคคล%1"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "ฉันเข้าใจว่าข้อมูลที่ถูกเข้ารหัสแล้วของฉันจะถูกส่งไปยัง LastPass"
+   },
+   "I_ve_forgot_the_answer": {
+      "message": "ฉันลืมคำตอบ"
+   },
+   "I_ve_forgotten_my_password_": {
+      "message": "ฉันลืมรหัสผ่านของฉัน"
+   },
+   "I_ve_lost_my_Google_Authenticator_device": {
+      "message": "ฉันทำอุปกรณ์ Google Authenticator หาย"
+   },
+   "I_ve_lost_my_Sesame_device": {
+      "message": "ฉันทำอุปกรณ์ Sesame หาย"
+   },
+   "I_ve_lost_my_YubiKey_device": {
+      "message": "ฉันทำอุปกรณ์ YubiKey หาย"
+   },
+   "I_ve_lost_my_device": {
+      "message": "ฉันทำอุปกรณ์หาย"
+   },
+   "I_ve_lost_my_grid": {
+      "message": "ฉันสูญเสียกริด"
+   },
+   "Iceland": {
+      "message": "ไอซ์แลนด์"
+   },
+   "Icons": {
+      "message": "ไอคอน"
+   },
+   "Identities": {
+      "message": "เอกลักษณ์"
+   },
+   "Identity": {
+      "message": "เอกลักษณ์"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "หากคุณมีบัญชี Lastpass อยู่แล้ว คุณสามารถปิดหน้าต่างนี้และเข้าสู่ระบบ"
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "หากคุณลืมรหัสผ่านหลักของคุณ,"
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "หากคุณทำอุปกรณ์ Google Authenticator หาย คลิกที่นี่เพื่อปิดใช้งานการยืนยันผ่าน Google Authenticator"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "หากคุณทำอุปกรณ์ Sesame ของคุณหาย คลิกที่นี่ปิดการใช้งานการตรวจสอบด้วย Sesame"
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "หากคุณทำ YubiKey ของคุณหาย คลิกที่นี่ปิดการใช้งานการตรวจสอบด้วย YubiKey"
+   },
+   "If_you_lost_your_device__click_here_to_disable_multifactor_authentication": {
+      "message": "ถ้าคุณทำอุปกรณ์หาย คลิกที่นี้เพื่อปิดการยืนยันตัวตนสองขั้น"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "ถ้าคุณทำ grid สูญหาย คลิกที่นี่ปิดการใช้งานการตรวจสอบด้วย grid"
+   },
+   "Import": {
+      "message": "นำเข้า"
+   },
+   "Import_From": {
+      "message": "นำเข้าจาก"
+   },
+   "Import_Your_Data": {
+      "message": "นำเข้าข้อมูลของคุณ"
+   },
+   "Importing_your_data_to_your_LastPass_vault_will_secure_it_and_protect_you_against_identity_theft__All_imported_data_remains_COMPLETELY_confidential__the_only_person_who_can_view_YOUR_data_is_YOU_": {
+      "message": "การนำเข้าข้อมูลของคุณสู่ตู้นิรภัยของ LastPass จะปกป้องคุณจากขโมย มันจะเป็นความลับสุดยอด ที่มีเพียงคุณเท่านั้น ที่จะเข้าถึงมันได้"
+   },
+   "India": {
+      "message": "อินเดีย"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "อินเดียนา, โบโกตา, ลิมา, ควิโต, ริโอ บลังโก"
+   },
+   "Indonesia": {
+      "message": "อินโดนีเซีย"
+   },
+   "Install": {
+      "message": "ติดตั้ง"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "ติดตั้ง LastPass รุ่นไบนารีสำหรับ Chrome เพื่อเปิดระบบ logout อัตโนมัติเมื่อโปรแกรมว่างงาน"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_importing_passwords_from_Google_Chrome_password_manager": {
+      "message": "ติดตั้ง LastPass เวอร์ชั่นไบนารี่ สำหรับโครม เพื่อที่จะนำเข้ารหัสผ่านที่บันทึกโครม"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "ติดตั้ง LastPass เวอร์ชั่นไบนารี่ สำหรับโครม เพื่อจะได้แชร์สถานะการล็อกอิน ในระหว่างบราวเซอร์ต่างๆได้"
+   },
+   "Instant_Messenger": {
+      "message": "โปรแกรมพูดคุย"
+   },
+   "Instructions": {
+      "message": "คำแนะนำ"
+   },
+   "Insurance": {
+      "message": "ประกัน"
+   },
+   "International_Date_Line_West": {
+      "message": "เส้นแบ่งวันที่นานาชาติฝั่งตะวันตก"
+   },
+   "Invalid_Password_": {
+      "message": "รหัสผ่านไม่ถูกต้อง"
+   },
+   "Invalid_email_address__try_again": {
+      "message": "ที่อยู่อีเมลไม่ถูกต้อง กรุณาลองอีกครั้ง"
+   },
+   "Invite_Friends_To_Try_LastPass": {
+      "message": "เชิญชวนเพื่อนของคุณให้ลองใช้ LastPass"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "อิหร่าน (สาธารณรัฐอิสลาม)"
+   },
+   "Iraq": {
+      "message": "อิรัก"
+   },
+   "Ireland": {
+      "message": "ไอร์แลนด์"
+   },
+   "Isle_of_Man": {
+      "message": "เกาะมาน"
+   },
+   "Israel": {
+      "message": "อิสราเอล"
+   },
+   "Issue_Number": {
+      "message": "หมายเลขหนังสือ"
+   },
+   "Issue_number": {
+      "message": "รหัสความปลอดภัยบนบัตร"
+   },
+   "Issued_Date": {
+      "message": "วันที่ออก"
+   },
+   "Issuing_Authority": {
+      "message": "ผู้มีอำนาจในการออก"
+   },
+   "Italian": {
+      "message": "ภาษาอิตาลี"
+   },
+   "Italy": {
+      "message": "อิตาลี"
+   },
+   "Jamaica": {
+      "message": "จาไมกา"
+   },
+   "January": {
+      "message": "มกราคม"
+   },
+   "Japan": {
+      "message": "ญี่ปุ่น"
+   },
+   "Japanese": {
+      "message": "ภาษาญี่ปุ่น"
+   },
+   "Jersey": {
+      "message": "เจอร์ซีย์"
+   },
+   "Jordan": {
+      "message": "จอร์แดน"
+   },
+   "July": {
+      "message": "กรกฎาคม"
+   },
+   "June": {
+      "message": "มิถุนายน"
+   },
+   "Kabul": {
+      "message": "คาบูล"
+   },
+   "Kathmandu": {
+      "message": "กาฐมาณฑุ"
+   },
+   "Kazakhstan": {
+      "message": "คาซัคสถาน"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "เก็บประวัติของการเข้าสู่ระบบและการกรอกแบบฟอร์มของฉัน"
+   },
+   "Kenya": {
+      "message": "เคนยา"
+   },
+   "Key_Index": {
+      "message": "ดัชนีรหัส"
+   },
+   "Key_Type": {
+      "message": "ชนิดของรหัส"
+   },
+   "Kiribati": {
+      "message": "คิริบาติ"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "เกาหลี, สาธารณรัฐประชาธิปไตยประชาชน"
+   },
+   "Korea__Republic_Of": {
+      "message": "เกาหลี, สาธารณรัฐ"
+   },
+   "Korean": {
+      "message": "ภาษาเกาหลี"
+   },
+   "Kuwait": {
+      "message": "คูเวต"
+   },
+   "Kyrgyzstan": {
+      "message": "เคอร์กิสสถาน"
+   },
+   "La_Paz": {
+      "message": "ลาปาซ"
+   },
+   "Language": {
+      "message": "ภาษา"
+   },
+   "Language_": {
+      "message": "ภาษา:"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "ลาว, สาธารณรัฐประชาธิปไตยประชาชน"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_Automatic_Password_Change": {
+      "message": "LastPass เปลี่ยนรหัสผ่านอัตโนมัติ"
+   },
+   "LastPass_CSV_File": {
+      "message": "ไฟล์ CSV ของ LastPass"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "ทูลบาร์ LastPass"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "ไฟล์ที่เข้ารหัสของ LastPass"
+   },
+   "LastPass_Enterprise": {
+      "message": "LastPass Enterprise"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "รับรองความถูกต้อง LastPass กริด Multifactor"
+   },
+   "LastPass_Menu": {
+      "message": "เมนู LastPass"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": "LastPass จะสามารถกรอกแบบฟอร์มหน้าเว็บได้ด้วยคลิกเดียว โดยใช้แบบฟอร์มกรอก 'อัตโนมัติจะไม่เพียง แต่ช่วยให้คุณประหยัดเวลา แต่ยังจะช่วยเพิ่มความปลอดภัยของคุณเมื่อช้อปปิ้งออนไลน์"
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "คุณไม่สามารถเข้าสู่ระบบได้หากไม่ตั้งค่าให้รับคุกกี้จาก lastpass.com"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass พบแบบฟอร์มการล็อกอินที่ไม่ปลอดภัย\n\nคุณต้องการทำต่อไหม?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass ตรวจพบแบบฟอร์มการเข้าสู่ระบบที่ไม่ปลอดภัย\n\nคุณยังต้องการให้ LastPass กรอกแบบฟอร์มหรือไม่?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass ตรวจพบการเปลี่ยนรหัสผ่านสำหรับ"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass ตรวจพบการเปลี่ยนรหัสผ่านสำหรับโดเมน"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass ตรวจพบการเปลี่ยนรหัสผ่านสำหรับผู้ใช้:"
+   },
+   "LastPass_detected_that_the_password_for_the_site_on_which_you_received_the_alert_has_the_same_password_as_your_LastPass_account_Master_Password_": {
+      "message": "LastPass ตรวจพบว่ารหัสผ่านสำหรับเว็บไซต์ที่คุณได้รับการแจ้งเตือนเป็นรหัสผ่านเดียวกับรหัสผ่านหลักบัญชี LastPass ของคุณ"
+   },
+   "LastPass_detected_that_the_site_that_triggered_this_security_alert_has_the_same_password_as_your_LastPass_account_Master_Password_": {
+      "message": "LastPass ตรวจพบว่ารหัสผ่านสำหรับเว็บไซต์ที่คุณได้รับการแจ้งเตือนเป็นรหัสผ่านเดียวกับรหัสผ่านหลักบัญชี LastPass ของคุณ"
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "LastPass ตรวจพบข้อผิดพลาดในการติดตั้ง กรุณาติดตั้ง LastPass ใหม่อีกครั้ง"
+   },
+   "LastPass_has_detected_that_you_have_used_your_Master_Password_as_the_password_for_this_site__It_is_highly_recommended_that_you_change_your_LastPass_Master_Password_to_protect_all_of_your_online_accounts_": {
+      "message": "LastPass ตรวจพบว่าคุณใช้รหัสผ่านหลักของคุณเป็นรหัสผ่านสำหรับเว็บไซต์นี้ เราแนะนำอย่างยิ่งให้คุณเปลี่ยนรหัสผ่านหลัก LastPass ของคุณเพื่อป้องกันบัญชีออนไลน์ทั้งหมดของคุณ"
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass กรอกข้อมูลการเข้าสู่ระบบของคุณลงในแบบฟอร์มในหน้านี้"
+   },
+   "LastPass_is_changing_your_password_now___": {
+      "message": "LastPass กำลังเปลี่ยนรหัสผ่านของคุณ..."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "การติดตั้ง LastPass เสร็จสมบูรณ์!!  เมื่อคุณติดตั้ง LastPass บนคอมพิวเตอร์เครื่องอื่นคุณไม่จำเป็นต้องทำขั้นตอนนี้ใหม่ทั้งหมด โดยคุณสามารถเข้าสู่ระบบได้ทันที.  และอย่าให้รหัสผ่านหลักนี้แก่ใครเด็ดขาด, รวมไปถึงพนักงานของ LastPass เองด้วย โดยเราจะไม่ถามรหัสผ่านหลักของคุณ.  LastPass จะเข้ารหัสข้อมูลต่างๆของคุณบนฝั่ง client, ซึ่งแม้แต่ LastPass ก็จะไม่รู้รหัสผ่านของคุณ.  คุณสามารถอ่านข้อมูลเพิ่มเติมได้โดยการคลิกไอคอน LastPass และเลือก 'ช่วยเหลือ'"
+   },
+   "LastPass_is_loading___": {
+      "message": "LastPass กำลังโหลด..."
+   },
+   "LastPass_is_loading_website___": {
+      "message": "LastPass กำลังโหลดเว็บไซต์..."
+   },
+   "LastPass_is_logging_in": {
+      "message": "LastPass กำลังลงชื่อเข้าใช้"
+   },
+   "LastPass_is_logging_in___": {
+      "message": "LastPass กำลังลงชื่อเข้าใช้..."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember_": {
+      "message": "LastPass คือรหัสผ่านสุดท้ายที่คุณต้องจำ"
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "LastPass จะเป็นเป็นรหัสผ่านสุดท้ายที่คุณจะต้องจำ หากคุณเป็นผู้ใ่ช้ใหม่ เราต้องการเวลาแค่ไม่กี่นาทีของคุณเพื่อตั้งค่าบัญชี คุณสามารถใช้บัญชีนี้ในเครื่องคอมพิวเตอร์อื่น ๆ ที่คุณใช้เพื่อให้คุณใช้ข้อมูลของคุณได้ทุกที่.  กดปุ่มสร้างบัญชีเพื่อเริ่มต้น"
+   },
+   "LastPass_is_the_last_password_you_will_ever_have_to_remember": {
+      "message": "LastPass คือรหัสผ่านสุดท้ายที่คุณต้องจำ"
+   },
+   "LastPass_must_reencrypt_all_of_your_data_because_of_a_key_change_": {
+      "message": "LastPass ต้องทำการเข้ารหัสข้อมูลทั้งหมดของคุณใหม่เนื่องจากคีย์ที่ใช้เข้ารหัสมีการเปลี่ยนแปลง"
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "หมายเลข 4 หลักสุดท้ายของหมายเลขโทรศัพท์ของคุณ"
+   },
+   "Last_Name": {
+      "message": "นามสกุล"
+   },
+   "Last_Name2": {
+      "message": "ชื่อกลาง"
+   },
+   "Last_Touch": {
+      "message": "สัมผัสครั้งล่าสุด"
+   },
+   "Last_name": {
+      "message": "นามสกุล"
+   },
+   "Last_used": {
+      "message": "ใช้งานครั้งล่าสุด"
+   },
+   "Latvia": {
+      "message": "ลัตเวีย"
+   },
+   "Launch": {
+      "message": "เปิด"
+   },
+   "Lebanon": {
+      "message": "เลบานอน"
+   },
+   "Left": {
+      "message": "Left"
+   },
+   "Lesotho": {
+      "message": "เลโซโท"
+   },
+   "Liberia": {
+      "message": "ไลบีเรีย"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "ลิเบีย, สาธารณรัฐอาหรับ"
+   },
+   "License_Class": {
+      "message": "ชั้นของไลเซนส์"
+   },
+   "License_Key": {
+      "message": "รหัสของไลเซนส์"
+   },
+   "Liechtenstein": {
+      "message": "ลิกเตนสไตน์"
+   },
+   "Link_Account": {
+      "message": "ลิงค์บัญชี"
+   },
+   "Link_Personal_Account": {
+      "message": "ลิงค์ข้อมูลส่วนบุคคล"
+   },
+   "Lithuania": {
+      "message": "ลิทัวเนีย"
+   },
+   "Local": {
+      "message": "ภาษาท้องถิ่น"
+   },
+   "Log_In_with_a_Different_Username": {
+      "message": "ลงชื่อเข้าใช้ด้วยชื่อผู้ใช้อื่น"
+   },
+   "Log_Out": {
+      "message": "ลงชื่อออก"
+   },
+   "Log_Out_": {
+      "message": "ออกจาก:"
+   },
+   "Log_into_a_Site": {
+      "message": "เข้าสู่ระบบในไซต์"
+   },
+   "Login": {
+      "message": "เข้าสู่ระบบ"
+   },
+   "LoginError": {
+      "message": "เกิดข้อผิดพลาดในการเข้าสู่ระบบ โปรดลองอีกครั้ง"
+   },
+   "Login_to_LastPass": {
+      "message": "เข้าสู่ LastPass"
+   },
+   "Logoff": {
+      "message": "ออกจากระบบ"
+   },
+   "Logoff_": {
+      "message": "ออกจากระบบ :"
+   },
+   "Logout": {
+      "message": "ออกจากระบบ"
+   },
+   "LoseChanges": {
+      "message": "คุณแน่ใจหรือว่าต้องการแก้ไขฟิลด์ของเว็บไซต์นี้? การทำเช่นนี้จะทำให้ท่านเสียการเปลี่ยนแปลงใดๆที่คุณทำกับเว็บไซต์นี้"
+   },
+   "Luxembourg": {
+      "message": "ลักเซมเบิร์ก"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "มาเก๊า"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "แมซิโดเนีย, อดีตสาธารณรัฐยูโกสลาเวีย"
+   },
+   "Madagascar": {
+      "message": "มาดากัสการ์"
+   },
+   "Make_Pronounceable": {
+      "message": "ทำให้ออกเสียงได้"
+   },
+   "Malawi": {
+      "message": "มาลาวี"
+   },
+   "Malaysia": {
+      "message": "มาเลเซีย"
+   },
+   "Maldives": {
+      "message": "มัลดีฟส์"
+   },
+   "Male": {
+      "message": "ชาย"
+   },
+   "Mali": {
+      "message": "มาลี"
+   },
+   "Malta": {
+      "message": "มอลตา"
+   },
+   "Manage_Shared_Folder": {
+      "message": "จัดการแฟ้มที่แบ่งปัน"
+   },
+   "Manage_Shared_Folders": {
+      "message": "จัดการโฟลเดอร์ที่แบ่งปัน"
+   },
+   "March": {
+      "message": "มีนาคม"
+   },
+   "Marshall_Islands": {
+      "message": "หมู่เกาะมาร์แชลล์"
+   },
+   "Martinique": {
+      "message": "มาร์ตินีก"
+   },
+   "Master_Password": {
+      "message": "รหัสผ่านหลัก"
+   },
+   "Master_Password_": {
+      "message": "รหัสผ่านหลัก"
+   },
+   "Matching_Sites": {
+      "message": "เว็บที่ตรงกัน"
+   },
+   "Mauritania": {
+      "message": "มอริเตเนีย"
+   },
+   "Mauritius": {
+      "message": "มอริเชียส"
+   },
+   "Maximize": {
+      "message": "สูงสุด"
+   },
+   "Maxthon": {
+      "message": "Maxthon"
+   },
+   "May": {
+      "message": "พฤษภาคม"
+   },
+   "Mayotte": {
+      "message": "มายอต"
+   },
+   "Member_ID": {
+      "message": "รหัสสมาชิก"
+   },
+   "Member_Name": {
+      "message": "ชื่อสมาชิก"
+   },
+   "Membership": {
+      "message": "ความเป็นสมาชิก"
+   },
+   "Membership_Number": {
+      "message": "หมายเลขสมาชิก"
+   },
+   "Message": {
+      "message": "ข้อความ"
+   },
+   "Message_": {
+      "message": "ข้อความ:"
+   },
+   "Meta": {
+      "message": "Meta"
+   },
+   "Mexico": {
+      "message": "เม็กซิโก"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "ไมโครนีเซีย, สหพันธรัฐ"
+   },
+   "Mid_Atlantic": {
+      "message": "แอตแลนติกกลาง"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "เลขตรงกลาง 3 หลักของหมายเลขโทรศัพท์ของคุณ"
+   },
+   "Middle_Name": {
+      "message": "ชื่อกลาง"
+   },
+   "Middle_name": {
+      "message": "ชื่อกลาง"
+   },
+   "Midway_Island__Samoa": {
+      "message": "เกาะมิดเวย์, ซาเมา"
+   },
+   "Mobile_Devices": {
+      "message": "โทรศัพท์"
+   },
+   "Mobile_Email_Address": {
+      "message": "ที่อยู่อีเมล์มือถือ"
+   },
+   "Mobile_Number": {
+      "message": "หมายเลขโทรศัพท์เคลื่อนที่"
+   },
+   "Mobile_number": {
+      "message": "หมายเลขโทรศัพท์มือถือ"
+   },
+   "Moldova__Republic_Of": {
+      "message": "มอลโดวา, สาธารณรัฐ"
+   },
+   "Monaco": {
+      "message": "โมนาโค"
+   },
+   "Mongolia": {
+      "message": "มองโกเลีย"
+   },
+   "Montenegro": {
+      "message": "มอนเตเนโกร"
+   },
+   "Montserrat": {
+      "message": "มอนต์เซอร์รัต"
+   },
+   "More": {
+      "message": "เพิ่มเติม"
+   },
+   "More_Information": {
+      "message": "ข้อมูลเพิ่มเติม"
+   },
+   "More_Options": {
+      "message": "ตัวเลือกเพิ่มเติม"
+   },
+   "Morocco": {
+      "message": "โมรอกโก"
+   },
+   "Most_Recent": {
+      "message": "ล่าสุด"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "เวลาแถบภูเขา (อเมริกา & แคนาดา)"
+   },
+   "Move_Selected_to_Group": {
+      "message": "ย้ายไปยังโฟลเดอร์ที่เลือก"
+   },
+   "Move_to_Group": {
+      "message": "ย้ายไปยังโฟลเดอร์"
+   },
+   "Move_to_Sub_Group": {
+      "message": "ย้ายไปยังโฟลเดอร์ย่อย"
+   },
+   "Mozambique": {
+      "message": "โมซัมบิก"
+   },
+   "Mr": {
+      "message": "นาย"
+   },
+   "Mrs": {
+      "message": "นาง"
+   },
+   "Ms": {
+      "message": "นางสาว"
+   },
+   "Multifactor_Authentication": {
+      "message": "การยืนยันตัวตนสองขั้นตอน"
+   },
+   "Multifactor_Authentication___Enterprise": {
+      "message": "การยืนยันตัวตนสองขั้น - องค์กร"
+   },
+   "Multifactor_Authentication___Free": {
+      "message": "การยืนยันตัวตนสองขั้น - ฟรี"
+   },
+   "Multifactor_Authentication___Premium": {
+      "message": "การยืนยันตัวตนสองขั้น - พรีเมี่ยม"
+   },
+   "Multifactor_Option": {
+      "message": "ตั้งค่าการยืนยันตัวตนสองขั้น"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_Account": {
+      "message": "บัญชีของฉัน"
+   },
+   "My_LastPass_Vault": {
+      "message": "ตู้เซฟ LastPass ของฉัน"
+   },
+   "My_Vault": {
+      "message": "ตู้เซฟของฉัน"
+   },
+   "Myanmar": {
+      "message": "พม่า"
+   },
+   "NAME": {
+      "message": "ชื่อ"
+   },
+   "Name_": {
+      "message": "ชื่อ:"
+   },
+   "Name__a_z_": {
+      "message": "ชื่อ (a-z)"
+   },
+   "Name__z_a_": {
+      "message": "ชื่อ (a-z)"
+   },
+   "Name_on_Card": {
+      "message": "ชื่อตามบัตร"
+   },
+   "Name_on_card": {
+      "message": "ชื่อที่ปรากฎในบัตร"
+   },
+   "Nameproper": {
+      "message": "ชื่อ"
+   },
+   "Namibia": {
+      "message": "นามีเบีย"
+   },
+   "Nationality": {
+      "message": "สัญชาติ"
+   },
+   "Nauru": {
+      "message": "นาอูรู"
+   },
+   "Nepal": {
+      "message": "เนปาล"
+   },
+   "Netherlands": {
+      "message": "เนเธอร์แลนด์"
+   },
+   "Netherlands_Antilles": {
+      "message": "เนเธอร์แลนด์แอนทิลลิส"
+   },
+   "Never": {
+      "message": "ไม่ต้องอีก"
+   },
+   "Never_Add_Site": {
+      "message": "ปิดการเพิ่มเว็บ"
+   },
+   "Never_Ask_Again": {
+      "message": "ไม่ต้องถามอีก"
+   },
+   "Never_AutoFill": {
+      "message": "ปิดการกรอกอัตโนมัติ"
+   },
+   "Never_AutoLogin": {
+      "message": "ปิดการล็อกอินอัตโนมัติ"
+   },
+   "Never_Fill_Forms": {
+      "message": "ปิดการกรอกแบบฟอร์ม"
+   },
+   "Never_For_This_Domain": {
+      "message": "ปิดใช้งานสำหรับโดเมนนี้"
+   },
+   "Never_For_This_Page": {
+      "message": "ปิดการใช้งานหน้านี้"
+   },
+   "Never_For_This_Site": {
+      "message": "ปิดการใช้งานเว็บนี้"
+   },
+   "Never_Generate_Password": {
+      "message": "ปิดใช้งานตัวสร้างรหัสผ่าน"
+   },
+   "Never_Show_Again": {
+      "message": "อย่าแสดงสิ่งนี้อีก"
+   },
+   "Never___": {
+      "message": "ไม่เคย ..."
+   },
+   "New_Caledonia": {
+      "message": "นิวแคลิโดเนีย"
+   },
+   "New_Master_Password": {
+      "message": "รหัสผ่านหลักใหม่"
+   },
+   "New_Zealand": {
+      "message": "นิวซีแลนด์"
+   },
+   "New_here__Create_an_Account_": {
+      "message": "ยังไม่เคยใช้? สร้างบัญชี."
+   },
+   "New_to_LastPass_": {
+      "message": "ไม่เคยใช้ LastPass?"
+   },
+   "Newfoundland": {
+      "message": "นิวฟาว์นแลนด์"
+   },
+   "News": {
+      "message": "ข่าว"
+   },
+   "Nicaragua": {
+      "message": "นิการากัว"
+   },
+   "Niger": {
+      "message": "ไนเจอร์"
+   },
+   "Nigeria": {
+      "message": "ไนจีเรีย"
+   },
+   "Niue": {
+      "message": "นีอูเอ"
+   },
+   "No": {
+      "message": "ไม่"
+   },
+   "No_Email": {
+      "message": "ไม่มีอีเมล"
+   },
+   "No_Matching_Sites_": {
+      "message": "ไม่มีเว็บไซต์ที่ตรงกับที่คุณค้นหา"
+   },
+   "No_Thanks": {
+      "message": "ไม่, ขอบคุณ"
+   },
+   "No_Updates_Are_Available": {
+      "message": "ไม่มีการอัปเดทใหม่ขณะนี้"
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "ไม่ ฉันไม่ต้องการให้ LastPass ช่วยกรอกแบบฟอร์มอัตโนมัติ"
+   },
+   "No__Save_as_New_Entry": {
+      "message": "ไม่ต้องการ บันทึกเป็นรายการใหม่เลย"
+   },
+   "No__Thanks": {
+      "message": "ไม่หละ ขอบคุณ"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "ไม่ ฉันไม่ต้องการนำเข้ารายการใดๆจากที่เก็บรหัสผ่าน"
+   },
+   "No_matches_found__Please_search_again_": {
+      "message": "ไม่พบส่งที่ตรงกัน กรุณาลองค้นหาอีกครั้ง"
+   },
+   "None_Available": {
+      "message": "ไม่มีรายการ"
+   },
+   "Norfolk_Island": {
+      "message": "เกาะนอร์ฟอล์ก"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "หมู่เกาะมาเรียนาเหนือ"
+   },
+   "Norway": {
+      "message": "นอร์เวย์"
+   },
+   "Norwegian": {
+      "message": "ภาษานอร์เวย์"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "ภาษานอร์เวย์มาตรฐาน"
+   },
+   "Not_Now": {
+      "message": "ไม่ต้องสำหรับตอนนี้"
+   },
+   "Note": {
+      "message": "บันทึก"
+   },
+   "Note_Type": {
+      "message": "ชนิดของบันทึก"
+   },
+   "Note_Type_": {
+      "message": "ชนิดของโน้ต"
+   },
+   "Notes": {
+      "message": "หมายเหตุ"
+   },
+   "Notes_": {
+      "message": "หมายเหตุ :"
+   },
+   "Notifications": {
+      "message": "การแจ้งเตือน"
+   },
+   "November": {
+      "message": "พฤศจิกายน"
+   },
+   "Nuku_alofa": {
+      "message": "นูกูอะโลฟา"
+   },
+   "Number": {
+      "message": "หมายเลข"
+   },
+   "Number_of_Licenses": {
+      "message": "จำนวนของไลเซนส์"
+   },
+   "OK": {
+      "message": "ตกลง"
+   },
+   "October": {
+      "message": "ตุลาคม"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "เสนอสร้างรหัสผ่านที่ปลอดภัย"
+   },
+   "Old_Password": {
+      "message": "รหัสผ่านเดิม"
+   },
+   "Oman": {
+      "message": "โอมาน"
+   },
+   "One_Time_Passwords": {
+      "message": "รหัสผ่านชั่วคราว"
+   },
+   "Open_All": {
+      "message": "เปิดทั้งหมด"
+   },
+   "Open_All_Favorites": {
+      "message": "เปิดรายการโปรดทั้งหมด"
+   },
+   "Open_All_Sites": {
+      "message": "เปิดทุกเว็บไซต์"
+   },
+   "Open_Dashlane___File___Export___CSV___Import_the_resulting_file_": {
+      "message": "เปิด Dashlane - ไฟล์ - ส่งออก - CSV นำเข้าไฟล์ที่ได้มา"
+   },
+   "Open_Favorites": {
+      "message": "เปิดรายการโปรด"
+   },
+   "Open_Favorites_in_Tabs": {
+      "message": "เปิดรายการโปรดในแท็บ"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "เปิดตู้เซฟ LastPass ของฉัน"
+   },
+   "Open_My_Vault": {
+      "message": "เปิดตู้เซฟของฉัน"
+   },
+   "Open_New_Pages_in": {
+      "message": "เปิดหน้าใหม่ใน"
+   },
+   "Open_Sticky_Password___Manage_Database___Export___Export_as_text__Import_this_file": {
+      "message": "เปิด Sticky Password - จัดการฐานข้อมูล - ส่งออก - ส่งออกเป็นข้อความ นำเข้าไฟล์นี้"
+   },
+   "Opera": {
+      "message": "โอเปร่า"
+   },
+   "Opera_Password_Manager": {
+      "message": "ตัวจัดการรหัสผ่านของโอเปร่า"
+   },
+   "Or__would_you_like_LastPass_to_save_a_new_user_password_for_this_site_": {
+      "message": "หรือคุณต้องการให้ LastPass บันทึกชื่อผู้ใช้/รหัสผ่านสำหรับเว็บไซต์นี้ใหม่?"
+   },
+   "Order_Number": {
+      "message": "จำนวนที่สั่งซื้อ"
+   },
+   "Order_Total": {
+      "message": "ยอดรวมการสั่งซื้อ"
+   },
+   "Order__": {
+      "message": "คำสั่ง #"
+   },
+   "Organization": {
+      "message": "องค์กร"
+   },
+   "Other": {
+      "message": "อื่น ๆ"
+   },
+   "Other_Sessions": {
+      "message": "เซสชั่นอื่นๆ"
+   },
+   "Overall_Progress_": {
+      "message": "ความคืบหน้าโดยรวม:"
+   },
+   "PASSWORDupper": {
+      "message": "รหัสผ่าน"
+   },
+   "PINs_Password_Manager": {
+      "message": "ตัวจัดการรหัสผ่าน PINs"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "เวลาแปซิฟิก (อเมริกา & แคนาดา)"
+   },
+   "Page_Down": {
+      "message": "Page Down"
+   },
+   "Page_Up": {
+      "message": "Page Up"
+   },
+   "Pakistan": {
+      "message": "ปากีสถาน"
+   },
+   "Palau": {
+      "message": "ปาเลา"
+   },
+   "Palestinian_Territories": {
+      "message": "ปาเลสไตน์, ดินแดน"
+   },
+   "Panama": {
+      "message": "ปานามา"
+   },
+   "Papua_New_Guinea": {
+      "message": "ปาปัวนิวกินี"
+   },
+   "Paraguay": {
+      "message": "ปารากวัย"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passphrase": {
+      "message": "คำที่ใช้สร้างรหัส"
+   },
+   "Passport": {
+      "message": "พาสปอร์ต"
+   },
+   "Password": {
+      "message": "รหัสผ่าน"
+   },
+   "Password_": {
+      "message": "รหัสผ่าน:"
+   },
+   "Password_Agent": {
+      "message": "Password Agent"
+   },
+   "Password_Alerts": {
+      "message": "การแจ้งเตือนรหัสผ่าน"
+   },
+   "Password_Copied": {
+      "message": "คัดลอกรหัสผ่านแล้ว"
+   },
+   "Password_Corral": {
+      "message": "Password Corral"
+   },
+   "Password_Depot": {
+      "message": "Password Depot"
+   },
+   "Password_Dragon": {
+      "message": "Password Dragon"
+   },
+   "Password_History": {
+      "message": "ประวัติรหัสผ่าน"
+   },
+   "Password_Keeper": {
+      "message": "Password Keeper"
+   },
+   "Password_Length": {
+      "message": "ความยาวรหัสผ่าน"
+   },
+   "Password_Length_": {
+      "message": "ความยาวของรหัสผ่าน:"
+   },
+   "Password_Management_for_Business": {
+      "message": "จัดการรหัสผ่านสำหรับองค์กร"
+   },
+   "Password_Reminder": {
+      "message": "ตัวช่วยเตือนความจำรหัสผ่าน"
+   },
+   "Password_Reminder_": {
+      "message": "การเตือนรหัสผ่าน:"
+   },
+   "Password_Safe": {
+      "message": "Password Safe"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "ตัวเตือนความจำรหัสผ่านไม่ตรงกับรหัสผ่าน"
+   },
+   "Password_updated_": {
+      "message": "ปรับปรุงรหัสผ่าน"
+   },
+   "Passwords_Max": {
+      "message": "Passwords Max"
+   },
+   "Pending": {
+      "message": "รอยืนยัน"
+   },
+   "Pending_Invites_": {
+      "message": "รอยืนยันคำเชิญชวน:"
+   },
+   "Pending_Share": {
+      "message": "รอยืนยันการแชร์"
+   },
+   "Permissions_": {
+      "message": "การอนุญาต:"
+   },
+   "Personal": {
+      "message": "ส่วนบุคคล"
+   },
+   "Personal_Account_Email_": {
+      "message": "อีเมลส่วนตัว:"
+   },
+   "Personal_Account_Master_Password_": {
+      "message": "รหัสผ่านหลักส่วนตัว"
+   },
+   "Peru": {
+      "message": "เปรู"
+   },
+   "Philippines": {
+      "message": "ฟิลิปปินส์"
+   },
+   "Phone_Number": {
+      "message": "หมายเลขโทรศัพท์"
+   },
+   "Phone_number": {
+      "message": "หมายเลขโทรศัพท์"
+   },
+   "Physician_Address": {
+      "message": "ที่อยู่จริง"
+   },
+   "Physician_Name": {
+      "message": "ชื่อจริง"
+   },
+   "Physician_Phone": {
+      "message": "เบอร์โทรจริง"
+   },
+   "Pin": {
+      "message": "PIN"
+   },
+   "Pitcairn": {
+      "message": "พิตแคร์น"
+   },
+   "Please_Make_a_Selection": {
+      "message": "กรุณาเลือก"
+   },
+   "Please_Wait___": {
+      "message": "กรุณารอ..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "โปรดตอบคำถามต่อไปนี้"
+   },
+   "Please_choose_the_type_of_export_you_would_like_to_perform_": {
+      "message": "กรุณาเลือกประเภทของการส่งออกที่คุณต้องการจะดำเนินการ:"
+   },
+   "Please_close_this_window": {
+      "message": "กรุณาปิดหน้าต่างนี้"
+   },
+   "Please_do_not_close_this_window__while_LastPass_changes_your_password_": {
+      "message": "กรุณาอย่าปิดหน้าต่างนี้, LastPass กำลังเปลี่ยนรหัสผ่านของคุณ"
+   },
+   "Please_enter_your_multifactor_authentication_code_": {
+      "message": "กรุณาใส่รหัสการยืนยันสองขั้นตอนของคุณ"
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": "กรุณาเปิดหน้านี้ทิ้งไว้จนกว่าการดำเนินการจะเสร็จสมบูรณ์"
+   },
+   "Please_note_that_upgrading_from_LastPass_Local_to_LastPass_Online_will_result_in_your_password_data_being_uploaded_in_its_encrypted_format_to_LastPass_servers___You_will_be_able_to_access_your_data_from_anywhere__and_LastPass_will_not_be_able_to_read_it___Would_you_like_to_continue_": {
+      "message": "โปรดทราบว่าการปรับรุ่นจาก Lastpass ภายใน ไปยัง Lastpass ออนไลน์ จะทำให้ข้อมูลรหัสผ่านของคุณจะถูกอัพโหลดในแบบเข้ารหัสไปยังเซิฟเวอร์ Lastpass คุณจะสามารถเข้าถึงข้อมูลของคุณได้จากทุกที่ และ Lastpass จะไม่สามารถอ่านมันได้ คุณต้องการจะดำเนินการต่อหรือไม่?"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "โปรดตั้งชื่อคอมพิวเตอร์เครื่องนี้"
+   },
+   "Please_reload_the_page_to_view_your_changes_": {
+      "message": "กรุณารีโหลดหน้าใหม่เพื่อดูการเปลี่ยนแปลงของคุณ"
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "กรุณาเริ่มต้นเบราว์เซอร์ของคุณใหม่ทั้งหมดเพื่อเริ่มต้นใช้ LastPass Online"
+   },
+   "Please_select": {
+      "message": "กรุณาเลือก"
+   },
+   "Please_select_from_an_existing_Form_Fill_Profile_or_create_a_new_profile_": {
+      "message": "โปรดเลือกโปรไฟล์แบบฟอร์มที่มีอยู่ หรือสร้างโปรไฟล์ขึ้นมาใหม่"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "โปรดเลือกเว็บไซต์ที่คุณต้องการใช้การเปลี่ยนแปลงนี้."
+   },
+   "Please_try_again_": {
+      "message": "โปรดลองอีกครั้ง"
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "โปรดไปที่ https://lastpass.com เพื่อสร้างบัญชีในภายหลัง."
+   },
+   "Poland": {
+      "message": "โปแลนด์"
+   },
+   "Policy_Number": {
+      "message": "หมายเลขความปลอดภััย"
+   },
+   "Policy_Type": {
+      "message": "ชนิดของนโยบายความปลอดภัย"
+   },
+   "Polish": {
+      "message": "ภาษาโปแลนด์"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "Server Poll สำหรับการเปลี่ยนแปลงบัญชี (นาที)"
+   },
+   "Port": {
+      "message": "พอร์ต"
+   },
+   "Portugal": {
+      "message": "โปรตุเกส"
+   },
+   "Portuguese": {
+      "message": "ภาษาโปรตุเกส"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "ภาษาโปรตุเกส (บราซิล)"
+   },
+   "Preferences": {
+      "message": "การตั้งค่า"
+   },
+   "Premium_User": {
+      "message": "ผู้ใช้พรีเมี่ยม"
+   },
+   "Price": {
+      "message": "ราคา"
+   },
+   "Print": {
+      "message": "พิมพ์"
+   },
+   "Print_Screen": {
+      "message": "พิมพ์ภาพหน้าจอ"
+   },
+   "Print_Secure_Notes": {
+      "message": "พิมพ์บันทึกที่ปลอดภัย"
+   },
+   "Print_Sites": {
+      "message": "พิมพ์เว็บ"
+   },
+   "Privacy": {
+      "message": "ความเป็นส่วนตัว"
+   },
+   "Private_Key": {
+      "message": "รหัสลับส่วนตัว"
+   },
+   "Product": {
+      "message": "ผลิตภัณฑ์"
+   },
+   "Profile": {
+      "message": "โปรไฟล์"
+   },
+   "Profile_ID": {
+      "message": "โปรไฟล์ ID"
+   },
+   "Profile_language": {
+      "message": "ภาษา"
+   },
+   "Profile_name": {
+      "message": "ชื่อโปรไฟล์"
+   },
+   "Progress": {
+      "message": "ความคืบหน้า"
+   },
+   "Pronounceable": {
+      "message": "คำนาม"
+   },
+   "Protected": {
+      "message": "ถูกป้องกัน"
+   },
+   "Public_Key": {
+      "message": "รหัสลับสาธารณะ"
+   },
+   "Publisher": {
+      "message": "ผู้จัดพิมพ์"
+   },
+   "Puerto_Rico": {
+      "message": "เปอร์โตริโก"
+   },
+   "Purchase_Date": {
+      "message": "วันที่ซื้อ"
+   },
+   "Purge": {
+      "message": "กำจัด"
+   },
+   "Qatar": {
+      "message": "กาตาร์"
+   },
+   "Re_Enter_Password": {
+      "message": "ใส่รหัสผ่านใหม่"
+   },
+   "Re_enter_your_master_password_": {
+      "message": "ใส่รหัสผ่านหลักอีกครั้ง:"
+   },
+   "Read_Only": {
+      "message": "อ่านเท่านั้น"
+   },
+   "Reason": {
+      "message": "เหตุผล"
+   },
+   "Recent_Sites": {
+      "message": "เว็บล่าสุด"
+   },
+   "Recently_Used": {
+      "message": "ถูกใช้เมื่อเร็วๆนี้"
+   },
+   "Recheck_Page": {
+      "message": "ตรวจสอบหน้านี้อีกครั้ง"
+   },
+   "Recipient_Email_Addresses_": {
+      "message": "อีเมลของผู้รับ:"
+   },
+   "Recipient__a_z_": {
+      "message": "ชื่อผู้รับ (a-z)"
+   },
+   "Recipient__z_a_": {
+      "message": "ชื่อผู้รับ (a-z)"
+   },
+   "Recipients_": {
+      "message": "ผู้รับ:"
+   },
+   "Recommended": {
+      "message": "แนะนำ"
+   },
+   "Recommended_Options": {
+      "message": "ออปชั่นที่แนะนำ"
+   },
+   "Reencrypting_Data___": {
+      "message": "กำลังเข้ารหัสข้อมูลใหม่ ..."
+   },
+   "Refer_a_Friend__Earn_Premium": {
+      "message": "แนะนำเพื่อน แล้วรับพรีเมี่ยม"
+   },
+   "Refer_a_Friend_invitations": {
+      "message": "แนะนำเพื่อน"
+   },
+   "Refresh": {
+      "message": "รีเฟรช"
+   },
+   "Refresh_Sites": {
+      "message": "รีเฟรชเว็บไซต์"
+   },
+   "Reject": {
+      "message": "ปฏิเสธ"
+   },
+   "Remember_Email": {
+      "message": "จำอีเมล์"
+   },
+   "Remember_Password": {
+      "message": "จำรหัสผ่าน"
+   },
+   "Remember_every_password": {
+      "message": "จำทุกรหัสผ่าน"
+   },
+   "Remove": {
+      "message": "ลบ"
+   },
+   "Remove_Favorite": {
+      "message": "ลบรายการโปรด"
+   },
+   "Remove_Personal_Account": {
+      "message": "ลบข้อมูลส่วนบุคคล"
+   },
+   "Remove_Site_from_Favorites": {
+      "message": "ลบเว็บไซต์ออกจากรายการโปรด"
+   },
+   "Rename": {
+      "message": "เปลี่ยนชื่อ"
+   },
+   "Rename_Group": {
+      "message": "เปลี่ยนชื่อโฟลเดอร์"
+   },
+   "Replace_Existing_Site": {
+      "message": "แทนที่อยู่ของเว็บไซต์"
+   },
+   "Request_failed__is_your_Internet_connection_down_": {
+      "message": "คำร้องผิดพลาด อินเตอร์ของคุณมีปัญหาหรือเปล่า?"
+   },
+   "Require_All_Character_Type": {
+      "message": "ต้องใช้ตัวอักษรทั้งหมด"
+   },
+   "Require_All_Character_Types": {
+      "message": "ต้องใช้ตัวอักษรทั้งหมด"
+   },
+   "Require_Every_Character_Type": {
+      "message": "ใช้ตัวอักษรทุกประเภท"
+   },
+   "Require_Password_Reprompt": {
+      "message": "ต้องกรอกรหัสผ่านอีกครั้ง"
+   },
+   "Required_to_Create_Account": {
+      "message": "ต้องสร้างชื่อผู้ใช้"
+   },
+   "Resend_Invitation": {
+      "message": "ส่งคำเชิญช่วนใหม่อีกครั้ง"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "เคารพการใช้ AutoComplete=off: ยอมให้เว็บไซด์ยกเลิกการเติมข้อมูลอัตโนมัติ"
+   },
+   "Restore": {
+      "message": "กูคืน"
+   },
+   "Reunion": {
+      "message": "การรวมตัวใหม่"
+   },
+   "Revelation_Password_Manager": {
+      "message": "Revelation Password Manager"
+   },
+   "Revoke_Access": {
+      "message": "ยกเลิกบัญชี"
+   },
+   "Right": {
+      "message": "Right"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "โรมาเนีย"
+   },
+   "Routing_Number": {
+      "message": "เลขเราติง"
+   },
+   "Routing_number": {
+      "message": "Routing number"
+   },
+   "Russian": {
+      "message": "ภาษารัสเซีย"
+   },
+   "Russian_Federation": {
+      "message": "รัสเซีย, สหพันธรัฐ"
+   },
+   "Rwanda": {
+      "message": "รวันดา"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "เว็บไซต์"
+   },
+   "SMTP_Port": {
+      "message": "พอร์ต SMTP"
+   },
+   "SMTP_Server": {
+      "message": "เซฟเวอร์ SMTP"
+   },
+   "SPB_Wallet": {
+      "message": "SPB Wallet"
+   },
+   "SSH_Key": {
+      "message": "SSH คีย์"
+   },
+   "SSID": {
+      "message": "SSID"
+   },
+   "SUCCESS": {
+      "message": "สำเร็จ!"
+   },
+   "SWIFT_Code": {
+      "message": "รหัส SWIFT"
+   },
+   "Safari": {
+      "message": "ซาฟารี"
+   },
+   "Safari_Password_Manager": {
+      "message": "ผู้จัดการรหัสผ่าน Safari"
+   },
+   "Saint_Barthelemy": {
+      "message": "เซนต์บาร์เตเลมี"
+   },
+   "Saint_Helena": {
+      "message": "เซนต์เฮเลนา"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "เซนต์คิตส์และเนวิส"
+   },
+   "Saint_Lucia": {
+      "message": "เซนต์ลูเซีย"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "เซนต์มาร์ติน (ส่วนของฝรั่งเศส)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "แซงปีแยร์และมีเกอลง"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "เซนต์วินเซนต์และเกรนาดีนส์"
+   },
+   "Samoa": {
+      "message": "หมู่เกาะซามัว"
+   },
+   "San_Marino": {
+      "message": "ซานมารีโน"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "เซาตูเมและปรินซิ"
+   },
+   "Saudi_Arabia": {
+      "message": "ซาอุดีอาระเบีย"
+   },
+   "Save": {
+      "message": "บันทึก"
+   },
+   "Save_All_Entered_Data": {
+      "message": "บันทึกข้อมูลที่ได้กรอกไปทั้งหมด"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "บันทึกรายละเอียดบัตรเครดิต"
+   },
+   "Save_Form_Fill_profile": {
+      "message": "บันทึกโปรไฟล์แบบฟอร์ม"
+   },
+   "Save_New_Site": {
+      "message": "บันทึกเว็บไซต์ใหม่"
+   },
+   "Save_Password_to_Vault": {
+      "message": "บันทึกรหัสผ่านไปยังตู้เซฟ"
+   },
+   "Save_Password_to_Vault_": {
+      "message": "บันทึกรหัสผ่านไปยังตู้เซฟ?"
+   },
+   "Save_Site": {
+      "message": "บันทึกเว็บไซต์"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "บันทึกการปิดการใช้งานรหัสผ่านครั้งเดียวเฉพาะส่วนสำหรับการกู้คืนบัญชี"
+   },
+   "Save_and_fill_passwords_for_any_website_or_app__Search_them_all_from_your_vault_": {
+      "message": "กรอกและบันทึกรหัสผ่านทุกเว็บไซต์หรือแอพ ค้นหารหัสทั้งหมดจากตู้เซฟของคุณ"
+   },
+   "Save_the_password_to_your_LastPass_Vault_": {
+      "message": "บันทึกรหัสผ่านไปยังตู้เซฟ LastPass ของคุณ?"
+   },
+   "Save_this_password_as_a_new_entry": {
+      "message": "บันทึกรหัสผ่านนี้เป็นรายการใหม่ไหม"
+   },
+   "Save_this_password_as_a_new_entry_": {
+      "message": "บันทึกรหัสผ่านเป็นรายการใหม่ไหม?"
+   },
+   "Save_this_website_into_your_LastPass_Vault_": {
+      "message": "บันทึกเว็บไซต์นี้ไปยังตู้เซฟ LastPass ของคุณ!"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "บันทึกการเปลี่ยนแปลงของคุณและปิดหน้าต่างนี้"
+   },
+   "Save_your_password_to_your_LastPass_Vault_": {
+      "message": "บันทึกรหัสผ่านของคุณไปยังตู้เซฟ LastPass ของคุณ?"
+   },
+   "Saved_Passwords": {
+      "message": "บันทึกรหัสผ่านแล้ว"
+   },
+   "Screen_Keyboard": {
+      "message": "แป้นพิมพ์บนหน้าจอ"
+   },
+   "Search_All_Data": {
+      "message": "ค้นหาข้อมูลทั้งหมด"
+   },
+   "Search_All_Groups": {
+      "message": "ค้นหาโฟลเดอร์ทั้งหมด"
+   },
+   "Search_All_Notes": {
+      "message": "ค้นหาบันทึกทั้งหมด"
+   },
+   "Search_All_Sites": {
+      "message": "ค้นหาเว็บไซต์ทั้งหมด"
+   },
+   "Search_LastPass_Vault": {
+      "message": "ค้นหาตู้เซฟ LastPass"
+   },
+   "Search_Vault": {
+      "message": "ค้นหาตู้เซฟ"
+   },
+   "Search_within_secure_notes": {
+      "message": "ค้นหาในโน้ตเข้ารหัส"
+   },
+   "Searchproper": {
+      "message": "ค้นหา"
+   },
+   "Secure_Note": {
+      "message": "บันทึกด้านความปลอดภัย"
+   },
+   "Secure_Notes": {
+      "message": "สมุดโน๊ต"
+   },
+   "Security": {
+      "message": "ความปลอดภัย"
+   },
+   "Security_Alert": {
+      "message": "แจ้งเตือนความปลอดภัย"
+   },
+   "Security_Alert__Master_Password_Reused": {
+      "message": "แจ้งเตือนความปลอดภัย: ใช้รหัสผ่านหลักซ้ำ"
+   },
+   "Security_Alert__This_site_has_the_same_password_as_your_LastPass_account__To_protect_all_of_your_online_accounts__it_is_recommended_that_you_change_your_LastPass_Master_Password_": {
+      "message": "แจ้งเตือนความปลอดภัย: เว็บไซต์นี้มีรหัสผ่านเดียวกับรหัสผ่านบัญชี LastPass ของคุณ เพื่อป้องกันบัญชีออนไลน์ทั้งหมดของคุณ เราแนะนำให้คุณเปลี่ยนรหัสผ่านหลัก LastPass ของคุณ"
+   },
+   "Security_Challenge": {
+      "message": "ท้าประลองความปลอดภัย"
+   },
+   "Security_Check": {
+      "message": "การตรวจสอบความปลอดภัย"
+   },
+   "Security_Code": {
+      "message": "รหัสรักษาความปลอดภัย"
+   },
+   "Security_code": {
+      "message": "รหัสรักษาความปลอดภัย"
+   },
+   "Select": {
+      "message": "เลือก"
+   },
+   "Select_All": {
+      "message": "เลือกทั้งหมด"
+   },
+   "Select_Identity": {
+      "message": "เลือกอัตลักษณ์"
+   },
+   "Selected_Items": {
+      "message": "รายการที่ถูกเลือก"
+   },
+   "Send": {
+      "message": "ส่ง"
+   },
+   "Send_Email": {
+      "message": "ส่งอีเมล"
+   },
+   "Send_SMS_passcodes": {
+      "message": "ส่งรหัส SMS"
+   },
+   "Send_Test_Email": {
+      "message": "ทดลองส่งอีเมล"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "ส่งรายงานข้อผิดพลาดที่ไม่ระบุชื่อเพื่อช่วยปรับปรุง LastPass"
+   },
+   "Sender__a_z_": {
+      "message": "ชื่อผู้ส่ง (a-z)"
+   },
+   "Sender__z_a_": {
+      "message": "ชื่อผู้ส่ง (a-z)"
+   },
+   "Senegal": {
+      "message": "เซเนกัล"
+   },
+   "September": {
+      "message": "กันยายน"
+   },
+   "Serbia": {
+      "message": "เซอร์เบีย"
+   },
+   "Server": {
+      "message": "เซฟเวอร์"
+   },
+   "Sesame": {
+      "message": "Sesame"
+   },
+   "SesameWrongButton": {
+      "message": "สำหรับการดูข้อมูลของคนเมื่อไม่ได้เชื่อมต่อ คุณต้องเปิดการทำงานของ Sesame และใช้ปุ่ม 'คัดลอกรหัสผ่านโดยไม่เชื่อมต่อ' แทนปุ่ม 'สร้างรหัสผ่านแบบครั้งเดียว'"
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "การรับรองความถูกต้องของ Sesame Multifactor"
+   },
+   "Sessions": {
+      "message": "เซสชัน"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "ตั้งค่าช่องกรอกข้อมูลของแบบฟอร์มที่กำหนดเอง"
+   },
+   "Settings": {
+      "message": "การตั้งค่า"
+   },
+   "Sex": {
+      "message": "เพศ"
+   },
+   "Seychelles": {
+      "message": "เซเชลส์"
+   },
+   "Share": {
+      "message": "แชร์"
+   },
+   "Share_Folder": {
+      "message": "แฟ้มที่แบ่งปัน"
+   },
+   "Share_Selected": {
+      "message": "แชร์ตัวเลือกนี้"
+   },
+   "Share_Site": {
+      "message": "แบ่งปันเว็บไซต์"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "แชร์สถานะการล็อกอินระหว่างบราวเซอร์"
+   },
+   "Share_offer_from": {
+      "message": "มีคำขอแชร์รหัสผ่านจาก"
+   },
+   "Shared_Folders": {
+      "message": "แชร์โฟลเดอร์"
+   },
+   "Shares": {
+      "message": "แชร์"
+   },
+   "Shift": {
+      "message": "Shift"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "ต้องการให้ LastPass จำรหัสผ่านนี้หรือไม่?"
+   },
+   "Show": {
+      "message": "แสดง"
+   },
+   "Show_Advanced_Options": {
+      "message": "แสดงตัวเลือกขั้นสูง"
+   },
+   "Show_All": {
+      "message": "แสดงทั้งหมด"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "ให้แสดงแถบเตือน ว่ามีการเปลี่ยนแปลงของรหัสผ่าน"
+   },
+   "Show_Deleted_Items": {
+      "message": "แสดงสิ่งที่ลบแล้ว"
+   },
+   "Show_Deleted_Sites": {
+      "message": "แสดงเว็บไซต์ที่ถูกลบ"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "แสดงแถบเตือนสำหรับกรอกข้อมูล"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "แสดงการแจ้งเตือนการกรอกแบบฟอร์ม"
+   },
+   "Show_Matching_Sites": {
+      "message": "แสดงเว็บที่ตรงกัน"
+   },
+   "Show_Matching_Sites_Count_in_Toolbar": {
+      "message": "แสดงจำนวนเว็บไซต์ตรงกันบน Toolbar"
+   },
+   "Show_Matching_Sites_in_top_level_menu": {
+      "message": "แสดงจำนวนเว็บไซต์บนเมนู"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "แสดงตู้เซฟ LastPass ของฉันหลังจากล็อกอิน"
+   },
+   "Show_Notifications": {
+      "message": "แสดงการแจ้งเตือน"
+   },
+   "Show_Password": {
+      "message": "แสดงรหัสผ่าน"
+   },
+   "Show_Password_History": {
+      "message": "แสดงประวัติรหัสผ่าน"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "แสดงบันทึกบาร์ประกาศไซต์"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "แสดงการแจ้งให้บันทึกเว็บไซต์"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "แสดงเว็บไซต์บนโฟลเดอร์"
+   },
+   "Show_Username_History": {
+      "message": "แสดงประวัติชื่อผู้ใช้"
+   },
+   "Show_Vault_After_Log_in": {
+      "message": "แสดงตู้เซฟหลังลงชื่อเข้าใช้"
+   },
+   "Show_Vault_After_Login": {
+      "message": "แสดงตู้เซฟหลักลงชื่อเข้าใช้"
+   },
+   "Show_all_sites": {
+      "message": "แสดงเว็บไซต์ทั้งหมด"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "แสดงการแจ้งเตือนเฉพาะหลังจากคลิก"
+   },
+   "Show_notifications_below_browser": {
+      "message": "แสดงการแจ้งเตือนด้านล่างของบราวเซอร์"
+   },
+   "Show_or_Hide_Password": {
+      "message": "ซ่อนหรือแสดงรหัสผ่าน"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "แสดงช่องเติมข้อมูลอื่นๆ"
+   },
+   "Sierra_Leone": {
+      "message": "เซียร์ราลีโอน"
+   },
+   "Sign_In": {
+      "message": "ลงชื่อเข้าใช้"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "ทำใ้้ห้ชีวิตคุณง่ายขึ้น: ใช้ LastPass เพื่อกรอกข้อมูลล็อกอินของเว็บไซต์นี้!"
+   },
+   "Singapore": {
+      "message": "สิงคโปร์"
+   },
+   "Site": {
+      "message": "เว็บไซต์"
+   },
+   "Site_Search": {
+      "message": "ค้นหาเว็บไซต์"
+   },
+   "Sites": {
+      "message": "เว็บไซต์"
+   },
+   "Skip_Tour": {
+      "message": "ข้ามการแนะนำไป"
+   },
+   "Skip_email_verification_of_unknown_devices_and_locations": {
+      "message": "ข้ามการยืนยันอีเมลที่ไม่รู้จักของอุปกรณ์และสถานที่"
+   },
+   "Slovak": {
+      "message": "ภาษาสโลวัก"
+   },
+   "Slovakia": {
+      "message": "สโลวาเกีย"
+   },
+   "Slovenia": {
+      "message": "สโลเวเนีย"
+   },
+   "Social_Security": {
+      "message": "ประกันสังคม"
+   },
+   "Social_Security_Number": {
+      "message": "หมายเลขบัตรประชาชน"
+   },
+   "Social_security_number": {
+      "message": "หมายเลขประกันสังคม"
+   },
+   "Software_License": {
+      "message": "ลิขสิทธิ์ซอฟต์แวร์"
+   },
+   "Solomon_Islands": {
+      "message": "หมู่เกาะโซโลมอน"
+   },
+   "Somalia": {
+      "message": "โซมาเลีย"
+   },
+   "Something_went_a_little_wrong__but_don_t_panic___LastPass_has_saved_your_last_known_password_": {
+      "message": "มีบางอย่างผิดพลาดเล็กน้อย, แต่ไม่ต้องกังวล! LastPass บันทึกรหัสผ่านล่าสุดที่คุณรู้ไว้แล้ว"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "ขออภัย แฟ้มเอกสารที่ถูกแบ่งปันนี้เป็นแบบอ่านอย่างเดียว"
+   },
+   "Sorry__your_password_can_not_be_the_same_as_your_email_address_": {
+      "message": "ขออภัย, รหัสผ่านของคุณไม่สามารถตรงกับที่อยู่อีเมล"
+   },
+   "Sorry__your_password_is_too_short__It_must_be_a_minimum_of_8_characters_long_for_security_reasons_": {
+      "message": "ขออภัย, รหัสผ่านของคุณสั้นเกินไป ต้องมีอย่างต่ำ 8 ตัวอักษรเพื่อความปลอดภัย"
+   },
+   "Sort_By_": {
+      "message": "เรียงโดย:"
+   },
+   "Source": {
+      "message": "ที่มา"
+   },
+   "Source_": {
+      "message": "แหล่งที่มา:"
+   },
+   "South_Africa": {
+      "message": "แอฟริกาใต้"
+   },
+   "South_Georgia": {
+      "message": "เกาะเซาท์จอร์เจีย"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "เกาะเซาท์จอร์เจียและหมู่เกาะเซาท์แซนด์วิช"
+   },
+   "Spain": {
+      "message": "สเปน"
+   },
+   "Spanish": {
+      "message": "ภาษาสเปน"
+   },
+   "Spanish__Mexico_": {
+      "message": "ภาษาสเปน (เม็กซิโก)"
+   },
+   "Special": {
+      "message": "พิเศษ"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sri_Lanka": {
+      "message": "ศรีลังกา"
+   },
+   "Start_Date": {
+      "message": "วันเริ่มต้น"
+   },
+   "Start_Downloading_Folder": {
+      "message": "กำลังเริ่มดาวน์โหลมฟลเดอร์"
+   },
+   "Start_date": {
+      "message": "วันที่เริ่ม"
+   },
+   "State": {
+      "message": "รัฐ"
+   },
+   "State___Province": {
+      "message": "รัฐ / จังหวัด"
+   },
+   "Status": {
+      "message": "สถานะ"
+   },
+   "Sticky_Password": {
+      "message": "Sticky Password"
+   },
+   "Stop_Downloading_Folder": {
+      "message": "หยุดดาวน์โหลดโฟลเดอร์"
+   },
+   "Submit_Form": {
+      "message": "ส่งแบบฟอร์ม"
+   },
+   "Submitting___": {
+      "message": "กำลังส่ง..."
+   },
+   "Sudan": {
+      "message": "ซูดาน"
+   },
+   "Support_Email": {
+      "message": "การสนับสนุนทางอีเมล"
+   },
+   "Suriname": {
+      "message": "ซูรินาเม"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "สฟาลบาร์และยานไมเอน"
+   },
+   "Swaziland": {
+      "message": "สวาซิแลนด์"
+   },
+   "Sweden": {
+      "message": "สวีเดน"
+   },
+   "Swedish": {
+      "message": "ภาษาสวีดิช"
+   },
+   "Swipe_finger": {
+      "message": "รูดนิ้ว"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "รูดนิ้วบนเซ็นเซอร์ลายนิ้วมือ"
+   },
+   "Switzerland": {
+      "message": "สวิสเซอร์แลนด์"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "ซีเรีย, สาธารณรัฐอาหรับ"
+   },
+   "Tabs": {
+      "message": "แท็บ"
+   },
+   "Taiwan": {
+      "message": "ไต้หวัน"
+   },
+   "Tajikistan": {
+      "message": "ทาจิกิสถาน"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "แทนซาเนีย, สหสาธารณรัฐ"
+   },
+   "Tehran": {
+      "message": "เตหะราน"
+   },
+   "Telephone": {
+      "message": "หมายเลขโทรศัพท์"
+   },
+   "Tell_a_friend_": {
+      "message": "บอกเพื่อนของคุณ!"
+   },
+   "Text": {
+      "message": "ข้อความ"
+   },
+   "Text_to_find": {
+      "message": "ข้อความที่ต้องการค้นหา"
+   },
+   "Thailand": {
+      "message": "ไทย"
+   },
+   "That_group_already_exists_": {
+      "message": "โฟลเดอร์นี้มีอยู่แล้ว"
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "เลข 4 หลักของปีที่ออกบัตรเครดิต"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "รหัสผ่านหลักของ Lastpass ที่คุณพิมพ์ซ้ำไม่ตรงกัน"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "รหัสผ่านหลักที่คุณใส่นั้นคือ 'รหัสผ่านเก่า' ซึ่งไม่ใช่รหัสผ่านที่ถูกต้อง"
+   },
+   "The_binary_version_of_the_LastPass_plugin_is_required_for_this_operation__It_can_be_downloaded_from_lastpass_com_": {
+      "message": "จำเป็นต้องใช้ปลั๊กอิน LastPass เวอร์ชันไบนารีสำหรับการทำงานนี้ สามารถดาวน์โหลดได้จาก lastpass.com"
+   },
+   "The_credit_card_number": {
+      "message": "หมายเลขบัตรเครดิต"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "เลข 4 หลักปีที่หมดอายุของบัตรเครดิต"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "เดือนที่หมดอายุของบัตรเครดิต"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "รหัสความปลอดภัยบนบัตร\nใช้ได้กับบัตรเดบิตของยุโรปบางเจ้าเท่านั้น เช่น Maestro"
+   },
+   "The_credit_card_s_security_code__For_most_credit_cards__this_is_the_last_3_digits_of_a_number_printed_on_the_back_of_the_card__For_American_Express_credit_cards__it_is_the_last_4_digits_of_a_number_printed_in_small_print_on_the_front_of_the_card_": {
+      "message": "รหัสความปลอดภัยบนบัตร\nสำหรับบัตรเครดิตทั่วไป มันคือเลข 3 หลัก ที่อยู่ด้านหลังของบัตร\nสำหรับบัตรของอเมริกันเอ็กเพรซ มันจะเป็นตัวเลขเล็กๆ 4 หลักที่พิมพ์อยู่ด้านหน้าของบัตร"
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "ชื่อเต็มบนบัตรเครดิต"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "เดือนที่ออกบัตรเครดิต"
+   },
+   "The_name_of_your_bank": {
+      "message": "ชื่อของธนาคารของคุณ"
+   },
+   "The_notes_field_contains_too_much_data___You_may_store_a_maximum_of_45_000_characters_per_note___Would_you_like_us_to_truncate_the_note_for_you___You_will_lose_some_of_your_data_": {
+      "message": "ขอบเขตของโน๊ตมีข้อมูลมากเกินไป คุณสามารถเก็บข้อมูลได้สูงสุดที่ 45,000 ตัวอักษรต่อ 1 โน๊ต\n\nคุณต้องการให้เราลบข้อความบางส่วนออกจากโน๊ตของคุณหรือไม่? คุณจะเสียข้อมูลบางส่วนไป"
+   },
+   "The_random_password_that_was_generated_has_been_saved_to_your_vault_": {
+      "message": "รหัสผ่านแบบสุ่ม ได้ถูกเก็บไว้ในตู้นิรภัย ของคุณแล้ว"
+   },
+   "The_value_to_be_filled": {
+      "message": "ค่าที่จะใส่ลงไป"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "รุ่นของ Chrome ที่คุณกำลังทำงานอยู่ในปัจจุบันไม่ได้มีการสนับสนุนฐานข้อมูลที่เปิดใช้งาน HTML5 ดังนั้นหน้าเข้าสู่ระบบนี้จะไม่จำอีเมลและรหัสผ่านของคุณและคุณสมบัติอื่น ๆ เช่นการเข้าสู่ระบบโดยอัตโนมัติเมื่อเริ่มต้นเบราว์เซอร์จะไม่ทำงาน คุณอาจจะสามารถแก้ไขปัญหานี้โดยการเพิ่ม - เปิดใช้งานฐานข้อมูลเป็นพารามิเตอร์ไปยัง Google ทางลัดของคุณเบราว์เซอร์ Chrome"
+   },
+   "The_website_needs_you_to_enter_information__Please_close_this_overlay_and_enter_it_": {
+      "message": "เว็บไซต์นี้ต้องการให้คุณกรอกข้อมูล กรุณาปิดกล่องข้อความนี้ แล้วไปกรอกข้อมูล"
+   },
+   "The_website_needs_you_to_enter_information__Please_switch_to_the_tab_and_enter_it_": {
+      "message": "เว็บไซต์นี้ต้องการให้คุณกรอกข้อมูล กรุณาปิดแท็บข้อความนี้ แล้วไปกรอกข้อมูล"
+   },
+   "These_preferences_are_stored_on_your_computer_or_device__you_will_see_this_message_again_if_you_delete_browser_information__or_use_a_different_computer__The_best_way_to_avoid_this_message_is_to_change_your_LastPass_Master_Password_": {
+      "message": "การตั้งค่านี้ถูกจัดเก็บบนคอมพิวเตอร์หรืออุปกรณ์ของคุณ คุณจะพบข้อความนี้อีกครั้งหากคุณลบข้อมูลเบราว์เซอร์ หรือใช้คอมพิวเตอร์เครื่องอื่น ทางที่ดีที่สุดเพื่อซ่อนข้อความนี้คือเปลี่ยนรหัสผ่านหลัก LastPass ของคุณ"
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "คุณลักษณะนี้้ต้องจัดการผ่านหน้าเว็บไซต์เท่านั้น"
+   },
+   "This_computer_is_trusted__do_not_require_a_second_form_of_authentication_for_30_days_": {
+      "message": "คอมเครื่องนี้ ไม่ต้องกรอกรหัสผ่าน 30 วัน"
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "นี่เป็นเว็บไซต์ที่แชร์ไว้ คุณไม่ได้รับอนุญาตให้ดูรหัสผ่าน"
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "นี่คือชื่อหรือ URL สำหรับหน้าเว็บนี้"
+   },
+   "This_may_take_a_while___": {
+      "message": "นี่อาจใช้เวลาสักครู่..."
+   },
+   "This_password_you_use_to_log_into_this_website_": {
+      "message": "รหัสผ่านนี้จะใช้ล็อกอินในเว็บไซต์นี้"
+   },
+   "This_site_has_the_same_password_as_your_LastPass_account__To_protect_all_of_your_online_accounts__it_is_recommended_that_you_change_your_LastPass_Master_Password_": {
+      "message": "เว็บไซต์นี้มีรหัสผ่านเดียวกับรหัสผ่านหลักบัญชี LastPass ของคุณ เพื่อป้องกันบัญชีออนไลน์ทั้งหมดของคุณ เราแนะนำให้คุณเปลี่ยนรหัสผ่านหลัก LastPass ของคุณ"
+   },
+   "Time_Zone": {
+      "message": "เขตเวลา"
+   },
+   "Timed_out": {
+      "message": "หมดเวลา"
+   },
+   "Timed_out_waiting_for_the_page_to_load___Retry_": {
+      "message": "หมดเวลาแล้ว กำลังรอให้เพจโหลด ลองอีกทีหรือไม่?"
+   },
+   "Timor_Leste": {
+      "message": "ติมอร์เลสเต"
+   },
+   "Title": {
+      "message": "ชื่อเรื่อง"
+   },
+   "To_create_your_account__please_re_enter_your_LastPass_master_password": {
+      "message": "เพื่อสร้างบัญชีของคุณ กรุณาใส่รหัสผ่านหลัก LastPass ของคุณอีกครั้ง"
+   },
+   "To_export_1Password_logins__login_to_1Password__Select_all_or_just_passwords_that_you_want_to_export__Then_select__File_menu___Export_All___Text_file_____Or____File_menu___Export_Selected___Text_file____Click_Export_button_and_Save_password_file__and_Import_the_resulting_file_": {
+      "message": "ในการส่งออกข้อมูล 1Password, ลงชื่อเข้าใช้ 1Password เลือกรหัสผ่านทั้งหมดหรือแค่บางส่วนตามที่คุณต้องการส่งออก จากนั้นเลือก เมนูไฟล์ / ส่งออกทั้งหมด / ไฟล์ข้อความ... หรือ เมนูไฟล์ / ส่งออกที่เลือก / ไฟล์ข้อความ... คลิกปุ่มส่งออกและบันทึกไฟล์รหัสผ่าน และนำเข้าไฟล์ที่ได้มา"
+   },
+   "To_export_FireForm_profiles__right_click_the_FireForm_icon__then_choose_Simple_setup___Go_to_the_General_options_tab__click_Export_all_profiles__and_save_an_XML_file___Import_the_resulting_file_": {
+      "message": "เพื่อจะส่งโปรไฟล์ของ Fireform, คลิกขวาที่ไอคอนของ Fireform และเลือกที่การตั้งค่าอย่างง่าย จากนั้นไปที่แท็ปตัวเลือกทั่วไป, คลิกที่ส่งออกโปรไฟล์ทั้งหมด, และบันทึกไฟล์ XML จากนั้นให้นำเข้าไฟล์ที่ถูกสร้างขึ้นออกมา"
+   },
+   "To_export_HP_Password_Safe_save_to_an_HTML_file__Import_the_resulting_file_": {
+      "message": "เพื่อส่งออกไฟล์ของ HP Password Safe ไปที่ไฟล์ HTML. นำเข้าไฟล์ที่ได้"
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "เพื่อเริ่มต้นกับ LastPass คุณจะต้องเพิ่มเว็บไซต์ในบัญชีของคุณ."
+   },
+   "To_import_passwords_from_Firefox_Password_Manager__simply_click_Import_below_": {
+      "message": "คลิ๊กปุ่มข้างล่างนี้ เพื่อนำเข้ารหัสผ่าน จากตัวจัดการรหัสผ่าน ของไฟร์ฟอก"
+   },
+   "To_import_passwords_from_Safari_Password_Manager__simply_click_Import_below_": {
+      "message": "เมื่อต้องการนำเข้ารหัสผ่านจากตัวจัดการรหัสผ่าน Safari เพียงคลิกนำเข้าด้านล่าง"
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "เพื่อป้องกันข้อมูลส่วนบุคคลของคุณและเก็บข้อมูลให้เป็นความลับ,"
+   },
+   "Toggle_LastPass_3_0": {
+      "message": "สลับไปใช้ LastPass เวอร์ชั่น 3.0"
+   },
+   "Togo": {
+      "message": "โตโก"
+   },
+   "Tokelau": {
+      "message": "โตเกเลา"
+   },
+   "Tonga": {
+      "message": "ตองกา"
+   },
+   "Tools": {
+      "message": "เครื่องมือ"
+   },
+   "Tor_Networks": {
+      "message": "Tor Networks"
+   },
+   "Track_History": {
+      "message": "ติดตามประวัติ"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "ตรินิแดดและโตเบโก"
+   },
+   "Trust_this_computer_for_30_days": {
+      "message": "มั่นใจในคอมเครื่องนี้ 30 วัน"
+   },
+   "Trusted_Devices": {
+      "message": "อุปกรณ์ที่น่าเชื่อถือ"
+   },
+   "Try_Again": {
+      "message": "ลองใหม่อีกครั้ง"
+   },
+   "Try_LastPass_Enterprise": {
+      "message": "ลองใช้ LastPass Enterprise ดูสิ"
+   },
+   "Tunisia": {
+      "message": "ตูนิเซีย"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "ตุรกี"
+   },
+   "Turkmenistan": {
+      "message": "เติร์กเมนิสถาน"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "หมู่เกาะเติกส์และเคคอส"
+   },
+   "Tutorials": {
+      "message": "แนะนำ"
+   },
+   "Tuvalu": {
+      "message": "ตูวาลู"
+   },
+   "Type": {
+      "message": "ประเภท"
+   },
+   "Type_": {
+      "message": "ประเภท :"
+   },
+   "URL": {
+      "message": "URL"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "ชื่อผู้ใช้"
+   },
+   "Uganda": {
+      "message": "ยูกันดา"
+   },
+   "Ukraine": {
+      "message": "ยูเครน"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "อูลานบาตอร์, เพิร์ธ"
+   },
+   "Unable_to_proceed__the_website_does_not_allow_automated_password_change_": {
+      "message": "ไม่สามารถดำเนินการได้ ทางเว็บไซต์ ไม่อนุญาตให้เปลี่ยนรหัสผ่านอัตโนมัติ"
+   },
+   "United_Arab_Emirates": {
+      "message": "สหรัฐอาหรับเอมิเรตส์"
+   },
+   "United_Kingdom": {
+      "message": "สหราชอาณาจักร"
+   },
+   "United_States": {
+      "message": "สหรัฐอเมริกา"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "หมู่เกาะขนาดเล็กรอบสหรัฐอเมริกา"
+   },
+   "Unknown": {
+      "message": "ไม่รู้จัก"
+   },
+   "Unselect_All": {
+      "message": "ยกเลิกการเลือกทั้งหมด"
+   },
+   "Untitled": {
+      "message": "Untitled"
+   },
+   "Up": {
+      "message": "Up"
+   },
+   "Upgrade": {
+      "message": "อัพเกรด"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "อัพเกรดเป็น LastPass Online!"
+   },
+   "Upgrade_to_Premium": {
+      "message": "อัพเกรดเป็นพรีเมี่ยม"
+   },
+   "Uploading_Data___": {
+      "message": "กำลังอัพโหลดข้อมูล ..."
+   },
+   "Uruguay": {
+      "message": "อุรุกวัย"
+   },
+   "Use": {
+      "message": "ใช้"
+   },
+   "Use_802_1X": {
+      "message": "ใช้ 802.1X"
+   },
+   "Use_Password": {
+      "message": "ใช้รหัสผ่าน"
+   },
+   "Use_Special_Characters": {
+      "message": "ใช้อักษรพิเศษ"
+   },
+   "Use_Special_Characters_": {
+      "message": "ใช้อักษรพิเศษ"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "ต้องการใช้รหัสนี้เลยไหม? (สำหรับเว็บนี้)"
+   },
+   "User_Group": {
+      "message": "กลุ่มผู้ใช้"
+   },
+   "User_Manual": {
+      "message": "คู่มือการใช้งาน"
+   },
+   "User_name": {
+      "message": "ชื่อผู้ใช้"
+   },
+   "Username_": {
+      "message": "ชื่อผู้ใช้:"
+   },
+   "Username_History": {
+      "message": "ชื่อผู้ใช้ในอดีต"
+   },
+   "Usernameproper": {
+      "message": "บัญชีผู้ใช้"
+   },
+   "Uzbekistan": {
+      "message": "อุสเบกิสถาน"
+   },
+   "Value": {
+      "message": "ค่า"
+   },
+   "Value_to_fill": {
+      "message": "ค่าที่จะใส่"
+   },
+   "Vanuatu": {
+      "message": "วานูอาตู"
+   },
+   "Vault": {
+      "message": "ตู้เซฟ"
+   },
+   "Vault_Tour": {
+      "message": "ทัวร์ในตู้นิรภัย"
+   },
+   "Venezuela": {
+      "message": "เวเนซุเอลา"
+   },
+   "Verify_Your_Email_Address": {
+      "message": "ยืนยันอีเมลของคุณ"
+   },
+   "Version": {
+      "message": "เวอร์ชัน"
+   },
+   "Version_": {
+      "message": "รุ่น:"
+   },
+   "Viet_Nam": {
+      "message": "เวียดนาม"
+   },
+   "View_Deleted_Shared_Folders": {
+      "message": "ดูแชร์โฟลเดอร์ที่ถูกลบแล้ว"
+   },
+   "View_History": {
+      "message": "ดูประวัติ"
+   },
+   "View_Image": {
+      "message": "ดูรูป"
+   },
+   "View_Passwords": {
+      "message": "ดูรหัสผ่านท้้งหมด"
+   },
+   "Virgin_Islands__British_": {
+      "message": "หมู่เกาะเวอร์จิน (อังกฤษ)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "หมู่เกาะเวอร์จิน (อเมริกา)"
+   },
+   "Wallis_and_Futuna": {
+      "message": "วาลลิสและฟุตูนา"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "เตือนก่อนที่จะกรอกแบบฟอร์มที่ไม่ปลอดภัย"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "ชมวิดีโอในการใช้งานพื้นฐาน"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "อีกทั้งเราจะไม่เก็บสำเนาหรือสำรองข้อมูลใดๆเอาไว้"
+   },
+   "Weak_Password": {
+      "message": "รหัสผ่านอ่อนแอ"
+   },
+   "Website": {
+      "message": "เว็บไซต์"
+   },
+   "Website_Auto_Logoff": {
+      "message": "ลงชื่ออกจากเว็บ แบบอัตโนมัติ"
+   },
+   "Website_password_changed": {
+      "message": "เปลี่ยนรหัสผ่านของเว็บแล้ว"
+   },
+   "Website_username_changed": {
+      "message": "เปลี่ยนชื่อผู้ใช้ของเว็บแล้ว"
+   },
+   "Welcome_back_to_LastPass_": {
+      "message": "ยินดีต้อนรับกลับสู่ LastPass,"
+   },
+   "Welcome_back_to_Last__Pass_": {
+      "message": "ยินดีต้อนรับกลับสู่ Last  Pass,"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "ยินดีต้อนรับสู่ LastPass!"
+   },
+   "Welcome_to_LastPass_4_0": {
+      "message": "ขอต้อนรับสู่ LastPass 4.0"
+   },
+   "West_Central_Africa": {
+      "message": "แอฟริกากลางตะวันตก"
+   },
+   "Western_Sahara": {
+      "message": "ซาฮาราตะวันตก"
+   },
+   "What_is_an_Identity_": {
+      "message": "อะไรคือ อัตลักษณ์?"
+   },
+   "Wi_Fi_Password": {
+      "message": "รหัสผ่าน Wi-Fi"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "รหัสผ่าน Wi-Fi"
+   },
+   "Windows": {
+      "message": "Windows"
+   },
+   "Would_you_like_LastPass_to_generate_a_secure_password_for_you_": {
+      "message": "คุณต้องการให้ LastPass ช่วยสร้างรหัสผ่านที่ปลอดภัยให้คุณหรือไม่"
+   },
+   "Would_you_like_LastPass_to_save_your_site_information_": {
+      "message": "คุณต้องการให้ LastPass บันทึกข้อมูลเว็บไซต์ของคุณไหม?"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "คุณต้องการตั้งค่าโปรไฟล์สำหรับกรอกฟิลด์เดี๋ยวนี้หรือไม่?"
+   },
+   "XML_Files": {
+      "message": "ไฟล์ XML"
+   },
+   "Yangon__Rangoon_": {
+      "message": "ย่างกุ้ง"
+   },
+   "Yemen": {
+      "message": "เยเมน"
+   },
+   "Yes": {
+      "message": "ใช่"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "ใช่ ใช้ในเว็บไซต์นี้เลย"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "ใช่ ให้ฉันเลือกว่าจะนำรายการใดเข้าสู่ LastPass."
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "ใช่, ให้ฉันใส่และตรวจสอบข้อมูลที่จะใช้สำหรับกรอกแบบฟอร์ม"
+   },
+   "You_are_moving_sites_to_a_shared_folder__This_will_potentially_make_them_available_to_others___Are_you_sure_you_would_like_to_continue_": {
+      "message": "คุณกำลังย้ายเว็บเข้าไปในแชร์โฟลเดอร์ มันจะทำให้คนอื่นเข้าถึงได้\nคูณยังต้องการจะดำเนินการต่อหรือไม่?"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "คุณไม่สามารถกำหนดค่าฮอตคีย์ซ้ำกันได้"
+   },
+   "You_cannot_move_individually_shared_sites_into_a_shared_folder_": {
+      "message": "คุณไม่สามารถที่จะย้ายการแชร์ส่วนตัวไปในโฟลเดอร์การแชร์ส่วนรวม"
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "คุณได้ตั้งค่า LastPass ในปัจจุบันที่ต้องจำรหัสผ่านของคุณ การทำเช่นนี้เป็นหลักทำให้ตัวเลือกออกจากระบบโดยอัตโนมัติที่คุณได้เลือกที่ไร้ประโยชน์ คุณต้องการที่จะหยุด LastPass การจดจำรหัสผ่านของคุณหรือไม่"
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "คุณยังไม่ได้เลือกโปรไฟล์สำหรับกรอกฟอร์มเริ่มต้น คุณต้องการที่จะเลือกตอนนี้หรือไม่?"
+   },
+   "You_may_also_be_blocking_all_cookies__which_causes_Chrome_to_disallow_HTML5_database_access_": {
+      "message": "คุณอาจกำลังบล็อกคุกกี้ทั้งหมดอยู่ นั่นทำให้ Chrome ไม่อนุญาตให้เข้าถึงฐานข้อมูล HTML5"
+   },
+   "You_may_change_your_Master_Password_through_the_LastPass_website_by_clicking_the_button_below__or_turn_off_Master_Password_security_alerts_using_the_links_at_the_bottom_of_this_page_": {
+      "message": "คุณอาจเปลี่ยนรหัสผ่านหลักของคุณผ่านเว็บไซต์ LastPass โดยคลิกปุ่มด้านล่าง หรือปิดการแจ้งเตือนความปลอดภัยของรหัสผ่านหลักโดยใช้ลิงก์บริเวณส่วนท้ายของหน้านี้"
+   },
+   "You_may_change_your_Master_Password_using_this_form__or_turn_off_Master_Password_security_alerts_using_the_links_below_the_form_": {
+      "message": "คุณอาจเปลี่ยนรหัสผ่านหลักของคุณผ่านแบบฟอร์มนี้ หรือปิดการแจ้งเตือนความปลอดภัยของรหัสผ่านหลักโดยใช้ลิงก์บริเวณส่วนท้ายของหน้านี้"
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "คุณต้องยอมรับที่จะส่งข้อมูลเข้ารหัสไปที่ LastPass.com\n\nLastPass.com จะเข้ารหัสข้อมูลของคุณและส่งมันไปยังเซิฟเวอร์ที่ปลอดภัย\n\nไม่มีใครที่ LastPass ที่สามารถเข้าถึงข้อมูลของคุณเนื่องจากมันจะถูกเข้ารหัสด้วยตัวถอดรหัสซึ่งเป็นความลับที่อยู่ในคอมพิวเตอร์ของคุณ  คุณจึงเป็นคนเดียวที่รู้รหัสผ่านของคุณ"
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "คุณต้องยอมรับข้อตกลงและเงื่อนไขเพื่อที่จะดำเนินการต่อ"
+   },
+   "You_must_enter_a_name_": {
+      "message": "คุณต้องป้อนชื่อ"
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "คุณต้องป้อนชื่อที่ไม่ซ้ำ."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "คุณต้องเริ่มโครมใหม่ หรือออกจากระบบเพื่อให้การเปลี่ยนแปลงมีผล"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "คุณต้องเริ่มเบราว์เซอร์ใหม่ก่อนการเปลี่ยนแปลงทั้งหมดจะมีผล"
+   },
+   "Your_4_digit_birth_year": {
+      "message": "ปีเกิดของคุณเป็นหมายเลข 4 หลัก"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "รหัสผ่านของคุณจาก Google Chrome ได้ถูกนำเข้าสู่ lastpass สำเร็จ"
+   },
+   "Your_Password_Reminder_can_not_be_the_same_as_your_chosen_Master_Password_for_security_reasons__Please_edit_your_Reminder_so_that_it_does_not_contain_your_Master_Password_": {
+      "message": "ข้อความเตือนความจำรหัสผ่านของคุณต้องไม่ตรงกับรหัสผ่านหลักของคุณเพื่อความปลอดภัย กรุณาแก้ไขคำใบ้ของคุณให้ไม่ตรงกับรหัสผ่านหลัก"
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "รหัสไปรษณีย์ของคุณ"
+   },
+   "Your_address_information": {
+      "message": "ข้อมูลที่อยู่ของคุณ"
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "ไฟล์แนบของคุณอยู่ที่:"
+   },
+   "Your_bank_account_information": {
+      "message": "ข้อมูลบัญชีธนาคารของคุณ"
+   },
+   "Your_birth_day": {
+      "message": "วันเกิดของคุณ"
+   },
+   "Your_birth_month": {
+      "message": "เดือนเกิดของคุณ"
+   },
+   "Your_city_name": {
+      "message": "ชื่อเมืองของคุณ"
+   },
+   "Your_company_s_name": {
+      "message": "ชื่อบริษัทของคุณ"
+   },
+   "Your_contact_information": {
+      "message": "ข้อมูลติดต่อของคุณ"
+   },
+   "Your_country_name": {
+      "message": "ชื่อประเทศของคุณ"
+   },
+   "Your_county_name": {
+      "message": "ชื่อประเทศของคุณ"
+   },
+   "Your_credit_card_information": {
+      "message": "ข้อมูลบัตรเครดิตของคุณ"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "การตั้งค่าปัจจุบันของคุณต้องใส่รหัสผ่านของคุณเพื่อทำสิ่งนี้"
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "ข้อมูลของคุณถูกส่งออกไปยัง"
+   },
+   "Your_email_address": {
+      "message": "อีเมล์ของคุณ"
+   },
+   "Your_first_name": {
+      "message": "ชื่อของคุณ"
+   },
+   "Your_government_ID_number": {
+      "message": "หมายเลขบัตรประชาชนของคุณ"
+   },
+   "Your_last_name": {
+      "message": "นามสกุลของคุณ"
+   },
+   "Your_middle_name": {
+      "message": "ชื่อกลางของคุณ"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "คุณไม่สามารถใช้รหัสผ่านเหมือนกันกับอีเมลของคุณ."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "รหัสผ่านของคุณสามาถคาดเดาได้ง่ายเกินไป."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "รหัสผ่านของคุณสั้นเกินไป. รหัสผ่านต้องมีอย่างต่ำ 6 ตัวอักษร"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "รหัสผ่านของคุณสั้นเกินไป ต้องยาวอย่างน้อย 8 ตัวอักษร"
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "ตัวช่วยจำรหัสผ่านจะทำหน้าที่บอกใบ้รหัสผ่านของคุณ"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "รหัสผ่านของคุณไม่ตรงกัน"
+   },
+   "Your_personal_information": {
+      "message": "ข้อมูลส่วนตัวของคุณ"
+   },
+   "Your_phone_number": {
+      "message": "หมายเลขโทรศัพท์ของคุณ"
+   },
+   "Your_phone_number_extension": {
+      "message": "เบอร์ต่อภายในของคุณ"
+   },
+   "Your_prefix_or_title": {
+      "message": "คำนำหน้าชื่อหรือยศของคุณ"
+   },
+   "Your_selected_Identity_no_longer_exists__Defaulting_to__All__and_logging_off_": {
+      "message": "เอกลักษณ์ของคุณไม่มีอยู่อีกต่อไป  กำัลังเปลี่ยนกลับไปเป็น 'ทั้งหมด' แล้วออกจากระบบ"
+   },
+   "Your_sex": {
+      "message": "เพศของคุณ"
+   },
+   "Your_state_or_province_name": {
+      "message": "ชื่อรัฐหรือจังหวัดของคุณ"
+   },
+   "Your_street_address": {
+      "message": "ที่อยู่ของคุณ"
+   },
+   "Your_time_zone": {
+      "message": "โซนเวลาของคุณ"
+   },
+   "Your_trust_token_has_expired_": {
+      "message": "โทเคนหมดอายุแล้ว"
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "ชื่อผู้ใช้ของคุณเมื่อคุณลงชื่อเข้าสู่เว็บไซต์"
+   },
+   "YubiKey": {
+      "message": "YubiKey"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "รับรองความถูกต้อง YubiKey Multifactor"
+   },
+   "Yugoslavia": {
+      "message": "ยูโกสลาเวีย"
+   },
+   "ZIP___Postal_Code": {
+      "message": "รหัสไปรษณีย์"
+   },
+   "ZIP___Postal_code": {
+      "message": "Zip / รหัสไปรษณีย์"
+   },
+   "Zambia": {
+      "message": "แซมเบีย"
+   },
+   "Zimbabwe": {
+      "message": "ซิมบับเว"
+   },
+   "_Hide_": {
+      "message": "[ซ่อน]"
+   },
+   "_History_": {
+      "message": "[ประวัติ]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(คุณมีข้อเสนอใหม่)"
+   },
+   "_Show_": {
+      "message": "[แสดง]"
+   },
+   "_domain_": {
+      "message": "(โดเมน)"
+   },
+   "_none_": {
+      "message": "(ไม่มี)"
+   },
+   "_s_Password_One_Click_Change": {
+      "message": "%s เปลี่ยนรหัสผ่านในคลิกเดียว"
+   },
+   "_unknown_": {
+      "message": "[ไม่ทราบ]"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": "รหัสผ่านที่แท้จริงคือ, ในขณะที่ยังรักษาสถานะการเป็นความลับ"
+   },
+   "ago": {
+      "message": "มาแล้ว"
+   },
+   "and": {
+      "message": "และ"
+   },
+   "appDesc": {
+      "message": "LastPass ตัวจัดการรหัสผ่านที่ได้รับรางวัล บันทึกรหัสผ่านของคุณ และให้คุณเข้าถึงอย่างปลอดภัยบนทุกอุปกรณ์คอมพิวเตอร์และโทรศัพท์"
+   },
+   "appName": {
+      "message": "ตัวจัดการรหัสผ่านฟรี"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "ติดต่อเราและเราจะส่งตัวเตือนความจำรหัสผ่านของคุณทางอีเมล์"
+   },
+   "day": {
+      "message": "วัน"
+   },
+   "days": {
+      "message": "วัน"
+   },
+   "delete_items_from": {
+      "message": "ลบรายการจาก"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "eWallet"
+   },
+   "ext_": {
+      "message": "ต่อ."
+   },
+   "false": {
+      "message": "เท็จ"
+   },
+   "favorites": {
+      "message": "รายการโปรด"
+   },
+   "hour": {
+      "message": "ชั่วโมง"
+   },
+   "hours": {
+      "message": "ชั่วโมง"
+   },
+   "just_now": {
+      "message": "เมื่อซักครู่"
+   },
+   "minute": {
+      "message": "นาที"
+   },
+   "minutes": {
+      "message": "นาที"
+   },
+   "month": {
+      "message": "เดือน"
+   },
+   "months": {
+      "message": "เดือน"
+   },
+   "move_items_from": {
+      "message": "ย้ายรายการจาก"
+   },
+   "move_items_to": {
+      "message": "ย้ายรายการไปที่"
+   },
+   "privacy_statement": {
+      "message": "ชี้แจงสิทธิส่วนบุคคล"
+   },
+   "recently_usedlower": {
+      "message": "ถูกใช้ล่าสุด"
+   },
+   "search": {
+      "message": "ค้นหา"
+   },
+   "search_my_deleted_items": {
+      "message": "ค้นหาจากรายการที่ฉันลบไปแล้ว"
+   },
+   "search_my_identities": {
+      "message": "ค้นหาอัตลักษณ์ของฉัน"
+   },
+   "search_my_received_shares": {
+      "message": "ค้นหาจากสิ่งที่มีคนแชร์มาให้"
+   },
+   "search_my_sent_shares": {
+      "message": "ค้นหาจากสิ่งที่ฉันแชร์ไปแล้ว"
+   },
+   "search_my_shared_folders": {
+      "message": "ค้นหาในแชร์โฟลเดอร์"
+   },
+   "search_my_vault": {
+      "message": "ค้นหาในตู้นิรภัย"
+   },
+   "second": {
+      "message": "วินาที"
+   },
+   "seconds": {
+      "message": "วินาที"
+   },
+   "send_more": {
+      "message": "ส่งไปอีก"
+   },
+   "shared": {
+      "message": "แชร์"
+   },
+   "terms_of_service": {
+      "message": "เงื่อนไขการบริการ"
+   },
+   "the_current_tab": {
+      "message": "แท็บปัจจุบัน"
+   },
+   "the_selected_items": {
+      "message": "รายการที่เลือก"
+   },
+   "this_Folder_s_items": {
+      "message": "รายการในโฟลเดอร์นี้"
+   },
+   "true": {
+      "message": "จริง"
+   },
+   "unnamed_site": {
+      "message": "เว็บที่ยังไม่ได้ตั้งชื่อ"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "เรา 'ไม่รู้' ว่ารหัสผ่าน LastPass ของคุณคืออะไร"
+   },
+   "week": {
+      "message": "สัปดาห์"
+   },
+   "weeks": {
+      "message": "สัปดาห์"
+   },
+   "year": {
+      "message": "ปี"
+   },
+   "years": {
+      "message": "ปี"
+   }
+}

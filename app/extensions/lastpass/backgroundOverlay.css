@@ -1,0 +1,35 @@
+.blur-background {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 20;
+}
+.blur-background.dark {
+  background-color: rgba(0, 0, 0, .6);
+}
+.blur-background.light {
+  background-color: rgba(255, 255, 255, .6);
+}
+.blur-background .loading {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  width: 64px;
+}
+.blur-background .loading-inner {
+  height: 64px;
+  width: 64px;
+  animation: spin 1s linear infinite;
+  background-repeat: no-repeat;
+  background-image: url('images/Loading@0.25x.png');
+}
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform:rotate(360deg);
+  }
+}

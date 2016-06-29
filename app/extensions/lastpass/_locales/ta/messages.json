@@ -1,0 +1,2813 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "12_hours": {
+      "message": "12 மணித்தியாலங்கள்"
+   },
+   "15_minutes": {
+      "message": "15 நிமிடங்கள்"
+   },
+   "1Password": {
+      "message": "1Password"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. USB-துறையில் உங்கள் YubiKey-ஐ USB-தொடர்பு மேல்நோக்கி இருக்குமாறு  நுழைக்கவும்"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. ஒரு முறை கடவுச்சொல்லை உருவாக்க LastPass சீசேம் பயன்பாட்டை இயக்கவும்"
+   },
+   "1_hour": {
+      "message": "1 மணித்தியாலம்"
+   },
+   "24_hours": {
+      "message": "24 மணித்தியாலங்கள்"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. கீழ்கண்ட பெட்டியில் உங்கள் கடவுசொல்லை ஒருமுறை உள்ளீட்டு, 'அங்கீகரிக்க'-வை அழுத்தவும்."
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. உங்கள் YubiKey தொடு பொத்தான் நிலையாக மின்னும் வரை காத்திருக்கவும்"
+   },
+   "30_minutes": {
+      "message": "30 நிமிடங்கள்"
+   },
+   "30_seconds": {
+      "message": "30 விநாடிகள்"
+   },
+   "3__Click_Authenticate": {
+      "message": "3. அங்கீகரிக்க-வை சொடுக்கவும்"
+   },
+   "3_hours": {
+      "message": "3 மணித்தியாலம்"
+   },
+   "5_minutes": {
+      "message": "5 நிமிடங்கள்"
+   },
+   "6_hours": {
+      "message": "6 மணித்தியாலங்கள்"
+   },
+   "ACTION": {
+      "message": "செயல்"
+   },
+   "A_Zupper": {
+      "message": "A-Z"
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "தேவையான ஒரு LastPass மேம்படுத்தல் கிடைக்கப்பெற்றுள்ளது பதிவிறக்க மற்றும் நிறுவல் தொடங்க OK வை சொடுக்குக."
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "ஒரு மறுமுயற்சி கோப்பு கண்டறியப்பட்டுள்ளது. உங்கள் தளத்தின் மாற்றங்கள் அனைத்தும் சேமிக்கப்படவில்லை என்று இதற்கு அர்த்தம். நீங்கள் இந்த கோப்பை நீக்கி, சாத்தியமாக, சில மாற்றங்களை இழக்க விரும்புகிறீர்களா?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "உங்கள் கோரிக்கையை செயல்படுத்துவதில் ஒரு சேவையக பிழை ஏற்பட்டது."
+   },
+   "About___": {
+      "message": "பற்றி ..."
+   },
+   "Accept": {
+      "message": "ஏற்க"
+   },
+   "Account_Number": {
+      "message": "கணக்கு எண்"
+   },
+   "Account_Settings": {
+      "message": "கணக்கு அமைப்புகள்"
+   },
+   "Account_Type": {
+      "message": "கணக்கு வகை"
+   },
+   "Account_number": {
+      "message": "கணக்கு எண்"
+   },
+   "Actionproper": {
+      "message": "செயல்"
+   },
+   "Actions": {
+      "message": "செயல்கள்"
+   },
+   "Add": {
+      "message": "சேர்"
+   },
+   "Add_Credit_Card": {
+      "message": "கடன் அட்டை சேர்"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "கடன் அட்டை சுயவிவரத்தை சேர்க்க"
+   },
+   "Add_Field": {
+      "message": "புலத்தை சேர்க்க"
+   },
+   "Add_Identity": {
+      "message": "அடையாளம் சேர்"
+   },
+   "Add_New_Site": {
+      "message": "புதிய தளம் சேர்"
+   },
+   "Add_Note": {
+      "message": "குறிப்பு சேர்க்க"
+   },
+   "Add_Profile": {
+      "message": "சுயவிவரத்தை சேர்"
+   },
+   "Add_Secure_Note": {
+      "message": "பாதுகாப்பான குறிப்பு சேர்"
+   },
+   "Add_Site": {
+      "message": "தளத்தை சேர்"
+   },
+   "Add_another_custom_field": {
+      "message": "மற்றொரு தனிப்பயன் புலத்தை சேர்"
+   },
+   "Address": {
+      "message": "முகவரி"
+   },
+   "Address_1": {
+      "message": "முகவரி 1"
+   },
+   "Address_2": {
+      "message": "முகவரி 2"
+   },
+   "Address_3": {
+      "message": "முகவரி 3"
+   },
+   "Adelaide": {
+      "message": "அடிலெய்டு"
+   },
+   "Admin_Tools": {
+      "message": "நிர்வாக கருவிகள்"
+   },
+   "Advanced": {
+      "message": "மேம்பட்ட"
+   },
+   "Advanced_Options": {
+      "message": "கூடுதல் விருப்பங்கள்"
+   },
+   "Afghanistan": {
+      "message": "ஆப்கானிஸ்தான்"
+   },
+   "Agent_Name": {
+      "message": "முகவர் பெயர்"
+   },
+   "Agent_Phone": {
+      "message": "முகவர் தொலைபேசி"
+   },
+   "Aland_Islands": {
+      "message": "ஆலந்து தீவுகள்"
+   },
+   "Alaska": {
+      "message": "அலாஸ்கா"
+   },
+   "Albania": {
+      "message": "அல்பேனியா"
+   },
+   "Algeria": {
+      "message": "அல்ஜீரியா"
+   },
+   "Alias": {
+      "message": "மறுபெயர்"
+   },
+   "All": {
+      "message": "அனைத்தும்"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "உங்கள் கணினியிலுள்ள அனைத்து பாதுகாக்கப்படாத தரவுகளை கண்டறிய லாஸ்ட்பாசை அனுமதிக்கவும்"
+   },
+   "Almaty": {
+      "message": "அல்மாட்டி"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "எப்பொழுதும் சுயவிவரத்தையும் கடனட்டையும் தெரிவுசெய்யவும்"
+   },
+   "American_Samoa": {
+      "message": "அமெரிக்க சமோவா"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "அம்மான், ஏதென்ஸ், இஸ்தான்புல், பெய்ரூட், கெய்ரோ, ஜெருசலம்"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "ஆம்ஸ்டர்டாம், பெர்லின், ரோம், வியன்னா, பராகுவே, பிரஸ்ஸல்ஸ்"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "ஒரு மேம்படுத்தல் உள்ளது. நீங்கள் இதை நிறுவ விரும்புகிறீர்களா?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "ஒரு பிழை உங்கள் தளங்களை ஏற்றும் போது எதிர்கொண்டது. தயவுசெய்து மீண்டும் உள்நுழைக."
+   },
+   "An_error_occurred": {
+      "message": "ஒரு பிழை ஏற்பட்டது"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "உங்கள் Google Chrome கடவுச்சொற்கள் இறக்குமதி பிழை ஏற்பட்டது."
+   },
+   "Andorra": {
+      "message": "அன்டோரா"
+   },
+   "Angola": {
+      "message": "அங்கோலா"
+   },
+   "Anguilla": {
+      "message": "அங்கியுலா"
+   },
+   "Antarctica": {
+      "message": "அண்ட்டார்க்ட்டுக்கா கண்டம்"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "ஆன்டிகுவா மற்றும் பார்புடா"
+   },
+   "Appearance": {
+      "message": "தோற்றம்"
+   },
+   "Application_": {
+      "message": "விண்ணப்பம்:"
+   },
+   "Applications": {
+      "message": "பயன்பாடுகள்"
+   },
+   "April": {
+      "message": "ஏப்ரல்"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "நீங்கள் இந்த அடையாளத்தை நீக்க வேண்டுமா?"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "நீங்கள் இந்த தளம் நீக்க வேண்டுமா?"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "LastPass உங்கள் கடவுச்சொல்லை நினைவில் வைக்க வேண்டும் என்பதில் உறுதியாக இருக்கிறீர்களா? இதனால் உங்கள் LastPass கணக்கின் பாதுகாப்பு குறிப்பிடத்தக்களவு குறையும்!"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "நீங்கள் நீக்க உறுதியாக இருக்கிறீர்களா?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "நீங்கள் தேர்ந்தெடுத்த தளங்கள் நீக்க நீங்கள் உறுதியாக இருக்கிறீர்களா?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "இந்த புலத்தை நீக்க நீங்கள் கண்டிப்பாக விழைகிறீர்களா?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "நீங்கள் இந்த படிவத்தை பூர்த்தி சுயவிவரத்தை நீக்க உறுதியாக இருக்கிறீர்களா?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "நீங்கள் இந்த உருவாக்கப்பட்ட கடவுச்சொல்லை நீக்க விரும்புகிறீர்களா?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "நீங்கள் இந்த பாதுகாப்பான குறிப்பை நீக்க விரும்புகிறீர்களா?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "நீங்கள் இந்த தளத்தில் நீக்க விரும்புகிறீர்களா?"
+   },
+   "Argentina": {
+      "message": "அர்ஜென்டீனா"
+   },
+   "Arizona": {
+      "message": "அரிசோனா"
+   },
+   "Armenia": {
+      "message": "ஆர்மீனியா"
+   },
+   "Aruba": {
+      "message": "அரூபா"
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "அட்லாண்டிக் நேரம் (கனடா), மனவ்ஸ், சாண்டியாகோ"
+   },
+   "Auckland__Wellington": {
+      "message": "ஆக்லாந்து, வெலிங்டன்"
+   },
+   "August": {
+      "message": "ஆகஸ்ட்"
+   },
+   "Australia": {
+      "message": "ஆஸ்திரேலியா"
+   },
+   "Austria": {
+      "message": "ஆஸ்திரியா"
+   },
+   "Authenticate": {
+      "message": "அங்கீகரி"
+   },
+   "Authentication": {
+      "message": "சான்றளிப்பு"
+   },
+   "Authentication_Failed_": {
+      "message": "அங்கீகாரம் தோல்வியுற்றது."
+   },
+   "AutoFill": {
+      "message": "தன்னிரப்பு"
+   },
+   "AutoLogin": {
+      "message": "தானாக நுளைதல்"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "தானாக உள்நுழைவு தகவலை நிரப்பவும்"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "சில நிமிடங்களுக்கு பிறகு தானாகவே வெளிச்செல்"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "கடைசியாக உட்சென்ற நேரம் இதற்கு குறைவாக  இருந்தால் தளங்களிற்கு தானாக உள்நுழை (வினாடிகள்)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "தெளிவற்ற எழுத்துக்கள் தவிர்"
+   },
+   "Azerbaijan": {
+      "message": "அஜர்பைஜான்"
+   },
+   "Azores": {
+      "message": "அசோர்ஸ்"
+   },
+   "Back": {
+      "message": "பின் நோக்கி"
+   },
+   "Baghdad": {
+      "message": "பாக்தாத்"
+   },
+   "Bahamas": {
+      "message": "பஹாமாஸ்"
+   },
+   "Bahrain": {
+      "message": "பஹ்ரைன்"
+   },
+   "Baku__Yerevan": {
+      "message": "பாக்கூ, ஏரேவன்"
+   },
+   "Bangladesh": {
+      "message": "வங்காளம்"
+   },
+   "Bank_Account": {
+      "message": "வங்கி கணக்கு"
+   },
+   "Bank_Name": {
+      "message": "வங்கி பெயர்"
+   },
+   "Bank_accountformfill": {
+      "message": "வங்கி கணக்கு"
+   },
+   "Bank_name": {
+      "message": "வங்கி பெயர்"
+   },
+   "Barbados": {
+      "message": "பார்படாஸ்"
+   },
+   "Belarus": {
+      "message": "பெலாரஸ்"
+   },
+   "Belgium": {
+      "message": "பெல்ஜியம்"
+   },
+   "Belize": {
+      "message": "பெலீசு"
+   },
+   "Benin": {
+      "message": "பெனின்"
+   },
+   "Bermuda": {
+      "message": "பெர்முடா"
+   },
+   "Bhutan": {
+      "message": "பூட்டான்"
+   },
+   "Binary_Component_": {
+      "message": "பைனரி உபகரண:"
+   },
+   "Birthday": {
+      "message": "பிறந்த நாள்"
+   },
+   "Blacklist": {
+      "message": "சராமாரி புகுபதிவு பிழையினால் உங்கள் கணக்கு தற்காலிகமாக (5 நிமிடத்திற்கு) முடக்கப்பட்டுள்ளது."
+   },
+   "Blog": {
+      "message": "வலைப்பதிவு"
+   },
+   "Bolivia": {
+      "message": "பொலிவியா"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "போஸ்னியா மற்றும் ஹெர்ஸிகோவினா"
+   },
+   "Botswana": {
+      "message": "போட்ஸ்வானா"
+   },
+   "Bouvet_Island": {
+      "message": "போவெட் தீவு"
+   },
+   "Branch_Address": {
+      "message": "கிளை முகவரி"
+   },
+   "Branch_Phone": {
+      "message": "கிளை தொலைபேசி"
+   },
+   "Brazil": {
+      "message": "பிரேசில்"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "பிரித்தானிய இந்திய பெருங்கடல் மண்டலம்"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "நீங்கள் வழக்கமாக உலாவலாம் மற்றும் நீங்கள் அவர்களை நுழைய LastPass தானாக கடவுச்சொற்களை தானாக நினைவிட்டுக்கொள்ளும்"
+   },
+   "Brunei_Darussalam": {
+      "message": "புருனே டருஸ்ஸலாம்"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "பியூனஸ் அயர்ஸ், ஜார்ஜ்டவுன்"
+   },
+   "Built_": {
+      "message": "கட்டப்பட்டது:"
+   },
+   "Bulgaria": {
+      "message": "பல்கேரியா"
+   },
+   "Burkina_Faso": {
+      "message": "புர்கினா பாசோ"
+   },
+   "Burundi": {
+      "message": "புருண்டி"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "நான் ஒரு மறதி பேர்வழி...என் கடவுச்சொல்லை நான் மறந்துவிட்டால் என்ன செய்வது?"
+   },
+   "CSV_Files": {
+      "message": "CSV கோப்புகள்"
+   },
+   "Cambodia": {
+      "message": "கம்போடியா"
+   },
+   "Cameroon": {
+      "message": "கேமரூன்"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "மறைக்கப்பட்ட LastPass சாளரத்தை கண்டுபிடிக்க முடியவில்லை"
+   },
+   "Canada": {
+      "message": "கனடா"
+   },
+   "Canary_Islands": {
+      "message": "கேனரி தீவுகள்"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "கான்பெர்ரா, மெல்போர்ன், சிட்னி, ஹோபர்ட்"
+   },
+   "Cancel": {
+      "message": "ரத்து செய்"
+   },
+   "Cape_Verde": {
+      "message": "கேப் வேர்டே"
+   },
+   "Cape_Verde_Is_": {
+      "message": "கேப் வேர்டே தீவு"
+   },
+   "Caracas": {
+      "message": "கேராகஸ்"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "காஸபிளன்கா, மோன்ரோவியா, ரெய்க்யாவிக்"
+   },
+   "Cayman_Islands": {
+      "message": "கேமன் தீவுகள்"
+   },
+   "Central_African_Republic": {
+      "message": "மத்திய ஆபிரிக்க குடியரசு"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "மத்திய அமெரிக்கா, சஸ்காச்சுவான்"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "மத்திய நேரம் (அமெரிக்கா & கனடா), குவாடலஜரா, மெக்ஸிக்கோ சிட்டி"
+   },
+   "Chad": {
+      "message": "சாட்"
+   },
+   "Change": {
+      "message": "மாற்று"
+   },
+   "Change_Password": {
+      "message": "கடவுச்சொல் மாற்றம்"
+   },
+   "Check_For_Updates": {
+      "message": "இற்றைப்படுத்தப்பார்"
+   },
+   "Checkbox": {
+      "message": "சோதனைப்பெட்டி"
+   },
+   "Checking_For_Updates___": {
+      "message": "மேம்படுத்தல்கள் சரிபார்க்கிறது ..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "சென்னை, கொல்கத்தா, மும்பை, புது தில்லி, ஸ்ரீஜெயவர்தனபுரா"
+   },
+   "Chile": {
+      "message": "சிலி"
+   },
+   "China": {
+      "message": "சினா"
+   },
+   "Chinese__Simplified_": {
+      "message": "சீனம் (எளிய வரிவடிவம்)"
+   },
+   "Chinese__Traditional_": {
+      "message": "சீன (பாரம்பரியமான)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "சுயவிவரம் மற்றும் கடன் அட்டையை தேர்வு செய்யவும்"
+   },
+   "Choose_a_source_above_": {
+      "message": "மேலேயுள்ள மூலத்தில் ஒன்றை தேர்ந்தெடுக்கவும்"
+   },
+   "Christmas_Island": {
+      "message": "கிறிஸ்துமஸ் தீவு"
+   },
+   "Chrome": {
+      "message": "குரோம்"
+   },
+   "City___Town": {
+      "message": "நகரம் / ஊர்"
+   },
+   "Clear": {
+      "message": "அழி"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "பயன்படுத்தியபின் ஒட்டுபலகையை அழிக்கவும் (வினாடிகள்)"
+   },
+   "Clear_Forms": {
+      "message": "படிவங்கள் தெளிவாக்கு"
+   },
+   "Clear_Local_Cache": {
+      "message": "உள்ளூர் Cacheஐ தெளிவாக்கு"
+   },
+   "Clear_Recent": {
+      "message": "சமீபத்திய தகவலை அழிக்க"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "lastpass பயன்படுத்த ஆரம்பிக்க 'தொடர்க'-வை சொடுக்கவும்"
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "கணக்கு அமைப்புகளை(Settings) தொடங்க இங்கே கிளிக் செய்யவும்"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "கருத்து தெரிவிக்க இங்கே கிளிக் செய்யவும்"
+   },
+   "Close": {
+      "message": "மூடு"
+   },
+   "Close_this_window": {
+      "message": "இந்த சாளரத்தை மூடுக"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "கோகோஸ் (கீலிங்) தீவுகள்"
+   },
+   "Collapse_All": {
+      "message": "அனைத்தும் சுருக்குக"
+   },
+   "Colombia": {
+      "message": "கொலம்பியா"
+   },
+   "Comoros": {
+      "message": "கோமரோஸ்"
+   },
+   "Company": {
+      "message": "நிறுவனம்"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "நிறுவனத்தின் கொள்கை இந்த நடவடிக்கையை தடைசெய்கிறது."
+   },
+   "Configure_Form_Fill": {
+      "message": "படிவ பூர்த்தியை கட்டமைக்க"
+   },
+   "Confirm": {
+      "message": "உறுதி"
+   },
+   "Confirm_Password": {
+      "message": "கடவுச்சொல் உறுதி"
+   },
+   "Congo": {
+      "message": "காங்கோ"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "காங்கோ, ஜனநாயக குடியரசு"
+   },
+   "Congratulations": {
+      "message": "வாழ்த்துக்கள்"
+   },
+   "Connection_Mode": {
+      "message": "இணைப்பு முறை"
+   },
+   "Connection_Type": {
+      "message": "இணைப்பு வகை"
+   },
+   "Contact": {
+      "message": "தொடர்பு"
+   },
+   "Continue": {
+      "message": "தொடர்க"
+   },
+   "Cook_Islands": {
+      "message": "குக் தீவுகள்"
+   },
+   "Copy": {
+      "message": "நகலெடு"
+   },
+   "Copy_Note": {
+      "message": "குறிப்பு நகலெடுக்க"
+   },
+   "Copy_Password": {
+      "message": "கடவுச்சொல் நகல் செய்"
+   },
+   "Copy_URL": {
+      "message": "URLஐ நகலெடு"
+   },
+   "Copy_Username": {
+      "message": "பெயரை பிரதி செய்"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "பதிப்புரிமை 2008 LastPass. அனைத்து உரிமைகளும் முன்பதியப்பட்டுள்ளது. இந்து மென்பொருளின் சில பகுதிகளின் உரிமம், கீழ்கண்டவாறு வேறு நிறுவனங்களிடமிருந்து பெறப்பட்டுள்ளது:"
+   },
+   "Costa_Rica": {
+      "message": "கோஸ்டா ரிகா"
+   },
+   "Cote_D_ivoire": {
+      "message": "கோட் டி ஐவரி"
+   },
+   "Country": {
+      "message": "நாடு"
+   },
+   "County": {
+      "message": "மாகாணம்"
+   },
+   "Create_Account": {
+      "message": "கணக்கு உருவாக்கு"
+   },
+   "Create_an_Account": {
+      "message": "ஒரு கணக்கை உருவாக்கவும்"
+   },
+   "Creating_Account___": {
+      "message": "கணக்கு உருவாக்குதல் ..."
+   },
+   "Credit_Card": {
+      "message": "கடன் அட்டை"
+   },
+   "Credit_Card_Number": {
+      "message": "கடன் அட்டை எண்"
+   },
+   "Credit_card_number": {
+      "message": "கடன் அட்டை எண்"
+   },
+   "Credit_cardformfill": {
+      "message": "கடன் அட்டை"
+   },
+   "Croatia": {
+      "message": "குரோஷியா"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "கியூபா"
+   },
+   "Custom_Value": {
+      "message": "தனிப்பயன் மதிப்பு"
+   },
+   "Cyprus": {
+      "message": "சைப்ரஸ்"
+   },
+   "Czech_Republic": {
+      "message": "செக் குடியரசு"
+   },
+   "Danish": {
+      "message": "டானிஷ்"
+   },
+   "Darwin": {
+      "message": "டார்வின்"
+   },
+   "Database": {
+      "message": "தரவுத்தளம்"
+   },
+   "Date_of_Birth": {
+      "message": "பிறந்த நாள்"
+   },
+   "December": {
+      "message": "டிசம்பர்"
+   },
+   "Default": {
+      "message": "முன்னிருப்பு"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "இயல்புநிலை சுயவிவரம் படிவ நிரப்பு"
+   },
+   "Delete": {
+      "message": "நீக்கு"
+   },
+   "Delete_Cache": {
+      "message": "தற்காலிக சேமிப்பை நீக்கு"
+   },
+   "Delete_Identity_": {
+      "message": "அடையாள நீக்க வேண்டுமா?"
+   },
+   "Delete_Selected": {
+      "message": "தேர்ந்தெடுத்ததை நீக்கு"
+   },
+   "Delete_Site_": {
+      "message": "தளம் நீக்கவா?"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "இந்த படிவபூர்த்தியை நீக்குக"
+   },
+   "Denmark": {
+      "message": "டென்மார்க்"
+   },
+   "Description": {
+      "message": "விளக்கம்"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "பாதுகாப்பற்ற குரோம் கடவுச்சொல் மேலாளரை(Password Manager) முடக்கு"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "பல காரணி அங்கீகாரம் முடக்கு"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "ஒற்றை காரணி அங்கீகாரம் முடக்கு"
+   },
+   "Djibouti": {
+      "message": "திஜிபொதி"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "ஏற்கனவே பூர்த்தியான புலத்தில் மேலெழுத வேண்டாம்"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "ஐந்து-வரியில் மீண்டும்"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "இதற்கு மறுமுறை கேட்காதே "
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "உண்மையில் நீங்கள் வெளியேற விரும்புகிறீர்களா? நீங்கள் ஒரு கணக்கை உருவாக்காமல் LastPass-ஐ பயன்படுத்த முடியாது."
+   },
+   "Dominica": {
+      "message": "டொமினிகா"
+   },
+   "Dominican_Republic": {
+      "message": "டொமினிக்கன் குடியரசு"
+   },
+   "Down": {
+      "message": "டவுன்"
+   },
+   "Dr": {
+      "message": "டாக்டர்"
+   },
+   "Driver_s_License": {
+      "message": "ஓட்டுனர் உரிமம்"
+   },
+   "Dutch": {
+      "message": "டச்சு"
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "கிழக்கத்திய நேரம் (அமெரிக்கா & கனடா)"
+   },
+   "Ecuador": {
+      "message": "ஈக்வடார்"
+   },
+   "Edit": {
+      "message": "திருத்து"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "கடன் அட்டை திருத்து"
+   },
+   "Edit_Form_Fields": {
+      "message": "படிவம் புலங்களை பதிப்பி"
+   },
+   "Edit_Secure_Notes": {
+      "message": "பாதுகாப்பான குறிப்புகள் திருத்து"
+   },
+   "Edit_Site": {
+      "message": "தளம் திருத்து"
+   },
+   "Egypt": {
+      "message": "எகிப்து"
+   },
+   "El_Salvador": {
+      "message": "எல் சால்வடார்"
+   },
+   "Email": {
+      "message": "மின்னஞ்சல்"
+   },
+   "Email_Account": {
+      "message": "மின்னஞ்சல் கணக்கு"
+   },
+   "Email_Address": {
+      "message": "மின்னஞ்சல் முகவரி"
+   },
+   "Email_address": {
+      "message": "மின்னஞ்சல் முகவரி"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "மின்னஞ்சல் ஏற்கனவே பயன்பாட்டில் உள்ளது, நீங்கள் உங்கள் கடவுச்சொல்லை மறந்துவிட்டீர்களா?"
+   },
+   "Enable_Credit_Monitoring": {
+      "message": "கடன் கண்காணிப்பு செயல்படுத்த"
+   },
+   "Enable_Free_Credit_Monitoring": {
+      "message": "இலவச கடன் கண்காணிப்பு செயல்படுத்த"
+   },
+   "Encryption": {
+      "message": "மறையாக்கம்"
+   },
+   "End": {
+      "message": "End"
+   },
+   "English": {
+      "message": "ஆங்கிலம்"
+   },
+   "English__United_Kingdom_": {
+      "message": "ஆங்கிலம் (யுனைடட் கிங்டம்)"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "தன்னிச்சையான குறிப்புகள் உள்ளிடவும்"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "உங்கள் ஸ்மார்ட் கார்டு PIN ஐ உள்ளிடவும்:"
+   },
+   "Enterprise": {
+      "message": "நிறுவனம்"
+   },
+   "Equatorial_Guinea": {
+      "message": "எக்குவடோரியல் கினி"
+   },
+   "Eritrea": {
+      "message": "எரித்திரியா"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "உங்கள் LastPass தளங்கள் மீட்டெடுக்கும்போது பிழை ஏற்பட்டது. உங்கள் தளங்களை மீட்டெடுக்க மீண்டும் நுழைய முயற்சி செய்யுங்கள்."
+   },
+   "ErrorLoginMsg": {
+      "message": "LastPass புகுபதிவில் பிழை நேர்ந்துள்ளது. உங்கள் இணைய இணைப்பை சரிபாருங்கள்."
+   },
+   "ErrorSendingMsg": {
+      "message": "சர்வரை தொடர்பு கொள்ள முயற்சிக்கும் போது ஒரு பிழை ஏற்பட்டது. உங்கள் இணைய இணைப்பை சரிபாருங்கள்."
+   },
+   "ErrorSessionMsg": {
+      "message": "உங்கள் LastPass காலாவதியாக தோன்றுகிறது. தயவு செய்து மறு புகுபதிவு செய்க."
+   },
+   "Estonia": {
+      "message": "எஸ்டோனியா"
+   },
+   "Ethiopia": {
+      "message": "எத்தியோப்பியா"
+   },
+   "Evening_Number": {
+      "message": "மாலை தொடர்பு எண்"
+   },
+   "Evening_number": {
+      "message": "மாலை எண்"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "LastPass இப்போது கணினியில் ஒரு முறை கடவுச்சொல் (OTP) சேமிக்க முடியும், அதனை கொண்டு நீங்கள் மறந்த உங்கள்  கணக்கு மாஸ்டர் கடவுச்சொல்லை மீட்க பயன்படுத்த முடியும். சேவையகத்தில் இயக்கபடுத்தபடும் வரை அந்த OTP  முடக்கபட்டிருக்கும்.\n\nஉங்கள் கணக்கு மீட்பு செயல்படுத்த வேண்டுமா?"
+   },
+   "Expand_All": {
+      "message": "அனைத்து விரிவாக்கு"
+   },
+   "Expiration_Date": {
+      "message": "காலாவதி தேதி"
+   },
+   "Expiration_date": {
+      "message": "காலாவதி தேதி"
+   },
+   "Export": {
+      "message": "ஏற்றுமதி"
+   },
+   "Export_To": {
+      "message": "ஏற்றுமதி"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "போக்லாந்து தீவுகள் (Malvinas)"
+   },
+   "Faroe_Islands": {
+      "message": "பரோயே தீவுகள்"
+   },
+   "Favorite": {
+      "message": "பிடித்தவை"
+   },
+   "Favoritesproper": {
+      "message": "பிடித்தவை"
+   },
+   "Fax_Number": {
+      "message": "தொலைநகல் எண்"
+   },
+   "Fax_number": {
+      "message": "தொலைநகல் எண்"
+   },
+   "February": {
+      "message": "பிப்ரவரி"
+   },
+   "Feedback": {
+      "message": "கருத்து"
+   },
+   "Female": {
+      "message": "பெண்"
+   },
+   "Fields_": {
+      "message": "துறைகள்:"
+   },
+   "Fiji": {
+      "message": "ஃபிஜி"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "ஃபிஜி, காம்சட்கா, மார்ஷல் தீவு"
+   },
+   "File": {
+      "message": "கோப்பு"
+   },
+   "Files": {
+      "message": "கோப்புகள்"
+   },
+   "Fill": {
+      "message": "பூர்த்தி"
+   },
+   "Fill_Current": {
+      "message": "தற்போதைய பூர்த்தி"
+   },
+   "Fill_Form": {
+      "message": "படிவம் பூர்த்தி"
+   },
+   "Fill_Forms": {
+      "message": "படிவங்களை பூர்த்தி செய்"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "முன்னிருப்பு படிவத்தை பூர்த்தி செய்"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "அடுத்த உள்நுழைவை உள்ளிடவும் (ஒன்றுக்கும் மேற்பட்ட)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "முந்தைய உள்நுழைவை உள்ளிடவும் (ஒன்றுக்கும் மேற்பட்ட)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "படிவபூர்த்தி தகவல்களை நிரப்ப அல்லது திருத்த"
+   },
+   "FillableFormDetected": {
+      "message": "ஒரு நிரப்பல் படிவம் இப்பக்கத்தில் கண்டறியப்பட்டுள்ளது."
+   },
+   "Filter": {
+      "message": "வடிகட்டு"
+   },
+   "Find_a_site": {
+      "message": "தளம் ஒன்று தேடு"
+   },
+   "Finland": {
+      "message": "பின்லாந்து"
+   },
+   "Finnish": {
+      "message": "ஃபின்னிஷ்"
+   },
+   "Firefox": {
+      "message": "ஃபயர்பாக்ஸ்"
+   },
+   "Firefox_Password_Manager": {
+      "message": "ஃபயர்பாக்ஸ் கடவுச்சொல் மேலாளர்"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "உங்கள் தொலைபேசி எண் முதல் 3 இலக்கங்கள்"
+   },
+   "First_Name": {
+      "message": "முதல் பெயர்"
+   },
+   "First_name": {
+      "message": "முதல் பெயர்"
+   },
+   "FormFill": {
+      "message": "படிவப்பூர்த்தி"
+   },
+   "FormFill_Profiles": {
+      "message": "படிவப்பூர்த்தி விவரக்குறிப்புகள்"
+   },
+   "Form_Fill": {
+      "message": "படிவ பூர்த்தி"
+   },
+   "Form_Name_": {
+      "message": "படிவம் பெயர்:"
+   },
+   "Forums": {
+      "message": "கருத்துக்களங்கள்"
+   },
+   "France": {
+      "message": "பிரான்ஸ்"
+   },
+   "French": {
+      "message": "பிரஞ்சு"
+   },
+   "French_Guiana": {
+      "message": "பிரஞ்சு கயானா"
+   },
+   "French_Polynesia": {
+      "message": "பிரஞ்சு பொலினீசியா"
+   },
+   "French_Southern_Territories": {
+      "message": "பிரஞ்சு தென் பகுதிகள்"
+   },
+   "French__Canada_": {
+      "message": "பிரஞ்சு (கனடா)"
+   },
+   "GMT_5": {
+      "message": "ஜிஎம்டி+5"
+   },
+   "GMT_7": {
+      "message": "ஜிஎம்டி+7"
+   },
+   "GMT_9": {
+      "message": "ஜிஎம்டி+9"
+   },
+   "GMT_Dublin__Edinburgh__Lisbon__London": {
+      "message": "ஜிஎம்டி டப்ளின், எடின்பர்க், லிஸ்பன், லண்டன்"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "ஜிஎம்டி: டப்ளின், எடின்பர்க், லிஸ்பன், லண்டன்"
+   },
+   "Gabon": {
+      "message": "கேபன்"
+   },
+   "Gambia": {
+      "message": "காம்பியா"
+   },
+   "Gender": {
+      "message": "பாலினம்"
+   },
+   "General": {
+      "message": "பொது"
+   },
+   "Generate": {
+      "message": "உருவாக்கு"
+   },
+   "Generate_Password": {
+      "message": "கடவுச்சொல் உருவாக்க"
+   },
+   "Generate_Secure_Password": {
+      "message": "பாதுகாப்பான கடவுச்சொல் உருவாக்க"
+   },
+   "Generated_Password_for": {
+      "message": "இதற்காக உருவாக்கிய கடவுச்சொல்"
+   },
+   "Generic": {
+      "message": "பொதுவான"
+   },
+   "Generic_CSV_File": {
+      "message": "பொதுவான CSV கோப்பு"
+   },
+   "Georgia": {
+      "message": "ஜோர்ஜியா"
+   },
+   "German": {
+      "message": "ஜெர்மன்"
+   },
+   "Germany": {
+      "message": "ஜெர்மனி"
+   },
+   "Ghana": {
+      "message": "கானா"
+   },
+   "Gibraltar": {
+      "message": "ஜிப்ரால்டர்"
+   },
+   "Go_Premium_": {
+      "message": "Premium வாங்கு!"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "கூகுள் அங்கீகரிப்பு பலகாரணி அங்கீகாரம்"
+   },
+   "Google_Chrome": {
+      "message": "கூகிள் குரோம்"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "Google Chrome கடவுச்சொல் மேலாளர்"
+   },
+   "Greece": {
+      "message": "கிரீஸ்"
+   },
+   "Greenland": {
+      "message": "கிரீன்லாந்து"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "கிரீன்லாந்து, பிரேசிலியாவில், மான்டிவிடீயோ"
+   },
+   "Grenada": {
+      "message": "கிரெனடா"
+   },
+   "Guadeloupe": {
+      "message": "க்வாதேலோப்"
+   },
+   "Guam": {
+      "message": "குவாம்"
+   },
+   "Guatemala": {
+      "message": "குவாதமாலா"
+   },
+   "Guernsey": {
+      "message": "கெர்ன்சி"
+   },
+   "Guinea": {
+      "message": "கினியா"
+   },
+   "Guinea_Bissau": {
+      "message": "கினியா-பிசாவு"
+   },
+   "Guyana": {
+      "message": "கயானா"
+   },
+   "Haiti": {
+      "message": "ஹெய்டி"
+   },
+   "Harare__Pretoria": {
+      "message": "ஹராரே, பிரிட்டோரியா"
+   },
+   "Hawaii": {
+      "message": "ஹவாய்"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "ஹேர்ட் மற்றும் மெக்டொனால்டு"
+   },
+   "Height": {
+      "message": "உயரம்"
+   },
+   "Help": {
+      "message": "உதவி"
+   },
+   "Help_Translate": {
+      "message": "மொழிபெயர்க உதவி"
+   },
+   "Help___": {
+      "message": "உதவி ..."
+   },
+   "Hide": {
+      "message": "மறை"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "சூழல் மெனு விருப்பங்கள் மறைக்க"
+   },
+   "Hide_Passwords": {
+      "message": "கடவுச்சொற்கள் மறைக்க"
+   },
+   "Highlight_input_boxes": {
+      "message": "உள்ளீட்டு பெட்டிகள் முன்னிலைப்படுத்தவும்"
+   },
+   "History": {
+      "message": "வரலாறு"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "ஹோலி சீ (வாடிகன் நகரம் மாநிலம்)"
+   },
+   "Home": {
+      "message": "Home"
+   },
+   "Honduras": {
+      "message": "ஹாண்டுராஸ்"
+   },
+   "Hong_Kong": {
+      "message": "ஹாங்காங்"
+   },
+   "Hostname": {
+      "message": "புரவலன் பெயர்"
+   },
+   "HotKeys": {
+      "message": "HotKeys"
+   },
+   "Hungarian": {
+      "message": "ஹங்கேரியன்"
+   },
+   "Hungary": {
+      "message": "ஹங்கேரி"
+   },
+   "IMPORT_": {
+      "message": "இறக்கவா?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "நீங்கள் உங்கள் lastpass கடவுச்சொல்லை ஒருபொழுதும் \nமறக்ககூடாதென்பது  மிகவும் முக்கியம்."
+   },
+   "I_Forgot_my_Password": {
+      "message": "என் கடவுச்சொல்லை மறந்துவிட்டேன்"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "என்னுடைய கடவுச்சொல்லை மறந்துவிட்டேன், உதவு"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "இதனை நான் படித்து உடன்படுகின்றேன்"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "எனது மறைகுறியிடப்பட்ட தரவு Lastpass-ற்கு அனுப்பப்படும் என்பது எனக்கு புரிகின்றது"
+   },
+   "Iceland": {
+      "message": "ஐஸ்லாந்து"
+   },
+   "Identities": {
+      "message": "அடையாளங்கள்"
+   },
+   "Identity": {
+      "message": "அடையாளம்"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "உங்களிடம் ஏற்கவனே lastpass கணக்கிருந்தால் இந்த சாளரத்தை மூடி பின் உள்நுழையவும்."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "உங்கள் LastPass மாஸ்டர் கடவுச்சொல்லை மறக்க நேரிட்டால்,"
+   },
+   "Import": {
+      "message": "இறக்குமதி"
+   },
+   "Import_From": {
+      "message": "இதிலிருந்து இறக்குமதி செய்"
+   },
+   "Import_Your_Data": {
+      "message": "உங்கள் தரவு இறக்குமதி"
+   },
+   "India": {
+      "message": "இந்தியா"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "இண்டியானா, போகோடா, லிமா, கியூடோ, ரியோ பிரான்கோ"
+   },
+   "Indonesia": {
+      "message": "இந்தோனேஷியா"
+   },
+   "Install": {
+      "message": "நிறுவ"
+   },
+   "Instructions": {
+      "message": "வழிமுறைகள்"
+   },
+   "Insurance": {
+      "message": "காப்புறுதி"
+   },
+   "International_Date_Line_West": {
+      "message": "சர்வதேச மேற்கு தேதிவரை"
+   },
+   "Invalid_Password_": {
+      "message": "தவறான கடவுச்சொல்."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "செல்லாத மின்னஞ்சல் முகவரி, மீண்டும் முயலவும்"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "ஈரான் (இஸ்லாமிய குடியரசு)"
+   },
+   "Iraq": {
+      "message": "ஈராக்"
+   },
+   "Ireland": {
+      "message": "அயர்லாந்து"
+   },
+   "Isle_of_Man": {
+      "message": "ஐல் ஆஃப் மேன்"
+   },
+   "Israel": {
+      "message": "இஸ்ரேல்"
+   },
+   "Issue_Number": {
+      "message": "இடுகை எண்"
+   },
+   "Issue_number": {
+      "message": "வெளியீடு எண்"
+   },
+   "Issued_Date": {
+      "message": "வழங்கப்பட்ட தேதி"
+   },
+   "Issuing_Authority": {
+      "message": "வெளியிடும் ஆணையம்"
+   },
+   "Italian": {
+      "message": "இத்தாலியர்"
+   },
+   "Italy": {
+      "message": "இத்தாலி"
+   },
+   "Jamaica": {
+      "message": "ஜமைக்கா"
+   },
+   "January": {
+      "message": "ஜனவரி"
+   },
+   "Japan": {
+      "message": "ஜப்பான்"
+   },
+   "Japanese": {
+      "message": "ஜப்பானிய"
+   },
+   "Jersey": {
+      "message": "ஜெர்சி"
+   },
+   "Jordan": {
+      "message": "ஜோர்டான்"
+   },
+   "July": {
+      "message": "ஜூலை"
+   },
+   "June": {
+      "message": "ஜூன்"
+   },
+   "Kabul": {
+      "message": "காபூல்"
+   },
+   "Kathmandu": {
+      "message": "காத்மாண்டு"
+   },
+   "Kazakhstan": {
+      "message": "கஜகஸ்தான்"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "எனது உள் நுழைவையும் படிவ நிரப்புதலையும் வரலாற்றில் பதியவும்"
+   },
+   "Kenya": {
+      "message": "கென்யா"
+   },
+   "Kiribati": {
+      "message": "கிரிபட்டி"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "கொரியா, ஜனநாயக மக்கள் குடியரசு"
+   },
+   "Korea__Republic_Of": {
+      "message": "கொரியா, குடியரசு"
+   },
+   "Korean": {
+      "message": "கொரிய"
+   },
+   "Kuwait": {
+      "message": "குவைத்"
+   },
+   "Kyrgyzstan": {
+      "message": "கிர்கிஸ்தான்"
+   },
+   "La_Paz": {
+      "message": "லா பாஸ்"
+   },
+   "Language": {
+      "message": "மொழி"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "லாவோ மக்கள் ஜனநாயக குடியரசு"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "LastPass CSV கோப்பு"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "LastPass Chrome கருவிப்பட்டி"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "LastPass மறைகுறியாக்கப்பட்ட கோப்பு"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "LastPass கட்டம் பல காரணி அங்கீகாரம்"
+   },
+   "LastPass_Menu": {
+      "message": "LastPass பட்டியல்"
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "குக்கீகளை lastpass.com இருந்து அனுமதிக்கப்படும் வரை LastPass உள்நுழைய முடியாது"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass பாதுகாப்பற்ற படிவமொன்றை காண்கிறது.\n\nதொடரவா?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass பாதுகாப்பற்ற படிவமொன்றை காண்கிறது.\n\nபடிவத்தை நிரப்பவா?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass ஒரு கடவுச்சொல்லில் மாற்றம் கண்டது,"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass ஒரு கடவுச்சொல்லில் மாற்றம் கண்டது,"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass ஒரு கடவுச்சொல்லில் மாற்றம் கண்டது, பயனர்"
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass இந்த பக்கத்தில் உள்ள படிவத்தில் உங்கள் புகுபதிவு தகவல்களை நிரப்பியுள்ளது."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "உங்கள் தொலைபேசி எண்ணின் கடைசி 4 இலக்கங்கள்"
+   },
+   "Last_Name": {
+      "message": "கடைசி பெயர்"
+   },
+   "Last_name": {
+      "message": "கடைசி பெயர்"
+   },
+   "Latvia": {
+      "message": "லாட்வியா"
+   },
+   "Launch": {
+      "message": "தொடங்கு"
+   },
+   "Lebanon": {
+      "message": "லெபனான்"
+   },
+   "Left": {
+      "message": "இடது"
+   },
+   "Lesotho": {
+      "message": "லெசோத்தோ"
+   },
+   "Liberia": {
+      "message": "லைபீரியா"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "லிபியன் அரேபிய ஜமாஹிரியா"
+   },
+   "License_Class": {
+      "message": "உரிம வகுப்பு"
+   },
+   "License_Key": {
+      "message": "உரிமத்தின் சாவி"
+   },
+   "Liechtenstein": {
+      "message": "லிச்சென்ஸ்டீன்"
+   },
+   "Lithuania": {
+      "message": "லிதுவேனியா"
+   },
+   "Local": {
+      "message": "உள்ளூர்"
+   },
+   "Log_into_a_Site": {
+      "message": "ஒரு தளத்தில் உள்நுழையவும்"
+   },
+   "Login": {
+      "message": "புகுபதிகை"
+   },
+   "LoginError": {
+      "message": "LastPassற்குள் நுழைய முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+   },
+   "Login_to_LastPass": {
+      "message": "LastPass ற்குல் நுளை"
+   },
+   "Logoff": {
+      "message": "விடுபதிகை"
+   },
+   "Logoff_": {
+      "message": "விடுபதிகை:"
+   },
+   "LoseChanges": {
+      "message": "நீங்கள் இந்த தளத்தின் துறைகள் வேண்டும் என்று உறுதியாக இருக்கிறீர்களா? அவ்வாறு நீங்கள் இந்த தளத்தில் செய்த மாற்றங்கள் இழக்க செய்யும்!"
+   },
+   "Luxembourg": {
+      "message": "லக்சம்பர்க்"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "மக்காவோ"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "மாசிடோனியா, முன்னாள் யூகோஸ்லாவிய குடியரசு"
+   },
+   "Madagascar": {
+      "message": "மடகாஸ்கர்"
+   },
+   "Malawi": {
+      "message": "மாலாவி"
+   },
+   "Malaysia": {
+      "message": "மலேஷியா"
+   },
+   "Maldives": {
+      "message": "மாலத்தீவு"
+   },
+   "Male": {
+      "message": "ஆண்"
+   },
+   "Mali": {
+      "message": "மாலி"
+   },
+   "Malta": {
+      "message": "மால்டா"
+   },
+   "Manage_Shared_Folders": {
+      "message": "பகிர்ந்த கோப்புறைகள் நிர்வகி"
+   },
+   "March": {
+      "message": "மார்ச்"
+   },
+   "Marshall_Islands": {
+      "message": "மார்ஷல் தீவுகள்"
+   },
+   "Martinique": {
+      "message": "மார்டினிக்"
+   },
+   "Master_Password": {
+      "message": "முதன்மை கடவுச்சொல்"
+   },
+   "Matching_Sites": {
+      "message": "பொருத்தமான தளங்கள்"
+   },
+   "Mauritania": {
+      "message": "Mauritania"
+   },
+   "Mauritius": {
+      "message": "மொரிஷியஸ்"
+   },
+   "May": {
+      "message": "மே"
+   },
+   "Mayotte": {
+      "message": "மயோட்டே"
+   },
+   "Member_Name": {
+      "message": "உறுப்பினர் பெயர்"
+   },
+   "Membership": {
+      "message": "உறுப்பினர்"
+   },
+   "Membership_Number": {
+      "message": "உறுப்பினர் எண்"
+   },
+   "Meta": {
+      "message": "மெட்டா (Meta)"
+   },
+   "Mexico": {
+      "message": "மெக்ஸிக்கோ"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "மைக்குரோனீசிய, கூட்டாட்சி நாடுகள்"
+   },
+   "Mid_Atlantic": {
+      "message": "மத்திய அட்லாண்டிக்"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "உங்கள் தொலைபேசி எண் மத்தியில் 3 இலக்கங்கள்"
+   },
+   "Middle_Name": {
+      "message": "மத்திய பெயர்"
+   },
+   "Middle_name": {
+      "message": "மத்திய பெயர்"
+   },
+   "Midway_Island__Samoa": {
+      "message": "மிட்வே தீவு, சமோவா"
+   },
+   "Mobile_Email_Address": {
+      "message": "கைபேசி மின்னஞ்சல் முகவரி"
+   },
+   "Mobile_Number": {
+      "message": "மொபைல் எண்"
+   },
+   "Mobile_number": {
+      "message": "செல்பேசி எண்"
+   },
+   "Moldova__Republic_Of": {
+      "message": "மால்டோவா, குடியரசு"
+   },
+   "Monaco": {
+      "message": "மொனாக்கோ"
+   },
+   "Mongolia": {
+      "message": "மங்கோலியா"
+   },
+   "Montenegro": {
+      "message": "மொண்டெனேகுரோ"
+   },
+   "Montserrat": {
+      "message": "மொன்ட்செராட்"
+   },
+   "More": {
+      "message": "மேலும்"
+   },
+   "More_Information": {
+      "message": "மேலும் தகவல்"
+   },
+   "Morocco": {
+      "message": "மொராக்கோ"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "மலை நேரம் (அமெரிக்கா & கனடா)"
+   },
+   "Mozambique": {
+      "message": "மொசாம்பிக்"
+   },
+   "Mr": {
+      "message": "திரு"
+   },
+   "Mrs": {
+      "message": "திருமதி"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_LastPass_Vault": {
+      "message": "எனது LastPass வால்ட் (Vault)"
+   },
+   "Myanmar": {
+      "message": "மியான்மார்"
+   },
+   "NAME": {
+      "message": "பெயர்"
+   },
+   "Name_": {
+      "message": "பெயர்:"
+   },
+   "Name_on_Card": {
+      "message": "அட்டை பெயர்"
+   },
+   "Name_on_card": {
+      "message": "அட்டையில் பெயர்"
+   },
+   "Nameproper": {
+      "message": "பெயர்"
+   },
+   "Namibia": {
+      "message": "நமீபியா"
+   },
+   "Nationality": {
+      "message": "நாட்டுரிமை"
+   },
+   "Nauru": {
+      "message": "நவ்ரூ"
+   },
+   "Nepal": {
+      "message": "நேபாளம்"
+   },
+   "Netherlands": {
+      "message": "நெதர்லாந்து"
+   },
+   "Netherlands_Antilles": {
+      "message": "நெதர்லாந்து அண்டிலிசு"
+   },
+   "Never": {
+      "message": "ஒருபோதும் இல்லை"
+   },
+   "Never_Show_Again": {
+      "message": "மீண்டும் காண்பிக்க வேண்டாம்"
+   },
+   "Never___": {
+      "message": "ஒருபோதுமில்லை (never)..."
+   },
+   "New_Caledonia": {
+      "message": "புதிய கலிடோனியா"
+   },
+   "New_Master_Password": {
+      "message": "புதிய மாஸ்டர் கடவுச்சொல்"
+   },
+   "New_Zealand": {
+      "message": "நியூசிலாந்து"
+   },
+   "Newfoundland": {
+      "message": "நியூஃபௌன்ட்லான்ட்"
+   },
+   "Nicaragua": {
+      "message": "நிகராகுவா"
+   },
+   "Niger": {
+      "message": "நைஜர்"
+   },
+   "Nigeria": {
+      "message": "நைஜீரியா"
+   },
+   "Niue": {
+      "message": "நியுவே"
+   },
+   "No": {
+      "message": "இல்லை"
+   },
+   "No_Matching_Sites_": {
+      "message": "பொருந்தும் தளங்கள் இல்லை!"
+   },
+   "No_Thanks": {
+      "message": "இல்லை, நன்றி"
+   },
+   "No_Updates_Are_Available": {
+      "message": "மேம்படுத்தல்கள் இல்லை"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "என் பாதுகாப்பற்ற தரவுகளை இறக்குமதி செய்யவேண்டாம்"
+   },
+   "None_Available": {
+      "message": "ஒன்றும் இல்லை"
+   },
+   "Norfolk_Island": {
+      "message": "நோர்போக் தீவு"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "வடக்கு மரியானா தீவுகள்"
+   },
+   "Norway": {
+      "message": "நார்வே"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "நார்வேய நைநோர்ஸ்க்"
+   },
+   "Not_Now": {
+      "message": "இப்போது இல்லை"
+   },
+   "Note_Type": {
+      "message": "குறிப்பு வகை"
+   },
+   "Notes": {
+      "message": "குறிப்புகள்"
+   },
+   "Notes_": {
+      "message": "குறிப்புகள்:"
+   },
+   "Notifications": {
+      "message": "அறிவிப்புகள்"
+   },
+   "November": {
+      "message": "நவம்பர்"
+   },
+   "Nuku_alofa": {
+      "message": "நுகுஅலோஃபா"
+   },
+   "Number": {
+      "message": "எண்"
+   },
+   "Number_of_Licenses": {
+      "message": "உரிமங்களின் எண்ணிக்கை"
+   },
+   "OK": {
+      "message": "சரி"
+   },
+   "October": {
+      "message": "அக்டோபர்"
+   },
+   "Old_Password": {
+      "message": "பழைய கடவுச்சொல்"
+   },
+   "Oman": {
+      "message": "ஓமன்"
+   },
+   "Open_All": {
+      "message": "அனைத்தையும் திற"
+   },
+   "Open_Favorites": {
+      "message": "விருப்பத்தளங்களை திறக்கவும்"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "என் LastPass வால்ட்டை திற"
+   },
+   "Open_New_Pages_in": {
+      "message": "புதிய பக்கங்கள் திறக்க"
+   },
+   "Opera": {
+      "message": "ஓபரா"
+   },
+   "Opera_Password_Manager": {
+      "message": "ஓபரா கடவுச்சொல் மேலாளர்"
+   },
+   "Order_Number": {
+      "message": "ஆணை எண்"
+   },
+   "Order_Total": {
+      "message": "ஆணை கூட்டுத்தொகை"
+   },
+   "Organization": {
+      "message": "அமைப்பு"
+   },
+   "Other": {
+      "message": "வேறு"
+   },
+   "Other_Sessions": {
+      "message": "மற்ற அமர்வுகள்"
+   },
+   "PASSWORDupper": {
+      "message": "கடவுச்சொல்"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "பசிபிக் நேரம் (அமெரிக்கா & கனடா)"
+   },
+   "Page_Down": {
+      "message": "Page Down"
+   },
+   "Page_Up": {
+      "message": "Page Up"
+   },
+   "Pakistan": {
+      "message": "பாக்கிஸ்தான்"
+   },
+   "Palau": {
+      "message": "பாலவ்"
+   },
+   "Palestinian_Territories": {
+      "message": "பாலஸ்தீன பகுதிகள்"
+   },
+   "Panama": {
+      "message": "பனாமா"
+   },
+   "Papua_New_Guinea": {
+      "message": "பாப்புவா புதிய கினியா"
+   },
+   "Paraguay": {
+      "message": "பாரகுவே"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passport": {
+      "message": "பாஸ்போர்ட்"
+   },
+   "Password": {
+      "message": "கடவுச்சொல்"
+   },
+   "Password_": {
+      "message": "கடவுச்சொல்:"
+   },
+   "Password_Agent": {
+      "message": "கடவுச்சொல் முகவர்"
+   },
+   "Password_Keeper": {
+      "message": "கடவுச்சொல் கீப்பர்"
+   },
+   "Password_Length": {
+      "message": "கடவுச்சொல் நீளம்"
+   },
+   "Password_Reminder": {
+      "message": "கடவுச்சொல் நினைவூட்டல்"
+   },
+   "Password_Safe": {
+      "message": "கடவுச்சொல் பாதுகாப்பகம்"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "கடவுச்சொல் நினைவூட்டல்: கடவுச்சொல் பொருந்தவில்லை"
+   },
+   "Password_updated_": {
+      "message": "கடவுச்சொல் புதிதாக்கப்பட்டது!"
+   },
+   "Personal": {
+      "message": "தனிப்பட்ட"
+   },
+   "Peru": {
+      "message": "பெரு"
+   },
+   "Philippines": {
+      "message": "பிலிப்பைன்ஸ்"
+   },
+   "Phone_Number": {
+      "message": "தொலைபேசி எண்"
+   },
+   "Phone_number": {
+      "message": "தொலைபேசி எண்"
+   },
+   "Pitcairn": {
+      "message": "பிட்கன் தீவுகள்"
+   },
+   "Please_Make_a_Selection": {
+      "message": "ஒன்றை தேர்ந்தெடுங்கள்"
+   },
+   "Please_Wait___": {
+      "message": "காத்திருக்கவும் ..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "பின்வரும் கேள்விக்கு தயவுசெய்து பதிலளிக்கவும்:"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "இந்த கணினிக்கு ஒரு பெயர் வழங்கவும்"
+   },
+   "Please_select": {
+      "message": "தேர்ந்தெடுக்கவும்"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "இந்த மாற்றத்தை நீங்கள் எந்த தளங்களில் செயல்படுத்த விரும்புகிறீர்களோ அதனை தேர்ந்தெடுக்கவும்."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "பின்னர் நேரத்தில் ஒரு கணக்கு உருவாக்க https://lastpass.com செல்லுங்கள்."
+   },
+   "Poland": {
+      "message": "போலந்து"
+   },
+   "Policy_Number": {
+      "message": "காப்புறுதி கொள்கை எண்"
+   },
+   "Policy_Type": {
+      "message": "காப்புறுதி கொள்கை வகை"
+   },
+   "Polish": {
+      "message": "போலிஷ்"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "சேவையக கணக்கு மாற்ற சுழற்சி இடைவெளி (நிமிடங்கள்"
+   },
+   "Port": {
+      "message": "துறைமுகம்"
+   },
+   "Portugal": {
+      "message": "போர்த்துக்கல்"
+   },
+   "Portuguese": {
+      "message": "போர்த்துகீசியம்"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "போர்த்துகீசியம் (பிரேசில்)"
+   },
+   "Preferences": {
+      "message": "விருப்பங்கள்"
+   },
+   "Price": {
+      "message": "விலை"
+   },
+   "Print": {
+      "message": "அச்சிடு"
+   },
+   "Print_Screen": {
+      "message": "திரை அச்சிட"
+   },
+   "Print_Secure_Notes": {
+      "message": "பாதுகாப்பான குறிப்புகள் அச்சிட"
+   },
+   "Print_Sites": {
+      "message": "தளங்கள் அச்சிட"
+   },
+   "Profile": {
+      "message": "சுயவிவரம்"
+   },
+   "Profile_language": {
+      "message": "சுயவிவர மொழி"
+   },
+   "Profile_name": {
+      "message": "சுயவிவர பெயர்"
+   },
+   "Pronounceable": {
+      "message": "உச்சரிக்கத்தக்க"
+   },
+   "Protected": {
+      "message": "பாதுகாக்கப்பட்ட"
+   },
+   "Publisher": {
+      "message": "வெளியீட்டாளர்"
+   },
+   "Puerto_Rico": {
+      "message": "ரிக்கோ"
+   },
+   "Purchase_Date": {
+      "message": "வாங்கப்பட்ட தேதி"
+   },
+   "Qatar": {
+      "message": "கத்தார்"
+   },
+   "Recent_Sites": {
+      "message": "சமீபத்திய தளங்கள்"
+   },
+   "Recently_Used": {
+      "message": "சமீபத்தில் பயன்படுத்தியவை"
+   },
+   "Recently_Used_list_size": {
+      "message": "சமீபத்தில் பயன்படுத்திய பட்டியல் அளவு"
+   },
+   "Recheck_Page": {
+      "message": "மீண்டும் பிழைதிருத்தம் செய்"
+   },
+   "Reencrypting_Data___": {
+      "message": "தரவு மீண்டும் மறையீடாக்கபடுகின்றது ..."
+   },
+   "Refresh": {
+      "message": "புதுப்பி"
+   },
+   "Refresh_Sites": {
+      "message": "தளங்கள் புதுப்பி"
+   },
+   "Reject": {
+      "message": "நிராகரி"
+   },
+   "Remember_Email": {
+      "message": "மின்னஞ்சலை ஞாபகம் வை"
+   },
+   "Remember_Password": {
+      "message": "கடவுச்சொல் ஞாபகம் வை"
+   },
+   "Replace_Existing_Site": {
+      "message": "சேமிக்கப்பட்டுள்ள தளத்தை மாற்றவும்"
+   },
+   "Require_Every_Character_Type": {
+      "message": "ஒவ்வொரு எழுத்துரு வகையும் தேவைப்படும்"
+   },
+   "Require_Password_Reprompt": {
+      "message": "கடவுச்சொல் மீண்டும் தேவை"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "Respect AutoComplete=off: வலைத்தளங்கள் தன்னிரப்பியை செயல்நீக்க அனுமதி"
+   },
+   "Reunion": {
+      "message": "மறு இணக்கம்"
+   },
+   "Right": {
+      "message": "வலது"
+   },
+   "RoboForm": {
+      "message": "RoboForm"
+   },
+   "Romania": {
+      "message": "ருமேனியா"
+   },
+   "Routing_number": {
+      "message": "Routing எண்"
+   },
+   "Russian": {
+      "message": "ரஷிய"
+   },
+   "Russian_Federation": {
+      "message": "ரஷியன் கூட்டமைப்பு"
+   },
+   "Rwanda": {
+      "message": "ருவாண்டா"
+   },
+   "SITE": {
+      "message": "வலைத்தளம்"
+   },
+   "Safari": {
+      "message": "சஃபாரி"
+   },
+   "Safari_Password_Manager": {
+      "message": "சஃபாரி கடவுச்சொல் மேலாளர்"
+   },
+   "Saint_Barthelemy": {
+      "message": "செயின்ட் பார்தேலெமி"
+   },
+   "Saint_Helena": {
+      "message": "செயிண்ட் எலனா"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "செயிண்ட் கிட்ஸ் மற்றும் நேவிஸ்"
+   },
+   "Saint_Lucia": {
+      "message": "செயிண்ட் லூசியா"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "செயிண்ட் மார்டின் (பிரஞ்சு பகுதி)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "செயின்ட் பியரி மற்றும் மிக்குயிலான்"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "செயின்ட் வின்சென்ட் மற்றும் கிரேனடீன்ஸ்"
+   },
+   "Samoa": {
+      "message": "சமோவா"
+   },
+   "San_Marino": {
+      "message": "சான் மரீனோ"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "பிரின்ஸிபி"
+   },
+   "Saudi_Arabia": {
+      "message": "சவுதி அரேபியா"
+   },
+   "Save": {
+      "message": "சேமி"
+   },
+   "Save_All_Entered_Data": {
+      "message": "அனைத்து உள்ளிட்டது தகவல்கள் சேமி"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "கடன் அட்டை சுயவிவரத்தை சேமி"
+   },
+   "Save_New_Site": {
+      "message": "புதிய தளம் சேமி"
+   },
+   "Save_Site": {
+      "message": "தளத்தை சேமி"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "கணக்கு மீட்புக்காக உள்ளூரில் ஒரு ஊனமுற்ற நேர கடவுச்சொல்லை சேமி"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "உங்கள் மாற்றங்களை சேமித்துவிட்டு இந்த சாளரத்தை மூடுங்கள்"
+   },
+   "Screen_Keyboard": {
+      "message": "திரை விசைப்பலகை"
+   },
+   "Search_All_Data": {
+      "message": "அனைத்து தரவு தேடல்"
+   },
+   "Search_All_Notes": {
+      "message": "அனைத்து குறிப்புகள் தேடல்"
+   },
+   "Search_All_Sites": {
+      "message": "அனைத்து தளங்களிலும் தேடல்"
+   },
+   "Search_Vault": {
+      "message": "தேடல் பெட்டகம்"
+   },
+   "Search_within_secure_notes": {
+      "message": "பாதுகாப்பான குறிப்புகளில் தேடவும்"
+   },
+   "Searchproper": {
+      "message": "தேடு"
+   },
+   "Secure_Notes": {
+      "message": "பாதுகாப்பான குறிப்புகள்"
+   },
+   "Security": {
+      "message": "பாதுகாப்பு"
+   },
+   "Security_Check": {
+      "message": "பாதுகாப்பு சோதனை"
+   },
+   "Security_Code": {
+      "message": "பாதுகாப்பு குறியீடு"
+   },
+   "Security_code": {
+      "message": "பாதுகாப்பு குறியீடு"
+   },
+   "Select": {
+      "message": "தேர்ந்தெடு"
+   },
+   "Select_All": {
+      "message": "அனைத்து தேர்வு"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "LastPass மேம்படுத்த உதவ 'அநாமதேய பிழை அறிக்கை தரவை' அனுப்பவும்"
+   },
+   "Senegal": {
+      "message": "செனகல்"
+   },
+   "September": {
+      "message": "செப்டம்பர்"
+   },
+   "Serbia": {
+      "message": "செர்பியா"
+   },
+   "Server": {
+      "message": "சேவையகம்"
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "சீசேம் பல காரணி அங்கீகாரம்"
+   },
+   "Sessions": {
+      "message": "அமர்வுகள்"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "தனிபயன் படிவ புலங்களை அமைக்கவும்"
+   },
+   "Settings": {
+      "message": "அமைப்புகள்"
+   },
+   "Sex": {
+      "message": "பாலினம்"
+   },
+   "Seychelles": {
+      "message": "செஷெல்ஸ்"
+   },
+   "Share": {
+      "message": "பகிர்க"
+   },
+   "Share_Selected": {
+      "message": "தேர்ந்தெடுத்ததை பகிர்க"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "மற்ற உலாவிகளுக்கிடையே உள்நுழைவு நிலையை பகிர்க"
+   },
+   "Shares": {
+      "message": "பங்குகள்"
+   },
+   "Shift": {
+      "message": "Shift"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "LastPass இந்த கடவுச்சொல்லை நினைவில் வைத்து கொள்ள வேண்டுமா?"
+   },
+   "Show": {
+      "message": "காண்பி"
+   },
+   "Show_Advanced_Options": {
+      "message": "கூடுதல் விருப்பங்கள் காட்டு"
+   },
+   "Show_Deleted_Sites": {
+      "message": "நீக்கப்பட்ட தளங்கள் காட்டுக"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "நிரப்பு பலகையை காட்டு"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "நிரப்பு அறிவிப்புகள் காண்பியுங்கள்"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "உள்நுழைவுக்கு பிறகு என் LastPass வால்ட்டை காட்டு"
+   },
+   "Show_Notifications": {
+      "message": "அறிவிப்புகளை காட்டு"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "தளம் சேமிப்பு பலகையை காட்டு"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "தளம் சேமித்தல் அறிவிப்புகளை காட்டு"
+   },
+   "Show_all_sites": {
+      "message": "அனைத்து தளங்களையும் காட்டு"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "மற்றொரு தனிப்பயன் புலத்தை உள்ளீட்டை காட்டு"
+   },
+   "Sierra_Leone": {
+      "message": "சியரா லியோன்"
+   },
+   "Singapore": {
+      "message": "சிங்கப்பூர்"
+   },
+   "Site_Search": {
+      "message": "தளத்தில் தேடல்"
+   },
+   "Sites": {
+      "message": "தளங்கள்"
+   },
+   "Slovak": {
+      "message": "ஸ்லோவாக்"
+   },
+   "Slovakia": {
+      "message": "ஸ்லோவாக்கியா"
+   },
+   "Slovenia": {
+      "message": "ஸ்லோவேனியா"
+   },
+   "Social_Security": {
+      "message": "சமூக பாதுகாப்பு"
+   },
+   "Social_security_number": {
+      "message": "சமூக பாதுகாப்பு எண் (SSN)"
+   },
+   "Software_License": {
+      "message": "மென்பொருள் உரிமம்"
+   },
+   "Solomon_Islands": {
+      "message": "சாலமன் தீவுகள்"
+   },
+   "Somalia": {
+      "message": "சொமாலியா"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "மன்னிக்கவும், இந்த பகிரப்பட்ட கோப்புறை படிக்க மட்டுமே."
+   },
+   "South_Africa": {
+      "message": "தென் ஆப்ரிக்கா"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "தெற்கு ஜார்ஜியா மற்றும் தெற்கு சாண்ட்விச் தீவுகள்"
+   },
+   "Spain": {
+      "message": "ஸ்பெயின்"
+   },
+   "Spanish": {
+      "message": "ஸ்பானிஷ்"
+   },
+   "Spanish__Mexico_": {
+      "message": "ஸ்பானிஷ் (மெக்ஸிக்கோ)"
+   },
+   "Special": {
+      "message": "சிறப்பு"
+   },
+   "Sri_Lanka": {
+      "message": "இலங்கை"
+   },
+   "Start_Date": {
+      "message": "தொடக்க தேதி"
+   },
+   "Start_date": {
+      "message": "தொடக்க நாள்"
+   },
+   "State___Province": {
+      "message": "மாநிலம் / மாகாணம்"
+   },
+   "Submit_Form": {
+      "message": "படிவத்தை சமர்ப்பி"
+   },
+   "Submitting___": {
+      "message": "சமர்ப்பிக்கப்படுகின்றது ..."
+   },
+   "Sudan": {
+      "message": "சூடான்"
+   },
+   "Support_Email": {
+      "message": "ஆதரவு மின்னஞ்சல்"
+   },
+   "Suriname": {
+      "message": "சூரினாம்"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "மேயன்"
+   },
+   "Swaziland": {
+      "message": "ஸ்வாசிலாந்து"
+   },
+   "Sweden": {
+      "message": "ஸ்வீடன்"
+   },
+   "Swedish": {
+      "message": "ஸ்வீடிஷ்"
+   },
+   "Swipe_current_user_s_finger": {
+      "message": "தற்போதைய பயனரின் விரலை தேய்க்கவும்"
+   },
+   "Swipe_finger": {
+      "message": "விரல் தேய்ப்பு"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "கைரேகை உணர்கருவி மீது உங்கள் விரலை தேய்க்கவும்"
+   },
+   "Switzerland": {
+      "message": "சுவிச்சர்லாந்து"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "சிரியன் அரபு குடியரசு"
+   },
+   "Tabs": {
+      "message": "தாவல்கள்"
+   },
+   "Taiwan": {
+      "message": "தைவான்"
+   },
+   "Tajikistan": {
+      "message": "தாஜிக்ஸ்தான்"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "டான்சானியா, ஐக்கிய குடியரசு"
+   },
+   "Tehran": {
+      "message": "தெஹ்ரான்"
+   },
+   "Telephone": {
+      "message": "தொலைபேசி"
+   },
+   "Tell_a_friend_": {
+      "message": "நண்பரிடம் கூறவும்!"
+   },
+   "Text": {
+      "message": "உரை"
+   },
+   "Text_to_find": {
+      "message": "தேடவேண்டிய உரை"
+   },
+   "Thailand": {
+      "message": "தாய்லாந்து"
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "4 இலக்க கடன் அட்டை வழங்கப்பட்ட ஆண்டு"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "நீங்கள் மறுநுழைத்த LastPass மாஸ்டர் கடவுச்சொல் பொருந்தவில்லை"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "நீங்கள் உள்ளிட்ட 'பழைய கடவுச்சொல்' உங்கள் சரியான LastPass மாஸ்டர் கடவுச்சொல் அல்ல"
+   },
+   "The_credit_card_number": {
+      "message": "கடன் அட்டை எண்"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "கடன் அட்டை முடிவுறும் 4 இலக்க ஆண்டு"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "கடன் அட்டையின் முடிவுறும் மாதம்"
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "அச்சிட்ட கடன் அட்டை முழு பெயர்"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "கடன் அட்டை வழங்கப்பட்ட மாதம்"
+   },
+   "The_name_of_your_bank": {
+      "message": "உங்கள் வங்கியின் பெயர்"
+   },
+   "The_value_to_be_filled": {
+      "message": "நிரப்பப்படவேண்டிய தகவல்"
+   },
+   "This_attachment_needs_to_be_saved_first_": {
+      "message": "இவ்விணைப்பை முதலில் சேமிக்க வேண்டும்."
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "இது ஒரு பகிர்வு தளம். நீங்கள் கடவுச்சொல்லை பார்வையிட அனுமதியில்லை."
+   },
+   "This_may_take_a_while___": {
+      "message": "இது சிறிது நேரம் எடுக்கலாம்..."
+   },
+   "Time_Zone": {
+      "message": "சமநேர மண்டலம்"
+   },
+   "Timor_Leste": {
+      "message": "திமோர்-லெஸ்டே"
+   },
+   "Title": {
+      "message": "தலைப்பு"
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "LastPass உபயோகிக்க தொடங்க, உங்கள் கணக்கு தளங்களை சேர்க்க வேண்டும்."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "உங்கள் தனியுரிமையை பாதுகாக்க மற்றும் உங்கள் தரவு இரகசியமாக வைத்திருக்க,"
+   },
+   "Togo": {
+      "message": "டோகோ"
+   },
+   "Tokelau": {
+      "message": "டோக்கெலாவ்"
+   },
+   "Tonga": {
+      "message": "டோங்கா"
+   },
+   "Tools": {
+      "message": "கருவிகள்"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "டிரினிடாட் மற்றும் டொபாகோ"
+   },
+   "Try_Again": {
+      "message": "மீண்டும் முயற்சி செய்"
+   },
+   "Tunisia": {
+      "message": "டுனிசியா"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "Turkey"
+   },
+   "Turkmenistan": {
+      "message": "Turkmenistan"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "Turks and Caicos Islands"
+   },
+   "Tuvalu": {
+      "message": "Tuvalu"
+   },
+   "Type": {
+      "message": "வகை"
+   },
+   "Type_": {
+      "message": "வகை:"
+   },
+   "URL_": {
+      "message": "URL:"
+   },
+   "USERNAME": {
+      "message": "பயனர்பெயர்"
+   },
+   "Uganda": {
+      "message": "Uganda"
+   },
+   "Ukraine": {
+      "message": "Ukraine"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "உலான் படார், பெர்த்"
+   },
+   "United_Arab_Emirates": {
+      "message": "United Arab Emirates"
+   },
+   "United_Kingdom": {
+      "message": "United Kingdom"
+   },
+   "United_States": {
+      "message": "ஐக்கிய அமெரிக்கா"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "யுனைடட் ஸ்டேட்ஸ் மைனர் அவுட்லயிங் தீவுகள்"
+   },
+   "Unselect_All": {
+      "message": "அனைத்தும் தேர்வுரத்து"
+   },
+   "Up": {
+      "message": "Up"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "ஆன்லைன் LastPass-ற்கு மேம்படுத்தவும்!"
+   },
+   "Uploading_Data___": {
+      "message": "தகவல்கள் பதிவேற்றபடுகின்றன..."
+   },
+   "Uruguay": {
+      "message": "உருகுவே"
+   },
+   "User_Manual": {
+      "message": "பயனர் கையேடு"
+   },
+   "User_name": {
+      "message": "பயனர் பெயர்"
+   },
+   "Username_": {
+      "message": "பயனர்பெயர்:"
+   },
+   "Usernameproper": {
+      "message": "பயனர்பெயர்"
+   },
+   "Uzbekistan": {
+      "message": "உஸ்பெகிஸ்தான்"
+   },
+   "Value_to_fill": {
+      "message": "நிரப்பவேண்டிய தகவல்"
+   },
+   "Vanuatu": {
+      "message": "வனுவாட்டு"
+   },
+   "Vault": {
+      "message": "பெட்டகம்"
+   },
+   "Venezuela": {
+      "message": "வெனிசுலா"
+   },
+   "Version_": {
+      "message": "பதிப்பு:"
+   },
+   "Viet_Nam": {
+      "message": "வியத்நாம்"
+   },
+   "View_Passwords": {
+      "message": "கடவுச்சொற்கள் காண்க"
+   },
+   "Virgin_Islands__British_": {
+      "message": "வர்ஜின் தீவுகள் (பிரிட்டிஷ்)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "வெர்ஜின் தீவுகள் (ஐக்கிய அமெரிக்க)"
+   },
+   "Wallis_and_Futuna": {
+      "message": "வலிசும் புட்டூனாவும்"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "பாதுகாப்பற்ற படிவங்களை பூர்த்தி செய்ய முன்பு எச்சரிக்கவும்"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "அடிப்படை பயன்பாடு பற்றிய ஒரு நிகழ்படத்தை காணவும்"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "நாம் ஒரு நகலை கூட வைப்பதில்லை."
+   },
+   "Website": {
+      "message": "வலைத்தளம்"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "LastPass ற்கு வரவேற்கிறோம்!"
+   },
+   "West_Central_Africa": {
+      "message": "மேற்கு மத்திய ஆப்ரிக்கா"
+   },
+   "Western_Sahara": {
+      "message": "மேற்கு சஹாரா"
+   },
+   "Wi_Fi_Password": {
+      "message": "Wi-Fi கடவுச்சொல்"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "Wi-Fi கடவுச்சொற்கள்"
+   },
+   "Windows": {
+      "message": "சாளரங்கள்"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "நீங்கள் இப்போது ஒரு சுயவிவர நிரப்புதல் படிவம் அமைக்க விரும்புகிறீர்களா?"
+   },
+   "XML_Files": {
+      "message": "XML கோப்புகளை"
+   },
+   "Yangon__Rangoon_": {
+      "message": "யங்கோன் (ரங்கூன்)"
+   },
+   "Yemen": {
+      "message": "ஏமன்"
+   },
+   "Yes": {
+      "message": "ஆம்"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "LastPass-ற்கு  இறக்குமதி செய்யவிரும்பும் பொருட்களை தேர்வு செய்ய அனுமதிக்கவும்"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "அதே மதிப்பிற்கு நீங்கள் ஒன்றுக்கும் மேற்பட்ட HotKey-யை ஒதுக்க முடியாது."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "நீங்கள் தொடர விதிமுறைகளை ஒப்புக்கொள்ள வேண்டும்"
+   },
+   "You_must_enter_a_name_": {
+      "message": "நீங்கள் ஒரு பெயரை உள்ளிட வேண்டும்."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "நீங்கள் ஒரு தனிப்பட்ட பெயரை உள்ளிட வேண்டும்."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "மாற்றங்களை கான, நீங்கள் Chrome ஐ மறுதொடக்கம் செய்ய வேண்டும்"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "மாற்றங்கள் அனைத்தும் அமல்படுத்த உங்கள் உலாவியை மறுதொடக்க வேண்டும்."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "உங்கள் 4 இலக்க பிறந்த வருடம்"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "உங்கள் Google Chrome கடவுச்சொற்கள் வெற்றிகரமாக இறக்குமதி செய்யப்பட்டன."
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "உங்கள் ஜிப் அல்லது அஞ்சல் குறியீடு"
+   },
+   "Your_address_information": {
+      "message": "உங்கள் முகவரி"
+   },
+   "Your_bank_account_information": {
+      "message": "உங்கள் வங்கி கணக்கு தகவல்"
+   },
+   "Your_birth_day": {
+      "message": "உங்கள் பிறந்த நாள்"
+   },
+   "Your_birth_month": {
+      "message": "உங்கள் பிறந்த மாதம்"
+   },
+   "Your_city_name": {
+      "message": "உங்கள் நகரப்பெயர்"
+   },
+   "Your_company_s_name": {
+      "message": "உங்கள் நிறுவனத்தின் பெயர்"
+   },
+   "Your_contact_information": {
+      "message": "உங்கள் தொடர்பு தகவல்கள்"
+   },
+   "Your_country_name": {
+      "message": "உங்கள் நாட்டின் பெயர்"
+   },
+   "Your_county_name": {
+      "message": "உங்கள் மாவட்டத்தின் பெயர்"
+   },
+   "Your_credit_card_information": {
+      "message": "உங்கள் கடன் அட்டை தகவல்"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "இந்த செயலை நிறைவு செய்ய உங்கள் தற்போதைய அமைப்பினால் உங்கள் LastPass கடவுச்சொல் தேவைப்படுகிறது."
+   },
+   "Your_email_address": {
+      "message": "உங்கள் மின்னஞ்சல் முகவரி"
+   },
+   "Your_first_name": {
+      "message": "உங்கள் முதல் பெயர்"
+   },
+   "Your_government_ID_number": {
+      "message": "உங்கள் அரசாங்க அடையாள அட்டை இலக்கம்"
+   },
+   "Your_last_name": {
+      "message": "உங்கள் கடைசி பெயர்"
+   },
+   "Your_middle_name": {
+      "message": "உங்கள் நடு பெயர்"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "உங்கள் கடவுச்சொல் உங்கள் மின்னஞ்சல்லை ஒத்து இருக்க முடியாது."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "உங்கள் கடவுச்சொல்லை எளிதாக யூகிக்க முடியும்"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "உங்கள் கடவுச்சொல்லை மிகவும் சிறியதாக உள்ளது. குறைந்தது 6 எழுத்துக்களாவது இருக்க வேண்டும்"
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "உங்கள் கடவுச்சொல் மிகவும் சிறியதாக உள்ளது. குறைந்தது 8 எழுத்துக்களாவது இருக்க வேண்டும்"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "உங்கள் கடவுச்சொற்கள் பொருந்தவில்லை."
+   },
+   "Your_personal_information": {
+      "message": "உங்கள் தனிப்பட்ட தகவல்"
+   },
+   "Your_phone_number": {
+      "message": "உங்கள் தொலைபேசி எண்"
+   },
+   "Your_phone_number_extension": {
+      "message": "உங்கள் தொலைபேசி நீட்டிப்பு எண்"
+   },
+   "Your_prefix_or_title": {
+      "message": "உங்கள் முன்னொட்டு அல்லது தலைப்பு"
+   },
+   "Your_sex": {
+      "message": "உங்கள் பாலினம்"
+   },
+   "Your_state_or_province_name": {
+      "message": "உங்கள் மாநில அல்லது மாகாணத்தின் பெயர்"
+   },
+   "Your_street_address": {
+      "message": "உங்கள் தெரு முகவரி"
+   },
+   "Your_time_zone": {
+      "message": "உங்கள் நேர மண்டலம்"
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "வலைதளங்களில் உள்நுழைய உங்கள் பயனர் பெயர்"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "YubiKey பல காரணி அங்கீகாரம்"
+   },
+   "Yugoslavia": {
+      "message": "யூகோஸ்லாவியா"
+   },
+   "ZIP___Postal_code": {
+      "message": "ஜிப் / அஞ்சல் குறியீடு"
+   },
+   "Zambia": {
+      "message": "சாம்பியா"
+   },
+   "Zimbabwe": {
+      "message": "ஜிம்பாப்வே"
+   },
+   "_Hide_": {
+      "message": "[மறை]"
+   },
+   "_History_": {
+      "message": "[வரலாறு]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(நிலுவையிலுள்ள புதிய பங்கு சலுகைகள்)"
+   },
+   "_Show_": {
+      "message": "[காட்டு]"
+   },
+   "_domain_": {
+      "message": "(domain)"
+   },
+   "_none_": {
+      "message": "(எதுவுமில்லை)"
+   },
+   "_unknown_": {
+      "message": "[தெரியாத]"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "ago": {
+      "message": "முன்"
+   },
+   "and": {
+      "message": "மற்றும்"
+   },
+   "day": {
+      "message": "நாள்"
+   },
+   "days": {
+      "message": "நாட்கள்"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "false": {
+      "message": "பிளை"
+   },
+   "favorites": {
+      "message": "பிடித்தவை"
+   },
+   "hour": {
+      "message": "மணி"
+   },
+   "hours": {
+      "message": "மணித்தியாளங்கள்"
+   },
+   "just_now": {
+      "message": "இப்பொழுதுதான்"
+   },
+   "minute": {
+      "message": "நிமிஷம்"
+   },
+   "minutes": {
+      "message": "நிமிடங்கள்"
+   },
+   "month": {
+      "message": "மாதம்"
+   },
+   "months": {
+      "message": "மாதங்கள்"
+   },
+   "privacy_statement": {
+      "message": "தனியுரிமை அறிக்கை"
+   },
+   "recently_usedlower": {
+      "message": "சமீபத்தில் பயன்படுத்திய"
+   },
+   "search": {
+      "message": "தேடல்"
+   },
+   "second": {
+      "message": "விநாடிகள்"
+   },
+   "seconds": {
+      "message": "விநாடிகள்"
+   },
+   "terms_of_service": {
+      "message": "சேவை விதிமுறைகள்"
+   },
+   "the_current_tab": {
+      "message": "தற்போதைய தாவல்"
+   },
+   "true": {
+      "message": "சரி"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "எங்களுக்கு உங்கள் LastPass கடவுச்சொல்லை என்ன என்று தெரியாது."
+   },
+   "week": {
+      "message": "வாரம்"
+   },
+   "weeks": {
+      "message": "வாரங்கள்"
+   },
+   "year": {
+      "message": "ஆண்டு"
+   },
+   "years": {
+      "message": "ஆண்டுகள்"
+   }
+}

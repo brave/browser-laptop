@@ -1,0 +1,37 @@
+.dropStyle {
+  border:thin dotted;
+  background: #9d9d9d !important;
+  background: -webkit-gradient(linear, left top, left bottom, from(#a9a9a9), to(#7a7a7a)); /* for webkit browsers */
+  font-weight: bold;
+  color: #e7e5e5;
+  position:absolute;
+  cursor:default;
+  text-align:left;
+  font-size:12px;
+  z-index:10000;
+  height:120px;
+  overflow:auto;
+  }
+.dropStyle div{
+  display:block;
+}
+.item {
+}
+.focus {
+background: #0399d4 !important; /* for non-css3 browsers */
+	background: -webkit-gradient(linear, left top, left bottom, from(#04acec), to(#0186ba)) !important; /* for webkit browsers */
+	color: #fff !important;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
+
+.item[aria-disabled="true"] {
+  color: grey;
+}
+.offscreen {
+   position: absolute;
+  left: -9000px;
+  width: 0;
+  overflow: hidden;
+}

@@ -825,6 +825,20 @@ function mainTemplateInit (nodeProps, frame) {
     }
   })
 
+  if (getSetting(settings.LAST_PASS_ENABLED)) {
+    template.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: 'LastPass',
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            nodeProps.height = 448
+            nodeProps.width = 350
+            ipc.send('chrome-browser-action-clicked', 'hdokiejnpimakedhajhdlcegeplioahd', frame.get('tabId'), 'LastPass', nodeProps)
+          }
+        }
+      })
+  }
   if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
     template.push(
       CommonMenu.separatorMenuItem,

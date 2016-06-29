@@ -1,0 +1,114 @@
+body {
+  margin:0 auto;
+  padding:0;
+}
+
+.table-left{
+  width:200px!important; 
+  margin-top:0px;
+  margin-bottom:0px;
+  display:inline-block;
+  font-size:20px;
+  float:left;
+
+}
+.breach_header_email {
+  display:inline-block;
+}
+.breach_header {
+  font-size:20px;
+  margin-top:20px;
+  margin-bottom:20px;
+}
+.muted p {
+  color:#ccc;
+}
+.table-right {
+  width:650px;
+  display:inline-block;
+  margin-left:5px;
+  float:right;
+}
+#breachimg {
+ width:100%;
+ padding-top:30px;
+ padding-bottom:0px;
+}
+.displaygroup{
+  margin-top:10px;
+  margin-bottom:10px;
+}
+.lp_grey_padding {
+  padding: 30px;
+}
+.lp_grey_bg {
+  position:relative;
+  background: #f8f8f8;
+  font: 15px/21px "open_sansregular", "Helvetica Neue", Helvetica, arial, sans-serif;
+  border: 1px #ddd solid;
+  -webkit-box-shadow: 3px 4px 5px rgba(0,0,0,.11);
+  -moz-box-shadow: 3px 4px 5px rgba(0,0,0,.11);
+  box-shadow: 3px 4px 5px rgba(0,0,0,.11);
+}
+.container {
+  width:970px;
+  margin:0 auto;
+  margin-top:60px;
+}
+p {
+margin-top:0px !important;
+margin-bottom:0px !important;
+}
+.stepbox h3{
+  margin-top:0px;
+  margin-bottom:0px;
+}
+#step1box {
+  margin-top:20px;
+  padding-left:80px;
+}
+#step2box {
+  margin-top:20px;
+  padding-left:60px;
+}
+#step3box {
+  margin-top:20px;
+  padding-left:40px;
+}
+.lpminheader {
+  padding:0;
+  margin:0 auto;
+  margin-bottom:10px;
+  position:absolute;
+  background-color:#d32d27;
+  height:40px;
+  width:100%;
+  top:0px;
+}
+.brand_white {
+  color:#ffffff;
+  display:block;
+  width:970px;
+  margin:0 auto;
+  padding:5px;
+}
+#step3box {
+  margin-top:20px;
+}
+.stepbox h3{
+        font-size:22px;
+        padding-bottom:10px;
+}
+.additionallist { list-style:none;padding-left:20px;}
+.header_buttons { float:right;margin-top:5px;  }
+.header_buttons a { color:white;margin-left:10px;font-size:14px; }
+#step1boxnoch { display:none }
+#bigredcheck { position:absolute!important;left:20px!important;width:50px!important; }
+#mediumgreycheck { position:absolute!important;left:20px!important;width:30px!important; }
+#smallgreycheck { width:10px!important;margin-right:5px; }
+#reused_list {
+        list-style:none; 
+        -moz-column-count: 2;
+        -webkit-column-count: 2;
+        column-count:2;
+}

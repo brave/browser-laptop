@@ -1,0 +1,84 @@
+/*
+******* Form Fill Dialog *******
+*/
+
+#formFillDialog {
+  max-height: 650px;
+  min-height: 215px;
+  max-width: 1000px;
+  min-width: 650px;
+}
+
+#formFillDialog .checkboxContainer {
+  margin-top: 20px;
+}
+
+#formFillDialog .dialogLeftPane {
+  width: 33%;
+}
+
+#formFillDialog .dialogRightPane {
+  left: 33%;
+}
+
+#formFillDialog .dialogTopPane td {
+  width: 33%;
+}
+
+#formFillDialog .inputFields {
+  margin: 0 20px;
+}
+
+/*
+******* Credit Card *******
+*/
+
+#formFillDialog.creditCard .creditCardHide {
+  display: none;
+}
+
+/*
+******* Phone Number *******
+*/
+
+.phoneNumber {
+  margin-top: 10px;
+}
+
+.phoneNumber td {
+  padding: 0;
+}
+
+.phoneNumber tr {
+  background-color: transparent;
+}
+
+.phoneNumber .extensionCell {
+  padding-left: 2%
+}
+
+.phoneNumber .dialogInput[size] {
+  text-align: center;
+}
+
+.areaCode, .phonePartOne {
+  margin: 0 5px;
+}
+
+.phoneNumber .phoneNumberCell {
+  white-space: nowrap;
+  padding-right: 5px;
+}
+
+.extensionLabel {
+  text-align: right;
+}
+
+.dialogInput.countryCode {
+  width: 20%;
+  margin-right: 2%;
+}
+
+.dialogInput.phone {
+  width: 78%;
+}

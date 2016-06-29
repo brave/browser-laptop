@@ -1,0 +1,222 @@
+.lp1 { margin-right:0.73em; }
+.lph { height:0; width:100%; position: absolute; top: 23px; border-top:1px solid #aaaaaa;}
+#lpbar { float: left; padding-top: 4px; font-size: 12px; }
+#guser { width: 100%; font-size: 12px; }
+.actionmenu { float: right; font-size: 12px;}
+.leaf {width: 100%}
+.open {width: 100%}
+.closed {width: 100%}
+.usercolhidden {display:none;}
+.usercolvisible {display:inline-block; width:141px; overflow:hidden;padding-right:calc(5% + 10px);}
+.ltcolhidden {display:none;}
+.ltcolvisible {display:inline-block; width:121px; overflow:hidden;padding-right:calc(5% + 10px);}
+#chooser:hover{cursor:hand;}
+.tree ul li:last-child { margin-bottom: 8px !important; }
+
+#thetree {
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+
+.sharesubtext { display:inline; font-size:11px; color: gray; padding-left:7px; font-style:italic;}
+.sharesubtext subtext:hover { cursor: pointer; }
+
+.border0px {
+  border: 0px;
+}
+
+.clearboth {
+  clear: both;
+}
+
+.vaultlink {
+  text-decoration: underline; color: #00C;
+}
+
+.hiddenfont {
+  visibility: hidden;display:inline;
+}
+
+.boldspan {
+  font-weight:bold;
+}
+
+.padding23span {
+  padding-left: 23px;
+}
+
+.width300div {
+  width: 300px;
+}
+
+body {
+  margin:0px; padding:0px; overflow: hidden;
+}
+
+#searchform {
+  margin:0px; padding:0px;
+}
+.searchinput {
+  font-size:16px;
+  font-style:italic;
+}
+
+#person {
+  margin-bottom:-5px; padding-top:6px;
+}
+
+#logo {
+  cursor: hand; cursor: pointer;
+  height:auto;
+  width:200px;
+  margin-left:25px;
+}
+
+#searchxlink {
+}
+
+.displayblock{ display: block; }
+.displaynone { display: none; }
+
+#identitycontainer {
+  padding-left:8px;
+}
+
+#identitylabel {
+  color: #858585;
+}
+
+#identity {
+  font-size: 12px; margin-top: 0px; width: 180px;
+}
+
+#menucol {
+  vertical-align:top;
+}
+
+#lptabs {
+  padding-left:5px;padding-top:5px;
+}
+
+#chooser {
+  float:right;
+}
+
+#usercol {
+  float: right; padding-right: calc(5% + 10px); width:161px;
+}
+
+#ltcol {
+  float: right; padding-right: calc(5% + 20px);width:121px;
+}
+
+#thetree {
+  clear: both;
+}
+
+#ffpane {
+  display:none;overflow:auto;
+}
+
+#identpane {
+  display:none;overflow:auto;
+}
+
+.noimg { margin-left:29px; }
+
+#rightside {
+  padding:10px 0 0 15px;
+}
+
+#adframe {
+  display:none;overflow:hidden;
+}
+
+#friend2 {
+  border:1px solid #AEBBC7;background-color:white;font-family:arial,tahoma,helvetica,sans-serif; font-size:11px;text-align: center; margin: auto; padding-bottom:10px !important;
+}
+
+#menucol {position:relative;}
+.actionsbox{z-index:100;background:#e6e6e6;}
+
+#lpfriendemail,#lpgift{
+    display:none;
+    color: #8a8a8a !important;
+}
+.promo {
+    font-size:13px !important; 
+    text-decoration:none !IMPORTANT;
+    position:absolute !important;bottom:0;left:37px;
+    width:160px !important;
+    min-width:160px !important;
+}
+
+.vbtn{
+  border: 1px solid #939393 !important;
+}
+
+#tabstable {
+  border:1px; width:100%;
+}
+
+#usercoldiv {
+  float: right; padding-right: 20px;
+}
+
+#headerli {
+  list-style-type:none;
+}
+
+#headerspan {
+  padding-left:9px;
+}
+
+#actionscol {
+  padding-right:52px;width:53px;display:inline;float:right;
+}
+
+#securitycheckscore {
+    border-radius:9px;
+    height:16px;
+    padding:3px 9px 0px 9px;
+    margin-left:8px;
+    margin-right:20px;
+    background:#3b352a;
+    color:#fff;
+    font-weight:bold;
+    display:none;
+    float:right;
+}
+
+.directionltr {
+  direction:ltr;
+}
+
+.turn90 { -webkit-transform:rotate(90deg); }
+#toolsturner img{
+  -webkit-transition:0.2s ease-in-out;
+  -webkit-transform-origin:7px 9px;
+  position:relative; top:-4px; left:4px;
+  width:12px;
+  height:12px;
+}
+#toolsturner {
+  cursor:pointer;
+}
+#lp_docwrite_homelocal212a{padding-left:8px;padding-top:4px;}
+.turn_hovertgt{ font-size:12px }
+
+.left{
+  float:left;
+}
+
+#tilepopup {
+  position:absolute;
+  border:1px solid #c5c5c5;
+  background-color:white;
+}
+
+#tilepopup div {
+  padding: 8px 20px 8px 8px;
+  border-bottom:1px solid #c5c5c5;
+}

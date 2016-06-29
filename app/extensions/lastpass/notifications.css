@@ -1,0 +1,52 @@
+
+.notification {
+  text-align: center;
+  border-width: 1px 0 1px 0;
+  border-style: solid;
+  border-color: #B4B4B4;
+  top: -50px;
+  height: 48px;
+  transition: top .2s;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  display: table;
+  table-layout: fixed;
+}
+
+.notification > div {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.messageCell {
+  padding: 10px;
+}
+
+.notification .title {
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.notification .close {
+  width: 48px;
+  cursor: pointer;
+}
+
+#errorMessage {
+  background-color: #FFDD86;
+  color: #8B6D3B;
+}
+
+#errorMessage a {
+  color: #8B6D3B;
+}
+
+#successMessage {
+  background-color: #B9DF90;
+  color: #3C763D;
+}
+
+#successMessage a {
+  color: #3C763D;
+}

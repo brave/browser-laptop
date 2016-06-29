@@ -29,6 +29,7 @@ const settings = {
   // Security Tab
   PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
+  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
   DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',

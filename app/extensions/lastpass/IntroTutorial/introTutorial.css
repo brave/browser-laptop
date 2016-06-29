@@ -1,0 +1,275 @@
+/*
+******* Dialog override *******
+*/
+#introTutorialWelcomeDialog {
+  min-height: 215px;
+  max-width: 550px;
+  min-width: 485px;
+}
+#introTutorialWelcomeDialog  .intro-tutorial.container {
+  width: 520px;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin: 0;
+}
+
+#introTutorialSelectSiteDialog,
+#introTutorialCompleteDialog {
+  min-height: 215px;
+  max-width: 620px;
+  min-width: 485px;
+}
+#introTutorialWelcomeDialog .dialogContent,
+#introTutorialSelectSiteDialog .dialogContent,
+#introTutorialCompleteDialog .dialogContent {
+  padding-bottom: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+.lp-grid.container {
+  width: 590px;
+}
+/*
+******* Intro Tutorial Dialogs *******
+*/
+.intro-tutorial img {
+  vertical-align: middle;
+}
+
+.intro-tutorial .clickable {
+  cursor: pointer;
+}
+.intro-tutorial hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: -15px;
+  margin-right: -15px;
+  border: 0;
+  border-top: 1px solid #cdcdcd;
+}
+.intro-tutorial p {
+  font-size: 13px;
+  color: rgba(63, 63, 58, .6);
+}
+.intro-tutorial a {
+  text-decoration: none;
+}
+.intro-tutorial h1 {
+  text-transform: capitalize;
+  font-weight: lighter;
+  font-size: 26px;
+  line-height: 36px;
+  color: #3F3F3A;
+}
+.intro-tutorial h2 {
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 36px;
+}
+.intro-tutorial h3 {
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+}
+.intro-tutorial h4 {
+  font-weight: 200;
+  font-size: 16px;
+  line-height: 32px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.intro-tutorial h5 {
+  font-weight: 200;
+  font-size: 24px;
+  line-height: 48px;
+  margin-bottom: 5px;
+}
+.intro-tutorial .line-height-sm {
+  line-height: 24px;
+}
+.intro-tutorial .line-height-md {
+  line-height: 32px;
+}
+.intro-tutorial .line-height-lg {
+  line-height: 42px;
+}
+.intro-tutorial .btn-cursor {
+  cursor: pointer;
+}
+.intro-tutorial .btn {
+  /* Structure */
+  display: inline-block;
+  /*font-size: $font-size-base;*/
+  padding: 18.5px 25px;
+  width: 215px;
+  border-radius: 3px;
+  background: white;
+  /*line-height: $line-height-btn;*/
+  font-weight: normal;
+  box-shadow: 0 1px 2px rgba(34, 48, 58, .3);
+  border: 1px solid #b6b6b6;
+  zoom: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+.intro-tutorial .btn:hover{
+  background-color: #f0f2f3;
+}
+.intro-tutorial .btn::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+.intro-tutorial .btn-short {
+  padding: 11px 25px;
+}
+.intro-tutorial .btn-primary {
+  border: 1px solid transparent;
+  color: white;
+  background: #D32D27;
+  box-shadow: 0 1px 2px rgba(34, 48, 58, .3);
+}
+.intro-tutorial .btn-primary:hover{
+   background: #D32D27;
+   color: white;
+ }
+.intro-tutorial .btn-dark {
+  border: 1px solid transparent;
+  color: white;
+  background: #3F3F3A;
+  box-shadow: 0 1px 2px rgba(34, 48, 58, .3);
+}
+.intro-tutorial .btn-dark:hover{
+  background: #3F3F3A;
+  color: white;
+}
+.intro-tutorial .btn-close {
+  width: 12px;
+  height: 12px;
+  margin-top: 15px;
+}
+.intro-tutorial .bg-red {
+  background-color: #D32D27;
+}
+.intro-tutorial.bg-white {
+  background-color: white;
+}
+.intro-tutorial .bg-gray {
+  background-color: #F0F2F3;
+}
+.intro-tutorial .bg-dark {
+  background-color: #3F3F3A;
+}
+.intro-tutorial .congrats-header {
+  background-image: url('../images/vault_4.0/congrats-confetti.png');
+  background-position: 0 0;
+  padding-bottom: 39px;
+  font-weight: 100;
+}
+.intro-tutorial .congrats-footer {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+.intro-tutorial .congrats h2 {
+  font-weight: 600;
+}
+.intro-tutorial .txt-white {
+  color: white;
+}
+.intro-tutorial .txt-red {
+  color: #D32D27;
+}
+.intro-tutorial .txt-gray {
+  color: rgb(130, 130, 130);
+}
+.intro-tutorial .txt-sm-transparent {
+  color: rgba(255, 255, 255, .7);
+}
+.intro-tutorial .txt-dark {
+  color: #3F3F3A;
+}
+
+.intro-tutorial .main-icon {
+  height: 200px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 45px;
+}
+.intro-tutorial .sm-icon {
+  height: 15px;
+  width: 15px;
+}
+.intro-tutorial .no-bottom-margin {
+  margin-bottom: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-end: 0;
+}
+.intro-tutorial .no-top-margin {
+  margin-top: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-start: 0;
+}
+.intro-tutorial .no-right-margin {
+  margin-right: 0;
+}
+.intro-tutorial .no-left-margin {
+  margin-left: 0;
+}
+.intro-tutorial .title-margin {
+  padding-left: 0;
+  margin-top: 30px;
+  margin-left: -10px;
+}
+.intro-tutorial .tile-margin {
+  margin-bottom: 20px;
+}
+.intro-tutorial .tile .overlay-text {
+  color: white;
+  position: absolute;
+  top: 93px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #E67E22;
+  line-height: 40px;
+  font-size: 14px;
+  font-weight: lighter;
+}
+.intro-tutorial .tile .itemIcon {
+  height:131px;
+}
+.intro-tutorial .tile .launchButton {
+
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  top: 24px;
+}
+.intro-tutorial .tile:hover .itemInfo,
+.intro-tutorial .tile.focus .itemInfo,
+.intro-tutorial .tile.selected .itemInfo,
+.intro-tutorial .tile:hover .itemIcon {
+  display: none;
+}
+.intro-tutorial .align-baseline {
+  vertical-align: baseline;
+}
+.intro-tutorial.spotlight-cover {
+  background-color: transparent;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}

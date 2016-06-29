@@ -1,0 +1,25 @@
+#sharedFolderAccessDialog {
+  max-height: 600px;
+  max-width: 1000px;
+}
+
+#sharedFolderAccessDialog .dialogLeftPane {
+  width: 30%;
+}
+
+#sharedFolderAccessDialog .dialogRightPane {
+  left: 30%;
+}
+
+#sharedFolderAccessDialog .checkboxContainer {
+  margin-top: 10px;
+  font-size: inherit;
+}
+
+#sharedFolderAccessOtherUsersContainer {
+  padding: 0 20px;
+}
+
+#sharedFolderAccessOtherUsers {
+  padding-top: 10px;
+}

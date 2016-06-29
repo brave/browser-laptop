@@ -1,0 +1,4253 @@
+{
+   "0_9": {
+      "message": "0-9"
+   },
+   "12_hours": {
+      "message": "12 שעות"
+   },
+   "15_minutes": {
+      "message": "15 דקות"
+   },
+   "1Password": {
+      "message": "סיסמה אחת"
+   },
+   "1__Insert_your_YubiKey_in_the_USB_port_with_the_USB_contact_facing_upward": {
+      "message": "1. הכנס את ה־YubiKey שלך ליציאת ה־USB באופן שכניסת ה־USB פונה כלפי מעלה"
+   },
+   "1__Run_the_Google_Authenticator_application_on_your_mobile_device": {
+      "message": "1. הפעל את יישום מאמת Google במכשיר הנייד שלך"
+   },
+   "1__Run_the_LastPass_Sesame_application_to_generate_a_one_time_password": {
+      "message": "1. הרץ את אפליקציית  LastPass Sasame כדי לחולל סיסמא חד פעמית"
+   },
+   "1_hour": {
+      "message": "שעע 1"
+   },
+   "24_hours": {
+      "message": "24 שעות"
+   },
+   "2__Enter_your_current_verification_code_in_the_box_below": {
+      "message": "2. הזן את קוד האימות הנוכחי שלך בתיבה שלהלן"
+   },
+   "2__Paste_the_one_time_password_in_the_input_box_below_and_click__Authenticate_": {
+      "message": "2. הדבק את הסיסמא החד פעמית לתוך תיבת הטקסט מתחת ולחץ על 'אימות'"
+   },
+   "2__Wait_until_your_YubiKey_touch_button_shines_with_a_steady_light": {
+      "message": "2. המתן עד שמתג המגע של ה־YubiKey שלך מאיר ברציפות"
+   },
+   "30_minutes": {
+      "message": "30 דקות"
+   },
+   "30_seconds": {
+      "message": "30 שניות"
+   },
+   "3__Click_Authenticate": {
+      "message": "3. לחץ על אימות"
+   },
+   "3__Hold_your_fingertip_on_the_touch_button_for_1_second": {
+      "message": "3. החזק את האצבע שלך על כפתור המגע ל1 שנייה"
+   },
+   "3_hours": {
+      "message": "3 שעות"
+   },
+   "5_minutes": {
+      "message": "5 דקות"
+   },
+   "6_hours": {
+      "message": "6 שעות"
+   },
+   "ACTION": {
+      "message": "פעולה"
+   },
+   "A_Zupper": {
+      "message": "א-ת"
+   },
+   "A_batch_of_SMS_passcodes_have_been_sent_to_your_mobile_device_": {
+      "message": "מספר הודעות SMS נשלחו למכשיר הנייד שלך."
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_as_a_password_change_for_this_site_": {
+      "message": "?סיסמא חדשה נוצרה. האם תרצי לשמור אותה כשינוי סיסמא עבור אתר זה"
+   },
+   "A_new_password_has_been_created___Would_you_like_LastPass_to_remember_this_password_change_for_this_site_": {
+      "message": "סיסמא חדשה נוצרה.\nהאם ברצונך ש\n   LastPass\nיזכור שינוי סיסמא זו לאתר זה ?"
+   },
+   "A_new_password_has_been_generated_": {
+      "message": "נוצרה ססמא חדשה!"
+   },
+   "A_randomly_generated_password_": {
+      "message": "סיסמה מיוצרת באופן אקראי"
+   },
+   "A_required_update_is_available_for_LastPass__Please_press_OK_to_begin_download_and_installation_": {
+      "message": "קיים עדכון נחוץ ל-LastPass.לחץ על אישור להתחלת ההורדה וההתקנה. "
+   },
+   "A_retry_file_has_been_found__This_likely_means_that_not_all_of_your_site_changes_have_been_saved__Would_you_like_to_delete_this_file_and_potentially_lose_some_changes_": {
+      "message": "קובץ חוזר נמצא שנית. סביר להניח שלא כל השינויים באתר שלך נשמרו. האם ברצונך למחוק קובץ זה וכתוצאה מכך לאבד כמה שינויים מסוימים?"
+   },
+   "A_server_error_occurred_while_processing_your_request_": {
+      "message": "אירעה שגיאה בשרת בזמן תהליך ביצוע הבקשה שלך."
+   },
+   "A_site_that_has_been_previously_shared_cannot_be_moved_to_a_shared_folder___Would_you_like_to_make_a_copy_": {
+      "message": "לא ניתן להעביר לתיקיה משותפת אתר שכבר שותף בעבר.\n\nהאם ברצונך ליצור עותק?"
+   },
+   "About": {
+      "message": "אודות"
+   },
+   "About_LastPass": {
+      "message": "אודות LastPass"
+   },
+   "About___": {
+      "message": "אודות..."
+   },
+   "Accept": {
+      "message": "קבל"
+   },
+   "Accepted": {
+      "message": "קבל"
+   },
+   "Account_Number": {
+      "message": "מספר חשבון"
+   },
+   "Account_Settings": {
+      "message": "הגדרות חשבון"
+   },
+   "Account_Type": {
+      "message": "סוג חשבון"
+   },
+   "Account_number": {
+      "message": "מספר חשבון"
+   },
+   "Actionproper": {
+      "message": "פעולה"
+   },
+   "Actions": {
+      "message": "פעולות"
+   },
+   "Add": {
+      "message": "הוסף"
+   },
+   "Add_Attachment": {
+      "message": "הוסף קובץ מצורף"
+   },
+   "Add_Credit_Card": {
+      "message": "הוסף כרטיס אשראי"
+   },
+   "Add_Credit_Card_profile": {
+      "message": "הוסף פרופיל של כרטיס אשראי"
+   },
+   "Add_Field": {
+      "message": "הוסף שדה"
+   },
+   "Add_Form_Fill_profile": {
+      "message": "הוספת טופס מילוי נתונים אישיים"
+   },
+   "Add_Identity": {
+      "message": "הוסף זהות"
+   },
+   "Add_New_Site": {
+      "message": "הוסף אתר חדש"
+   },
+   "Add_Note": {
+      "message": "הוסף הערה"
+   },
+   "Add_Profile": {
+      "message": "הוסף פרופיל"
+   },
+   "Add_Secure_Note": {
+      "message": "הוסף פתקית מאובטחת"
+   },
+   "Add_Site": {
+      "message": "הוסף אתר"
+   },
+   "Add_another_custom_field": {
+      "message": "הוסף שדה מותאם אישית נוסף"
+   },
+   "Address": {
+      "message": "כתובת"
+   },
+   "Address_1": {
+      "message": "כתובת 1"
+   },
+   "Address_2": {
+      "message": "כתובת 2"
+   },
+   "Address_3": {
+      "message": "כתובת 3"
+   },
+   "Adelaide": {
+      "message": "אדלייד"
+   },
+   "Admin_Console": {
+      "message": "ניהול החשבון"
+   },
+   "Admin_Tools": {
+      "message": "כלי ניהול"
+   },
+   "Advanced": {
+      "message": "מתקדם"
+   },
+   "Advanced_Options": {
+      "message": "אפשרויות מתקדמות"
+   },
+   "Advanced_Tools": {
+      "message": "כלים מתקדמים"
+   },
+   "Afghanistan": {
+      "message": "אפגניסטן"
+   },
+   "Agent_Name": {
+      "message": "שם הנציג"
+   },
+   "Agent_Phone": {
+      "message": "מספר טלפון של הנציג"
+   },
+   "Aland_Islands": {
+      "message": "איי אולנד"
+   },
+   "Alaska": {
+      "message": "אלסקה"
+   },
+   "Albania": {
+      "message": "אלבניה"
+   },
+   "Algeria": {
+      "message": "אלג'יריה"
+   },
+   "Alias": {
+      "message": "כינוי, שם נוסף"
+   },
+   "All": {
+      "message": "הכל"
+   },
+   "Allow_All_Character_Types": {
+      "message": "אפשר את כל סוגי התווים"
+   },
+   "Allow_LastPass_to_find_insecure_data_on_your_computer_": {
+      "message": "האם לאפשר ל־LastPass לחפש נתונים לא מאובטחים במחשב שלך?"
+   },
+   "Almaty": {
+      "message": "אלמאטי"
+   },
+   "Alt": {
+      "message": "Alt"
+   },
+   "Alternatively__enter_a_passcode_in_the_box_below_": {
+      "message": "לחילופין, הכנס ססמא בשדה הבא:"
+   },
+   "Always_Choose_Profile_and_Credit_Card": {
+      "message": "בחר תמיד בפרופיל וכרטיס אשראי"
+   },
+   "American_Samoa": {
+      "message": "סמואה האמריקנית"
+   },
+   "Amman__Athens__Istanbul__Beirut__Cairo__Jerusalem": {
+      "message": "עמאן, אתונה, איסטנבול, ביירות, קהיר, ירושלים"
+   },
+   "Amsterdam__Berlin__Rome__Vienna__Prague__Brussels": {
+      "message": "אמסטרדם, ברלין, רומא, וינה, פראג, בריסל"
+   },
+   "An_Update_is_Available__Would_you_like_to_install_": {
+      "message": "קיים עדכון זמין. האם ברצונך להתקינו?"
+   },
+   "An_error_has_been_encountered_while_loading_your_sites__Please_relogin_": {
+      "message": "אירעה שגיאה בעת טעינת האתר. אנא היכנס מחדש"
+   },
+   "An_error_occurred": {
+      "message": "התרחשה שגיאה"
+   },
+   "An_error_occurred_while_importing_your_Google_Chrome_passwords_": {
+      "message": "אירעה שגיאה בעת ייבוא הסיסמאות השלך מגוגל כרום"
+   },
+   "An_error_occurred_while_re_encrypting_your_data": {
+      "message": "התרחשה שגיאה בזמן ניסיון ההצפנה"
+   },
+   "An_error_occurred_while_uploading_your_data___Would_you_like_to_retry_": {
+      "message": "התרחשה שגיאה בזמן העלאת הנתונים.\nהאם ברצונך לנסות שוב?"
+   },
+   "Andorra": {
+      "message": "אנדורה"
+   },
+   "Angola": {
+      "message": "אנגולה"
+   },
+   "Anguilla": {
+      "message": "אנגווילה"
+   },
+   "Antarctica": {
+      "message": "אנטארקטיקה"
+   },
+   "Antigua_and_Barbuda": {
+      "message": "אנטיגואה וברבודה"
+   },
+   "Appearance": {
+      "message": "מראה"
+   },
+   "Application_": {
+      "message": "יישום:"
+   },
+   "Applications": {
+      "message": "יישומים"
+   },
+   "April": {
+      "message": "אפריל"
+   },
+   "Are_you_sure_you_do_not_want_LastPass_to_tell_you_when_your_Master_Password_is_at_risk_": {
+      "message": "אתה בטוח שאתה לא רוצה ש-LastPass יאמר לך מתי סיסמת המאסטר שלך בסכנה?"
+   },
+   "Are_you_sure_you_want_to_delete_this_": {
+      "message": "האם אתה בטוח שברצונך למחוק זאת?"
+   },
+   "Are_you_sure_you_want_to_delete_this_identity_": {
+      "message": "האם אתה בטוח שברצונך למחוק זהות זו?"
+   },
+   "Are_you_sure_you_want_to_delete_this_site_": {
+      "message": "האם אתה בטוח שברצונך למחוק את האתר הזה?"
+   },
+   "Are_you_sure_you_want_to_have_LastPass_remember_your_password___This_will_significantly_decrease_the_security_of_your_LastPass_account_": {
+      "message": "האם אתה בטוח כי ברצונך ש-LastPass תזכור את סיסמתך? דבר זה יפגע משמעותית במידת האבטחה של חשבון ה-LastPass שלך!"
+   },
+   "Are_you_sure_you_want_to_share_this_item___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "האם אתה בטוח שברצונך לשתף פריט זה? דבר זה יגרום לאובדן כל השינויים שבוצעו בפריט זה!"
+   },
+   "Are_you_sure_you_want_to_view_history___Doing_so_will_cause_you_to_lose_any_changes_you_have_made_to_this_item_": {
+      "message": "האם אתה בטוח שברצונך להציג היסטוריה? דבר זה יגרום לאובדן כל השינויים שבוצעו בפריט זה!"
+   },
+   "Are_you_sure_you_would_like_to_change_your_LastPass_password_for_this_site_": {
+      "message": "האם אתה בטוח שאתה רוצה לשנות את סיסמאת LastPass לאתר הזה?"
+   },
+   "Are_you_sure_you_would_like_to_copy_your_LastPass_site_s_URL_to_the_clipboard_": {
+      "message": "האם אתה בטוח שאתה רוצה להעתיק את כתובות האתרים שלך בLastPass ללוח העתקה?"
+   },
+   "Are_you_sure_you_would_like_to_copy_your_LastPass_site_s_password_to_the_clipboard_": {
+      "message": "האם אתה בטוח שאתה רוצה להעתיק את סיסמאות האתרים שלך בLastPass ללוח העתקה?"
+   },
+   "Are_you_sure_you_would_like_to_copy_your_LastPass_site_s_username_to_the_clipboard_": {
+      "message": "האם אתה בטוח שאתה רוצה להעתיק את שמות המשתמשים שלך באתרים שלך בLastPass ללוח העתקה?"
+   },
+   "Are_you_sure_you_would_like_to_delete_": {
+      "message": "האם אתה בטוח שאתה רוצה למחוק?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_items_": {
+      "message": "האם אתה בטוח שברצונך למחוק את הפריטים הנבחרים?"
+   },
+   "Are_you_sure_you_would_like_to_delete_the_selected_sites_": {
+      "message": "האם אתה בטוח כי ברצונך למחוק את האתרים שנבחרו?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_application_": {
+      "message": "האם אתה בטוח שברצונך למחוק יישום זה?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_field_": {
+      "message": "האם אתה בטוח כי ברצונך למחוק שדה זה?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_form_fill_profile_": {
+      "message": "האם אתה בטוח כי ברצונך למחוק פרופיל מילוי טפסים זה?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_generated_password_": {
+      "message": "האם אתה בטוח כי ברצונך למחוק סיסמה מחוללת זו?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_group_": {
+      "message": "האם אתה בטוח שברצונך למחוק את התיקיה הזו?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_never_URL_": {
+      "message": "האם אתה בטוח שאתה רוצה למחוק את כתובת 'לעולם לא' הזו?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_secure_note_": {
+      "message": "האם אתה בטוח כי ברצונך למחוק פתקית מאובטחת זו?"
+   },
+   "Are_you_sure_you_would_like_to_delete_this_site_": {
+      "message": "האם אתה בטוח כי ברצונך למחוק אתר זה?"
+   },
+   "Are_you_sure_you_would_like_to_remove_this_attachment_": {
+      "message": "האם אתה בטוח שאתה רוצה להסיר את הקובץ המצורף?"
+   },
+   "Are_you_sure_you_would_like_to_save_a_new_site_to_your_LastPass_vault_": {
+      "message": "האם אתה בטוח שברצונך לשמור אתר חדש לכספת LastPass?"
+   },
+   "Are_you_sure_you_would_like_your_LastPass_Form_Fill_information_to_be_filled_into_the_following_site_": {
+      "message": "האם אתה בטוח שאתה רוצה שטפסי LastPass ימלאו באתר זה?"
+   },
+   "Are_you_sure_you_would_like_your_LastPass_site_information_to_be_filled_into_the_following_site_": {
+      "message": "האם אתה בטוח שאתה רוצה שהמידע של אתרי LastPass שלך ימלאו באתר זה?"
+   },
+   "Argentina": {
+      "message": "ארגנטינה"
+   },
+   "Arizona": {
+      "message": "אריזונה"
+   },
+   "Armenia": {
+      "message": "ארמניה"
+   },
+   "Arts": {
+      "message": "אומנות"
+   },
+   "Aruba": {
+      "message": "ארובה"
+   },
+   "At_least_this_many_numbers_will_be_in_a_generated_password_": {
+      "message": "לפחות מספר כזה של ספרות יהיו בסיסמא שנוצרה."
+   },
+   "Atlantic_Time__Canada___Manaus__Santiago": {
+      "message": "שעון האוקיינוס האטלנטי (קנדה), מנאוס, סנטיאגו"
+   },
+   "Auckland__Wellington": {
+      "message": "אוקלנד, וולינגטון"
+   },
+   "August": {
+      "message": "אוגוסט"
+   },
+   "Australia": {
+      "message": "אוסטרליה"
+   },
+   "Austria": {
+      "message": "אוסטריה"
+   },
+   "Authenticate": {
+      "message": "אמת"
+   },
+   "Authentication": {
+      "message": "אימות"
+   },
+   "Authentication_Failed_": {
+      "message": "האימות נכשל."
+   },
+   "AutoFill": {
+      "message": "הזן אוטומטית"
+   },
+   "AutoLogin": {
+      "message": "כניסה אוטומטית"
+   },
+   "Automatically_Fill_Login_Information": {
+      "message": "הזן פרטי כניסה אוטומטית"
+   },
+   "Automatically_Logoff_after_idle__mins_": {
+      "message": "התנתק אוטומטית לאחר X זמן של חוסר פעילות (X בדקות)"
+   },
+   "Automatically_Logoff_when_all_browsers_are_closed_and_Chrome_has_been_closed_for__mins_": {
+      "message": "צא באופן אוטומטי בעת שכל הדפדפנים נסגרו ו-Chrome נסגר (דקות)"
+   },
+   "Automatically_login_to_sites_if_time_since_last_login____seconds_": {
+      "message": "הכנס אוטומטית לאתרים אם הזמן שחלף מאז מהכניסה האחרונה > (שניות)"
+   },
+   "Avoid_Ambiguous_Characters": {
+      "message": "המנע מסימנים לא ברורים"
+   },
+   "Azerbaijan": {
+      "message": "אזרבייג'אן"
+   },
+   "Azores": {
+      "message": "האיים האזוריים"
+   },
+   "BACKUPPER": {
+      "message": "חזרה"
+   },
+   "Back": {
+      "message": "חזרה"
+   },
+   "Baghdad": {
+      "message": "בגדד"
+   },
+   "Bahamas": {
+      "message": "איי בהאמה"
+   },
+   "Bahrain": {
+      "message": "בחריין"
+   },
+   "Baku__Yerevan": {
+      "message": "באקו, ירוואן"
+   },
+   "Bangladesh": {
+      "message": "בנגלדש"
+   },
+   "Bank_Account": {
+      "message": "חשבון בנק"
+   },
+   "Bank_Name": {
+      "message": "שם הבנק"
+   },
+   "Bank_accountformfill": {
+      "message": "חשבון בנק"
+   },
+   "Bank_name": {
+      "message": "שם הבנק"
+   },
+   "Barbados": {
+      "message": "ברבדוס"
+   },
+   "Before_you_can_use_LastPass__you_must_first_connect_your_fingerprint_reader_and_enroll_one_or_more_fingers_": {
+      "message": "לפני שתוכל להשתמש ב-LastPass, תחילה עליך לחבר את קורא טביעות האצבע שלך ולרשום אצבע אחת או יותר."
+   },
+   "Belarus": {
+      "message": "בלארוס"
+   },
+   "Belgium": {
+      "message": "בלגיה"
+   },
+   "Belize": {
+      "message": "בליז"
+   },
+   "Benin": {
+      "message": "בנין"
+   },
+   "Bermuda": {
+      "message": "ברמודה"
+   },
+   "Bhutan": {
+      "message": "בהוטן"
+   },
+   "Binary_Component_": {
+      "message": "רכיב בינארי:"
+   },
+   "Birthday": {
+      "message": "יום הולדת"
+   },
+   "Bit_Strength": {
+      "message": "עצמת הצפנה בביטים"
+   },
+   "Blacklist": {
+      "message": "חשבונך מושהה זמנית (ל-5 דקות) עקב נסיונות כניסה כושלים רבים מדי."
+   },
+   "Blog": {
+      "message": "בלוג"
+   },
+   "Bolivia": {
+      "message": "בוליביה"
+   },
+   "Bookmarklets": {
+      "message": "ישומי סימניה"
+   },
+   "Bosnia_and_Herzegovina": {
+      "message": "בוסניה והרצגובינה"
+   },
+   "Botswana": {
+      "message": "בוטסואנה"
+   },
+   "Bouvet_Island": {
+      "message": "האי בובה"
+   },
+   "Branch_Address": {
+      "message": "כתובת סניף"
+   },
+   "Branch_Phone": {
+      "message": "טלפון סניף"
+   },
+   "Brazil": {
+      "message": "ברזיל"
+   },
+   "British_Indian_Ocean_Territory": {
+      "message": "הטריטוריה הבריטית באוקיינוס ההודי"
+   },
+   "Browse_the_web_as_you_normally_would_and_LastPass_will_automatically_remember_passwords_as_you_enter_them_": {
+      "message": "גלוש ברשת כרגיל ו־LastPass יזכור את הסיסמאות באופן אוטומטי כשאשר תזין אותן."
+   },
+   "Brunei_Darussalam": {
+      "message": "ברוניי דרוסלאם"
+   },
+   "Buenos_Aires__Georgetown": {
+      "message": "בואנוס איירס, ג'ורג'טאון"
+   },
+   "Built_": {
+      "message": "בנוי:"
+   },
+   "Bulgaria": {
+      "message": "בולגריה"
+   },
+   "Burkina_Faso": {
+      "message": "בורקינה פאסו"
+   },
+   "Burundi": {
+      "message": "בורונדי"
+   },
+   "Business": {
+      "message": "עסקים"
+   },
+   "But_I_m_a_forgetful_person___what_should_I_do_if_I_forget_my_password_": {
+      "message": "אבל אני אחד ששוכח... מה עלי לעשות אם אני שוכח את הסיסמה שלי?"
+   },
+   "CSV_Files": {
+      "message": "קבצי CSV"
+   },
+   "Cambodia": {
+      "message": "קמבודיה"
+   },
+   "Cameroon": {
+      "message": "קמרון"
+   },
+   "Can_t_find_hidden_LastPass_window": {
+      "message": "לא מוצא את חלון LastPass המוסתר"
+   },
+   "Canada": {
+      "message": "קנדה"
+   },
+   "Canary_Islands": {
+      "message": "האיים הקנריים"
+   },
+   "Canberra__Melbourne__Sydney__Hobart": {
+      "message": "קנברה, מלבורן, סידני, הובארט"
+   },
+   "Cancel": {
+      "message": "ביטול"
+   },
+   "Cape_Verde": {
+      "message": "קייפ ורדה"
+   },
+   "Cape_Verde_Is_": {
+      "message": "איי כף ורדה"
+   },
+   "Caracas": {
+      "message": "קראקס"
+   },
+   "Casablanca__Monrovia__Reykjavik": {
+      "message": "קזבלנקה, מונרוביה, רייקיאוויק"
+   },
+   "Catalan": {
+      "message": "קטלאנית"
+   },
+   "Cayman_Islands": {
+      "message": "איי קיימן"
+   },
+   "Central_African_Republic": {
+      "message": "הרפובליקה המרכז אפריקאית"
+   },
+   "Central_America__Saskatchewan": {
+      "message": "מרכז אמריקה, ססקצ'ואן"
+   },
+   "Central_Time__US___Canada___Guadalajara__Mexico_City": {
+      "message": "שעון המרכז (ארה'ב וקנדה), גואדלחרה, מקסיקו סיטי"
+   },
+   "Chad": {
+      "message": "צ 'אד"
+   },
+   "Change": {
+      "message": "שינוי"
+   },
+   "Change_Group_Name": {
+      "message": "שנה את שם התיקיה"
+   },
+   "Change_Master_Password": {
+      "message": "שינוי סיסמת המאסטר"
+   },
+   "Change_Password": {
+      "message": "שינוי סיסמה"
+   },
+   "Change_Password_Now": {
+      "message": "שנה סיסמה עכשיו"
+   },
+   "Change_Your_Password": {
+      "message": "שנה את הסיסמה שלך"
+   },
+   "Check_For_Updates": {
+      "message": "בדוק אם קיימים עדכונים"
+   },
+   "Check_this_box_to_fine_tune_how_your_password_is_generated_": {
+      "message": "סמן תיבה זו כדי לכוונן איך ליצור את הסיסמה שלך"
+   },
+   "Checkbox": {
+      "message": "תיבת סימון"
+   },
+   "Checking_For_Updates___": {
+      "message": "בודק האם קיימים עדכונים..."
+   },
+   "Chennai__Kolkata__Mumbai__New_Delhi__Sri_Jayawardenepura": {
+      "message": "צ'נאי, כלכותה, מומביי, ניו דלהי, סרי ג'אווארדנפורה"
+   },
+   "Chile": {
+      "message": "צ 'ילה"
+   },
+   "China": {
+      "message": "סין"
+   },
+   "Chinese__Simplified_": {
+      "message": "סינית (פשוטה)"
+   },
+   "Chinese__Traditional_": {
+      "message": "סינית (מסורתית)"
+   },
+   "Choose_Profile_and_Credit_Card": {
+      "message": "בחר פרופיל וכרטיס אשראי"
+   },
+   "Choose_a_source_above_": {
+      "message": "בחר מקור למעלה."
+   },
+   "Christmas_Island": {
+      "message": "אי חג המולד"
+   },
+   "Chrome": {
+      "message": "כרום"
+   },
+   "City___Town": {
+      "message": "עיר / יישוב"
+   },
+   "Clear": {
+      "message": "נקה"
+   },
+   "Clear_Clipboard_after_use__seconds_": {
+      "message": "נקה את זכרון הלוח לאחר השימוש (שניות)"
+   },
+   "Clear_Forms": {
+      "message": "נקה טפסים"
+   },
+   "Clear_Local_Cache": {
+      "message": "נקה זיכרון מטמון מקומי"
+   },
+   "Clear_Recent": {
+      "message": "נקה אחרונים"
+   },
+   "Clear_Search": {
+      "message": "נקה חיפוש"
+   },
+   "Clear_filled_fields_on_logoff": {
+      "message": "נקה שדות מילוי בהתנתקות"
+   },
+   "Click_Continue_to_start_using_LastPass_": {
+      "message": "לחץ על המשך כדי להתחיל להשתמש ב־LastPas."
+   },
+   "Click_Icons_in_Fields": {
+      "message": "הקלק על האייקונים בשדות"
+   },
+   "Click_here_for_instructions_on_importing_from_RoboForm_": {
+      "message": "לחץ כאן לקבלת הוראות לייבוא מ-RoboForm."
+   },
+   "Click_here_for_instructions_on_importing_from_a_generic_CSV_file_": {
+      "message": "לחץ כאן לקבלת הדרכה על יבוא מקובץ CSV גנרי."
+   },
+   "Click_here_to_initiate_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "לחץ כאן על מנת להתחיל אימות רב-שלבי בטלפון או מכשיר נייד אחר שברשותךץ"
+   },
+   "Click_here_to_launch_account_settings": {
+      "message": "לחץ כאן כדי להכנס למסך הגדרות החשבון"
+   },
+   "Click_here_to_launch_feedback": {
+      "message": "לחץ כאן כדי להכנס למסך המשוב"
+   },
+   "Click_here_to_view_the_LastPass_User_Manual": {
+      "message": "לחץ כאן כדי לראות את המדריך למשתמש של LastPass"
+   },
+   "Click_on_the_icons_at_the_bottom_for_additional_actions_": {
+      "message": "הקלק על האייקונים בתחתית כדי לראות פעולות נוספות."
+   },
+   "Click_to_fine_tune_how_your_password_is_generated_": {
+      "message": "לחץ כדי לכוון בעדינות איך הססמה שלך מיוצרת."
+   },
+   "Click_to_hide_advanced_options_": {
+      "message": "לחץ כדי להסתיר את אפשרויות מתקדמות."
+   },
+   "Clipperz": {
+      "message": "Clipperz"
+   },
+   "Close": {
+      "message": "סגור"
+   },
+   "Close_this_window": {
+      "message": "סגור חלון"
+   },
+   "Co_pay": {
+      "message": "תשלום משותף"
+   },
+   "Cocos__Keeling__Islands": {
+      "message": "איי קוקוס (קילינג)"
+   },
+   "Collapse_All": {
+      "message": "צמצם הכל"
+   },
+   "Colombia": {
+      "message": "קולומביה"
+   },
+   "Comoros": {
+      "message": "איי קומורו"
+   },
+   "Company": {
+      "message": "חברה"
+   },
+   "CompanyPolicyProhibits": {
+      "message": "מדיניות החברה אוסרת פעולה זו."
+   },
+   "Company_Phone": {
+      "message": "טלפון חברה"
+   },
+   "Company_policy_prevents_changing_some_settings__not_all_updates_have_been_saved_": {
+      "message": "מדיניות החברה מונעת שינוי של הגדרות מסוימות, לא כל השינויים נשמרו."
+   },
+   "Configure_Form_Fill": {
+      "message": "קביעת תצורה של מילוי טופס"
+   },
+   "Confirm": {
+      "message": "אשר"
+   },
+   "Confirm_Master_Password": {
+      "message": "אישור סיסמת מאסטר"
+   },
+   "Confirm_Password": {
+      "message": "אשר סיסמה"
+   },
+   "Congo": {
+      "message": "קונגו"
+   },
+   "Congo__the_Democratic_Republic_of_The": {
+      "message": "קונגו, הרפובליקה הדמוקרטית של"
+   },
+   "Congratulations": {
+      "message": "מזל טוב"
+   },
+   "Congratulations_": {
+      "message": "ברכות!"
+   },
+   "Connection_Mode": {
+      "message": "מצב חיבור"
+   },
+   "Connection_Type": {
+      "message": "סוג חיבור"
+   },
+   "Contact": {
+      "message": "צור קשר"
+   },
+   "Continue": {
+      "message": "המשך"
+   },
+   "Control_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "תווי בקרה שימצאו בשם הקובץ שנבחר, לא יעובדו"
+   },
+   "Cook_Islands": {
+      "message": "איי קוק"
+   },
+   "Copy": {
+      "message": "העתק"
+   },
+   "Copy_Note": {
+      "message": "העתק הערה"
+   },
+   "Copy_Password": {
+      "message": "העתק סיסמה"
+   },
+   "Copy_URL": {
+      "message": "העתק כתובת Url"
+   },
+   "Copy_Username": {
+      "message": "העתק שם משתמש"
+   },
+   "Copyright_2008_LastPass__All_Rights_Reserved__Portions_of_this_software_were_licensed_from_third_parties_as_described_at_": {
+      "message": "זכויות יוצרים LastPass 2009. כל הזכויות שמורות."
+   },
+   "Cost": {
+      "message": "עלות"
+   },
+   "Costa_Rica": {
+      "message": "קוסטה ריקה"
+   },
+   "Cote_D_ivoire": {
+      "message": "חוף השנהב"
+   },
+   "Country": {
+      "message": "מדינה"
+   },
+   "County": {
+      "message": "מחוז"
+   },
+   "Create_Account": {
+      "message": "צור חשבון"
+   },
+   "Create_Group": {
+      "message": "צור תיקיה"
+   },
+   "Create_Sub_Group": {
+      "message": "צור תיקיית משנה"
+   },
+   "Create_Your_LastPass_Account": {
+      "message": "צור את חשבון ה-LastPass שלך"
+   },
+   "Create_an_Account": {
+      "message": "צור חשבון"
+   },
+   "Creating_Account___": {
+      "message": "יוצר חשבון..."
+   },
+   "Credit_Card": {
+      "message": "כרטיס אשראי"
+   },
+   "Credit_Card_Number": {
+      "message": "מספר כרטיס אשראי"
+   },
+   "Credit_Monitoring": {
+      "message": "פיקוח על אשראי"
+   },
+   "Credit_card_number": {
+      "message": "מספר כרטיס אשראי"
+   },
+   "Credit_cardformfill": {
+      "message": "כרטיס אשראי"
+   },
+   "Croatia": {
+      "message": "קרואטיה"
+   },
+   "Ctrl": {
+      "message": "Ctrl"
+   },
+   "Cuba": {
+      "message": "קובה"
+   },
+   "Custom_Value": {
+      "message": "ערך מותאם אישית"
+   },
+   "Custom_field__": {
+      "message": "שדה מותאם אישית מספר"
+   },
+   "Custom_fields": {
+      "message": "שדות מותאמים אישית"
+   },
+   "Cyprus": {
+      "message": "קפריסין"
+   },
+   "Czech_Republic": {
+      "message": "צ 'כיה"
+   },
+   "Danish": {
+      "message": "דנית"
+   },
+   "Darn__Passwords_": {
+      "message": "סיסמאות מתוכנת Darn!"
+   },
+   "Darwin": {
+      "message": "דרווין"
+   },
+   "Dashlane": {
+      "message": "Dashlane"
+   },
+   "Database": {
+      "message": "מסד נתונים"
+   },
+   "Date": {
+      "message": "תאריך"
+   },
+   "Date_of_Birth": {
+      "message": "תאריך לידה"
+   },
+   "December": {
+      "message": "דצמבר"
+   },
+   "Default": {
+      "message": "ברירת מחדל"
+   },
+   "Default_Form_Fill_Profile": {
+      "message": "פרופיל ברירת מחדל למילוי טפסים"
+   },
+   "Delete": {
+      "message": "מחק"
+   },
+   "Delete_Cache": {
+      "message": "מחיקת מטמון"
+   },
+   "Delete_Formfill_Profile": {
+      "message": "מחק פרופיל מילוי טפסים"
+   },
+   "Delete_Group": {
+      "message": "מחק תיקיה"
+   },
+   "Delete_Identity_": {
+      "message": "למחוק זהות?"
+   },
+   "Delete_Selected": {
+      "message": "מחק נבחרים"
+   },
+   "Delete_Site": {
+      "message": "מחק אתר"
+   },
+   "Delete_Site_": {
+      "message": "למחוק את האתר?"
+   },
+   "Delete_this_form_fill_profile": {
+      "message": "מחק פרופיל מילוי טפסים זה"
+   },
+   "Denmark": {
+      "message": "דנמרק"
+   },
+   "Description": {
+      "message": "תיאור"
+   },
+   "Dining": {
+      "message": "מסעדות"
+   },
+   "Disable": {
+      "message": "כבה"
+   },
+   "Disable_Insecure_Chrome_Password_Manager": {
+      "message": "השבת את מנהל הסיסמאות הלא מאובטח של Chrome"
+   },
+   "Disable_LastPass": {
+      "message": "כבה את LastPass"
+   },
+   "Disable_LastPass_Master_Password_risk_warning_on_this_site_": {
+      "message": "לבטל את האזהרה על סיסמת המאסטר שלך ב-LastPass עבור האתר הזה?"
+   },
+   "Disable_LastPass_for_this_page_or_the_entire_site_": {
+      "message": "לכבות את LastPass עבור דף זה או האתר כולו?"
+   },
+   "Disable_Multifactor_Authentication": {
+      "message": "השבת אימות רב-שלבי"
+   },
+   "Disable_Page": {
+      "message": "כבה דף"
+   },
+   "Disable_Single_factor_Authentication": {
+      "message": "השבת אימות Single-factor"
+   },
+   "Disable_Site": {
+      "message": "כבה אתר"
+   },
+   "Disable_alert___": {
+      "message": "בטל התראות"
+   },
+   "Disable_alert_for_this_site": {
+      "message": "בטל התראות עבור אתר זה"
+   },
+   "Disable_all_weak_duplicate_site_alerts": {
+      "message": "בטל את כל ההתראות החלשות והכפולות לאתר"
+   },
+   "Disable_for_all_sites": {
+      "message": "כבה בכל האתרים"
+   },
+   "Discard_changes_and_close_this_window": {
+      "message": "בטל את השינויים וסגור את החלון הזה"
+   },
+   "Dismiss": {
+      "message": "שחרר"
+   },
+   "Djibouti": {
+      "message": "ג 'יבוטי"
+   },
+   "Do_not_overwrite_fields_that_are_already_filled": {
+      "message": "אל תחליף שדות שכבר מולאו"
+   },
+   "Do_not_re_prompt_for": {
+      "message": "אל תבקש שנית עבור"
+   },
+   "Do_not_re_prompt_for_": {
+      "message": "אל תבקש שנית ל- "
+   },
+   "Do_not_show_this_message_for_this_domain": {
+      "message": "אל תציג הודעה זו במתחם זה"
+   },
+   "Do_you_like_LastPass_": {
+      "message": "האם אתה אוהב את LastPass?"
+   },
+   "Do_you_really_want_to_quit___You_cannot_use_LastPass_without_creating_an_account_": {
+      "message": "האם אתה בטוח שאתה רוצה לצאת? לא תוכל להשתמש ב-LastPass בלי ליצור חשבון."
+   },
+   "Dominica": {
+      "message": "דומיניקה"
+   },
+   "Dominican_Republic": {
+      "message": "הרפובליקה הדומיניקנית"
+   },
+   "Down": {
+      "message": "למטה"
+   },
+   "Dr": {
+      "message": "ד'ר"
+   },
+   "Driver_s_License": {
+      "message": "רישיון נהיגה"
+   },
+   "Duplicate_password": {
+      "message": "ססמא כפולה"
+   },
+   "Dutch": {
+      "message": "הולנדית"
+   },
+   "ERROR__Moving_sites_between_shared_folders_is_currently_not_supported_": {
+      "message": "שגיאה: העברת האתרים בין תיקיות משותפות אינה נתמכת עדיין."
+   },
+   "ERROR__You_are_not_allowed_to_move_sites_out_of_shared_folders__Delete_is_the_only_supported_operation_": {
+      "message": "שגיאה: אינך רשאי להעביר אתרים מתוך תיקיות משותפות. מחיקה היא האפעולה האפשרית היחידה."
+   },
+   "Eastern_Time__US___Canada_": {
+      "message": "שעון החוף המזרחי (ארה'ב וקנדה)"
+   },
+   "Ecuador": {
+      "message": "אקוודור"
+   },
+   "Edit": {
+      "message": "ערוך"
+   },
+   "Edit_Application": {
+      "message": "ערוך יישום"
+   },
+   "Edit_Application_Fields": {
+      "message": "ערוך את שדות היישום"
+   },
+   "Edit_Credit_Card_profile": {
+      "message": "עריכת פרופיל כרטיס אשראי"
+   },
+   "Edit_Form_Fields": {
+      "message": "ערוך את שדות הטופס"
+   },
+   "Edit_Form_Fill_profile": {
+      "message": "ערוך את פרופיל מילוי הטופס"
+   },
+   "Edit_Secure_Note": {
+      "message": "ערוך פתקית מאובטחת"
+   },
+   "Edit_Secure_Notes": {
+      "message": "ערוך הערות מאובטחות"
+   },
+   "Edit_Site": {
+      "message": "ערוך אתר"
+   },
+   "Edit_Site_Fields": {
+      "message": "ערוך את שדות האתר"
+   },
+   "Education": {
+      "message": "השכלה"
+   },
+   "Egypt": {
+      "message": "מצרים"
+   },
+   "El_Salvador": {
+      "message": "אל סלבדור"
+   },
+   "Email": {
+      "message": "מייל"
+   },
+   "Email_": {
+      "message": "דואר אלקטרוני:"
+   },
+   "Email_Account": {
+      "message": "חשבון דוא'ל"
+   },
+   "Email_Address": {
+      "message": "כתובת דוא'ל"
+   },
+   "Email_Address_": {
+      "message": "כתובת דוא'ל:"
+   },
+   "Email_address": {
+      "message": "כתובת דוא'ל"
+   },
+   "Email_already_in_use__have_you_forgotten_your_password_": {
+      "message": "כתובת דוא'ל זו כבר בשימוש, האם שכחת את סיסמתך?"
+   },
+   "Enable_Credit_Monitoring": {
+      "message": "אפשר ניטור אשראי"
+   },
+   "Enable_Free_Credit_Monitoring": {
+      "message": "אפשר ניטור אשראי חופשי"
+   },
+   "Enable_new_login_screen": {
+      "message": "אפשר מסך כניסה חדש"
+   },
+   "Encryption": {
+      "message": "הצפנה"
+   },
+   "End": {
+      "message": "סוף"
+   },
+   "English": {
+      "message": "אנגלית"
+   },
+   "English__United_Kingdom_": {
+      "message": "אנגלית (בריטניה)"
+   },
+   "Enter_Code_": {
+      "message": "הכנס קוד:"
+   },
+   "Enter_PIN": {
+      "message": "הזן PIN"
+   },
+   "Enter_a_passcode_in_the_box_below_": {
+      "message": "הכנס את הקוד בתיבה הבאה:"
+   },
+   "Enter_arbitrary_notes": {
+      "message": "הכנס הערות כלליות"
+   },
+   "Enter_your_smart_card_PIN_": {
+      "message": "הזן את ה־PIN של הכרטיס החכם שלך:"
+   },
+   "Enterprise": {
+      "message": "ארגון"
+   },
+   "Entertainment": {
+      "message": "בידור"
+   },
+   "Equatorial_Guinea": {
+      "message": "גינאה המשוונית"
+   },
+   "Eritrea": {
+      "message": "אריתריאה"
+   },
+   "Error": {
+      "message": "שגיאה"
+   },
+   "ErrorGetAcctsMsg": {
+      "message": "אירעה שגיאה בעת טעינת אתרי ה-LastPass שלך. אנא נסה להיכנס שוב  על מנת לאחזר את אתריך."
+   },
+   "ErrorLoginMsg": {
+      "message": "אירעה שגיאה בכניסה ל-LastPass. אנא בדוק את חיבור האינטרנט שלך."
+   },
+   "ErrorSendingMsg": {
+      "message": "אירעה שגיאה בעת ניסיון התקשרות לשרת. אנא בדוק את חיבור האינטרנט שלך."
+   },
+   "ErrorSessionMsg": {
+      "message": "זמן החיבור ל- LastPass פג,נסה שנית."
+   },
+   "Error__This_folder_has_already_been_moved_": {
+      "message": "שגיאה: האם התיקייה הועברה?"
+   },
+   "Error_opening_attachment_": {
+      "message": "שגיאה בפתיחת הקובץ המצורף."
+   },
+   "Estonia": {
+      "message": "אסטוניה"
+   },
+   "Ethiopia": {
+      "message": "אתיופיה"
+   },
+   "Evening_Number": {
+      "message": "מספר ערב"
+   },
+   "Evening_number": {
+      "message": "מספר בשעות הערב"
+   },
+   "ExistingUsersOTPPrompt": {
+      "message": "LastPass יכולה עכשיו לשמור סיסמה חד-פעמית (OTP) מקומית, שניתן להשתמש בה כדי לשחזר את החשבון שלך אם תשכח את הסיסמה הראשית שלך. סיסמת ה-OTP תישאר מושבתת עד שתופעל בשרת.\nהאם אתה מעוניין להפעיל את תכונת שיחזור החשבון?"
+   },
+   "Expand_All": {
+      "message": "הרחב הכל"
+   },
+   "Expiration": {
+      "message": "תפוגה"
+   },
+   "Expiration_Date": {
+      "message": "תאריך תפוגה"
+   },
+   "Expiration_date": {
+      "message": "תאריף תפוגה"
+   },
+   "Export": {
+      "message": "יצא"
+   },
+   "Export_To": {
+      "message": "ייצא ל־"
+   },
+   "Export_To_LastPass_CSV_File": {
+      "message": "יצא לקובץ CSV של LastPass"
+   },
+   "FIPS_Mode": {
+      "message": "מצב תקן אחיד של הבטחת עיבוד מידע (FIPS)"
+   },
+   "Falkland_Islands__Malvinas_": {
+      "message": "איי פוקלנד (מאלווינאס)"
+   },
+   "Faroe_Islands": {
+      "message": "איי פארו"
+   },
+   "Favorite": {
+      "message": "מועדף"
+   },
+   "Favoritesproper": {
+      "message": "מועדפים"
+   },
+   "Fax_Number": {
+      "message": "מספר פקס"
+   },
+   "Fax_number": {
+      "message": "מספר פקס"
+   },
+   "February": {
+      "message": "פברואר"
+   },
+   "Feedback": {
+      "message": "משוב"
+   },
+   "Female": {
+      "message": "נקבה"
+   },
+   "Field_Type_": {
+      "message": "סוג שדה:"
+   },
+   "Fields_": {
+      "message": "שדות:"
+   },
+   "Fiji": {
+      "message": "פיג 'י"
+   },
+   "Fiji__Kamchatka__Marshall_Is_": {
+      "message": "פיג'י, קמצ'טקה, איי מרשל."
+   },
+   "File": {
+      "message": "קובץ"
+   },
+   "File_too_large__it_must_be_less_than_10MB_": {
+      "message": "הקובץ גדול מדי, הקובץ חייב להיות מתחת ל- 10 מגהבייט."
+   },
+   "File_too_large__it_must_be_less_than_5MB_": {
+      "message": "קובץ גדול מדי, הוא חייב להיות פחות מ 5MB."
+   },
+   "Files": {
+      "message": "קבצים"
+   },
+   "Fill": {
+      "message": "מלא"
+   },
+   "Fill_Current": {
+      "message": "מלא נוכחי"
+   },
+   "Fill_Form": {
+      "message": "מילוי טופס"
+   },
+   "Fill_Forms": {
+      "message": "מילוי טפסים"
+   },
+   "Fill_In_Default_Form_Fill_Profile": {
+      "message": "מלא טופס לפי פרופיל ברירת מחדל"
+   },
+   "Fill_In_Next_Login__When_Multiple_": {
+      "message": "הזן את הסט הבא (יותר משדה אחד)"
+   },
+   "Fill_In_Previous_Login__When_Multiple_": {
+      "message": "הזן את הסט הקודם (יותר משדה אחד)"
+   },
+   "Fill_or_Edit_Form_Fill_Data": {
+      "message": "מלא או ערוך נתוני מילוי טופס"
+   },
+   "Fill_with": {
+      "message": "מלא עם..."
+   },
+   "FillableFormDetected": {
+      "message": "זוהה טופס שניתן למילוי בדף זה."
+   },
+   "Filter": {
+      "message": "סנן"
+   },
+   "Finance": {
+      "message": "כספים"
+   },
+   "Find_a_site": {
+      "message": "מצא אתר"
+   },
+   "Finland": {
+      "message": "פינלנד"
+   },
+   "Finnish": {
+      "message": "פינית"
+   },
+   "FireForm": {
+      "message": "FireForm"
+   },
+   "Firefox": {
+      "message": "Firefox"
+   },
+   "Firefox_Password_Manager": {
+      "message": "מנהל הסיסמאות של Firefox"
+   },
+   "First_3_digits_of_your_phone_number": {
+      "message": "שלוש הספרות הראשונות של מספר הטלפון שלך"
+   },
+   "First_Name": {
+      "message": "שם פרטי"
+   },
+   "First_name": {
+      "message": "שם פרטי"
+   },
+   "For_each_coordinate_listed_below__find_the_value_on_your_grid_and_enter_the_value_": {
+      "message": "לכל קואורדינטה ברשימה למטה, מצא והכנס את הערך בטבלה שלך."
+   },
+   "Forgot_Password_": {
+      "message": "שכחת סיסמה?"
+   },
+   "Forgot_your_password_": {
+      "message": "שכחת את הסיסמה?"
+   },
+   "FormFill": {
+      "message": "מילוי טופס"
+   },
+   "FormFill_Profiles": {
+      "message": "פרופילי מילוי טפסים"
+   },
+   "Form_Fill": {
+      "message": "מילוי טופס"
+   },
+   "Form_Fill_Profile": {
+      "message": "פרופיל מילוי טפסים"
+   },
+   "Form_Fill_Profiles": {
+      "message": "טופס מילוי פרופילים"
+   },
+   "Form_Fills": {
+      "message": "הזנת טפסים"
+   },
+   "Form_Name_": {
+      "message": "שם טופס:"
+   },
+   "Format": {
+      "message": "פורמט"
+   },
+   "Forums": {
+      "message": "פורומים"
+   },
+   "France": {
+      "message": "צרפת"
+   },
+   "French": {
+      "message": "צרפתית"
+   },
+   "French_Guiana": {
+      "message": "גיאנה הצרפתית"
+   },
+   "French_Polynesia": {
+      "message": "פולינזיה הצרפתית"
+   },
+   "French_Southern_Territories": {
+      "message": "הטריטוריות הדרומיות של צרפת"
+   },
+   "French__Canada_": {
+      "message": "צרפתית (קנדה)"
+   },
+   "Full_path_of_file_to_import_": {
+      "message": "הנתיב המלא של קובץ לייבוא:"
+   },
+   "Full_path_of_the_file_to_import_": {
+      "message": "הנתיב המלא של הקובץ לייבוא:"
+   },
+   "GET_FREE_PREMIUM": {
+      "message": "קבל פרמיום חינם"
+   },
+   "GMT_5": {
+      "message": "שעון גריניץ' + 5"
+   },
+   "GMT_7": {
+      "message": "שעון גריניץ' + 7"
+   },
+   "GMT_9": {
+      "message": "שעון גריניץ' + 9"
+   },
+   "GMT_Dublin__Edinburgh__Lisbon__London": {
+      "message": "GMT דבלין, אדינבורו, ליסבון, לונדון"
+   },
+   "GMT__Dublin__Edinburgh__Lisbon__London": {
+      "message": "שעון גרינוויץ': דבלין, אדינבורו, ליסבון, לונדון"
+   },
+   "Gabon": {
+      "message": "גבון"
+   },
+   "Gambia": {
+      "message": "גמביה"
+   },
+   "Games": {
+      "message": "משחקים"
+   },
+   "Gender": {
+      "message": "מין"
+   },
+   "General": {
+      "message": "כללי"
+   },
+   "Generate": {
+      "message": "צור"
+   },
+   "GeneratePassword": {
+      "message": "אם אתה יוצר חשבון או משנה את הסיסמה שלך, לחץ על צור כדי ליצור סיסמה ייחודית ומאובטחת עם LastPass."
+   },
+   "Generate_Another_Password": {
+      "message": "צור סיסמה אחרת"
+   },
+   "Generate_Password": {
+      "message": "חולל סיסמה"
+   },
+   "Generate_Secure_Password": {
+      "message": "יצירת סיסמה מאובטחת"
+   },
+   "Generated_Password_for": {
+      "message": "הסיסמה שנוצרה עבור"
+   },
+   "Generic": {
+      "message": "כללי"
+   },
+   "Generic_CSV_File": {
+      "message": "קובץ CSV כללי"
+   },
+   "Georgia": {
+      "message": "גאורגיה"
+   },
+   "German": {
+      "message": "גרמנית"
+   },
+   "Germany": {
+      "message": "גרמניה"
+   },
+   "Ghana": {
+      "message": "גאנה"
+   },
+   "Gibraltar": {
+      "message": "גיברלטר"
+   },
+   "Go_Back": {
+      "message": "חזור"
+   },
+   "Go_Back_": {
+      "message": "לחזור?"
+   },
+   "Go_Premium_": {
+      "message": "עבור לגרסת Premium"
+   },
+   "Go_to_URL": {
+      "message": "לך לכתובת URL"
+   },
+   "Google_Authenticator": {
+      "message": "מאמת Google"
+   },
+   "Google_Authenticator_Multifactor_Authentication": {
+      "message": "אימות רב־שלבי של מאמת Google"
+   },
+   "Google_Chrome": {
+      "message": "Google Chrome"
+   },
+   "Google_Chrome_Password_Manager": {
+      "message": "מנהל סיסמאות גוגל כרום"
+   },
+   "Google_Chrome_requires_that_extensions_use_the_same_language_as_the_browser__so_in_order_to_switch_LastPass_s_language__please_change_the_main_browser_language_under_Chrome_s_Options_": {
+      "message": "Google Chrome מחייב שהרחבות ישתמשו באותה השפה כמו הדפדפן ולכן כדי לשנות את השפה של LastPass עליך לשנות את שפת הדפדפן בתפריט האפשרויות שלChrome."
+   },
+   "Greece": {
+      "message": "יוון"
+   },
+   "Greenland": {
+      "message": "גרינלנד"
+   },
+   "Greenland__Brasilia__Montevideo": {
+      "message": "גרינלנד, ברזיליה, מונטווידאו"
+   },
+   "Grenada": {
+      "message": "גרנדה"
+   },
+   "Group_": {
+      "message": "תיקיה:"
+   },
+   "Group_ID": {
+      "message": "זיהוי קבוצה"
+   },
+   "Group_Name": {
+      "message": "שם התיקיה"
+   },
+   "Groups": {
+      "message": "תיקיות"
+   },
+   "Guadeloupe": {
+      "message": "גוואדלופ"
+   },
+   "Guam": {
+      "message": "גואם"
+   },
+   "Guatemala": {
+      "message": "גואטמלה"
+   },
+   "Guernsey": {
+      "message": "גרנזי"
+   },
+   "Guinea": {
+      "message": "גינאה"
+   },
+   "Guinea_Bissau": {
+      "message": "גינאה ביסאו"
+   },
+   "Guyana": {
+      "message": "גיאנה"
+   },
+   "HP_Password_Safe": {
+      "message": "כספת הסיסמאות של HP"
+   },
+   "Haiti": {
+      "message": "האיטי"
+   },
+   "Harare__Pretoria": {
+      "message": "הארארה, פרטוריה"
+   },
+   "Hawaii": {
+      "message": "הוואי"
+   },
+   "Health": {
+      "message": "בריאות"
+   },
+   "Health_Insurance": {
+      "message": "ביטוח בריאות"
+   },
+   "Heard_Island_and_Mcdonald_Islands": {
+      "message": "האי הרד ואיי מקדונלד"
+   },
+   "Height": {
+      "message": "גובה"
+   },
+   "Help": {
+      "message": "עזרה"
+   },
+   "Help_Center": {
+      "message": "מרכז העזרה"
+   },
+   "Help_Translate": {
+      "message": "עזור בתרגום"
+   },
+   "Help___": {
+      "message": "עזרה..."
+   },
+   "Help_spread_the_word": {
+      "message": "עזור להפיץ את המידע"
+   },
+   "Hide": {
+      "message": "הסתר"
+   },
+   "Hide_Advanced_Options": {
+      "message": "הסתר אפשרויות מתקדמות"
+   },
+   "Hide_Context_Menu_Options": {
+      "message": "הסתר אפשרויות תפריט ההקשר"
+   },
+   "Hide_Password": {
+      "message": "הסתר סיסמה"
+   },
+   "Hide_Passwords": {
+      "message": "הסתר סיסמאות"
+   },
+   "Highlight_input_boxes": {
+      "message": "הבלט תיבות קלט"
+   },
+   "History": {
+      "message": "היסטוריה"
+   },
+   "Holy_See__Vatican_City_State_": {
+      "message": "הכס הקדוש (מדינת הוותיקן)"
+   },
+   "Home": {
+      "message": "בית"
+   },
+   "Honduras": {
+      "message": "הונדורס"
+   },
+   "Hong_Kong": {
+      "message": "הונג קונג"
+   },
+   "Hostname": {
+      "message": "שם מארח"
+   },
+   "HotKeys": {
+      "message": "קיצורי מקלדת"
+   },
+   "Hungarian": {
+      "message": "הונגרית"
+   },
+   "Hungary": {
+      "message": "הונגריה"
+   },
+   "IBAN_Number": {
+      "message": "מספר IBAN"
+   },
+   "IMPORT_": {
+      "message": "לייבא?"
+   },
+   "IT_IS_CRITICAL_THAT_YOU_NEVER_FORGET_YOUR_NEW_LASTPASS_PASSWORD_": {
+      "message": "מאוד חשוב שלעולם לא תשכח את סיסמת LastPass החדשה שלך."
+   },
+   "I_Forgot_my_Password": {
+      "message": "שכחתי את הסיסמה שלי"
+   },
+   "I_forgot_my_password__Help_": {
+      "message": "שכחתי את הסיסמא, עזרו לי"
+   },
+   "I_have_read_and_agree_with_the": {
+      "message": "קראתי ואני מסכים עם"
+   },
+   "I_understand_that_my_encrypted_data_will_be_sent_to_LastPass": {
+      "message": "אני מבין כי הנתונים המוצפנים שלי ישלחו אל LastPass"
+   },
+   "I_ve_forgot_the_answer": {
+      "message": "שכחתי את התשובה"
+   },
+   "I_ve_forgotten_my_password_": {
+      "message": "שכחתי את הסיסמא שלי."
+   },
+   "I_ve_lost_my_Google_Authenticator_device": {
+      "message": "איבדתי את התקן האימות של גוגל שלי"
+   },
+   "I_ve_lost_my_Sesame_device": {
+      "message": "איבדתי את התקן ה-Sesame שלי"
+   },
+   "I_ve_lost_my_YubiKey_device": {
+      "message": "איבדתי את התקן ה-YubiKey שלי"
+   },
+   "I_ve_lost_my_device": {
+      "message": "איבדתי את המכשיר שלי"
+   },
+   "Iceland": {
+      "message": "איסלנד"
+   },
+   "Icons": {
+      "message": "סמלים"
+   },
+   "Identities": {
+      "message": "זהויות"
+   },
+   "Identity": {
+      "message": "זהות"
+   },
+   "If_checked__your_credit_report_will_be_regularly_monitored_and_you_will_be_alerted_if_any_suspicious_activity_occurs_": {
+      "message": "אם מסומן, דו'ח האשראי שלך יהיה במעקב קבוע ותקבל התראה אם ​​תתרחש כל פעילות חשודה."
+   },
+   "If_not_specified__will_use_a_file_extension_of_": {
+      "message": "באם לא צויין, אשתמש בסיומת קובץ:"
+   },
+   "If_you_already_have_a_LastPass_account_you_can_close_this_window_and_login_": {
+      "message": "אם כבר יש לך חשבון LastPass תוכל לסגור חלון זה ולהתחבר."
+   },
+   "If_you_do_end_up_forgetting_your_LastPass_master_password_": {
+      "message": "אם בסופו של דבר תשכח את סיסמת LastPass הראשית שלך,"
+   },
+   "If_you_forgot_your_answer__click_here_to_reset_your_security_question": {
+      "message": "אם שכחת את התשובה שלך, לחץ כאן כדי לאפס את שאלת האבטחה שלך"
+   },
+   "If_you_have_another_format_that_LastPass_doesn_t_currently_support_you_can_attempt_to_save_your_data_as_a_CSV_file__YOU_MUST_MODIFY_THE_FIRST_ROW_OF_THE_CSV_FILE_FOR_LASTPASS_TO_RECOGNIZE_IT__The_first_row_s_column_names_should_be_properly_setup_for_the_data_in_the_columns_Possible_first_row_names___url_username_password_extra_name_grouping___extra__means__notes__and__grouping__is_what_group_it_should_be_in___You_do_not_have_to_use_all_the_column_names_and_they_don_t_need_to_be_in_any_order___For_example_your_file_s_first_row_might_be_like___name_username_password_url__If_you_want_to_import_a_Secure_Note_instead_of_a_Site__simply_ensure_the__url____username___and__password__columns_are_left_blank__or_omit_the__url____username___and_or__password__columns_entirely___and_ensure_the__extra__column_is_not_blank___As_long_as_these_two_things_have_been_done__the_record_will_automatically_be_imported_as_a_Secure_Note_instead_of_a_Site___This_should_be_very_simple__just_open_your_saved_CSV_file_in_Excel_and_make_sure_the_top_row_has_the_appropriate_name_from_above_for_what_it_is___Save_it__then_import_the_resulting_file_": {
+      "message": "אם יש לך פורמט נוסף ש-LastPass לא תומך בו, ניתן לשמור את המידע כקובץ CSV\n\nחובה לעדכן את השורה הראשונה של ה-CSV כדי ש-LASTPASS יזהה אותו!\n\nהשמות שבשורה הראשונה חייבים להיות נכונים\nשמות אפשריים לשורה הראשונה:\n\nכתובת אתר, שם משתמש, סיסמא, אקסטרא, שם, קבוצה\n\nהמשמעות של אקסטרא הוא פתקים וקבוצה היא באיזו תיקיה זה אמור להיות. לא חייב להשתמש בכל שמות השורה והם לא חייבים להיות בסדר כלשהו. לדוגמא השורה הראשונה של הקובץ שלך יכול להיראות כך:\n\nשם, שם משתמש, סיסמא, כתובת אתר\n\nאם אתה מעוניין לייבא פתק מאובטח במקום אתר, פשוט השאר את הטורים 'כתובת אתר', 'שם משתמש', ו'סיסמא' ריקים, ו-וודא שהטור 'אקסטרא' הוא לא ריק. כל עוד התנאים האלה מוקפדים הערך ייובא אוטומטית כפתק מאובטח במקום כאתר.\n\nזה אמור להיות ממש פשוט, פשוט פתח את קובץ ה-CSV באקסל ו-וודא שכל טור מכיל את הערכים הנכונים לפי הכותרת של הטור. שמור את הקובץ וייבא אותו."
+   },
+   "If_you_lost_your_Google_Authenticator_device__click_here_to_disable_Google_Authenticator_authentication": {
+      "message": "אם איבדת את מכשיר מאמת Google, לחץ כאן כדי לבטל את אימות מאמת Google"
+   },
+   "If_you_lost_your_Sesame_device__click_here_to_disable_Sesame_authentication": {
+      "message": "אם אבד לך כרטיס ה-Sesame, לחץ כאן בכדי לבטל הזדהות באמצעות Sesame."
+   },
+   "If_you_lost_your_YubiKey_device__click_here_to_disable_YubiKey_authentication": {
+      "message": "אם איבדת את ההתקן YubiKey, לחץ כאן כדי לבטל את אימות ה־YubiKey"
+   },
+   "If_you_lost_your_device__click_here_to_disable_multifactor_authentication": {
+      "message": "אם איבדת את המכשיר שלך, לחץ כאן כדי לנטרל אימות רב-שלבי"
+   },
+   "If_you_lost_your_grid__click_here_to_disable_grid_authentication": {
+      "message": "אם איבדת את הטבלה שלך, לחץ כאן לביטול אימות בעזרת טבלה."
+   },
+   "Import": {
+      "message": "יבוא"
+   },
+   "Import_From": {
+      "message": "יבוא מ־"
+   },
+   "Import_Your_Data": {
+      "message": "יבוא הנתונים שלך"
+   },
+   "Importing_your_data_to_your_LastPass_vault_will_secure_it_and_protect_you_against_identity_theft__All_imported_data_remains_COMPLETELY_confidential__the_only_person_who_can_view_YOUR_data_is_YOU_": {
+      "message": "ייבוא הנתונים אל כספת ה-LastPass שלך יאבטח אותם ויגן עליך מפני גניבת זהות. כל הנתונים המיובאים נשארים חסויים לחלוטין: האדם היחיד שיכול לצפות בנתונים שלך הוא אתה."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_enable_access_for_assistive_devices_": {
+      "message": "על מנת ש-LastPass יוכל למלא מידע אימות בסיסי לתוך דיאלוגים, אתה צריך לאפשר גישה להתקני עזר."
+   },
+   "In_order_for_LastPass_to_fill_into_basic_authentication_dialogs__you_need_to_install_the_binary_version_of_LastPass_for_Chrome_": {
+      "message": "על מנת ש-LastPass יוכל למלא מידע אימות בסיסי לתוך דיאלוגים, אתה צריך להתקין את הגרסא הבינארית של LastPass עבור Chrome."
+   },
+   "In_order_to_complete_the_process___s_will_have_to_log_in_to__s_and_navigate_through_a_number_of_windows_quickly__It_is_normal_to_see_windows_flashing_and_changing_quickly__and_may_take_several_moments__We_ll_let_you_know_when_you_re_all_set_": {
+      "message": "כדי להשלים את התהליך, %s יצטרך להיכנס ל-%s ולנווט דרך מספר חלונות במהירות. זה נורמלי לראות חלונות מהבהבים ומשתנים במהירות, ויכול לקחת מספר דקות. אנחנו ניידע אותך כשנסיים!"
+   },
+   "India": {
+      "message": "הודו"
+   },
+   "Indiana__Bogota__Lima__Quito__Rio_Branco": {
+      "message": "אינדיאנה, בוגוטה, לימה, קיטו, ריו ברנקו"
+   },
+   "Indonesia": {
+      "message": "אינדונזיה"
+   },
+   "Install": {
+      "message": "התקן"
+   },
+   "Install_Binary_Component": {
+      "message": "התקן רכיב בינארי"
+   },
+   "Install_the_LastPass_Library_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "התקן את LastPass Binary לכרום בכדי לאפשר התנתקות אוטומטית לאחר חוסר פעילות"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_automatic_logoff_after_idle": {
+      "message": "התקן את הגירסה הבינארית של LastPass עבור Chrome כדי לאפשר התנתקות אוטומטית בעת חוסר פעילות"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_importing_passwords_from_Google_Chrome_password_manager": {
+      "message": "התקן את הגירסה הבינארית של LastPass עבור Chrome כדי לאפשר את ייבוא הססמאות ממנהל הססמאות של Google Chrome"
+   },
+   "Install_the_binary_version_of_LastPass_for_Chrome_to_enable_sharing_login_state_between_other_browsers": {
+      "message": "התקן את הגירסה הבינארית של LastPass עבור Chrome כדי לאפשר שיתוף מצב כניסות עם דפדפנים אחרים"
+   },
+   "Instant_Messenger": {
+      "message": "תוכנת הודעות מיידיות"
+   },
+   "Instructions": {
+      "message": "הוראות"
+   },
+   "Insurance": {
+      "message": "ביטוח"
+   },
+   "International_Date_Line_West": {
+      "message": "קו התאריך הבינלאומי המערבי"
+   },
+   "Invalid_Password_": {
+      "message": "סיסמה לא חוקית."
+   },
+   "Invalid_email_address__try_again": {
+      "message": "כתובת דוא'ל לא חוקית, נסה שוב"
+   },
+   "Invalid_file_type__it_must_be_an_image_that_can_be_displayed_by_your_browser_": {
+      "message": "סוג קובץ לא חוקי, הקובץ חייב להיות תמונה שניתן להציג על ידי הדפדפן שלך."
+   },
+   "Invite": {
+      "message": "הזמן"
+   },
+   "Iran__Islamic_Republic_Of_": {
+      "message": "אירן (הרפובליקה האיסלמית של)"
+   },
+   "Iraq": {
+      "message": "עירק"
+   },
+   "Ireland": {
+      "message": "אירלנד"
+   },
+   "Isle_of_Man": {
+      "message": "האי מאן"
+   },
+   "Israel": {
+      "message": "ישראל"
+   },
+   "Issue_Number": {
+      "message": "מספר נושא"
+   },
+   "Issue_number": {
+      "message": "מספר גיליון"
+   },
+   "Issued_Date": {
+      "message": "תאריך הנפקה"
+   },
+   "Issuing_Authority": {
+      "message": "רשות מנפיקה"
+   },
+   "It_is_recommended_that_you_delete_the_attachment_file_after_you_use_it_": {
+      "message": "מומלץ שתמחק את הקובץ המצורף לאחר השימוש בו."
+   },
+   "It_is_very_important_that_you_remember_your_new_LastPass_Master_Password_": {
+      "message": "חשוב מאוד שתזכור את סיסמת ה-LastPass הראשית החדשה שלך."
+   },
+   "Italian": {
+      "message": "איטלקית"
+   },
+   "Italy": {
+      "message": "איטליה"
+   },
+   "IterationsReduction": {
+      "message": "נראה שמספר החזרות הנדרשות כדי ליצור את סיסמא המאסטר שלך ב-LastPass נמוך מגרסת המטמון. האם ברצונך להמשיך?"
+   },
+   "Jamaica": {
+      "message": "ג 'מייקה"
+   },
+   "January": {
+      "message": "ינואר"
+   },
+   "Japan": {
+      "message": "יפן"
+   },
+   "Japanese": {
+      "message": "יפנית"
+   },
+   "Jersey": {
+      "message": "ג'רזי"
+   },
+   "Jordan": {
+      "message": "ירדן"
+   },
+   "July": {
+      "message": "יולי"
+   },
+   "June": {
+      "message": "יוני"
+   },
+   "Kabul": {
+      "message": "קאבול"
+   },
+   "Kathmandu": {
+      "message": "קטמנדו"
+   },
+   "Kazakhstan": {
+      "message": "קזחסטן"
+   },
+   "KeePass": {
+      "message": "KeePass"
+   },
+   "Keep_a_history_of_my_logins_and_form_fills": {
+      "message": "שמור את היסטוריית הכניסות ומילוי הטפסים שלי"
+   },
+   "Kenya": {
+      "message": "קניה"
+   },
+   "Key_Index": {
+      "message": "מדד מפתח"
+   },
+   "Key_Type": {
+      "message": "סוג מפתח"
+   },
+   "Kiribati": {
+      "message": "קיריבטי"
+   },
+   "Korea__Democratic_People_s_Republic_Of": {
+      "message": "הרפובליקה הדמוקרטית העממית של קוריאה"
+   },
+   "Korea__Republic_Of": {
+      "message": "הרפובליקה של קוריאה"
+   },
+   "Korean": {
+      "message": "קוראנית"
+   },
+   "Kuwait": {
+      "message": "כווית"
+   },
+   "Kyrgyzstan": {
+      "message": "קירגיזסטן"
+   },
+   "La_Paz": {
+      "message": "לה פאס"
+   },
+   "Language": {
+      "message": "שפה"
+   },
+   "Language_": {
+      "message": "שפה:"
+   },
+   "Lao_People_s_Democratic_Republic": {
+      "message": "הרפובליקה הדמוקרטית העממית של לאו"
+   },
+   "LastPass": {
+      "message": "LastPass"
+   },
+   "LastPass_CSV_File": {
+      "message": "קובץ CSV של LastPass"
+   },
+   "LastPass_Chrome_Toolbar": {
+      "message": "סרגל LastPass ל-Chrome"
+   },
+   "LastPass_Encrypted_File": {
+      "message": "קובץ מוצפן של LastPass"
+   },
+   "LastPass_Grid_Multifactor_Authentication": {
+      "message": "אימות גריד רב-שלבי של LastPass"
+   },
+   "LastPass_Menu": {
+      "message": "LastPass תפריט"
+   },
+   "LastPass_can_automatically_fill_web_page_forms_with_a_single_click___Using_automatic__Form_Filling__will_not_only_save_you_time__but_will_also_enhance_your_security_when_shopping_online_": {
+      "message": ".יכולה למלא אוטומטית טפסי אינטרנט בלחיצת כפתור LastPass\n...על ידי שימוש ב 'מילוי אוטומטי"
+   },
+   "LastPass_cannot_login_until_cookies_are_allowed_from_lastpass_com": {
+      "message": "LastPass לא יוכל להתחבר, עד שיהיה היתר שימוש בקבצי Cookie עבור האתר של lastpass.com"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_like_to_continue_": {
+      "message": "LastPass זיהה טופס כניסה שאינו מאובטח. \n\nהאם ברצונך להמשיך?"
+   },
+   "LastPass_detected_a_login_form_that_is_insecure___Would_you_still_like_LastPass_to_fill_the_form_": {
+      "message": "LastPass זיהה טופס כניסה שאינו מאובטח. \n\nהאם עדיין ברצונך ש־LastPass ימלא את הטופס?"
+   },
+   "LastPass_detected_a_password_change_for": {
+      "message": "LastPass הבחין בשינוי הסיסמה עבור"
+   },
+   "LastPass_detected_a_password_change_for_domain_": {
+      "message": "LastPass הבחין בשינוי הסיסמה עבור תחום קבוצת מחשבים:"
+   },
+   "LastPass_detected_a_password_change_for_user_": {
+      "message": "LastPass זיהה שינוי סיסמה עבור המשתמש:"
+   },
+   "LastPass_detected_that_the_site_that_triggered_this_security_alert_has_the_same_password_as_your_LastPass_account_Master_Password_": {
+      "message": "LastPass זיהה שהאתר שגרם לאזהרת האבטחה מכיל את אותה סיסמא כמו סיסמת המאסטר שלך ב-LastPass."
+   },
+   "LastPass_has_detected_an_installation_error___Please_reinstall_LastPass_": {
+      "message": "LastPass זיהתה שגיאת התקנה. אנא התקן את LastPass מחדש."
+   },
+   "LastPass_has_detected_that_you_are_using_a_weak_password_for_the_site_below__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass זיהה שאתה משתמש בסיסמא חלשה לאתר שבהמשך. אנו ממליצים ללכת להגדרות החשבון שלך לאתר זה, ויצירת סיסמא חדשה. השתמש LastPass כדי ליצור סיסמא ייחודית, חזקה עבור חשבון זה. אז אתה יכול לשמור את השינויים באתר, ול- LastPass."
+   },
+   "LastPass_has_detected_that_you_have_used_the_password_for_this_login_on_other_sites__too__We_recommend_going_to_your_account_settings_for_this_site__and_creating_a_new_password__Use_LastPass_to_generate_a_unique__strong_password_for_this_account__You_can_then_save_the_changes_on_the_site__and_to_LastPass_": {
+      "message": "LastPass זיהה שבחרת להשתמש בסיסמה זהה לכניסה לאתרים אחרים, אנו ממליצים ללכת להגדרות החשבון שלך לאתר זה, וליצור סיסמא חדשה. השתמש LastPass כדי ליצור סיסמא ייחודית, חזקה עבור אתר זה. אתה יכול לשמור את השינויים באתר, וב- LastPass."
+   },
+   "LastPass_has_filled_your_login_information_into_the_form_on_this_page_": {
+      "message": "LastPass מילא את פרטי מידע הכניסה שלך בטופס של הדף הזה."
+   },
+   "LastPass_is_fully_installed___When_you_install_LastPass_on_other_computers_you_will_not_have_to_go_through_this_process_again__you_ll_simply_be_able_to_login____Do_not_share_your_Master_Password_with_anyone__including_LastPass_employees__we_ll_never_ask_for_it___LastPass_encrypts_your_sensitive_data_locally_so_even_LastPass_employees_do_not_have_access_to_it___You_can_get_help_by_clicking_on_the_LastPass_icon_and_going_to_Help_": {
+      "message": "LastPass מותקן באופן מלא! בעת התקנת LastPass במחשבים אחרים, לא תצטרך לעבור תהליך זה שוב, פשוט תהיה לך אפשרות להיכנס. \n\nאל תשתף את הסיסמה הראשית שלך עם כל אחד, כולל עובדים של LastPass. אנחנו לעולם לא נבקש אותו ממך! \n\nLastPass מצפין את הנתונים הרגישים שלך באופן מקומי, כך שאפילו לעובדים של LastPass אין גישה אליהם. \n\nבאפשרותך לקבל עזרה באמצעות לחיצה על סמל LastPass ולגשת אל תפריט עזרה לקבלת סיוע."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember_": {
+      "message": "LastPass היא הסיסמה האחרונה שתצטרך אי פעם לזכור."
+   },
+   "LastPass_is_the_last_password_you_ll_ever_have_to_remember___If_you_re_new_to_LastPass__we_ll_just_need_a_few_minutes_of_your_time_to_setup_your_account___You_ll_be_able_to_use_this_account_on_any_other_PC_you_use_to_always_keep_your_personal_data_in_sync___Hit_create_account_to_begin_": {
+      "message": "LastPass היא הסיסמה האחרונה שאי פעם תצטרך לזכור. אם אתה משתמש חדש ב־LastPass, אנו נצטרך רק כמה דקות מזמנך כדי להגדיר את החשבון שלך. \n\nתוכל להשתמש בחשבון זה בכל מחשב אחר כדי לשמור תמיד על הנתונים האישיים שלך מסונכרנים. לחץ על צור חשבון כדי להתחיל."
+   },
+   "LastPass_is_the_last_password_you_will_ever_have_to_remember": {
+      "message": "LastPass היא הסיסמה האחרונה שתצטרך אי פעם לזכור"
+   },
+   "LastPass_must_reencrypt_all_of_your_data_because_of_a_key_change_": {
+      "message": "LastPass חייב לקודד מחדש את כל הנתונים שלך בגלל שינוי מפתח."
+   },
+   "Last_4_digits_of_your_phone_number": {
+      "message": "4 ספרות אחרונות של מספר הטלפון"
+   },
+   "Last_Name": {
+      "message": "שם משפחה"
+   },
+   "Last_Name2": {
+      "message": "שם משפחה 2"
+   },
+   "Last_Touch": {
+      "message": "שם קשר"
+   },
+   "Last_name": {
+      "message": "שם משפחה"
+   },
+   "Latvia": {
+      "message": "לטביה"
+   },
+   "Launch": {
+      "message": "הפעל"
+   },
+   "Launch_Site": {
+      "message": "הרץ אתר"
+   },
+   "Lebanon": {
+      "message": "לבנון"
+   },
+   "Left": {
+      "message": "שמאל"
+   },
+   "Lesotho": {
+      "message": "לסוטו"
+   },
+   "Liberia": {
+      "message": "ליבריה"
+   },
+   "Libyan_Arab_Jamahiriya": {
+      "message": "לוב"
+   },
+   "License_Class": {
+      "message": "דרגת רישיון"
+   },
+   "License_Key": {
+      "message": "מפתח רישיון"
+   },
+   "Liechtenstein": {
+      "message": "ליכטנשטיין"
+   },
+   "Link_Personal_Account": {
+      "message": "קישור לחשבון אישי"
+   },
+   "Lithuania": {
+      "message": "ליטא"
+   },
+   "Local": {
+      "message": "מקומי"
+   },
+   "Log_In_with_a_Different_Username": {
+      "message": "היכנס עם שם משתמש אחר"
+   },
+   "Log_into_a_Site": {
+      "message": "היכנס לאתר"
+   },
+   "LoggedInOffline": {
+      "message": "LastPass לא הצליח להתחבר לשרת ההתחברות, אז אתה עכשיו במצב לא מקוון.\n\nחלק מהאפשרויות עשויות להיות מוגבלות."
+   },
+   "Login": {
+      "message": "התחבר"
+   },
+   "LoginError": {
+      "message": "שגיאה בהתחברות ל־LastPass. אנא נסה שוב."
+   },
+   "Login_to_LastPass": {
+      "message": "היכנס ל-LastPass"
+   },
+   "Logoff": {
+      "message": "התנתק"
+   },
+   "Logoff_": {
+      "message": "יציאה:"
+   },
+   "Logoff_after_logged_in_for_minutes": {
+      "message": "התנתק לאחר החיבור כעבור דקות"
+   },
+   "Logoff_on_browser_close": {
+      "message": "בצע ניתוק בעת סגירת הדפדפן"
+   },
+   "Logout": {
+      "message": "התנתק"
+   },
+   "LoseChanges": {
+      "message": "האם אתה בטוח כי ברצונך לערוך את שדות האתר? דבר זה עלול לגרום לאבדן השינויים שביצאת באתר זה!"
+   },
+   "LoseChangesApp": {
+      "message": "האם אתה בטוח שברצונך לערוך את השדות של היישום הזה? דבר זה יגרום לאובדן כל השינויים שביצעת ביישום זה!"
+   },
+   "Luxembourg": {
+      "message": "לוקסמבורג"
+   },
+   "MSI_PasswordKeeper": {
+      "message": "MSI PasswordKeeper"
+   },
+   "Macao": {
+      "message": "מקאו"
+   },
+   "Macedonia__the_Former_Yugoslav_Republic_Of": {
+      "message": "מקדוניה, לשעבר הרפובליקה היוגוסלבית"
+   },
+   "Madagascar": {
+      "message": "מדגסקר"
+   },
+   "Make_Pronounceable": {
+      "message": "הפוך לקל לביטוי"
+   },
+   "Malawi": {
+      "message": "מלאווי"
+   },
+   "Malaysia": {
+      "message": "מלזיה"
+   },
+   "Maldives": {
+      "message": "האיים המלדיביים"
+   },
+   "Male": {
+      "message": "זכר"
+   },
+   "Mali": {
+      "message": "מאלי"
+   },
+   "Malta": {
+      "message": "מלטה"
+   },
+   "Manage_Shared_Folder": {
+      "message": "נהל תיקיה משותפת"
+   },
+   "Manage_Shared_Folders": {
+      "message": "ניהול תיקיות משותפות"
+   },
+   "March": {
+      "message": "מרץ"
+   },
+   "Marshall_Islands": {
+      "message": "איי מרשל"
+   },
+   "Martinique": {
+      "message": "מרטיניק"
+   },
+   "Master_Password": {
+      "message": "סיסמת מאסטר"
+   },
+   "Master_Password_": {
+      "message": "סיסמת מאסטר"
+   },
+   "Matching_Sites": {
+      "message": "אתרים מתאימים"
+   },
+   "Mauritania": {
+      "message": "מאוריטניה"
+   },
+   "Mauritius": {
+      "message": "מאוריציוס"
+   },
+   "Maxthon": {
+      "message": "מקסתון"
+   },
+   "May": {
+      "message": "מאי"
+   },
+   "Mayotte": {
+      "message": "מאיוט"
+   },
+   "Member_ID": {
+      "message": "מזהה משתמש"
+   },
+   "Member_Name": {
+      "message": "שם חבר"
+   },
+   "Membership": {
+      "message": "חברות"
+   },
+   "Membership_Number": {
+      "message": "מספר חברות"
+   },
+   "Message": {
+      "message": "הודעה"
+   },
+   "Meta": {
+      "message": "מטה"
+   },
+   "Mexico": {
+      "message": "מקסיקו"
+   },
+   "Micronesia__Federated_States_Of": {
+      "message": "המדינות המאוחדות של מיקרונזיה"
+   },
+   "Mid_Atlantic": {
+      "message": "מרכז האוקיינוס האטלנטי"
+   },
+   "Middle_3_digits_of_your_phone_number": {
+      "message": "שלוש הספרות הבאות של מספר הטלפון שלך"
+   },
+   "Middle_Name": {
+      "message": "שם אמצעי"
+   },
+   "Middle_name": {
+      "message": "שם שני"
+   },
+   "Midway_Island__Samoa": {
+      "message": "האי מידווי, סמואה"
+   },
+   "Minimum_Digit_Count": {
+      "message": "מינימום תווים נומריים"
+   },
+   "Mobile_Email_Address": {
+      "message": "כתובת דוא'ל ניידת"
+   },
+   "Mobile_Number": {
+      "message": "מספר טלפון נייד"
+   },
+   "Mobile_number": {
+      "message": "מספר טלפון נייד"
+   },
+   "Moldova__Republic_Of": {
+      "message": "הרפובליקה של מולדובה"
+   },
+   "Monaco": {
+      "message": "מונאקו"
+   },
+   "Mongolia": {
+      "message": "מונגוליה"
+   },
+   "Montenegro": {
+      "message": "מונטנגרו"
+   },
+   "Montserrat": {
+      "message": "מונטסראט"
+   },
+   "More": {
+      "message": "עוד"
+   },
+   "More_Information": {
+      "message": "מידע נוסף"
+   },
+   "More_Options": {
+      "message": "אפשרויות נוספות"
+   },
+   "Morocco": {
+      "message": "מרוקו"
+   },
+   "Mountain_Time__US___Canada_": {
+      "message": "שעון אזור ההרים (ארה'ב וקנדה)"
+   },
+   "Move_Selected_to_Group": {
+      "message": "העבר את הנבחרים לתיקיה"
+   },
+   "Move_matching_sites_to_top_menu": {
+      "message": "העבר אתרים דומים לתחילת התפריט"
+   },
+   "Move_to_Group": {
+      "message": "העבר לתיקיה"
+   },
+   "Move_to_Sub_Group": {
+      "message": "העבר לתיקיית משנה"
+   },
+   "Mozambique": {
+      "message": "מוזמביק"
+   },
+   "Mr": {
+      "message": "מר"
+   },
+   "Mrs": {
+      "message": "גברת"
+   },
+   "Ms": {
+      "message": "מרת"
+   },
+   "Multifactor_Authentication": {
+      "message": "אימות רב-שלבי"
+   },
+   "MyPasswordSafe": {
+      "message": "MyPasswordSafe"
+   },
+   "My_Account": {
+      "message": "החשבון שלי"
+   },
+   "My_LastPass_Vault": {
+      "message": "כספת ה-LastPass שלי"
+   },
+   "My_Vault": {
+      "message": "הכספת שלי"
+   },
+   "Myanmar": {
+      "message": "מיאנמר"
+   },
+   "NAME": {
+      "message": "שם"
+   },
+   "Name_": {
+      "message": "שם:"
+   },
+   "Name_on_Card": {
+      "message": "שם על הכרטיס"
+   },
+   "Name_on_card": {
+      "message": "שם בעל הכרטיס"
+   },
+   "Nameproper": {
+      "message": "שם"
+   },
+   "Namibia": {
+      "message": "נמיביה"
+   },
+   "Nationality": {
+      "message": "אזרחות"
+   },
+   "Native_Client_only": {
+      "message": "לקוח מקומי בלבד"
+   },
+   "Native_Messaging": {
+      "message": "הודעות מקומיות"
+   },
+   "Nauru": {
+      "message": "נאורו"
+   },
+   "Nepal": {
+      "message": "נפאל"
+   },
+   "Netherlands": {
+      "message": "הולנד"
+   },
+   "Netherlands_Antilles": {
+      "message": "האנטילים ההולנדיים"
+   },
+   "Never": {
+      "message": "לעולם לא"
+   },
+   "Never_Add_Site": {
+      "message": "השבת הוספת אתרים"
+   },
+   "Never_Ask_Again": {
+      "message": "לעולם אל תשאל שוב"
+   },
+   "Never_AutoFill": {
+      "message": "השבת מילוי אוטומטי"
+   },
+   "Never_AutoLogin": {
+      "message": "השבת התחברות אוטומטית"
+   },
+   "Never_Fill_Forms": {
+      "message": "השבת מילוי טפסים"
+   },
+   "Never_For_This_Domain": {
+      "message": "השבת לדומיין זה"
+   },
+   "Never_For_This_Page": {
+      "message": "לא לבצע עבור דף זה"
+   },
+   "Never_For_This_Site": {
+      "message": "השבת עבור אתר זה"
+   },
+   "Never_Generate_Password": {
+      "message": "השבת מחולל ססמאות"
+   },
+   "Never_Show_Again": {
+      "message": "אל תציג שוב"
+   },
+   "Never_Show_Context_Icons": {
+      "message": "אל תציג אייקונים קשורים"
+   },
+   "Never___": {
+      "message": "לעולם לא..."
+   },
+   "Never_show_me_this_message_again_": {
+      "message": "לעולם אל תציג לי הודעה זו שוב*"
+   },
+   "New_Caledonia": {
+      "message": "קלדוניה החדשה"
+   },
+   "New_Master_Password": {
+      "message": "סיסמה ראשית חדשה"
+   },
+   "New_Zealand": {
+      "message": "ניו זילנד"
+   },
+   "New_here__Create_an_Account_": {
+      "message": "חדש כאן? צור חשבון."
+   },
+   "New_to_LastPass_": {
+      "message": "חדש ב LastPass?"
+   },
+   "Newfoundland": {
+      "message": "ניופאונדלנד"
+   },
+   "News_Reference": {
+      "message": "חדשות"
+   },
+   "Next_SMS_passcode_starts_with": {
+      "message": "קוד האס.אם.אס הבא מתחיל ב"
+   },
+   "Nicaragua": {
+      "message": "ניקרגואה"
+   },
+   "Niger": {
+      "message": "ניז'ר"
+   },
+   "Nigeria": {
+      "message": "ניגריה"
+   },
+   "Niue": {
+      "message": "ניואה"
+   },
+   "No": {
+      "message": "לא"
+   },
+   "NoFavorites": {
+      "message": "אין לך מועדפים עדיין."
+   },
+   "No_Form_Fill_Profiles_": {
+      "message": "אין פרופילים של טפסים למילוי!"
+   },
+   "No_Matching_Sites_": {
+      "message": "אין אתרים מתאימים!"
+   },
+   "No_Thanks": {
+      "message": "לא תודה"
+   },
+   "No_Updates_Are_Available": {
+      "message": "אין עדכונים זמינים"
+   },
+   "No_Wi_Fi_adapter_was_detected_on_this_computer___This_feature_requires_a_Wi_Fi_adapter_": {
+      "message": "לא זוהה מתאם אלחוטי (Wi-Fi) במחשב זה. תכונה זו מחייבת מתאם אלחוטי (Wi-Fi)."
+   },
+   "No__I_do_not_want_LastPass_to_help_me_fill_forms_automatically": {
+      "message": "לא, אני לא רוצה ש-LastPass תסייע לי במילוי הטופס אוטומטית"
+   },
+   "No__Save_as_New_Entry": {
+      "message": "לא, שמור כרשומה חדשה"
+   },
+   "No__Thanks": {
+      "message": "לא, תודה"
+   },
+   "No__do_not_import_any_of_my_insecure_items": {
+      "message": "לא, אל תייבא פריטים לא מאובטחים"
+   },
+   "No_matches_found__Please_search_again_": {
+      "message": "לא נמצאו פריטים מתאימים. אנא נסה שנית."
+   },
+   "None_Available": {
+      "message": "אין זמינים"
+   },
+   "Norfolk_Island": {
+      "message": "האי נורפוק"
+   },
+   "Northern_Mariana_Islands": {
+      "message": "איי מריאנה הצפוניים"
+   },
+   "Norway": {
+      "message": "נורבגיה"
+   },
+   "Norwegian": {
+      "message": "נורבגית"
+   },
+   "Norwegian_Nynorsk": {
+      "message": "נורווגית נינורסק"
+   },
+   "Not_Now": {
+      "message": "לא כרגע"
+   },
+   "Note": {
+      "message": "הערה"
+   },
+   "Note_Type": {
+      "message": "סוג הערה"
+   },
+   "Note_Type_": {
+      "message": "סוג הערה:"
+   },
+   "Notes": {
+      "message": "הערות"
+   },
+   "Notes_": {
+      "message": "הערות:"
+   },
+   "Notifications": {
+      "message": "הודעות"
+   },
+   "November": {
+      "message": "נובמבר"
+   },
+   "Nuku_alofa": {
+      "message": "נוקואלופה"
+   },
+   "Number": {
+      "message": "מספר"
+   },
+   "Number_of_Licenses": {
+      "message": "מספר רישיונות"
+   },
+   "OK": {
+      "message": "אישור"
+   },
+   "October": {
+      "message": "אוקטובר"
+   },
+   "Offer_to_Generate_Secure_Passwords": {
+      "message": "הצע לחולל סיסמה מאובטחת"
+   },
+   "Old_Password": {
+      "message": "סיסמא ישנה"
+   },
+   "Oman": {
+      "message": "עומאן"
+   },
+   "One_Time_Passwords": {
+      "message": "סיסמא חד-פעמית"
+   },
+   "Open_All": {
+      "message": "פתח הכל"
+   },
+   "Open_Dashlane___File___Export___CSV___Import_the_resulting_file_": {
+      "message": "לחץ על תפריט-קובץ-ייצוא-CSV. ייבא את הקובץ."
+   },
+   "Open_Favorites": {
+      "message": "פתח מועדפים"
+   },
+   "Open_Favorites_in_Tabs": {
+      "message": "פתח מועדפים בלשוניות"
+   },
+   "Open_File": {
+      "message": "פתח קובץ"
+   },
+   "Open_My_LastPass_Vault": {
+      "message": "פתח את כספת ה-LastPass"
+   },
+   "Open_New_Pages_in": {
+      "message": "פתח דף חדש ב"
+   },
+   "Open_Popover": {
+      "message": "פתח חלונית"
+   },
+   "Open_Security_Challenge": {
+      "message": "התחל מבחן אבטחה"
+   },
+   "Open_Sticky_Password___Manage_Database___Export___Export_as_text__Import_this_file": {
+      "message": "פתח סיסמה נדבקת - נהל מסד הנתונים - ייצא - ייצא כטקסט. ייבא קובץ זה"
+   },
+   "Open_login_dialog_when_browser_starts": {
+      "message": "פתח תיבת דו-שיח של כניסה בהפעלת דפדפן"
+   },
+   "Opera": {
+      "message": "Opera"
+   },
+   "Opera_Password_Manager": {
+      "message": "מנהל האופרה סיסמה"
+   },
+   "Or__would_you_like_LastPass_to_save_a_new_user_password_for_this_site_": {
+      "message": "האם אתה רוצה ש \nLastPass\nישמור משתמש/סיסמא חדשים לאתר הזה\n?"
+   },
+   "Order_Number": {
+      "message": "מספר הזמנה"
+   },
+   "Order_Total": {
+      "message": "סה'כ הזמנה"
+   },
+   "Organization": {
+      "message": "ארגון"
+   },
+   "Other": {
+      "message": "אחר"
+   },
+   "Other_Sessions": {
+      "message": "סשנים אחרים"
+   },
+   "Overall_Progress_": {
+      "message": "התקדמות כוללת:"
+   },
+   "PASSWORDupper": {
+      "message": "סיסמה"
+   },
+   "PINs_Password_Manager": {
+      "message": "מנהל ססמאות PIN"
+   },
+   "Pacific_Time__US___Canada_": {
+      "message": "שעון החוף המערבי (ארה'ב וקנדה)"
+   },
+   "Page_Down": {
+      "message": "Page Down"
+   },
+   "Page_Up": {
+      "message": "Page Up"
+   },
+   "Pakistan": {
+      "message": "פקיסטן"
+   },
+   "Palau": {
+      "message": "פלאו"
+   },
+   "Palestinian_Territories": {
+      "message": "השטחים הפלשתיניים"
+   },
+   "Panama": {
+      "message": "פנמה"
+   },
+   "Papua_New_Guinea": {
+      "message": "פפואה גינאה החדשה"
+   },
+   "Paraguay": {
+      "message": "פרגוואי"
+   },
+   "Passpack": {
+      "message": "Passpack"
+   },
+   "Passphrase": {
+      "message": "סיסמה"
+   },
+   "Passport": {
+      "message": "דרכון"
+   },
+   "Password": {
+      "message": "סיסמה"
+   },
+   "Password_": {
+      "message": "סיסמה:"
+   },
+   "Password_Agent": {
+      "message": "Password Agent"
+   },
+   "Password_Corral": {
+      "message": "סיסמת קוראל"
+   },
+   "Password_Depot": {
+      "message": "Password Depot"
+   },
+   "Password_Dragon": {
+      "message": "סיסמת דרקון"
+   },
+   "Password_Keeper": {
+      "message": "Password Keeper"
+   },
+   "Password_Length": {
+      "message": "אורך סיסמה"
+   },
+   "Password_Length_": {
+      "message": "אורך סיסמה:"
+   },
+   "Password_Reminder": {
+      "message": "תזכורת סיסמה"
+   },
+   "Password_Reminder_": {
+      "message": "תזכורת לסיסמא:"
+   },
+   "Password_Safe": {
+      "message": "Password Safe"
+   },
+   "Password_reminder_cannot_match_password": {
+      "message": "תזכורת לסיסמה לא יכולה להיות זהה לסיסמה."
+   },
+   "Password_updated_": {
+      "message": "סיסמא עודכנה!"
+   },
+   "Passwords_Max": {
+      "message": "Password Max"
+   },
+   "Personal": {
+      "message": "אישי"
+   },
+   "Peru": {
+      "message": "פרו"
+   },
+   "Philippines": {
+      "message": "הפיליפינים"
+   },
+   "Phone_Number": {
+      "message": "מספר טלפון"
+   },
+   "Phone_number": {
+      "message": "מספר טלפון"
+   },
+   "Physician_Address": {
+      "message": "כתובת רופא"
+   },
+   "Physician_Name": {
+      "message": "שם רופא"
+   },
+   "Physician_Phone": {
+      "message": "טלפון לרופא"
+   },
+   "Pin": {
+      "message": "מספר פין"
+   },
+   "Pitcairn": {
+      "message": "איי פיטקרן"
+   },
+   "Please_Make_a_Selection": {
+      "message": "אנא בחר"
+   },
+   "Please_Wait___": {
+      "message": "אנא המתן ..."
+   },
+   "Please_answer_the_following_question_": {
+      "message": "אנא ענה על השאלה הבאה:"
+   },
+   "Please_choose_the_type_of_export_you_would_like_to_perform_": {
+      "message": "בחר את סוג הייצוא שברצונך לבצע:"
+   },
+   "Please_choose_the_type_of_print_you_would_like_to_perform_": {
+      "message": "נא לבחור את סוג ההדפסה שברצונך לבצע:"
+   },
+   "Please_close_this_window": {
+      "message": "סגור את החלון הזה"
+   },
+   "Please_complete_multifactor_authentication_on_your_phone_or_mobile_device_": {
+      "message": "אנא השלם את האימות הרב-שלבי בטלפון או במכשיר הנייד שלך."
+   },
+   "Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "אנא הכנס את הנתיב המלא של הקובץ לייבוא."
+   },
+   "Please_enter_your_multifactor_authentication_code_": {
+      "message": "אנא הכנס קוד אימות רב-שלבי"
+   },
+   "Please_keep_this_page_open_until_the_operation_completes_": {
+      "message": "נא לשמור על דף זה פתוח עד השלמת הפעולה."
+   },
+   "Please_move_sites_from_only_one_shared_folder_at_a_time_": {
+      "message": "אנא העבר אתרים מתיקיה משותפת אחת בלבד בכל פעם."
+   },
+   "Please_note_that_upgrading_from_LastPass_Local_to_LastPass_Online_will_result_in_your_password_data_being_uploaded_in_its_encrypted_format_to_LastPass_servers___You_will_be_able_to_access_your_data_from_anywhere__and_LastPass_will_not_be_able_to_read_it___Would_you_like_to_continue_": {
+      "message": "אנא שים לב, כי שדרוג מLastPass מקומי לLastPass מקוון כרוכה בהעלאת נתוני הססמאות שלך בתצורה מוצפנת לשרתי LastPass. תוכל לגשת לנתוניך מכל מקום, וLastPass לא תוכל לקרוא אותם. האם ברצונך להמשיך?"
+   },
+   "Please_provide_this_computer_a_name": {
+      "message": "אנא הענק שם למחשב זה"
+   },
+   "Please_reload_the_page_to_view_your_changes_": {
+      "message": "אנא טען את העמוד מחדש כדי לראות את השינויים."
+   },
+   "Please_restart_all_your_browsers_to_begin_using_LastPass_Online_": {
+      "message": "LAST PASS אנא הפעל מחדש את כל הדפדפנים שלך כדי להתחיל להשתמש ברשת ב"
+   },
+   "Please_restart_your_browser_to_finish_enabling_native_messaging_": {
+      "message": "אנא הפעל מחדש את הדפדפן שלך בכדי לאפשר הודעות מקומיות."
+   },
+   "Please_select": {
+      "message": "נא לבחור"
+   },
+   "Please_select_which_sites_you_wish_to_apply_this_change_": {
+      "message": "אנא בחר את האתרים בהם ברצונך לבצע שינוי זה."
+   },
+   "Please_visit_https___lastpass_com_to_create_an_account_at_a_later_time_": {
+      "message": "אנא בקר ב-https://lastpass.com במועד מאוחר יותר בכדי ליצור את חשבונך"
+   },
+   "Poland": {
+      "message": "פולין"
+   },
+   "Policy_Number": {
+      "message": "מדינות מספר"
+   },
+   "Policy_Type": {
+      "message": "סוג מדיניות"
+   },
+   "Polish": {
+      "message": "פולנית"
+   },
+   "Poll_Server_for_account_changes__mins_": {
+      "message": "דגום שרת לשינויים בחשבון (דקות)"
+   },
+   "Port": {
+      "message": "חיבור"
+   },
+   "Portugal": {
+      "message": "פורטוגל"
+   },
+   "Portuguese": {
+      "message": "פורטוגזית"
+   },
+   "Portuguese__Brazilian_": {
+      "message": "פרוטוגזית (ברזילאית)"
+   },
+   "Preferences": {
+      "message": "העדפות"
+   },
+   "Price": {
+      "message": "מחיר"
+   },
+   "Print": {
+      "message": "הדפס"
+   },
+   "Print_Screen": {
+      "message": "הדפס מסך"
+   },
+   "Print_Secure_Notes": {
+      "message": "הדפס פתקית מאובטחת"
+   },
+   "Print_Sites": {
+      "message": "הדפס אתרים"
+   },
+   "Privacy": {
+      "message": "פרטיות"
+   },
+   "Private_Key": {
+      "message": "מפתח פרטי"
+   },
+   "Productivity_Tools": {
+      "message": "כלים יעילים"
+   },
+   "Profile": {
+      "message": "פרופיל"
+   },
+   "Profile_language": {
+      "message": "שפת הפרופיל"
+   },
+   "Profile_name": {
+      "message": "שם הפרופיל"
+   },
+   "Pronounceable": {
+      "message": "ניתן להגייה"
+   },
+   "Protected": {
+      "message": "מוגן"
+   },
+   "Public_Key": {
+      "message": "מפתח ציבורי"
+   },
+   "Publisher": {
+      "message": "מוציא לאור"
+   },
+   "Puerto_Rico": {
+      "message": "פורטו ריקו"
+   },
+   "Purchase_Date": {
+      "message": "תאריך רכישה"
+   },
+   "Purge": {
+      "message": "מחק סופית"
+   },
+   "Qatar": {
+      "message": "קטאר"
+   },
+   "Re_Enter_Password": {
+      "message": "הזן סיסמה שנית"
+   },
+   "Reason": {
+      "message": "סיבה"
+   },
+   "Recent_Sites": {
+      "message": "אתרים אחרונים"
+   },
+   "Recently_Used": {
+      "message": "היו בשימוש לאחרונה"
+   },
+   "Recently_Used_list_size": {
+      "message": "גודל רשימת אחרונים"
+   },
+   "Recheck_Page": {
+      "message": "בדוק דף שנית"
+   },
+   "Recommended": {
+      "message": "מומלץ"
+   },
+   "Recommended_Options": {
+      "message": "אפשרויות מומלצות"
+   },
+   "Reencrypting_Data___": {
+      "message": "מצפין נתונים מחדש"
+   },
+   "Refresh": {
+      "message": "רענן"
+   },
+   "Refresh_Sites": {
+      "message": "רענן אתרים"
+   },
+   "Reject": {
+      "message": "דחה"
+   },
+   "Remember_Email": {
+      "message": "זכור אימייל"
+   },
+   "Remember_Password": {
+      "message": "זכור סיסמה"
+   },
+   "Remove_Linked_Personal_Account": {
+      "message": "מחק חשבון מקושר"
+   },
+   "Remove_Personal_Account": {
+      "message": "הסר חשבון אישי"
+   },
+   "Rename_Group": {
+      "message": "שנה שם תיקיה"
+   },
+   "Replace_Existing_Site": {
+      "message": "החלף אתר קיים"
+   },
+   "Request_failed__is_your_Internet_connection_down_": {
+      "message": "בקשה נכשלה: האם קיים חיבור תקין לאינטרנט?"
+   },
+   "Require_All_Character_Type": {
+      "message": "דרוש את כל סוגי התווים"
+   },
+   "Require_All_Character_Types": {
+      "message": "דרוש את כל סוגי התווים"
+   },
+   "Require_Every_Character_Type": {
+      "message": "דרוש את כל סוגי הסימנים"
+   },
+   "Require_Password_Reprompt": {
+      "message": "דרוש הזנת סיסמה מחדש"
+   },
+   "Require_security_reprompt_when_": {
+      "message": "דרוש חידוש כניסה מאוטחת כאשר:"
+   },
+   "Respect_AutoComplete_off__allow_websites_to_disable_AutoFill": {
+      "message": "כבד 'AutoComplete=off ': הרשה לאתרים לבטל מילוי אוטומטי"
+   },
+   "Reunion": {
+      "message": "ריוניון"
+   },
+   "Revelation_Password_Manager": {
+      "message": "Revelation Password Manager"
+   },
+   "Right": {
+      "message": "ימינה"
+   },
+   "RoboForm": {
+      "message": "רובופורם"
+   },
+   "Romania": {
+      "message": "רומניה"
+   },
+   "Routing_Number": {
+      "message": "מספר ניתוב"
+   },
+   "Routing_number": {
+      "message": "מספר ניתוב"
+   },
+   "Russian": {
+      "message": "רוסית"
+   },
+   "Russian_Federation": {
+      "message": "הפדרציה הרוסית"
+   },
+   "Rwanda": {
+      "message": "רואנדה"
+   },
+   "SID": {
+      "message": "SID"
+   },
+   "SITE": {
+      "message": "אתר"
+   },
+   "SMTP_Port": {
+      "message": "יציאת SMTP"
+   },
+   "SMTP_Server": {
+      "message": "שרת SMTP"
+   },
+   "SPB_Wallet": {
+      "message": "ארנק SPB"
+   },
+   "SSH_Key": {
+      "message": "SSH מפתח"
+   },
+   "SSID": {
+      "message": "שם הרשת האלחוטית (SSID)"
+   },
+   "SWIFT_Code": {
+      "message": "קוד SWIFT"
+   },
+   "Safari": {
+      "message": "Safari"
+   },
+   "Safari_Password_Manager": {
+      "message": "מנהל הסיסמאות של Safari"
+   },
+   "Saint_Barthelemy": {
+      "message": "סנט ברתלמי"
+   },
+   "Saint_Helena": {
+      "message": "סנט הלנה"
+   },
+   "Saint_Kitts_and_Nevis": {
+      "message": "סנט קיטס ונוויס"
+   },
+   "Saint_Lucia": {
+      "message": "סנט לוסיה"
+   },
+   "Saint_Martin__French_Part_": {
+      "message": "סן מרטן (בחלקו הצרפתי)"
+   },
+   "Saint_Pierre_and_Miquelon": {
+      "message": "סנט פייר ומיקלון"
+   },
+   "Saint_Vincent_and_the_Grenadines": {
+      "message": "סנט וינסנט והגרנדינים"
+   },
+   "Samoa": {
+      "message": "סמואה"
+   },
+   "San_Marino": {
+      "message": "סן מרינו"
+   },
+   "Sao_Tome_and_Principe": {
+      "message": "סאו טומה ופרינסיפה"
+   },
+   "Saudi_Arabia": {
+      "message": "ערב הסעודית"
+   },
+   "Save": {
+      "message": "שמור"
+   },
+   "Save_All_Entered_Data": {
+      "message": "שמור את כל המידע שהוזן"
+   },
+   "Save_Credit_Card_profile": {
+      "message": "שמור פרופיל כרטיס אשראי"
+   },
+   "Save_File": {
+      "message": "שמור קובץ"
+   },
+   "Save_New_Site": {
+      "message": "שמור אתר חדש"
+   },
+   "Save_Password_to_Vault": {
+      "message": "שמור את הסיסמה בכספת"
+   },
+   "Save_Password_to_Vault_": {
+      "message": "?האם לשמור את הסיסמה בכספת"
+   },
+   "Save_Site": {
+      "message": "שמור אתר"
+   },
+   "Save_a_disabled_One_Time_Password_locally_for_Account_Recovery": {
+      "message": "שמור מקומית סיסמה חד-פעמית מושבתת לצורך שחזור חשבון"
+   },
+   "Save_the_password_to_your_LastPass_Vault_": {
+      "message": "לשמור את הססמה בכספת LastPass שלך?"
+   },
+   "Save_this_password_as_a_new_entry": {
+      "message": "שמור ססמה זו כרשומה חדשה"
+   },
+   "Save_this_password_as_a_new_entry_": {
+      "message": "לשמור את הסיסמה הזו כרשומה חדשה?"
+   },
+   "Save_your_changes_and_close_this_window": {
+      "message": "שמור את השינויים וסגור חלון זה"
+   },
+   "Save_your_password_to_your_LastPass_Vault_": {
+      "message": "?האם לשמור את הסיסמה שלך בכספת"
+   },
+   "Saved_Passwords": {
+      "message": "סיסמאות שמורות"
+   },
+   "Screen_Keyboard": {
+      "message": "מקלדת מסך"
+   },
+   "Search_All_Data": {
+      "message": "חפש בכל הנתונים"
+   },
+   "Search_All_Notes": {
+      "message": "חפש בכל הערות"
+   },
+   "Search_All_Sites": {
+      "message": "חיפוש בכל האתרים"
+   },
+   "Search_LastPass_Vault": {
+      "message": "חפש בכספת LastPass"
+   },
+   "Search_Vault": {
+      "message": "חיפוש בכספת"
+   },
+   "Search_within_secure_notes": {
+      "message": "חיפוש בתוך פתקיות מאובטחות"
+   },
+   "Searchproper": {
+      "message": "חפש"
+   },
+   "Secure_Note": {
+      "message": "הערת אבטחה"
+   },
+   "Secure_Notes": {
+      "message": "פתקיות מאובטחות"
+   },
+   "Security": {
+      "message": "אבטחה"
+   },
+   "Security_Alert": {
+      "message": "אזהרת הבטחה"
+   },
+   "Security_Alert__Master_Password_Reused": {
+      "message": "אזהרת אבטחה: שימוש חוזר בסיסמה הראשית"
+   },
+   "Security_Alert__This_site_has_the_same_password_as_your_LastPass_account__To_protect_all_of_your_online_accounts__it_is_recommended_that_you_change_your_LastPass_Master_Password_": {
+      "message": "התראת אבטחה: אתר זה משתמש באותה סיסמא כמו סיסמת המאסטר שלך ב-LastPass. כדי להגן על כל החשבונות שלך מומלץ כי תשנה את סיסמת המאסטר שלך ב-LastPass."
+   },
+   "Security_Challenge": {
+      "message": "מבחן אבטחה"
+   },
+   "Security_Check": {
+      "message": "בדיקת אבטחה"
+   },
+   "Security_Code": {
+      "message": "קוד אבטחה"
+   },
+   "Security_Notice": {
+      "message": "הודעת אבטחה"
+   },
+   "Security_Question_Multifactor_Authentication": {
+      "message": "שאלת אימות אבטחה רב־שלבי"
+   },
+   "Security_code": {
+      "message": "קוד אבטחה"
+   },
+   "Select": {
+      "message": "בחר"
+   },
+   "Select_All": {
+      "message": "בחר הכל"
+   },
+   "Select_Identity": {
+      "message": "בחר זהות"
+   },
+   "Select_a_group_in_your_LastPass_Vault_to_place_this_website___Optional_": {
+      "message": "בחר תיקיה בכספת LastPass שלך כדי לשים בה את האתר. [אופציונאלי]"
+   },
+   "Select_a_preference_to_edit__then_tap_OK_": {
+      "message": "בחר מאפיינים לעריכה ולאחר מכן לחץ על אישור."
+   },
+   "Select_or_enter_a_new_group_name": {
+      "message": "בחר או הכנס שם תיקיה חדש"
+   },
+   "Send": {
+      "message": "שלח"
+   },
+   "Send_Email": {
+      "message": "שלח מכתב דואר אלקטרוני"
+   },
+   "Send_SMS_passcodes": {
+      "message": "שלח קוד אישור ב-SMS"
+   },
+   "Send_anonymous_error_reporting_data_to_help_improve_LastPass": {
+      "message": "שלח נתוני שגיאות באופן אלמוני בכדי לשפר את LastPass"
+   },
+   "Senegal": {
+      "message": "סנגל"
+   },
+   "September": {
+      "message": "ספטמבר"
+   },
+   "Serbia": {
+      "message": "סרביה"
+   },
+   "Server": {
+      "message": "שרת"
+   },
+   "SesameWrongButton": {
+      "message": "כדי להציג את המידע שלך כזמן שאינך מקוון, עליך להריץ את Sesame\nand ע'י לחיצה על כפתור ה'העתק סיסמא לא מקוונת'..."
+   },
+   "Sesame_Multifactor_Authentication": {
+      "message": "אימות רב-שלבי בשיטת Sesame"
+   },
+   "Sessions": {
+      "message": "רצף תקשורת"
+   },
+   "Set_up_custom_form_fields": {
+      "message": "הגדרת שדות מותאמים אישית בטופס"
+   },
+   "Settings": {
+      "message": "הגדרות"
+   },
+   "Sex": {
+      "message": "מין"
+   },
+   "Seychelles": {
+      "message": "סיישל"
+   },
+   "Share": {
+      "message": "שתף"
+   },
+   "Share_Folder": {
+      "message": "שתף תיקיה"
+   },
+   "Share_Item": {
+      "message": "שתף פריט"
+   },
+   "Share_Selected": {
+      "message": "שתף נבחרים"
+   },
+   "Share_login_state_between_other_browsers": {
+      "message": "שתף מצב כניסה למערכת בין דפדפנים נוספים"
+   },
+   "Share_offer_from": {
+      "message": "שתף הצעה מ"
+   },
+   "Shares": {
+      "message": "שיתופים"
+   },
+   "Shift": {
+      "message": "הזז"
+   },
+   "Shopping": {
+      "message": "קניות"
+   },
+   "Should_LastPass_remember_this_password_": {
+      "message": "האם על LastPass לזכור סיסמה זו?"
+   },
+   "Show": {
+      "message": "הצג"
+   },
+   "Show_Advanced_Options": {
+      "message": "הצג אפשרויות מתקדמות"
+   },
+   "Show_Change_Password_Notification_Bar": {
+      "message": "הצג סרגל הודעות שינוי סיסמה"
+   },
+   "Show_Deleted_Items": {
+      "message": "צפה בפריטים מחוקים"
+   },
+   "Show_Deleted_Sites": {
+      "message": "הצג אתרים שנמחקו"
+   },
+   "Show_Fill_Notification_Bar": {
+      "message": "הצג סרגל הודעות מילוי טופס"
+   },
+   "Show_Form_Fill_Notifications": {
+      "message": "הצג הודעת הזנת טופס"
+   },
+   "Show_Matching_Sites": {
+      "message": "הראה אתרים מתאימים"
+   },
+   "Show_Matching_Sites_in_top_level_menu": {
+      "message": "הצג אתרים תואמים בתפריט העליון"
+   },
+   "Show_My_LastPass_Vault_After_Login": {
+      "message": "הצג את כספת ה-LastPass שלי לאחר התחברות"
+   },
+   "Show_Notifications": {
+      "message": "הצג הודעות"
+   },
+   "Show_Password": {
+      "message": "הצג סיסמה"
+   },
+   "Show_Save_Site_Notification_Bar": {
+      "message": "הצג סרגל הודעות לשמירת האתר"
+   },
+   "Show_Save_Site_Notifications": {
+      "message": "הצג הודעות שמירת אתר"
+   },
+   "Show_Sites_in_Groups": {
+      "message": "הצג אתרים בתיקיות"
+   },
+   "Show_Vault_After_Login": {
+      "message": "הצג את הכספת לאחר כניסה למערכת"
+   },
+   "Show_all_sites": {
+      "message": "הצג את כל האתרים"
+   },
+   "Show_certain_notifications_only_after_click": {
+      "message": "הראה התראות מסוימות רק אחרי לחיצה"
+   },
+   "Show_notifications_below_browser": {
+      "message": "הצג הודעות מתחת לדפדפן"
+   },
+   "Show_or_Hide_Password": {
+      "message": "הצג או הסתר ססמה"
+   },
+   "Shows_another_custom_field_entry": {
+      "message": "מציג הזנה אחרת בשדה מותאם אישית"
+   },
+   "Sierra_Leone": {
+      "message": "סיירה לאונה"
+   },
+   "Sign_In": {
+      "message": "התחבר"
+   },
+   "Simplify_your_life__Use_LastPass_to_autofill_in_this_site_s_login_info_": {
+      "message": "פשט את חייך: השתמש ב-LastPass להזנת פרטי הכניסה לאתר זה אוטומטית!"
+   },
+   "Singapore": {
+      "message": "סינגפור"
+   },
+   "Site": {
+      "message": "אתר"
+   },
+   "Site_Search": {
+      "message": "חפש אתר"
+   },
+   "Sites": {
+      "message": "אתרים"
+   },
+   "Slovak": {
+      "message": "סלובקית"
+   },
+   "Slovakia": {
+      "message": "סלובקיה"
+   },
+   "Slovenia": {
+      "message": "סלובניה"
+   },
+   "Social": {
+      "message": "חברה"
+   },
+   "Social_Security": {
+      "message": "מספר ביטוח לאומי"
+   },
+   "Social_Security_Number": {
+      "message": "ת.ז."
+   },
+   "Social_security_number": {
+      "message": "מספר תעודת זהות"
+   },
+   "Software_License": {
+      "message": "רישיון תוכנה"
+   },
+   "Solomon_Islands": {
+      "message": "איי שלמה"
+   },
+   "Somalia": {
+      "message": "סומליה"
+   },
+   "Sorry__this_shared_folder_is_read_only_": {
+      "message": "מצטערים, תיקיה משותפת זו היא לקריאה בלבד."
+   },
+   "Sorry__you_cannot_perform_this_operation_on_a_mix_of_shared_and_non_shared_folders__or_multiple_shared_folders_at_once_": {
+      "message": "מצטערים, אין אפשרות לבצע פעולה זו בשילוב תיקיות משותפות ולא משותפות, או מספר תיקיות משותפות בו זמנית."
+   },
+   "Source": {
+      "message": "מקור"
+   },
+   "Source_": {
+      "message": "מקור:"
+   },
+   "South_Africa": {
+      "message": "דרום אפריקה"
+   },
+   "South_Georgia": {
+      "message": "ג'ורג'יה הדרומית"
+   },
+   "South_Georgia_and_the_South_Sandwich_Islands": {
+      "message": "ג'ורג'יה הדרומית ואיי סנדוויץ'"
+   },
+   "Spain": {
+      "message": "ספרד"
+   },
+   "Spanish": {
+      "message": "ספרדית"
+   },
+   "Spanish__Mexico_": {
+      "message": "ספרדית (מקסיקו)"
+   },
+   "Special": {
+      "message": "מיוחד"
+   },
+   "SplashID": {
+      "message": "SplashID"
+   },
+   "Sports": {
+      "message": "ספורט"
+   },
+   "Sri_Lanka": {
+      "message": "סרי לנקה"
+   },
+   "Start_Date": {
+      "message": "תאריך הנפקה"
+   },
+   "Start_Trial": {
+      "message": "התחל הדגמא"
+   },
+   "Start_date": {
+      "message": "תאריך התחלה"
+   },
+   "State": {
+      "message": "מדינה"
+   },
+   "State___Province": {
+      "message": "מדינה / מחוז"
+   },
+   "Status": {
+      "message": "מצב"
+   },
+   "Sticky_Password": {
+      "message": "סיסמה דביקה"
+   },
+   "Store_every_note": {
+      "message": "אחסן כל רישום"
+   },
+   "Submit_Form": {
+      "message": "שלח טופס"
+   },
+   "Submitting___": {
+      "message": "שולח..."
+   },
+   "Success__Your_Password_Is_Updated": {
+      "message": "בוצע! הסיסמה שלך השתנתה"
+   },
+   "Sudan": {
+      "message": "סודאן"
+   },
+   "Support_Email": {
+      "message": "דוא'ל תמיכה"
+   },
+   "Suriname": {
+      "message": "סורינאם"
+   },
+   "Suspicious_characters_found_in_selected_filename__will_not_process_it": {
+      "message": "תווים חשודים שנמצאו בקובץ הנבחר, לא יעובדו"
+   },
+   "Svalbard_and_Jan_Mayen": {
+      "message": "איי סוולברד ויאן מאיין"
+   },
+   "Swaziland": {
+      "message": "סוואזילנד"
+   },
+   "Sweden": {
+      "message": "שבדיה"
+   },
+   "Swedish": {
+      "message": "שוודית"
+   },
+   "Swipe_current_user_s_finger": {
+      "message": "גרור את האצבע של המשתמש הנוכחי"
+   },
+   "Swipe_finger": {
+      "message": "החלק אצבע"
+   },
+   "Swipe_your_finger_on_the_fingerprint_sensor": {
+      "message": "העבר אצבעך על חיישן טביעת האצבעות"
+   },
+   "Switzerland": {
+      "message": "שוויץ"
+   },
+   "Syrian_Arab_Republic": {
+      "message": "סוריה"
+   },
+   "Tabs": {
+      "message": "טאבים"
+   },
+   "Taiwan": {
+      "message": "טייוואן"
+   },
+   "Tajikistan": {
+      "message": "טג'יקיסטן"
+   },
+   "Tanzania__United_Republic_Of": {
+      "message": "טנזניה, הרפובליקה המאוחדת"
+   },
+   "Tehran": {
+      "message": "טהרן"
+   },
+   "Telecom": {
+      "message": "חברות תקשורת"
+   },
+   "Telephone": {
+      "message": "טלפון"
+   },
+   "Tell_a_friend_": {
+      "message": "ספר לחבר!"
+   },
+   "Text": {
+      "message": "טקסט"
+   },
+   "Text_to_find": {
+      "message": "טקסט לחיפוש"
+   },
+   "Thailand": {
+      "message": "תאילנד"
+   },
+   "That_file_is_missing_or_empty___Please_enter_the_full_path_of_the_file_to_import_": {
+      "message": "קובץ זה חסר או ריק. אנא הכנס את הנתיב המלא של הקובץ לייבוא."
+   },
+   "That_group_already_exists_": {
+      "message": "התיקיה כבר קיימת."
+   },
+   "The_4_digit_year_the_credit_card_was_issued": {
+      "message": "שנת ההנפקה של כרטיס האשראי ב-4 ספרות"
+   },
+   "The_LastPass_Wi_Fi_utility_was_not_detected_on_this_computer___Would_you_like_to_run_the_LastPass_Universal_Installer_in_order_to_install_it_": {
+      "message": "לא זוהה כלי השירות של LastPass Wi-Fi במחשב זה. האם ברצונך להפעיל את תוכנית ההתקנה של LastPass העולמית כדי להתקין אותו?"
+   },
+   "The_LastPass_master_password_you_reentered_does_not_match": {
+      "message": "סיסמת העל שהזנת שנית אינה תואמת"
+   },
+   "The__Old_Password__you_entered_is_not_your_correct_LastPass_master_password": {
+      "message": "הסיסמה הישנה שהזנת אינה סיסמת LastPass הראשית הנכונה שלך"
+   },
+   "The_binary_version_of_the_LastPass_plugin_is_required_for_this_operation__It_can_be_downloaded_from_lastpass_com_": {
+      "message": "לביצוע פעולה זו נדרשת הגירסה הבינארית של תוסף . ניתן להורידה באתר lastpass.com."
+   },
+   "The_credit_card_number": {
+      "message": "מספר כרטיס האשראי"
+   },
+   "The_credit_card_s_4_digit_expiration_year": {
+      "message": "שנת סיום תוקף כרטיס האשראי ב-4 ספרות"
+   },
+   "The_credit_card_s_expiration_month": {
+      "message": "חודש סיום תוקף כרטיס האשראי"
+   },
+   "The_credit_card_s_issue_number__Only_applicable_to_certain_European_brands_of_debit_cards__such_as_Maestro_": {
+      "message": "מספר ההנפקה של כרטיס האשראי. \nרלוונטי רק לכרטיסי חיוב אירופאיים מסויימים כגון Maestro."
+   },
+   "The_credit_card_s_security_code__For_most_credit_cards__this_is_the_last_3_digits_of_a_number_printed_on_the_back_of_the_card__For_American_Express_credit_cards__it_is_the_last_4_digits_of_a_number_printed_in_small_print_on_the_front_of_the_card_": {
+      "message": "קוד האבטחה של כרטיס האשראי.\nבמרבית כרטיסי האשראי מדובר ב-3 הספרות האחרונות של המספר המודפס על צידו האחורי של הכרטיס. \nבכרטיסי American Express מדובר ב-4 הספרות האחרונות של מספר, המודפס באותיות קטנות בצידו הקדמי של הכרטיס."
+   },
+   "The_full_name_printed_on_the_credit_card": {
+      "message": "השם המלא המודפס על כרטיס האשראי"
+   },
+   "The_month_the_credit_card_was_issued": {
+      "message": "החודש בו הונפק כרטיס האשראי"
+   },
+   "The_name_of_your_bank": {
+      "message": "שם הבנק"
+   },
+   "The_notes_field_contains_too_much_data___You_may_store_a_maximum_of_45_000_characters_per_note___Would_you_like_us_to_truncate_the_note_for_you___You_will_lose_some_of_your_data_": {
+      "message": "פתקית זו מכילה מעל כמות התווים המקסימלית של 45,000 תווים.\n\nהאם ברצונך שנקצר אותה עבורך? חלק מהמידע יאבד."
+   },
+   "The_number_of_characters_in_the_generated_password_": {
+      "message": "מספר התווים בססמה החדשה."
+   },
+   "The_password_that_you_use_to_log_into_this_website_": {
+      "message": "הסיסמא בה אתה משתמש כדי להכנס לאתר זה."
+   },
+   "The_text_beside__the_name_of__or_the_ID_of_the_form_field_to_be_filled__If_multiple_items_are_to_be_matched__specify_each_match_on_a_separate_line_": {
+      "message": "הטקסט ליד, שמו, או קוד הזיהוי של שדה הטופס שימולא filled.\nאם פריטים מרובים אמורים להיות מותאמים, ציין כל תיאום בשורה נפרדת."
+   },
+   "The_value_to_be_filled": {
+      "message": "הערך שיש למלא"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work_": {
+      "message": "גירסת כרום שאתה מריץ אינה תומכת  בבסיס נתונים HMTL5. לכן, עמוד זה לא יזכור את כתובת האימייל והסיסמה שלך ואפשרויות נוספות, כמו כניסה אוטומטית עם איתחול הדפדפן לא יעבדו"
+   },
+   "The_version_of_Chrome_you_are_currently_running_does_not_have_HTML5_database_support_enabled___As_such__this_login_page_will_not_remember_your_email_and_password__and_other_features_such_as_automatic_login_on_browser_restart_will_not_work___You_may_be_able_to_fix_this_by_adding___enable_databases_as_a_parameter_to_your_Google_Chrome_browser_shortcut_": {
+      "message": "בגרסת כרום שהינך מריץ כרגע תמיכת  HTML5 Database אינה מופעלת."
+   },
+   "This_attachment_needs_to_be_saved_first_": {
+      "message": "קובץ מצורף זה צריך להישמר קודם."
+   },
+   "This_can_only_be_handled_from_a_webpage": {
+      "message": "פעולה זאת מסוגלת להתבצע רק מדף באינטרנט"
+   },
+   "This_computer_is_trusted__do_not_require_a_second_form_of_authentication_for_30_days_": {
+      "message": "המחשב הזה בטוח אל תדרוש מחדש אימות במהלך 30 הימים הקרובים."
+   },
+   "This_feature_is_not_available_in_this_version__Please_install_the_binary_extension_by_going_to_https___lastpass_com_dl": {
+      "message": "תכונה זו אינה זמינה בגירסה זו. יש להתקין את ההרחבה, על ידי מעבר ל- https://lastpass.com/dl"
+   },
+   "This_feature_requires_the_binary_version_of_this_browser_extension___Would_you_like_to_install_it_now_": {
+      "message": "תכונה זו מחייבת שימוש בגירסה הבינארית של הרחבת דפדפן זה. האם ברצונך להתקין אותו כעת?"
+   },
+   "This_feature_still_needs_to_be_implemented__to_read_directly_from_": {
+      "message": "אפשרות זו עדיין לא יושמה, על מנת לקרוא מ- "
+   },
+   "This_is_a_potential_security_risk__because_anyone_who_learns_the_password_for_that_site_may_gain_access_to_all_of_your_accounts__LastPass_strongly_recommends_that_your_Master_Password_should_not_be_used_on_any_other_website_": {
+      "message": "זהו סיכון פוטנציאלי באבטחה, כיוון שכל מי שמגלה את הסיסמה לאתר יוכל לקבל גישה לכל החשבונות שלך. LastPass ממליץ שלא תשתמש בסיסמא הראשית שלך בשום אתר אחר."
+   },
+   "This_is_a_shared_site__You_are_not_permitted_to_view_the_password_": {
+      "message": "זהו אתר משותף. אינך רשאי לראות את הסיסמה."
+   },
+   "This_is_the_name_or_URL_of_this_web_page_": {
+      "message": "זהו השם או כתובת האתר"
+   },
+   "This_may_take_a_while___": {
+      "message": "זה עלול לקחת זמן מה ..."
+   },
+   "This_page_failed_to_load_properly___Please_ensure_you_are_running_the_latest_version_of_Maxthon__LastPass_requires_at_least_Maxthon_4_0_3_2000____Otherwise__this_may_have_happened_to_due_a_bug_in_Maxthon___Please_try_opening_this_page_again_": {
+      "message": "העלאת הדף נכשלה. אנא ודא שמותקנת ורצה הגרסה האחרונה של maxthon אלטרנטיבית, יתכן שמדובר בשגיאה של תוכנת Maxthon, נסה לפתוח דף זה שנית."
+   },
+   "This_page_failed_to_load_properly___Please_ensure_you_are_running_the_latest_version_of_Maxthon__LastPass_requires_at_least_Maxthon_4_0_3_3000____Otherwise__this_may_have_happened_to_due_a_bug_in_Maxthon___Please_try_opening_this_page_again_": {
+      "message": "העלאת הדף נכשלה. אנא ודא שמותקנת ורצה הגרסה האחרונה של maxthon. אלטרנטיבית, יתכן שמדובר בשגיאה של תוכנת Maxthon, נסה לפתוח דף זה שנית."
+   },
+   "Time_Zone": {
+      "message": "אזור זמן"
+   },
+   "Timor_Leste": {
+      "message": "מזרח האי טימור-לאסטה"
+   },
+   "Title": {
+      "message": "כותרת"
+   },
+   "To_create_your_account__please_re_enter_your_LastPass_master_password": {
+      "message": "כדי ליצור את חשבונך, אנא הקלד שנית את הססמה הראשית שלך."
+   },
+   "To_export_1Password_logins__login_to_1Password__Select_all_or_just_passwords_that_you_want_to_export__Then_select__File_menu___Export_All___Text_file_____Or____File_menu___Export_Selected___Text_file____Click_Export_button_and_Save_password_file__and_Import_the_resulting_file_": {
+      "message": "כדי לשמור בקובץ חיצוני את הסיסמאות בחר את הסיסמאות שברצונך לשמור ולאחר מכן בחר בתפריט:\nקובץ->ייצא הכל->קובץ טקסט\n(ייצא מסומנים במקרה של שמירה של חלק מהסיסמאות )\nלחץ על כפתור 'ייצא' ושמור את הקובץ. לאחר מכן ייבא את הקובץ שנוצר."
+   },
+   "To_export_Clipperz_cards__login_to_www_clipperz_com__Click_on_data__then_Export__then_Export_to_JSON__Copy_all_of_the_text_and_save_it_to_a_file_using_a_text_editor__then_import_it__Please_note_that_this_import_may_not_work_properly_if_you_ve_changed_field_names_from_their_defaults_": {
+      "message": "על מנת לייצא כרטיסיות Clipperz, היכנס לאתר www.clipperz.com. לחץ על data->Export->Export to JSON. העתק את כל הטקסט ושמור אותו לקובץ טקסט באמצעות עורך טקסט ואז ייבא את הקובץ. לידיעתך, ייתכן וייבוא זה לא יפעל כראוי אם שינית שמות של שדות משמות ברירת המחדל."
+   },
+   "To_export_FireForm_profiles__right_click_the_FireForm_icon__then_choose_Simple_setup___Go_to_the_General_options_tab__click_Export_all_profiles__and_save_an_XML_file___Import_the_resulting_file_": {
+      "message": "על מנת לייצא פרופילים של FireForm, לחץ לחיצה ימנית על האייקון של FireForm, ואז בחר באופציה 'התקנה פשוטה'. לך ללשונית האפשרויות 'כללי', לחץ 'ייצא את כל הפרופילים', ושמור כקובץ XML. ייבא קובץ זה."
+   },
+   "To_export_HP_Password_Safe_save_to_an_HTML_file__Import_the_resulting_file_": {
+      "message": "בכדי לייבא את כספת הסיסמאות של HP ,צור קובץ HTML.ייבא את הקובץ שנוצר."
+   },
+   "To_export_KeePass_logins__open_your_KeePass_database__and_click_on_File___Export_To___XML_File___Choose_a_file_location_and_press_the_Save_button___Then__press_the_OK_button___Import_the_resulting_file_": {
+      "message": "כדי לייצא כניסות של KeePass, פתח את מסד הנתונים של KeePass ולחץ על קובץ - ייצוא לקובץ XML. בחר את מיקום הקובץ ולחץ על לחצן שמור. לאחר מכן, הקש על לחצן אישור. ייבא את הקובץ שנוצר."
+   },
+   "To_export_LastPass_logins__open_your_browser_with_the_LastPass_plugin_installed__and_click_on_LastPass___Tools___Export_To___CSV_File___Choose_a_file_location_and_press_the_Save_button___Import_the_resulting_file_": {
+      "message": "כדי לייצא כניסות של LastPass, פתח את הדפדפן עם תוסף LastPass מותקן ולחץ על LastPass - כלים - יצא אל - קובץ CSV. בחר את מיקום הקובץ ולחץ על לחצן שמור. ייבא את הקובץ שנוצר."
+   },
+   "To_export_Password_Agent_logins__open_your_Password_Agent_database__and_click_on_File___Print_and_Export___Change_the_output_format_to_XML_File__make_sure__Group__is_checked___Choose_a_file_location_and_press_the_Save_button___Import_the_resulting_file_": {
+      "message": "כדי לייצא את הכניסות של Password Agent, פתח את מסד הנתונים של Password Agent ולחץ על קובץ - הדפסה וייצוא - שנה את תבנית הפלט לקובץ XML, ודא כי נבחרה 'קבוצה'. בחר את מיקום הקובץ ולחץ על לחצן שמור. ייבא את הקובץ שנוצר."
+   },
+   "To_export_Passwords_Max_passwords__click_File___Database___Export___Text___Click_OK__and_save_a_CSV_file___Import_the_resulting_file_": {
+      "message": "כדי לייצא את הסיסמאות של Max passwords, לחץ על קובץ - מסד נתונים - ייצוא - טקסט. לחץ על אישור ושמור כקובץ CSV. ייבא את הקובץ שנוצר."
+   },
+   "To_export_RoboForm_logins__click_on_RoboForm_Logins____Print_List__Click_on_the_Full_URL_check_box_and_press_the_save_button__Import_the_resulting_file___To_export_RoboForm_SafeNotes__click_on_RoboForm_SafeNotes_Print_List__Press_the_save_button__Import_the_resulting_file___To_export_RoboForm_Identities__click_on_RoboForm_Identities_Print_List__Press_the_save_button__Import_the_resulting_file_": {
+      "message": "כדי לייצא את הכניסות של RoboForm, לחץ על RoboForm - כניסות... - הדפס רשימה. לחץ על תיבת הסימון של כתובת האינטרנט המלאה ולחץ על לחצן שמור. ייבא את הקובץ שנוצר. \n\nכדי לייצא את הפתקיות הבטוחות של RoboForm, לחץ על RoboForm - פתקיות בטוחות - הדפסת רשימה. לחץ על לחצן שמור. ייבא את הקובץ שנוצר.\n\nכדי לייצא את הזהויות של RobForm, לחץ על RoboForm - זהויות - הדפסת רשימה. לחץ על לחצן שמור. ייבא את הקובץ שנוצר."
+   },
+   "To_export_eWallet_cards__go_to_eWallet___Tools___Export__Save_as_a_text_file__Import_the_resulting_file_": {
+      "message": "כדי לייצא כרטיסי eWallet, עבור אל eWallet - כלים - ייצוא. שמור כקובץ טקסט. ייבא את הקובץ שנוצר."
+   },
+   "To_export_from_MyPasswordSafe__Click_on_File___Save_As___Select_type_of_UNENCRYPTED_XML___Save_the_file___Import_the_resulting_file_": {
+      "message": "כדי ליצא מ־MyPasswordSafe, לחץ על קובץ » שמירה בשם » בחר את סוג ה־XML שאינו מוצפן » שמור את הקובץ. יבא את הקובץ שנוצר."
+   },
+   "To_export_from_Password_Safe__Click_on_File___Export_To___XML___Save_the_file___Import_the_resulting_file_": {
+      "message": "כדי ליצא מ־Password Safe, לחץ על קובץ » ייצוא אל » XML » שמור את הקובץ. ייבא את הקובץ שנוצר."
+   },
+   "To_export_passwords__login_to_the_desktop_application_and_go_to_File___Export___CSV___All_Entries___Import_the_resulting_file_": {
+      "message": "כדי ליצא סיסמאות, כנס אל היישום בשולחן העבודה ועבור אל קובץ » יצא » CSV » כל הערכים. יבא את הקובץ שנוצר."
+   },
+   "To_export_passwords_from_Darn__Passwords___click_Tools___Print___Click_Settings__and_check_Include_Notes_in_Export___Click_Print__and_click_the_Export_to_File_icon_that_looks_like_a_blue_disk___Name_the_file__and_click_Open___Import_the_resulting_file_": {
+      "message": "כדי לייצא סיסמאות מ־Darn! Passwords!, לחץ על כלים - הדפסה. לחץ על הגדרות וסמן כולל פתקיות בייצוא. לחץ על הדפס ולאחר מכן לחץ ייצא אל סמל הקובץ שנראה כדיסק כחול. תן שם לקובץ, ולחץ על פתח. ייבא את הקובץ שנוצר."
+   },
+   "To_export_passwords_from_Passpack__Login__go_to_the_Tools_screen__and_click_Export__Under__What_Type_of_Format_Would_You_Like_To_Export___Select__Comma_Separated_Values___and_on__Which_Entries_Would_You_Like_To_Export___Select__All_of_my_entries___then_hit__Continue___Select_all_of_the_text_in_the_text_box_on_the_next_screen__copy_it_to_the_clipboard__create_a_new_file_with_notepad_called_passpack_csv__paste_the_contents_into_this_file__Import_this_file_": {
+      "message": "ליצוא סיסמאות מ-Passpack: כנס, עבור למסך 'Tools' ולחץ על יצא. תחת  '?What Type of Format Would You Like To Export' בחר ב-'Comma Seperated Values' וב-Which Entries Would You Like To Export? בחר Select _All of my entries ולחץ על 'Continue'. בחר את כל הטקסט בתיבה שתופיע, העתק ללוח הגזירים (clipboard), וצור קובץ חדש באמצעות Notepad לו תקרא passpack.csv, הדבק את תוכן הקובץ. ייבא את קובץ הפלט."
+   },
+   "To_export_passwords_from_Password_Corral__Login__go_to_the_File___Export_Password___Create_a_plaintext_export_of_all_your_password___Import_this_file_": {
+      "message": "כדי לייצא סיסמאות מ־Password Corral: כנס אליו, עבור אל קובץ » ייצא סיסמה » צור קובץ טקסט רגיל שייצא את הסיסמה שלך. ייבא את הקובץ הזה."
+   },
+   "To_export_passwords_from_Password_Depot__click_on_the__Tools__tab_and_select__Export___Select_the__Extensible_Markup_Language_format____xml____specify_a_target_file_and_select_the_folder_you_want_to_export_": {
+      "message": "כדי לייצא סיסמאות ממאגר הססמאות, לחץ על כרטיסיית 'כלים' ובחר 'ייצוא'. בחר בפורמט Extensible Markup Language (*. Xml)', ציין את היעד ובחר את התיקייה שברצונך לייצא."
+   },
+   "To_export_passwords_from_Password_Dragon__Login__go_to_the_File___Export___Text_File__make_sure_you_check__Password___it_defaults_off___Import_the_saved_file_": {
+      "message": "כדי ליצא את הסיסמאות של Password Dragon: כנס אליו, עבור אל קובץ » ייצוא » קובץ טקסט. ודא שסימנת 'סיסמא', כיוון שברירת המחדל שלו מופיע כלא מסומן. יבא את הקובץ שנשמר."
+   },
+   "To_export_passwords_from_Revelation_Password_Manager__export_the_data_as_XML_": {
+      "message": "כדי לייצא את הסיסמאות ממנהל הסיסמאות הגלויות, ייצא את הנתונים כ-XML."
+   },
+   "To_export_passwords_from_SPB_Wallet__open_the_wallet__click_File__Export__select_file_destination_in_the_dialog_box_and_click_Save__Then__paste_the_data_into_the_box_on_this_page_": {
+      "message": "כדי לייצא את הסיסמאות מ-SPB Wallet, פתח את SPB Wallet, לחץ על 'קובץ', 'ייצוא', בחר את יעד הקובץ בתיבת הדו שיח ולחץ על 'שמור'. לאחר מכן, העתק והדבק את הנתונים לתוך התיבה בדף זה."
+   },
+   "To_get_started_with_LastPass__you_will_need_to_add_sites_to_your_account_": {
+      "message": "להתחלת השימוש ב-LastPass עליך להוסיף אתרים לחשבונך"
+   },
+   "To_import_Wi_Fi_passwords__simply_click_Import_below_": {
+      "message": "כדי לייבא סיסמאות Wi-Fi, פשוט לחץ על 'ייבוא' בלחצן למטה."
+   },
+   "To_import_from_PINs_Password_Manager_Export_in_Tab_Separated_format___Then__import_the_resulting_file_": {
+      "message": "על מנת לייבא סיסמאות מייצוא מנהל הסיסמאות בפורמט לשוניות מופרדות. אחר כך, ייבא את הקובץ שנוצר."
+   },
+   "To_import_passwords_from_Opera_Password_Manager__simply_click_Import_below_": {
+      "message": "כדי לייבא סיסמאות ממנהל הסיסמאות של Opera, פשוט לחץ על 'ייבוא' בלחצן מתחתך."
+   },
+   "To_import_passwords_from_Safari_Password_Manager__simply_click_Import_below_": {
+      "message": "כדי לייבא סיסמאות ממנהל ההסיסמאות של Safari, פשוט לחץ על 'ייבוא' בלחצן מתחתך."
+   },
+   "To_import_your_MSI_PasswordKeeper_logins__open_the_program___Click__Txt___and_then__Open____Import_the_resulting_file_": {
+      "message": "כדי לייבא את סיסמאות הכניסה שלך מ-MSI PasswordKeeper הפעל את התוכנה, לחץ על 'txt' ולאחר מכן 'Open'. ייבא את הקובץ שהתקבל."
+   },
+   "To_import_your_Password_Keeper_logins__open_the_program__and_the_password_file_to_be_exported___Click_File___Export_File___Click_Yes__enter_your_password__and_click_OK___This_opens_a_standard_Windows_Save_dialog__so_enter_a_file_name_and_location___Import_the_resulting_file_": {
+      "message": "כדי ליבא את הכניסות של ה־Password Keeper שלך, פתח את התוכנה ואת קובץ הסיסמא שמיועד לייצוא. לחץ על קובץ » יצא קובץ. לחץ על כן, הזן את הסיסמה שלך ולאחר מכן לחץ על אישור. פעולה זו פותחת תיבת דו־שיח רגילה של שמירה ע'י Windows, לכן הזן שם קובץ ומיקום. יבא את הקובץ שנוצר."
+   },
+   "To_import_your_TurboPasswords_logins__open_the_program__and_the_password_file_to_be_exported__If_you_want_to_restrict_the_export_to_a_particular_category_or_type__filter_the_entries_displayed_using_the_Category_and_Type_drop_downs_above_the_main_window__Click_File_Export_Category__This_opens_a_standard_Windows_Save_dialog__so_enter_a_file_name_and_location__and_select_Comma_Separated_Values___csv__from_the_Save_as_Type_box_": {
+      "message": "על מנת לייבא את חשבונות TurboPassword שלך, פתח את התוכנה ואת קובץ הססמאות שברצונך לייצא. אם ברצונך להגביל את הייצוא לקטגוריה או לסוג מסוימים, סנן את הרשומות המופיעות בעזרת הרשימות הנפתחות של הקטגוריה והסוג, שמעל לחלון המרכזי. לחץ קובץ|ייצא קטגוריה. תפתח תיבת דו שיח סטנדרטית של שמירה, בה יש להכניס שם קובץ ומיקום, ולבחור Comma Separated Values (.csv) בתיבת שמור בשם."
+   },
+   "To_protect_your_privacy_and_keep_your_data_confidential_": {
+      "message": "כדי להגן על הפרטיות שלך ולשמור על נתוניך חסויים,"
+   },
+   "Togo": {
+      "message": "טוגו"
+   },
+   "Tokelau": {
+      "message": "טוקלאו"
+   },
+   "Tonga": {
+      "message": "טונגה"
+   },
+   "Tools": {
+      "message": "כלים"
+   },
+   "Travel": {
+      "message": "טיולים"
+   },
+   "Trinidad_and_Tobago": {
+      "message": "טרינידד וטובגו"
+   },
+   "Try_Again": {
+      "message": "נסה שנית"
+   },
+   "Try_LastPass_Enterprise": {
+      "message": "נסה LastPass לחברות וארגונים (עסקי)"
+   },
+   "Tunisia": {
+      "message": "טוניסיה"
+   },
+   "TurboPasswords": {
+      "message": "TurboPasswords"
+   },
+   "Turkey": {
+      "message": "טורקיה"
+   },
+   "Turkmenistan": {
+      "message": "טורקמניסטן"
+   },
+   "Turks_and_Caicos_Islands": {
+      "message": "איי טורקס וקאיקוס"
+   },
+   "Tutorials": {
+      "message": "הדרכות"
+   },
+   "Tuvalu": {
+      "message": "טובאלו"
+   },
+   "Type": {
+      "message": "סוג"
+   },
+   "Type_": {
+      "message": "סוג:"
+   },
+   "URL": {
+      "message": "כתובת"
+   },
+   "URL_": {
+      "message": "כתובת האתר (URL):"
+   },
+   "USERNAME": {
+      "message": "שם משתמש"
+   },
+   "Uganda": {
+      "message": "אוגנדה"
+   },
+   "Ukraine": {
+      "message": "אוקראינה"
+   },
+   "Ulaan_Bataar__Perth": {
+      "message": "אולאן באטאר, פרת'"
+   },
+   "Unexpected_data_type__": {
+      "message": "קובץ נתונים לא מזוהה:"
+   },
+   "United_Arab_Emirates": {
+      "message": "איחוד האמירויות הערביות"
+   },
+   "United_Kingdom": {
+      "message": "בריטניה"
+   },
+   "United_States": {
+      "message": "ארצות הברית"
+   },
+   "United_States_Minor_Outlying_Islands": {
+      "message": "האיים המרוחקים הקטנים של ארצות הברית"
+   },
+   "Unknown": {
+      "message": "לא ידוע"
+   },
+   "Unselect_All": {
+      "message": "נקה בחירה"
+   },
+   "Up": {
+      "message": "מעלה"
+   },
+   "Upgrade_to_LastPass_Online_": {
+      "message": "באינטרנט Last Pass שדרג ל"
+   },
+   "Upgrade_to_Premium": {
+      "message": "שדרג לפרימיום"
+   },
+   "Uploading_Data___": {
+      "message": "טוען נתונים ..."
+   },
+   "Uruguay": {
+      "message": "אורוגוואי"
+   },
+   "Use": {
+      "message": "השתמש"
+   },
+   "Use_802_1X": {
+      "message": "השתמש ב־802.1X"
+   },
+   "Use_Password": {
+      "message": "השתמש בסיסמא"
+   },
+   "Use_Special_Characters": {
+      "message": "השתמש בתווים מיוחדים"
+   },
+   "Use_Special_Characters_": {
+      "message": "להשתמש בסימנים מיוחדים?"
+   },
+   "Use_this_password_now__for_this_site__": {
+      "message": "השתמש בסיסמ זו עכשיו (לאתר זה)?"
+   },
+   "User": {
+      "message": "משתמש"
+   },
+   "User_Manual": {
+      "message": "הוראות שימוש"
+   },
+   "User_name": {
+      "message": "שם משתמש"
+   },
+   "Username_": {
+      "message": "שם משתמש:"
+   },
+   "Usernameproper": {
+      "message": "שם משתמש"
+   },
+   "Uzbekistan": {
+      "message": "אוזבקיסטן"
+   },
+   "Value": {
+      "message": "ערך"
+   },
+   "Value_to_fill": {
+      "message": "הערך שיש למלא"
+   },
+   "Vanuatu": {
+      "message": "ונואטו"
+   },
+   "Vault": {
+      "message": "כספת"
+   },
+   "Venezuela": {
+      "message": "ונצואלה"
+   },
+   "Version": {
+      "message": "גירסה"
+   },
+   "Version_": {
+      "message": "גרסה:"
+   },
+   "Viet_Nam": {
+      "message": "ויטנאם"
+   },
+   "View_History": {
+      "message": "צפה בהיסטוריה"
+   },
+   "View_Image": {
+      "message": "הצג תמונה"
+   },
+   "View_Passwords": {
+      "message": "הצג סיסמאות"
+   },
+   "Virgin_Islands__British_": {
+      "message": "איי הבתולה (בריטניה)"
+   },
+   "Virgin_Islands__U_S__": {
+      "message": "איי הבתולה (ארה'ב)"
+   },
+   "Wallis_and_Futuna": {
+      "message": "ואליס ופוטונה"
+   },
+   "Warn_before_filling_insecure_forms": {
+      "message": "הזהר טרם מילוי טופס לא מאובטח"
+   },
+   "Watch_a_video_on_basic_usage": {
+      "message": "צפה בסרטון וידאו על אופן השימוש הבסיסי"
+   },
+   "We_also_DO_NOT_keep_a_copy_or_backup_of_it_": {
+      "message": "גם אנו לא שומרים עותק או גיבוי של זה."
+   },
+   "We_have_detected_that_you_have_not_yet_granted_LastPass_permission_to_access_native_messaging___Native_messaging_is_required_to_provide_extra_features_such_as_sharing_of_login_state_with_other_browsers__fingerprint_authentication__importing__exporting__and_attachments_": {
+      "message": "זיהינו שעדיין לא הקצת ל-LastPass הרשאת גישה להודעות מקומיות..."
+   },
+   "Weak_Password": {
+      "message": "ססמה חלשה"
+   },
+   "Website": {
+      "message": "אתר אינטרנט"
+   },
+   "Welcome_back_to_LastPass_": {
+      "message": "ברוך השב ל-LastPass,"
+   },
+   "Welcome_back_to_Last__Pass_": {
+      "message": "ברוך השב ל-Last Pass,"
+   },
+   "Welcome_to_LastPass_": {
+      "message": "ברוך הבא ל-LastPass!"
+   },
+   "West_Central_Africa": {
+      "message": "מערב מרכז אפריקה"
+   },
+   "Western_Sahara": {
+      "message": "סהרה המערבית"
+   },
+   "What_you_use_to_log_into_this_website_": {
+      "message": "מה שאתה משתמש בו כדי להכנס לאתר זה."
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used": {
+      "message": "כאשר תיבה זו מסומנת, ישתמשו בלפחות תו אחד מאותיות קטנות, תו אחד מאותיות גדולות ותו אחד מיוחד"
+   },
+   "When_this_box_is_checked__at_least_one_lower_case_character__one_upper_case_character__and_one_special_character_will_be_used_": {
+      "message": "כאשר תיבה זו מסומנת, לפחות תו אחד מכל סוג יהיה בשימוש."
+   },
+   "When_this_box_is_checked__characters_like___and___will_be_used_when_randomly_generating_a_password_": {
+      "message": "כאשר תיבה זו מסומנת,תוים כמו # ! ישמש באופן אקראי בעת יצירת סיסמא."
+   },
+   "When_this_box_is_checked__confusing_characters__1_I_L_0_O__are_not_used_": {
+      "message": "כאשר תיבה זו מסומנת, תווים שקל להתבלבל ביניהם ( L, 0, O, 1, I )\nלא נמצאים בשימוש."
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce": {
+      "message": "כאשר תיבה זו מסומנת, צור סיסמא קלה לבטוי"
+   },
+   "When_this_box_is_checked__generate_a_password_that_is_easy_to_pronounce_": {
+      "message": "כאשר תיבה זו מסומנת, צור סיסמה קלה לביטוי."
+   },
+   "When_this_box_is_checked__potentially_confusing_characters__1_I_L_0_O__are_not_used": {
+      "message": "כאשר תיבה זו מסומנת, תווים שעלולים להיות מבלבלים (0,1, וכו') לא נמצאים בשימוש"
+   },
+   "When_this_box_is_checked__use_characters_like___and___in_the_password": {
+      "message": "כאשר תיבה זו מסומנת, השתמש בתווים כמו # ו! בסיסמה"
+   },
+   "Wi_Fi_Password": {
+      "message": "סיסמת Wi-Fi"
+   },
+   "Wi_Fi_Passwords": {
+      "message": "סיסמאות Wi-Fi"
+   },
+   "Windows": {
+      "message": "חלונות"
+   },
+   "Would_you_like_LastPass_to_generate_a_secure_password_for_you_": {
+      "message": "האם תרצה ש-LastPass תצור סיסמא בטוחה עבורך?"
+   },
+   "Would_you_like_LastPass_to_save_your_site_information_": {
+      "message": "האם ברצונך שנתוני האתר יישמרו על ידי LastPass?"
+   },
+   "Would_you_like_to_set_up_a_Form_Filling_profile_now_": {
+      "message": "?האם תרצה לבנות פרופיל מילוי טפסים עכשיו"
+   },
+   "XML_Files": {
+      "message": "קבצי XML"
+   },
+   "Yangon__Rangoon_": {
+      "message": "ינגון (רנגון)"
+   },
+   "Yemen": {
+      "message": "תימן"
+   },
+   "Yes": {
+      "message": "כן"
+   },
+   "Yes__Use_for_this_Site": {
+      "message": "כן, השתמש לאתר זה"
+   },
+   "Yes__let_me_choose_which_items_I_want_imported_into_LastPass": {
+      "message": "כן, אפשר לי לבחור את הפריטים שייובאו לתוך LastPass"
+   },
+   "Yes__let_me_enter_and_review_data_that_will_be_used_when_filling_forms": {
+      "message": "כן, תן לי למלא ולבחון נתונים שישמשו למילוי טפסים"
+   },
+   "You_are_moving_sites_from_a_shared_folder_into_your_general_vault__This_will_potentially_make_them_unavailable_to_others____Do_you_want_to_continue_": {
+      "message": "הינך מעביר אתרים מתיקיה משותפת אל הכספת הכללית שלך. פעולה זו עשויה להפוך אותם כלא זמינים לאחרים. \n\nהאם ברצונך להמשיך?"
+   },
+   "You_are_moving_sites_to_a_different_shared_folder__This_may_change_who_has_access_to_the_sites____Do_you_want_to_continue_": {
+      "message": "הינך מעביר אתרים לתיקיה משותפת אחרת. פעולה זו עלולה לשנות את האפשרות למי תהיה גישה לאתרים. \n\nהאם ברצונך להמשיך?"
+   },
+   "You_are_moving_sites_to_a_shared_folder__This_will_potentially_make_them_available_to_others___Are_you_sure_you_would_like_to_continue_": {
+      "message": "הינך מעביר אתרים לתיקייה משותפת. פעולה זו עשויה להפוך אותם כזמינים לאחרים.\n\nהאם אתה בטוח שברצונך להמשיך?"
+   },
+   "You_cannot_assign_more_than_one_HotKey_the_same_value_": {
+      "message": "אינך יכול להקצות יותר מ-Hotkey אחד לאותו ערך."
+   },
+   "You_cannot_move_individually_shared_sites_into_a_shared_folder_": {
+      "message": "אין באפשרותך להעביר אתרים משותפים בנפרד לתוך תיקיה משותפת."
+   },
+   "You_currently_have_LastPass_set_to_remember_your_password___Doing_so_essentially_makes_the_automatically_logoff_options_you_ve_chosen_useless___Would_you_like_LastPass_to_stop_remembering_your_password_": {
+      "message": "כרגע יש לך את LastPass מכוונת על זכירת הסיסמא שלך. בכך..."
+   },
+   "You_have_not_yet_chosen_a_default_form_fill_profile___Would_you_like_to_choose_one_now_": {
+      "message": "לא בחרת עדיין פרופיל ברירת מחדל למילוי טפסים. האם אתה רוצה לבחור פרופיל כעת?"
+   },
+   "You_have_saved_your_password_to_your_LastPass_Vault_": {
+      "message": "שמרת סיסמתך בכספת LastPass"
+   },
+   "You_may_also_be_blocking_all_cookies__which_causes_Chrome_to_disallow_HTML5_database_access_": {
+      "message": "ייתכן גם שאתה חוסם את כל העוגיות, דבר הגורם ל-Chrome למנוע גישה לבסיס נתונים HTML5."
+   },
+   "You_may_change_your_Master_Password_through_the_LastPass_website_by_clicking_the_button_below__or_turn_off_Master_Password_security_alerts_using_the_links_at_the_bottom_of_this_page_": {
+      "message": "אתה יכול לשנות את הסיסמה הראשית שלך דרך האתר של LastPass בלחיצה על הכפתור למטה, או לכבות התרעות הקשורות לסיסמה הראשית בעזרת הלינקים בתחתית העמוד הזה."
+   },
+   "You_must_agree_to_send_your_encrypted_data_to_LastPass_com___LastPass_com_encrypts_your_data_and_sends_it_to_its_secure_servers__No_one_at_LastPass_can_read_your_confidential_data_since_it_is_encrypted_using_your_secret_password_and_you_are_the_only_one_who_knows_your_password_": {
+      "message": "עליך להסכים לשלוח את המידע המוצפן שלך ל LastPass.com\n\nLastPass מצפינה את המידע שלך..."
+   },
+   "You_must_agree_to_the_terms_to_continue": {
+      "message": "אתה חייב לאשר הסכמתך לתנאים כדי להמשיך"
+   },
+   "You_must_enter_a_name_": {
+      "message": "עליך להזין שם."
+   },
+   "You_must_enter_a_unique_name_": {
+      "message": "חובה עליך להכניס שם ייחודי."
+   },
+   "You_must_restart_Chrome_or_logoff_and_back_in_to_get_logoff_on_browser_close_changes_to_be_reflected": {
+      "message": "עליך לאתחל את כרום או לצאת ולהיכנס להחשבון כדי ששינויי 'צא מהחשבון בסגירת דפדפן' ייכנסו לתוקף"
+   },
+   "You_must_restart_your_browser_before_all_of_the_changes_will_take_effect_": {
+      "message": "עליך להפעיל מחדש את הדפדפן לפני שכל השינויים ייכנסו לתוקף."
+   },
+   "Your_4_digit_birth_year": {
+      "message": "שנת לידה ב-4 ספרות"
+   },
+   "Your_Google_Chrome_passwords_have_been_imported_successfully_": {
+      "message": "סיסמאותך מגוגל כרום יובאו בהצלחה"
+   },
+   "Your_ZIP_or_postal_code": {
+      "message": "המיקוד שלך"
+   },
+   "Your_address_information": {
+      "message": "כתובת"
+   },
+   "Your_attachment_is_located_at_": {
+      "message": "הקובץ המצורף שלך ממוקם ב:"
+   },
+   "Your_bank_account_information": {
+      "message": "פרטי חשבון הבנק שלך"
+   },
+   "Your_bank_account_number__This_number_can_typically_be_found_to_the_right_of_the_routing_number_on_your_personal_checks_": {
+      "message": "מספר חשבון הבנק שלך. \nמספר זה הוא בדרך כלל המספר הימני בתחתית השיקים האישיים שלך."
+   },
+   "Your_bank_s_routing_number__This_9_digit_number_can_typically_be_found_on_your_personal_checks_in_the_bottom_left_corner_": {
+      "message": "מספר הניתוב של הבנק שלך.\nמספר זה הוא בדרך כלל המספר האמצעי בתחתית השיקים האישיים שלך."
+   },
+   "Your_birth_day": {
+      "message": "יום הלידה שלך"
+   },
+   "Your_birth_month": {
+      "message": "חודש הלידה שלך"
+   },
+   "Your_city_name": {
+      "message": "שם העיר שלך"
+   },
+   "Your_company_s_name": {
+      "message": "שם החברה בה אתה עובד"
+   },
+   "Your_contact_information": {
+      "message": "פרטי הקשר שלך"
+   },
+   "Your_country_name": {
+      "message": "שם המדינה שלך"
+   },
+   "Your_county_name": {
+      "message": "שם המחוז שלך"
+   },
+   "Your_credit_card_information": {
+      "message": "פרטי כרטיס האשראי שלך"
+   },
+   "Your_current_settings_require_you_to_enter_your_LastPass_password_to_complete_this_action_": {
+      "message": "ההגדרות הנוכחיות שלך דורשות שתכניס את סיסמת ה-LastPass שלך להשלמת הפעולה."
+   },
+   "Your_data_has_been_exported_to": {
+      "message": "הנתונים שלך יוצאו ל"
+   },
+   "Your_email_address": {
+      "message": "כתובת הדוא'ל שלך"
+   },
+   "Your_first_name": {
+      "message": "השם הפרטי שלך"
+   },
+   "Your_government_ID_number": {
+      "message": "מספר תעודת הזהות שלך"
+   },
+   "Your_last_name": {
+      "message": "שם המשפחה שלך"
+   },
+   "Your_middle_name": {
+      "message": "השם השני שלך"
+   },
+   "Your_password_can_not_be_the_same_as_your_email_": {
+      "message": "סיסמתך אינה יכולה להיות זהה לכתובת הדוא'ל שלך."
+   },
+   "Your_password_is_easily_guessable_": {
+      "message": "ניתן לנחש בקלות את סיסמתך."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_6_characters_long": {
+      "message": "סיסמתך קצרה מידי. עליה להיות בת 6 תווים לפחות."
+   },
+   "Your_password_is_too_short__It_must_be_at_least_8_characters_long": {
+      "message": "הסיסמה שלך קצרה מדי. עליה להיות באורך לפחות של 8 תווים"
+   },
+   "Your_password_reminder_serves_to_remind_you_of_what_your": {
+      "message": "תזכורת הסיסמה שלך משמשת להזכיר לך מה"
+   },
+   "Your_passwords_did_not_match_": {
+      "message": "הסיסמאות שלך אינן תואמות."
+   },
+   "Your_personal_information": {
+      "message": "המידע האישי שלך"
+   },
+   "Your_phone_number": {
+      "message": "מספר הטלפון שלך"
+   },
+   "Your_phone_number_extension": {
+      "message": "מספר השלוחה שלך"
+   },
+   "Your_prefix_or_title": {
+      "message": "התואר שלך או קידומת אחרת"
+   },
+   "Your_selected_Identity_no_longer_exists__Defaulting_to__All__and_logging_off_": {
+      "message": "החשבון שבחרת אינו קיים יותר. מחזיר למצב 'כל' ומתנתק"
+   },
+   "Your_sex": {
+      "message": "המין שלך"
+   },
+   "Your_state_or_province_name": {
+      "message": "שם מדינה או מחוז"
+   },
+   "Your_street_address": {
+      "message": "הרחוב שלך"
+   },
+   "Your_time_zone": {
+      "message": "אזור הזמן שלך"
+   },
+   "Your_trust_token_has_expired_": {
+      "message": "זמן הביטחון למכשיר זה פג."
+   },
+   "Your_username_when_signing_into_Web_sites": {
+      "message": "שם המשתמש שלך בעת כניסה לאתרי אינטרנט"
+   },
+   "YubiKey_Multifactor_Authentication": {
+      "message": "אימות רב-שלבי בשיטת YubiKey"
+   },
+   "Yugoslavia": {
+      "message": "יוגוסלביה"
+   },
+   "ZIP___Postal_Code": {
+      "message": "מיקוד"
+   },
+   "ZIP___Postal_code": {
+      "message": "מיקוד"
+   },
+   "Zambia": {
+      "message": "זמביה"
+   },
+   "Zimbabwe": {
+      "message": "זימבבואה"
+   },
+   "_Hide_": {
+      "message": "[החבא]"
+   },
+   "_History_": {
+      "message": "[היסטוריה]"
+   },
+   "_New_Pending_Share_Offers_": {
+      "message": "(הצעות שיתוף חדשות ממתינות)"
+   },
+   "_Not_applicable_when_the_Pronounceable_box_is_checked__": {
+      "message": "לא ישים כאשר תיבת 'קל לביטוי' מסומנת"
+   },
+   "_Optional_": {
+      "message": "(אופציונאלי)"
+   },
+   "_Show_": {
+      "message": "[הצג]"
+   },
+   "_domain_": {
+      "message": "(דומיין)"
+   },
+   "_none_": {
+      "message": "(ללא)"
+   },
+   "_s_Password_One_Click_Change": {
+      "message": "%s שינוי בסיסמה בלחיצה אחת"
+   },
+   "_s_will_now_attempt_to_change_your_password_to_a_strong__generated_password_that_will_be_saved_in_your_vault_and_known_only_to_you_": {
+      "message": "%s ינסה לשנות את הסיסמה שלך לסיסמה חזקה שתיוצר אוטומטית, תישמר בכספת שלך ותהיה ידועה רק לך."
+   },
+   "_unknown_": {
+      "message": "[לא ידוע]"
+   },
+   "a_zlower": {
+      "message": "a-z"
+   },
+   "actual_password_is__while_still_maintaining_its_secrecy_": {
+      "message": ".היא הסיסמא שלך ובמקביל שומרת על הסודיות שלה"
+   },
+   "ago": {
+      "message": "לפני"
+   },
+   "and": {
+      "message": "וגם"
+   },
+   "appName": {
+      "message": "סיסמאת מנהל חינם"
+   },
+   "contact_us_and_we_will_email_you_your_password_reminder_": {
+      "message": "צור עמנו קשר ואנו נשלח לך אימייל המכיל את תזכורת ססמתך."
+   },
+   "day": {
+      "message": "יום"
+   },
+   "days": {
+      "message": "ימים"
+   },
+   "dummy": {
+      "message": "dummy, leave this here so we don't mess up the trailing comma"
+   },
+   "eWallet": {
+      "message": "ארנק אלקטרוני"
+   },
+   "ext_": {
+      "message": "שלוחה"
+   },
+   "false": {
+      "message": "שקר"
+   },
+   "favorites": {
+      "message": "מועדפים"
+   },
+   "hour": {
+      "message": "שעה"
+   },
+   "hours": {
+      "message": "שעות"
+   },
+   "just_now": {
+      "message": "ממש עכשיו"
+   },
+   "minute": {
+      "message": "דקה"
+   },
+   "minutes": {
+      "message": "דקות"
+   },
+   "month": {
+      "message": "חודש"
+   },
+   "months": {
+      "message": "חודשים"
+   },
+   "privacy_statement": {
+      "message": "הצהרת פרטיות"
+   },
+   "recently_usedlower": {
+      "message": "היו בשימוש לאחרונה"
+   },
+   "search": {
+      "message": "חיפוש"
+   },
+   "second": {
+      "message": "שנייה"
+   },
+   "seconds": {
+      "message": "שניות"
+   },
+   "send_more": {
+      "message": "שלח עוד"
+   },
+   "shared": {
+      "message": "משותף"
+   },
+   "terms_of_service": {
+      "message": "תנאי שימוש"
+   },
+   "the_current_tab": {
+      "message": "הטאב הנוכחי"
+   },
+   "true": {
+      "message": "אמת"
+   },
+   "we_DO_NOT_know_what_your_LastPass_password_is_": {
+      "message": "אנו לא יודעים מהי סיסמת העל שלך!"
+   },
+   "week": {
+      "message": "שבוע"
+   },
+   "weeks": {
+      "message": "שבועות"
+   },
+   "year": {
+      "message": "שנה"
+   },
+   "years": {
+      "message": "שנים"
+   }
+}
