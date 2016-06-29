@@ -405,8 +405,10 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.SHOW_NOTIFICATION, (e, msg) => {
-      BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
-                                                        locale.translation(msg))
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
+                                                          locale.translation(msg))
+      }
     })
 
     ipcMain.on(messages.SET_RESOURCE_ENABLED, (e, resourceName, enabled) => {
@@ -422,8 +424,10 @@ app.on('ready', () => {
     ipcMain.on(messages.SHOW_FLASH_INSTALLED_MESSAGE, (e) => {
       flash.checkFlashInstalled((installed) => {
         if (installed) {
-          BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
-                                                            locale.translation('flashInstalled'))
+          if (BrowserWindow.getFocusedWindow()) {
+            BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
+                                                              locale.translation('flashInstalled'))
+          }
         }
       })
     })
