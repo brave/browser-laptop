@@ -1,10 +1,14 @@
+var os = require('os')
+var path = require('path')
 var VersionInfo = require('./lib/versionInfo')
 var execute = require('./lib/execute')
 
 console.log('Installing native modules, please wait...')
+
+var braveGyp = path.join(os.homedir(), '.brave-gyp')
 var env = {
-  HOME: '~/.brave-gyp',
-  APPDATA: '~/.brave-gyp'
+  HOME: braveGyp,
+  APPDATA: braveGyp
 }
 
 var rebuildCmd = '"../.bin/node-gyp" rebuild' +
