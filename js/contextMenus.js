@@ -733,17 +733,17 @@ function mainTemplateInit (nodeProps, frame) {
 
   if (isImage) {
     template.push({
-        label: locale.translation('openImageInNewTab'),
-        click: (item, focusedWindow) => {
-          if (focusedWindow && nodeProps.srcURL) {
-            // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL)
-          }
+      label: locale.translation('openImageInNewTab'),
+      click: (item, focusedWindow) => {
+        if (focusedWindow && nodeProps.srcURL) {
+          // TODO: open this in the next tab instead of last tab
+          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL)
         }
-      },
-      saveAsMenuItem('saveImage', nodeProps.srcURL),
-      copyAddressMenuItem('copyImageAddress', nodeProps.srcURL),
-      CommonMenu.separatorMenuItem)
+      }
+    },
+    saveAsMenuItem('saveImage', nodeProps.srcURL),
+    copyAddressMenuItem('copyImageAddress', nodeProps.srcURL),
+    CommonMenu.separatorMenuItem)
   }
 
   if (isInputField) {
