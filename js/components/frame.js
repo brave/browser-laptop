@@ -190,8 +190,6 @@ class Frame extends ImmutableComponent {
     }
 
     if (!guestInstanceId || newSrc !== 'about:blank') {
-      // XXX: Should webview src always be set to location, not src? Location
-      // works for flash CtP, src loads the wrong URL.
       this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
     }
 
@@ -280,11 +278,12 @@ class Frame extends ImmutableComponent {
       this.expireFlash(prevOrigin)
     }
 
-    if (this.webview && !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()) {
-      // Flash has been allowed. The location should be reloaded, not the src.
-      this.updateWebview(cb, this.props.frame.get('location'))
-    } else if (this.shouldCreateWebview() || this.props.frame.get('src') !== prevProps.frame.get('src')) {
+    if (this.props.frame.get('src') !== prevProps.frame.get('src')) {
       this.updateWebview(cb)
+    } else if (this.shouldCreateWebview()) {
+      // plugin/insecure-content allow state has changed. recreate with the current
+      // location, not the src.
+      this.updateWebview(cb, this.props.frame.get('location'))
     } else {
       if (this.runOnDomReady) {
         // there is already a callback waiting for did-attach
