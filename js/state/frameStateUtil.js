@@ -216,6 +216,15 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
   return isAncestorFrameKey(frames, parentFrame, parentFrameKey)
 }
 
+function getPartition (frameOpts) {
+  let partition = 'persist:default'
+  if (frameOpts.get('isPrivate')) {
+    partition = 'default'
+  } else if (frameOpts.get('partitionNumber')) {
+    partition = `persist:partition-${frameOpts.get('partitionNumber')}`
+  }
+  return partition
+}
 /**
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
@@ -415,6 +424,7 @@ module.exports = {
   getFramePropsIndex,
   getFrameKeysByDisplayIndex,
   getFeatures,
+  getPartition,
   addFrame,
   undoCloseFrame,
   removeFrame,

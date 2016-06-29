@@ -244,7 +244,7 @@ function registerForHeadersReceived (session) {
  * @param {string} partition name of the partition
  */
 function registerPermissionHandler (session, partition) {
-  const isPrivate = !partition.startsWith('persist:') && partition !== 'main-1'
+  const isPrivate = !partition.startsWith('persist:')
   // Keep track of per-site permissions granted for this session.
   let permissions = null
   session.setPermissionRequestHandler((webContents, permission, cb) => {
@@ -464,7 +464,7 @@ function shouldIgnoreUrl (url) {
 }
 
 module.exports.init = () => {
-  ['main-1'].forEach((partition) => {
+  ['default'].forEach((partition) => {
     initForPartition(partition)
   })
   ipcMain.on(messages.INITIALIZE_PARTITION, (e, partition) => {

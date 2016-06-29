@@ -10,6 +10,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const cx = require('../lib/classSet.js')
 const siteUtil = require('../state/siteUtil')
+const FrameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
 const { getZoomValuePercentage, getNextZoomLevel } = require('../lib/zoom')
 const messages = require('../constants/messages.js')
@@ -125,14 +126,7 @@ class Frame extends ImmutableComponent {
       }
       this.webview = document.createElement('webview')
 
-      let partition
-      if (this.props.frame.get('isPrivate')) {
-        partition = 'default'
-      } else if (this.props.frame.get('partitionNumber')) {
-        partition = `persist:partition-${this.props.frame.get('partitionNumber')}`
-      } else {
-        partition = 'persist:default'
-      }
+      let partition = FrameStateUtil.getPartition(this.props.frame)
       ipc.sendSync(messages.INITIALIZE_PARTITION, partition)
       this.webview.setAttribute('partition', partition)
 
