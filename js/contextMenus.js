@@ -358,8 +358,8 @@ function tabTemplateInit (frameProps) {
 
   if (!frameProps.get('isPrivate')) {
     const isPinned = frameProps.get('pinnedLocation')
-    var location = frameProps.get('location');
-    if (!(location === 'about:blank' || location == 'about:newtab' || isIntermediateAboutPage(location)))
+    const location = frameProps.get('location')
+    if (!(location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location))) {
       items.push({
         label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
         click: (item) => {
@@ -367,6 +367,7 @@ function tabTemplateInit (frameProps) {
           windowActions.setPinned(frameProps, !isPinned)
         }
       })
+    }
   }
 
   // items.push({
