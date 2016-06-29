@@ -9,7 +9,6 @@
       const href = elem.getAttribute('href')
       if (href &&
           (href.toLowerCase().includes('//get.adobe.com/flashplayer') ||
-           href.toLowerCase().includes('//www.adobe.com/go/getflashplayer') ||
            href.toLowerCase().includes('//www.adobe.com/go/getflash'))) {
         elem.setAttribute('target', '')
       }
