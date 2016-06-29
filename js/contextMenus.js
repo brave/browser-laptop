@@ -27,7 +27,7 @@ const locale = require('../js/l10n')
 const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
-const {isUrl} = require('./lib/appUrlUtil')
+const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -358,14 +358,15 @@ function tabTemplateInit (frameProps) {
 
   if (!frameProps.get('isPrivate')) {
     const isPinned = frameProps.get('pinnedLocation')
-
-    items.push({
-      label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
-      click: (item) => {
-        // Handle converting the current tab window into a pinned site
-        windowActions.setPinned(frameProps, !isPinned)
-      }
-    })
+    var location = frameProps.get('location');
+    if (!(location === 'about:blank' || location == 'about:newtab' || isIntermediateAboutPage(location)))
+      items.push({
+        label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
+        click: (item) => {
+          // Handle converting the current tab window into a pinned site
+          windowActions.setPinned(frameProps, !isPinned)
+        }
+      })
   }
 
   // items.push({
