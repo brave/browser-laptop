@@ -588,6 +588,12 @@ class Main extends ImmutableComponent {
     return siteSettings.getSiteSettingsForURL(this.allSiteSettings, location)
   }
 
+  frameBraverySettings (location) {
+    return Immutable.fromJS(siteSettings.activeSettings(this.frameSiteSettings(location),
+                                                        this.props.appState,
+                                                        appConfig))
+  }
+
   get activeSiteSettings () {
     return this.frameSiteSettings(this.activeRequestedLocation)
   }
@@ -814,6 +820,7 @@ class Main extends ImmutableComponent {
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
+              frameBraverySettings={this.frameBraverySettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}

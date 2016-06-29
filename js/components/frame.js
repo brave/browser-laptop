@@ -32,6 +32,12 @@ const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
 
+const WEBRTC_DEFAULT = 'default'
+const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
+// Looks like Brave leaks true public IP from behind system proxy when this option
+// is on.
+// const WEBRTC_PUBLIC_ONLY = 'default_public_interface_only'
+
 class Frame extends ImmutableComponent {
   constructor () {
     super()
@@ -85,7 +91,8 @@ class Frame extends ImmutableComponent {
 
   shouldCreateWebview () {
     return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent() ||
-      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
+      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins() ||
+      this.webRTCPolicy !== this.getWebRTCPolicy()
   }
 
   allowRunningInsecureContent () {
@@ -250,6 +257,9 @@ class Frame extends ImmutableComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
+      if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
+        this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy())
+      }
       this.webview.setActive(this.props.isActive)
       this.handleShortcut()
       this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
@@ -799,6 +809,19 @@ class Frame extends ImmutableComponent {
 
   onClearMatch () {
     this.webview.stopFindInPage('clearSelection')
+  }
+
+  get webRTCPolicy () {
+    return this.webview ? this.webview.getWebRTCIPHandlingPolicy() : WEBRTC_DEFAULT
+  }
+
+  getWebRTCPolicy () {
+    const braverySettings = this.props.frameBraverySettings
+    if (!braverySettings || braverySettings.get('fingerprintingProtection') !== true) {
+      return WEBRTC_DEFAULT
+    } else {
+      return WEBRTC_DISABLE_NON_PROXY
+    }
   }
 
   render () {
