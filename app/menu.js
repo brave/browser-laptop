@@ -292,7 +292,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('stop'),
-          accelerator: 'CmdOrCtrl+.',
+          accelerator: isDarwin ? 'Cmd+.' : 'Esc',
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_STOP])
           }
