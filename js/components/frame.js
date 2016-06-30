@@ -91,8 +91,7 @@ class Frame extends ImmutableComponent {
 
   shouldCreateWebview () {
     return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent() ||
-      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins() ||
-      this.webRTCPolicy !== this.getWebRTCPolicy()
+      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
   }
 
   allowRunningInsecureContent () {
