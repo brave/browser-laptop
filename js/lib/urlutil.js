@@ -81,22 +81,27 @@ const UrlUtil = {
    * @returns {Boolean} Returns true if this is not a valid URL.
    */
   isNotURL: function (input) {
+    // for cases, quoted strings
+    const case1Reg = /^".*"$/
     // for cases, ?abc and "a? b" which should searching query
-    const case1Reg = /^(\?)|(\?.+\s)/
+    const case2Reg = /^(\?)|(\?.+\s)/
     // for cases, pure string
-    const case2Reg = /[\?\.\/\s:]/
+    const case3Reg = /[\?\.\/\s:]/
     // for cases, data:uri and view-source:uri
-    const case3Reg = /^\w+:.*/
+    const case4Reg = /^\w+:.*/
 
     let str = input.trim()
     if (str.toLowerCase() === 'localhost') {
       return false
     }
-    if (case1Reg.test(str) || !case2Reg.test(str) ||
+    if (case1Reg.test(str)) {
+      return true
+    }
+    if (case2Reg.test(str) || !case3Reg.test(str) ||
         this.getScheme(str) === str) {
       return true
     }
-    if (case3Reg.test(str)) {
+    if (case4Reg.test(str)) {
       return !this.canParseURL(str)
     }
 
