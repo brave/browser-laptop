@@ -148,5 +148,17 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(item)
   })
 
+  // Based on https://github.com/webrtcHacks/webrtcnotify
+  var webrtcMethods = ['createOffer', 'createAnswer', 'setLocalDescription', 'setRemoteDescription']
+  webrtcMethods.forEach(function (method) {
+    var item = {
+      type: 'WebRTC',
+      objName: 'webkitRTCPeerConnection',
+      propName: method,
+      obj: webkitRTCPeerConnection
+    }
+    methods.push(item)
+  })
+
   methods.forEach(trapInstanceMethod)
 }
