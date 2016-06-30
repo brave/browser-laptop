@@ -1,7 +1,7 @@
 # Changelog
 
 ## [0.10.5](https://github.com/brave/browser-laptop/releases/v0.10.5dev)
-- Added LastPass support add ([#2316](https://github.com/brave/browser-laptop/issues/2316))
+- Added LastPass support ([#2316](https://github.com/brave/browser-laptop/issues/2316))
 - Added Flash Click to Play support (Flash is only available after enabling Flash in preferences explicitly) ([#2279](https://github.com/brave/browser-laptop/issues/2279))
 - Added lookup selection to context menu for macOS ([#1627](https://github.com/brave/browser-laptop/issues/1627))
 - Changed pin tab option to not show for about:blank and about:newtab ([#2253](https://github.com/brave/browser-laptop/issues/2253))
