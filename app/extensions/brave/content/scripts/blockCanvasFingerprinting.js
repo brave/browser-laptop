@@ -78,7 +78,6 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
 
     // Block the read from occuring; send info to background page instead
     chrome.ipc.sendToHost('got-canvas-fingerprinting', msg)
-    throw 'access denied'
   }
 
   /**
