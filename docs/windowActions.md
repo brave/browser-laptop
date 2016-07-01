@@ -6,7 +6,7 @@
 
 * * *
 
-### setState(windowState) 
+### setState(windowState)
 
 Dispatches an event to the main process to replace the window state
 
@@ -16,7 +16,7 @@ Dispatches an event to the main process to replace the window state
 
 
 
-### loadUrl(frame, location) 
+### loadUrl(frame, location)
 
 Dispatches a message to the store to load a new URL.
 Both the frame's src and location properties will be updated accordingly.
@@ -36,7 +36,7 @@ but the location should. For user entered new URLs, both should be updated.
 
 
 
-### setNavigated(location, key, isNavigatedInPage) 
+### setNavigated(location, key, isNavigatedInPage)
 
 Dispatches a message to the store to let it know a page has been navigated.
 
@@ -50,7 +50,7 @@ Dispatches a message to the store to let it know a page has been navigated.
 
 
 
-### setSecurityState(frameProps, securityState) 
+### setSecurityState(frameProps, securityState)
 
 Dispatches a message to set the security state.
 
@@ -63,7 +63,7 @@ Dispatches a message to set the security state.
 
 
 
-### setFrameTabId(frameProps, tabId) 
+### setFrameTabId(frameProps, tabId)
 
 Dispatches a message to set the frame tab id
 
@@ -75,7 +75,7 @@ Dispatches a message to set the frame tab id
 
 
 
-### setFrameError(frameProps, errorDetails) 
+### setFrameError(frameProps, errorDetails)
 
 Dispatches a message to set the frame error state
 
@@ -88,7 +88,7 @@ Dispatches a message to set the frame error state
 
 
 
-### setLoginRequiredDetail(frameProps, detail) 
+### setLoginRequiredDetail(frameProps, detail)
 
 Dispatches a message to set the login required detail.
 
@@ -100,7 +100,7 @@ Dispatches a message to set the login required detail.
 
 
 
-### setNavBarUserInput(location) 
+### setNavBarUserInput(location)
 
 Dispatches a message to the store to set the user entered text for the URL bar.
 Unlike setLocation and loadUrl, this does not modify the state of src and location.
@@ -111,10 +111,10 @@ Unlike setLocation and loadUrl, this does not modify the state of src and locati
 
 
 
-### setFrameTitle(frameProps, title) 
+### setFrameTitle(frameProps, title)
 
 Dispatches a message to the store to set the current frame's title.
-This should be called in response to the webview encountering a <title> tag.
+This should be called in response to the webview encountering a `<title>` tag.
 
 **Parameters**
 
@@ -124,7 +124,7 @@ This should be called in response to the webview encountering a <title> tag.
 
 
 
-### setFindbarShown(frameProps, shown) 
+### setFindbarShown(frameProps, shown)
 
 Shows/hides the find-in-page bar.
 
@@ -136,7 +136,7 @@ Shows/hides the find-in-page bar.
 
 
 
-### setFindbarSelected(frameProps, selected) 
+### setFindbarSelected(frameProps, selected)
 
 Highlight text in the findbar
 
@@ -148,7 +148,7 @@ Highlight text in the findbar
 
 
 
-### setPinned(frameProps, isPinned) 
+### setPinned(frameProps, isPinned)
 
 Sets a frame as pinned
 
@@ -160,7 +160,7 @@ Sets a frame as pinned
 
 
 
-### onWebviewLoadStart(frameProps, location) 
+### onWebviewLoadStart(frameProps, location)
 
 Dispatches a message to the store to indicate that the webview is loading.
 
@@ -172,7 +172,7 @@ Dispatches a message to the store to indicate that the webview is loading.
 
 
 
-### onWebviewLoadEnd(frameProps) 
+### onWebviewLoadEnd(frameProps)
 
 Dispatches a message to the store to indicate that the webview is done loading.
 
@@ -182,7 +182,7 @@ Dispatches a message to the store to indicate that the webview is done loading.
 
 
 
-### setFullScreen(frameProps, isFullScreen, showFullScreenWarning) 
+### setFullScreen(frameProps, isFullScreen, showFullScreenWarning)
 
 Dispatches a message to the store to indicate that the webview entered full screen mode.
 
@@ -196,7 +196,7 @@ Dispatches a message to the store to indicate that the webview entered full scre
 
 
 
-### setNavBarFocused(focused) 
+### setNavBarFocused(focused)
 
 Dispatches a message to the store to indicate if the navigation bar is focused.
 
@@ -206,7 +206,7 @@ Dispatches a message to the store to indicate if the navigation bar is focused.
 
 
 
-### newFrame(frameOpts, openInForeground) 
+### newFrame(frameOpts, openInForeground)
 
 Dispatches a message to the store to create a new frame
 
@@ -219,7 +219,7 @@ Dispatches a message to the store to create a new frame
 
 
 
-### cloneFrame(frameProps) 
+### cloneFrame(frameProps)
 
 Dispatches a message to the store to create a new frame similar to the passed arg.
 
@@ -229,7 +229,7 @@ Dispatches a message to the store to create a new frame similar to the passed ar
 
 
 
-### closeFrame(frames, frameProps) 
+### closeFrame(frames, frameProps)
 
 Dispatches a message to close a frame
 
@@ -241,14 +241,14 @@ Dispatches a message to close a frame
 
 
 
-### undoClosedFrame() 
+### undoClosedFrame()
 
 Dispatches a message to the store to undo a closed frame
 The new frame is expected to appear at the index it was last closed at
 
 
 
-### setActiveFrame(frameProps) 
+### setActiveFrame(frameProps)
 
 Dispatches a message to the store to set a new frame as the active frame.
 
@@ -258,7 +258,7 @@ Dispatches a message to the store to set a new frame as the active frame.
 
 
 
-### setFocusedFrame(frameProps) 
+### setFocusedFrame(frameProps)
 
 Dispatches a message to the store when the frame is active and the window is focused
 
@@ -268,7 +268,7 @@ Dispatches a message to the store when the frame is active and the window is foc
 
 
 
-### setPreviewFrame(frameProps) 
+### setPreviewFrame(frameProps)
 
 Dispatches a message to the store to set a preview frame.
 This is done when hovering over a tab.
@@ -279,7 +279,7 @@ This is done when hovering over a tab.
 
 
 
-### setTabPageIndex(index) 
+### setTabPageIndex(index)
 
 Dispatches a message to the store to set the tab page index.
 
@@ -289,7 +289,7 @@ Dispatches a message to the store to set the tab page index.
 
 
 
-### setTabPageIndexByFrame(frameProps) 
+### setTabPageIndexByFrame(frameProps)
 
 Dispatches a message to the store to set the tab page index.
 
@@ -299,7 +299,7 @@ Dispatches a message to the store to set the tab page index.
 
 
 
-### updateBackForwardState(frameProps, canGoBack, canGoForward) 
+### updateBackForwardState(frameProps, canGoBack, canGoForward)
 
 Dispatches a message to the store to update the back-forward information.
 
@@ -313,7 +313,7 @@ Dispatches a message to the store to update the back-forward information.
 
 
 
-### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail) 
+### setIsBeingDraggedOverDetail(dragType, dragOverKey, dragDetail)
 
 Dispatches a message to the store to indicate that something is dragging over this item.
 
@@ -327,7 +327,7 @@ Dispatches a message to the store to indicate that something is dragging over th
 
 
 
-### moveTab(sourceFrameProps, destinationFrameProps, prepend) 
+### moveTab(sourceFrameProps, destinationFrameProps, prepend)
 
 Dispatches a message to the store to indicate that the specified frame should move locations.
 
@@ -341,7 +341,7 @@ Dispatches a message to the store to indicate that the specified frame should mo
 
 
 
-### setUrlBarSuggestions(suggestionList, selectedIndex) 
+### setUrlBarSuggestions(suggestionList, selectedIndex)
 
 Sets the URL bar suggestions and selected index.
 
@@ -353,7 +353,7 @@ Sets the URL bar suggestions and selected index.
 
 
 
-### setUrlBarAutocompleteEnabled(enabled) 
+### setUrlBarAutocompleteEnabled(enabled)
 
 Enables or disables the urlbar autocomplete.
 Autocomplete is defined to be the action of inserting text into the urlbar itself
@@ -367,7 +367,7 @@ This is sometimes only temporarily disabled, e.g. a user is pressing backspace.
 
 
 
-### setUrlBarSuggestionSearchResults(searchResults) 
+### setUrlBarSuggestionSearchResults(searchResults)
 
 Sets the URL bar suggestion search results.
 This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
@@ -379,7 +379,7 @@ Note: This should eventually be refactored outside of the component doing XHR an
 
 
 
-### setUrlBarSelected(isSelected) 
+### setUrlBarSelected(isSelected)
 
 Marks the URL bar text as selected or not
 
@@ -389,7 +389,7 @@ Marks the URL bar text as selected or not
 
 
 
-### setUrlBarActive(isActive) 
+### setUrlBarActive(isActive)
 
 Marks the URL bar as active or not.
 If the URL bar is active that means it's in a position that it should be displaying
@@ -402,7 +402,7 @@ are no autocomplete results.
 
 
 
-### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
+### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails)
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
 
@@ -417,7 +417,7 @@ set from an IPC call.
 
 
 
-### setSearchDetail(searchDetail) 
+### setSearchDetail(searchDetail)
 
 Dispatches a message to set the search engine details.
 
@@ -427,7 +427,7 @@ Dispatches a message to set the search engine details.
 
 
 
-### setFindDetail(frameProps, findDetail) 
+### setFindDetail(frameProps, findDetail)
 
 Dispatches a message to set the find-in-page details.
 
@@ -439,7 +439,7 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(currentDetail, originalDetail, destinationDetail) 
+### setBookmarkDetail(currentDetail, originalDetail, destinationDetail)
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
@@ -454,7 +454,7 @@ If set, also indicates that add/edit is shown
 
 
 
-### setContextMenuDetail(detail) 
+### setContextMenuDetail(detail)
 
 Dispatches a message to set context menu detail.
 If set, also indicates that the context menu is shown.
@@ -465,7 +465,7 @@ If set, also indicates that the context menu is shown.
 
 
 
-### setPopupWindowDetail(detail) 
+### setPopupWindowDetail(detail)
 
 Dispatches a message to set popup window detail.
 If set, also indicates that the popup window is shown.
@@ -476,7 +476,7 @@ If set, also indicates that the popup window is shown.
 
 
 
-### setAudioMuted(frameProps, muted) 
+### setAudioMuted(frameProps, muted)
 
 Dispatches a message to indicate that the frame should be muted
 
@@ -488,7 +488,7 @@ Dispatches a message to indicate that the frame should be muted
 
 
 
-### muteAllAudio(framePropsList, muted) 
+### muteAllAudio(framePropsList, muted)
 
 Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
 
@@ -500,7 +500,7 @@ Dispatches a mute/unmute call to all frames in a provided list (used by TabList)
 
 
 
-### muteAllAudioExcept(frameToSkip) 
+### muteAllAudioExcept(frameToSkip)
 
 Dispatches a mute call to all frames except the one provided.
 The provided frame will have its audio unmuted.
@@ -511,7 +511,7 @@ The provided frame will have its audio unmuted.
 
 
 
-### setAudioPlaybackActive(frameProps, audioPlaybackActive) 
+### setAudioPlaybackActive(frameProps, audioPlaybackActive)
 
 Dispatches a message to indicate that audio is playing
 
@@ -523,7 +523,7 @@ Dispatches a message to indicate that audio is playing
 
 
 
-### setThemeColor(frameProps, themeColor, computedThemeColor) 
+### setThemeColor(frameProps, themeColor, computedThemeColor)
 
 Dispatches a message to indicate that the theme color has changed for a page
 
@@ -538,7 +538,7 @@ Dispatches a message to indicate that the theme color has changed for a page
 
 
 
-### setFavicon(frameProps, favicon) 
+### setFavicon(frameProps, favicon)
 
 Dispatches a message to indicate that the favicon has changed
 
@@ -550,7 +550,7 @@ Dispatches a message to indicate that the favicon has changed
 
 
 
-### setMaximizeState(isMaximized) 
+### setMaximizeState(isMaximized)
 
 Sets the maximize state of the window
 
@@ -560,7 +560,7 @@ Sets the maximize state of the window
 
 
 
-### savePosition(position) 
+### savePosition(position)
 
 Saves the position of the window in the window state
 
@@ -570,7 +570,7 @@ Saves the position of the window in the window state
 
 
 
-### setWindowFullScreen(isFullScreen) 
+### setWindowFullScreen(isFullScreen)
 
 Sets the fullscreen state of the window
 
@@ -580,7 +580,7 @@ Sets the fullscreen state of the window
 
 
 
-### setMouseInTitlebar(mouseInTitlebar) 
+### setMouseInTitlebar(mouseInTitlebar)
 
 Dispatches a message to indicate if the mouse is in the titlebar
 
@@ -590,7 +590,7 @@ Dispatches a message to indicate if the mouse is in the titlebar
 
 
 
-### setSiteInfoVisible(isVisible) 
+### setSiteInfoVisible(isVisible)
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -600,7 +600,7 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 
 
 
-### setBraveryPanelDetail(braveryPanelDetail) 
+### setBraveryPanelDetail(braveryPanelDetail)
 
 Dispatches a message to indicate the bravery panel should be shown
 
@@ -611,7 +611,7 @@ Dispatches a message to indicate the bravery panel should be shown
 
 
 
-### setDownloadsToolbarVisible(isVisible) 
+### setDownloadsToolbarVisible(isVisible)
 
 Dispatches a message to indicate if the downloads toolbar is visible
 
@@ -621,7 +621,7 @@ Dispatches a message to indicate if the downloads toolbar is visible
 
 
 
-### setReleaseNotesVisible(isVisible) 
+### setReleaseNotesVisible(isVisible)
 
 Dispatches a message to indicate the release notes should be visible
 
@@ -631,7 +631,7 @@ Dispatches a message to indicate the release notes should be visible
 
 
 
-### setLinkHoverPreview(href, showOnRight) 
+### setLinkHoverPreview(href, showOnRight)
 
 Dispatches a message to indicate the href preview should be shown
 for a hovered link
@@ -644,7 +644,7 @@ for a hovered link
 
 
 
-### setBlockedBy(frameProps, blockType, location) 
+### setBlockedBy(frameProps, blockType, location)
 
 Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
 
@@ -658,7 +658,7 @@ Dispatches a message to indicate the site info, such as # of blocked ads, should
 
 
 
-### setRedirectedBy(frameProps, ruleset, location) 
+### setRedirectedBy(frameProps, ruleset, location)
 
 Similar to setBlockedBy but for httpse redirects
 
@@ -672,7 +672,7 @@ Similar to setBlockedBy but for httpse redirects
 
 
 
-### setNoScript(frameProps, source) 
+### setNoScript(frameProps, source)
 
 Sets which scripts were blocked on a page.
 
@@ -684,7 +684,7 @@ Sets which scripts were blocked on a page.
 
 
 
-### setNoScriptVisible(isVisible) 
+### setNoScriptVisible(isVisible)
 
 Sets whether the noscript icon is visible.
 
@@ -694,7 +694,7 @@ Sets whether the noscript icon is visible.
 
 
 
-### addHistory(frameProps) 
+### addHistory(frameProps)
 
 Adds a history entry
 
