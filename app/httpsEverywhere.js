@@ -81,7 +81,7 @@ function getHostnamePatterns (url) {
     // copy the original array
     var tmp = segmented.slice()
     tmp[index] = '*'
-    hostPatterns.push(tmp.join('*'))
+    hostPatterns.push(tmp.join('.'))
   })
   // Now eat away from the left with * so that for x.y.z.google.com we also
   // check *.z.google.com and *.google.com.
