@@ -75,6 +75,18 @@ describe('notificationBar', function () {
       })
   })
 
+  it('does not show the same notification twice', function * () {
+    let notificationUrl = Brave.server.url('double-notification.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('.notificationItem:nth-child(2)')
+      .waitUntil(function () {
+        return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
+      })
+  })
+
   // https://travis-ci.org/brave/browser-laptop/builds/132700770
   it.skip('shows notification for login form', function * () {
     yield this.app.client
