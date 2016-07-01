@@ -461,7 +461,13 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')
-      appState = appState.set('notifications', notifications.push(Immutable.fromJS(action.detail)))
+      appState = appState.set('notifications', notifications.filterNot((notification) => {
+        let message = notification.get('message')
+        // action.detail is a regular mutable object only when running tests
+        return action.detail.get
+          ? message === action.detail.get('message')
+          : message === action.detail['message']
+      }).push(Immutable.fromJS(action.detail)))
       break
     case AppConstants.APP_HIDE_MESSAGE_BOX:
       appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
