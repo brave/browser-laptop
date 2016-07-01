@@ -283,6 +283,10 @@ class Main extends ImmutableComponent {
       windowActions.setDownloadsToolbarVisible(true)
     })
 
+    ipc.on(messages.HIDE_DOWNLOADS_TOOLBAR, () => {
+      windowActions.setDownloadsToolbarVisible(false)
+    })
+
     const self = this
     ipc.on(messages.SHORTCUT_SET_ACTIVE_FRAME_BY_INDEX, (e, i) =>
       windowActions.setActiveFrame(FrameStateUtil.getFrameByDisplayIndex(self.props.windowState, i)))
