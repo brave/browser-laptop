@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.10.5](https://github.com/brave/browser-laptop/releases/v0.10.5dev)
+## [0.11.0](https://github.com/brave/browser-laptop/releases/v0.11.0dev)
 - Added LastPass support ([#2316](https://github.com/brave/browser-laptop/issues/2316))
 - Added Flash Click to Play support (Flash is only available after enabling Flash in preferences explicitly) ([#2279](https://github.com/brave/browser-laptop/issues/2279))
 - Added lookup selection to context menu for macOS ([#1627](https://github.com/brave/browser-laptop/issues/1627))
@@ -11,6 +11,7 @@
 - Fixed session tabs 1password bug ([#2303](https://github.com/brave/browser-laptop/issues/2303))
 - Fixed downloads bar overflow ([#2322](https://github.com/brave/browser-laptop/issues/2322))
 - Fixed selection menu to truncate properly ([#2240](https://github.com/brave/browser-laptop/issues/2240))
+- Fixed cookie changes not persisting to disk on fast shutdown ([#2335](https://github.com/brave/browser-laptop/issues/2335))
 
 ## [0.10.4](https://github.com/brave/browser-laptop/releases/v0.10.4dev)
 - Added autocomplete support in the URL bar. ([#1596](https://github.com/brave/browser-laptop/issues/1596))
