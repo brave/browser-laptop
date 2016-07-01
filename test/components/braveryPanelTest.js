@@ -114,7 +114,7 @@ describe('Bravery Panel', function () {
         .waitForVisible(braveryPanel)
         .waitUntil(function () {
           return this.getText(fpStat)
-            .then((stat) => stat === '1')
+            .then((stat) => stat === '3')
         })
         .click(fpSwitch)
     })

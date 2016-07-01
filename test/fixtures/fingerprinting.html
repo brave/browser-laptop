@@ -2,6 +2,29 @@
 <head>
 <script>
 function init() {
+  // WebRTC from https://github.com/diafygi/webrtc-ips
+  var RTCPeerConnection = window.webkitRTCPeerConnection;
+  //minimal requirements for data connection
+  var mediaConstraints = {
+      optional: [{RtpDataChannels: true}]
+  };
+  var servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
+  //construct a new RTCPeerConnection
+  var pc = new RTCPeerConnection(servers, mediaConstraints);
+  //listen for candidate events
+  pc.onicecandidate = function(ice){
+      //skip non-candidate events
+      if(ice.candidate)
+          console.log(ice.candidate.candidate);
+  };
+  //create a bogus data channel
+  pc.createDataChannel("");
+  //create an offer sdp
+  pc.createOffer(function(result){
+      //trigger the stun server request
+      pc.setLocalDescription(result, function(){}, function(){});
+  }, function(){});
+
   // Canvas
   var canvas = document.createElement("canvas");
   canvas.width = 2000;
@@ -11,6 +34,7 @@ function init() {
   ctx.rect(0, 0, 10, 10);
   ctx.rect(2, 2, 6, 6);
   document.getElementById('canvas').innerText = canvas.toDataURL()
+
   // WebGL
   canvas = document.createElement("canvas");
   var gl = canvas.getContext("webgl")
@@ -19,7 +43,7 @@ function init() {
 }
 </script>
 </head>
-<body onload="init()">
+<body onload="setTimeout(init, 100)">
 <div>
 fingerprinting test
 <div id='canvas'></div>
