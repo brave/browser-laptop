@@ -9,6 +9,7 @@ const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i
 const defaultScheme = 'http://'
 const fileScheme = 'file://'
 const os = require('os')
+const urlParse = require('url').parse
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -199,6 +200,37 @@ const UrlUtil = {
     } catch (e) {
       return undefined
     }
+  },
+
+  /**
+   * Gets applicable hostname patterns for a given URL. Ex: for x.y.google.com,
+   * rulesets matching x.y.google.com, *.y.google.com, and *.google.com are
+   * applicable.
+   * @param {string} url The url to get hostname patterns for
+   * @return {Array.<string>}
+   */
+  getHostnamePatterns: function (url) {
+    var host = urlParse(url).hostname
+    if (!host) {
+      return []
+    }
+    var hostPatterns = [host]
+    var segmented = host.split('.')
+
+    // Since targets can contain a single wildcard, replace each label of the
+    // hostname with "*" in turn.
+    segmented.forEach((label, index) => {
+      // copy the original array
+      var tmp = segmented.slice()
+      tmp[index] = '*'
+      hostPatterns.push(tmp.join('.'))
+    })
+    // Now eat away from the left with * so that for x.y.z.google.com we also
+    // check *.z.google.com and *.google.com.
+    for (var i = 2; i <= segmented.length - 2; ++i) {
+      hostPatterns.push('*.' + segmented.slice(i, segmented.length).join('.'))
+    }
+    return hostPatterns
   }
 }
 

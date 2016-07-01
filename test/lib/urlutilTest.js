@@ -61,4 +61,26 @@ describe('urlutil', function () {
       assert.equal(UrlUtil.isURL('localhost:8089'), true)
     })
   })
+
+  describe('getHostnamePatterns', function () {
+    it('gets bare domain hostname patterns', function () {
+      // XXX: *.com probably should be excluded
+      assert.deepEqual(UrlUtil.getHostnamePatterns('http://brave.com'),
+                       ['brave.com', '*.com', 'brave.*'])
+    })
+    it('gets subdomain hostname patterns', function () {
+      assert.deepEqual(UrlUtil.getHostnamePatterns('https://bar.brave.com'),
+                       ['bar.brave.com',
+                        '*.brave.com',
+                        'bar.*.com',
+                        'bar.brave.*'])
+      assert.deepEqual(UrlUtil.getHostnamePatterns('https://foo.bar.brave.com'),
+                       ['foo.bar.brave.com',
+                        '*.bar.brave.com',
+                        'foo.*.brave.com',
+                        'foo.bar.*.com',
+                        'foo.bar.brave.*',
+                        '*.brave.com'])
+    })
+  })
 })
