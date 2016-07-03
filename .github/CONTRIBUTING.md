@@ -10,6 +10,7 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
 ## Making changes
 
 * Make commits in logical units. If needed, run `git rebase -i` to squash commits before opening a pull request.
+* New features and most other pull requests require a new [test](https://github.com/brave/browser-laptop/blob/master/docs/tests.md) to be written before the pull request will be accepted.  Some exceptions would be a tweak to an area of code that doesn't have tests yet, text changes, build config changes, things that can't be tested due to test suite limitations, etc.
 * Use Github [auto-closing keywords](https://help.github.com/articles/closing-issues-via-commit-messages/) in the commit message, and make the commit messsage body as descriptive as necessary. Ex:
 
 ````
