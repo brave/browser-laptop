@@ -33,6 +33,7 @@ public/built
 
 # Temp files
 .DS_Store
+temp.VisualElementsManifest.xml
 
 # electron-packager output dirs
 *-darwin-x64

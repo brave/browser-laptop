@@ -99,12 +99,23 @@ cmds = cmds.concat([
     ' --version-string.FileDescription="Brave"'
 ])
 
+function BuildManifestFile () {
+  const fs = require('fs')
+  const fileContents = fs.readFileSync('./res/Update.VisualElementsManifest.xml', 'utf8')
+  const versionedFileContents = fileContents.replace(/{{braveVersion}}/g, 'app-' + VersionInfo.braveVersion)
+  fs.writeFileSync('temp.VisualElementsManifest.xml', versionedFileContents, 'utf8')
+}
+
 if (isLinux) {
   cmds.push('mv Brave-linux-x64/Brave Brave-linux-x64/brave')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 } else if (isDarwin) {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
 } else if (isWindows) {
+  BuildManifestFile()
+  cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'Update.VisualElementsManifest.xml') + '"')
+  cmds.push('copy .\\res\\start-tile-70.png "' + path.join(buildDir, 'resources', 'start-tile-70.png') + '"')
+  cmds.push('copy .\\res\\start-tile-150.png "' + path.join(buildDir, 'resources', 'start-tile-150.png') + '"')
   cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
 }
