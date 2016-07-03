@@ -129,6 +129,7 @@ var rendererIdentifiers = function () {
     'find',
     'checkForUpdates',
     'preferences',
+    'settings',
     'bookmarksManager',
     'importBookmarks',
     'reportAnIssue',

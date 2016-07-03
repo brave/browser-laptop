@@ -161,7 +161,7 @@ module.exports.checkForUpdateMenuItem = () => {
 
 module.exports.preferencesMenuItem = () => {
   return {
-    label: locale.translation('preferences'),
+    label: locale.translation(isDarwin ? 'preferences' : 'settings'),
     accelerator: 'CmdOrCtrl+,',
     click: (item, focusedWindow) => {
       if (BrowserWindow.getAllWindows().length === 0) {
