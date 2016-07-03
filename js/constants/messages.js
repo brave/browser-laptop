@@ -49,6 +49,7 @@ const messages = {
   SHOW_FLASH_INSTALLED_MESSAGE: _,
   // Downloads
   SHOW_DOWNLOADS_TOOLBAR: _, /** Ensures the downloads toolbar is visible */
+  HIDE_DOWNLOADS_TOOLBAR: _, /** Hides the downloads toolbar */
   DOWNLOAD_ACTION: _, /** @arg {string} downloadId, @arg {string} action such as 'resume', 'pause', or 'cancel' */
   // Updates
   UPDATE_REQUESTED: _,

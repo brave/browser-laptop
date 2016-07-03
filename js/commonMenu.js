@@ -201,6 +201,7 @@ module.exports.downloadsMenuItem = () => {
           location: 'about:downloads'
         }))
       } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.HIDE_DOWNLOADS_TOOLBAR])
         module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:downloads', { singleFrame: true }])
       }
     }
