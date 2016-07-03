@@ -114,7 +114,7 @@ Unlike setLocation and loadUrl, this does not modify the state of src and locati
 ### setFrameTitle(frameProps, title) 
 
 Dispatches a message to the store to set the current frame's title.
-This should be called in response to the webview encountering a <title> tag.
+This should be called in response to the webview encountering a `<title>` tag.
 
 **Parameters**
 
