@@ -162,7 +162,7 @@ const windowActions = {
 
   /**
    * Dispatches a message to the store to set the current frame's title.
-   * This should be called in response to the webview encountering a <title> tag.
+   * This should be called in response to the webview encountering a `<title>` tag.
    *
    * @param {Object} frameProps - The frame properties to modify
    * @param {string} title - The title to set for the frame
