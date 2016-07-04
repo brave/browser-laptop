@@ -31,6 +31,7 @@ const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
+const flash = require('../flash')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -546,8 +547,14 @@ class Frame extends ImmutableComponent {
           }
         }
       } else {
-        ipc.send(messages.SHOW_FLASH_INSTALLED_MESSAGE)
-        windowActions.loadUrl(this.props.frame, adobeUrl)
+        flash.checkFlashInstalled((installed) => {
+          if (installed) {
+            remote.getCurrentWindow().webContents.send(messages.SHOW_NOTIFICATION,
+                                                       locale.translation('flashInstalled'))
+          } else {
+            windowActions.loadUrl(this.props.frame, adobeUrl)
+          }
+        })
       }
       ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
         const cb = this.notificationCallbacks[msg]
@@ -562,12 +569,13 @@ class Frame extends ImmutableComponent {
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
-        const currentUrl = urlParse(this.props.frame.get('location'))
         if ((e.url.includes('//get.adobe.com/flashplayer') ||
-             e.url.includes('//www.adobe.com/go/getflash')) &&
-            ['http:', 'https:'].includes(currentUrl.protocol) &&
-            !currentUrl.hostname.includes('.adobe.com')) {
-          interceptFlash(e.url)
+             e.url.includes('//www.adobe.com/go/getflash'))) {
+          const currentProvisionalUrl = urlParse(this.props.frame.get('provisionalLocation'))
+          if (['http:', 'https:'].includes(currentProvisionalUrl.protocol) &&
+              !currentProvisionalUrl.hostname.includes('.adobe.com')) {
+            interceptFlash(e.url)
+          }
         }
         windowActions.onWebviewLoadStart(this.props.frame, e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()

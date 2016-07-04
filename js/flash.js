@@ -3,10 +3,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const electron = require('electron')
-const app = electron.app
 const fs = require('fs')
 const path = require('path')
+let electron
+let app
+try {
+  electron = require('electron')
+} catch (e) {
+  electron = global.require('electron')
+}
+if (process.type === 'browser') {
+  app = electron.app
+} else {
+  app = electron.remote.app
+}
 
 module.exports.init = () => {
   // TODO: This only works if sync currently
