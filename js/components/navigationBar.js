@@ -40,6 +40,7 @@ class NavigationBar extends ImmutableComponent {
       appActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK), siteTags.BOOKMARK)
     } else {
       appActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK), siteTags.BOOKMARK)
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
   }
 
