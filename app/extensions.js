@@ -128,6 +128,7 @@ let generateBraveManifest = () => {
 }
 
 let defaultExtensions = {
+  PDFJS: 'oemmndcbldboiebfnladdacbdfmadadm',
   OnePassword: 'aomjjhallfgjeglblehebfpbcfeobpgk',
   Dashlane: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
   LastPass: 'hdokiejnpimakedhajhdlcegeplioahd'
@@ -197,6 +198,9 @@ module.exports.init = () => {
 
   let enableExtensions = () => {
     installExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
+
+    installExtension(defaultExtensions.PDFJS, getExtensionsPath('pdfjs'))
+    enableExtension(defaultExtensions.PDFJS)
 
     if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
       installExtension(defaultExtensions.OnePassword, getExtensionsPath('1password'))
