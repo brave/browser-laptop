@@ -13,6 +13,7 @@ const dragTypes = require('../constants/dragTypes')
 const siteUtil = require('../state/siteUtil')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
+const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 class PinnedTabs extends ImmutableComponent {
   constructor () {
@@ -35,7 +36,10 @@ class PinnedTabs extends ImmutableComponent {
         const droppedOnFrameProps = this.props.frames.find((frame) => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
-          windowActions.setPinned(sourceDragData, true)
+          const location = sourceDragData.get('location')
+          if (!(location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location))) {
+            windowActions.setPinned(sourceDragData, true)
+          }
         } else {
           appActions.moveSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED),
             siteUtil.getDetailFromFrame(droppedOnFrameProps, siteTags.PINNED),
