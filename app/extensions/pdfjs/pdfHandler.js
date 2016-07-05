@@ -188,6 +188,10 @@ chrome.webRequest.onBeforeRequest.addListener(
   },
   ['blocking']);
 
+chrome.extension.isAllowedFileSchemeAccess = (cb) => {
+  cb(true)
+}
+
 chrome.extension.isAllowedFileSchemeAccess(function(isAllowedAccess) {
   if (isAllowedAccess) {
     return;

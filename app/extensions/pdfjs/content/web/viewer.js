@@ -9359,7 +9359,7 @@ exports.DefaultExernalServices = DefaultExernalServices;
   }
 
   function isAllowedFileSchemeAccess(callback) {
-    ChromeCom.request('isAllowedFileSchemeAccess', null, callback);
+    callback(true)
   }
 
   function isRuntimeAvailable() {
