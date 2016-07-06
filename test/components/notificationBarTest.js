@@ -47,6 +47,18 @@ describe('notificationBar', function () {
       })
   })
 
+  it('does not show the same notification twice', function * () {
+    let notificationUrl = Brave.server.url('double-notification.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('.notificationItem:nth-child(2)')
+      .waitUntil(function () {
+        return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
+      })
+  })
+
   it('can accept permission request persistently', function * () {
     yield this.app.client
       .tabByIndex(0)
@@ -72,18 +84,6 @@ describe('notificationBar', function () {
       .waitForExist(titleBar)
       .waitUntil(function () {
         return this.getText(titleBar).then((val) => val.includes('granted'))
-      })
-  })
-
-  it('does not show the same notification twice', function * () {
-    let notificationUrl = Brave.server.url('double-notification.html')
-    yield this.app.client
-      .tabByIndex(0)
-      .loadUrl(notificationUrl)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.notificationItem:nth-child(2)')
-      .waitUntil(function () {
-        return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
       })
   })
 
