@@ -76,7 +76,8 @@ class Tab extends ImmutableComponent {
     windowActions.closeFrame(this.props.frames, this.props.frameProps)
   }
 
-  onMuteFrame (muted) {
+  onMuteFrame (muted, event) {
+    event.stopPropagation()
     windowActions.setAudioMuted(this.props.frameProps, muted)
   }
 
