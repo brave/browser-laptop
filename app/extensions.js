@@ -28,6 +28,7 @@ let generateBraveManifest = () => {
         js: [
           'content/scripts/util.js',
           'js/actions/extensionActions.js',
+          'content/scripts/navigator.js',
           'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
           'content/scripts/inputHandler.js',
