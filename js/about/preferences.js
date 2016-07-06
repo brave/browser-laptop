@@ -102,6 +102,7 @@ class SettingCheckbox extends ImmutableComponent {
           checked={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
       </span>
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
+      {this.props.options}
     </div>
   }
 }
@@ -349,16 +350,26 @@ class SecurityTab extends ImmutableComponent {
   render () {
     return <div>
       <SettingsList dataL10nId='passwordSettings'>
-        <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
+          options={
+            getSetting(settings.PASSWORD_MANAGER_ENABLED, this.props.settings)
+              ? <span className='linkText' data-l10n-id='managePasswords'
+                onClick={aboutActions.newFrame.bind(null, {
+                  location: 'about:passwords'
+                }, true)}></span>
+              : null
+          } />
         <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='useLastPass' prefKey={settings.LAST_PASS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='useLastPass' prefKey={settings.LAST_PASS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
+          options={
+            getSetting(settings.LAST_PASS_ENABLED, this.props.settings)
+              ? <span className='linkText' data-l10n-id='preferences'
+                onClick={aboutActions.newFrame.bind(null, {
+                  location: 'chrome-extension://hdokiejnpimakedhajhdlcegeplioahd/tabDialog.html?dialog=preferences&cmd=open'
+                }, true)}></span>
+              : null
+          } />
         <SettingCheckbox dataL10nId='useDashlane' prefKey={settings.DASHLANE_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <div classname='settingItem'>
-          <span className='linkText' data-l10n-id='managePasswords'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: 'about:passwords'
-            }, true)}></span>
-        </div>
       </SettingsList>
       <SettingsList dataL10nId='pluginSettings'>
         <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
@@ -367,8 +378,8 @@ class SecurityTab extends ImmutableComponent {
         <span className='fa fa-info-circle' id='flashInfoIcon' />
         {
           isDarwin || isWindows
-            ? <span><span data-l10n-id='enableFlashSubtext' />
-              <span className='linkText'onClick={aboutActions.newFrame.bind(null, {
+            ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
+              <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                 location: 'https://get.adobe.com/flashplayer'
               })}>{'Adobe'}</span>.</span>
             : <span data-l10n-id='enableFlashSubtextLinux' />
