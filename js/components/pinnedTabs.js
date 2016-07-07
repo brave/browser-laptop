@@ -13,6 +13,7 @@ const dragTypes = require('../constants/dragTypes')
 const siteUtil = require('../state/siteUtil')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
+const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 class PinnedTabs extends ImmutableComponent {
   constructor () {
@@ -24,6 +25,10 @@ class PinnedTabs extends ImmutableComponent {
   onDrop (e) {
     const clientX = e.clientX
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
+    const location = sourceDragData.get('location')
+    if (location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) {
+      return
+    }
 
     // This must be executed async because the state change that this causes
     // will cause the onDragEnd to never run
