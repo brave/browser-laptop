@@ -116,17 +116,17 @@ describe('Bravery Panel', function () {
           return this.getText(fpStat)
             .then((stat) => stat === '3')
         })
-        .click(fpSwitch)
     })
     it('allows fingerprinting when setting is off', function * () {
       const url = Brave.server.url('fingerprinting.html')
       yield this.app.client
+        .click(fpSwitch)
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
         .waitUntil(function () {
           return this.getText('body')
-            .then((text) => text !== 'fingerprinting test')
+            .then((text) => text === 'fingerprinting test')
         })
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(braveMenu)
@@ -135,7 +135,6 @@ describe('Bravery Panel', function () {
           return this.getText(fpStat)
             .then((stat) => stat === '0')
         })
-        .click(fpSwitch)
     })
   })
 })
