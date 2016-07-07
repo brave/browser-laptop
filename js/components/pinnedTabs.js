@@ -25,6 +25,10 @@ class PinnedTabs extends ImmutableComponent {
   onDrop (e) {
     const clientX = e.clientX
     const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
+    const location = sourceDragData.get('location')
+    if (location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) {
+      return
+    }
 
     // This must be executed async because the state change that this causes
     // will cause the onDragEnd to never run
@@ -36,10 +40,7 @@ class PinnedTabs extends ImmutableComponent {
         const droppedOnFrameProps = this.props.frames.find((frame) => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
-          const location = sourceDragData.get('location')
-          if (!(location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location))) {
-            windowActions.setPinned(sourceDragData, true)
-          }
+          windowActions.setPinned(sourceDragData, true)
         } else {
           appActions.moveSite(siteUtil.getDetailFromFrame(sourceDragData, siteTags.PINNED),
             siteUtil.getDetailFromFrame(droppedOnFrameProps, siteTags.PINNED),
