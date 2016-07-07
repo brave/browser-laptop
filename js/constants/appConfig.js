@@ -108,7 +108,8 @@ module.exports = {
     'general.downloads.default-save-path': null,
     'general.disable-title-mode': process.platform === 'win32',
     'advanced.hardware-acceleration-enabled': true,
-    'advanced.default-zoom-level': null
+    'advanced.default-zoom-level': null,
+    'advanced.pdfjs-enabled': true
   },
   uaExceptionHosts: [
     'get.adobe.com', 'adobe.com', 'www.adobe.com', 'helpx.adobe.com'
