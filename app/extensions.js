@@ -1,7 +1,6 @@
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const AppStore = require('../js/stores/appStore')
-const appConfig = require('../js/constants/appConfig')
 const config = require('../js/constants/config')
 const { getAppUrl, getExtensionsPath, getIndexHTML } = require('../js/lib/appUrlUtil')
 const { getSetting } = require('../js/settings')
@@ -54,8 +53,7 @@ let generateBraveManifest = () => {
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
           'js/actions/extensionActions.js',
-          'content/scripts/themeColor.js',
-          'content/scripts/publisherIdentification.js'
+          'content/scripts/themeColor.js'
         ]
       },
       {
@@ -80,12 +78,6 @@ let generateBraveManifest = () => {
         ]
       }
     ],
-    background: {
-      scripts: [
-        'content/scripts/util.js',
-        'brave-background.js'
-      ]
-    },
     permissions: [
       'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings'
     ],
@@ -134,30 +126,7 @@ let defaultExtensions = {
   LastPass: 'hdokiejnpimakedhajhdlcegeplioahd'
 }
 
-let backgroundPage = null
-
-module.exports.sendToTab = (tabId, message) => {
-  if (backgroundPage) {
-    backgroundPage.send('tab-message', tabId, message, [].slice.call(arguments, 2))
-  }
-}
-
 module.exports.init = () => {
-  process.on('background-page-loaded', function (extensionId, backgroundPageWebContents) {
-    if (extensionId === config.braveExtensionId) {
-      backgroundPage = backgroundPageWebContents
-      backgroundPage.on('dom-ready', () => {
-        backgroundPage.send('update-state', AppStore.getState().toJS(), appConfig)
-      })
-    }
-  })
-
-  process.on('background-page-destroyed', function (extensionId, backgroundPageId) {
-    if (extensionId === config.braveExtensionId) {
-      backgroundPage = null
-    }
-  })
-
   process.on('chrome-browser-action-popup', function (extensionId, tabId, name, props, popup) {
     // TODO(bridiver) find window from tabId
     let win = BrowserWindow.getFocusedWindow()
