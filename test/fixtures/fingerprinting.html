@@ -3,43 +3,45 @@
 <script>
 function init() {
   // WebRTC from https://github.com/diafygi/webrtc-ips
-  var RTCPeerConnection = window.webkitRTCPeerConnection;
-  //minimal requirements for data connection
-  var mediaConstraints = {
-      optional: [{RtpDataChannels: true}]
-  };
-  var servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
-  //construct a new RTCPeerConnection
-  var pc = new RTCPeerConnection(servers, mediaConstraints);
-  //listen for candidate events
-  pc.onicecandidate = function(ice){
-      //skip non-candidate events
-      if(ice.candidate)
-          console.log(ice.candidate.candidate);
-  };
-  //create a bogus data channel
-  pc.createDataChannel("");
-  //create an offer sdp
-  pc.createOffer(function(result){
-      //trigger the stun server request
-      pc.setLocalDescription(result, function(){}, function(){});
-  }, function(){});
+  try {
+      var RTCPeerConnection = window.webkitRTCPeerConnection;
+      //minimal requirements for data connection
+      var mediaConstraints = {
+          optional: [{RtpDataChannels: true}]
+      };
+      var servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
+      //construct a new RTCPeerConnection
+      var pc = new RTCPeerConnection(servers, mediaConstraints);
+      //listen for candidate events
+      pc.onicecandidate = function(ice){
+      };
+      //create a bogus data channel
+      pc.createDataChannel("");
+      //create an offer sdp
+      pc.createOffer(function(result){
+          //trigger the stun server request
+          pc.setLocalDescription(result, function(){}, function(){});
+      }, function(){});
+  } catch (e) {}
 
   // Canvas
-  var canvas = document.createElement("canvas");
-  canvas.width = 2000;
-  canvas.height = 200;
-  canvas.style.display = "inline";
-  var ctx = canvas.getContext("2d");
-  ctx.rect(0, 0, 10, 10);
-  ctx.rect(2, 2, 6, 6);
-  canvas.toDataURL()
+  try {
+      var canvas = document.createElement("canvas");
+      canvas.width = 2000;
+      canvas.height = 200;
+      canvas.style.display = "inline";
+      var ctx = canvas.getContext("2d");
+      ctx.rect(0, 0, 10, 10);
+      ctx.rect(2, 2, 6, 6);
+      canvas.toDataURL()
+  } catch (e) {}
 
   // WebGL
-  canvas = document.createElement("canvas");
-  var gl = canvas.getContext("webgl")
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.getSupportedExtensions()
+  try {
+      var canvas = document.createElement("canvas");
+      var gl = canvas.getContext("webgl")
+      gl.getSupportedExtensions()
+  } catch (e) {}
 }
 </script>
 </head>

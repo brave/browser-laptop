@@ -105,10 +105,6 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
-        .waitUntil(function () {
-          return this.getText('body')
-            .then((text) => text === 'fingerprinting test')
-        })
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(braveMenu)
         .waitForVisible(braveryPanel)
