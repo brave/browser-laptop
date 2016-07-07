@@ -130,9 +130,9 @@ class Main extends ImmutableComponent {
       var xVelocity = deltaX / time
       var yVelocity = deltaY / time
       if (trackingFingers && Math.abs(yVelocity) < 1) {
-        if (xVelocity > 4) {
+        if (xVelocity > 1.5) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (xVelocity < -4) {
+        } else if (xVelocity < -1.5) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
