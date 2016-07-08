@@ -5,6 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
+const aboutActions = require('./aboutActions')
 
 require('../../less/about/flash.less')
 
@@ -16,6 +17,7 @@ class FlashPlaceholder extends ImmutableComponent {
     super()
     const braveryDefaults = window.initBraveryDefaults
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onPrefsClick = this.onPrefsClick.bind(this)
     this.state = {
       flashEnabled: braveryDefaults && braveryDefaults.flash ? braveryDefaults.flash.enabled : this.flashEnabled
     }
@@ -56,22 +58,39 @@ class FlashPlaceholder extends ImmutableComponent {
     }
   }
 
+  onPrefsClick (e) {
+    aboutActions.newFrame({
+      location: 'about:preferences#security'
+    }, true)
+  }
+
   render () {
     const flashEnabled = this.state.flashEnabled
     // TODO: Localization doesn't work due to CORS error from inside iframe
     const cmd = isDarwin ? 'Control-Click' : 'Right-Click'
     const flashRightClick = flashEnabled ? `${cmd} to run Adobe Flash Player` : 'Adobe Flash has been blocked.'
-    const flashExpirationText = flashEnabled ? 'For your security, approvals are limited to 1 week.' : null
-    const flashSubtext = flashEnabled ? `on ${this.origin || 'this site'}.` : 'To run Flash, enable it in Preferences > Security.'
+    const flashSubtext = `on ${this.origin || 'this site'}.`
     return <div onContextMenu={this.onContextMenu}>
       <div className='flashMainContent'>
         <img src='img/bravePluginAlert.png' />
         <div id='flashRightClick'>{flashRightClick}</div>
-        <div className='flashSubtext'>{flashSubtext}</div>
+        <div className='flashSubtext'>
+        {
+          flashEnabled
+          ? flashSubtext
+          : <span>
+            To run Flash, enable it in <span className='linkText' onClick={this.onPrefsClick}>Preferences</span>.
+          </span>
+        }
+        </div>
       </div>
-      <div className='flashFooter'>
-        {flashExpirationText}
-      </div>
+      {
+        flashEnabled
+        ? <div className='flashFooter'>
+          For security, <span className='linkText' onClick={this.onPrefsClick}>approvals</span> expire in 1 week.
+        </div>
+        : null
+      }
     </div>
   }
 }
