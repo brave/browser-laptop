@@ -67,6 +67,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
 
   let contentSettings = {
     cookies: getBlock3rdPartyStorage(braveryDefaults),
+    referer: [{
+      setting: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? 'block' : 'allow',
+      primaryPattern: '*'
+    }],
     adInsertion: [{
       setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
       primaryPattern: '*'
@@ -101,8 +105,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
       if (hostSetting.cookieControl === 'block3rdPartyCookie') {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'block')
         addContentSettings(contentSettings.cookies, hostPattern, parseSiteSettingsPattern(hostPattern), 'allow')
+        addContentSettings(contentSettings.referer, hostPattern, '*', 'block')
       } else {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
+        addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
       }
     }
     if (typeof hostSetting.fingerprintingProtection === 'boolean') {

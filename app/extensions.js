@@ -30,6 +30,7 @@ let generateBraveManifest = () => {
           'content/scripts/navigator.js',
           'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
+          'content/scripts/block3rdPartyContent.js',
           'content/scripts/inputHandler.js',
           'content/scripts/spellCheck.js'
         ],
