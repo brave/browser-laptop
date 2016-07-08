@@ -2,32 +2,32 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+function isAdobeLink (href) {
+  if (typeof href !== 'string') {
+    return false
+  }
+  return href.toLowerCase().includes('//get.adobe.com/flashplayer') ||
+    href.toLowerCase().includes('//www.adobe.com/go/getflash')
+}
+
 // Open flash links in the same tab so we can intercept them correctly
 (function () {
   function replaceAdobeLinks () {
     Array.from(document.querySelectorAll('a[target="_blank"]')).forEach((elem) => {
       const href = elem.getAttribute('href')
-      if (href &&
-          (href.toLowerCase().includes('//get.adobe.com/flashplayer') ||
-           href.toLowerCase().includes('//www.adobe.com/go/getflash'))) {
+      if (isAdobeLink(href)) {
         elem.setAttribute('target', '')
       }
     })
   }
-  // Some pages insert the password form into the DOM after it's loaded
   var observer = new window.MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.addedNodes.length) {
-        replaceAdobeLinks()
-      }
-    })
-  })
-  setTimeout(() => {
     replaceAdobeLinks()
-    observer.observe(document.documentElement, {
-      childList: true
-    })
-  }, 1000)
+  })
+  replaceAdobeLinks()
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  })
 })()
 
 const placeholderUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-flash.html'
@@ -101,6 +101,18 @@ function getFlashObjects (elem) {
       })
     }
   })
+
+  // Some sites have custom Flash placeholders which we should replace with our
+  // own.
+  Array.from(elem.querySelectorAll('a > img')).forEach((el) => {
+    let href = el.parentNode ? el.parentNode.href : null
+    if (isAdobeLink(href)) {
+      results.push({
+        element: el
+      })
+    }
+  })
+
   return results
 }
 
@@ -139,21 +151,14 @@ function insertFlashPlaceholders (elem) {
 }
 
 var observer = new window.MutationObserver(function (mutations) {
-  mutations.forEach(function (mutation) {
-    if (mutation.addedNodes) {
-      Array.from(mutation.addedNodes).forEach((node) => {
-        insertFlashPlaceholders(node)
-      })
-    }
-  })
+  insertFlashPlaceholders(document.documentElement)
 })
 
 if (chrome.contentSettings.flashActive != 'allow' ||
     chrome.contentSettings.flashEnabled != 'allow') {
-  setTimeout(() => {
-    insertFlashPlaceholders(document.documentElement)
-    observer.observe(document.documentElement, {
-      childList: true
-    })
-  }, 1000)
+  insertFlashPlaceholders(document.documentElement)
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  })
 }
