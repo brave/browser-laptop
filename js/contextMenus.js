@@ -1063,6 +1063,50 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
   }))
 }
 
+function onBackButtonHistoryMenu (activeFrame, history, rect) {
+  const menuTemplate = []
+
+  if (activeFrame && history) {
+    for (let index = (history.currentIndex - 1); index > -1; index--) {
+      menuTemplate.push({
+        label: history.entries[index].display,
+        icon: history.entries[index].icon,
+        click: (item, focusedWindow) => {
+          activeFrame.goToIndex(index)
+        }
+      })
+    }
+  }
+
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: rect.left,
+    top: rect.bottom,
+    template: menuTemplate
+  }))
+}
+
+function onForwardButtonHistoryMenu (activeFrame, history, rect) {
+  const menuTemplate = []
+
+  if (activeFrame && history) {
+    for (let index = (history.currentIndex + 1); index < history.entries.length; index++) {
+      menuTemplate.push({
+        label: history.entries[index].display,
+        icon: history.entries[index].icon,
+        click: (item, focusedWindow) => {
+          activeFrame.goToIndex(index)
+        }
+      })
+    }
+  }
+
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: rect.left,
+    top: rect.bottom,
+    template: menuTemplate
+  }))
+}
+
 module.exports = {
   onHamburgerMenu,
   onMainContextMenu,
@@ -1074,5 +1118,7 @@ module.exports = {
   onBookmarkContextMenu,
   onShowBookmarkFolderMenu,
   onShowUsernameMenu,
-  onMoreBookmarksMenu
+  onMoreBookmarksMenu,
+  onBackButtonHistoryMenu,
+  onForwardButtonHistoryMenu
 }

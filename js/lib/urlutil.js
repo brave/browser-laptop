@@ -273,6 +273,17 @@ const UrlUtil = {
       ['http:', 'https:'].includes(parsed.protocol) &&
       !exemptHostPattern.test(parsed.hostname) &&
       !['/search', '/search/'].includes(parsed.pathname)
+  },
+
+  /**
+   */
+  getDefaultFavicon: function (url) {
+    if (this.isURL(url)) {
+      const loc = new window.URL(url)
+      return loc.protocol + '//' + loc.host + '/favicon.ico'
+    }
+
+    return ''
   }
 }
 
