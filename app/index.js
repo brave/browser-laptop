@@ -55,6 +55,7 @@ let lastWindowClosed = false
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
+let errorCerts = {}
 // URLs to callback for auth.
 let authCallbacks = {}
 // Don't show the keytar prompt more than once per 24 hours
@@ -206,6 +207,15 @@ app.on('ready', () => {
       e.preventDefault()
       cb(true)
       return
+    }
+
+    errorCerts[url] = {
+      subjectName: cert.subjectName,
+      issuerName: cert.issuerName,
+      serialNumber: cert.serialNumber,
+      validStart: cert.validStart,
+      validExpiry: cert.validExpiry,
+      fingerprint: cert.fingerprint
     }
 
     // Tell the page to show an unlocked icon. Note this is sent to the main
@@ -443,6 +453,19 @@ app.on('ready', () => {
       if (acceptCertDomains[host]) {
         event.sender.send(messages.SET_SECURITY_STATE, frameKey, {
           secure: false
+        })
+      }
+    })
+
+    ipcMain.on(messages.GET_CERT_ERROR_DETAIL, (event, url) => {
+      if (errorCerts[url]) {
+        event.sender.send(messages.SET_CERT_ERROR_DETAIL, {
+          subjectName: errorCerts[url].subjectName,
+          issuerName: errorCerts[url].issuerName,
+          serialNumber: errorCerts[url].serialNumber,
+          validStart: errorCerts[url].validStart,
+          validExpiry: errorCerts[url].validExpiry,
+          fingerprint: errorCerts[url].fingerprint
         })
       }
     })

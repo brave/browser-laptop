@@ -120,6 +120,8 @@ const messages = {
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
+  GET_CERT_ERROR_DETAIL: _,
+  SET_CERT_ERROR_DETAIL: _,
   SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
   HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
   // Bookmarks

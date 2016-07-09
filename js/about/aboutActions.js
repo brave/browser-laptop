@@ -66,6 +66,15 @@ const AboutActions = {
   },
 
   /**
+   * Get certificate detail when error.
+   *
+   * @param {string} url - The URL with the cert error
+   */
+  getCertErrorDetail: function (url) {
+    ipc.send(messages.GET_CERT_ERROR_DETAIL, url)
+  },
+
+  /**
    * Opens a context menu
    */
   contextMenu: function (nodeProps, contextMenuType, e) {
