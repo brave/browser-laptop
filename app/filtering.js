@@ -247,7 +247,7 @@ function registerPermissionHandler (session, partition) {
   const isPrivate = !partition.startsWith('persist:')
   // Keep track of per-site permissions granted for this session.
   let permissions = null
-  session.setPermissionRequestHandler((webContents, permission, cb) => {
+  session.setPermissionRequestHandler((origin, embedderOrigin, permission, cb) => {
     if (!permissions) {
       permissions = {
         media: {
@@ -273,7 +273,7 @@ function registerPermissionHandler (session, partition) {
         }
       }
     }
-    const url = webContents.getURL()
+    const url = origin || embedderOrigin
     // Allow notifications for the main app
     if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||
         url.startsWith('chrome-extension://') && permission === 'openExternal') {
@@ -314,14 +314,10 @@ function registerPermissionHandler (session, partition) {
     }
     const message = `Allow ${host} to ${permissions[permission].action}?`
 
-    const clearCallback = () => {
-      if (permissionCallbacks[message]) {
-        permissionCallbacks[message](0, false)
-      }
-    }
-
     // If this is a duplicate, clear the previous callback and use the new one
-    clearCallback()
+    if (permissionCallbacks[message]) {
+      permissionCallbacks[message](0, false)
+    }
 
     appActions.showMessageBox({
       buttons: [locale.translation('deny'), locale.translation('allow')],
@@ -332,7 +328,7 @@ function registerPermissionHandler (session, partition) {
     })
 
     permissionCallbacks[message] = (buttonIndex, persist) => {
-      delete permissionCallbacks[message]
+      permissionCallbacks[message] = null
       // hide the message box if this was triggered automatically
       appActions.hideMessageBox(message)
       const result = !!(buttonIndex)
@@ -342,23 +338,6 @@ function registerPermissionHandler (session, partition) {
         appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result, isPrivate)
       }
     }
-
-    // automatically clear on close or navigation
-    webContents.on('crashed', (e) => {
-      clearCallback()
-    })
-
-    webContents.on('close', (e) => {
-      clearCallback()
-    })
-
-    webContents.on('destroyed', (e) => {
-      clearCallback()
-    })
-
-    webContents.on('did-navigate', (e) => {
-      clearCallback()
-    })
   })
 }
 
@@ -503,7 +482,6 @@ module.exports.init = () => {
     if (permissionCallbacks[message]) {
       permissionCallbacks[message](buttonIndex, persist)
     }
-    appActions.hideMessageBox(message)
   })
 }
 
