@@ -165,6 +165,8 @@ class Frame extends ImmutableComponent {
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
       }
+      // the webview tag is where the user's page is rendered (runs in its own process)
+      // @see http://electron.atom.io/docs/api/web-view-tag/
       this.webview = document.createElement('webview')
 
       let partition = FrameStateUtil.getPartition(this.props.frame)
@@ -752,6 +754,31 @@ class Frame extends ImmutableComponent {
 
   goBack () {
     this.webview.goBack()
+  }
+
+  showBackHistory (rect) {
+    const webContent = this.webview.getWebContents()
+    const currentIndex = webContent.getCurrentEntryIndex()
+    const historyCount = webContent.getEntryCount()
+
+    let history = {
+      count: historyCount,
+      currentIndex: currentIndex,
+      entries: []
+    }
+
+    for (let index = 0; index < historyCount; index++) {
+      history.entries.push({
+        index: index,
+        url: webContent.getURLAtIndex(index)
+      })
+    }
+
+    contextMenus.onBackButtonHistoryMenu(this, history, rect)
+  }
+
+  goToIndex (index) {
+    this.webview.goToIndex(index)
   }
 
   goForward () {

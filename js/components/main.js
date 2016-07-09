@@ -60,6 +60,10 @@ class Main extends ImmutableComponent {
     super()
     this.onCloseFrame = this.onCloseFrame.bind(this)
     this.onBack = this.onBack.bind(this)
+    this.backButtonLock = false
+    this.onBackButtonMouseDown = this.onBackButtonMouseDown.bind(this)
+    this.onBackButtonMouseUp = this.onBackButtonMouseUp.bind(this)
+    this.onBackButtonMouseLeave = this.onBackButtonMouseLeave.bind(this)
     this.onForward = this.onForward.bind(this)
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onClickWindow = this.onClickWindow.bind(this)
@@ -464,8 +468,45 @@ class Main extends ImmutableComponent {
     return location
   }
 
-  onBack () {
+  onBack (e) {
+    if (e.target.attributes.getNamedItem('disabled')) {
+      return
+    }
+
+    if (this.backButtonLock) {
+      this.backButtonLock = false
+      return
+    }
+
     this.activeFrame.goBack()
+  }
+
+  onBackButtonMouseDown (e) {
+    if (e.target.attributes.getNamedItem('disabled')) {
+      return
+    }
+
+    const self = this
+    const rect = e.target.getBoundingClientRect()
+
+    this.backButtonTimer = setTimeout(function () {
+      self.backButtonLock = true
+      self.activeFrame.showBackHistory(rect)
+    }, 1000)
+  }
+
+  onBackButtonMouseUp (e) {
+    if (this.backButtonTimer) {
+      clearTimeout(this.backButtonTimer)
+      this.backButtonTimer = null
+    }
+  }
+
+  onBackButtonMouseLeave (e) {
+    this.onBackButtonMouseUp(e)
+    if (this.backButtonLock) {
+      this.backButtonLock = false
+    }
   }
 
   onForward () {
@@ -549,7 +590,6 @@ class Main extends ImmutableComponent {
         if (node.classList.contains('contextMenu') && e.button === 1) {
           e.preventDefault()
         }
-
         return
       }
       node = node.parentNode
@@ -681,7 +721,10 @@ class Main extends ImmutableComponent {
             <span data-l10n-id='backButton'
               className='back fa fa-angle-left'
               disabled={!activeFrame || !activeFrame.get('canGoBack')}
-              onClick={this.onBack} />
+              onClick={this.onBack}
+              onMouseDown={this.onBackButtonMouseDown}
+              onMouseUp={this.onBackButtonMouseUp}
+              onMouseLeave={this.onBackButtonMouseLeave} />
             <span data-l10n-id='forwardButton'
               className='forward fa fa-angle-right'
               disabled={!activeFrame || !activeFrame.get('canGoForward')}
