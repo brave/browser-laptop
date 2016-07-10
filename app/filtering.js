@@ -270,6 +270,9 @@ function registerPermissionHandler (session, partition) {
         },
         openExternal: {
           action: locale.translation('permissionExternal')
+        },
+        protocolRegistration: {
+          action: locale.translation('permissionProtocolRegistration')
         }
       }
     }

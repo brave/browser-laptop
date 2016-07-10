@@ -40,6 +40,7 @@ AppStore
       pointerLockPermission: boolean,
       fullscreenPermission: boolean,
       openExternalPermission: boolean,
+      protocolRegistrationPermission: boolean,
       savePasswords: boolean, // Only false or undefined/null
       shieldsUp: boolean,
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)

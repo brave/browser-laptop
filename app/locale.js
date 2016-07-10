@@ -156,6 +156,7 @@ var rendererIdentifiers = function () {
     'permissionDisableCursor',
     'permissionFullscreen',
     'permissionExternal',
+    'permissionProtocolRegistration',
     'tabsSuggestionTitle',
     'bookmarksSuggestionTitle',
     'historySuggestionTitle',
