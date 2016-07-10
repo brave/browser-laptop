@@ -74,6 +74,12 @@ module.exports.aboutUrls = new Immutable.Map({
 module.exports.isIntermediateAboutPage = (location) =>
   ['about:safebrowsing', 'about:error', 'about:certerror'].includes(getBaseUrl(location))
 
+module.exports.isNotImplementedAboutPage = (location) =>
+  ['about:config', 'about:history'].includes(getBaseUrl(location))
+
+module.exports.isNavigatableAboutPage = (location) =>
+  !module.exports.isIntermediateAboutPage(location) && !module.exports.isNotImplementedAboutPage(location) && !['about:newtab', 'about:blank', 'about:flash'].includes(getBaseUrl(location))
+
 // Map of target URLs mapped to source about: URLs
 const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj, v, k) => {
   obj[v] = k

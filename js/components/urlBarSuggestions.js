@@ -10,7 +10,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const config = require('../constants/config.js')
 const top500 = require('./../data/top500.js')
-const {aboutUrls, isIntermediateAboutPage, isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
+const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 const Immutable = require('immutable')
 const debounce = require('../lib/debounce.js')
 const settings = require('../constants/settings')
@@ -135,7 +135,7 @@ class UrlBarSuggestions extends ImmutableComponent {
             : null
           }
           {
-            suggestion.type !== suggestionTypes.SEARCH
+            suggestion.type !== suggestionTypes.SEARCH && suggestion.type !== suggestionTypes.ABOUT_PAGES
             ? <div className='suggestionLocation'>{suggestion.location}</div>
             : null
           }
@@ -295,7 +295,7 @@ class UrlBarSuggestions extends ImmutableComponent {
 
     // about pages
     suggestions = suggestions.concat(mapListToElements({
-      data: aboutUrls.keySeq().filter((x) => !isIntermediateAboutPage(x)),
+      data: aboutUrls.keySeq().filter((x) => isNavigatableAboutPage(x)),
       maxResults: config.urlBarSuggestions.maxAboutPages,
       type: suggestionTypes.ABOUT_PAGES,
       clickHandler: navigateClickHandler((x) => x)}))
