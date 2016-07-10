@@ -94,13 +94,13 @@ class AddEditBookmark extends ImmutableComponent {
         <div className='genericFormTable'>
           <div id='bookmarkName' className='formRow'>
             <label data-l10n-id='nameField' htmlFor='bookmarkName' />
-            <input onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
+            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
           </div>
           {
             !this.isFolder
             ? <div id='bookmarkLocation' className='formRow'>
               <label data-l10n-id='locationField' htmlFor='bookmarkLocation' />
-              <input onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
+              <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
             </div>
             : null
           }

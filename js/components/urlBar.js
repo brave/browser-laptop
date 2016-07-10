@@ -348,6 +348,7 @@ class UrlBar extends ImmutableComponent {
             <span>{this.titleValue}</span>
           </div>
           : <input type='text'
+            spellCheck='false'
             disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
             onFocus={this.onFocus}
             onBlur={this.onBlur}

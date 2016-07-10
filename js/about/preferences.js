@@ -132,7 +132,8 @@ class GeneralTab extends ImmutableComponent {
           </select>
         </SettingItem>
         <SettingItem dataL10nId='myHomepage'>
-          <input data-l10n-id='homepageInput'
+          <input spellCheck='false'
+            data-l10n-id='homepageInput'
             value={getSetting(settings.HOMEPAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
