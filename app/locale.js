@@ -25,6 +25,7 @@ var rendererIdentifiers = function () {
     'copyImageAddress',
     'openImageInNewTab',
     'saveImage',
+    'copyImage',
     'copyLinkAddress',
     'copyEmailAddress',
     'saveLinkAs',
