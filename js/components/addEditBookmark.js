@@ -120,7 +120,11 @@ class AddEditBookmark extends ImmutableComponent {
             </select>
           </div>
           <div className='formRow'>
-            <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
+            {
+              this.props.originalDetail
+              ? <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
+              : null
+            }
             <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
