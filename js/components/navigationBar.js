@@ -36,10 +36,12 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onToggleBookmark (isBookmarked) {
+    const siteDetail = siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK)
     if (isBookmarked) {
-      appActions.removeSite(siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK), siteTags.BOOKMARK)
+      appActions.removeSite(siteDetail, siteTags.BOOKMARK)
     } else {
-      appActions.addSite(siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK), siteTags.BOOKMARK)
+      appActions.addSite(siteDetail, siteTags.BOOKMARK)
+      windowActions.setBookmarkDetail(siteDetail)
     }
   }
 
