@@ -67,6 +67,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   clickSelected (e) {
     this.ctrlKey = e.ctrlKey
     this.metaKey = e.metaKey
+    this.shiftKey = e.shiftKey
     ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
   }
 
@@ -186,15 +187,17 @@ class UrlBarSuggestions extends ImmutableComponent {
       // so remove the meta keys from the real event here.
       e.metaKey = e.metaKey || this.metaKey
       e.ctrlKey = e.ctrlKey || this.ctrlKey
+      e.shiftKey = e.shiftKey || this.shiftKey
       delete this.metaKey
       delete this.ctrlKey
+      delete this.shiftKey
 
       const location = formatUrl(site)
       if (eventUtil.isForSecondaryAction(e)) {
         windowActions.newFrame({
           location,
           partitionNumber: site && site.get && site.get('partitionNumber') || undefined
-        }, false)
+        }, !!e.shiftKey)
         e.preventDefault()
         windowActions.setNavBarFocused(true)
       } else {

@@ -29,7 +29,7 @@ const bookmarkActions = {
         windowActions.newFrame({
           location: bookmarkItem.get('location'),
           partitionNumber: bookmarkItem && bookmarkItem.get && bookmarkItem.get('partitionNumber') || undefined
-        }, false)
+        }, !!e.shiftKey)
       } else {
         windowActions.loadUrl(activeFrame, bookmarkItem.get('location'))
       }

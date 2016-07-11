@@ -115,7 +115,7 @@ class UrlBar extends ImmutableComponent {
             if (e.altKey) {
               windowActions.newFrame({ location }, true)
             } else if (e.metaKey) {
-              windowActions.newFrame({ location }, false)
+              windowActions.newFrame({ location }, !!e.shiftKey)
             } else {
               windowActions.loadUrl(this.props.activeFrameProps, location)
             }
