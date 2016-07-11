@@ -890,6 +890,13 @@ function mainTemplateInit (nodeProps, frame) {
       })
   }
 
+  if (frame.get('location') === 'about:bookmarks') {
+    template.push(
+      CommonMenu.separatorMenuItem,
+      addBookmarkMenuItem('addBookmark'),
+      addFolderMenuItem())
+  }
+
   return template
 }
 
