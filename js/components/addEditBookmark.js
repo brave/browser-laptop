@@ -22,6 +22,7 @@ class AddEditBookmark extends ImmutableComponent {
     this.onClose = this.onClose.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onSave = this.onSave.bind(this)
+    this.onRemoveBookmark = this.onRemoveBookmark.bind(this)
   }
   get isBlankTab () {
     return ['about:blank', 'about:newtab'].includes(this.props.currentDetail.get('location'))
@@ -82,6 +83,10 @@ class AddEditBookmark extends ImmutableComponent {
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
     this.onClose()
   }
+  onRemoveBookmark () {
+    appActions.removeSite(this.props.currentDetail, siteTags.BOOKMARK)
+    this.onClose()
+  }
   get displayBookmarkName () {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
@@ -115,6 +120,7 @@ class AddEditBookmark extends ImmutableComponent {
             </select>
           </div>
           <div className='formRow'>
+            <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
             <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
