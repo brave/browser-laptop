@@ -74,13 +74,6 @@ const init = (settingsState, args) => {
   }
 
   const fileMenu = [
-// Note: we are keeping this here for testing. Calling process.crash() from the inspector does not create a crash report.
-//        {
-//          label: 'Crash!!!!!',
-//          click: function (item, focusedWindow) {
-//            process.crash()
-//          }
-//        },
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
     CommonMenu.newPartitionedTabMenuItem(),
@@ -486,6 +479,29 @@ const init = (settingsState, args) => {
       submenu: helpMenu
     }
   ]
+
+  if (process.env.NODE_ENV === 'development') {
+    template.push({
+      label: 'Debug',
+      submenu: [
+        {
+          // Makes future renderer processes pause when they are created until a debugger appears.
+          // The console will print a message like: [84790:0710/201431:ERROR:child_process.cc(136)] Renderer (84790) paused waiting for debugger to attach. Send SIGUSR1 to unpause.
+          // And this means you should attach Xcode or whatever your debugger is to PID 84790 to unpause.
+          // To debug all renderer processes then add the appendSwitch call to app/index.js
+          label: 'append wait renderer switch',
+          click: function () {
+            electron.app.commandLine.appendSwitch('renderer-startup-dialog')
+          }
+        }, {
+          label: 'Crash main process',
+          click: function (item, focusedWindow) {
+            process.crash()
+          }
+        }
+      ]
+    })
+  }
 
   if (isDarwin) {
     template.unshift({
