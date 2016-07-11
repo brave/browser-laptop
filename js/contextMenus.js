@@ -7,6 +7,7 @@ const remote = electron.remote
 const Menu = remote.Menu
 const Immutable = require('immutable')
 const clipboard = electron.clipboard
+const nativeImage = electron.nativeImage
 const messages = require('./constants/messages')
 const windowStore = require('./stores/windowStore')
 const windowActions = require('./actions/windowActions')
@@ -28,6 +29,8 @@ const getSetting = require('./settings').getSetting
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
+const {getBase64FromImageUrl} = require('./lib/imageUtil')
+const urlParse = require('url').parse
 
 const isDarwin = process.platform === 'darwin'
 
@@ -732,18 +735,39 @@ function mainTemplateInit (nodeProps, frame) {
   }
 
   if (isImage) {
-    template.push({
-      label: locale.translation('openImageInNewTab'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow && nodeProps.srcURL) {
-          // TODO: open this in the next tab instead of last tab
-          focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL)
+    template.push(
+      {
+        label: locale.translation('openImageInNewTab'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow && nodeProps.srcURL) {
+            // TODO: open this in the next tab instead of last tab
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL)
+          }
         }
-      }
-    },
-    saveAsMenuItem('saveImage', nodeProps.srcURL),
-    copyAddressMenuItem('copyImageAddress', nodeProps.srcURL),
-    CommonMenu.separatorMenuItem)
+      },
+      saveAsMenuItem('saveImage', nodeProps.srcURL),
+      {
+        label: locale.translation('copyImage'),
+        click: (item) => {
+          const copyFromDataURL = (dataURL) =>
+            clipboard.write({
+              image: nativeImage.createFromDataURL(dataURL),
+              html: `<img src='${nodeProps.srcURL}'>`,
+              text: nodeProps.srcURL
+            })
+          if (nodeProps.srcURL) {
+            if (urlParse(nodeProps.srcURL).protocol === 'data:') {
+              copyFromDataURL(nodeProps.srcURL)
+            } else {
+              getBase64FromImageUrl(nodeProps.srcURL).then((dataURL) =>
+                copyFromDataURL(dataURL))
+            }
+          }
+        }
+      },
+      copyAddressMenuItem('copyImageAddress', nodeProps.srcURL),
+      CommonMenu.separatorMenuItem
+    )
   }
 
   if (isInputField) {
