@@ -141,7 +141,9 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
     sites = sites.splice(index, 1)
     return sites
   }
-  return sites.setIn([index, 'tags'], tags.toSet().remove(tag).toList())
+  return sites
+    .setIn([index, 'parentFolderId'], 0)
+    .setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
 function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
