@@ -90,4 +90,29 @@ span.browserButton {
     background-color: #ccc;
     font-size: 14px;
   }
+
+  &.tactileButton {
+    display: block;
+    min-width: 80px;
+    height: 2em;
+    line-height: 2em;
+    margin: 0.5em 0;
+    vertical-align: middle;
+    text-align: center;
+    border: solid 1px @braveMediumOrange;
+    background: @braveMediumOrange;
+    border-radius: @borderRadius;
+    color: white;
+    box-shadow: @lightBoxShadow;
+    padding-left: 1em;
+    font-size: 0.9em;
+    font-weight: 400;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+
+    &:hover {
+      color: white;
+    }
+  }
 }
