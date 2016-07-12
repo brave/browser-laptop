@@ -43,6 +43,7 @@ const permissionNames = {
   'pointerLockPermission': 'boolean',
   'fullscreenPermission': 'boolean',
   'openExternalPermission': 'boolean',
+  'protocolRegistrationPermission': 'boolean',
   'flash': 'number'
 }
 
