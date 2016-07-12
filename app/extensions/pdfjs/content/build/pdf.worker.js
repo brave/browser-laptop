@@ -28,8 +28,8 @@ factory((root.pdfjsDistBuildPdfWorker = {}));
   // Use strict in our context only - users might not want it
   'use strict';
 
-var pdfjsVersion = '1.5.294';
-var pdfjsBuild = '64a409b';
+var pdfjsVersion = '1.5.338';
+var pdfjsBuild = '5779432';
 
   var pdfjsFilePath =
     typeof document !== 'undefined' && document.currentScript ?
@@ -3501,10 +3501,7 @@ var createBlob = function createBlob(data, contentType) {
   if (typeof Blob !== 'undefined') {
     return new Blob([data], { type: contentType });
   }
-  // Blob builder is deprecated in FF14 and removed in FF18.
-  var bb = new MozBlobBuilder();
-  bb.append(data);
-  return bb.getBlob(contentType);
+  warn('The "Blob" constructor is not supported.');
 };
 
 var createObjectURL = (function createObjectURLClosure() {
@@ -27897,6 +27894,25 @@ function getFontType(type, subtype) {
   }
 }
 
+// Some bad PDF generators, e.g. Scribus PDF, include glyph names
+// in a 'uniXXXX' format -- attempting to recover proper ones.
+function recoverGlyphName(name, glyphsUnicodeMap) {
+  if (glyphsUnicodeMap[name] !== undefined) {
+    return name;
+  }
+  // The glyph name is non-standard, trying to recover.
+  var unicode = getUnicodeForGlyph(name, glyphsUnicodeMap);
+  if (unicode !== -1) {
+    for (var key in glyphsUnicodeMap) {
+      if (glyphsUnicodeMap[key] === unicode) {
+        return key;
+      }
+    }
+  }
+  info('Unable to recover a standard glyph name for: ' + name);
+  return name;
+}
+
 var Glyph = (function GlyphClosure() {
   function Glyph(fontChar, unicode, accent, width, vmetric, operatorListId,
                  isSpace, isInFont) {
@@ -28156,6 +28172,7 @@ var ProblematicCharRanges = new Int32Array([
   0x2028, 0x2030,
   0x205F, 0x2070,
   0x25CC, 0x25CD,
+  0x3000, 0x3001,
   // Chars that is used in complex-script shaping.
   0xAA60, 0xAA80,
   // Specials Unicode block.
@@ -29977,26 +29994,6 @@ var Font = (function FontClosure() {
         return false;
       }
 
-      // Some bad PDF generators, e.g. Scribus PDF, include glyph names
-      // in a 'uniXXXX' format -- attempting to recover proper ones.
-      function recoverGlyphName(name, glyphsUnicodeMap) {
-        if (glyphsUnicodeMap[name] !== undefined) {
-          return name;
-        }
-        // The glyph name is non-standard, trying to recover.
-        var unicode = getUnicodeForGlyph(name, glyphsUnicodeMap);
-        if (unicode !== -1) {
-          for (var key in glyphsUnicodeMap) {
-            if (glyphsUnicodeMap[key] === unicode) {
-              return key;
-            }
-          }
-        }
-        warn('Unable to recover a standard glyph name for: ' + name);
-        return name;
-      }
-
-
       if (properties.type === 'CIDFontType2') {
         var cidToGidMap = properties.cidToGidMap || [];
         var isCidToGidMapEmpty = cidToGidMap.length === 0;
@@ -30361,7 +30358,7 @@ var Font = (function FontClosure() {
       }
 
       // trying to estimate space character width
-      var possibleSpaceReplacements = ['space', 'minus', 'one', 'i'];
+      var possibleSpaceReplacements = ['space', 'minus', 'one', 'i', 'I'];
       var width;
       for (var i = 0, ii = possibleSpaceReplacements.length; i < ii; i++) {
         var glyphName = possibleSpaceReplacements[i];
@@ -30570,11 +30567,21 @@ function type1FontGlyphMapping(properties, builtInEncoding, glyphNames) {
   }
 
   // Lastly, merge in the differences.
-  var differences = properties.differences;
+  var differences = properties.differences, glyphsUnicodeMap;
   if (differences) {
     for (charCode in differences) {
       var glyphName = differences[charCode];
       glyphId = glyphNames.indexOf(glyphName);
+
+      if (glyphId === -1) {
+        if (!glyphsUnicodeMap) {
+          glyphsUnicodeMap = getGlyphsUnicode();
+        }
+        var standardGlyphName = recoverGlyphName(glyphName, glyphsUnicodeMap);
+        if (standardGlyphName !== glyphName) {
+          glyphId = glyphNames.indexOf(standardGlyphName);
+        }
+      }
       if (glyphId >= 0) {
         charCodeToGlyphId[charCode] = glyphId;
       } else {
@@ -40611,6 +40618,7 @@ var TextWidgetAnnotation = (function TextWidgetAnnotationClosure() {
     WidgetAnnotation.call(this, params);
 
     this.data.textAlignment = Util.getInheritableProperty(params.dict, 'Q');
+    this.data.maxLen = Util.getInheritableProperty(params.dict, 'MaxLen');
   }
 
   Util.inherit(TextWidgetAnnotation, WidgetAnnotation, {
