@@ -1,5 +1,6 @@
 /* global describe, before, it */
 
+const Brave = require('../lib/brave')
 const siteSettings = require('../../js/state/siteSettings')
 const siteUtil = require('../../js/state/siteUtil')
 const assert = require('assert')
@@ -7,6 +8,7 @@ const Immutable = require('immutable')
 let siteSettingsMap = new Immutable.Map()
 
 describe('siteSettings', function () {
+  Brave.beforeAll(this)
   describe('simple URL host pattern', function () {
     before(function () {
       siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https://www.brave.com', 'prop1', 1)
