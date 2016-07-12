@@ -1,0 +1,8 @@
+<Application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <VisualElements
+    BackgroundColor="#404040"
+    ShowNameOnSquare150x150Logo="on"
+    ForegroundText="light"
+    Square70x70Logo="{{braveVersion}}\resources\start-tile-70.png"
+    Square150x150Logo="{{braveVersion}}\resources\start-tile-150.png" />
+</Application>
