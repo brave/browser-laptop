@@ -26,6 +26,7 @@
     "start": "node ./tools/start.js --debug=5858 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')",
+    "update-pdfjs": "rm -r app/extensions/pdfjs/; cp -r ../pdf.js/build/chromium/ app/extensions/pdfjs/",
     "vagrant-destroy-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant destroy",
     "vagrant-halt-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant halt",
     "vagrant-rsync-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant rsync-auto",
