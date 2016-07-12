@@ -332,3 +332,26 @@
 .pinnedTabs {
   margin-left: 9px;
 }
+
+.segmentedControl {
+  width: 30%;
+  border: solid 1px @braveOrange;
+  border-radius: @borderRadius;
+  margin: 0 auto 20px;
+  height: 2em;
+}
+
+.segmentedControl > div {
+  color: @braveOrange;
+  text-align: center;
+  display: inline-block;
+  width: 50%;
+  height: 2em;
+  line-height: 2em;
+  cursor: pointer;
+}
+
+.segmentedControl > div.selected {
+  color: white;
+  background: @braveOrange;
+}

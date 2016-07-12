@@ -1,0 +1,113 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "variables.less";
+
+.modal {
+  opacity: 1;
+  position: fixed;
+  background: @white50;
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 8999;
+
+  &.fade {
+    transition: @transitionFast;
+  }
+
+  &.hidden {
+    opacity: 0;
+    z-index: -1;
+  }
+
+  .modal {
+    background: transparent;
+
+    .dialog {
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+
+      button.close {
+        margin-top: -8px;
+        margin-right: -8px;
+        span {
+          font-size: 1.5em;
+          color: @highlightBlue;
+        }
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: none;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .dialog {
+    position: fixed;
+    width: 90%;
+    left: 5%;
+    top: 15%;
+    background: white;
+    border: solid 1px @lightGray;
+    border-radius: @borderRadius;
+    box-shadow: @boxShadow;
+    z-index: 9000;
+    padding: 20px;
+    box-sizing: border-box;
+
+    &.fade {
+      transition: @transitionFast;
+    }
+
+    .settingsListTitle:first-of-type {
+      margin-bottom: 10px;
+    }
+
+    .settingsListLabel {
+      font-size: 0.75em;
+      margin-top: 0.5em;
+    }
+  }
+
+  button {
+    &:extend(.tactileButton);
+
+    &.close {
+      display: inline-block;
+      background: none;
+      height: 2em;
+      width: 2em;
+      min-width: 2em;
+      cursor: pointer;
+      border: none;
+      box-shadow: none;
+
+      span {
+        font-size: 2em;
+        color: @braveOrange;
+      }
+    }
+
+    &.alt {
+      background: @gray;
+      border: solid 1px @gray;
+    }
+  }
+}

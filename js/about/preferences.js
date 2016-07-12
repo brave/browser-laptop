@@ -6,6 +6,7 @@
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
+const SwitchControl = require('../components/switchControl')
 const cx = require('../lib/classSet.js')
 const { getZoomValuePercentage } = require('../lib/zoom')
 const config = require('../constants/config')
@@ -32,6 +33,8 @@ const isWindows = navigator.platform && navigator.platform.includes('Win')
 const hintCount = 3
 
 // Stylesheets
+
+require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -49,7 +52,7 @@ const permissionNames = {
 
 const changeSetting = (cb, key, e) => {
   if (e.target.type === 'checkbox') {
-    cb(key, e.target.checked)
+    cb(key, e.target.value)
   } else {
     let value = e.target.value
     if (e.target.dataset && e.target.dataset.type === 'number') {
@@ -96,12 +99,10 @@ class SettingItem extends ImmutableComponent {
 class SettingCheckbox extends ImmutableComponent {
   render () {
     return <div style={this.props.style} className='settingItem'>
-      <span className='checkboxContainer'>
-        <input type='checkbox' id={this.props.prefKey}
-          disabled={this.props.disabled}
-          onChange={this.props.onChange ? this.props.onChange : changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
-          checked={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
-      </span>
+      <SwitchControl id={this.props.prefKey}
+        disabled={this.props.disabled}
+        onClick={this.props.onChange ? this.props.onChange : changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
+        checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
       {this.props.options}
     </div>
@@ -288,7 +289,7 @@ class SitePermissionsPage extends React.Component {
   }
 }
 
-class PrivacyTab extends ImmutableComponent {
+class ShieldsTab extends ImmutableComponent {
   constructor () {
     super()
     this.onChangeAdControl = this.onChangeAdControl.bind(this)
@@ -315,10 +316,10 @@ class PrivacyTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(cookieblock, e.target.value === 'block3rdPartyCookie')
   }
   onToggleSetting (setting, e) {
-    aboutActions.setResourceEnabled(setting, e.target.checked)
+    aboutActions.setResourceEnabled(setting, e.target.value)
   }
   render () {
-    return <div>
+    return <div id='shieldsContainer'>
       <SettingsList dataL10nId='braveryDefaults'>
         <SettingItem dataL10nId='adControl'>
           <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
@@ -347,7 +348,7 @@ class PrivacyTab extends ImmutableComponent {
 
 class SecurityTab extends ImmutableComponent {
   onToggleFlash (e) {
-    aboutActions.setResourceEnabled(flash, e.target.checked)
+    aboutActions.setResourceEnabled(flash, e.target.value)
   }
   render () {
     return <div>
@@ -415,15 +416,7 @@ class AdvancedTab extends ImmutableComponent {
   }
 }
 
-class BraveryTab extends ImmutableComponent {
-  render () {
-    return <div>
-      Bravery settings coming soon
-    </div>
-  }
-}
-
-class TopBarButton extends ImmutableComponent {
+class PreferenceNavigationButton extends ImmutableComponent {
   render () {
     return <div className={cx({
       selected: this.props.selected,
@@ -435,6 +428,7 @@ class TopBarButton extends ImmutableComponent {
           fa: true,
           [this.props.icon]: true
         })}>
+        <i className={this.props.icon.replace('fa-', 'i-')} />
         <div className='tabMarkerText'
           data-l10n-id={this.props.dataL10nId} />
       </div>
@@ -465,47 +459,42 @@ class HelpfulHints extends ImmutableComponent {
   }
 }
 
-class TopBar extends ImmutableComponent {
+class PreferenceNavigation extends ImmutableComponent {
   render () {
     return <div className='prefAside'>
       <div data-l10n-id='prefAsideTitle' />
-      <TopBarButton icon='fa-list-alt'
+      <PreferenceNavigationButton icon='fa-list-alt'
         dataL10nId='general'
         onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}
         selected={this.props.preferenceTab === preferenceTabs.GENERAL}
       />
-      <TopBarButton icon='fa-search'
+      <PreferenceNavigationButton icon='fa-search'
         dataL10nId='search'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SEARCH)}
         selected={this.props.preferenceTab === preferenceTabs.SEARCH}
       />
-      <TopBarButton icon='fa-bookmark-o'
+      <PreferenceNavigationButton icon='fa-bookmark-o'
         dataL10nId='tabs'
         onClick={this.props.changeTab.bind(null, preferenceTabs.TABS)}
         selected={this.props.preferenceTab === preferenceTabs.TABS}
       />
-      <TopBarButton icon='fa-refresh'
-        dataL10nId='sync'
-        className='notImplemented'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
-        selected={this.props.preferenceTab === preferenceTabs.SYNC}
-      />
-      <TopBarButton icon='fa-user'
-        dataL10nId='privacy'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.PRIVACY)}
-        selected={this.props.preferenceTab === preferenceTabs.PRIVACY}
-      />
-      <TopBarButton icon='fa-lock'
+      <PreferenceNavigationButton icon='fa-lock'
         dataL10nId='security'
         onClick={this.props.changeTab.bind(null, preferenceTabs.SECURITY)}
         selected={this.props.preferenceTab === preferenceTabs.SECURITY}
       />
-      <TopBarButton onClick={this.props.changeTab.bind(null, preferenceTabs.BRAVERY)}
-        dataL10nId='bravery'
-        className='notImplemented'
-        selected={this.props.preferenceTab === preferenceTabs.BRAVERY}
+      <PreferenceNavigationButton icon='fa-user'
+        dataL10nId='shields'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.SHIELDS)}
+        selected={this.props.preferenceTab === preferenceTabs.SHIELDS}
       />
-      <TopBarButton icon='fa-tasks'
+      <PreferenceNavigationButton icon='fa-refresh'
+        className='notImplemented'
+        dataL10nId='sync'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
+        selected={this.props.preferenceTab === preferenceTabs.SYNC}
+      />
+      <PreferenceNavigationButton icon='fa-server'
         dataL10nId='advanced'
         onClick={this.props.changeTab.bind(null, preferenceTabs.ADVANCED)}
         selected={this.props.preferenceTab === preferenceTabs.ADVANCED}
@@ -604,21 +593,18 @@ class AboutPreferences extends React.Component {
       case preferenceTabs.SYNC:
         tab = <SyncTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
-      case preferenceTabs.PRIVACY:
-        tab = <PrivacyTab settings={settings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
+      case preferenceTabs.SHIELDS:
+        tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />
-        break
-      case preferenceTabs.BRAVERY:
-        tab = <BraveryTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.ADVANCED:
         tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />
         break
     }
     return <div>
-      <TopBar preferenceTab={this.state.preferenceTab} hintNumber={this.state.hintNumber}
+      <PreferenceNavigation preferenceTab={this.state.preferenceTab} hintNumber={this.state.hintNumber}
         changeTab={this.changeTab.bind(this)}
         refreshHint={this.refreshHint.bind(this)}
         getNextHintNumber={this.getNextHintNumber.bind(this)} />

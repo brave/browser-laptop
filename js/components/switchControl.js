@@ -5,8 +5,6 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet')
-const ipc = require('electron').ipcRenderer
-const messages = require('../constants/messages')
 
 /**
  * Represents an on/off switch control
@@ -15,7 +13,6 @@ class SwitchControl extends ImmutableComponent {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
-    this.onInfoClick = this.onInfoClick.bind(this)
   }
   onClick () {
     this.props.onClick({
@@ -23,11 +20,6 @@ class SwitchControl extends ImmutableComponent {
         value: !this.props.checkedOn
       }
     })
-  }
-  onInfoClick () {
-    if (this.props.infoUrl) {
-      ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, this.props.infoUrl)
-    }
   }
   render () {
     return <div className={cx({
@@ -65,7 +57,7 @@ class SwitchControl extends ImmutableComponent {
           ? <span className='switchControlRightText' data-l10n-id={this.props.rightl10nId} />
           : null}
           {this.props.rightl10nId && this.props.infoUrl
-          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId} /><span className='fa fa-question-circle info clickable' onClick={this.onInfoClick} /></div>
+          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId} /><span className='fa fa-question-circle info clickable' /></div>
           : null}
         </div>
       }

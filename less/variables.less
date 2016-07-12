@@ -7,6 +7,8 @@
 @borderRadius: 4px;
 @borderRadiusTabs: 4px;
 @borderRadiusURL: 4px;
+@bigBorderRadius: 16px;
+@fullBorderRadius: 1000px;
 @privateTabBackground: #392e54;
 
 @chromePrimary: #F3F3F3;
@@ -36,11 +38,10 @@
 @loadTimeColor: @highlightBlue;
 @activeTabDefaultColor: @chromePrimary;
 @buttonColor: #5a5a5a;
-@braveOrange: #FF5000;
+@braveOrange: rgb(255, 80, 0);
+@braveMediumOrange: rgb(232, 72, 0);
+@braveDarkOrange: #D44600;
 @dragSpacing: 50px;
-
-@breakpointNarrowViewport: 600px;
-@transitionDuration: 200ms;
 
 @navbarHeight: 36px;
 @tabsToolbarHeight: 23px;
@@ -57,15 +58,26 @@
 @carotRadius: 8px;
 @sideBarWidth: 200px;
 
+@veryLightGray: rgb(250, 250, 248);
+@lightGray: rgb(238, 236, 236);
 @gray: rgb(153, 153, 153);
 @mediumGray: rgb(101, 101, 101);
 @darkGray: rgb(68, 68, 68);
 
-@gray30: rgba(116, 116, 130, 0.3);
+@white25: rgba(255, 255, 255, 0.25);
+@white50: rgba(255, 255, 255, 0.5);
+@gray25: rgba(116, 116, 130, 0.25);
+@gray50: rgba(116, 116, 130, 0.5);
+@black10: rgba(0, 0, 0, 0.1);
 @black25: rgba(0, 0, 0, 0.25);
-@white60: rgba(255, 255, 255, 0.6);
+@black50: rgba(0, 0, 0, 0.5);
 
+@boxShadow: 0 0 10px @black25;
+@softBoxShadow: 0 4px 8px @lightGray;
+@lightBoxShadow: 0 2px 2px @lightGray;
 @insetShadow: inset -5px 0 15px @black25;
+
+@orangeButtonShadow: 0 2px 0 @braveDarkOrange;
 
 @zindexWindowNotActive: 900;
 @zindexWindow: 1000;
@@ -89,6 +101,16 @@
 
 @zindexWindowFullScreen: 4000;
 @zindexWindowFullScreenBanner: 4100;
+
+@breakpointNarrowViewport: 600px;
+@transitionDuration: 200ms;
+
+@transition: all 600ms linear;
+@transitionFast: all 200ms linear;
+@transitionSlow: all 1s linear;
+@transitionEase: all 600ms ease;
+@transitionFastEase: all 200ms ease;
+@transitionSlowEase: all 1s ease;
 
 :root {
   --navbar-height: @navbarHeight;
