@@ -8,7 +8,6 @@ const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 const remote = electron.remote
-const fs = require('fs')
 
 // Actions
 const windowActions = require('../actions/windowActions')
@@ -172,64 +171,8 @@ class Main extends ImmutableComponent {
   }
 
   componentDidMount () {
-    ipc.send(messages.WEB_CONTENTS_INITIALIZED)
-
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
-
-    ipc.on(messages.DOWNLOAD_DATAFILE, (event, url, nonce, headers, path) => {
-      let msg = messages.DOWNLOAD_DATAFILE_DONE + nonce
-      let args = {}
-      let stream = fs.createWriteStream(path)
-      function pump (reader) {
-        return reader.read().then((result) => {
-          if (result.done) {
-            stream.end()
-          } else {
-            const chunk = result.value
-            // Convert Uint8Array to node buffer
-            const buf = Buffer.from(chunk.buffer)
-            stream.write(buf)
-            return pump(reader)
-          }
-        }).catch((e) => {
-          ipc.send(msg, args, e.message)
-          stream.end()
-        })
-      }
-      window.fetch(url, {headers: headers}).then((response) => {
-        args.statusCode = response.status
-        if (response.status !== 200) {
-          ipc.send(msg, args)
-          return
-        }
-        let reader = response.body.getReader()
-        args.etag = response.headers.get('etag')
-        stream.on('close', () => {
-          ipc.send(msg, args)
-        })
-        return pump(reader)
-      }).catch((e) => {
-        ipc.send(msg, {}, e.message)
-        stream.end()
-      })
-    })
-
-    ipc.on(messages.SEND_XHR_REQUEST, (event, url, nonce, headers) => {
-      const xhr = new window.XMLHttpRequest()
-      xhr.open('GET', url)
-      if (headers) {
-        for (let name in headers) {
-          xhr.setRequestHeader(name, headers[name])
-        }
-      }
-      xhr.send()
-      xhr.onload = () => {
-        ipc.send(messages.GOT_XHR_RESPONSE + nonce,
-                 {statusCode: xhr.status},
-                 xhr.responseText)
-      }
-    })
 
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
