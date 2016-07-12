@@ -340,6 +340,10 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
+      const currentWindow = require('electron').remote.getCurrentWindow()
+      if (currentWindow && currentWindow.isFullScreen()) {
+        currentWindow.setFullScreen(false)
+      }
       // Use the frameProps we passed in, or default to the active frame
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
       const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(windowState)
