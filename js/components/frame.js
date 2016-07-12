@@ -781,7 +781,7 @@ class Frame extends ImmutableComponent {
 
   onFindHide () {
     windowActions.setFindbarShown(this.props.frame, false)
-    this.onClearMatch()
+    this.webview.stopFindInPage('keepSelection')
   }
 
   onUpdateWheelZoom () {
