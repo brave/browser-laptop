@@ -1,7 +1,12 @@
 #Directory Structure
 
-- `app`: Code that runs in the main process. This includes the top level menu, shortcut handling, and contains other resources which need to be accessed from the main process.
+- `app`: Container for all app runtime code
+  - `browser`: Code that runs in the main process. This includes the top level menu, shortcut handling, and contains other resources which need to be accessed from the main process. Files in this directory can use `require('electron')` for most electron APIs and `ipcMain` for IPC calls.
+  - `renderer`: Code that runs in the renderer processes. It should be primarily UI related code for the main browser windows. Files in this directory must use `global.require('electron').remote` and for most electron APIs and `ipcRenderer` for IPC calls.
+  - `common`: Code that is shared by the browser and renderer process. This includes things like utility functions, constants and actions. Stores can live in either the browser or the renderer process, but should not be shared becuase the renderer processes are short-lived compared to the browser process and therefore won't receive the same set of updates. Files in the common directory should avoid using electron APIs, but if it is necessary they must do a process type check and either `require('electron')` or `global.require('electron').remote` as appropriate.
 
+#Deprecated Directory Structure
+- `app`: Code that runs in the main process. This includes the top level menu, shortcut handling, and contains other resources which need to be accessed from the main process.
   - `content`: Content scripts which run in content of webpages before the actual web pages load.  They need to be accessible outside of webpack by the main process, they are a bit out of place here.
   - `ext`: Third party resources which are excluded from the linter.
 
