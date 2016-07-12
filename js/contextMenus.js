@@ -917,8 +917,12 @@ function mainTemplateInit (nodeProps, frame) {
   if (frame.get('location') === 'about:bookmarks') {
     template.push(
       CommonMenu.separatorMenuItem,
-      addBookmarkMenuItem('addBookmark'),
-      addFolderMenuItem())
+      addBookmarkMenuItem('addBookmark', {
+        location: nodeProps.linkURL,
+        tags: [siteTags.BOOKMARK]
+      }),
+      addFolderMenuItem()
+    )
   }
 
   return template
