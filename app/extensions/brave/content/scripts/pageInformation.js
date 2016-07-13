@@ -97,7 +97,9 @@
           break
 
         case 'Identifier':
-          return (computed ? expr.name : context[expr.name])
+          value = computed ? expr.name : context[expr.name]
+          if (value !== 'eval') return value
+          throw new Error('eval not allowed in expression')
 
         case 'Literal':
           return expr.value
