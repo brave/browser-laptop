@@ -14,6 +14,8 @@ const aboutActions = require('./aboutActions')
 const dndData = require('../dndData')
 const cx = require('../lib/classSet.js')
 
+const ipc = window.chrome.ipc
+
 // Stylesheets
 require('../../less/about/itemList.less')
 require('../../less/about/bookmarks.less')
@@ -183,14 +185,14 @@ class AboutBookmarks extends React.Component {
     super()
     this.onChangeSelectedFolder = this.onChangeSelectedFolder.bind(this)
     this.state = {
-      bookmarks: window.initBookmarks ? Immutable.fromJS(window.initBookmarks) : Immutable.Map(),
-      bookmarkFolders: window.initBookmarkFolders ? Immutable.fromJS(window.initBookmarkFolders) : Immutable.Map(),
+      bookmarks: Immutable.Map(),
+      bookmarkFolders: Immutable.Map(),
       selectedFolderId: 0
     }
-    window.addEventListener(messages.BOOKMARKS_UPDATED, (e) => {
+    ipc.on(messages.BOOKMARKS_UPDATED, (e, detail) => {
       this.setState({
-        bookmarks: Immutable.fromJS(e.detail && e.detail.bookmarks || {}),
-        bookmarkFolders: Immutable.fromJS(e.detail && e.detail.bookmarkFolders || {})
+        bookmarks: Immutable.fromJS(detail && detail.bookmarks || {}),
+        bookmarkFolders: Immutable.fromJS(detail && detail.bookmarkFolders || {})
       })
     })
   }

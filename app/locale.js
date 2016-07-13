@@ -9,6 +9,7 @@ const path = require('path')
 const ipcMain = require('electron').ipcMain
 const electron = require('electron')
 const app = electron.app
+const {LANGUAGE, REQUEST_LANGUAGE} = require('../js/constants/messages')
 
 // Exhaustive list of identifiers used by top and context menus
 var rendererIdentifiers = function () {
@@ -288,9 +289,10 @@ if (ipcMain) {
     event.returnValue = translations
   })
 
+  // TODO: There shouldn't need to be a REQUEST_LANGUAGE event at all
   // Respond to requests for the currently configured language code
-  ipcMain.on('request-language', function (event) {
-    event.sender.send('language', {
+  ipcMain.on(REQUEST_LANGUAGE, function (event) {
+    event.sender.send(LANGUAGE, {
       langCode: lang,
       languageCodes: availableLanguages
     })

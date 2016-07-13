@@ -7,6 +7,8 @@ const ImmutableComponent = require('../components/immutableComponent')
 const messages = require('../constants/messages')
 const aboutActions = require('./aboutActions')
 
+const ipc = window.chrome.ipc
+
 require('../../less/about/flash.less')
 
 const isDarwin = window.navigator.platform === 'MacIntel'
@@ -15,15 +17,14 @@ class FlashPlaceholder extends ImmutableComponent {
   // TODO: Show placeholder telling user how to enable flash if it's not
   constructor () {
     super()
-    const braveryDefaults = window.initBraveryDefaults
     this.onContextMenu = this.onContextMenu.bind(this)
     this.onPrefsClick = this.onPrefsClick.bind(this)
     this.state = {
-      flashEnabled: braveryDefaults && braveryDefaults.flash ? braveryDefaults.flash.enabled : this.flashEnabled
+      flashEnabled: this.flashEnabled
     }
-    window.addEventListener(messages.BRAVERY_DEFAULTS_UPDATED, (e) => {
+    ipc.on(messages.BRAVERY_DEFAULTS_UPDATED, (e, braveryDefaults) => {
       this.setState({
-        flashEnabled: e.detail && e.detail.flash && e.detail.flash.enabled
+        flashEnabled: braveryDefaults && braveryDefaults.flash && braveryDefaults.flash.enabled
       })
     })
   }

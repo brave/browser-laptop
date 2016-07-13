@@ -86,7 +86,7 @@ class Frame extends ImmutableComponent {
     // send state to about pages
     let aboutDetails = this.props.frame.get('aboutDetails')
     if (this.isAboutPage() && aboutDetails) {
-      this.webview.send('state-updated', aboutDetails.toJS())
+      this.webview.send(messages.STATE_UPDATED, aboutDetails.toJS())
     }
   }
 

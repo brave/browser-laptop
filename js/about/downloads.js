@@ -10,6 +10,8 @@ const messages = require('../constants/messages')
 const aboutActions = require('./aboutActions')
 const downloadUtil = require('../state/downloadUtil')
 
+const ipc = window.chrome.ipc
+
 // Stylesheets
 require('../../less/about/itemList.less')
 require('../../less/about/downloads.less')
@@ -56,11 +58,11 @@ class AboutDownloads extends React.Component {
   constructor () {
     super()
     this.state = {
-      downloads: window.initDownloads ? Immutable.fromJS(window.initDownloads) : Immutable.Map()
+      downloads: Immutable.Map()
     }
-    window.addEventListener(messages.DOWNLOADS_UPDATED, (e) => {
+    ipc.on(messages.DOWNLOADS_UPDATED, (e, detail) => {
       this.setState({
-        downloads: Immutable.fromJS(e.detail && e.detail.downloads || {})
+        downloads: Immutable.fromJS(detail && detail.downloads || {})
       })
     })
   }
