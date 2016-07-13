@@ -30,6 +30,7 @@ const alphaPath = path.join(app.getPath('userData'), 'ledger-alpha.json')
 // TBD: remove these post beta [MTR]
 const logPath = path.join(app.getPath('userData'), 'ledger-log.json')
 const publisherPath = path.join(app.getPath('userData'), 'ledger-publisher.json')
+const scoresPath = path.join(app.getPath('userData'), 'ledger-scores.json')
 
 // TBD: move this into appStore.getState().get(‘ledger.client’) [MTR]
 const statePath = path.join(app.getPath('userData'), 'ledger-state.json')
@@ -340,6 +341,7 @@ var publisherNormalizer = () => {
   })
 
   syncWriter(publisherPath, data, () => {})
+  syncWriter(scoresPath, synopsis.allN(), () => {})
 
   return data
 }
