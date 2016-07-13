@@ -137,6 +137,20 @@ const UrlUtil = {
   },
 
   /**
+   * Checks if a URL has a given file type.
+   * @param {string} url - URL to check
+   * @param {string} ext - File extension
+   * @return {boolean}
+   */
+  isFileType: function (url, ext) {
+    const pathname = urlParse(url).pathname
+    if (!pathname) {
+      return false
+    }
+    return pathname.toLowerCase().endsWith('.' + ext)
+  },
+
+  /**
    * Checks if a URL is a view-source URL.
    * @param {String} input The input URL.
    * @returns {Boolean} Whether or not this is a view-source URL.

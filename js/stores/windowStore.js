@@ -327,6 +327,10 @@ const doAction = (action) => {
       } else if (action.frameOpts.isPartitioned) {
         nextPartitionNumber = incrementPartitionNumber()
       }
+      if (action.frameOpts.location && UrlUtil.isFileType(action.frameOpts.location, 'pdf')) {
+        // Workaround #2427
+        action.frameOpts.location = 'chrome-extension://adnmjfhcejodgpaljdmlmjoclihpcfka/' + action.frameOpts.location
+      }
       windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
         nextKey, nextPartitionNumber, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
       if (action.openInForeground) {

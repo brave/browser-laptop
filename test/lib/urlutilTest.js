@@ -62,6 +62,24 @@ describe('urlutil', function () {
     })
   })
 
+  describe('isFileType', function () {
+    it('relative file', function * () {
+      assert.equal(UrlUtil.isFileType('/file/abc/test.pdf', 'pdf'), true)
+    })
+    it('relative path', function * () {
+      assert.equal(UrlUtil.isFileType('/file/abc/test', 'pdf'), false)
+    })
+    it('JPG URL', function * () {
+      assert.equal(UrlUtil.isFileType('http://example.com/test/ABC.JPG?a=b#test', 'jpg'), true)
+    })
+    it('non-JPG URL', function * () {
+      assert.equal(UrlUtil.isFileType('http://example.com/test/jpg', 'jpg'), false)
+    })
+    it('invalid URL', function * () {
+      assert.equal(UrlUtil.isFileType('foo', 'jpg'), false)
+    })
+  })
+
   describe('getHostnamePatterns', function () {
     it('gets bare domain hostname patterns', function () {
       // XXX: *.com probably should be excluded
