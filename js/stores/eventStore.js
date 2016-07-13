@@ -83,22 +83,22 @@ const doAction = (action) => {
   switch (action.actionType) {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
       // create a page view event if this is a page load on the active tabId
-      if (action.frameProps.get('tabId') === lastActiveTabId) {
-        addPageView(action.frameProps.get('src'))
+      if (!lastActiveTabId || action.frameProps.get('tabId') === lastActiveTabId) {
+        addPageView(action.frameProps.get('location'))
       }
 
-      if (action.isError || isSourceAboutUrl(action.frameProps.get('src'))) {
+      if (action.isError || isSourceAboutUrl(action.frameProps.get('location'))) {
         break
       }
 
       let pageLoadEvent = Immutable.fromJS({
         timestamp: new Date().getTime(),
-        url: action.frameProps.get('src')
+        url: action.frameProps.get('location')
       })
       eventState = eventState.set('page_load', eventState.get('page_load').push(pageLoadEvent))
       break
     case WindowConstants.WINDOW_SET_FOCUSED_FRAME:
-      addPageView(action.frameProps.get('src'))
+      addPageView(action.frameProps.get('location'))
       lastActiveTabId = action.frameProps.get('tabId')
       break
     case AppConstants.APP_CLOSE_WINDOW:
