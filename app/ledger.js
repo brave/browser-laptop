@@ -271,16 +271,17 @@ var run = (delayTime) => {
 var synopsisNormalizer = () => {
   var i, duration, n, pct, publisher, results, total
   var data = []
+  var scorekeeper = synopsis.options.scorekeeper
 
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
-  results = underscore.sortBy(results, (entry) => { return -entry.score })
+  results = underscore.sortBy(results, (entry) => { return -entry.scores[scorekeeper] })
   n = results.length
 
   total = 0
-  for (i = 0; i < n; i++) { total += results[i].score }
+  for (i = 0; i < n; i++) { total += results[i].scores[scorekeeper] }
   if (total === 0) return data
 
   pct = []
@@ -297,7 +298,7 @@ var synopsisNormalizer = () => {
     // TBD: remove after post-beta... [MTR]
     if (!data[i].publisherURL) data[i].publisherURL = 'http://' + results[i].publisher
 
-    pct[i] = Math.round((results[i].score * 100) / total)
+    pct[i] = Math.round((results[i].scores[scorekeeper] * 100) / total)
 
     if (duration >= msecs.day) {
       data[i].daysSpent = Math.max(Math.round(duration / msecs.day), 1)
