@@ -1,5 +1,6 @@
 const ReactDOM = require('react-dom')
 const { getSourceAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
+const ipc = window.chrome.ipc
 
 let element
 
@@ -36,10 +37,10 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
 }
 
 if (element) {
-  let component = ReactDOM.render(element, document.querySelector('#appContainer'))
-  window.aboutDetails && component.setState(window.aboutDetails)
-  delete window.aboutDetails
-  window.addEventListener('state-updated', function (e) {
-    component.setState(e.detail)
+  const component = ReactDOM.render(element, document.querySelector('#appContainer'))
+  ipc.on('state-updated', (e, detail) => {
+    if (detail) {
+      component.setState(detail)
+    }
   })
 }

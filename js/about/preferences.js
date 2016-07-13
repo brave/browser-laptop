@@ -29,6 +29,8 @@ const flash = appConfig.resourceNames.FLASH
 const isDarwin = navigator.platform === 'MacIntel'
 const isWindows = navigator.platform && navigator.platform.includes('Win')
 
+const ipc = window.chrome.ipc
+
 // TODO: Determine this from the l20n file automatically
 const hintCount = 3
 
@@ -511,33 +513,30 @@ class AboutPreferences extends React.Component {
     this.state = {
       preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
-      languageCodes: window.languageCodes ? Immutable.fromJS(window.languageCodes) : Immutable.Map(),
+      languageCodes: Immutable.Map(),
       flashInstalled: false,
-      settings: window.initSettings ? Immutable.fromJS(window.initSettings) : Immutable.Map(),
-      siteSettings: window.initSiteSettings ? Immutable.fromJS(window.initSiteSettings) : Immutable.Map(),
-      braveryDefaults: window.initBraveryDefaults ? Immutable.fromJS(window.initBraveryDefaults) : Immutable.Map()
+      settings: Immutable.Map(),
+      siteSettings: Immutable.Map(),
+      braveryDefaults: Immutable.Map()
     }
     aboutActions.checkFlashInstalled()
-    window.addEventListener(messages.SETTINGS_UPDATED, (e) => {
-      this.setState({
-        settings: Immutable.fromJS(e.detail || {})
-      })
+
+    ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
+      this.setState({ settings: Immutable.fromJS(settings || {}) })
     })
-    window.addEventListener(messages.SITE_SETTINGS_UPDATED, (e) => {
-      this.setState({
-        siteSettings: Immutable.fromJS(e.detail || {})
-      })
+    ipc.on(messages.SITE_SETTINGS_UPDATED, (e, siteSettings) => {
+      this.setState({ siteSettings: Immutable.fromJS(siteSettings || {}) })
     })
-    window.addEventListener(messages.BRAVERY_DEFAULTS_UPDATED, (e) => {
-      this.setState({
-        braveryDefaults: Immutable.fromJS(e.detail || {})
-      })
+    ipc.on(messages.BRAVERY_DEFAULTS_UPDATED, (e, braveryDefaults) => {
+      this.setState({ braveryDefaults: Immutable.fromJS(braveryDefaults || {}) })
     })
-    window.addEventListener(messages.FLASH_UPDATED, (e) => {
-      this.setState({
-        flashInstalled: e.detail
-      })
+    ipc.on(messages.FLASH_UPDATED, (e, flashInstalled) => {
+      this.setState({ flashInstalled })
     })
+    ipc.on(messages.LANGUAGE, (e, {languageCodes}) => {
+      this.setState({ languageCodes })
+    })
+    ipc.send(messages.REQUEST_LANGUAGE)
     this.onChangeSetting = this.onChangeSetting.bind(this)
   }
 

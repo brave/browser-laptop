@@ -132,7 +132,11 @@ const messages = {
   // Extensions
   NEW_POPUP_WINDOW: _,
   // NoScript
-  TEMPORARY_ALLOW_SCRIPTS: _ /** @arg {string} origin to allow scripts on */
+  TEMPORARY_ALLOW_SCRIPTS: _, /** @arg {string} origin to allow scripts on */
+  // Localization
+  LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
+  REQUEST_LANGUAGE: _,
+  STATE_UPDATED: _
 }
 
 module.exports = mapValuesByKeys(messages)

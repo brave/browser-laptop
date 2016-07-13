@@ -40,20 +40,10 @@
     };
     img.src = 'img/favicon.ico';
   }
-
-  var stateUpdateListener = function (e) {
-    window.removeEventListener('state-updated', stateUpdateListener)
-    window.aboutDetails = e.detail
-  }
-  window.addEventListener('state-updated', stateUpdateListener)
-
-
-  window.addEventListener('language', function (evt) {
-    document.l10n.requestLanguages([evt.detail.langCode])
-    document.getElementsByName('availableLanguages')[0].content = evt.detail.languageCodes.join(', ')
-    window.languageCodes = evt.detail.languageCodes
+  chrome.ipc.on('language', (e, detail) => {
+    document.l10n.requestLanguages([detail.langCode])
+    document.getElementsByName('availableLanguages')[0].content = detail.languageCodes.join(', ')
   })
-
   window.addEventListener('load', function () {
     var po = document.createElement('script')
     po.async = true

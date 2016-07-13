@@ -7,6 +7,8 @@ const messages = require('../constants/messages')
 const Immutable = require('immutable')
 const aboutActions = require('./aboutActions')
 
+const ipc = window.chrome.ipc
+
 require('../../less/about/passwords.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -68,20 +70,19 @@ class PasswordItem extends React.Component {
     }
   }
 
-  onDecrypt (e) {
-    if (e.detail.id !== this.props.id) {
+  onDecrypt (e, details) {
+    if (details.id !== this.props.id) {
       return
     }
-    e.stopPropagation()
-    aboutActions.setClipboard(e.detail.decrypted)
+    aboutActions.setClipboard(details.decrypted)
     aboutActions.showNotification('passwordCopied')
     this.setState({
-      decrypted: e.detail.decrypted
+      decrypted: details.decrypted
     })
   }
 
   componentDidMount () {
-    window.addEventListener('decrypted-password', this.onDecrypt)
+    ipc.on('decrypted-password', this.onDecrypt)
   }
 
   render () {
@@ -115,21 +116,21 @@ class AboutPasswords extends React.Component {
   constructor () {
     super()
     this.state = {
-      passwordDetails: window.initPasswords ? Immutable.fromJS(window.initPasswords) : new Immutable.List(),
-      disabledSiteDetails: window.initDisabledSites ? Immutable.fromJS(window.initDisabledSites) : new Immutable.Map()
+      passwordDetails: new Immutable.List(),
+      disabledSiteDetails: new Immutable.Map()
     }
     this.onClear = this.onClear.bind(this)
-    window.addEventListener(messages.PASSWORD_DETAILS_UPDATED, (e) => {
-      if (e.detail) {
+    ipc.on(messages.PASSWORD_DETAILS_UPDATED, (e, detail) => {
+      if (detail) {
         this.setState({
-          passwordDetails: Immutable.fromJS(e.detail)
+          passwordDetails: Immutable.fromJS(detail)
         })
       }
     })
-    window.addEventListener(messages.PASSWORD_SITE_DETAILS_UPDATED, (e) => {
-      if (e.detail) {
+    ipc.on(messages.PASSWORD_SITE_DETAILS_UPDATED, (e, detail) => {
+      if (detail) {
         this.setState({
-          disabledSiteDetails: Immutable.fromJS(e.detail)
+          disabledSiteDetails: Immutable.fromJS(detail)
         })
       }
     })
