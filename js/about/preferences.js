@@ -7,6 +7,7 @@ const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
+const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet.js')
 const { getZoomValuePercentage } = require('../lib/zoom')
 const config = require('../constants/config')
@@ -20,6 +21,8 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
+const tableSort = require('tablesort')
+const pad = require('underscore.string/pad')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -127,9 +130,122 @@ class SettingCheckbox extends ImmutableComponent {
   }
 }
 
+class LedgerTableRow extends ImmutableComponent {
+  getFormattedTime () {
+    var d = this.props.daysSpent
+    var h = this.props.hoursSpent
+    var m = this.props.minutesSpent
+    var s = this.props.secondsSpent
+    if (d << 0 > 364) {
+      return '>1y'
+    }
+    d = (d << 0 === 0) ? '' : (d + 'd ')
+    h = (h << 0 === 0) ? '' : (h + 'h ')
+    m = (m << 0 === 0) ? '' : (m + 'm ')
+    s = (s << 0 === 0) ? '' : (s + 's ')
+    return (d + h + m + s + '')
+  }
+  padLeft (v) { return pad(v, 12, '0') }
+  render () {
+    var faviconURL = this.props.faviconURL || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA0xpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUNFNTM2NTcxQzQyMTFFNjhEODk5OTY1MzJCOUU0QjEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUNFNTM2NTYxQzQyMTFFNjhEODk5OTY1MzJCOUU0QjEiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjUxZDUzZDBmLTYzOWMtMTE3OS04Yjk3LTg3Y2M5YTUyOWRmMSIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjUxZDUzZDBmLTYzOWMtMTE3OS04Yjk3LTg3Y2M5YTUyOWRmMSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PmF3+n4AAAAoSURBVHja7M1BAQAABAQw9O98SvDbCqyT1KepZwKBQCAQCAQ3VoABAAu6Ay00hnjWAAAAAElFTkSuQmCC'
+
+    return <tr>
+      <td data-sort={this.padLeft(this.props.rank)}>{this.props.rank}</td>
+      <td><a href={this.props.publisherURL}><img src={faviconURL} alt={this.props.site} /><span>{this.props.site}</span></a></td>
+      <td data-sort={this.padLeft(this.props.views)}>{this.props.views}</td>
+      <td data-sort={this.padLeft(this.props.duration)}>{this.getFormattedTime()}</td>
+      <td className='notImplemented'><input type='range' name='points' min='0' max='10'></input></td>
+      <td data-sort={this.padLeft(this.props.percentage)}>{this.props.percentage}</td>
+    </tr>
+  }
+}
+
+class LedgerTable extends ImmutableComponent {
+  componentDidMount (event) {
+    return tableSort(document.getElementById('ledgerTable'))
+  }
+  render () {
+    var rows = []
+    if (!this.props.data.synopsis) {
+      return false
+    }
+    for (let i = 0; i < this.props.data.synopsis.length; i++) {
+      rows[i] = <LedgerTableRow {...this.props.data.synopsis[i]} />
+    }
+    return <table id='ledgerTable' className='sort'>
+      <thead>
+        <tr>
+          <th className='sort-header' data-l10n-id='rank' />
+          <th className='sort-header' data-l10n-id='publisher' />
+          <th className='sort-header' data-l10n-id='views' />
+          <th className='sort-header' data-l10n-id='timeSpent' />
+          <th className='sort-header notImplemented' data-l10n-id='adjustment' />
+          <th className='sort-header'>&#37;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows}
+      </tbody>
+    </table>
+  }
+}
+
+class BitcoinDashboard extends ImmutableComponent {
+  shouldComponentUpdate () { return true }
+  componentWillMount () {
+    this.setState({ shouldShowOverlay: false })
+  }
+  getOverlayContent () {
+    return <iframe src={this.props.buyURL} />
+  }
+  copyToClipboard (text) {
+    console.log('Bitcoin Address: ' + text)
+    document.execCommand('copy')
+  }
+  goToURL (url) {
+    return window.open(url, '_blank')
+  }
+  onMessage (event) {
+    if (event.type === 'message' && (!event.data || !event.data.event || event.data.event !== 'modal_closed')) {
+      return false
+    }
+    this.hideOverlay()
+  }
+  hideOverlay () {
+    this.setState({ shouldShowOverlay: false })
+  }
+  showOverlay (event) {
+    this.setState({ shouldShowOverlay: true })
+  }
+  render () {
+    var emptyDialog = true
+    window.addEventListener('message', this.onMessage.bind(this), false)
+// if someone can figure out how to get a localized title attribute (bitcoinCopyAddress) here, please do so!
+    return <div id='bitcoinDashboard'>
+      <ModalOverlay title={'bitcoinBuy'} content={this.getOverlayContent()} emptyDialog={emptyDialog} shouldShow={this.state.shouldShowOverlay} onShow={this.showOverlay.bind(this)} onHide={this.hideOverlay.bind(this)} />
+      <div>{this.props.statusText}</div>
+      <div className='board'>
+        <div className='panel'>
+          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
+          <a href={this.props.paymentURL} target='_blank'>
+            <img src={this.props.paymentIMG} alt={'Add Bitcoin'} />
+          </a>
+          <div className='settingsListCopy alt'><span className='settingsListCopy' onClick={this.copyToClipboard.bind(this, this.props.address || 'Not available')} title={'Copy Bitcoin address to clipboard'}>{this.props.address}</span></div>
+          <button data-l10n-id='bitcoinVisitAccount' onClick={this.goToURL.bind(this, this.props.paymentURL)} />
+        </div>
+        <div className='panel'>
+          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+          <div id='coinbaseLogo' />
+          <button data-l10n-id='add' onClick={this.showOverlay.bind(this)} />
+        </div>
+      </div>
+    </div>
+  }
+}
+
 class GeneralTab extends ImmutableComponent {
   enabled (keyArray) {
-    return keyArray.every(key => getSetting(key, this.props.settings) === true)
+    return keyArray.every((key) => getSetting(key, this.props.settings) === true)
   }
 
   render () {
@@ -278,6 +394,53 @@ class TabsTab extends ImmutableComponent {
     </div>
   }
 }
+
+class PaymentsTab extends ImmutableComponent {
+  shouldComponentUpdate () { return true }
+  componentWillMount () {
+    this.setState({ shouldShowOverlay: false })
+  }
+  getTableContent () {
+    return this.props.data.enabled ? <LedgerTable data={this.props.data} /> : <div className='pull-left' data-l10n-id='tableEmptyText' />
+  }
+  getButtonContent () {
+    return this.props.data.buttonLabel && this.props.data.buttonURL ? <a className='settingsListTitle pull-right' href={this.props.data.buttonURL}>{this.props.data.buttonLabel}</a> : null
+  }
+  getNotificationContent () {
+    return this.props.data.statusText ? <div className='notificationBar'>
+      <div className='pull-left'>{this.props.data.statusText}</div>
+    </div> : <div className='notificationBar'>
+      <div className='pull-left' data-l10n-id='notificationEmptyText' />
+    </div>
+  }
+  getOverlayContent () {
+    BitcoinDashboard.defaultProps = this.props.data
+    return <BitcoinDashboard />
+  }
+  getFundingLink () {
+    return this.props.data.address ? <div className='settingsListLink pull-right' data-l10n-id='addFundsTitle' value='addFundsTitle' onClick={this.showOverlay.bind(this)} /> : null
+  }
+  hideOverlay (event) {
+    this.setState({ shouldShowOverlay: false })
+  }
+  showOverlay (event) {
+    this.setState({ shouldShowOverlay: true })
+  }
+  render () {
+    return this.props.data.enabled ? <div id='paymentsContainer'>
+      <ModalOverlay title={'addFunds'} content={this.getOverlayContent()} shouldShow={this.state.shouldShowOverlay} onShow={this.showOverlay.bind(this)} onHide={this.hideOverlay.bind(this)} />
+      <div className='titleBar'>
+        <div className='settingsListTitle pull-left' data-l10n-id='publisherPaymentsTitle' value='publisherPaymentsTitle' />
+        {this.getButtonContent()}
+        {this.getFundingLink()}
+      </div>
+      {this.getNotificationContent()}
+      {this.getTableContent()}
+    </div> : <div className='emptyMessage' data-l10n-id='publisherEmptyText' />
+  }
+}
+PaymentsTab.propTypes = { data: React.PropTypes.array.isRequired }
+PaymentsTab.defaultProps = { data: [] }
 
 class SyncTab extends ImmutableComponent {
   render () {
@@ -594,6 +757,11 @@ class PreferenceNavigation extends ImmutableComponent {
         onClick={this.props.changeTab.bind(null, preferenceTabs.SHIELDS)}
         selected={this.props.preferenceTab === preferenceTabs.SHIELDS}
       />
+      <PreferenceNavigationButton icon='fa-bitcoin'
+        dataL10nId='publishers'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.PUBLISHERS)}
+        selected={this.props.preferenceTab === preferenceTabs.PUBLISHERS}
+      />
       <PreferenceNavigationButton icon='fa-refresh'
         className='notImplemented'
         dataL10nId='sync'
@@ -621,12 +789,16 @@ class AboutPreferences extends React.Component {
       flashInstalled: false,
       settings: Immutable.Map(),
       siteSettings: Immutable.Map(),
-      braveryDefaults: Immutable.Map()
+      braveryDefaults: Immutable.Map(),
+      ledger: []
     }
     aboutActions.checkFlashInstalled()
 
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
+    })
+    ipc.on(messages.LEDGER_UPDATED, (e, ledgerData) => {
+      PaymentsTab.defaultProps.data = ledgerData
     })
     ipc.on(messages.SITE_SETTINGS_UPDATED, (e, siteSettings) => {
       this.setState({ siteSettings: Immutable.fromJS(siteSettings || {}) })
@@ -702,6 +874,9 @@ class AboutPreferences extends React.Component {
         break
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
+        break
+      case preferenceTabs.PUBLISHERS:
+        tab = <PaymentsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />

@@ -94,6 +94,7 @@ module.exports = {
     'bookmarks.toolbar.show': false,
     'bookmarks.toolbar.showFavicon': false,
     'bookmarks.toolbar.showOnlyFavicon': false,
+    'payments.enabled': false,
     'privacy.do-not-track': false,
     'security.passwords.active-password-manager': null, // Set in settings.js by passwordManagerDefault (defaults to built in)
     'security.passwords.manager-enabled': true,

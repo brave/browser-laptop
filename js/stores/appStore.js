@@ -480,6 +480,12 @@ const handleAppAction = (action) => {
                                                            action.hostPattern, action.key)
       appState = appState.set('siteSettings', newSiteSettings)
       break
+    case AppConstants.APP_UPDATE_LEDGER_INFO:
+      appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
+      break
+    case AppConstants.APP_UPDATE_PUBLISHER_INFO:
+      appState = appState.set('publisherInfo', Immutable.fromJS(action.publisherInfo))
+      break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')
       appState = appState.set('notifications', notifications.filterNot((notification) => {

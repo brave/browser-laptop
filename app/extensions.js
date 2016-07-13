@@ -52,7 +52,8 @@ let generateBraveManifest = () => {
           'js/actions/extensionActions.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
-          'content/scripts/themeColor.js'
+          'content/scripts/themeColor.js',
+          'content/scripts/pageInformation.js'
         ]
       },
       {
@@ -110,7 +111,8 @@ let generateBraveManifest = () => {
     'form-action': '\'none\'',
     'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
-    'img-src': '* data:'
+    'img-src': '* data:',
+    'frame-src': '\'self\' https://buy.coinbase.com'
   }
 
   if (process.env.NODE_ENV === 'development') {
