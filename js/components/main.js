@@ -63,6 +63,9 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
 
+// Ledger
+const ledgerInterop = require('../ledgerInterop')
+
 class Main extends ImmutableComponent {
   constructor () {
     super()
@@ -245,6 +248,109 @@ class Main extends ImmutableComponent {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
 
+<<<<<<< HEAD
+=======
+    ipc.on(messages.DOWNLOAD_DATAFILE, (event, url, nonce, headers, path) => {
+      let msg = messages.DOWNLOAD_DATAFILE_DONE + nonce
+      let args = {}
+      let stream = fs.createWriteStream(path)
+      function pump (reader) {
+        return reader.read().then((result) => {
+          if (result.done) {
+            stream.end()
+          } else {
+            const chunk = result.value
+            // Convert Uint8Array to node buffer
+            const buf = Buffer.from(chunk.buffer)
+            stream.write(buf)
+            return pump(reader)
+          }
+        }).catch((e) => {
+          ipc.send(msg, args, e.message)
+          stream.end()
+        })
+      }
+      window.fetch(url, {headers: headers}).then((response) => {
+        args.statusCode = response.status
+        if (response.status !== 200) {
+          ipc.send(msg, args)
+          return
+        }
+        let reader = response.body.getReader()
+        args.etag = response.headers.get('etag')
+        stream.on('close', () => {
+          ipc.send(msg, args)
+        })
+        return pump(reader)
+      }).catch((e) => {
+        ipc.send(msg, {}, e.message)
+        stream.end()
+      })
+    })
+
+    ipc.on(messages.SEND_XHR_REQUEST, (event, url, nonce, headers, responseType) => {
+// TBD: this is _never_ invoked, and i can't figure out why! [MTR]
+      console.log('XHR: nonce=' + nonce)
+      const xhr = new window.XMLHttpRequest()
+
+      xhr.open('GET', url)
+      if (headers) {
+        for (let name in headers) {
+          xhr.setRequestHeader(name, headers[name])
+        }
+      }
+      xhr.responseType = responseType || 'text'
+      xhr.onerror = () => {
+        var oops = 'xhr: target='
+        try { oops += this.target.toString() } catch (ex) { oops += '[' + ex.toString() + ']' }
+        oops += ' type=' + this.type
+        ipc.send(messages.GOT_XHR_RESPONSE + nonce, new Error(oops))
+      }
+      xhr.onload = () => {
+        var done, f
+        var response = {}
+
+        // very useful for debugging...
+        for (var p in xhr) { try { response[p] = xhr[p] } catch (ex) { response[p] = ex.toString() } }
+        response.statusCode = xhr.status
+        response.headers = {}
+        xhr.getAllResponseHeaders().split('\r\n').forEach((header) => {
+          var i = header.indexOf(': ')
+
+          if (i > 0) response.headers[header.substring(0, i).toLowerCase()] = header.substring(i + 2)
+        })
+
+        done = (err, result) => { ipc.send(messages.GOT_XHR_RESPONSE + nonce, err, response, result) }
+
+        f = {
+          arraybuffer: () => {
+            var ab = xhr.response
+            var buffer = new Buffer(ab.byteLength)
+            var view = new Uint8Array(ab)
+
+            for (let i = 0; i < buffer.length; i++) buffer[i] = view[i]
+            done(null, buffer)
+          },
+
+          blob: () => {
+            var reader = new window.FileReader()
+
+            reader.readAsDataURL(xhr.response)
+            reader.onloadend = () => { done(null, reader.result) }
+          },
+
+          document: () => { done(null, xhr.responseXML) },
+
+          text: () => { done(null, xhr.responseText) }
+        }[responseType] || (() => { done(null, xhr.response) })
+
+        try { f() } catch (ex) { done(ex) }
+      }
+
+      try { xhr.send() } catch (ex) { ipc.send(messages.GOT_XHR_RESPONSE + nonce, ex) }
+    })
+
+>>>>>>> Ledger client integration
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
         const frameProps = self.props.windowState.get('frames').find((frame) => frame.get('location') === url)
@@ -931,6 +1037,7 @@ class Main extends ImmutableComponent {
               cookieblock={this.props.appState.get('cookieblock')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
+              ledger={ledgerInterop.generalCommunications()}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

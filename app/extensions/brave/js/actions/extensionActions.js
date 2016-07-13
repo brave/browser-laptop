@@ -8,7 +8,7 @@ var ExtensionActions = {
    * @param {object} action - The action to dispatch
    */
   dispatchAction: function (action) {
-    sendMessage({type: 'action', action}) // brave-default.js
+    chrome.ipc.send('dispatch-action', JSON.stringify(action))
   },
 
   /**
@@ -17,11 +17,12 @@ var ExtensionActions = {
    * @param {string} location - The URL of the page
    * @param {object} publisherInfo - The publisher identification data
    */
-  setPagePublisher: function (location, publisherInfo) {
+  setPageInfo: function (location, pageInfo) {
+    pageInfo.url = location
     ExtensionActions.dispatchAction({
-      actionType: 'event-set-page-publisher',
+      actionType: 'event-set-page-info',
       location,
-      publisherInfo
+      pageInfo
     })
   }
 }

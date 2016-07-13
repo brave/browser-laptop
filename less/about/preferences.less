@@ -114,6 +114,9 @@ body {
           background: url('../../img/shields.svg') 0 0 / contain no-repeat;
           margin: -3px -1px 0px 1px;
         }
+        &.i-bitcoin {
+          background: url('../../img/bitcoin.svg') 0 0 / contain no-repeat;
+        }
         &.i-refresh {
           background: url('../../img/refresh.svg') 0 0 / contain no-repeat;
         }
@@ -232,6 +235,7 @@ a {
 }
 
 .settingsListTitle,
+.settingsListCopy,
 .settingsListLink,
 .settingsList .settingItem span:not(.browserButton),
 .settingsList em,
@@ -239,6 +243,24 @@ a {
   color: @darkGray;
   font-size: 0.9em;
   margin: 1.2em 2px 7px;
+}
+
+.settingsListCopy {
+  color: @braveOrange;
+  cursor: pointer;
+  font-family: "Lucida Sans Typewriter", "Lucida Console", monaco, "Bitstream Vera Sans Mono", monospace;
+  font-size: 1em;
+
+  &.alt {
+    color: black;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+span.settingsListCopy {
+  background-color: @lightGray;
 }
 
 .settingsListLink {
@@ -391,6 +413,111 @@ table.sortableTable {
   margin: 5em 0;
   font-size: 1.2em;
   color: @mediumGray;
+}
+
+#paymentsContainer {
+  position: relative;
+  overflow-x: hidden;
+
+  .titleBar {
+    overflow: hidden;
+  }
+
+  & > table,
+  & > table tbody,
+  .notificationBar {
+    border: none;
+    padding: 50px;
+    margin: 0 auto;
+    width: 80%;
+  }
+
+  .notificationBar {
+    margin-top: 50px;
+    padding: 30px;
+    height: 15px;
+    background: @lightGray;
+    border-radius: @bigBorderRadius;
+    clear: both;
+
+    > div {
+      display: inline-block;
+      line-height: 1em;
+      font-size: 1em;
+
+      &.settingsListLink:last-of-type {
+        margin-right: 20px;
+      }
+    }
+  }
+
+  tr {
+    height: 1.7em;
+
+    th {
+      color: @darkGray;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    td {
+      color: @mediumGray;
+      -webkit-font-smoothing: antialiased;
+      text-align: center;
+      width: 8%;
+
+      a {
+        vertical-align: middle;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        img {
+          width: 1.5em;
+          height: 1.5em;
+          margin: -0.375em 0.375em 0 0;
+          vertical-align: middle;
+        }
+      }
+
+      &:nth-of-type(2) {
+        width: 20%;
+        text-align: left;
+      }
+
+      input[type='range'] {
+        background: transparent;
+        -webkit-appearance: none;
+        width: 90%;
+        margin: 0 0 0 20%;
+        outline: none;
+
+        &::-webkit-slider-runnable-track {
+          -webkit-appearance: none;
+          background: @gray25;
+          border-radius: 1000px;
+          height: 1em;
+        }
+
+        &::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          background: linear-gradient(to bottom, @braveOrange, @braveDarkOrange);
+          width: 1em;
+          height: 1em;
+          border-radius: 50%;
+          box-shadow: 0 0 6px @black25;
+          cursor: pointer;
+        }
+      }
+    }
+  }
 }
 
 .board {
