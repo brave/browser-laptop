@@ -103,7 +103,7 @@ const init = (settingsState, args) => {
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('importFrom'),
-      enabled: false
+      visible: false
       /*
       submenu: [
         {label: 'Google Chrome...'},
@@ -141,7 +141,7 @@ const init = (settingsState, args) => {
       }
     }, {
       label: locale.translation('share'),
-      enabled: false
+      visible: false
       /*
       submenu: [
         {label: 'Email Page Link...'},
@@ -222,14 +222,12 @@ const init = (settingsState, args) => {
     CommonMenu.separatorMenuItem,
     CommonMenu.findOnPageMenuItem(),
     {
-      // TODO: hook up find next/prev shortcut. low-priority since this is
-      // probably not used much.
       label: locale.translation('findNext'),
-      enabled: false,
+      visible: false,
       accelerator: 'CmdOrCtrl+G'
     }, {
       label: locale.translation('findPrevious'),
-      enabled: false,
+      visible: false,
       accelerator: 'Shift+CmdOrCtrl+G'
     },
     CommonMenu.separatorMenuItem
@@ -272,7 +270,7 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('toolbars'),
-          enabled: false
+          visible: false
           /*
           submenu: [
             {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
@@ -305,17 +303,17 @@ const init = (settingsState, args) => {
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('readingView'),
-          enabled: false,
+          visible: false,
           accelerator: 'Alt+CmdOrCtrl+R'
         }, {
           label: locale.translation('tabManager'),
-          enabled: false,
+          visible: false,
           accelerator: 'Alt+CmdOrCtrl+M'
         },
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('textEncoding'),
-          enabled: false
+          visible: false
           /*
           submenu: [
             {label: 'Autodetect', submenu: []},
@@ -393,7 +391,7 @@ const init = (settingsState, args) => {
         {
           label: locale.translation('showAllHistory'),
           accelerator: 'CmdOrCtrl+Y',
-          enabled: false
+          visible: false
         },
         CommonMenu.separatorMenuItem,
         {
@@ -421,7 +419,7 @@ const init = (settingsState, args) => {
         bookmarkPageMenuItem,
         {
           label: locale.translation('addToFavoritesBar'),
-          enabled: false,
+          visible: false,
           accelerator: 'Shift+CmdOrCtrl+D'
         },
         CommonMenu.separatorMenuItem,
@@ -441,7 +439,7 @@ const init = (settingsState, args) => {
           // "Minimize all" added automatically
         }, {
           label: locale.translation('zoom'),
-          enabled: false
+          visible: false
         },
         CommonMenu.separatorMenuItem,
         {
@@ -458,10 +456,10 @@ const init = (settingsState, args) => {
           }
         }, {
           label: locale.translation('moveTabToNewWindow'),
-          enabled: false
+          visible: false
         }, {
           label: locale.translation('mergeAllWindows'),
-          enabled: false
+          visible: false
         },
         CommonMenu.separatorMenuItem,
         CommonMenu.bookmarksMenuItem(),
@@ -470,7 +468,7 @@ const init = (settingsState, args) => {
         {
           label: locale.translation('history'),
           accelerator: 'CmdOrCtrl+Y',
-          enabled: false
+          visible: false
         },
         CommonMenu.separatorMenuItem,
         {
