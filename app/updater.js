@@ -142,14 +142,14 @@ var requestVersionInfo = (done, pingOnly) => {
   var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
   debug(queryString)
 
-  request(queryString, (err, response, body) => {
+  request(queryString, (err, statusCode, body) => {
     appActions.setUpdateLastCheck()
     if (pingOnly) {
       return
     }
-    if (!err && response.statusCode === 204) {
+    if (!err && statusCode === 204) {
       autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
-    } else if (!err && (response.statusCode === 200)) {
+    } else if (!err && (statusCode === 200)) {
       if (body) {
         try {
           body = JSON.parse(body)

@@ -57,14 +57,9 @@ const messages = {
   CHECK_FOR_UPDATE: _,
   SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
-  SEND_XHR_REQUEST: _, /** @arg {string} url to request, @arg {number} nonce, @arg {Object=} headers if any */
-  GOT_XHR_RESPONSE: _, /** @arg {Object} response, @arg {string} body */
-  DOWNLOAD_DATAFILE: _, /** @arg {string} url, @arg {number} nonce, @arg {Object} headers, @arg {string} path */
-  DOWNLOAD_DATAFILE_DONE: _, /** @arg {Object} response */
   // App state
   APP_INITIALIZED: _,
   // Web contents state
-  WEB_CONTENTS_INITIALIZED: _,
   // Webview page messages
   CONTEXT_MENU_OPENED: _, /** @arg {Object} nodeProps properties of node being clicked */
   APP_STATE_CHANGE: _,

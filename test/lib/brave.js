@@ -76,6 +76,8 @@ var exports = {
   beforeEach: function (context) {
     context.timeout(30000)
 
+    exports.beforeAllServerSetup(context)
+
     context.beforeEach(function () {
       return exports.startApp.call(this)
     })

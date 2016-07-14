@@ -356,12 +356,9 @@ app.on('ready', () => {
     SiteHacks.init()
     NoScript.init()
     spellCheck.init()
-
-    ipcMain.once(messages.WEB_CONTENTS_INITIALIZED, () => {
-      HttpsEverywhere.init()
-      TrackingProtection.init()
-      AdBlock.init()
-    })
+    HttpsEverywhere.init()
+    TrackingProtection.init()
+    AdBlock.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {

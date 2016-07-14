@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const {urlInput, braveMenu, braveMenuDisabled, adsBlockedStat, braveryPanel, httpsEverywhereStat, noScriptStat, noScriptSwitch, fpSwitch, fpStat, noScriptNavButton} = require('../lib/selectors')
@@ -11,8 +11,14 @@ describe('Bravery Panel', function () {
       .waitForBrowserWindow()
       .waitForVisible('#window')
       .waitForVisible(urlInput)
-      .waitForUrl(Brave.newTabUrl)
+  }
+
+  function * openBraveMenu (client) {
+    yield client
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForVisible(braveMenu)
+      .click(braveMenu)
+      .waitForVisible(braveryPanel)
   }
 
   describe('General', function () {
@@ -34,8 +40,8 @@ describe('Bravery Panel', function () {
     })
   })
   describe('Stats', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
     })
     it('detects blocked elements', function * () {
@@ -44,10 +50,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(braveMenu)
-        .click(braveMenu)
-        .waitForVisible(braveryPanel)
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
             .then((blocked) => blocked === '2')
@@ -59,9 +63,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(braveMenu)
-        .waitForVisible(braveryPanel)
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
             .then((blocked) => blocked === '1')
@@ -73,9 +76,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(braveMenu)
-        .waitForVisible(braveryPanel)
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
         .waitUntil(function () {
           return this.getText(httpsEverywhereStat)
             .then((upgraded) => upgraded === '1')
@@ -87,27 +89,24 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(braveMenu)
-        .waitForVisible(braveryPanel)
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
         .click(noScriptSwitch)
         .waitForVisible(noScriptNavButton)
         .waitUntil(function () {
           return this.getText(noScriptStat)
             .then((stat) => stat === '2')
         })
-        .click(noScriptSwitch)
     })
     it('blocks fingerprinting', function * () {
       const url = Brave.server.url('fingerprinting.html')
       yield this.app.client
-        .click(fpSwitch)
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(braveMenu)
-        .waitForVisible(braveryPanel)
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
+        .click(fpSwitch)
         .waitUntil(function () {
           return this.getText(fpStat)
             .then((stat) => stat === '3')
@@ -116,7 +115,6 @@ describe('Bravery Panel', function () {
     it('allows fingerprinting when setting is off', function * () {
       const url = Brave.server.url('fingerprinting.html')
       yield this.app.client
-        .click(fpSwitch)
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
@@ -124,9 +122,8 @@ describe('Bravery Panel', function () {
           return this.getText('body')
             .then((text) => text === 'fingerprinting test')
         })
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(braveMenu)
-        .waitForVisible(braveryPanel)
+      yield openBraveMenu(this.app.client)
+      this.app.client
         .waitUntil(function () {
           return this.getText(fpStat)
             .then((stat) => stat === '0')
