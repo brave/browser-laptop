@@ -153,6 +153,12 @@ AppStore
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'general.language': string, // The language code to use for localization and spell check or null to use the system default
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
+    'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
+    'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
+    'shutdown.clear-history': boolean, // true to clear history on shutdown
+    'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
+    'shutdown.clear-cache': boolean, // true to clear cache on shutdown
+    'shutdown.all-site-cookies': boolean, // true to clear all site cookies on shutdown
   }],
   dictionary: {
     locale: string, // en_US, en, or any other locale string

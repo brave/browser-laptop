@@ -10,6 +10,12 @@ strong, div, span, li, em, p, a {
 }
 
 .prefTabContainer {
+  .sectionTitle {
+    color: @braveOrange;
+    font-size: 1.3em;
+    margin-bottom: 0.3em;
+  }
+
   flex-grow: 1;
   padding: 40px;
   min-width: 704px;
@@ -219,13 +225,17 @@ a {
   text-decoration: underline;
 }
 
+.settingsListContainer {
+  margin-bottom: 2em;
+}
+
 .settingsListTitle,
 .settingsListLink,
 .settingsList .settingItem span:not(.browserButton),
 .settingsList em {
   color: @darkGray;
   font-size: 0.9em;
-  margin: 2em 0 0.75em;
+  margin: 0.75em 0 0;
 }
 
 .settingsListLink {
@@ -334,10 +344,6 @@ input[type="checkbox"][disabled] {
   font-size: 16px;
   list-style: none;
   margin: 20px;
-}
-
-#sitePermissionsPage {
-  padding-top: 20px;
 }
 
 .permissionAction {

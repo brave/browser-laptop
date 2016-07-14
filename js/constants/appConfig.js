@@ -109,7 +109,11 @@ module.exports = {
     'general.disable-title-mode': process.platform === 'win32',
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
-    'advanced.pdfjs-enabled': true
+    'advanced.pdfjs-enabled': true,
+    'shutdown.clear-history': false,
+    'shutdown.clear-downloads': false,
+    'shutdown.clear-cache': false,
+    'shutdown.all-site-cookies': false
   },
   uaExceptionHosts: [
     'get.adobe.com', 'adobe.com', 'www.adobe.com', 'helpx.adobe.com'

@@ -76,7 +76,7 @@ const changeSetting = (cb, key, e) => {
 
 class SettingsList extends ImmutableComponent {
   render () {
-    return <div>
+    return <div className='settingsListContainer'>
       {
         this.props.dataL10nId
         ? <div className='settingsListTitle' data-l10n-id={this.props.dataL10nId} />
@@ -120,13 +120,8 @@ class GeneralTab extends ImmutableComponent {
     })
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     return <SettingsList>
+      <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
-        <SettingItem dataL10nId='selectedLanguage'>
-          <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
-            {languageOptions}
-          </select>
-        </SettingItem>
         <SettingItem dataL10nId='startsWith'>
           <select value={getSetting(settings.STARTUP_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.STARTUP_MODE)} >
@@ -141,13 +136,21 @@ class GeneralTab extends ImmutableComponent {
             value={getSetting(settings.HOMEPAGE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
+        <SettingItem dataL10nId='selectedLanguage'>
+          <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)} >
+            {languageOptions}
+          </select>
+        </SettingItem>
       </SettingsList>
-      <SettingsList dataL10nId='bookmarkToolbarSettings'>
+      <div className='sectionTitle' data-l10n-id='bokmarksBarSettings' />
+      <SettingsList>
         <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ visibility: (getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, this.props.settings) === true ? 'visible' : 'hidden') }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: (getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, this.props.settings) === true ? 'block' : 'none') }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <SettingsList dataL10nId='appearanceSettings'>
+      <div className='sectionTitle' data-l10n-id='appearanceSettings' />
+      <SettingsList>
         <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         {
           isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -161,6 +164,7 @@ class GeneralTab extends ImmutableComponent {
 class SearchTab extends ImmutableComponent {
   render () {
     return <div>
+      <div className='sectionTitle' data-l10n-id='searchSettings' />
       <SettingsList>
         <SettingItem dataL10nId='defaultSearchEngine'>
           <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
@@ -170,10 +174,11 @@ class SearchTab extends ImmutableComponent {
           </select>
         </SettingItem>
       </SettingsList>
-      <SettingsList dataL10nId='suggestionTypes'>
-        <SettingCheckbox dataL10nId='history' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarks' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='openedTabs' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <div className='sectionTitle' data-l10n-id='locationBarSettings' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='showHistoryMatches' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='showBookmarkMatches' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='offerSearchSuggestions' prefKey={settings.OFFER_SEARCH_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
     </div>
@@ -182,23 +187,26 @@ class SearchTab extends ImmutableComponent {
 
 class TabsTab extends ImmutableComponent {
   render () {
-    return <SettingsList>
-      <SettingItem dataL10nId='tabsPerTabPage'>
-        <select
-          value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
-          data-type='number'
-          onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
-          {
-            // Sorry, Brad says he hates primes :'(
-            [6, 8, 10, 20].map((x) =>
-              <option value={x} key={x}>{x}</option>)
-          }
-        </select>
-      </SettingItem>
-      <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-    </SettingsList>
+    return <div>
+      <div className='sectionTitle' data-l10n-id='tabSettings' />
+      <SettingsList>
+        <SettingItem dataL10nId='tabsPerTabPage'>
+          <select
+            value={getSetting(settings.TABS_PER_PAGE, this.props.settings)}
+            data-type='number'
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.TABS_PER_PAGE)}>
+            {
+              // Sorry, Brad says he hates primes :'(
+              [6, 8, 10, 20].map((x) =>
+                <option value={x} key={x}>{x}</option>)
+            }
+          </select>
+        </SettingItem>
+        <SettingCheckbox dataL10nId='switchToNewTabs' prefKey={settings.SWITCH_TO_NEW_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
+    </div>
   }
 }
 
@@ -238,7 +246,7 @@ class SitePermissionsPage extends React.Component {
   render () {
     return this.isPermissionsNonEmpty()
     ? <div id='sitePermissionsPage'>
-      <div data-l10n-id='sitePermissions'></div>
+      <div className='sectionTitle' data-l10n-id='sitePermissions' />
       <ul className='sitePermissions'>
         {
           Object.keys(permissionNames).map((name) =>
@@ -322,7 +330,8 @@ class ShieldsTab extends ImmutableComponent {
   }
   render () {
     return <div id='shieldsContainer'>
-      <SettingsList dataL10nId='braveryDefaults'>
+      <div className='sectionTitle' data-l10n-id='braveryDefaults' />
+      <SettingsList>
         <SettingItem dataL10nId='adControl'>
           <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
             <option data-l10n-id='showBraveAds' value='showBraveAds' />
@@ -341,9 +350,6 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScript' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <SettingsList dataL10nId='advancedPrivacySettings'>
-        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
     </div>
   }
 }
@@ -354,7 +360,15 @@ class SecurityTab extends ImmutableComponent {
   }
   render () {
     return <div>
-      <SettingsList dataL10nId='passwordSettings'>
+      <div className='sectionTitle' data-l10n-id='privateData' />
+      <SettingsList dataL10nId='privateDataMessage'>
+        <SettingCheckbox dataL10nId='browsingHistory' prefKey={settings.SHUTDOWN_CLEAR_HISTORY} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='downloadHistory' prefKey={settings.SHUTDOWN_CLEAR_DOWNLOADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='cachedImagesAndFiles' prefKey={settings.SHUTDOWN_CLEAR_CACHE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='allSiteCookies' prefKey={settings.SHUTDOWN_ALL_SITE_COOKIES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
+      <SettingsList dataL10nId='passwordManager'>
         <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
           options={
             getSetting(settings.PASSWORD_MANAGER_ENABLED, this.props.settings)
@@ -376,11 +390,15 @@ class SecurityTab extends ImmutableComponent {
           } />
         <SettingCheckbox dataL10nId='useDashlane' prefKey={settings.DASHLANE_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <SettingsList dataL10nId='pluginSettings'>
-        <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
+      <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
-      <div className='subtext'>
-        <span className='fa fa-info-circle' id='flashInfoIcon' />
+      <div className='sectionTitle' data-l10n-id='pluginSettings' />
+      <SettingsList>
+        <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
+        <span className='subtext'>
+          <span className='fa fa-info-circle' id='flashInfoIcon' />
         {
           isDarwin || isWindows
             ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
@@ -389,7 +407,8 @@ class SecurityTab extends ImmutableComponent {
               })}>{'Adobe'}</span>.</span>
             : <span data-l10n-id='enableFlashSubtextLinux' />
         }
-      </div>
+        </span>
+      </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings} />
     </div>
   }
@@ -399,7 +418,8 @@ class AdvancedTab extends ImmutableComponent {
   render () {
     const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <div>
-      <SettingsList dataL10nId='contentRenderingOptions'>
+      <div className='sectionTitle' data-l10n-id='contentSettings' />
+      <SettingsList>
         <SettingItem dataL10nId='defaultZoomLevel'>
           <select
             value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
@@ -464,7 +484,7 @@ class HelpfulHints extends ImmutableComponent {
 class PreferenceNavigation extends ImmutableComponent {
   render () {
     return <div className='prefAside'>
-      <div data-l10n-id='prefAsideTitle' />
+      <div />
       <PreferenceNavigationButton icon='fa-list-alt'
         dataL10nId='general'
         onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}

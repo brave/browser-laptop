@@ -31,6 +31,10 @@ const settings = {
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
   LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
   DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
+  SHUTDOWN_CLEAR_HISTORY: 'shutdown.clear-history',
+  SHUTDOWN_CLEAR_DOWNLOADS: 'shutdown.clear-downloads',
+  SHUTDOWN_CLEAR_CACHE: 'shutdown.clear-cache',
+  SHUTDOWN_ALL_SITE_COOKIES: 'shutdown.all-site-cookies',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
