@@ -63,8 +63,7 @@ let generateBraveManifest = () => {
           'content/scripts/util.js',
           'content/scripts/spellCheck.js',
           'content/scripts/inputHandler.js',
-          'content/scripts/themeColor.js',
-          'content/scripts/brave-about.js'
+          'content/scripts/themeColor.js'
         ],
         matches: [
           '<all_urls>'

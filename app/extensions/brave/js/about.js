@@ -50,6 +50,6 @@
     po.src = aboutEntryPage
     var s = document.getElementsByTagName('script')[0]
     s.parentNode.insertBefore(po, s)
-    window.dispatchEvent(new CustomEvent('request-language'))
+    chrome.ipc.send('request-language')
   })
 })()

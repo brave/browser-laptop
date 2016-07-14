@@ -4,13 +4,7 @@
 
 const messages = require('../constants/messages')
 const serializer = require('../dispatcher/serializer')
-
-function dispatch (action) {
-  const event = new window.CustomEvent(messages.DISPATCH_ACTION, {
-    detail: serializer.serialize(action)
-  })
-  window.dispatchEvent(event)
-}
+const ipc = window.chrome.ipc
 
 const AboutActions = {
   /**
@@ -19,7 +13,7 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   dispatchAction: function (action) {
-    dispatch(action)
+    ipc.send(messages.DISPATCH_ACTION, serializer.serialize(action))
   },
 
   /**
@@ -29,13 +23,7 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSetting: function (key, value) {
-    const event = new window.CustomEvent(messages.CHANGE_SETTING, {
-      detail: {
-        key,
-        value
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.CHANGE_SETTING, key, value)
   },
 
   /**
@@ -46,14 +34,7 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSiteSetting: function (hostPattern, key, value) {
-    const event = new window.CustomEvent(messages.CHANGE_SITE_SETTING, {
-      detail: {
-        hostPattern,
-        key,
-        value
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.CHANGE_SITE_SETTING, hostPattern, key, value)
   },
 
   /**
@@ -63,13 +44,7 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    */
   removeSiteSetting: function (hostPattern, key) {
-    const event = new window.CustomEvent(messages.CHANGE_SITE_SETTING, {
-      detail: {
-        hostPattern,
-        key
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.CHANGE_SITE_SETTING, hostPattern, key)
   },
 
   /**
@@ -78,13 +53,7 @@ const AboutActions = {
    * preserve the about preload script. See #672
    */
   newFrame: function (frameOpts, openInForeground = true) {
-    const event = new window.CustomEvent(messages.NEW_FRAME, {
-      detail: {
-        frameOpts,
-        openInForeground
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.sendToHost(messages.NEW_FRAME, frameOpts, openInForeground)
   },
 
   /**
@@ -93,12 +62,7 @@ const AboutActions = {
    * @param {string} url - The URL with the cert error
    */
   acceptCertError: function (url) {
-    const event = new window.CustomEvent(messages.CERT_ERROR_ACCEPTED, {
-      detail: {
-        url
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.CERT_ERROR_ACCEPTED, url)
   },
 
   /**
@@ -107,95 +71,47 @@ const AboutActions = {
   contextMenu: function (nodeProps, contextMenuType, e) {
     e.preventDefault()
     e.stopPropagation()
-    const event = new window.CustomEvent(messages.CONTEXT_MENU_OPENED, {
-      detail: {
-        nodeProps,
-        contextMenuType
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.sendToHost(messages.CONTEXT_MENU_OPENED, nodeProps, contextMenuType)
   },
 
   moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
-    const event = new window.CustomEvent(messages.MOVE_SITE, {
-      detail: {
-        sourceDetail,
-        destinationDetail,
-        prepend,
-        destinationIsParent
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.MOVE_SITE, sourceDetail, destinationDetail, prepend, destinationIsParent)
   },
 
   openDownloadPath: function (download) {
-    const event = new window.CustomEvent(messages.OPEN_DOWNLOAD_PATH, {
-      detail: {
-        download: download.toJS()
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.OPEN_DOWNLOAD_PATH, download.tJS())
   },
 
   decryptPassword: function (encryptedPassword, authTag, iv, id) {
-    const event = new window.CustomEvent(messages.DECRYPT_PASSWORD, {
-      detail: {
-        encryptedPassword,
-        authTag,
-        iv,
-        id
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.DECRYPT_PASSWORD, encryptedPassword, authTag, iv, id)
   },
 
   setClipboard: function (text) {
-    const event = new window.CustomEvent(messages.SET_CLIPBOARD, {
-      detail: text
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.SET_CLIPBOARD, text)
   },
 
   deletePassword: function (password) {
-    const event = new window.CustomEvent(messages.DELETE_PASSWORD, {
-      detail: password
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.DELETE_PASSWORD, password)
   },
 
   deletePasswordSite: function (origin) {
-    const event = new window.CustomEvent(messages.DELETE_PASSWORD_SITE, {
-      detail: origin
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.DELETE_PASSWORD_SITE, origin)
   },
 
   clearPasswords: function () {
-    const event = new window.CustomEvent(messages.CLEAR_PASSWORDS)
-    window.dispatchEvent(event)
+    ipc.send(messages.CLEAR_PASSWORDS)
   },
 
   checkFlashInstalled: function () {
-    const event = new window.CustomEvent(messages.CHECK_FLASH_INSTALLED)
-    window.dispatchEvent(event)
+    ipc.send(messages.CHECK_FLASH_INSTALLED)
   },
 
   showNotification: function (msg) {
-    // msg is l10n id of message to show
-    const event = new window.CustomEvent(messages.SHOW_NOTIFICATION, {
-      detail: msg
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.SHOW_NOTIFICATION, msg)
   },
 
   setResourceEnabled: function (resourceName, enabled) {
-    const event = new window.CustomEvent(messages.SET_RESOURCE_ENABLED, {
-      detail: {
-        resourceName,
-        enabled
-      }
-    })
-    window.dispatchEvent(event)
+    ipc.send(messages.SET_RESOURCE_ENABLED, resourceName, enabled)
   }
 }
 module.exports = AboutActions
