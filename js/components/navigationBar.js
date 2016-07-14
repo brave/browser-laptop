@@ -40,7 +40,7 @@ class NavigationBar extends ImmutableComponent {
     if (!isBookmarked) {
       appActions.addSite(siteDetail, siteTags.BOOKMARK)
     }
-    windowActions.setBookmarkDetail(siteDetail)
+    windowActions.setBookmarkDetail(siteDetail, siteDetail)
   }
 
   onReload (e) {
