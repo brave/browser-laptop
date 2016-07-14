@@ -349,6 +349,34 @@ function undoCloseFrame (windowState, closedFrames) {
  * @return Immutable top level application state ready to merge back in
  */
 function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
+  function getNewActiveFrame (activeFrameIndex) {
+    // Go to the next frame if it exists.
+    let index = activeFrameIndex
+    let nextFrame = frames.get(index)
+    do {
+      if (nextFrame) {
+        if (nextFrame.get('pinnedLocation') === undefined) {
+          return nextFrame.get('key')
+        }
+        nextFrame = frames.get(++index)
+      }
+    } while (nextFrame)
+    // Otherwise go to the frame right before the active tab.
+    index = activeFrameIndex
+    while (index > 0) {
+      const prevFrame = frames.get(--index)
+      if (prevFrame && prevFrame.get('pinnedLocation') === undefined) {
+        return prevFrame.get('key')
+      }
+    }
+    // Fall back on the original logic.
+    return Math.max(
+      frames.get(activeFrameIndex)
+      ? frames.get(activeFrameIndex).get('key')
+      : frames.get(activeFrameIndex - 1).get('key'),
+    0)
+  }
+
   if (!frameProps.get('isPrivate')) {
     frameProps = frameProps.set('isFullScreen', false)
     closedFrames = closedFrames.push(frameProps)
@@ -365,14 +393,13 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
   }
   const framePropsIndex = getFramePropsIndex(frames, frameProps)
   frames = frames.splice(framePropsIndex, 1)
-  const newActiveFrameKey = frameProps.get('key') === activeFrameKey && frames.size > 0
-    ? Math.max(
-      frames.get(activeFrameIndex)
-      // Go to the next frame if it exists.
-      ? frames.get(activeFrameIndex).get('key')
-      // Otherwise go to the frame right before the active tab.
-      : frames.get(activeFrameIndex - 1).get('key'),
-    0) : activeFrameKey
+
+  let newActiveFrameKey = activeFrameKey
+  if (frameProps.get('key') === activeFrameKey && frames.size > 0) {
+    // Frame with focus was closed; let's find new active NON-PINNED frame.
+    newActiveFrameKey = getNewActiveFrame(activeFrameIndex)
+  }
+
   return {
     previewFrameKey: null,
     activeFrameKey: newActiveFrameKey,
