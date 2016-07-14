@@ -13,7 +13,7 @@ strong, div, span, li, em, p, a {
   .sectionTitle {
     color: @braveOrange;
     font-size: 1.3em;
-    margin-bottom: 0.3em;
+    margin-bottom: 0.7em;
   }
 
   flex-grow: 1;
@@ -23,7 +23,7 @@ strong, div, span, li, em, p, a {
 
   > div {
     > .column {
-      width: 320px;
+      width: 340px;
 
       &.gutter {
         border-left: solid 1px @lightGray;
@@ -48,7 +48,7 @@ strong, div, span, li, em, p, a {
 }
 
 .prefAside {
-  background-color: @gray;
+  background: linear-gradient(#A7AAA9, #83858A);
   box-shadow: @insetShadow;
   position: fixed;
   z-index: 600;
@@ -79,7 +79,7 @@ strong, div, span, li, em, p, a {
       align-items: center;
       width: 100%;
       background: transparent;
-      padding: 10px 0 0 10px;
+      padding: 10px 0 0 20px;
 
       &:before,
       &::before {
@@ -93,18 +93,23 @@ strong, div, span, li, em, p, a {
 
         &.i-list-alt {
           background: url('../../img/list.svg') 0 0 / contain no-repeat;
+          margin: 3px -2px 0px 2px;
         }
         &.i-search {
           background: url('../../img/search.svg') 0 0 / contain no-repeat;
+          margin: 1px -1px 0px 1px;
         }
         &.i-bookmark-o {
           background: url('../../img/bookmark.svg') 0 0 / contain no-repeat;
+          margin: 0px 1px -8px -1px;
         }
         &.i-lock {
           background: url('../../img/lock.svg') 0 0 / contain no-repeat;
+          margin: 0px -4px 0px 4px;
         }
         &.i-user {
           background: url('../../img/shields.svg') 0 0 / contain no-repeat;
+          margin: -3px -1px 0px 1px;
         }
         &.i-refresh {
           background: url('../../img/refresh.svg') 0 0 / contain no-repeat;
@@ -146,7 +151,7 @@ strong, div, span, li, em, p, a {
 }
 
 .helpfulHints {
-  color: @white50;
+  color: #eee;
   cursor: default;
   padding: 30px 0;
   margin-top: 20px;
@@ -156,15 +161,15 @@ strong, div, span, li, em, p, a {
     -webkit-app-region: no-drag;
     font-size: inherit;
     font-weight: normal;
-    margin: 10px;
+    margin: 18px;
     * {
       color: white;
     }
   }
   > div {
     color: white;
-    font-size: smaller;
-    margin: 10px;
+    font-size: 0.8em;;
+    margin: 8px 10px 15px 18px;
   }
   >.helpfulHintsBottom {
     position: absolute;
@@ -235,7 +240,7 @@ a {
 .settingsList em {
   color: @darkGray;
   font-size: 0.9em;
-  margin: 0.75em 0 0;
+  margin: 1.2em 2px 7px;
 }
 
 .settingsListLink {
@@ -262,7 +267,7 @@ a {
     }
 
     .switchControl {
-      min-width: 60px;
+      min-width: 54px;
     }
 
     span:not(.browserButton) {
