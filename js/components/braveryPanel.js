@@ -6,6 +6,7 @@ const React = require('react')
 const ipc = require('electron').ipcRenderer
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
+const config = require('../constants/config')
 const Dialog = require('./dialog')
 const SwitchControl = require('./switchControl')
 const windowActions = require('../actions/windowActions')
@@ -33,6 +34,7 @@ class BraveryPanel extends ImmutableComponent {
     this.onToggleFp = this.onToggleSiteSetting.bind(this, 'fingerprintingProtection')
     this.onReload = this.onReload.bind(this)
     this.onEditGlobal = this.onEditGlobal.bind(this)
+    this.onInfoClick = this.onInfoClick.bind(this)
   }
   get isBlockingTrackedContent () {
     return this.blockedByTrackingList && this.blockedByTrackingList.size > 0
@@ -129,6 +131,9 @@ class BraveryPanel extends ImmutableComponent {
   }
   onEditGlobal () {
     ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, 'about:preferences#privacy')
+  }
+  onInfoClick () {
+    ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, config.fingerprintingInfoUrl)
   }
   onToggleSiteSetting (setting, e) {
     let ruleKey = siteUtil.getOrigin(this.props.activeRequestedLocation)
@@ -286,7 +291,7 @@ class BraveryPanel extends ImmutableComponent {
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
                   </select>
-                  <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} infoUrl='https://github.com/brave/browser-laptop/wiki/Fingerprinting-Protection-Mode' className='fingerprintingProtectionSwitch' />
+                  <SwitchControl onClick={this.onToggleFp} rightl10nId='fingerprintingProtection' checkedOn={fpEnabled} disabled={!shieldsUp} onInfoClick={this.onInfoClick} className='fingerprintingProtectionSwitch' />
                   <SwitchControl onClick={this.onToggleSafeBrowsing} rightl10nId='safeBrowsing' checkedOn={this.props.braverySettings.safeBrowsing} disabled={!shieldsUp} />
                 </div>
               </div></span>
