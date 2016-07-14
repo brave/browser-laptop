@@ -245,7 +245,7 @@ var callback = (err, result, delayTime) => {
   } else if (result.persona) {
     returnValue.statusText = ''
   } else {
-    returnValue.statusText = 'Initializing'
+    returnValue.statusText = 'Initializing.'
   }
   cacheRuleSet(result.ruleset)
 
@@ -610,7 +610,7 @@ var visit = (location, timestamp) => {
 }
 
 var handleGeneralCommunication = (event) => {
-  var info, now, result, timestamp
+  var info, now, offset, result, timestamp
 
   if (!returnValue.enabled) {
     event.returnValue = { enabled: false }
@@ -629,11 +629,14 @@ var handleGeneralCommunication = (event) => {
 
     if (timestamp > then) timestamp = then
   })
-  returnValue.statusText = 'Publisher synopsis as of ' + moment(timestamp).fromNow()
   if (returnValue._internal.reconcileStamp) {
-    returnValue.statusText += ', reconcilation due ' + moment(returnValue._internal.reconcileStamp).fromNow()
+    offset = moment(returnValue._internal.reconcileStamp).fromNow()
+    if (returnValue._internal.reconcileStamp > now) {
+      returnValue.statusText = 'Publishers love you! Next submission ' + offset + '.'
+    } else {
+      returnValue.statusText = 'Monthly publisher submission overdue ' + offset + '. Please add funds.'
+    }
   }
-  returnValue.statusText += '.'
 
   result = underscore.omit(returnValue, '_internal')
   info = returnValue._internal.paymentInfo
