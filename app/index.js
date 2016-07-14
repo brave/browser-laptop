@@ -607,6 +607,9 @@ app.on('ready', () => {
       }
 
       passwordCallbacks[message] = (buttonIndex) => {
+        passwordCallbacks[message] = null
+        appActions.hideMessageBox(message)
+
         if (buttonIndex === 1) {
           return
         }
@@ -632,9 +635,7 @@ app.on('ready', () => {
     ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
       if (passwordCallbacks[message]) {
         passwordCallbacks[message](buttonIndex)
-        delete passwordCallbacks[message]
       }
-      appActions.hideMessageBox(message)
     })
 
     // Setup the crash handling
