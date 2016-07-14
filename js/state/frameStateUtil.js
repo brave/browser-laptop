@@ -68,6 +68,14 @@ function getFrameByKey (windowState, key) {
   return find(windowState, {key})
 }
 
+function isFrameKeyPinned (frames, key) {
+  if (typeof key !== 'number') {
+    return false
+  }
+  const frame = frames.find(matchFrame.bind(null, {key}))
+  return frame ? frame.get('pinnedLocation') : false
+}
+
 function getFrameByTabId (windowState, tabId) {
   return find(windowState, {tabId})
 }
@@ -305,6 +313,9 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     if (!isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
       break
     }
+  }
+  if (isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
+    insertionIndex = 0
   }
 
   return {
