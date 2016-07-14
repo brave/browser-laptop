@@ -404,9 +404,14 @@ const init = (settingsState, args) => {
             appActions.clearSitesWithoutTags(appStore.getState().get('sites'))
           }
         }, {
+          label: locale.translation('clearCache'),
+          click: function () {
+            Filtering.clearCache()
+          }
+        }, {
           label: locale.translation('clearSiteData'),
           click: function () {
-            Filtering.clearSessionData()
+            Filtering.clearStorageData()
           }
         }
       ]

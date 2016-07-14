@@ -113,7 +113,7 @@ module.exports = {
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
-    'shutdown.all-site-cookies': false
+    'shutdown.clear-all-site-cookies': false
   },
   uaExceptionHosts: [
     'get.adobe.com', 'adobe.com', 'www.adobe.com', 'helpx.adobe.com'

@@ -17,6 +17,7 @@ const urlParse = require('url').parse
 const getBaseDomain = require('../js/lib/baseDomain').getBaseDomain
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
+const promisify = require('../js/lib/promisify')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
@@ -551,12 +552,30 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   return false
 }
 
-module.exports.clearSessionData = () => {
+/**
+ * Clears all storage data.
+ * This includes: appcache, cookies, filesystem, indexdb, local storage,
+ * shadercache, websql, and serviceworkers.
+ * @return a promise that always resolves (called on app shutdon so must always)
+ */
+module.exports.clearStorageData = () => {
+  let p = Promise.resolve()
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
-    ses.clearStorageData(() => {
-    })
-    ses.clearCache(() => {
-    })
+    p = p.then(promisify(ses.clearStorageData.bind(ses)).catch(() => {}))
   }
+  return p
+}
+
+/**
+ * Clears all session cache.
+ * @return a promise that always resolves (called on app shutdon so must always)
+ */
+module.exports.clearCache = () => {
+  let p = Promise.resolve()
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    p = p.then(promisify(ses.clearCache.bind(ses)).catch(() => {}))
+  }
+  return p
 }

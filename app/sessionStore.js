@@ -19,6 +19,8 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
 const sessionStorageVersion = 1
+const filtering = require('./filtering')
+
 let suffix = ''
 if (process.env.NODE_ENV === 'development') {
   suffix = '-dev'
@@ -56,7 +58,7 @@ module.exports.saveAppState = (payload) => {
     }
 
     try {
-      module.exports.cleanAppData(payload)
+      module.exports.cleanAppData(payload, true)
       payload.cleanedOnShutdown = true
     } catch (e) {
       payload.cleanedOnShutdown = false
@@ -69,6 +71,7 @@ module.exports.saveAppState = (payload) => {
 
     promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
       .then(() => promisify(fs.rename, tmpStoragePath, storagePath))
+      .then(module.exports.cleanSessionDataOnShutdown())
       .then(resolve)
       .catch(reject)
   })
@@ -77,29 +80,29 @@ module.exports.saveAppState = (payload) => {
 /**
  * Cleans session data from unwanted values.
  */
-module.exports.cleanSessionData = (sessionData) => {
-  if (!sessionData) {
-    sessionData = {}
+module.exports.cleanPerWindowData = (perWindowData) => {
+  if (!perWindowData) {
+    perWindowData = {}
   }
   // Hide the context menu when we restore.
-  delete sessionData.contextMenuDetail
+  delete perWindowData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
-  delete sessionData.previewFrameKey
+  delete perWindowData.previewFrameKey
   // Don't restore add/edit dialog
-  delete sessionData.bookmarkDetail
+  delete perWindowData.bookmarkDetail
   // Don't restore bravery panel
-  delete sessionData.braveryPanelDetail
+  delete perWindowData.braveryPanelDetail
   // Don't restore drag data
-  if (sessionData.ui) {
-    delete sessionData.ui.dragging
+  if (perWindowData.ui) {
+    delete perWindowData.ui.dragging
   }
-  sessionData.frames = sessionData.frames || []
+  perWindowData.frames = perWindowData.frames || []
   let newKey = 0
   const cleanFrame = (frame) => {
     newKey++
     // Reset the ids back to sequential numbers
-    if (frame.key === sessionData.activeFrameKey) {
-      sessionData.activeFrameKey = newKey
+    if (frame.key === perWindowData.activeFrameKey) {
+      perWindowData.activeFrameKey = newKey
     } else {
       // For now just set everything to unloaded unless it's the active frame
       frame.unloaded = true
@@ -181,22 +184,24 @@ module.exports.cleanSessionData = (sessionData) => {
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
   // the max frame key ID.
-  if (sessionData.closedFrames) {
-    sessionData.closedFrames.forEach(cleanFrame)
+  if (perWindowData.closedFrames) {
+    perWindowData.closedFrames.forEach(cleanFrame)
   }
-  if (sessionData.frames) {
+  if (perWindowData.frames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    sessionData.frames = sessionData.frames
+    perWindowData.frames = perWindowData.frames
       .filter((frame) => !frame.pinnedLocation)
-    sessionData.frames.forEach(cleanFrame)
+    perWindowData.frames.forEach(cleanFrame)
   }
 }
 
 /**
  * Cleans app data before it's written to disk.
  * @param {Object} data - top-level app data
+ * @param {Object} isShutdown - true if the data is being cleared for a shutdown
+ * WARNING: getPrefs is only available in this function when isShutdown is true
  */
-module.exports.cleanAppData = (data) => {
+module.exports.cleanAppData = (data, isShutdown) => {
   if (data.settings) {
     // useragent value gets recalculated on restart
     data.settings[settings.USERAGENT] = undefined
@@ -211,7 +216,7 @@ module.exports.cleanAppData = (data) => {
   // Get rid of them here.
   delete data.windows
   if (data.perWindowState) {
-    data.perWindowState.forEach(module.exports.cleanSessionData)
+    data.perWindowState.forEach(module.exports.cleanPerWindowData)
   }
   // Delete expired Flash approvals
   let now = Date.now()
@@ -222,13 +227,13 @@ module.exports.cleanAppData = (data) => {
     }
   }
   if (data.sites) {
-    const clearHistory = getSetting(settings.SHUTDOWN_CLEAR_HISTORY)
+    const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)
     if (clearHistory) {
       data.sites = data.sites.filter((site) => site && site.tags && site.tags.size)
     }
   }
   if (data.downloads) {
-    const clearDownloads = getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS)
+    const clearDownloads = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS)
     if (clearDownloads) {
       delete data.downloads
     } else {
@@ -247,6 +252,21 @@ module.exports.cleanAppData = (data) => {
       })
     }
   }
+}
+
+/**
+ * Cleans session data on shutdown if the prefs are on.
+ * @return a promise which resolve when the work is done.
+ */
+module.exports.cleanSessionDataOnShutdown = () => {
+  let p = Promise.resolve()
+  if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES)) {
+    p = p.then(filtering.clearStorageData())
+  }
+  if (getSetting(settings.SHUTDOWN_CLEAR_CACHE)) {
+    p = p.then(filtering.clearCache())
+  }
+  return p
 }
 
 /**
@@ -279,7 +299,7 @@ module.exports.loadAppState = () => {
     }
     // Clean app data here if it wasn't cleared on shutdown
     if (data.cleanedOnShutdown !== true) {
-      module.exports.cleanAppData(data)
+      module.exports.cleanAppData(data, false)
     }
     data.cleanedOnShutdown = false
     // Always recalculate the update status

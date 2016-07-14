@@ -34,7 +34,7 @@ const settings = {
   SHUTDOWN_CLEAR_HISTORY: 'shutdown.clear-history',
   SHUTDOWN_CLEAR_DOWNLOADS: 'shutdown.clear-downloads',
   SHUTDOWN_CLEAR_CACHE: 'shutdown.clear-cache',
-  SHUTDOWN_ALL_SITE_COOKIES: 'shutdown.all-site-cookies',
+  SHUTDOWN_CLEAR_ALL_SITE_COOKIES: 'shutdown.clear-all-site-cookies',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',

@@ -158,7 +158,7 @@ AppStore
     'shutdown.clear-history': boolean, // true to clear history on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
-    'shutdown.all-site-cookies': boolean, // true to clear all site cookies on shutdown
+    'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
   }],
   dictionary: {
     locale: string, // en_US, en, or any other locale string

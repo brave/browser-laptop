@@ -103,6 +103,7 @@ var rendererIdentifiers = function () {
     'forward',
     'reopenLastClosedWindow',
     'showAllHistory',
+    'clearCache',
     'clearHistory',
     'clearSiteData',
     'bookmarks',
