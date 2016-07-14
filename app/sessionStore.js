@@ -221,6 +221,32 @@ module.exports.cleanAppData = (data) => {
       delete data.siteSettings[host].flash
     }
   }
+  if (data.sites) {
+    const clearHistory = getSetting(settings.SHUTDOWN_CLEAR_HISTORY)
+    if (clearHistory) {
+      data.sites = data.sites.filter((site) => site && site.tags && site.tags.size)
+    }
+  }
+  if (data.downloads) {
+    const clearDownloads = getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS)
+    if (clearDownloads) {
+      delete data.downloads
+    } else {
+      // Always at least delete downloaded items older than a week
+      const dateOffset = 7 * 24 * 60 * 60 * 1000
+      const lastWeek = new Date().getTime() - dateOffset
+      Object.keys(data.downloads).forEach((downloadId) => {
+        if (data.downloads[downloadId].startTime < lastWeek) {
+          delete data.downloads[downloadId]
+        } else {
+          const state = data.downloads[downloadId].state
+          if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
+            data.downloads[downloadId].state = downloadStates.INTERRUPTED
+          }
+        }
+      })
+    }
+  }
 }
 
 /**
@@ -270,21 +296,6 @@ module.exports.loadAppState = () => {
         })
         return
       }
-    }
-    // Delete downloaded items older than a week
-    if (data.downloads) {
-      const dateOffset = 7 * 24 * 60 * 60 * 1000
-      const lastWeek = new Date().getTime() - dateOffset
-      Object.keys(data.downloads).forEach((downloadId) => {
-        if (data.downloads[downloadId].startTime < lastWeek) {
-          delete data.downloads[downloadId]
-        } else {
-          const state = data.downloads[downloadId].state
-          if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
-            data.downloads[downloadId].state = downloadStates.INTERRUPTED
-          }
-        }
-      })
     }
     resolve(data)
   })
