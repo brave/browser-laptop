@@ -31,8 +31,7 @@ let generateBraveManifest = () => {
           'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
           'content/scripts/block3rdPartyContent.js',
-          'content/scripts/inputHandler.js',
-          'content/scripts/spellCheck.js'
+          'content/scripts/inputHandler.js'
         ],
         css: [
           'brave-default.css'
@@ -49,12 +48,25 @@ let generateBraveManifest = () => {
           getIndexHTML()
         ],
         js: [
+          'js/actions/extensionActions.js',
           'content/scripts/adInfo.js',
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
-          'js/actions/extensionActions.js',
           'content/scripts/themeColor.js'
+        ]
+      },
+      {
+        run_at: 'document_end',
+        matches: ['<all_urls>'],
+        include_globs: [
+          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
+        ],
+        exclude_globs: [
+          getIndexHTML()
+        ],
+        js: [
+          'content/scripts/spellCheck.js'
         ]
       },
       {

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const placeholderUrl = chrome.extension.getURL('about-flash.html')
+
 function isAdobeLink (href) {
   if (typeof href !== 'string') {
     return false
@@ -20,17 +22,17 @@ function isAdobeLink (href) {
       }
     })
   }
-  var observer = new window.MutationObserver(function (mutations) {
+  setTimeout(() => {
+    var observer = new window.MutationObserver(function (mutations) {
+      replaceAdobeLinks()
+    })
     replaceAdobeLinks()
-  })
-  replaceAdobeLinks()
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true
-  })
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    })
+  }, 1000)
 })()
-
-const placeholderUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-flash.html'
 
 /**
  * Whether a src is a .swf file.
@@ -150,15 +152,17 @@ function insertFlashPlaceholders (elem) {
   })
 }
 
-var observer = new window.MutationObserver(function (mutations) {
-  insertFlashPlaceholders(document.documentElement)
-})
-
-if (chrome.contentSettings.flashActive != 'allow' ||
-    chrome.contentSettings.flashEnabled != 'allow') {
-  insertFlashPlaceholders(document.documentElement)
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true
+setTimeout(() => {
+  var observer = new window.MutationObserver(function (mutations) {
+    insertFlashPlaceholders(document.documentElement)
   })
-}
+
+  if (chrome.contentSettings.flashActive != 'allow' ||
+      chrome.contentSettings.flashEnabled != 'allow') {
+    insertFlashPlaceholders(document.documentElement)
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    })
+  }
+}, 1000)
