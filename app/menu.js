@@ -498,8 +498,15 @@ const init = (settingsState, args) => {
           }
         }, {
           label: 'Crash main process',
-          click: function (item, focusedWindow) {
+          click: function () {
             process.crash()
+          }
+        }, {
+          label: 'Relaunch',
+          accelerator: 'Command+Alt+R',
+          click: function () {
+            electron.app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
+            process.exit(0)
           }
         }
       ]

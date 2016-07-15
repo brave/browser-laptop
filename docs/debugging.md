@@ -28,7 +28,9 @@ The code which runs in the main process is inside of the `app` directory.
 
 Calls to `console.log` and related functions go into the terminal you did `npm start` from.
 
-Unlike with the renderer process, since the main process isn't using webpack dev server, you will need to manually restart the app to see your changes.
+Unlike with the renderer process, since the main process isn't using webpack dev server, you will need to restart the app to see your changes.
+The app can be restarted with `Command+Alt+R` when using a development environment.
+
 
 ## Debugging Content
 
