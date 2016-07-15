@@ -55,7 +55,7 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
  * @param {string=} loc - Original URL
  */
 const setPDFLocation = (loc) => {
-  if (loc && UrlUtil.isFileType(loc, 'pdf')) {
+  if (loc && UrlUtil.isFileType(loc, 'pdf') && !loc.startsWith(PDFJS_ORIGIN)) {
     return PDFJS_ORIGIN + loc
   }
   return loc
