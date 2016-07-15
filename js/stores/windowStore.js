@@ -36,6 +36,7 @@ let windowState = Immutable.fromJS({
 let lastEmittedState
 
 const CHANGE_EVENT = 'change'
+const PDFJS_ORIGIN = 'chrome-extension://adnmjfhcejodgpaljdmlmjoclihpcfka/'
 
 const frameStatePath = (key) =>
   ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
@@ -46,6 +47,18 @@ const frameStatePathForFrame = (frameProps) =>
 const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
   windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'location']), loc)
   windowState = windowState.setIn(frameStatePath.concat(['navbar', 'urlbar', 'urlPreview']), null)
+}
+
+/**
+ * PDFJS shows a server error if a PDF link does not fire a navigation event.
+ * Workaround by setting the PDF location manually.
+ * @param {string=} loc - Original URL
+ */
+const setPDFLocation = (loc) => {
+  if (loc && UrlUtil.isFileType(loc, 'pdf')) {
+    return PDFJS_ORIGIN + loc
+  }
+  return loc
 }
 
 /**
@@ -155,6 +168,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL:
       const frame = FrameStateUtil.getFrameByKey(windowState, action.key)
       const currentLocation = frame.get('location')
+      action.location = setPDFLocation(action.location)
       const parsedUrl = urlParse(action.location)
 
       // For types that are not navigatable, just do a loadUrl on them
@@ -327,10 +341,7 @@ const doAction = (action) => {
       } else if (action.frameOpts.isPartitioned) {
         nextPartitionNumber = incrementPartitionNumber()
       }
-      if (action.frameOpts.location && UrlUtil.isFileType(action.frameOpts.location, 'pdf')) {
-        // Workaround #2427
-        action.frameOpts.location = 'chrome-extension://adnmjfhcejodgpaljdmlmjoclihpcfka/' + action.frameOpts.location
-      }
+      action.frameOpts.location = setPDFLocation(action.frameOpts.location)
       windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
         nextKey, nextPartitionNumber, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
       if (action.openInForeground) {
