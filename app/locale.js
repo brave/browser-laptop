@@ -19,6 +19,7 @@ var rendererIdentifiers = function () {
     'passwordCopied',
     'flashInstalled',
     'about',
+    'aboutApp',
     'quit',
     'quitApp',
     'addToReadingList',
