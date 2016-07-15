@@ -295,7 +295,7 @@ module.exports.autoHideMenuBarMenuItem = () => {
 
 module.exports.aboutBraveMenuItem = () => {
   return {
-    label: locale.translation('about') + ' ' + appConfig.name,
+    label: locale.translation('aboutApp'),
     click: (item, focusedWindow) => {
       if (process.type === 'browser') {
         process.emit(messages.SHOW_ABOUT)
