@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.11.1](https://github.com/brave/browser-laptop/releases/v0.11.1dev)
+- Added built-in PDF reader with PDF.js. Can be disabled in preferences. ([#1084](https://github.com/brave/browser-laptop/issues/1084))
+- Added more data clearing options, including on shutdown. ([#2472](https://github.com/brave/browser-laptop/issues/2472))
+- Added support for navigator.registerProtocolHandler (Mostly used for gmail `mailto:` and `bitcoin:` handling). ([#1583](https://github.com/brave/browser-laptop/issues/1583))
+- Added Copy Image to clipboard option through the context menu. ([#1174](https://github.com/brave/browser-laptop/issues/1174))
+- Added a customized Windows 10 Start Menu tile. ([#2372](https://github.com/brave/browser-laptop/issues/2372))
+- Added edit bookmark ability when staring a site. ([#2439](https://github.com/brave/browser-laptop/issues/2439))
+- Added Lastpass preferences. ([#2411](https://github.com/brave/browser-laptop/pull/2411))
+- Added `Command + Shift + Click` support for various UI elements to open and focus a new tab. ([#2436](https://github.com/brave/browser-laptop/issues/2436))
+- Fixed Vimeo player not playing due to referrer blocking. ([#2474](https://github.com/brave/browser-laptop/issues/2474))
+- Fixed crashes with notifications. ([#1931](https://github.com/brave/browser-laptop/issues/1931))
+- Fixed new-tab ordering from pinned tabs. ([#2453](Opening another tab from pinned tab does not order correctly #2453))
+- Fixed exiting full screen when closing a full screen tab. ([#2404](https://github.com/brave/browser-laptop/issues/2404))
+- Fixed spell check happening in URLbar. ([#2434](https://github.com/brave/browser-laptop/issues/2434))
+- Fixed webRTC fingerprinting blocking. ([#2412](https://github.com/brave/browser-laptop/issues/2412))
+- Fixed find in page highlighting not clearing when find bar is closed. ([#2476](https://github.com/brave/browser-laptop/issues/2476))
+- Upgrade to Electron 1.2.7. ([#2470](https://github.com/brave/browser-laptop/issues/2470))
+
 ## [0.11.0](https://github.com/brave/browser-laptop/releases/v0.11.0dev)
 - Added LastPass support. ([#2316](https://github.com/brave/browser-laptop/issues/2316))
 - Added WebRTC fingerprinting protection. ([#260](https://github.com/brave/browser-laptop/issues/260))
