@@ -238,7 +238,8 @@ a {
 .settingsListTitle,
 .settingsListLink,
 .settingsList .settingItem span:not(.browserButton),
-.settingsList em {
+.settingsList em,
+.settingsList .subtext {
   color: @darkGray;
   font-size: 0.9em;
   margin: 1.2em 2px 7px;
@@ -280,6 +281,7 @@ a {
       text-align: left;
       font-size: 0.95em;
     }
+
     .linkText {
       text-align: left;
     }
@@ -308,6 +310,10 @@ a {
       width: 100px;
     }
   }
+
+  .subtext {
+    font-size: 0.95em;
+  }
 }
 
 input:not([type="checkbox"]), select {
@@ -325,8 +331,8 @@ input[type="checkbox"][disabled] {
   display: inline-block;
   text-decoration: underline;
   color: @braveOrange;
-  cursor: default;
-  margin: 20px auto;
+  cursor: pointer;
+  margin: 0;
 
   &:hover {
     color: #000;
@@ -423,7 +429,7 @@ table.sortableTable {
 }
 
 #flashInfoIcon {
-  padding: 5px;
+  padding: 5px 5px 5px 0;
 }
 
 #coinbaseLogo {
