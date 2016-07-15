@@ -14,7 +14,7 @@
 <submit "জমা দিন">
 <settings "সেটিংস">
 <aboutPages "About পাতাগুলো">
-<listOfAboutPages "about পেজগুলোর তালিকা">
+<listOfAboutPages "about পাতাগুলোর তালিকা">
 <history "ইতিহাস">
 <settingName "সেটিংস এর নাম">
 <settingValue "সেটিংস এর মান">
@@ -29,7 +29,7 @@
 <openTypeInNewPrivateTab "{{$type}} একটি নতুন গোপনীয় ট্যাবে খুলুন">
 <copyLinkLocation "লিঙ্কের অবস্থান কপি করুন">
 <closeTab "ট্যাব বন্ধ করুন">
-<closeTabButton title: "ট্যাব বন্ধ করুন">
+<closeTabButton title: "ট্যাব বাটন বন্ধ করুন">
 <closeOtherTabs "অন্যান্য ট্যাবগুলো বন্ধ করুন">
 <reloadTab "ট্যাব পুনরায় লোড করুন">
 <reloadButton title: "পাতাটি পুনরায় লোড করুন">
@@ -43,8 +43,8 @@
 <downloadType "{{$type}} ডাউনলোড করুন">
 <setDefaultSearch "{{$title}} কে ডিফল্ট সার্চ ইঞ্জিন হিসাবে নির্ধারণ করুন">
 <viewPageSource "পাতাটির সোর্স কোড দেখুন">
-<menuButton title: "মেন্যু">
-<emptyFolderItem "(ফাঁকা)">
+<menuButton title: "মেনু বাটন">
+<emptyFolderItem "(ফাঁকা ফোল্ডার)">
 <moreBookmarks "আরও বুকমার্ক...">
 
 <braveMenuTotalReplacements "মোট প্রতিস্থাপিত হয়েছে: {{$count}}">
@@ -55,7 +55,7 @@
 <basicAuthMessage "{{$host}} এ আপনার পাসওয়ার্ড ও ইউজারনেম প্রয়োজন”>
 
 <crashScreenHeader "কোন কিছু ভুল হয়েছে =(">
-<crashScreenText "ওয়েবপেজ লোড করার সময় ত্রুটি দেখা গেছে। পাতাটি পুনরায় লোড করুন অথবা অন্য পাতায় যান">
+<crashScreenText "ওয়েবপেজ লোড করার সময় সমস্যা দেখা গেছে। পাতাটি পুনরায় লোড করুন অথবা অন্য পাতায় যান">
 
 <deny "গ্রহণযোগ্য নয়">
 <grant "গ্রহণযোগ্য">
@@ -88,7 +88,7 @@
 <updateError "আমরা আপডেট করতে সক্ষম হইনি">
 <updateHello "হ্যালো!">
 <updateOops "উফ!">
-<updateNotYet "এখনো নয়t!">
+<updateNotYet "এখনো আপডেট হয়নি">  
 <updateAvail "Brave এর একটি আপডেট সংস্করণ এই মাত্র প্রকাশিত হলো">
 <updateNotAvail "দুঃখিত, এখনো কোন আপডেট পাওয়া যায়নি। দয়া করে পরবর্তীতে চেস্টা করুন">
 <updateRequiresRelaunch "দ্রুত পুনরায় চালু করা প্রয়োজন...">
@@ -108,9 +108,9 @@
 }>
 <caseSensitivity "বড়/ছোট অক্ষর অনুরূপ খুঁজুন">
 
-<nameField "শিরোনাম:">
-<locationField "অবস্থান:">
-<parentFolderField "ফোল্ডার:">
+<nameField "শিরোনাম এর জায়গা:">
+<locationField "অবস্থান এর জায়গা:">
+<parentFolderField "ফোল্ডার এর জায়গা:">
 <save "সংরক্ষণ করুন">
 
 <bookmarksToolbar "বুকমার্ক টুলবার">
