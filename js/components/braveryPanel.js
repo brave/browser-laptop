@@ -130,7 +130,7 @@ class BraveryPanel extends ImmutableComponent {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.props.activeRequestedLocation)
   }
   onEditGlobal () {
-    ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, 'about:preferences#privacy')
+    ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, 'about:preferences#shields')
   }
   onInfoClick () {
     ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, config.fingerprintingInfoUrl)
