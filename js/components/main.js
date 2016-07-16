@@ -182,12 +182,14 @@ class Main extends ImmutableComponent {
           return
         }
       }
+      const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
 
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
       windowActions.newFrame({
         location: url || config.defaultUrl,
         isPrivate: !!options.isPrivate,
-        isPartitioned: !!options.isPartitioned
+        isPartitioned: !!options.isPartitioned,
+        parentFrameKey: activeFrame.get('key')
       }, openInForeground)
     })
 
