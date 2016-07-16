@@ -180,14 +180,28 @@ class BookmarksList extends ImmutableComponent {
   }
 }
 
+class SearchResults extends React.Component {
+  render () {
+    return (
+      <list className='bookmarkList'>
+      {
+        this.props.bookmarks.map((bookmark) => <BookmarkItem bookmark={bookmark} />)
+      }
+      </list>
+    )
+  }
+}
+
 class AboutBookmarks extends React.Component {
   constructor () {
     super()
     this.onChangeSelectedFolder = this.onChangeSelectedFolder.bind(this)
+    this.onChangeSearch = this.onChangeSearch.bind(this)
     this.state = {
       bookmarks: Immutable.Map(),
       bookmarkFolders: Immutable.Map(),
-      selectedFolderId: 0
+      selectedFolderId: 0,
+      search: null
     }
     ipc.on(messages.BOOKMARKS_UPDATED, (e, detail) => {
       this.setState({
@@ -201,9 +215,22 @@ class AboutBookmarks extends React.Component {
       selectedFolderId: id
     })
   }
+  onChangeSearch (evt) {
+    console.log('search term changed')
+    this.setState({
+      search: evt.target.value
+    })
+  }
+  searchedBookmarks (searchTerm, bookmarks) {
+    return bookmarks.filter((bookmark) => {
+      const title = bookmark.get('customTitle') || bookmark.get('title')
+      return title.match(new RegExp(searchTerm, 'gi'))
+    })
+  }
   render () {
     return <div className='bookmarksPage'>
       <h2 data-l10n-id='folders' />
+      <input type='text' className='searchInput' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
       <div className='bookmarkPageContent'>
         <Sticky enabled top={10}>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
@@ -212,7 +239,9 @@ class AboutBookmarks extends React.Component {
             isRoot
             selectedFolderId={this.state.selectedFolderId} />
         </Sticky>
-        <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />
+        {this.state.search
+         ? <SearchResults bookmarks={this.searchedBookmarks(this.state.search, this.state.bookmarks)} />
+         : <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />}
       </div>
     </div>
   }
