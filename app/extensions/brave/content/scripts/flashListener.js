@@ -135,7 +135,6 @@ function insertFlashPlaceholders (elem) {
         return
       }
       let iframe = document.createElement('iframe')
-      iframe.setAttribute('sandbox', 'allow-scripts')
       let hash = window.location.origin
       if (chrome.contentSettings.flashEnabled == 'allow') {
         hash = hash + '#flashEnabled'

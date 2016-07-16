@@ -76,16 +76,6 @@ let generateBraveManifest = () => {
         exclude_globs: [
           getAppUrl('about-blank.html')
         ]
-      },
-      {
-        run_at: 'document_start',
-        all_frames: true,
-        js: [
-          'content/scripts/brave-about-flash.js'
-        ],
-        matches: [
-          '<all_urls>'
-        ]
       }
     ],
     permissions: [
