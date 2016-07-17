@@ -74,6 +74,7 @@ const messages = {
   SET_RESOURCE_ENABLED: _,
   GO_BACK: _,
   GO_FORWARD: _,
+  GOT_PDFJS_URL: _, /** @arg {string} origin - of PDFJS extension */
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */

@@ -488,6 +488,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_DICTIONARY:
       appState = appState.setIn(['dictionary', 'locale'], action.locale)
       break
+    case AppConstants.APP_SET_PDFJS_ORIGIN:
+      appState = appState.set('pdfjsOrigin', action.origin)
+      break
     default:
   }
 

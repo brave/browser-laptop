@@ -20,6 +20,9 @@ limitations under the License.
 (function ExtensionRouterClosure() {
   var VIEWER_URL = chrome.extension.getURL('content/web/viewer.html');
   var CRX_BASE_URL = chrome.extension.getURL('/');
+  if (chrome.ipc && chrome.ipc.send) {
+    chrome.ipc.send('got-pdfjs-url', CRX_BASE_URL)
+  }
 
   var schemes = [
     'http',

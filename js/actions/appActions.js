@@ -323,6 +323,18 @@ const appActions = {
       actionType: AppConstants.APP_SET_DICTIONARY,
       locale
     })
+  },
+
+  /**
+   * Sets PDFJS origin
+   * @param {string} origin - The origin of the PDFJS extension. Ends in
+   *   a slash.
+   */
+  setPDFJSOrigin: function (origin) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_PDFJS_ORIGIN,
+      origin
+    })
   }
 }
 

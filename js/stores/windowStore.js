@@ -36,7 +36,7 @@ let windowState = Immutable.fromJS({
 let lastEmittedState
 
 const CHANGE_EVENT = 'change'
-const PDFJS_ORIGIN = 'chrome-extension://adnmjfhcejodgpaljdmlmjoclihpcfka/'
+let PDFJS_ORIGIN = null
 
 const frameStatePath = (key) =>
   ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
@@ -55,7 +55,9 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
  * @param {string=} loc - Original URL
  */
 const setPDFLocation = (loc) => {
-  if (loc && UrlUtil.isFileType(loc, 'pdf') && !loc.startsWith(PDFJS_ORIGIN)) {
+  PDFJS_ORIGIN = PDFJS_ORIGIN || require('./appStoreRenderer').state.get('pdfjsOrigin')
+  if (loc && PDFJS_ORIGIN &&
+      UrlUtil.isFileType(loc, 'pdf') && !loc.startsWith(PDFJS_ORIGIN)) {
     return PDFJS_ORIGIN + loc
   }
   return loc

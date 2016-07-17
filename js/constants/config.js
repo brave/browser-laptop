@@ -40,5 +40,6 @@ module.exports = {
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
     replacementUrl: adHost
   },
-  braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd'
+  braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
+  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm'
 }
