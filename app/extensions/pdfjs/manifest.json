@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PDF Viewer",
-  "version": "1.5.338",
+  "version": "1.5.339",
   "description": "Uses HTML5 to display PDF files directly in the browser.",
   "icons": {
     "128": "icon128.png",
