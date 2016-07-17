@@ -165,7 +165,11 @@ var rendererIdentifiers = function () {
     'historySuggestionTitle',
     'aboutPagesSuggestionTitle',
     'searchSuggestionTitle',
-    'topSiteSuggestionTitle'
+    'topSiteSuggestionTitle',
+    'prefsRestart',
+    'yes',
+    'no',
+    'neverForThisSite'
   ]
 }
 

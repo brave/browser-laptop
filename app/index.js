@@ -63,6 +63,8 @@ let throttleKeytar = false
 // Map of password notification bar messages to their callbacks
 const passwordCallbacks = {}
 
+const prefsRestartCallbacks = {}
+
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
@@ -381,6 +383,26 @@ app.on('ready', () => {
       app.quit()
     })
 
+    ipcMain.on(messages.PREFS_RESTART, () => {
+      var message = locale.translation('prefsRestart')
+
+      appActions.showMessageBox({
+        buttons: [locale.translation('yes'), locale.translation('no')],
+        options: {
+          persist: false
+        },
+        message
+      })
+      prefsRestartCallbacks[message] = (buttonIndex, persist) => {
+        if (buttonIndex === 0) {
+          app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
+          app.exit(0)
+        } else {
+          appActions.hideMessageBox(message)
+        }
+      }
+    })
+
     ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
       Menu.init(AppStore.getState().get('settings'), args)
     })
@@ -597,7 +619,11 @@ app.on('ready', () => {
       if (!(message in passwordCallbacks)) {
         // Notification not shown already
         appActions.showMessageBox({
-          buttons: ['Yes', 'No', 'Never for this site'],
+          buttons: [
+            locale.translation('yes'),
+            locale.translation('no'),
+            locale.translation('neverForThisSite')
+          ],
           options: {
             persist: false,
             advancedText: '[Password settings]',
@@ -633,9 +659,12 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
+    ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
       if (passwordCallbacks[message]) {
         passwordCallbacks[message](buttonIndex)
+      }
+      if (prefsRestartCallbacks[message]) {
+        prefsRestartCallbacks[message](buttonIndex, persist)
       }
     })
 
