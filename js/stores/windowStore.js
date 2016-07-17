@@ -55,6 +55,9 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
  * @param {string=} loc - Original URL
  */
 const setPDFLocation = (loc) => {
+  if (!getSetting(settings.PDFJS_ENABLED)) {
+    return loc
+  }
   PDFJS_ORIGIN = PDFJS_ORIGIN || require('./appStoreRenderer').state.get('pdfjsOrigin')
   if (loc && PDFJS_ORIGIN &&
       UrlUtil.isFileType(loc, 'pdf') && !loc.startsWith(PDFJS_ORIGIN)) {
