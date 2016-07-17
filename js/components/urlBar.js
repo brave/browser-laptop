@@ -15,8 +15,11 @@ const ipc = global.require('electron').ipcRenderer
 const UrlBarSuggestions = require('./urlBarSuggestions.js')
 const messages = require('../constants/messages')
 const dragTypes = require('../constants/dragTypes')
+const { getSetting } = require('../settings')
+const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
+const appStoreRenderer = require('../stores/appStoreRenderer')
 
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -265,10 +268,16 @@ class UrlBar extends ImmutableComponent {
       }
     }
 
-    const location = this.props.urlbar.get('location')
+    let location = this.props.urlbar.get('location')
     const history = this.props.activeFrameProps.get('history')
     if (isIntermediateAboutPage(location) && history.size > 0) {
       return history.last()
+    }
+
+    // We can extend the conditions if there are more chrome-extension to
+    // truncate
+    if (getSetting(settings.PDFJS_ENABLED) && location.startsWith(appStoreRenderer.state.get('pdfjsOrigin'))) {
+      location = location.replace(/^chrome-extension:\/\/.+\/(\w+:\/\/.+)/, '$1')
     }
 
     return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
