@@ -36,7 +36,7 @@ let windowState = Immutable.fromJS({
 let lastEmittedState
 
 const CHANGE_EVENT = 'change'
-const PDFJS_ORIGIN = 'chrome-extension://adnmjfhcejodgpaljdmlmjoclihpcfka/'
+const PDFJS_ORIGIN = `chrome-extension://${config.PDFJSExtensionId}/`
 
 const frameStatePath = (key) =>
   ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
