@@ -272,7 +272,8 @@ if (chrome.contentSettings.passwordManager == 'allow') {
         })
       })
       observer.observe(document.documentElement, {
-        childList: true
+        childList: true,
+        subtree: true
       })
     }, 1000)
   }
