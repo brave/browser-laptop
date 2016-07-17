@@ -9,6 +9,7 @@ function isAdobeLink (href) {
     return false
   }
   return href.toLowerCase().includes('//get.adobe.com/flashplayer') ||
+    href.toLowerCase().includes('//www.macromedia.com/go/getflash') ||
     href.toLowerCase().includes('//www.adobe.com/go/getflash')
 }
 
