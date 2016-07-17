@@ -11,7 +11,7 @@
 - Added `Command + Shift + Click` support for various UI elements to open and focus a new tab. ([#2436](https://github.com/brave/browser-laptop/issues/2436))
 - Fixed Vimeo player not playing due to referrer blocking. ([#2474](https://github.com/brave/browser-laptop/issues/2474))
 - Fixed crashes with notifications. ([#1931](https://github.com/brave/browser-laptop/issues/1931))
-- Fixed new-tab ordering from pinned tabs. ([#2453](Opening another tab from pinned tab does not order correctly #2453))
+- Fixed new-tab ordering from pinned tabs. ([#2453](https://github.com/brave/browser-laptop/issues/2453))
 - Fixed exiting full screen when closing a full screen tab. ([#2404](https://github.com/brave/browser-laptop/issues/2404))
 - Fixed spell check happening in URLbar. ([#2434](https://github.com/brave/browser-laptop/issues/2434))
 - Fixed webRTC fingerprinting blocking. ([#2412](https://github.com/brave/browser-laptop/issues/2412))
