@@ -74,11 +74,19 @@ if (chrome.contentSettings.passwordManager == 'allow') {
             }, usernameElem.value || '')
         }
       })
+      usernameElem.addEventListener('blur', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        chrome.ipc.send('hide-context-menu')
+      })
     }
 
     // Whenever a form is submitted, offer to save it in the password manager
     // if the credentials have changed.
     form.addEventListener('submit', (e) => {
+      if (usernameElem) {
+        usernameElem.blur()
+      }
       onFormSubmit(form, formOrigin)
     })
     Array.from(form.querySelectorAll('button')).forEach((button) => {
