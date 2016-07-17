@@ -113,11 +113,16 @@ class Main extends ImmutableComponent {
     var deltaX = 0
     var deltaY = 0
     var startTime = 0
+    var xVelocity = 0
+    var yVelocity = 0
 
     this.mainWindow.addEventListener('wheel', (e) => {
       if (trackingFingers) {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
+        var time = (new Date()).getTime() - startTime
+        xVelocity = deltaX / time
+        yVelocity = deltaY / time
       }
     })
     ipc.on('scroll-touch-begin', function () {
@@ -125,9 +130,6 @@ class Main extends ImmutableComponent {
       startTime = (new Date()).getTime()
     })
     ipc.on('scroll-touch-end', function () {
-      var time = (new Date()).getTime() - startTime
-      var xVelocity = deltaX / time
-      var yVelocity = deltaY / time
       if (trackingFingers && Math.abs(yVelocity) < 1) {
         if (xVelocity > 1.5) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
