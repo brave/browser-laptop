@@ -170,10 +170,11 @@ var rendererIdentifiers = function () {
     'topSiteSuggestionTitle',
     'notificationPasswordWithUserName',
     'notificationPassword',
-    'notificationPasswordYes',
-    'notificationPasswordNo',
-    'notificationPasswordNeverRemember',
-    'notificationPasswordSettings'
+    'notificationPasswordSettings',
+    'prefsRestart',
+    'yes',
+    'no',
+    'neverForThisSite'
   ]
 }
 
