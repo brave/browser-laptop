@@ -119,7 +119,7 @@ In order do run any build commands, you'll need an environment variable set for 
 
 From within brave-browser you can create a .app file for distribution:
 
-    npm run build-package
+    CHANNEL=dev npm run build-package
 
 After the .app file is built you can create a dmg and update zip with:
 
@@ -133,9 +133,11 @@ You'll also need to set the `CERT` and `CERT_PASSWORD` environment variables wit
 
 To set these values, you can either set the environment on a per-session basis (`$env:CHANNEL="dev"`) or update your [system/user environment variables](http://www.computerhope.com/issues/ch000549.htm).
 
+You must also have NSIS 3.0rc2 or later installed and `makensis`'s folder must be in your PATH.
+
 To create a folder with the app .exe and all dependencies you can run:
 
-    npm run build-package
+    CHANNEL=dev npm run build-package
 
 After the above folder is created, you can create a setup (exe, msi, RELEASES file and update nupkg) with:
 
@@ -145,7 +147,7 @@ After the above folder is created, you can create a setup (exe, msi, RELEASES fi
 
 To create a package:
 
-    npm run build-package
+    CHANNEL=dev npm run build-package
 
 To create a dev package:
 
