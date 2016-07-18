@@ -229,7 +229,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)
     if (clearHistory) {
-      data.sites = data.sites.filter((site) => site && site.tags && site.tags.size)
+      data.sites = data.sites.filter((site) => site && site.tags && site.tags.length)
     }
   }
   if (data.downloads) {
