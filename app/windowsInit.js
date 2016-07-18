@@ -21,12 +21,17 @@ const getBraveDefaultsBinPath = () => {
   return path.join(appDir, 'resources', 'braveDefaults.exe')
 }
 
+const getVisualElementsManifestPath = () => {
+  const appDir = getBraveBinPath()
+  return path.join(appDir, 'resources', 'Update.VisualElementsManifest.xml')
+}
+
 function CopyManifestFile () {
   const versionedRoot = getBraveBinPath()
   let updateRoot = versionedRoot.split('\\')
   updateRoot.pop()
   updateRoot = updateRoot.join('\\')
-  const cmd = 'copy "' + path.join(versionedRoot, 'Update.VisualElementsManifest.xml') + '" "' + updateRoot + '"'
+  const cmd = 'copy "' + getVisualElementsManifestPath() + '" "' + updateRoot + '"'
   execSync(cmd)
 }
 

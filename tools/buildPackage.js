@@ -113,7 +113,7 @@ if (isLinux) {
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'extensions'))
 } else if (isWindows) {
   BuildManifestFile()
-  cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'Update.VisualElementsManifest.xml') + '"')
+  cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'resources', 'Update.VisualElementsManifest.xml') + '"')
   cmds.push('copy .\\res\\start-tile-70.png "' + path.join(buildDir, 'resources', 'start-tile-70.png') + '"')
   cmds.push('copy .\\res\\start-tile-150.png "' + path.join(buildDir, 'resources', 'start-tile-150.png') + '"')
   cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
