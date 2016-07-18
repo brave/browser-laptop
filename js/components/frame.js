@@ -505,6 +505,12 @@ class Frame extends ImmutableComponent {
         case messages.GO_FORWARD:
           method = () => this.webview.goForward()
           break
+        case messages.CAN_SWIPE_BACK:
+          remote.getCurrentWindow().webContents.send(messages.CAN_SWIPE_BACK)
+          break
+        case messages.CAN_SWIPE_FORWARD:
+          remote.getCurrentWindow().webContents.send(messages.CAN_SWIPE_FORWARD)
+          break
         case messages.NEW_FRAME:
           method = (frameOpts, openInForeground) => {
             windowActions.newFrame(frameOpts, openInForeground)
