@@ -338,6 +338,5 @@ WindowStore
   },
   flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
-  pdfjsOrigin: string // Origin of the PDFJS extension
 }
 ```

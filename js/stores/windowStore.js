@@ -36,7 +36,7 @@ let windowState = Immutable.fromJS({
 let lastEmittedState
 
 const CHANGE_EVENT = 'change'
-let PDFJS_ORIGIN = null
+const PDFJS_ORIGIN = `chrome-extension://${config.PDFJSExtensionId}/`
 
 const frameStatePath = (key) =>
   ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), key)]
@@ -58,8 +58,7 @@ const setPDFLocation = (loc) => {
   if (!getSetting(settings.PDFJS_ENABLED)) {
     return loc
   }
-  PDFJS_ORIGIN = PDFJS_ORIGIN || require('./appStoreRenderer').state.get('pdfjsOrigin')
-  if (loc && PDFJS_ORIGIN &&
+  if (loc &&
       UrlUtil.isFileType(loc, 'pdf') && !loc.startsWith(PDFJS_ORIGIN)) {
     return PDFJS_ORIGIN + loc
   }

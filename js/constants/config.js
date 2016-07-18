@@ -41,5 +41,5 @@ module.exports = {
     replacementUrl: adHost
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
-  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm'
+  PDFJSExtensionId: 'ckglimbbooghmggmkikhbolcfmgniemo'
 }

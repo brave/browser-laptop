@@ -512,10 +512,6 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.GOT_PDFJS_URL, (e, origin) => {
-      appActions.setPDFJSOrigin(origin)
-    })
-
     ipcMain.on(messages.SHOW_USERNAME_LIST, (e, origin, action, boundingRect, value) => {
       const passwords = AppStore.getState().get('passwords')
       if (!passwords || passwords.size === 0) {

@@ -30,8 +30,7 @@ const AppConstants = {
   APP_SHOW_MESSAGE_BOX: _, /** @param {Object} detail */
   APP_HIDE_MESSAGE_BOX: _, /** @param {string} message */
   APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
-  APP_SET_DICTIONARY: _, /** @param {string} locale */
-  APP_SET_PDFJS_ORIGIN: _ /** @param {string} origin */
+  APP_SET_DICTIONARY: _ /** @param {string} locale */
 }
 
 module.exports = mapValuesByKeys(AppConstants)
