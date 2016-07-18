@@ -282,17 +282,6 @@ Adds a word to the dictionary
 
 
 
-### setPDFJSOrigin(origin) 
-
-Sets PDFJS origin
-
-**Parameters**
-
-**origin**: `string`, The origin of the PDFJS extension. Ends in
-  a slash.
-
-
-
 
 * * *
 

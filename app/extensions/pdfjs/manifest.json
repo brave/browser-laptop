@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PDF Viewer",
-  "version": "1.5.338",
+  "version": "1.5.340",
   "description": "Uses HTML5 to display PDF files directly in the browser.",
   "icons": {
     "128": "icon128.png",
@@ -56,6 +56,7 @@
     "default_popup": "pageActionPopup.html"
   },
   "incognito": "split",
+  "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDb5PIb8ayK6vHvEIY1nJKRSCDE8iJ1T43qFN+5dvCVQrmyEkgqB9ZuZNT24Lwot96HV51VoITHKRNIVKI2Nrbfn0M49t7qtaP34g/GXJ7mAIbSzsY4+i+Wsz8EL2SNEIw6uH8RmXG7nZ29NJ7sk7jn17QmMsO2UJ01UT8hfOOOEQIDAQAB",
   "web_accessible_resources": [
     "content/web/viewer.html",
     "http:/*",
