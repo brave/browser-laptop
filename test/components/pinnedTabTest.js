@@ -64,15 +64,31 @@ describe('pinnedTabs', function () {
           return this.elements(tabsTabs).then((res) => res.value.length === 2)
         })
     })
+  })
+
+  describe('Pinning with partitions', function () {
+    Brave.beforeAll(this)
     it('pinning the same site again with a different session is allowed', function * () {
+      yield setup(this.app.client)
+      this.page1Url = Brave.server.url('page1.html')
       yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url, { isPartitioned: true })
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
         .waitForUrl(this.page1Url)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="4"]')
+        .waitForExist('.tab[data-frame-key="2"]')
         .setPinned(this.page1Url, true)
+        .waitForExist(pinnedTabsTabs)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 1)
+        })
+        .waitUntil(function () {
+          return this.elements(tabsTabs).then((res) => res.value.length === 1)
+        })
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
+        .waitForExist('.tab[data-frame-key="3"]')
+        .setPinned(this.page1Url, true, {partitionNumber: 1})
+        .waitUntil(function () {
+          return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
         })
         .waitUntil(function () {
           return this.elements(tabsTabs).then((res) => res.value.length === 2)
@@ -208,9 +224,6 @@ describe('pinnedTabs', function () {
         .waitForExist(pinnedTabsTabs)
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
-        })
-        .waitUntil(function () {
-          return this.elements(tabsTabs).then((res) => res.value.length === 1)
         })
     })
     it('close attempt retains pinned tab and selects next active frame', function * () {
