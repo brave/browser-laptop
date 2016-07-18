@@ -410,6 +410,7 @@ const init = (settingsState, args) => {
           label: locale.translation('clearSiteData'),
           click: function () {
             Filtering.clearStorageData()
+            Filtering.clearCache()
           }
         }
       ]
