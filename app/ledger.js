@@ -105,6 +105,7 @@ var initialize = () => {
 
         returnValue.enabled = true
         returnValue._internal.reconcileStamp = state.reconcileStamp
+        returnValue._internal.reconcileDelay = state.prepareTransaction && state.delayStamp
         info = state.paymentInfo
         if (info) {
           returnValue._internal.paymentInfo = info
@@ -114,10 +115,11 @@ var initialize = () => {
                                                        state.options.debugP ? (5 * msecs.second) : 5 * msecs.minute)
         }
         cacheRuleSet(state.ruleset)
-        client = LedgerClient(state.personaId, state.options, state)
+        client = LedgerClient(state.personaId, underscore.extend({ roundtrip: roundtrip }, state.options), state)
         if (client.sync(callback) === true) {
           run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 10 * msecs.minute) }))
         }
+        getWalletInfo()
       })
       return
     }
@@ -133,7 +135,7 @@ var initialize = () => {
       makeClient(alphaPath, (err, alpha) => {
         if (err) return
 
-        client = LedgerClient(alpha.client.personaId, alpha.client.options, null)
+        client = LedgerClient(alpha.client.personaId, underscore.extend({ roundtrip: roundtrip }, alpha.client.options), null)
         if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
       })
     })
@@ -232,6 +234,7 @@ var callback = (err, result, delayTime) => {
   if (!result) return run(delayTime)
 
   returnValue._internal.reconcileStamp = result.reconcileStamp
+  returnValue._internal.reconcileDelay = result.prepareTransaction && result.delayStamp
   if (result.wallet) {
     if (result.paymentInfo) {
       returnValue._internal.paymentInfo = result.paymentInfo
@@ -248,8 +251,55 @@ var callback = (err, result, delayTime) => {
     returnValue.statusText = 'Initializing.'
   }
   cacheRuleSet(result.ruleset)
+  getWalletInfo()
 
   syncWriter(statePath, result, () => { run(delayTime) })
+}
+
+var roundtrip = (params, options, callback) => {
+  var parts = underscore.extend(underscore.pick(options.server, [ 'protocol', 'hostname', 'port' ]),
+                                underscore.omit(params, [ 'payload' ]))
+  var i = parts.path.indexOf('?')
+
+  if (i !== -1) {
+    parts.pathname = parts.path.substring(0, i)
+    parts.search = parts.path.substring(i)
+  } else {
+    parts.pathname = parts.path
+  }
+  options = { url: url.format(parts), method: params.method, payload: params.payload, responseType: 'text',
+              headers: { 'content-type': 'application/json; charset=utf-8' }, verboseP: options.verboseP
+            }
+  request.request(options, (err, response, body) => {
+    var payload
+
+    if ((response) && (options.verboseP)) {
+      console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
+                 ' ' + (response.statusMessage || ''))
+    }
+
+    if (err) return callback(err)
+
+    if (Math.floor(response.statusCode / 100) !== 2) return callback(new Error('HTTP response ' + response.statusCode))
+
+    try {
+      payload = (response.statusCode !== 204) ? JSON.parse(body) : null
+    } catch (err) {
+      return callback(err)
+    }
+    if (options.verboseP) console.log('>>> ' + JSON.stringify(payload, null, 2).split('\n').join('\n>>> '))
+
+    try {
+      callback(null, response, payload)
+    } catch (err0) {
+      if (options.verboseP) console.log('callback: ' + err0.toString() + '\n' + err0.stack)
+    }
+  })
+
+  if (!options.verboseP) return
+
+  console.log('<<< ' + params.method + ' ' + params.path)
+  if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
 var run = (delayTime) => {
@@ -266,6 +316,23 @@ var run = (delayTime) => {
   if (client.isReadyToReconcile()) return client.reconcile(synopsis.topN(topPublishersN), callback)
 
   console.log('\nwhat? wait, how can this happen?')
+}
+
+var getWalletInfo = () => {
+  var currency
+
+  try {
+    returnValue._internal.braveryProperties = client.getBraveryProperties()
+    currency = returnValue._internal.braveryProperties.fee && returnValue._internal.braveryProperties.fee.currency
+
+    client.getWalletProperties(currency, function (err, body) {
+      if (err) return console.log('getWalletProperties error: ' + err.toString())
+
+      returnValue._internal.walletProperties = underscore.pick(body, [ 'balance', 'rates' ])
+    })
+  } catch (ex) {
+    console.log('properties error: ' + ex.toString())
+  }
 }
 
 var synopsisNormalizer = () => {
@@ -485,7 +552,7 @@ eventStore.addChangeListener(() => {
         })
       }
 
-      faviconURL = page.faviconURL || entry.protocol + '//' + publisher + '/favicon.ico'
+      faviconURL = page.faviconURL || entry.protocol + '//' + url.parse(location).host + '/favicon.ico'
       entry.faviconURL = null
 
       console.log('request: ' + faviconURL)
@@ -580,7 +647,7 @@ var visit = (location, timestamp) => {
   var setLocation = () => {
     var duration, publisher
 
-    console.log((location === currentLocation ? 'same' : 'new') + ' location: ' + location)
+    if (location !== currentLocation) console.log('new location: ' + location)
     if (!synopsis) return
 
 /*
@@ -630,11 +697,16 @@ var handleGeneralCommunication = (event) => {
     if (timestamp > then) timestamp = then
   })
   if (returnValue._internal.reconcileStamp) {
-    offset = moment(returnValue._internal.reconcileStamp).fromNow()
-    if (returnValue._internal.reconcileStamp > now) {
-      returnValue.statusText = 'Publishers love you! Next submission ' + offset + '.'
+    if (returnValue._internal.reconcileDelay) {
+      returnValue.statusText = 'Monthly publisher submission in progress, estimated completion in ' +
+                               moment(returnValue._internal.reconcileDelay).fromNow() + '.'
     } else {
-      returnValue.statusText = 'Monthly publisher submission overdue ' + offset + '. Please add funds.'
+      offset = moment(returnValue._internal.reconcileStamp).fromNow()
+      if (returnValue._internal.reconcileStamp > now) {
+        returnValue.statusText = 'Publishers love you! Next submission ' + offset + '.'
+      } else {
+        returnValue.statusText = 'Monthly publisher submission overdue ' + offset + '. Please add funds.'
+      }
     }
   }
 

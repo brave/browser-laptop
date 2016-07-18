@@ -288,12 +288,12 @@ class Main extends ImmutableComponent {
       })
     })
 
-    ipc.on(messages.SEND_XHR_REQUEST, (event, url, nonce, headers, responseType) => {
+    ipc.on(messages.SEND_XHR_REQUEST, (event, method, url, nonce, headers, responseType, payload) => {
 // TBD: this is _never_ invoked, and i can't figure out why! [MTR]
       console.log('XHR: nonce=' + nonce)
       const xhr = new window.XMLHttpRequest()
 
-      xhr.open('GET', url)
+      xhr.open(method || 'GET', url)
       if (headers) {
         for (let name in headers) {
           xhr.setRequestHeader(name, headers[name])
@@ -313,6 +313,7 @@ class Main extends ImmutableComponent {
         // very useful for debugging...
         for (var p in xhr) { try { response[p] = xhr[p] } catch (ex) { response[p] = ex.toString() } }
         response.statusCode = xhr.status
+        response.statusMessage = xhr.statusText
         response.headers = {}
         xhr.getAllResponseHeaders().split('\r\n').forEach((header) => {
           var i = header.indexOf(': ')
@@ -347,7 +348,9 @@ class Main extends ImmutableComponent {
         try { f() } catch (ex) { done(ex) }
       }
 
-      try { xhr.send() } catch (ex) { ipc.send(messages.GOT_XHR_RESPONSE + nonce, ex) }
+      try {
+        if (payload) { xhr.send(payload) } else { xhr.send() }
+      } catch (ex) { ipc.send(messages.GOT_XHR_RESPONSE + nonce, ex) }
     })
 
 >>>>>>> Ledger client integration

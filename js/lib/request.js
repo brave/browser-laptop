@@ -5,7 +5,24 @@
 'use strict'
 
 const electron = require('electron')
+<<<<<<< HEAD
 const session = electron.session
+=======
+const BrowserWindow = electron.BrowserWindow
+const ipcMain = electron.ipcMain
+const messages = require('../constants/messages')
+const underscore = require('underscore')
+
+const getWebContents = () => {
+  try {
+    return BrowserWindow.getAllWindows()[0].webContents
+  } catch (e) {
+    return null
+  }
+}
+
+var nonce = 0
+>>>>>>> support 0.8.34 ledger-client with roundtrip option
 
 /**
  * Sends a network request using Chromium's networks stack instead of Node's.
@@ -33,14 +50,15 @@ const https = require('https')
 const url = require('url')
 
 module.exports.request = (options, callback) => {
-  var client, parts
+  var client, parts, request
 
   if (typeof options === 'string') options = { url: options }
   parts = url.parse(options.url)
-  parts.method = 'GET'
+  parts.method = options.method || 'GET'
+  parts.headers = options.headers
 
   client = parts.protocol === 'https:' ? https : http
-  client.request(parts, (response) => {
+  request = client.request(parts, (response) => {
     var chunks = []
     var responseType = options.responseType || 'text'
 
@@ -49,7 +67,7 @@ module.exports.request = (options, callback) => {
 
       chunks.push(chunk)
     }).on('end', () => {
-      var rsp = { statusCode: response.statusCode, headers: response.headers }
+      var rsp = underscore.pick(response, [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
 
       var done = (err, result) => { callback(err, rsp, result) }
 
@@ -63,11 +81,14 @@ module.exports.request = (options, callback) => {
         text: () => { done(null, Buffer.concat(chunks).toString('utf8')) }
       }[responseType] || (() => { done(null, Buffer.concat(chunks).toString('binary')) })
 
+      underscore.defaults(rsp, { httpVersionMajor: 1, httpVersionMinor: 1 })
       try { f() } catch (ex) { done(ex) }
     }).setEncoding('binary')
   }).on('error', (err) => {
     callback(err)
-  }).end()
+  })
+  if (options.payload) request.write(JSON.stringify(options.payload))
+  request.end()
 
 /*
 // TBD: see note above [MTR]
@@ -85,7 +106,8 @@ module.exports.request = (options, callback) => {
       })
 
       if (typeof options === 'string') options = { url: options }
-      webContents.send(messages.SEND_XHR_REQUEST, options.url, nonce, null, options.responseType)
+      webContents.send(messages.SEND_XHR_REQUEST, options.method || 'GET', options.url, nonce, options.headers,
+                       options.responseType, options.payload)
     } catch (ex) {
       callback(ex)
     }

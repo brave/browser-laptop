@@ -84,7 +84,7 @@
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
     "ledger-client": "https://github.com/brave/ledger-client.git",
-    "ledger-publisher": "^0.8.32",
+    "ledger-publisher": "^0.8.33",
     "lru_cache": "^1.0.0",
     "moment": "^2.13.0",
     "random-lib": "2.1.0",
