@@ -342,6 +342,9 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   updateSuggestions (newIndex) {
     const suggestions = this.suggestionList || this.props.suggestions.get('suggestionList')
+    if (!suggestions) {
+      return
+    }
     // Update the urlbar preview content
     if (newIndex === 0 || newIndex > suggestions.size) {
       windowActions.setUrlBarPreview(null)
