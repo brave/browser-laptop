@@ -18,6 +18,7 @@ module.exports = {
   titleBar: '#titleBar',
   navigatorBookmarked: '#navigator .endButtons .removeBookmarkButton',
   navigatorNotBookmarked: '#navigator .endButtons .bookmarkButton',
+  bookmarksToolbar: '.bookmarksToolbar',
   notificationBar: '.notificationBar',
   errorContent: '.errorContent',
   errorUrl: '.errorUrl',
