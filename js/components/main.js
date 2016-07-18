@@ -643,6 +643,7 @@ class Main extends ImmutableComponent {
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchDetail={this.props.windowState.get('searchDetail')}
             enableNoScript={this.enableNoScript(activeSiteSettings)}
+            settings={this.props.appState.get('settings')}
             noScriptIsVisible={noScriptIsVisible}
           />
           {
