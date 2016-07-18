@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const {activeWebview, notificationBar, titleBar, urlInput} = require('../lib/selectors')
@@ -18,6 +18,11 @@ describe('notificationBar', function () {
     this.loginUrl1 = Brave.server.url('login1.html')
     this.loginUrl2 = Brave.server.url('login2.html')
     yield setup(this.app.client)
+  })
+
+  beforeEach(function * () {
+    yield this.app.client
+      .waitForExist('.notificationItem', undefined, true)
   })
 
   it('shows notification bar for geolocation', function * () {
@@ -57,6 +62,8 @@ describe('notificationBar', function () {
       .waitUntil(function () {
         return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
       })
+      .click('button=Deny')
+      .click('button=Deny')
   })
 
   it('can accept permission request persistently', function * () {
