@@ -101,18 +101,18 @@ const init = (settingsState, args) => {
       }
     },
     CommonMenu.separatorMenuItem,
+    /*
     {
       label: locale.translation('importFrom'),
       visible: false
-      /*
       submenu: [
         {label: 'Google Chrome...'},
         {label: 'Firefox...'},
         {label: 'Safari...'}
       ]
-      */
     },
     CommonMenu.separatorMenuItem,
+    */
     {
       // this should be disabled when
       // no windows are active
@@ -268,19 +268,19 @@ const init = (settingsState, args) => {
           }
         },
         CommonMenu.separatorMenuItem,
+        /*
         {
           label: locale.translation('toolbars'),
           visible: false
-          /*
           submenu: [
             {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
             {label: 'Tab Bar'},
             {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
             {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
           ]
-          */
         },
         CommonMenu.separatorMenuItem,
+        */
         {
           label: locale.translation('stop'),
           accelerator: isDarwin ? 'Cmd+.' : 'Esc',
@@ -301,6 +301,7 @@ const init = (settingsState, args) => {
           }
         },
         CommonMenu.separatorMenuItem,
+        /*
         {
           label: locale.translation('readingView'),
           visible: false,
@@ -314,7 +315,6 @@ const init = (settingsState, args) => {
         {
           label: locale.translation('textEncoding'),
           visible: false
-          /*
           submenu: [
             {label: 'Autodetect', submenu: []},
             CommonMenu.separatorMenuItem,
@@ -323,9 +323,9 @@ const init = (settingsState, args) => {
             CommonMenu.separatorMenuItem,
             {label: 'etc...'}
           ]
-          */
         },
         CommonMenu.separatorMenuItem,
+        */
         {
           label: locale.translation('toggleDeveloperTools'),
           accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
@@ -388,12 +388,14 @@ const init = (settingsState, args) => {
           }
         },
         CommonMenu.separatorMenuItem,
+        /*
         {
           label: locale.translation('showAllHistory'),
           accelerator: 'CmdOrCtrl+Y',
           visible: false
         },
         CommonMenu.separatorMenuItem,
+        */
         {
           label: locale.translation('clearHistory'),
           accelerator: 'Shift+CmdOrCtrl+Delete',
