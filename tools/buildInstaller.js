@@ -51,7 +51,7 @@ if (isDarwin) {
 } else if (isWindows) {
   // a cert file must be present to sign the created package
   // a password MUST be passed as the CERT_PASSWORD environment variable
-  var cert = process.env.CERT || 'brave-authenticode.pfx'
+  var cert = process.env.CERT || '../brave-authenticode.pfx'
   var certPassword = process.env.CERT_PASSWORD
   if (!certPassword) {
     throw new Error('Certificate password required. Set environment variable CERT_PASSWORD.')
