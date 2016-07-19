@@ -152,17 +152,18 @@ function insertFlashPlaceholders (elem) {
   })
 }
 
-setTimeout(() => {
-  var observer = new window.MutationObserver(function (mutations) {
-    insertFlashPlaceholders(document.documentElement)
-  })
+if (chrome.contentSettings.flashActive != 'allow' ||
+    chrome.contentSettings.flashEnabled != 'allow') {
+  insertFlashPlaceholders(document.documentElement)
+  setTimeout(() => {
+    var observer = new window.MutationObserver(function (mutations) {
+      insertFlashPlaceholders(document.documentElement)
+    })
 
-  if (chrome.contentSettings.flashActive != 'allow' ||
-      chrome.contentSettings.flashEnabled != 'allow') {
     insertFlashPlaceholders(document.documentElement)
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true
     })
-  }
-}, 1000)
+  }, 1000)
+}
