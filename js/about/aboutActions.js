@@ -79,7 +79,7 @@ const AboutActions = {
   },
 
   openDownloadPath: function (download) {
-    ipc.send(messages.OPEN_DOWNLOAD_PATH, download.tJS())
+    ipc.send(messages.OPEN_DOWNLOAD_PATH, download.toJS())
   },
 
   decryptPassword: function (encryptedPassword, authTag, iv, id) {
