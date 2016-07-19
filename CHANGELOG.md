@@ -16,6 +16,7 @@
 - Fixed spell check happening in URLbar. ([#2434](https://github.com/brave/browser-laptop/issues/2434))
 - Fixed webRTC fingerprinting blocking. ([#2412](https://github.com/brave/browser-laptop/issues/2412))
 - Fixed find in page highlighting not clearing when find bar is closed. ([#2476](https://github.com/brave/browser-laptop/issues/2476))
+- Fixed two finger swipe gesture on macOS conflicting with scrolling. ([#2577](https://github.com/brave/browser-laptop/issues/2577))
 - Upgrade to Electron 1.2.7. ([#2470](https://github.com/brave/browser-laptop/issues/2470))
 
 ## [0.11.0](https://github.com/brave/browser-laptop/releases/v0.11.0dev)
