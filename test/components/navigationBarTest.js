@@ -2,9 +2,10 @@
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
-const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon} = require('../lib/selectors')
+const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
+const settings = require('../../js/constants/settings')
 
 describe('navigationBar', function () {
   function * setup (client) {
@@ -605,6 +606,60 @@ describe('navigationBar', function () {
 
     it('has focus', function * () {
       yield this.app.client.waitForElementFocus(urlInput)
+    })
+  })
+
+  describe('auto open bookmarks toolbar for the first bookmark', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      const page1Url = Brave.server.url('page1.html')
+
+      yield setup(this.app.client)
+
+      yield this.app.client
+        .waitForExist(urlInput)
+        .waitForElementFocus(urlInput)
+        .tabByUrl(this.newTabUrl)
+        .url(page1Url)
+        .waitForUrl(page1Url)
+        .windowParentByUrl(page1Url)
+        .moveToObject(navigator)
+        .waitForExist(navigatorNotBookmarked)
+        .moveToObject(navigator)
+        .click(navigatorNotBookmarked)
+        .waitForExist(navigatorBookmarked)
+        // unfocus current box
+        .click('.dialog')
+    })
+
+    it('should open if user has no bookmarks', function * () {
+      yield this.app.client
+        .moveToObject(navigator)
+        .isExisting(bookmarksToolbar).should.eventually.be.true
+    })
+
+    it('should remain hidden if user has bookmarks but has toolbar hidden', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      const page2Url = Brave.server.url('page2.html')
+
+      // user don't like toolbars
+      yield this.app.client
+        .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, false)
+
+      yield this.app.client
+        .waitForUrl(page1Url)
+        .waitForVisible('#thelink')
+        .click('#thelink')
+        .waitForUrl(page2Url)
+        .windowParentByUrl(page2Url)
+        .moveToObject(navigator)
+        .click(navigatorNotBookmarked)
+        .waitForExist(navigatorBookmarked)
+        // unfocus current box
+        .click('.dialog')
+
+      yield this.app.client.isExisting(bookmarksToolbar).should.eventually.be.false
     })
   })
 })
