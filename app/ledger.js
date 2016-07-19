@@ -38,7 +38,8 @@ const statePath = path.join(app.getPath('userData'), 'ledger-state.json')
 // TBD: move this into appStore.getState().get(‘publishers.synopsis’) [MTR]
 const synopsisPath = path.join(app.getPath('userData'), 'ledger-synopsis.json')
 
-var msecs = { week: 7 * 24 * 60 * 60 * 1000,
+var msecs = { year: 365 * 24 * 60 * 60 * 1000,
+              week: 7 * 24 * 60 * 60 * 1000,
               day: 24 * 60 * 60 * 1000,
               hour: 60 * 60 * 1000,
               minute: 60 * 1000,
@@ -99,26 +100,15 @@ var initialize = () => {
       console.log('found ' + statePath)
 
       makeClient(statePath, (err, state) => {
-        var info
-
         if (err) return
 
         returnValue.enabled = true
-        returnValue._internal.reconcileStamp = state.reconcileStamp
-        returnValue._internal.reconcileDelay = state.prepareTransaction && state.delayStamp
-        info = state.paymentInfo
-        if (info) {
-          returnValue._internal.paymentInfo = info
-          cacheReturnValue()
-
-          returnValue._internal.triggerID = setTimeout(() => { triggerNotice() },
-                                                       state.options.debugP ? (5 * msecs.second) : 5 * msecs.minute)
-        }
-        cacheRuleSet(state.ruleset)
+        getStateInfo(state)
         client = LedgerClient(state.personaId, underscore.extend({ roundtrip: roundtrip }, state.options), state)
         if (client.sync(callback) === true) {
           run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 10 * msecs.minute) }))
         }
+        cacheRuleSet(state.ruleset)
         getWalletInfo()
       })
       return
@@ -233,17 +223,8 @@ var callback = (err, result, delayTime) => {
 
   if (!result) return run(delayTime)
 
-  returnValue._internal.reconcileStamp = result.reconcileStamp
-  returnValue._internal.reconcileDelay = result.prepareTransaction && result.delayStamp
   if (result.wallet) {
-    if (result.paymentInfo) {
-      returnValue._internal.paymentInfo = result.paymentInfo
-      cacheReturnValue()
-
-      if (!returnValue._internal.triggerID) {
-        returnValue._internal.triggerID = setTimeout(() => { triggerNotice() }, 5 * msecs.minute)
-      }
-    }
+    getStateInfo(result)
     returnValue.statusText = 'Initialized.'
   } else if (result.persona) {
     returnValue.statusText = ''
@@ -316,6 +297,35 @@ var run = (delayTime) => {
   if (client.isReadyToReconcile()) return client.reconcile(synopsis.topN(topPublishersN), callback)
 
   console.log('\nwhat? wait, how can this happen?')
+}
+
+var getStateInfo = (state) => {
+  var i
+  var info = state.paymentInfo
+  var then = underscore.now() - msecs.year
+
+  returnValue._internal.reconcileStamp = state.reconcileStamp
+  returnValue._internal.reconcileDelay = state.prepareTransaction && state.delayStamp
+
+  if (info) {
+    returnValue._internal.paymentInfo = info
+    cacheReturnValue()
+
+    if (!returnValue._internal.triggerID) {
+      returnValue._internal.triggerID = setTimeout(() => { triggerNotice() },
+                                                   state.options.debugP ? (5 * msecs.second) : 5 * msecs.minute)
+    }
+  }
+
+  returnValue.transactions = []
+  if (!state.transactions) return
+
+  for (i = state.transactions.length - 1; i >= 0; i--) {
+    if (state.transactions[i].stamp < then) break
+
+    returnValue.transactions.push(underscore.extend(underscore.omit(state.transactions[i], [ 'fee' ]),
+                                                    state.transactions[i].fee))
+  }
 }
 
 var getWalletInfo = () => {
