@@ -718,6 +718,8 @@ var handleGeneralCommunication = (event) => {
 
     underscore.extend(result, returnValue._internal.cache || {})
   }
+  if (returnValue._internal.braveryProperties) underscore.extend(result, { bravery: returnValue._internal.braveryProperties })
+  if (returnValue._internal.walletProperties) underscore.extend(result, { wallet: returnValue._internal.walletProperties })
 /*
   console.log('\n' + JSON.stringify(underscore.extend(underscore.omit(result, [ 'synopsis', 'paymentIMG' ]),
                                                       { synopsis: result.synopsis && '...',
