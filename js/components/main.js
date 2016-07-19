@@ -110,34 +110,46 @@ class Main extends ImmutableComponent {
   registerSwipeListener () {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
+    var canSwipeBack = false
+    var canSwipeForward = false
     var deltaX = 0
     var deltaY = 0
     var startTime = 0
-    var xVelocity = 0
-    var yVelocity = 0
+    var time
 
     this.mainWindow.addEventListener('wheel', (e) => {
       if (trackingFingers) {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
-        var time = (new Date()).getTime() - startTime
-        xVelocity = deltaX / time
-        yVelocity = deltaY / time
+        time = (new Date()).getTime() - startTime
+        if (deltaX > 0) {
+          webviewActions.checkSwipe(false)
+        } else if (deltaX < 0) {
+          webviewActions.checkSwipe(true)
+        }
       }
+    })
+    ipc.on(messages.CAN_SWIPE_BACK, (e) => {
+      canSwipeBack = true
+    })
+    ipc.on(messages.CAN_SWIPE_FORWARD, (e) => {
+      canSwipeForward = true
     })
     ipc.on('scroll-touch-begin', function () {
       trackingFingers = true
       startTime = (new Date()).getTime()
     })
     ipc.on('scroll-touch-end', function () {
-      if (trackingFingers && Math.abs(yVelocity) < 1) {
-        if (xVelocity > 1.5) {
+      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50) {
+        if (deltaX > 100 && canSwipeForward) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (xVelocity < -1.5) {
+        } else if (deltaX < -100 && canSwipeBack) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
       trackingFingers = false
+      canSwipeBack = false
+      canSwipeForward = false
       deltaX = 0
       deltaY = 0
       startTime = 0

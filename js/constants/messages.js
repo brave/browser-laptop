@@ -74,6 +74,10 @@ const messages = {
   SET_RESOURCE_ENABLED: _,
   GO_BACK: _,
   GO_FORWARD: _,
+  CAN_SWIPE_BACK: _,
+  CAN_SWIPE_FORWARD: _,
+  CHECK_SWIPE_BACK: _,
+  CHECK_SWIPE_FORWARD: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
