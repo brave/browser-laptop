@@ -173,26 +173,6 @@ function getFramePropsIndex (frames, frameProps) {
 }
 
 /**
- * Converts a feature string into an object.
- * @param {String} featureStr A string like, arg=val,arg2=val2
- */
-function getFeatures (featureStr) {
-  return String(featureStr)
-    .split(',')
-    .reduce((acc, feature) => {
-      feature = feature
-        .split('=')
-        .map((featureElem) => featureElem.trim())
-      if (feature.length !== 2) {
-        return acc
-      }
-
-      acc[decodeURIComponent(feature[0])] = decodeURIComponent(feature[1])
-      return acc
-    }, {})
-}
-
-/**
  * Determines if the specified frame was opened from the specified
  * ancestorFrameKey.
  *
@@ -233,19 +213,55 @@ function getPartition (frameOpts) {
   }
   return partition
 }
+
+function cloneFrame (frameOpts, guestInstanceId) {
+  const cloneableAttributes = [
+    'audioMuted',
+    'canGoBack',
+    'canGoForward',
+    'icon',
+    'title',
+    'isPrivate',
+    'partitionNumber',
+    'themeColor',
+    'computedThemeColor'
+  ]
+  let clone = {}
+  cloneableAttributes.forEach((attr) => {
+    clone[attr] = frameOpts[attr]
+  })
+
+  clone.guestInstanceId = guestInstanceId
+  // copy the history
+  clone.history = frameOpts.history.slice(0)
+  // location is loaded by the webcontents
+  clone.delayedLoadUrl = frameOpts.location
+  clone.location = 'about:blank'
+  clone.src = 'about:blank'
+  clone.parentFrameKey = frameOpts.key
+  return clone
+}
+
 /**
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
 function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   const url = frameOpts.location || config.defaultUrl
+
+  // delayedLoadUrl is used as a placeholder when the new frame is created
+  // from a renderer initiated navigation (window.open, cmd/ctrl-click, etc...)
+  const delayedLoadUrl = frameOpts.delayedLoadUrl
+  delete frameOpts.delayedLoadUrl
   const navbarFocus = activeFrameKey === newKey &&
                       url === config.defaultUrl &&
-                      frameOpts.delayedLoadUrl === undefined
-  const location = frameOpts.delayedLoadUrl || url // page url
+                      delayedLoadUrl === undefined
+  const location = delayedLoadUrl || url // page url
 
   // Only add pin requests if it's not already added
-  if (frameOpts.isPinned) {
+  const isPinned = frameOpts.isPinned
+  delete frameOpts.isPinned
+  if (isPinned) {
     const alreadyPinnedFrameProps = frames.find((frame) =>
       frame.get('pinnedLocation') === location && frame.get('partitionNumber') === partitionNumber)
     if (alreadyPinnedFrameProps) {
@@ -253,7 +269,7 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     }
   }
 
-  const frame = Immutable.fromJS({
+  const frame = Immutable.fromJS(Object.assign({
     zoomLevel: config.zoom.defaultValue,
     audioMuted: false, // frame is muted
     canGoBack: false,
@@ -263,21 +279,17 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     src: url, // what the iframe src should be
     tabId: -1,
     // if this is a delayed load then go ahead and start the loading indicator
-    loading: !!frameOpts.delayedLoadUrl,
-    startLoadTime: frameOpts.delayedLoadUrl ? new Date().getTime() : null,
+    loading: !!delayedLoadUrl,
+    startLoadTime: delayedLoadUrl ? new Date().getTime() : null,
     endLoadTime: null,
-    isPrivate: frameOpts.isPrivate || false,
+    isPrivate: false,
     partitionNumber,
-    element: frameOpts.element,
-    features: getFeatures(frameOpts.features),
-    pinnedLocation: frameOpts.isPinned ? url : undefined,
+    pinnedLocation: isPinned ? url : undefined,
     key: newKey,
-    parentFrameKey: frameOpts.parentFrameKey,
-    guestInstanceId: frameOpts.guestInstanceId,
     navbar: {
       focused: navbarFocus,
       urlbar: {
-        location: frameOpts.delayedLoadUrl || url,
+        location: delayedLoadUrl || url,
         urlPreview: '',
         suggestions: {
           selectedIndex: 0,
@@ -300,7 +312,7 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     },
     unloaded: frameOpts.unloaded,
     history: []
-  })
+  }, frameOpts))
 
   // Find the closest index to the current frame's index which has
   // a different ancestor frame key.
@@ -461,8 +473,8 @@ module.exports = {
   findDisplayIndexForFrameKey,
   getFramePropsIndex,
   getFrameKeysByDisplayIndex,
-  getFeatures,
   getPartition,
+  cloneFrame,
   addFrame,
   undoCloseFrame,
   removeFrame,

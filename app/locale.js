@@ -92,6 +92,7 @@ var rendererIdentifiers = function () {
     'reloadTab',
     'cleanReload',
     'reload',
+    'cloneTab',
     'readingView',
     'tabManager',
     'textEncoding',

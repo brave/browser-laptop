@@ -113,6 +113,74 @@ describe('findbar', function () {
   })
 })
 
+describe('clone tab', function () {
+  describe('frame', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.url1 = Brave.server.url('page1.html')
+      this.webview1 = '.frameWrapper:nth-child(1) webview'
+      this.webview2 = '.frameWrapper.isActive:nth-child(2) webview'
+
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.url1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+    })
+
+    it('opens a new foreground tab', function * () {
+      yield this.app.client
+        .waitUntil(function () {
+          return this.getTabCount().then((count) => {
+            return count === 2
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(this.webview1)
+        .waitForExist(this.webview2)
+        .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
+    })
+
+    it('uses the cloned webcontents', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(this.webview2 + '[data-guest-instance-id]')
+    })
+  })
+
+  describe('history', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.url1 = Brave.server.url('page1.html')
+      this.url2 = Brave.server.url('page2.html')
+      this.webview1 = '.frameWrapper:nth-child(1) webview'
+      this.webview2 = '.frameWrapper.isActive:nth-child(2) webview'
+
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        // add some history
+        .loadUrl(this.url1)
+        .loadUrl(this.url2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+    })
+
+    it('preserves the history', function * () {
+      let backButton = '.backforward .back'
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(this.webview2 + '[src="' + this.url2 + '"]')
+        .waitForExist(backButton + ':not([disabled])')
+        .click(backButton)
+        .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
+    })
+  })
+})
+
 describe('view source', function () {
   Brave.beforeAll(this)
 
