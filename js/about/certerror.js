@@ -6,17 +6,67 @@ const React = require('react')
 const Button = require('../components/button')
 const aboutActions = require('./aboutActions')
 const WindowConstants = require('../constants/windowConstants')
+const messages = require('../constants/messages')
+const ipc = window.chrome.ipc
 
 require('../../less/button.less')
 require('../../less/window.less')
 require('../../less/about/error.less')
 
+function toHexString (byteArray) {
+  return byteArray.map(function (byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2)
+  }).join(':')
+}
+
+function toByteArray (str) {
+  var bytes = []
+  for (var i = 0; i < str.length; ++i) {
+    bytes.push(str.charCodeAt(i))
+  }
+  return bytes
+}
+
+function seperateHex (hexStr) {
+  var result = []
+  for (var i = 0; i < hexStr.length; ++i) {
+    result += hexStr[i]
+    if (i % 2 && i !== hexStr.length - 1) {
+      result += ':'
+    }
+  }
+  return result
+}
+
 class CertErrorPage extends React.Component {
   constructor () {
     super()
     this.state = {
-      advanced: false
+      advanced: false,
+      certDetail: false,
+      certIssuerName: null,
+      certSubjectName: null,
+      certSerialNumber: null,
+      certValidStart: null,
+      certValidExpiry: null,
+      certFingerprint: null
     }
+
+    ipc.on(messages.SET_CERT_ERROR_DETAIL, (e, detail) => {
+      var validStart = new Date()
+      var validExpiry = new Date()
+      validStart.setTime(detail.validStart * 1000)
+      validExpiry.setTime(detail.validExpiry * 1000)
+      this.setState({
+        certDetail: true,
+        certIssuerName: detail.issuerName,
+        certSubjectName: detail.subjectName,
+        certSerialNumber: seperateHex(detail.serialNumber),
+        certValidStart: validStart.toString(),
+        certValidExpiry: validExpiry.toString(),
+        certFingerprint: detail.fingerprint.split('/')
+      })
+    })
   }
 
   onAccept () {
@@ -40,6 +90,10 @@ class CertErrorPage extends React.Component {
     this.setState({advanced: true})
   }
 
+  onDetail () {
+    aboutActions.getCertErrorDetail(this.state.url)
+  }
+
   render () {
     return <div className='errorContent'>
       <svg width='75' height='75' className='errorLogo' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>
@@ -49,12 +103,29 @@ class CertErrorPage extends React.Component {
         <span data-l10n-id='certErrorText'></span>&nbsp;
         <span className='errorUrl'>{this.state.url || ''}</span>
         <span className='errorText'>{this.state.error || ''}</span>
+        {this.state.certDetail
+          ? (<div>
+            <span className='certErrorText'>{'Issued To'}</span>
+            <span className='errorText'>{'Common Name (CN): ' + this.state.certSubjectName}</span>
+            <span className='errorText'>{'Serial Number: ' + this.state.certSerialNumber}</span>
+            <span className='certErrorText'>{'Issued By'}</span>
+            <span className='errorText'>{'Common Name (CN): ' + this.state.certIssuerName}</span>
+            <span className='certErrorText'>{'Period of Validity'}</span>
+            <span className='errorText'>{'Begins On: ' + this.state.certValidStart}</span>
+            <span className='errorText'>{'Expires On: ' + this.state.certValidExpiry}</span>
+            <span className='certErrorText'>{'Fingerprint: '}</span>
+            <span className='errorText'>{this.state.certFingerprint[0] + ': ' +
+              toHexString(toByteArray(window.atob(this.state.certFingerprint[1])))}</span>
+          </div>) : null}
       </div>
       <div className='buttons'>
         <Button l10nId='certErrorSafety' className='actionButton' onClick={this.onSafety.bind(this)} />
-        {this.state.url ? (this.state.advanced
-                  ? <Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)} />
-                  : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)} />) : null}
+          {this.state.url ? (this.state.advanced
+            ? (<div>
+              <Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)} />
+              <Button l10nId='certErrorShowCertificate' className='subtleButton' onClick={this.onDetail.bind(this)} />
+            </div>)
+            : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)} />) : null}
       </div>
     </div>
   }
