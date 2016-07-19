@@ -227,13 +227,13 @@ module.exports.cleanAppData = (data, isShutdown) => {
     }
   }
   if (data.sites) {
-    const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)
+    const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
       data.sites = data.sites.filter((site) => site && site.tags && site.tags.length)
     }
   }
   if (data.downloads) {
-    const clearDownloads = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS)
+    const clearDownloads = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS) === true
     if (clearDownloads) {
       delete data.downloads
     } else {
@@ -260,10 +260,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
  */
 module.exports.cleanSessionDataOnShutdown = () => {
   let p = Promise.resolve()
-  if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES)) {
+  if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES) === true) {
     p = p.then(filtering.clearStorageData())
   }
-  if (getSetting(settings.SHUTDOWN_CLEAR_CACHE)) {
+  if (getSetting(settings.SHUTDOWN_CLEAR_CACHE) === true) {
     p = p.then(filtering.clearCache())
   }
   return p
