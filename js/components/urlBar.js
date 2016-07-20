@@ -135,6 +135,9 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.DOWN:
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
+          if (!this.urlBarSuggestions.suggestionList) {
+            this.urlBarSuggestions.suggestionList = this.urlBarSuggestions.getNewSuggestionList()
+          }
           this.urlBarSuggestions.nextSuggestion()
           e.preventDefault()
         }
@@ -174,12 +177,6 @@ class UrlBar extends ImmutableComponent {
     if (this.isSelected()) {
       windowActions.setUrlBarSelected(false)
       windowActions.setUrlBarActive(true)
-
-      windowActions.setUrlBarAutocompleteEnabled(true)
-      if (!this.urlBarSuggestions.suggestionList) {
-        this.urlBarSuggestions.suggestionList = this.urlBarSuggestions.getNewSuggestionList()
-      }
-      this.urlBarSuggestions.updateSuggestions(null)
     }
   }
 
@@ -382,17 +379,20 @@ class UrlBar extends ImmutableComponent {
           })}>{this.loadTime}</span>
         }
 
-      <UrlBarSuggestions
-        ref={(node) => { this.urlBarSuggestions = node }}
-        hidden={!this.shouldRenderUrlBarSuggestions}
-        suggestions={this.props.urlbar.get('suggestions')}
-        sites={this.props.sites}
-        frames={this.props.frames}
-        searchDetail={this.searchDetail}
-        activeFrameProps={this.props.activeFrameProps}
-        urlLocation={this.props.urlbar.get('location')}
-        urlPreview={this.props.urlbar.get('urlPreview')}
-        previewActiveIndex={this.props.previewActiveIndex || 0} />
+        {
+          this.shouldRenderUrlBarSuggestions
+          ? <UrlBarSuggestions
+            ref={(node) => { this.urlBarSuggestions = node }}
+            suggestions={this.props.urlbar.get('suggestions')}
+            sites={this.props.sites}
+            frames={this.props.frames}
+            searchDetail={this.searchDetail}
+            activeFrameProps={this.props.activeFrameProps}
+            urlLocation={this.props.urlbar.get('location')}
+            urlPreview={this.props.urlbar.get('urlPreview')}
+            previewActiveIndex={this.props.previewActiveIndex || 0} />
+          : null
+        }
     </form>
   }
 }
