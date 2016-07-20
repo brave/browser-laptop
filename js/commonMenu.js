@@ -210,7 +210,7 @@ module.exports.downloadsMenuItem = () => {
 
 module.exports.passwordsMenuItem = () => {
   return {
-    label: 'Passwords manager...',
+    label: locale.translation('passwordsManager'),
     click: (item, focusedWindow) => {
       if (BrowserWindow.getAllWindows().length === 0) {
         appActions.newWindow(Immutable.fromJS({
