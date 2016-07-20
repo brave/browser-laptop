@@ -249,7 +249,7 @@ class AboutBookmarks extends React.Component {
   }
   searchedBookmarks (searchTerm, bookmarks) {
     return bookmarks.filter((bookmark) => {
-      const title = bookmark.get('customTitle') || bookmark.get('title') || bookmark.get('location')
+      const title = bookmark.get('customTitle') + bookmark.get('title') + bookmark.get('location')
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
