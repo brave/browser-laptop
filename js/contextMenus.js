@@ -767,7 +767,8 @@ function mainTemplateInit (nodeProps, frame) {
       },
       copyAddressMenuItem('copyImageAddress', nodeProps.srcURL)
     )
-    if (nodeProps.srcURL && urlParse(nodeProps.srcURL).protocol !== 'data:') {
+    if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'content/search/google.xml' &&
+      nodeProps.srcURL && urlParse(nodeProps.srcURL).protocol !== 'data:') {
       template.push(
         {
           label: locale.translation('searchImage'),
