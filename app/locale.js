@@ -28,6 +28,7 @@ var rendererIdentifiers = function () {
     'openImageInNewTab',
     'saveImage',
     'copyImage',
+    'searchImage',
     'copyLinkAddress',
     'copyEmailAddress',
     'saveLinkAs',
