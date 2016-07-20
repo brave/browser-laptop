@@ -160,6 +160,7 @@ var rendererIdentifiers = function () {
     'permissionFullscreen',
     'permissionExternal',
     'permissionProtocolRegistration',
+    'permissionMessage',
     'tabsSuggestionTitle',
     'bookmarksSuggestionTitle',
     'historySuggestionTitle',
