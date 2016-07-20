@@ -15,14 +15,15 @@ const session = electron.session
 
 const acorn = require('acorn')
 const moment = require('moment')
-var qr = require('qr-image')
-var random = require('random-lib')
+const qr = require('qr-image')
+const random = require('random-lib')
 const tldjs = require('tldjs')
 const underscore = require('underscore')
 
 const messages = require('../js/constants/messages')
 const request = require('../js/lib/request')
 const eventStore = require('../js/stores/eventStore')
+const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
 
 // TBD: remove this post alpha [MTR]
 const alphaPath = path.join(app.getPath('userData'), 'ledger-alpha.json')
@@ -239,7 +240,7 @@ var callback = (err, result, delayTime) => {
 
 var roundtrip = (params, options, callback) => {
   var parts = underscore.extend(underscore.pick(options.server, [ 'protocol', 'hostname', 'port' ]),
-                                underscore.omit(params, [ 'payload' ]))
+                                underscore.omit(params, [ 'headers', 'payload' ]))
   var i = parts.path.indexOf('?')
 
   if (i !== -1) {
@@ -249,7 +250,8 @@ var roundtrip = (params, options, callback) => {
     parts.pathname = parts.path
   }
   options = { url: url.format(parts), method: params.method, payload: params.payload, responseType: 'text',
-              headers: { 'content-type': 'application/json; charset=utf-8' }, verboseP: options.verboseP
+              headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+              verboseP: options.verboseP
             }
   request.request(options, (err, response, body) => {
     var payload
@@ -284,9 +286,7 @@ var roundtrip = (params, options, callback) => {
 }
 
 var run = (delayTime) => {
-/*
   console.log('\nledger client run: delayTime=' + delayTime)
- */
 
   if (delayTime === 0) {
     delayTime = client.timeUntilReconcile()
@@ -578,7 +578,7 @@ eventStore.addChangeListener(() => {
 })
 
 var cacheRuleSet = (ruleset) => {
-  var stewed
+  var stewed, syncP
 
   var prune = function (tree) {
     var result
@@ -623,6 +623,34 @@ var cacheRuleSet = (ruleset) => {
 
     returnValue._internal.ruleset.raw = ruleset
     returnValue._internal.ruleset.cooked = stewed
+    if (!synopsis) return
+
+    underscore.keys(synopsis.publishers).forEach((publisher) => {
+      var location = (synopsis.publishers[publisher].protocol || 'http:') + '//' + publisher
+      var ctx = url.parse(location, true)
+
+      ctx.TLD = tldjs.getPublicSuffix(ctx.host)
+      if (!ctx.TLD) return
+
+      ctx = underscore.mapObject(ctx, function (value, key) { if (!underscore.isFunction(value)) return value })
+      ctx.URL = location
+      ctx.SLD = tldjs.getDomain(ctx.host)
+      ctx.RLD = tldjs.getSubdomain(ctx.host)
+      ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
+
+      stewed.forEach((rule) => {
+        if ((rule.consequent !== null) || (rule.dom)) return
+        if (!rulesolver.resolve(rule.condition, ctx)) return
+
+        console.log('\npurging ' + publisher)
+        delete synopsis.publishers[publisher]
+        syncP = true
+      })
+    })
+    if (!syncP) return
+
+    syncWriter(synopsisPath, synopsis, () => {})
+    delete returnValue.synopsis
   } catch (ex) {
     console.log('ruleset error: ' + ex.toString() + '\n' + ex.stack)
   }

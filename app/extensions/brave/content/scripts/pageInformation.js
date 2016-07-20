@@ -6,8 +6,6 @@
 /* jshint esversion: 6 */
 
 (function () { try { 
-  if (window.top !== window.self) return
-
   var resolve = (tree, context) => {
     var node = tree.body ? tree.body[0] : tree
 
@@ -113,6 +111,14 @@
 
     return traverse(node.expression)
   }
+
+  if ((typeof module !== 'undefined') &&  (typeof exports !== 'undefined')) {
+    module.exports = { resolve: resolve }
+
+    return
+  }
+
+  if (window.top !== window.self) return
 
   var results = { timestamp: new Date().getTime(), protocol: document.location.protocol }
 
