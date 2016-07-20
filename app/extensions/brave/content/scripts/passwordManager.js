@@ -74,11 +74,6 @@ if (chrome.contentSettings.passwordManager == 'allow') {
             }, usernameElem.value || '')
         }
       })
-      usernameElem.addEventListener('blur', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        chrome.ipc.send('hide-context-menu')
-      })
     }
 
     // Whenever a form is submitted, offer to save it in the password manager
@@ -86,6 +81,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     form.addEventListener('submit', (e) => {
       if (usernameElem) {
         usernameElem.blur()
+        chrome.ipc.send('hide-context-menu')
       }
       onFormSubmit(form, formOrigin)
     })
