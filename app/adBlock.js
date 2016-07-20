@@ -33,7 +33,7 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
     const urlHost = URL.parse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&
       (shouldCheckMainFrame || (details.resourceType !== 'mainFrame' &&
-                                urlHost !== firstPartyUrlHost)) &&
+                                Filtering.isThirdPartyHost(firstPartyUrlHost, urlHost))) &&
       firstPartyUrl.protocol.startsWith('http') &&
       mapFilterType[details.resourceType] !== undefined &&
       !whitelistHosts.includes(urlHost) &&
