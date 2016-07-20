@@ -184,10 +184,14 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
+    if (menu.length) {
+      console.log('----added sep')
+      menu.push(CommonMenu.separatorMenuItem)
+    }
   }
 
   if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
-    menu.push(CommonMenu.separatorMenuItem, {
+    menu.push({
       label: 'Hide downloads bar',
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
