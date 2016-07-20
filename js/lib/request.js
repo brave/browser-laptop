@@ -17,8 +17,8 @@ module.exports.request = (url, callback) => {
   if (!defaultSession) {
     callback(new Error('Request failed, no session available'))
   } else {
-    defaultSession.webRequest.fetch(url, 'get', {}, (statusCode, responseBody, headers) => {
-      callback(null, statusCode, responseBody)
+    defaultSession.webRequest.fetch(url, (err, response, responseBody) => {
+      callback(err, response.statusCode, responseBody)
     })
   }
 }
@@ -28,11 +28,11 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
   if (!defaultSession) {
     reject('Request failed, no session available')
   } else {
-    defaultSession.webRequest.fetch(url, 'get', headers, path, (statusCode, responseBody, headers) => {
-      if (statusCode === 200) {
+    defaultSession.webRequest.fetch(url, { headers, path }, (err, response) => {
+      if (!err && response.statusCode === 200) {
         resolve(headers['etag'])
-      } else if (statusCode !== 200) {
-        reject(`Got HTTP status code ${statusCode}`)
+      } else {
+        reject(`Got HTTP status code ${response.statusCode}`)
       }
     })
   }
