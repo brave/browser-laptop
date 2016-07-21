@@ -13,19 +13,20 @@ const session = electron.session
  * @param {string} url - the url to load
  */
 module.exports.request = (options, callback) => {
-  var headers, method, payload, type, url
+  var params
   let defaultSession = session.defaultSession
 
   if (!defaultSession) return callback(new Error('Request failed, no session available'))
 
   if (typeof options === 'string') options = { url: options }
-  url = options.url
-  method = options.method || 'GET'
-  payload = options.payload || null
-  headers = options.headers || []
-  type = headers['content-type'] || 'application/json; charset=utf-8'
+  params = underscore.pick(options, [ 'method', 'headers' ])
+  if (options.payload) {
+    underscore.extend(params, { payload: JSON.stringify(options.payload),
+                                payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
+                              })
+  }
 
-  defaultSession.webRequest.fetch(url, method, payload && JSON.stringify(payload), headers, type, (err, response, body) => {
+  defaultSession.webRequest.fetch(options.url, params, (err, response, body) => {
     var responseType = options.responseType || 'text'
     var rsp = underscore.pick(response || {},
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])

@@ -249,6 +249,11 @@ var roundtrip = (params, options, callback) => {
   } else {
     parts.pathname = parts.path
   }
+
+// TBD: temporary
+  if (!params.headers) params.headers = {}
+  params.headers['x-magic'] = 'true'
+
   options = { url: url.format(parts), method: params.method, payload: params.payload, responseType: 'text',
               headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
               verboseP: options.verboseP
