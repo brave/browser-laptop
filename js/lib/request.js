@@ -6,6 +6,7 @@
 
 const electron = require('electron')
 const session = electron.session
+const util = require('util')
 
 /**
  * Sends a network request using Chromium's networks stack instead of Node's.
@@ -31,6 +32,10 @@ module.exports.request = (options, callback) => {
     var rsp = underscore.pick(response || {},
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
 
+    underscore.keys(rsp.headers).forEach((header) => {
+      if (util.isArray(rsp.headers[header])) rsp.headers[header] = rsp.headers[header][0]
+    })
+
     if (err) return callback(err, rsp)
 
     underscore.defaults(rsp, { statusMessage: '', httpVersionMajor: 1, httpVersionMinor: 1 })
@@ -46,7 +51,7 @@ const https = require('https')
 const underscore = require('underscore')
 const url = require('url')
 
-module.exports.request = (options, callback) => {
+module.exports.request2 = (options, callback) => {
   var client, parts, request
 
   if (typeof options === 'string') options = { url: options }
