@@ -316,7 +316,7 @@ function registerPermissionHandler (session, partition) {
     if (!host) {
       return
     }
-    const message = `Allow ${host} to ${permissions[permission].action}?`
+    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, host).replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
     // If this is a duplicate, clear the previous callback and use the new one
     if (permissionCallbacks[message]) {
