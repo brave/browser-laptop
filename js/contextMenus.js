@@ -769,9 +769,23 @@ function mainTemplateInit (nodeProps, frame) {
           }
         }
       },
-      copyAddressMenuItem('copyImageAddress', nodeProps.srcURL),
-      CommonMenu.separatorMenuItem
+      copyAddressMenuItem('copyImageAddress', nodeProps.srcURL)
     )
+    if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'content/search/google.xml' &&
+      nodeProps.srcURL && urlParse(nodeProps.srcURL).protocol !== 'data:') {
+      template.push(
+        {
+          label: locale.translation('searchImage'),
+          click: (item) => {
+            let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL'])
+              .replace('{searchTerms}', encodeURIComponent(nodeProps.srcURL))
+              .replace('?q', 'byimage?image_url')
+            windowActions.newFrame({ location: searchUrl }, true)
+          }
+        }
+      )
+    }
+    template.push(CommonMenu.separatorMenuItem)
   }
 
   if (isInputField) {
