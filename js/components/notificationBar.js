@@ -7,6 +7,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const ipc = require('electron').ipcRenderer
 const messages = require('../constants/messages')
+const getOrigin = require('../state/siteUtil').getOrigin
 
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
@@ -65,13 +66,24 @@ class NotificationItem extends ImmutableComponent {
 
 class NotificationBar extends ImmutableComponent {
   render () {
-    if (!this.props.notifications || !this.props.notifications.size) {
+    if (!this.props.notifications || !this.props.notifications.size ||
+        !this.props.activeFrame) {
+      return null
+    }
+    const activeOrigin = getOrigin(this.props.activeFrame.get('location'))
+    if (!activeOrigin) {
+      return null
+    }
+    const activeNotifications = this.props.notifications.filter((item) =>
+      item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true)
+
+    if (!activeNotifications.size) {
       return null
     }
 
     return <div className='notificationBar'>
     {
-      this.props.notifications.takeLast(3).map((notificationDetail) =>
+      activeNotifications.takeLast(3).map((notificationDetail) =>
         <NotificationItem detail={notificationDetail} />
       )
     }

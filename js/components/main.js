@@ -712,7 +712,8 @@ class Main extends ImmutableComponent {
           </div>
         </div>
         <UpdateBar updates={this.props.appState.get('updates')} />
-        <NotificationBar notifications={this.props.appState.get('notifications')} />
+        <NotificationBar notifications={this.props.appState.get('notifications')}
+          activeFrame={activeFrame} />
         {
           showBookmarksToolbar
           ? <BookmarksToolbar

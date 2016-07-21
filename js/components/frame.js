@@ -539,6 +539,7 @@ class Frame extends ImmutableComponent {
         appActions.showMessageBox({
           buttons: [locale.translation('deny'), locale.translation('allow')],
           message,
+          frameOrigin: this.origin,
           options: {
             nonce,
             persist: true

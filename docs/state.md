@@ -118,6 +118,7 @@ AppStore
   notifications: [{
     message: string,
     buttons: Array<string>,
+    frameOrigin: (string|undefined), // origin that the notification is from, or undefined if not applicable.
     options: {
       persist: boolean, // whether to show a 'Remember this decision' checkbox
       advancedText: string, // more info text

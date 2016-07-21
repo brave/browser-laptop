@@ -27,6 +27,7 @@ const dialog = electron.dialog
 const app = electron.app
 const uuid = require('node-uuid')
 const path = require('path')
+const getOrigin = require('../js/state/siteUtil').getOrigin
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
@@ -312,11 +313,11 @@ function registerPermissionHandler (session, partition) {
       }
     }
 
-    const host = urlParse(url).host
-    if (!host) {
+    const urlOrigin = getOrigin(url)
+    if (!urlOrigin) {
       return
     }
-    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, host).replace(/{{\s*permission\s*}}/, permissions[permission].action)
+    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, urlOrigin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
     // If this is a duplicate, clear the previous callback and use the new one
     if (permissionCallbacks[message]) {
@@ -325,6 +326,7 @@ function registerPermissionHandler (session, partition) {
 
     appActions.showMessageBox({
       buttons: [locale.translation('deny'), locale.translation('allow')],
+      frameOrigin: urlOrigin,
       options: {
         persist: true
       },
@@ -339,7 +341,7 @@ function registerPermissionHandler (session, partition) {
       cb(result)
       if (persist) {
         // remember site setting for this host over http(s)
-        appActions.changeSiteSetting('https?://' + host, permission + 'Permission', result, isPrivate)
+        appActions.changeSiteSetting(urlOrigin, permission + 'Permission', result, isPrivate)
       }
     }
   })
