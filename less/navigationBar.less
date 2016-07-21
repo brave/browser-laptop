@@ -8,6 +8,16 @@
 
 @import "variables.less";
 
+// Fade In animation for URL bar transitions
+@keyframes fadeIn {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}
+
 // On MacOS we need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .backforward {
@@ -207,7 +217,18 @@
     }
   }
 
+  &:not(.titleMode) {
+    .urlbarForm, .browserButton {
+      animation: fadeIn .6s;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+  }
+
   &.titleMode {
+    &:extend(#navigator:not(.titleMode).urlbarForm);
+    animation: fadeIn 1.2s;
+
     input {
       display: none;
     }
