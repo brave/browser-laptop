@@ -13,26 +13,29 @@ function isAdobeLink (href) {
 }
 
 // Open flash links in the same tab so we can intercept them correctly
-(function () {
-  function replaceAdobeLinks () {
-    Array.from(document.querySelectorAll('a[target="_blank"]')).forEach((elem) => {
-      const href = elem.getAttribute('href')
-      if (isAdobeLink(href)) {
-        elem.setAttribute('target', '')
-      }
-    })
-  }
-  setTimeout(() => {
-    var observer = new window.MutationObserver(function (mutations) {
+if (chrome.contentSettings.flashActive != 'allow' &&
+    chrome.contentSettings.flashEnabled == 'allow') {
+  (function () {
+    function replaceAdobeLinks () {
+      Array.from(document.querySelectorAll('a[target="_blank"]')).forEach((elem) => {
+        const href = elem.getAttribute('href')
+        if (isAdobeLink(href)) {
+          elem.setAttribute('target', '')
+        }
+      })
+    }
+    setTimeout(() => {
+      var observer = new window.MutationObserver(function (mutations) {
+        replaceAdobeLinks()
+      })
       replaceAdobeLinks()
-    })
-    replaceAdobeLinks()
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    })
-  }, 1000)
-})()
+      observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+      })
+    }, 1000)
+  })()
+}
 
 /**
  * Whether a src is a .swf file.
