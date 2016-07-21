@@ -12,15 +12,32 @@ const session = electron.session
  * Depends on there being a loaded browser window available.
  * @param {string} url - the url to load
  */
-module.exports.request = (url, callback) => {
+module.exports.request = (options, callback) => {
+  var headers, method, payload, type, url
   let defaultSession = session.defaultSession
-  if (!defaultSession) {
-    callback(new Error('Request failed, no session available'))
-  } else {
-    defaultSession.webRequest.fetch(url, {}, (err, response, responseBody) => {
-      callback(err, response.statusCode, responseBody)
-    })
-  }
+
+  if (!defaultSession) return callback(new Error('Request failed, no session available'))
+
+  if (typeof options === 'string') options = { url: options }
+  url = options.url
+  method = options.method || 'GET'
+  payload = options.payload || null
+  headers = options.headers || []
+  type = headers['content-type'] || 'application/json; charset=utf-8'
+
+  defaultSession.webRequest.fetch(url, method, payload && JSON.stringify(payload), headers, type, (err, response, body) => {
+    var responseType = options.responseType || 'text'
+    var rsp = underscore.pick(response || {},
+                              [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
+
+    if (err) return callback(err, rsp)
+
+    underscore.defaults(rsp, { statusMessage: '', httpVersionMajor: 1, httpVersionMinor: 1 })
+    if (responseType !== 'text') body = new Buffer(body, 'binary')
+    if (responseType === 'blob') body = 'data:' + rsp.headers['content-type'] + ';base64,' + body.toString('base64')
+
+    callback(null, rsp, body)
+  })
 }
 
 const http = require('http')
