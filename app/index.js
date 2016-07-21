@@ -610,16 +610,16 @@ app.on('ready', () => {
       }
 
       var message = username
-        ? `Would you like Brave to remember the password for ${username} on ${origin}?`
-        : `Would you like Brave to remember your password on ${origin}?`
+        ? locale.translation('notificationPasswordWithUserName').replace(/{{\s*username\s*}}/, username).replace(/{{\s*origin\s*}}/, origin)
+        : locale.translation('notificationPassword').replace(/{{\s*origin\s*}}/, origin)
 
       if (!(message in passwordCallbacks)) {
         // Notification not shown already
         appActions.showMessageBox({
-          buttons: ['Yes', 'No', 'Never for this site'],
+          buttons: [locale.translation('notificationPasswordYes'), locale.translation('notificationPasswordNo'), locale.translation('notificationPasswordNeverRemember')],
           options: {
             persist: false,
-            advancedText: '[Password settings]',
+            advancedText: locale.translation('notificationPasswordSettings'),
             advancedLink: 'about:passwords'
           },
           message

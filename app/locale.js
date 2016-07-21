@@ -165,7 +165,13 @@ var rendererIdentifiers = function () {
     'historySuggestionTitle',
     'aboutPagesSuggestionTitle',
     'searchSuggestionTitle',
-    'topSiteSuggestionTitle'
+    'topSiteSuggestionTitle',
+    'notificationPasswordWithUserName',
+    'notificationPassword',
+    'notificationPasswordYes',
+    'notificationPasswordNo',
+    'notificationPasswordNeverRemember',
+    'notificationPasswordSettings'
   ]
 }
 
