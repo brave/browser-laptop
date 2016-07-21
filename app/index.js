@@ -142,7 +142,7 @@ const saveIfAllCollected = (forceSave) => {
     const logSaveAppStateError = (e) => {
       console.error('Error saving app state: ', e)
     }
-    SessionStore.saveAppState(appState).catch(logSaveAppStateError).then(() => {
+    SessionStore.saveAppState(appState, shuttingDown).catch(logSaveAppStateError).then(() => {
       if (shuttingDown) {
         sessionStateStoreCompleteOnQuit = true
         // If there's an update to apply, then do it here.

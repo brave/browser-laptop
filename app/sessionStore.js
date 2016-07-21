@@ -40,7 +40,7 @@ const promisify = require('../js/lib/promisify')
  *   (not immutable data)
  * @return a promise which resolves when the state is saved
  */
-module.exports.saveAppState = (payload) => {
+module.exports.saveAppState = (payload, isShutdown) => {
   return new Promise((resolve, reject) => {
     // Don't persist private frames
     let startupModeSettingValue
@@ -58,8 +58,8 @@ module.exports.saveAppState = (payload) => {
     }
 
     try {
-      module.exports.cleanAppData(payload, true)
-      payload.cleanedOnShutdown = true
+      module.exports.cleanAppData(payload, isShutdown)
+      payload.cleanedOnShutdown = isShutdown
     } catch (e) {
       payload.cleanedOnShutdown = false
     }
@@ -69,10 +69,12 @@ module.exports.saveAppState = (payload) => {
       ? path.join(app.getPath('userData'), 'session-store-tmp-' + epochTimestamp)
       : path.join(process.env.HOME, '.brave-test-session-store-tmp-' + epochTimestamp)
 
-    promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
+    let p = promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
       .then(() => promisify(fs.rename, tmpStoragePath, storagePath))
-      .then(module.exports.cleanSessionDataOnShutdown())
-      .then(resolve)
+    if (isShutdown) {
+      p = p.then(module.exports.cleanSessionDataOnShutdown())
+    }
+    p = p.then(resolve)
       .catch(reject)
   })
 }
@@ -309,7 +311,7 @@ module.exports.loadAppState = () => {
       // The process always restarts after an update so if the state
       // indicates that a restart isn't wanted, close right away.
       if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-        module.exports.saveAppState(data).then(() => {
+        module.exports.saveAppState(data, true).then(() => {
           // Exit immediately without doing the session store saving stuff
           // since we want the same state saved except for the update status
           app.exit(0)
