@@ -575,12 +575,9 @@ class Frame extends ImmutableComponent {
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
-        if (UrlUtil.isFlashInstallUrl(e.url)) {
-          const currentProvisionalUrl = urlParse(this.props.frame.get('provisionalLocation'))
-          if (['http:', 'https:'].includes(currentProvisionalUrl.protocol) &&
-              !currentProvisionalUrl.hostname.includes('.adobe.com')) {
-            interceptFlash(e.url)
-          }
+        if (UrlUtil.isFlashInstallUrl(e.url) &&
+            UrlUtil.shouldInterceptFlash(this.props.frame.get('provisionalLocation'))) {
+          interceptFlash(e.url)
         }
         windowActions.onWebviewLoadStart(this.props.frame, e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()

@@ -255,6 +255,24 @@ const UrlUtil = {
   isFlashInstallUrl: function (url) {
     const adobeRegex = new RegExp('//(get\\.adobe\\.com/([a-z_-]+/)*flashplayer|www\\.macromedia\\.com/go/getflash|www\\.adobe\\.com/go/getflash)', 'i')
     return adobeRegex.test(url)
+  },
+
+  /**
+   * Checks whether the first-party page is one that should have Flash install
+   * URL interception.
+   * @param {string} url
+   * @return {boolean}
+   */
+  shouldInterceptFlash: function (url) {
+    if (!url) {
+      return false
+    }
+    const parsed = urlParse(url)
+    const exemptHostPattern = new RegExp('(\\.adobe\\.com|\\.google(\\.\\w+){1,2}|^duckduckgo\\.com|^search\\.yahoo\\.com)$')
+    return parsed.hostname &&
+      ['http:', 'https:'].includes(parsed.protocol) &&
+      !exemptHostPattern.test(parsed.hostname) &&
+      !['/search', '/search/'].includes(parsed.pathname)
   }
 }
 
