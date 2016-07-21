@@ -41,15 +41,15 @@ require('../../less/about/preferences.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const permissionNames = {
-  'mediaPermission': 'boolean',
-  'geolocationPermission': 'boolean',
-  'notificationsPermission': 'boolean',
-  'midiSysexPermission': 'boolean',
-  'pointerLockPermission': 'boolean',
-  'fullscreenPermission': 'boolean',
-  'openExternalPermission': 'boolean',
-  'protocolRegistrationPermission': 'boolean',
-  'flash': 'number'
+  'mediaPermission': ['boolean'],
+  'geolocationPermission': ['boolean'],
+  'notificationsPermission': ['boolean'],
+  'midiSysexPermission': ['boolean'],
+  'pointerLockPermission': ['boolean'],
+  'fullscreenPermission': ['boolean'],
+  'openExternalPermission': ['boolean'],
+  'protocolRegistrationPermission': ['boolean'],
+  'flash': ['boolean', 'number']
 }
 
 const changeSetting = (cb, key, e) => {
@@ -221,7 +221,7 @@ class SyncTab extends ImmutableComponent {
 class SitePermissionsPage extends React.Component {
   hasEntryForPermission (name) {
     return this.props.siteSettings.some((value) => {
-      return value.get ? typeof value.get(name) === permissionNames[name] : false
+      return value.get && permissionNames[name] ? permissionNames[name].includes(typeof value.get(name)) : false
     })
   }
 
@@ -230,7 +230,7 @@ class SitePermissionsPage extends React.Component {
     return this.props.siteSettings.some((value) => {
       if (value && value.get) {
         for (let name in permissionNames) {
-          if (typeof value.get(name) === permissionNames[name]) {
+          if (permissionNames[name].includes(typeof value.get(name))) {
             return true
           }
         }
@@ -260,15 +260,18 @@ class SitePermissionsPage extends React.Component {
                     return null
                   }
                   const granted = value.get(name)
-                  if (typeof granted === permissionNames[name]) {
+                  if (permissionNames[name].includes(typeof granted)) {
                     let statusText
                     let statusArgs
                     if (name === 'flash') {
-                      // Show the number of days/hrs/min til expiration
                       if (granted === 1) {
                         // Flash is allowed just one time
                         statusText = 'flashAllowOnce'
+                      } else if (granted === false) {
+                        // Flash installer is never intercepted
+                        statusText = 'alwaysDeny'
                       } else {
+                        // Show the number of days/hrs/min til expiration
                         statusText = 'flashAllowAlways'
                         statusArgs = {
                           time: new Date(granted).toLocaleString()

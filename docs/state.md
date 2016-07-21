@@ -49,7 +49,7 @@ AppStore
       noScript: boolean,
       httpsEverywhere: boolean,
       fingerprintingProtection: boolean,
-      flash: number, // approval expiration time
+      flash: (number|boolean), // approval expiration time if allowed, false if never allow
     }
   },
   temporarySiteSettings: {

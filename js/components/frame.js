@@ -520,14 +520,20 @@ class Frame extends ImmutableComponent {
     })
 
     const interceptFlash = (adobeUrl) => {
+      if (!this.origin) {
+        return
+      }
+      const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
+                                                               this.origin)
+      if (activeSiteSettings && activeSiteSettings.get('flash') === false) {
+        return
+      }
+
       this.webview.stop()
       // Generate a random string that is unlikely to collide. Not
       // cryptographically random.
       const nonce = Math.random().toString()
       if (this.props.flashInitialized) {
-        if (!this.origin) {
-          return
-        }
         const message = `Allow ${this.origin} to run Flash Player?`
         // Show Flash notification bar
         appActions.showMessageBox({
@@ -548,7 +554,7 @@ class Frame extends ImmutableComponent {
           } else {
             appActions.hideMessageBox(message)
             if (persist) {
-              // TODO: Never show this message again on this domain?
+              appActions.changeSiteSetting(this.origin, 'flash', false)
             }
           }
         }
