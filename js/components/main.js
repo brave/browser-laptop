@@ -307,7 +307,9 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frames = self.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
+      const frames = self.props.windowState.get('frames')
+        .filter((frame) => frame.get('location') === detail.url ||
+          urlParse(frame.get('location')).hostname === urlParse(detail.url).hostname)
       frames.forEach((frame) =>
         windowActions.setLoginRequiredDetail(frame, detail))
     })
