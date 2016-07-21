@@ -533,11 +533,11 @@ eventStore.addChangeListener(() => {
         if (typeof redirects === 'undefined') redirects = 0
 
         request.request({ url: url, responseType: 'blob' }, (err, response, blob) => {
-          var prefix, tail
+          var matchP, prefix, tail
 
 /*
           console.log('\nresponse: ' + url +
-                      ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 40) + '\nresponse=' +
+                      ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 80) + '\nresponse=' +
                       JSON.stringify(response, null, 2))
  */
 
@@ -558,17 +558,19 @@ eventStore.addChangeListener(() => {
 
             prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
             underscore.keys(fileTypes).forEach((fileType) => {
+              if (matchP) return
               if ((prefix.length < fileTypes[fileType].length) &&
                   (fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0)) return
 
               blob = 'data:image/' + fileType + blob.substr(tail)
+              matchP = true
             })
           }
 
           entry.faviconURL = blob
           syncWriter(synopsisPath, synopsis, () => {})
           console.log('\n' + publisher + ' synopsis=' +
-                      JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL' ]),
+                      JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL', 'window' ]),
                                                        { faviconURL: entry.faviconURL && '... ' }), null, 2))
         })
       }

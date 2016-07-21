@@ -6,6 +6,7 @@
 
 const electron = require('electron')
 const session = electron.session
+const underscore = require('underscore')
 const util = require('util')
 
 /**
@@ -20,7 +21,8 @@ module.exports.request = (options, callback) => {
   if (!defaultSession) return callback(new Error('Request failed, no session available'))
 
   if (typeof options === 'string') options = { url: options }
-  params = underscore.pick(options, [ 'method', 'headers' ])
+  params = underscore.defaults(underscore.pick(options, [ 'method', 'headers' ]), { headers: {} })
+  params.headers['accept-encoding'] = ''
   if (options.payload) {
     underscore.extend(params, { payload: JSON.stringify(options.payload),
                                 payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
@@ -28,8 +30,6 @@ module.exports.request = (options, callback) => {
   }
 
   defaultSession.webRequest.fetch(options.url, params, (err, response, body) => {
-    var i
-    var bytes = []
     var responseType = options.responseType || 'text'
     var rsp = underscore.pick(response || {},
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
@@ -41,22 +41,19 @@ module.exports.request = (options, callback) => {
     if (err) return callback(err, rsp)
 
     underscore.defaults(rsp, { statusMessage: '', httpVersionMajor: 1, httpVersionMinor: 1 })
-    if (responseType !== 'text') {
-      for (i = 0; i < body.length; i++) bytes.push(body.charCodeAt(i))
-      body = new Buffer(bytes)
-    }
+    if (responseType !== 'text') body = new Buffer(body, 'binary')
     if (responseType === 'blob') body = 'data:' + rsp.headers['content-type'] + ';base64,' + body.toString('base64')
 
     callback(null, rsp, body)
   })
 }
 
+/*
 const http = require('http')
 const https = require('https')
-const underscore = require('underscore')
 const url = require('url')
 
-module.exports.request2 = (options, callback) => {
+module.exports.request = (options, callback) => {
   var client, parts, request
 
   if (typeof options === 'string') options = { url: options }
@@ -97,6 +94,7 @@ module.exports.request2 = (options, callback) => {
   if (options.payload) request.write(JSON.stringify(options.payload))
   request.end()
 }
+ */
 
 module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
   let defaultSession = session.defaultSession
