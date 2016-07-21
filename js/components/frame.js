@@ -575,9 +575,7 @@ class Frame extends ImmutableComponent {
       // Instead of telling person to install Flash, ask them if they want to
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
-        if ((e.url.includes('//get.adobe.com/flashplayer') ||
-             e.url.includes('//www.macromedia.com/go/getflash') ||
-             e.url.includes('//www.adobe.com/go/getflash'))) {
+        if (UrlUtil.isFlashInstallUrl(e.url)) {
           const currentProvisionalUrl = urlParse(this.props.frame.get('provisionalLocation'))
           if (['http:', 'https:'].includes(currentProvisionalUrl.protocol) &&
               !currentProvisionalUrl.hostname.includes('.adobe.com')) {

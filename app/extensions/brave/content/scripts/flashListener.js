@@ -3,14 +3,13 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const placeholderUrl = chrome.extension.getURL('about-flash.html')
+const adobeRegex = new RegExp('//(get\\.adobe\\.com/([a-z_-]+/)*flashplayer|www\\.macromedia\\.com/go/getflash|www\\.adobe\\.com/go/getflash)', 'i')
 
 function isAdobeLink (href) {
   if (typeof href !== 'string') {
     return false
   }
-  return href.toLowerCase().includes('//get.adobe.com/flashplayer') ||
-    href.toLowerCase().includes('//www.macromedia.com/go/getflash') ||
-    href.toLowerCase().includes('//www.adobe.com/go/getflash')
+  return adobeRegex.test(href)
 }
 
 // Open flash links in the same tab so we can intercept them correctly

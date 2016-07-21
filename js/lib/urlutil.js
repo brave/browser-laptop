@@ -245,6 +245,16 @@ const UrlUtil = {
       hostPatterns.push('*.' + segmented.slice(i, segmented.length).join('.'))
     }
     return hostPatterns
+  },
+
+  /**
+   * Checks whether a link is an Flash installer URL.
+   * @param {string} url
+   * @return {boolean}
+   */
+  isFlashInstallUrl: function (url) {
+    const adobeRegex = new RegExp('//(get\\.adobe\\.com/([a-z_-]+/)*flashplayer|www\\.macromedia\\.com/go/getflash|www\\.adobe\\.com/go/getflash)', 'i')
+    return adobeRegex.test(url)
   }
 }
 

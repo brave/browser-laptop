@@ -101,4 +101,20 @@ describe('urlutil', function () {
                         '*.brave.com'])
     })
   })
+
+  describe('isFlashInstallUrl', function () {
+    it('gets English flash install', function () {
+      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/flashplayer'))
+      assert(UrlUtil.isFlashInstallUrl('https://www.adobe.com/go/getflash/'))
+      assert(UrlUtil.isFlashInstallUrl('http://www.macromedia.com/go/GETFLASH'))
+    })
+    it('gets non-English flash install', function () {
+      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/jp/flashplayer#test'))
+      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/en/us/flashplayer/etc'))
+      assert(UrlUtil.isFlashInstallUrl('https://get.adobe.com/en-US/flashplayer/etc'))
+    })
+    it('returns false for non-flash url', function () {
+      assert(!UrlUtil.isFlashInstallUrl('https://gettadobe.com/jp/flashplayer'))
+    })
+  })
 })
