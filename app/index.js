@@ -653,7 +653,7 @@ app.on('ready', () => {
       }
 
       passwordCallbacks[message] = (buttonIndex) => {
-        passwordCallbacks[message] = null
+        delete passwordCallbacks[message]
         appActions.hideMessageBox(message)
 
         if (buttonIndex === 1) {

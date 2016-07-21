@@ -174,7 +174,8 @@ var rendererIdentifiers = function () {
     'prefsRestart',
     'yes',
     'no',
-    'neverForThisSite'
+    'neverForThisSite',
+    'passwordsManager'
   ]
 }
 
