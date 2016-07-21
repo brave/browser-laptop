@@ -28,6 +28,8 @@ module.exports.request = (options, callback) => {
   }
 
   defaultSession.webRequest.fetch(options.url, params, (err, response, body) => {
+    var i
+    var bytes = []
     var responseType = options.responseType || 'text'
     var rsp = underscore.pick(response || {},
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
@@ -39,7 +41,10 @@ module.exports.request = (options, callback) => {
     if (err) return callback(err, rsp)
 
     underscore.defaults(rsp, { statusMessage: '', httpVersionMajor: 1, httpVersionMinor: 1 })
-    if (responseType !== 'text') body = new Buffer(body, 'binary')
+    if (responseType !== 'text') {
+      for (i = 0; i < body.length; i++) bytes.push(body.charCodeAt(i))
+      body = new Buffer(bytes)
+    }
     if (responseType === 'blob') body = 'data:' + rsp.headers['content-type'] + ';base64,' + body.toString('base64')
 
     callback(null, rsp, body)
