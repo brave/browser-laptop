@@ -264,6 +264,10 @@ var roundtrip = (params, options, callback) => {
     if ((response) && (options.verboseP)) {
       console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
                  ' ' + (response.statusMessage || ''))
+      underscore.keys(response.headers).forEach((header) => {
+        console.log('>>> ' + header + ': ' + response.headers[header])
+      })
+      console.log('>>>')
     }
 
     if (err) return callback(err)
@@ -287,6 +291,8 @@ var roundtrip = (params, options, callback) => {
   if (!options.verboseP) return
 
   console.log('<<< ' + params.method + ' ' + params.path)
+  underscore.keys(options.headers).forEach((header) => { console.log('<<< ' + header + ': ' + options.headers[header]) })
+  console.log('<<<')
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
