@@ -509,7 +509,7 @@ const init = (settingsState, args) => {
           accelerator: 'Command+Alt+R',
           click: function () {
             electron.app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
-            process.exit(0)
+            electron.app.quit()
           }
         }
       ]

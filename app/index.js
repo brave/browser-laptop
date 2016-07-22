@@ -404,9 +404,10 @@ app.on('ready', () => {
         message
       })
       prefsRestartCallbacks[message] = (buttonIndex, persist) => {
+        delete prefsRestartCallbacks[message]
         if (buttonIndex === 0) {
           app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
-          app.exit(0)
+          app.quit()
         } else {
           appActions.hideMessageBox(message)
         }
