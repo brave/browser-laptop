@@ -38,7 +38,7 @@ let initializedPartitions = {}
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 // Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net', 'webtoon.phinf.naver.net', 'player.vimeo.com', 'cloud.typography.com', 'imgcomic.naver.net', 'fiddle.jshell.net', 'www.cibconline.cibc.com']
+const refererExceptions = ['use.typekit.net', 'webtoon.phinf.naver.net', 'player.vimeo.com', 'cloud.typography.com', 'imgcomic.naver.net', 'fiddle.jshell.net', 'www.cibconline.cibc.com', 's.codepen.io']
 
 /**
  * Maps downloadId to an electron download-item
