@@ -17,7 +17,7 @@ module.exports.request = (url, callback) => {
   if (!defaultSession) {
     callback(new Error('Request failed, no session available'))
   } else {
-    defaultSession.webRequest.fetch(url, (err, response, responseBody) => {
+    defaultSession.webRequest.fetch(url, {}, (err, response, responseBody) => {
       callback(err, response.statusCode, responseBody)
     })
   }
