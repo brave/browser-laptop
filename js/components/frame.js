@@ -334,6 +334,14 @@ class Frame extends ImmutableComponent {
         }
         this.webview.reloadIgnoringCache()
         break
+      case 'clone':
+        if (this.isAboutPage()) {
+          break
+        }
+        const newGuest = this.webview.clone()
+        const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
+        windowActions.cloneFrame(this.props.frame, newGuestInstanceId)
+        break
       case 'explicitLoadURL':
         this.webview.loadURL(location)
         break

@@ -152,6 +152,51 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
+const newFrame = (frameOpts, openInForeground) => {
+  if (frameOpts === undefined) {
+    frameOpts = {}
+  }
+  if (openInForeground === undefined) {
+    openInForeground = true
+  }
+  frameOpts.location = frameOpts.location || config.defaultUrl
+  if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
+    frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
+  } else {
+    const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
+    if (defaultURL) {
+      frameOpts.location = defaultURL
+        .replace('{searchTerms}', encodeURIComponent(frameOpts.location))
+    } else {
+      // Bad URLs passed here can actually crash the browser
+      frameOpts.location = ''
+    }
+  }
+
+  const nextKey = incrementNextKey()
+  let nextPartitionNumber = 0
+  if (frameOpts.partitionNumber) {
+    nextPartitionNumber = frameOpts.partitionNumber
+    if (currentPartitionNumber < nextPartitionNumber) {
+      currentPartitionNumber = nextPartitionNumber
+    }
+  } else if (frameOpts.isPartitioned) {
+    nextPartitionNumber = incrementPartitionNumber()
+  }
+  frameOpts.location = setPDFLocation(frameOpts.location)
+  windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), frameOpts,
+    nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey')))
+  if (openInForeground) {
+    const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+    updateTabPageIndex(activeFrame)
+    // For about:newtab we want to have the urlbar focused, not the new frame.
+    // Otherwise we want to focus the new tab when it is a new frame in the foreground.
+    if (activeFrame.get('location') !== 'about:newtab') {
+      focusWebview(activeFrameStatePath())
+    }
+  }
+}
+
 const windowStore = new WindowStore()
 const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
@@ -315,48 +360,10 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_NEW_FRAME:
-      if (action.frameOpts === undefined) {
-        action.frameOpts = {}
-      }
-      if (action.openInForeground === undefined) {
-        action.openInForeground = true
-      }
-      action.frameOpts.location = action.frameOpts.location || config.defaultUrl
-      if (action.frameOpts.location && UrlUtil.isURL(action.frameOpts.location)) {
-        action.frameOpts.location = UrlUtil.getUrlFromInput(action.frameOpts.location)
-      } else {
-        const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
-        if (defaultURL) {
-          action.frameOpts.location = defaultURL
-            .replace('{searchTerms}', encodeURIComponent(action.frameOpts.location))
-        } else {
-          // Bad URLs passed here can actually crash the browser
-          action.frameOpts.location = ''
-        }
-      }
-
-      const nextKey = incrementNextKey()
-      let nextPartitionNumber = 0
-      if (action.frameOpts.partitionNumber) {
-        nextPartitionNumber = action.frameOpts.partitionNumber
-        if (currentPartitionNumber < nextPartitionNumber) {
-          currentPartitionNumber = nextPartitionNumber
-        }
-      } else if (action.frameOpts.isPartitioned) {
-        nextPartitionNumber = incrementPartitionNumber()
-      }
-      action.frameOpts.location = setPDFLocation(action.frameOpts.location)
-      windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), action.frameOpts,
-        nextKey, nextPartitionNumber, action.openInForeground ? nextKey : windowState.get('activeFrameKey')))
-      if (action.openInForeground) {
-        const activeFrame = FrameStateUtil.getActiveFrame(windowState)
-        updateTabPageIndex(activeFrame)
-        // For about:newtab we want to have the urlbar focused, not the new frame.
-        // Otherwise we want to focus the new tab when it is a new frame in the foreground.
-        if (activeFrame.get('location') !== 'about:newtab') {
-          focusWebview(activeFrameStatePath())
-        }
-      }
+      newFrame(action.frameOpts, action.openInForeground)
+      break
+    case WindowConstants.WINDOW_CLONE_FRAME:
+      newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground)
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
       const currentWindow = require('electron').remote.getCurrentWindow()
@@ -662,7 +669,7 @@ ipc.on(messages.IMPORT_BOOKMARKS, () => {
   }
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev', 'clone']
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, () => {

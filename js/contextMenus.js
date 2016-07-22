@@ -852,6 +852,15 @@ function mainTemplateInit (nodeProps, frame) {
               }
             }
           },
+          {
+            label: locale.translation('cloneTab'),
+            click: (item, focusedWindow) => {
+              if (focusedWindow) {
+                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+              }
+            }
+          },
+
           CommonMenu.separatorMenuItem,
           addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false), {
             label: locale.translation('find'),
