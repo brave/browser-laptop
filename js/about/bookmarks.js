@@ -55,11 +55,19 @@ class BookmarkItem extends ImmutableComponent {
         <span>&nbsp;(<span data-l10n-id='partitionNumber' data-l10n-args={JSON.stringify(l10nArgs)} />)</span>
     }
 
+    var className = 'listItem'
+
+    // If the bookmark item is in the selected folder, show
+    // it as selected
+    if (this.props.inSelectedFolder) {
+      className += ' selected'
+    }
+
     return <div role='listitem'
       onDrop={this.onDrop.bind(this)}
       onDragStart={this.onDragStart.bind(this)}
       onDragOver={this.onDragOver.bind(this)}
-      className='listItem'
+      className={className}
       onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmark.toJS(), 'bookmark')}
       data-context-menu-disable
       draggable='true'
@@ -180,14 +188,41 @@ class BookmarksList extends ImmutableComponent {
   }
 }
 
+class SearchResults extends React.Component {
+  render () {
+    // Sort bookmarks by title
+    var sortedBookmarks = this.props.bookmarks.sort((a, b) => {
+      if (a.get('title').toUpperCase() < b.get('title').toUpperCase()) return -1
+      if (a.get('title').toUpperCase() > b.get('title').toUpperCase()) return 1
+      return 0
+    })
+
+    // Flag each bookmark if it is in the selected folder
+    var selectedFolderIndex = sortedBookmarks.map((bookmark, idx) => {
+      return sortedBookmarks.get(idx).get('parentFolderId') === this.props.selectedFolderId
+    })
+
+    return (
+      <list className='bookmarkList'>
+      {
+        sortedBookmarks.map((bookmark, idx) => <BookmarkItem bookmark={bookmark} inSelectedFolder={selectedFolderIndex.get(idx)} />)
+      }
+      </list>
+    )
+  }
+}
+
 class AboutBookmarks extends React.Component {
   constructor () {
     super()
     this.onChangeSelectedFolder = this.onChangeSelectedFolder.bind(this)
+    this.onChangeSearch = this.onChangeSearch.bind(this)
+    this.onClearSearchText = this.onClearSearchText.bind(this)
     this.state = {
       bookmarks: Immutable.Map(),
       bookmarkFolders: Immutable.Map(),
-      selectedFolderId: 0
+      selectedFolderId: 0,
+      search: ''
     }
     ipc.on(messages.BOOKMARKS_UPDATED, (e, detail) => {
       this.setState({
@@ -198,12 +233,33 @@ class AboutBookmarks extends React.Component {
   }
   onChangeSelectedFolder (id) {
     this.setState({
-      selectedFolderId: id
+      selectedFolderId: id,
+      search: ''
+    })
+  }
+  onChangeSearch (evt) {
+    this.setState({
+      search: evt.target.value
+    })
+  }
+  onClearSearchText (evt) {
+    this.setState({
+      search: ''
+    })
+  }
+  searchedBookmarks (searchTerm, bookmarks) {
+    return bookmarks.filter((bookmark) => {
+      const title = bookmark.get('customTitle') + bookmark.get('title') + bookmark.get('location')
+      return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
   render () {
     return <div className='bookmarksPage'>
       <h2 data-l10n-id='folders' />
+      <input type='text' className='searchInput' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
+      {this.state.search
+        ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear'></span>
+        : null}
       <div className='bookmarkPageContent'>
         <Sticky enabled top={10}>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
@@ -212,7 +268,9 @@ class AboutBookmarks extends React.Component {
             isRoot
             selectedFolderId={this.state.selectedFolderId} />
         </Sticky>
-        <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />
+        {this.state.search
+         ? <SearchResults bookmarks={this.searchedBookmarks(this.state.search, this.state.bookmarks)} selectedFolderId={this.state.selectedFolderId} />
+         : <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />}
       </div>
     </div>
   }
