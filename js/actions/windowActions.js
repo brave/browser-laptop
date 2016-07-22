@@ -7,6 +7,7 @@
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const WindowConstants = require('../constants/windowConstants')
 const appActions = require('../actions/appActions')
+const webviewActions = require('../actions/webviewActions')
 const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
@@ -315,6 +316,7 @@ const windowActions = {
     const remote = global.require('electron').remote
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {
+      webviewActions.setFullScreen(false)
       this.setFullScreen(frameProps, false)
     }
     // Flush out any pending login required prompts
