@@ -16,7 +16,8 @@ const util = require('util')
  */
 module.exports.request = (options, callback) => {
   var params
-  let defaultSession = session.defaultSession
+  var defaultSession = session.defaultSession
+  var responseType = options.responseType || 'text'
 
   if (!defaultSession) return callback(new Error('Request failed, no session available'))
 
@@ -30,7 +31,6 @@ module.exports.request = (options, callback) => {
   }
 
   defaultSession.webRequest.fetch(options.url, params, (err, response, body) => {
-    var responseType = options.responseType || 'text'
     var rsp = underscore.pick(response || {},
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
 
@@ -48,7 +48,6 @@ module.exports.request = (options, callback) => {
   })
 }
 
-/*
 const http = require('http')
 const https = require('https')
 const url = require('url')
@@ -94,10 +93,9 @@ module.exports.request = (options, callback) => {
   if (options.payload) request.write(JSON.stringify(options.payload))
   request.end()
 }
- */
 
 module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
-  let defaultSession = session.defaultSession
+  var defaultSession = session.defaultSession
   if (!defaultSession) {
     reject('Request failed, no session available')
   } else {

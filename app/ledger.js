@@ -107,7 +107,7 @@ var initialize = () => {
         getStateInfo(state)
         client = LedgerClient(state.personaId, underscore.extend({ roundtrip: roundtrip }, state.options), state)
         if (client.sync(callback) === true) {
-          run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 10 * msecs.minute) }))
+          run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
         cacheRuleSet(state.ruleset)
         getWalletInfo()
