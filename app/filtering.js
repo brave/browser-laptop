@@ -38,7 +38,7 @@ let initializedPartitions = {}
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 // Third party domains that require a valid referer to work
-const refererExceptions = ['use.typekit.net', 'webtoon.phinf.naver.net', 'player.vimeo.com', 'cloud.typography.com', 'imgcomic.naver.net', 'fiddle.jshell.net', 'www.cibconline.cibc.com', 's.codepen.io']
+const refererExceptions = ['use.typekit.net', 'webtoon.phinf.naver.net', 'player.vimeo.com', 'cloud.typography.com', 'imgcomic.naver.net', 'fiddle.jshell.net', 'www.cibconline.cibc.com']
 
 /**
  * Maps downloadId to an electron download-item
@@ -195,12 +195,8 @@ function registerForBeforeSendHeaders (session) {
         if (requestHeaders['Cookie']) {
           requestHeaders['Cookie'] = undefined
         }
-      }
-      if (requestHeaders['Referer'] && !refererExceptions.includes(parsedUrl.hostname)) {
-        // Clear cross-origin referer always.
-        let parsedRef = urlParse(requestHeaders['Referer'])
-        if (parsedUrl.protocol !== parsedRef.protocol ||
-            parsedUrl.host !== parsedRef.host) {
+        if (requestHeaders['Referer'] &&
+            !refererExceptions.includes(parsedUrl.hostname)) {
           requestHeaders['Referer'] = undefined
         }
       }
