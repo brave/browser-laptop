@@ -66,6 +66,21 @@ const webviewActions = {
         webview.send(messages.CHECK_SWIPE_FORWARD)
       }
     }
+  },
+
+  /**
+   * Set/unset webkit fullscreen status
+   * @param {Boolean} isFullScreen - fullscreen state to go to
+   */
+  setFullScreen: function (isFullScreen) {
+    const webview = getWebview()
+    if (webview) {
+      if (!isFullScreen) {
+        webview.executeJavaScript('document.webkitExitFullscreen()')
+      } else {
+        webview.executeJavaScript('document.webkitRequestFullscreen()')
+      }
+    }
   }
 }
 
