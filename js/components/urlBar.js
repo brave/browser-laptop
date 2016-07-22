@@ -138,6 +138,9 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.DOWN:
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
+          if (!this.urlBarSuggestions.suggestionList) {
+            this.urlBarSuggestions.suggestionList = this.urlBarSuggestions.getNewSuggestionList()
+          }
           this.urlBarSuggestions.nextSuggestion()
           e.preventDefault()
         }
