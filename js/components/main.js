@@ -15,6 +15,7 @@ const webviewActions = require('../actions/webviewActions')
 const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
+const getOrigin = require('../state/siteUtil').getOrigin
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -307,7 +308,9 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frames = self.props.windowState.get('frames').filter((frame) => frame.get('location') === detail.url)
+      const frames = self.props.windowState.get('frames')
+        .filter((frame) => frame.get('location') === detail.url ||
+          getOrigin(frame.get('location')) === getOrigin(detail.url))
       frames.forEach((frame) =>
         windowActions.setLoginRequiredDetail(frame, detail))
     })
