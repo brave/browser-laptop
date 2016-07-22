@@ -79,6 +79,10 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     // Whenever a form is submitted, offer to save it in the password manager
     // if the credentials have changed.
     form.addEventListener('submit', (e) => {
+      if (usernameElem) {
+        usernameElem.blur()
+        chrome.ipc.send('hide-context-menu')
+      }
       onFormSubmit(form, formOrigin)
     })
     Array.from(form.querySelectorAll('button')).forEach((button) => {
