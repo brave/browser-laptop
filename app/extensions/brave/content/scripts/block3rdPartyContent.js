@@ -17,6 +17,7 @@ function getBlockRefererScript () {
   return '(' + Function.prototype.toString.call(blockReferer) + '());'
 }
 
-if (chrome.contentSettings.referer != 'allow') {
+if (chrome.contentSettings.referer != 'allow' &&
+    document.location.origin && document.location.origin !== 'https://youtube.googleapis.com') {
   executeScript(getBlockRefererScript())
 }
