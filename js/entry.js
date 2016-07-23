@@ -33,9 +33,7 @@ const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
 
-// don't allow scaling or zooming of the ui
-webFrame.setPageScaleLimits(1, 1)
-webFrame.setZoomLevelLimits(0, 0)
+webFrame.setZoomLevelLimits(1, 1)
 
 // get appStore from url
 ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
