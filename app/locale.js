@@ -18,6 +18,7 @@ var rendererIdentifiers = function () {
     'confirmClearPasswords',
     'passwordCopied',
     'flashInstalled',
+    'allowFlashPlayer',
     'about',
     'aboutApp',
     'quit',
