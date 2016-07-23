@@ -542,7 +542,7 @@ class Frame extends ImmutableComponent {
       // cryptographically random.
       const nonce = Math.random().toString()
       if (this.props.flashInitialized) {
-        const message = `Allow ${this.origin} to run Flash Player?`
+        const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
         // Show Flash notification bar
         appActions.showMessageBox({
           buttons: [locale.translation('deny'), locale.translation('allow')],
