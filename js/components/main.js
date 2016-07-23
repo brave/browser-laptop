@@ -130,6 +130,16 @@ class Main extends ImmutableComponent {
         }
       }
     })
+    ipc.on(messages.OPEN_BRAVERY_PANEL, (e) => {
+      if (!this.braveShieldsDisabled) {
+        this.onBraveMenu()
+      } else {
+        windowActions.newFrame({
+          location: 'about:preferences#shields',
+          singleFrame: true
+        }, true)
+      }
+    })
     ipc.on(messages.CAN_SWIPE_BACK, (e) => {
       canSwipeBack = true
     })

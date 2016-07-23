@@ -142,6 +142,8 @@ var rendererIdentifiers = function () {
     'submitFeedback',
     'bookmarksToolbar',
     'bravery',
+    'braverySite',
+    'braveryGlobal',
     'blockPopups',
     'learnSpelling',
     'ignoreSpelling',

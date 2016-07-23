@@ -305,3 +305,27 @@ module.exports.aboutBraveMenuItem = () => {
     }
   }
 }
+
+module.exports.braverySiteMenuItem = () => {
+  return {
+    label: locale.translation('braverySite'),
+    click: (item, focusedWindow) => {
+      module.exports.sendToFocusedWindow(focusedWindow, [messages.OPEN_BRAVERY_PANEL])
+    }
+  }
+}
+
+module.exports.braveryGlobalMenuItem = () => {
+  return {
+    label: locale.translation('braveryGlobal'),
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:preferences#shields'
+        }))
+      } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences#shields', { singleFrame: true }])
+      }
+    }
+  }
+}

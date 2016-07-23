@@ -42,6 +42,7 @@ const messages = {
   SHORTCUT_PREV_TAB: _,
   // Misc application events
   QUIT_APPLICATION: _,
+  OPEN_BRAVERY_PANEL: _,
   PREFS_RESTART: _,
   UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
   CERT_ERROR: _, /** @arg {Object} details of certificate error */

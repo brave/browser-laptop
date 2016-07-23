@@ -432,6 +432,12 @@ const init = (settingsState, args) => {
         CommonMenu.importBookmarksMenuItem()
       ]
     }, {
+      label: locale.translation('bravery'),
+      submenu: [
+        CommonMenu.braveryGlobalMenuItem(),
+        CommonMenu.braverySiteMenuItem()
+      ]
+    }, {
       label: locale.translation('window'),
       role: 'window',
       submenu: [
