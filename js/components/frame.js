@@ -438,6 +438,12 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('focus', this.onFocus)
+    this.webview.addEventListener('mouseenter', (e) => {
+      remote.getCurrentWindow().webContents.send(messages.ENABLE_SWIPE_GESTURE)
+    })
+    this.webview.addEventListener('mouseleave', (e) => {
+      remote.getCurrentWindow().webContents.send(messages.DISABLE_SWIPE_GESTURE)
+    })
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
       e.preventDefault()
