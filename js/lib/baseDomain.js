@@ -5,14 +5,24 @@
 const punycode = require('punycode')
 const publicSuffixes = require('./psl')
 
+const LRUCache = require('lru_cache/core').LRUCache
+
+let cachedBaseDomain = new LRUCache(50)
+
 /**
  * Returns base domain for specified host based on Public Suffix List.
  * @param {string} hostname The name of the host to get the base domain for
  */
+
 module.exports.getBaseDomain = function (hostname) {
   // decode punycode if exists
   if (hostname.indexOf('xn--') >= 0) {
     hostname = punycode.toUnicode(hostname)
+  }
+
+  let baseDomain = cachedBaseDomain.get(hostname)
+  if (baseDomain) {
+    return baseDomain
   }
 
   // search through PSL
@@ -44,5 +54,8 @@ module.exports.getBaseDomain = function (hostname) {
     tld--
   }
 
-  return curDomain
+  baseDomain = curDomain
+  cachedBaseDomain.put(baseDomain)
+
+  return baseDomain
 }
