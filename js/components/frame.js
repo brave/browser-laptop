@@ -802,7 +802,7 @@ class Frame extends ImmutableComponent {
         url: url,
         title: title,
         display: title || url,
-        icon: UrlUtil.getDefaultFavicon(url)
+        icon: UrlUtil.getDefaultFaviconUrl(url)
       })
     }
 
