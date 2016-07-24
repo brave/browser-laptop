@@ -3,7 +3,7 @@
 ## Debugging the Render processes
 
 Most of the time you'll be debugging the render process and this can be done with the built in developer tools.
-To open the dev tools use `Command+Alt+J` on macOS or `Control+Alt+J` on Windows and Linux.
+To open the dev tools use `Shift+F8`.
 
 If you've ever used the built in Chrome developer tools you'll be right at home with a DOM inspector, Network monitor, Sources debugging, Timeline, Resources, Audits, and Console.
 
@@ -34,7 +34,7 @@ The app can be restarted with `Command+Alt+R` when using a development environme
 
 ## Debugging Content
 
-Content is the web page which is loaded.  You can open the loaded content dev tools using `Command+Shift+I` on macOS or `Control+Shift+I` on Windows.
+Content is the web page which is loaded.  You can open the loaded content dev tools using `Command+Alt+I` on macOS or `Control+Alt+I` on Windows.
 
 If you'd like to see code run on each page load, you can edit `app/extensions/brave/brave-default.js`.
 

@@ -22,7 +22,8 @@ module.exports.register = (win) => {
     ['Ctrl+PageUp', messages.SHORTCUT_PREV_TAB],
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
     ['CmdOrCtrl+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_NEXT],
-    ['CmdOrCtrl+Shift+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_PREV]
+    ['CmdOrCtrl+Shift+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_PREV],
+    ['CmdOrCtrl+Alt+J', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS]
   ]
 
   if (!isDarwin) {
@@ -54,6 +55,13 @@ module.exports.register = (win) => {
         win.webContents.send(shortcutEventName[1], shortcutEventName[2])
       }
     }))
+
+  electronLocalshortcut.register(win, 'Shift+F8', () => {
+    let win = BrowserWindow.getFocusedWindow()
+    if (win) {
+      win.toggleDevTools()
+    }
+  })
 }
 
 module.exports.unregister = (win) => {

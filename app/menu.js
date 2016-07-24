@@ -332,14 +332,6 @@ const init = (settingsState, args) => {
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
           }
-        }, {
-          label: locale.translation('toggleBrowserConsole'),
-          accelerator: 'CmdOrCtrl+Alt+J',
-          click: function (item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.toggleDevTools()
-            }
-          }
         },
         CommonMenu.separatorMenuItem,
         {
@@ -516,6 +508,14 @@ const init = (settingsState, args) => {
           click: function () {
             electron.app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
             electron.app.quit()
+          }
+        }, {
+          label: locale.translation('toggleBrowserConsole'),
+          accelerator: 'Shift+F8',
+          click: function (item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.toggleDevTools()
+            }
           }
         }
       ]
