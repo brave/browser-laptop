@@ -54,8 +54,7 @@ module.exports.getBaseDomain = function (hostname) {
     tld--
   }
 
-  baseDomain = curDomain
-  cachedBaseDomain.put(baseDomain)
+  cachedBaseDomain.put(curDomain)
 
-  return baseDomain
+  return curDomain
 }

@@ -196,7 +196,7 @@ function registerForBeforeSendHeaders (session) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&
-            !refererExceptions.includes(parsedUrl.hostname) && !refererExceptions.includes(getBaseDomain(parsedUrl.hostname))) {
+            !refererExceptions.includes(parsedUrl.hostname)) {
           requestHeaders['Referer'] = undefined
         }
       }
