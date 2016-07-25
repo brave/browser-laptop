@@ -21,6 +21,7 @@ const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 const windowStore = require('../stores/windowStore')
+const searchProviders = require('../data/searchProviders')
 
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -120,7 +121,19 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
+            let entries = searchProviders.providers
             let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
+            if (!isLocationUrl) {
+              entries.forEach((entry) => {
+                const searchRE = new RegExp('^' + entry.shortcut + ' .*', 'g')
+                if (searchRE.test(location)) {
+                  const replaceRE = new RegExp('^' + entry.shortcut + ' ', 'g')
+                  location = location.replace(replaceRE, '')
+                  searchUrl = entry.search.replace('{searchTerms}', encodeURIComponent(location))
+                  return false
+                }
+              })
+            }
             location = isLocationUrl ? location : searchUrl
             // do search.
             if (e.altKey) {

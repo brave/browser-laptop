@@ -134,7 +134,7 @@ AppStore
     'general.downloads.default-save-path': string, // default path for saving files
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
     'general.disable-title-mode': boolean, // true if title mode should always be disabled
-    'search.default-search-engine': string, // path to the open search XML
+    'search.default-search-engine': string, // name of search engine, from js/data/searchProviders.js
     'search.offer-search-suggestions': boolean, // true if suggestions should be offered from the default search engine when available.
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs

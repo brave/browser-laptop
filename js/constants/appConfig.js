@@ -86,7 +86,7 @@ module.exports = {
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,
-    'search.default-search-engine': 'content/search/google.xml',
+    'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,

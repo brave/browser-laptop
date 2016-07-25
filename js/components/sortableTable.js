@@ -14,6 +14,7 @@ class SortableTable extends ImmutableComponent {
   componentDidMount (event) {
     return tableSort(document.getElementsByClassName('sortableTable')[0])
   }
+
   render () {
     var headings = []
     var rows = []
@@ -26,7 +27,8 @@ class SortableTable extends ImmutableComponent {
         headings[j] = headings[j] || <th className='sort-header' data-l10n-id={this.props.headings[j]} />
         rows[i][j] = <td data-sort={this.props.rows[i][j]}>{this.props.rows[i][j] === true ? '✕' : this.props.rows[i][j]}</td>
       }
-      rows[i] = <tr>{rows[i]}</tr>
+      rows[i] = <tr className={this.props.isHover ? 'rowHover' : ''}
+        onClick={this.props.hoverCallback.bind(this, rows[i])}>{rows[i]}</tr>
     }
     return <table className='sortableTable sort'>
       <thead>
@@ -43,7 +45,9 @@ class SortableTable extends ImmutableComponent {
 
 SortableTable.defaultProps = {
   headings: React.PropTypes.array.isRequired,
-  rows: React.PropTypes.array.isRequired
+  rows: React.PropTypes.array.isRequired,
+  isHover: React.PropTypes.bool,
+  hoverCallback: React.PropTypes.func
 }
 
 module.exports = SortableTable

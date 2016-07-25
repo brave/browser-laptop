@@ -11,7 +11,6 @@ const ipc = electron.ipcRenderer
 // Actions
 const windowActions = require('../actions/windowActions')
 const webviewActions = require('../actions/webviewActions')
-const loadOpenSearch = require('../lib/openSearch').loadOpenSearch
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
 const getOrigin = require('../state/siteUtil').getOrigin
@@ -47,6 +46,8 @@ const keyCodes = require('../constants/keyCodes')
 
 // State handling
 const FrameStateUtil = require('../state/frameStateUtil')
+
+const searchProviders = require('../data/searchProviders')
 
 // Util
 const cx = require('../lib/classSet.js')
@@ -201,16 +202,25 @@ class Main extends ImmutableComponent {
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
   }
 
-  loadOpenSearch () {
+  loadSearchProviders () {
+    let entries = searchProviders.providers
     let engine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
-    if (this.lastLoadedOpenSearch === undefined || engine !== this.lastLoadedOpenSearch) {
-      loadOpenSearch(engine).then((searchDetail) => windowActions.setSearchDetail(searchDetail))
-      this.lastLoadedOpenSearch = engine
+    if (this.lastLoadedSearchProviders === undefined || engine !== this.lastLoadedSearchProviders) {
+      entries.forEach((entry) => {
+        if (entry.name === engine) {
+          windowActions.setSearchDetail(Immutable.fromJS({
+            searchURL: entry.search,
+            autocompleteURL: entry.autocomplete
+          }))
+          this.lastLoadedSearchProviders = engine
+          return false
+        }
+      })
     }
   }
 
   componentDidUpdate (prevProps) {
-    this.loadOpenSearch()
+    this.loadSearchProviders()
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     const activeFramePrev = FrameStateUtil.getActiveFrame(prevProps.windowState)
     const activeFrameTitle = activeFrame && (activeFrame.get('title') || activeFrame.get('location')) || ''
@@ -369,7 +379,7 @@ class Main extends ImmutableComponent {
       windowActions.setContextMenuDetail()
     })
 
-    this.loadOpenSearch()
+    this.loadSearchProviders()
 
     window.addEventListener('mousemove', (e) => {
       if (e.pageY !== this.pageY) {
