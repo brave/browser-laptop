@@ -519,6 +519,9 @@ class Frame extends ImmutableComponent {
         case messages.GO_FORWARD:
           method = () => this.webview.goForward()
           break
+        case messages.RELOAD:
+          method = () => this.webview.reload()
+          break
         case messages.CAN_SWIPE_BACK:
           remote.getCurrentWindow().webContents.send(messages.CAN_SWIPE_BACK)
           break

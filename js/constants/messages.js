@@ -77,6 +77,7 @@ const messages = {
   SET_RESOURCE_ENABLED: _,
   GO_BACK: _,
   GO_FORWARD: _,
+  RELOAD: _,
   CAN_SWIPE_BACK: _,
   CAN_SWIPE_FORWARD: _,
   CHECK_SWIPE_BACK: _,
