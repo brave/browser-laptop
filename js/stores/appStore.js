@@ -12,6 +12,7 @@ const siteSettings = require('../state/siteSettings')
 const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
 const app = electron.app
+const ipcMain = electron.ipcMain
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const downloadStates = require('../constants/downloadStates')
@@ -335,6 +336,11 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('crashed', (e) => {
         console.error('Window crashed. Reloading...')
         mainWindow.loadURL(appUrlUtil.getIndexHTML())
+        ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
+          if (message === locale.translation('unexpectedErrorWindowReload')) {
+            appActions.hideMessageBox(message)
+          }
+        })
         appActions.showMessageBox({
           buttons: [locale.translation('ok')],
           options: {
