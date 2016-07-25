@@ -111,7 +111,7 @@ class Tab extends ImmutableComponent {
     const previewMode = new Date().getTime() - this.lastPreviewClearTime < 1500
     window.clearTimeout(this.hoverClearTimeout)
     this.hoverTimeout =
-      window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 400)
+      window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 200 : 400)
   }
 
   onClickTab (e) {
