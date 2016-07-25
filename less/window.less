@@ -97,10 +97,12 @@ html,
 
   &:not(.isActive) {
     z-index: @zindexWindowNotActive;
+    opacity: 0;
     &.isPreview {
       background: gray;
       z-index: @zindexWindowIsPreview;
-      transition: background @transitionDuration ease-in;
+      opacity: 1;
+      transition: opacity @transitionDuration ease-in-out;
     }
 
     // Webviews can cause flickers w/ Chrome  v49 if left visible
