@@ -111,6 +111,7 @@ class Main extends ImmutableComponent {
   registerSwipeListener () {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
+    var swipeGesture = false
     var canSwipeBack = false
     var canSwipeForward = false
     var deltaX = 0
@@ -146,9 +147,17 @@ class Main extends ImmutableComponent {
     ipc.on(messages.CAN_SWIPE_FORWARD, (e) => {
       canSwipeForward = true
     })
+    ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
+      swipeGesture = true
+    })
+    ipc.on(messages.DISABLE_SWIPE_GESTURE, (e) => {
+      swipeGesture = false
+    })
     ipc.on('scroll-touch-begin', function () {
-      trackingFingers = true
-      startTime = (new Date()).getTime()
+      if (swipeGesture) {
+        trackingFingers = true
+        startTime = (new Date()).getTime()
+      }
     })
     ipc.on('scroll-touch-end', function () {
       if (time > 50 && trackingFingers && Math.abs(deltaY) < 50) {
