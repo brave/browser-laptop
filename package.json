@@ -57,6 +57,10 @@
     {
       "name": "Yan Zhu",
       "email": "yan@brave.com"
+    },
+    {
+      "name": "Brian Clifton",
+      "email": "clifton@brave.com"
     }
   ],
   "license": "MPL-2.0",
