@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PDF Viewer",
-  "version": "1.5.361",
+  "version": "1.5.364",
   "description": "Uses HTML5 to display PDF files directly in the browser.",
   "icons": {
     "128": "icon128.png",
@@ -39,11 +39,6 @@
   "storage": {
     "managed_schema": "preferences_schema.json"
   },
-  "options_ui": {
-    "page": "options/options.html",
-    "chrome_style": true
-  },
-  "options_page": "options/options.html",
   "background": {
     "page": "pdfHandler.html"
   },

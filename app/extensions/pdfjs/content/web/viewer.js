@@ -9403,7 +9403,7 @@ exports.DefaultExernalServices = DefaultExernalServices;
   }
 
   function isAllowedFileSchemeAccess(callback) {
-    callback(true)
+    callback(true);
   }
 
   function isRuntimeAvailable() {
