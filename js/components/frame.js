@@ -678,7 +678,11 @@ class Frame extends ImmutableComponent {
       // XXX: loadstart probably does not need to be called twice anymore.
       loadStart(e)
     })
+
     this.webview.addEventListener('did-navigate', (e) => {
+      if (this.props.frame.get('findbarShown')) {
+        this.onFindHide()
+      }
       for (let message in this.notificationCallbacks) {
         appActions.hideMessageBox(message)
       }
