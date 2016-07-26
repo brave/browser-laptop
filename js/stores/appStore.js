@@ -245,7 +245,9 @@ function windowDefaults () {
     windowOffset: 20,
     webPreferences: {
       sharedWorker: true,
-      partition: 'default'
+      partition: 'default',
+      allowFileAccessFromFileUrls: true,
+      allowUniversalAccessFromFileUrls: true
     }
   }
 }
