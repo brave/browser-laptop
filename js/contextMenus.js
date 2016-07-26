@@ -363,6 +363,13 @@ function tabTemplateInit (frameProps) {
           focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
         }
       }
+    }, {
+      label: locale.translation('clone'),
+      click: (item, focusedWindow) => {
+        if (focusedWindow) {
+          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+        }
+      }
     })
 
   if (!frameProps.get('isPrivate')) {
@@ -858,15 +865,6 @@ function mainTemplateInit (nodeProps, frame) {
               }
             }
           },
-          {
-            label: locale.translation('cloneTab'),
-            click: (item, focusedWindow) => {
-              if (focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
-              }
-            }
-          },
-
           CommonMenu.separatorMenuItem,
           addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false), {
             label: locale.translation('find'),
