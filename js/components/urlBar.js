@@ -77,6 +77,16 @@ class UrlBar extends ImmutableComponent {
     windowActions.setNavBarUserInput(location)
   }
 
+  // Temporarily disable the autocomplete when a user is pressing backspace.
+  // Otherwise, they'd have to hit backspace twice for each character they wanted
+  // to delete.
+  hideAutoComplete () {
+    if (this.autocompleteEnabled) {
+      windowActions.setUrlBarAutocompleteEnabled(false)
+    }
+    windowActions.setUrlBarSuggestions(undefined, null)
+  }
+
   onKeyDown (e) {
     switch (e.keyCode) {
       case KeyCodes.ENTER:
@@ -156,16 +166,12 @@ class UrlBar extends ImmutableComponent {
             const suggestionLocation = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
             appActions.removeSite({ location: suggestionLocation })
           }
+        } else {
+          this.hideAutoComplete()
         }
         break
       case KeyCodes.BACKSPACE:
-        // Temporarily disable the autocomplete when a user is pressing backspace.
-        // Otherwise, they'd have to hit backspace twice for each characater they wanted
-        // to delete.
-        if (this.autocompleteEnabled) {
-          windowActions.setUrlBarAutocompleteEnabled(false)
-        }
-        windowActions.setUrlBarSuggestions(undefined, null)
+        this.hideAutoComplete()
         break
       default:
         // Any other keydown is fair game for autocomplete to be enabled.
