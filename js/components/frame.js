@@ -786,7 +786,7 @@ class Frame extends ImmutableComponent {
     this.webview.goBack()
   }
 
-  getHistory () {
+  getHistory (appState) {
     const webContent = this.webview.getWebContents()
     const currentIndex = webContent.getCurrentEntryIndex()
     const historyCount = webContent.getEntryCount()
@@ -800,13 +800,27 @@ class Frame extends ImmutableComponent {
     for (let index = 0; index < historyCount; index++) {
       const url = webContent.getURLAtIndex(index)
       const title = webContent.getTitleAtIndex(index)
+      let favicon = null
+
+      if (url.startsWith('chrome-extension://')) {
+        // TODO: return brave lion (or better: get icon from extension if possible as data URI)
+      } else if (appState) {
+        const sites = appState.get('sites')
+
+        if (sites) {
+          const site = sites.find(function (element) { return element.get('location') === url })
+          if (site) { favicon = site.get('favicon') }
+        }
+
+        if (!favicon) { favicon = UrlUtil.getDefaultFaviconUrl(url) }
+      }
 
       history.entries.push({
         index: index,
         url: url,
         title: title,
         display: title || url,
-        icon: UrlUtil.getDefaultFaviconUrl(url)
+        icon: favicon
       })
     }
 

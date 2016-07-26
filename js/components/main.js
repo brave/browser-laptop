@@ -453,7 +453,7 @@ class Main extends ImmutableComponent {
   }
 
   onBackLongPress (rect) {
-    contextMenus.onBackButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(), rect)
+    contextMenus.onBackButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), rect)
   }
 
   onForward () {
@@ -461,7 +461,7 @@ class Main extends ImmutableComponent {
   }
 
   onForwardLongPress (rect) {
-    contextMenus.onForwardButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(), rect)
+    contextMenus.onForwardButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), rect)
   }
 
   onBraveMenu () {

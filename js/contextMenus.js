@@ -31,6 +31,7 @@ const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('url').parse
+const eventUtil = require('./lib/eventUtil')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -1066,11 +1067,20 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
 
   if (activeFrame && history) {
     for (let index = (history.currentIndex - 1); index > -1; index--) {
+      const url = history.entries[index].url
+
       menuTemplate.push({
         label: history.entries[index].display,
         icon: history.entries[index].icon,
-        click: (item, focusedWindow) => {
-          activeFrame.goToIndex(index)
+        click: (e, focusedWindow) => {
+          if (eventUtil.isForSecondaryAction(e)) {
+            windowActions.newFrame({
+              location: url,
+              partitionNumber: activeFrame.props.frame.get('partitionNumber')
+            }, !!e.shiftKey)
+          } else {
+            activeFrame.goToIndex(index)
+          }
         }
       })
     }
@@ -1088,11 +1098,20 @@ function onForwardButtonHistoryMenu (activeFrame, history, rect) {
 
   if (activeFrame && history) {
     for (let index = (history.currentIndex + 1); index < history.entries.length; index++) {
+      const url = history.entries[index].url
+
       menuTemplate.push({
         label: history.entries[index].display,
         icon: history.entries[index].icon,
-        click: (item, focusedWindow) => {
-          activeFrame.goToIndex(index)
+        click: (e, focusedWindow) => {
+          if (eventUtil.isForSecondaryAction(e)) {
+            windowActions.newFrame({
+              location: url,
+              partitionNumber: activeFrame.props.frame.get('partitionNumber')
+            }, !!e.shiftKey)
+          } else {
+            activeFrame.goToIndex(index)
+          }
         }
       })
     }
