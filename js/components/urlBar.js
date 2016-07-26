@@ -19,7 +19,7 @@ const { getSetting } = require('../settings')
 const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
-const appStoreRenderer = require('../stores/appStoreRenderer')
+const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -285,7 +285,8 @@ class UrlBar extends ImmutableComponent {
 
     // We can extend the conditions if there are more chrome-extension to
     // truncate
-    if (getSetting(settings.PDFJS_ENABLED) && location.startsWith(appStoreRenderer.state.get('pdfjsOrigin'))) {
+    if (getSetting(settings.PDFJS_ENABLED) &&
+        location.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
       location = location.replace(/^chrome-extension:\/\/.+\/(\w+:\/\/.+)/, '$1')
     }
 
