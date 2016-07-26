@@ -69,9 +69,6 @@ class FindBar extends ImmutableComponent {
       // Redo search if details have changed
       this.onFindFirst()
     }
-    if (this.props.frame.get('location') !== prevProps.frame.get('location')) {
-      this.props.onFindHide()
-    }
   }
 
   onKeyDown (e) {
