@@ -116,6 +116,8 @@
     "empty-port": "0.0.2",
     "flow-bin": "^0.22.1",
     "gulp": "^3.9.0",
+    "jsdom": "9.4.1",
+    "jsdom-global": "2.0.0",
     "jsdox": "^0.4.9",
     "jsonfile": "^2.2.3",
     "less": "^2.5.3",

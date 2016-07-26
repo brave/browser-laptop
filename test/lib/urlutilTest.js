@@ -8,35 +8,76 @@ describe('urlutil', function () {
     it('null for empty', function * () {
       assert.equal(UrlUtil.getScheme('/file/path/to/file'), null)
     })
-
     it('localhost: for localhost', function * () {
       assert.equal(UrlUtil.getScheme('localhost://127.0.0.1'), 'localhost:')
     })
-
     it('gets scheme with :', function * () {
       assert.equal(UrlUtil.getScheme('data:datauri'), 'data:')
     })
-
     it('host:port is not recognized as a scheme', function * () {
       assert.equal(UrlUtil.getScheme('localhost:8089'), null)
     })
-
     it('gets scheme with ://', function * () {
       assert.equal(UrlUtil.getScheme('http://www.brave.com'), 'http://')
     })
   })
 
   describe('prependScheme', function () {
+    it('returns null when input is null', function () {
+      assert.equal(UrlUtil.prependScheme(null), null)
+    })
+    it('returns undefined when input is undefined', function () {
+      assert.equal(UrlUtil.prependScheme(), undefined)
+    })
     it('prepends file:// to absolute file path', function * () {
       assert.equal(UrlUtil.prependScheme('/file/path/to/file'), 'file:///file/path/to/file')
     })
-
     it('defaults to http://', function * () {
       assert.equal(UrlUtil.prependScheme('www.brave.com'), 'http://www.brave.com')
     })
-
     it('keeps schema if already exists', function * () {
       assert.equal(UrlUtil.prependScheme('https://www.brave.com'), 'https://www.brave.com')
+    })
+  })
+
+  describe('isNotURL', function () {
+    it('returns true when input is null', function () {
+      assert.equal(UrlUtil.isNotURL(null), true)
+    })
+    it('returns true when input is undefined', function () {
+      assert.equal(UrlUtil.isNotURL(), true)
+    })
+    it('returns false when input is "localhost"', function () {
+      assert.equal(UrlUtil.isNotURL('localhost'), false)
+    })
+    it('returns true when input is a quoted string', function () {
+      assert.equal(UrlUtil.isNotURL('"brave.com"'), true)
+    })
+    it('returns true when input is a pure string (no TLD)', function () {
+      assert.equal(UrlUtil.isNotURL('brave'), true)
+    })
+    describe('search query', function () {
+      it('returns true when input starts with ?', function () {
+        assert.equal(UrlUtil.isNotURL('?brave'), true)
+      })
+      it('returns true when input has a question mark followed by a space', function () {
+        assert.equal(UrlUtil.isNotURL('?brave'), true)
+      })
+    })
+    it('returns false when input is a valid URL', function () {
+      assert.equal(UrlUtil.isNotURL('brave.com'), false)
+    })
+  })
+
+  describe('getUrlFromInput', function () {
+    it('returns empty string when input is null', function () {
+      assert.equal(UrlUtil.getUrlFromInput(null), '')
+    })
+    it('returns empty string when input is undefined', function () {
+      assert.equal(UrlUtil.getUrlFromInput(), '')
+    })
+    it('calls prependScheme', function () {
+      assert.equal(UrlUtil.getUrlFromInput('/file/path/to/file'), 'file:///file/path/to/file')
     })
   })
 
@@ -44,19 +85,15 @@ describe('urlutil', function () {
     it('absolute file path without scheme', function * () {
       assert.equal(UrlUtil.isURL('/file/path/to/file'), true)
     })
-
     it('absolute file path with scheme', function * () {
       assert.equal(UrlUtil.isURL('file:///file/path/to/file'), true)
     })
-
     it('detects data URI', function * () {
       assert.equal(UrlUtil.isURL('data:text/html,hi'), true)
     })
-
     it('someBraveServer:8089', function * () {
       assert.equal(UrlUtil.isURL('someBraveServer:8089'), true)
     })
-
     it('localhost', function * () {
       assert.equal(UrlUtil.isURL('localhost:8089'), true)
     })
@@ -77,6 +114,15 @@ describe('urlutil', function () {
     })
     it('invalid URL', function * () {
       assert.equal(UrlUtil.isFileType('foo', 'jpg'), false)
+    })
+  })
+
+  describe('getHostname', function () {
+    it('returns undefined if the URL is invalid', function () {
+      assert.equal(UrlUtil.getHostname(null), undefined)
+    })
+    it('returns the host field (including port number)', function () {
+      assert.equal(UrlUtil.getHostname('https://brave.com:8080/test/'), 'brave.com:8080')
     })
   })
 
@@ -134,6 +180,18 @@ describe('urlutil', function () {
     })
     it('does not intercept on adobe site', function () {
       assert(!UrlUtil.shouldInterceptFlash('https://www.adobe.com/test'))
+    })
+  })
+
+  describe('getDefaultFaviconUrl', function () {
+    it('returns empty string if input is not a URL', function () {
+      assert.equal(UrlUtil.getDefaultFaviconUrl('invalid-url-goes-here'), '')
+    })
+    it('returns the default favicon URL when given a valid URL', function () {
+      assert.equal(UrlUtil.getDefaultFaviconUrl('https://brave.com'), 'https://brave.com/favicon.ico')
+    })
+    it('includes the port in the response when given a valid URL with a port number', function () {
+      assert.equal(UrlUtil.getDefaultFaviconUrl('https://brave.com:8080'), 'https://brave.com:8080/favicon.ico')
     })
   })
 })

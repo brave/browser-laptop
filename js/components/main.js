@@ -35,6 +35,7 @@ const BookmarksToolbar = require('./bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
+const LongPressButton = require('./longPressButton')
 
 // Constants
 const config = require('../constants/config')
@@ -61,6 +62,8 @@ class Main extends ImmutableComponent {
     this.onCloseFrame = this.onCloseFrame.bind(this)
     this.onBack = this.onBack.bind(this)
     this.onForward = this.onForward.bind(this)
+    this.onBackLongPress = this.onBackLongPress.bind(this)
+    this.onForwardLongPress = this.onForwardLongPress.bind(this)
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onClickWindow = this.onClickWindow.bind(this)
     this.onDoubleClick = this.onDoubleClick.bind(this)
@@ -449,8 +452,16 @@ class Main extends ImmutableComponent {
     this.activeFrame.goBack()
   }
 
+  onBackLongPress (rect) {
+    contextMenus.onBackButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(), rect)
+  }
+
   onForward () {
     this.activeFrame.goForward()
+  }
+
+  onForwardLongPress (rect) {
+    contextMenus.onForwardButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(), rect)
   }
 
   onBraveMenu () {
@@ -530,7 +541,6 @@ class Main extends ImmutableComponent {
         if (node.classList.contains('contextMenu') && e.button === 1) {
           e.preventDefault()
         }
-
         return
       }
       node = node.parentNode
@@ -659,14 +669,20 @@ class Main extends ImmutableComponent {
           onDragOver={this.onDragOver}
           onDrop={this.onDrop}>
           <div className='backforward'>
-            <span data-l10n-id='backButton'
+            <LongPressButton
+              l10nId='backButton'
               className='back fa fa-angle-left'
               disabled={!activeFrame || !activeFrame.get('canGoBack')}
-              onClick={this.onBack} />
-            <span data-l10n-id='forwardButton'
+              onClick={this.onBack}
+              onLongPress={this.onBackLongPress}
+            />
+            <LongPressButton
+              l10nId='forwardButton'
               className='forward fa fa-angle-right'
               disabled={!activeFrame || !activeFrame.get('canGoForward')}
-              onClick={this.onForward} />
+              onClick={this.onForward}
+              onLongPress={this.onForwardLongPress}
+            />
           </div>
           <NavigationBar
             ref={(node) => { this.navBar = node }}

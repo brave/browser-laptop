@@ -46,6 +46,10 @@ const UrlUtil = {
    * @returns {String} path with a scheme
    */
   prependScheme: function (input) {
+    if (input === undefined || input === null) {
+      return input
+    }
+
     // expand relative path
     if (input.startsWith('~/')) {
       input = input.replace(/^~/, os.homedir())
@@ -82,6 +86,10 @@ const UrlUtil = {
    * @returns {Boolean} Returns true if this is not a valid URL.
    */
   isNotURL: function (input) {
+    if (input === undefined || input === null) {
+      return true
+    }
+
     // for cases, quoted strings
     const case1Reg = /^".*"$/
     // for cases, ?abc and "a? b" which should searching query
@@ -116,6 +124,10 @@ const UrlUtil = {
    * @returns {String} The formatted URL.
    */
   getUrlFromInput: function (input) {
+    if (input === undefined || input === null) {
+      return ''
+    }
+
     input = input.trim()
 
     input = this.prependScheme(input)
@@ -273,6 +285,19 @@ const UrlUtil = {
       ['http:', 'https:'].includes(parsed.protocol) &&
       !exemptHostPattern.test(parsed.hostname) &&
       !['/search', '/search/'].includes(parsed.pathname)
+  },
+
+  /**
+   * Gets the default favicon URL for a URL.
+   * @param {string} url The URL to find a favicon for
+   * @return {string} url The base favicon URL
+   */
+  getDefaultFaviconUrl: function (url) {
+    if (this.isURL(url)) {
+      const loc = new window.URL(url)
+      return loc.protocol + '//' + loc.host + '/favicon.ico'
+    }
+    return ''
   }
 }
 
