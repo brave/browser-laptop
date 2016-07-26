@@ -2,13 +2,32 @@
 
 # Brave Browser
 
-Desktop browser for macOS, Windows and Linux. To download the latest release,
-go to https://github.com/brave/browser-laptop/releases. To build Brave from
-source code, see below.
+Desktop browser for macOS, Windows, and Linux.
+
+Follow [@brave](https://twitter.com/brave) on Twitter for important news and annoucements.
+
+For other versions of our browser, please see:
+* iPhone - [brave/browser-ios](https://github.com/brave/browser-ios)
+* Android - [brave/browser-android](https://github.com/brave/browser-android)
+
+## Downloads
+
+To download the latest release, [see our releases page](https://github.com/brave/browser-laptop/releases).
+
+For a more user-friendly download page, [please visit our website](https://brave.com/downloads.html).
+
+## Useful documentation
+
+* See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for tips and guidelines about contributing.
+* See [docs/tests.md](docs/tests.md) for information on testing, including how to run a subset of the tests.
+* See [docs/debugging.md](docs/debugging.md) for information on debugging.
 
 ## Build prerequisites
 
+You'll need certain packages installed before you can build and run Brave locally.
+
 ### All platforms
+
 1. `nodejs` **`>= 6.1`**
 
     Install from your package manager or download from https://nodejs.org
@@ -18,13 +37,16 @@ source code, see below.
         sudo npm install -g node-gyp@3.3.1
 
 ### Windows
-Ensure you have the following installed:
 
-* [Node.js 6.1+](https://nodejs.org/en/)
+Ensure you also have the following installed (required by node-gyp):
+
 * [Python 2.7](https://www.python.org/downloads/)
 * [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)
 
+After being installed, Visual Studio 2015 may [require some additional configuration](https://github.com/brave/browser-laptop/wiki/Configuring-Visual-Studio-2015).
+
 ###  Linux
+
 * `apt-get install libgnome-keyring-dev build-essential`
 
 ## Installation
@@ -52,17 +74,21 @@ After installing the prerequisites:
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
 
+### Troubleshooting
+
 Additional notes on troubleshooting installation issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
+
+### Preconfigured VMs
 
 Some platforms are available as pre-configured VMs. See the [readme](https://github.com/brave/browser-laptop/blob/master/test/vms/vagrant/README.md) for details.
 
 ## Development
 
-To start the server and file watchers run the following on the command line:
+You will also have to have two terminal tabs up to run Brave. One for Brave to watch for changes to the code, and one to run Brave.
+
+To run a development version of the browser, run the following on the command line:
 
     npm run watch
-
-To run the browser:
 
     npm start
 
@@ -71,8 +97,6 @@ To run the tests:
     npm run watch-test  or  npm run watch-all
 
     npm test
-
-You will also have to have two terminal tabs up to run Brave. One for Brave to watch changes, and one to run Brave.
 
 Some errors related to [brave/electron](https://github.com/brave/electron) update can be fixed by doing a clean install:
 
@@ -90,30 +114,42 @@ npm config set brave:port 9001
 
 Additional notes on troubleshooting development issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
 
-### Debugging
-
-See [docs/debugging.md](docs/debugging.md) for information on debugging.
-
 ### Running inside of a development version of Brave's Electron fork
 
-We are using a fork of Electron with some minor modifications here: https://github.com/brave/electron
+We are using a [fork of Electron with some minor modifications](https://github.com/brave/electron). We try to upstream everything to [electron/electron](https://github.com/electron/electron) but forking allows us to take patches before upstreaming.
 
-Most of the time you will not need to use that repository, we provide pre-built binaries when you `npm install` with our own fork of [electron-prebuilt](https://github.com/brave/electron-prebuilt).
+By default, we provide pre-built binaries when you `npm install` with our own fork of [electron-prebuilt](https://github.com/brave/electron-prebuilt).
 
-If you want to add code to Electron itself, then you may want to build it.  An example would be exposing a new event to the webview from Electron.   We try to upstream everything to [atom/electron](https://github.com/atom/electron) but we can take things in our fork early before upstreaming.
+If you want to modify the code to Electron itself, then you'll need to build it.  An example of why you might do that would be exposing a new event to the webview from Electron.
 
 Build instructions:
 - [OSX build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
 - [Windows build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-windows.md)
 - [Linux build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-linux.md)
 
-### Contributing
+Once you're happy with the changes you've made in the electron fork, you can test the changes locally by building and then copying the output files over the `node_modules/electron-prebuilt` for browser-laptop.
 
-See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for contribution guidelines.
+Assuming you have your directories in a structure such as this:
+
+    projects/
+        electron/
+        browser-laptop/
+
+You can simply run an npm task to build and install your local electron instance:
+
+    npm run install
+
+If your directory structure isn't side by side, you can run the following (altering the rsync as needed):
+
+    npm run build
+    rsync -avz --delete out/D/Brave.app {{path-to-browser-laptop}}/node_modules/electron-prebuilt/dist/
+
 
 ## Packaging for bundles, installers, and updates
 
 In order do run any build commands, you'll need an environment variable set for `CHANNEL` (set to `'dev'`, `'beta'`, or `'stable'`).
+
+For more information, see [docs/buildingReleases.md](docs/buildingReleases.md) which has a more detailed overview of our release process.
 
 ### OSX:
 
