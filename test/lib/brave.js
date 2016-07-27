@@ -2,7 +2,6 @@ require('babel-polyfill')
 var Application = require('spectron').Application
 var chai = require('chai')
 require('./coMocha')
-require('jsdom-global')()
 
 const path = require('path')
 const fs = require('fs')

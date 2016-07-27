@@ -46,5 +46,6 @@ module.exports = [
   'flow-bin',
   'mkdirp',
   'babel$',
-  'babel-(?!polyfill|regenerator-runtime)'
+  'babel-(?!polyfill|regenerator-runtime)',
+  'jsdom-global'
 ]

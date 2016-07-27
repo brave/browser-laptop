@@ -786,42 +786,44 @@ class Frame extends ImmutableComponent {
     this.webview.goBack()
   }
 
+  getHistoryEntry (sites, webContent, index) {
+    const url = webContent.getURLAtIndex(index)
+    const title = webContent.getTitleAtIndex(index)
+
+    let entry = {
+      index: index,
+      url: url,
+      display: title || url,
+      icon: null
+    }
+
+    if (url.startsWith('chrome-extension://')) {
+      // TODO: return brave lion (or better: get icon from extension if possible as data URI)
+    } else {
+      if (sites) {
+        const site = sites.find(function (element) { return element.get('location') === url })
+        if (site) { entry.icon = site.get('favicon') }
+      }
+
+      if (!entry.icon) { entry.icon = UrlUtil.getDefaultFaviconUrl(url) }
+    }
+
+    return entry
+  }
+
   getHistory (appState) {
     const webContent = this.webview.getWebContents()
-    const currentIndex = webContent.getCurrentEntryIndex()
     const historyCount = webContent.getEntryCount()
+    const sites = appState ? appState.get('sites') : null
 
     let history = {
       count: historyCount,
-      currentIndex: currentIndex,
+      currentIndex: webContent.getCurrentEntryIndex(),
       entries: []
     }
 
     for (let index = 0; index < historyCount; index++) {
-      const url = webContent.getURLAtIndex(index)
-      const title = webContent.getTitleAtIndex(index)
-      let favicon = null
-
-      if (url.startsWith('chrome-extension://')) {
-        // TODO: return brave lion (or better: get icon from extension if possible as data URI)
-      } else if (appState) {
-        const sites = appState.get('sites')
-
-        if (sites) {
-          const site = sites.find(function (element) { return element.get('location') === url })
-          if (site) { favicon = site.get('favicon') }
-        }
-
-        if (!favicon) { favicon = UrlUtil.getDefaultFaviconUrl(url) }
-      }
-
-      history.entries.push({
-        index: index,
-        url: url,
-        title: title,
-        display: title || url,
-        icon: favicon
-      })
+      history.entries.push(this.getHistoryEntry(sites, webContent, index))
     }
 
     return history
