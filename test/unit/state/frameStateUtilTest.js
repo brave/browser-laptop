@@ -1,9 +1,9 @@
-/* global describe, before, it */
-const frameStateUtil = require('../../js/state/frameStateUtil')
+/* global describe, before, it, beforeEach */
+const frameStateUtil = require('../../../js/state/frameStateUtil')
 const Immutable = require('immutable')
 const assert = require('assert')
 
-/*global beforeEach */
+require('../braveUnit')
 
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: null,

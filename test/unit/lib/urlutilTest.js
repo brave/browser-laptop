@@ -1,7 +1,8 @@
 /* global describe, it */
-
-const UrlUtil = require('../../js/lib/urlutil')
+const UrlUtil = require('../../../js/lib/urlutil')
 const assert = require('assert')
+
+require('../braveUnit')
 
 describe('urlutil', function () {
   describe('getScheme', function () {

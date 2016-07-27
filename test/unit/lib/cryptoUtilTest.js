@@ -1,6 +1,8 @@
 /* global describe, it */
-const CryptoUtil = require('../../js/lib/cryptoUtil')
+const CryptoUtil = require('../../../js/lib/cryptoUtil')
 const assert = require('assert')
+
+require('../braveUnit')
 
 describe('crypto util test', function () {
   it('gets random bytes', function () {

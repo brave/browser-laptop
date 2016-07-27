@@ -2,9 +2,9 @@
 
 ## About tests
 
-Tests use the [mocha test frameowrk](https://mochajs.org/).
+Tests use the [mocha test framework](https://mochajs.org/).
 
-Most tests use [webdriver.io](http://webdriver.io/) to bring up the browser and run through the tests.
+Most tests use [webdriver.io](http://webdriver.io/) framework (via [Spectron](https://github.com/electron/spectron) to bring up the browser and run through the tests.
 
 Tests are located in the top level `test` directory and their filenames have a suffix of `Test.js`.
 
