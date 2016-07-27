@@ -289,7 +289,7 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
     navbar: {
       focused: navbarFocus,
       urlbar: {
-        location: delayedLoadUrl || url,
+        location: url,
         urlPreview: '',
         suggestions: {
           selectedIndex: 0,

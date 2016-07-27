@@ -215,7 +215,8 @@ WindowStore
     },
     fingerprintingProtection: {
       blocked: Array<string>
-    }
+    },
+    provisionalLocation: string
     security: {
       isSecure: boolean, // is using https
       loginRequiredDetail: {
