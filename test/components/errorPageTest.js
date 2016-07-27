@@ -36,13 +36,17 @@ describe('errorPage', function () {
 
     it('should go back to newtab when back is clicked', function * () {
       yield this.app.client
-        .leftClick('span[data-l10n-id=back]')
+        .waitForUrl(getTargetAboutUrl('about:error'))
+        .waitForVisible('span[data-l10n-id=back]')
+        .leftClick('span[data-l10n-id=back]', 5, 5)
         .waitForUrl(Brave.newTabUrl)
     })
 
     // TODO(bridiver) - need a better way to test this
     it.skip('should attempt a reload when reload is clicked', function * () {
       yield this.app.client
+        .waitForUrl(getTargetAboutUrl('about:error'))
+        .waitForVisible('span[data-l10n-id=errorReload]')
         .leftClick('span[data-l10n-id=errorReload]')
         .waitForUrl(getTargetAboutUrl('about:error'))
         // still no back button for the url

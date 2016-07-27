@@ -28,7 +28,7 @@ describe('tab pages', function () {
       })
       // Create a full tab set, but not a second page
       for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE] - 1; i++) {
-        yield this.app.client.click(newFrameButton)
+        yield this.app.client.windowByUrl(Brave.browserWindowUrl).click(newFrameButton)
       }
     })
 

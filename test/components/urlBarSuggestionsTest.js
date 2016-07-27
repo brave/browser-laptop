@@ -44,6 +44,8 @@ describe('urlbarSuggestions', function () {
 
   it('navigates to a suggestion with keyboard', function * () {
     yield this.app.client.ipcSend(messages.SHORTCUT_NEW_FRAME)
+      .waitForUrl(Brave.newTabUrl)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="3"].active')
       .ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
@@ -63,6 +65,8 @@ describe('urlbarSuggestions', function () {
   it('selects a location auto complete result but not for titles', function * () {
     const page1Url = Brave.server.url('page1.html')
     yield this.app.client.ipcSend(messages.SHORTCUT_NEW_FRAME)
+      .waitForUrl(Brave.newTabUrl)
+      .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="4"].active')
       .ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
