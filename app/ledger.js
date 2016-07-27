@@ -11,6 +11,7 @@ const util = require('util')
 
 const electron = require('electron')
 const app = electron.app
+const protocolHandler = electron.protocol
 const session = electron.session
 
 const acorn = require('acorn')
@@ -110,7 +111,7 @@ var initialize = () => {
           run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
         cacheRuleSet(state.ruleset)
-        getWalletInfo()
+        getPaymentInfo()
       })
       return
     }
@@ -233,7 +234,7 @@ var callback = (err, result, delayTime) => {
     returnValue.statusText = 'Initializing.'
   }
   cacheRuleSet(result.ruleset)
-  getWalletInfo()
+  getPaymentInfo()
 
   syncWriter(statePath, result, () => { run(delayTime) })
 }
@@ -249,10 +250,6 @@ var roundtrip = (params, options, callback) => {
   } else {
     parts.pathname = parts.path
   }
-
-// TBD: temporary
-  if (!params.headers) params.headers = {}
-  params.headers['x-magic'] = 'true'
 
   options = { url: url.format(parts), method: params.method, payload: params.payload, responseType: 'text',
               headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
@@ -272,7 +269,9 @@ var roundtrip = (params, options, callback) => {
 
     if (err) return callback(err)
 
-    if (Math.floor(response.statusCode / 100) !== 2) return callback(new Error('HTTP response ' + response.statusCode))
+    if (Math.floor(response.statusCode / 100) !== 2) {
+      return callback(new Error('HTTP response ' + response.statusCode) + ' for ' + params.method + ' ' + params.path)
+    }
 
     try {
       payload = (response.statusCode !== 204) ? JSON.parse(body) : null
@@ -339,17 +338,29 @@ var getStateInfo = (state) => {
   }
 }
 
-var getWalletInfo = () => {
-  var currency
+var getPaymentInfo = () => {
+  var amount, currency
 
   try {
     returnValue._internal.braveryProperties = client.getBraveryProperties()
-    currency = returnValue._internal.braveryProperties.fee && returnValue._internal.braveryProperties.fee.currency
+    if (returnValue._internal.braveryProperties.fee) {
+      amount = returnValue._internal.braveryProperties.fee.amount
+      currency = returnValue._internal.braveryProperties.fee.currency
+    }
 
-    client.getWalletProperties(currency, function (err, body) {
+    client.getWalletProperties(amount, currency, function (err, body) {
+      var info = returnValue._internal.paymentInfo || {}
+
       if (err) return console.log('getWalletProperties error: ' + err.toString())
 
-      returnValue._internal.walletProperties = underscore.pick(body, [ 'balance', 'rates' ])
+      info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'mode', 'balance' ]))
+      info.address = client.getWalletAddress()
+      if ((amount) && (currency)) {
+        info = underscore.extend(info, { amount: amount, currency: currency })
+        if ((body.rates) && (body.rates[currency])) info.btc = (amount / body.rates[currency]).toFixed(4)
+      }
+      returnValue._internal.paymentInfo = info
+      cacheReturnValue()
     })
   } catch (ex) {
     console.log('properties error: ' + ex.toString())
@@ -363,6 +374,8 @@ var synopsisNormalizer = () => {
 
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
+    if (synopsis.publishers[publisher].scores[scorekeeper] <= 0) return
+
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
   results = underscore.sortBy(results, (entry) => { return -entry.scores[scorekeeper] })
@@ -378,10 +391,10 @@ var synopsisNormalizer = () => {
     duration = results[i].duration
 
     data[i] = { rank: i + 1,
-                 site: results[i].publisher, views: results[i].visits, duration: duration,
-                 daysSpent: 0, hoursSpent: 0, minutesSpent: 0, secondsSpent: 0,
-                 faviconURL: publisher.faviconURL
-               }
+                site: results[i].publisher, views: results[i].visits, duration: duration,
+                daysSpent: 0, hoursSpent: 0, minutesSpent: 0, secondsSpent: 0,
+                faviconURL: publisher.faviconURL
+              }
     if (results[i].protocol) data[i].publisherURL = results[i].protocol + '//' + results[i].publisher
     // TBD: remove after post-beta... [MTR]
     if (!data[i].publisherURL) data[i].publisherURL = 'http://' + results[i].publisher
@@ -402,13 +415,25 @@ var synopsisNormalizer = () => {
   }
 
   pct = foo(pct, 100)
+  total = 0
   for (i = 0; i < n; i++) {
-    if (pct[i] === 0) {
+/*
+    if (pct[i] <= 0) {
       data = data.slice(0, i)
       break
     }
+ */
+    if (pct[i] < 0) pct[i] = 0
 
     data[i].percentage = pct[i]
+    total += pct[i]
+  }
+
+  for (i = data.length - 1; (total > 100) && (i >= 0); i--) {
+    if (data[i].percentage < 2) continue
+
+    data[i].percentage--
+    total--
   }
 
   return data
@@ -743,10 +768,13 @@ var handleGeneralCommunication = (event) => {
 
   timestamp = now
   underscore.keys(synopsis.publishers).forEach((publisher) => {
-    var then = underscore.last(synopsis.publishers[publisher].window).timestamp
+    var last = underscore.last(synopsis.publishers[publisher].window)
 
-    if (timestamp > then) timestamp = then
+    if (!last) return
+
+    if (timestamp > last.timestamp) timestamp = last.timestamp
   })
+
   if (returnValue._internal.reconcileStamp) {
     if (returnValue._internal.reconcileDelay) {
       returnValue.statusText = 'Monthly publisher submission in progress, estimated completion in ' +
@@ -765,12 +793,14 @@ var handleGeneralCommunication = (event) => {
   info = returnValue._internal.paymentInfo
   if (info) {
     underscore.extend(result, underscore.pick(info, [ 'balance', 'address', 'btc', 'amount', 'currency' ]))
-    if ((info.buyURLExpires) && (info.buyURLExpires > underscore.now())) result.buyURL = info.buyURL
-
+    if ((!info.buyURLExpires) || (info.buyURLExpires > underscore.now())) result.buyURL = info.buyURL
     underscore.extend(result, returnValue._internal.cache || {})
+
+    if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
+      delete result[protocolHandler.isNavigatorProtocolHandled('', 'bitcoin') ? 'buyURL' : 'paymentURL']
+    }
   }
   if (returnValue._internal.braveryProperties) underscore.extend(result, { bravery: returnValue._internal.braveryProperties })
-  if (returnValue._internal.walletProperties) underscore.extend(result, { wallet: returnValue._internal.walletProperties })
 /*
   console.log('\n' + JSON.stringify(underscore.extend(underscore.omit(result, [ 'synopsis', 'paymentIMG' ]),
                                                       { synopsis: result.synopsis && '...',
