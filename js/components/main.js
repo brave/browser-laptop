@@ -55,6 +55,7 @@ const eventUtil = require('../lib/eventUtil')
 const { isIntermediateAboutPage, getBaseUrl } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
+const debounce = require('../lib/debounce.js')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -76,6 +77,7 @@ class Main extends ImmutableComponent {
     this.onBraveMenu = this.onBraveMenu.bind(this)
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
+    this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
   }
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
@@ -349,7 +351,10 @@ class Main extends ImmutableComponent {
     this.loadOpenSearch()
 
     window.addEventListener('mousemove', (e) => {
-      self.checkForTitleMode(e.pageY)
+      if (e.pageY !== this.pageY) {
+        this.pageY = e.pageY
+        this.checkForTitleMode()
+      }
     })
     window.addEventListener('focus', () => {
       const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
@@ -414,7 +419,7 @@ class Main extends ImmutableComponent {
     })
   }
 
-  checkForTitleMode (pageY) {
+  checkForTitleMode () {
     const navigator = document.querySelector('.top')
     // Uncaught TypeError: Cannot read property 'getBoundingClientRect' of null
     if (!navigator) {
@@ -422,9 +427,9 @@ class Main extends ImmutableComponent {
     }
 
     const height = navigator.getBoundingClientRect().bottom
-    if (pageY <= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
+    if (this.pageY < height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
       windowActions.setMouseInTitlebar(true)
-    } else if (pageY === undefined || pageY > height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
+    } else if (this.pageY === undefined || this.pageY >= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
       windowActions.setMouseInTitlebar(false)
     }
   }
