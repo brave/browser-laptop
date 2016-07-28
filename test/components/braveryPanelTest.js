@@ -89,6 +89,10 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(url)
         .url(url)
+        .waitUntil(function () {
+          return this.getText('body')
+            .then((body) => body === 'test1 test2')
+        })
       yield openBraveMenu(this.app.client)
       yield this.app.client
         .click(noScriptSwitch)
@@ -96,6 +100,27 @@ describe('Bravery Panel', function () {
         .waitUntil(function () {
           return this.getText(noScriptStat)
             .then((stat) => stat === '2')
+        })
+    })
+    it('shows noscript tag content', function * () {
+      const url = Brave.server.url('scriptBlock.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .url(url)
+        .waitUntil(function () {
+          return this.getElementSize('noscript')
+            .then((size) => size.height === 0 && size.width === 0)
+        })
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
+        .click(noScriptSwitch)
+        .tabByIndex(0)
+        .url(url)
+        .waitUntil(function () {
+          // getText returns empty in this case
+          return this.getElementSize('noscript')
+            .then((size) => size.height > 0)
         })
     })
     it('blocks fingerprinting', function * () {

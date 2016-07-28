@@ -430,6 +430,9 @@ class Frame extends ImmutableComponent {
 
   addEventListeners () {
     this.webview.addEventListener('content-blocked', (e) => {
+      if (e.details[0] === 'javascript') {
+        windowActions.setBlockedBy(this.props.frame, 'noScript', e.details[1])
+      }
     })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.props.frame)
@@ -513,11 +516,6 @@ class Frame extends ImmutableComponent {
           method = (detail) => {
             const description = [detail.type, detail.scriptUrl || this.props.frame.get('location')].join(': ')
             windowActions.setBlockedBy(this.props.frame, 'fingerprintingProtection', description)
-          }
-          break
-        case messages.SCRIPTS_BLOCKED:
-          method = (src) => {
-            windowActions.setBlockedBy(this.props.frame, 'noScript', src)
           }
           break
         case messages.THEME_COLOR_COMPUTED:

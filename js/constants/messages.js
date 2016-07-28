@@ -68,7 +68,6 @@ const messages = {
   APP_STATE_CHANGE: _,
   STOP_LOAD: _,
   THEME_COLOR_COMPUTED: _,
-  SCRIPTS_BLOCKED: _, /** @arg {string} src */
   HIDE_CONTEXT_MENU: _,
   LEAVE_FULL_SCREEN: _,
   ENTER_FULL_SCREEN: _,
