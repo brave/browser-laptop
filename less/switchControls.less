@@ -29,6 +29,7 @@
     .switchBackground {
       height: 26px;
       width: 60px;
+        background-color: @switchBG_off;
       .switchIndicator {
         height: 22px;
         width: 22px;
@@ -50,6 +51,7 @@
 
   .switchControlTopText {
     margin: 0 auto 5px auto;
+    color: #bbb;
   }
 
   .switchControlRight {
@@ -62,20 +64,21 @@
   }
 
   .switchBackground {
-    background-color: #777;
+    background-color: @switchBG_off;
     border-radius: 12px;
-    height: 20px;
+    height: 16px;
     position: relative;
-    width: 45px;
+    width: 44px;
+//    box-shadow: inset 0 1px 4px @black25, 0 1px 4px @lightGray;
 
     .switchIndicator {
       background-color: white;
       border-radius: 100%;
-      height: 16px;
+      height: 12px;
       left: 2px;
       position: absolute;
       top: 2px;
-      width: 16px;
+      width: 12px;
     }
   }
 }
