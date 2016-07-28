@@ -759,7 +759,7 @@ function mainTemplateInit (nodeProps, frame) {
         click: (item, focusedWindow) => {
           if (focusedWindow && nodeProps.srcURL) {
             // TODO: open this in the next tab instead of last tab
-            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL)
+            focusedWindow.webContents.send(messages.SHORTCUT_NEW_FRAME, nodeProps.srcURL, { isPrivate: frame.get('isPrivate'), partitionNumber: frame.get('partitionNumber') })
           }
         }
       },

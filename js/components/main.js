@@ -224,12 +224,16 @@ class Main extends ImmutableComponent {
       const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
 
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
-      windowActions.newFrame({
+      const frameOpts = {
         location: url || config.defaultUrl,
         isPrivate: !!options.isPrivate,
         isPartitioned: !!options.isPartitioned,
         parentFrameKey: activeFrame.get('key')
-      }, openInForeground)
+      }
+      if (options.partitionNumber !== undefined) {
+        frameOpts.partitionNumber = options.partitionNumber
+      }
+      windowActions.newFrame(frameOpts, openInForeground)
     })
 
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {

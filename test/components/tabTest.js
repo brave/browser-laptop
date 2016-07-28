@@ -73,6 +73,26 @@ describe('tabs', function () {
     })
   })
 
+  describe('specific session tab signal', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      var url = Brave.server.url('page1.html')
+      yield this.app
+        .client.ipcSend(messages.SHORTCUT_NEW_FRAME, url, { partitionNumber: 3 })
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+    })
+    it('creates a new session tab', function * () {
+      yield this.app.client
+        .waitForExist('.tab[data-frame-key="2"]')
+    })
+    it('makes the new session webview visible', function * () {
+      yield this.app.client
+        .waitForVisible('webview[partition="persist:partition-3"]')
+    })
+  })
+
   describe('close tab', function () {
     var tabCountBeforeTabClose = 2
     var tabCountAfterTabClose = 1
