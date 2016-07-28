@@ -107,7 +107,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
         .waitUntil(function () {
           return this.getElementSize('noscript')
             .then((size) => size.height === 0 && size.width === 0)
