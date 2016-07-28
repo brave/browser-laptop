@@ -49,7 +49,7 @@ class LongPressButton extends ImmutableComponent {
       this.isLocked = false
       return
     }
-    this.props.onClick()
+    this.props.onClick(e)
   }
 
   render () {

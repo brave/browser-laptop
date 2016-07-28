@@ -52,7 +52,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 // Util
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
-const { isIntermediateAboutPage, getBaseUrl } = require('../lib/appUrlUtil')
+const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
@@ -457,16 +457,32 @@ class Main extends ImmutableComponent {
     return location
   }
 
-  onBack () {
-    this.activeFrame.goBack()
+  onNav (e, navCheckProp, navType, navAction) {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    const isNavigatable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
+    if (e && eventUtil.isForSecondaryAction(e) && isNavigatable) {
+      if (activeFrame && activeFrame.get(navCheckProp)) {
+        const win = remote.getCurrentWindow()
+        win.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {
+          [navType]: true,
+          openInForeground: !!e.shiftKey
+        })
+      }
+    } else {
+      navAction.call(this.activeFrame)
+    }
+  }
+
+  onBack (e) {
+    this.onNav(e, 'canGoBack', 'back', this.activeFrame.goBack)
+  }
+
+  onForward (e) {
+    this.onNav(e, 'canGoForward', 'forward', this.activeFrame.goForward)
   }
 
   onBackLongPress (rect) {
     contextMenus.onBackButtonHistoryMenu(this.activeFrame, this.activeFrame.getHistory(this.props.appState), rect)
-  }
-
-  onForward () {
-    this.activeFrame.goForward()
   }
 
   onForwardLongPress (rect) {

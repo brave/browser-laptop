@@ -38,5 +38,7 @@ module.exports = {
   fpStat: '.braveryStat.fpStat',
   fpSwitch: '.fingerprintingProtectionSwitch .switchMiddle',
   noScriptSwitch: '.noScriptSwitch .switchMiddle',
-  noScriptNavButton: '#navigator .noScript'
+  noScriptNavButton: '#navigator .noScript',
+  backButton: '.backforward .back',
+  forwardButton: '.backforward .forward'
 }

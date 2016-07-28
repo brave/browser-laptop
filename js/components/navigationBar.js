@@ -50,7 +50,7 @@ class NavigationBar extends ImmutableComponent {
 
   onReload (e) {
     if (eventUtil.isForSecondaryAction(e)) {
-      windowActions.cloneFrame(this.props.activeFrame)
+      ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {}, { openInForeground: !!e.shiftKey })
     } else {
       ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
     }

@@ -25,7 +25,7 @@ const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
 const FindBar = require('./findbar.js')
-const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
+const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -307,6 +307,24 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  clone (args) {
+    if (!isNavigatableAboutPage(getBaseUrl(this.props.frame.get('location')))) {
+      return
+    }
+    const newGuest = this.webview.clone()
+    const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
+    let cloneAction
+    if (args && args.get('back')) {
+      cloneAction = newGuest.goBack
+    } else if (args && args.get('forward')) {
+      cloneAction = () => newGuest.goForward
+    }
+    if (cloneAction) {
+      newGuest.once('did-attach', cloneAction.bind(newGuest))
+    }
+    windowActions.cloneFrame(this.props.frame, newGuestInstanceId, args && args.get('openInForeground'))
+  }
+
   handleShortcut () {
     const activeShortcut = this.props.frame.get('activeShortcut')
     const activeShortcutDetails = this.props.frame.get('activeShortcutDetails')
@@ -336,12 +354,7 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'clone':
-        if (this.isAboutPage()) {
-          break
-        }
-        const newGuest = this.webview.clone()
-        const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
-        windowActions.cloneFrame(this.props.frame, newGuestInstanceId)
+        this.clone(activeShortcutDetails)
         break
       case 'explicitLoadURL':
         this.webview.loadURL(location)

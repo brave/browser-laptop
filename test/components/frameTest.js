@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const { activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar } = require('../lib/selectors')
+const { activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar, backButton, forwardButton } = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
@@ -170,13 +170,45 @@ describe('clone tab', function () {
     })
 
     it('preserves the history', function * () {
-      let backButton = '.backforward .back'
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(this.webview2 + '[src="' + this.url2 + '"]')
         .waitForExist(backButton + ':not([disabled])')
+        .waitForExist(forwardButton + '[disabled]')
         .click(backButton)
         .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
+    })
+  })
+
+  describe('back clone', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.url1 = Brave.server.url('page1.html')
+      this.url2 = Brave.server.url('page2.html')
+      this.webview1 = '.frameWrapper:nth-child(1) webview'
+      this.webview2 = '.frameWrapper.isActive:nth-child(2) webview'
+
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        // add some history
+        .loadUrl(this.url1)
+        .loadUrl(this.url2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE, { back: true })
+    })
+
+    it('preserves proper navigation', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(this.webview2 + '[src="' + this.url1 + '"]')
+        .waitForExist(backButton + ':not([disabled])')
+        .waitForExist(forwardButton + ':not([disabled])')
+        .click(forwardButton)
+        .waitForExist(this.webview2 + '[src="' + this.url2 + '"]')
+        .waitForExist(backButton + ':not([disabled])')
+        .waitForExist(forwardButton + '[disabled]')
     })
   })
 })
