@@ -99,11 +99,23 @@ class SettingItem extends ImmutableComponent {
 }
 
 class SettingCheckbox extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick (e) {
+    if (this.props.disabled) {
+      return
+    }
+    return this.props.onChange ? this.props.onChange(e) : changeSetting(this.props.onChangeSetting, this.props.prefKey, e)
+  }
+
   render () {
     return <div style={this.props.style} className='settingItem'>
       <SwitchControl id={this.props.prefKey}
         disabled={this.props.disabled}
-        onClick={this.props.onChange ? this.props.onChange : changeSetting.bind(null, this.props.onChangeSetting, this.props.prefKey)}
+        onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)} />
       <label data-l10n-id={this.props.dataL10nId} htmlFor={this.props.prefKey} />
       {this.props.options}
