@@ -90,6 +90,10 @@ class Tabs extends ImmutableComponent {
     }
   }
 
+  newTab () {
+    windowActions.newFrame()
+  }
+
   render () {
     this.tabRefs = []
     return <div className='tabs'>
@@ -131,7 +135,7 @@ class Tabs extends ImmutableComponent {
         <Button label='+'
           l10nId='newTabButton'
           className='navbutton newFrameButton'
-          onClick={windowActions.newFrame} />
+          onClick={this.newTab} />
       </span>
     </div>
   }
