@@ -53,6 +53,7 @@ let generateBraveManifest = () => {
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
+          'content/scripts/noScript.js',
           'content/scripts/themeColor.js'
         ]
       },

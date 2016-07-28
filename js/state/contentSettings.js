@@ -79,7 +79,18 @@ const getContentSettingsFromSiteSettings = (appState) => {
       setting: getPasswordManagerEnabled(appState) ? 'allow' : 'block',
       primaryPattern: '*'
     }],
-    javascript: [],
+    javascript: [{
+      setting: braveryDefaults.noScript ? 'block' : 'allow',
+      primaryPattern: '*'
+    }, {
+      setting: 'allow',
+      secondaryPattern: '*',
+      primaryPattern: 'file:///*'
+    }, {
+      setting: 'allow',
+      secondaryPattern: '*',
+      primaryPattern: 'chrome-extension://*'
+    }],
     canvasFingerprinting: [{
       setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
       primaryPattern: '*'
@@ -97,9 +108,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
   let hostSettings = appState.get('siteSettings').toJS()
   for (var hostPattern in hostSettings) {
     let hostSetting = hostSettings[hostPattern]
-    if (hostSetting.noScript) {
-      // TODO(bridiver) - enable this when we support temporary overrides
-      // addContentSettings(contentSettings.javascript, hostPattern)
+    if (typeof hostSetting.noScript === 'boolean') {
+      // TODO: support temporary override
+      addContentSettings(contentSettings.javascript, hostPattern, '*',
+        hostSetting.noScript ? 'block' : 'allow')
     }
     if (hostSetting.cookieControl) {
       if (hostSetting.cookieControl === 'block3rdPartyCookie') {

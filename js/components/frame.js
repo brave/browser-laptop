@@ -25,7 +25,6 @@ const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
 const FindBar = require('./findbar.js')
-const consoleStrings = require('../constants/console')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
@@ -503,6 +502,11 @@ class Frame extends ImmutableComponent {
             windowActions.setBlockedBy(this.props.frame, 'fingerprintingProtection', description)
           }
           break
+        case messages.SCRIPTS_BLOCKED:
+          method = (src) => {
+            windowActions.setBlockedBy(this.props.frame, 'noScript', src)
+          }
+          break
         case messages.THEME_COLOR_COMPUTED:
           method = (computedThemeColor) =>
             windowActions.setThemeColor(this.props.frame, undefined, computedThemeColor || null)
@@ -737,14 +741,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('media-paused', ({title}) => {
       windowActions.setAudioPlaybackActive(this.props.frame, false)
     })
-    this.webview.addEventListener('console-message', (e) => {
-      if (this.props.enableNoScript && e.level === 2 &&
-          e.message && e.message.includes(consoleStrings.SCRIPT_BLOCKED)) {
-        // Note that the site was blocked
-        windowActions.setBlockedBy(this.props.frame,
-                                   'noScript', this.getScriptLocation(e.message))
-      }
-    })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       // Due to a bug in Electron, after navigating to a page with a theme color
       // to a page without a theme color, the background is sent to us as black
@@ -770,16 +766,6 @@ class Frame extends ImmutableComponent {
 
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
-  }
-
-  getScriptLocation (msg) {
-    const defaultMsg = '[Inline script]'
-    if (msg.includes(consoleStrings.EXTERNAL_SCRIPT_BLOCKED)) {
-      let match = /'.+?'/.exec(msg)
-      return match ? match[0].replace(/'/g, '') : defaultMsg
-    } else {
-      return defaultMsg
-    }
   }
 
   goBack () {
