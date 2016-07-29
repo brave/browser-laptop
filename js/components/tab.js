@@ -100,16 +100,17 @@ class Tab extends ImmutableComponent {
 
   onMouseLeave () {
     window.clearTimeout(this.hoverTimeout)
-    this.lastPreviewClearTime = new Date().getTime()
     windowActions.setPreviewFrame(null)
   }
 
-  onMouseEnter () {
-    // If a user has recently seen a preview they likely are scrolling through
-    // previews.  If we're not in preview mode we add a bit of hover time
-    // before doing a preview
-    const previewMode = new Date().getTime() - this.lastPreviewClearTime < 1500
-    window.clearTimeout(this.hoverClearTimeout)
+  onMouseEnter (e) {
+    // relatedTarget inside mouseenter checks which element before this event was the pointer on
+    // if this element has a tab-like class, then it's likely that the user was previewing
+    // a sequency of tabs. Called here as previewMode.
+    const previewMode = /tab/i.test(e.relatedTarget.classList)
+
+    // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
+    // as reported here: https://github.com/brave/browser-laptop/issues/1434
     this.hoverTimeout =
       window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 200 : 400)
   }

@@ -3,7 +3,17 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import "variables.less";
-
+@keyframes tabFadeIn {
+  0% {
+    opacity: 0.5
+  }
+  50% {
+    opacity: 0.6
+  }
+  100% {
+    opacity: 0.5
+  }
+}
 :root {
   --default-font-family: "Arial";
 }
@@ -92,17 +102,17 @@ html,
     width: 100%;
     &.isPreview {
       opacity: 0.5;
+      animation: tabFadeIn 0.75s ease-in-out;
+      animation-fill-mode: forwards;
     }
   }
 
   &:not(.isActive) {
     z-index: @zindexWindowNotActive;
-    opacity: 0;
+
     &.isPreview {
       background: gray;
       z-index: @zindexWindowIsPreview;
-      opacity: 1;
-      transition: opacity @transitionDuration ease-in-out;
     }
 
     // Webviews can cause flickers w/ Chrome  v49 if left visible
