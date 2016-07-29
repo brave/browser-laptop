@@ -18,10 +18,27 @@ if (process.type === 'browser') {
   app = electron.remote.app
 }
 
+const getPepperFlashPath = () => {
+  if (['darwin', 'win32'].includes(process.platform)) {
+    return app.getPath('pepperFlashSystemPlugin')
+  }
+  const basePath = '/usr/lib'
+  const plugin = 'libpepflashplayer.so'
+  let pluginPath = path.resolve(basePath, 'pepperflash-nonfree', plugin)
+  try {
+    fs.statSync(pluginPath)
+  } catch (e) {
+    pluginPath = path.resolve(basePath, 'PepperFlash', plugin)
+    // Throws error if not found
+    fs.statSync(pluginPath)
+  }
+  return pluginPath
+}
+
 module.exports.init = () => {
   // TODO: This only works if sync currently
   try {
-    const pepperFlashSystemPluginPath = app.getPath('pepperFlashSystemPlugin')
+    const pepperFlashSystemPluginPath = getPepperFlashPath()
     const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
     const data = fs.readFileSync(pepperFlashManifestPath)
     if (!data) {
@@ -39,7 +56,7 @@ module.exports.init = () => {
 
 module.exports.checkFlashInstalled = (cb) => {
   try {
-    const pepperFlashSystemPluginPath = app.getPath('pepperFlashSystemPlugin')
+    const pepperFlashSystemPluginPath = getPepperFlashPath()
     const pepperFlashManifestPath = path.resolve(pepperFlashSystemPluginPath, '..', 'manifest.json')
     fs.readFile(pepperFlashManifestPath, (err, data) => {
       if (err || !data) {
