@@ -53,6 +53,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
 const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
+const { getBaseDomain } = require('../lib/baseDomain')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
@@ -338,7 +339,8 @@ class Main extends ImmutableComponent {
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
       const frames = self.props.windowState.get('frames')
         .filter((frame) => frame.get('location') === detail.url ||
-          getOrigin(frame.get('location')) === getOrigin(detail.url))
+          getOrigin(frame.get('location')) === getOrigin(detail.url) ||
+        getBaseDomain(getOrigin(frame.get('location'))) === getBaseDomain(getOrigin(detail.url)))
       frames.forEach((frame) =>
         windowActions.setLoginRequiredDetail(frame, detail))
     })
