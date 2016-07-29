@@ -2,7 +2,7 @@
 
 ## [0.11.2](https://github.com/brave/browser-laptop/releases/v0.11.2dev)
 - Added history on long click over back and forward buttons. ([#1622](https://github.com/brave/browser-laptop/issues/1622))
-- Added a search box to the Bookmarks page (about:bookmarks) ([#995](Add a search box on the about:bookmarks page #995))
+- Added a search box to the Bookmarks page (about:bookmarks) ([#995](https://github.com/brave/browser-laptop/issues/995))
 - Added context menu for cloning a tab including back-forward history. ([#2593](https://github.com/brave/browser-laptop/pull/2593))
 - Added support for forking navigation via `CmdOrCtrl+Click` on back, forward or reload buttons. ([#2753](https://github.com/brave/browser-laptop/issues/2753))
 - Added optional Shift for zoom in shortcut. ([#2685](https://github.com/brave/browser-laptop/issues/2685))
