@@ -14,7 +14,6 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
 const { getZoomValuePercentage, getNextZoomLevel } = require('../lib/zoom')
 const messages = require('../constants/messages.js')
-const remote = global.require('electron').remote
 const contextMenus = require('../contextMenus')
 const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
@@ -31,6 +30,7 @@ const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
 const flash = require('../flash')
+const currentWindow = require('../../app/renderer/currentWindow')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -449,7 +449,7 @@ class Frame extends ImmutableComponent {
       windowActions.setLinkHoverPreview(e.url, showOnRight)
     })
     this.webview.addEventListener('set-active', (e) => {
-      if (e.active && remote.getCurrentWindow().isFocused()) {
+      if (e.active && currentWindow.isFocused()) {
         windowActions.setFocusedFrame(this.props.frame)
       }
       if (e.active && !this.props.isActive) {
@@ -458,10 +458,10 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('focus', this.onFocus)
     this.webview.addEventListener('mouseenter', (e) => {
-      remote.getCurrentWindow().webContents.send(messages.ENABLE_SWIPE_GESTURE)
+      currentWindow.webContents.send(messages.ENABLE_SWIPE_GESTURE)
     })
     this.webview.addEventListener('mouseleave', (e) => {
-      remote.getCurrentWindow().webContents.send(messages.DISABLE_SWIPE_GESTURE)
+      currentWindow.webContents.send(messages.DISABLE_SWIPE_GESTURE)
     })
     // @see <a href="https://github.com/atom/electron/blob/master/docs/api/web-view-tag.md#event-new-window">new-window event</a>
     this.webview.addEventListener('new-window', (e) => {
@@ -469,7 +469,7 @@ class Frame extends ImmutableComponent {
 
       let guestInstanceId = e.options && e.options.webPreferences && e.options.webPreferences.guestInstanceId
       let windowOpts = e.options && e.options.windowOptions || {}
-      windowOpts.parentWindowKey = remote.getCurrentWindow().id
+      windowOpts.parentWindowKey = currentWindow.id
       windowOpts.disposition = e.disposition
       let delayedLoadUrl = e.options && e.options.delayedLoadUrl
 
@@ -549,10 +549,10 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CAN_SWIPE_BACK:
-          remote.getCurrentWindow().webContents.send(messages.CAN_SWIPE_BACK)
+          currentWindow.webContents.send(messages.CAN_SWIPE_BACK)
           break
         case messages.CAN_SWIPE_FORWARD:
-          remote.getCurrentWindow().webContents.send(messages.CAN_SWIPE_FORWARD)
+          currentWindow.webContents.send(messages.CAN_SWIPE_FORWARD)
           break
         case messages.NEW_FRAME:
           method = (frameOpts, openInForeground) => {
@@ -605,8 +605,8 @@ class Frame extends ImmutableComponent {
       } else {
         flash.checkFlashInstalled((installed) => {
           if (installed) {
-            remote.getCurrentWindow().webContents.send(messages.SHOW_NOTIFICATION,
-                                                       locale.translation('flashInstalled'))
+            currentWindow.webContents.send(messages.SHOW_NOTIFICATION,
+                                           locale.translation('flashInstalled'))
           } else {
             windowActions.loadUrl(this.props.frame, adobeUrl)
           }

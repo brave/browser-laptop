@@ -7,7 +7,6 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
-const remote = electron.remote
 
 // Actions
 const windowActions = require('../actions/windowActions')
@@ -57,6 +56,7 @@ const { getBaseDomain } = require('../lib/baseDomain')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
+const currentWindow = require('../../app/renderer/currentWindow')
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -144,8 +144,7 @@ class Main extends ImmutableComponent {
           window.isFirstProfiling = true
           console.info('See this blog post for more information on profiling: http://benchling.engineering/performance-engineering-with-react/')
         }
-        const win = remote.getCurrentWindow()
-        win.openDevTools()
+        currentWindow.openDevTools()
         console.log('starting to profile...')
         window.perf.start()
       } else {
@@ -214,9 +213,8 @@ class Main extends ImmutableComponent {
     const activeFramePrev = FrameStateUtil.getActiveFrame(prevProps.windowState)
     const activeFrameTitle = activeFrame && (activeFrame.get('title') || activeFrame.get('location')) || ''
     const activeFramePrevTitle = activeFramePrev && (activeFramePrev.get('title') || activeFramePrev.get('location')) || ''
-    const win = remote.getCurrentWindow()
-    if (activeFrameTitle !== activeFramePrevTitle && win) {
-      win.setTitle(activeFrameTitle)
+    if (activeFrameTitle !== activeFramePrevTitle) {
+      currentWindow.setTitle(activeFrameTitle)
     }
 
     // If the tab changes or was closed, exit out of full screen to give a better
@@ -409,22 +407,21 @@ class Main extends ImmutableComponent {
     }, true)
 
     const activeFrame = FrameStateUtil.getActiveFrame(self.props.windowState)
-    const win = remote.getCurrentWindow()
-    if (activeFrame && win) {
-      win.setTitle(activeFrame.get('title'))
+    if (activeFrame) {
+      currentWindow.setTitle(activeFrame.get('title'))
     }
 
     // Handlers for saving window state
-    win.on('maximize', function () {
+    currentWindow.on('maximize', function () {
       windowActions.setMaximizeState(true)
     })
 
-    win.on('unmaximize', function () {
+    currentWindow.on('unmaximize', function () {
       windowActions.setMaximizeState(false)
     })
 
     let moveTimeout = null
-    win.on('move', function (event) {
+    currentWindow.on('move', function (event) {
       if (moveTimeout) {
         clearTimeout(moveTimeout)
       }
@@ -433,11 +430,11 @@ class Main extends ImmutableComponent {
       }, 1000)
     })
 
-    win.on('enter-full-screen', function (event) {
+    currentWindow.on('enter-full-screen', function (event) {
       windowActions.setWindowFullScreen(true)
     })
 
-    win.on('leave-full-screen', function (event) {
+    currentWindow.on('leave-full-screen', function (event) {
       windowActions.setWindowFullScreen(false)
     })
   }
@@ -481,8 +478,7 @@ class Main extends ImmutableComponent {
     const isNavigatable = isNavigatableAboutPage(getBaseUrl(activeFrame.get('location')))
     if (e && eventUtil.isForSecondaryAction(e) && isNavigatable) {
       if (activeFrame && activeFrame.get(navCheckProp)) {
-        const win = remote.getCurrentWindow()
-        win.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {
+        currentWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {
           [navType]: true,
           openInForeground: !!e.shiftKey
         })
@@ -564,14 +560,13 @@ class Main extends ImmutableComponent {
   }
 
   onDoubleClick (e) {
-    const win = remote.getCurrentWindow()
     if (!e.target.className.includes('navigatorWrapper')) {
       return
     }
-    if (win.isMaximized()) {
-      win.maximize()
+    if (currentWindow.isMaximized()) {
+      currentWindow.maximize()
     } else {
-      win.unmaximize()
+      currentWindow.unmaximize()
     }
   }
 

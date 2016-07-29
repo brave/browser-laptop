@@ -17,6 +17,7 @@ const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
+const currentWindow = require('../../app/renderer/currentWindow')
 
 const { l10nErrorText } = require('../lib/errorUtil')
 const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes } = require('../lib/appUrlUtil')
@@ -674,12 +675,11 @@ ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
   let action = Serializer.deserialize(serializedPayload)
   let queryInfo = action.queryInfo || action.frameProps || {}
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-  let win = require('electron').remote.getCurrentWindow()
-  if (queryInfo.windowId === -2 && win.isFocused()) {
-    queryInfo.windowId = win.id
+  if (queryInfo.windowId === -2 && currentWindow.isFocused()) {
+    queryInfo.windowId = currentWindow.id
   }
   // handle any ipc dispatches that are targeted to this window
-  if (queryInfo.windowId && queryInfo.windowId === win.id) {
+  if (queryInfo.windowId && queryInfo.windowId === currentWindow.id) {
     doAction(action)
   }
 })

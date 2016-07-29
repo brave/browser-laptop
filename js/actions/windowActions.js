@@ -12,6 +12,7 @@ const messages = require('../constants/messages')
 const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
+const currentWindow = require('../../app/renderer/currentWindow')
 
 function dispatch (action) {
   AppDispatcher.dispatch(action)
@@ -313,7 +314,6 @@ const windowActions = {
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
     const ipc = global.require('electron').ipcRenderer
-    const remote = global.require('electron').remote
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {
       webviewActions.setFullScreen(false)
@@ -331,7 +331,7 @@ const windowActions = {
       // only has pinned frames and tried to close, so close the
       // whole app.
       if (nonPinnedFrames.size === 0) {
-        appActions.closeWindow(remote.getCurrentWindow().id)
+        appActions.closeWindow(currentWindow.id)
         return
       }
 
@@ -352,7 +352,7 @@ const windowActions = {
         frameProps
       })
     } else {
-      appActions.closeWindow(remote.getCurrentWindow().id)
+      appActions.closeWindow(currentWindow.id)
     }
   },
 

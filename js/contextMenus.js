@@ -32,6 +32,7 @@ const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
 const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
+const currentWindow = require('../app/renderer/currentWindow')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -979,20 +980,20 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
-    mainMenu.popup(remote.getCurrentWindow())
+    mainMenu.popup(currentWindow)
   }
 }
 
 function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
-  tabMenu.popup(remote.getCurrentWindow())
+  tabMenu.popup(currentWindow)
 }
 
 function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
-  tabsToolbarMenu.popup(remote.getCurrentWindow())
+  tabsToolbarMenu.popup(currentWindow)
 }
 
 function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
@@ -1000,19 +1001,19 @@ function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
     e.stopPropagation()
   }
   const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit(downloadId, downloadItem))
-  downloadsToolbarMenu.popup(remote.getCurrentWindow())
+  downloadsToolbarMenu.popup(currentWindow)
 }
 
 function onTabPageContextMenu (framePropsList, e) {
   e.stopPropagation()
   const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
-  tabPageMenu.popup(remote.getCurrentWindow())
+  tabPageMenu.popup(currentWindow)
 }
 
 function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   e.stopPropagation()
   const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
-  inputMenu.popup(remote.getCurrentWindow())
+  inputMenu.popup(currentWindow)
 }
 
 function onBookmarkContextMenu (siteDetail, activeFrame, e) {
@@ -1020,7 +1021,7 @@ function onBookmarkContextMenu (siteDetail, activeFrame, e) {
     e.stopPropagation()
   }
   const menu = Menu.buildFromTemplate(bookmarkTemplateInit(siteDetail, activeFrame))
-  menu.popup(remote.getCurrentWindow())
+  menu.popup(currentWindow)
 }
 
 function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
