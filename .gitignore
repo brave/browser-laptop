@@ -57,3 +57,6 @@ httpse.sqlite
 
 # vim swap files
 *.swp
+
+# node-anonize2-relic-emscripten
+anonize2.js.mem

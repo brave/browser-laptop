@@ -48,6 +48,7 @@ module.exports.request = (options, callback) => {
   })
 }
 
+/*
 const http = require('http')
 const https = require('https')
 const url = require('url')
@@ -93,6 +94,7 @@ module.exports.request = (options, callback) => {
   if (options.payload) request.write(JSON.stringify(options.payload))
   request.end()
 }
+ */
 
 module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
   var defaultSession = session.defaultSession

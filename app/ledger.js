@@ -241,7 +241,7 @@ var callback = (err, result, delayTime) => {
 
 var roundtrip = (params, options, callback) => {
   var parts = underscore.extend(underscore.pick(options.server, [ 'protocol', 'hostname', 'port' ]),
-                                underscore.omit(params, [ 'headers', 'payload' ]))
+                                underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
   var i = parts.path.indexOf('?')
 
   if (i !== -1) {
@@ -348,7 +348,7 @@ var getPaymentInfo = () => {
       currency = returnValue._internal.braveryProperties.fee.currency
     }
 
-    client.getWalletProperties(amount, currency, function (err, body) {
+    client.getWalletProperties(currency, function (err, body) {
       var info = returnValue._internal.paymentInfo || {}
 
       if (err) return console.log('getWalletProperties error: ' + err.toString())
@@ -623,7 +623,7 @@ var cacheRuleSet = (ruleset) => {
 
     if (util.isArray(tree)) {
       result = []
-      tree.forEach(function (branch) { result.push(prune(branch)) })
+      tree.forEach((branch) => { result.push(prune(branch)) })
       return result
     }
 
@@ -631,7 +631,7 @@ var cacheRuleSet = (ruleset) => {
 
     tree = underscore.omit(tree, [ 'start', 'end', 'raw' ])
     result = {}
-    underscore.keys(tree).forEach(function (key) { result[key] = prune(tree[key]) })
+    underscore.keys(tree).forEach((key) => { result[key] = prune(tree[key]) })
     return result
   }
 
@@ -777,14 +777,14 @@ var handleGeneralCommunication = (event) => {
 
   if (returnValue._internal.reconcileStamp) {
     if (returnValue._internal.reconcileDelay) {
-      returnValue.statusText = 'Monthly publisher submission in progress, estimated completion in ' +
+      returnValue.statusText = 'Publisher submission in progress, estimated completion in ' +
                                moment(returnValue._internal.reconcileDelay).fromNow() + '.'
     } else {
       offset = moment(returnValue._internal.reconcileStamp).fromNow()
       if (returnValue._internal.reconcileStamp > now) {
         returnValue.statusText = 'Publishers love you! Next submission ' + offset + '.'
       } else {
-        returnValue.statusText = 'Monthly publisher submission overdue ' + offset + '. Please add funds.'
+        returnValue.statusText = 'Publisher submission overdue ' + offset + '. Please add funds.'
       }
     }
   }

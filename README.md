@@ -70,7 +70,6 @@ After installing the prerequisites:
 
 3. Install the Node (v5+) dependencies:
 
-        npm install -g install-cmake
         npm install
 
 If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
