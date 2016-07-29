@@ -35,7 +35,9 @@ module.exports.register = (win) => {
       ['Alt+D', messages.SHORTCUT_FOCUS_URL],
       ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
       ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
-  } else {
+  } else if (process.env.NODE_ENV !== 'development') {
+    // We're in Darwin and release or test mode...
+    // We disable for development mode because Browser level dev tools copy doesn't work.
     // Workaround for #1060
     simpleWebContentEvents.push([
       'Cmd+C',
