@@ -239,7 +239,7 @@ class SearchTab extends ImmutableComponent {
     return <div>
       <div className='sectionTitle' data-l10n-id='searchSettings' />
       <SettingItem dataL10nId='defaultSearchEngine'>
-        <SortableTable headings={['Default', 'Search Engines', 'Engine Go Key (type first)']} rows={this.searchProviders}
+        <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
           isHover hoverCallback={this.hoverCallback.bind(this)} />
       </SettingItem>
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />

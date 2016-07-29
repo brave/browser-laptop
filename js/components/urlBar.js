@@ -36,6 +36,7 @@ class UrlBar extends ImmutableComponent {
     this.onChange = this.onChange.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.searchFaviconStyle = null
   }
 
   get activeFrame () {
@@ -147,6 +148,7 @@ class UrlBar extends ImmutableComponent {
           // this can't go through appActions for some reason
           // or the whole window will reload on the first page request
           this.updateDOMInputFocus(false)
+          this.searchFaviconStyle = null
         }
         break
       case KeyCodes.UP:
@@ -218,6 +220,27 @@ class UrlBar extends ImmutableComponent {
     windowActions.setUrlBarSelected(false)
     windowActions.setUrlBarActive(true)
     windowActions.setNavBarUserInput(e.target.value)
+    let location = this.props.urlbar.get('location')
+    if (location !== null && location.length !== 0) {
+      const isLocationUrl = isUrl(location)
+      if (!isLocationUrl) {
+        let entries = searchProviders.providers
+        entries.forEach((entry) => {
+          const searchRE = new RegExp('^' + entry.shortcut + ' .*', 'g')
+          if (searchRE.test(location)) {
+            const iconSize = 16
+            this.searchFaviconStyle = {
+              backgroundImage: `url(${entry.image})`,
+              minWidth: iconSize,
+              width: iconSize,
+              backgroundSize: iconSize,
+              height: iconSize
+            }
+            return false
+          }
+        })
+      }
+    }
   }
 
   onFocus (e) {
@@ -350,12 +373,13 @@ class UrlBar extends ImmutableComponent {
         onClick={this.onSiteInfo}
         className={cx({
           urlbarIcon: true,
-          'fa': true,
-          'fa-lock': this.isHTTPPage && this.props.isSecure && !this.props.urlbar.get('active'),
-          'fa-unlock-alt': this.isHTTPPage && !this.props.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode,
-          'fa fa-file': this.props.urlbar.get('active') && this.props.loading === false,
+          'fa': !this.searchFaviconStyle,
+          'fa-lock': !this.searchFaviconStyle && this.isHTTPPage && this.isSecure && !this.props.urlbar.get('active'),
+          'fa-unlock-alt': !this.searchFaviconStyle && this.isHTTPPage && !this.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode,
+          'fa fa-file': !this.searchFaviconStyle && this.props.urlbar.get('active') && this.props.loading === false,
           extendedValidation: this.extendedValidationSSL
-        })} />
+        })}
+        style={this.searchFaviconStyle} />
         {
           this.props.titleMode
           ? <div id='titleBar'>
