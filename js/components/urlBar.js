@@ -37,6 +37,7 @@ class UrlBar extends ImmutableComponent {
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.searchFaviconStyle = null
+    this.searchSelectEntry = null
   }
 
   get activeFrame () {
@@ -122,18 +123,14 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
-            let entries = searchProviders.providers
             let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
-            if (!isLocationUrl) {
-              entries.forEach((entry) => {
-                const searchRE = new RegExp('^' + entry.shortcut + ' .*', 'g')
-                if (searchRE.test(location)) {
-                  const replaceRE = new RegExp('^' + entry.shortcut + ' ', 'g')
-                  location = location.replace(replaceRE, '')
-                  searchUrl = entry.search.replace('{searchTerms}', encodeURIComponent(location))
-                  return false
-                }
-              })
+            if (this.searchSelectEntry !== null && !isLocationUrl) {
+              const searchRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' .*', 'g')
+              if (searchRE.test(location)) {
+                const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
+                location = location.replace(replaceRE, '')
+                searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
+              }
             }
             location = isLocationUrl ? location : searchUrl
             // do search.
@@ -149,6 +146,7 @@ class UrlBar extends ImmutableComponent {
           // or the whole window will reload on the first page request
           this.updateDOMInputFocus(false)
           this.searchFaviconStyle = null
+          this.searchSelectEntry = null
         }
         break
       case KeyCodes.UP:
@@ -236,6 +234,7 @@ class UrlBar extends ImmutableComponent {
               backgroundSize: iconSize,
               height: iconSize
             }
+            this.searchSelectEntry = entry
             return false
           }
         })
