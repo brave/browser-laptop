@@ -24,7 +24,7 @@ const getPepperFlashPath = () => {
   }
   const basePath = '/usr/lib'
   const plugin = 'libpepflashplayer.so'
-  let pluginPath = path.resolve(basePath, 'pepperflash-nonfree', plugin)
+  let pluginPath = path.resolve(basePath, 'pepperflashplugin-nonfree', plugin)
   try {
     fs.statSync(pluginPath)
   } catch (e) {
