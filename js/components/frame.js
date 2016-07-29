@@ -49,6 +49,8 @@ class Frame extends ImmutableComponent {
     this.notificationCallbacks = {}
     // Change to DNT requires restart
     this.doNotTrack = getSetting(settings.DO_NOT_TRACK)
+    // Counter for detecting PDF URL redirect loops
+    this.reloadCounter = {}
   }
 
   isAboutPage () {
@@ -537,7 +539,14 @@ class Frame extends ImmutableComponent {
           method = () => this.webview.goForward()
           break
         case messages.RELOAD:
-          method = () => this.webview.reload()
+          method = () => {
+            const location = this.props.frame.get('location')
+            this.reloadCounter[location] = this.reloadCounter[location] || 0
+            if (this.reloadCounter[location] < 2) {
+              this.webview.reload()
+              this.reloadCounter[location] = this.reloadCounter[location] + 1
+            }
+          }
           break
         case messages.CAN_SWIPE_BACK:
           remote.getCurrentWindow().webContents.send(messages.CAN_SWIPE_BACK)
