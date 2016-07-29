@@ -320,11 +320,8 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   if (insertionIndex === -1) {
     insertionIndex = frames.size
   }
-  while (insertionIndex < frames.size) {
+  if (!isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
     ++insertionIndex
-    if (!isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
-      break
-    }
   }
   if (isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
     insertionIndex = 0
