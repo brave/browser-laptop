@@ -20,6 +20,7 @@ const qr = require('qr-image')
 const random = require('random-lib')
 const tldjs = require('tldjs')
 const underscore = require('underscore')
+const uuid = require('node-uuid')
 
 const messages = require('../js/constants/messages')
 const request = require('../js/lib/request')
@@ -49,7 +50,7 @@ var msecs = { year: 365 * 24 * 60 * 60 * 1000,
           }
 
 var client
-var topPublishersN = 25
+// var topPublishersN = 25
 
 var LedgerPublisher
 var synopsis
@@ -304,7 +305,7 @@ var run = (delayTime) => {
   }
   if (delayTime > 0) return setTimeout(() => { if (client.sync(callback) === true) return run(0) }, delayTime)
 
-  if (client.isReadyToReconcile()) return client.reconcile(synopsis.topN(topPublishersN), callback)
+  if (client.isReadyToReconcile()) return client.reconcile(uuid.v4().toLowerCase(), callback)
 
   console.log('\nwhat? wait, how can this happen?')
 }
@@ -348,7 +349,7 @@ var getPaymentInfo = () => {
       currency = returnValue._internal.braveryProperties.fee.currency
     }
 
-    client.getWalletProperties(currency, function (err, body) {
+    client.getWalletProperties(amount, currency, function (err, body) {
       var info = returnValue._internal.paymentInfo || {}
 
       if (err) return console.log('getWalletProperties error: ' + err.toString())
