@@ -169,6 +169,8 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ESC:
         e.preventDefault()
         ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
+        this.searchFaviconStyle = null
+        this.searchSelectEntry = null
         break
       case KeyCodes.DELETE:
         if (e.shiftKey) {
