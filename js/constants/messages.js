@@ -143,7 +143,9 @@ const messages = {
   // Localization
   LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
   REQUEST_LANGUAGE: _,
-  STATE_UPDATED: _
+  STATE_UPDATED: _,
+  // Debugging
+  DEBUG_REACT_PROFILE: _
 }
 
 module.exports = mapValuesByKeys(messages)

@@ -517,6 +517,12 @@ const init = (settingsState, args) => {
               focusedWindow.toggleDevTools()
             }
           }
+        }, {
+          label: 'Toggle React Profiling',
+          accelerator: 'Alt+P',
+          click: function (item, focusedWindow) {
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.DEBUG_REACT_PROFILE])
+          }
         }
       ]
     })

@@ -47,5 +47,6 @@ module.exports = [
   'mkdirp',
   'babel$',
   'babel-(?!polyfill|regenerator-runtime)',
-  'jsdom-global'
+  'jsdom-global',
+  'react-addons-perf'
 ]

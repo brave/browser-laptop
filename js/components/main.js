@@ -137,6 +137,23 @@ class Main extends ImmutableComponent {
         }
       }
     })
+    ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
+      window.perf = require('react-addons-perf')
+      if (!window.perf.isRunning()) {
+        if (!window.isFirstProfiling) {
+          window.isFirstProfiling = true
+          console.info('See this blog post for more information on profiling: http://benchling.engineering/performance-engineering-with-react/')
+        }
+        const win = remote.getCurrentWindow()
+        win.openDevTools()
+        console.log('starting to profile...')
+        window.perf.start()
+      } else {
+        window.perf.stop()
+        console.log('profiling stopped. Wasted:')
+        window.perf.printWasted()
+      }
+    })
     ipc.on(messages.OPEN_BRAVERY_PANEL, (e) => {
       if (!this.braveShieldsDisabled) {
         this.onBraveMenu()

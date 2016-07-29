@@ -39,3 +39,10 @@ Content is the web page which is loaded.  You can open the loaded content dev to
 If you'd like to see code run on each page load, you can edit `app/extensions/brave/brave-default.js`.
 
 Calls to `console.log` and related functions go into the per page dev tools console mentioned above.
+
+
+## Profiling React code
+
+The `Debug` menu has a `Toggle React Profiling` option which will start/stop the React addon for profiling.
+The `window.perf` object is exposed for the window that is opened for more advanced usage.
+An introduction to profiling in React is covered [here](http://benchling.engineering/performance-engineering-with-react/).
