@@ -29,29 +29,29 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   get activeIndex () {
-    if (this.props.suggestions.get('suggestionList') === null) {
+    if (this.props.suggestionList === null) {
       return 0
     }
-    return Math.abs(this.props.suggestions.get('selectedIndex') % (this.props.suggestions.get('suggestionList').size + 1))
+    return Math.abs(this.props.selectedIndex % (this.props.suggestionList.size + 1))
   }
 
   nextSuggestion () {
     // If the user presses down and don't have an explicit selected index, skip to the 2nd one
-    if (this.props.locationValueSuffix && this.props.suggestions.get('selectedIndex') === null && this.props.suggestions.get('suggestionList').size > 1) {
+    if (this.props.locationValueSuffix && this.props.selectedIndex === null && this.props.suggestionList.size > 1) {
       this.updateSuggestions(2)
       return
     }
 
-    this.updateSuggestions(this.props.suggestions.get('selectedIndex') + 1)
+    this.updateSuggestions(this.props.selectedIndex + 1)
   }
 
   previousSuggestion () {
-    const suggestions = this.props.suggestions.get('suggestionList')
+    const suggestions = this.props.suggestionList
     if (!suggestions) {
       return
     }
 
-    let newIndex = this.props.suggestions.get('selectedIndex') - 1
+    let newIndex = this.props.selectedIndex - 1
     if (newIndex < 0) {
       newIndex = suggestions.size
     }
@@ -73,12 +73,10 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   // Whether the suggestions box should be rendered
   shouldRender () {
-    const suggestions = this.props.suggestions.get('suggestionList')
-    return suggestions && suggestions.size > 0
+    return this.props.suggestionList && this.props.suggestionList.size > 0
   }
 
   render () {
-    const suggestions = this.props.suggestions.get('suggestionList')
     window.removeEventListener('click', this)
 
     if (!this.shouldRender()) {
@@ -91,6 +89,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // If there is a URL suffix that means there's an active autocomplete for the first element.
     // We should show that as selected so the user knows what is being matched.
 
+    const suggestions = this.props.suggestionList
     const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
     const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)
     const aboutPagesSuggestions = suggestions.filter((s) => s.type === suggestionTypes.ABOUT_PAGES)
@@ -122,7 +121,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         return <li data-index={currentIndex + 1}
           onMouseOver={this.onMouseOver.bind(this)}
           onClick={suggestion.onClick}
-          key={suggestion.location}
+          key={`${suggestion.location}|${index + i}`}
           ref={(node) => { selected && (this.selectedElement = node) }}
           className={cx({
             selected,
@@ -322,7 +321,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // Search suggestions
     if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
-        data: this.props.suggestions.get('searchResults'),
+        data: this.props.searchResults,
         maxResults: config.urlBarSuggestions.maxSearch,
         type: suggestionTypes.SEARCH,
         clickHandler: navigateClickHandler((searchTerms) => this.props.searchDetail.get('searchURL')
@@ -340,7 +339,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   updateSuggestions (newIndex) {
-    const suggestions = this.suggestionList || this.props.suggestions.get('suggestionList')
+    const suggestions = this.suggestionList || this.props.suggestionList
     if (!suggestions) {
       return
     }
@@ -359,7 +358,7 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   searchXHR () {
     if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
-      this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
+      this.updateSuggestions(this.props.selectedIndex)
       return
     }
 
@@ -372,11 +371,11 @@ class UrlBarSuggestions extends ImmutableComponent {
       xhr.send()
       xhr.onload = () => {
         windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
-        this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
+        this.updateSuggestions(this.props.selectedIndex)
       }
     } else {
       windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
-      this.updateSuggestions(this.props.suggestions.get('selectedIndex'))
+      this.updateSuggestions(this.props.selectedIndex)
     }
   }
 }

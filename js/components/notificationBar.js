@@ -66,10 +66,6 @@ class NotificationItem extends ImmutableComponent {
 
 class NotificationBar extends ImmutableComponent {
   render () {
-    if (!this.props.notifications || !this.props.notifications.size ||
-        !this.props.activeFrame) {
-      return null
-    }
     const activeOrigin = getOrigin(this.props.activeFrame.get('location'))
     if (!activeOrigin) {
       return null

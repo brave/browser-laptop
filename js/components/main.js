@@ -799,8 +799,12 @@ class Main extends ImmutableComponent {
           </div>
         </div>
         <UpdateBar updates={this.props.appState.get('updates')} />
-        <NotificationBar notifications={this.props.appState.get('notifications')}
-          activeFrame={activeFrame} />
+        {
+          this.props.appState.get('notifications') && this.props.appState.get('notifications').size && activeFrame
+          ? <NotificationBar notifications={this.props.appState.get('notifications')}
+            activeFrame={activeFrame} />
+          : null
+        }
         {
           showBookmarksToolbar
           ? <BookmarksToolbar
@@ -838,7 +842,7 @@ class Main extends ImmutableComponent {
           frames={this.props.windowState.get('frames')}
           sites={this.props.appState.get('sites')}
           key='tab-bar'
-          activeFrame={activeFrame}
+          activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
           onMenu={this.onHamburgerMenu}
         />
       </div>
@@ -874,6 +878,18 @@ class Main extends ImmutableComponent {
               hrefPreview={frame.get('hrefPreview')}
               showOnRight={frame.get('showOnRight')}
               location={frame.get('location')}
+              isPrivate={frame.get('isPrivate')}
+              partitionNumber={frame.get('partitionNumber')}
+              activeShortcut={frame.get('activeShortcut')}
+              activeShortcutDetail={frame.get('activeShortcutDetail')}
+              provisionalLocation={frame.get('provisionalLocation')}
+              pinnedLocation={frame.get('pinnedLocation')}
+              src={frame.get('src')}
+              guestInstanceId={frame.get('guestInstanceId')}
+              tabId={frame.get('tabId')}
+              aboutDetails={frame.get('aboutDetails')}
+              unloaded={frame.get('unloaded')}
+              audioMuted={frame.get('audioMuted')}
               passwords={this.props.appState.get('passwords')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}

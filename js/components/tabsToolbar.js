@@ -8,6 +8,7 @@ const Tabs = require('./tabs')
 const Button = require('./button')
 const PinnedTabs = require('./pinnedTabs')
 const contextMenus = require('../contextMenus')
+const windowStore = require('../stores/windowStore')
 
 class TabsToolbarButtons extends ImmutableComponent {
   render () {
@@ -27,7 +28,7 @@ class TabsToolbar extends ImmutableComponent {
   }
 
   onContextMenu (e) {
-    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, undefined, undefined, e)
+    contextMenus.onTabsToolbarContextMenu(windowStore.getFrame(this.props.activeFrameKey), undefined, undefined, e)
   }
 
   render () {
@@ -45,7 +46,7 @@ class TabsToolbar extends ImmutableComponent {
         pinnedFrames.size > 0
         ? <PinnedTabs sites={this.props.sites}
           frames={this.props.frames}
-          activeFrame={this.props.activeFrame}
+          activeFrameKey={this.props.activeFrameKey}
           paintTabs={this.props.paintTabs}
           previewTabs={this.props.previewTabs}
           draggingOverData={this.props.draggingOverData}
@@ -59,7 +60,7 @@ class TabsToolbar extends ImmutableComponent {
         previewTabs={this.props.previewTabs}
         tabsPerTabPage={this.props.tabsPerTabPage}
         frames={this.props.frames}
-        activeFrame={this.props.activeFrame}
+        activeFrameKey={this.props.activeFrameKey}
         tabPageIndex={tabPageIndex}
         currentFrames={currentFrames}
         startingFrameIndex={startingFrameIndex}

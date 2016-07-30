@@ -72,10 +72,6 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
-  get searchDetail () {
-    return this.props.searchDetail
-  }
-
   // restores the url bar to the current location
   restore () {
     windowActions.setNavBarUserInput(this.props.location)
@@ -124,7 +120,7 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
-            let searchUrl = this.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
+            let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
             location = isLocationUrl ? location : searchUrl
             // do search.
             if (e.altKey) {
@@ -237,7 +233,7 @@ class UrlBar extends ImmutableComponent {
     this.updateDOM()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps) {
     this.updateDOM()
     // Select the part of the URL which was an autocomplete suffix.
     if (this.urlInput && this.props.locationValueSuffix.length > 0) {
@@ -326,7 +322,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onContextMenu (e) {
-    contextMenus.onUrlBarContextMenu(this.searchDetail, this.activeFrame, e)
+    contextMenus.onUrlBarContextMenu(this.props.searchDetail, this.activeFrame, e)
   }
 
   render () {
@@ -385,13 +381,18 @@ class UrlBar extends ImmutableComponent {
         }
 
         {
+          // TODO(for perf!): urlLocation shouldn't be passed into UrlBarSuggestions props.
+          // `urlLocation` usage should be refactored out into UrlBar.
+          // Passing it in causes uneeded extra renders for UrlBarSuggestions.
           this.shouldRenderUrlBarSuggestions
           ? <UrlBarSuggestions
             ref={(node) => { this.urlBarSuggestions = node }}
-            suggestions={this.props.urlbar.get('suggestions')}
+            selectedIndex={this.props.urlbar.getIn(['suggestions', 'selectedIndex'])}
+            suggestionList={this.props.urlbar.getIn(['suggestions', 'suggestionList'])}
+            searchResults={this.props.urlbar.getIn(['suggestions', 'searchResults'])}
             locationValueSuffix={this.props.locationValueSuffix}
             sites={this.props.sites}
-            searchDetail={this.searchDetail}
+            searchDetail={this.props.searchDetail}
             activeFrameKey={this.props.activeFrameKey}
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}

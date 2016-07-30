@@ -66,18 +66,18 @@ class Frame extends ImmutableComponent {
 
   get frameBraverySettings () {
     const frameSiteSettings =
-      siteSettings.getSiteSettingsForURL(this.props.allSiteSettings, this.frame.get('location'))
+      siteSettings.getSiteSettingsForURL(this.props.allSiteSettings, this.props.location)
     return Immutable.fromJS(siteSettings.activeSettings(frameSiteSettings,
                                                         appStoreRenderer.state,
                                                         appConfig))
   }
 
   isAboutPage () {
-    return aboutUrls.get(getBaseUrl(this.frame.get('location')))
+    return aboutUrls.get(getBaseUrl(this.props.location))
   }
 
   updateAboutDetails () {
-    let location = getBaseUrl(this.frame.get('location'))
+    let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
       this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
@@ -104,9 +104,8 @@ class Frame extends ImmutableComponent {
     }
 
     // send state to about pages
-    let aboutDetails = this.frame.get('aboutDetails')
-    if (this.isAboutPage() && aboutDetails) {
-      this.webview.send(messages.STATE_UPDATED, aboutDetails.toJS())
+    if (this.isAboutPage() && this.props.aboutDetails) {
+      this.webview.send(messages.STATE_UPDATED, this.props.aboutDetails.toJS())
     }
   }
 
@@ -116,7 +115,7 @@ class Frame extends ImmutableComponent {
   }
 
   allowRunningInsecureContent () {
-    let hack = siteHacks[urlParse(this.frame.get('location')).hostname]
+    let hack = siteHacks[urlParse(this.props.location).hostname]
     return !!(hack && hack.allowRunningInsecureContent)
   }
 
@@ -161,17 +160,16 @@ class Frame extends ImmutableComponent {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
         // allow force loading of new frames
-        this.frame.get('unloaded') === true &&
+        this.props.unloaded === true &&
         // don't lazy load about pages
-        !aboutUrls.get(getBaseUrl(this.frame.get('src'))) &&
+        !aboutUrls.get(getBaseUrl(this.props.src)) &&
         // pinned tabs don't serialize their state so the icon is lost for lazy loading
-        !this.frame.get('pinnedLocation')) {
+        !this.props.pinnedLocation) {
       return
     }
 
-    let src = this.frame.get('src')
-    let location = this.frame.get('location')
-    newSrc = newSrc || src
+    let location = this.props.location
+    newSrc = newSrc || this.props.src
 
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
@@ -180,7 +178,7 @@ class Frame extends ImmutableComponent {
     if (this.shouldCreateWebview()) {
       // only set the guestInstanceId if this is a new frame
       if (this.webview == null) {
-        guestInstanceId = this.frame.get('guestInstanceId')
+        guestInstanceId = this.props.guestInstanceId
       }
       while (this.webviewContainer.firstChild) {
         this.webviewContainer.removeChild(this.webviewContainer.firstChild)
@@ -199,7 +197,7 @@ class Frame extends ImmutableComponent {
       webviewAdded = true
     }
     this.webview.setAttribute('allowDisplayingInsecureContent', true)
-    this.webview.setAttribute('data-frame-key', this.frame.get('key'))
+    this.webview.setAttribute('data-frame-key', this.props.frameKey)
 
     const parsedUrl = urlParse(location)
     if (!appConfig.uaExceptionHosts.includes(parsedUrl.hostname)) {
@@ -243,7 +241,7 @@ class Frame extends ImmutableComponent {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
       this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
-      this.webview.setAudioMuted(this.frame.get('audioMuted') || false)
+      this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
     this.updateWebview(cb)
@@ -261,8 +259,7 @@ class Frame extends ImmutableComponent {
   zoom (zoomIn) {
     const newZoomLevel =
       zoomIn === undefined ? undefined : getNextZoomLevel(this.zoomLevel, zoomIn)
-    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel,
-                                 this.frame.get('isPrivate'))
+    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel, this.props.isPrivate)
   }
 
   zoomIn () {
@@ -278,7 +275,6 @@ class Frame extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const prevPropsFrame = windowStore.getFrame(prevProps.frameKey)
     const cb = () => {
       if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
         this.webview.setWebRTCIPHandlingPolicy(this.getWebRTCPolicy())
@@ -292,30 +288,29 @@ class Frame extends ImmutableComponent {
       }
       // make sure the webview content updates to
       // match the fullscreen state of the frame
-      if (prevPropsFrame.get('isFullScreen') !==
-         this.frame.get('isFullScreen')) {
-        if (this.frame.get('isFullScreen')) {
+      if (prevProps.isFullScreen !== this.props.isFullScreen) {
+        if (this.props.isFullScreen) {
           this.webview.executeJavaScript('document.webkitRequestFullscreen()')
         } else {
           this.webview.executeJavaScript('document.webkitExitFullscreen()')
         }
       }
-      this.webview.setAudioMuted(this.frame.get('audioMuted') || false)
+      this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
 
     // For cross-origin navigation, clear temp Flash approvals
-    const prevOrigin = siteUtil.getOrigin(prevPropsFrame.get('location'))
+    const prevOrigin = siteUtil.getOrigin(prevProps.location)
     if (this.origin !== prevOrigin) {
       this.expireFlash(prevOrigin)
     }
 
-    if (this.frame.get('src') !== prevPropsFrame.get('src')) {
+    if (this.props.src !== prevProps.src) {
       this.updateWebview(cb)
     } else if (this.shouldCreateWebview()) {
       // plugin/insecure-content allow state has changed. recreate with the current
       // location, not the src.
-      this.updateWebview(cb, this.frame.get('location'))
+      this.updateWebview(cb, this.props.location)
     } else {
       if (this.runOnDomReady) {
         // there is already a callback waiting for did-attach
@@ -329,7 +324,7 @@ class Frame extends ImmutableComponent {
   }
 
   clone (args) {
-    if (!isNavigatableAboutPage(getBaseUrl(this.frame.get('location')))) {
+    if (!isNavigatableAboutPage(getBaseUrl(this.props.location))) {
       return
     }
     const newGuest = this.webview.clone()
@@ -347,10 +342,7 @@ class Frame extends ImmutableComponent {
   }
 
   handleShortcut () {
-    const activeShortcut = this.frame.get('activeShortcut')
-    const activeShortcutDetails = this.frame.get('activeShortcutDetails')
-    const location = this.frame.get('location')
-    switch (activeShortcut) {
+    switch (this.props.activeShortcut) {
       case 'stop':
         this.webview.stop()
         break
@@ -361,9 +353,9 @@ class Frame extends ImmutableComponent {
         // Ensure that the webview thinks we're on the same location as the browser does.
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
-        // In this case both the user display and the user think they're on frame.get('location').
-        if (this.webview.getURL() !== location) {
-          this.webview.loadURL(location)
+        // In this case both the user display and the user think they're on this.props.location.
+        if (this.webview.getURL() !== this.props.location) {
+          this.webview.loadURL(this.props.location)
         } else {
           this.webview.reload()
         }
@@ -375,10 +367,10 @@ class Frame extends ImmutableComponent {
         this.webview.reloadIgnoringCache()
         break
       case 'clone':
-        this.clone(activeShortcutDetails)
+        this.clone(this.props.activeShortcutDetails)
         break
       case 'explicitLoadURL':
-        this.webview.loadURL(location)
+        this.webview.loadURL(this.props.location)
         break
       case 'zoom-in':
         this.zoomIn()
@@ -414,12 +406,12 @@ class Frame extends ImmutableComponent {
       case 'fill-password':
         let currentUrl = urlParse(this.webview.getURL())
         if (currentUrl &&
-            [currentUrl.protocol, currentUrl.host].join('//') === activeShortcutDetails.get('origin')) {
+            [currentUrl.protocol, currentUrl.host].join('//') === this.props.activeShortcutDetails.get('origin')) {
           this.webview.send(messages.GOT_PASSWORD,
-                            activeShortcutDetails.get('username'),
-                            activeShortcutDetails.get('password'),
-                            activeShortcutDetails.get('origin'),
-                            activeShortcutDetails.get('action'),
+                            this.props.activeShortcutDetails.get('username'),
+                            this.props.activeShortcutDetails.get('password'),
+                            this.props.activeShortcutDetails.get('origin'),
+                            this.props.activeShortcutDetails.get('action'),
                             true)
         }
         break
@@ -427,7 +419,7 @@ class Frame extends ImmutableComponent {
         setImmediate(() => this.webview.focus())
         break
       case 'load-non-navigatable-url':
-        this.webview.loadURL(this.frame.get('activeShortcutDetails'))
+        this.webview.loadURL(this.props.activeShortcutDetails)
         break
       case 'copy':
         let selection = window.getSelection()
@@ -444,7 +436,7 @@ class Frame extends ImmutableComponent {
         this.onFindAgain(false)
         break
     }
-    if (activeShortcut) {
+    if (this.props.activeShortcut) {
       windowActions.setActiveFrameShortcut(this.frame, null, null)
     }
   }
@@ -494,9 +486,9 @@ class Frame extends ImmutableComponent {
 
       let frameOpts = {
         location: e.url,
-        parentFrameKey: this.frame.get('key'),
-        isPrivate: this.frame.get('isPrivate'),
-        partitionNumber: this.frame.get('partitionNumber'),
+        parentFrameKey: this.props.frameKey,
+        isPrivate: this.props.isPrivate,
+        partitionNumber: this.props.partitionNumber,
         // use the delayed load url for the temporary title
         delayedLoadUrl,
         guestInstanceId
@@ -512,7 +504,7 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-attach', (e) => {
       let tabId = this.webview.getWebContents().getId()
-      if (this.frame.get('tabId') !== tabId) {
+      if (this.props.tabId !== tabId) {
         windowActions.setFrameTabId(this.frame, tabId)
       }
     })
@@ -535,7 +527,7 @@ class Frame extends ImmutableComponent {
       switch (e.channel) {
         case messages.GOT_CANVAS_FINGERPRINTING:
           method = (detail) => {
-            const description = [detail.type, detail.scriptUrl || this.frame.get('location')].join(': ')
+            const description = [detail.type, detail.scriptUrl || this.props.location].join(': ')
             windowActions.setBlockedBy(this.frame, 'fingerprintingProtection', description)
           }
           break
@@ -559,11 +551,10 @@ class Frame extends ImmutableComponent {
           break
         case messages.RELOAD:
           method = () => {
-            const location = this.frame.get('location')
-            this.reloadCounter[location] = this.reloadCounter[location] || 0
-            if (this.reloadCounter[location] < 2) {
+            this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] || 0
+            if (this.reloadCounter[this.props.location] < 2) {
               this.webview.reload()
-              this.reloadCounter[location] = this.reloadCounter[location] + 1
+              this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] + 1
             }
           }
           break
@@ -645,7 +636,7 @@ class Frame extends ImmutableComponent {
       // run Flash if it's installed.
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         if (UrlUtil.isFlashInstallUrl(e.url) &&
-            UrlUtil.shouldInterceptFlash(this.frame.get('provisionalLocation'))) {
+            UrlUtil.shouldInterceptFlash(this.props.provisionalLocation)) {
           interceptFlash(e.url)
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
@@ -655,7 +646,7 @@ class Frame extends ImmutableComponent {
         })
         if (isSecure) {
           // Check that there isn't a cert error.
-          ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.frame.get('key'))
+          ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frameKey)
         }
       }
       windowActions.updateBackForwardState(
@@ -675,10 +666,10 @@ class Frame extends ImmutableComponent {
         this.frame,
         this.webview.getURL())
 
-      const parsedUrl = urlParse(this.frame.get('location'))
+      const parsedUrl = urlParse(this.props.location)
       const protocol = parsedUrl.protocol
-      const isError = this.frame.getIn(['aboutDetails', 'errorCode'])
-      if (!this.frame.get('isPrivate') && this.frame.get('provisionalLocation') === this.frame.get('location') && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
+      const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
+      if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
         appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
@@ -725,7 +716,7 @@ class Frame extends ImmutableComponent {
     })
 
     this.webview.addEventListener('did-navigate', (e) => {
-      if (this.frame.get('findbarShown')) {
+      if (this.props.findbarShown) {
         this.onFindHide()
       }
       for (let message in this.notificationCallbacks) {
@@ -736,13 +727,13 @@ class Frame extends ImmutableComponent {
       if (this.props.isActive && this.webview.canGoBack() && document.activeElement !== this.webview) {
         this.webview.focus()
       }
-      windowActions.setNavigated(e.url, this.frame.get('key'), false)
+      windowActions.setNavigated(e.url, this.props.frameKey, false)
     })
     this.webview.addEventListener('crashed', (e) => {
       windowActions.setFrameError(this.frame, {
         event_type: 'crashed',
         title: 'unexpectedError',
-        url: this.frame.get('location')
+        url: this.props.location
       })
       windowActions.loadUrl(this.frame, 'about:error')
       this.webview = false
@@ -763,7 +754,7 @@ class Frame extends ImmutableComponent {
       loadEnd(true)
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
-      windowActions.setNavigated(e.url, this.frame.get('key'), true)
+      windowActions.setNavigated(e.url, this.props.frameKey, true)
       loadEnd(true)
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
@@ -797,8 +788,8 @@ class Frame extends ImmutableComponent {
           return
         }
         windowActions.setFindDetail(this.frame, Immutable.fromJS({
-          numberOfMatches: e.result.matches || this.frame.getIn(['findDetail', 'numberOfMatches']),
-          activeMatchOrdinal: e.result.activeMatchOrdinal || this.frame.getIn(['findDetail', 'activeMatchOrdinal'])
+          numberOfMatches: e.result.matches || this.props.get('numberOfMatches'),
+          activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.findDetail && this.props.findDetail.get('activeMatchOrdinal')
         }))
       }
     })
@@ -863,7 +854,7 @@ class Frame extends ImmutableComponent {
   }
 
   get origin () {
-    return siteUtil.getOrigin(this.frame.get('location'))
+    return siteUtil.getOrigin(this.props.location)
   }
 
   onFocus () {
@@ -874,12 +865,12 @@ class Frame extends ImmutableComponent {
   }
 
   onFindAgain (forward) {
-    if (!this.frame.get('findbarShown')) {
+    if (!this.props.findbarShown) {
       windowActions.setFindbarShown(this.frame, true)
     }
-    const searchString = this.frame.getIn(['findDetail', 'searchString'])
+    const searchString = this.props.findDetail && this.props.findDetail.get('searchString')
     if (searchString) {
-      this.onFind(searchString, this.frame.getIn(['findDetail', 'caseSensitivity']), forward)
+      this.onFind(searchString, this.props.findDetail && this.props.findDetail.get('caseSensitivity') || undefined, forward)
     }
   }
 
