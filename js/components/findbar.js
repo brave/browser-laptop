@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const keyCodes = require('../constants/keyCodes')
 const Button = require('./button.js')
 const windowActions = require('../actions/windowActions')
+const windowStore = require('../stores/windowStore')
 
 class FindBar extends ImmutableComponent {
   constructor () {
@@ -20,15 +21,19 @@ class FindBar extends ImmutableComponent {
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
   }
 
+  get frame () {
+    return windowStore.getFrame(this.props.frameKey)
+  }
+
   onChange (e) {
-    windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.frame, Immutable.fromJS({
       searchString: e.target.value,
       caseSensitivity: this.isCaseSensitive
     }))
   }
 
   onCaseSensitivityChange (e) {
-    windowActions.setFindDetail(this.props.frame, Immutable.fromJS({
+    windowActions.setFindDetail(this.frame, Immutable.fromJS({
       searchString: this.searchString,
       caseSensitivity: e.target.checked
     }))
@@ -89,7 +94,7 @@ class FindBar extends ImmutableComponent {
   }
 
   onBlur (e) {
-    windowActions.setFindbarSelected(this.props.frame, false)
+    windowActions.setFindbarSelected(this.frame, false)
   }
 
   get numberOfMatches () {

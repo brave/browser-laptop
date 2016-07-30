@@ -57,6 +57,7 @@ const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
 const currentWindow = require('../../app/renderer/currentWindow')
+const emptyMap = new Immutable.Map()
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -669,7 +670,6 @@ class Main extends ImmutableComponent {
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
-    const braveryDefaults = siteSettings.braveryDefaults(this.props.appState, appConfig)
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
@@ -796,7 +796,7 @@ class Main extends ImmutableComponent {
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
             shouldAllowWindowDrag={shouldAllowWindowDrag}
-            activeFrameKey={activeFrame.get('key')}
+            activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
             windowWidth={this.props.appState.get('defaultWindowWidth')}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
             sites={this.props.appState.get('sites')} />
@@ -839,28 +839,33 @@ class Main extends ImmutableComponent {
               ref={(node) => { this.frames[frame.get('key')] = node }}
               prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
               onCloseFrame={this.onCloseFrame}
-              braveryDefaults={braveryDefaults}
-              frame={frame}
+              frameKey={frame.get('key')}
               key={frame.get('key')}
               settings={getBaseUrl(frame.get('location')) === 'about:preferences'
-                ? this.props.appState.get('settings') || new Immutable.Map()
+                ? this.props.appState.get('settings') || emptyMap
                 : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')
-                      .includes(siteTags.BOOKMARK)) || new Immutable.Map()
+                      .includes(siteTags.BOOKMARK)) || emptyMap
                 : null}
-              downloads={this.props.appState.get('downloads') || new Immutable.Map()}
+              downloads={this.props.appState.get('downloads') || emptyMap}
               bookmarkFolders={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')
-                      .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
+                      .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
                 : null}
+              isFullScreen={frame.get('isFullScreen') && frame.get('showFullScreenWarning')}
+              findbarShown={frame.get('findbarShown')}
+              findbarSelected={frame.get('findbarSelected')}
+              findDetail={frame.get('findDetail')}
+              hrefPreview={frame.get('hrefPreview')}
+              showOnRight={frame.get('showOnRight')}
+              location={frame.get('location')}
               passwords={this.props.appState.get('passwords')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
-              frameBraverySettings={this.frameBraverySettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
