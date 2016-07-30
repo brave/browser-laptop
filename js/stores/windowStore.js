@@ -108,8 +108,20 @@ class WindowStore extends EventEmitter {
     return windowState
   }
 
+  get state () {
+    return windowState
+  }
+
+  getFrames () {
+    return this.state.get('frames')
+  }
+
+  getFrame (key) {
+    return FrameStateUtil.getFrameByKey(windowState, key)
+  }
+
   getFrameCount () {
-    return windowState.get('frames').size
+    return this.state.get('frames').size
   }
 
   emitChanges () {

@@ -67,13 +67,18 @@ class PinnedTabs extends ImmutableComponent {
               <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
                 ref={(node) => this.tabRefs.push(node)}
                 draggingOverData={this.props.draggingOverData}
-                frameProps={frameProps}
-                frames={this.props.frames}
+                themeColor={frameProps.get('themeColor') || frameProps.get('computedThemeColor')}
+                icon={frameProps.get('icon')}
+                audioPlaybackActive={frameProps.get('audioPlaybackActive')}
+                audioMuted={frameProps.get('audioMuted')}
+                title={frameProps.get('title')}
+                isPrivate={frameProps.get('isPrivate')}
+                partitionNumber={frameProps.get('partitionNumber')}
+                frameKey={frameProps.get('key')}
                 key={'tab-' + frameProps.get('key')}
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
                 isActive={this.props.activeFrame === frameProps}
-                isPrivate={frameProps.get('isPrivate')}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
       }
     </div>

@@ -14,22 +14,26 @@ const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 const contextMenus = require('../contextMenus')
 const dnd = require('../dnd')
+const windowStore = require('../stores/windowStore')
 
 class Tab extends ImmutableComponent {
+  get frame () {
+    return windowStore.getFrame(this.props.frameKey)
+  }
   get isPinned () {
-    return !!this.props.frameProps.get('pinnedLocation')
+    return !!this.frame.get('pinnedLocation')
   }
 
   get draggingOverData () {
     if (!this.props.draggingOverData ||
-        this.props.draggingOverData.get('dragOverKey') !== this.props.frameProps.get('key')) {
+        this.props.draggingOverData.get('dragOverKey') !== this.props.frameKey) {
       return
     }
 
     const sourceDragData = dnd.getInProcessDragData()
     const location = sourceDragData.get('location')
     const key = this.props.draggingOverData.get('dragOverKey')
-    const draggingOverFrame = this.props.frames.get(key)
+    const draggingOverFrame = windowStore.getFrame(key)
     if ((location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) &&
         (draggingOverFrame && draggingOverFrame.get('pinnedLocation'))) {
       return
@@ -40,7 +44,7 @@ class Tab extends ImmutableComponent {
 
   get isDragging () {
     const sourceDragData = dnd.getInProcessDragData()
-    return sourceDragData && this.props.frameProps.get('key') === sourceDragData.get('key')
+    return sourceDragData && this.props.frameKey === sourceDragData.get('key')
   }
 
   get isDraggingOverLeft () {
@@ -61,41 +65,41 @@ class Tab extends ImmutableComponent {
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
-    return (this.props.frameProps.get('title') ||
-      this.props.frameProps.get('location')).replace('▶ ', '')
+    return (this.frame.get('title') ||
+      this.frame.get('location')).replace('▶ ', '')
   }
 
   onDragStart (e) {
-    dnd.onDragStart(dragTypes.TAB, this.props.frameProps, e)
+    dnd.onDragStart(dragTypes.TAB, this.frame, e)
   }
 
   onDragEnd (e) {
-    dnd.onDragEnd(dragTypes.TAB, this.props.frameProps, e)
+    dnd.onDragEnd(dragTypes.TAB, this.frame, e)
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tab.getBoundingClientRect(), this.props.frameProps.get('key'), this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tab.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
   }
 
   setActiveFrame () {
-    windowActions.setActiveFrame(this.props.frameProps)
+    windowActions.setActiveFrame(this.frame)
   }
 
   onCloseFrame (event) {
     event.stopPropagation()
-    windowActions.closeFrame(this.props.frames, this.props.frameProps)
+    windowActions.closeFrame(windowStore.getFrames(), this.frame)
   }
 
   onMuteFrame (muted, event) {
     event.stopPropagation()
-    windowActions.setAudioMuted(this.props.frameProps, muted)
+    windowActions.setAudioMuted(this.frame, muted)
   }
 
   get loading () {
-    return this.props.frameProps &&
-    this.props.frameProps.get('loading') &&
-    (!this.props.frameProps.get('provisionalLocation') ||
-    !this.props.frameProps.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
+    return this.frame &&
+    this.frame.get('loading') &&
+    (!this.frame.get('provisionalLocation') ||
+    !this.frame.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
   }
 
   onMouseLeave () {
@@ -111,7 +115,8 @@ class Tab extends ImmutableComponent {
 
     // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
     // as reported here: https://github.com/brave/browser-laptop/issues/1434
-    this.hoverTimeout = window.setTimeout(windowActions.setPreviewFrame.bind(null, this.props.frameProps), previewMode ? 0 : 200)
+    this.hoverTimeout =
+      window.setTimeout(windowActions.setPreviewFrame.bind(null, this.frame), previewMode ? 0 : 200)
   }
 
   onClickTab (e) {
@@ -131,8 +136,7 @@ class Tab extends ImmutableComponent {
       width: iconSize
     }
     const activeTabStyle = {}
-    const backgroundColor = this.props.paintTabs &&
-      (this.props.frameProps.get('themeColor') || this.props.frameProps.get('computedThemeColor'))
+    const backgroundColor = this.props.paintTabs && this.props.themeColor
     if (this.props.isActive && backgroundColor) {
       activeTabStyle.background = backgroundColor
       const textColor = getTextColorForBackground(backgroundColor)
@@ -142,7 +146,7 @@ class Tab extends ImmutableComponent {
       }
     }
 
-    const icon = this.props.frameProps.get('icon')
+    const icon = this.props.icon
     if (!this.loading && icon) {
       iconStyle = Object.assign(iconStyle, {
         backgroundImage: `url(${icon})`,
@@ -152,17 +156,16 @@ class Tab extends ImmutableComponent {
     }
 
     let playIcon = null
-    if (this.props.frameProps.get('audioPlaybackActive') ||
-      this.props.frameProps.get('audioMuted')) {
+    if (this.props.audioPlaybackActive || this.propsaudioMuted) {
       playIcon = <span className={cx({
         audioPlaybackActive: true,
         fa: true,
-        'fa-volume-up': this.props.frameProps.get('audioPlaybackActive') &&
-          !this.props.frameProps.get('audioMuted'),
-        'fa-volume-off': this.props.frameProps.get('audioPlaybackActive') &&
-          this.props.frameProps.get('audioMuted')
+        'fa-volume-up': this.props.audioPlaybackActive &&
+          !this.props.audioMuted,
+        'fa-volume-off': this.props.audioPlaybackActive &&
+          this.props.audioMuted
       })}
-        onClick={this.onMuteFrame.bind(this, !this.props.frameProps.get('audioMuted'))} />
+        onClick={this.onMuteFrame.bind(this, !this.props.audioMuted)} />
     }
 
     return <div
@@ -182,24 +185,24 @@ class Tab extends ImmutableComponent {
         active: this.props.isActive,
         private: this.props.isPrivate
       })}
-        data-frame-key={this.props.frameProps.get('key')}
+        data-frame-key={this.props.frameKey}
         ref={(node) => { this.tab = node }}
         draggable
-        title={this.props.frameProps.get('title')}
+        title={this.props.title}
         onDragStart={this.onDragStart.bind(this)}
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
         onClick={this.onClickTab.bind(this)}
-        onContextMenu={contextMenus.onTabContextMenu.bind(this, this.props.frameProps)}
+        onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
         style={activeTabStyle}>
         {
-          this.props.frameProps.get('isPrivate')
+          this.props.isPrivate
           ? <div className='privateIcon fa fa-eye' />
           : null
         }
         {
-          this.props.frameProps.get('partitionNumber')
-          ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.frameProps.get('partitionNumber') })}
+          this.props.partitionNumber
+          ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.partitionNumber })}
             data-l10n-id='sessionInfoTab'
             className='privateIcon fa fa-user' />
           : null

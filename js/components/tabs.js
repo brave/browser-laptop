@@ -116,13 +116,18 @@ class Tabs extends ImmutableComponent {
             .map((frameProps) =>
               <Tab ref={(node) => this.tabRefs.push(node)}
                 draggingOverData={this.props.draggingOverData}
-                frameProps={frameProps}
-                frames={this.props.frames}
+                frameKey={frameProps.get('key')}
+                themeColor={frameProps.get('themeColor') || frameProps.get('computedThemeColor')}
+                icon={frameProps.get('icon')}
+                audioPlaybackActive={frameProps.get('audioPlaybackActive')}
+                audioMuted={frameProps.get('audioMuted')}
+                title={frameProps.get('title')}
+                isPrivate={frameProps.get('isPrivate')}
+                partitionNumber={frameProps.get('partitionNumber')}
                 key={'tab-' + frameProps.get('key')}
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
                 isActive={this.props.activeFrame === frameProps}
-                isPrivate={frameProps.get('isPrivate')}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
         }
         {(() => {
