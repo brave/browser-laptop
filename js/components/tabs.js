@@ -11,8 +11,6 @@ const windowActions = require('../actions/windowActions')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
 
-const FrameStateUtil = require('../state/frameStateUtil')
-
 const Button = require('./button')
 const Tab = require('./tab')
 const dnd = require('../dnd')
@@ -25,10 +23,6 @@ class Tabs extends ImmutableComponent {
     this.onDrop = this.onDrop.bind(this)
     this.onPrevPage = this.onPrevPage.bind(this)
     this.onNextPage = this.onNextPage.bind(this)
-  }
-
-  get activeFrameIndex () {
-    return FrameStateUtil.getFramePropsIndex(this.props.frames, this.props.activeFrame)
   }
 
   onPrevPage () {
