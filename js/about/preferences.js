@@ -191,14 +191,14 @@ class SearchEntry extends ImmutableComponent {
     return <div>
       <span style={this.props.iconStyle}>
       </span>
-      <span style={this.props.textStyle}>{this.props.name}</span>
+      <span style={{paddingLeft: '5px', verticalAlign: 'middle'}}>{this.props.name}</span>
     </div>
   }
 }
 
 class SearchShortcutEntry extends ImmutableComponent {
   render () {
-    return <div style={this.props.textStyle}>
+    return <div style={{paddingLeft: '5px', verticalAlign: 'middle'}}>
       {this.props.shortcut}
     </div>
   }
@@ -219,14 +219,10 @@ class SearchTab extends ImmutableComponent {
         display: 'inline-block',
         verticalAlign: 'middle'
       }
-      let textStyle = {
-        paddingLeft: '5px',
-        verticalAlign: 'middle'
-      }
       array.push([<SearchSelectEntry name={entry.name} settings={this.props.settings} />,
-        <SearchEntry name={entry.name} iconStyle={iconStyle} textStyle={textStyle}
+        <SearchEntry name={entry.name} iconStyle={iconStyle}
           onChangeSetting={this.props.onChangeSetting} />,
-        <SearchShortcutEntry shortcut={entry.shortcut} textStyle={textStyle} />])
+        <SearchShortcutEntry shortcut={entry.shortcut} />])
     })
     return array
   }
@@ -238,10 +234,8 @@ class SearchTab extends ImmutableComponent {
   render () {
     return <div>
       <div className='sectionTitle' data-l10n-id='searchSettings' />
-      <SettingItem dataL10nId='defaultSearchEngine'>
-        <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
-          isHover hoverCallback={this.hoverCallback.bind(this)} />
-      </SettingItem>
+      <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
+        isHover hoverCallback={this.hoverCallback.bind(this)} />
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showHistoryMatches' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

@@ -463,7 +463,6 @@ describe('navigationBar', function () {
   describe('search engine go key', function () {
     Brave.beforeAll(this)
     const entries = searchProviders.providers
-    const searchTerm = ' brave'
 
     before(function * () {
       yield setup(this.app.client)
@@ -480,12 +479,12 @@ describe('navigationBar', function () {
           // escape
           yield this.app.client.ipcSend('shortcut-active-frame-stop')
           // type go key
-          yield this.app.client.keys(entry.shortcut + searchTerm)
+          yield this.app.client.keys(entry.shortcut + ' ')
         })
 
         it('sets the value', function * () {
           yield this.app.client.waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === entry.shortcut + searchTerm)
+            return this.getValue(urlInput).then((val) => val === entry.shortcut)
           })
         })
 

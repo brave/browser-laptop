@@ -21,7 +21,8 @@ const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 const windowStore = require('../stores/windowStore')
-const searchProviders = require('../data/searchProviders')
+var searchProviders = require('../data/searchProviders')
+const searchIconSize = 16
 
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -36,7 +37,7 @@ class UrlBar extends ImmutableComponent {
     this.onChange = this.onChange.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.searchFaviconStyle = null
+    this.activateSearchEngine = false
     this.searchSelectEntry = null
   }
 
@@ -124,13 +125,10 @@ class UrlBar extends ImmutableComponent {
             this.urlBarSuggestions.clickSelected(e)
           } else {
             let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
-            if (this.searchSelectEntry !== null && !isLocationUrl) {
-              const searchRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' .*', 'g')
-              if (searchRE.test(location)) {
-                const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
-                location = location.replace(replaceRE, '')
-                searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
-              }
+            if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
+              const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
+              location = location.replace(replaceRE, '')
+              searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
             }
             location = isLocationUrl ? location : searchUrl
             // do search.
@@ -145,8 +143,7 @@ class UrlBar extends ImmutableComponent {
           // this can't go through appActions for some reason
           // or the whole window will reload on the first page request
           this.updateDOMInputFocus(false)
-          this.searchFaviconStyle = null
-          this.searchSelectEntry = null
+          this.clearSearchEngine()
         }
         break
       case KeyCodes.UP:
@@ -169,8 +166,7 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.ESC:
         e.preventDefault()
         ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_STOP)
-        this.searchFaviconStyle = null
-        this.searchSelectEntry = null
+        this.clearSearchEngine()
         break
       case KeyCodes.DELETE:
         if (e.shiftKey) {
@@ -208,6 +204,7 @@ class UrlBar extends ImmutableComponent {
     // On blur, a user expects the text shown from the last autocomplete suffix
     // to be auto entered as the new location.
     this.updateLocationToSuggestion()
+    this.clearSearchEngine()
   }
 
   updateLocationToSuggestion () {
@@ -216,26 +213,16 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
-  onChange (e) {
-    windowActions.setUrlBarSelected(false)
-    windowActions.setUrlBarActive(true)
-    windowActions.setNavBarUserInput(e.target.value)
-    let location = this.props.urlbar.get('location')
+  detectSearchEngine (input) {
+    let location = input || this.props.urlbar.get('location')
     if (location !== null && location.length !== 0) {
       const isLocationUrl = isUrl(location)
-      if (!isLocationUrl) {
+      if (!isLocationUrl &&
+        !(this.searchSelectEntry && location.startsWith(this.searchSelectEntry.shortcut + ' '))) {
         let entries = searchProviders.providers
         entries.forEach((entry) => {
-          const searchRE = new RegExp('^' + entry.shortcut + ' .*', 'g')
-          if (searchRE.test(location)) {
-            const iconSize = 16
-            this.searchFaviconStyle = {
-              backgroundImage: `url(${entry.image})`,
-              minWidth: iconSize,
-              width: iconSize,
-              backgroundSize: iconSize,
-              height: iconSize
-            }
+          if (location.startsWith(entry.shortcut + ' ')) {
+            this.activateSearchEngine = true
             this.searchSelectEntry = entry
             return false
           }
@@ -244,8 +231,21 @@ class UrlBar extends ImmutableComponent {
     }
   }
 
+  clearSearchEngine () {
+    this.activateSearchEngine = false
+    this.searchSelectEntry = null
+  }
+
+  onChange (e) {
+    windowActions.setUrlBarSelected(false)
+    windowActions.setUrlBarActive(true)
+    windowActions.setNavBarUserInput(e.target.value)
+    this.detectSearchEngine(e.target.value)
+  }
+
   onFocus (e) {
     windowActions.setUrlBarSelected(true)
+    this.detectSearchEngine()
   }
 
   onActiveFrameStop () {
@@ -374,13 +374,23 @@ class UrlBar extends ImmutableComponent {
         onClick={this.onSiteInfo}
         className={cx({
           urlbarIcon: true,
-          'fa': !this.searchFaviconStyle,
-          'fa-lock': !this.searchFaviconStyle && this.isHTTPPage && this.isSecure && !this.props.urlbar.get('active'),
-          'fa-unlock-alt': !this.searchFaviconStyle && this.isHTTPPage && !this.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode,
-          'fa fa-file': !this.searchFaviconStyle && this.props.urlbar.get('active') && this.props.loading === false,
+          'fa': !this.activateSearchEngine,
+          'fa-lock': !this.activateSearchEngine && this.isHTTPPage && this.isSecure && !this.props.urlbar.get('active'),
+          'fa-unlock-alt': !this.activateSearchEngine && this.isHTTPPage && !this.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode,
+          'fa fa-file': !this.activateSearchEngine && this.props.urlbar.get('active') && this.props.loading === false,
           extendedValidation: this.extendedValidationSSL
         })}
-        style={this.searchFaviconStyle} />
+        style={
+          this.activateSearchEngine
+          ? {
+            backgroundImage: `url(${this.searchSelectEntry['image-url']})`,
+            minWidth: searchIconSize,
+            width: searchIconSize,
+            backgroundSize: searchIconSize,
+            height: searchIconSize,
+            marginTop: '3px'
+          } : {}
+        } />
         {
           this.props.titleMode
           ? <div id='titleBar'>
