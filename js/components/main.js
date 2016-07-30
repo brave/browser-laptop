@@ -838,8 +838,8 @@ class Main extends ImmutableComponent {
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}
-          tabs={this.props.windowState.getIn(['ui', 'tabs'])}
-          frames={this.props.windowState.get('frames')}
+          tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
+          tabs={this.props.windowState.get('tabs')}
           sites={this.props.appState.get('sites')}
           key='tab-bar'
           activeFrameKey={activeFrame && activeFrame.get('key') || undefined}

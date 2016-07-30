@@ -18,15 +18,15 @@ const windowStore = require('../stores/windowStore')
 
 class Tab extends ImmutableComponent {
   get frame () {
-    return windowStore.getFrame(this.props.frameKey)
+    return windowStore.getFrame(this.props.tab.get('frameKey'))
   }
   get isPinned () {
-    return !!this.frame.get('pinnedLocation')
+    return !!this.props.tab.get('pinnedLocation')
   }
 
   get draggingOverData () {
     if (!this.props.draggingOverData ||
-        this.props.draggingOverData.get('dragOverKey') !== this.props.frameKey) {
+        this.props.draggingOverData.get('dragOverKey') !== this.props.tab.get('frameKey')) {
       return
     }
 
@@ -44,7 +44,7 @@ class Tab extends ImmutableComponent {
 
   get isDragging () {
     const sourceDragData = dnd.getInProcessDragData()
-    return sourceDragData && this.props.frameKey === sourceDragData.get('key')
+    return sourceDragData && this.props.tab.get('frameKey') === sourceDragData.get('key')
   }
 
   get isDraggingOverLeft () {
@@ -65,8 +65,8 @@ class Tab extends ImmutableComponent {
     // YouTube tries to change the title to add a play icon when
     // there is audio. Since we have our own audio indicator we get
     // rid of it.
-    return (this.frame.get('title') ||
-      this.frame.get('location')).replace('▶ ', '')
+    return (this.props.tab.get('title') ||
+      this.props.tab.get('location')).replace('▶ ', '')
   }
 
   onDragStart (e) {
@@ -78,7 +78,7 @@ class Tab extends ImmutableComponent {
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tab.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tab.get('frameKey'), this.draggingOverData, e)
   }
 
   setActiveFrame () {
@@ -97,9 +97,9 @@ class Tab extends ImmutableComponent {
 
   get loading () {
     return this.frame &&
-    this.frame.get('loading') &&
-    (!this.frame.get('provisionalLocation') ||
-    !this.frame.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
+    this.props.tab.get('loading') &&
+    (!this.props.tab.get('provisionalLocation') ||
+    !this.props.tab.get('provisionalLocation').startsWith('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/'))
   }
 
   onMouseLeave () {
@@ -136,7 +136,7 @@ class Tab extends ImmutableComponent {
       width: iconSize
     }
     const activeTabStyle = {}
-    const backgroundColor = this.props.paintTabs && this.props.themeColor
+    const backgroundColor = this.props.paintTabs && (this.props.tab.get('themeColor') || this.props.tab.get('computedThemeColor'))
     if (this.props.isActive && backgroundColor) {
       activeTabStyle.background = backgroundColor
       const textColor = getTextColorForBackground(backgroundColor)
@@ -146,7 +146,7 @@ class Tab extends ImmutableComponent {
       }
     }
 
-    const icon = this.props.icon
+    const icon = this.props.tab.get('icon')
     if (!this.loading && icon) {
       iconStyle = Object.assign(iconStyle, {
         backgroundImage: `url(${icon})`,
@@ -156,16 +156,16 @@ class Tab extends ImmutableComponent {
     }
 
     let playIcon = null
-    if (this.props.audioPlaybackActive || this.propsaudioMuted) {
+    if (this.props.tab.get('audioPlaybackActive') || this.props.tab.get('audioMuted')) {
       playIcon = <span className={cx({
         audioPlaybackActive: true,
         fa: true,
-        'fa-volume-up': this.props.audioPlaybackActive &&
-          !this.props.audioMuted,
-        'fa-volume-off': this.props.audioPlaybackActive &&
-          this.props.audioMuted
+        'fa-volume-up': this.props.tab.get('audioPlaybackActive') &&
+          !this.props.tab.get('audioMuted'),
+        'fa-volume-off': this.props.tab.get('audioPlaybackActive') &&
+          this.props.tab.get('audioMuted')
       })}
-        onClick={this.onMuteFrame.bind(this, !this.props.audioMuted)} />
+        onClick={this.onMuteFrame.bind(this, !this.props.tab.get('audioMuted'))} />
     }
 
     return <div
@@ -183,12 +183,12 @@ class Tab extends ImmutableComponent {
         tab: true,
         isPinned: this.isPinned,
         active: this.props.isActive,
-        private: this.props.isPrivate
+        private: this.props.tab.get('isPrivate')
       })}
-        data-frame-key={this.props.frameKey}
-        ref={(node) => { this.tab = node }}
+        data-frame-key={this.props.tab.get('frameKey')}
+        ref={(node) => { this.tabNode = node }}
         draggable
-        title={this.props.title}
+        title={this.props.tab.get('title')}
         onDragStart={this.onDragStart.bind(this)}
         onDragEnd={this.onDragEnd.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
@@ -196,13 +196,13 @@ class Tab extends ImmutableComponent {
         onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
         style={activeTabStyle}>
         {
-          this.props.isPrivate
+          this.props.tab.get('isPrivate')
           ? <div className='privateIcon fa fa-eye' />
           : null
         }
         {
-          this.props.partitionNumber
-          ? <div data-l10n-args={JSON.stringify({ partitionNumber: this.props.partitionNumber })}
+          this.props.tab.get('partitionNumber')
+          ? <div data-l10n-args={JSON.stringify({partitionNumber: this.props.tab.get('partitionNumber')})}
             data-l10n-id='sessionInfoTab'
             className='privateIcon fa fa-user' />
           : null

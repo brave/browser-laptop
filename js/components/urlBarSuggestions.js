@@ -28,6 +28,10 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.searchXHR = debounce(this.searchXHR.bind(this), 50)
   }
 
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
+  }
+
   get activeIndex () {
     if (this.props.suggestionList === null) {
       return 0
@@ -199,7 +203,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         e.preventDefault()
         windowActions.setNavBarFocused(true)
       } else {
-        windowActions.loadUrl(this.props.activeFrameProps, location)
+        windowActions.loadUrl(this.activeFrame, location)
         windowActions.setUrlBarActive(false)
         this.blur()
       }

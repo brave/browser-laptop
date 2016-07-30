@@ -201,6 +201,9 @@ class BookmarksToolbar extends ImmutableComponent {
     this.clickBookmarkItem = this.clickBookmarkItem.bind(this)
     this.showBookmarkFolderMenu = this.showBookmarkFolderMenu.bind(this)
   }
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
+  }
   onDrop (e) {
     e.preventDefault()
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
@@ -355,6 +358,7 @@ class BookmarksToolbar extends ImmutableComponent {
           <BookmarkToolbarButton
             ref={(node) => this.bookmarkRefs.push(node)}
             contextMenuDetail={this.props.contextMenuDetail}
+            activeFrameKey={this.props.activeFrameKey}
             draggingOverData={this.props.draggingOverData}
             openContextMenu={this.openContextMenu}
             clickBookmarkItem={this.clickBookmarkItem}

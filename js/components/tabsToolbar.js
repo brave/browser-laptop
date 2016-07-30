@@ -32,42 +32,39 @@ class TabsToolbar extends ImmutableComponent {
   }
 
   render () {
-    const tabPageIndex = this.props.tabs.get('tabPageIndex')
-    const startingFrameIndex = tabPageIndex * this.props.tabsPerTabPage
-    const pinnedFrames = this.props.frames
-      .filter((frame) => frame.get('pinnedLocation'))
-    const currentFrames = this.props.frames
-      .filter((frame) => !frame.get('pinnedLocation'))
+    const startingFrameIndex = this.props.tabPageIndex * this.props.tabsPerTabPage
+    const pinnedTabs = this.props.tabs.filter((tab) => tab.get('pinnedLocation'))
+    const unpinnedTabs = this.props.tabs.filter((tab) => !tab.get('pinnedLocation'))
+    const currentTabs = unpinnedTabs
       .slice(startingFrameIndex, startingFrameIndex + this.props.tabsPerTabPage)
-
     return <div className='tabsToolbar'
       onContextMenu={this.onContextMenu}>
       {
-        pinnedFrames.size > 0
+        pinnedTabs.size > 0
         ? <PinnedTabs sites={this.props.sites}
-          frames={this.props.frames}
           activeFrameKey={this.props.activeFrameKey}
           paintTabs={this.props.paintTabs}
           previewTabs={this.props.previewTabs}
           draggingOverData={this.props.draggingOverData}
-          tabs={this.props.tabs} />
+          tabPageIndex={this.props.tabPageIndex}
+          pinnedTabs={pinnedTabs}
+          />
         : null
       }
-      <Tabs tabs={this.props.tabs}
+      <Tabs tabs={unpinnedTabs}
         shouldAllowWindowDrag={this.props.shouldAllowWindowDrag}
         draggingOverData={this.props.draggingOverData}
         paintTabs={this.props.paintTabs}
         previewTabs={this.props.previewTabs}
         tabsPerTabPage={this.props.tabsPerTabPage}
-        frames={this.props.frames}
         activeFrameKey={this.props.activeFrameKey}
-        tabPageIndex={tabPageIndex}
-        currentFrames={currentFrames}
+        tabPageIndex={this.props.tabPageIndex}
+        currentTabs={currentTabs}
         startingFrameIndex={startingFrameIndex}
-        partOfFullPageSet={currentFrames.size === this.props.tabsPerTabPage}
+        partOfFullPageSet={currentTabs.size === this.props.tabsPerTabPage}
       />
       <TabsToolbarButtons
-        noFrames={currentFrames.size === 0}
+        noFrames={currentTabs.size === 0}
         onMenu={this.props.onMenu} />
     </div>
   }

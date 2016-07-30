@@ -8,6 +8,7 @@ const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 
 const windowActions = require('../actions/windowActions')
+const windowStore = require('../stores/windowStore')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
 
@@ -26,23 +27,21 @@ class Tabs extends ImmutableComponent {
   }
 
   onPrevPage () {
-    if (this.props.tabs.get('tabPageIndex') === 0) {
+    if (this.props.tabPageIndex === 0) {
       return
     }
-    windowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') - 1)
+    windowActions.setTabPageIndex(this.props.tabPageIndex - 1)
   }
 
   onNextPage () {
-    if (this.props.tabs.get('tabPageIndex') + 1 === this.totalPages) {
+    if (this.props.tabPageIndex + 1 === this.totalPages) {
       return
     }
-    windowActions.setTabPageIndex(this.props.tabs.get('tabPageIndex') + 1)
+    windowActions.setTabPageIndex(this.props.tabPageIndex + 1)
   }
 
   get totalPages () {
-    return Math.ceil(this.props.frames
-        .filter((frame) => !frame.get('pinnedLocation'))
-        .size / this.props.tabsPerTabPage)
+    return Math.ceil(this.props.tabs.size / this.props.tabsPerTabPage)
   }
 
   onDrop (e) {
@@ -53,10 +52,10 @@ class Tabs extends ImmutableComponent {
       // will cause the onDragEnd to never run
       setTimeout(() => {
         const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((tab) => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
+        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.tab.get('frameKey') !== key), clientX).selectedRef
         if (droppedOnTab) {
           const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-          const droppedOnFrameProps = this.props.frames.find((frame) => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+          const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.tab.get('frameKey'))
           windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
           if (sourceDragData.get('pinnedLocation')) {
             windowActions.setPinned(sourceDragData, false)
@@ -105,27 +104,19 @@ class Tabs extends ImmutableComponent {
           }
         })()}
         {
-          this.props.currentFrames
-            .filter((frameProps) => !frameProps.get('pinnedLocation'))
-            .map((frameProps) =>
+          this.props.currentTabs
+            .map((tab) =>
               <Tab ref={(node) => this.tabRefs.push(node)}
                 draggingOverData={this.props.draggingOverData}
-                frameKey={frameProps.get('key')}
-                themeColor={frameProps.get('themeColor') || frameProps.get('computedThemeColor')}
-                icon={frameProps.get('icon')}
-                audioPlaybackActive={frameProps.get('audioPlaybackActive')}
-                audioMuted={frameProps.get('audioMuted')}
-                title={frameProps.get('title')}
-                isPrivate={frameProps.get('isPrivate')}
-                partitionNumber={frameProps.get('partitionNumber')}
-                key={'tab-' + frameProps.get('key')}
+                tab={tab}
+                key={'tab-' + tab.get('frameKey')}
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
-                isActive={this.props.activeFrameKey === frameProps.get('key')}
+                isActive={this.props.activeFrameKey === tab.get('frameKey')}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
         }
         {(() => {
-          if (this.props.currentFrames.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
+          if (this.props.currentTabs.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
             return <span
               className='nextTab fa fa-caret-right'
               onClick={this.onNextPage} />

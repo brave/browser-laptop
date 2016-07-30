@@ -243,10 +243,48 @@ function cloneFrame (frameOpts, guestInstanceId) {
 }
 
 /**
+ * Returns an object in the same format that was passed to it (ImmutableJS/POD)
+ * for the subset of frame data that is used for tabs.
+ */
+const tabFromFrame = (frame) => {
+  return frame.toJS
+  ? Immutable.fromJS({
+    themeColor: frame.get('themeColor'),
+    computedThemeColor: frame.get('computedThemeColor'),
+    icon: frame.get('icon'),
+    audioPlaybackActive: frame.get('audioPlaybackActive'),
+    audioMuted: frame.get('audioMuted'),
+    title: frame.get('title'),
+    isPrivate: frame.get('isPrivate'),
+    partitionNumber: frame.get('partitionNumber'),
+    frameKey: frame.get('key'),
+    loading: frame.get('loading'),
+    provisionalLocation: frame.get('provisionalLocation'),
+    pinnedLocation: frame.get('pinnedLocation'),
+    location: frame.get('location')
+  })
+  : {
+    themeColor: frame.themeColor,
+    computedThemeColor: frame.computedThemeColor,
+    icon: frame.icon,
+    audioPlaybackActive: frame.audioPlaybackActive,
+    audioMuted: frame.audioMuted,
+    title: frame.title,
+    isPrivate: frame.isPrivate,
+    partitionNumber: frame.partitionNumber,
+    frameKey: frame.key,
+    loading: frame.loading,
+    provisionalLocation: frame.provisionalLocation,
+    pinnedLocation: frame.pinnedLocation,
+    location: frame.location
+  }
+}
+
+/**
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
+function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrameKey) {
   const url = frameOpts.location || config.defaultUrl
 
   // delayedLoadUrl is used as a placeholder when the new frame is created
@@ -331,6 +369,7 @@ function addFrame (frames, frameOpts, newKey, partitionNumber, activeFrameKey) {
   }
 
   return {
+    tabs: tabs.splice(insertionIndex, 0, tabFromFrame(frame)),
     frames: frames.splice(insertionIndex, 0, frame),
     activeFrameKey
   }
@@ -348,6 +387,7 @@ function undoCloseFrame (windowState, closedFrames) {
   const insertIndex = closedFrame.get('closedAtIndex')
   return {
     closedFrames: closedFrames.pop(),
+    tabs: windowState.get('tabs').splice(insertIndex, 0, tabFromFrame(closedFrame)),
     frames: windowState.get('frames').splice(insertIndex, 0,
           closedFrame
           .delete('guestInstanceId')
@@ -360,7 +400,7 @@ function undoCloseFrame (windowState, closedFrames) {
  * Removes a frame specified by frameProps
  * @return Immutable top level application state ready to merge back in
  */
-function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
+function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
   function getNewActiveFrame (activeFrameIndex) {
     // Go to the next frame if it exists.
     let index = activeFrameIndex
@@ -405,6 +445,7 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
   }
   const framePropsIndex = getFramePropsIndex(frames, frameProps)
   frames = frames.splice(framePropsIndex, 1)
+  tabs = tabs.splice(framePropsIndex, 1)
 
   let newActiveFrameKey = activeFrameKey
   if (frameProps.get('key') === activeFrameKey && frames.size > 0) {
@@ -416,6 +457,7 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
     previewFrameKey: null,
     activeFrameKey: newActiveFrameKey,
     closedFrames,
+    tabs,
     frames
   }
 }
@@ -424,7 +466,7 @@ function removeFrame (frames, closedFrames, frameProps, activeFrameKey) {
  * Removes all but the specified frameProps
  * @return Immutable top level application state ready to merge back in
  */
-function removeOtherFrames (frames, closedFrames, frameProps) {
+function removeOtherFrames (frames, tabs, closedFrames, frameProps) {
   closedFrames = closedFrames.concat(frames.filter((currentFrameProps) => !currentFrameProps.get('isPrivate') && currentFrameProps.get('key') !== frameProps.get('key')))
     .take(config.maxClosedFrames)
   closedFrames.forEach((currentFrameProps) => {
@@ -434,9 +476,11 @@ function removeOtherFrames (frames, closedFrames, frameProps) {
   })
 
   frames = Immutable.fromJS([frameProps])
+  tabs = tabFromFrame(frames.get(0))
   return {
     activeFrameKey: frameProps.get('key'),
     closedFrames,
+    tabs,
     frames
   }
 }
@@ -479,5 +523,6 @@ module.exports = {
   undoCloseFrame,
   removeFrame,
   removeOtherFrames,
+  tabFromFrame,
   getFrameTabPageIndex
 }
