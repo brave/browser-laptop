@@ -24,7 +24,9 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_NEXT],
     ['CmdOrCtrl+Shift+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_PREV],
     ['CmdOrCtrl+Alt+J', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS],
-    ['CmdOrCtrl+Shift+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN]
+    ['Shift+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN],
+    ['Shift+-', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT],
+    ['Shift+0', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_RESET]
   ]
 
   if (!isDarwin) {
