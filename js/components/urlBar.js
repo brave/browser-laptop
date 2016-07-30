@@ -20,6 +20,7 @@ const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
+const windowStore = require('../stores/windowStore')
 
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -34,6 +35,10 @@ class UrlBar extends ImmutableComponent {
     this.onChange = this.onChange.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+  }
+
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
   }
 
   isActive () {
@@ -73,8 +78,7 @@ class UrlBar extends ImmutableComponent {
 
   // restores the url bar to the current location
   restore () {
-    const location = this.props.activeFrameProps.get('location')
-    windowActions.setNavBarUserInput(location)
+    windowActions.setNavBarUserInput(this.props.location)
   }
 
   // Temporarily disable the autocomplete when a user is pressing backspace.
@@ -96,8 +100,6 @@ class UrlBar extends ImmutableComponent {
 
         let location = this.props.urlbar.get('location')
 
-        // If a suffix is present then the user wants the first suggestion instead
-        const urlSuffixInUse = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix'])
         if (location === null || location.length === 0) {
           windowActions.setUrlBarSelected(true)
         } else {
@@ -107,8 +109,8 @@ class UrlBar extends ImmutableComponent {
           // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
           // For whitepsace we want a search no matter what.
           if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
-            windowActions.loadUrl(this.props.activeFrameProps, `www.${location}.com`)
-          } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || urlSuffixInUse)) {
+            windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
+          } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || this.props.locationValueSuffix)) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
             const isDarwin = process.platform === 'darwin'
             if (e.altKey) {
@@ -130,7 +132,7 @@ class UrlBar extends ImmutableComponent {
             } else if (e.metaKey) {
               windowActions.newFrame({ location }, !!e.shiftKey)
             } else {
-              windowActions.loadUrl(this.props.activeFrameProps, location)
+              windowActions.loadUrl(this.activeFrame, location)
             }
           }
           // this can't go through appActions for some reason
@@ -161,9 +163,9 @@ class UrlBar extends ImmutableComponent {
         break
       case KeyCodes.DELETE:
         if (e.shiftKey) {
-          const selectedIndex = this.locationValueSuffix.length > 0 ? 1 : this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
+          const selectedIndex = this.props.locationValueSuffix.length > 0 ? 1 : this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
           if (selectedIndex !== undefined) {
-            const suggestionLocation = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
+            const suggestionLocation = this.activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
             appActions.removeSite({ location: suggestionLocation })
           }
         } else {
@@ -198,8 +200,8 @@ class UrlBar extends ImmutableComponent {
   }
 
   updateLocationToSuggestion () {
-    if (this.locationValueSuffix.length > 0) {
-      windowActions.setNavBarUserInput(this.locationValue + this.locationValueSuffix)
+    if (this.props.locationValueSuffix.length > 0) {
+      windowActions.setNavBarUserInput(this.locationValue + this.props.locationValueSuffix)
     }
   }
 
@@ -238,15 +240,15 @@ class UrlBar extends ImmutableComponent {
   componentDidUpdate () {
     this.updateDOM()
     // Select the part of the URL which was an autocomplete suffix.
-    if (this.urlInput && this.locationValueSuffix.length > 0) {
+    if (this.urlInput && this.props.locationValueSuffix.length > 0) {
       const len = this.urlInput.value.length
-      const suffixLen = this.locationValueSuffix.length
+      const suffixLen = this.props.locationValueSuffix.length
       this.urlInput.setSelectionRange(len - suffixLen, len)
     }
   }
 
   get hostValue () {
-    const parsed = urlParse(this.props.activeFrameProps.get('location'))
+    const parsed = urlParse(this.props.location)
     return parsed.host &&
       parsed.protocol !== 'about:' &&
       parsed.protocol !== 'chrome-extension:' ? parsed.host : ''
@@ -256,29 +258,24 @@ class UrlBar extends ImmutableComponent {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
     return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
-      ? '' : this.props.activeFrameProps.get('title')
+      ? '' : this.props.title
   }
 
   get autocompleteEnabled () {
-    return this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled'])
-  }
-
-  get locationValueSuffix () {
-    return this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
+    return this.props.urlbar.getIn(['suggestions', 'autocompleteEnabled'])
   }
 
   get locationValue () {
     // If there's a selected autocomplete entry, we just want to show its location
-    const selectedIndex = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])
-    if (selectedIndex) {
-      const suggestionLocation = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'suggestionList', selectedIndex - 1]).location
+    if (this.props.suggestionIndex) {
+      const suggestionLocation = this.props.urlbar.getIn(['suggestions', 'suggestionList', this.props.suggestionIndex - 1]).location
       if (suggestionLocation) {
         return suggestionLocation
       }
     }
 
     let location = this.props.urlbar.get('location')
-    const history = this.props.activeFrameProps.get('history')
+    const history = this.props.history
     if (isIntermediateAboutPage(location) && history.size > 0) {
       return history.last()
     }
@@ -295,31 +292,22 @@ class UrlBar extends ImmutableComponent {
   }
 
   get loadTime () {
-    const { activeFrameProps } = this.props
-    const startLoadTime = activeFrameProps.get('startLoadTime')
-    const endLoadTime = activeFrameProps.get('endLoadTime')
-    let loadTime = ''
-
-    if (startLoadTime && endLoadTime) {
-      const loadMilliseconds = endLoadTime - startLoadTime
-      loadTime = (loadMilliseconds / 1000).toFixed(2) + 's'
+    if (this.props.startLoadTime && this.props.endLoadTime) {
+      const loadMilliseconds = this.props.endLoadTime - this.props.startLoadTime
+      return (loadMilliseconds / 1000).toFixed(2) + 's'
     }
-    return loadTime
-  }
-
-  get secure () {
-    return this.props.activeFrameProps.getIn(['security', 'isSecure'])
+    return ''
   }
 
   get aboutPage () {
-    const protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
+    const protocol = urlParse(this.props.location).protocol
     return ['about:', 'file:', 'chrome:', 'view-source:'].includes(protocol)
   }
 
   get isHTTPPage () {
     // Whether this page is HTTP or HTTPS. We don't show security indicators
     // for other protocols like mailto: and about:.
-    const protocol = urlParse(this.props.activeFrameProps.get('location')).protocol
+    const protocol = urlParse(this.props.location).protocol
     return protocol === 'http:' || protocol === 'https:'
   }
 
@@ -333,12 +321,12 @@ class UrlBar extends ImmutableComponent {
   }
 
   onDragStart (e) {
-    dndData.setupDataTransferURL(e.dataTransfer, this.props.activeFrameProps.get('location'), this.props.activeFrameProps.get('title'))
-    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.props.activeFrameProps)
+    dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
+    dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, this.activeFrame)
   }
 
   onContextMenu (e) {
-    contextMenus.onUrlBarContextMenu(this.searchDetail, this.props.activeFrameProps, e)
+    contextMenus.onUrlBarContextMenu(this.searchDetail, this.activeFrame, e)
   }
 
   render () {
@@ -354,8 +342,8 @@ class UrlBar extends ImmutableComponent {
         className={cx({
           urlbarIcon: true,
           'fa': true,
-          'fa-lock': this.isHTTPPage && this.secure && !this.props.urlbar.get('active'),
-          'fa-unlock-alt': this.isHTTPPage && !this.secure && !this.props.urlbar.get('active') && !this.props.titleMode,
+          'fa-lock': this.isHTTPPage && this.props.isSecure && !this.props.urlbar.get('active'),
+          'fa-unlock-alt': this.isHTTPPage && !this.props.isSecure && !this.props.urlbar.get('active') && !this.props.titleMode,
           'fa fa-file': this.props.urlbar.get('active') && this.props.loading === false,
           extendedValidation: this.extendedValidationSSL
         })} />
@@ -368,17 +356,17 @@ class UrlBar extends ImmutableComponent {
           </div>
           : <input type='text'
             spellCheck='false'
-            disabled={this.props.activeFrameProps.get('location') === undefined && this.loadTime === ''}
+            disabled={this.props.location === undefined && this.loadTime === ''}
             onFocus={this.onFocus}
             onBlur={this.onBlur}
             onKeyDown={this.onKeyDown}
             onChange={this.onChange}
             onClick={this.onClick}
             onContextMenu={this.onContextMenu}
-            value={this.locationValue + this.locationValueSuffix}
+            value={this.locationValue + this.props.locationValueSuffix}
             data-l10n-id='urlbar'
             className={cx({
-              insecure: !this.secure && this.props.loading === false && !this.isHTTPPage,
+              insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
               private: this.private,
               testHookLoadDone: !this.props.loading
             })}
@@ -401,10 +389,10 @@ class UrlBar extends ImmutableComponent {
           ? <UrlBarSuggestions
             ref={(node) => { this.urlBarSuggestions = node }}
             suggestions={this.props.urlbar.get('suggestions')}
+            locationValueSuffix={this.props.locationValueSuffix}
             sites={this.props.sites}
-            frames={this.props.frames}
             searchDetail={this.searchDetail}
-            activeFrameProps={this.props.activeFrameProps}
+            activeFrameKey={this.props.activeFrameKey}
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}
             previewActiveIndex={this.props.previewActiveIndex || 0} />

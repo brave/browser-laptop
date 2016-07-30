@@ -20,6 +20,7 @@ const getSetting = require('../settings').getSetting
 const eventUtil = require('../lib/eventUtil.js')
 const cx = require('../lib/classSet.js')
 const locale = require('../l10n')
+const windowStore = require('../stores/windowStore')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
@@ -36,8 +37,7 @@ class UrlBarSuggestions extends ImmutableComponent {
 
   nextSuggestion () {
     // If the user presses down and don't have an explicit selected index, skip to the 2nd one
-    const hasUrlSuffix = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
-    if (hasUrlSuffix && this.props.suggestions.get('selectedIndex') === null && this.props.suggestions.get('suggestionList').size > 1) {
+    if (this.props.locationValueSuffix && this.props.suggestions.get('selectedIndex') === null && this.props.suggestions.get('suggestionList').size > 1) {
       this.updateSuggestions(2)
       return
     }
@@ -90,7 +90,6 @@ class UrlBarSuggestions extends ImmutableComponent {
 
     // If there is a URL suffix that means there's an active autocomplete for the first element.
     // We should show that as selected so the user knows what is being matched.
-    const hasUrlSuffix = this.props.activeFrameProps.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''
 
     const bookmarkSuggestions = suggestions.filter((s) => s.type === suggestionTypes.BOOKMARK)
     const historySuggestions = suggestions.filter((s) => s.type === suggestionTypes.HISTORY)
@@ -119,7 +118,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
       items = items.concat(suggestions.map((suggestion, i) => {
         const currentIndex = index + i
-        const selected = this.activeIndex === currentIndex + 1 || currentIndex === 0 && hasUrlSuffix
+        const selected = this.activeIndex === currentIndex + 1 || currentIndex === 0 && this.props.locationValueSuffix
         return <li data-index={currentIndex + 1}
           onMouseOver={this.onMouseOver.bind(this)}
           onClick={suggestion.onClick}
@@ -306,7 +305,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // opened frames
     if (getSetting(settings.OPENED_TAB_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
-        data: this.props.frames,
+        data: windowStore.getFrames(),
         maxResults: config.urlBarSuggestions.maxOpenedFrames,
         type: suggestionTypes.TAB,
         clickHandler: (frameProps) =>
@@ -315,7 +314,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         formatTitle: (frame) => frame.get('title'),
         formatUrl: (frame) => frame.get('location'),
         filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
-          frame.get('key') !== this.props.activeFrameProps.get('key') &&
+          frame.get('key') !== this.props.activeFrameKey &&
           (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
           frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))}))
     }

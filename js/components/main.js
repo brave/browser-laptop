@@ -58,6 +58,7 @@ const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
 const currentWindow = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
+const emptyList = new Immutable.List()
 
 class Main extends ImmutableComponent {
   constructor () {
@@ -726,7 +727,18 @@ class Main extends ImmutableComponent {
             navbar={activeFrame && activeFrame.get('navbar')}
             frames={this.props.windowState.get('frames')}
             sites={this.props.appState.get('sites')}
-            activeFrame={activeFrame}
+            activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+            location={activeFrame && activeFrame.get('location') || ''}
+            title={activeFrame && activeFrame.get('title') || ''}
+            scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
+            partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
+            history={activeFrame && activeFrame.get('history') || emptyList}
+            suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
+            isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
+            locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
+            startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
+            endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
+            loading={activeFrame && activeFrame.get('loading')}
             mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
             searchDetail={this.props.windowState.get('searchDetail')}
             enableNoScript={this.enableNoScript(activeSiteSettings)}
