@@ -17,6 +17,7 @@ const cx = require('../lib/classSet.js')
 const dnd = require('../dnd')
 const dndData = require('../dndData')
 const calculateTextWidth = require('../lib/textCalculator').calculateTextWidth
+const windowStore = require('../stores/windowStore')
 
 class BookmarkToolbarButton extends ImmutableComponent {
   constructor () {
@@ -28,6 +29,9 @@ class BookmarkToolbarButton extends ImmutableComponent {
     this.onDragLeave = this.onDragLeave.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+  }
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
   }
   onClick (e) {
     if (!this.props.clickBookmarkItem(this.props.bookmark, e) &&
@@ -243,13 +247,13 @@ class BookmarksToolbar extends ImmutableComponent {
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
   openContextMenu (bookmark, e) {
-    contextMenus.onBookmarkContextMenu(bookmark, this.props.activeFrame, e)
+    contextMenus.onBookmarkContextMenu(bookmark, this.activeFrame, e)
   }
   clickBookmarkItem (bookmark, e) {
-    return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.props.activeFrame, e)
+    return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)
   }
   showBookmarkFolderMenu (bookmark, e) {
-    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.props.activeFrame, e)
+    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
   }
   updateBookmarkData (props) {
     this.bookmarks = props.sites
@@ -322,11 +326,11 @@ class BookmarksToolbar extends ImmutableComponent {
     }
   }
   onMoreBookmarksMenu (e) {
-    contextMenus.onMoreBookmarksMenu(this.props.activeFrame, this.bookmarks, this.overflowBookmarkItems, e)
+    contextMenus.onMoreBookmarksMenu(this.activeFrame, this.bookmarks, this.overflowBookmarkItems, e)
   }
   onContextMenu (e) {
     const closest = dnd.closestFromXOffset(this.bookmarkRefs.filter((x) => !!x), e.clientX).selectedRef
-    contextMenus.onTabsToolbarContextMenu(this.props.activeFrame, closest && closest.props.bookmark || undefined, closest && closest.isDroppedOn, e)
+    contextMenus.onTabsToolbarContextMenu(this.activeFrame, closest && closest.props.bookmark || undefined, closest && closest.isDroppedOn, e)
   }
   render () {
     let showFavicon = this.props.showFavicon

@@ -796,7 +796,7 @@ class Main extends ImmutableComponent {
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
             shouldAllowWindowDrag={shouldAllowWindowDrag}
-            activeFrame={activeFrame}
+            activeFrameKey={activeFrame.get('key')}
             windowWidth={this.props.appState.get('defaultWindowWidth')}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
             sites={this.props.appState.get('sites')} />
