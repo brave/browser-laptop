@@ -36,6 +36,9 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onToggleBookmark (isBookmarked) {
+    if (isBookmarked === undefined) {
+      isBookmarked = this.bookmarked
+    }
     const siteDetail = siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const hasBookmark = this.props.sites.find(
@@ -184,7 +187,7 @@ class NavigationBar extends ImmutableComponent {
               removeBookmarkButton: this.bookmarked
             })}
             l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-            onClick={() => this.onToggleBookmark(this.bookmarked)} />
+            onClick={this.onToggleBookmark} />
         </div>
       }
     </div>
