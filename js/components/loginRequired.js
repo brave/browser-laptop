@@ -69,7 +69,7 @@ class LoginRequired extends React.Component {
       username: '',
       password: ''
     })
-    ipc.send(messages.LOGIN_RESPONSE, this.props.frameProps.get('location'), this.state.username, this.state.password)
+    ipc.send(messages.LOGIN_RESPONSE, this.detail.url, this.state.username, this.state.password)
     windowActions.setLoginRequiredDetail(this.props.frameProps)
   }
   render () {
