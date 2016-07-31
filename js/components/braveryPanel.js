@@ -136,6 +136,9 @@ class BraveryPanel extends ImmutableComponent {
     ipc.emit(messages.SHORTCUT_NEW_FRAME, {}, config.fingerprintingInfoUrl)
   }
   onToggleSiteSetting (setting, e) {
+    if (setting !== 'shieldsUp' && !this.props.braverySettings.shieldsUp) {
+      return
+    }
     let ruleKey = siteUtil.getOrigin(this.props.activeRequestedLocation)
     const parsedUrl = urlParse(this.props.activeRequestedLocation)
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
