@@ -197,6 +197,9 @@
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
     color: @chromeText;
   }
+  @media (max-width: @breakpointNarrowViewport) {
+    max-width: 80%;
+  }
 }
 
 #navigator {
@@ -246,6 +249,7 @@
     .endButtons {
       position: absolute;
       top: -2px;
+      right: 0;
     }
 
     .noScript {
@@ -325,7 +329,10 @@
     -webkit-app-region: no-drag;
 
     &.endButtons {
-      margin-right: 30px;
+      margin-right: 20px;
+      @media (max-width: @breakpointNarrowViewport) {
+        margin-right: -5px;
+      }
     }
   }
 
