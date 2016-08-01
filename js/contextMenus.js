@@ -356,7 +356,7 @@ function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
   const items = []
   items.push(
-    CommonMenu.newTabMenuItem(),
+    CommonMenu.newTabMenuItem(frameProps.get('key')),
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('reloadTab'),

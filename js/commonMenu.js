@@ -68,12 +68,12 @@ module.exports.quitMenuItem = () => {
   }
 }
 
-module.exports.newTabMenuItem = () => {
+module.exports.newTabMenuItem = (parentFrameKey) => {
   return {
     label: locale.translation('newTab'),
     accelerator: 'CmdOrCtrl+T',
     click: function (item, focusedWindow) {
-      if (!module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME])) {
+      if (!module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, undefined, { parentFrameKey }])) {
         // no active windows
         appActions.newWindow()
       }

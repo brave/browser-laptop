@@ -33,6 +33,37 @@ describe('tabs', function () {
     })
   })
 
+  describe('tab order', function () {
+    describe('sequentially by default', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+      })
+
+      it('creates a new tab when signaled', function * () {
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
+          .waitForExist('.tab[data-frame-key="2"]')
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank')
+          .waitForExist('.tabArea + .tabArea + .tabArea .tab[data-frame-key="3"')
+      })
+    })
+    describe('respects parentFrameKey', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+      })
+
+      it('creates a new tab when signaled', function * () {
+        yield this.app.client
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { openInForeground: false })
+          .waitForExist('.tab[data-frame-key="2"]')
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, 'about:blank', { parentFrameKey: 1 })
+          .waitForExist('.tabArea:nth-child(2) .tab[data-frame-key="3"]')
+      })
+    })
+  })
+
   describe('new private tab signal', function () {
     Brave.beforeAll(this)
     before(function * () {
