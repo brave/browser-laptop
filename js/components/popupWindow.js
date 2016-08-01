@@ -14,10 +14,10 @@ const windowActions = require('../actions/windowActions')
 class PopupWindow extends ImmutableComponent {
 
   componentDidMount () {
-    let src = this.props.detail.get('src')
-    if (src) {
+    let location = this.props.detail.get('location')
+    if (location) {
       let webview = document.createElement('webview')
-      webview.setAttribute('src', src)
+      webview.setAttribute('location', location)
       if (parseInt(this.props.detail.get('height'))) {
         console.log('got height')
         webview.style.height = this.props.detail.get('height') + 'px'

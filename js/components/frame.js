@@ -138,21 +138,21 @@ class Frame extends ImmutableComponent {
     this.expireFlash(this.origin)
   }
 
-  updateWebview (cb, newSrc) {
+  updateWebview (cb) {
     // lazy load webview
     if (!this.webview && !this.props.isActive && !this.props.isPreview &&
         // allow force loading of new frames
         this.props.frame.get('unloaded') === true &&
         // don't lazy load about pages
-        !aboutUrls.get(getBaseUrl(this.props.frame.get('src'))) &&
+        !aboutUrls.get(getBaseUrl(this.props.frame.get('location'))) &&
         // pinned tabs don't serialize their state so the icon is lost for lazy loading
         !this.props.frame.get('pinnedLocation')) {
       return
     }
 
-    let src = this.props.frame.get('src')
+    // TODO see https://github.com/brave/browser-laptop/issues/2473
+    // let src = this.props.frame.get('src')
     let location = this.props.frame.get('location')
-    newSrc = newSrc || src
 
     // Create the webview dynamically because React doesn't whitelist all
     // of the attributes we need
@@ -199,8 +199,8 @@ class Frame extends ImmutableComponent {
       this.webview.allowRunningPlugins = true
     }
 
-    if (!guestInstanceId || newSrc !== 'about:blank') {
-      this.webview.setAttribute('src', isSourceAboutUrl(newSrc) ? getTargetAboutUrl(newSrc) : newSrc)
+    if (!guestInstanceId || location !== 'about:blank') {
+      this.webview.setAttribute('location', isSourceAboutUrl(location) ? getTargetAboutUrl(location) : location)
     }
 
     if (webviewAdded) {
@@ -291,12 +291,12 @@ class Frame extends ImmutableComponent {
       this.expireFlash(prevOrigin)
     }
 
-    if (this.props.frame.get('src') !== prevProps.frame.get('src')) {
+    if (this.props.frame.get('location') !== prevProps.frame.get('location')) {
       this.updateWebview(cb)
     } else if (this.shouldCreateWebview()) {
       // plugin/insecure-content allow state has changed. recreate with the current
       // location, not the src.
-      this.updateWebview(cb, this.props.frame.get('location'))
+      this.updateWebview(cb)
     } else {
       if (this.runOnDomReady) {
         // there is already a callback waiting for did-attach
