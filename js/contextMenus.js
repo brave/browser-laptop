@@ -353,7 +353,7 @@ function usernameTemplateInit (usernames, origin, action) {
 }
 
 function tabTemplateInit (frameProps) {
-  const tabKey = frameProps.get('key')
+  const frameKey = frameProps.get('key')
   const items = []
   items.push(
     CommonMenu.newTabMenuItem(),
@@ -362,14 +362,14 @@ function tabTemplateInit (frameProps) {
       label: locale.translation('reloadTab'),
       click: (item, focusedWindow) => {
         if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, tabKey)
+          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, frameKey)
         }
       }
     }, {
       label: locale.translation('clone'),
       click: (item, focusedWindow) => {
         if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_CLONE, {
+          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_CLONE, frameKey, {
             openInForeground: true
           })
         }
@@ -425,7 +425,7 @@ function tabTemplateInit (frameProps) {
       click: (item, focusedWindow) => {
         if (focusedWindow) {
           // TODO: Don't switch active tabs when this is called
-          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabKey)
+          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, frameKey)
         }
       }
     })
@@ -435,21 +435,21 @@ function tabTemplateInit (frameProps) {
     label: locale.translation('closeOtherTabs'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, true)
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, frameKey, true, true)
       }
     }
   }, {
     label: locale.translation('closeTabsToRight'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, true, false)
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, frameKey, true, false)
       }
     }
   }, {
     label: locale.translation('closeTabsToLeft'),
     click: (item, focusedWindow) => {
       if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabKey, false, true)
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, frameKey, false, true)
       }
     }
   }, CommonMenu.separatorMenuItem)

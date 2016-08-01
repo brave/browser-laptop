@@ -658,12 +658,12 @@ frameShortcuts.forEach((shortcut) => {
     emitChanges()
   })
   // Listen for actions on frame N
-  if (['reload', 'mute'].includes(shortcut)) {
-    ipc.on(`shortcut-frame-${shortcut}`, (e, i) => {
+  if (['reload', 'mute', 'clone'].includes(shortcut)) {
+    ipc.on(`shortcut-frame-${shortcut}`, (e, i, args) => {
       const path = ['frames', FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), i)]
       windowState = windowState.mergeIn(path, {
         activeShortcut: shortcut,
-        activeShortcutDetails: null
+        activeShortcutDetails: args
       })
       emitChanges()
     })
