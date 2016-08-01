@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const tableSort = require('tableSort')
+const tableSort = require('tablesort')
 
 /**
  * Represents a sortable table with supp
