@@ -10,7 +10,7 @@
   display: flex;
   flex: 1;
   overflow: auto;
-  padding: 0 4px 0 6px;
+  padding: 0 4px 0 0;
   height: @tabsToolbarHeight;
   position: relative;
   white-space: nowrap;
@@ -182,6 +182,15 @@
 
   &:not(.isPinned) {
     flex: 1;
+    &:first-child {
+      padding-left: 6px;
+    }
+  }
+
+  &.isPinned {
+    &:last-child {
+      padding-right: 6px;
+    }
   }
 
   &.draggingOverLeft {
