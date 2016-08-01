@@ -27,13 +27,15 @@ const request = require('../js/lib/request')
 const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
 
-// TBD: remove this post alpha [MTR]
-const alphaPath = path.join(app.getPath('userData'), 'ledger-alpha.json')
+const clientOptions = { verboseP: true }
 
 // TBD: remove these post beta [MTR]
 const logPath = path.join(app.getPath('userData'), 'ledger-log.json')
 const publisherPath = path.join(app.getPath('userData'), 'ledger-publisher.json')
 const scoresPath = path.join(app.getPath('userData'), 'ledger-scores.json')
+
+// TBD: move this into appStore.getState().get(‘vault.client’) [MTR]
+const vaultPath = path.join(app.getPath('userData'), 'vault-state.json')
 
 // TBD: move this into appStore.getState().get(‘ledger.client’) [MTR]
 const statePath = path.join(app.getPath('userData'), 'ledger-state.json')
@@ -61,7 +63,7 @@ var currentLocation = 'NOOP'
 var currentTimestamp = underscore.now()
 
 var returnValue = {
-  enabled: false,
+  enabled: true,
   synopsis: null,
   statusText: null,
   notifyP: false,
@@ -73,76 +75,24 @@ var init = () => {
   try { initialize() } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
-var initialize = () => {
-  var LedgerClient
+// use this method to turn the ledger on/off
 
-  var makeClient = (path, cb) => {
-    fs.readFile(path, (err, data) => {
-      var state
-
-      if (err) return console.log('read error: ' + err.toString())
-
-      try {
-        state = JSON.parse(data)
-        console.log('\nstarting up ledger client integration')
-        cb(null, state)
-      } catch (ex) {
-        console.log(path + (state ? ' ledger' : ' parse') + ' error: ' + ex.toString())
-        cb(ex)
-      }
-    })
+var enable = (onoff) => {
+  if (!onoff) {
+    synopsis = null
+    return
   }
 
-  LedgerPublisher = require('ledger-publisher')
-  returnValue._internal.ruleset = { raw: [], cooked: [] }
-  cacheRuleSet(LedgerPublisher.rules)
-
-  LedgerClient = require('ledger-client')
-  fs.access(statePath, fs.FF_OK, (err) => {
-    if (!err) {
-      console.log('found ' + statePath)
-
-      makeClient(statePath, (err, state) => {
-        if (err) return
-
-        returnValue.enabled = true
-        getStateInfo(state)
-        client = LedgerClient(state.personaId, underscore.extend({ roundtrip: roundtrip }, state.options), state)
-        if (client.sync(callback) === true) {
-          run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
-        }
-        cacheRuleSet(state.ruleset)
-        getPaymentInfo()
-      })
-      return
-    }
-    if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
-
-    fs.access(alphaPath, fs.FF_OK, (err) => {
-      if (err) {
-        if (err.code !== 'ENOENT') console.log('accessPath read error: ' + err.toString())
-        return
-      }
-
-      console.log('found ' + alphaPath)
-      makeClient(alphaPath, (err, alpha) => {
-        if (err) return
-
-        client = LedgerClient(alpha.client.personaId, underscore.extend({ roundtrip: roundtrip }, alpha.client.options), null)
-        if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
-      })
-    })
-  })
-
+  synopsis = new (LedgerPublisher.Synopsis)()
   fs.readFile(synopsisPath, (err, data) => {
     console.log('\nstarting up ledger publisher integration')
-    synopsis = new (LedgerPublisher.Synopsis)()
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
       return
     }
 
+    console.log('found ' + synopsisPath)
     try {
       synopsis = new (LedgerPublisher.Synopsis)(data)
     } catch (ex) {
@@ -158,6 +108,7 @@ var initialize = () => {
         return
       }
 
+      console.log('found ' + publisherPath)
       try {
         data = JSON.parse(data)
         underscore.keys(data).sort().forEach((publisher) => {
@@ -173,6 +124,86 @@ var initialize = () => {
         console.log('publishersPath parse error: ' + ex.toString())
       }
     })
+  })
+}
+
+// use this method to create the wallet, as needed
+
+var boot = () => {
+  var boot2 = (personaId) => {
+    fs.access(statePath, fs.FF_OK, (err) => {
+      if (!err) return
+
+      if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
+
+      client = (require('ledger-client'))(personaId, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
+      if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
+    })
+  }
+
+  fs.readFile(vaultPath, (err, data) => {
+    var personaId
+
+    if (!err) {
+      console.log('found ' + vaultPath)
+
+      try { personaId = JSON.parse(data).userId } catch (ex) {
+        console.log('vaultPath parse error: ' + ex.toString())
+      }
+
+      if (personaId) return boot2(personaId)
+    } else {
+      if (err.code !== 'ENOENT') console.log('vaultPath read error: ' + err.toString())
+    }
+
+    (require('vault-client'))(underscore.extend(clientOptions, { roundtrip: roundtrip }), null, (err, result) => {
+      if (err) return console.log('vault-client initialization error: ' + err.toString())
+
+      if (result) syncWriter(vaultPath, result, () => {})
+
+      boot2(result.userId)
+    })
+  })
+}
+
+var initialize = () => {
+  LedgerPublisher = require('ledger-publisher')
+
+  // YAN: should be set dynamically based on user preferences... [MTR]
+  enable(true)
+
+  returnValue._internal.ruleset = { raw: [], cooked: [] }
+  cacheRuleSet(LedgerPublisher.rules)
+
+  fs.access(statePath, fs.FF_OK, (err) => {
+    if (!err) {
+      console.log('found ' + statePath)
+
+      fs.readFile(statePath, (err, data) => {
+        var state
+
+        if (err) return console.log('read error: ' + err.toString())
+
+        try {
+          state = JSON.parse(data)
+          console.log('\nstarting up ledger client integration')
+        } catch (ex) {
+          return console.log('statePath parse error: ' + ex.toString())
+        }
+
+        getStateInfo(state)
+        client = (require('ledger-client'))(state.personaId,
+                                            underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
+                                                                clientOptions), state)
+        if (client.sync(callback) === true) {
+          run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
+        }
+        cacheRuleSet(state.ruleset)
+        if (state.wallet) getPaymentInfo()
+      })
+      return
+    }
+    if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
   })
 }
 
@@ -222,28 +253,29 @@ var callback = (err, result, delayTime) => {
     }, 1 * msecs.hour)
   }
 
-  returnValue.enabled = true
-
   if (!result) return run(delayTime)
 
   if (result.wallet) {
     getStateInfo(result)
     returnValue.statusText = 'Initialized.'
+    getPaymentInfo()
   } else if (result.persona) {
     returnValue.statusText = ''
   } else {
     returnValue.statusText = 'Initializing.'
   }
   cacheRuleSet(result.ruleset)
-  getPaymentInfo()
 
   syncWriter(statePath, result, () => { run(delayTime) })
 }
 
 var roundtrip = (params, options, callback) => {
-  var parts = underscore.extend(underscore.pick(options.server, [ 'protocol', 'hostname', 'port' ]),
-                                underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
-  var i = parts.path.indexOf('?')
+  var i
+  var parts = typeof options.server === 'string' ? url.parse(options.server) : options.server
+
+  parts = underscore.extend(underscore.pick(parts, [ 'protocol', 'hostname', 'port' ]),
+                            underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
+  i = parts.path.indexOf('?')
 
   if (i !== -1) {
     parts.pathname = parts.path.substring(0, i)
@@ -290,14 +322,29 @@ var roundtrip = (params, options, callback) => {
 
   if (!options.verboseP) return
 
-  console.log('<<< ' + params.method + ' ' + params.path)
+  console.log('<<< ' + params.method + ' ' + parts.protocol + '//' + parts.hostname + params.path)
   underscore.keys(options.headers).forEach((header) => { console.log('<<< ' + header + ': ' + options.headers[header]) })
   console.log('<<<')
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
 var run = (delayTime) => {
+  var state
+  var ballots = client.ballots()
+  var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
+
   console.log('\nledger client run: delayTime=' + delayTime)
+
+  try {
+    winners.forEach((winner) => {
+      var result = client.vote(winner)
+
+      if (result) state = result
+    })
+    if (state) syncWriter(statePath, state, () => {})
+  } catch (ex) {
+    console.log('ledger client error: ' + ex.toString() + '\n' + ex.stack)
+  }
 
   if (delayTime === 0) {
     delayTime = client.timeUntilReconcile()
@@ -527,7 +574,7 @@ eventStore.addChangeListener(() => {
   var view = eventStore.getState().toJS().page_view
   var info = eventStore.getState().toJS().page_info
 
-  if (!util.isArray(info)) return
+  if ((!synopsis) || (!util.isArray(info))) return
 
   info.forEach((page) => {
     var entry, faviconURL, publisher
@@ -536,7 +583,7 @@ eventStore.addChangeListener(() => {
 /*
     console.log('\npage=' + JSON.stringify(page, null, 2))
  */
-    if ((!synopsis) || (location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
+    if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
 
     if (!page.publisher) {
       try {
@@ -698,7 +745,7 @@ var cacheRuleSet = (ruleset) => {
 var handleLedgerPublisher = (event, location) => {
   var ctx
 
-  if ((event.sender.session === session.fromPartition('default')) || (!tldjs.isValid(location))) {
+  if ((!synopsis) || (event.sender.session === session.fromPartition('default')) || (!tldjs.isValid(location))) {
     event.returnValue = {}
     return
   }
@@ -756,7 +803,7 @@ var visit = (location, timestamp) => {
 var handleGeneralCommunication = (event) => {
   var info, now, offset, result, timestamp
 
-  if (!returnValue.enabled) {
+  if (!synopsis) {
     event.returnValue = { enabled: false }
     return
   }
@@ -821,6 +868,8 @@ if (ipc) {
 }
 
 module.exports = {
-  init: init,
+  init: init,     // on browser startup
+  boot: boot,     // create wallet
+  enable: enable, // on/off toggle
   visit: visit
 }
