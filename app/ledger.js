@@ -249,7 +249,7 @@ var callback = (err, result, delayTime) => {
   }
 
   if (err) {
-    console.log('ledger client error: ' + err.toString() + '\n' + err.stack)
+    console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
     return setTimeout(() => {
       if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
     }, 1 * msecs.hour)
@@ -345,7 +345,7 @@ var run = (delayTime) => {
     })
     if (state) syncWriter(statePath, state, () => {})
   } catch (ex) {
-    console.log('ledger client error: ' + ex.toString() + '\n' + ex.stack)
+    console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
 
   if (delayTime === 0) {
@@ -388,11 +388,8 @@ var getStateInfo = (state) => {
     transaction = state.transactions[i]
     if (transaction.stamp < then) break
 
-    ballots = {}
-    underscore.keys(transaction.ballots || {}).forEach((publisher) => {
-      ballots[publisher] = transaction.ballots[publisher].submissionIds.length
-    })
-    state.ballots.forEach((ballot) => {
+    ballots = underscore.clone(transaction.ballots || {})
+    underscore.keys(state.ballots).forEach((ballot) => {
       if (ballot.viewingId !== transaction.viewingId) return
 
       if (!ballots[ballot.publisher]) ballots[ballot.publisher] = 0
