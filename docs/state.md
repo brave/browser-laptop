@@ -176,6 +176,22 @@ WindowStore
 {
   activeFrameKey: number,
   previewFrameKey: number,
+  tabs: [{
+    themeColor: string, // css compatible color string
+    computedThemeColor: string, // css computed theme color from the favicon
+    icon: string, // favicon url
+    audioPlaybackActive: boolean, // frame is playing audio
+    audioMuted: boolean, // frame is muted
+    title: string, // page title
+    isPrivate: boolean, // private browsing tab
+    partitionNumber: number, // the session partition to use
+    pinnedLocation: string, // Indicates if a frame is pinned and its pin location
+    provisionalLocation: string,
+    icon: string, // favicon url
+    location: string, // The currently navigated location
+    loading: boolean,
+    frameKey: number
+  }],
   frames: [{
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
@@ -194,9 +210,9 @@ WindowStore
     partitionNumber: number, // the session partition to use
     loading: boolean,
     themeColor: string, // css compatible color string
+    computedThemeColor: string, // css computed theme color from the favicon
     isFullScreen: boolean, // true if the frame should be shown as full screen
     showFullScreenWarning: boolean, // true if a warning should be shown about full screen
-    computedThemeColor: string, // css computed theme color from the favicon
     startLoadTime: datetime,
     endtLoadTime: datetime,
     guestInstanceId: string, // not persisted
@@ -217,7 +233,7 @@ WindowStore
     fingerprintingProtection: {
       blocked: Array<string>
     },
-    provisionalLocation: string
+    provisionalLocation: string,
     security: {
       isSecure: boolean, // is using https
       loginRequiredDetail: {
@@ -341,5 +357,6 @@ WindowStore
   },
   flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
+  lastAppVersion: string, // Version of the last file that was saved
 }
 ```

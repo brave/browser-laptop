@@ -18,6 +18,7 @@ const app = electron.app
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
+const {tabFromFrame} = require('../js/state/frameStateUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 
@@ -53,6 +54,11 @@ module.exports.saveAppState = (payload, isShutdown) => {
       payload.perWindowState.forEach((wndPayload) => {
         wndPayload.frames = wndPayload.frames.filter((frame) => !frame.isPrivate)
       })
+      // tabs will be auto-reset to what the frame is in cleanAppData but just in
+      // case clean fails we don't want to save private tabs.
+      payload.perWindowState.forEach((wndPayload) => {
+        wndPayload.tabs = wndPayload.tabs.filter((tab) => !tab.isPrivate)
+      })
     } else {
       delete payload.perWindowState
     }
@@ -63,6 +69,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
     } catch (e) {
       payload.cleanedOnShutdown = false
     }
+    payload.lastAppVersion = app.getVersion()
 
     const epochTimestamp = (new Date()).getTime().toString()
     const tmpStoragePath = process.env.NODE_ENV !== 'test'
@@ -195,6 +202,8 @@ module.exports.cleanPerWindowData = (perWindowData) => {
       .filter((frame) => !frame.pinnedLocation)
     perWindowData.frames.forEach(cleanFrame)
   }
+  // Always recalculate tab data from frame data
+  perWindowData.tabs = perWindowData.frames.map(frame => tabFromFrame(frame))
 }
 
 /**
@@ -300,7 +309,7 @@ module.exports.loadAppState = () => {
       return
     }
     // Clean app data here if it wasn't cleared on shutdown
-    if (data.cleanedOnShutdown !== true) {
+    if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
       module.exports.cleanAppData(data, false)
     }
     data.cleanedOnShutdown = false

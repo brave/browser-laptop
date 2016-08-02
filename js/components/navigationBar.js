@@ -20,6 +20,7 @@ const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const getSetting = require('../settings').getSetting
+const windowStore = require('../stores/windowStore')
 
 class NavigationBar extends ImmutableComponent {
   constructor () {
@@ -30,13 +31,19 @@ class NavigationBar extends ImmutableComponent {
     this.onNoScript = this.onNoScript.bind(this)
   }
 
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
+  }
+
   get loading () {
-    return this.props.activeFrame &&
-      this.props.activeFrame.get('loading')
+    return this.props.activeFrameKey !== undefined && this.props.loading
   }
 
   onToggleBookmark (isBookmarked) {
-    const siteDetail = siteUtil.getDetailFromFrame(this.props.activeFrame, siteTags.BOOKMARK)
+    if (isBookmarked === undefined) {
+      isBookmarked = this.bookmarked
+    }
+    const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const hasBookmark = this.props.sites.find(
       (site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER)
@@ -68,18 +75,18 @@ class NavigationBar extends ImmutableComponent {
   }
 
   get bookmarked () {
-    return this.props.activeFrame &&
+    return this.props.activeFrameKey !== undefined &&
       isSiteInList(this.props.sites, Immutable.fromJS({
-        location: this.props.activeFrame.get('location'),
-        partitionNumber: this.props.activeFrame.get('partitionNumber'),
-        title: this.props.activeFrame.get('title')
+        location: this.props.location,
+        partitionNumber: this.props.partitionNumber,
+        title: this.props.title
       }), siteTags.BOOKMARK)
   }
 
   get titleMode () {
     return this.props.mouseInTitlebar === false &&
-      this.props.activeFrame.get('title') &&
-      !['about:blank', 'about:newtab'].includes(this.props.activeFrame.get('location')) &&
+      this.props.title &&
+      !['about:blank', 'about:newtab'].includes(this.props.location) &&
       !this.loading &&
       !this.props.navbar.getIn(['urlbar', 'focused']) &&
       !this.props.navbar.getIn(['urlbar', 'active']) &&
@@ -92,8 +99,7 @@ class NavigationBar extends ImmutableComponent {
   }
 
   get showNoScriptInfo () {
-    const scriptsBlocked = this.props.activeFrame.getIn(['noScript', 'blocked'])
-    return this.props.enableNoScript && scriptsBlocked && scriptsBlocked.size
+    return this.props.enableNoScript && this.props.scriptsBlocked && this.props.scriptsBlocked.size
   }
 
   onNoScript () {
@@ -105,8 +111,8 @@ class NavigationBar extends ImmutableComponent {
     const prevBookmarked = prevProps.activeFrame &&
       isSiteInList(prevProps.sites, Immutable.fromJS({
         location: prevProps.activeFrame.get('location'),
-        partitionNumber: this.props.activeFrame.get('partitionNumber'),
-        title: this.props.activeFrame.get('title')
+        partitionNumber: this.props.partitionNumber,
+        title: this.props.title
       }), siteTags.BOOKMARK)
     if (this.bookmarked !== prevBookmarked) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
@@ -118,19 +124,18 @@ class NavigationBar extends ImmutableComponent {
   }
 
   render () {
-    const frameProps = this.props.activeFrame
-    if (!frameProps) {
+    if (this.props.activeFrameKey === undefined) {
       return null
     }
 
     return <div id='navigator'
       ref='navigator'
-      data-frame-key={frameProps.get('key')}
+      data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.titleMode
       })}>
       {
-        isSourceAboutUrl(frameProps.get('location')) || this.titleMode
+        isSourceAboutUrl(this.props.location) || this.titleMode
         ? null
         : <div className='startButtons'>
         {
@@ -156,15 +161,22 @@ class NavigationBar extends ImmutableComponent {
       }
       <UrlBar ref='urlBar'
         sites={this.props.sites}
-        activeFrameProps={frameProps}
+        activeFrameKey={this.props.activeFrameKey}
         searchDetail={this.props.searchDetail}
-        frames={this.props.frames}
         loading={this.loading}
+        location={this.props.location}
+        suggestionIndex={this.props.suggestionIndex}
+        title={this.props.title}
+        history={this.props.history}
+        isSecure={this.props.isSecure}
+        locationValueSuffix={this.props.locationValueSuffix}
+        startLoadTime={this.props.startLoadTime}
+        endLoadTime={this.props.endLoadTime}
         titleMode={this.titleMode}
         urlbar={this.props.navbar.get('urlbar')}
         />
       {
-        isSourceAboutUrl(frameProps.get('location'))
+        isSourceAboutUrl(this.props.location)
         ? null
         : <div className='endButtons'>
           {
@@ -184,7 +196,7 @@ class NavigationBar extends ImmutableComponent {
               removeBookmarkButton: this.bookmarked
             })}
             l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-            onClick={() => this.onToggleBookmark(this.bookmarked)} />
+            onClick={this.onToggleBookmark} />
         </div>
       }
     </div>

@@ -7,6 +7,7 @@ const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const Tab = require('./tab')
 const windowActions = require('../actions/windowActions')
+const windowStore = require('../stores/windowStore')
 const appActions = require('../actions/appActions')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
@@ -34,10 +35,10 @@ class PinnedTabs extends ImmutableComponent {
     // will cause the onDragEnd to never run
     setTimeout(() => {
       const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((tab) => tab && tab.props.frameProps.get('key') !== key), clientX).selectedRef
+      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.tab.get('frameKey') !== key), clientX).selectedRef
       if (droppedOnTab) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        const droppedOnFrameProps = this.props.frames.find((frame) => frame.get('key') === droppedOnTab.props.frameProps.get('key'))
+        const droppedOnFrameProps = windowStore.getFrame(droppedOnTab.props.tab.get('frameKey'))
         windowActions.moveTab(sourceDragData, droppedOnFrameProps, isLeftSide)
         if (!sourceDragData.get('pinnedLocation')) {
           windowActions.setPinned(sourceDragData, true)
@@ -61,19 +62,15 @@ class PinnedTabs extends ImmutableComponent {
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}>
        {
-          this.props.frames
-            .filter((frameProps) => frameProps.get('pinnedLocation'))
-            .map((frameProps) =>
-              <Tab activeDraggedTab={this.props.tabs.get('activeDraggedTab')}
-                ref={(node) => this.tabRefs.push(node)}
+          this.props.pinnedTabs
+            .map((tab) =>
+              <Tab ref={(node) => this.tabRefs.push(node)}
                 draggingOverData={this.props.draggingOverData}
-                frameProps={frameProps}
-                frames={this.props.frames}
-                key={'tab-' + frameProps.get('key')}
+                tab={tab}
+                key={'tab-' + tab.get('frameKey')}
                 paintTabs={this.props.paintTabs}
                 previewTabs={this.props.previewTabs}
-                isActive={this.props.activeFrame === frameProps}
-                isPrivate={frameProps.get('isPrivate')}
+                isActive={this.props.activeFrameKey === tab.get('frameKey')}
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
       }
     </div>

@@ -8,6 +8,7 @@ require('../braveUnit')
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],
+  tabs: [],
   closedFrames: []
 })
 
@@ -161,10 +162,16 @@ describe('frameStateUtil', function () {
   })
 
   describe('removeFrame', function () {
-    let frames, closedFrames, frameProps, activeFrameKey
+    let frames, tabs, closedFrames, frameProps, activeFrameKey
 
     beforeEach(function () {
       frames = Immutable.fromJS([
+        { key: 2 },
+        { key: 3 },
+        { key: 4, pinnedLocation: 'https://www.facebook.com/' },
+        { key: 5, pinnedLocation: 'https://twitter.com/' }
+      ])
+      tabs = Immutable.fromJS([
         { key: 2 },
         { key: 3 },
         { key: 4, pinnedLocation: 'https://www.facebook.com/' },
@@ -176,14 +183,14 @@ describe('frameStateUtil', function () {
     })
 
     it('removed frame is added to `closedFrames`', function () {
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(false, inClosedFrames === undefined)
     })
 
     it('sets isFullScreen=false for the removed frame', function () {
       frameProps = Immutable.fromJS({ key: 2, isFullScreen: true })
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(false, inClosedFrames.get('isFullScreen'))
     })
@@ -191,13 +198,13 @@ describe('frameStateUtil', function () {
     it('removed frame is NOT added to `closedFrames` if private', function () {
       frames = Immutable.fromJS([{ key: 2 }])
       frameProps = Immutable.fromJS({ isPrivate: true, key: 2 })
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(true, inClosedFrames === undefined)
     })
 
     it('removes the frame from `frames`', function () {
-      const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
       const inFrames = result.frames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(true, inFrames === undefined)
     })
@@ -205,20 +212,20 @@ describe('frameStateUtil', function () {
     describe('does not change `activeFrameKey`', function () {
       it('if frame removed is not active', function () {
         activeFrameKey = 3
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
 
       it('if there are no frames left', function () {
         frames = Immutable.fromJS([{ key: 2 }])
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
     })
 
     describe('when active frame is removed', function () {
       it('returns the next *non-pinned* active frame key', function () {
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
         assert.equal(3, result.activeFrameKey)
       })
 
@@ -229,7 +236,7 @@ describe('frameStateUtil', function () {
           key: 3
         })
         activeFrameKey = 3
-        const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
         assert.equal(2, result.activeFrameKey)
       })
 
@@ -239,7 +246,7 @@ describe('frameStateUtil', function () {
             { key: 2 },
             { pinnedLocation: 'https://www.facebook.com/', key: 4 }
           ])
-          const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+          const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
           assert.equal(4, result.activeFrameKey)
         })
 
@@ -248,7 +255,7 @@ describe('frameStateUtil', function () {
             { pinnedLocation: 'https://www.facebook.com/', key: 6 },
             { key: 2 }
           ])
-          const result = frameStateUtil.removeFrame(frames, closedFrames, frameProps, activeFrameKey)
+          const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
           assert.equal(6, result.activeFrameKey)
         })
       })
