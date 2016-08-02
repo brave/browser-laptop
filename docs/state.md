@@ -156,6 +156,7 @@ AppStore
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
+    'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'shutdown.clear-history': boolean, // true to clear history on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown

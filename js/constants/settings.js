@@ -43,7 +43,8 @@ const settings = {
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',
-  DEFAULT_ZOOM_LEVEL: 'advanced.default-zoom-level'
+  DEFAULT_ZOOM_LEVEL: 'advanced.default-zoom-level',
+  SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled'
 }
 
 module.exports = settings
