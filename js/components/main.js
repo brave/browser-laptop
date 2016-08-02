@@ -881,7 +881,8 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
                 : null}
-              isFullScreen={frame.get('isFullScreen') && frame.get('showFullScreenWarning')}
+              isFullScreen={frame.get('isFullScreen')}
+              showFullScreenWarning={frame.get('showFullScreenWarning')}
               findbarShown={frame.get('findbarShown')}
               findbarSelected={frame.get('findbarSelected')}
               findDetail={frame.get('findDetail')}
