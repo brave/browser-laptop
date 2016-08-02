@@ -110,7 +110,7 @@ module.exports = {
     'advanced.hardware-acceleration-enabled': true,
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
-    'advanced.smooth-scroll-enabled': true,
+    'advanced.smooth-scroll-enabled': false,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
