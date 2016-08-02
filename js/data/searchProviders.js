@@ -36,14 +36,12 @@ module.exports = { "providers" :
       "name" : "Twitter",
       "image" : "https://twitter.com/favicon.ico",
       "search" : "https://twitter.com/search?q={searchTerms}&source=desktop-search",
-      "autocomplete" : "https://api.twitter.com/1.1/search/tweets.json?q={searchTerms}",
       "shortcut" : "t"
     },
     {
       "name" : "Wikipedia",
       "image" : "https://en.wikipedia.org/favicon.ico",
       "search" : "https://en.wikipedia.org/wiki/Special:Search?search={searchTerms}",
-      "autocomplete": "https://en.wikipedia.org/w/api.php?search={searchTerms}",
       "shortcut" : "w"
     },
     {

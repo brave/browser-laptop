@@ -361,7 +361,7 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   searchXHR () {
-    if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
+    if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS) || !this.props.searchDetail.get('autocompleteURL')) {
       this.updateSuggestions(this.props.selectedIndex)
       return
     }
