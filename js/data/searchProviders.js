@@ -6,16 +6,16 @@ module.exports = { "providers" :
   [
     {
       "name" : "Amazon",
-      "image" : "http://www.amazon.com/favicon.ico",
-      "search" : "http://www.amazon.com/exec/obidos/external-search/?field-keywords={searchTerms}&mode=blended",
-      "autocomplete" : "http://completion.amazon.com/search/complete?method=completion&q={searchTerms}&search-alias=aps&client=amazon-search-ui&mkt=1",
+      "image" : "https://www.amazon.com/favicon.ico",
+      "search" : "https://www.amazon.com/exec/obidos/external-search/?field-keywords={searchTerms}&mode=blended",
+      "autocomplete" : "https://completion.amazon.com/search/complete?method=completion&q={searchTerms}&search-alias=aps&client=amazon-search-ui&mkt=1",
       "shortcut" : "a"
     },
     {
       "name" : "Bing",
       "image" : "https://www.bing.com/favicon.ico",
       "search" : "https://www.bing.com/search?q={searchTerms}",
-      "autocomplete" : "http://api.bing.com/osjson.aspx?query={searchTerms}&language={language}&form=OSDJAS",
+      "autocomplete" : "https://api.bing.com/osjson.aspx?query={searchTerms}&language={language}&form=OSDJAS",
       "shortcut" : "b"
     },
     {
@@ -42,8 +42,8 @@ module.exports = { "providers" :
     {
       "name" : "Wikipedia",
       "image" : "https://en.wikipedia.org/favicon.ico",
-      "search" : "http://en.wikipedia.org/wiki/Special:Search?search={searchTerms}",
-      "autocomplete": "http://en.wikipedia.org/w/api.php?search={searchTerms}",
+      "search" : "https://en.wikipedia.org/wiki/Special:Search?search={searchTerms}",
+      "autocomplete": "https://en.wikipedia.org/w/api.php?search={searchTerms}",
       "shortcut" : "w"
     },
     {
@@ -57,7 +57,7 @@ module.exports = { "providers" :
       "name" : "Youtube",
       "image" : "https://www.youtube.com/favicon.ico",
       "search" : "https://www.youtube.com/results?search_type=search_videos&search_query={searchTerms}&search_sort=relevance&search_category=0&page=",
-      "autocomplete": "http://suggestqueries.google.com/complete/search?output=chrome&client=chrome&hl=it&q={searchTerms}&ds=yt",
+      "autocomplete": "https://suggestqueries.google.com/complete/search?output=chrome&client=chrome&hl=it&q={searchTerms}&ds=yt",
       "shortcut" : "yt"
     }
   ]
