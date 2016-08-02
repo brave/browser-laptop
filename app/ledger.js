@@ -358,7 +358,7 @@ var run = (delayTime) => {
 }
 
 var getStateInfo = (state) => {
-  var i
+  var ballots, i, transaction
   var info = state.paymentInfo
   var then = underscore.now() - msecs.year
 
@@ -379,10 +379,23 @@ var getStateInfo = (state) => {
   if (!state.transactions) return
 
   for (i = state.transactions.length - 1; i >= 0; i--) {
-    if (state.transactions[i].stamp < then) break
+    transaction = state.transactions[i]
+    if (transaction.stamp < then) break
 
-    returnValue.transactions.push(underscore.extend(underscore.omit(state.transactions[i], [ 'fee' ]),
-                                                    state.transactions[i].fee))
+    ballots = {}
+    underscore.keys(transaction.ballots || {}).forEach((publisher) => {
+      ballots[publisher] = transaction.ballots[publisher].submissionIds.length
+    })
+    state.ballots.forEach((ballot) => {
+      if (ballot.viewingId !== transaction.viewingId) return
+
+      if (!ballots[ballot.publisher]) ballots[ballot.publisher] = 0
+      ballots[ballot.publisher]++
+    })
+
+    returnValue.transactions.push(underscore.extend(underscore.pick(transaction,
+                                                                    [ 'viewingId', 'stamp', 'currency', 'amount' ]),
+                                                    { ballots: ballots }))
   }
 }
 
