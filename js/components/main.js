@@ -901,6 +901,14 @@ class Main extends ImmutableComponent {
               unloaded={frame.get('unloaded')}
               audioMuted={frame.get('audioMuted')}
               passwords={this.props.appState.get('passwords')}
+              adblock={this.props.appState.get('adblock')}
+              safeBrowsing={this.props.appState.get('safeBrowsing')}
+              httpsEverywhere={this.props.appState.get('httpsEverywhere')}
+              trackingProtection={this.props.appState.get('trackingProtection')}
+              adInsertion={this.props.appState.get('adInsertion')}
+              noScript={this.props.appState.get('noScript')}
+              flash={this.props.appState.get('flash')}
+              cookieblock={this.props.appState.get('cookieblock')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
