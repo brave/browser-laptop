@@ -2,6 +2,8 @@
 
 ## [0.11.2](https://github.com/brave/browser-laptop/releases/v0.11.2dev)
 - Added history on long click over back and forward buttons. ([#1622](https://github.com/brave/browser-laptop/issues/1622))
+- Added search panel to preferences with more search options. ([#2694](https://github.com/brave/browser-laptop/issues/2694))
+- Added search shortcuts (Example: "yt cat videos" in the URL bar to search for cat videos on YouTube). ([#2694](https://github.com/brave/browser-laptop/issues/2694))
 - Added a search box to the Bookmarks page (about:bookmarks) ([#995](https://github.com/brave/browser-laptop/issues/995))
 - Added context menu for cloning a tab including back-forward history. ([#2593](https://github.com/brave/browser-laptop/pull/2593))
 - Added support for forking navigation via `CmdOrCtrl+Click` on back, forward or reload buttons. ([#2753](https://github.com/brave/browser-laptop/issues/2753))
@@ -13,6 +15,7 @@
 - Added search image on context menu if default engine is google. ([#2606](https://github.com/brave/browser-laptop/issues/2606))
 - Added a way to view SSL certificates when there is an error. ([#1057](https://github.com/brave/browser-laptop/issues/1057))
 - Security (Severity: High): Address Bar Spoofing security. ([#2723](https://github.com/brave/browser-laptop/issues/2723))
+- Optimized React rendering and IPC when typing in the URL bar. ([#2736](https://github.com/brave/browser-laptop/issues/2736))
 - Changed tab-specific notifications to only be shown on the active tab. ([#1928](https://github.com/brave/browser-laptop/issues/1928))
 - Changed bookmarks bar to auto opens on first bookmark if no bookmarks exist. ([#1487](https://github.com/brave/browser-laptop/issues/1487))
 - Fixed auto logging out when clear cookies on shutdown option is on. ([#2620](https://github.com/brave/browser-laptop/issues/2620))
