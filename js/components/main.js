@@ -892,7 +892,7 @@ class Main extends ImmutableComponent {
               isPrivate={frame.get('isPrivate')}
               partitionNumber={frame.get('partitionNumber')}
               activeShortcut={frame.get('activeShortcut')}
-              activeShortcutDetail={frame.get('activeShortcutDetail')}
+              activeShortcutDetails={frame.get('activeShortcutDetails')}
               provisionalLocation={frame.get('provisionalLocation')}
               pinnedLocation={frame.get('pinnedLocation')}
               src={frame.get('src')}
