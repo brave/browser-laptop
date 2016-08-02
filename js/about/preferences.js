@@ -181,7 +181,8 @@ class SearchSelectEntry extends ImmutableComponent {
   }
   render () {
     return <div>
-    {this.props.settings.get('search.default-search-engine') === this.props.name ? 'x' : ''}
+    {this.props.settings.get('search.default-search-engine') === this.props.name
+      ? <span className='fa fa-check-square' id='searchSelectIcon' /> : null}
     </div>
   }
 }
