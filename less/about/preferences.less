@@ -455,7 +455,7 @@ table.sortableTable {
       background-color: @switchBG_on;
       .switchIndicator {
         left: auto;
-        right: 3px;
+        right: 2px;
       }
     }
   }
@@ -503,20 +503,20 @@ table.sortableTable {
   .switchBackground {
     background-color: @switchBG_off;
     border-radius: 12px;
-    height: 16px;
+    height: @switchHeight;
     position: relative;
-    width: 45px;
-    box-shadow: inset 0 1px 4px @black25, 0 1px 4px @lightGray;
+    width: @switchWidth;
+    box-shadow: @switchShadow;
 
     .switchIndicator {
       background-color: white;
       border-radius: 100%;
-      height: 12px;
-      left: 2px;
+      height: @switchNubDiameter;
+      left: @switchNubLeftMargin;
       position: absolute;
-      top: 2px;
-      width: 12px;
-      box-shadow: 1px 1px 5px -2px black;
+      top: @switchNubTopMargin;
+      width: @switchNubDiameter;
+      box-shadow: @switchNubShadow;
     }
   }
 }
