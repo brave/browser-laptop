@@ -64,6 +64,8 @@ var currentTimestamp = underscore.now()
 
 var returnValue = {
   enabled: true,
+  creating: true,
+  created: true,
   synopsis: null,
   statusText: null,
   notifyP: false,
@@ -361,6 +363,10 @@ var getStateInfo = (state) => {
   var ballots, i, transaction
   var info = state.paymentInfo
   var then = underscore.now() - msecs.year
+
+  returnValue.creating = returnValue.created = false
+  if (state.wallet) returnValue.created = true
+  else if (state.persona) returnValue.creating = true
 
   returnValue._internal.reconcileStamp = state.reconcileStamp
   returnValue._internal.reconcileDelay = state.prepareTransaction && state.delayStamp
