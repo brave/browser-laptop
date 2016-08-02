@@ -240,6 +240,7 @@ class UrlBar extends ImmutableComponent {
     windowActions.setUrlBarSelected(false)
     windowActions.setUrlBarActive(true)
     windowActions.setNavBarUserInput(e.target.value)
+    this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
   }
 
@@ -388,7 +389,8 @@ class UrlBar extends ImmutableComponent {
             width: searchIconSize,
             backgroundSize: searchIconSize,
             height: searchIconSize,
-            marginTop: '3px'
+            marginTop: '3px',
+            marginRight: '3px'
           } : {}
         } />
         {
