@@ -6,7 +6,9 @@ const Immutable = require('immutable')
 
 // Top 500 alexa sites sorted by popularity
 const top500 = Immutable.fromJS([
+  'gmail.com',
   'google.com',
+  'mail.google.com',
   'facebook.com',
   'youtube.com',
   'yahoo.com',
