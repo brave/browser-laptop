@@ -301,6 +301,13 @@ module.exports.loadAppState = () => {
 
     try {
       data = Object.assign(module.exports.defaultAppState(), JSON.parse(data))
+      // xml migration
+      if (data.settings['search.default-search-engine'] === 'content/search/google.xml') {
+        data.settings['search.default-search-engine'] = 'Google'
+      }
+      if (data.settings['search.default-search-engine'] === 'contnt/search/duckduckgo.xml') {
+        data.settings['search.default-search-engine'] = 'DuckDuckGo'
+      }
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.

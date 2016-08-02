@@ -6,6 +6,7 @@ const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, 
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
+const searchProviders = require('../../js/data/searchProviders')
 
 describe('navigationBar', function () {
   function * setup (client) {
@@ -454,6 +455,49 @@ describe('navigationBar', function () {
         const url = Brave.server.url('page1.html')
         yield this.app.client.waitUntil(function () {
           return this.getAttribute(activeWebview, 'src').then((src) => src === url)
+        })
+      })
+    })
+  })
+
+  describe('search engine go key', function () {
+    Brave.beforeAll(this)
+    const entries = searchProviders.providers
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.waitForExist(urlInput)
+      yield this.app.client.waitForElementFocus(urlInput)
+      yield this.app.client.waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === '')
+      })
+    })
+
+    entries.forEach((entry) => {
+      describe('each entry', function () {
+        before(function * () {
+          // escape
+          yield this.app.client.ipcSend('shortcut-active-frame-stop')
+          // type go key
+          yield this.app.client.keys(entry.shortcut + ' ')
+        })
+
+        it('sets the value', function * () {
+          yield this.app.client.waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === entry.shortcut)
+          })
+        })
+
+        it('has focus', function * () {
+          yield this.app.client.waitForElementFocus(urlInput)
+        })
+
+        it('has the icon', function * () {
+          yield this.app.client
+            .waitForExist(urlbarIcon)
+            .getCssProperty(urlbarIcon, 'background-image').then((backgroundImage) =>
+              backgroundImage.value === `url("${entry.image}")`
+            )
         })
       })
     })

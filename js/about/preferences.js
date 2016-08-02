@@ -16,6 +16,8 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
+const SortableTable = require('../components/sortableTable')
+const searchProviders = require('../data/searchProviders')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -173,19 +175,68 @@ class GeneralTab extends ImmutableComponent {
   }
 }
 
+class SearchSelectEntry extends ImmutableComponent {
+  shouldComponentUpdate (nextProps, nextState) {
+    return this.props.settings.get('search.default-search-engine') !== nextProps.settings.get('search.default-search-engine')
+  }
+  render () {
+    return <div>
+    {this.props.settings.get('search.default-search-engine') === this.props.name
+      ? <span className='fa fa-check-square' id='searchSelectIcon' /> : null}
+    </div>
+  }
+}
+
+class SearchEntry extends ImmutableComponent {
+  render () {
+    return <div>
+      <span style={this.props.iconStyle}>
+      </span>
+      <span style={{paddingLeft: '5px', verticalAlign: 'middle'}}>{this.props.name}</span>
+    </div>
+  }
+}
+
+class SearchShortcutEntry extends ImmutableComponent {
+  render () {
+    return <div style={{paddingLeft: '5px', verticalAlign: 'middle'}}>
+      {this.props.shortcut}
+    </div>
+  }
+}
+
 class SearchTab extends ImmutableComponent {
+  get searchProviders () {
+    let entries = searchProviders.providers
+    let array = []
+    const iconSize = 16
+    entries.forEach((entry) => {
+      let iconStyle = {
+        backgroundImage: `url(${entry.image})`,
+        minWidth: iconSize,
+        width: iconSize,
+        backgroundSize: iconSize,
+        height: iconSize,
+        display: 'inline-block',
+        verticalAlign: 'middle'
+      }
+      array.push([<SearchSelectEntry name={entry.name} settings={this.props.settings} />,
+        <SearchEntry name={entry.name} iconStyle={iconStyle}
+          onChangeSetting={this.props.onChangeSetting} />,
+        <SearchShortcutEntry shortcut={entry.shortcut} />])
+    })
+    return array
+  }
+
+  hoverCallback (rows) {
+    this.props.onChangeSetting(settings.DEFAULT_SEARCH_ENGINE, rows[1].props.children.props.name)
+  }
+
   render () {
     return <div>
       <div className='sectionTitle' data-l10n-id='searchSettings' />
-      <SettingsList>
-        <SettingItem dataL10nId='defaultSearchEngine'>
-          <select value={getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.DEFAULT_SEARCH_ENGINE)}>
-            <option value='content/search/google.xml'>Google</option>
-            <option value='content/search/duckduckgo.xml'>DuckDuckGo</option>
-          </select>
-        </SettingItem>
-      </SettingsList>
+      <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
+        isHover hoverCallback={this.hoverCallback.bind(this)} />
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showHistoryMatches' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

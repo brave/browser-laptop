@@ -788,7 +788,7 @@ function mainTemplateInit (nodeProps, frame) {
       },
       copyAddressMenuItem('copyImageAddress', nodeProps.srcURL)
     )
-    if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'content/search/google.xml' &&
+    if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'Google' &&
       nodeProps.srcURL && urlParse(nodeProps.srcURL).protocol !== 'data:') {
       template.push(
         {
