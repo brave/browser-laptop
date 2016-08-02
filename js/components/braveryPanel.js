@@ -168,7 +168,7 @@ class BraveryPanel extends ImmutableComponent {
         <div className='braveryPanelHeader'>
           <div className='braveryPanelHeaderLeft'>
             <div data-l10n-id='braveryPanelTitle' />
-            <span className='braverySettingsFor'>{this.displayHost}</span>
+            <span title={this.displayHost} className='braverySettingsFor'>{this.displayHost}</span>
           </div>
           <div className='braveryPanelHeaderRight'>
             <div className='braveryShieldsUpDown'>
