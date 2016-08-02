@@ -1,6 +1,7 @@
 {
   "icon": "res/app.png",
   "section": "web",
-  "categories": ["Network"]
+  "categories": ["Network","WebBrowser"],
+  "mimeType": ["text/html", "text/xml", "application/xhtml_xml", "image/webp","x-scheme-handler/http", "x-scheme-handler/https", "x-scheme-handler/ftp"]
 }
 
