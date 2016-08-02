@@ -383,7 +383,7 @@ class UrlBar extends ImmutableComponent {
         style={
           this.activateSearchEngine
           ? {
-            backgroundImage: `url(${this.searchSelectEntry['image-url']})`,
+            backgroundImage: `url(${this.searchSelectEntry.image})`,
             minWidth: searchIconSize,
             width: searchIconSize,
             backgroundSize: searchIconSize,
