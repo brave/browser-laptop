@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
-const { aboutUrls } = require('../lib/appUrlUtil')
+const { aboutUrls, isIntermediateAboutPage }  = require('../lib/appUrlUtil')
 
 class AboutAbout extends ImmutableComponent {
   render () {
@@ -12,7 +12,7 @@ class AboutAbout extends ImmutableComponent {
       <h1 data-l10n-id='listOfAboutPages' />
       <ul>
       {
-      aboutUrls.keySeq().sort().map((aboutSourceUrl) =>
+      aboutUrls.keySeq().sort().filter((aboutSourceUrl) => !isIntermediateAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
         <li>
           <a href={aboutUrls.get(aboutSourceUrl)} target='_blank'>
             {aboutSourceUrl}
