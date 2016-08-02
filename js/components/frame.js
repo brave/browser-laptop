@@ -525,6 +525,9 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
+        case messages.ABOUT_COMPONENT_INITIALIZED:
+          this.updateAboutDetails()
+          break
         case messages.GOT_CANVAS_FINGERPRINTING:
           method = (detail) => {
             const description = [detail.type, detail.scriptUrl || this.props.location].join(': ')

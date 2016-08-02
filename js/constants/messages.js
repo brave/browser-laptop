@@ -128,6 +128,7 @@ const messages = {
   RELOAD_URL: _,
   DISPATCH_ACTION: _,
   CHECK_FLASH_INSTALLED: _,
+  ABOUT_COMPONENT_INITIALIZED: _,
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
