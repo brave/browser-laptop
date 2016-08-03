@@ -259,6 +259,20 @@ describe('navigationBar', function () {
             classes.includes('fa-lock')
           ))
     })
+    it('Blocks active mixed content', function * () {
+      const page1Url = 'https://mixed-script.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl)
+        .url(page1Url)
+        .waitUntil(() => {
+          return this.app.client.execute(() => document.readyState).then((ret) =>
+            ret.value === 'complete'
+          )
+        }).waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+    })
   })
 
   describe('themeColor', function () {
