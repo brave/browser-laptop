@@ -12,10 +12,8 @@ const cx = require('../lib/classSet.js')
 const siteUtil = require('../state/siteUtil')
 const FrameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
-const { getZoomValuePercentage, getNextZoomLevel } = require('../lib/zoom')
 const messages = require('../constants/messages.js')
 const contextMenus = require('../contextMenus')
-const config = require('../constants/config.js')
 const siteHacks = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const clipboard = global.require('electron').clipboard
@@ -225,6 +223,10 @@ class Frame extends ImmutableComponent {
         this.runOnDomReady = cb
         let eventCallback = (e) => {
           this.webview.removeEventListener(e.type, eventCallback)
+          // handle deprectaed zoom level site settings
+          if (this.zoomLevel) {
+            this.webview.setZoomLevel(this.zoomLevel)
+          }
           this.runOnDomReady()
           delete this.runOnDomReady
         }
@@ -240,7 +242,6 @@ class Frame extends ImmutableComponent {
   componentDidMount () {
     const cb = () => {
       this.webview.setActive(this.props.isActive)
-      this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
       this.webview.setAudioMuted(this.props.audioMuted || false)
       this.updateAboutDetails()
     }
@@ -248,30 +249,27 @@ class Frame extends ImmutableComponent {
   }
 
   get zoomLevel () {
-    const activeSiteSettings = this.props.frameSiteSettings
-    if (!activeSiteSettings || activeSiteSettings.get('zoomLevel') === undefined) {
-      const settingDefaultZoom = getSetting(settings.DEFAULT_ZOOM_LEVEL)
-      return settingDefaultZoom === undefined || settingDefaultZoom === null ? config.zoom.defaultValue : settingDefaultZoom
-    }
-    return activeSiteSettings.get('zoomLevel')
-  }
-
-  zoom (zoomIn) {
-    const newZoomLevel =
-      zoomIn === undefined ? undefined : getNextZoomLevel(this.zoomLevel, zoomIn)
-    appActions.changeSiteSetting(this.origin, 'zoomLevel', newZoomLevel, this.props.isPrivate)
+    const zoom = this.props.frameSiteSettings && this.props.frameSiteSettings.get('zoomLevel')
+    appActions.changeSiteSetting(this.origin, 'zoomLevel', null, false)
+    return zoom
   }
 
   zoomIn () {
-    this.zoom(true)
+    if (this.webview) {
+      this.webview.zoomIn()
+    }
   }
 
   zoomOut () {
-    this.zoom(false)
+    if (this.webview) {
+      this.webview.zoomOut()
+    }
   }
 
   zoomReset () {
-    this.zoom()
+    if (this.webview) {
+      this.webview.zoomReset()
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -281,7 +279,6 @@ class Frame extends ImmutableComponent {
       }
       this.webview.setActive(this.props.isActive)
       this.handleShortcut()
-      this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
       // give focus when switching tabs
       if (this.props.isActive && !prevProps.isActive) {
         this.webview.focus()

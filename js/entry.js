@@ -25,6 +25,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
 const electron = global.require('electron')
+const currentWindow = require('../app/renderer/currentWindow')
 const ipc = electron.ipcRenderer
 const webFrame = electron.webFrame
 const windowStore = require('./stores/windowStore')
@@ -36,6 +37,8 @@ const patch = require('immutablepatch')
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
 webFrame.setZoomLevelLimits(0, 0)
+// override any default zoom level changes
+currentWindow.webContents.setZoomLevel(0.0)
 
 // get appStore from url
 ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {

@@ -18,6 +18,7 @@ const UpdateStatus = require('../constants/updateStatus')
 const downloadStates = require('../constants/downloadStates')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
+const Filtering = require('../../app/filtering')
 const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const dates = require('../../app/dates')
@@ -292,6 +293,9 @@ function handleChangeSettingAction (settingKey, settingValue) {
         wnd.setAutoHideMenuBar(settingValue)
         wnd.setMenuBarVisibility(!settingValue)
       })
+      break
+    case settings.DEFAULT_ZOOM_LEVEL:
+      Filtering.setDefaultZoomLevel(settingValue)
       break
     default:
   }

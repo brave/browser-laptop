@@ -21,6 +21,7 @@ const promisify = require('../js/lib/promisify')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
+const config = require('../js/constants/config')
 const locale = require('./locale')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
@@ -414,6 +415,7 @@ function registerForDownloadListener (session) {
 
 function registerSession (partition, fn) {
   let ses = session.fromPartition(partition)
+  ses.userPrefs.setDefaultZoomLevel(getSetting(settings.DEFAULT_ZOOM_LEVEL) || config.zoom.defaultValue)
   registeredSessions[partition] = ses
   fn(ses, partition)
 }
@@ -554,4 +556,11 @@ module.exports.clearCache = () => {
     p = p.then(promisify(ses.clearCache.bind(ses)).catch(() => {}))
   }
   return p
+}
+
+module.exports.setDefaultZoomLevel = (zoom) => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    ses.userPrefs.setDefaultZoomLevel(zoom)
+  }
 }
