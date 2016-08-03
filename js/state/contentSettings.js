@@ -79,6 +79,18 @@ const getContentSettingsFromSiteSettings = (appState) => {
       setting: getPasswordManagerEnabled(appState) ? 'allow' : 'block',
       primaryPattern: '*'
     }],
+    runInsecureContent: [{
+      setting: 'block',
+      primaryPattern: '*'
+    }, {
+      setting: 'allow',
+      secondaryPattern: '*',
+      primaryPattern: 'https://www.twitch.tv:443'
+    }, {
+      setting: 'allow',
+      secondaryPattern: '*',
+      primaryPattern: 'https://player.twitch.tv:443'
+    }],
     javascript: [{
       setting: braveryDefaults.noScript ? 'block' : 'allow',
       primaryPattern: '*'
