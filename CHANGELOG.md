@@ -15,6 +15,7 @@
 - Added search image on context menu if default engine is google. ([#2606](https://github.com/brave/browser-laptop/issues/2606))
 - Added a way to view SSL certificates when there is an error. ([#1057](https://github.com/brave/browser-laptop/issues/1057))
 - Security (Severity: High): Address Bar Spoofing security. ([#2723](https://github.com/brave/browser-laptop/issues/2723))
+- Security (Severity: High): Re-enable mixed content blocking. ([#2887](https://github.com/brave/browser-laptop/issues/2887))
 - Optimized React rendering and IPC when typing in the URL bar. ([#2736](https://github.com/brave/browser-laptop/issues/2736))
 - Changed tab-specific notifications to only be shown on the active tab. ([#1928](https://github.com/brave/browser-laptop/issues/1928))
 - Changed bookmarks bar to auto opens on first bookmark if no bookmarks exist. ([#1487](https://github.com/brave/browser-laptop/issues/1487))
