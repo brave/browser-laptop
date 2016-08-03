@@ -8,7 +8,7 @@ function blockReferer () {
     var parser = document.createElement('a')
     parser.href = document.referrer
     if (parser.origin !== document.location.origin) {
-      window.Document.prototype.__defineGetter__('referrer', () => { return 'https://example.com' })
+      window.Document.prototype.__defineGetter__('referrer', () => { return document.location.origin })
     }
   }
 }
