@@ -197,7 +197,7 @@ function registerForBeforeSendHeaders (session) {
         }
         if (requestHeaders['Referer'] &&
             !refererExceptions.includes(parsedUrl.hostname)) {
-          requestHeaders['Referer'] = undefined
+          requestHeaders['Referer'] = 'https://example.com'
         }
       }
     }
