@@ -31,6 +31,7 @@ const getPasswordManagerEnabled = (appState) => {
   let appSettings = appState.get('settings')
   if (appSettings) {
     if (typeof appSettings.get(settings.PASSWORD_MANAGER_ENABLED) === 'boolean') {
+      // TODO: finish me
       return appSettings.get(settings.PASSWORD_MANAGER_ENABLED)
     }
   }

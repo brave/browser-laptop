@@ -1,0 +1,28 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const passwordManagers = {
+  BUILT_IN: 'BuiltIn',
+  ONE_PASSWORD: '1Password',
+  DASHLANE: 'Dashlane',
+  LAST_PASS: 'LastPass'
+}
+
+let extensionIds = {}
+extensionIds[passwordManagers.BUILT_IN] = null
+extensionIds[passwordManagers.ONE_PASSWORD] = 'aomjjhallfgjeglblehebfpbcfeobpgk'
+extensionIds[passwordManagers.DASHLANE] = 'fdjamakpfbbddfjaooikfcpapjohcfmg'
+extensionIds[passwordManagers.LAST_PASS] = 'hdokiejnpimakedhajhdlcegeplioahd'
+
+let displayNames = {}
+displayNames[passwordManagers.BUILT_IN] = null
+displayNames[passwordManagers.ONE_PASSWORD] = '1Password'
+displayNames[passwordManagers.DASHLANE] = 'Dashlane'
+displayNames[passwordManagers.LAST_PASS] = 'LastPass'
+
+module.exports = {
+  passwordManagers,
+  extensionIds,
+  displayNames
+}
