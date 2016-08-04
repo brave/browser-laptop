@@ -708,9 +708,6 @@ class Frame extends ImmutableComponent {
       }
     }
     this.webview.addEventListener('load-commit', (e) => {
-      // TODO: This is a temporary hack for zoom in 0.11.2.
-      // The code is being reworked to avoid in/out/in zoom effects.
-      this.webview.setZoomFactor(getZoomValuePercentage(this.zoomLevel) / 100)
       loadStart(e)
     })
     this.webview.addEventListener('load-start', (e) => {
