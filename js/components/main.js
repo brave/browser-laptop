@@ -703,7 +703,7 @@ class Main extends ImmutableComponent {
       {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
-          activeSiteSettings={activeSiteSettings}
+          lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
         : null
       }

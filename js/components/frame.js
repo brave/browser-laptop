@@ -257,18 +257,21 @@ class Frame extends ImmutableComponent {
   zoomIn () {
     if (this.webview) {
       this.webview.zoomIn()
+      windowActions.setLastZoomPercentage(this.frame, this.webview.getZoomPercent())
     }
   }
 
   zoomOut () {
     if (this.webview) {
       this.webview.zoomOut()
+      windowActions.setLastZoomPercentage(this.frame, this.webview.getZoomPercent())
     }
   }
 
   zoomReset () {
     if (this.webview) {
       this.webview.zoomReset()
+      windowActions.setLastZoomPercentage(this.frame, this.webview.getZoomPercent())
     }
   }
 

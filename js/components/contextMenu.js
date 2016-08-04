@@ -6,11 +6,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
-const config = require('../constants/config')
 const cx = require('../lib/classSet.js')
-const getSetting = require('../settings').getSetting
-const settings = require('../constants/settings')
-const { getZoomValuePercentage } = require('../lib/zoom.js')
 
 class ContextMenuItem extends ImmutableComponent {
   get submenu () {
@@ -87,16 +83,12 @@ class ContextMenuItem extends ImmutableComponent {
       return label
     }
     if (item.get('labelDataBind') === 'zoomLevel') {
-      // The original zoomLevel is 0 and each increment above or below represents zooming 20% larger or smaller
-      const activeSiteSettings = this.props.activeSiteSettings
-      let zoomLevel
-      if (!activeSiteSettings || activeSiteSettings.get('zoomLevel') === undefined) {
-        const settingDefaultZoom = getSetting(settings.DEFAULT_ZOOM_LEVEL)
-        zoomLevel = settingDefaultZoom === undefined || settingDefaultZoom === null ? config.zoom.defaultValue : settingDefaultZoom
-      } else {
-        zoomLevel = activeSiteSettings.get('zoomLevel')
+      const activeWebview = document.querySelector('.frameWrapper.isActive webview')
+      let percent = 100
+      if (activeWebview) {
+        percent = activeWebview.getZoomPercent()
       }
-      return `${getZoomValuePercentage(zoomLevel)}%`
+      return `${percent}%`
     }
     return ''
   }
@@ -199,7 +191,7 @@ class ContextMenuSingle extends ImmutableComponent {
       this.props.template.map((contextMenuItem) =>
         <ContextMenuItem contextMenuItem={contextMenuItem}
           submenuIndex={this.props.submenuIndex}
-          activeSiteSettings={this.props.activeSiteSettings}
+          lastZoomPercentage={this.props.lastZoomPercentage}
           contextMenuDetail={this.props.contextMenuDetail}
         />)
     }
@@ -247,13 +239,13 @@ class ContextMenu extends ImmutableComponent {
       style={styles}>
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
-        activeSiteSettings={this.props.activeSiteSettings}
+        lastZoomPercentage={this.props.lastZoomPercentage}
         template={this.props.contextMenuDetail.get('template')} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
-            activeSiteSettings={this.props.activeSiteSettings}
+            lastZoomPercentage={this.props.lastZoomPercentage}
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')} />)
       }

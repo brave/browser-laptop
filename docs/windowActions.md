@@ -552,6 +552,19 @@ Dispatches a message to indicate that the favicon has changed
 
 
 
+### setLastZoomPercentage(frameProps, percentage) 
+
+Dispatches a message to store the last zoom percentage.
+This is mainly just used to trigger updates throughout React.
+
+**Parameters**
+
+**frameProps**: `object`, The frame to set blocked info on
+
+**percentage**: `number`, The new zoom percentage
+
+
+
 ### setMaximizeState(isMaximized) 
 
 Sets the maximize state of the window
