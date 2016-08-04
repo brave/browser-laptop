@@ -278,7 +278,7 @@ app.on('ready', () => {
 
     // When the browser is closing we need to send a signal
     // to record the currently active location in the ledger
-    ledger.visit('NOOP', new Date().getTime())
+    ledger.quit()
 
     e.preventDefault()
 

@@ -280,6 +280,28 @@ const appActions = {
   },
 
   /**
+   * Updates ledger information for the payments pane
+   * @param {object} ledgerInfo - the current ledger state
+   */
+  updateLedgerInfo: function (ledgerInfo) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_LEDGER_INFO,
+      ledgerInfo
+    })
+  },
+
+  /**
+   * Updates publisher information for the payments pane
+   * @param {object} publisherInfo - the current publisher synopsis
+   */
+  updatePublisherInfo: function (publisherInfo) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_PUBLISHER_INFO,
+      publisherInfo
+    })
+  },
+
+  /**
    * Shows a message box in the notification bar
    * @param {{message: string, buttons: Array.<string>, frameOrigin: string, options: Object}} detail
    */
