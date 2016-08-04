@@ -10,6 +10,7 @@ const defaultScheme = 'http://'
 const fileScheme = 'file://'
 const os = require('os')
 const urlParse = require('url').parse
+const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -285,6 +286,19 @@ const UrlUtil = {
       ['http:', 'https:'].includes(parsed.protocol) &&
       !exemptHostPattern.test(parsed.hostname) &&
       !['/search', '/search/'].includes(parsed.pathname)
+  },
+
+  /**
+   * Gets PDF location from a potential PDFJS URL
+   * @param {string} url
+   * @return {string}
+   */
+  getLocationIfPDF: function (url) {
+    if (url && url.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
+      return url.replace(/^chrome-extension:\/\/.+\/(\w+:\/\/.+)/, '$1')
+    } else {
+      return url
+    }
   },
 
   /**

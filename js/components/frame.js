@@ -394,8 +394,11 @@ class Frame extends ImmutableComponent {
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':
+        const downloadLocation = getSetting(settings.PDFJS_ENABLED)
+          ? UrlUtil.getLocationIfPDF(this.webview.getURL())
+          : this.webview.getURL()
         // TODO: Sometimes this tries to save in a non-existent directory
-        this.webview.downloadURL(this.webview.getURL())
+        this.webview.downloadURL(downloadLocation)
         break
       case 'print':
         this.webview.print()
