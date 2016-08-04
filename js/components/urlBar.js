@@ -446,6 +446,7 @@ class UrlBar extends ImmutableComponent {
             activeFrameKey={this.props.activeFrameKey}
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}
+            searchSelectEntry={this.searchSelectEntry}
             previewActiveIndex={this.props.previewActiveIndex || 0} />
           : null
         }
