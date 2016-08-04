@@ -150,6 +150,8 @@ const getContentSettingsFromSiteSettings = (appState) => {
       addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')
       addContentSettings(contentSettings.adInsertion, hostPattern, '*', 'block')
+      addContentSettings(contentSettings.javascript, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
     }
   }
   return { content_settings: contentSettings }
