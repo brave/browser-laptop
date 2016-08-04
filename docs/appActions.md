@@ -240,6 +240,26 @@ Removes a site setting
 
 
 
+### updateLedgerInfo(ledgerInfo) 
+
+Updates ledger information for the payments pane
+
+**Parameters**
+
+**ledgerInfo**: `object`, the current ledger state
+
+
+
+### updatePublisherInfo(publisherInfo) 
+
+Updates publisher information for the payments pane
+
+**Parameters**
+
+**publisherInfo**: `object`, the current publisher synopsis
+
+
+
 ### showMessageBox(detail) 
 
 Shows a message box in the notification bar
