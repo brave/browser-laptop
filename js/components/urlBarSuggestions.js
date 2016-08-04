@@ -328,8 +328,12 @@ class UrlBarSuggestions extends ImmutableComponent {
         data: this.props.searchResults,
         maxResults: config.urlBarSuggestions.maxSearch,
         type: suggestionTypes.SEARCH,
-        clickHandler: navigateClickHandler((searchTerms) => this.props.searchDetail.get('searchURL')
-          .replace('{searchTerms}', encodeURIComponent(searchTerms)))}))
+        clickHandler: navigateClickHandler((searchTerms) => {
+          let searchURL = this.props.searchSelectEntry
+          ? this.props.searchSelectEntry.search : this.props.searchDetail.get('searchURL')
+          return searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
+        })
+      }))
     }
 
     // Alexa top 500
@@ -361,7 +365,9 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   searchXHR () {
-    if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS) || !this.props.searchDetail.get('autocompleteURL')) {
+    let autocompleteURL = this.props.searchSelectEntry
+    ? this.props.searchSelectEntry.autocomplete : this.props.searchDetail.get('autocompleteURL')
+    if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS) || !autocompleteURL) {
       this.updateSuggestions(this.props.selectedIndex)
       return
     }
@@ -369,7 +375,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     const urlLocation = this.props.urlLocation
     if (!isUrl(urlLocation) && urlLocation.length > 0) {
       const xhr = new window.XMLHttpRequest({mozSystem: true})
-      xhr.open('GET', this.props.searchDetail.get('autocompleteURL')
+      xhr.open('GET', autocompleteURL
         .replace('{searchTerms}', encodeURIComponent(urlLocation)), true)
       xhr.responseType = 'json'
       xhr.send()
