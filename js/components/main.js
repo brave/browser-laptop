@@ -7,6 +7,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
+const systemPreferences = electron.remote.systemPreferences
 
 // Actions
 const windowActions = require('../actions/windowActions')
@@ -179,7 +180,8 @@ class Main extends ImmutableComponent {
       swipeGesture = false
     })
     ipc.on('scroll-touch-begin', function () {
-      if (swipeGesture) {
+      if (swipeGesture &&
+        systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
         trackingFingers = true
         startTime = (new Date()).getTime()
       }
