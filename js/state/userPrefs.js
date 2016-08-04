@@ -21,7 +21,11 @@ const setUserPrefType = (ses, path, value) => {
       ses.userPrefs.setListPref(path, value)
       break
     case 'number':
-      ses.userPrefs.setIntegerPref(path, value)
+      if ((/^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i).test(value.to_s())) {
+        ses.userPrefs.setDoublePref(path, value)
+      } else {
+        ses.userPrefs.setIntegerPref(path, value)
+      }
       break
     case 'boolean':
       ses.userPrefs.setBooleanPref(path, value)
