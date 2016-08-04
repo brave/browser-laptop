@@ -457,11 +457,12 @@ class SecurityTab extends ImmutableComponent {
             <option data-l10n-id='onePassword' value={passwordManagers.ONE_PASSWORD} />
             <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
             <option data-l10n-id='lastPass' value={passwordManagers.LAST_PASS} />
+            <option data-l10n-id='doNotManageMyPasswords' value={passwordManagers.UNMANAGED} />
           </select>
         </SettingItem>
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
-          ? <label className='linkText' data-l10n-id='managePasswords'
+          ? <label className='linkTextSmall' data-l10n-id='managePasswords'
             onClick={aboutActions.newFrame.bind(null, {
               location: 'about:passwords'
             }, true)}>

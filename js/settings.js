@@ -5,7 +5,7 @@
 const appConfig = require('./constants/appConfig')
 const Immutable = require('immutable')
 const settings = require('./constants/settings')
-const {passwordManagers, extensionIds, displayNames} = require('./constants/passwordManagers')
+const {passwordManagers, defaultPasswordManager, extensionIds, displayNames} = require('./constants/passwordManagers')
 
 // Retrofit the new single setting; we don't want to erase values set by the user.
 const passwordManagerDefault = (settingKey, settingsCollection) => {
@@ -18,8 +18,7 @@ const passwordManagerDefault = (settingKey, settingsCollection) => {
   const lastPassEnabled = resolveValue(settings.LAST_PASS_ENABLED, settingsCollection) === true
   if (lastPassEnabled) { return passwordManagers.LAST_PASS }
 
-  // default to Built-In
-  return passwordManagers.BUILT_IN
+  return defaultPasswordManager
 }
 
 const resolveValue = (settingKey, settingsCollection) => {
