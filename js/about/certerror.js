@@ -105,17 +105,34 @@ class CertErrorPage extends React.Component {
         <span className='errorText'>{this.state.error || ''}</span>
         {this.state.certDetail
           ? (<div>
-            <span className='certErrorText'>{'Issued To'}</span>
-            <span className='errorText'>{'Common Name (CN): ' + this.state.certSubjectName}</span>
-            <span className='errorText'>{'Serial Number: ' + this.state.certSerialNumber}</span>
-            <span className='certErrorText'>{'Issued By'}</span>
-            <span className='errorText'>{'Common Name (CN): ' + this.state.certIssuerName}</span>
-            <span className='certErrorText'>{'Period of Validity'}</span>
-            <span className='errorText'>{'Begins On: ' + this.state.certValidStart}</span>
-            <span className='errorText'>{'Expires On: ' + this.state.certValidExpiry}</span>
-            <span className='certErrorText'>{'Fingerprint: '}</span>
-            <span className='errorText'>{this.state.certFingerprint[0] + ': ' +
-              toHexString(toByteArray(window.atob(this.state.certFingerprint[1])))}</span>
+            <span className='certErrorText' data-l10n-id='issuedTo'></span>
+            <div>
+              <span className='certAttrText' data-l10n-id='commonName'></span>
+              <span className='certAttrText'>{' ' + this.state.certSubjectName}</span>
+            </div>
+            <div>
+              <span className='certAttrText' data-l10n-id='serialNumber'></span>
+              <span className='certAttrText'>{' ' + this.state.certSerialNumber}</span>
+            </div>
+            <span className='certErrorText' data-l10n-id='issuedBy'></span>
+            <div>
+              <span className='certAttrText' data-l10n-id='commonName'></span>
+              <span className='certAttrText'>{' ' + this.state.certIssuerName}</span>
+            </div>
+            <span className='certErrorText' data-l10n-id='periodOfValidity'></span>
+            <div>
+              <span className='certAttrText' data-l10n-id='beginsOn'></span>
+              <span className='certAttrText'>{' ' + this.state.certValidStart}</span>
+            </div>
+            <div>
+              <span className='certAttrText' data-l10n-id='expiresOn'></span>
+              <span className='certAttrText'>{' ' + this.state.certValidExpiry}</span>
+            </div>
+            <div>
+              <span className='certAttrText' data-l10n-id='fingerprint'></span>
+              <span className='certAttrText'>{' ' + this.state.certFingerprint[0] + ': ' +
+                toHexString(toByteArray(window.atob(this.state.certFingerprint[1])))}</span>
+            </div>
           </div>) : null}
       </div>
       <div className='buttons'>
