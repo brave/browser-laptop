@@ -342,11 +342,16 @@ const handleAppAction = (action) => {
       mainWindow.webContents.on('crashed', (e) => {
         console.error('Window crashed. Reloading...')
         mainWindow.loadURL(appUrlUtil.getIndexHTML())
-        ipcMain.once(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, persist) => {
+
+        function notificationResponseCallback (e, message, buttonIndex, persist) {
           if (message === locale.translation('unexpectedErrorWindowReload')) {
             appActions.hideMessageBox(message)
+          } else {
+            ipcMain.once(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
           }
-        })
+        }
+        ipcMain.once(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
+
         appActions.showMessageBox({
           buttons: [locale.translation('ok')],
           options: {
