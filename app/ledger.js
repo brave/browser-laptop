@@ -610,6 +610,7 @@ var ledgerInfo = {
   creating: false,
   created: false,
 
+  delayStamp: undefined,
   reconcileStamp: undefined,
   reconcileDelay: undefined,
 
@@ -790,6 +791,7 @@ var getStateInfo = (state) => {
   if (state.wallet) ledgerInfo.created = true
   else if (state.persona) ledgerInfo.creating = true
 
+  ledgerInfo.delayStamp = state.delayStamp
   ledgerInfo.reconcileStamp = state.reconcileStamp
   ledgerInfo.reconcileDelay = state.prepareTransaction && state.delayStamp
 
@@ -912,7 +914,8 @@ if (ipc) {
                                     underscore.omit(ledgerInfo, [ '_internal' ]))
     if (ledgerInfo.reconcileStamp) offset = moment(ledgerInfo.reconcileStamp).fromNow()
     returnValue.statusText =
-      (!ledgerInfo.created) ? (ledgerInfo.creating ? '' : 'Initializing.')
+      (!ledgerInfo.created) ? (ledgerInfo.creating ? 'Initialization complete ' + moment(ledgerInfo.delayStamp).fromNow() + '.'
+                               : 'Initializing.')
       : (!ledgerInfo.reconcileStamp) ? 'Initialized.'
       : (ledgerInfo.reconcileDelay) ? ('Publisher submission in progress, estimated completion in ' +
                                        moment(returnValue._internal.reconcileDelay).fromNow() + '.')
