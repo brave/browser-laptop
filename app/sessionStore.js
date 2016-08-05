@@ -305,7 +305,7 @@ module.exports.loadAppState = () => {
       if (data.settings['search.default-search-engine'] === 'content/search/google.xml') {
         data.settings['search.default-search-engine'] = 'Google'
       }
-      if (data.settings['search.default-search-engine'] === 'contnt/search/duckduckgo.xml') {
+      if (data.settings['search.default-search-engine'] === 'content/search/duckduckgo.xml') {
         data.settings['search.default-search-engine'] = 'DuckDuckGo'
       }
     } catch (e) {
