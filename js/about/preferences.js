@@ -177,11 +177,11 @@ class GeneralTab extends ImmutableComponent {
 
 class SearchSelectEntry extends ImmutableComponent {
   shouldComponentUpdate (nextProps, nextState) {
-    return this.props.settings.get('search.default-search-engine') !== nextProps.settings.get('search.default-search-engine')
+    return this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE) !== nextProps.settings.get(settings.DEFAULT_SEARCH_ENGINE)
   }
   render () {
     return <div>
-    {this.props.settings.get('search.default-search-engine') === this.props.name
+    {this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE) === this.props.name
       ? <span className='fa fa-check-square' id='searchSelectIcon' /> : null}
     </div>
   }
