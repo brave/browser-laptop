@@ -126,6 +126,10 @@ class SettingCheckbox extends ImmutableComponent {
 }
 
 class GeneralTab extends ImmutableComponent {
+  enabled (keyArray) {
+    return keyArray.every(key => getSetting(key, this.props.settings) === true)
+  }
+
   render () {
     var languageOptions = this.props.languageCodes.map(function (lc) {
       return (
@@ -160,8 +164,8 @@ class GeneralTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='bookmarkToolbarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: (getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, this.props.settings) === true ? 'block' : 'none') }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR, settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='appearanceSettings' />
       <SettingsList>
