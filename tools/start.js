@@ -1,8 +1,29 @@
-var path = require('path')
-var execute = require('./lib/execute')
+const path = require('path')
+const spawn = require('child_process').spawn
 
-var env = {
-  NODE_ENV: 'development'
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
+const options = {
+  env: process.env,
+  cwd: path.join(__dirname, '..')
 }
+const electron = spawn('electron', ['./'].concat(process.argv.slice(2)), options)
 
-execute('electron "' + path.join(__dirname, '..') + '" ' + process.argv.slice(2).join(' '), env)
+electron.stdout.pipe(process.stdout)
+electron.stderr.pipe(process.stderr)
+
+electron.on('error', (err) => {
+  console.error(`could not start electron ${err}`)
+})
+
+electron.on('exit', (code, signal) => {
+  console.log(`process exited with code ${code}`)
+  process.exit(code)
+})
+
+process.on('SIGTERM', () => {
+  electron.kill('SIGTERM')
+})
+
+process.on('SIGINT', () => {
+  electron.kill('SIGINT')
+})
