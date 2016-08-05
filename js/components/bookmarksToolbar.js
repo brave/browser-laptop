@@ -264,7 +264,7 @@ class BookmarksToolbar extends ImmutableComponent {
     const noParentItems = this.bookmarks
       .filter((bookmark) => !bookmark.get('parentFolderId'))
     let widthAccountedFor = 0
-    const overflowButtonWidth = 24
+    const overflowButtonWidth = 25
 
     // Dynamically calculate how many bookmark items should appear on the toolbar
     // before it is actually rendered.
@@ -272,19 +272,25 @@ class BookmarksToolbar extends ImmutableComponent {
       this.root = window.getComputedStyle(document.querySelector(':root'))
       this.maxWidth = Number.parseInt(this.root.getPropertyValue('--bookmark-item-max-width'), 10)
       this.padding = Number.parseInt(this.root.getPropertyValue('--bookmark-item-padding'), 10) * 2
+      this.toolbarPadding = Number.parseInt(this.root.getPropertyValue('--bookmarks-toolbar-padding'), 10) * 2
       this.margin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-margin'), 10) * 2
+      this.chevronMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-chevron-margin'), 10)
       this.fontSize = this.root.getPropertyValue('--bookmark-item-font-size')
       this.fontFamily = this.root.getPropertyValue('--default-font-family')
+      this.chevronWidth = this.chevronMargin + calculateTextWidth('\uF078', `${this.fontSize} "FontAwesome"`)
     }
+    widthAccountedFor += this.toolbarPadding
+
     // Loop through until we fill up the entire bookmark toolbar width
     let i
     for (i = 0; i < noParentItems.size; i++) {
-      const iconWidth = props.showFavicon && noParentItems.getIn([i, 'favicon']) ? 20 : 0
+      const iconWidth = props.showFavicon && (noParentItems.getIn([i, 'favicon']) || noParentItems.getIn([i, 'folderId'])) ? 20 : 0
+      const chevronWidth = props.showFavicon && noParentItems.getIn([i, 'folderId']) ? this.chevronWidth : 0
       if (props.showFavicon && props.showOnlyFavicon) {
         widthAccountedFor += this.padding + iconWidth
       } else {
         const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
-        widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth, this.maxWidth)
+        widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth + chevronWidth, this.maxWidth)
       }
       widthAccountedFor += this.margin
       if (widthAccountedFor >= window.innerWidth - overflowButtonWidth) {
