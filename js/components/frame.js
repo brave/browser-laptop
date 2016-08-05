@@ -250,7 +250,7 @@ class Frame extends ImmutableComponent {
 
   get zoomLevel () {
     const zoom = this.props.frameSiteSettings && this.props.frameSiteSettings.get('zoomLevel')
-    appActions.changeSiteSetting(this.origin, 'zoomLevel', null, false)
+    appActions.removeSiteSetting(this.origin, 'zoomLevel')
     return zoom
   }
 
