@@ -323,7 +323,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     }
 
     // Search suggestions
-    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
+    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS) && this.props.searchResults) {
       suggestions = suggestions.concat(mapListToElements({
         data: this.props.searchResults,
         maxResults: config.urlBarSuggestions.maxSearch,
@@ -368,12 +368,17 @@ class UrlBarSuggestions extends ImmutableComponent {
     let autocompleteURL = this.props.searchSelectEntry
     ? this.props.searchSelectEntry.autocomplete : this.props.searchDetail.get('autocompleteURL')
     if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS) || !autocompleteURL) {
+      windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
       this.updateSuggestions(this.props.selectedIndex)
       return
     }
 
-    const urlLocation = this.props.urlLocation
+    let urlLocation = this.props.urlLocation
     if (!isUrl(urlLocation) && urlLocation.length > 0) {
+      if (this.props.searchSelectEntry) {
+        const replaceRE = new RegExp('^' + this.props.searchSelectEntry.shortcut + ' ', 'g')
+        urlLocation = urlLocation.replace(replaceRE, '')
+      }
       const xhr = new window.XMLHttpRequest({mozSystem: true})
       xhr.open('GET', autocompleteURL
         .replace('{searchTerms}', encodeURIComponent(urlLocation)), true)
