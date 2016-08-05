@@ -423,7 +423,7 @@ class ShieldsTab extends ImmutableComponent {
 class SecurityTab extends ImmutableComponent {
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
-    ipc.send(messages.PREFS_RESTART)
+    ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   render () {
     return <div>
@@ -661,7 +661,7 @@ class AboutPreferences extends React.Component {
     aboutActions.changeSetting(key, value)
     if (key === settings.DO_NOT_TRACK || key === settings.HARDWARE_ACCELERATION_ENABLED ||
       key === settings.PDFJS_ENABLED || key === settings.SMOOTH_SCROLL_ENABLED) {
-      ipc.send(messages.PREFS_RESTART)
+      ipc.send(messages.PREFS_RESTART, key, value)
     }
   }
 
