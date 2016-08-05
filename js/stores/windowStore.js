@@ -396,9 +396,10 @@ const doAction = (action) => {
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
       const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(windowState)
       const index = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
+      const activeFrameKey = FrameStateUtil.getActiveFrame(windowState).get('key')
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
-        frameProps.get('key')))
+        activeFrameKey))
       if (closingActive) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }

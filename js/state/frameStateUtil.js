@@ -439,16 +439,25 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
       closedFrames = closedFrames.shift()
     }
   }
-  let activeFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))
-  if (activeFrameIndex === -1) {
+
+  // If the frame being removed IS ACTIVE, then try to replace activeFrameKey with parentFrameKey
+  let isActiveFrameBeingRemoved = frameProps.get('key') === activeFrameKey
+
+  let parentFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))
+  let activeFrameIndex
+
+  if (!isActiveFrameBeingRemoved || parentFrameIndex === -1) {
     activeFrameIndex = findIndexForFrameKey(frames, activeFrameKey)
+  } else {
+    activeFrameIndex = parentFrameIndex
   }
+
   const framePropsIndex = getFramePropsIndex(frames, frameProps)
   frames = frames.splice(framePropsIndex, 1)
   tabs = tabs.splice(framePropsIndex, 1)
 
   let newActiveFrameKey = activeFrameKey
-  if (frameProps.get('key') === activeFrameKey && frames.size > 0) {
+  if (isActiveFrameBeingRemoved && frames.size > 0) {
     // Frame with focus was closed; let's find new active NON-PINNED frame.
     newActiveFrameKey = getNewActiveFrame(activeFrameIndex)
   }
