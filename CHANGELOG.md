@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.3](https://github.com/brave/browser-laptop/releases/v0.11.3dev)
+- Fix URL bar problem from no default search engine. ([#2956](https://github.com/brave/browser-laptop/issues/2956))
+- Fix PDF downloading with File > Save Page as. ([#2954](https://github.com/brave/browser-laptop/issues/2954))
+- Fix NoScript should not take effect when shields are down. ([#2950](https://github.com/brave/browser-laptop/issues/2950))
+- Fix undefined error popup caused by zoomed page upgrading. ([#2989](https://github.com/brave/browser-laptop/issues/2989))
+- Upgrade to libchromiumcontent 52.0.2743.116. ([#2964](https://github.com/brave/browser-laptop/issues/2964))
+
 ## [0.11.2](https://github.com/brave/browser-laptop/releases/v0.11.2dev)
 - Added history on long click over back and forward buttons. ([#1622](https://github.com/brave/browser-laptop/issues/1622))
 - Added search panel to preferences with more search options. ([#2694](https://github.com/brave/browser-laptop/issues/2694))
