@@ -533,19 +533,10 @@ function getEditableItems (selection, editFlags) {
 
 function hamburgerTemplateInit (location, e) {
   const template = [
-    {
-      l10nLabelId: 'new',
-      submenu: [
-        CommonMenu.newTabMenuItem(),
-        CommonMenu.newPrivateTabMenuItem(),
-        CommonMenu.newPartitionedTabMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.newWindowMenuItem()
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    CommonMenu.findOnPageMenuItem(),
-    CommonMenu.printMenuItem(),
+    CommonMenu.newTabMenuItem(),
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       l10nLabelId: 'zoom',
@@ -569,7 +560,7 @@ function hamburgerTemplateInit (location, e) {
       }]
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.preferencesMenuItem(),
+
     {
       label: locale.translation('bookmarks'),
       submenu: [
@@ -578,26 +569,14 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.separatorMenuItem,
         CommonMenu.importBookmarksMenuItem()
       ]
-    }, {
-      label: locale.translation('bravery'),
-      submenu: [
-        CommonMenu.braveryGlobalMenuItem(),
-        CommonMenu.braverySiteMenuItem()
-      ]
     },
     CommonMenu.downloadsMenuItem(),
+    CommonMenu.findOnPageMenuItem(),
+    CommonMenu.printMenuItem(),
     CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('help'),
-      submenu: [
-        CommonMenu.aboutBraveMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.reportAnIssueMenuItem(),
-        CommonMenu.submitFeedbackMenuItem()
-      ]
-    }
+    CommonMenu.preferencesMenuItem(),
+    CommonMenu.separatorMenuItem,
+    CommonMenu.quitMenuItem()
   ]
   return template
 }
