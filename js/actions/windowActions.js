@@ -13,6 +13,7 @@ const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
 const currentWindow = require('../../app/renderer/currentWindow')
+const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
   AppDispatcher.dispatch(action)
@@ -335,7 +336,11 @@ const windowActions = {
         return
       }
 
-      if (!forceClosePinned) {
+      const frameKey = frameProps ? frameProps.get('key') : null
+      const activeFrameKey = windowStore.getState().get('activeFrameKey')
+      const isActiveFrame = frameKey === activeFrameKey
+
+      if (!forceClosePinned && isActiveFrame) {
         // Go to next frame if the user tries to close a pinned tab
         ipc.emit(messages.SHORTCUT_NEXT_TAB)
         return
@@ -677,7 +682,7 @@ const windowActions = {
    * @param {Object} frameToSkip - Properties of the frame to keep audio
    */
   muteAllAudioExcept: function (frameToSkip) {
-    let framePropsList = require('../stores/windowStore').getState().get('frames')
+    let framePropsList = windowStore.getState().get('frames')
 
     framePropsList.forEach((frameProps) => {
       if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
