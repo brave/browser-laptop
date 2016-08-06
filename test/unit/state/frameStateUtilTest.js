@@ -167,13 +167,15 @@ describe('frameStateUtil', function () {
     beforeEach(function () {
       frames = Immutable.fromJS([
         { key: 2 },
-        { key: 3 },
+        { key: 3, parentFrameKey: 2 },
+        { key: 4 },
         { key: 4, pinnedLocation: 'https://www.facebook.com/' },
         { key: 5, pinnedLocation: 'https://twitter.com/' }
       ])
       tabs = Immutable.fromJS([
         { key: 2 },
         { key: 3 },
+        { key: 4 },
         { key: 4, pinnedLocation: 'https://www.facebook.com/' },
         { key: 5, pinnedLocation: 'https://twitter.com/' }
       ])
@@ -210,14 +212,21 @@ describe('frameStateUtil', function () {
     })
 
     describe('does not change `activeFrameKey`', function () {
-      it('if frame removed is not active', function () {
-        activeFrameKey = 3
+      it('if frame removed is not active and has parentFrameKey set', function () {
+        frameProps = Immutable.fromJS({ key: 3 })
+        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
+        assert.equal(activeFrameKey, result.activeFrameKey)
+      })
+
+      it('if frame removed is not active and does NOT have parentFrameKey set', function () {
+        frameProps = Immutable.fromJS({ key: 4 })
         const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
 
       it('if there are no frames left', function () {
         frames = Immutable.fromJS([{ key: 2 }])
+        tabs = Immutable.fromJS([{ key: 2 }])
         const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
         assert.equal(activeFrameKey, result.activeFrameKey)
       })
@@ -229,7 +238,13 @@ describe('frameStateUtil', function () {
         assert.equal(3, result.activeFrameKey)
       })
 
-      it('returns the previous *non-pinned* frame key (if none found for next)', function () {
+      it('returns the previous *non-pinned* frame key (if none found for next and no parent association)', function () {
+        frames = Immutable.fromJS([
+          { key: 2 },
+          { key: 3 },
+          { key: 4, pinnedLocation: 'https://www.facebook.com/' },
+          { key: 5, pinnedLocation: 'https://twitter.com/' }
+        ])
         frameProps = Immutable.fromJS({
           isFullScreen: false,
           isPrivate: false,
