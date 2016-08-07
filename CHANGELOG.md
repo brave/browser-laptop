@@ -38,7 +38,7 @@
 - Fixed Notification bar for crashes not dismissing. ([#2617](https://github.com/brave/browser-laptop/issues/2617))
 - Fixed "Open Image In New Tab" respecting private / session info. ([#2746](https://github.com/brave/browser-laptop/issues/2746))
 - Fixed pressing down on URL bar now shows autosuggest. ([#2444](https://github.com/brave/browser-laptop/issues/2444))
-- Fixed showing scrollbars in tabs bar in Arch linux. ([#2599](Arch linux: Scroll bar appears over tabs when they fill the tab bar #2599))
+- Fixed showing scrollbars in tabs bar in Arch linux. ([#2599](https://github.com/brave/browser-laptop/issues/2599))
 - Upgrade to libchromiumcontent 52.0.2743.82. ([#1592](https://github.com/brave/browser-laptop/issues/1592))
 - Upgrade to Electron 1.3.0. ([#2635](https://github.com/brave/browser-laptop/issues/2635))
 
