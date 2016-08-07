@@ -110,7 +110,7 @@ function urlBarTemplateInit (searchDetail, activeFrame, e) {
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
   const menu = [
-    CommonMenu.bookmarksMenuItem(),
+    CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem
   ]
@@ -213,7 +213,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
 function bookmarkTemplateInit (siteDetail, activeFrame) {
   const location = siteDetail.get('location')
-  const isFolder = siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+  const isFolder = siteUtil.isFolder(siteDetail)
   const template = []
 
   if (!isFolder) {
@@ -573,7 +573,7 @@ function hamburgerTemplateInit (location, e) {
     {
       label: locale.translation('bookmarks'),
       submenu: [
-        CommonMenu.bookmarksMenuItem(),
+        CommonMenu.bookmarksManagerMenuItem(),
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.importBookmarksMenuItem()
