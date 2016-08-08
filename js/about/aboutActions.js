@@ -121,6 +121,10 @@ const AboutActions = {
 
   setResourceEnabled: function (resourceName, enabled) {
     ipc.send(messages.SET_RESOURCE_ENABLED, resourceName, enabled)
+  },
+
+  clearBrowsingDataNow: function () {
+    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
   }
 }
 module.exports = AboutActions

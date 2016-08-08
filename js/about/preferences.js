@@ -17,6 +17,7 @@ const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
+const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 
 const adblock = appConfig.resourceNames.ADBLOCK
@@ -40,6 +41,7 @@ const hintCount = 3
 
 require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
+require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const permissionNames = {
@@ -425,6 +427,13 @@ class ShieldsTab extends ImmutableComponent {
 }
 
 class SecurityTab extends ImmutableComponent {
+  constructor (e) {
+    super()
+    this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
+  }
+  clearBrowsingDataNow () {
+    aboutActions.clearBrowsingDataNow()
+  }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
     ipc.send(messages.PREFS_RESTART, flash, e.target.value)
@@ -437,6 +446,7 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='downloadHistory' prefKey={settings.SHUTDOWN_CLEAR_DOWNLOADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='cachedImagesAndFiles' prefKey={settings.SHUTDOWN_CLEAR_CACHE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='allSiteCookies' prefKey={settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
       <SettingsList dataL10nId='passwordManager'>

@@ -574,6 +574,10 @@ class Frame extends ImmutableComponent {
           method = (frameOpts, openInForeground) => {
             windowActions.newFrame(frameOpts, openInForeground)
           }
+          break
+        case messages.CLEAR_BROWSING_DATA_NOW:
+          windowActions.setClearBrowsingDataDetail({})
+          break
       }
       method.apply(this, e.args)
     })

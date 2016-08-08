@@ -61,6 +61,7 @@ span.browserButton {
   &.actionButton,
   &.wideButton,
   &.secondaryButton,
+  &.secondaryAltButton,
   &.subtleButton {
     .buttonCommon;
     width: auto;
@@ -84,6 +85,12 @@ span.browserButton {
 
   &.secondaryButton {
     background-color: #eee;
+  }
+
+  &.secondaryAltButton {
+    background-color: #fff;
+    color: @braveOrange;
+    border: 1px solid #ccc;
   }
 
   &.subtleButton {

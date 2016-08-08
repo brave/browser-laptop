@@ -101,6 +101,8 @@ module.exports.cleanPerWindowData = (perWindowData) => {
   delete perWindowData.bookmarkDetail
   // Don't restore bravery panel
   delete perWindowData.braveryPanelDetail
+  // Don't restore cache clearing popup
+  delete perWindowData.clearBrowsingDataDetail
   // Don't restore drag data
   if (perWindowData.ui) {
     delete perWindowData.ui.dragging

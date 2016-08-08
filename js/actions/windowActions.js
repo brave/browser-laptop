@@ -925,6 +925,16 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_ADD_HISTORY,
       frameProps
     })
+  },
+
+  /**
+   * Sets the clear browsing data popup detail
+   */
+  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+      clearBrowsingDataDetail
+    })
   }
 }
 

@@ -5,6 +5,7 @@ require('./coMocha')
 
 const path = require('path')
 const fs = require('fs')
+const {getTargetAboutUrl, isSourceAboutUrl} = require('../../js/lib/appUrlUtil')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -177,7 +178,16 @@ var exports = {
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
+      if (isSourceAboutUrl(url)) {
+        url = getTargetAboutUrl(url)
+      }
       return this.url(url).waitForUrl(url)
+    })
+
+    this.app.client.addCommand('getAppState', function () {
+      return this.execute(function () {
+        return window.appStoreRenderer.state.toJS()
+      })
     })
 
     this.app.client.addCommand('showFindbar', function (show) {
