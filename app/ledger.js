@@ -918,12 +918,14 @@ if (ipc) {
                                : 'Initializing.')
       : (!ledgerInfo.reconcileStamp) ? 'Initialized.'
       : (ledgerInfo.reconcileDelay) ? ('Publisher submission in progress, estimated completion in ' +
-                                       moment(returnValue._internal.reconcileDelay).fromNow() + '.')
+                                       moment(ledgerInfo.reconcileDelay).fromNow() + '.')
       : (ledgerInfo.reconcileStamp > underscore.now()) ? ('Publishers love you! Next submission ' + offset + '.')
       : ('Publisher submission overdue ' + offset + '. Please add funds.')
+/*
     console.log('\n' + JSON.stringify(underscore.extend(underscore.omit(returnValue, [ 'synopsis', 'paymentIMG' ]),
                                                         { synopsis: returnValue.synopsis && '...',
                                                           paymentIMG: returnValue.paymentIMG && '...' }), null, 2))
+ */
 
     event.returnValue = returnValue
   })
