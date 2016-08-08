@@ -131,9 +131,8 @@ function insertFlashPlaceholders (elem) {
   let flashObjects = getFlashObjects(elem)
   flashObjects.forEach((obj) => {
     let el = obj.element
-    let pluginRect = el.getBoundingClientRect()
-    let height = pluginRect.height
-    let width = pluginRect.width
+    let height = el.offsetHeight || el.getAttribute('height')
+    let width = el.offsetWidth || el.getAttribute('width')
     if (height > minHeight && width > minWidth) {
       let parent = el.parentNode
       if (!parent) {
