@@ -87,5 +87,8 @@ module.exports = {
         redirectURL: googleTagServicesRedirect
        }
     }
+  },
+  'play.spotify.com': {
+    enableFlashCTP: true
   }
 }
