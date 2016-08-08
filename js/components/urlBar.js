@@ -300,14 +300,6 @@ class UrlBar extends ImmutableComponent {
   }
 
   get locationValue () {
-    // If there's a selected autocomplete entry, we just want to show its location
-    if (this.props.suggestionIndex) {
-      const suggestionLocation = this.props.urlbar.getIn(['suggestions', 'suggestionList', this.props.suggestionIndex - 1]).location
-      if (suggestionLocation) {
-        return suggestionLocation
-      }
-    }
-
     let location = this.props.urlbar.get('location')
     const history = this.props.history
     if (isIntermediateAboutPage(location) && history.size > 0) {
