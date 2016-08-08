@@ -5,12 +5,19 @@
 
 'use strict'
 
+let ready = false
 // TODO(bridiver) - this should also send a notification to Brave
 process.on('uncaughtException', function (error) {
   var message, ref, stack
   stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
   message = 'Uncaught Exception:\n' + stack
   console.error('An uncaught exception occurred in the main process ' + message)
+  setTimeout(() => {
+    if (!ready) {
+      console.error('Process failed to load within 60 seconds')
+      process.exit(1)
+    }
+  }, 60 * 1000)
 })
 
 if (process.platform === 'win32') {
@@ -391,6 +398,7 @@ app.on('ready', () => {
       })
     }
     process.emit(messages.APP_INITIALIZED)
+    ready = true
 
     if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({
