@@ -719,6 +719,12 @@ Adds a history entry
 
 
 
+### setClearBrowsingDataDetail() 
+
+Sets the clear browsing data popup detail
+
+
+
 
 * * *
 

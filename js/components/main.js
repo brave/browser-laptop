@@ -27,6 +27,7 @@ const DownloadsBar = require('./downloadsBar')
 const Button = require('./button')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
+const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
 const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
@@ -77,6 +78,7 @@ class Main extends ImmutableComponent {
     this.onDrop = this.onDrop.bind(this)
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
+    this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onBraveMenu = this.onBraveMenu.bind(this)
@@ -535,6 +537,10 @@ class Main extends ImmutableComponent {
     windowActions.setBraveryPanelDetail()
   }
 
+  onHideClearBrowsingDataPanel () {
+    windowActions.setClearBrowsingDataDetail()
+  }
+
   onHideNoScript () {
     windowActions.setNoScriptVisible(false)
   }
@@ -680,6 +686,7 @@ class Main extends ImmutableComponent {
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
+    const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
@@ -689,6 +696,7 @@ class Main extends ImmutableComponent {
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !braveryPanelIsVisible &&
+      !clearBrowsingDataPanelIsVisible &&
       !releaseNotesIsVisible &&
       !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
@@ -771,6 +779,13 @@ class Main extends ImmutableComponent {
               braverySettings={braverySettings}
               activeSiteSettings={activeSiteSettings}
               onHide={this.onHideBraveryPanel} />
+            : null
+          }
+          {
+           clearBrowsingDataPanelIsVisible
+            ? <ClearBrowsingDataPanel
+              clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
+              onHide={this.onHideClearBrowsingDataPanel} />
             : null
           }
           {

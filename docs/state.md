@@ -329,6 +329,13 @@ WindowStore
     expandNoScript: boolean, // Whether noscript section should be expanded
     expandFp: boolean // Whether fingerprinting protection should be expanded
   },
+  clearBrowsingDataDetail: {
+    browserHistory: boolean,
+    downloadHistory: boolean,
+    cachedImagesAndFiles: boolean,
+    savedPasswords: boolean,
+    allSiteCookies: boolean
+  },
   contextMenuDetail: {
     left: number, // the left position of the context menu
     right: number, // the right position of the context menu

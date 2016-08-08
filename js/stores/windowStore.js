@@ -630,6 +630,13 @@ const doAction = (action) => {
         })
       }
       break
+    case WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
+      if (!action.clearBrowsingDataDetail) {
+        windowState = windowState.delete('clearBrowsingDataDetail')
+      } else {
+        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
+      }
+      break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
       windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
       break
@@ -686,6 +693,13 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowState = FrameStateUtil.makePrevFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
   emitChanges()
+})
+
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+  doAction({
+    actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+    clearBrowsingDataDetail
+  })
 })
 
 ipc.on(messages.IMPORT_BOOKMARKS, () => {
