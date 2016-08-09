@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.11.4](https://github.com/brave/browser-laptop/releases/v0.11.4dev)
+- Added a clear browsing data now button in preferences and popup panel with clearing options. ([#2471](https://github.com/brave/browser-laptop/issues/2471))
+- Changed Accept-Encoding to advertise it supports Brotli compression. ([#2890](https://github.com/brave/browser-laptop/issues/2890))
+- Fixed printing on Windows. ([#1616](https://github.com/brave/browser-laptop/issues/1616))
+- Fixed Flash placeholder sometimes not showing. ([#3047](https://github.com/brave/browser-laptop/issues/3047))
+- Fixed Spotify WebPlayer. ([#3011](https://github.com/brave/browser-laptop/issues/3011))
+- Fixed remove restart prompt if turning a pref on and off. ([#2958](https://github.com/brave/browser-laptop/issues/2958))
+- Fixed a common Brave crasher. ([#1954](https://github.com/brave/browser-laptop/issues/1954))
+- Fixes closing an inactive tab should not change the active tab. ([#2923](https://github.com/brave/browser-laptop/issues/2923))
+
 ## [0.11.3](https://github.com/brave/browser-laptop/releases/v0.11.3dev)
 - Fix URL bar problem from no default search engine. ([#2956](https://github.com/brave/browser-laptop/issues/2956))
 - Fix PDF downloading with File > Save Page as. ([#2954](https://github.com/brave/browser-laptop/issues/2954))
