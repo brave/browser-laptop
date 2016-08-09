@@ -696,8 +696,11 @@ var roundtrip = (params, options, callback) => {
 
   parts = underscore.extend(underscore.pick(parts, [ 'protocol', 'hostname', 'port' ]),
                             underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
-  i = parts.path.indexOf('?')
 
+// TBD: let the user configure this via preferences [MTR]
+  if ((parts.hostname === 'ledger.brave.com') && (params.useProxy)) parts.hostname = 'ledger-proxy.privateinternetaccess.com'
+
+  i = parts.path.indexOf('?')
   if (i !== -1) {
     parts.pathname = parts.path.substring(0, i)
     parts.search = parts.path.substring(i)
@@ -719,6 +722,7 @@ var roundtrip = (params, options, callback) => {
         console.log('>>> ' + header + ': ' + response.headers[header])
       })
       console.log('>>>')
+      console.log('>>> ' + body.split('\n').join('\n>>> '))
     }
 
     if (err) return callback(err)
@@ -732,7 +736,6 @@ var roundtrip = (params, options, callback) => {
     } catch (err) {
       return callback(err)
     }
-    if (options.verboseP) console.log('>>> ' + JSON.stringify(payload, null, 2).split('\n').join('\n>>> '))
 
     try {
       callback(null, response, payload)
