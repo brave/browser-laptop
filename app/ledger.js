@@ -624,6 +624,7 @@ var ledgerInfo = {
   currency: undefined,
 
   paymentURL: undefined,
+  buyURL: undefined,
   bravery: undefined,
 
   _internal: {}
@@ -901,36 +902,6 @@ var syncWriter = (path, obj, options, cb) => {
     if (err) console.log('write error: ' + err.toString())
 
     cb(err)
-  })
-}
-
-// YAN: legacy code, please remove when you remove js/ledgerInterop.js and its use in js/components/main.js
-if (ipc) {
-  ipc.on(messages.LEDGER_GENERAL_COMMUNICATION, (event) => {
-    var offset, returnValue
-
-    updatePublisherInfo()
-    updateLedgerInfo()
-
-    returnValue = underscore.extend({ enabled: true },
-                                    underscore.omit(publisherInfo, [ '_internal' ]),
-                                    underscore.omit(ledgerInfo, [ '_internal' ]))
-    if (ledgerInfo.reconcileStamp) offset = moment(ledgerInfo.reconcileStamp).fromNow()
-    returnValue.statusText =
-      (!ledgerInfo.created) ? (ledgerInfo.creating ? 'Initialization complete ' + moment(ledgerInfo.delayStamp).fromNow() + '.'
-                               : 'Initializing.')
-      : (!ledgerInfo.reconcileStamp) ? 'Initialized.'
-      : (ledgerInfo.reconcileDelay) ? ('Publisher submission in progress, estimated completion in ' +
-                                       moment(ledgerInfo.reconcileDelay).fromNow() + '.')
-      : (ledgerInfo.reconcileStamp > underscore.now()) ? ('Publishers love you! Next submission ' + offset + '.')
-      : ('Publisher submission overdue ' + offset + '. Please add funds.')
-/*
-    console.log('\n' + JSON.stringify(underscore.extend(underscore.omit(returnValue, [ 'synopsis', 'paymentIMG' ]),
-                                                        { synopsis: returnValue.synopsis && '...',
-                                                          paymentIMG: returnValue.paymentIMG && '...' }), null, 2))
- */
-
-    event.returnValue = returnValue
   })
 }
 

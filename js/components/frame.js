@@ -77,7 +77,8 @@ class Frame extends ImmutableComponent {
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
-      this.webview.send(messages.LEDGER_UPDATED, this.props.ledger || null)
+      const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).toJS()
+      this.webview.send(messages.LEDGER_UPDATED, ledgerData)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
       this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
