@@ -72,8 +72,13 @@ describe('settings unit test', function () {
         assert.equal(response, passwordManagers.LAST_PASS)
       })
 
-      it('defaults to `BuiltIn` if nothing is set', function () {
+      it('returns `Unmanaged` if PASSWORD_MANAGER_ENABLED was false', function () {
         settingsCollection[settingsConst.PASSWORD_MANAGER_ENABLED] = false
+        const response = settings.getSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, settingsCollection)
+        assert.equal(response, passwordManagers.UNMANAGED)
+      })
+
+      it('defaults to `BuiltIn` if no other conditions are met', function () {
         const response = settings.getSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, settingsCollection)
         assert.equal(response, passwordManagers.BUILT_IN)
       })
