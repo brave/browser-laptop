@@ -14,7 +14,7 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
-const passwordManagers = require('../constants/passwordManagers').passwordManagers
+const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
@@ -440,6 +440,8 @@ class SecurityTab extends ImmutableComponent {
     ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   render () {
+    const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
+
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
       <SettingsList dataL10nId='privateDataMessage'>
@@ -465,6 +467,15 @@ class SecurityTab extends ImmutableComponent {
           ? <label className='linkTextSmall' data-l10n-id='managePasswords'
             onClick={aboutActions.newFrame.bind(null, {
               location: 'about:passwords'
+            }, true)}>
+          </label>
+          : null
+        }
+        {
+          getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.LAST_PASS
+          ? <label className='linkTextSmall' data-l10n-id='preferences'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: lastPassPreferencesUrl
             }, true)}>
           </label>
           : null
