@@ -421,6 +421,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to set the tab page index being previewed.
+   *
+   * @param {number} previewTabPageIndex - The tab page index to preview
+   */
+  setPreviewTabPageIndex: function (previewTabPageIndex) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX,
+      previewTabPageIndex
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set the tab page index.
    *
    * @param {number} frameProps - The frame props to center around

@@ -89,15 +89,18 @@ class Tabs extends ImmutableComponent {
 
   render () {
     this.tabRefs = []
+    const index = this.props.previewTabPageIndex !== undefined
+      ? this.props.previewTabPageIndex : this.props.tabPageIndex
     return <div className='tabs'>
       <span className={cx({
         tabStripContainer: true,
+        isPreview: this.props.previewTabPageIndex !== undefined,
         allowDragging: this.props.shouldAllowWindowDrag
       })}
         onDragOver={this.onDragOver}
         onDrop={this.onDrop}>
         {(() => {
-          if (this.props.tabPageIndex > 0) {
+          if (index > 0) {
             return <span
               className='prevTab fa fa-caret-left'
               onClick={this.onPrevPage} />
@@ -116,7 +119,7 @@ class Tabs extends ImmutableComponent {
                 partOfFullPageSet={this.props.partOfFullPageSet} />)
         }
         {(() => {
-          if (this.props.currentTabs.size >= this.props.tabsPerTabPage && this.totalPages > this.props.tabPageIndex + 1) {
+          if (this.props.currentTabs.size >= this.props.tabsPerTabPage && this.totalPages > index + 1) {
             return <span
               className='nextTab fa fa-caret-right'
               onClick={this.onNextPage} />

@@ -291,6 +291,16 @@ Dispatches a message to the store to set the tab page index.
 
 
 
+### setPreviewTabPageIndex(previewTabPageIndex) 
+
+Dispatches a message to the store to set the tab page index being previewed.
+
+**Parameters**
+
+**previewTabPageIndex**: `number`, The tab page index to preview
+
+
+
 ### setTabPageIndexByFrame(frameProps) 
 
 Dispatches a message to the store to set the tab page index.

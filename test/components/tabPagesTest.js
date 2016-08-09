@@ -3,7 +3,7 @@
 const Brave = require('../lib/brave')
 const appConfig = require('../../js/constants/appConfig')
 const settings = require('../../js/constants/settings')
-const {urlInput, newFrameButton, tabPage, tabPage1, tabPage2, closeTab, activeWebview} = require('../lib/selectors')
+const {urlInput, newFrameButton, tabsTabs, tabPage, tabPage1, tabPage2, closeTab, activeWebview} = require('../lib/selectors')
 const assert = require('assert')
 
 describe('tab pages', function () {
@@ -75,6 +75,34 @@ describe('tab pages', function () {
           return this.elements(tabPage).then((res) => res.value.length === (defaultTabsPerPage + 1))
         })
       })
+    })
+  })
+
+  describe('tab page previews', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client.changeSetting(settings.TABS_PER_PAGE, appConfig.defaultSettings[settings.TABS_PER_PAGE])
+      // Make sure there are 2 tab pages
+      for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE]; i++) {
+        yield this.app.client.windowByUrl(Brave.browserWindowUrl).click(newFrameButton)
+      }
+
+      yield this.app.client
+        .waitUntil(function () {
+          return this.elements(tabPage).then((res) => res.value.length === 2)
+        })
+    })
+
+    it('hovering over a tab page changes it', function * () {
+      yield this.app.client
+        .waitForExist(tabPage2 + '.active')
+        .moveToObject(tabPage1, 5, 5)
+        .waitForExist('.tabStripContainer.isPreview')
+        .waitUntil(function () {
+          return this.elements(tabsTabs).then((res) => res.value.length === appConfig.defaultSettings[settings.TABS_PER_PAGE])
+        })
     })
   })
 })
