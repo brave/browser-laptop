@@ -30,6 +30,20 @@ describe('urlbarSuggestions', function () {
       .waitForElementFocus(urlInput)
   })
 
+  it('deactivates suggestions on escape', function * () {
+    yield this.app.client.ipcSend('shortcut-focus-url')
+      .waitForElementFocus(urlInput)
+      .setValue(urlInput, 'Page 1')
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === 'Page 1')
+      })
+      .waitForExist(urlBarSuggestions)
+      .keys('\uE00C')
+      .waitUntil(function () {
+        return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
+      })
+  })
+
   it('navigates to a suggestion when clicked', function * () {
     yield this.app.client.ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
