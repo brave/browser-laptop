@@ -7,6 +7,7 @@ const AppStore = require('../stores/appStore')
 const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
+const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const { registerUserPrefs } = require('./userPrefs')
@@ -30,11 +31,12 @@ const addContentSettings = (settingList, hostPattern, secondaryPattern = undefin
 const getPasswordManagerEnabled = (appState) => {
   let appSettings = appState.get('settings')
   if (appSettings) {
-    if (typeof appSettings.get(settings.PASSWORD_MANAGER_ENABLED) === 'boolean') {
-      return appSettings.get(settings.PASSWORD_MANAGER_ENABLED)
+    const passwordManager = appSettings.get(settings.ACTIVE_PASSWORD_MANAGER)
+    if (typeof passwordManager === 'string') {
+      return passwordManager === passwordManagers.BUILT_IN
     }
   }
-  return appConfig.defaultSettings[settings.PASSWORD_MANAGER_ENABLED]
+  return defaultPasswordManager === passwordManagers.BUILT_IN
 }
 
 const getBlock3rdPartyStorage = (braveryDefaults) => {

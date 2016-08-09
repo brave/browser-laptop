@@ -25,7 +25,7 @@ const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
-const getSetting = require('./settings').getSetting
+const {getSetting, getActivePasswordManager} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
@@ -910,40 +910,18 @@ function mainTemplateInit (nodeProps, frame) {
     }
   })
 
-  if (getSetting(settings.LAST_PASS_ENABLED)) {
+  const passwordManager = getActivePasswordManager()
+  if (passwordManager.get('extensionId')) {
     template.push(
       CommonMenu.separatorMenuItem,
       {
-        label: 'LastPass',
+        // TODO: use locale.translate
+        label: passwordManager.get('displayName'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            nodeProps.height = 448
-            nodeProps.width = 350
-            ipc.send('chrome-browser-action-clicked', 'hdokiejnpimakedhajhdlcegeplioahd', frame.get('tabId'), 'LastPass', nodeProps)
-          }
-        }
-      })
-  }
-  if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
-    template.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: '1Password',
-        click: (item, focusedWindow) => {
-          if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', frame.get('tabId'), '1Password', nodeProps)
-          }
-        }
-      })
-  }
-  if (getSetting(settings.DASHLANE_ENABLED)) {
-    template.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: 'Dashlane',
-        click: (item, focusedWindow) => {
-          if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'fdjamakpfbbddfjaooikfcpapjohcfmg', frame.get('tabId'), 'Dashlane', nodeProps)
+            nodeProps.height = passwordManager.get('popupHeight') || nodeProps.height
+            nodeProps.width = passwordManager.get('popupWidth') || nodeProps.width
+            ipc.send('chrome-browser-action-clicked', passwordManager.get('extensionId'), frame.get('tabId'), passwordManager.get('name'), nodeProps)
           }
         }
       })
