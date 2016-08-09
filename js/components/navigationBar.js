@@ -108,11 +108,11 @@ class NavigationBar extends ImmutableComponent {
 
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
-    const prevBookmarked = prevProps.activeFrame &&
+    const prevBookmarked = this.props.activeFrameKey !== undefined &&
       isSiteInList(prevProps.sites, Immutable.fromJS({
-        location: prevProps.activeFrame.get('location'),
-        partitionNumber: this.props.partitionNumber,
-        title: this.props.title
+        location: prevProps.location,
+        partitionNumber: prevProps.partitionNumber,
+        title: prevProps.title
       }), siteTags.BOOKMARK)
     if (this.bookmarked !== prevBookmarked) {
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
