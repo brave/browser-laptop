@@ -216,8 +216,8 @@ class AppStore extends EventEmitter {
         BrowserWindow.getAllWindows().forEach((wnd) =>
           wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
         lastEmittedState = appState
+        this.emit(CHANGE_EVENT, d.toJS())
       }
-      this.emit(CHANGE_EVENT, d.toJS())
     } else {
       this.emit(CHANGE_EVENT, [])
     }
