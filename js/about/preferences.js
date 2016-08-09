@@ -14,9 +14,11 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
+const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 
 const adblock = appConfig.resourceNames.ADBLOCK
@@ -40,6 +42,7 @@ const hintCount = 3
 
 require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
+require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const permissionNames = {
@@ -126,6 +129,10 @@ class SettingCheckbox extends ImmutableComponent {
 }
 
 class GeneralTab extends ImmutableComponent {
+  enabled (keyArray) {
+    return keyArray.every(key => getSetting(key, this.props.settings) === true)
+  }
+
   render () {
     var languageOptions = this.props.languageCodes.map(function (lc) {
       return (
@@ -160,8 +167,8 @@ class GeneralTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='bookmarkToolbarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: (getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, this.props.settings) === true ? 'block' : 'none') }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR, settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='appearanceSettings' />
       <SettingsList>
@@ -421,11 +428,20 @@ class ShieldsTab extends ImmutableComponent {
 }
 
 class SecurityTab extends ImmutableComponent {
+  constructor (e) {
+    super()
+    this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
+  }
+  clearBrowsingDataNow () {
+    aboutActions.clearBrowsingDataNow()
+  }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
-    ipc.send(messages.PREFS_RESTART)
+    ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   render () {
+    const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
+
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
       <SettingsList dataL10nId='privateDataMessage'>
@@ -433,29 +449,37 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='downloadHistory' prefKey={settings.SHUTDOWN_CLEAR_DOWNLOADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='cachedImagesAndFiles' prefKey={settings.SHUTDOWN_CLEAR_CACHE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='allSiteCookies' prefKey={settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
-      <SettingsList dataL10nId='passwordManager'>
-        <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
-          options={
-            getSetting(settings.PASSWORD_MANAGER_ENABLED, this.props.settings)
-              ? <span className='linkText' data-l10n-id='managePasswords'
-                onClick={aboutActions.newFrame.bind(null, {
-                  location: 'about:passwords'
-                }, true)}></span>
-              : null
-          } />
-        <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='useLastPass' prefKey={settings.LAST_PASS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
-          options={
-            getSetting(settings.LAST_PASS_ENABLED, this.props.settings)
-              ? <span className='linkText' data-l10n-id='preferences'
-                onClick={aboutActions.newFrame.bind(null, {
-                  location: 'chrome-extension://hdokiejnpimakedhajhdlcegeplioahd/tabDialog.html?dialog=preferences&cmd=open'
-                }, true)}></span>
-              : null
-          } />
-        <SettingCheckbox dataL10nId='useDashlane' prefKey={settings.DASHLANE_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <SettingsList>
+        <SettingItem dataL10nId='passwordManager'>
+          <select value={getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)} onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ACTIVE_PASSWORD_MANAGER)} >
+            <option data-l10n-id='builtInPasswordManager' value={passwordManagers.BUILT_IN} />
+            <option data-l10n-id='onePassword' value={passwordManagers.ONE_PASSWORD} />
+            <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
+            <option data-l10n-id='lastPass' value={passwordManagers.LAST_PASS} />
+            <option data-l10n-id='doNotManageMyPasswords' value={passwordManagers.UNMANAGED} />
+          </select>
+        </SettingItem>
+        {
+          getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
+          ? <label className='linkTextSmall' data-l10n-id='managePasswords'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:passwords'
+            }, true)}>
+          </label>
+          : null
+        }
+        {
+          getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.LAST_PASS
+          ? <label className='linkTextSmall' data-l10n-id='preferences'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: lastPassPreferencesUrl
+            }, true)}>
+          </label>
+          : null
+        }
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
@@ -661,7 +685,7 @@ class AboutPreferences extends React.Component {
     aboutActions.changeSetting(key, value)
     if (key === settings.DO_NOT_TRACK || key === settings.HARDWARE_ACCELERATION_ENABLED ||
       key === settings.PDFJS_ENABLED || key === settings.SMOOTH_SCROLL_ENABLED) {
-      ipc.send(messages.PREFS_RESTART)
+      ipc.send(messages.PREFS_RESTART, key, value)
     }
   }
 

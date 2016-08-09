@@ -94,6 +94,7 @@ const updateTabPageIndex = (frameProps) => {
     return
   }
   windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+  windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
 }
 
 const focusWebview = (frameStatePath) => {
@@ -396,9 +397,10 @@ const doAction = (action) => {
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
       const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(windowState)
       const index = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
+      const activeFrameKey = FrameStateUtil.getActiveFrame(windowState).get('key')
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
-        frameProps.get('key')))
+        activeFrameKey))
       if (closingActive) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }
@@ -415,6 +417,7 @@ const doAction = (action) => {
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null
       })
+      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)
       break
     case WindowConstants.WINDOW_SET_PREVIEW_FRAME:
@@ -423,9 +426,17 @@ const doAction = (action) => {
           ? action.frameProps.get('key') : null
       })
       break
+    case WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
+      if (action.previewTabPageIndex !== windowState.getIn(['ui', 'tabs', 'tabPageIndex'])) {
+        windowState = windowState.setIn(['ui', 'tabs', 'previewTabPageIndex'], action.previewTabPageIndex)
+      } else {
+        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+      }
+      break
     case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:
       if (action.index !== undefined) {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
+        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
         updateTabPageIndex(action.frameProps)
       }
@@ -579,6 +590,7 @@ const doAction = (action) => {
       windowState = windowState.merge({
         previewFrameKey: null
       })
+      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       // Pin changes need to happen right away or else a race condition could happen for app state
       // change detection where it adds a second frame
       windowStore.emitChanges()
@@ -627,6 +639,13 @@ const doAction = (action) => {
           expandNoScript: action.braveryPanelDetail.expandNoScript,
           expandFp: action.braveryPanelDetail.expandFp
         })
+      }
+      break
+    case WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
+      if (!action.clearBrowsingDataDetail) {
+        windowState = windowState.delete('clearBrowsingDataDetail')
+      } else {
+        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
       }
       break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
@@ -685,6 +704,13 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowState = FrameStateUtil.makePrevFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
   emitChanges()
+})
+
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+  doAction({
+    actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+    clearBrowsingDataDetail
+  })
 })
 
 ipc.on(messages.IMPORT_BOOKMARKS, () => {

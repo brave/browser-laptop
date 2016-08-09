@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -11,11 +11,12 @@
     "build-package": "node ./tools/buildPackage.js",
     "check-security": "nsp check",
     "checks": "npm run check-security",
-    "clean-adblock-data": "rm -f ~/Library/Application\\ Support/Brave/ABPFilterParserData.dat",
-    "clean-httpse-data": "rm -f ~/Library/Application\\ Support/Brave/httpse.json",
-    "clean-sb-data": "rm -f ~/Library/Application\\ Support/Brave/SafeBrowsingData.dat",
-    "clean-session-store": "rm -f ~/Library/Application\\ Support/Brave/session-store-1-dev",
-    "clean-tp-data": "rm -f ~/Library/Application\\ Support/Brave/TrackingProtection.dat",
+    "clean": "node ./tools/clean.js",
+    "clean-adblock-data": "node ./tools/clean.js userData ABPFilterParserData.dat",
+    "clean-httpse-data": "node ./tools/clean.js userData httpse.json",
+    "clean-sb-data": "node ./tools/clean.js userData SafeBrowsingData.dat",
+    "clean-session-store": "node ./tools/clean.js userData session-store-1-dev",
+    "clean-tp-data": "node ./tools/clean.js userData TrackingProtection.dat",
     "docs": "jsdox js/actions/appActions.js js/actions/windowActions.js --output docs",
     "download-languages": "node ./tools/downloadLanguages",
     "electron-rebuild": "electron-rebuild",
@@ -158,7 +159,8 @@
       "public/**",
       "app/ext/**",
       "app/gen/**",
-      "decls/**"
+      "decls/**",
+      "tools/lib/rimraf.js"
     ]
   },
   "pre-commit": [

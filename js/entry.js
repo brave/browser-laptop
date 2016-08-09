@@ -52,6 +52,10 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
 })
 
+if (process.env.NODE_ENV === 'test') {
+  window.appStoreRenderer = appStoreRenderer
+}
+
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
   appStoreRenderer.state = action.stateDiff
     ? appStoreRenderer.state = patch(appStoreRenderer.state, Immutable.fromJS(action.stateDiff))

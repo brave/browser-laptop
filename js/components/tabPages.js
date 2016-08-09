@@ -12,6 +12,28 @@ const dnd = require('../dnd')
 const dndData = require('../dndData')
 
 class TabPage extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onMouseEnter = this.onMouseEnter.bind(this)
+    this.onMouseLeave = this.onMouseLeave.bind(this)
+  }
+  onMouseLeave () {
+    window.clearTimeout(this.hoverTimeout)
+    windowActions.setPreviewTabPageIndex()
+  }
+
+  onMouseEnter (e) {
+    // relatedTarget inside mouseenter checks which element before this event was the pointer on
+    // if this element has a tab-like class, then it's likely that the user was previewing
+    // a sequency of tabs. Called here as previewMode.
+    const previewMode = /tab(?!pages)/i.test(e.relatedTarget.classList)
+
+    // If user isn't in previewMode, we add a bit of delay to avoid tab from flashing out
+    // as reported here: https://github.com/brave/browser-laptop/issues/1434
+    this.hoverTimeout =
+      window.setTimeout(windowActions.setPreviewTabPageIndex.bind(null, this.props.index), previewMode ? 0 : 200)
+  }
+
   onDrop (e) {
     if (this.props.frames.size === 0) {
       return
@@ -45,6 +67,8 @@ class TabPage extends ImmutableComponent {
       frame.get('audioPlaybackActive') && !frame.get('audioMuted'))
     return <span data-tab-page={this.props.index}
       onDragOver={this.onDragOver.bind(this)}
+      onMouseEnter={this.props.previewTabPage ? this.onMouseEnter : null}
+      onMouseLeave={this.props.previewTabPage ? this.onMouseLeave : null}
       onDrop={this.onDrop.bind(this)}
       className={cx({
         tabPage: true,
@@ -68,13 +92,14 @@ class TabPages extends ImmutableComponent {
         sourceDragFromPageIndex /= this.props.tabsPerTabPage
       }
     }
-    return <div>
+    return <div className='tabPageWrap'>
     {
       tabPageCount > 1 &&
       Array.from(new Array(tabPageCount)).map((x, i) =>
         <TabPage
           key={`tabPage-${i}`}
           frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
+          previewTabPage={this.props.previewTabPage}
           index={i}
           sourceDragFromPageIndex={sourceDragFromPageIndex}
           active={this.props.tabPageIndex === i} />)

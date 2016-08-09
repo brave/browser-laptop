@@ -18,7 +18,6 @@ const UpdateStatus = require('../constants/updateStatus')
 const downloadStates = require('../constants/downloadStates')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
-const Filtering = require('../../app/filtering')
 const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const dates = require('../../app/dates')
@@ -216,8 +215,8 @@ class AppStore extends EventEmitter {
         BrowserWindow.getAllWindows().forEach((wnd) =>
           wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() }))
         lastEmittedState = appState
+        this.emit(CHANGE_EVENT, d.toJS())
       }
-      this.emit(CHANGE_EVENT, d.toJS())
     } else {
       this.emit(CHANGE_EVENT, [])
     }
@@ -295,6 +294,7 @@ function handleChangeSettingAction (settingKey, settingValue) {
       })
       break
     case settings.DEFAULT_ZOOM_LEVEL:
+      const Filtering = require('../../app/filtering')
       Filtering.setDefaultZoomLevel(settingValue)
       break
     default:
@@ -343,14 +343,12 @@ const handleAppAction = (action) => {
         console.error('Window crashed. Reloading...')
         mainWindow.loadURL(appUrlUtil.getIndexHTML())
 
-        function notificationResponseCallback (e, message, buttonIndex, persist) {
+        ipcMain.on(messages.NOTIFICATION_RESPONSE, function notificationResponseCallback (e, message, buttonIndex, persist) {
           if (message === locale.translation('unexpectedErrorWindowReload')) {
             appActions.hideMessageBox(message)
-          } else {
-            ipcMain.once(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
+            ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
           }
-        }
-        ipcMain.once(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
+        })
 
         appActions.showMessageBox({
           buttons: [locale.translation('ok')],
@@ -504,6 +502,26 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SET_DICTIONARY:
       appState = appState.setIn(['dictionary', 'locale'], action.locale)
+      break
+    case AppConstants.APP_CLEAR_DATA:
+      if (action.clearDataDetail.get('browserHistory')) {
+        handleAppAction({actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS})
+      }
+      if (action.clearDataDetail.get('downloadHistory')) {
+        handleAppAction({actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS})
+      }
+      // Site cookies clearing should also clear cache so that evercookies will be properly removed
+      if (action.clearDataDetail.get('cachedImagesAndFiles') || action.clearDataDetail.get('allSiteCookies')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearCache()
+      }
+      if (action.clearDataDetail.get('savedPasswords')) {
+        handleAppAction({actionType: AppConstants.APP_CLEAR_PASSWORDS})
+      }
+      if (action.clearDataDetail.get('allSiteCookies')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearStorageData()
+      }
       break
     default:
   }

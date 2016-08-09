@@ -413,24 +413,24 @@ function registerForDownloadListener (session) {
   })
 }
 
-function registerSession (partition, fn) {
-  let ses = session.fromPartition(partition)
-  ses.userPrefs.setDefaultZoomLevel(getSetting(settings.DEFAULT_ZOOM_LEVEL) || config.zoom.defaultValue)
+function initSession (ses, partition) {
+  initializedPartitions[partition] = true
   registeredSessions[partition] = ses
-  fn(ses, partition)
+  ses.setEnableBrotli(true)
+  ses.userPrefs.setDefaultZoomLevel(getSetting(settings.DEFAULT_ZOOM_LEVEL) || config.zoom.defaultValue)
 }
 
 function initForPartition (partition) {
-  let fns = [userPrefs.init,
+  let fns = [initSession,
+    userPrefs.init,
     registerForBeforeRequest,
     registerForBeforeRedirect,
     registerForBeforeSendHeaders,
     registerPermissionHandler,
     registerForHeadersReceived,
     registerForDownloadListener]
-
-  initializedPartitions[partition] = true
-  fns.forEach(registerSession.bind(this, partition))
+  let ses = session.fromPartition(partition)
+  fns.forEach((fn) => { fn(ses, partition) })
 }
 
 function shouldIgnoreUrl (url) {

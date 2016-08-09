@@ -1,7 +1,7 @@
 /* global describe, before, it */
 
-const siteSettings = require('../../js/state/siteSettings')
-const siteUtil = require('../../js/state/siteUtil')
+const siteSettings = require('../../../js/state/siteSettings')
+const siteUtil = require('../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
 let siteSettingsMap = new Immutable.Map()

@@ -19,7 +19,6 @@ class PopupWindow extends ImmutableComponent {
       let webview = document.createElement('webview')
       webview.setAttribute('src', src)
       if (parseInt(this.props.detail.get('height'))) {
-        console.log('got height')
         webview.style.height = this.props.detail.get('height') + 'px'
       }
       if (parseInt(this.props.detail.get('width'))) {

@@ -8,7 +8,9 @@
   --bookmark-item-max-width: 100px;
   --bookmark-item-padding: 5px;
   --bookmark-item-margin: 3px;
+  --bookmark-item-chevron-margin: 4px;
   --bookmark-item-font-size: 11px;
+  --bookmarks-toolbar-padding: 10px;
 }
 
 .bookmarksToolbar {
@@ -18,7 +20,7 @@
   box-sizing: border-box;
   display: flex;
   flex: 1;
-  padding: 3px 10px;
+  padding: 3px var(--bookmarks-toolbar-padding);
   height: @bookmarksToolbarHeight;
 
   &.allowDragging {
@@ -37,13 +39,6 @@
     margin: 0px;
   }
 
-  .overflowIndicator {
-    padding-left: 6px;
-    padding-right: 6px;
-    margin-bottom: auto;
-    margin-top: auto;
-  }
-
   .bookmarkToolbarButton {
     border-radius: @borderRadius;
     color: black;
@@ -53,7 +48,6 @@
     margin: auto var(--bookmark-item-margin);
     padding: 2px var(--bookmark-item-padding);
     text-overflow: ellipsis;
-    overflow: hidden;
     user-select: none;
     white-space: nowrap;
     max-width: var(--bookmark-item-max-width);
@@ -113,7 +107,7 @@
 
     .bookmarkFolderChevron {
       color: #676767;
-      margin-left: 4px;
+      margin-left: var(--bookmark-item-chevron-margin);
     }
   }
 
@@ -126,5 +120,14 @@
     margin-right: 5px;
     width: auto;
     -webkit-user-select: none;
+  }
+
+  .overflowIndicator {
+    padding-left: 6px;
+    padding-right: 11px;
+    margin-left: auto;
+    margin-right: 0;
+    margin-bottom: auto;
+    margin-top: auto;
   }
 }

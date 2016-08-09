@@ -6,6 +6,7 @@ const { getAppUrl, getExtensionsPath, getIndexHTML } = require('../js/lib/appUrl
 const { getSetting } = require('../js/settings')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
+const {passwordManagers, extensionIds} = require('../js/constants/passwordManagers')
 
 let generateBraveManifest = () => {
   let baseManifest = {
@@ -131,12 +132,6 @@ let generateBraveManifest = () => {
   return baseManifest
 }
 
-let defaultExtensions = {
-  OnePassword: 'aomjjhallfgjeglblehebfpbcfeobpgk',
-  Dashlane: 'fdjamakpfbbddfjaooikfcpapjohcfmg',
-  LastPass: 'hdokiejnpimakedhajhdlcegeplioahd'
-}
-
 module.exports.init = () => {
   process.on('chrome-browser-action-popup', function (extensionId, tabId, name, props, popup) {
     // TODO(bridiver) find window from tabId
@@ -186,25 +181,26 @@ module.exports.init = () => {
       disableExtension(config.PDFJSExtensionId)
     }
 
-    if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
-      installExtension(defaultExtensions.OnePassword, getExtensionsPath('1password'))
-      enableExtension(defaultExtensions.OnePassword)
+    const activePasswordManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER)
+    if (activePasswordManager === passwordManagers.ONE_PASSWORD) {
+      installExtension(extensionIds[passwordManagers.ONE_PASSWORD], getExtensionsPath('1password'))
+      enableExtension(extensionIds[passwordManagers.ONE_PASSWORD])
     } else {
-      disableExtension(defaultExtensions.OnePassword)
+      disableExtension(extensionIds[passwordManagers.ONE_PASSWORD])
     }
 
-    if (getSetting(settings.LAST_PASS_ENABLED)) {
-      installExtension(defaultExtensions.LastPass, getExtensionsPath('lastpass'))
-      enableExtension(defaultExtensions.LastPass)
+    if (activePasswordManager === passwordManagers.DASHLANE) {
+      installExtension(extensionIds[passwordManagers.DASHLANE], getExtensionsPath('dashlane'))
+      enableExtension(extensionIds[passwordManagers.DASHLANE])
     } else {
-      disableExtension(defaultExtensions.LastPass)
+      disableExtension(extensionIds[passwordManagers.DASHLANE])
     }
 
-    if (getSetting(settings.DASHLANE_ENABLED)) {
-      installExtension(defaultExtensions.Dashlane, getExtensionsPath('dashlane'))
-      enableExtension(defaultExtensions.Dashlane)
+    if (activePasswordManager === passwordManagers.LAST_PASS) {
+      installExtension(extensionIds[passwordManagers.LAST_PASS], getExtensionsPath('lastpass'))
+      enableExtension(extensionIds[passwordManagers.LAST_PASS])
     } else {
-      disableExtension(defaultExtensions.Dashlane)
+      disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
   }
 

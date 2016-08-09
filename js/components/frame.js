@@ -574,11 +574,15 @@ class Frame extends ImmutableComponent {
           method = (frameOpts, openInForeground) => {
             windowActions.newFrame(frameOpts, openInForeground)
           }
+          break
+        case messages.CLEAR_BROWSING_DATA_NOW:
+          windowActions.setClearBrowsingDataDetail({})
+          break
       }
       method.apply(this, e.args)
     })
 
-    const interceptFlash = (adobeUrl) => {
+    const interceptFlash = (stopCurrentLoad, adobeUrl) => {
       if (!this.origin) {
         return
       }
@@ -588,7 +592,10 @@ class Frame extends ImmutableComponent {
         return
       }
 
-      this.webview.stop()
+      if (stopCurrentLoad) {
+        this.webview.stop()
+      }
+
       // Generate a random string that is unlikely to collide. Not
       // cryptographically random.
       const nonce = Math.random().toString()
@@ -623,7 +630,7 @@ class Frame extends ImmutableComponent {
           if (installed) {
             currentWindow.webContents.send(messages.SHOW_NOTIFICATION,
                                            locale.translation('flashInstalled'))
-          } else {
+          } else if (stopCurrentLoad && adobeUrl) {
             windowActions.loadUrl(this.frame, adobeUrl)
           }
         })
@@ -643,7 +650,7 @@ class Frame extends ImmutableComponent {
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         if (UrlUtil.isFlashInstallUrl(e.url) &&
             UrlUtil.shouldInterceptFlash(this.props.provisionalLocation)) {
-          interceptFlash(e.url)
+          interceptFlash(true, e.url)
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
         const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
@@ -683,6 +690,11 @@ class Frame extends ImmutableComponent {
       const hack = siteHacks[parsedUrl.hostname]
       if (hack && hack.pageLoadEndScript) {
         this.webview.executeJavaScript(hack.pageLoadEndScript)
+      }
+      if (hack && hack.enableFlashCTP &&
+          !this.webview.allowRunningPlugins && this.props.flashInitialized) {
+        // Fix #3011
+        interceptFlash(false)
       }
     }
     const loadFail = (e) => {

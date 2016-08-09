@@ -13,6 +13,7 @@ const siteTags = require('../constants/siteTags')
 const siteUtil = require('../state/siteUtil')
 const UrlUtil = require('../lib/urlutil')
 const currentWindow = require('../../app/renderer/currentWindow')
+const windowStore = require('../stores/windowStore')
 
 function dispatch (action) {
   AppDispatcher.dispatch(action)
@@ -335,7 +336,11 @@ const windowActions = {
         return
       }
 
-      if (!forceClosePinned) {
+      const frameKey = frameProps ? frameProps.get('key') : null
+      const activeFrameKey = windowStore.getState().get('activeFrameKey')
+      const isActiveFrame = frameKey === activeFrameKey
+
+      if (!forceClosePinned && isActiveFrame) {
         // Go to next frame if the user tries to close a pinned tab
         ipc.emit(messages.SHORTCUT_NEXT_TAB)
         return
@@ -412,6 +417,18 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       index
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to set the tab page index being previewed.
+   *
+   * @param {number} previewTabPageIndex - The tab page index to preview
+   */
+  setPreviewTabPageIndex: function (previewTabPageIndex) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX,
+      previewTabPageIndex
     })
   },
 
@@ -677,7 +694,7 @@ const windowActions = {
    * @param {Object} frameToSkip - Properties of the frame to keep audio
    */
   muteAllAudioExcept: function (frameToSkip) {
-    let framePropsList = require('../stores/windowStore').getState().get('frames')
+    let framePropsList = windowStore.getState().get('frames')
 
     framePropsList.forEach((frameProps) => {
       if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
@@ -919,6 +936,16 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_ADD_HISTORY,
       frameProps
+    })
+  },
+
+  /**
+   * Sets the clear browsing data popup detail
+   */
+  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+      clearBrowsingDataDetail
     })
   }
 }

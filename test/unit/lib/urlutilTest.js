@@ -62,7 +62,7 @@ describe('urlutil', function () {
         assert.equal(UrlUtil.isNotURL('?brave'), true)
       })
       it('returns true when input has a question mark followed by a space', function () {
-        assert.equal(UrlUtil.isNotURL('?brave'), true)
+        assert.equal(UrlUtil.isNotURL('? brave'), true)
       })
     })
     it('returns false when input is a valid URL', function () {
