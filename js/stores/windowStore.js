@@ -94,6 +94,7 @@ const updateTabPageIndex = (frameProps) => {
     return
   }
   windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+  windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
 }
 
 const focusWebview = (frameStatePath) => {
@@ -416,6 +417,7 @@ const doAction = (action) => {
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null
       })
+      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)
       break
     case WindowConstants.WINDOW_SET_PREVIEW_FRAME:
@@ -424,9 +426,17 @@ const doAction = (action) => {
           ? action.frameProps.get('key') : null
       })
       break
+    case WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
+      if (action.previewTabPageIndex !== windowState.getIn(['ui', 'tabs', 'tabPageIndex'])) {
+        windowState = windowState.setIn(['ui', 'tabs', 'previewTabPageIndex'], action.previewTabPageIndex)
+      } else {
+        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+      }
+      break
     case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:
       if (action.index !== undefined) {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
+        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
         updateTabPageIndex(action.frameProps)
       }
@@ -580,6 +590,7 @@ const doAction = (action) => {
       windowState = windowState.merge({
         previewFrameKey: null
       })
+      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       // Pin changes need to happen right away or else a race condition could happen for app state
       // change detection where it adds a second frame
       windowStore.emitChanges()

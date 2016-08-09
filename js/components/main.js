@@ -855,6 +855,7 @@ class Main extends ImmutableComponent {
             nonPinnedFrames.size > tabsPerPage
             ? <TabPages frames={nonPinnedFrames}
               tabsPerTabPage={tabsPerPage}
+              previewTabPage={getSetting(settings.SHOW_TAB_PREVIEWS)}
               tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])} />
             : null
           }
@@ -866,6 +867,7 @@ class Main extends ImmutableComponent {
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}
           tabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'tabPageIndex'])}
+          previewTabPageIndex={this.props.windowState.getIn(['ui', 'tabs', 'previewTabPageIndex'])}
           tabs={this.props.windowState.get('tabs')}
           sites={this.props.appState.get('sites')}
           key='tab-bar'
