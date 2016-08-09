@@ -365,5 +365,36 @@ WindowStore
   flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   lastAppVersion: string, // Version of the last file that was saved
+  ledgerInfo: {
+    creating: boolean,
+    created: boolean,
+    reconcileStamp: ?,
+    reconcileDelay: ?,
+    delayStamp: ?,
+    transactions: Array,
+    balance: string,
+    address: string,
+    btc: string,
+    amount: number,
+    currency: string,
+    paymentURL: string,
+    buyURL: string,
+    bravery: {}
+  },
+  publisherInfo: {
+    synopsis: {
+      hoursSpent: number,
+      minutesSpent: number,
+      secondsSpent: number,
+      daysSpent: number,
+      percentage: number,
+      publisherURL: string,
+      rank: number,
+      views: number,
+      duration: number,
+      faviconURL: string,
+      site: string
+    }
+  }
 }
 ```

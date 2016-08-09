@@ -63,9 +63,6 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
 
-// Ledger
-const ledgerInterop = require('../ledgerInterop')
-
 class Main extends ImmutableComponent {
   constructor () {
     super()
@@ -936,7 +933,8 @@ class Main extends ImmutableComponent {
               cookieblock={this.props.appState.get('cookieblock')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
-              ledger={ledgerInterop.generalCommunications()}
+              ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
+              publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
