@@ -445,14 +445,52 @@ describe('navigationBar', function () {
       })
     })
 
-    describe('escape', function * () {
+    describe('type escape once', function () {
       before(function * () {
-        yield this.app.client.ipcSend('shortcut-active-frame-stop')
+        this.page = Brave.server.url('page1.html')
+        return yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.page)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .setValue(urlInput, 'blah')
+          // hit escape
+          .keys('\uE00C')
+          .waitForElementFocus(urlInput)
       })
 
-      it('reverts typing on escape', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(config.defaultUrl)
-        yield selectsText(this.app.client)
+      it('does not select the urlbar text', function * () {
+        yield selectsText(this.app.client, '')
+      })
+
+      it('does not revert the urlbar text', function * () {
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal('blah')
+      })
+    })
+
+    describe('type escape twice', function () {
+      before(function * () {
+        this.page = Brave.server.url('page1.html')
+        return yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.page)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .setValue(urlInput, 'blah')
+          // hit escape
+          .keys('\uE00C')
+          .waitForElementFocus(urlInput)
+          .keys('\uE00C')
+      })
+
+      it('selects the urlbar text', function * () {
+        yield selectsText(this.app.client, this.page)
+      })
+
+      it('sets the urlbar text to the webview src', function * () {
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
       })
     })
 
@@ -641,12 +679,6 @@ describe('navigationBar', function () {
         yield selectsText(this.app.client, '')
       })
     })
-  })
-
-  describe('escape', function () {
-    it('sets the urlbar text to the webview src')
-
-    it('selects the urlbar text')
   })
 
   describe('shortcut-focus-url', function () {

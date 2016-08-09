@@ -250,9 +250,13 @@ class UrlBar extends ImmutableComponent {
   }
 
   onActiveFrameStop () {
-    this.restore()
-    windowActions.setUrlBarSelected(true)
-    windowActions.setUrlBarActive(false)
+    if (this.isFocused()) {
+      windowActions.setUrlBarActive(false)
+      if (!this.shouldRenderUrlBarSuggestions) {
+        this.restore()
+        windowActions.setUrlBarSelected(true)
+      }
+    }
   }
 
   componentWillMount () {
