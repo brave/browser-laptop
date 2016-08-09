@@ -251,7 +251,7 @@ class UrlBar extends ImmutableComponent {
 
   onActiveFrameStop () {
     this.restore()
-    windowActions.setUrlBarSelected(true)
+    windowActions.setUrlBarSelected(false)
     windowActions.setUrlBarActive(false)
   }
 
