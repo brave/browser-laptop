@@ -614,7 +614,22 @@ var ledgerInfo = {
   reconcileStamp: undefined,
   reconcileDelay: undefined,
 
-  transactions: [],
+  transactions:
+  [
+/*
+    { viewingId       : undefined
+    , submissionStamp : undefined
+    , satoshis        : undefined
+    , currency        : undefined
+    , amount          : undefined
+    , ballots         :
+      { 'publisher1'  : undefined
+        ...
+      }
+    }
+  , ...
+ */
+  ],
 
   // set from ledger client's state.paymentInfo OR client's getWalletProperties
   balance: undefined,
@@ -642,9 +657,14 @@ var updateLedgerInfo = () => {
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
 
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
+/* YAN: this comment is temporary until the preferences panel for payments can handle only one of these properties defined
       delete ledgerInfo[protocolHandler.isNavigatorProtocolHandled('', 'bitcoin') ? 'buyURL' : 'paymentURL']
+ */
     }
   }
+
+// TBD: temporary for development...
+  console.log('\n' + JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2) + '\n\n')
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
 }
@@ -805,7 +825,7 @@ var getStateInfo = (state) => {
   }
 
   ledgerInfo.transactions = []
-  if (!state.transactions) return
+  if (!state.transactions) return updateLedgerInfo()
 
   for (i = state.transactions.length - 1; i >= 0; i--) {
     transaction = state.transactions[i]
@@ -819,9 +839,8 @@ var getStateInfo = (state) => {
       ballots[ballot.publisher]++
     })
 
-    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction,
-                                                                   [ 'viewingId', 'stamp', 'currency', 'amount' ]),
-                                                   { ballots: ballots }))
+    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction, [ 'viewingId', 'submissionStamp', 'satoshis' ]),
+                                                   transaction.fee, { ballots: ballots }))
   }
 
   updateLedgerInfo()
@@ -849,6 +868,7 @@ var getPaymentInfo = () => {
         if ((body.rates) && (body.rates[currency])) info.btc = (amount / body.rates[currency]).toFixed(4)
       }
       ledgerInfo._internal.paymentInfo = info
+      updateLedgerInfo()
       cacheReturnValue()
     })
   } catch (ex) {
@@ -869,11 +889,13 @@ var cacheReturnValue = () => {
   if (cache.paymentURL === paymentURL) return
 
   cache.paymentURL = paymentURL
+  updateLedgerInfo()
   try {
     chunks = []
 
     qr.image(paymentURL, { type: 'png' }).on('data', (chunk) => { chunks.push(chunk) }).on('end', () => {
       cache.paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
+      updateLedgerInfo()
     })
   } catch (ex) {
     console.log('qr.imageSync error: ' + ex.toString())
