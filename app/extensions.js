@@ -27,7 +27,6 @@ let generateBraveManifest = () => {
         match_about_blank: true,
         js: [
           'content/scripts/util.js',
-          'js/actions/extensionActions.js',
           'content/scripts/navigator.js',
           'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
@@ -49,7 +48,6 @@ let generateBraveManifest = () => {
           getIndexHTML()
         ],
         js: [
-          'js/actions/extensionActions.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
           'content/scripts/themeColor.js',

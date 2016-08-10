@@ -167,5 +167,10 @@
     if (prefix) results.faviconURL = prefix + results.faviconURL
   }
 
-  ExtensionActions.setPageInfo(document.location.href, results)
+  results.url = window.location.href
+  chrome.ipc.send('dispatch-action', JSON.stringify({
+    location: window.location.href,
+    actionType: 'event-set-page-info',
+    pageInfo: results
+  }))
 } catch (ex) { console.log(ex.toString() + '\n' + ex.stack) } })()

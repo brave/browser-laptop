@@ -160,7 +160,6 @@ const messages = {
   DEBUG_REACT_PROFILE: _,
   // Ledger
   LEDGER_PUBLISHER: _,
-  LEDGER_GENERAL_COMMUNICATION: _,
   LEDGER_UPDATED: _
 }
 
