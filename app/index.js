@@ -79,6 +79,7 @@ let throttleKeytar = false
 const passwordCallbacks = {}
 
 const prefsRestartCallbacks = {}
+const prefsRestartLastValue = {}
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
@@ -410,23 +411,31 @@ app.on('ready', () => {
       app.quit()
     })
 
-    ipcMain.on(messages.PREFS_RESTART, () => {
+    ipcMain.on(messages.PREFS_RESTART, (e, config, value) => {
       var message = locale.translation('prefsRestart')
-
-      appActions.showMessageBox({
-        buttons: [locale.translation('yes'), locale.translation('no')],
-        options: {
-          persist: false
-        },
-        message
-      })
-      prefsRestartCallbacks[message] = (buttonIndex, persist) => {
-        delete prefsRestartCallbacks[message]
-        if (buttonIndex === 0) {
-          app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
-          app.quit()
-        } else {
-          appActions.hideMessageBox(message)
+      if (prefsRestartLastValue[config] !== undefined && prefsRestartLastValue[config] !== value) {
+        delete prefsRestartLastValue[config]
+        appActions.hideMessageBox(message)
+      } else {
+        appActions.showMessageBox({
+          buttons: [locale.translation('yes'), locale.translation('no')],
+          options: {
+            persist: false
+          },
+          message
+        })
+        prefsRestartCallbacks[message] = (buttonIndex, persist) => {
+          delete prefsRestartCallbacks[message]
+          if (buttonIndex === 0) {
+            app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
+            app.quit()
+          } else {
+            delete prefsRestartLastValue[config]
+            appActions.hideMessageBox(message)
+          }
+        }
+        if (prefsRestartLastValue[config] === undefined) {
+          prefsRestartLastValue[config] = value
         }
       }
     })
