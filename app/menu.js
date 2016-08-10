@@ -11,9 +11,7 @@ const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const dialog = electron.dialog
 const appActions = require('../js/actions/appActions')
-const siteUtil = require('../js/state/siteUtil')
 const getSetting = require('../js/settings').getSetting
-const appStore = require('../js/stores/appStore')
 const locale = require('./locale')
 
 const isDarwin = process.platform === 'darwin'
@@ -390,7 +388,6 @@ const init = (settingsState, args) => {
         {
           label: locale.translation('clearHistory'),
           accelerator: 'Shift+CmdOrCtrl+Delete',
-          enabled: siteUtil.hasNoTagSites(appStore.getState().get('sites')),
           click: function (item, focusedWindow) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {browserHistory: true}])
           }
@@ -402,7 +399,7 @@ const init = (settingsState, args) => {
         }, {
           label: locale.translation('clearSiteData'),
           click: function (item, focusedWindow) {
-            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {allSiteCookies: true}])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {allSiteCookies: true, cachedImagesAndFiles: true}])
           }
         }
       ]

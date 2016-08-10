@@ -300,6 +300,7 @@ WindowStore
     },
     tabs: {
       tabPageIndex: number, // Index of the current tab page
+      previewTabPageIndex: number // Index of the tab being previewed
     },
     siteInfo: {
       isVisible: boolean // Whether or not to show site info like # of blocked ads
