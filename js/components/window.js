@@ -42,10 +42,10 @@ class Window extends React.Component {
       if (this.props.frames.length === 0) {
         windowActions.newFrame({
           location: config.defaultUrl
-        })
+        }, true)
       } else {
         this.props.frames.forEach((frame) => {
-          windowActions.newFrame(frame)
+          windowActions.newFrame(frame, true)
         })
       }
     }
