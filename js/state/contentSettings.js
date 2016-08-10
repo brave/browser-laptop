@@ -108,7 +108,8 @@ const getContentSettingsFromSiteSettings = (appState) => {
   }
 
   let hostSettings = appState.get('siteSettings').toJS()
-  for (var hostPattern in hostSettings) {
+  // We do 2 passes for setting content settings. On the first pass we consider all shield types.
+  for (let hostPattern in hostSettings) {
     let hostSetting = hostSettings[hostPattern]
     if (typeof hostSetting.noScript === 'boolean') {
       // TODO: support temporary override
@@ -134,8 +135,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (typeof hostSetting.flash === 'number') {
       addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
     }
-
-    // these should always be the last rules so they take precendence over the others
+  }
+  // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
+  for (let hostPattern in hostSettings) {
+    let hostSetting = hostSettings[hostPattern]
     if (hostSetting.shieldsUp === false) {
       addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')

@@ -414,10 +414,12 @@ const handleAppAction = (action) => {
       }
       break
     case AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS:
-      const downloads = appState.get('downloads')
-        .filter((download) =>
-          ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
-      appState = appState.set('downloads', downloads)
+      if (appState.get('downloads')) {
+        const downloads = appState.get('downloads')
+          .filter((download) =>
+            ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
+        appState = appState.set('downloads', downloads)
+      }
       break
     case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
       appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))

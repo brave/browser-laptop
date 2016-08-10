@@ -37,6 +37,7 @@ const headersReceivedFilteringFns = []
 let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}`
 
 // Third party domains that require a valid referer to work
 const refererExceptions = ['use.typekit.net', 'cloud.typography.com']
@@ -193,7 +194,8 @@ function registerForBeforeSendHeaders (session) {
       if (module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
                                           parsedUrl.hostname)) {
         // Clear cookie and referer on third-party requests
-        if (requestHeaders['Cookie']) {
+        if (requestHeaders['Cookie'] &&
+            getOrigin(details.firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&

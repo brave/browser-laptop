@@ -23,8 +23,8 @@ const aboutUrl = 'https://brave.com/'
 let menuArgs = {}
 let lastSettingsState, lastArgs
 
-const menu = Menu.buildFromTemplate([])
-Menu.setApplicationMenu(menu)
+let appMenu = Menu.buildFromTemplate([])
+Menu.setApplicationMenu(appMenu)
 
 /**
  * Sets up the menu.
@@ -566,8 +566,10 @@ const init = (settingsState, args) => {
     })
   }
 
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
+  const oldMenu = appMenu
+  appMenu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(appMenu)
+  oldMenu.destroy()
 }
 
 module.exports.init = init
