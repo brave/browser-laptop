@@ -96,6 +96,8 @@ class NavigationBar extends ImmutableComponent {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark(false))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
+    // Set initial bookmark status in menu
+    ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
   }
 
   get showNoScriptInfo () {
@@ -116,6 +118,7 @@ class NavigationBar extends ImmutableComponent {
       }))
 
     if (this.bookmarked !== prevBookmarked) {
+      // Used to update the Bookmarks menu (the checked status next to "Bookmark Page")
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
     }
     if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {

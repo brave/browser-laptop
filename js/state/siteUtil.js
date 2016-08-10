@@ -356,7 +356,10 @@ module.exports.hasNoTagSites = function (sites) {
  */
 
 module.exports.getBookmarks = function (sites) {
-  return sites.filter((site) => isBookmarkFolder(site.get('tags')) || isBookmark(site.get('tags')))
+  if (sites) {
+    return sites.filter((site) => isBookmarkFolder(site.get('tags')) || isBookmark(site.get('tags')))
+  }
+  return []
 }
 
 /**

@@ -385,6 +385,11 @@ describe('siteUtil', function () {
       const processedSites = siteUtil.getBookmarks(sites)
       assert.deepEqual(expectedSites, processedSites)
     })
+    it('returns empty list if input was falsey', function () {
+      const processedSites = siteUtil.getBookmarks(null)
+      const expectedSites = []
+      assert.deepEqual(processedSites, expectedSites)
+    })
   })
 
   describe('getOrigin', function () {
