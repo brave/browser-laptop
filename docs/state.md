@@ -371,7 +371,7 @@ WindowStore
   ledgerInfo: {
     creating: boolean,
     created: boolean,
-    reconcileStamp: ?,
+    reconcileStamp: number,
     reconcileDelay: ?,
     delayStamp: ?,
     transactions: Array,
@@ -381,6 +381,7 @@ WindowStore
     amount: number,
     currency: string,
     paymentURL: string,
+    paymentIMG: string,
     buyURL: string,
     bravery: {}
   },

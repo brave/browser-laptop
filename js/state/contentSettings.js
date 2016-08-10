@@ -6,6 +6,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
+const config = require('../constants/config')
 const settings = require('../constants/settings')
 const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
@@ -51,6 +52,12 @@ const getBlock3rdPartyStorage = (braveryDefaults) => {
         setting: 'allow',
         primaryPattern: '*',
         secondaryPattern: '[firstParty]'
+      },
+      {
+        // Needed for coinbase widget localStorage to work in about:preferences
+        setting: 'allow',
+        primaryPattern: `chrome-extension://${config.braveExtensionId}`,
+        secondaryPattern: config.coinbaseOrigin
       }
     ]
   } else {
