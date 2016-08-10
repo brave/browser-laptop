@@ -14,6 +14,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const importFromHTML = require('../lib/importer').importFromHTML
+const AppUrlUtil = require('../lib/appUrlUtil')
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
@@ -158,11 +159,9 @@ const newFrame = (frameOpts, openInForeground) => {
   if (frameOpts === undefined) {
     frameOpts = {}
   }
-  if (openInForeground === undefined) {
-    openInForeground = true
-  }
+
   frameOpts.location = frameOpts.location || config.defaultUrl
-  if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
+	if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
     frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
   } else {
     const defaultURL = windowStore.getState().getIn(['searchDetail', 'searchURL'])
@@ -173,6 +172,14 @@ const newFrame = (frameOpts, openInForeground) => {
       // Bad URLs passed here can actually crash the browser
       frameOpts.location = ''
     }
+  }
+
+  if (openInForeground === undefined || openInForeground === null) {
+    openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS)
+		// About urls (expect about:newtab) should open in foreground 
+		if(!openInForeground && AppUrlUtil.isSourceAboutUrl(frameOpts.location) && frameOpts.location !== 'about:newtab') {
+			openInForeground = true
+		}
   }
 
   const nextKey = incrementNextKey()
