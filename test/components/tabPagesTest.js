@@ -46,6 +46,10 @@ describe('tab pages', function () {
         })
     })
 
+    it('focuses active tab\'s page when closing last tab on page', function * () {
+      yield this.app.client.waitForVisible('.tab.active')
+    })
+
     describe('allows changing to tab pages', function () {
       before(function * () {
         // Make sure there are 2 tab pages

@@ -395,13 +395,16 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
-      const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(windowState)
       const index = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
       const activeFrameKey = FrameStateUtil.getActiveFrame(windowState).get('key')
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
-      if (closingActive) {
+      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
+
+      // If we reach the limit of opened tabs per page while closing tabs, switch to 
+      // the active tab's page otherwise the user will hang on empty page
+      if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }
       break
