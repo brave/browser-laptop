@@ -52,7 +52,7 @@ const AboutActions = {
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672
    */
-  newFrame: function (frameOpts, openInForeground = true) {
+  newFrame: function (frameOpts, openInForeground) {
     ipc.sendToHost(messages.NEW_FRAME, frameOpts, openInForeground)
   },
 
