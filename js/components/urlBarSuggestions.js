@@ -205,6 +205,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       } else {
         windowActions.loadUrl(this.activeFrame, location)
         windowActions.setUrlBarActive(false)
+        windowActions.setUrlBarPreview(null)
         this.blur()
       }
     }
