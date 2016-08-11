@@ -24,6 +24,9 @@ var searchProviders = require('../data/searchProviders')
 const searchIconSize = 16
 const UrlUtil = require('../lib/urlutil')
 
+const EventUtil = require('../lib/eventUtil')
+const eventElHasAncestorWithClasses = EventUtil.eventElHasAncestorWithClasses
+
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
@@ -203,8 +206,11 @@ class UrlBar extends ImmutableComponent {
     windowActions.setUrlBarSelected(false)
     // On blur, a user expects the text shown from the last autocomplete suffix
     // to be auto entered as the new location.
-    this.updateLocationToSuggestion()
     this.clearSearchEngine()
+
+    if (!eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm'])) {
+      this.updateLocationToSuggestion()
+    }
   }
 
   updateLocationToSuggestion () {
@@ -250,9 +256,13 @@ class UrlBar extends ImmutableComponent {
   }
 
   onActiveFrameStop () {
-    this.restore()
-    windowActions.setUrlBarSelected(true)
-    windowActions.setUrlBarActive(false)
+    if (this.isFocused()) {
+      windowActions.setUrlBarActive(false)
+      if (!this.shouldRenderUrlBarSuggestions) {
+        this.restore()
+        windowActions.setUrlBarSelected(true)
+      }
+    }
   }
 
   componentWillMount () {
