@@ -206,10 +206,9 @@ class UrlBar extends ImmutableComponent {
     windowActions.setUrlBarSelected(false)
     // On blur, a user expects the text shown from the last autocomplete suffix
     // to be auto entered as the new location.
-
     this.clearSearchEngine()
 
-    if (!eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlBarForm'])) {
+    if (!eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm'])) {
       this.updateLocationToSuggestion()
     }
   }
