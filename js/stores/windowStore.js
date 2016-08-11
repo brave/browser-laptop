@@ -190,16 +190,17 @@ const newFrame = (frameOpts, openInForeground, insertionIndex) => {
 
   // Find the closest index to the current frame's index which has
   // a different ancestor frame key.
-  if (!insertionIndex) {
+  if (insertionIndex === undefined) {
     insertionIndex = FrameStateUtil.findIndexForFrameKey(frames, frameOpts.parentFrameKey)
-  }
-  if (insertionIndex === -1) {
-    insertionIndex = frames.size
-  }
-  while (insertionIndex < frames.size) {
-    ++insertionIndex
-    if (!FrameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
-      break
+    if (insertionIndex === -1) {
+      insertionIndex = frames.size
+    } else {
+      while (insertionIndex < frames.size) {
+        ++insertionIndex
+        if (!FrameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
+          break
+        }
+      }
     }
   }
   if (FrameStateUtil.isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
@@ -415,7 +416,8 @@ const doAction = (action) => {
       newFrame(action.frameOpts, action.openInForeground)
       break
     case WindowConstants.WINDOW_CLONE_FRAME:
-      newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground)
+      let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
+      newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground, insertionIndex)
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame

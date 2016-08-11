@@ -150,6 +150,47 @@ describe('clone tab', function () {
     })
   })
 
+  describe('index', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      this.clickWithTargetPage = Brave.server.url('click_with_target.html')
+      this.page1 = Brave.server.url('page1.html')
+
+      yield setup(this.app.client)
+      yield this.app.client
+        .waitUntilWindowLoaded()
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForUrl(Brave.newTabUrl)
+        .url(this.clickWithTargetPage)
+        .waitForVisible('#name')
+        .click('#name')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('.tab[data-frame-key="2"]')
+      yield this.app.client
+        .ipcSend('shortcut-set-active-frame-by-index', 0)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_CLONE)
+        .waitUntil(function () {
+          return this.getTabCount().then((count) => {
+            return count === 3
+          })
+        })
+    })
+
+    it('inserts after the tab to clone', function * () {
+      this.tab1 = '.tabArea:nth-child(1) .tab[data-frame-key="1"]'
+      this.tab2 = '.tabArea:nth-child(2) .tab[data-frame-key="3"]'
+      this.tab3 = '.tabArea:nth-child(3) .tab[data-frame-key="2"]'
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(this.tab1)
+        .waitForExist(this.tab2)
+        .waitForExist(this.tab3)
+    })
+  })
+
   describe('history', function () {
     Brave.beforeAll(this)
 
@@ -283,4 +324,3 @@ function * setup (client) {
     .waitForVisible('#window')
     .waitForVisible(urlInput)
 }
-
