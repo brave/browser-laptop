@@ -447,8 +447,9 @@ class Frame extends ImmutableComponent {
   /**
    * Shows a Flash CtP notification if Flash is installed and enabled.
    * If not enabled, alert user that Flash is installed.
-   * @param {string} origin - Origin requesting to run Flash
-   * @param {function=} noFlashCallback - Optional cllback to run if Flash is not
+   * @param {string} origin - frame origin that is requesting to run flash.
+   *   can either be main frame or subframe.
+   * @param {function=} noFlashCallback - Optional callback to run if Flash is not
    *   installed
    */
   showFlashNotification (origin, noFlashCallback) {
@@ -466,7 +467,7 @@ class Frame extends ImmutableComponent {
       appActions.showMessageBox({
         buttons: [locale.translation('deny'), locale.translation('allow')],
         message,
-        frameOrigin: origin,
+        frameOrigin: this.origin,
         options: {
           nonce,
           persist: true
@@ -475,14 +476,14 @@ class Frame extends ImmutableComponent {
       this.notificationCallbacks[message] = (buttonIndex, persist) => {
         if (buttonIndex === 1) {
           if (persist) {
-            appActions.changeSiteSetting(origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
+            appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
           } else {
-            appActions.changeSiteSetting(origin, 'flash', 1)
+            appActions.changeSiteSetting(this.origin, 'flash', 1)
           }
         } else {
           appActions.hideMessageBox(message)
           if (persist) {
-            appActions.changeSiteSetting(origin, 'flash', false)
+            appActions.changeSiteSetting(this.origin, 'flash', false)
           }
         }
       }
