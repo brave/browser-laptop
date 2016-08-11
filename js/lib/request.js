@@ -48,56 +48,8 @@ module.exports.request = (options, callback) => {
   })
 }
 
-/*
-const http = require('http')
-const https = require('https')
-const url = require('url')
-
-module.exports.request = (options, callback) => {
-  var client, parts, request
-
-  if (typeof options === 'string') options = { url: options }
-  parts = url.parse(options.url)
-  parts.method = options.method || 'GET'
-  parts.headers = options.headers
-
-  client = parts.protocol === 'https:' ? https : http
-  request = client.request(parts, (response) => {
-    var chunks = []
-    var responseType = options.responseType || 'text'
-
-    response.on('data', (chunk) => {
-      if (!Buffer.isBuffer(chunk)) chunk = new Buffer(chunk, responseType !== 'text' ? 'binary' : 'utf8')
-
-      chunks.push(chunk)
-    }).on('end', () => {
-      var rsp = underscore.pick(response, [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
-
-      var done = (err, result) => { callback(err, rsp, result) }
-
-      var f = {
-        arraybuffer: () => { done(null, Buffer.concat(chunks)) },
-
-        blob: () => {
-          done(null, 'data:' + rsp.headers['content-type'] + ';base64,' + Buffer.concat(chunks).toString('base64'))
-        },
-
-        text: () => { done(null, Buffer.concat(chunks).toString('utf8')) }
-      }[responseType] || (() => { done(null, Buffer.concat(chunks).toString('binary')) })
-
-      underscore.defaults(rsp, { httpVersionMajor: 1, httpVersionMinor: 1 })
-      try { f() } catch (ex) { done(ex) }
-    }).setEncoding('binary')
-  }).on('error', (err) => {
-    callback(err)
-  })
-  if (options.payload) request.write(JSON.stringify(options.payload))
-  request.end()
-}
- */
-
 module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
-  var defaultSession = session.defaultSession
+  let defaultSession = session.defaultSession
   if (!defaultSession) {
     reject('Request failed, no session available')
   } else {
