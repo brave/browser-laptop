@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {activeWebview} = require('../lib/selectors')
+const {activeWebview, minimizeButton, maximizeButton, closeButton} = require('../lib/selectors')
 
 describe('application window', function () {
   describe('application launch', function () {
@@ -145,6 +145,56 @@ describe('application window', function () {
       })
     })
   })
+
+  if (process.platform !== 'darwin') {
+    describe('window top action buttons', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield this.app.client
+          .waitUntilWindowLoaded()
+          .waitForUrl(Brave.newTabUrl)
+          .windowByIndex(0)
+          .resizeWindow(600, 700)
+          .waitUntilWindowLoaded()
+      })
+
+      it('should be maximized when maximize button is clicked', function * () {
+        yield this.app.client
+          .click(maximizeButton)
+          .windowByIndex(0)
+           .getWindowWidth().should.eventually.be.getPrimaryDisplayWidth()
+          .getWindowHeight().should.eventually.be.getPrimaryDisplayHeight()
+      })
+
+      it('should be minimized when minimize button is clicked', function * () {
+        yield this.app.client
+              .click(minimizeButton)
+              .waitUntil(function () {
+                return this.windowByIndex(0).isWindowMinimized()
+              })
+      })
+
+      it('should close the new window when close button is clicked', function * () {
+        yield this.app.client
+          .windowByIndex(0)
+          .newWindowAction()
+          .waitUntil(function () {
+            return this.getWindowCount().then((count) => {
+              return count === 2
+            })
+          })
+          .windowByIndex(1)
+          .waitUntilWindowLoaded()
+          .click(closeButton)
+          .waitUntil(function () {
+            return this.getWindowCount().then((count) => {
+              return count === 1
+            })
+          })
+      })
+    })
+  }
 
   describe('windw.open with click', function () {
     describe('with features', function () {

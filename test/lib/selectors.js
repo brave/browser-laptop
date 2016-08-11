@@ -42,5 +42,8 @@ module.exports = {
   backButton: '.backforward .back',
   forwardButton: '.backforward .forward',
   clearBrowsingDataPanel: '.clearBrowsingDataPanel',
-  saveButton: '[data-l10n-id="save"]'
+  saveButton: '[data-l10n-id="save"]',
+  minimizeButton: '.min-btn',
+  maximizeButton: '.max-btn',
+  closeButton: '.close-btn'
 }

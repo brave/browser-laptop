@@ -29,6 +29,137 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
+// Window Header
+.window-header {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 18px; 
+  padding: 3px 0;
+  margin: 0px;
+  display: flex;
+  line-height: 30px;
+
+  .hidden {
+    display: none;
+  }
+
+  .title-bar-btns {
+    -webkit-app-region: no-drag;
+  }
+
+  .win-7, .win-10 {
+    margin: -13px 3px 0 0;
+
+    button.win-action-btn {
+      outline: 0;
+      cursor: pointer;
+      width: 45px;
+      height: 23px;
+      color: #b1acac;
+      background-size: 12px 12px!important;
+      background-position: center!important;
+      border: 1px solid #e1e1e1;
+      display: inline-block;
+      padding: 12px;
+
+      &.fullscreen {
+        height:21px;
+        padding:6px;
+      }
+
+      &.close-btn {
+        background: url('../img/window-actions/windows/10/close-btn.svg') no-repeat;
+        &:hover {
+          background: url('../img/window-actions/windows/10/close-btn-white.svg') no-repeat;
+          background-color: #e5182c;
+        }
+        &:active {
+          background: url('../img/window-actions/windows/10/close-btn-white.svg') no-repeat;
+          background-color: #ef717c;
+        }
+      }
+
+      &.min-btn {
+        border-right: 0px;
+        border-bottom-left-radius: 5px;
+        background: url('../img/window-actions/windows/10/min-btn.svg') no-repeat;
+        &:hover {
+          background-color: #e5e5e5;
+        }
+        &:active {
+          background-color: #cacacb;
+        }
+      }
+
+      &.max-btn {
+        background: url('../img/window-actions/windows/10/max-btn.svg') no-repeat;
+        border-right: 0px;
+        &:hover {
+          background-color: #e5e5e5;
+        }
+        &:active {
+          background-color: #cacacb;
+        }
+        &.fullscreen {
+          background: url('../img/window-actions/windows/10/max-btn-fullscreen.svg') no-repeat;
+          &:hover {
+            background-color: #e5e5e5;
+          }
+          &:active {
+            background-color: #cacacb;
+          }
+        }
+      }
+    }
+
+  }
+
+  .linux {
+    button {
+      outline: 0;
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      color: transparent;
+      background-color: transparent;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-width: 0;
+      border-radius: 50%;
+      display: inline-block;
+      padding: 0px;
+      margin-right: 15px;
+    }
+
+    min-btn:backdrop, .max-btn:backdrop, .close-btn:backdrop {
+      opacity: 1;
+    }
+
+    .close-btn {
+      background: url('../img/window-actions/linux/titlebutton-close.png') 0 0 / contain no-repeat;
+    }
+
+    .min-btn {
+      background: url('../img/window-actions/linux/titlebutton-minimize.png') 0 0 / contain no-repeat;
+    }
+
+    .max-btn {
+      background: url('../img/window-actions/linux/titlebutton-maximize.png') 0 0 / contain no-repeat;
+    }
+
+    .close-btn:hover {
+      background: url('../img/window-actions/linux/titlebutton-close-hover.png') 0 0 / contain no-repeat;
+    }
+
+    .min-btn:hover {
+      background: url('../img/window-actions/linux/titlebutton-minimize-hover.png') 0 0 / contain no-repeat;
+    }
+
+    .max-btn:hover {
+      background: url('../img/window-actions/linux/titlebutton-maximize-hover.png') 0 0 / contain no-repeat;
+    }
+  }
+}
 
 // Here I grouped the rules to keep the layout of the top bar consistent.
 // The tricky part is to keep the title in `#navigator` centered when the
