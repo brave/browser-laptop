@@ -154,7 +154,9 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
-const newFrame = (frameOpts, openInForeground) => {
+const newFrame = (frameOpts, openInForeground, insertionIndex) => {
+  const frames = windowState.get('frames')
+
   if (frameOpts === undefined) {
     frameOpts = {}
   }
@@ -185,8 +187,31 @@ const newFrame = (frameOpts, openInForeground) => {
   } else if (frameOpts.isPartitioned) {
     nextPartitionNumber = incrementPartitionNumber()
   }
-  windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), windowState.get('tabs'), frameOpts,
-    nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey')))
+
+  // Find the closest index to the current frame's index which has
+  // a different ancestor frame key.
+  if (!insertionIndex) {
+    insertionIndex = FrameStateUtil.findIndexForFrameKey(frames, frameOpts.parentFrameKey)
+  }
+  if (insertionIndex === -1) {
+    insertionIndex = frames.size
+  }
+  while (insertionIndex < frames.size) {
+    ++insertionIndex
+    if (!FrameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
+      break
+    }
+  }
+  if (FrameStateUtil.isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
+    insertionIndex = 0
+  }
+
+  windowState = windowState.merge(
+    FrameStateUtil.addFrame(
+      frames, windowState.get('tabs'), frameOpts,
+    nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey'), insertionIndex)
+  )
+
   if (openInForeground) {
     const activeFrame = FrameStateUtil.getActiveFrame(windowState)
     updateTabPageIndex(activeFrame)
