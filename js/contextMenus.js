@@ -560,7 +560,6 @@ function hamburgerTemplateInit (location, e) {
       }]
     },
     CommonMenu.separatorMenuItem,
-
     {
       label: locale.translation('bookmarks'),
       submenu: [
@@ -569,6 +568,12 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.separatorMenuItem,
         CommonMenu.importBookmarksMenuItem()
       ]
+    },{
+      label: locale.translation('bravery'),
+      submenu: [
+        CommonMenu.braveryGlobalMenuItem(),
+        CommonMenu.braverySiteMenuItem()
+      ]
     },
     CommonMenu.downloadsMenuItem(),
     CommonMenu.findOnPageMenuItem(),
@@ -576,6 +581,17 @@ function hamburgerTemplateInit (location, e) {
     CommonMenu.separatorMenuItem,
     CommonMenu.preferencesMenuItem(),
     CommonMenu.separatorMenuItem,
+    {
+      label: locale.translation('help'),
+      submenu: [
+        CommonMenu.aboutBraveMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.checkForUpdateMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.reportAnIssueMenuItem(),
+        CommonMenu.submitFeedbackMenuItem()
+      ]
+    },
     CommonMenu.quitMenuItem()
   ]
   return template

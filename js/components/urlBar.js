@@ -23,6 +23,7 @@ const windowStore = require('../stores/windowStore')
 var searchProviders = require('../data/searchProviders')
 const searchIconSize = 16
 const UrlUtil = require('../lib/urlutil')
+const Button = require('./button')
 
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
@@ -368,6 +369,14 @@ class UrlBar extends ImmutableComponent {
       action='#'
       id='urlbar'
       ref='urlbar'>
+      <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
+        className={cx({
+          navbutton: true,
+          bookmarkButton: true,
+          removeBookmarkButton: this.bookmarked
+        })}
+        l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+        onClick={this.onToggleBookmark} />
       <span
         onDragStart={this.onDragStart}
         draggable
