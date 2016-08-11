@@ -302,7 +302,12 @@ const doAction = (action) => {
           title: ''
         })
       }
-      updateNavBarInput(action.location, frameStatePath(key))
+
+      // Update nav bar unless when spawning a new tab. The user might have
+      // typed in the URL bar while we were navigating -- we should preserve it.
+      if (!(action.location === 'about:newtab' && !FrameStateUtil.getActiveFrame(windowState).get('canGoForward'))) {
+        updateNavBarInput(action.location, frameStatePath(key))
+      }
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
