@@ -136,7 +136,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     titleBarStyle: 'hidden-inset',
     autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
-    webPreferences: defaults.webPreferences
+    webPreferences: defaults.webPreferences,
+    frame: (process.platform === 'darwin')
   }
 
   if (process.platform === 'linux') {

@@ -1,4 +1,7 @@
 module.exports = {
+  minimizeButton: '.min-btn',
+  maximizeButton: '.max-btn',
+  closeButton: '.close-btn',
   urlInput: '#urlInput',
   activeWebview: '.frameWrapper.isActive webview',
   activeTab: '.tab.active',
