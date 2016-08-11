@@ -281,7 +281,7 @@ const UrlUtil = {
       return false
     }
     const parsed = urlParse(url)
-    const exemptHostPattern = new RegExp('(\\.adobe\\.com|\\.google(\\.\\w+){1,2}|^duckduckgo\\.com|^search\\.yahoo\\.com)$')
+    const exemptHostPattern = new RegExp('(\\.adobe\\.com|www\\.google(\\.\\w+){1,2}|^duckduckgo\\.com|^search\\.yahoo\\.com)$')
     return parsed.hostname &&
       ['http:', 'https:'].includes(parsed.protocol) &&
       !exemptHostPattern.test(parsed.hostname) &&
