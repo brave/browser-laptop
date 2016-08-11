@@ -331,6 +331,10 @@ class UrlBarSuggestions extends ImmutableComponent {
         clickHandler: navigateClickHandler((searchTerms) => {
           let searchURL = this.props.searchSelectEntry
           ? this.props.searchSelectEntry.search : this.props.searchDetail.get('searchURL')
+          if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'DuckDuckGo' &&
+            this.props.isBlockingScripts) {
+            searchURL = searchURL.replace('?q=', 'html?q=')
+          }
           return searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
         })
       }))
