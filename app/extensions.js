@@ -50,7 +50,6 @@ let generateBraveManifest = () => {
         ],
         js: [
           'js/actions/extensionActions.js',
-          'content/scripts/adInfo.js',
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',

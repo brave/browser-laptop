@@ -46,6 +46,7 @@ const Extensions = require('./extensions')
 const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
+const AdInfo = require('./browser/ads/adInfo')
 const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
@@ -388,6 +389,7 @@ app.on('ready', () => {
     HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()
+    AdInfo.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {

@@ -148,6 +148,9 @@ const messages = {
   LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
   REQUEST_LANGUAGE: _,
   STATE_UPDATED: _,
+  // Ads
+  GET_AD_DIV_CANDIDATES: _,
+  SET_AD_DIV_CANDIDATES: _,
   // Debugging
   DEBUG_REACT_PROFILE: _
 }
