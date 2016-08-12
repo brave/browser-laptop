@@ -124,11 +124,18 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
+            const defaultEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
             let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
-            if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
+            if (this.activateSearchEngine && this.searchSelectEntry !== null &&
+              this.searchSelectEntry.name !== defaultEngine && !isLocationUrl) {
               const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
               location = location.replace(replaceRE, '')
               searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
+            }
+            if ((defaultEngine === 'DuckDuckGo' ||
+              (this.searchSelectEntry && this.searchSelectEntry.name === 'DuckDuckGo')) &&
+            this.props.isBlockingScripts) {
+              searchUrl = searchUrl.replace('?q=', 'html?q=')
             }
             location = isLocationUrl ? location : searchUrl
             // do search.
@@ -456,7 +463,8 @@ class UrlBar extends ImmutableComponent {
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}
             searchSelectEntry={this.searchSelectEntry}
-            previewActiveIndex={this.props.previewActiveIndex || 0} />
+            previewActiveIndex={this.props.previewActiveIndex || 0}
+            isBlockingScripts={this.props.isBlockingScripts} />
           : null
         }
     </form>

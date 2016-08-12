@@ -764,6 +764,7 @@ class Main extends ImmutableComponent {
             enableNoScript={this.enableNoScript(activeSiteSettings)}
             settings={this.props.appState.get('settings')}
             noScriptIsVisible={noScriptIsVisible}
+            blockedScripts={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
           />
           {
             siteInfoIsVisible
