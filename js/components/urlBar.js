@@ -252,7 +252,11 @@ class UrlBar extends ImmutableComponent {
   onActiveFrameStop () {
     if (this.isFocused()) {
       windowActions.setUrlBarActive(false)
-      if (!this.shouldRenderUrlBarSuggestions) {
+      if (!this.shouldRenderUrlBarSuggestions ||
+          // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
+          // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
+          !this.props.urlbar.getIn(['suggestions', 'suggestionList']) ||
+          this.props.urlbar.getIn(['suggestions', 'suggestionList']).size === 0) {
         this.restore()
         windowActions.setUrlBarSelected(true)
       }
@@ -352,6 +356,8 @@ class UrlBar extends ImmutableComponent {
     windowActions.setSiteInfoVisible(true)
   }
 
+  // Currently even if there are no suggestions we render the URL bar suggestions because
+  // it needs to generate them. This needs to be refactored.  See https://github.com/brave/browser-laptop/issues/3151
   get shouldRenderUrlBarSuggestions () {
     return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
       this.props.urlbar.get('active')
