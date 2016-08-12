@@ -4,7 +4,7 @@
 
 Desktop browser for macOS, Windows, and Linux.
 
-Follow [@brave](https://twitter.com/brave) on Twitter for important news and annoucements.
+Follow [@brave](https://twitter.com/brave) on Twitter for important news and announcements.
 
 For other versions of our browser, please see:
 * iPhone - [brave/browser-ios](https://github.com/brave/browser-ios)
