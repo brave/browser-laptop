@@ -213,7 +213,7 @@ class BitcoinDashboard extends ImmutableComponent {
     aboutActions.setClipboard(text)
   }
   goToURL (url) {
-    window.open(url, '_blank')
+    window.location.href = url
   }
   onMessage (e) {
     if (!e.data || e.origin !== config.coinbaseOrigin) {
@@ -244,7 +244,7 @@ class BitcoinDashboard extends ImmutableComponent {
       <div className='board'>
         <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-          <a href={this.ledgerData.get('paymentURL')} target='_blank'>
+          <a href={this.ledgerData.get('paymentURL')}>
             <img src={this.ledgerData.get('paymentIMG')} alt={'Add Bitcoin'} />
           </a>
           <div className='settingsListCopy alt'><span className='settingsListCopy' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address') || 'Not available')} title={'Copy Bitcoin address to clipboard'}>{this.ledgerData.get('address')}</span></div>
