@@ -35,6 +35,9 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
     break
   case 'about:flash':
     element = require('./flashPlaceholder')
+    break
+  case 'about:history':
+    element = require('./history')
 }
 
 if (element) {

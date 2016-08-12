@@ -1,0 +1,47 @@
+@import "./itemList.less";
+
+.historyPage {
+  margin: 20px;
+
+  .historyPageContent {
+    border-top: 1px solid @chromeBorderColor;
+    display: flex;
+
+    .historyList {
+      padding-top: 10px;
+      overflow: hidden;
+
+      .listItem {
+        display: flex;
+        height: 1rem;
+
+        .aboutListItem {
+          align-items: center;
+        }
+
+        .aboutItemDate {
+          color: #aaa;
+          margin-right: 10px;
+        }
+      }
+    }
+
+    .sticky-outer-wrapper {
+      min-width: 100%;
+      padding-top: 10px;
+    }
+  }
+}
+
+.searchInput {
+    float: right;
+    padding: 5px;
+    margin-top: -35px;
+}
+
+.searchInputClear {
+    float: right;
+    padding: 8px;
+    margin-top: -39px;
+    color: #999;
+}

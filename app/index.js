@@ -294,6 +294,13 @@ app.on('ready', () => {
     saveIfAllCollected()
   })
 
+  // Window state must be fetched from main process; this is fired once it's retrieved
+  ipcMain.on(messages.RESPONSE_WINDOW_STATE_FOR_MENU, (wnd, data) => {
+    if (data) {
+      Menu.init(AppStore.getState(), data)
+    }
+  })
+
   ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
     if (data) {
       lastWindowState = data
@@ -367,8 +374,11 @@ app.on('ready', () => {
     // reset the browser window. This will default to en-US if
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      // Initialize after localization strings async loaded
-      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_WINDOW_STATE_FOR_MENU)
+      } else {
+        Menu.init(AppStore.getState(), null)
+      }
     })
 
     // Do this after loading the state
@@ -523,7 +533,11 @@ app.on('ready', () => {
     // save app state every 5 minutes regardless of update frequency
     setInterval(initiateSessionStateSave, 1000 * 60 * 5)
     AppStore.addChangeListener(() => {
-      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_WINDOW_STATE_FOR_MENU)
+      } else {
+        Menu.init(AppStore.getState(), null)
+      }
     })
 
     let masterKey

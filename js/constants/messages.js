@@ -110,6 +110,9 @@ const messages = {
   RESPONSE_WINDOW_STATE: _,
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
+  // Menu rebuilding
+  REQUEST_WINDOW_STATE_FOR_MENU: _,
+  RESPONSE_WINDOW_STATE_FOR_MENU: _,
   // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
   BLOCKED_PAGE: _,
@@ -118,6 +121,7 @@ const messages = {
   SITE_SETTINGS_UPDATED: _,
   BRAVERY_DEFAULTS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
+  HISTORY_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   // About pages from contentScript

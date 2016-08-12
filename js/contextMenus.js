@@ -33,6 +33,7 @@ const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
 const currentWindow = require('../app/renderer/currentWindow')
+const config = require('./constants/config')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -915,7 +916,6 @@ function mainTemplateInit (nodeProps, frame) {
     template.push(
       CommonMenu.separatorMenuItem,
       {
-        // TODO: use locale.translate
         label: passwordManager.get('displayName'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
@@ -954,6 +954,8 @@ function onHamburgerMenu (location, e) {
 function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
     onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+  } else if (contextMenuType === 'history') {
+    // TODO: add new onHistoryContextMenu() and associated methods.
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
@@ -1054,7 +1056,8 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
   const menuTemplate = []
 
   if (activeFrame && history) {
-    for (let index = (history.currentIndex - 1); index > -1; index--) {
+    const stopIndex = Math.max((history.currentIndex - config.navigationBar.maxHistorySites), -1)
+    for (let index = (history.currentIndex - 1); index > stopIndex; index--) {
       const url = history.entries[index].url
 
       menuTemplate.push({
@@ -1072,6 +1075,18 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
         }
       })
     }
+
+    if (stopIndex !== -1) {
+      menuTemplate.push(
+        CommonMenu.separatorMenuItem,
+        {
+          label: locale.translation('showAllHistory'),
+          click: (e, focusedWindow) => {
+            windowActions.newFrame({ location: 'about:history' })
+            windowActions.setContextMenuDetail()
+          }
+        })
+    }
   }
 
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -1085,7 +1100,8 @@ function onForwardButtonHistoryMenu (activeFrame, history, rect) {
   const menuTemplate = []
 
   if (activeFrame && history) {
-    for (let index = (history.currentIndex + 1); index < history.entries.length; index++) {
+    const stopIndex = Math.min((history.currentIndex + config.navigationBar.maxHistorySites), history.entries.length)
+    for (let index = (history.currentIndex + 1); index < stopIndex; index++) {
       const url = history.entries[index].url
 
       menuTemplate.push({
@@ -1102,6 +1118,18 @@ function onForwardButtonHistoryMenu (activeFrame, history, rect) {
           }
         }
       })
+    }
+
+    if (stopIndex !== history.entries.length) {
+      menuTemplate.push(
+        CommonMenu.separatorMenuItem,
+        {
+          label: locale.translation('showAllHistory'),
+          click: (e, focusedWindow) => {
+            windowActions.newFrame({ location: 'about:history' })
+            windowActions.setContextMenuDetail()
+          }
+        })
     }
   }
 

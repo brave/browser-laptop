@@ -85,6 +85,10 @@ class Frame extends ImmutableComponent {
         bookmarks: this.props.bookmarks.toJS(),
         bookmarkFolders: this.props.bookmarkFolders.toJS()
       })
+    } else if (location === 'about:history') {
+      this.webview.send(messages.HISTORY_UPDATED, {
+        history: this.props.history.toJS()
+      })
     } else if (location === 'about:downloads') {
       this.webview.send(messages.DOWNLOADS_UPDATED, {
         downloads: this.props.downloads.toJS()

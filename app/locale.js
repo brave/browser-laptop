@@ -110,6 +110,8 @@ var rendererIdentifiers = function () {
     'clearCache',
     'clearHistory',
     'clearSiteData',
+    'recentlyClosed',
+    'recentlyVisited',
     'bookmarks',
     'addToFavoritesBar',
     'window',
