@@ -133,56 +133,56 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
     const downloads = appStoreRenderer.state.get('downloads')
     if (downloadUtil.shouldAllowPause(downloadItem)) {
       menu.push({
-        label: 'Pause',
+        label: locale.translation('downloadItemPause'),
         click: downloadActions.pauseDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowResume(downloadItem)) {
       menu.push({
-        label: 'Resume',
+        label: locale.translation('downloadItemResume'),
         click: downloadActions.resumeDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCancel(downloadItem)) {
       menu.push({
-        label: 'Cancel',
+        label: locale.translation('downloadItemCancel'),
         click: downloadActions.cancelDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRedownload(downloadItem)) {
       menu.push({
-        label: 'Download Again',
+        label: locale.translation('downloadItemRedownload'),
         click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
       menu.push({
-        label: 'Copy Link Location',
+        label: locale.translation('downloadItemCopyLink'),
         click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
       })
     }
 
     if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
       menu.push({
-        label: 'Open Folder Path',
+        label: locale.translation('downloadItemPath'),
         click: downloadActions.locateShellPath.bind(null, downloadItem)
       })
     }
 
     if (downloadUtil.shouldAllowDelete(downloadItem)) {
       menu.push({
-        label: 'Delete Download',
+        label: locale.translation('downloadItemDelete'),
         click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
       menu.push({
-        label: 'Clear Download',
+        label: locale.translation('downloadItemClear'),
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
@@ -194,7 +194,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
   if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
     menu.push({
-      label: 'Hide downloads bar',
+      label: locale.translation('downloadToolbarHide'),
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
       }
@@ -203,7 +203,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
   menu.push(CommonMenu.separatorMenuItem,
     {
-      label: 'Clear completed downloads',
+      label: locale.translation('downloadItemClearCompleted'),
       click: () => {
         appActions.clearCompletedDownloads()
       }
