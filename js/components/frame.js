@@ -595,7 +595,7 @@ class Frame extends ImmutableComponent {
           break
         case messages.GOT_CANVAS_FINGERPRINTING:
           method = (detail) => {
-            const description = [detail.type, detail.scriptUrl || this.props.location].join(': ')
+            const description = [detail.type, detail.scriptUrl || this.props.provisionalLocation].join(': ')
             windowActions.setBlockedBy(this.frame, 'fingerprintingProtection', description)
           }
           break
