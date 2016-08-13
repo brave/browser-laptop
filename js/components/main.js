@@ -313,13 +313,13 @@ class Main extends ImmutableComponent {
       windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
     ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) => {
         if (blockType === appConfig.resourceNames.SAFE_BROWSING) {
           // Since Safe Browsing never actually loads the main frame we need to add history here.
@@ -331,7 +331,7 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
