@@ -11,7 +11,7 @@ const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const dialog = electron.dialog
 const appActions = require('../js/actions/appActions')
-const siteUtil = require('../js/state/siteUtil')
+// const siteUtil = require('../js/state/siteUtil')
 const getSetting = require('../js/settings').getSetting
 const locale = require('./locale')
 const isDarwin = process.platform === 'darwin'
@@ -374,9 +374,13 @@ const createBookmarksSubmenu = (CommonMenu) => {
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.importBookmarksMenuItem(),
-    CommonMenu.separatorMenuItem
-  ].concat(CommonMenu.createBookmarkMenuItems(siteUtil.getBookmarks(lastSites)))
+    CommonMenu.importBookmarksMenuItem()
+  ]
+  // TODO: commented out temporarily.
+  // Needs to be changed to update existing menu, not rebuild all menus (even if some are cached).
+  //
+  // ,CommonMenu.separatorMenuItem
+  // ].concat(CommonMenu.createBookmarkMenuItems(siteUtil.getBookmarks(lastSites)))
 }
 
 const createWindowSubmenu = (CommonMenu) => {
@@ -643,7 +647,10 @@ const init = (settingsState, sites) => {
   // This needs to be within the init method to handle translations
   const CommonMenu = require('../js/commonMenu')
 
-  createMenu(CommonMenu)
+  // Only rebuild menu if it doesn't already exist (prevent leaking resources).
+  if (appMenu.items.length === 0) {
+    createMenu(CommonMenu)
+  }
 }
 
 module.exports = {
