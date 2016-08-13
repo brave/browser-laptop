@@ -106,9 +106,7 @@ class UrlBar extends ImmutableComponent {
           // Filter javascript URLs to prevent self-XSS
           location = location.replace(/^(\s*javascript:)+/i, '')
           const isLocationUrl = isUrl(location)
-          // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
-          // For whitepsace we want a search no matter what.
-          if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
+          if (!isLocationUrl && e.ctrlKey) {
             windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || this.props.locationValueSuffix)) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
