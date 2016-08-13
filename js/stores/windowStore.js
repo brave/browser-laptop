@@ -434,7 +434,7 @@ const doAction = (action) => {
         activeFrameKey))
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
 
-      // If we reach the limit of opened tabs per page while closing tabs, switch to 
+      // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))

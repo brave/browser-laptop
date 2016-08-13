@@ -33,6 +33,7 @@ const appStoreRenderer = require('./stores/appStoreRenderer')
 const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
+const l10n = require('./l10n')
 
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
@@ -65,3 +66,5 @@ ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
 window.addEventListener('beforeunload', function () {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
+
+l10n.init()
