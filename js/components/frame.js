@@ -833,7 +833,7 @@ class Frame extends ImmutableComponent {
           return
         }
         windowActions.setFindDetail(this.frame, Immutable.fromJS({
-          numberOfMatches: e.result.matches || this.props.get('numberOfMatches'),
+          numberOfMatches: e.result.matches || this.props.findDetail && this.props.findDetail.get('numberOfMatches') || 0,
           activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.findDetail && this.props.findDetail.get('activeMatchOrdinal')
         }))
       }
