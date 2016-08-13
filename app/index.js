@@ -368,9 +368,8 @@ app.on('ready', () => {
     // reset the browser window. This will default to en-US if
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      Menu.init(AppStore.getState().get('settings'), {})
-
       // Initialize after localization strings async loaded
+      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
     })
 
     // Do this after loading the state
@@ -443,7 +442,9 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
-      Menu.init(AppStore.getState().get('settings'), args)
+      if (args && typeof args.bookmarked === 'boolean') {
+        Menu.updateBookmarkedStatus(args.bookmarked)
+      }
     })
 
     ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
@@ -524,7 +525,7 @@ app.on('ready', () => {
     // save app state every 5 minutes regardless of update frequency
     setInterval(initiateSessionStateSave, 1000 * 60 * 5)
     AppStore.addChangeListener(() => {
-      Menu.init(AppStore.getState().get('settings'))
+      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
     })
 
     let masterKey

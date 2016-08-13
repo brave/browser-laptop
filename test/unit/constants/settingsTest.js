@@ -1,5 +1,6 @@
 /* global describe, it */
 
+require('babel-polyfill')
 const settings = require('../../../js/constants/settings')
 const appConfig = require('../../../js/constants/appConfig')
 const assert = require('assert')

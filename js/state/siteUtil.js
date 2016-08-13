@@ -8,6 +8,18 @@ const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const urlParse = require('url').parse
 
+const isBookmark = (tags) => {
+  return tags && tags.includes(siteTags.BOOKMARK)
+}
+
+const isBookmarkFolder = (tags) => {
+  if (!tags) {
+    return false
+  }
+  return typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
+    tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
+}
+
 /**
  * Obtains the index of the location in sites
  *
@@ -16,10 +28,11 @@ const urlParse = require('url').parse
  * @return index of the site or -1 if not found.
  */
 module.exports.getSiteIndex = function (sites, siteDetail, tags) {
-  let isBookmarkFolder = typeof tags === 'string' && tags === siteTags.BOOKMARK_FOLDER ||
-    tags && typeof tags !== 'string' && tags.includes(siteTags.BOOKMARK_FOLDER)
-  if (isBookmarkFolder) {
-    return sites.findIndex((site) => site.get('folderId') === siteDetail.get('folderId') && site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+  if (!sites || !siteDetail) {
+    return -1
+  }
+  if (isBookmarkFolder(tags)) {
+    return sites.findIndex((site) => isBookmarkFolder(site.get('tags')) && site.get('folderId') === siteDetail.get('folderId'))
   }
   return sites.findIndex((site) => site.get('location') === siteDetail.get('location') && (site.get('partitionNumber') || 0) === (siteDetail.get('partitionNumber') || 0))
 }
@@ -31,12 +44,12 @@ module.exports.getSiteIndex = function (sites, siteDetail, tags) {
  * @param siteDetail The site to check if it's in the specified tag
  * @return true if the location is already bookmarked
  */
-module.exports.isSiteInList = function (sites, siteDetail, tag) {
-  const index = module.exports.getSiteIndex(sites, siteDetail, tag)
+module.exports.isSiteBookmarked = function (sites, siteDetail) {
+  const index = module.exports.getSiteIndex(sites, siteDetail, siteTags.BOOKMARK)
   if (index === -1) {
     return false
   }
-  return sites.get(index).get('tags').includes(tag)
+  return isBookmark(sites.get(index).get('tags'))
 }
 
 const getNextFolderIdItem = (sites) =>
@@ -56,6 +69,10 @@ const getNextFolderIdItem = (sites) =>
   })
 
 module.exports.getNextFolderId = (sites) => {
+  const defaultFolderId = 0
+  if (!sites) {
+    return defaultFolderId
+  }
   const maxIdItem = getNextFolderIdItem(sites)
   return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
 }
@@ -97,7 +114,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     location: siteDetail.get('location'),
     // We don't want bookmarks and other site info being renamed on users if they already exist
     // The name should remain the same while it is bookmarked forever.
-    title: oldSite && tags.includes(siteTags.BOOKMARK) ? oldSite.get('title') : siteDetail.get('title')
+    title: oldSite && isBookmark(tags) ? oldSite.get('title') : siteDetail.get('title')
   })
   if (folderId) {
     site = site.set('folderId', Number(folderId))
@@ -261,7 +278,10 @@ module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
  * @return true if the site detail is a folder.
  */
 module.exports.isFolder = function (siteDetail) {
-  return siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+  if (siteDetail) {
+    return isBookmarkFolder(siteDetail.get('tags'))
+  }
+  return false
 }
 
 /**
@@ -328,6 +348,18 @@ module.exports.clearSitesWithoutTags = function (sites) {
  */
 module.exports.hasNoTagSites = function (sites) {
   return sites.findIndex((site) => !site.get('tags') || site.get('tags').size === 0) !== -1
+}
+
+/**
+ * Returns all sites that have a bookmark tag.
+ * @param sites The application state's Immutable sites list.
+ */
+
+module.exports.getBookmarks = function (sites) {
+  if (sites) {
+    return sites.filter((site) => isBookmarkFolder(site.get('tags')) || isBookmark(site.get('tags')))
+  }
+  return []
 }
 
 /**

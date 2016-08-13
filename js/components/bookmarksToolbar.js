@@ -116,7 +116,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   get isFolder () {
-    return this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+    return siteUtil.isFolder(this.props.bookmark)
   }
 
   onContextMenu (e) {
@@ -259,8 +259,8 @@ class BookmarksToolbar extends ImmutableComponent {
     contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
   }
   updateBookmarkData (props) {
-    this.bookmarks = props.sites
-      .filter((site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER))
+    this.bookmarks = siteUtil.getBookmarks(props.sites)
+
     const noParentItems = this.bookmarks
       .filter((bookmark) => !bookmark.get('parentFolderId'))
     let widthAccountedFor = 0

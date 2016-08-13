@@ -11,7 +11,7 @@ const Button = require('./button')
 const UrlBar = require('./urlBar')
 const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
-const {isSiteInList} = require('../state/siteUtil')
+const {isSiteBookmarked} = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
@@ -76,11 +76,11 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrameKey !== undefined &&
-      isSiteInList(this.props.sites, Immutable.fromJS({
+      isSiteBookmarked(this.props.sites, Immutable.fromJS({
         location: this.props.location,
         partitionNumber: this.props.partitionNumber,
         title: this.props.title
-      }), siteTags.BOOKMARK)
+      }))
   }
 
   get titleMode () {
@@ -96,6 +96,8 @@ class NavigationBar extends ImmutableComponent {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark(false))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
+    // Set initial bookmark status in menu
+    ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
   }
 
   get showNoScriptInfo () {
@@ -109,12 +111,14 @@ class NavigationBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
     const prevBookmarked = this.props.activeFrameKey !== undefined &&
-      isSiteInList(prevProps.sites, Immutable.fromJS({
+      isSiteBookmarked(prevProps.sites, Immutable.fromJS({
         location: prevProps.location,
         partitionNumber: prevProps.partitionNumber,
         title: prevProps.title
-      }), siteTags.BOOKMARK)
+      }))
+
     if (this.bookmarked !== prevBookmarked) {
+      // Used to update the Bookmarks menu (the checked status next to "Bookmark Page")
       ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
     }
     if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
