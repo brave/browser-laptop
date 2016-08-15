@@ -86,7 +86,7 @@
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
     "ledger-client": "https://github.com/brave/ledger-client.git#beta",
-    "ledger-publisher": "^0.8.37",
+    "ledger-publisher": "^0.8.39",
     "lru_cache": "^1.0.0",
     "moment": "^2.13.0",
     "random-lib": "2.1.0",
@@ -103,8 +103,7 @@
     "tldjs": "1.6.2",
     "tracking-protection": "1.1.x",
     "underscore.string": "^3.3.4",
-    "url-loader": "^0.5.7",
-    "vault-client": "https://github.com/brave/vault-client.git"
+    "url-loader": "^0.5.7"
   },
   "devDependencies": {
     "asar": "^0.11.0",

@@ -53,7 +53,6 @@ const publisherPath = path.join(app.getPath('userData'), 'ledger-publisher.json'
 const scoresPath = path.join(app.getPath('userData'), 'ledger-scores.json')
 
 // TBD: move these to secureState post beta [MTR]
-const vaultPath = path.join(app.getPath('userData'), 'vault-state.json')
 const statePath = path.join(app.getPath('userData'), 'ledger-state.json')
 const synopsisPath = path.join(app.getPath('userData'), 'ledger-synopsis.json')
 
@@ -89,7 +88,20 @@ const msecs = { year: 365 * 24 * 60 * 60 * 1000,
  */
 
 var init = () => {
-  try { initialize() } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
+  try {
+// TBD: immediately prior to beta, replace all the code inside the `try { }` with `initialize()` [MTR]
+    fs.access(synopsisPath, fs.FF_OK, (err) => {
+      if (err) {
+        if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
+        return
+      }
+
+      enable(true)
+      boot()
+
+      initialize()
+    })
+  } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
 var quit = () => {
@@ -148,41 +160,15 @@ var enable = (onoff) => {
 }
 
 var boot = () => {
-  var boot2 = (personaId) => {
-    fs.access(statePath, fs.FF_OK, (err) => {
-      if (!err) return
-
-      if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
-
-      client = (require('ledger-client'))(personaId, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
-      if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
-    })
-  }
-
   if (client) return
 
-  fs.readFile(vaultPath, (err, data) => {
-    var personaId
+  fs.access(statePath, fs.FF_OK, (err) => {
+    if (!err) return
 
-    if (!err) {
-      console.log('found ' + vaultPath)
+    if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
-      try { personaId = JSON.parse(data).userId } catch (ex) {
-        console.log('vaultPath parse error: ' + ex.toString())
-      }
-
-      if (personaId) return boot2(personaId)
-    } else {
-      if (err.code !== 'ENOENT') console.log('vaultPath read error: ' + err.toString())
-    }
-
-    (require('vault-client'))(underscore.extend(clientOptions, { roundtrip: roundtrip }), null, (err, result) => {
-      if (err) return console.log('vault-client initialization error: ' + err.toString())
-
-      if (result) syncWriter(vaultPath, result, () => {})
-
-      boot2(result.userId)
-    })
+    client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
+    if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
   })
 }
 
@@ -330,8 +316,7 @@ eventStore.addChangeListener(() => {
  */
 
 var initialize = () => {
-  // YAN: the `|| true` is temporary until this is available in the payments tab
-  enable(getSetting(settings.PAYMENTS_ENABLED) || true)
+  enable(getSetting(settings.PAYMENTS_ENABLED))
 
   cacheRuleSet(ledgerPublisher.rules)
 
@@ -359,7 +344,7 @@ var initialize = () => {
           run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
         cacheRuleSet(state.ruleset)
-        if (state.wallet) getPaymentInfo()
+        if (state.properties.wallet) getPaymentInfo()
       })
       return
     }
@@ -702,7 +687,7 @@ var callback = (err, result, delayTime) => {
 
   if (!result) return run(delayTime)
 
-  if (result.wallet) {
+  if (result.properties.wallet) {
     getStateInfo(result)
     getPaymentInfo()
   }
@@ -812,7 +797,7 @@ var getStateInfo = (state) => {
   var then = underscore.now() - msecs.year
 
   ledgerInfo.creating = ledgerInfo.created = false
-  if (state.wallet) ledgerInfo.created = true
+  if (state.properties.wallet) ledgerInfo.created = true
   else if (state.persona) ledgerInfo.creating = true
 
   ledgerInfo.delayStamp = state.delayStamp
