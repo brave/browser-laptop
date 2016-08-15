@@ -380,7 +380,12 @@ WindowStore
     paymentURL: string,
     paymentIMG: string,
     buyURL: string,
-    bravery: {}
+    bravery: {
+      fee: {
+        currency: string,
+        amount: number
+      }
+    }
   },
   publisherInfo: {
     synopsis: {

@@ -125,6 +125,14 @@ const AboutActions = {
 
   clearBrowsingDataNow: function () {
     ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
+  },
+
+  createWallet: function () {
+    ipc.send(messages.LEDGER_CREATE_WALLET)
+  },
+
+  setLedgerEnabled: function (enabled) {
+    ipc.send(messages.LEDGER_ENABLE, enabled)
   }
 }
 module.exports = AboutActions

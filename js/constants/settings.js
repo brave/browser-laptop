@@ -44,6 +44,7 @@ const settings = {
   LANGUAGE: 'general.language',
   // Payments Tab
   PAYMENTS_ENABLED: 'payments.enabled',
+  PAYMENTS_MONTHLY_AMOUNT: 'payments.monthly-amount',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',

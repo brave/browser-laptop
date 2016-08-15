@@ -89,18 +89,7 @@ const msecs = { year: 365 * 24 * 60 * 60 * 1000,
 
 var init = () => {
   try {
-// TBD: immediately prior to beta, replace all the code inside the `try { }` with `initialize()` [MTR]
-    fs.access(synopsisPath, fs.FF_OK, (err) => {
-      if (err) {
-        if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
-        return
-      }
-
-      enable(true)
-      boot()
-
-      initialize()
-    })
+    initialize()
   } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 

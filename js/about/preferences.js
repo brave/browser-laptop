@@ -412,19 +412,41 @@ class TabsTab extends ImmutableComponent {
 }
 
 class PaymentsTab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.createWallet = this.createWallet.bind(this)
+  }
+
+  createWallet () {
+    if (!this.props.ledgerData.get('created')) {
+      aboutActions.createWallet()
+    }
+  }
+
+  get enabled () {
+    return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
+  }
+
+  get walletButton () {
+    const buttonText = this.props.ledgerData.get('created')
+      ? 'addFundsTitle'
+      : (this.props.ledgerData.get('creating') ? 'creatingWallet' : 'createWallet')
+    const onButtonClick = this.props.ledgerData.get('created')
+      ? this.props.showOverlay.bind(this, 'addFunds')
+      : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
+    return <Button l10nId={buttonText} className='primaryButton' onClick={onButtonClick.bind(this)} />
+  }
+
+  get walletStatus () {
+    return this.props.ledgerData.get('created')
+      ? 'createdWalletStatus'
+      : (this.props.ledgerData.get('creating') ? 'creatingWalletStatus' : 'createWalletStatus')
+  }
+
   get tableContent () {
-    return this.props.ledgerData.get('enabled') ? <LedgerTable ledgerData={this.props.ledgerData} /> : <div className='pull-left' data-l10n-id='tableEmptyText' />
+    return <LedgerTable ledgerData={this.props.ledgerData} />
   }
-  get buttonContent () {
-    return this.props.ledgerData.get('buttonLabel') && this.props.ledgerData.get('buttonURL') ? <a className='settingsListTitle pull-right' href={this.props.ledgerData.get('buttonURL')}>{this.props.ledgerData.get('buttonLabel')}</a> : null
-  }
-  get notificationContent () {
-    return this.props.ledgerData.get('statusText') ? <div className='notificationBar'>
-      <div className='pull-left'>{this.props.ledgerData.get('statusText')}</div>
-    </div> : <div className='notificationBar'>
-      <div className='pull-left' data-l10n-id='notificationEmptyText' />
-    </div>
-  }
+
   get overlayContent () {
     return <BitcoinDashboard ledgerData={this.props.ledgerData}
       bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
@@ -432,26 +454,78 @@ class PaymentsTab extends ImmutableComponent {
       hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
       hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
   }
-  get fundingLink () {
-    return this.props.ledgerData.get('address') ? <div className='settingsListLink pull-right' data-l10n-id='addFundsTitle' value='addFundsTitle' onClick={this.props.showOverlay.bind(this, 'addFunds')} /> : null
+
+  get enabledContent () {
+    return <div>
+      <div className='walletBar'>
+        <table>
+          <thead>
+            <tr>
+              <th data-l10n-id='accountBalance' />
+              <th data-l10n-id='monthlyBudget' />
+              <th data-l10n-id='status' />
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span id='fundsAmount'>
+                {
+                `${this.props.ledgerData.get('balance') || 0} BTC`
+                }
+                </span>
+                {this.walletButton}
+              </td>
+              <td>
+                <SettingsList>
+                  <SettingItem>
+                    <select disabled id='fundsSelectBox'
+                      value={getSetting(settings.PAYMENTS_MONTHLY_AMOUNT,
+                        this.props.settings)}
+                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_MONTHLY_AMOUNT)} >
+                      {
+                        [1, 5, 10, 15, 20, 30, 40, 50].map((amount) =>
+                          <option value={amount}>${amount} USD</option>
+                        )
+                      }
+                    </select>
+                  </SettingItem>
+                </SettingsList>
+              </td>
+              <td data-l10n-id={this.walletStatus} />
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {this.tableContent}
+    </div>
   }
+
   render () {
-    return this.props.ledgerData.get('enabled')
-      ? <div id='paymentsContainer'>
+    return <div id='paymentsContainer'>
         {
-        this.props.addFundsOverlayVisible
+        this.enabled && this.props.addFundsOverlayVisible
           ? <ModalOverlay title={'addFunds'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
           : null
         }
-        <div className='titleBar'>
-          <div className='sectionTitle pull-left' data-l10n-id='publisherPaymentsTitle' value='publisherPaymentsTitle' />
-          {this.buttonContent}
-          {this.fundingLink}
+      <div className='titleBar'>
+        <div className='sectionTitle pull-left' data-l10n-id='publisherPaymentsTitle' value='publisherPaymentsTitle' />
+        <div className='pull-left' id='enablePaymentsSwitch'>
+          <SettingCheckbox dataL10nId='enable' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         </div>
-        {this.notificationContent}
-        {this.tableContent}
       </div>
-      : <div><div className='emptyMessage' data-l10n-id='publisherEmptyText' /></div>
+        {
+        this.enabled
+          ? this.enabledContent
+          : <div className='paymentsMessage'>
+            <h3 data-l10n-id='paymentsWelcomeTitle' />
+            <div data-l10n-id='paymentsWelcomeText1' />
+            <div data-l10n-id='paymentsWelcomeText2' />
+            <div className='boldText' data-l10n-id='paymentsWelcomeText3' />
+            <a href='https://github.com/brave/ledger/blob/master/documentation/Ledger-Principles.md' target='_blank' data-l10n-id='paymentsWelcomeText4' />
+          </div>
+        }
+    </div>
   }
 }
 
@@ -771,7 +845,7 @@ class PreferenceNavigation extends ImmutableComponent {
         selected={this.props.preferenceTab === preferenceTabs.SHIELDS}
       />
       <PreferenceNavigationButton icon='fa-bitcoin'
-        dataL10nId='publishers'
+        dataL10nId='payments'
         onClick={this.props.changeTab.bind(null, preferenceTabs.PUBLISHERS)}
         selected={this.props.preferenceTab === preferenceTabs.PUBLISHERS}
       />
@@ -813,8 +887,6 @@ class AboutPreferences extends React.Component {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
     })
     ipc.on(messages.LEDGER_UPDATED, (e, ledgerData) => {
-      // Always enable unless explicitly disabled for now
-      ledgerData.enabled = ledgerData.enabled || true
       this.setState({ ledgerData: Immutable.fromJS(ledgerData) })
     })
     ipc.on(messages.SITE_SETTINGS_UPDATED, (e, siteSettings) => {
@@ -867,6 +939,9 @@ class AboutPreferences extends React.Component {
     if (key === settings.DO_NOT_TRACK || key === settings.HARDWARE_ACCELERATION_ENABLED ||
       key === settings.PDFJS_ENABLED || key === settings.SMOOTH_SCROLL_ENABLED) {
       ipc.send(messages.PREFS_RESTART, key, value)
+    }
+    if (key === settings.PAYMENTS_ENABLED) {
+      aboutActions.setLedgerEnabled(value)
     }
   }
 
