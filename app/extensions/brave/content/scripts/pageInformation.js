@@ -100,7 +100,7 @@
           throw new Error('eval not allowed in expression')
 
         case 'Literal':
-          return expr.value
+          return (expr.regex ? new RegExp(expr.regex.pattern) : expr.value)
 
         default:
           throw new Error('unsupported evaluation type: ' + expr.type)
