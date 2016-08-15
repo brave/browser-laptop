@@ -105,7 +105,11 @@ function registerForBeforeRequest (session) {
           cb({ cancel: true })
         }
         return
+      } else if (results.resourceName === 'siteHacks' && results.cancel === false) {
+        cb({})
+        return
       }
+
       if (results.redirectURL) {
         // Show the ruleset that was applied and the URLs that were upgraded in
         // siteinfo
