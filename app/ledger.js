@@ -609,8 +609,9 @@ var ledgerInfo = {
   // Bitcoin wallet address
   address: undefined,
 
-  // Bitcoin wallet balance (truncated BTC and satoshis
+  // Bitcoin wallet balance (truncated BTC and satoshis)
   balance: undefined,
+  unconfirmed: undefined,
   satoshis: undefined,
 
   // the desired contribution (the btc value approximates the amount/currency designation)
@@ -632,7 +633,8 @@ var updateLedgerInfo = () => {
   if (!client) return
 
   if (info) {
-    underscore.extend(ledgerInfo, underscore.pick(info, [ 'address', 'balance', 'satoshis', 'btc', 'amount', 'currency' ]))
+    underscore.extend(ledgerInfo,
+                      underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
     if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
 
@@ -841,7 +843,7 @@ var getPaymentInfo = () => {
 
       if (err) return console.log('getWalletProperties error: ' + err.toString())
 
-      info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'balance', 'satoshis' ]))
+      info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'balance', 'unconfirmed', 'satoshis' ]))
       info.address = client.getWalletAddress()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
