@@ -434,7 +434,7 @@ class PaymentsTab extends ImmutableComponent {
     const onButtonClick = this.props.ledgerData.get('created')
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
-    return <Button l10nId={buttonText} className='primaryButton' onClick={onButtonClick.bind(this)} />
+    return <Button l10nId={buttonText} className='primaryButton' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
   }
 
   get walletStatus () {
@@ -444,6 +444,7 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get tableContent () {
+    // TODO: This should have individual enable switches and be sortable. #2497
     return <LedgerTable ledgerData={this.props.ledgerData} />
   }
 
@@ -455,7 +456,26 @@ class PaymentsTab extends ImmutableComponent {
       hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
   }
 
+  get accountBalanceString () {
+    const balance = Number(this.props.ledgerData.get('balance') || 0)
+    const currency = this.props.ledgerData.get('currency')
+    if (!currency) {
+      return `${balance} BTC`
+    }
+    if (balance === 0) {
+      return `0 ${currency}`
+    }
+    // Calculates account balance
+    if (this.props.ledgerData.get('btc') &&
+        typeof this.props.ledgerData.get('amount') === 'number') {
+      const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
+      return `${(balance / btcValue).toFixed(2)} ${currency}`
+    }
+    return `${balance} BTC`
+  }
+
   get enabledContent () {
+    // TODO: Monthly contribution amount should be changeable.
     return <div>
       <div className='walletBar'>
         <table>
@@ -470,9 +490,7 @@ class PaymentsTab extends ImmutableComponent {
             <tr>
               <td>
                 <span id='fundsAmount'>
-                {
-                `${this.props.ledgerData.get('balance') || 0} BTC`
-                }
+                {this.accountBalanceString}
                 </span>
                 {this.walletButton}
               </td>
