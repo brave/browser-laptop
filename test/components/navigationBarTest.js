@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
-const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked} = require('../lib/selectors')
+const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked, saveButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
@@ -745,9 +745,9 @@ describe('navigationBar', function () {
         .waitForExist(navigatorNotBookmarked)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
+        .waitForVisible(saveButton)
+        .click(saveButton)
         .waitForExist(navigatorBookmarked)
-        // unfocus current box
-        .click('.dialog')
     })
 
     it('should open if user has no bookmarks', function * () {
@@ -772,9 +772,9 @@ describe('navigationBar', function () {
         .windowParentByUrl(page2Url)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
+        .waitForVisible(saveButton)
+        .click(saveButton)
         .waitForExist(navigatorBookmarked)
-        // unfocus current box
-        .click('.dialog')
 
       yield this.app.client.isExisting(bookmarksToolbar).should.eventually.be.false
     })

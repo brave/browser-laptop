@@ -41,5 +41,6 @@ module.exports = {
   noScriptNavButton: '#navigator .noScript',
   backButton: '.backforward .back',
   forwardButton: '.backforward .forward',
-  clearBrowsingDataPanel: '.clearBrowsingDataPanel'
+  clearBrowsingDataPanel: '.clearBrowsingDataPanel',
+  saveButton: '[data-l10n-id="save"]'
 }
