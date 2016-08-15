@@ -136,7 +136,12 @@
   for (i = 0; i < rules.length; i++) {
     rule = rules[i]
 
-    if (!resolve(rule.condition, context)) continue
+    try {
+      if (!resolve(rule.condition, context)) continue
+    } catch (ex) {
+      console.log('error resolving rule at position #' + i + '\n' + ex.stack)
+      continue
+    }
 
     if (rule.publisher) {
       context.node = document.body.querySelector(rule.publisher.selector)
