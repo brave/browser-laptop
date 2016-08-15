@@ -28,7 +28,7 @@ class AddEditBookmark extends ImmutableComponent {
     return ['about:blank', 'about:newtab'].includes(this.props.currentDetail.get('location'))
   }
   get isFolder () {
-    return this.props.currentDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+    return siteUtil.isFolder(this.props.currentDetail)
   }
   updateFolders (props) {
     this.folders = siteUtil.getFolders(this.props.sites, props.currentDetail.get('folderId'))

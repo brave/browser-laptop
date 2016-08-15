@@ -25,7 +25,7 @@ const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const ipc = global.require('electron').ipcRenderer
 const locale = require('../js/l10n')
-const getSetting = require('./settings').getSetting
+const {getSetting, getActivePasswordManager} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl} = require('./lib/appUrlUtil')
@@ -110,7 +110,7 @@ function urlBarTemplateInit (searchDetail, activeFrame, e) {
 
 function tabsToolbarTemplateInit (activeFrame, closestDestinationDetail, isParent) {
   const menu = [
-    CommonMenu.bookmarksMenuItem(),
+    CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem
   ]
@@ -133,56 +133,56 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
     const downloads = appStoreRenderer.state.get('downloads')
     if (downloadUtil.shouldAllowPause(downloadItem)) {
       menu.push({
-        label: 'Pause',
+        label: locale.translation('downloadItemPause'),
         click: downloadActions.pauseDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowResume(downloadItem)) {
       menu.push({
-        label: 'Resume',
+        label: locale.translation('downloadItemResume'),
         click: downloadActions.resumeDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCancel(downloadItem)) {
       menu.push({
-        label: 'Cancel',
+        label: locale.translation('downloadItemCancel'),
         click: downloadActions.cancelDownload.bind(null, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRedownload(downloadItem)) {
       menu.push({
-        label: 'Download Again',
+        label: locale.translation('downloadItemRedownload'),
         click: downloadActions.redownloadURL.bind(null, downloadItem, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowCopyLink(downloadItem)) {
       menu.push({
-        label: 'Copy Link Location',
+        label: locale.translation('downloadItemCopyLink'),
         click: downloadActions.copyLinkToClipboard.bind(null, downloadItem)
       })
     }
 
     if (downloadUtil.shouldAllowOpenDownloadLocation(downloadItem)) {
       menu.push({
-        label: 'Open Folder Path',
+        label: locale.translation('downloadItemPath'),
         click: downloadActions.locateShellPath.bind(null, downloadItem)
       })
     }
 
     if (downloadUtil.shouldAllowDelete(downloadItem)) {
       menu.push({
-        label: 'Delete Download',
+        label: locale.translation('downloadItemDelete'),
         click: downloadActions.deleteDownload.bind(null, downloads, downloadItem, downloadId)
       })
     }
 
     if (downloadUtil.shouldAllowRemoveFromList(downloadItem)) {
       menu.push({
-        label: 'Clear Download',
+        label: locale.translation('downloadItemClear'),
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
@@ -194,7 +194,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
   if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
     menu.push({
-      label: 'Hide downloads bar',
+      label: locale.translation('downloadToolbarHide'),
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
       }
@@ -203,7 +203,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
   menu.push(CommonMenu.separatorMenuItem,
     {
-      label: 'Clear completed downloads',
+      label: locale.translation('downloadItemClearCompleted'),
       click: () => {
         appActions.clearCompletedDownloads()
       }
@@ -213,7 +213,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
 function bookmarkTemplateInit (siteDetail, activeFrame) {
   const location = siteDetail.get('location')
-  const isFolder = siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+  const isFolder = siteUtil.isFolder(siteDetail)
   const template = []
 
   if (!isFolder) {
@@ -573,7 +573,7 @@ function hamburgerTemplateInit (location, e) {
     {
       label: locale.translation('bookmarks'),
       submenu: [
-        CommonMenu.bookmarksMenuItem(),
+        CommonMenu.bookmarksManagerMenuItem(),
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.importBookmarksMenuItem()
@@ -910,40 +910,18 @@ function mainTemplateInit (nodeProps, frame) {
     }
   })
 
-  if (getSetting(settings.LAST_PASS_ENABLED)) {
+  const passwordManager = getActivePasswordManager()
+  if (passwordManager.get('extensionId')) {
     template.push(
       CommonMenu.separatorMenuItem,
       {
-        label: 'LastPass',
+        // TODO: use locale.translate
+        label: passwordManager.get('displayName'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            nodeProps.height = 448
-            nodeProps.width = 350
-            ipc.send('chrome-browser-action-clicked', 'hdokiejnpimakedhajhdlcegeplioahd', frame.get('tabId'), 'LastPass', nodeProps)
-          }
-        }
-      })
-  }
-  if (getSetting(settings.ONE_PASSWORD_ENABLED)) {
-    template.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: '1Password',
-        click: (item, focusedWindow) => {
-          if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'aomjjhallfgjeglblehebfpbcfeobpgk', frame.get('tabId'), '1Password', nodeProps)
-          }
-        }
-      })
-  }
-  if (getSetting(settings.DASHLANE_ENABLED)) {
-    template.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: 'Dashlane',
-        click: (item, focusedWindow) => {
-          if (focusedWindow) {
-            ipc.send('chrome-browser-action-clicked', 'fdjamakpfbbddfjaooikfcpapjohcfmg', frame.get('tabId'), 'Dashlane', nodeProps)
+            nodeProps.height = passwordManager.get('popupHeight') || nodeProps.height
+            nodeProps.width = passwordManager.get('popupWidth') || nodeProps.width
+            ipc.send('chrome-browser-action-clicked', passwordManager.get('extensionId'), frame.get('tabId'), passwordManager.get('name'), nodeProps)
           }
         }
       })
@@ -981,6 +959,7 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
   } else {
     const mainMenu = Menu.buildFromTemplate(mainTemplateInit(nodeProps, frame))
     mainMenu.popup(currentWindow)
+    mainMenu.destroy()
   }
 }
 
@@ -988,12 +967,14 @@ function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
   tabMenu.popup(currentWindow)
+  tabMenu.destroy()
 }
 
 function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
   tabsToolbarMenu.popup(currentWindow)
+  tabsToolbarMenu.destroy()
 }
 
 function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
@@ -1002,18 +983,21 @@ function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
   }
   const downloadsToolbarMenu = Menu.buildFromTemplate(downloadsToolbarTemplateInit(downloadId, downloadItem))
   downloadsToolbarMenu.popup(currentWindow)
+  downloadsToolbarMenu.destroy()
 }
 
 function onTabPageContextMenu (framePropsList, e) {
   e.stopPropagation()
   const tabPageMenu = Menu.buildFromTemplate(tabPageTemplateInit(framePropsList))
   tabPageMenu.popup(currentWindow)
+  tabPageMenu.destroy()
 }
 
 function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   e.stopPropagation()
   const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
   inputMenu.popup(currentWindow)
+  inputMenu.destroy()
 }
 
 function onBookmarkContextMenu (siteDetail, activeFrame, e) {
@@ -1022,6 +1006,7 @@ function onBookmarkContextMenu (siteDetail, activeFrame, e) {
   }
   const menu = Menu.buildFromTemplate(bookmarkTemplateInit(siteDetail, activeFrame))
   menu.popup(currentWindow)
+  menu.destroy()
 }
 
 function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {

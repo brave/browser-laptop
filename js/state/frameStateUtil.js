@@ -284,7 +284,7 @@ const tabFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrameKey) {
+function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrameKey, insertionIndex) {
   const url = frameOpts.location || config.defaultUrl
 
   // delayedLoadUrl is used as a placeholder when the new frame is created
@@ -351,22 +351,6 @@ function addFrame (frames, tabs, frameOpts, newKey, partitionNumber, activeFrame
     unloaded: frameOpts.unloaded,
     history: []
   }, frameOpts))
-
-  // Find the closest index to the current frame's index which has
-  // a different ancestor frame key.
-  let insertionIndex = findIndexForFrameKey(frames, frameOpts.parentFrameKey)
-  if (insertionIndex === -1) {
-    insertionIndex = frames.size
-  }
-  while (insertionIndex < frames.size) {
-    ++insertionIndex
-    if (!isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
-      break
-    }
-  }
-  if (isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
-    insertionIndex = 0
-  }
 
   return {
     tabs: tabs.splice(insertionIndex, 0, tabFromFrame(frame)),
@@ -505,7 +489,9 @@ function getFrameTabPageIndex (frames, frameProps, tabsPerTabPage) {
 module.exports = {
   query,
   find,
+  isAncestorFrameKey,
   isFrameKeyActive,
+  isFrameKeyPinned,
   getFrameIndex,
   getFrameDisplayIndex,
   getActiveFrameIndex,

@@ -300,6 +300,7 @@ WindowStore
     },
     tabs: {
       tabPageIndex: number, // Index of the current tab page
+      previewTabPageIndex: number // Index of the tab being previewed
     },
     siteInfo: {
       isVisible: boolean // Whether or not to show site info like # of blocked ads
@@ -328,6 +329,13 @@ WindowStore
     expandHttpse: boolean, // If specified, indicates if the httpse section should be expanded
     expandNoScript: boolean, // Whether noscript section should be expanded
     expandFp: boolean // Whether fingerprinting protection should be expanded
+  },
+  clearBrowsingDataDetail: {
+    browserHistory: boolean,
+    downloadHistory: boolean,
+    cachedImagesAndFiles: boolean,
+    savedPasswords: boolean,
+    allSiteCookies: boolean
   },
   contextMenuDetail: {
     left: number, // the left position of the context menu

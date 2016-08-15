@@ -17,6 +17,11 @@ const dnd = require('../dnd')
 const windowStore = require('../stores/windowStore')
 
 class Tab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onMouseEnter = this.onMouseEnter.bind(this)
+    this.onMouseLeave = this.onMouseLeave.bind(this)
+  }
   get frame () {
     return windowStore.getFrame(this.props.tab.get('frameKey'))
   }
@@ -177,8 +182,8 @@ class Tab extends ImmutableComponent {
         isPinned: this.isPinned,
         partOfFullPageSet: this.props.partOfFullPageSet
       })}
-      onMouseEnter={this.props.previewTabs ? this.onMouseEnter.bind(this) : null}
-      onMouseLeave={this.props.previewTabs ? this.onMouseLeave.bind(this) : null}>
+      onMouseEnter={this.props.previewTabs ? this.onMouseEnter : null}
+      onMouseLeave={this.props.previewTabs ? this.onMouseLeave : null}>
       <div className={cx({
         tab: true,
         isPinned: this.isPinned,

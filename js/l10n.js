@@ -4,6 +4,7 @@
 
 const ipcRenderer = require('electron').ipcRenderer
 const locale = require('../app/locale')
+const {LANGUAGE, REQUEST_LANGUAGE} = require('./constants/messages')
 
 // rendererTranslationCache stores a hash containing the entire set of menu translations
 // for the currently selected language
@@ -25,4 +26,12 @@ exports.translation = (token) => {
     // Otherwise retrieve translation directly
     return locale.translation(token)
   }
+}
+
+exports.init = () => {
+  ipcRenderer.on(LANGUAGE, (e, detail) => {
+    document.l10n.requestLanguages([detail.langCode])
+    document.getElementsByName('availableLanguages')[0].content = detail.languageCodes.join(', ')
+  })
+  ipcRenderer.send(REQUEST_LANGUAGE)
 }

@@ -12,15 +12,21 @@ function isAdobeLink (href) {
   return adobeRegex.test(href)
 }
 
+function showFlashNotification (origin, e) {
+  chrome.ipc.sendToHost('show-flash-notification', origin)
+  e.preventDefault()
+  e.stopPropagation()
+}
+
 // Open flash links in the same tab so we can intercept them correctly
 if (chrome.contentSettings.flashActive != 'allow' &&
     chrome.contentSettings.flashEnabled == 'allow') {
   (function () {
     function replaceAdobeLinks () {
-      Array.from(document.querySelectorAll('a[target="_blank"]')).forEach((elem) => {
+      Array.from(document.querySelectorAll('a')).forEach((elem) => {
         const href = elem.getAttribute('href')
         if (isAdobeLink(href)) {
-          elem.setAttribute('target', '')
+          elem.onclick = showFlashNotification.bind(null, window.location.origin)
         }
       })
     }

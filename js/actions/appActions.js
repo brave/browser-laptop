@@ -323,6 +323,17 @@ const appActions = {
       actionType: AppConstants.APP_SET_DICTIONARY,
       locale
     })
+  },
+
+  /**
+   * Clears the data specified in dataDetail
+   * @param {object} clearDataDetail - the app data to clear as per doc/state.md's clearBrowsingDataDetail
+   */
+  clearAppData: function (clearDataDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_DATA,
+      clearDataDetail
+    })
   }
 }
 

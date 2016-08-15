@@ -282,6 +282,16 @@ Adds a word to the dictionary
 
 
 
+### clearAppData(clearDataDetail) 
+
+Clears the data specified in dataDetail
+
+**Parameters**
+
+**clearDataDetail**: `object`, the app data to clear as per doc/state.md's clearBrowsingDataDetail
+
+
+
 
 * * *
 

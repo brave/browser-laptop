@@ -444,6 +444,68 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  /**
+   * Shows a Flash CtP notification if Flash is installed and enabled.
+   * If not enabled, alert user that Flash is installed.
+   * @param {string} origin - frame origin that is requesting to run flash.
+   *   can either be main frame or subframe.
+   * @param {function=} noFlashCallback - Optional callback to run if Flash is not
+   *   installed
+   */
+  showFlashNotification (origin, noFlashCallback) {
+    if (!origin || !UrlUtil.shouldInterceptFlash(origin)) {
+      noFlashCallback()
+      return
+    }
+
+    // Generate a random string that is unlikely to collide. Not
+    // cryptographically random.
+    const nonce = Math.random().toString()
+    if (this.props.flashInitialized) {
+      const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
+      // Show Flash notification bar
+      appActions.showMessageBox({
+        buttons: [locale.translation('deny'), locale.translation('allow')],
+        message,
+        frameOrigin: this.origin,
+        options: {
+          nonce,
+          persist: true
+        }
+      })
+      this.notificationCallbacks[message] = (buttonIndex, persist) => {
+        if (buttonIndex === 1) {
+          if (persist) {
+            appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
+          } else {
+            appActions.changeSiteSetting(this.origin, 'flash', 1)
+          }
+        } else {
+          appActions.hideMessageBox(message)
+          if (persist) {
+            appActions.changeSiteSetting(this.origin, 'flash', false)
+          }
+        }
+      }
+    } else {
+      flash.checkFlashInstalled((installed) => {
+        if (installed) {
+          currentWindow.webContents.send(messages.SHOW_NOTIFICATION,
+                                         locale.translation('flashInstalled'))
+        } else if (noFlashCallback) {
+          noFlashCallback()
+        }
+      })
+    }
+
+    ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
+      const cb = this.notificationCallbacks[msg]
+      if (cb) {
+        cb(buttonIndex, persist)
+      }
+    })
+  }
+
   addEventListeners () {
     this.webview.addEventListener('content-blocked', (e) => {
       if (e.details[0] === 'javascript') {
@@ -555,6 +617,11 @@ class Frame extends ImmutableComponent {
         case messages.GO_FORWARD:
           method = () => this.webview.goForward()
           break
+        case messages.SHOW_FLASH_NOTIFICATION:
+          method = (origin) => this.showFlashNotification(origin, () => {
+            windowActions.loadUrl(this.frame, 'https://get.adobe.com/flashplayer/')
+          })
+          break
         case messages.RELOAD:
           method = () => {
             this.reloadCounter[this.props.location] = this.reloadCounter[this.props.location] || 0
@@ -574,6 +641,10 @@ class Frame extends ImmutableComponent {
           method = (frameOpts, openInForeground) => {
             windowActions.newFrame(frameOpts, openInForeground)
           }
+          break
+        case messages.CLEAR_BROWSING_DATA_NOW:
+          windowActions.setClearBrowsingDataDetail({})
+          break
       }
       method.apply(this, e.args)
     })
@@ -592,49 +663,9 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
       }
 
-      // Generate a random string that is unlikely to collide. Not
-      // cryptographically random.
-      const nonce = Math.random().toString()
-      if (this.props.flashInitialized) {
-        const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
-        // Show Flash notification bar
-        appActions.showMessageBox({
-          buttons: [locale.translation('deny'), locale.translation('allow')],
-          message,
-          frameOrigin: this.origin,
-          options: {
-            nonce,
-            persist: true
-          }
-        })
-        this.notificationCallbacks[message] = (buttonIndex, persist) => {
-          if (buttonIndex === 1) {
-            if (persist) {
-              appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
-            } else {
-              appActions.changeSiteSetting(this.origin, 'flash', 1)
-            }
-          } else {
-            appActions.hideMessageBox(message)
-            if (persist) {
-              appActions.changeSiteSetting(this.origin, 'flash', false)
-            }
-          }
-        }
-      } else {
-        flash.checkFlashInstalled((installed) => {
-          if (installed) {
-            currentWindow.webContents.send(messages.SHOW_NOTIFICATION,
-                                           locale.translation('flashInstalled'))
-          } else if (stopCurrentLoad && adobeUrl) {
-            windowActions.loadUrl(this.frame, adobeUrl)
-          }
-        })
-      }
-      ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
-        const cb = this.notificationCallbacks[msg]
-        if (cb) {
-          cb(buttonIndex, persist)
+      this.showFlashNotification(this.origin, () => {
+        if (stopCurrentLoad && adobeUrl) {
+          windowActions.loadUrl(this.frame, adobeUrl)
         }
       })
     }
@@ -802,7 +833,7 @@ class Frame extends ImmutableComponent {
           return
         }
         windowActions.setFindDetail(this.frame, Immutable.fromJS({
-          numberOfMatches: e.result.matches || this.props.get('numberOfMatches'),
+          numberOfMatches: e.result.matches || this.props.findDetail && this.props.findDetail.get('numberOfMatches') || 0,
           activeMatchOrdinal: e.result.activeMatchOrdinal || this.props.findDetail && this.props.findDetail.get('activeMatchOrdinal')
         }))
       }

@@ -158,8 +158,12 @@ if (chrome.contentSettings.adInsertion == 'allow') {
   var host = document.location.hostname
   if (host) {
     host = host.replace('www.', '')
-    const adDivCandidates = adInfo[host] || []
-    // TODO(bridiver) move ad url to chrome.storage
-    setAdDivCandidates(adDivCandidates, 'https://oip.brave.com')
+    chrome.ipc.on('set-ad-div-candidates', (e, divHost, adDivCandidates, placeholderUrl) => {
+      // don't accidentally intercept messages not intended for this host
+      if (host === divHost) {
+        setAdDivCandidates(adDivCandidates, placeholderUrl)
+      }
+    })
+    chrome.ipc.send('get-ad-div-candidates', host)
   }
 }

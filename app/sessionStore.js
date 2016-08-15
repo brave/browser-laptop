@@ -97,10 +97,16 @@ module.exports.cleanPerWindowData = (perWindowData) => {
   delete perWindowData.contextMenuDetail
   // Don't save preview frame since they are only related to hovering on a tab
   delete perWindowData.previewFrameKey
+  // Don't save preview tab pages
+  if (perWindowData.ui && perWindowData.ui.tabs) {
+    delete perWindowData.ui.tabs.previewTabPageIndex
+  }
   // Don't restore add/edit dialog
   delete perWindowData.bookmarkDetail
   // Don't restore bravery panel
   delete perWindowData.braveryPanelDetail
+  // Don't restore cache clearing popup
+  delete perWindowData.clearBrowsingDataDetail
   // Don't restore drag data
   if (perWindowData.ui) {
     delete perWindowData.ui.dragging

@@ -7,6 +7,7 @@ const AppStore = require('../stores/appStore')
 const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
+const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const { registerUserPrefs } = require('./userPrefs')
@@ -30,11 +31,12 @@ const addContentSettings = (settingList, hostPattern, secondaryPattern = undefin
 const getPasswordManagerEnabled = (appState) => {
   let appSettings = appState.get('settings')
   if (appSettings) {
-    if (typeof appSettings.get(settings.PASSWORD_MANAGER_ENABLED) === 'boolean') {
-      return appSettings.get(settings.PASSWORD_MANAGER_ENABLED)
+    const passwordManager = appSettings.get(settings.ACTIVE_PASSWORD_MANAGER)
+    if (typeof passwordManager === 'string') {
+      return passwordManager === passwordManagers.BUILT_IN
     }
   }
-  return appConfig.defaultSettings[settings.PASSWORD_MANAGER_ENABLED]
+  return defaultPasswordManager === passwordManagers.BUILT_IN
 }
 
 const getBlock3rdPartyStorage = (braveryDefaults) => {
@@ -106,7 +108,8 @@ const getContentSettingsFromSiteSettings = (appState) => {
   }
 
   let hostSettings = appState.get('siteSettings').toJS()
-  for (var hostPattern in hostSettings) {
+  // We do 2 passes for setting content settings. On the first pass we consider all shield types.
+  for (let hostPattern in hostSettings) {
     let hostSetting = hostSettings[hostPattern]
     if (typeof hostSetting.noScript === 'boolean') {
       // TODO: support temporary override
@@ -132,8 +135,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (typeof hostSetting.flash === 'number') {
       addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
     }
-
-    // these should always be the last rules so they take precendence over the others
+  }
+  // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
+  for (let hostPattern in hostSettings) {
+    let hostSetting = hostSettings[hostPattern]
     if (hostSetting.shieldsUp === false) {
       addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')

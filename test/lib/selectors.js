@@ -40,5 +40,6 @@ module.exports = {
   noScriptSwitch: '.noScriptSwitch .switchMiddle',
   noScriptNavButton: '#navigator .noScript',
   backButton: '.backforward .back',
-  forwardButton: '.backforward .forward'
+  forwardButton: '.backforward .forward',
+  clearBrowsingDataPanel: '.clearBrowsingDataPanel'
 }

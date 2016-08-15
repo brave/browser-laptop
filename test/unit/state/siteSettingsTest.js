@@ -1,7 +1,6 @@
 /* global describe, before, it */
 
 const siteSettings = require('../../../js/state/siteSettings')
-const siteUtil = require('../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
 let siteSettingsMap = new Immutable.Map()
@@ -158,35 +157,6 @@ describe('siteSettings', function () {
       assert.strictEqual(setting.get('prop2'), 2)
       assert.strictEqual(setting.get('prop3'), 3)
       assert.strictEqual(setting.get('prop4'), 4)
-    })
-  })
-})
-
-describe('siteUtil', function () {
-  describe('gets URL origin', function () {
-    it('gets URL origin for simple url', function () {
-      assert.strictEqual(siteUtil.getOrigin('https://abc.bing.com'), 'https://abc.bing.com')
-    })
-    it('gets URL origin for url with port', function () {
-      assert.strictEqual(siteUtil.getOrigin('https://bing.com:443/?test=1#abc'), 'https://bing.com:443')
-    })
-    it('gets URL origin for IP host', function () {
-      assert.strictEqual(siteUtil.getOrigin('http://127.0.0.1:443/?test=1#abc'), 'http://127.0.0.1:443')
-    })
-    it('gets URL origin for slashless protocol URL', function () {
-      assert.strictEqual(siteUtil.getOrigin('about:test/foo'), 'about:test')
-    })
-    it('returns null for invalid URL', function () {
-      assert.strictEqual(siteUtil.getOrigin('abc'), null)
-    })
-    it('returns null for empty URL', function () {
-      assert.strictEqual(siteUtil.getOrigin(''), null)
-    })
-    it('returns null for null URL', function () {
-      assert.strictEqual(siteUtil.getOrigin(null), null)
-    })
-    it('returns correct result for URL with hostname that is a scheme', function () {
-      assert.strictEqual(siteUtil.getOrigin('http://http/test'), 'http://http')
     })
   })
 })

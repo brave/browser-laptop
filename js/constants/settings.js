@@ -27,14 +27,16 @@ const settings = {
   DO_NOT_TRACK: 'privacy.do-not-track',
   BLOCK_CANVAS_FINGERPRINTING: 'privacy.block-canvas-fingerprinting',
   // Security Tab
-  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
-  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
-  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
-  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
+  ACTIVE_PASSWORD_MANAGER: 'security.passwords.active-password-manager',
   SHUTDOWN_CLEAR_HISTORY: 'shutdown.clear-history',
   SHUTDOWN_CLEAR_DOWNLOADS: 'shutdown.clear-downloads',
   SHUTDOWN_CLEAR_CACHE: 'shutdown.clear-cache',
   SHUTDOWN_CLEAR_ALL_SITE_COOKIES: 'shutdown.clear-all-site-cookies',
+  // Security Tab: DEPRECATED but still required (for now)
+  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
+  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
+  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
+  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
   // Other settings
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',

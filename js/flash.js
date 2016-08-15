@@ -29,8 +29,12 @@ const getPepperFlashPath = () => {
     fs.statSync(pluginPath)
   } catch (e) {
     pluginPath = path.resolve(basePath, 'PepperFlash', plugin)
-    // Throws error if not found
-    fs.statSync(pluginPath)
+    try {
+      fs.statSync(pluginPath)
+    } catch (e) {
+      // Throws error if not found
+      pluginPath = path.resolve('/usr/lib64/chromium', 'PepperFlash', plugin)
+    }
   }
   return pluginPath
 }
