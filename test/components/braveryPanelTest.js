@@ -34,7 +34,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(page1Url)
-        .url(page1Url)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(braveMenu)
     })
@@ -49,7 +48,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
       yield openBraveMenu(this.app.client)
       yield this.app.client
         .waitUntil(function () {
@@ -62,7 +60,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
       yield openBraveMenu(this.app.client)
       yield this.app.client
         .waitUntil(function () {
@@ -75,7 +72,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
       yield openBraveMenu(this.app.client)
       yield this.app.client
         .waitUntil(function () {
@@ -88,7 +84,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
         .waitUntil(function () {
           return this.getText('body')
             .then((body) => body === 'test1 test2')
@@ -115,7 +110,7 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .click(noScriptSwitch)
         .tabByIndex(0)
-        .url(url)
+        .loadUrl(url)
         .waitUntil(function () {
           // getText returns empty in this case
           return this.getElementSize('noscript')
@@ -127,7 +122,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
       yield openBraveMenu(this.app.client)
       yield this.app.client
         .click(fpSwitch)
@@ -141,7 +135,6 @@ describe('Bravery Panel', function () {
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(url)
-        .url(url)
         .waitUntil(function () {
           return this.getText('body')
             .then((text) => text === 'fingerprinting test')
