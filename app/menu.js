@@ -584,7 +584,6 @@ const updateMenu = (CommonMenu, appState, windowState) => {
   // Only update menu when necessary
 
   if (updated.settings || updated.closedFrames) {
-    console.log('rebuilding history menu')
     let historyMenu = menuUtil.getParentMenuDetails(appMenu, locale.translation('history'))
     if (historyMenu && historyMenu.menu && historyMenu.menu.submenu && historyMenu.index !== -1) {
       const menu = historyMenu.menu.submenu
@@ -595,7 +594,6 @@ const updateMenu = (CommonMenu, appState, windowState) => {
   }
 
   if (updated.sites) {
-    console.log('rebuilding bookmarks menu')
     let bookmarksMenu = menuUtil.getParentMenuDetails(appMenu, locale.translation('bookmarks'))
     if (bookmarksMenu && bookmarksMenu.menu && bookmarksMenu.menu.submenu && bookmarksMenu.index !== -1) {
       const menu = bookmarksMenu.menu.submenu
