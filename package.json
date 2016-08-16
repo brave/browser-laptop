@@ -152,7 +152,6 @@
   "standard": {
     "ignore": [
       "app/extensions/**",
-      "app/browser/ads/adDivCandidates.js",
       "Brave-darwin-x64/**",
       "less/**",
       "res/**",
