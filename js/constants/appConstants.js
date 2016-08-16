@@ -30,6 +30,7 @@ const AppConstants = {
   APP_CLEAR_DATA: _,
   APP_SHOW_MESSAGE_BOX: _, /** @param {Object} detail */
   APP_HIDE_MESSAGE_BOX: _, /** @param {string} message */
+  APP_CLEAR_MESSAGE_BOXES: _, /** @param {string} origin */
   APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
   APP_SET_DICTIONARY: _ /** @param {string} locale */
 }

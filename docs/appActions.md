@@ -260,6 +260,16 @@ Hides a message box in the notification bar
 
 
 
+### clearMessageBoxes(origin) 
+
+Clears all message boxes for a given origin.
+
+**Parameters**
+
+**origin**: `string`, Clears all message boxes for a given origin.
+
+
+
 ### addWord(word, learn) 
 
 Adds a word to the dictionary

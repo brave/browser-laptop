@@ -302,6 +302,17 @@ const appActions = {
   },
 
   /**
+   * Clears all message boxes for a given origin.
+   * @param {string} origin
+   */
+  clearMessageBoxes: function (origin) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_CLEAR_MESSAGE_BOXES,
+      origin
+    })
+  },
+
+  /**
    * Adds a word to the dictionary
    * @param {string} word - The word to add
    * @param {boolean} learn - true if the word should be learned, false if ignored

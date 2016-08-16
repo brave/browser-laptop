@@ -315,6 +315,10 @@ const windowActions = {
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
     const ipc = global.require('electron').ipcRenderer
+    const origin = siteUtil.getOrigin(frameProps.get('location'))
+    if (origin) {
+      appActions.clearMessageBoxes(origin)
+    }
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {
       webviewActions.setFullScreen(false)

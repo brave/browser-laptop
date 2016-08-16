@@ -491,6 +491,11 @@ const handleAppAction = (action) => {
         return notification.get('message') === action.message
       }))
       break
+    case AppConstants.APP_CLEAR_MESSAGE_BOXES:
+      appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+        return notification.get('frameOrigin') === action.origin
+      }))
+      break
     case AppConstants.APP_ADD_WORD:
       let listType = 'ignoredWords'
       if (action.learn) {
