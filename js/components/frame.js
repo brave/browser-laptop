@@ -764,6 +764,7 @@ class Frame extends ImmutableComponent {
       if (this.props.findbarShown) {
         this.onFindHide()
       }
+
       for (let message in this.notificationCallbacks) {
         appActions.hideMessageBox(message)
       }
@@ -773,6 +774,10 @@ class Frame extends ImmutableComponent {
         this.webview.focus()
       }
       windowActions.setNavigated(e.url, this.props.frameKey, false)
+      // After navigating to the URL, set correct frame title
+      let webContents = this.webview.getWebContents()
+      let title = webContents.getTitleAtIndex(webContents.getCurrentEntryIndex())
+      windowActions.setFrameTitle(this.frame, title)
     })
     this.webview.addEventListener('crashed', (e) => {
       windowActions.setFrameError(this.frame, {
