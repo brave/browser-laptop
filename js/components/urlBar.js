@@ -130,9 +130,10 @@ class UrlBar extends ImmutableComponent {
               location = location.replace(replaceRE, '')
               searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
             }
+
             if ((defaultEngine === 'DuckDuckGo' ||
               (this.searchSelectEntry && this.searchSelectEntry.name === 'DuckDuckGo')) &&
-            this.props.isBlockingScripts) {
+            this.props.enableNoScript) {
               searchUrl = searchUrl.replace('?q=', 'html?q=')
             }
             location = isLocationUrl ? location : searchUrl
@@ -462,7 +463,7 @@ class UrlBar extends ImmutableComponent {
             urlPreview={this.props.urlbar.get('urlPreview')}
             searchSelectEntry={this.searchSelectEntry}
             previewActiveIndex={this.props.previewActiveIndex || 0}
-            isBlockingScripts={this.props.isBlockingScripts} />
+            enableNoScript={this.props.enableNoScript} />
           : null
         }
     </form>
