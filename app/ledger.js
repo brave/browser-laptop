@@ -32,7 +32,6 @@ const session = electron.session
 
 const acorn = require('acorn')
 const ledgerPublisher = require('ledger-publisher')
-const moment = require('moment')
 const qr = require('qr-image')
 const random = require('random-lib')
 const tldjs = require('tldjs')
@@ -471,7 +470,6 @@ var visit = (location, timestamp) => {
   var setLocation = () => {
     var duration, publisher
 
-    if (location !== currentLocation) console.log('new location: ' + location)
     if (!synopsis) return
 
 /*
@@ -486,7 +484,6 @@ var visit = (location, timestamp) => {
     publishers[publisher][currentLocation] = timestamp
 
     duration = timestamp - currentTimestamp
-    console.log('addVisit ' + currentLocation + ' for ' + moment.duration(duration).humanize())
     synopsis.addPublisher(publisher, duration)
     updatePublisherInfo()
   }

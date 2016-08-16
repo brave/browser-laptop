@@ -372,11 +372,13 @@ WindowStore
     reconcileDelay: ?,
     delayStamp: ?,
     transactions: Array,
-    balance: string,
+    balance: string, // balance in BTC
+    unconfirmed: string, // unconfirmed balance in BTC
+    satoshis: number, // balance as a number of satoshis
     address: string,
-    btc: string,
-    amount: number,
-    currency: string,
+    btc: string, // BTC to pay per month
+    amount: number, // currency amount to pay per month
+    currency: string, // currency string
     paymentURL: string,
     paymentIMG: string,
     buyURL: string,
