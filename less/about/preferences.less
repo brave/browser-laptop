@@ -439,6 +439,11 @@ table.sortableTable {
   }
 }
 
+#ledgerTable {
+  height: ~"-webkit-calc(100vh - 350px)";
+  overflow-y: scroll;
+}
+
 #paymentsContainer {
   position: relative;
   overflow-x: hidden;
@@ -474,6 +479,10 @@ table.sortableTable {
       font-weight: 600;
     }
 
+    &.paymentsDisabled {
+      opacity: 0.6;
+    }
+
     td {
       color: @mediumGray;
       -webkit-font-smoothing: antialiased;
@@ -496,7 +505,11 @@ table.sortableTable {
         }
       }
 
-      &:nth-of-type(2) {
+      &.narrow {
+        width: 5%;
+      }
+
+      &.wide {
         width: 20%;
         text-align: left;
       }
@@ -680,4 +693,21 @@ table.sortableTable {
 
 #fundsSelectBox {
   margin: 0 auto;
+}
+
+#paymentsFooter {
+  opacity: 0.8;
+  img {
+    max-height: 30px;
+    padding: 10px;
+  }
+  .largeImg {
+    max-height: 40px;
+    padding-top: 5px;
+  }
+  div {
+    font-size: 12px;
+    margin-top: 15px;
+    margin-left: 15px;
+  }
 }

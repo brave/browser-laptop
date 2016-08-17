@@ -129,6 +129,35 @@ class SettingCheckbox extends ImmutableComponent {
   }
 }
 
+class SiteSettingCheckbox extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick (e) {
+    if (this.props.disabled || !this.props.hostPattern) {
+      return
+    } else {
+      const value = !!e.target.value
+      value === this.props.defaultValue
+        ? aboutActions.removeSiteSetting(this.props.hostPattern,
+            this.props.prefKey)
+        : aboutActions.changeSiteSetting(this.props.hostPattern,
+            this.props.prefKey, value)
+    }
+  }
+
+  render () {
+    return <div style={this.props.style} className='settingItem siteSettingItem'>
+      <SwitchControl
+        disabled={this.props.disabled}
+        onClick={this.onClick}
+        checkedOn={this.props.checked} />
+    </div>
+  }
+}
+
 class LedgerTableRow extends ImmutableComponent {
   get synopsis () {
     return this.props.synopsis
@@ -151,21 +180,39 @@ class LedgerTableRow extends ImmutableComponent {
 
   padLeft (v) { return pad(v, 12, '0') }
 
+  get hostPattern () {
+    return `https?://${this.synopsis.get('site')}`
+  }
+
+  get enabled () {
+    const hostSettings = this.props.siteSettings.get(this.hostPattern)
+    if (hostSettings) {
+      const result = hostSettings.get('ledgerPayments')
+      if (typeof result === 'boolean') {
+        return result
+      }
+    }
+    return true
+  }
+
   render () {
     const faviconURL = this.synopsis.get('faviconURL') || appConfig.defaultFavicon
     const rank = this.synopsis.get('rank')
     const views = this.synopsis.get('views')
     const duration = this.synopsis.get('duration')
     const publisherURL = this.synopsis.get('publisherURL')
+    // TODO: This should redistribute percentages accordingly when a site is
+    // enabled/disabled for payments.
     const percentage = this.synopsis.get('percentage')
     const site = this.synopsis.get('site')
+    const defaultSiteSetting = true
 
-    return <tr>
-      <td data-sort={this.padLeft(rank)}>{rank}</td>
-      <td><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
+    return <tr className={this.enabled ? '' : 'paymentsDisabled'}>
+      <td className='narrow' data-sort={this.padLeft(rank)}>{rank}</td>
+      <td className='wide'><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
+      <td className='narrow'><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
       <td data-sort={this.padLeft(views)}>{views}</td>
       <td data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
-      <td className='notImplemented'><input type='range' name='points' min='0' max='10'></input></td>
       <td data-sort={this.padLeft(percentage)}>{percentage}</td>
     </tr>
   }
@@ -177,23 +224,26 @@ class LedgerTable extends ImmutableComponent {
     if (!synopsis) {
       return null
     }
-    return <table id='ledgerTable' className='sort'>
-      <thead>
-        <tr>
-          <th className='sort-header' data-l10n-id='rank' />
-          <th className='sort-header' data-l10n-id='publisher' />
-          <th className='sort-header' data-l10n-id='views' />
-          <th className='sort-header' data-l10n-id='timeSpent' />
-          <th className='sort-header notImplemented' data-l10n-id='adjustment' />
-          <th className='sort-header'>&#37;</th>
-        </tr>
-      </thead>
-      <tbody>
-      {
-        synopsis.map((row) => <LedgerTableRow synopsis={row} />)
-      }
-      </tbody>
-    </table>
+    return <div id='ledgerTable'>
+      <table className='sort'>
+        <thead>
+          <tr>
+            <th className='sort-header' data-l10n-id='rank' />
+            <th className='sort-header' data-l10n-id='publisher' />
+            <th className='sort-header' data-l10n-id='include' />
+            <th className='sort-header' data-l10n-id='views' />
+            <th className='sort-header' data-l10n-id='timeSpent' />
+            <th className='sort-header'>&#37;</th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          synopsis.map((row) => <LedgerTableRow synopsis={row}
+            siteSettings={this.props.siteSettings} />)
+        }
+        </tbody>
+      </table>
+    </div>
   }
 }
 
@@ -444,8 +494,9 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get tableContent () {
-    // TODO: This should have individual enable switches and be sortable. #2497
-    return <LedgerTable ledgerData={this.props.ledgerData} />
+    // TODO: This should be sortable. #2497
+    return <LedgerTable ledgerData={this.props.ledgerData}
+      siteSettings={this.props.siteSettings} />
   }
 
   get overlayContent () {
@@ -472,6 +523,15 @@ class PaymentsTab extends ImmutableComponent {
       return `${(balance / btcValue).toFixed(2)} ${currency}`
     }
     return `${balance} BTC`
+  }
+
+  get footerContent () {
+    return <div id='paymentsFooter'>
+      <div data-l10n-id='paymentsFooterText' />
+      <a href='https://www.privateinternetaccess.com/' target='_blank'><img className='largeImg' src='img/private_internet_access.png' /></a>
+      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-right' src='img/bitgo.png' /></a>
+      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-right' src='img/coinbase.png' /></a>
+    </div>
   }
 
   get enabledContent () {
@@ -543,6 +603,7 @@ class PaymentsTab extends ImmutableComponent {
             <a href='https://github.com/brave/ledger/blob/master/documentation/Ledger-Principles.md' target='_blank' data-l10n-id='paymentsWelcomeText4' />
           </div>
         }
+        {this.footerContent}
     </div>
   }
 }
