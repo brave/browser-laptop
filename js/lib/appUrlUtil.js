@@ -75,7 +75,7 @@ module.exports.isIntermediateAboutPage = (location) =>
   ['about:safebrowsing', 'about:error', 'about:certerror'].includes(getBaseUrl(location))
 
 module.exports.isNotImplementedAboutPage = (location) =>
-  ['about:config', 'about:history'].includes(getBaseUrl(location))
+  ['about:config'].includes(getBaseUrl(location))
 
 module.exports.isNavigatableAboutPage = (location) =>
   !module.exports.isIntermediateAboutPage(location) && !module.exports.isNotImplementedAboutPage(location) && !['about:newtab', 'about:blank', 'about:flash'].includes(getBaseUrl(location))

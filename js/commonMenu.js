@@ -13,9 +13,6 @@ const settings = require('./constants/settings')
 const getSetting = require('./settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const isDarwin = process.platform === 'darwin'
-const siteTags = require('./constants/siteTags')
-const siteUtil = require('./state/siteUtil')
-const eventUtil = require('./lib/eventUtil')
 
 let electron
 try {
@@ -194,6 +191,22 @@ module.exports.bookmarksManagerMenuItem = () => {
   }
 }
 
+module.exports.historyMenuItem = () => {
+  return {
+    label: locale.translation('showAllHistory'),
+    accelerator: 'CmdOrCtrl+Y',
+    click: function (item, focusedWindow) {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:history'
+        }))
+      } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:history', { singleFrame: true }])
+      }
+    }
+  }
+}
+
 module.exports.downloadsMenuItem = () => {
   return {
     label: locale.translation('downloadsManager'),
@@ -251,46 +264,6 @@ module.exports.importBookmarksMenuItem = () => {
     {label: 'Safari...'}
   ]
   */
-}
-
-module.exports.createBookmarkMenuItems = (bookmarks, parentFolderId) => {
-  let filteredBookmarks
-  if (parentFolderId) {
-    filteredBookmarks = bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === parentFolderId)
-  } else {
-    filteredBookmarks = bookmarks.filter((bookmark) => !bookmark.get('parentFolderId'))
-  }
-
-  var payload = []
-  filteredBookmarks.forEach((site) => {
-    if (site.get('tags').includes(siteTags.BOOKMARK) && site.get('location')) {
-      payload.push({
-        // TODO include label made from favicon. It needs to be of type NativeImage
-        // which can be made using a Buffer / DataURL / local image
-        // the image will likely need to be included in the site data
-        // there was potentially concern about the size of the app state
-        // and as such there may need to be another mechanism or cache
-        //
-        // see: https://github.com/brave/browser-laptop/issues/3050
-        label: site.get('customTitle') || site.get('title'),
-        click: (item, focusedWindow, e) => {
-          if (eventUtil.isForSecondaryAction(e)) {
-            module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, site.get('location'), { openInForeground: !!e.shiftKey }])
-          } else {
-            module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, site.get('location')])
-          }
-        }
-      })
-    } else if (siteUtil.isFolder(site)) {
-      const folderId = site.get('folderId')
-      const submenuItems = bookmarks.filter((bookmark) => bookmark.get('parentFolderId') === folderId)
-      payload.push({
-        label: site.get('customTitle') || site.get('title'),
-        submenu: submenuItems.count() > 0 ? module.exports.createBookmarkMenuItems(bookmarks, folderId) : null
-      })
-    }
-  })
-  return payload
 }
 
 module.exports.reportAnIssueMenuItem = () => {

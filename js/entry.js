@@ -53,6 +53,10 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
 })
 
+ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
+  ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowStore.getState().toJS())
+})
+
 if (process.env.NODE_ENV === 'test') {
   window.appStoreRenderer = appStoreRenderer
   window.windowActions = require('./actions/windowActions')

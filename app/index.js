@@ -59,6 +59,7 @@ const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
+const FrameStateUtil = require('../js/state/frameStateUtil')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -294,6 +295,19 @@ app.on('ready', () => {
     saveIfAllCollected()
   })
 
+  // Window state must be fetched from main process; this is fired once it's retrieved
+  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowState) => {
+    if (windowState) {
+      const activeFrame = FrameStateUtil.getActiveFrame(Immutable.fromJS(windowState))
+      const windowData = Immutable.fromJS({
+        location: activeFrame.get('location'),
+        closedFrames: windowState.closedFrames
+      })
+
+      Menu.init(AppStore.getState(), windowData)
+    }
+  })
+
   ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
     if (data) {
       lastWindowState = data
@@ -367,8 +381,7 @@ app.on('ready', () => {
     // reset the browser window. This will default to en-US if
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      // Initialize after localization strings async loaded
-      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
+      Menu.init(AppStore.getState(), null)
     })
 
     // Do this after loading the state
@@ -439,9 +452,9 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
-      if (args && typeof args.bookmarked === 'boolean') {
-        Menu.updateBookmarkedStatus(args.bookmarked)
+    ipcMain.on(messages.UPDATE_MENU_BOOKMARKED_STATUS, (e, isBookmarked) => {
+      if (typeof isBookmarked === 'boolean') {
+        Menu.updateBookmarkedStatus(isBookmarked)
       }
     })
 
@@ -522,8 +535,13 @@ app.on('ready', () => {
 
     // save app state every 5 minutes regardless of update frequency
     setInterval(initiateSessionStateSave, 1000 * 60 * 5)
+
     AppStore.addChangeListener(() => {
-      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
+      } else {
+        Menu.init(AppStore.getState(), null)
+      }
     })
 
     let masterKey

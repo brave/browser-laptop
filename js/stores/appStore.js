@@ -146,6 +146,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     mainWindow.setFullScreen(true)
   }
 
+  mainWindow.on('focus', function () {
+    mainWindow.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
+  })
+
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
     appActions.setDefaultWindowSize(evt.sender.getSize())
