@@ -5,6 +5,7 @@ require('./coMocha')
 
 const path = require('path')
 const fs = require('fs')
+const {getTargetAboutUrl, isSourceAboutUrl} = require('../../js/lib/appUrlUtil')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -177,13 +178,21 @@ var exports = {
     })
 
     this.app.client.addCommand('loadUrl', function (url) {
+      if (isSourceAboutUrl(url)) {
+        url = getTargetAboutUrl(url)
+      }
       return this.url(url).waitForUrl(url)
+    })
+
+    this.app.client.addCommand('getAppState', function () {
+      return this.execute(function () {
+        return window.appStoreRenderer.state.toJS()
+      })
     })
 
     this.app.client.addCommand('showFindbar', function (show) {
       return this.execute(function (show) {
-        var windowActions = require('../../../js/actions/windowActions')
-        windowActions.setFindbarShown(Object.assign({
+        window.windowActions.setFindbarShown(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
           key: 1
         }), show !== false)
@@ -193,8 +202,7 @@ var exports = {
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
         var Immutable = require('immutable')
-        var windowActions = require('../../../js/actions/windowActions')
-        windowActions.setPinned(Immutable.fromJS(Object.assign({
+        window.windowActions.setPinned(Immutable.fromJS(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)

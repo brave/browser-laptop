@@ -18,7 +18,6 @@ const UpdateStatus = require('../constants/updateStatus')
 const downloadStates = require('../constants/downloadStates')
 const BrowserWindow = electron.BrowserWindow
 const LocalShortcuts = require('../../app/localShortcuts')
-const Filtering = require('../../app/filtering')
 const appActions = require('../actions/appActions')
 const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const dates = require('../../app/dates')
@@ -295,6 +294,7 @@ function handleChangeSettingAction (settingKey, settingValue) {
       })
       break
     case settings.DEFAULT_ZOOM_LEVEL:
+      const Filtering = require('../../app/filtering')
       Filtering.setDefaultZoomLevel(settingValue)
       break
     default:
@@ -414,10 +414,12 @@ const handleAppAction = (action) => {
       }
       break
     case AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS:
-      const downloads = appState.get('downloads')
-        .filter((download) =>
-          ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
-      appState = appState.set('downloads', downloads)
+      if (appState.get('downloads')) {
+        const downloads = appState.get('downloads')
+          .filter((download) =>
+            ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
+        appState = appState.set('downloads', downloads)
+      }
       break
     case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
       appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))
@@ -489,6 +491,11 @@ const handleAppAction = (action) => {
         return notification.get('message') === action.message
       }))
       break
+    case AppConstants.APP_CLEAR_MESSAGE_BOXES:
+      appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+        return notification.get('frameOrigin') === action.origin
+      }))
+      break
     case AppConstants.APP_ADD_WORD:
       let listType = 'ignoredWords'
       if (action.learn) {
@@ -502,6 +509,26 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SET_DICTIONARY:
       appState = appState.setIn(['dictionary', 'locale'], action.locale)
+      break
+    case AppConstants.APP_CLEAR_DATA:
+      if (action.clearDataDetail.get('browserHistory')) {
+        handleAppAction({actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS})
+      }
+      if (action.clearDataDetail.get('downloadHistory')) {
+        handleAppAction({actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS})
+      }
+      // Site cookies clearing should also clear cache so that evercookies will be properly removed
+      if (action.clearDataDetail.get('cachedImagesAndFiles') || action.clearDataDetail.get('allSiteCookies')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearCache()
+      }
+      if (action.clearDataDetail.get('savedPasswords')) {
+        handleAppAction({actionType: AppConstants.APP_CLEAR_PASSWORDS})
+      }
+      if (action.clearDataDetail.get('allSiteCookies')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearStorageData()
+      }
       break
     default:
   }

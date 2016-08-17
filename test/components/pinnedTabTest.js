@@ -84,14 +84,14 @@ describe('pinnedTabs', function () {
         .waitUntil(function () {
           return this.elements(tabsTabs).then((res) => res.value.length === 1)
         })
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.page1Url, {partitionNumber: 1})
         .waitForExist('.tab[data-frame-key="3"]')
         .setPinned(this.page1Url, true, {partitionNumber: 1})
         .waitUntil(function () {
           return this.elements(pinnedTabsTabs).then((res) => res.value.length === 2)
         })
         .waitUntil(function () {
-          return this.elements(tabsTabs).then((res) => res.value.length === 2)
+          return this.elements(tabsTabs).then((res) => res.value.length === 1)
         })
     })
   })

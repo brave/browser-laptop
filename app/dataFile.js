@@ -18,10 +18,12 @@ const storagePath = (url) =>
 const downloadPath = (url) => `${storagePath(url)}.temp`
 
 function downloadSingleFile (resourceName, url, version, force, resolve, reject) {
+  // console.log('downloading file for: ', resourceName, url)
   let headers = {}
   const AppStore = require('../js/stores/appStore')
   const etag = AppStore.getState().getIn([resourceName, 'etag'])
   if (!force && etag) {
+    // console.log('setting etag: ', etag)
     headers = {
       'If-None-Match': etag
     }
@@ -34,6 +36,7 @@ function downloadSingleFile (resourceName, url, version, force, resolve, reject)
         reject('could not rename downloaded file')
       } else {
         appActions.setResourceETag(resourceName, newEtag)
+        // console.log('set resource last check: ', resourceName, version, new Date().getTime())
         appActions.setResourceLastCheck(resourceName, version, new Date().getTime())
         resolve()
       }
@@ -107,8 +110,13 @@ module.exports.init = (resourceName, startExtension, onInitDone, forceDownload) 
       })
     })
 
+  // console.log('should redownload first? ', resourceName, version, module.exports.shouldRedownloadFirst(resourceName, version))
+  // If the last check version changes we always want to force a download, otherwise we always don't want to force
+  const AppStore = require('../js/stores/appStore')
+  const lastCheckVersion = AppStore.getState().getIn([resourceName, 'lastCheckVersion'])
+  // console.log('lastCheckVersion, version: ', lastCheckVersion, version, lastCheckVersion !== version)
   if (forceDownload || module.exports.shouldRedownloadFirst(resourceName, version)) {
-    module.exports.downloadDataFile(resourceName, url, version, false)
+    module.exports.downloadDataFile(resourceName, url, version, lastCheckVersion !== version)
       .then(loadProcess.bind(null, resourceName, version))
       .catch(loadProcess.bind(null, resourceName, version))
   } else {

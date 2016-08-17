@@ -315,6 +315,10 @@ const windowActions = {
    */
   closeFrame: function (frames, frameProps, forceClosePinned) {
     const ipc = global.require('electron').ipcRenderer
+    const origin = siteUtil.getOrigin(frameProps.get('location'))
+    if (origin) {
+      appActions.clearMessageBoxes(origin)
+    }
     // If the frame was full screen, exit
     if (frameProps && frameProps.get('isFullScreen')) {
       webviewActions.setFullScreen(false)
@@ -417,6 +421,18 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       index
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to set the tab page index being previewed.
+   *
+   * @param {number} previewTabPageIndex - The tab page index to preview
+   */
+  setPreviewTabPageIndex: function (previewTabPageIndex) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX,
+      previewTabPageIndex
     })
   },
 
@@ -924,6 +940,16 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_ADD_HISTORY,
       frameProps
+    })
+  },
+
+  /**
+   * Sets the clear browsing data popup detail
+   */
+  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+      clearBrowsingDataDetail
     })
   }
 }

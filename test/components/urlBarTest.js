@@ -1,4 +1,4 @@
-/* global describe, it, before, beforeEach */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const {urlInput} = require('../lib/selectors')
@@ -14,9 +14,9 @@ describe('urlBar', function () {
   }
 
   describe('autocomplete', function () {
-    Brave.beforeAll(this)
+    Brave.beforeEach(this)
 
-    before(function * () {
+    beforeEach(function * () {
       yield setup(this.app.client)
       yield this.app.client.waitForExist(urlInput)
       yield this.app.client.waitForElementFocus(urlInput)
@@ -27,10 +27,6 @@ describe('urlBar', function () {
         .addSite({ location: 'https://brave.com', title: 'Brave' })
         .addSite({ location: 'https://brave.com/test' })
         .addSite({ location: 'https://www.youtube.com' })
-    })
-
-    beforeEach(function * () {
-      yield this.app.client.setValue(urlInput, '')
     })
 
     it('autocompletes without protocol', function * () {

@@ -28,9 +28,15 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
   if (!defaultSession) {
     reject('Request failed, no session available')
   } else {
+    // console.log('webRequest.fetch: ', url, headers, path)
     defaultSession.webRequest.fetch(url, { headers, path }, (err, response) => {
+      // console.log('response: ', response)
       if (!err && response.statusCode === 200) {
-        resolve(headers['etag'])
+        let etag = response.headers['etag']
+        if (etag && etag.constructor === Array) {
+          etag = etag[0]
+        }
+        resolve(etag)
       } else {
         reject(`Got HTTP status code ${response.statusCode}`)
       }

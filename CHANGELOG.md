@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.11.5](https://github.com/brave/browser-laptop/releases/v0.11.5dev)
+- Fixed a top crasher. ([#3054](https://github.com/brave/browser-laptop/issues/3054))
+- Fixed parts of the UI that was not getting translated for different locales. ([#2638](https://github.com/brave/browser-laptop/issues/2638))
+- Fixed URL bar sometimes clearing if you type very fast when a new tab is opened. ([#2812](https://github.com/brave/browser-laptop/issues/2812))
+- Fixed the possibility to have a blank tab set when closing a tab under some cases ([#3092](https://github.com/brave/browser-laptop/issues/3092))
+- Fixed DuckDuckGo URL to use the NoScript version when NoScript is on. ([#3118](https://github.com/brave/browser-laptop/issues/3118))
+- Fixed cloned tabs ordering, it will now appear next to the original one ([#2779](https://github.com/brave/browser-laptop/issues/2779))
+- Fixed needing to press Esc two times to clear typing. ([#3088](https://github.com/brave/browser-laptop/issues/3088))
+- Fixed Flash click to play on Google docs. ([#3090](https://github.com/brave/browser-laptop/issues/3090))
+- Fixed restart notification in the preferences page so it doesn't show if you toggle a pref on / off. ([#2958](https://github.com/brave/browser-laptop/issues/2958))
+
+## [0.11.4](https://github.com/brave/browser-laptop/releases/v0.11.4dev)
+- Added a clear browsing data now button in preferences and popup panel with clearing options. ([#2471](https://github.com/brave/browser-laptop/issues/2471))
+- Added tab page previews. ([#1424](https://github.com/brave/browser-laptop/issues/1424))
+- Changed Accept-Encoding to advertise it supports Brotli compression. ([#2890](https://github.com/brave/browser-laptop/issues/2890))
+- Fixed printing on Windows. ([#1616](https://github.com/brave/browser-laptop/issues/1616))
+- Fixed some memory leaks. ([#3030](https://github.com/brave/browser-laptop/issues/3030))
+- Fixed Flash placeholder sometimes not showing. ([#3047](https://github.com/brave/browser-laptop/issues/3047))
+- Fixed Spotify WebPlayer. ([#3011](https://github.com/brave/browser-laptop/issues/3011))
+- Fixed a common Brave crasher. ([#1954](https://github.com/brave/browser-laptop/issues/1954))
+- Fixed closing an inactive tab should not change the active tab. ([#2923](https://github.com/brave/browser-laptop/issues/2923))
+- Fixed PDFJS error when clicking on a dropbox file. ([#3056](https://github.com/brave/browser-laptop/issues/3056))
+
 ## [0.11.3](https://github.com/brave/browser-laptop/releases/v0.11.3dev)
 - Fix URL bar problem from no default search engine. ([#2956](https://github.com/brave/browser-laptop/issues/2956))
 - Fix PDF downloading with File > Save Page as. ([#2954](https://github.com/brave/browser-laptop/issues/2954))
@@ -38,7 +61,7 @@
 - Fixed Notification bar for crashes not dismissing. ([#2617](https://github.com/brave/browser-laptop/issues/2617))
 - Fixed "Open Image In New Tab" respecting private / session info. ([#2746](https://github.com/brave/browser-laptop/issues/2746))
 - Fixed pressing down on URL bar now shows autosuggest. ([#2444](https://github.com/brave/browser-laptop/issues/2444))
-- Fixed showing scrollbars in tabs bar in Arch linux. ([#2599](Arch linux: Scroll bar appears over tabs when they fill the tab bar #2599))
+- Fixed showing scrollbars in tabs bar in Arch linux. ([#2599](https://github.com/brave/browser-laptop/issues/2599))
 - Upgrade to libchromiumcontent 52.0.2743.82. ([#1592](https://github.com/brave/browser-laptop/issues/1592))
 - Upgrade to Electron 1.3.0. ([#2635](https://github.com/brave/browser-laptop/issues/2635))
 

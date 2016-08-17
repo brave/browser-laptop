@@ -109,9 +109,7 @@ class UrlBar extends ImmutableComponent {
           // Filter javascript URLs to prevent self-XSS
           location = location.replace(/^(\s*javascript:)+/i, '')
           const isLocationUrl = isUrl(location)
-          // If control key is pressed and input has no space in it add www. as a prefix and .com as a suffix.
-          // For whitepsace we want a search no matter what.
-          if (!isLocationUrl && !/\s/g.test(location) && e.ctrlKey) {
+          if (!isLocationUrl && e.ctrlKey) {
             windowActions.loadUrl(this.activeFrame, `www.${location}.com`)
           } else if (this.shouldRenderUrlBarSuggestions && (this.urlBarSuggestions.activeIndex > 0 || this.props.locationValueSuffix)) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
@@ -127,11 +125,19 @@ class UrlBar extends ImmutableComponent {
             // load the selected suggestion
             this.urlBarSuggestions.clickSelected(e)
           } else {
+            const defaultEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
             let searchUrl = this.props.searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(location))
-            if (this.activateSearchEngine && this.searchSelectEntry !== null && !isLocationUrl) {
+            if (this.activateSearchEngine && this.searchSelectEntry !== null &&
+              this.searchSelectEntry.name !== defaultEngine && !isLocationUrl) {
               const replaceRE = new RegExp('^' + this.searchSelectEntry.shortcut + ' ', 'g')
               location = location.replace(replaceRE, '')
               searchUrl = this.searchSelectEntry.search.replace('{searchTerms}', encodeURIComponent(location))
+            }
+
+            if ((defaultEngine === 'DuckDuckGo' ||
+              (this.searchSelectEntry && this.searchSelectEntry.name === 'DuckDuckGo')) &&
+            this.props.enableNoScript) {
+              searchUrl = searchUrl.replace('?q=', 'html?q=')
             }
             location = isLocationUrl ? location : searchUrl
             // do search.
@@ -258,7 +264,11 @@ class UrlBar extends ImmutableComponent {
   onActiveFrameStop () {
     if (this.isFocused()) {
       windowActions.setUrlBarActive(false)
-      if (!this.shouldRenderUrlBarSuggestions) {
+      if (!this.shouldRenderUrlBarSuggestions ||
+          // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
+          // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
+          !this.props.urlbar.getIn(['suggestions', 'suggestionList']) ||
+          this.props.urlbar.getIn(['suggestions', 'suggestionList']).size === 0) {
         this.restore()
         windowActions.setUrlBarSelected(true)
       }
@@ -350,6 +360,8 @@ class UrlBar extends ImmutableComponent {
     windowActions.setSiteInfoVisible(true)
   }
 
+  // Currently even if there are no suggestions we render the URL bar suggestions because
+  // it needs to generate them. This needs to be refactored.  See https://github.com/brave/browser-laptop/issues/3151
   get shouldRenderUrlBarSuggestions () {
     return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
       this.props.urlbar.get('active')
@@ -448,7 +460,8 @@ class UrlBar extends ImmutableComponent {
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}
             searchSelectEntry={this.searchSelectEntry}
-            previewActiveIndex={this.props.previewActiveIndex || 0} />
+            previewActiveIndex={this.props.previewActiveIndex || 0}
+            enableNoScript={this.props.enableNoScript} />
           : null
         }
     </form>

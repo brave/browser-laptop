@@ -179,7 +179,17 @@ var rendererIdentifiers = function () {
     'yes',
     'no',
     'neverForThisSite',
-    'passwordsManager'
+    'passwordsManager',
+    'downloadItemPause',
+    'downloadItemResume',
+    'downloadItemCancel',
+    'downloadItemRedownload',
+    'downloadItemCopyLink',
+    'downloadItemPath',
+    'downloadItemDelete',
+    'downloadItemClear',
+    'downloadToolbarHide',
+    'downloadItemClearCompleted'
   ]
 }
 

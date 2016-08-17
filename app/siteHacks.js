@@ -41,6 +41,7 @@ module.exports.init = () => {
     let hack = siteHacks[domain]
 
     let redirectURL
+    let cancel
     if (hack && hack.onBeforeRequest &&
         (hack.enableForAll ||
          hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, details.firstPartyUrl) ||
@@ -49,10 +50,14 @@ module.exports.init = () => {
       if (result && result.redirectURL) {
         redirectURL = result.redirectURL
       }
+      if (result && typeof result.cancel === 'boolean') {
+        cancel = result.cancel
+      }
     }
     return {
       resourceName,
-      redirectURL
+      redirectURL,
+      cancel
     }
   })
 }

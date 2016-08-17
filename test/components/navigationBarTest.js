@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
-const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked} = require('../lib/selectors')
+const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked, saveButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
@@ -445,14 +445,79 @@ describe('navigationBar', function () {
       })
     })
 
-    describe('escape', function * () {
+    describe('type escape once with suggestions', function () {
       before(function * () {
-        yield this.app.client.ipcSend('shortcut-active-frame-stop')
+        this.page = Brave.server.url('page1.html')
+        return yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.page)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .setValue(urlInput, 'google')
+          .waitForExist(urlBarSuggestions + ' li')
+
+          // hit escape
+          .keys('\uE00C')
+          .waitForElementFocus(urlInput)
       })
 
-      it('reverts typing on escape', function * () {
-        yield this.app.client.getValue(urlInput).should.eventually.be.equal(config.defaultUrl)
-        yield selectsText(this.app.client)
+      it('does not select the urlbar text', function * () {
+        yield selectsText(this.app.client, '.com')
+      })
+
+      it('does not revert the urlbar text', function * () {
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal('google.com')
+      })
+    })
+
+    describe('type escape once with no suggestions', function () {
+      before(function * () {
+        this.page = Brave.server.url('page1.html')
+        return yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.page)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .setValue(urlInput, 'random-uuid-d63ecb78-eec8-4c08-973b-fb39cb5a6f1a')
+
+          // hit escape
+          .keys('\uE00C')
+          .waitForElementFocus(urlInput)
+      })
+
+      it('does select the urlbar text', function * () {
+        yield selectsText(this.app.client, this.page)
+      })
+
+      it('does revert the urlbar text', function * () {
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
+      })
+    })
+
+    describe('type escape twice', function () {
+      before(function * () {
+        this.page = Brave.server.url('page1.html')
+        return yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.page)
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
+          .waitForElementFocus(urlInput)
+          .setValue(urlInput, 'blah')
+          // hit escape
+          .keys('\uE00C')
+          .waitForElementFocus(urlInput)
+          .keys('\uE00C')
+      })
+
+      it('selects the urlbar text', function * () {
+        yield selectsText(this.app.client, this.page)
+      })
+
+      it('sets the urlbar text to the webview src', function * () {
+        yield this.app.client.getValue(urlInput).should.eventually.be.equal(this.page)
       })
     })
 
@@ -643,12 +708,6 @@ describe('navigationBar', function () {
     })
   })
 
-  describe('escape', function () {
-    it('sets the urlbar text to the webview src')
-
-    it('selects the urlbar text')
-  })
-
   describe('shortcut-focus-url', function () {
     Brave.beforeAll(this)
 
@@ -686,9 +745,9 @@ describe('navigationBar', function () {
         .waitForExist(navigatorNotBookmarked)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
+        .waitForVisible(saveButton)
+        .click(saveButton)
         .waitForExist(navigatorBookmarked)
-        // unfocus current box
-        .click('.dialog')
     })
 
     it('should open if user has no bookmarks', function * () {
@@ -713,9 +772,9 @@ describe('navigationBar', function () {
         .windowParentByUrl(page2Url)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
+        .waitForVisible(saveButton)
+        .click(saveButton)
         .waitForExist(navigatorBookmarked)
-        // unfocus current box
-        .click('.dialog')
 
       yield this.app.client.isExisting(bookmarksToolbar).should.eventually.be.false
     })

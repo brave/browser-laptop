@@ -260,6 +260,16 @@ Hides a message box in the notification bar
 
 
 
+### clearMessageBoxes(origin) 
+
+Clears all message boxes for a given origin.
+
+**Parameters**
+
+**origin**: `string`, Clears all message boxes for a given origin.
+
+
+
 ### addWord(word, learn) 
 
 Adds a word to the dictionary
@@ -279,6 +289,16 @@ Adds a word to the dictionary
 **Parameters**
 
 **locale**: `string`, The locale to set for the dictionary
+
+
+
+### clearAppData(clearDataDetail) 
+
+Clears the data specified in dataDetail
+
+**Parameters**
+
+**clearDataDetail**: `object`, the app data to clear as per doc/state.md's clearBrowsingDataDetail
 
 
 

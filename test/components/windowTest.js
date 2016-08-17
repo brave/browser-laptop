@@ -221,14 +221,6 @@ describe('application window', function () {
           })
       })
 
-      // Fails intermittently
-      it.skip('loads and is visible', function * () {
-        yield this.app.client
-          .windowParentByUrl(this.page1)
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-      })
-
       it('has a min width of 480 and height of 300', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
@@ -239,7 +231,6 @@ describe('application window', function () {
       })
     })
 
-    // requires https://github.com/brave/browser-electron/issues/98
     describe('without features', function () {
       Brave.beforeAll(this)
 
@@ -247,10 +238,7 @@ describe('application window', function () {
         var page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .windowByIndex(0)
-          .waitUntilWindowLoaded()
-          .waitForVisible(activeWebview)
-          .tabByIndex(0)
+          .waitForUrl(Brave.newTabUrl)
           .url(Brave.server.url('window_open.html'))
           .execute(function (page1) {
             global.triggerFunction = function () {

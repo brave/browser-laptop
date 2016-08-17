@@ -33,6 +33,7 @@ const appStoreRenderer = require('./stores/appStoreRenderer')
 const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
+const l10n = require('./l10n')
 
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
@@ -52,6 +53,11 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
 })
 
+if (process.env.NODE_ENV === 'test') {
+  window.appStoreRenderer = appStoreRenderer
+  window.windowActions = require('./actions/windowActions')
+}
+
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
   appStoreRenderer.state = action.stateDiff
     ? appStoreRenderer.state = patch(appStoreRenderer.state, Immutable.fromJS(action.stateDiff))
@@ -61,3 +67,5 @@ ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
 window.addEventListener('beforeunload', function () {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
+
+l10n.init()

@@ -14,14 +14,15 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
+const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
-const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
@@ -40,6 +41,7 @@ const hintCount = 3
 
 require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
+require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const permissionNames = {
@@ -378,18 +380,12 @@ class ShieldsTab extends ImmutableComponent {
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
-    if (e.target.value === 'showBraveAds') {
+    if (e.target.value === 'blockAds') {
       aboutActions.setResourceEnabled(adblock, true)
       aboutActions.setResourceEnabled(trackingProtection, true)
-      aboutActions.setResourceEnabled(adInsertion, true)
-    } else if (e.target.value === 'blockAds') {
-      aboutActions.setResourceEnabled(adblock, true)
-      aboutActions.setResourceEnabled(trackingProtection, true)
-      aboutActions.setResourceEnabled(adInsertion, false)
     } else {
       aboutActions.setResourceEnabled(adblock, false)
       aboutActions.setResourceEnabled(trackingProtection, false)
-      aboutActions.setResourceEnabled(adInsertion, false)
     }
   }
   onChangeCookieControl (e) {
@@ -404,7 +400,6 @@ class ShieldsTab extends ImmutableComponent {
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
           <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
-            <option data-l10n-id='showBraveAds' value='showBraveAds' />
             <option data-l10n-id='blockAds' value='blockAds' />
             <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
           </select>
@@ -425,11 +420,20 @@ class ShieldsTab extends ImmutableComponent {
 }
 
 class SecurityTab extends ImmutableComponent {
+  constructor (e) {
+    super()
+    this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
+  }
+  clearBrowsingDataNow () {
+    aboutActions.clearBrowsingDataNow()
+  }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
     ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
   render () {
+    const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
+
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
       <SettingsList dataL10nId='privateDataMessage'>
@@ -437,29 +441,37 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='downloadHistory' prefKey={settings.SHUTDOWN_CLEAR_DOWNLOADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='cachedImagesAndFiles' prefKey={settings.SHUTDOWN_CLEAR_CACHE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='allSiteCookies' prefKey={settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
-      <SettingsList dataL10nId='passwordManager'>
-        <SettingCheckbox dataL10nId='usePasswordManager' prefKey={settings.PASSWORD_MANAGER_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
-          options={
-            getSetting(settings.PASSWORD_MANAGER_ENABLED, this.props.settings)
-              ? <span className='linkText' data-l10n-id='managePasswords'
-                onClick={aboutActions.newFrame.bind(null, {
-                  location: 'about:passwords'
-                }, true)}></span>
-              : null
-          } />
-        <SettingCheckbox dataL10nId='useOnePassword' prefKey={settings.ONE_PASSWORD_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='useLastPass' prefKey={settings.LAST_PASS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
-          options={
-            getSetting(settings.LAST_PASS_ENABLED, this.props.settings)
-              ? <span className='linkText' data-l10n-id='preferences'
-                onClick={aboutActions.newFrame.bind(null, {
-                  location: 'chrome-extension://hdokiejnpimakedhajhdlcegeplioahd/tabDialog.html?dialog=preferences&cmd=open'
-                }, true)}></span>
-              : null
-          } />
-        <SettingCheckbox dataL10nId='useDashlane' prefKey={settings.DASHLANE_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      <SettingsList>
+        <SettingItem dataL10nId='passwordManager'>
+          <select value={getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings)} onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ACTIVE_PASSWORD_MANAGER)} >
+            <option data-l10n-id='builtInPasswordManager' value={passwordManagers.BUILT_IN} />
+            <option data-l10n-id='onePassword' value={passwordManagers.ONE_PASSWORD} />
+            <option data-l10n-id='dashlane' value={passwordManagers.DASHLANE} />
+            <option data-l10n-id='lastPass' value={passwordManagers.LAST_PASS} />
+            <option data-l10n-id='doNotManageMyPasswords' value={passwordManagers.UNMANAGED} />
+          </select>
+        </SettingItem>
+        {
+          getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
+          ? <label className='linkTextSmall' data-l10n-id='managePasswords'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:passwords'
+            }, true)}>
+          </label>
+          : null
+        }
+        {
+          getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.LAST_PASS
+          ? <label className='linkTextSmall' data-l10n-id='preferences'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: lastPassPreferencesUrl
+            }, true)}>
+          </label>
+          : null
+        }
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>

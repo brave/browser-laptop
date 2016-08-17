@@ -57,6 +57,24 @@ describe('urlutil', function () {
     it('returns true when input is a pure string (no TLD)', function () {
       assert.equal(UrlUtil.isNotURL('brave'), true)
     })
+    it('returns false when input is a string with whitespace but has schema', function () {
+      assert.equal(UrlUtil.isNotURL('https://wwww.brave.com/test space.jpg'), false)
+    })
+    it('returns true when input is a string with schema but invalid domain name', function () {
+      assert.equal(UrlUtil.isNotURL('https://www.bra ve.com/test space.jpg'), true)
+    })
+    it('returns true when input contains more than one word', function () {
+      assert.equal(UrlUtil.isNotURL('brave is cool'), true)
+    })
+    it('returns false when input has custom protocol', function () {
+      assert.equal(UrlUtil.isNotURL('brave://test'), false)
+    })
+    it('returns true when input has space in schema', function () {
+      assert.equal(UrlUtil.isNotURL('https ://brave.com'), true)
+    })
+    it('returns false when input is chrome-extension', function () {
+      assert.equal(UrlUtil.isNotURL('chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/cast_sender.js'), false)
+    })
     describe('search query', function () {
       it('returns true when input starts with ?', function () {
         assert.equal(UrlUtil.isNotURL('?brave'), true)

@@ -102,6 +102,7 @@ const updateTabPageIndex = (frameProps) => {
     return
   }
   windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], index)
+  windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
 }
 
 const focusWebview = (frameStatePath) => {
@@ -161,7 +162,9 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
-const newFrame = (frameOpts, openInForeground) => {
+const newFrame = (frameOpts, openInForeground, insertionIndex) => {
+  const frames = windowState.get('frames')
+
   if (frameOpts === undefined) {
     frameOpts = {}
   }
@@ -192,8 +195,32 @@ const newFrame = (frameOpts, openInForeground) => {
   } else if (frameOpts.isPartitioned) {
     nextPartitionNumber = incrementPartitionNumber()
   }
-  windowState = windowState.merge(FrameStateUtil.addFrame(windowState.get('frames'), windowState.get('tabs'), frameOpts,
-    nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey')))
+
+  // Find the closest index to the current frame's index which has
+  // a different ancestor frame key.
+  if (insertionIndex === undefined) {
+    insertionIndex = FrameStateUtil.findIndexForFrameKey(frames, frameOpts.parentFrameKey)
+    if (insertionIndex === -1) {
+      insertionIndex = frames.size
+    } else {
+      while (insertionIndex < frames.size) {
+        ++insertionIndex
+        if (!FrameStateUtil.isAncestorFrameKey(frames, frames.get(insertionIndex), frameOpts.parentFrameKey)) {
+          break
+        }
+      }
+    }
+  }
+  if (FrameStateUtil.isFrameKeyPinned(frames, frameOpts.parentFrameKey)) {
+    insertionIndex = 0
+  }
+
+  windowState = windowState.merge(
+    FrameStateUtil.addFrame(
+      frames, windowState.get('tabs'), frameOpts,
+    nextKey, nextPartitionNumber, openInForeground ? nextKey : windowState.get('activeFrameKey'), insertionIndex)
+  )
+
   if (openInForeground) {
     const activeFrame = FrameStateUtil.getActiveFrame(windowState)
     updateTabPageIndex(activeFrame)
@@ -309,7 +336,12 @@ const doAction = (action) => {
           title: ''
         })
       }
-      updateNavBarInput(action.location, frameStatePath(key))
+
+      // Update nav bar unless when spawning a new tab. The user might have
+      // typed in the URL bar while we were navigating -- we should preserve it.
+      if (!(action.location === 'about:newtab' && !FrameStateUtil.getActiveFrame(windowState).get('canGoForward'))) {
+        updateNavBarInput(action.location, frameStatePath(key))
+      }
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
@@ -397,18 +429,22 @@ const doAction = (action) => {
       newFrame(action.frameOpts, action.openInForeground)
       break
     case WindowConstants.WINDOW_CLONE_FRAME:
-      newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground)
+      let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
+      newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground, insertionIndex)
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
-      const closingActive = !action.frameProps || action.frameProps === FrameStateUtil.getActiveFrame(windowState)
       const index = FrameStateUtil.getFramePropsIndex(windowState.get('frames'), frameProps)
       const activeFrameKey = FrameStateUtil.getActiveFrame(windowState).get('key')
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
-      if (closingActive) {
+      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
+
+      // If we reach the limit of opened tabs per page while closing tabs, switch to
+      // the active tab's page otherwise the user will hang on empty page
+      if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }
       break
@@ -424,6 +460,7 @@ const doAction = (action) => {
         activeFrameKey: action.frameProps.get('key'),
         previewFrameKey: null
       })
+      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       updateTabPageIndex(action.frameProps)
       break
     case WindowConstants.WINDOW_SET_PREVIEW_FRAME:
@@ -432,9 +469,17 @@ const doAction = (action) => {
           ? action.frameProps.get('key') : null
       })
       break
+    case WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
+      if (action.previewTabPageIndex !== windowState.getIn(['ui', 'tabs', 'tabPageIndex'])) {
+        windowState = windowState.setIn(['ui', 'tabs', 'previewTabPageIndex'], action.previewTabPageIndex)
+      } else {
+        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
+      }
+      break
     case WindowConstants.WINDOW_SET_TAB_PAGE_INDEX:
       if (action.index !== undefined) {
         windowState = windowState.setIn(['ui', 'tabs', 'tabPageIndex'], action.index)
+        windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       } else {
         updateTabPageIndex(action.frameProps)
       }
@@ -572,11 +617,14 @@ const doAction = (action) => {
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
       const location = action.frameProps.get('location')
-      const alreadyPinnedFrameProps = windowState.get('frames').find((frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
+      const alreadyPinnedFrameProps = windowState.get('frames').find(
+        (frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location &&
+          (action.frameProps.get('partitionNumber') || 0) === (frame.get('partitionNumber') || 0))
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
         doAction(action)
         action.actionType = WindowConstants.WINDOW_SET_ACTIVE_FRAME
+        action.frameProps = alreadyPinnedFrameProps
         doAction(action)
       } else {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
@@ -589,6 +637,7 @@ const doAction = (action) => {
       windowState = windowState.merge({
         previewFrameKey: null
       })
+      windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
       // Pin changes need to happen right away or else a race condition could happen for app state
       // change detection where it adds a second frame
       windowStore.emitChanges()
@@ -637,6 +686,13 @@ const doAction = (action) => {
           expandNoScript: action.braveryPanelDetail.expandNoScript,
           expandFp: action.braveryPanelDetail.expandFp
         })
+      }
+      break
+    case WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL:
+      if (!action.clearBrowsingDataDetail) {
+        windowState = windowState.delete('clearBrowsingDataDetail')
+      } else {
+        windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
       }
       break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
@@ -695,6 +751,13 @@ ipc.on(messages.SHORTCUT_PREV_TAB, () => {
   windowState = FrameStateUtil.makePrevFrameActive(windowState)
   updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
   emitChanges()
+})
+
+ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDetail) => {
+  doAction({
+    actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
+    clearBrowsingDataDetail
+  })
 })
 
 ipc.on(messages.IMPORT_BOOKMARKS, () => {

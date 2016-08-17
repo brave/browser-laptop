@@ -86,7 +86,7 @@ class AppDispatcher {
 
 const appDispatcher = new AppDispatcher()
 
-if (process.type !== 'renderer') {
+if (process.type === 'browser') {
   const electron = require('electron')
   const ipcMain = electron.ipcMain
   ipcMain.on('app-dispatcher-register', (event) => {
@@ -111,11 +111,11 @@ if (process.type !== 'renderer') {
   ipcMain.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
 
+    let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
+    queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
     if (event.sender.hostWebContents) {
       // received from an extension
       // only extension messages will have a hostWebContents
-      let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
-      queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
       let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
       // default to the windowId of the hostWebContents
       queryInfo.windowId = queryInfo.windowId || win.id
@@ -125,7 +125,9 @@ if (process.type !== 'renderer') {
       appDispatcher.dispatch(payload, event.sender.hostWebContents)
     } else {
       // received from a browser window
-      appDispatcher.dispatch(payload, event.sender)
+      if (event.sender.id !== queryInfo.windowId) {
+        appDispatcher.dispatch(payload, event.sender)
+      }
     }
   })
 }

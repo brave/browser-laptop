@@ -41,6 +41,7 @@ const messages = {
   SHORTCUT_FRAME_CLONE: _, /** @arg {number} key of frame, @arg {object} options such as openInForeground */
   SHORTCUT_NEXT_TAB: _,
   SHORTCUT_PREV_TAB: _,
+  SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL: _,
   // Misc application events
   QUIT_APPLICATION: _,
   OPEN_BRAVERY_PANEL: _,
@@ -85,6 +86,7 @@ const messages = {
   CHECK_SWIPE_FORWARD: _,
   ENABLE_SWIPE_GESTURE: _,
   DISABLE_SWIPE_GESTURE: _,
+  SHOW_FLASH_NOTIFICATION: _,
   // Password manager
   GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
   GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
@@ -129,6 +131,7 @@ const messages = {
   DISPATCH_ACTION: _,
   CHECK_FLASH_INSTALLED: _,
   ABOUT_COMPONENT_INITIALIZED: _,
+  CLEAR_BROWSING_DATA_NOW: _,
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
@@ -146,6 +149,9 @@ const messages = {
   LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
   REQUEST_LANGUAGE: _,
   STATE_UPDATED: _,
+  // Ads
+  GET_AD_DIV_CANDIDATES: _,
+  SET_AD_DIV_CANDIDATES: _,
   // Debugging
   DEBUG_REACT_PROFILE: _
 }
