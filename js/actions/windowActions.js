@@ -501,8 +501,8 @@ const windowActions = {
   setUrlBarSuggestions: function (suggestionList, selectedIndex) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS,
-      suggestionList: suggestionList,
-      selectedIndex: selectedIndex
+      suggestionList,
+      selectedIndex
     })
   },
 
