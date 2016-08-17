@@ -584,7 +584,7 @@ const updateMenu = (CommonMenu, appState, windowData) => {
   }
 
   // When bookmarks are removed via AppStore (context menu, etc), `isBookmarkChecked` needs to be recalculated
-  if (windowData.get('location')) {
+  if (windowData && windowData.get('location')) {
     isBookmarkChecked = isSiteBookmarked(appState.get('sites'), Immutable.fromJS({location: windowData.get('location')}))
   }
 
