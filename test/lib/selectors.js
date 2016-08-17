@@ -2,6 +2,7 @@ module.exports = {
   urlInput: '#urlInput',
   activeWebview: '.frameWrapper.isActive webview',
   activeTab: '.tab.active',
+  activeTabTitle: '.tab.active .tabTitle',
   activeTabFavicon: '.tab.active .tabIcon',
   pinnedTabs: '.pinnedTabs',
   pinnedTabsTabs: '.pinnedTabs .tab',
