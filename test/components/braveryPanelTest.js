@@ -14,11 +14,18 @@ describe('Bravery Panel', function () {
   }
 
   function * openBraveMenu (client) {
-    yield client
+    return client
       .windowByUrl(Brave.browserWindowUrl)
       .waitForVisible(braveMenu)
       .click(braveMenu)
       .waitForVisible(braveryPanel)
+  }
+
+  function * waitForDataFile (client, dataFile) {
+    return client.waitUntil(function () {
+      return this.getAppState().then((val) =>
+        val.value[dataFile].etag && val.value[dataFile].etag.length > 0)
+    })
   }
 
   describe('General', function () {
@@ -44,6 +51,7 @@ describe('Bravery Panel', function () {
       yield setup(this.app.client)
     })
     it('detects blocked elements', function * () {
+      yield waitForDataFile(this.app.client, 'trackingProtection')
       const url = Brave.server.url('tracking.html')
       yield this.app.client
         .tabByIndex(0)
@@ -56,6 +64,7 @@ describe('Bravery Panel', function () {
         })
     })
     it('detects adblock elements', function * () {
+      yield waitForDataFile(this.app.client, 'adblock')
       const url = Brave.server.url('adblock.html')
       yield this.app.client
         .tabByIndex(0)
@@ -68,6 +77,7 @@ describe('Bravery Panel', function () {
         })
     })
     it('detects https upgrades', function * () {
+      yield waitForDataFile(this.app.client, 'httpsEverywhere')
       const url = Brave.server.url('httpsEverywhere.html')
       yield this.app.client
         .tabByIndex(0)
