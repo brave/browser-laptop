@@ -608,11 +608,14 @@ const doAction = (action) => {
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
       const location = action.frameProps.get('location')
-      const alreadyPinnedFrameProps = windowState.get('frames').find((frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
+      const alreadyPinnedFrameProps = windowState.get('frames').find(
+        (frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location &&
+          (action.frameProps.get('partitionNumber') || 0) === (frame.get('partitionNumber') || 0))
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
         doAction(action)
         action.actionType = WindowConstants.WINDOW_SET_ACTIVE_FRAME
+        action.frameProps = alreadyPinnedFrameProps
         doAction(action)
       } else {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],

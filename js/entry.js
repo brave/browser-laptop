@@ -55,6 +55,7 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
 
 if (process.env.NODE_ENV === 'test') {
   window.appStoreRenderer = appStoreRenderer
+  window.windowActions = require('./actions/windowActions')
 }
 
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
