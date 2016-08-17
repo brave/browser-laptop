@@ -14,6 +14,7 @@
 
    IPC entry point:
       LEDGER_PUBLISHER - called synchronously by app/extensions/brave/content/scripts/pageInformation.js
+      CHANGE_SETTING - called asynchronously to record a settings change
 
    eventStore entry point:
       addChangeListener - called when tabs render or gain focus
@@ -43,6 +44,7 @@ const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
 const getSetting = require('../js/settings').getSetting
+const appStore = require('../js/stores/appStore')
 const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
 
@@ -188,6 +190,21 @@ if (ipc) {
     ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
 
     event.returnValue = { context: ctx, rules: publisherInfo._internal.ruleset.cooked }
+  })
+
+  ipc.on(messages.CHANGE_SETTING, (event, key, value) => {
+    if (!client) return
+
+    if (key === settings.PAYMENTS_MONTHLY_AMOUNT) {
+      var amount = parseInt(value, 10)
+      var bravery = client.getBraveryProperties()
+
+      if (isNaN(amount) || (amount <= 0)) return
+
+      underscore.extend(bravery.fee, { amount: amount })
+      client.setBraveryProperties(bravery, callback)
+      getPaymentInfo()
+    }
   })
 }
 
@@ -401,13 +418,14 @@ var synopsisNormalizer = () => {
     duration = results[i].duration
 
     data[i] = { rank: i + 1,
+                // TBD: the `ledger-publisher` package does not currently report `verified` ...
+                verified: publisher.verified || false,
                 site: results[i].publisher, views: results[i].visits, duration: duration,
                 daysSpent: 0, hoursSpent: 0, minutesSpent: 0, secondsSpent: 0,
-                faviconURL: publisher.faviconURL
+                faviconURL: publisher.faviconURL,
+                score: results[i].scores[scorekeeper]
               }
     if (results[i].protocol) data[i].publisherURL = results[i].protocol + '//' + results[i].publisher
-    // TBD: remove after post-beta... [MTR]
-    if (!data[i].publisherURL) data[i].publisherURL = 'http://' + results[i].publisher
 
     pct[i] = Math.round((results[i].scores[scorekeeper] * 100) / total)
 
@@ -755,14 +773,19 @@ var roundtrip = (params, options, callback) => {
 var run = (delayTime) => {
   var state
   var ballots = client.ballots()
+  var siteSettings = appStore.getState().get('siteSettings')
   var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
 
   console.log('\nledger client run: delayTime=' + delayTime)
 
   try {
     winners.forEach((winner) => {
-      var result = client.vote(winner)
+      var result
+      var siteSetting = siteSettings.get(`https?://${winner}`)
 
+      if ((siteSetting) && (siteSetting.get('ledgerPayments') === false)) return
+
+      result = client.vote(winner)
       if (result) state = result
     })
     if (state) syncWriter(statePath, state, () => {})
