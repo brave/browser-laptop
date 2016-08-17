@@ -568,7 +568,7 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.separatorMenuItem,
         CommonMenu.importBookmarksMenuItem()
       ]
-    },{
+    }, {
       label: locale.translation('bravery'),
       submenu: [
         CommonMenu.braveryGlobalMenuItem(),
