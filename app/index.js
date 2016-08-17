@@ -380,7 +380,9 @@ app.on('ready', () => {
     // Initiate the translation for a configured language and
     // reset the browser window. This will default to en-US if
     // not yet configured.
-    locale.init(initialState.settings[settings.LANGUAGE])
+    locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
+      Menu.init(AppStore.getState(), null)
+    })
 
     // Do this after loading the state
     // For tests we always want to load default app state
@@ -533,6 +535,7 @@ app.on('ready', () => {
 
     // save app state every 5 minutes regardless of update frequency
     setInterval(initiateSessionStateSave, 1000 * 60 * 5)
+
     AppStore.addChangeListener(() => {
       if (BrowserWindow.getFocusedWindow()) {
         BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
