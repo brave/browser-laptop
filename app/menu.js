@@ -354,7 +354,7 @@ const createHistorySubmenu = (CommonMenu) => {
     //   label: locale.translation('recentlyVisited'),
     //   enabled: false
     // },
-    // CommonMenu.separatorMenuItem,
+    CommonMenu.separatorMenuItem,
     CommonMenu.historyMenuItem())
 
   return submenu
@@ -575,8 +575,8 @@ const createMenu = (CommonMenu) => {
   }
 }
 
-const updateMenu = (CommonMenu, appState, windowState) => {
-  const updated = menuUtil.checkForUpdate(appState, windowState)
+const updateMenu = (CommonMenu, appState, windowData) => {
+  const updated = menuUtil.checkForUpdate(appState, windowData)
   if (updated.nothingUpdated) {
     return
   }
@@ -608,10 +608,10 @@ const updateMenu = (CommonMenu, appState, windowState) => {
 
 /**
  * Sets up the menu.
- * @param {Object} appState - Application state
- * @param {Object} windowState - Current window state
+ * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
+ * @param {Object} windowData - Information specific to the current window (recently closed tabs, etc)
  */
-module.exports.init = (appState, windowState) => {
+module.exports.init = (appState, windowData) => {
   // The menu will always be called once localization is done
   // so don't bother loading anything until it is done.
   if (!locale.initialized) {
@@ -623,7 +623,7 @@ module.exports.init = (appState, windowState) => {
   if (appMenu.items.length === 0) {
     createMenu(CommonMenu)
   } else {
-    updateMenu(CommonMenu, appState, windowState)
+    updateMenu(CommonMenu, appState, windowData)
   }
 }
 

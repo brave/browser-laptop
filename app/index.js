@@ -295,9 +295,9 @@ app.on('ready', () => {
   })
 
   // Window state must be fetched from main process; this is fired once it's retrieved
-  ipcMain.on(messages.RESPONSE_WINDOW_STATE_FOR_MENU, (wnd, data) => {
-    if (data) {
-      Menu.init(AppStore.getState(), data)
+  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowData) => {
+    if (windowData) {
+      Menu.init(AppStore.getState(), Immutable.fromJS(windowData))
     }
   })
 
@@ -375,7 +375,7 @@ app.on('ready', () => {
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
       if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_WINDOW_STATE_FOR_MENU)
+        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
       } else {
         Menu.init(AppStore.getState(), null)
       }
@@ -449,9 +449,9 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
-      if (args && typeof args.bookmarked === 'boolean') {
-        Menu.updateBookmarkedStatus(args.bookmarked)
+    ipcMain.on(messages.UPDATE_MENU_BOOKMARKED_STATUS, (e, isBookmarked) => {
+      if (typeof isBookmarked === 'boolean') {
+        Menu.updateBookmarkedStatus(isBookmarked)
       }
     })
 
@@ -534,7 +534,7 @@ app.on('ready', () => {
     setInterval(initiateSessionStateSave, 1000 * 60 * 5)
     AppStore.addChangeListener(() => {
       if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_WINDOW_STATE_FOR_MENU)
+        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
       } else {
         Menu.init(AppStore.getState(), null)
       }

@@ -61,10 +61,10 @@ module.exports.getMenuItem = (appMenu, label) => {
  * and also causes menu clicks to not work.  So we don't want to update it a lot.
  * Should only be updated when appState or windowState change (for history or bookmarks)
  * NOTE: settingsState is not used directly; it gets used indirectly via getSetting()
- * @param {Object} appState - Application state
- * @param {Object} windowState - Current window state
+ * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
+ * @param {Object} windowData - Information specific to the current window (recently closed tabs, etc)
  */
-module.exports.checkForUpdate = (appState, windowState) => {
+module.exports.checkForUpdate = (appState, windowData) => {
   const updated = {
     nothing: true,
     settings: false,
@@ -85,8 +85,8 @@ module.exports.checkForUpdate = (appState, windowState) => {
     updated.sites = true
   }
 
-  if (windowState && windowState.closedFrames !== lastClosedFrames) {
-    lastClosedFrames = windowState.closedFrames
+  if (windowData && windowData.get('closedFrames') !== lastClosedFrames) {
+    lastClosedFrames = windowData.get('closedFrames')
     updated.nothing = false
     updated.closedFrames = true
   }
@@ -110,7 +110,7 @@ const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
         // and as such there may need to be another mechanism or cache
         //
         // see: https://github.com/brave/browser-laptop/issues/3050
-        label: site.get('customTitle') || site.get('title'),
+        label: site.get('customTitle') || site.get('title') || site.get('location'),
         click: (item, focusedWindow, e) => {
           if (eventUtil.isForSecondaryAction(e)) {
             CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, site.get('location'), { openInForeground: !!e.shiftKey }])
@@ -140,7 +140,7 @@ module.exports.createBookmarkMenuItems = () => {
 
 module.exports.createRecentlyClosedMenuItems = () => {
   const payload = []
-  if (lastClosedFrames && lastClosedFrames.length > 0) {
+  if (lastClosedFrames && lastClosedFrames.size > 0) {
     payload.push(
       CommonMenu.separatorMenuItem,
       {
@@ -151,12 +151,12 @@ module.exports.createRecentlyClosedMenuItems = () => {
     const lastTen = (lastClosedFrames.size < 10) ? lastClosedFrames : lastClosedFrames.slice(-10)
     lastTen.forEach((closedFrame) => {
       payload.push({
-        label: closedFrame.title,
+        label: closedFrame.get('title') || closedFrame.get('location'),
         click: (item, focusedWindow, e) => {
           if (eventUtil.isForSecondaryAction(e)) {
-            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, closedFrame.location, { openInForeground: !!e.shiftKey }])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, closedFrame.get('location'), { openInForeground: !!e.shiftKey }])
           } else {
-            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, closedFrame.location])
+            CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, closedFrame.get('location')])
           }
         }
       })

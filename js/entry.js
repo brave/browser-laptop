@@ -53,8 +53,12 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-ipc.on(messages.REQUEST_WINDOW_STATE_FOR_MENU, () => {
-  ipc.send(messages.RESPONSE_WINDOW_STATE_FOR_MENU, windowStore.getState().toJS())
+ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
+  const windowData = {
+    closedFrames: windowStore.getState().get('closedFrames').toJS()
+  }
+
+  ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
 })
 
 if (process.env.NODE_ENV === 'test') {

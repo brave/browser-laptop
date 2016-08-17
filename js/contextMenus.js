@@ -1055,8 +1055,8 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
 function onBackButtonHistoryMenu (activeFrame, history, rect) {
   const menuTemplate = []
 
-  if (activeFrame && history) {
-    const stopIndex = Math.max((history.currentIndex - config.navigationBar.maxHistorySites), -1)
+  if (activeFrame && history && history.entries.length > 0) {
+    const stopIndex = Math.max(((history.currentIndex - config.navigationBar.maxHistorySites) - 1), -1)
     for (let index = (history.currentIndex - 1); index > stopIndex; index--) {
       const url = history.entries[index].url
 
@@ -1076,17 +1076,16 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
       })
     }
 
-    if (stopIndex !== -1) {
-      menuTemplate.push(
-        CommonMenu.separatorMenuItem,
-        {
-          label: locale.translation('showAllHistory'),
-          click: (e, focusedWindow) => {
-            windowActions.newFrame({ location: 'about:history' })
-            windowActions.setContextMenuDetail()
-          }
-        })
-    }
+    // Always display "Show History" link
+    menuTemplate.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('showAllHistory'),
+        click: (e, focusedWindow) => {
+          windowActions.newFrame({ location: 'about:history' })
+          windowActions.setContextMenuDetail()
+        }
+      })
   }
 
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -1099,8 +1098,8 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
 function onForwardButtonHistoryMenu (activeFrame, history, rect) {
   const menuTemplate = []
 
-  if (activeFrame && history) {
-    const stopIndex = Math.min((history.currentIndex + config.navigationBar.maxHistorySites), history.entries.length)
+  if (activeFrame && history && history.entries.length > 0) {
+    const stopIndex = Math.min(((history.currentIndex + config.navigationBar.maxHistorySites) + 1), history.entries.length)
     for (let index = (history.currentIndex + 1); index < stopIndex; index++) {
       const url = history.entries[index].url
 
@@ -1120,17 +1119,16 @@ function onForwardButtonHistoryMenu (activeFrame, history, rect) {
       })
     }
 
-    if (stopIndex !== history.entries.length) {
-      menuTemplate.push(
-        CommonMenu.separatorMenuItem,
-        {
-          label: locale.translation('showAllHistory'),
-          click: (e, focusedWindow) => {
-            windowActions.newFrame({ location: 'about:history' })
-            windowActions.setContextMenuDetail()
-          }
-        })
-    }
+    // Always display "Show History" link
+    menuTemplate.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('showAllHistory'),
+        click: (e, focusedWindow) => {
+          windowActions.newFrame({ location: 'about:history' })
+          windowActions.setContextMenuDetail()
+        }
+      })
   }
 
   windowActions.setContextMenuDetail(Immutable.fromJS({

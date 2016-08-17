@@ -104,11 +104,11 @@ describe('menuUtil', function () {
         key: 'value'
       }
     })
-    const windowStateClosedFrames = {
+    const windowStateClosedFrames = Immutable.fromJS({
       closedFrames: [{
         frameId: 1
       }]
-    }
+    })
     it('sets updated.nothing to false if `settings` was updated', function () {
       const updated = menuUtil.checkForUpdate(appStateSettings, null)
       assert.equal(updated.nothing, false)
@@ -233,12 +233,12 @@ describe('menuUtil', function () {
 
   describe('createRecentlyClosedMenuItems', function () {
     it('returns an array of closedFrames preceded by a separator and "Recently Closed" items', function () {
-      const windowStateClosedFrames = {
+      const windowStateClosedFrames = Immutable.fromJS({
         closedFrames: [{
           title: 'sample',
           location: 'https://brave.com'
         }]
-      }
+      })
 
       menuUtil.checkForUpdate(null, windowStateClosedFrames)
       const menuItems = menuUtil.createRecentlyClosedMenuItems()
@@ -248,8 +248,32 @@ describe('menuUtil', function () {
       assert.equal(menuItems[0].type, 'separator')
       assert.equal(menuItems[1].label, 'RECENTLYCLOSED')
       assert.equal(menuItems[1].enabled, false)
-      assert.equal(menuItems[2].label, windowStateClosedFrames.closedFrames[0].title)
+      assert.equal(menuItems[2].label, windowStateClosedFrames.get('closedFrames').first().get('title'))
       assert.equal(typeof menuItems[2].click === 'function', true)
+    })
+    it('only shows the last 10 items', function () {
+      const windowStateClosedFrames = Immutable.fromJS({
+        closedFrames: [
+          { title: 'site01', location: 'https://brave01.com' },
+          { title: 'site02', location: 'https://brave02.com' },
+          { title: 'site03', location: 'https://brave03.com' },
+          { title: 'site04', location: 'https://brave04.com' },
+          { title: 'site05', location: 'https://brave05.com' },
+          { title: 'site06', location: 'https://brave06.com' },
+          { title: 'site07', location: 'https://brave07.com' },
+          { title: 'site08', location: 'https://brave08.com' },
+          { title: 'site09', location: 'https://brave09.com' },
+          { title: 'site10', location: 'https://brave10.com' },
+          { title: 'site11', location: 'https://brave11.com' }
+        ]
+      })
+
+      menuUtil.checkForUpdate(null, windowStateClosedFrames)
+      const menuItems = menuUtil.createRecentlyClosedMenuItems()
+
+      assert.equal(menuItems.length, 12)
+      assert.equal(menuItems[2].label, windowStateClosedFrames.get('closedFrames').get(1).get('title'))
+      assert.equal(menuItems[11].label, windowStateClosedFrames.get('closedFrames').get(10).get('title'))
     })
   })
 })

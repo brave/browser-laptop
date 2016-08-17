@@ -46,7 +46,6 @@ const messages = {
   QUIT_APPLICATION: _,
   OPEN_BRAVERY_PANEL: _,
   PREFS_RESTART: _,
-  UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
   LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
   LOGIN_RESPONSE: _,
@@ -111,8 +110,9 @@ const messages = {
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
   // Menu rebuilding
-  REQUEST_WINDOW_STATE_FOR_MENU: _,
-  RESPONSE_WINDOW_STATE_FOR_MENU: _,
+  REQUEST_MENU_DATA_FOR_WINDOW: _,
+  RESPONSE_MENU_DATA_FOR_WINDOW: _,
+  UPDATE_MENU_BOOKMARKED_STATUS: _, /** @arg {Object} currently only has a boolean "bookmarked" */
   // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
   BLOCKED_PAGE: _,
