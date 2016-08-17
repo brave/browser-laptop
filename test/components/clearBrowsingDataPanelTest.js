@@ -3,7 +3,6 @@
 const Brave = require('../lib/brave')
 const {urlInput, clearBrowsingDataPanel} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
-const assert = require('assert')
 
 describe('Clear Browsing Panel', function () {
   function * setup (client) {
@@ -34,24 +33,25 @@ describe('Clear Browsing Panel', function () {
         .click(clearBrowsingDataButton)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(clearBrowsingDataPanel)
-        .getAppState()
     })
     it('can clear browsing history', function * () {
       const page1Url = Brave.server.url('page1.html')
-      const state = yield this.app.client
+      yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .tabByIndex(0)
         .loadUrl(page1Url)
         .url(getTargetAboutUrl(page1Url))
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(clearBrowsingDataPanel)
-        .getAppState()
-      assert.equal(state.value.sites.length, 1)
-      yield this.app.client
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.sites.length === 1
+          })
+        })
         .click('.browserHistorySwitch .switchBackground')
         .click('.clearDataButton')
         .waitUntil(function () {
-          return this.getAppState(state).then((val) => {
+          return this.getAppState().then((val) => {
             return val.value.sites.length === 0
           })
         })
