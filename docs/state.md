@@ -152,7 +152,7 @@ AppStore
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'general.language': string, // The language code to use for localization and spell check or null to use the system default
     'payments.enabled': boolean, // true if the Payments pane is active
-    'payments.monthly-amount': number, // in USD
+    'payments.contribution-amount': number, // in USD
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
@@ -404,7 +404,8 @@ WindowStore
       duration: number,
       faviconURL: string,
       verified: boolean,
-      site: string
+      site: string,
+      score: ?
     }
   }
 }

@@ -195,7 +195,7 @@ if (ipc) {
   ipc.on(messages.CHANGE_SETTING, (event, key, value) => {
     if (!client) return
 
-    if (key === settings.PAYMENTS_MONTHLY_AMOUNT) {
+    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) {
       var amount = parseInt(value, 10)
       var bravery = client.getBraveryProperties()
 

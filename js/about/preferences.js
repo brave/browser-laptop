@@ -535,7 +535,8 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get enabledContent () {
-    // TODO: Monthly contribution amount should be changeable.
+    // TODO: report when funds are too low
+    // TODO: support non-USD currency
     return <div>
       <div className='walletBar'>
         <table>
@@ -557,13 +558,13 @@ class PaymentsTab extends ImmutableComponent {
               <td>
                 <SettingsList>
                   <SettingItem>
-                    <select disabled id='fundsSelectBox'
-                      value={getSetting(settings.PAYMENTS_MONTHLY_AMOUNT,
+                    <select id='fundsSelectBox'
+                      value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
                         this.props.settings)}
-                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_MONTHLY_AMOUNT)} >
+                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
                       {
                         [1, 5, 10, 15, 20, 30, 40, 50].map((amount) =>
-                          <option value={amount}>${amount} USD</option>
+                          <option value={amount}>{amount} {this.props.ledgerData.get('currency')}</option>
                         )
                       }
                     </select>
