@@ -54,11 +54,7 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
 })
 
 ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
-  const windowData = {
-    closedFrames: windowStore.getState().get('closedFrames').toJS()
-  }
-
-  ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
+  ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowStore.getState().toJS())
 })
 
 if (process.env.NODE_ENV === 'test') {

@@ -84,7 +84,7 @@ class Window extends React.Component {
       }
     })
 
-    // TODO: fire off menu refresh (only if closedFrames changed)
+    // TODO: fire off menu refresh; or find a frame closed event
   }
 
   onAppStateChange () {

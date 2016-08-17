@@ -4,6 +4,7 @@
 
 'use strict'
 
+const Immutable = require('immutable')
 const electron = require('electron')
 const appConfig = require('../js/constants/appConfig')
 const Menu = electron.Menu
@@ -15,6 +16,7 @@ const appActions = require('../js/actions/appActions')
 const menuUtil = require('../js/lib/menuUtil')
 const getSetting = require('../js/settings').getSetting
 const locale = require('./locale')
+const {isSiteBookmarked} = require('../js/state/siteUtil')
 const isDarwin = process.platform === 'darwin'
 const aboutUrl = 'https://brave.com/'
 
@@ -22,7 +24,7 @@ const aboutUrl = 'https://brave.com/'
 let appMenu = Menu.buildFromTemplate([])
 Menu.setApplicationMenu(appMenu)
 
-// Used to hold the default value for "isBookmarked" (see createBookmarksSubmenu)
+// Value for history menu's "Bookmark Page" menu item; see createBookmarksSubmenu()
 let isBookmarkChecked = false
 
 // Submenu initialization
@@ -581,7 +583,12 @@ const updateMenu = (CommonMenu, appState, windowData) => {
     return
   }
 
-  // Only update menu when necessary
+  // When bookmarks are removed via AppStore (context menu, etc), `isBookmarkChecked` needs to be recalculated
+  if (windowData.get('location')) {
+    isBookmarkChecked = isSiteBookmarked(appState.get('sites'), Immutable.fromJS({location: windowData.get('location')}))
+  }
+
+  // Only rebuild menus when necessary
 
   if (updated.settings || updated.closedFrames) {
     let historyMenu = menuUtil.getParentMenuDetails(appMenu, locale.translation('history'))

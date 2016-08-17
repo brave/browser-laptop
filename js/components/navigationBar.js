@@ -51,8 +51,12 @@ class NavigationBar extends ImmutableComponent {
     if (!isBookmarked) {
       appActions.addSite(siteDetail, siteTags.BOOKMARK)
     }
+    // Show bookmarks toolbar after first bookmark is saved
     appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !hasBookmark || showBookmarksToolbar)
+    // trigger the AddEditBookmark modal
     windowActions.setBookmarkDetail(siteDetail, siteDetail)
+    // Update checked/unchecked status in the Bookmarks menu
+    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
 
   onReload (e) {
@@ -96,7 +100,7 @@ class NavigationBar extends ImmutableComponent {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark(false))
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
-    // Set initial bookmark status in menu
+    // Set initial checked/unchecked status in Bookmarks menu
     ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
 
@@ -118,7 +122,6 @@ class NavigationBar extends ImmutableComponent {
       }))
 
     if (this.bookmarked !== prevBookmarked) {
-      // Used to update the Bookmarks menu (the checked status next to "Bookmark Page")
       ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
     }
     if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
