@@ -24,9 +24,15 @@ class AddEditBookmark extends ImmutableComponent {
     this.onSave = this.onSave.bind(this)
     this.onRemoveBookmark = this.onRemoveBookmark.bind(this)
   }
+
   get isBlankTab () {
     return ['about:blank', 'about:newtab'].includes(this.props.currentDetail.get('location'))
   }
+
+  get bookmarkNameValid () {
+    return (this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle'))
+  }
+
   get isFolder () {
     return siteUtil.isFolder(this.props.currentDetail)
   }
@@ -68,6 +74,7 @@ class AddEditBookmark extends ImmutableComponent {
     } else {
       currentDetail = currentDetail.set('customTitle', e.target.value)
     }
+
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onLocationChange (e) {
@@ -79,6 +86,11 @@ class AddEditBookmark extends ImmutableComponent {
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   onSave () {
+    // First check if the title of the currentDetail is set
+    if (!this.bookmarkNameValid) {
+      return false
+    }
+
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
     this.onClose()
@@ -91,7 +103,7 @@ class AddEditBookmark extends ImmutableComponent {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
     }
-    return this.props.currentDetail.get('title')
+    return this.props.currentDetail.get('title') || ''
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
@@ -125,7 +137,7 @@ class AddEditBookmark extends ImmutableComponent {
               ? <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
               : null
             }
-            <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
+            <Button l10nId='save' className={this.bookmarkNameValid ? 'primaryButton' : 'primaryButton disabled'} onClick={this.onSave} />
           </div>
         </div>
       </div>
