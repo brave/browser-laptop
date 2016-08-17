@@ -24,6 +24,9 @@ var searchProviders = require('../data/searchProviders')
 const searchIconSize = 16
 const UrlUtil = require('../lib/urlutil')
 
+const EventUtil = require('../lib/eventUtil')
+const eventElHasAncestorWithClasses = EventUtil.eventElHasAncestorWithClasses
+
 const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
@@ -209,8 +212,11 @@ class UrlBar extends ImmutableComponent {
     windowActions.setUrlBarSelected(false)
     // On blur, a user expects the text shown from the last autocomplete suffix
     // to be auto entered as the new location.
-    this.updateLocationToSuggestion()
     this.clearSearchEngine()
+
+    if (!eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm'])) {
+      this.updateLocationToSuggestion()
+    }
   }
 
   updateLocationToSuggestion () {
@@ -258,11 +264,7 @@ class UrlBar extends ImmutableComponent {
   onActiveFrameStop () {
     if (this.isFocused()) {
       windowActions.setUrlBarActive(false)
-      if (!this.shouldRenderUrlBarSuggestions ||
-          // TODO: Once we take out suggestion generation from within URLBarSuggestions we can remove this check
-          // and put it in shouldRenderUrlBarSuggestions where it belongs.  See https://github.com/brave/browser-laptop/issues/3151
-          !this.props.urlbar.getIn(['suggestions', 'suggestionList']) ||
-          this.props.urlbar.getIn(['suggestions', 'suggestionList']).size === 0) {
+      if (!this.shouldRenderUrlBarSuggestions) {
         this.restore()
         windowActions.setUrlBarSelected(true)
       }
@@ -314,14 +316,6 @@ class UrlBar extends ImmutableComponent {
   }
 
   get locationValue () {
-    // If there's a selected autocomplete entry, we just want to show its location
-    if (this.props.suggestionIndex) {
-      const suggestionLocation = this.props.urlbar.getIn(['suggestions', 'suggestionList', this.props.suggestionIndex - 1]).location
-      if (suggestionLocation) {
-        return suggestionLocation
-      }
-    }
-
     let location = this.props.urlbar.get('location')
     const history = this.props.history
     if (isIntermediateAboutPage(location) && history.size > 0) {
