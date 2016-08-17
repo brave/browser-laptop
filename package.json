@@ -139,7 +139,7 @@
     "sqlite3": "^3.1.1",
     "standard": "^7.0.0",
     "style-loader": "^0.13.0",
-    "webdriverio": "^4.0.3",
+    "webdriverio": "4.2.5",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0",
     "webpack-notifier": "^1.2.1",
