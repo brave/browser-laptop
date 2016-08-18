@@ -81,6 +81,31 @@ const webviewActions = {
         webview.executeJavaScript('document.webkitRequestFullscreen()')
       }
     }
+  },
+
+  findInPage (searchString, caseSensitivity, forward, webview) {
+    webview = webview || getWebview()
+    if (!webview) {
+      return
+    }
+
+    if (searchString) {
+      webview.findInPage(searchString, {
+        matchCase: caseSensitivity,
+        forward: forward !== undefined ? forward : true,
+        findNext: forward !== undefined
+      })
+    } else {
+      webview.stopFindInPage('clearSelection')
+    }
+  },
+
+  stopFindInPage (webview) {
+    webview = webview || getWebview()
+    if (!webview) {
+      return
+    }
+    webview.stopFindInPage('keepSelection')
   }
 }
 
