@@ -28,6 +28,8 @@ const AppConstants = {
   APP_CHANGE_SITE_SETTING: _,
   APP_REMOVE_SITE_SETTING: _,
   APP_CLEAR_DATA: _,
+  APP_UPDATE_LEDGER_INFO: _,
+  APP_UPDATE_PUBLISHER_INFO: _,
   APP_SHOW_MESSAGE_BOX: _, /** @param {Object} detail */
   APP_HIDE_MESSAGE_BOX: _, /** @param {string} message */
   APP_CLEAR_MESSAGE_BOXES: _, /** @param {string} origin */

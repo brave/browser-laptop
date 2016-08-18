@@ -157,7 +157,12 @@ const messages = {
   GET_AD_DIV_CANDIDATES: _,
   SET_AD_DIV_CANDIDATES: _,
   // Debugging
-  DEBUG_REACT_PROFILE: _
+  DEBUG_REACT_PROFILE: _,
+  // Ledger
+  LEDGER_PUBLISHER: _,
+  LEDGER_UPDATED: _,
+  LEDGER_ENABLE: _,
+  LEDGER_CREATE_WALLET: _
 }
 
 module.exports = mapValuesByKeys(messages)

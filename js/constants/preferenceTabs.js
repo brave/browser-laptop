@@ -12,6 +12,7 @@ const preferenceTabs = {
   SYNC: _,
   SHIELDS: _,
   SECURITY: _,
+  PUBLISHERS: _,
   ADVANCED: _
 }
 

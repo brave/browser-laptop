@@ -73,6 +73,7 @@
   "homepage": "https://www.brave.com/",
   "dependencies": {
     "abp-filter-parser-cpp": "1.1.x",
+    "acorn": "3.2.0",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
     "electron-squirrel-startup": "^1.0.0",
@@ -84,7 +85,11 @@
     "immutablepatch": "^0.2.2",
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
+    "ledger-client": "https://github.com/brave/ledger-client.git#beta",
+    "ledger-publisher": "^0.8.39",
     "lru_cache": "^1.0.0",
+    "random-lib": "2.1.0",
+    "qr-image": "^3.1.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
     "react-stickynode": "1.1.x",
@@ -92,7 +97,9 @@
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",
     "tablesort": "4.0.1",
+    "tldjs": "1.6.2",
     "tracking-protection": "1.1.x",
+    "underscore": "1.8.3",
     "underscore.string": "^3.3.4",
     "url-loader": "^0.5.7"
   },
@@ -172,6 +179,6 @@
   ],
   "engineStrict": true,
   "engines": {
-    "node": ">= 5.6.0"
+    "node": ">= 6.1.0"
   }
 }

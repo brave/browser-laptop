@@ -40,5 +40,6 @@ module.exports = {
     authUrl: (userId) => `${vaultHost}/v1/users/${userId}`
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
-  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm'
+  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm',
+  coinbaseOrigin: 'https://buy.coinbase.com'
 }

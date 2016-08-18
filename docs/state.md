@@ -50,6 +50,7 @@ AppStore
       httpsEverywhere: boolean,
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
+      ledgerPayments: boolean // False if site should not be paid by the ledger. Defaults to true.
     }
   },
   temporarySiteSettings: {
@@ -150,6 +151,8 @@ AppStore
     'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'general.language': string, // The language code to use for localization and spell check or null to use the system default
+    'payments.enabled': boolean, // true if the Payments pane is active
+    'payments.contribution-amount': number, // in USD
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
@@ -364,5 +367,46 @@ WindowStore
   flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   lastAppVersion: string, // Version of the last file that was saved
+  ledgerInfo: {
+    creating: boolean,
+    created: boolean,
+    reconcileStamp: number,
+    reconcileDelay: ?,
+    delayStamp: ?,
+    transactions: Array,
+    balance: string, // balance in BTC
+    unconfirmed: string, // unconfirmed balance in BTC
+    satoshis: number, // balance as a number of satoshis
+    address: string,
+    btc: string, // BTC to pay per month
+    amount: number, // currency amount to pay per month
+    currency: string, // currency string
+    paymentURL: string,
+    paymentIMG: string,
+    buyURL: string,
+    bravery: {
+      fee: {
+        currency: string,
+        amount: number
+      }
+    }
+  },
+  publisherInfo: {
+    synopsis: {
+      hoursSpent: number,
+      minutesSpent: number,
+      secondsSpent: number,
+      daysSpent: number,
+      percentage: number,
+      publisherURL: string,
+      rank: number,
+      views: number,
+      duration: number,
+      faviconURL: string,
+      verified: boolean,
+      site: string,
+      score: ?
+    }
+  }
 }
 ```

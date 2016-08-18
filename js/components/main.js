@@ -933,6 +933,8 @@ class Main extends ImmutableComponent {
               cookieblock={this.props.appState.get('cookieblock')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
+              ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
+              publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}

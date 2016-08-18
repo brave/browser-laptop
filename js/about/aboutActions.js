@@ -44,7 +44,7 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    */
   removeSiteSetting: function (hostPattern, key) {
-    ipc.send(messages.CHANGE_SITE_SETTING, hostPattern, key)
+    ipc.send(messages.REMOVE_SITE_SETTING, hostPattern, key)
   },
 
   /**
@@ -125,6 +125,14 @@ const AboutActions = {
 
   clearBrowsingDataNow: function () {
     ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
+  },
+
+  createWallet: function () {
+    ipc.send(messages.LEDGER_CREATE_WALLET)
+  },
+
+  setLedgerEnabled: function (enabled) {
+    ipc.send(messages.LEDGER_ENABLE, enabled)
   }
 }
 module.exports = AboutActions

@@ -7,6 +7,7 @@ const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
+const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet.js')
 const { getZoomValuePercentage } = require('../lib/zoom')
 const config = require('../constants/config')
@@ -20,6 +21,7 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
+const pad = require('underscore.string/pad')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -127,9 +129,189 @@ class SettingCheckbox extends ImmutableComponent {
   }
 }
 
+class SiteSettingCheckbox extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick (e) {
+    if (this.props.disabled || !this.props.hostPattern) {
+      return
+    } else {
+      const value = !!e.target.value
+      value === this.props.defaultValue
+        ? aboutActions.removeSiteSetting(this.props.hostPattern,
+            this.props.prefKey)
+        : aboutActions.changeSiteSetting(this.props.hostPattern,
+            this.props.prefKey, value)
+    }
+  }
+
+  render () {
+    return <div style={this.props.style} className='settingItem siteSettingItem'>
+      <SwitchControl
+        disabled={this.props.disabled}
+        onClick={this.onClick}
+        checkedOn={this.props.checked} />
+    </div>
+  }
+}
+
+class LedgerTableRow extends ImmutableComponent {
+  get synopsis () {
+    return this.props.synopsis
+  }
+
+  get formattedTime () {
+    var d = this.synopsis.get('daysSpent')
+    var h = this.synopsis.get('hoursSpent')
+    var m = this.synopsis.get('minutesSpent')
+    var s = this.synopsis.get('secondsSpent')
+    if (d << 0 > 364) {
+      return '>1y'
+    }
+    d = (d << 0 === 0) ? '' : (d + 'd ')
+    h = (h << 0 === 0) ? '' : (h + 'h ')
+    m = (m << 0 === 0) ? '' : (m + 'm ')
+    s = (s << 0 === 0) ? '' : (s + 's ')
+    return (d + h + m + s + '')
+  }
+
+  padLeft (v) { return pad(v, 12, '0') }
+
+  get hostPattern () {
+    return `https?://${this.synopsis.get('site')}`
+  }
+
+  get enabled () {
+    const hostSettings = this.props.siteSettings.get(this.hostPattern)
+    if (hostSettings) {
+      const result = hostSettings.get('ledgerPayments')
+      if (typeof result === 'boolean') {
+        return result
+      }
+    }
+    return true
+  }
+
+  render () {
+    const faviconURL = this.synopsis.get('faviconURL') || appConfig.defaultFavicon
+    const rank = this.synopsis.get('rank')
+    const views = this.synopsis.get('views')
+    const duration = this.synopsis.get('duration')
+    const publisherURL = this.synopsis.get('publisherURL')
+    // TODO: This should redistribute percentages accordingly when a site is
+    // enabled/disabled for payments.
+    const percentage = this.synopsis.get('percentage')
+    const site = this.synopsis.get('site')
+    const defaultSiteSetting = true
+
+    return <tr className={this.enabled ? '' : 'paymentsDisabled'}>
+      <td className='narrow' data-sort={this.padLeft(rank)}>{rank}</td>
+      <td className='wide'><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
+      <td className='narrow'><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
+      <td data-sort={this.padLeft(views)}>{views}</td>
+      <td data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
+      <td data-sort={this.padLeft(percentage)}>{percentage}</td>
+    </tr>
+  }
+}
+
+class LedgerTable extends ImmutableComponent {
+  render () {
+    const synopsis = this.props.ledgerData.get('synopsis')
+    if (!synopsis) {
+      return null
+    }
+    return <div id='ledgerTable'>
+      <table className='sort'>
+        <thead>
+          <tr>
+            <th className='sort-header' data-l10n-id='rank' />
+            <th className='sort-header' data-l10n-id='publisher' />
+            <th className='sort-header' data-l10n-id='include' />
+            <th className='sort-header' data-l10n-id='views' />
+            <th className='sort-header' data-l10n-id='timeSpent' />
+            <th className='sort-header'>&#37;</th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          synopsis.map((row) => <LedgerTableRow synopsis={row}
+            siteSettings={this.props.siteSettings} />)
+        }
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+class BitcoinDashboard extends ImmutableComponent {
+  constructor () {
+    super()
+    this.buyCompleted = false
+  }
+  get ledgerData () {
+    return this.props.ledgerData
+  }
+  get overlayContent () {
+    return <iframe src={this.ledgerData.get('buyURL')} />
+  }
+  copyToClipboard (text) {
+    aboutActions.setClipboard(text)
+  }
+  goToURL (url) {
+    window.location.href = url
+  }
+  onMessage (e) {
+    if (!e.data || e.origin !== config.coinbaseOrigin) {
+      return
+    }
+    if (e.data.event === 'modal_closed') {
+      if (this.buyCompleted) {
+        this.props.hideParentOverlay()
+        this.buyCompleted = false
+      } else {
+        this.props.hideOverlay()
+      }
+    } else if (e.data.event === 'buy_completed') {
+      this.buyCompleted = true
+    }
+  }
+  render () {
+    window.addEventListener('message', this.onMessage.bind(this), false)
+    var emptyDialog = true
+// if someone can figure out how to get a localized title attribute (bitcoinCopyAddress) here, please do so!
+    return <div id='bitcoinDashboard'>
+      {
+      this.props.bitcoinOverlayVisible
+        ? <ModalOverlay title={'bitcoinBuy'} content={this.overlayContent} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
+        : null
+      }
+      <div>{this.ledgerData.get('statusText')}</div>
+      <div className='board'>
+        <div className='panel'>
+          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
+          <a href={this.ledgerData.get('paymentURL')}>
+            <img src={this.ledgerData.get('paymentIMG')} alt={'Add Bitcoin'} />
+          </a>
+          <div className='settingsListCopy alt'><span className='settingsListCopy' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address') || 'Not available')} title={'Copy Bitcoin address to clipboard'}>{this.ledgerData.get('address')}</span></div>
+          <button data-l10n-id='bitcoinVisitAccount' onClick={this.goToURL.bind(this, this.ledgerData.get('paymentURL') || 'about:blank')} />
+        </div>
+        <div className='panel'>
+          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+          <div id='coinbaseLogo' />
+          <button data-l10n-id='add' onClick={this.props.showOverlay.bind(this)} />
+        </div>
+      </div>
+    </div>
+  }
+}
+
 class GeneralTab extends ImmutableComponent {
   enabled (keyArray) {
-    return keyArray.every(key => getSetting(key, this.props.settings) === true)
+    return keyArray.every((key) => getSetting(key, this.props.settings) === true)
   }
 
   render () {
@@ -275,6 +457,154 @@ class TabsTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='paintTabs' prefKey={settings.PAINT_TABS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showTabPreviews' prefKey={settings.SHOW_TAB_PREVIEWS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+    </div>
+  }
+}
+
+class PaymentsTab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.createWallet = this.createWallet.bind(this)
+  }
+
+  createWallet () {
+    if (!this.props.ledgerData.get('created')) {
+      aboutActions.createWallet()
+    }
+  }
+
+  get enabled () {
+    return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
+  }
+
+  get walletButton () {
+    const buttonText = this.props.ledgerData.get('created')
+      ? 'addFundsTitle'
+      : (this.props.ledgerData.get('creating') ? 'creatingWallet' : 'createWallet')
+    const onButtonClick = this.props.ledgerData.get('created')
+      ? this.props.showOverlay.bind(this, 'addFunds')
+      : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
+    return <Button l10nId={buttonText} className='primaryButton' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
+  }
+
+  get walletStatus () {
+    return this.props.ledgerData.get('created')
+      ? 'createdWalletStatus'
+      : (this.props.ledgerData.get('creating') ? 'creatingWalletStatus' : 'createWalletStatus')
+  }
+
+  get tableContent () {
+    // TODO: This should be sortable. #2497
+    return <LedgerTable ledgerData={this.props.ledgerData}
+      siteSettings={this.props.siteSettings} />
+  }
+
+  get overlayContent () {
+    return <BitcoinDashboard ledgerData={this.props.ledgerData}
+      bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
+      showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
+      hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
+      hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
+  }
+
+  get accountBalanceString () {
+    const balance = Number(this.props.ledgerData.get('balance') || 0)
+    const currency = this.props.ledgerData.get('currency')
+    if (!currency) {
+      return `${balance} BTC`
+    }
+    if (balance === 0) {
+      return `0 ${currency}`
+    }
+    // Calculates account balance
+    if (this.props.ledgerData.get('btc') &&
+        typeof this.props.ledgerData.get('amount') === 'number') {
+      const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
+      return `${(balance / btcValue).toFixed(2)} ${currency}`
+    }
+    return `${balance} BTC`
+  }
+
+  get footerContent () {
+    return <div id='paymentsFooter'>
+      <div data-l10n-id='paymentsFooterText' />
+      <a href='https://www.privateinternetaccess.com/' target='_blank'><img className='largeImg' src='img/private_internet_access.png' /></a>
+      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-right' src='img/bitgo.png' /></a>
+      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-right' src='img/coinbase.png' /></a>
+    </div>
+  }
+
+  get enabledContent () {
+    // TODO: report when funds are too low
+    // TODO: support non-USD currency
+    return <div>
+      <div className='walletBar'>
+        <table>
+          <thead>
+            <tr>
+              <th data-l10n-id='accountBalance' />
+              <th data-l10n-id='monthlyBudget' />
+              <th data-l10n-id='status' />
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span id='fundsAmount'>
+                {this.accountBalanceString}
+                </span>
+                {this.walletButton}
+              </td>
+              <td>
+                <SettingsList>
+                  <SettingItem>
+                    <select id='fundsSelectBox'
+                      value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT,
+                        this.props.settings)}
+                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
+                      {
+                        [1, 5, 10, 15, 20, 30, 40, 50].map((amount) =>
+                          <option value={amount}>{amount} {this.props.ledgerData.get('currency')}</option>
+                        )
+                      }
+                    </select>
+                  </SettingItem>
+                </SettingsList>
+              </td>
+              <td data-l10n-id={this.walletStatus} />
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {this.tableContent}
+    </div>
+  }
+
+  render () {
+    return <div id='paymentsContainer'>
+        {
+        this.enabled && this.props.addFundsOverlayVisible
+          ? <ModalOverlay title={'addFunds'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
+          : null
+        }
+      <div className='titleBar'>
+        <div className='sectionTitle pull-left' data-l10n-id='publisherPaymentsTitle' value='publisherPaymentsTitle' />
+        <div className='pull-left' id='enablePaymentsSwitch'>
+          <SettingCheckbox dataL10nId='enable' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </div>
+      </div>
+        {
+        this.enabled
+          ? this.enabledContent
+          : <div className='paymentsMessage'>
+            <h3 data-l10n-id='paymentsWelcomeTitle' />
+            <div data-l10n-id='paymentsWelcomeText1' />
+            <div data-l10n-id='paymentsWelcomeText2' />
+            <div className='boldText' data-l10n-id='paymentsWelcomeText3' />
+            <a href='https://github.com/brave/ledger/blob/master/documentation/Ledger-Principles.md' target='_blank' data-l10n-id='paymentsWelcomeText4' />
+          </div>
+        }
+        {this.footerContent}
     </div>
   }
 }
@@ -594,6 +924,11 @@ class PreferenceNavigation extends ImmutableComponent {
         onClick={this.props.changeTab.bind(null, preferenceTabs.SHIELDS)}
         selected={this.props.preferenceTab === preferenceTabs.SHIELDS}
       />
+      <PreferenceNavigationButton icon='fa-bitcoin'
+        dataL10nId='payments'
+        onClick={this.props.changeTab.bind(null, preferenceTabs.PUBLISHERS)}
+        selected={this.props.preferenceTab === preferenceTabs.PUBLISHERS}
+      />
       <PreferenceNavigationButton icon='fa-refresh'
         className='notImplemented'
         dataL10nId='sync'
@@ -615,18 +950,24 @@ class AboutPreferences extends React.Component {
     super()
     let hash = window.location.hash ? window.location.hash.slice(1) : ''
     this.state = {
+      bitcoinOverlayVisible: false,
+      addFundsOverlayVisible: false,
       preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
       languageCodes: Immutable.Map(),
       flashInstalled: false,
       settings: Immutable.Map(),
       siteSettings: Immutable.Map(),
-      braveryDefaults: Immutable.Map()
+      braveryDefaults: Immutable.Map(),
+      ledgerData: Immutable.Map()
     }
     aboutActions.checkFlashInstalled()
 
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
+    })
+    ipc.on(messages.LEDGER_UPDATED, (e, ledgerData) => {
+      this.setState({ ledgerData: Immutable.fromJS(ledgerData) })
     })
     ipc.on(messages.SITE_SETTINGS_UPDATED, (e, siteSettings) => {
       this.setState({ siteSettings: Immutable.fromJS(siteSettings || {}) })
@@ -679,6 +1020,19 @@ class AboutPreferences extends React.Component {
       key === settings.PDFJS_ENABLED || key === settings.SMOOTH_SCROLL_ENABLED) {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
+    if (key === settings.PAYMENTS_ENABLED) {
+      aboutActions.setLedgerEnabled(value)
+    }
+  }
+
+  setOverlayVisible (isVisible, overlayName) {
+    let stateDiff = {}
+    stateDiff[`${overlayName}OverlayVisible`] = isVisible
+    if (overlayName === 'addFunds' && isVisible === false) {
+      // Hide the child overlay when the parent is closed
+      stateDiff['bitcoinOverlayVisible'] = false
+    }
+    this.setState(stateDiff)
   }
 
   render () {
@@ -687,6 +1041,7 @@ class AboutPreferences extends React.Component {
     const siteSettings = this.state.siteSettings
     const braveryDefaults = this.state.braveryDefaults
     const languageCodes = this.state.languageCodes
+    const ledgerData = this.state.ledgerData
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} languageCodes={languageCodes} />
@@ -702,6 +1057,15 @@ class AboutPreferences extends React.Component {
         break
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
+        break
+      case preferenceTabs.PUBLISHERS:
+        tab = <PaymentsTab settings={settings} siteSettings={siteSettings}
+          braveryDefaults={braveryDefaults} ledgerData={ledgerData}
+          onChangeSetting={this.onChangeSetting}
+          bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
+          addFundsOverlayVisible={this.state.addFundsOverlayVisible}
+          showOverlay={this.setOverlayVisible.bind(this, true)}
+          hideOverlay={this.setOverlayVisible.bind(this, false)} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} flashInstalled={this.state.flashInstalled} onChangeSetting={this.onChangeSetting} />

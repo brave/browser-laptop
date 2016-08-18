@@ -42,6 +42,9 @@ const settings = {
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
   LANGUAGE: 'general.language',
+  // Payments Tab
+  PAYMENTS_ENABLED: 'payments.enabled',
+  PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',

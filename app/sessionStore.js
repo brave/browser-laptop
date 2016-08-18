@@ -209,7 +209,7 @@ module.exports.cleanPerWindowData = (perWindowData) => {
     perWindowData.frames.forEach(cleanFrame)
   }
   // Always recalculate tab data from frame data
-  perWindowData.tabs = perWindowData.frames.map(frame => tabFromFrame(frame))
+  perWindowData.tabs = perWindowData.frames.map((frame) => tabFromFrame(frame))
 }
 
 /**
