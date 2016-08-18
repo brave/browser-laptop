@@ -349,6 +349,15 @@ var initialize = () => {
           run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
         cacheRuleSet(state.ruleset)
+
+        // Make sure bravery props are up-to-date with user settings
+        const amount = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10)
+        if (!isNaN(amount) && amount > 0) {
+          let bravery = client.getBraveryProperties()
+          underscore.extend(bravery.fee, { amount: amount })
+          client.setBraveryProperties(bravery, callback)
+        }
+
         if (state.properties.wallet) getPaymentInfo()
       })
       return

@@ -289,7 +289,6 @@ class BitcoinDashboard extends ImmutableComponent {
         ? <ModalOverlay title={'bitcoinBuy'} content={this.overlayContent} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
         : null
       }
-      <div>{this.ledgerData.get('statusText')}</div>
       <div className='board'>
         <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
@@ -488,9 +487,27 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get walletStatus () {
-    return this.props.ledgerData.get('created')
-      ? 'createdWalletStatus'
-      : (this.props.ledgerData.get('creating') ? 'creatingWalletStatus' : 'createWalletStatus')
+    let status = {}
+    if (this.props.ledgerData.get('created')) {
+      const transactions = this.props.ledgerData.get('transactions')
+      const pendingFunds = Number(this.props.ledgerData.get('unconfirmed') || 0)
+      if (pendingFunds + Number(this.props.ledgerData.get('balance') || 0) <
+          Number(this.props.ledgerData.get('btc') || 0)) {
+        status.id = 'insufficientFundsStatus'
+      } else if (pendingFunds > 0) {
+        status.id = 'pendingFundsStatus'
+        status.args = {funds: this.btcToCurrencyString(pendingFunds)}
+      } else if (transactions && transactions.size > 0) {
+        status.id = 'defaultWalletStatus'
+      } else {
+        status.id = 'createdWalletStatus'
+      }
+    } else if (this.props.ledgerData.get('creating')) {
+      status.id = 'creatingWalletStatus'
+    } else {
+      status.id = 'createWalletStatus'
+    }
+    return status
   }
 
   get tableContent () {
@@ -507,8 +524,8 @@ class PaymentsTab extends ImmutableComponent {
       hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
   }
 
-  get accountBalanceString () {
-    const balance = Number(this.props.ledgerData.get('balance') || 0)
+  btcToCurrencyString (btc) {
+    const balance = Number(btc || 0)
     const currency = this.props.ledgerData.get('currency')
     if (!currency) {
       return `${balance} BTC`
@@ -516,7 +533,6 @@ class PaymentsTab extends ImmutableComponent {
     if (balance === 0) {
       return `0 ${currency}`
     }
-    // Calculates account balance
     if (this.props.ledgerData.get('btc') &&
         typeof this.props.ledgerData.get('amount') === 'number') {
       const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
@@ -551,7 +567,7 @@ class PaymentsTab extends ImmutableComponent {
             <tr>
               <td>
                 <span id='fundsAmount'>
-                {this.accountBalanceString}
+                {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
                 </span>
                 {this.walletButton}
               </td>
@@ -571,7 +587,8 @@ class PaymentsTab extends ImmutableComponent {
                   </SettingItem>
                 </SettingsList>
               </td>
-              <td data-l10n-id={this.walletStatus} />
+              <td data-l10n-id={this.walletStatus.id}
+                data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
             </tr>
           </tbody>
         </table>

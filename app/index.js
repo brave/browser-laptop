@@ -305,7 +305,7 @@ app.on('ready', () => {
     if (windowState) {
       const activeFrame = FrameStateUtil.getActiveFrame(Immutable.fromJS(windowState))
       const windowData = Immutable.fromJS({
-        location: activeFrame.get('location'),
+        location: activeFrame ? activeFrame.get('location') : 'about:blank',
         closedFrames: windowState.closedFrames
       })
 
