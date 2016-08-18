@@ -534,19 +534,10 @@ function getEditableItems (selection, editFlags) {
 
 function hamburgerTemplateInit (location, e) {
   const template = [
-    {
-      l10nLabelId: 'new',
-      submenu: [
-        CommonMenu.newTabMenuItem(),
-        CommonMenu.newPrivateTabMenuItem(),
-        CommonMenu.newPartitionedTabMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.newWindowMenuItem()
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    CommonMenu.findOnPageMenuItem(),
-    CommonMenu.printMenuItem(),
+    CommonMenu.newTabMenuItem(),
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       l10nLabelId: 'zoom',
@@ -570,7 +561,6 @@ function hamburgerTemplateInit (location, e) {
       }]
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.preferencesMenuItem(),
     {
       label: locale.translation('bookmarks'),
       submenu: [
@@ -587,6 +577,10 @@ function hamburgerTemplateInit (location, e) {
       ]
     },
     CommonMenu.downloadsMenuItem(),
+    CommonMenu.findOnPageMenuItem(),
+    CommonMenu.printMenuItem(),
+    CommonMenu.separatorMenuItem,
+    CommonMenu.preferencesMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('help'),
@@ -598,7 +592,8 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.reportAnIssueMenuItem(),
         CommonMenu.submitFeedbackMenuItem()
       ]
-    }
+    },
+    CommonMenu.quitMenuItem()
   ]
   return template
 }
