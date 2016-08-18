@@ -129,6 +129,34 @@ const AboutActions = {
 
   createWallet: function () {
     ipc.send(messages.LEDGER_CREATE_WALLET)
+  },
+
+  setLedgerEnabled: function (enabled) {
+    ipc.send(messages.LEDGER_ENABLE, enabled)
+  },
+
+  addAutofillAddress: function () {
+    ipc.sendToHost(messages.ADD_AUTOFILL_ADDRESS)
+  },
+
+  removeAutofillAddress: function (address) {
+    ipc.send(messages.REMOVE_AUTOFILL_ADDRESS, address)
+  },
+
+  editAutofillAddress: function (address) {
+    ipc.sendToHost(messages.EDIT_AUTOFILL_ADDRESS, address)
+  },
+
+  addAutofillCreditCard: function () {
+    ipc.sendToHost(messages.ADD_AUTOFILL_CREDIT_CARD)
+  },
+
+  removeAutofillCreditCard: function (card) {
+    ipc.send(messages.REMOVE_AUTOFILL_CREDIT_CARD, card)
+  },
+
+  editAutofillCreditCard: function (card) {
+    ipc.sendToHost(messages.EDIT_AUTOFILL_CREDIT_CARD, card)
   }
 }
 module.exports = AboutActions

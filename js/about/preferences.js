@@ -835,6 +835,14 @@ class SecurityTab extends ImmutableComponent {
           : null
         }
       </SettingsList>
+      <div className='sectionTitle' data-l10n-id='autofillSettings' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='enableAutofill' prefKey={settings.AUTOFILL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <Button l10nId='manageAutofillData' className='primaryButton manageAutofillDataButton'
+          onClick={aboutActions.newFrame.bind(null, {
+            location: 'about:autofill'
+          }, true)} />
+      </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

@@ -545,6 +545,68 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_BITCOIN_HANDLED:
       appState = appState.set('hasBitcoinHandler', action.handled)
       break
+    case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
+      {
+        const Filtering = require('../../app/filtering')
+        if (appState.getIn(['autofill', 'addresses']) === undefined) {
+          appState = appState.setIn(['autofill', 'addresses'], new Immutable.List())
+        }
+        appState = appState.setIn(['autofill', 'addresses'],
+          appState.getIn(['autofill', 'addresses']).filterNot((address) => {
+            return Immutable.is(address, action.originalDetail)
+          }))
+        if (action.originalDetail.toJS().guid !== undefined) {
+          Filtering.removeAutofillAddress(action.originalDetail.toJS().guid)
+        }
+
+        let addresses = appState.getIn(['autofill', 'addresses'])
+        const guid = Filtering.addAutofillAddress(action.detail.toJS())
+        let detail = action.detail
+        detail = detail.set('guid', Immutable.fromJS(guid))
+        appState = appState.setIn(['autofill', 'addresses'], addresses.push(Immutable.fromJS(detail)))
+        break
+      }
+    case AppConstants.APP_REMOVE_AUTOFILL_ADDRESS:
+      {
+        const Filtering = require('../../app/filtering')
+        appState = appState.setIn(['autofill', 'addresses'],
+          appState.getIn(['autofill', 'addresses']).filterNot((address) => {
+            return Immutable.is(address, Immutable.fromJS(action.detail))
+          }))
+        Filtering.removeAutofillAddress(action.detail.guid)
+        break
+      }
+    case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
+      {
+        const Filtering = require('../../app/filtering')
+        if (appState.getIn(['autofill', 'creditCards']) === undefined) {
+          appState = appState.setIn(['autofill', 'creditCards'], new Immutable.List())
+        }
+        appState = appState.setIn(['autofill', 'creditCards'],
+          appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
+            return Immutable.is(card, action.originalDetail)
+          }))
+        if (action.originalDetail.toJS().guid !== undefined) {
+          Filtering.removeAutofillCreditCard(action.originalDetail.toJS().guid)
+        }
+
+        let creditCards = appState.getIn(['autofill', 'creditCards'])
+        const guid = Filtering.addAutofillCreditCard(action.detail.toJS())
+        let detail = action.detail
+        detail = detail.set('guid', Immutable.fromJS(guid))
+        appState = appState.setIn(['autofill', 'creditCards'], creditCards.push(Immutable.fromJS(detail)))
+        break
+      }
+    case AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD:
+      {
+        const Filtering = require('../../app/filtering')
+        appState = appState.setIn(['autofill', 'creditCards'],
+          appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
+            return Immutable.is(card, Immutable.fromJS(action.detail))
+          }))
+        Filtering.removeAutofillCreditCard(action.detail.guid)
+        break
+      }
     default:
   }
 

@@ -378,6 +378,36 @@ const appActions = {
       actionType: AppConstants.APP_SET_BITCOIN_HANDLED,
       handled
     })
+  },
+
+  addAutofillAddress: function (detail, originalDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_AUTOFILL_ADDRESS,
+      detail,
+      originalDetail
+    })
+  },
+
+  removeAutofillAddress: function (detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+      detail
+    })
+  },
+
+  addAutofillCreditCard: function (detail, originalDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
+      detail,
+      originalDetail
+    })
+  },
+
+  removeAutofillCreditCard: function (detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+      detail
+    })
   }
 }
 

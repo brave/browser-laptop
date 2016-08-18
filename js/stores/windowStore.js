@@ -704,6 +704,30 @@ const doAction = (action) => {
         windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
       }
       break
+    case WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
+      if (!action.currentDetail && !action.originalDetail) {
+        windowState = windowState.delete('autofillAddressDetail')
+      } else {
+        windowState = windowState.mergeIn(['autofillAddressDetail'], {
+          currentDetail: action.currentDetail,
+          originalDetail: action.originalDetail
+        })
+      }
+      // Since the input values of addresses are bound, we need to notify the controls sync.
+      windowStore.emitChanges()
+      break
+    case WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
+      if (!action.currentDetail && !action.originalDetail) {
+        windowState = windowState.delete('autofillCreditCardDetail')
+      } else {
+        windowState = windowState.mergeIn(['autofillCreditCardDetail'], {
+          currentDetail: action.currentDetail,
+          originalDetail: action.originalDetail
+        })
+      }
+      // Since the input values of credit cards are bound, we need to notify the controls sync.
+      windowStore.emitChanges()
+      break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
       windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
       break

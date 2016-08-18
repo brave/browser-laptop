@@ -108,6 +108,9 @@ class Frame extends ImmutableComponent {
       }
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+    } else if (location === 'about:autofill') {
+      this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, this.props.autofillAddresses.toJS())
+      this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, this.props.autofillCreditCards.toJS())
     }
 
     // send state to about pages
@@ -596,6 +599,19 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-title-updated', ({title}) => {
       windowActions.setFrameTitle(this.frame, title)
     })
+    this.webview.addEventListener('show-autofill-settings', (e) => {
+      windowActions.newFrame({ location: 'about:autofill' }, true)
+    })
+    this.webview.addEventListener('update-autofill-popup-data-list-values', (e) => {
+      console.log(e)
+    })
+    this.webview.addEventListener('show-autofill-popup', (e) => {
+      contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
+    })
+    this.webview.addEventListener('hide-autofill-popup', (e) => {
+      // TODO(Anthony): conflict with contextmenu
+      // windowActions.setContextMenuDetail()
+    })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
@@ -654,6 +670,18 @@ class Frame extends ImmutableComponent {
         case messages.CLEAR_BROWSING_DATA_NOW:
           method = (clearBrowsingDataDetail) =>
             windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
+          break
+        case messages.ADD_AUTOFILL_ADDRESS:
+          windowActions.setAutofillAddressDetail({}, {})
+          break
+        case messages.EDIT_AUTOFILL_ADDRESS:
+          windowActions.setAutofillAddressDetail(e.args[0], e.args[0])
+          break
+        case messages.ADD_AUTOFILL_CREDIT_CARD:
+          windowActions.setAutofillCreditCardDetail({month: '1', year: new Date().getFullYear()}, {})
+          break
+        case messages.EDIT_AUTOFILL_CREDIT_CARD:
+          windowActions.setAutofillCreditCardDetail(e.args[0], e.args[0])
           break
       }
       method.apply(this, e.args)

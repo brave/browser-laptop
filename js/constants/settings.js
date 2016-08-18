@@ -32,6 +32,8 @@ const settings = {
   SHUTDOWN_CLEAR_DOWNLOADS: 'shutdown.clear-downloads',
   SHUTDOWN_CLEAR_CACHE: 'shutdown.clear-cache',
   SHUTDOWN_CLEAR_ALL_SITE_COOKIES: 'shutdown.clear-all-site-cookies',
+  // Autofill
+  AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Security Tab: DEPRECATED but still required (for now)
   PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',

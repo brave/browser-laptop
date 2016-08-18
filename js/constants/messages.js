@@ -137,6 +137,14 @@ const messages = {
   CHECK_FLASH_INSTALLED: _,
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,
+  ADD_AUTOFILL_ADDRESS: _,
+  REMOVE_AUTOFILL_ADDRESS: _,
+  EDIT_AUTOFILL_ADDRESS: _,
+  ADD_AUTOFILL_CREDIT_CARD: _,
+  REMOVE_AUTOFILL_CREDIT_CARD: _,
+  EDIT_AUTOFILL_CREDIT_CARD: _,
+  AUTOFILL_ADDRESSES_UPDATED: _,
+  AUTOFILL_CREDIT_CARDS_UPDATED: _,
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */

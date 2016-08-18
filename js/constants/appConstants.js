@@ -36,6 +36,10 @@ const AppConstants = {
   APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
   APP_SET_DICTIONARY: _, /** @param {string} locale */
   APP_SET_BITCOIN_HANDLED: _ /** @param {boolean} handled */
+  APP_ADD_AUTOFILL_ADDRESS: _,
+  APP_REMOVE_AUTOFILL_ADDRESS: _,
+  APP_ADD_AUTOFILL_CREDIT_CARD: _,
+  APP_REMOVE_AUTOFILL_CREDIT_CARD: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)
