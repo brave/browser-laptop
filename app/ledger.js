@@ -660,8 +660,9 @@ var updateLedgerInfo = () => {
     }
   }
 
-// TBD: temporary for development...
+/*
   console.log(JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
+ */
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
 }
