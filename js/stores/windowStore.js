@@ -59,12 +59,20 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
  * @param suggestionList - The suggestion list to use to figure out the suffix.
  */
 const updateUrlSuffix = (suggestionList) => {
-  const suggestion = suggestionList && suggestionList.get(0)
+  let selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
+
+  if (!selectedIndex) {
+    selectedIndex = 0
+  } else {
+    selectedIndex--
+  }
+
+  const suggestion = suggestionList && suggestionList.get(selectedIndex)
   let suffix = ''
   if (suggestion) {
-    const selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
     const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
-    if (!selectedIndex && autocompleteEnabled) {
+
+    if (autocompleteEnabled) {
       const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
       const index = suggestion.location.toLowerCase().indexOf(location.toLowerCase())
       if (index !== -1) {
@@ -515,6 +523,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
+
       if (action.suggestionList !== undefined) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
       }
