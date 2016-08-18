@@ -669,8 +669,9 @@ var updateLedgerInfo = () => {
     }
   }
 
-// TBD: temporary for development...
+/*
   console.log(JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
+ */
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
 }
@@ -749,7 +750,7 @@ var roundtrip = (params, options, callback) => {
         console.log('>>> ' + header + ': ' + response.headers[header])
       })
       console.log('>>>')
-      console.log('>>> ' + body.split('\n').join('\n>>> '))
+      console.log('>>> ' + (body || '').split('\n').join('\n>>> '))
     }
 
     if (err) return callback(err)
