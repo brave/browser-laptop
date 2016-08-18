@@ -7,6 +7,7 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const keyCodes = require('../constants/keyCodes')
 const Button = require('./button.js')
+const SwitchControl = require('../components/switchControl')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
 
@@ -35,7 +36,7 @@ class FindBar extends ImmutableComponent {
   onCaseSensitivityChange (e) {
     windowActions.setFindDetail(this.frame, Immutable.fromJS({
       searchString: this.searchString,
-      caseSensitivity: e.target.checked
+      caseSensitivity: !this.isCaseSensitive
     }))
   }
 
@@ -146,38 +147,36 @@ class FindBar extends ImmutableComponent {
     }
 
     return <div className='findBar' onBlur={this.onBlur}>
-      <div className='searchStringContainer'>
-        <input type='text'
-          spellCheck='false'
-          ref={(node) => { this.searchInput = node }}
-          onKeyDown={this.onKeyDown}
-          onChange={this.onChange}
-          value={this.searchString} />
-          {findMatchText}
-      </div>
-      <Button iconClass='findButton fa-chevron-up'
-        className='findButton smallButton findPrev'
-        disabled={this.numberOfMatches === 0}
-
-        onClick={this.onFindPrev} />
-      <Button iconClass='findButton fa-chevron-down'
-        className='findButton smallButton findNext'
-        disabled={this.numberOfMatches === 0}
-        onClick={this.onFindNext} />
-      <Button iconClass='fa-times'
-        className='findButton smallButton hideButton'
-        onClick={this.props.onFindHide} />
-      <div className='caseSensitivityContainer'>
-        <input
+      <div className='searchContainer'>
+        <div className='searchStringContainer'>
+          <span className='fa fa-search'></span>
+          <input type='text'
+            spellCheck='false'
+            ref={(node) => { this.searchInput = node }}
+            onKeyDown={this.onKeyDown}
+            onChange={this.onChange}
+            value={this.searchString} />
+          <span className='fa fa-times'
+            onClick={this.props.onFindHide}></span>
+        </div>
+        <span className='findMatchText'>{findMatchText}</span>
+        <Button iconClass='findButton fa-caret-down'
+          className='findButton smallButton findNext'
+          disabled={this.numberOfMatches <= 0}
+          onClick={this.onFindNext} />
+        <Button iconClass='findButton fa-caret-up'
+          className='findButton smallButton findPrev'
+          disabled={this.numberOfMatches <= 0}
+          onClick={this.onFindPrev} />
+        <SwitchControl
           id='caseSensitivityCheckbox'
-          type='checkbox'
-          className='caseSensitivityCheckbox'
-          checked={this.isCaseSensitive}
-          onChange={this.onCaseSensitivityChange} />
-        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity'>
-          {'Match case'}
-        </label>
+          checkedOn={this.isCaseSensitive}
+          onClick={this.onCaseSensitivityChange} />
+        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity'></label>
       </div>
+      <Button label='+'
+        className='navbutton closeButton'
+        onClick={this.props.onFindHide} />
     </div>
   }
 }
