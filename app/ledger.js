@@ -195,16 +195,7 @@ if (ipc) {
   ipc.on(messages.CHANGE_SETTING, (event, key, value) => {
     if (!client) return
 
-    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) {
-      var amount = parseInt(value, 10)
-      var bravery = client.getBraveryProperties()
-
-      if (isNaN(amount) || (amount <= 0)) return
-
-      underscore.extend(bravery.fee, { amount: amount })
-      client.setBraveryProperties(bravery, callback)
-      getPaymentInfo()
-    }
+    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) setPaymentInfo(value)
   })
 }
 
@@ -351,13 +342,7 @@ var initialize = () => {
         cacheRuleSet(state.ruleset)
 
         // Make sure bravery props are up-to-date with user settings
-        const amount = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10)
-        if (!isNaN(amount) && amount > 0) {
-          let bravery = client.getBraveryProperties()
-          underscore.extend(bravery.fee, { amount: amount })
-          client.setBraveryProperties(bravery, callback)
-        }
-
+        setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
         if (state.properties.wallet) getPaymentInfo()
       })
       return
@@ -886,6 +871,17 @@ var getPaymentInfo = () => {
   } catch (ex) {
     console.log('properties error: ' + ex.toString())
   }
+}
+
+var setPaymentInfo = (amount) => {
+  var bravery = client.getBraveryProperties()
+
+  amount = parseInt(amount, 10)
+  if (isNaN(amount) || (amount <= 0)) return
+
+  underscore.extend(bravery.fee, { amount: amount })
+  client.setBraveryProperties(bravery, callback)
+  if (ledgerInfo.created) getPaymentInfo()
 }
 
 var cacheReturnValue = () => {
