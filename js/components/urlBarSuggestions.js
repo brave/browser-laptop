@@ -164,6 +164,11 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.updateSuggestions(parseInt(e.target.dataset.index, 10))
   }
 
+  componentDidMount () {
+    this.suggestionList = this.getNewSuggestionList()
+    this.searchXHR()
+  }
+
   componentWillUpdate (prevProps) {
     if (this.selectedElement) {
       this.selectedElement.scrollIntoView()

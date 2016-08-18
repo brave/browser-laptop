@@ -37,6 +37,16 @@ describe('urlbarSuggestions', function () {
       })
   })
 
+  it('show suggestion when single letter is typed in', function * () {
+    yield this.app.client.ipcSend('shortcut-focus-url')
+      .waitForElementFocus(urlInput)
+      .setValue(urlInput, 'a')
+      .waitUntil(function () {
+        return this.getValue(urlInput).then((val) => val === 'a')
+      })
+      .waitForExist(urlBarSuggestions)
+  })
+
   it('deactivates suggestions on escape', function * () {
     yield this.app.client
       .setValue(urlInput, 'Page 1')
