@@ -740,7 +740,7 @@ var roundtrip = (params, options, callback) => {
         console.log('>>> ' + header + ': ' + response.headers[header])
       })
       console.log('>>>')
-      console.log('>>> ' + body.split('\n').join('\n>>> '))
+      console.log('>>> ' + (body || '').split('\n').join('\n>>> '))
     }
 
     if (err) return callback(err)
