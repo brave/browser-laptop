@@ -51,7 +51,7 @@ describe('menuUtil', function () {
     }
 
     mockery.registerMock('electron', fakeElectron)
-    menuUtil = require('../../../js/lib/menuUtil')
+    menuUtil = require('../../../app/browser/lib/menuUtil')
   })
 
   after(function () {

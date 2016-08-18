@@ -3,12 +3,12 @@
 
 'use strict'
 
-const CommonMenu = require('../commonMenu')
-const messages = require('../constants/messages')
-const siteTags = require('../constants/siteTags')
-const eventUtil = require('./eventUtil')
-const siteUtil = require('../state/siteUtil')
-const locale = require('../../app/locale')
+const CommonMenu = require('../../common/commonMenu')
+const messages = require('../../../js/constants/messages')
+const siteTags = require('../../../js/constants/siteTags')
+const eventUtil = require('../../../js/lib/eventUtil')
+const siteUtil = require('../../../js/state/siteUtil')
+const locale = require('../../locale')
 
 // States which can trigger dynamic menus to change
 let lastSettingsState, lastSites, lastClosedFrames

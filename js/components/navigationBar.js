@@ -11,7 +11,6 @@ const Button = require('./button')
 const UrlBar = require('./urlBar')
 const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
-const {isSiteBookmarked} = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
@@ -46,7 +45,7 @@ class NavigationBar extends ImmutableComponent {
     const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     const hasBookmark = this.props.sites.find(
-      (site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER)
+      (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
     )
     if (!isBookmarked) {
       appActions.addSite(siteDetail, siteTags.BOOKMARK)
@@ -80,7 +79,7 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrameKey !== undefined &&
-      isSiteBookmarked(this.props.sites, Immutable.fromJS({
+      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
         location: this.props.location,
         partitionNumber: this.props.partitionNumber,
         title: this.props.title
@@ -115,7 +114,7 @@ class NavigationBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
     const prevBookmarked = this.props.activeFrameKey !== undefined &&
-      isSiteBookmarked(prevProps.sites, Immutable.fromJS({
+      siteUtil.isSiteBookmarked(prevProps.sites, Immutable.fromJS({
         location: prevProps.location,
         partitionNumber: prevProps.partitionNumber,
         title: prevProps.title

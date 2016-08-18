@@ -4,13 +4,13 @@
 
 'use strict'
 
-const appConfig = require('./constants/appConfig')
-const appActions = require('../js/actions/appActions')
-const messages = require('../js/constants/messages')
+const appConfig = require('../../js/constants/appConfig')
+const appActions = require('../../js/actions/appActions')
+const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
-const locale = require('../js/l10n')
-const settings = require('./constants/settings')
-const getSetting = require('./settings').getSetting
+const locale = require('../../js/l10n')
+const settings = require('../../js/constants/settings')
+const getSetting = require('../../js/settings').getSetting
 const issuesUrl = 'https://github.com/brave/browser-laptop/issues'
 const isDarwin = process.platform === 'darwin'
 
