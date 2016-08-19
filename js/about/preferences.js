@@ -618,11 +618,12 @@ class PaymentsTab extends ImmutableComponent {
             <h3 data-l10n-id='paymentsWelcomeTitle' />
             <div data-l10n-id='paymentsWelcomeText1' />
             <div data-l10n-id='paymentsWelcomeText2' />
-            <div className='boldText' data-l10n-id='paymentsWelcomeText3' />
+            <div data-l10n-id='paymentsWelcomeText3' />
+            <div className='boldText' data-l10n-id='paymentsWelcomeTextBold' />
             <a href='https://github.com/brave/ledger/blob/master/documentation/Ledger-Principles.md' target='_blank' data-l10n-id='paymentsWelcomeText4' />
           </div>
         }
-        {this.footerContent}
+        {this.enabled ? null : this.footerContent}
     </div>
   }
 }
