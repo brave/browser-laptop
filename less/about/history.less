@@ -1,10 +1,124 @@
 @import "./itemList.less";
+/*@import "./preferences.less";*/
+@import "./common.less";
+
+strong, div, span, li, em, p, a {
+  font-weight: 200;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: @veryLightGray;
+}
 
 .siteDetailsPage {
+  margin: 0;
+  padding-top: 40px;
+  min-width: 704px;
+
+  /*name/color taken from preferences.less*/
+  .sectionTitle {
+    color: @braveOrange;
+  }
+
+  .siteDetailsPageHeader {
+    padding: 0 40px;
+
+    .sectionTitle {
+      font-size: 28px;
+      display: inline-block;
+    }
+    .headerActions {
+      float: right;
+
+      .searchWrapper {
+        display: inline-block;
+
+        /*overridden from siteDetails.less*/
+        input.searchInput {
+          float: none;
+          padding: 5px;
+          margin-top: 0;
+          margin-right: 12px;
+          font-size: 16px;
+          min-width: 280px;
+          height: 22px;
+        }
+        .searchInputPlaceholder {
+          font-family: FontAwesome;
+        }
+        .searchInputClear {
+          float: none;
+          margin: 0;
+          padding: 0;
+          width: 0;
+          cursor: pointer;
+          position: relative;
+          left: -35px;
+        }
+      }
+      /*copied from preferences.less*/
+      span.browserButton.primaryButton.clearBrowsingDataButton {
+        font-size: 0.9em;
+        padding: 5px 20px;
+        margin: 0;
+      }
+    }
+  }
+
   .siteDetailsPageContent {
-    .sticky-outer-wrapper {
-      min-width: 100%;
+    border-top: 0px;
+    margin-top: 15px;
+    display: block;
+    clear: both;
+
+    .sectionTitle {
+      font-size: 16px;
+      margin-bottom: 12px;
+      padding-left: 40px;
+    }
+
+    .sortableTable {
+      border-spacing: 0px;
+
+      .time {
+        color: #656565;
+        font-weight: 800;
+        text-align: center;
+        width: 154px;
+      }
+      .title {
+        max-width: 415px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      .domain {
+      }
+    }
+
+    .historyList {
       padding-top: 10px;
+      overflow: hidden;
+
+      .listItem {
+        display: flex;
+        height: 1rem;
+        padding-left: 5px;
+
+        &:hover {
+          background: #ffcc99;
+        }
+        .aboutListItem {
+          align-items: center;
+        }
+        .aboutItemLocation {
+          margin-left: 10px;
+        }
+        .aboutItemDate {
+          color: #aaa;
+          margin-right: 10px;
+        }
+      }
     }
   }
 }
