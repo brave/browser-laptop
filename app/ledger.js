@@ -44,6 +44,7 @@ const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
 const getSetting = require('../js/settings').getSetting
+const locale = require('./locale')
 const appStore = require('../js/stores/appStore')
 const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
@@ -85,6 +86,14 @@ const msecs = { year: 365 * 24 * 60 * 60 * 1000,
               }
 
 /*
+ * notification state globals
+ */
+
+let addFundsMessage
+let suppressNotifications = false
+let notificationTimeout = null
+
+/*
  * module entry points
  */
 
@@ -101,6 +110,10 @@ var quit = () => {
 var enable = (onoff) => {
   if (!onoff) {
     synopsis = null
+    if (notificationTimeout) {
+      clearInterval(notificationTimeout)
+      notificationTimeout = null
+    }
     return updateLedgerInfo()
   }
 
@@ -123,6 +136,9 @@ var enable = (onoff) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
     updateLedgerInfo()
+
+    // Check if the add funds notification should be shown every 15 minutes
+    notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
 
     fs.readFile(publisherPath, (err, data) => {
       if (err) {
@@ -196,6 +212,24 @@ if (ipc) {
     if (!client) return
 
     if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) setPaymentInfo(value)
+  })
+
+  ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
+    if (message === addFundsMessage) {
+      appActions.hideMessageBox(message)
+      if (buttonIndex === 0) {
+        // Don't show notifications for the next 6 hours.
+        suppressNotifications = true
+        setTimeout(() => { suppressNotifications = false }, 6 * msecs.hour)
+      } else {
+        // Open payments panel
+        let win = electron.BrowserWindow.getFocusedWindow()
+        if (win) {
+          win.webContents.send(messages.SHORTCUT_NEW_FRAME,
+            'about:preferences#publishers', { singleFrame: true })
+        }
+      }
+    }
   })
 }
 
@@ -933,6 +967,39 @@ var syncWriter = (path, obj, options, cb) => {
 
     cb(err)
   })
+}
+
+/**
+ * UI controller functionality
+ */
+
+/**
+ * Show message that it's time to add funds if reconciliation is less than
+ * a day in the future and balance is too low.
+ */
+const notifyAddFunds = () => {
+  if (!getSetting(settings.PAYMENTS_ENABLED) ||
+      !getSetting(settings.PAYMENTS_NOTIFICATIONS) || suppressNotifications) {
+    return
+  }
+  const reconcileStamp = ledgerInfo.reconcileStamp
+  const balance = Number(ledgerInfo.balance || 0)
+  const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
+
+  if (ledgerInfo.btc && reconcileStamp &&
+      reconcileStamp - underscore.now() < msecs.day &&
+      balance + unconfirmed < Number(ledgerInfo.btc)) {
+    addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
+    appActions.showMessageBox({
+      message: addFundsMessage,
+      buttons: [locale.translation('updateLater'),
+        locale.translation('addFunds')],
+      options: {
+        updateStyle: true, // TODO: Show this in the style of updateBar.less
+        persist: false
+      }
+    })
+  }
 }
 
 module.exports = {
