@@ -50,15 +50,13 @@ class HistoryItem extends ImmutableComponent {
       data-context-menu-disable
       onDoubleClick={this.navigate.bind(this)}>
     {
-      this.props.history.get('customTitle') || this.props.history.get('title') || this.props.history.get('location')
+      this.props.history.get('customTitle') || this.props.history.get('title')
       ? <span className='aboutListItem' title={this.props.history.get('location')}>
-        <span className='aboutItemDate'>{new Date(this.props.history.get('lastAccessedTime')).toLocaleDateString()}</span>
         <span className='aboutItemTitle'>{this.props.history.get('customTitle') || this.props.history.get('title')}</span>
         {partitionNumberInfo}
         <span className='aboutItemSeparator'>-</span><span className='aboutItemLocation'>{this.props.history.get('location')}</span>
       </span>
       : <span className='aboutListItem' title={this.props.history.get('location')}>
-        <span className='aboutItemDate'>{new Date(this.props.history.get('lastAccessedTime')).toLocaleDateString()}</span>
         <span>{this.props.history.get('location')}</span>
         {partitionNumberInfo}
       </span>
