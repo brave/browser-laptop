@@ -80,7 +80,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
         <div className='genericFormTable'>
           <div id='nameOnCard' className='formRow'>
-            <label data-l10n-id='nameOnCard' htmlFor='nameOnCard' />
+            <label data-l10n-id='name' htmlFor='nameOnCard' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
               value={this.props.currentDetail.get('name')} ref={(nameOnCard) => { this.nameOnCard = nameOnCard }} />
           </div>
@@ -100,8 +100,8 @@ class AutofillCreditCardPanel extends ImmutableComponent {
             </select>
           </div>
           <div className='formRow'>
-            <Button l10nId='cancel' className='secondaryAltButton manageAutofillDataButtons' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton manageAutofillDataButtons' onClick={this.onSave} />
+            <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+            <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
       </div>

@@ -93,7 +93,7 @@ class AutofillAddressPanel extends ImmutableComponent {
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
         <div className='genericFormTable'>
           <div id='nameOnAddress' className='formRow'>
-            <label data-l10n-id='nameOnAddress' htmlFor='nameOnAddress' />
+            <label data-l10n-id='name' htmlFor='nameOnAddress' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
               value={this.props.currentDetail.get('name')}
               ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
@@ -139,8 +139,8 @@ class AutofillAddressPanel extends ImmutableComponent {
               value={this.props.currentDetail.get('email')} />
           </div>
           <div className='formRow'>
-            <Button l10nId='cancel' className='secondaryAltButton manageAutofillDataButtons' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton manageAutofillDataButtons' onClick={this.onSave} />
+            <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
+            <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
       </div>

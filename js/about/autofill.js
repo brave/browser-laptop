@@ -137,66 +137,70 @@ class AboutAutofill extends React.Component {
     var savedAddresssPage = this.isAddresssEmpty
     ? <div><span data-l10n-id='noAddressesSaved' /></div>
     : <div>
-      <h2 data-l10n-id='addresses' />
-      <div className='autofillPageContent'>
-        <table className='autofillList'>
-          <thead>
-            <tr>
-              <th></th>
-              <th data-l10n-id='nameOnAddress'></th>
-              <th data-l10n-id='organization'></th>
-              <th data-l10n-id='streetAddress'></th>
-              <th data-l10n-id='city'></th>
-              <th data-l10n-id='state'></th>
-              <th data-l10n-id='postalCode'></th>
-              <th data-l10n-id='country'></th>
-              <th data-l10n-id='phone'></th>
-              <th data-l10n-id='email'></th>
-            </tr>
-          </thead>
-          <tbody>
-          {
-            this.state.addressesDetails.sort((a, b) => {
-              return a.get('name') > b.get('name') ? 1 : -1
-            }).map((item) =>
-              <AddressItem address={item} />)
-          }
-          </tbody>
-        </table>
-      </div>
+      <table className='autofillList'>
+        <thead>
+          <tr>
+            <th></th>
+            <th data-l10n-id='name'></th>
+            <th data-l10n-id='organization'></th>
+            <th data-l10n-id='streetAddress'></th>
+            <th data-l10n-id='city'></th>
+            <th data-l10n-id='state'></th>
+            <th data-l10n-id='postalCode'></th>
+            <th data-l10n-id='country'></th>
+            <th data-l10n-id='phone'></th>
+            <th data-l10n-id='email'></th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          this.state.addressesDetails.sort((a, b) => {
+            return a.get('name') > b.get('name') ? 1 : -1
+          }).map((item) =>
+            <AddressItem address={item} />)
+        }
+        </tbody>
+      </table>
     </div>
 
     var savedCreditCardsPage = this.isCreditCardsEmpty
     ? <div><span data-l10n-id='noCreditCardsSaved' /></div>
     : <div>
-      <h2 data-l10n-id='creditCards' />
-      <div className='autofillPageContent'>
-        <table className='autofillList'>
-          <thead>
-            <tr>
-              <th></th>
-              <th data-l10n-id='nameOnCard'></th>
-              <th data-l10n-id='creditCardNumber'></th>
-              <th data-l10n-id='expirationDate'></th>
-            </tr>
-          </thead>
-          <tbody>
-          {
-            this.state.creditCardsDetails.sort((a, b) => {
-              return a.get('name') > b.get('name') ? 1 : -1
-            }).map((item) =>
-              <CreditCardItem creditCard={item} />)
-          }
-          </tbody>
-        </table>
-      </div>
+      <table className='autofillList'>
+        <thead>
+          <tr>
+            <th></th>
+            <th data-l10n-id='name'></th>
+            <th data-l10n-id='creditCardNumber'></th>
+            <th data-l10n-id='expirationDate'></th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          this.state.creditCardsDetails.sort((a, b) => {
+            return a.get('name') > b.get('name') ? 1 : -1
+          }).map((item) =>
+            <CreditCardItem creditCard={item} />)
+        }
+        </tbody>
+      </table>
     </div>
     return <div className='autofillPage'>
       <h1 data-l10n-id='autofillTitle' />
-      {savedAddresssPage}
-      <Button l10nId='addAddress' className='primaryButton' onClick={this.onAddAddress} />
-      {savedCreditCardsPage}
-      <Button l10nId='addCreditCard' className='primaryButton' onClick={this.onAddCreditCard} />
+      <div className='autofillPageContent'>
+        <div className='autofillPageFooter'></div>
+        <h2 data-l10n-id='addresses' />
+        <div className='autofillPageContent'>
+          {savedAddresssPage}
+          <Button l10nId='addAddress' className='primaryButton' onClick={this.onAddAddress} />
+        </div>
+        <div className='autofillPageFooter'></div>
+        <h2 data-l10n-id='creditCards' />
+        <div className='autofillPageContent'>
+          {savedCreditCardsPage}
+          <Button l10nId='addCreditCard' className='primaryButton' onClick={this.onAddCreditCard} />
+        </div>
+      </div>
     </div>
   }
 }
