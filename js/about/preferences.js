@@ -580,7 +580,7 @@ class PaymentsTab extends ImmutableComponent {
                       onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
                       {
                         [5, 10, 15, 20].map((amount) =>
-                          <option value={amount}>{amount} {this.props.ledgerData.get('currency')}</option>
+                          <option value={amount}>{amount} {this.props.ledgerData.get('currency') || 'USD'}</option>
                         )
                       }
                     </select>
