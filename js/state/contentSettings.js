@@ -80,6 +80,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
       setting: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? 'block' : 'allow',
       primaryPattern: '*'
     }],
+    adInsertion: [{
+      setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
     passwordManager: [{
       setting: getPasswordManagerEnabled(appState) ? 'allow' : 'block',
       primaryPattern: '*'
@@ -132,6 +136,9 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (typeof hostSetting.fingerprintingProtection === 'boolean') {
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', hostSetting.fingerprintingProtection ? 'block' : 'allow')
     }
+    if (hostSetting.adControl) {
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
+    }
     if (typeof hostSetting.flash === 'number') {
       addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
     }
@@ -142,6 +149,7 @@ const getContentSettingsFromSiteSettings = (appState) => {
     if (hostSetting.shieldsUp === false) {
       addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
       addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', 'block')
       addContentSettings(contentSettings.javascript, hostPattern, '*', 'allow')
       addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
     }

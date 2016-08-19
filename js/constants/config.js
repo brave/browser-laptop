@@ -7,6 +7,7 @@
 // https://vault-staging.brave.com for a dev build
 // http://localhost:3000 for production
 const vaultHost = process.env.VAULT_HOST || 'https://vault-staging.brave.com'
+const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
 module.exports = {
   zoom: {
@@ -37,7 +38,8 @@ module.exports = {
   defaultOpenSearchPath: 'content/search/google.xml',
   vault: {
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,
-    authUrl: (userId) => `${vaultHost}/v1/users/${userId}`
+    authUrl: (userId) => `${vaultHost}/v1/users/${userId}`,
+    replacementUrl: adHost
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
   PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm',

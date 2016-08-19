@@ -25,6 +25,7 @@ const pad = require('underscore.string/pad')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
@@ -729,12 +730,18 @@ class ShieldsTab extends ImmutableComponent {
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
-    if (e.target.value === 'blockAds') {
+    if (e.target.value === 'showBraveAds') {
       aboutActions.setResourceEnabled(adblock, true)
       aboutActions.setResourceEnabled(trackingProtection, true)
+      aboutActions.setResourceEnabled(adInsertion, true)
+    } else if (e.target.value === 'blockAds') {
+      aboutActions.setResourceEnabled(adblock, true)
+      aboutActions.setResourceEnabled(trackingProtection, true)
+      aboutActions.setResourceEnabled(adInsertion, false)
     } else {
       aboutActions.setResourceEnabled(adblock, false)
       aboutActions.setResourceEnabled(trackingProtection, false)
+      aboutActions.setResourceEnabled(adInsertion, false)
     }
   }
   onChangeCookieControl (e) {
@@ -749,6 +756,7 @@ class ShieldsTab extends ImmutableComponent {
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
           <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
+            <option data-l10n-id='showBraveAds' value='showBraveAds' />
             <option data-l10n-id='blockAds' value='blockAds' />
             <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
           </select>

@@ -12,11 +12,14 @@ module.exports.braveryDefaults = (appState, appConfig) => {
     let enabled = appState.getIn([value, 'enabled'])
     defaults[value] = enabled === undefined ? appConfig[value].enabled : enabled
   })
+  let replaceAds = defaults[appConfig.resourceNames.AD_INSERTION] || false
   let blockAds = defaults[appConfig.resourceNames.ADBLOCK] || false
   let blockTracking = defaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
   let blockCookies = defaults[appConfig.resourceNames.COOKIEBLOCK] || false
   defaults.adControl = 'allowAdsAndTracking'
-  if (blockAds && blockTracking) {
+  if (blockAds && replaceAds && blockTracking) {
+    defaults.adControl = 'showBraveAds'
+  } else if (blockAds && !replaceAds && blockTracking) {
     defaults.adControl = 'blockAds'
   }
   defaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
@@ -99,6 +102,11 @@ module.exports.activeSettings = (siteSettings, appState, appConfig) => {
 
     return defaults.fingerprintingProtection
   })()
+
+  settings.adInsertion = {
+    enabled: settings.adControl === 'showBraveAds',
+    url: appConfig.adInsertion.url
+  }
 
   return Object.assign(defaults, settings)
 }
