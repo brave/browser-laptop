@@ -78,6 +78,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
 
     return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel' isClickDismiss>
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
+        <div className='formRow manageAutofillDataTitle' data-l10n-id='editCreditCard' />
         <div className='genericFormTable'>
           <div id='nameOnCard' className='formRow'>
             <label data-l10n-id='name' htmlFor='nameOnCard' />

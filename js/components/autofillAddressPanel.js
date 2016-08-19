@@ -91,6 +91,7 @@ class AutofillAddressPanel extends ImmutableComponent {
   render () {
     return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel' isClickDismiss>
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
+        <div className='formRow manageAutofillDataTitle' data-l10n-id='editAddress' />
         <div className='genericFormTable'>
           <div id='nameOnAddress' className='formRow'>
             <label data-l10n-id='name' htmlFor='nameOnAddress' />
