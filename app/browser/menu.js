@@ -6,17 +6,17 @@
 
 const Immutable = require('immutable')
 const electron = require('electron')
-const appConfig = require('../js/constants/appConfig')
+const appConfig = require('../../js/constants/appConfig')
 const Menu = electron.Menu
 const MenuItem = electron.MenuItem
-const messages = require('../js/constants/messages')
-const settings = require('../js/constants/settings')
+const messages = require('../../js/constants/messages')
+const settings = require('../../js/constants/settings')
 const dialog = electron.dialog
-const appActions = require('../js/actions/appActions')
-const menuUtil = require('../js/lib/menuUtil')
-const getSetting = require('../js/settings').getSetting
-const locale = require('./locale')
-const {isSiteBookmarked} = require('../js/state/siteUtil')
+const appActions = require('../../js/actions/appActions')
+const menuUtil = require('./lib/menuUtil')
+const getSetting = require('../../js/settings').getSetting
+const locale = require('../locale')
+const {isSiteBookmarked} = require('../../js/state/siteUtil')
 const isDarwin = process.platform === 'darwin'
 const aboutUrl = 'https://brave.com/'
 
@@ -618,7 +618,7 @@ const updateMenu = (CommonMenu, appState, windowData) => {
  * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
  * @param {Object} windowData - Information specific to the current window (recently closed tabs, etc)
  */
-module.exports.init = (appState, windowData) => {
+module.exports.rebuild = (appState, windowData) => {
   // The menu will always be called once localization is done
   // so don't bother loading anything until it is done.
   if (!locale.initialized) {
@@ -626,7 +626,7 @@ module.exports.init = (appState, windowData) => {
   }
 
   // This needs to be within the init method to handle translations
-  const CommonMenu = require('../js/commonMenu')
+  const CommonMenu = require('../common/commonMenu')
   if (appMenu.items.length === 0) {
     createMenu(CommonMenu)
   } else {

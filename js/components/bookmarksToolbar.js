@@ -250,7 +250,7 @@ class BookmarksToolbar extends ImmutableComponent {
         appActions.addSite({ location: url }, siteTags.BOOKMARK))
   }
   openContextMenu (bookmark, e) {
-    contextMenus.onBookmarkContextMenu(bookmark, this.activeFrame, e)
+    contextMenus.onSiteDetailContextMenu(bookmark, this.activeFrame, e)
   }
   clickBookmarkItem (bookmark, e) {
     return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)

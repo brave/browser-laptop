@@ -112,7 +112,7 @@ const messages = {
   // Menu rebuilding
   REQUEST_MENU_DATA_FOR_WINDOW: _,
   RESPONSE_MENU_DATA_FOR_WINDOW: _,
-  UPDATE_MENU_BOOKMARKED_STATUS: _, /** @arg {Object} currently only has a boolean "bookmarked" */
+  UPDATE_MENU_BOOKMARKED_STATUS: _, /** @isBookmarked {boolean} should menu show "Bookmark Page" as checked */
   // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
   BLOCKED_PAGE: _,

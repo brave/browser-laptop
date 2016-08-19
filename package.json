@@ -85,7 +85,7 @@
     "immutablepatch": "^0.2.2",
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
-    "ledger-client": "https://github.com/brave/ledger-client.git#beta",
+    "ledger-client": "^0.8.43",
     "ledger-publisher": "^0.8.39",
     "lru_cache": "^1.0.0",
     "random-lib": "2.1.0",

@@ -14,6 +14,7 @@ const ipc = window.chrome.ipc
 
 // Stylesheets
 require('../../less/about/itemList.less')
+require('../../less/about/siteDetails.less')
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -51,13 +52,11 @@ class HistoryItem extends ImmutableComponent {
     {
       this.props.history.get('customTitle') || this.props.history.get('title')
       ? <span className='aboutListItem' title={this.props.history.get('location')}>
-        <span className='aboutItemDate'>{new Date(this.props.history.get('lastAccessedTime')).toLocaleDateString()}</span>
         <span className='aboutItemTitle'>{this.props.history.get('customTitle') || this.props.history.get('title')}</span>
         {partitionNumberInfo}
         <span className='aboutItemSeparator'>-</span><span className='aboutItemLocation'>{this.props.history.get('location')}</span>
       </span>
       : <span className='aboutListItem' title={this.props.history.get('location')}>
-        <span className='aboutItemDate'>{new Date(this.props.history.get('lastAccessedTime')).toLocaleDateString()}</span>
         <span>{this.props.history.get('location')}</span>
         {partitionNumberInfo}
       </span>
@@ -68,7 +67,7 @@ class HistoryItem extends ImmutableComponent {
 
 class HistoryList extends ImmutableComponent {
   render () {
-    return <list className='historyList'>
+    return <list className='siteDetailsList'>
     {
       this.props.history.map((entry) =>
         <HistoryItem history={entry} />)
@@ -111,12 +110,12 @@ class AboutHistory extends React.Component {
     })
   }
   render () {
-    return <div className='historyPage'>
+    return <div className='siteDetailsPage'>
       <h2 data-l10n-id='history' />
 
-      <div className='historyPageContent'>
+      <div className='siteDetailsPageContent'>
         <Sticky enabled top={10}>
-          <HistoryList history={this.state.history.filter((site) => site.get('tags').isEmpty())}
+          <HistoryList history={this.state.history.filter((site) => site.get('tags').isEmpty()).slice(-500)}
             onChangeSelectedEntry={this.onChangeSelectedEntry}
             selectedEntry={this.state.selectedEntry} />
         </Sticky>

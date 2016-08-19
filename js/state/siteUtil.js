@@ -9,7 +9,10 @@ const getSetting = require('../settings').getSetting
 const urlParse = require('url').parse
 
 const isBookmark = (tags) => {
-  return tags && tags.includes(siteTags.BOOKMARK)
+  if (!tags) {
+    return false
+  }
+  return tags.includes(siteTags.BOOKMARK)
 }
 
 const isBookmarkFolder = (tags) => {
@@ -270,6 +273,18 @@ module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
     return siteDetail1.get('folderId') === siteDetail2.get('folderId')
   }
   return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') === siteDetail2.get('partitionNumber')
+}
+
+/**
+ * Determines if the site detail is a bookmark.
+ * @param siteDetail The site detail to check.
+ * @return true if the site detail has a bookmark tag.
+ */
+module.exports.isBookmark = function (siteDetail) {
+  if (siteDetail) {
+    return isBookmark(siteDetail.get('tags'))
+  }
+  return false
 }
 
 /**

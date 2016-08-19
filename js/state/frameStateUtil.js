@@ -426,7 +426,6 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
 
   // If the frame being removed IS ACTIVE, then try to replace activeFrameKey with parentFrameKey
   let isActiveFrameBeingRemoved = frameProps.get('key') === activeFrameKey
-
   let parentFrameIndex = findIndexForFrameKey(frames, frameProps.get('parentFrameKey'))
   let activeFrameIndex
 
