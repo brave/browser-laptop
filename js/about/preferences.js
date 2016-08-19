@@ -608,6 +608,7 @@ class PaymentsTab extends ImmutableComponent {
         <div className='sectionTitle pull-left' data-l10n-id='publisherPaymentsTitle' value='publisherPaymentsTitle' />
         <div className='pull-left' id='enablePaymentsSwitch'>
           <SettingCheckbox dataL10nId='enable' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+          {this.enabled ? <SettingCheckbox dataL10nId='notifications' prefKey={settings.PAYMENTS_NOTIFICATIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} /> : null}
         </div>
       </div>
         {
@@ -1039,6 +1040,7 @@ class AboutPreferences extends React.Component {
     }
     if (key === settings.PAYMENTS_ENABLED) {
       aboutActions.setLedgerEnabled(value)
+      this.onChangeSetting(settings.PAYMENTS_NOTIFICATIONS, value)
     }
   }
 
