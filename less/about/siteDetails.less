@@ -1,0 +1,38 @@
+@import "./itemList.less";
+
+.siteDetailsPage {
+  margin: 20px;
+
+  .siteDetailsPageContent {
+    border-top: 1px solid @chromeBorderColor;
+    display: flex;
+
+    .siteDetailsList {
+      padding-top: 10px;
+      overflow: hidden;
+
+      .listItem {
+        display: flex;
+        height: 1rem;
+
+        .aboutListItem {
+          align-items: center;
+          min-width: 0;
+        }
+      }
+    }
+  }
+}
+
+.searchInput {
+    float: right;
+    padding: 5px;
+    margin-top: -35px;
+}
+
+.searchInputClear {
+    float: right;
+    padding: 8px;
+    margin-top: -39px;
+    color: #999;
+}

@@ -181,6 +181,15 @@ describe('siteUtil', function () {
       const expectedSites = sites.setIn([0, 'parentFolderId'], 0).setIn([0, 'tags'], Immutable.List([]))
       assert.deepEqual(processedSites, expectedSites)
     })
+    it('deletes a history entry (no tag specified)', function () {
+      const siteDetail = {
+        tags: [],
+        location: testUrl1
+      }
+      const sites = Immutable.fromJS([siteDetail])
+      const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail))
+      assert.deepEqual(processedSites, Immutable.fromJS([]))
+    })
   })
 
   describe('moveSite', function () {
@@ -285,19 +294,19 @@ describe('siteUtil', function () {
   })
 
   describe('isFolder', function () {
-    it('returns true if the input is a siteDetail and has a BOOKMARK_FOLDER tag', function () {
+    it('returns true if the input is a siteDetail and has a `BOOKMARK_FOLDER` tag', function () {
       const siteDetail = Immutable.fromJS({
         tags: [siteTags.BOOKMARK_FOLDER]
       })
       assert.equal(siteUtil.isFolder(siteDetail), true)
     })
-    it('returns false if the input does not have a BOOKMARK_FOLDER tag', function () {
+    it('returns false if the input does not have a `BOOKMARK_FOLDER` tag', function () {
       const siteDetail = Immutable.fromJS({
         tags: [siteTags.BOOKMARK]
       })
       assert.equal(siteUtil.isFolder(siteDetail), false)
     })
-    it('returns false if there is no `tags` property', function () {
+    it('returns false if there is not a `tags` property', function () {
       const siteDetail = Immutable.fromJS({
         notTags: null
       })
@@ -308,6 +317,30 @@ describe('siteUtil', function () {
     })
     it('returns false if the input is undefined', function () {
       assert.equal(siteUtil.isFolder(), false)
+    })
+  })
+
+  describe('isBookmark', function () {
+    it('returns true if the input is a siteDetail and has a `BOOKMARK` tag', function () {
+      const siteDetail = Immutable.fromJS({
+        tags: [siteTags.BOOKMARK]
+      })
+      assert.equal(siteUtil.isBookmark(siteDetail), true)
+    })
+    it('returns false if the input does not have a `BOOKMARK` tag', function () {
+      const siteDetail = Immutable.fromJS({
+        tags: [siteTags.BOOKMARK_FOLDER]
+      })
+      assert.equal(siteUtil.isBookmark(siteDetail), false)
+    })
+    it('returns false if there is not a `tags` property', function () {
+      const siteDetail = Immutable.fromJS({
+        notTags: null
+      })
+      assert.equal(siteUtil.isBookmark(siteDetail), false)
+    })
+    it('returns false if the input is falsey', function () {
+      assert.equal(siteUtil.isBookmark(null), false)
     })
   })
 

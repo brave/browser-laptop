@@ -19,7 +19,7 @@ const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
-const CommonMenu = require('./commonMenu')
+const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
@@ -188,7 +188,6 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
       })
     }
     if (menu.length) {
-      console.log('----added sep')
       menu.push(CommonMenu.separatorMenuItem)
     }
   }
@@ -212,12 +211,31 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
   return menu
 }
 
-function bookmarkTemplateInit (siteDetail, activeFrame) {
-  const location = siteDetail.get('location')
-  const isFolder = siteUtil.isFolder(siteDetail)
+function siteDetailTemplateInit (siteDetail, activeFrame) {
+  let isHistoryEntry = false
+  let isFolder = false
+  let isRootFolder = false
+  let deleteLabel
+  let deleteTag
+
+  if (siteUtil.isBookmark(siteDetail)) {
+    deleteLabel = 'deleteBookmark'
+    deleteTag = siteTags.BOOKMARK
+  } else if (siteUtil.isFolder(siteDetail)) {
+    isFolder = true
+    isRootFolder = siteDetail.get('folderId') === 0
+    deleteLabel = 'deleteFolder'
+    deleteTag = siteTags.BOOKMARK_FOLDER
+  } else {
+    isHistoryEntry = true
+    deleteLabel = 'deleteHistoryEntry'
+  }
+
   const template = []
 
   if (!isFolder) {
+    const location = siteDetail.get('location')
+
     template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
       openInNewPrivateTabMenuItem(location),
       openInNewSessionTabMenuItem(location),
@@ -228,28 +246,31 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       CommonMenu.separatorMenuItem)
   }
 
-  // We want edit / delete items for everything except for the bookmarks toolbar item
-  if (!isFolder || siteDetail.get('folderId') !== 0) {
+  if (!isRootFolder) {
+    // History can be deleted but not edited
+    // Picking this menu item pops up the AddEditBookmark modal
+    if (!isHistoryEntry) {
+      template.push(
+        {
+          label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
+          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail)
+        },
+        CommonMenu.separatorMenuItem)
+    }
+
     template.push(
       {
-        label: isFolder ? locale.translation('editFolder') : locale.translation('editBookmark'),
-        click: () => {
-          // originalLocation is undefined signifies add mode
-          windowActions.setBookmarkDetail(siteDetail, siteDetail)
-        }
-      })
-
-    template.push(
-      CommonMenu.separatorMenuItem, {
-        label: isFolder ? locale.translation('deleteFolder') : locale.translation('deleteBookmark'),
-        click: () => {
-          appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
-        }
-      }, CommonMenu.separatorMenuItem)
+        label: locale.translation(deleteLabel),
+        click: () => appActions.removeSite(siteDetail, deleteTag)
+      },
+      CommonMenu.separatorMenuItem)
   }
 
-  template.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
-    addFolderMenuItem(siteDetail, true))
+  if (!isHistoryEntry) {
+    template.push(
+      addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+      addFolderMenuItem(siteDetail, true))
+  }
 
   return template
 }
@@ -291,7 +312,7 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
       icon: showFavicon ? site.get('favicon') : undefined,
       faIcon,
       contextMenu: function (e) {
-        onBookmarkContextMenu(site, activeFrame, e)
+        onSiteDetailContextMenu(site, activeFrame, e)
       },
       dragEnd: function (e) {
         dnd.onDragEnd(dragTypes.BOOKMARK, site, e)
@@ -948,9 +969,9 @@ function onHamburgerMenu (location, e) {
 
 function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
-    onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
   } else if (contextMenuType === 'history') {
-    // TODO: add new onHistoryContextMenu() and associated methods.
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
@@ -997,11 +1018,11 @@ function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   inputMenu.destroy()
 }
 
-function onBookmarkContextMenu (siteDetail, activeFrame, e) {
+function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
-  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(siteDetail, activeFrame))
+  const menu = Menu.buildFromTemplate(siteDetailTemplateInit(siteDetail, activeFrame))
   menu.popup(currentWindow)
   menu.destroy()
 }
@@ -1141,7 +1162,7 @@ module.exports = {
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,
   onUrlBarContextMenu,
-  onBookmarkContextMenu,
+  onSiteDetailContextMenu,
   onShowBookmarkFolderMenu,
   onShowUsernameMenu,
   onMoreBookmarksMenu,

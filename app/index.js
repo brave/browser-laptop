@@ -32,7 +32,7 @@ const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const app = electron.app
-const Menu = require('./menu')
+const Menu = require('./browser/menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
@@ -60,7 +60,6 @@ const spellCheck = require('./spellCheck')
 const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
-const FrameStateUtil = require('../js/state/frameStateUtil')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -300,16 +299,10 @@ app.on('ready', () => {
     saveIfAllCollected()
   })
 
-  // Window state must be fetched from main process; this is fired once it's retrieved
-  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowState) => {
-    if (windowState) {
-      const activeFrame = FrameStateUtil.getActiveFrame(Immutable.fromJS(windowState))
-      const windowData = Immutable.fromJS({
-        location: activeFrame ? activeFrame.get('location') : 'about:blank',
-        closedFrames: windowState.closedFrames
-      })
-
-      Menu.init(AppStore.getState(), windowData)
+  // Window state is fetched via the renderer process; this is fired once it's retrieved
+  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowData) => {
+    if (windowData) {
+      Menu.rebuild(AppStore.getState(), Immutable.fromJS(windowData))
     }
   })
 
@@ -386,7 +379,7 @@ app.on('ready', () => {
     // reset the browser window. This will default to en-US if
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      Menu.init(AppStore.getState(), null)
+      Menu.rebuild(AppStore.getState(), null)
     })
 
     // Do this after loading the state
@@ -545,7 +538,7 @@ app.on('ready', () => {
       if (BrowserWindow.getFocusedWindow()) {
         BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
       } else {
-        Menu.init(AppStore.getState(), null)
+        Menu.rebuild(AppStore.getState(), null)
       }
     })
 
