@@ -332,6 +332,50 @@ Sets whether the bitcoin protocol is handled.
 
 
 
+### addAutofillAddress(detail, originalDetail) 
+
+Add address data
+
+**Parameters**
+
+**detail**: `object`, the address to add as per doc/state.md's autofillAddressDetail
+
+**originalDetail**: `object`, the original address before editing
+
+
+
+### removeAutofillAddress(detail) 
+
+Remove address data
+
+**Parameters**
+
+**detail**: `object`, the address to remove as per doc/state.md's autofillAddressDetail
+
+
+
+### addAutofillCreditCard(detail, originalDetail) 
+
+Add credit card data
+
+**Parameters**
+
+**detail**: `object`, the credit card to add as per doc/state.md's autofillCreditCardDetail
+
+**originalDetail**: `object`, the original credit card before editing
+
+
+
+### removeAutofillCreditCard(detail) 
+
+Remove credit card data
+
+**Parameters**
+
+**detail**: `object`, the credit card to remove as per doc/state.md's autofillCreditCardDetail
+
+
+
 
 * * *
 

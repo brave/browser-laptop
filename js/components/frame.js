@@ -602,9 +602,6 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('show-autofill-settings', (e) => {
       windowActions.newFrame({ location: 'about:autofill' }, true)
     })
-    this.webview.addEventListener('update-autofill-popup-data-list-values', (e) => {
-      console.log(e)
-    })
     this.webview.addEventListener('show-autofill-popup', (e) => {
       contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     })

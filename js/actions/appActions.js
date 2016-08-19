@@ -380,6 +380,11 @@ const appActions = {
     })
   },
 
+  /**
+   * Add address data
+   * @param {object} detail - the address to add as per doc/state.md's autofillAddressDetail
+   * @param {object} originalDetail - the original address before editing
+   */
   addAutofillAddress: function (detail, originalDetail) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_ADD_AUTOFILL_ADDRESS,
@@ -388,6 +393,10 @@ const appActions = {
     })
   },
 
+  /**
+   * Remove address data
+   * @param {object} detail - the address to remove as per doc/state.md's autofillAddressDetail
+   */
   removeAutofillAddress: function (detail) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
@@ -395,6 +404,11 @@ const appActions = {
     })
   },
 
+  /**
+   * Add credit card data
+   * @param {object} detail - the credit card to add as per doc/state.md's autofillCreditCardDetail
+   * @param {object} originalDetail - the original credit card before editing
+   */
   addAutofillCreditCard: function (detail, originalDetail) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
@@ -403,6 +417,10 @@ const appActions = {
     })
   },
 
+  /**
+   * Remove credit card data
+   * @param {object} detail - the credit card to remove as per doc/state.md's autofillCreditCardDetail
+   */
   removeAutofillCreditCard: function (detail) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,

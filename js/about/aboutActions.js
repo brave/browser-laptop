@@ -135,26 +135,52 @@ const AboutActions = {
     ipc.send(messages.LEDGER_ENABLE, enabled)
   },
 
+  /**
+   * Open a adding address dialog
+   */
   addAutofillAddress: function () {
     ipc.sendToHost(messages.ADD_AUTOFILL_ADDRESS)
   },
 
+  /**
+   * Remove address
+   *
+   * @param {object} address - address to remove as per doc/state.md's autofillAddressDetail
+   */
   removeAutofillAddress: function (address) {
     ipc.send(messages.REMOVE_AUTOFILL_ADDRESS, address)
   },
 
+  /**
+   * Open a edit address dialog
+   *
+   * @param {object} address - address to edit as per doc/state.md's autofillAddressDetail
+   */
   editAutofillAddress: function (address) {
     ipc.sendToHost(messages.EDIT_AUTOFILL_ADDRESS, address)
   },
 
+  /**
+   * Open a adding credit card dialog
+   */
   addAutofillCreditCard: function () {
     ipc.sendToHost(messages.ADD_AUTOFILL_CREDIT_CARD)
   },
 
+  /**
+   * Remove credit card
+   *
+   * @param {object} card - credit card to remove as per doc/state.md's autofillCreditCardDetail
+   */
   removeAutofillCreditCard: function (card) {
     ipc.send(messages.REMOVE_AUTOFILL_CREDIT_CARD, card)
   },
 
+  /**
+   * Open a editing credit card dialog
+   *
+   * @param {object} card - credit card to edit as per doc/state.md's autofillCreditCardDetail
+   */
   editAutofillCreditCard: function (card) {
     ipc.sendToHost(messages.EDIT_AUTOFILL_CREDIT_CARD, card)
   }

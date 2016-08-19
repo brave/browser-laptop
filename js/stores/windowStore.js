@@ -713,7 +713,7 @@ const doAction = (action) => {
           originalDetail: action.originalDetail
         })
       }
-      // Since the input values of addresses are bound, we need to notify the controls sync.
+      // Since the input values of address are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       break
     case WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
@@ -725,7 +725,7 @@ const doAction = (action) => {
           originalDetail: action.originalDetail
         })
       }
-      // Since the input values of credit cards are bound, we need to notify the controls sync.
+      // Since the input values of credit card are bound, we need to notify the controls sync.
       windowStore.emitChanges()
       break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:

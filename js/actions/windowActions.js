@@ -964,6 +964,8 @@ const windowActions = {
 
   /**
    * Sets the manage autofill address popup detail
+   * @param {Object} currentDetail - Properties of the address to change to
+   * @param {Object} originalDetail - Properties of the address to edit
    */
   setAutofillAddressDetail: function (currentDetail, originalDetail) {
     dispatch({
@@ -974,7 +976,9 @@ const windowActions = {
   },
 
   /**
-   * Sets the manage autofill credit cards popup detail
+   * Sets the manage autofill credit card popup detail
+   * @param {Object} currentDetail - Properties of the credit card to change to
+   * @param {Object} originalDetail - Properties of the credit card to edit
    */
   setAutofillCreditCardDetail: function (currentDetail, originalDetail) {
     dispatch({
