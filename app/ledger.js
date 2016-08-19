@@ -99,7 +99,7 @@ let notificationTimeout = null
 
 var init = () => {
   try {
-    initialize()
+    initialize(getSetting(settings.PAYMENTS_ENABLED))
   } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
@@ -174,7 +174,7 @@ var boot = () => {
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
     client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
-    if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
+    if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
   })
 }
 
@@ -209,9 +209,8 @@ if (ipc) {
   })
 
   ipc.on(messages.CHANGE_SETTING, (event, key, value) => {
-    if (!client) return
-
-    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) setPaymentInfo(value)
+    if (key === settings.PAYMENTS_ENABLED) return initialize(value)
+    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(value)
   })
 
   ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
@@ -345,8 +344,14 @@ eventStore.addChangeListener(() => {
  * module initialization
  */
 
-var initialize = () => {
-  enable(getSetting(settings.PAYMENTS_ENABLED))
+var initialize = (onoff) => {
+  enable(onoff)
+
+  if (!onoff) {
+    client = null
+    return
+  }
+  if (client) return
 
   cacheRuleSet(ledgerPublisher.rules)
 
@@ -371,7 +376,7 @@ var initialize = () => {
                                             underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
                                                                 clientOptions), state)
         if (client.sync(callback) === true) {
-          run(random.randomInt({ min: 0, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
+          run(random.randomInt({ min: 1, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
         cacheRuleSet(state.ruleset)
 
@@ -703,7 +708,7 @@ var logs = []
 
 var callback = (err, result, delayTime) => {
   var i, then
-  var entries = client.report()
+  var entries = client && client.report()
   var now = underscore.now()
 
   console.log('\nledger client callback: errP=' + (!!err) + ' resultP=' + (!!result) + ' delayTime=' + delayTime)
@@ -721,14 +726,16 @@ var callback = (err, result, delayTime) => {
 
   if (err) {
     console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
+    if (!client) return
+
     return setTimeout(() => {
-      if (client.sync(callback) === true) run(random.randomInt({ min: 0, max: 10 * msecs.minute }))
+      if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     }, 1 * msecs.hour)
   }
 
   if (!result) return run(delayTime)
 
-  if (result.properties.wallet) {
+  if ((client) && (result.properties.wallet)) {
     getStateInfo(result)
     getPaymentInfo()
   }
@@ -800,6 +807,8 @@ var roundtrip = (params, options, callback) => {
 }
 
 var run = (delayTime) => {
+  if ((typeof delayTime === 'undefined') || (!client)) return
+
   var state
   var ballots = client.ballots()
   var siteSettings = appStore.getState().get('siteSettings')
@@ -879,6 +888,8 @@ var getStateInfo = (state) => {
 
 var getPaymentInfo = () => {
   var amount, currency
+
+  if (!client) return
 
   try {
     ledgerInfo.bravery = client.getBraveryProperties()
