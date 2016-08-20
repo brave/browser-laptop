@@ -364,10 +364,6 @@ class GeneralTab extends ImmutableComponent {
 }
 
 class SearchSelectEntry extends ImmutableComponent {
-  shouldComponentUpdate (nextProps, nextState) {
-    return getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings) !==
-      getSetting(settings.DEFAULT_SEARCH_ENGINE, nextProps.settings)
-  }
   render () {
     return <div>
     {getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings) === this.props.name
