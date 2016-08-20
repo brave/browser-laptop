@@ -9,7 +9,6 @@
    module entry points:
      init()   - called by app/index.js   to start module
      quit()   -   ..   ..   ..     ..    prior to browser quitting
-     enable() - called by Payments panel for on/off
      boot()   -   ..   ..   ..      ..   to create wallet
 
    IPC entry point:
@@ -107,64 +106,6 @@ var quit = () => {
   visit('NOOP', underscore.now())
 }
 
-var enable = (onoff) => {
-  if (!onoff) {
-    synopsis = null
-    if (notificationTimeout) {
-      clearInterval(notificationTimeout)
-      notificationTimeout = null
-    }
-    return updateLedgerInfo()
-  }
-
-  synopsis = new (ledgerPublisher.Synopsis)()
-  fs.readFile(synopsisPath, (err, data) => {
-    console.log('\nstarting up ledger publisher integration')
-
-    if (err) {
-      if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
-      return updateLedgerInfo()
-    }
-
-    console.log('found ' + synopsisPath)
-    try {
-      synopsis = new (ledgerPublisher.Synopsis)(data)
-    } catch (ex) {
-      console.log('synopsisPath parse error: ' + ex.toString())
-    }
-    underscore.keys(synopsis.publishers).forEach((publisher) => {
-      if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
-    })
-    updateLedgerInfo()
-
-    // Check if the add funds notification should be shown every 15 minutes
-    notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
-
-    fs.readFile(publisherPath, (err, data) => {
-      if (err) {
-        if (err.code !== 'ENOENT') console.log('publisherPath read error: ' + err.toString())
-        return
-      }
-
-      console.log('found ' + publisherPath)
-      try {
-        data = JSON.parse(data)
-        underscore.keys(data).sort().forEach((publisher) => {
-          var entries = data[publisher]
-
-          publishers[publisher] = {}
-          entries.forEach((entry) => {
-            locations[entry.location] = entry
-            publishers[publisher][entry.location] = entry.when
-          })
-        })
-      } catch (ex) {
-        console.log('publishersPath parse error: ' + ex.toString())
-      }
-    })
-  })
-}
-
 var boot = () => {
   if (client) return
 
@@ -194,7 +135,7 @@ if (ipc) {
     ctx = url.parse(location, true)
     ctx.TLD = tldjs.getPublicSuffix(ctx.host)
     if (!ctx.TLD) {
-      console.log('no TLD for:' + ctx.host)
+      console.log('\nno TLD for:' + ctx.host)
       event.returnValue = {}
       return
     }
@@ -322,16 +263,20 @@ eventStore.addChangeListener(() => {
 
           entry.faviconURL = blob
           updatePublisherInfo()
+/*
           console.log('\n' + publisher + ' synopsis=' +
                       JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL', 'window' ]),
                                                        { faviconURL: entry.faviconURL && '... ' }), null, 2))
+ */
         })
       }
 
       faviconURL = page.faviconURL || entry.protocol + '//' + url.parse(location).host + '/favicon.ico'
       entry.faviconURL = null
 
+/*
       console.log('request: ' + faviconURL)
+ */
       fetch(faviconURL)
     }
   })
@@ -357,7 +302,7 @@ var initialize = (onoff) => {
 
   fs.access(statePath, fs.FF_OK, (err) => {
     if (!err) {
-      console.log('found ' + statePath)
+      console.log('\nfound ' + statePath)
 
       fs.readFile(statePath, (err, data) => {
         var state
@@ -387,6 +332,64 @@ var initialize = (onoff) => {
       return
     }
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
+  })
+}
+
+var enable = (onoff) => {
+  if (!onoff) {
+    synopsis = null
+    if (notificationTimeout) {
+      clearInterval(notificationTimeout)
+      notificationTimeout = null
+    }
+    return updateLedgerInfo()
+  }
+
+  synopsis = new (ledgerPublisher.Synopsis)()
+  fs.readFile(synopsisPath, (err, data) => {
+    console.log('\nstarting up ledger publisher integration')
+
+    if (err) {
+      if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
+      return updateLedgerInfo()
+    }
+
+    console.log('found ' + synopsisPath)
+    try {
+      synopsis = new (ledgerPublisher.Synopsis)(data)
+    } catch (ex) {
+      console.log('synopsisPath parse error: ' + ex.toString())
+    }
+    underscore.keys(synopsis.publishers).forEach((publisher) => {
+      if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
+    })
+    updateLedgerInfo()
+
+    // Check if the add funds notification should be shown every 15 minutes
+    notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
+
+    fs.readFile(publisherPath, (err, data) => {
+      if (err) {
+        if (err.code !== 'ENOENT') console.log('publisherPath read error: ' + err.toString())
+        return
+      }
+
+      console.log('\nfound ' + publisherPath)
+      try {
+        data = JSON.parse(data)
+        underscore.keys(data).sort().forEach((publisher) => {
+          var entries = data[publisher]
+
+          publishers[publisher] = {}
+          entries.forEach((entry) => {
+            locations[entry.location] = entry
+            publishers[publisher][entry.location] = entry.when
+          })
+        })
+      } catch (ex) {
+        console.log('publishersPath parse error: ' + ex.toString())
+      }
+    })
   })
 }
 
@@ -711,7 +714,9 @@ var callback = (err, result, delayTime) => {
   var entries = client && client.report()
   var now = underscore.now()
 
-  console.log('\nledger client callback: errP=' + (!!err) + ' resultP=' + (!!result) + ' delayTime=' + delayTime)
+  if (client.options.verboseP) {
+    console.log('\nledger client callback: errP=' + (!!err) + ' resultP=' + (!!result) + ' delayTime=' + delayTime)
+  }
 
   if (entries) {
     then = now - msecs.week
@@ -772,9 +777,7 @@ var roundtrip = (params, options, callback) => {
     if ((response) && (options.verboseP)) {
       console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
                  ' ' + (response.statusMessage || ''))
-      underscore.keys(response.headers).forEach((header) => {
-        console.log('>>> ' + header + ': ' + response.headers[header])
-      })
+      underscore.keys(response.headers).forEach((header) => { console.log('>>> ' + header + ': ' + response.headers[header]) })
       console.log('>>>')
       console.log('>>> ' + (body || '').split('\n').join('\n>>> '))
     }
@@ -814,7 +817,7 @@ var run = (delayTime) => {
   var siteSettings = appStore.getState().get('siteSettings')
   var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
 
-  console.log('\nledger client run: delayTime=' + delayTime)
+  if (client.options.verboseP) console.log('\nledger client run: delayTime=' + delayTime)
 
   try {
     winners.forEach((winner) => {
@@ -839,7 +842,7 @@ var run = (delayTime) => {
 
   if (client.isReadyToReconcile()) return client.reconcile(uuid.v4().toLowerCase(), callback)
 
-  console.log('\nwhat? wait, how can this happen?')
+  console.log('what? wait, how can this happen?')
 }
 
 /*
@@ -1016,6 +1019,5 @@ const notifyAddFunds = () => {
 module.exports = {
   init: init,
   quit: quit,
-  enable: enable,
   boot: boot
 }
