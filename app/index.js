@@ -549,9 +549,6 @@ app.on('ready', () => {
     ipcMain.on(messages.LEDGER_CREATE_WALLET, () => {
       ledger.boot()
     })
-    ipcMain.on(messages.LEDGER_ENABLE, (e, enabled) => {
-      ledger.enable(enabled)
-    })
 
     let masterKey
     ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {
