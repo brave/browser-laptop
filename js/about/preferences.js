@@ -1048,7 +1048,6 @@ class AboutPreferences extends React.Component {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
     if (key === settings.PAYMENTS_ENABLED) {
-      aboutActions.setLedgerEnabled(value)
       this.onChangeSetting(settings.PAYMENTS_NOTIFICATIONS, value)
     }
   }

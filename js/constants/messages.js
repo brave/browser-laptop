@@ -161,7 +161,6 @@ const messages = {
   // Ledger
   LEDGER_PUBLISHER: _,
   LEDGER_UPDATED: _,
-  LEDGER_ENABLE: _,
   LEDGER_CREATE_WALLET: _
 }
 
