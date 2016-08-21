@@ -840,7 +840,10 @@ var run = (delayTime) => {
   }
   if (delayTime > 0) {
     active = client
-    return setTimeout(() => { if ((active === client) && (client.sync(callback) === true)) return run(0) }, delayTime)
+    return setTimeout(() => {
+      if (!client) return console.log('\n\n*** MTR says this can\'t happen... please tell him that he\'s wrong!\n\n')
+      if ((active === client) && (client.sync(callback) === true)) return run(0)
+    }, delayTime)
   }
 
   if (client.isReadyToReconcile()) return client.reconcile(uuid.v4().toLowerCase(), callback)
