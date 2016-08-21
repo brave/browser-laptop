@@ -121,7 +121,16 @@ function registerForBeforeRequest (session) {
         return
       }
     }
-    cb({})
+    // Redirect to non-script version of DDG when it's blocked
+    let url = details.url
+    if (details.resourceType === 'mainFrame' &&
+      url.startsWith('https://duckduckgo.com/?q') &&
+    module.exports.isResourceEnabled('noScript', url)) {
+      url = url.replace('?q=', 'html?q=')
+      cb({redirectURL: url})
+    } else {
+      cb({})
+    }
   })
 }
 
