@@ -21,6 +21,7 @@ const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
+const FindBar = require('./findbar.js')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
@@ -84,6 +85,8 @@ class Main extends ImmutableComponent {
     this.onBraveMenu = this.onBraveMenu.bind(this)
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
+    this.onFind = this.onFind.bind(this)
+    this.onFindHide = this.onFindHide.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
   }
   registerWindowLevelShortcuts () {
@@ -620,6 +623,16 @@ class Main extends ImmutableComponent {
     windowActions.setUrlBarActive(false)
   }
 
+  onFindHide () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    windowActions.setFindbarShown(activeFrame, false)
+    webviewActions.stopFindInPage()
+  }
+
+  onFind (searchString, caseSensitivity, forward) {
+    webviewActions.findInPage(searchString, caseSensitivity, forward)
+  }
+
   onTabContextMenu (e) {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
@@ -874,6 +887,17 @@ class Main extends ImmutableComponent {
           activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
           onMenu={this.onHamburgerMenu}
         />
+
+        {
+          activeFrame && activeFrame.get('findbarShown')
+          ? <FindBar
+            frameKey={activeFrame.get('key')}
+            selected={activeFrame.get('findbarSelected')}
+            findDetail={activeFrame.get('findDetail')}
+            onFind={this.onFind}
+            onFindHide={this.onFindHide} />
+          : null
+        }
       </div>
       <div className='mainContainer'>
         <div className='tabContainer'
@@ -906,7 +930,6 @@ class Main extends ImmutableComponent {
               isFullScreen={frame.get('isFullScreen')}
               showFullScreenWarning={frame.get('showFullScreenWarning')}
               findbarShown={frame.get('findbarShown')}
-              findbarSelected={frame.get('findbarSelected')}
               findDetail={frame.get('findDetail')}
               hrefPreview={frame.get('hrefPreview')}
               showOnRight={frame.get('showOnRight')}
