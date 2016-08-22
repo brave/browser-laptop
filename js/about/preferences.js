@@ -25,6 +25,7 @@ const pad = require('underscore.string/pad')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
+const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
@@ -363,12 +364,9 @@ class GeneralTab extends ImmutableComponent {
 }
 
 class SearchSelectEntry extends ImmutableComponent {
-  shouldComponentUpdate (nextProps, nextState) {
-    return this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE) !== nextProps.settings.get(settings.DEFAULT_SEARCH_ENGINE)
-  }
   render () {
     return <div>
-    {this.props.settings.get(settings.DEFAULT_SEARCH_ENGINE) === this.props.name
+    {getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings) === this.props.name
       ? <span className='fa fa-check-square' id='searchSelectIcon' /> : null}
     </div>
   }
@@ -580,7 +578,7 @@ class PaymentsTab extends ImmutableComponent {
                       onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)} >
                       {
                         [5, 10, 15, 20].map((amount) =>
-                          <option value={amount}>{amount} {this.props.ledgerData.get('currency')}</option>
+                          <option value={amount}>{amount} {this.props.ledgerData.get('currency') || 'USD'}</option>
                         )
                       }
                     </select>
@@ -618,11 +616,12 @@ class PaymentsTab extends ImmutableComponent {
             <h3 data-l10n-id='paymentsWelcomeTitle' />
             <div data-l10n-id='paymentsWelcomeText1' />
             <div data-l10n-id='paymentsWelcomeText2' />
-            <div className='boldText' data-l10n-id='paymentsWelcomeText3' />
+            <div data-l10n-id='paymentsWelcomeText3' />
+            <div className='boldText' data-l10n-id='paymentsWelcomeTextBold' />
             <a href='https://github.com/brave/ledger/blob/master/documentation/Ledger-Principles.md' target='_blank' data-l10n-id='paymentsWelcomeText4' />
           </div>
         }
-        {this.footerContent}
+        {this.enabled ? null : this.footerContent}
     </div>
   }
 }
@@ -728,12 +727,18 @@ class ShieldsTab extends ImmutableComponent {
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
-    if (e.target.value === 'blockAds') {
+    if (e.target.value === 'showBraveAds') {
       aboutActions.setResourceEnabled(adblock, true)
       aboutActions.setResourceEnabled(trackingProtection, true)
+      aboutActions.setResourceEnabled(adInsertion, true)
+    } else if (e.target.value === 'blockAds') {
+      aboutActions.setResourceEnabled(adblock, true)
+      aboutActions.setResourceEnabled(trackingProtection, true)
+      aboutActions.setResourceEnabled(adInsertion, false)
     } else {
       aboutActions.setResourceEnabled(adblock, false)
       aboutActions.setResourceEnabled(trackingProtection, false)
+      aboutActions.setResourceEnabled(adInsertion, false)
     }
   }
   onChangeCookieControl (e) {
@@ -748,6 +753,7 @@ class ShieldsTab extends ImmutableComponent {
       <SettingsList>
         <SettingItem dataL10nId='adControl'>
           <select value={this.props.braveryDefaults.get('adControl')} onChange={this.onChangeAdControl}>
+            <option data-l10n-id='showBraveAds' value='showBraveAds' />
             <option data-l10n-id='blockAds' value='blockAds' />
             <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
           </select>
@@ -1039,7 +1045,6 @@ class AboutPreferences extends React.Component {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
     if (key === settings.PAYMENTS_ENABLED) {
-      aboutActions.setLedgerEnabled(value)
       this.onChangeSetting(settings.PAYMENTS_NOTIFICATIONS, value)
     }
   }

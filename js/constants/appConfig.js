@@ -7,6 +7,7 @@ const { getTargetAboutUrl } = require('../lib/appUrlUtil')
 const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
 const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
+const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 
 module.exports = {
   name: 'Brave',
@@ -17,6 +18,7 @@ module.exports = {
     SAFE_BROWSING: 'safeBrowsing',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
+    AD_INSERTION: 'adInsertion',
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
@@ -57,6 +59,10 @@ module.exports = {
   },
   siteHacks: {
     enabled: true
+  },
+  adInsertion: {
+    enabled: true,
+    url: adHost
   },
   crashes: {
     crashSubmitUrl: crashURL

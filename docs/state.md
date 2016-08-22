@@ -43,7 +43,7 @@ AppStore
       protocolRegistrationPermission: boolean,
       savePasswords: boolean, // Only false or undefined/null
       shieldsUp: boolean,
-      adControl: string, // (blockAds | allowAdsAndTracking)
+      adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
       safeBrowsing: boolean,
       noScript: boolean,
@@ -92,6 +92,9 @@ AppStore
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
     enabled: boolean // Enable HTTPS Everywhere
+  },
+  adInsertion: {
+    enabled: boolean // Enable ad insertion
   },
   cookieblock: {
     enabled: boolean // Enable 3p cookie/referer blocking

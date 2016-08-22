@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.11.5",
+  "version": "0.11.6",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -160,6 +160,7 @@
   "standard": {
     "ignore": [
       "app/extensions/**",
+      "app/browser/ads/adDivCandidates.js",
       "Brave-darwin-x64/**",
       "less/**",
       "res/**",

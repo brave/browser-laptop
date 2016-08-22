@@ -278,6 +278,7 @@ class BraveryPanel extends ImmutableComponent {
                     disabled: !shieldsUp
                   })} data-l10n-id='adControl' />
                   <select value={adControl} onChange={this.onToggleAdControl} disabled={!shieldsUp}>
+                    <option data-l10n-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
                   </select>

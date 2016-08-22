@@ -46,6 +46,7 @@ const Extensions = require('./extensions')
 const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
 const AdBlock = require('./adBlock')
+const AdInsertion = require('./browser/ads/adInsertion')
 const HttpsEverywhere = require('./httpsEverywhere')
 const SiteHacks = require('./siteHacks')
 const CmdLine = require('./cmdLine')
@@ -398,6 +399,7 @@ app.on('ready', () => {
     HttpsEverywhere.init()
     TrackingProtection.init()
     AdBlock.init()
+    AdInsertion.init()
 
     if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
       if (!CmdLine.newWindowURL) {
@@ -546,9 +548,6 @@ app.on('ready', () => {
 
     ipcMain.on(messages.LEDGER_CREATE_WALLET, () => {
       ledger.boot()
-    })
-    ipcMain.on(messages.LEDGER_ENABLE, (e, enabled) => {
-      ledger.enable(enabled)
     })
 
     let masterKey
