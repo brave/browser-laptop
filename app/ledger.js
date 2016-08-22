@@ -841,8 +841,11 @@ var run = (delayTime) => {
   if (delayTime > 0) {
     active = client
     return setTimeout(() => {
+      if (active !== client) return
+
       if (!client) return console.log('\n\n*** MTR says this can\'t happen... please tell him that he\'s wrong!\n\n')
-      if ((active === client) && (client.sync(callback) === true)) return run(0)
+
+      if (client.sync(callback) === true) return run(0)
     }, delayTime)
   }
 
