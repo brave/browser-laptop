@@ -61,6 +61,7 @@ const synopsisPath = path.join(app.getPath('userData'), 'ledger-synopsis.json')
  * ledger globals
  */
 
+var bootP = false
 var client
 const clientOptions = { loggingP: true, verboseP: true }
 
@@ -107,8 +108,9 @@ var quit = () => {
 }
 
 var boot = () => {
-  if (client) return
+  if ((bootP) || (client)) return
 
+  bootP = true
   fs.access(statePath, fs.FF_OK, (err) => {
     if (!err) return
 
@@ -116,6 +118,8 @@ var boot = () => {
 
     client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
+
+    bootP = false
   })
 }
 
