@@ -31,6 +31,8 @@ const protocolHandler = electron.protocol
 const session = electron.session
 
 const acorn = require('acorn')
+const ledgerBalance = require('ledger-balance')
+ledgerBalance.roundTrip = roundtrip
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const random = require('random-lib')
@@ -116,6 +118,7 @@ var boot = () => {
 
     client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
+    getBalance()
   })
 }
 
@@ -328,6 +331,7 @@ var initialize = (onoff) => {
         // Make sure bravery props are up-to-date with user settings
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
         if (state.properties.wallet) getPaymentInfo()
+        getBalance()
       })
       return
     }
@@ -843,7 +847,7 @@ var run = (delayTime) => {
     return setTimeout(() => {
       if (active !== client) return
 
-      if (!client) return console.log('\n\n*** MTR says this can\'t happen... please tell him that he\'s wrong!\n\n')
+      if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
 
       if (client.sync(callback) === true) return run(0)
     }, delayTime)
@@ -896,6 +900,25 @@ var getStateInfo = (state) => {
   }
 
   updateLedgerInfo()
+}
+
+var getBalance = () => {
+  setTimeout(getBalance, msecs.minute)
+  if ((!client) || (!ledgerInfo.address)) return
+
+  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, clientOptions),
+  (err, provider, result) => {
+    if (err) return console.log('ledger balance error: ' + err.toString())
+
+    if (typeof result.unconfirmed === 'undefined') return
+
+    if (result.unconfirmed > 0) {
+      ledgerInfo.unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      return updateLedgerInfo()
+    }
+
+    if (ledgerInfo.unconfirmed !== '0.0000') getPaymentInfo()
+  })
 }
 
 var getPaymentInfo = () => {
