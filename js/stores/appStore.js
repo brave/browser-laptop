@@ -523,6 +523,8 @@ const handleAppAction = (action) => {
     case AppConstants.APP_CLEAR_DATA:
       if (action.clearDataDetail.get('browserHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS})
+        BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
+        BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW))
       }
       if (action.clearDataDetail.get('downloadHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS})

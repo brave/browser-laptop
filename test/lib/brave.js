@@ -190,6 +190,12 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('getWindowState', function () {
+      return this.execute(function () {
+        return window.windowStore.state.toJS()
+      })
+    })
+
     this.app.client.addCommand('showFindbar', function (show) {
       return this.execute(function (show) {
         window.windowActions.setFindbarShown(Object.assign({
@@ -267,6 +273,17 @@ var exports = {
       return this.execute(function (hostPattern, key, value) {
         return require('../../../js/actions/appActions').changeSiteSetting(hostPattern, key, value)
       }, key, value).then((response) => response.value)
+    })
+
+    /**
+     * Clears application data
+     *
+     * @param {object} clearDataDetail - the options to use for clearing
+     */
+    this.app.client.addCommand('clearAppData', function (clearDataDetail) {
+      return this.execute(function (clearDataDetail) {
+        return require('../../../js/actions/appActions').clearAppData(clearDataDetail)
+      }, clearDataDetail).then((response) => response.value)
     })
 
     this.app.client.addCommand('getDefaultWindowHeight', function () {

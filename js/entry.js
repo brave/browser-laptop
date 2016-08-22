@@ -30,6 +30,7 @@ const ipc = electron.ipcRenderer
 const webFrame = electron.webFrame
 const windowStore = require('./stores/windowStore')
 const appStoreRenderer = require('./stores/appStoreRenderer')
+const windowActions = require('./actions/windowActions')
 const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
@@ -66,13 +67,18 @@ ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
 
 if (process.env.NODE_ENV === 'test') {
   window.appStoreRenderer = appStoreRenderer
-  window.windowActions = require('./actions/windowActions')
+  window.windowActions = windowActions
+  window.windowStore = windowStore
 }
 
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
   appStoreRenderer.state = action.stateDiff
     ? appStoreRenderer.state = patch(appStoreRenderer.state, Immutable.fromJS(action.stateDiff))
     : appStoreRenderer.state = Immutable.fromJS(action.state)
+})
+
+ipc.on(messages.CLEAR_CLOSED_FRAMES, () => {
+  windowActions.clearClosedFrames()
 })
 
 window.addEventListener('beforeunload', function () {

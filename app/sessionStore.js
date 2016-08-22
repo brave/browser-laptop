@@ -89,7 +89,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
 /**
  * Cleans session data from unwanted values.
  */
-module.exports.cleanPerWindowData = (perWindowData) => {
+module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   if (!perWindowData) {
     perWindowData = {}
   }
@@ -195,6 +195,10 @@ module.exports.cleanPerWindowData = (perWindowData) => {
       }
     }
   }
+  const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
+  if (clearHistory) {
+    perWindowData.closedFrames = []
+  }
 
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
@@ -233,7 +237,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // Get rid of them here.
   delete data.windows
   if (data.perWindowState) {
-    data.perWindowState.forEach(module.exports.cleanPerWindowData)
+    data.perWindowState.forEach((perWindowState) =>
+      module.exports.cleanPerWindowData(perWindowState, isShutdown))
   }
   // Delete expired Flash approvals
   let now = Date.now()

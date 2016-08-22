@@ -458,6 +458,9 @@ const doAction = (action) => {
       windowState = windowState.merge(FrameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       focusWebview(activeFrameStatePath())
       break
+    case WindowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
+      windowState = windowState.set('closedFrames', new Immutable.List())
+      break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
       if (!action.frameProps) {
         break

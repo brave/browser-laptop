@@ -19,7 +19,9 @@ var exclusions = {
   'Delta.com.xml': 'https://delta.com does not redirect to https://www.delta.com',
   'Cargo.xml': 'breaks cargocollective.com',
   'TMZ.com.xml': 'breaks www.tmz.com',
-  'BusinessInsider.xml': 'breaks http://www.businessinsider.com/silicon-valley-100-2016-6?op=0'
+  'BusinessInsider.xml': 'breaks http://www.businessinsider.com/silicon-valley-100-2016-6?op=0',
+  'Tesco.xml': 'breaks tesco.com due to CSP mismatch',
+  'Vodafone.ie.xml': 'breaks pagination on http://shop.vodafone.ie/shop/phonesAndPlans/phonesAndPlansHome.jsp?subPage=phones&planFilter=onAccount'
 }
 
 var rulesets = JSON.parse(fs.readFileSync('rulesets.json', 'utf8'))
