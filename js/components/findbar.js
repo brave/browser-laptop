@@ -10,11 +10,13 @@ const Button = require('./button.js')
 const SwitchControl = require('../components/switchControl')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
+const {getTextColorForBackground} = require('../lib/color')
 
 class FindBar extends ImmutableComponent {
   constructor () {
     super()
     this.onBlur = this.onBlur.bind(this)
+    this.onClear = this.onClear.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onChange = this.onChange.bind(this)
     this.onFindPrev = this.onFindPrev.bind(this)
@@ -98,6 +100,14 @@ class FindBar extends ImmutableComponent {
     windowActions.setFindbarSelected(this.frame, false)
   }
 
+  onClear () {
+    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+      searchString: '',
+      caseSensitivity: this.isCaseSensitive
+    }))
+    this.focus()
+  }
+
   get numberOfMatches () {
     if (!this.props.findDetail || this.props.findDetail.get('numberOfMatches') === undefined) {
       return -1
@@ -146,7 +156,20 @@ class FindBar extends ImmutableComponent {
         data-l10n-id='findResultMatches' />
     }
 
-    return <div className='findBar' onBlur={this.onBlur}>
+    const backgroundColor = this.props.paintTabs && (this.props.themeColor || this.props.computedThemeColor)
+    let textColor
+    let findBarStyle = {}
+
+    if (backgroundColor) {
+      textColor = getTextColorForBackground(backgroundColor)
+      findBarStyle = {
+        background: backgroundColor,
+        border: '1px solid ' + backgroundColor,
+        color: textColor
+      }
+    }
+
+    return <div className='findBar' style={findBarStyle} onBlur={this.onBlur}>
       <div className='searchContainer'>
         <div className='searchStringContainer'>
           <span className='fa fa-search'></span>
@@ -157,7 +180,7 @@ class FindBar extends ImmutableComponent {
             onChange={this.onChange}
             value={this.searchString} />
           <span className='fa fa-times'
-            onClick={this.props.onFindHide}></span>
+            onClick={this.onClear}></span>
         </div>
         <span className='findMatchText'>{findMatchText}</span>
         <Button iconClass='findButton fa-caret-down'
@@ -172,7 +195,7 @@ class FindBar extends ImmutableComponent {
           id='caseSensitivityCheckbox'
           checkedOn={this.isCaseSensitive}
           onClick={this.onCaseSensitivityChange} />
-        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity'></label>
+        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarStyle}></label>
       </div>
       <Button label='+'
         className='navbutton closeButton'

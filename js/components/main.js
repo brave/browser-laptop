@@ -891,6 +891,9 @@ class Main extends ImmutableComponent {
         {
           activeFrame && activeFrame.get('findbarShown')
           ? <FindBar
+            paintTabs={getSetting(settings.PAINT_TABS)}
+            themeColor={activeFrame.get('themeColor')}
+            computedThemeColor={activeFrame.get('computedThemeColor')}
             frameKey={activeFrame.get('key')}
             selected={activeFrame.get('findbarSelected')}
             findDetail={activeFrame.get('findDetail')}
