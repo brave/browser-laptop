@@ -5,29 +5,71 @@
 @import "variables.less";
 
 .findBar {
-  background: @chromeControlsBackground;
-  opacity: 0.95;
+  background: @findbarBackground;
+  border-bottom: 1px solid @lightGray;
+  color: @highlightBlue;
+  display: flex;
+  font-size: 12px;
+  align-items: center;
+  justify-content: center;
   padding: 5px 10px;
-  position: absolute;
-  top: 0;
-  right: 0;
+  animation: slideIn 25ms;
 
-  .findButton {
+  .findMatchText {
+    margin: 0 10px;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  label {
+    color: @mediumGray;
+  }
+
+  span.findButton {
+    color: @gray;
+    border: 1px solid @findbarBackground;
+    font-size: 18px;
     margin: 0 2px;
+
+    &:not([disabled]):hover {
+      border: 1px solid @gray;
+    }
 
     &.hideButton:not([disabled]):hover {
       background: @chromeControlsWarningBackground;
     }
   }
 
+  .closeButton {
+    color: @gray;
+    font-size: 22px;
+    margin-right: 0;
+    transform: rotate(45deg);
+  }
+
+  .searchContainer {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+  }
+
   .searchStringContainer {
+    background: white;
+    border-radius: @borderRadius;
     display: inline-block;
     position: relative;
 
+    span {
+      color: @gray;
+      padding: 0 5px;
+    }
+
     input {
+      height: 16px;
       width: 200px;
       margin-right: 5px;
-      padding-right: 28px;
+      padding-right: 0 5px;
+      border: none;
     }
 
     .foundResults {
@@ -44,8 +86,7 @@
     input {
       margin-right: 6px;
     }
-    color: white;
-    font-size: 12px;
+    color: @gray;
     margin-top: 6px;
   }
 }
