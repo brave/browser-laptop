@@ -49,6 +49,7 @@ const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../constants/keyCodes')
+const isWindows = process.platform === 'win32'
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -893,7 +894,7 @@ class Main extends ImmutableComponent {
                 braveShieldsDown: !braverySettings.shieldsUp
               })}
               onClick={this.onBraveMenu} />
-              {process.platform === 'darwin' ? null : <WindowActionBar windowMaximized={this.props.windowState.getIn(['ui', 'isMaximized'])} />}
+              { isWindows ? <WindowActionBar windowMaximized={this.props.windowState.getIn(['ui', 'isMaximized'])} /> : null }
           </div>
         </div>
         <UpdateBar updates={this.props.appState.get('updates')} />

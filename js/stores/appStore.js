@@ -28,7 +28,6 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
-const isDarwin = process.platform === 'darwin'
 const locale = require('../../app/locale')
 const path = require('path')
 
@@ -36,6 +35,8 @@ const path = require('path')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
+const isDarwin = process.platform === 'darwin'
+const isWindows = process.platform === 'win32'
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -134,10 +135,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     // frame: false,
     // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
     titleBarStyle: 'hidden-inset',
-    autoHideMenuBar: autoHideMenuBarSetting,
+    autoHideMenuBar: false,//autoHideMenuBarSetting,
     title: appConfig.name,
     webPreferences: defaults.webPreferences,
-    frame: (process.platform === 'darwin')
+    frame: !isWindows
   }
 
   if (process.platform === 'linux') {
@@ -145,6 +146,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   }
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
+
+  mainWindow.setMenuBarVisibility(true)
 
   if (windowState.ui && windowState.ui.isMaximized) {
     mainWindow.maximize()

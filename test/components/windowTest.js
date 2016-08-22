@@ -2,6 +2,7 @@
 
 const Brave = require('../lib/brave')
 const {activeWebview, minimizeButton, maximizeButton, closeButton} = require('../lib/selectors')
+const isWindows = process.platform === 'win32'
 
 describe('application window', function () {
   describe('application launch', function () {
@@ -146,7 +147,7 @@ describe('application window', function () {
     })
   })
 
-  if (process.platform !== 'darwin') {
+  if (isWindows) {
     describe('window top action buttons', function () {
       Brave.beforeAll(this)
 
