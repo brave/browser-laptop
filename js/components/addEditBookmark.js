@@ -92,7 +92,7 @@ class AddEditBookmark extends ImmutableComponent {
     }
 
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
-    appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail, true)
+    appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
     this.onClose()
   }
   onRemoveBookmark () {

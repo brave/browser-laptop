@@ -12,6 +12,7 @@ AppStore
   sites: [{
     location: string,
     title: string,
+    customTitle: string, // User provided title for bookmark; overrides title
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     favicon: string, // URL of the favicon
     lastAccessedTime: number, // datetime.getTime()
