@@ -121,7 +121,8 @@ var boot = () => {
     try {
       client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
     } catch (ex) {
-      return console.log('ledger-client error: ' + ex.toString() + '\n' + err.stack)
+      bootP = false
+      return console.log('ledger-client error: ' + ex.toString() + '\n' + ex.stack)
     }
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     getBalance()
