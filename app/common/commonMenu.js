@@ -60,13 +60,17 @@ module.exports.sendToFocusedWindow = (focusedWindow, message) => {
   }
 }
 
-module.exports.quitMenuItem = () => {
-  return {
-    label: locale.translation('quitApp'),
-    accelerator: 'CmdOrCtrl+Q',
-    click: app.quit
+module.exports.quitMenuItem = () => ({
+  label: locale.translation('quitApp'),
+  accelerator: 'CmdOrCtrl+Q',
+  click: function () {
+    if (process.type === 'browser') {
+      app.quit()
+    } else {
+      electron.ipcRenderer.send(messages.QUIT_APPLICATION)
+    }
   }
-}
+})
 
 module.exports.newTabMenuItem = (parentFrameKey) => {
   return {
