@@ -354,7 +354,7 @@ var enable = (onoff) => {
       clearInterval(notificationTimeout)
       notificationTimeout = null
     }
-    return updateLedgerInfo()
+    return updatePublisherInfo()
   }
 
   synopsis = new (ledgerPublisher.Synopsis)()
@@ -363,7 +363,7 @@ var enable = (onoff) => {
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
-      return updateLedgerInfo()
+      return updatePublisherInfo()
     }
 
     if (clientOptions.verboseP) console.log('\nfound ' + synopsisPath)
@@ -375,7 +375,7 @@ var enable = (onoff) => {
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
-    updateLedgerInfo()
+    updatePublisherInfo()
 
     // Check if the add funds notification should be shown every 15 minutes
     notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
@@ -438,6 +438,10 @@ var updatePublisherInfo = () => {
 
   syncWriter(synopsisPath, synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
+
+  if (clientOptions.debugP) {
+    console.log('\nupdatePublisherInfo: ' + JSON.stringify(underscore.omit(publisherInfo, [ '_internal' ])))
+  }
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
 }
@@ -708,7 +712,9 @@ var updateLedgerInfo = () => {
     }
   }
 
-  if (clientOptions.debugP) console.log(JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
+  if (clientOptions.debugP) {
+    console.log('\nupdateLedgerInfo: ' + JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
+  }
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
 }
@@ -770,6 +776,7 @@ var roundtrip = (params, options, callback) => {
                 : typeof params.server !== 'undefined' ? params.server
                 : typeof options.server === 'string' ? url.parse(options.server) : options.server
 
+  if (!params.method) params.method = 'GET'
   parts = underscore.extend(underscore.pick(parts, [ 'protocol', 'hostname', 'port' ]),
                             underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
 
