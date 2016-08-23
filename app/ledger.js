@@ -31,6 +31,7 @@ const protocolHandler = electron.protocol
 const session = electron.session
 
 const acorn = require('acorn')
+const ledgerBalance = require('ledger-balance')
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const random = require('random-lib')
@@ -116,8 +117,14 @@ var boot = () => {
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
-    client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
+    try {
+      client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
+    } catch (ex) {
+      bootP = false
+      return console.log('ledger-client error: ' + ex.toString() + '\n' + ex.stack)
+    }
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
+    getBalance()
 
     bootP = false
   })
@@ -298,7 +305,7 @@ var initialize = (onoff) => {
 
   if (!onoff) {
     client = null
-    return
+    return appActions.updateLedgerInfo({})
   }
   if (client) return
 
@@ -306,7 +313,7 @@ var initialize = (onoff) => {
 
   fs.access(statePath, fs.FF_OK, (err) => {
     if (!err) {
-      console.log('\nfound ' + statePath)
+      if (clientOptions.verboseP) console.log('\nfound ' + statePath)
 
       fs.readFile(statePath, (err, data) => {
         var state
@@ -315,7 +322,7 @@ var initialize = (onoff) => {
 
         try {
           state = JSON.parse(data)
-          console.log('\nstarting up ledger client integration')
+          if (clientOptions.verboseP) console.log('\nstarting up ledger client integration')
         } catch (ex) {
           return console.log('statePath parse error: ' + ex.toString())
         }
@@ -332,10 +339,13 @@ var initialize = (onoff) => {
         // Make sure bravery props are up-to-date with user settings
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
         if (state.properties.wallet) getPaymentInfo()
+        getBalance()
       })
       return
     }
+
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
+    appActions.updateLedgerInfo({})
   })
 }
 
@@ -346,19 +356,19 @@ var enable = (onoff) => {
       clearInterval(notificationTimeout)
       notificationTimeout = null
     }
-    return updateLedgerInfo()
+    return updatePublisherInfo()
   }
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(synopsisPath, (err, data) => {
-    console.log('\nstarting up ledger publisher integration')
+    if (clientOptions.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
-      return updateLedgerInfo()
+      return updatePublisherInfo()
     }
 
-    console.log('found ' + synopsisPath)
+    if (clientOptions.verboseP) console.log('\nfound ' + synopsisPath)
     try {
       synopsis = new (ledgerPublisher.Synopsis)(data)
     } catch (ex) {
@@ -367,7 +377,7 @@ var enable = (onoff) => {
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
-    updateLedgerInfo()
+    updatePublisherInfo()
 
     // Check if the add funds notification should be shown every 15 minutes
     notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
@@ -378,7 +388,7 @@ var enable = (onoff) => {
         return
       }
 
-      console.log('\nfound ' + publisherPath)
+      if (clientOptions.verboseP) console.log('\nfound ' + publisherPath)
       try {
         data = JSON.parse(data)
         underscore.keys(data).sort().forEach((publisher) => {
@@ -430,6 +440,10 @@ var updatePublisherInfo = () => {
 
   syncWriter(synopsisPath, synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
+
+  if (clientOptions.debugP) {
+    console.log('\nupdatePublisherInfo: ' + JSON.stringify(underscore.omit(publisherInfo, [ '_internal' ])))
+  }
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
 }
@@ -618,7 +632,7 @@ var cacheRuleSet = (ruleset) => {
         if ((rule.consequent !== null) || (rule.dom)) return
         if (!rulesolver.resolve(rule.condition, ctx)) return
 
-        console.log('\npurging ' + publisher)
+        if (clientOptions.verboseP) console.log('\npurging ' + publisher)
         delete synopsis.publishers[publisher]
         syncP = true
       })
@@ -700,9 +714,9 @@ var updateLedgerInfo = () => {
     }
   }
 
-/*
-  console.log(JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
- */
+  if (clientOptions.debugP) {
+    console.log('\nupdateLedgerInfo: ' + JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
+  }
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
 }
@@ -718,8 +732,9 @@ var callback = (err, result, delayTime) => {
   var entries = client && client.report()
   var now = underscore.now()
 
-  if (client.options.verboseP) {
-    console.log('\nledger client callback: errP=' + (!!err) + ' resultP=' + (!!result) + ' delayTime=' + delayTime)
+  if (clientOptions.verboseP) {
+    console.log('\nledger client callback: clientP=' + (!!client) + ' errP=' + (!!err) + ' resultP=' + (!!result) +
+                ' delayTime=' + delayTime)
   }
 
   if (entries) {
@@ -737,9 +752,13 @@ var callback = (err, result, delayTime) => {
     console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
+/* TBD: avoid error lock-up in sync preventing future reconciliations
     return setTimeout(() => {
       if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     }, 1 * msecs.hour)
+ */
+
+    if (typeof delayTime === 'undefined') delayTime = 0
   }
 
   if (!result) return run(delayTime)
@@ -755,8 +774,11 @@ var callback = (err, result, delayTime) => {
 
 var roundtrip = (params, options, callback) => {
   var i
-  var parts = typeof options.server === 'string' ? url.parse(options.server) : options.server
+  var parts = typeof params.server === 'string' ? url.parse(params.server)
+                : typeof params.server !== 'undefined' ? params.server
+                : typeof options.server === 'string' ? url.parse(options.server) : options.server
 
+  if (!params.method) params.method = 'GET'
   parts = underscore.extend(underscore.pick(parts, [ 'protocol', 'hostname', 'port' ]),
                             underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
 
@@ -801,7 +823,7 @@ var roundtrip = (params, options, callback) => {
     try {
       callback(null, response, payload)
     } catch (err0) {
-      if (options.verboseP) console.log('callback: ' + err0.toString() + '\n' + err0.stack)
+      if (options.verboseP) console.log('\ncallback: ' + err0.toString() + '\n' + err0.stack)
     }
   })
 
@@ -814,14 +836,14 @@ var roundtrip = (params, options, callback) => {
 }
 
 var run = (delayTime) => {
+  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+
   if ((typeof delayTime === 'undefined') || (!client)) return
 
   var active, state
   var ballots = client.ballots()
   var siteSettings = appStore.getState().get('siteSettings')
   var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
-
-  if (client.options.verboseP) console.log('\nledger client run: delayTime=' + delayTime)
 
   try {
     winners.forEach((winner) => {
@@ -845,8 +867,11 @@ var run = (delayTime) => {
   if (delayTime > 0) {
     active = client
     return setTimeout(() => {
-      if (!client) return console.log('\n\n*** MTR says this can\'t happen... please tell him that he\'s wrong!\n\n')
-      if ((active === client) && (client.sync(callback) === true)) return run(0)
+      if (active !== client) return
+
+      if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
+
+      if (client.sync(callback) === true) return run(0)
     }, delayTime)
   }
 
@@ -899,6 +924,31 @@ var getStateInfo = (state) => {
   updateLedgerInfo()
 }
 
+var getBalance = () => {
+  if (!client) return
+
+  setTimeout(getBalance, msecs.minute)
+  if (!ledgerInfo.address) return
+
+  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
+  (err, provider, result) => {
+    if (err) return console.log('ledger balance error: ' + err.toString())
+
+    if (typeof result.unconfirmed === 'undefined') return
+
+    if (result.unconfirmed > 0) {
+      ledgerInfo.unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      if (clientOptions.verboseP) console.log('\ngetBalance refreshes ledger info: ' + ledgerInfo.unconfirmed)
+      return updateLedgerInfo()
+    }
+
+    if (ledgerInfo.unconfirmed === '0.0000') return
+
+    if (clientOptions.verboseP) console.log('\ngetBalance refreshes payment info')
+    getPaymentInfo()
+  })
+}
+
 var getPaymentInfo = () => {
   var amount, currency
 
@@ -938,7 +988,11 @@ var setPaymentInfo = (amount) => {
   if (isNaN(amount) || (amount <= 0)) return
 
   underscore.extend(bravery.fee, { amount: amount })
-  client.setBraveryProperties(bravery, callback)
+  client.setBraveryProperties(bravery, (err, result) => {
+    if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
+
+    if (result) syncWriter(statePath, result, () => {})
+  })
   if (ledgerInfo.created) getPaymentInfo()
 }
 
