@@ -194,13 +194,13 @@ class AboutAutofill extends React.Component {
         <h2 data-l10n-id='addresses' />
         <div className='autofillPageContent'>
           {savedAddresssPage}
-          <Button l10nId='addAddress' className='primaryButton' onClick={this.onAddAddress} />
+          <Button l10nId='addAddress' className='primaryButton addAddressButton' onClick={this.onAddAddress} />
         </div>
         <div className='autofillPageFooter'></div>
         <h2 data-l10n-id='creditCards' />
         <div className='autofillPageContent'>
           {savedCreditCardsPage}
-          <Button l10nId='addCreditCard' className='primaryButton' onClick={this.onAddCreditCard} />
+          <Button l10nId='addCreditCard' className='primaryButton addCreditCardButton' onClick={this.onAddCreditCard} />
         </div>
       </div>
     </div>

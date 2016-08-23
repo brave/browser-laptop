@@ -73,7 +73,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
       ExpYear.push(<option value={i}>{i}</option>)
     }
 
-    return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel' isClickDismiss>
+    return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel autofillCreditCardPanel' isClickDismiss>
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
         <div className='formRow manageAutofillDataTitle' data-l10n-id='editCreditCard' />
         <div className='genericFormTable'>
@@ -90,17 +90,17 @@ class AutofillCreditCardPanel extends ImmutableComponent {
           <div id='expirationDate' className='formRow'>
             <label data-l10n-id='expirationDate' htmlFor='expirationDate' />
             <select value={this.displayMonth}
-              onChange={this.onExpMonthChange} className='formSelect' >
+              onChange={this.onExpMonthChange} className='formSelect expMonthSelect' >
               {ExpMonth}
             </select>
             <select value={this.props.currentDetail.get('year')}
-              onChange={this.onExpYearChange} className='formSelect' >
+              onChange={this.onExpYearChange} className='formSelect expYearSelect' >
               {ExpYear}
             </select>
           </div>
           <div className='formRow'>
             <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
+            <Button l10nId='save' className='primaryButton saveCreditCardButton' onClick={this.onSave} />
           </div>
         </div>
       </div>

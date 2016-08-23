@@ -89,7 +89,7 @@ class AutofillAddressPanel extends ImmutableComponent {
     e.stopPropagation()
   }
   render () {
-    return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel' isClickDismiss>
+    return <Dialog onHide={this.props.onHide} className='manageAutofillDataPanel autofillAddressPanel' isClickDismiss>
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
         <div className='formRow manageAutofillDataTitle' data-l10n-id='editAddress' />
         <div className='genericFormTable'>
@@ -141,7 +141,7 @@ class AutofillAddressPanel extends ImmutableComponent {
           </div>
           <div className='formRow'>
             <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton' onClick={this.onSave} />
+            <Button l10nId='save' className='primaryButton saveAddressButton' onClick={this.onSave} />
           </div>
         </div>
       </div>

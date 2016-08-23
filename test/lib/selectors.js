@@ -45,5 +45,8 @@ module.exports = {
   clearBrowsingDataPanel: '.clearBrowsingDataPanel',
   clearBrowsingDataButton: '.clearBrowsingDataButton',
   saveButton: '[data-l10n-id="save"]',
-  securityTab: '[data-l10n-id="security"]'
+  securityTab: '[data-l10n-id="security"]',
+  saveButton: '[data-l10n-id="save"]',
+  autofillAddressPanel: '.autofillAddressPanel',
+  autofillCreditCardPanel: '.autofillCreditCardPanel'
 }

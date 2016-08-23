@@ -106,6 +106,12 @@ var exports = {
       }, message, ...param).then((response) => response.value)
     })
 
+    this.app.client.addCommand('ipcSendRenderer', function (message, ...param) {
+      return this.execute(function (message, ...param) {
+        return require('electron').ipcRenderer.send(message, ...param)
+      }, message, ...param).then((response) => response.value)
+    })
+
     var windowHandlesOrig = this.app.client.windowHandles
     Object.getPrototypeOf(this.app.client).windowHandles = function () {
       return windowHandlesOrig.apply(this)
@@ -193,6 +199,12 @@ var exports = {
     this.app.client.addCommand('getWindowState', function () {
       return this.execute(function () {
         return window.windowStore.state.toJS()
+      })
+    })
+
+    this.app.client.addCommand('setContextMenuDetail', function () {
+      return this.execute(function () {
+        return window.windowActions.setContextMenuDetail()
       })
     })
 
