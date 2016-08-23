@@ -117,9 +117,12 @@ var boot = () => {
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
+    appActions.updateLedgerInfo({ creating: true })
     try {
       client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
+      appActions.updateLedgerInfo({})
+
       bootP = false
       return console.log('ledger-client error: ' + ex.toString() + '\n' + ex.stack)
     }
