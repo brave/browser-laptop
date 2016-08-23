@@ -25,8 +25,8 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 class HistoryDay extends ImmutableComponent {
   navigate (entry) {
     aboutActions.newFrame({
-      location: entry.get('location'),
-      partitionNumber: entry.get('partitionNumber')
+      location: entry.location,
+      partitionNumber: entry.partitionNumber
     })
   }
   render () {
@@ -125,7 +125,7 @@ class AboutHistory extends React.Component {
     })
   }
   historyDescendingOrder () {
-    return this.state.history.filter((site) => site.get('tags').isEmpty())
+    return this.state.history.filter((site) => site.get('lastAccessedTime'))
       .sort((left, right) => {
         if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
         if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
@@ -133,7 +133,7 @@ class AboutHistory extends React.Component {
       }).slice(-500)
   }
   clearBrowsingDataNow () {
-    aboutActions.clearBrowsingDataNow()
+    aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
   render () {
     return <div className='siteDetailsPage'>

@@ -650,7 +650,8 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CLEAR_BROWSING_DATA_NOW:
-          windowActions.setClearBrowsingDataDetail({})
+          method = (clearBrowsingDataDetail) =>
+            windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
           break
       }
       method.apply(this, e.args)
