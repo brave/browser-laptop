@@ -779,7 +779,7 @@ class SecurityTab extends ImmutableComponent {
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
   }
   clearBrowsingDataNow () {
-    aboutActions.clearBrowsingDataNow()
+    aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)

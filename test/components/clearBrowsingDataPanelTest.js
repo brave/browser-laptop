@@ -49,8 +49,8 @@ describe('Clear Browsing Panel', function () {
         .click(securityTab)
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
-        .waitForVisible('.browserHistorySwitch .switchBackground')
-        .click('.browserHistorySwitch .switchBackground')
+        .waitForBrowserWindow()
+        .waitForVisible('.browserHistorySwitch')
         .waitForVisible('.clearDataButton')
         .click('.clearDataButton')
         .waitUntil(function () {
