@@ -79,7 +79,9 @@ class CreditCardItem extends ImmutableComponent {
         </span>
       </td>
       <td className='creditCardName'>{creditCard.get('name')}</td>
-      <td className='creditCardNumber'>{creditCard.get('card')}</td>
+      <td className='creditCardNumber'>{
+        creditCard.get('card') !== undefined ? '***' + creditCard.get('card').slice(-4) : null
+      }</td>
       <td className='creditCardPExpirationDate'>
         {creditCard.get('month') + '/' + creditCard.get('year')}
       </td>

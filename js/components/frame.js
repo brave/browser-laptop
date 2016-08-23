@@ -109,8 +109,44 @@ class Frame extends ImmutableComponent {
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
     } else if (location === 'about:autofill') {
-      this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, this.props.autofillAddresses.toJS())
-      this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, this.props.autofillCreditCards.toJS())
+      const partition = FrameStateUtil.getPartition(this.frame)
+      if (this.props.autofillAddresses) {
+        const addresses = this.props.autofillAddresses.toJS()
+        let list = []
+        for (let index in addresses) {
+          const address = currentWindow.webContents.session.autofill.getProfile(addresses[index][partition])
+          let addressDetail = {
+            name: address.full_name,
+            organization: address.company_name,
+            streetAddress: address.street_address,
+            city: address.city,
+            state: address.state,
+            postalCode: address.postal_code,
+            country: address.country_code,
+            phone: address.phone,
+            email: address.email,
+            guid: addresses[index]
+          }
+          list.push(addressDetail)
+        }
+        this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
+      }
+      if (this.props.autofillCreditCards) {
+        const creditCards = this.props.autofillCreditCards.toJS()
+        let list = []
+        for (let index in creditCards) {
+          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(creditCards[index][partition])
+          let creditCardDetail = {
+            name: creditCard.name,
+            card: creditCard.card_number,
+            month: creditCard.expiration_month,
+            year: creditCard.expiration_year,
+            guid: creditCards[index]
+          }
+          list.push(creditCardDetail)
+        }
+        this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
+      }
     }
 
     // send state to about pages
@@ -675,7 +711,7 @@ class Frame extends ImmutableComponent {
           windowActions.setAutofillAddressDetail(e.args[0], e.args[0])
           break
         case messages.ADD_AUTOFILL_CREDIT_CARD:
-          windowActions.setAutofillCreditCardDetail({month: '1', year: new Date().getFullYear()}, {})
+          windowActions.setAutofillCreditCardDetail({month: '1', year: new Date().getFullYear().toString()}, {})
           break
         case messages.EDIT_AUTOFILL_CREDIT_CARD:
           windowActions.setAutofillCreditCardDetail(e.args[0], e.args[0])
