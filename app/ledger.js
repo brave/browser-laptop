@@ -923,8 +923,10 @@ var getStateInfo = (state) => {
 }
 
 var getBalance = () => {
+  if (!client) return
+
   setTimeout(getBalance, msecs.minute)
-  if ((!client) || (!ledgerInfo.address)) return
+  if (!ledgerInfo.address) return
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
   (err, provider, result) => {
