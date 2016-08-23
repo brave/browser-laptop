@@ -27,26 +27,26 @@
   &.reverseExpand {
     flex-direction: row-reverse;
   }
+}
 
-  .contextMenuSingle {
-    background-color: rgba(238, 238, 238, 0.97);
-    border: 1px solid rgba(204, 204, 204, 0.54);
-    box-shadow: 1px 4px 8px -3px rgba(0, 0, 0, 0.5);
-    border-radius: @borderRadius;
-    box-sizing: border-box;
-    display: table;
-    min-width: 220px;
-    max-width: 400px;
+.contextMenuSingle {
+  background-color: rgba(238, 238, 238, 0.97);
+  border: 1px solid rgba(204, 204, 204, 0.54);
+  box-shadow: 1px 4px 8px -3px rgba(0, 0, 0, 0.5);
+  border-radius: @borderRadius;
+  box-sizing: border-box;
+  display: table;
+  min-width: 220px;
+  max-width: 400px;
 
-    &.isSubmenu {
-      position: relative;
-    }
+  &.isSubmenu {
+    position: relative;
   }
+}
 
-  .contextMenuIcon {
-    font-size: 14px;
-    margin-right: 8px;
-  }
+.contextMenuIcon {
+  font-size: 14px;
+  margin-right: 8px;
 }
 
 .contextMenuItem {
@@ -75,23 +75,6 @@
 
   &.multiContextMenuItem {
     display: flex;
-
-    .contextMenuSubItem {
-      border: 1px solid #aaaaaa;
-      border-radius: @borderRadius;
-      background-color: #fbfbfb;
-      color: black;
-      flex-grow: 1;
-      margin: 1px;
-      padding: 4px;
-      text-align: center;
-    }
-
-    .multiItemTitle {
-      margin-top: auto;
-      margin-bottom: auto;
-      padding-right: 10px;
-    }
   }
 
   &.contextMenuSeparator {
@@ -117,28 +100,45 @@
     color: #bbb;
   }
 
-  .contextMenuItemText {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .submenuIndicatorContainer {
-    display: flex;
-    margin: auto 0 auto auto;
-
-    .submenuIndicatorSpacer {
-      flex-grow: 1;
-    }
-
-    .submenuIndicator {
-      color: #676767;
-      font-size: 10px;
-      float: right;
-      margin: auto 0 auto 5px;
-    }
-  }
-
   .fa {
     font-size: @bookmarksIconSize;
+  }
+}
+
+.contextMenuSubItem {
+  border: 1px solid #aaaaaa;
+  border-radius: @borderRadius;
+  background-color: #fbfbfb;
+  color: black;
+  flex-grow: 1;
+  margin: 1px;
+  padding: 4px;
+  text-align: center;
+}
+
+.multiItemTitle {
+  margin-top: auto;
+  margin-bottom: auto;
+  padding-right: 10px;
+}
+
+.contextMenuItemText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.submenuIndicatorContainer {
+  display: flex;
+  margin: auto 0 auto auto;
+
+  .submenuIndicatorSpacer {
+    flex-grow: 1;
+  }
+
+  .submenuIndicator {
+    color: #676767;
+    font-size: 10px;
+    float: right;
+    margin: auto 0 auto 5px;
   }
 }

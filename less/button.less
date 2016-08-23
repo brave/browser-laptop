@@ -13,7 +13,7 @@
   padding: 0px 20px;
 }
 
-span.browserButton {
+.browserButton {
   cursor: default;
   display: inline-block;
   line-height: 30px;
@@ -36,93 +36,93 @@ span.browserButton {
     opacity: .25;
     pointer-events: none;
   }
+}
 
-  &.smallButton {
-    line-height: 18px;
-    width: 18px;
-    height: 18px;
-    font-size: 12px;
+.smallButton {
+  line-height: 18px;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+}
+
+.newFrameButton {
+  font-size: 0px;
+  width: 23px;
+  height: 23px;
+  margin: 0px;
+  opacity: 0.5;
+  background: url('../img/icon_new_frame.svg') 0 0 / contain no-repeat;
+  &:hover {
+    opacity: 0.8;
   }
+}
 
-  &.newFrameButton {
-    font-size: 0px;
-    width: 23px;
-    height: 23px;
-    margin: 0px;
-    opacity: 0.5;
-    background: url('../img/icon_new_frame.svg') 0 0 / contain no-repeat;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
+.menuButton {
+  height: auto;
+}
 
-  &.menuButton {
-    height: auto;
-  }
+.primaryButton,
+.actionButton,
+.wideButton,
+.secondaryButton,
+.secondaryAltButton,
+.subtleButton {
+  .buttonCommon;
+  width: auto;
+  height: auto;
+}
 
-  &.primaryButton,
-  &.actionButton,
-  &.wideButton,
-  &.secondaryButton,
-  &.secondaryAltButton,
-  &.subtleButton {
-    .buttonCommon;
-    width: auto;
-    height: auto;
-  }
+.primaryButton {
+  background-color: @braveOrange;
+}
 
-  &.primaryButton {
-    background-color: @braveOrange;
-  }
+.actionButton,
+.wideButton {
+  background-color: #4099FF;
+}
 
-  &.actionButton,
-  &.wideButton {
-    background-color: #4099FF;
-  }
+.wideButton {
+  display: block;
+  margin-right: 0px;
+  margin-left: 0px;
+}
 
-  &.wideButton {
-    display: block;
-    margin-right: 0px;
-    margin-left: 0px;
-  }
+.secondaryButton {
+  background-color: #eee;
+}
 
-  &.secondaryButton {
-    background-color: #eee;
-  }
+.secondaryAltButton {
+  background-color: #fff;
+  color: @braveOrange;
+  border: 1px solid #ccc;
+}
 
-  &.secondaryAltButton {
-    background-color: #fff;
-    color: @braveOrange;
-    border: 1px solid #ccc;
-  }
+.subtleButton {
+  background-color: #ccc;
+  font-size: 14px;
+}
 
-  &.subtleButton {
-    background-color: #ccc;
-    font-size: 14px;
-  }
+.tactileButton {
+  display: block;
+  min-width: 80px;
+  height: 2em;
+  line-height: 2em;
+  margin: 0.5em 0;
+  vertical-align: middle;
+  text-align: center;
+  border: solid 1px @braveMediumOrange;
+  background: @braveMediumOrange;
+  border-radius: @borderRadius;
+  color: white;
+  box-shadow: @lightBoxShadow;
+  padding-left: 1em;
+  font-size: 0.9em;
+  font-weight: 400;
+  cursor: pointer;
+  outline: none;
+  text-align: left;
 
-  &.tactileButton {
-    display: block;
-    min-width: 80px;
-    height: 2em;
-    line-height: 2em;
-    margin: 0.5em 0;
-    vertical-align: middle;
-    text-align: center;
-    border: solid 1px @braveMediumOrange;
-    background: @braveMediumOrange;
-    border-radius: @borderRadius;
+  &:hover {
     color: white;
-    box-shadow: @lightBoxShadow;
-    padding-left: 1em;
-    font-size: 0.9em;
-    font-weight: 400;
-    cursor: pointer;
-    outline: none;
-    text-align: left;
-
-    &:hover {
-      color: white;
-    }
   }
 }
