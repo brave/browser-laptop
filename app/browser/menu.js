@@ -425,11 +425,6 @@ const createWindowSubmenu = (CommonMenu) => {
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.downloadsMenuItem(),
     CommonMenu.passwordsMenuItem(),
-    {
-      label: locale.translation('history'),
-      accelerator: 'CmdOrCtrl+Y',
-      visible: false
-    },
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('bringAllToFront'),
