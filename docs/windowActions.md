@@ -250,6 +250,12 @@ The new frame is expected to appear at the index it was last closed at
 
 
 
+### clearClosedFrames() 
+
+Dispatches a message to the store to clear closed frames
+
+
+
 ### setActiveFrame(frameProps) 
 
 Dispatches a message to the store to set a new frame as the active frame.
