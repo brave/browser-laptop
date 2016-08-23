@@ -172,23 +172,10 @@ AppStore
   },
   autofill: {
     addresses: [{
-      name: string,
-      organization: string,
-      streetAddress: string,
-      city: string,
-      state: string,
-      postalCode: string,
-      country: string,
-      phone: string,
-      email: string,
-      guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
     }],
     creditCards: [{
-      name: string,
-      card: string,
-      month: string,
-      year: string,
-      guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
     }]
   }
 }
@@ -442,13 +429,15 @@ WindowStore
     postalCode: string,
     country: string,
     phone: string,
-    email: string
+    email: string,
+    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
   },
   autofillCreditCardDetail: {
     name: string,
     card: string,
     month: string,
-    year: string
+    year: string,
+    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
   }
 }
 ```
