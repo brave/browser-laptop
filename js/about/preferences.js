@@ -222,7 +222,7 @@ class LedgerTableRow extends ImmutableComponent {
 class LedgerTable extends ImmutableComponent {
   render () {
     const synopsis = this.props.ledgerData.get('synopsis')
-    if (!synopsis) {
+    if (!synopsis || !synopsis.size) {
       return null
     }
     return <div id='ledgerTable'>
