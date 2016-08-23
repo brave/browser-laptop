@@ -23,22 +23,18 @@ describe('urlbarSuggestions', function () {
     yield this.app.client
       .tabByUrl(Brave.newTabUrl)
       .loadUrl(this.page1Url)
-      // TODO(bridiver) - creating a new frame here should not be necessary
+      .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
-      .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('.tab[data-frame-key="2"].active')
+      .waitForElementFocus(urlInput)
       .waitUntil(function () {
         return this.getAppState().then((val) => {
           return val.value.sites.length === 2
         })
       })
-      .ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="3"].active')
-      .waitForElementFocus(urlInput)
   })
 
   it('deactivates suggestions on escape', function * () {
@@ -47,7 +43,7 @@ describe('urlbarSuggestions', function () {
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
-      .waitForExist(urlBarSuggestions)
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
       .keys('\uE00C')
       .waitUntil(function () {
         return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
@@ -60,9 +56,9 @@ describe('urlbarSuggestions', function () {
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
-      .click(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
-      .waitForExist('.tab[data-frame-key="1"].active')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .tabByIndex(1).getUrl().should.eventually.equal(this.page1Url)
   })
 
   it('navigates to a suggestion with keyboard', function * () {
@@ -73,11 +69,11 @@ describe('urlbarSuggestions', function () {
       })
       .waitForExist(urlBarSuggestions)
       .keys('Down arrow')
-      .waitForExist(urlBarSuggestions + ' li+li.selected')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
       .keys('Down arrow')
-      .waitForExist(urlBarSuggestions + ' li+li+li+li.selected')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"].selected')
       .keys('Enter')
-      .waitForExist('.tab[data-frame-key="1"].active')
+      .tabByIndex(1).getUrl().should.become(this.page2Url)
   })
 
   it('selects a location auto complete result but not for titles', function * () {
