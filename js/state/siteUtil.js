@@ -155,12 +155,15 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
     return sites
   }
   const tags = sites.getIn([index, 'tags'])
-  // If there are no tags and the removeSite call was called without a specific tag
-  // then remove the entry completely.
   if (tags.size === 0 && !tag) {
-    sites = sites.splice(index, 1)
-    return sites
+    // If called without tags and entry has no tags, remove the entry
+    return sites.splice(index, 1)
+  } else if (tags.size > 0 && !tag) {
+    // If called without tags BUT entry has tags, null out lastAccessedTime.
+    // This is a bookmark entry that we want to clear history for (but NOT delete/untag bookmark)
+    return sites.setIn([index, 'lastAccessedTime'], null)
   }
+  // Else, remove the specified tag
   return sites
     .setIn([index, 'parentFolderId'], 0)
     .setIn([index, 'tags'], tags.toSet().remove(tag).toList())
