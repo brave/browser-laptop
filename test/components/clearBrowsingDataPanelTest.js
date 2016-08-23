@@ -1,7 +1,7 @@
-/* global describe, it, before */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, clearBrowsingDataPanel} = require('../lib/selectors')
+const {urlInput, clearBrowsingDataButton, securityTab} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const messages = require('../../js/constants/messages')
 
@@ -15,41 +15,43 @@ describe('Clear Browsing Panel', function () {
       .waitForVisible(urlInput)
   }
 
-  describe('General', function () {
-    Brave.beforeAll(this)
-    before(function * () {
-      yield setup(this.app.client)
-    })
-    it('shows clearing options', function * () {
-      const page1Url = 'about:preferences'
-      const clearBrowsingDataButton = '.clearBrowsingDataButton'
-      const securityTab = '[data-l10n-id="security"]'
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible(securityTab)
-        .click(securityTab)
-        .waitForVisible(clearBrowsingDataButton)
-        .click(clearBrowsingDataButton)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(clearBrowsingDataPanel)
-    })
-    it('can clear browsing history', function * () {
+  describe('with history', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       const page1Url = Brave.server.url('page1.html')
+      yield setup(this.app.client)
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
         .tabByIndex(0)
         .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(clearBrowsingDataPanel)
+        .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.sites.length === 1
           })
         })
+    })
+
+    it('shows clearing options', function * () {
+      const clearBrowsingDataButton = '.clearBrowsingDataButton'
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .waitForVisible(securityTab)
+        .click(securityTab)
+        .waitForVisible(clearBrowsingDataButton)
+    })
+
+    it('clears the browsing history', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .waitForVisible(securityTab)
+        .click(securityTab)
+        .waitForVisible(clearBrowsingDataButton)
+        .click(clearBrowsingDataButton)
+        .waitForVisible('.browserHistorySwitch .switchBackground')
         .click('.browserHistorySwitch .switchBackground')
+        .waitForVisible('.clearDataButton')
         .click('.clearDataButton')
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -57,14 +59,29 @@ describe('Clear Browsing Panel', function () {
           })
         })
     })
-    it('Clearing browsing history clears closedFrames', function * () {
+  })
+
+  describe('with closedFrames', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       const page1Url = Brave.server.url('page1.html')
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .waitForBrowserWindow()
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.sites.length === 1
+          })
+        })
+    })
+
+    it('clears closedFrames', function * () {
+      const page2Url = Brave.server.url('page2.html')
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .tabByIndex(0)
-        .url(page1Url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page2Url)
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
             return val.value.frames.length === 2
