@@ -222,7 +222,7 @@ class LedgerTableRow extends ImmutableComponent {
 class LedgerTable extends ImmutableComponent {
   render () {
     const synopsis = this.props.ledgerData.get('synopsis')
-    if (!synopsis) {
+    if (!synopsis || !synopsis.size) {
       return null
     }
     return <div id='ledgerTable'>
@@ -779,7 +779,7 @@ class SecurityTab extends ImmutableComponent {
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
   }
   clearBrowsingDataNow () {
-    aboutActions.clearBrowsingDataNow()
+    aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)

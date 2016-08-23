@@ -181,14 +181,27 @@ describe('siteUtil', function () {
       const expectedSites = sites.setIn([0, 'parentFolderId'], 0).setIn([0, 'tags'], Immutable.List([]))
       assert.deepEqual(processedSites, expectedSites)
     })
-    it('deletes a history entry (no tag specified)', function () {
-      const siteDetail = {
-        tags: [],
-        location: testUrl1
-      }
-      const sites = Immutable.fromJS([siteDetail])
-      const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail))
-      assert.deepEqual(processedSites, Immutable.fromJS([]))
+    describe('called with tag=null/undefined', function () {
+      it('deletes a history entry (has no tags)', function () {
+        const siteDetail = {
+          tags: [],
+          location: testUrl1
+        }
+        const sites = Immutable.fromJS([siteDetail])
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail))
+        assert.deepEqual(processedSites, Immutable.fromJS([]))
+      })
+      it('nulls out the lastAccessedTime for a bookmarked entry (has tag)', function () {
+        const siteDetail = {
+          location: testUrl1,
+          tags: [siteTags.BOOKMARK],
+          lastAccessedTime: 123
+        }
+        const sites = Immutable.fromJS([siteDetail])
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail))
+        const expectedSites = sites.setIn([0, 'lastAccessedTime'], null)
+        assert.deepEqual(processedSites, expectedSites)
+      })
     })
   })
 

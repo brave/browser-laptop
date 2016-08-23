@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
@@ -14,38 +14,35 @@ describe('urlbarSuggestions', function () {
       .waitForVisible(urlInput)
   }
 
-  Brave.beforeAll(this)
-  before(function * () {
+  Brave.beforeEach(this)
+  beforeEach(function * () {
     this.page1Url = Brave.server.url('page1.html')
     this.page2Url = Brave.server.url('page2.html')
 
     yield setup(this.app.client)
     yield this.app.client
       .tabByUrl(Brave.newTabUrl)
-      .url(this.page1Url)
-      .waitForUrl(this.page1Url)
+      .loadUrl(this.page1Url)
+      // TODO(bridiver) - creating a new frame here should not be necessary
       .windowByUrl(Brave.browserWindowUrl)
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
+      .loadUrl(this.page2Url)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="2"].active')
-      .waitForElementFocus(urlInput)
-
-    // add the page2.html to history (necessary for autocomplete mouseover test)
-    yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
-      .url(this.page2Url)
-      .waitForUrl(this.page2Url)
-      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.sites.length === 2
+        })
+      })
       .ipcSend(messages.SHORTCUT_NEW_FRAME)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('.tab[data-frame-key="3"].active')
       .waitForElementFocus(urlInput)
   })
 
   it('deactivates suggestions on escape', function * () {
-    yield this.app.client.ipcSend('shortcut-focus-url')
-      .waitForElementFocus(urlInput)
+    yield this.app.client
       .setValue(urlInput, 'Page 1')
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
@@ -58,8 +55,7 @@ describe('urlbarSuggestions', function () {
   })
 
   it('navigates to a suggestion when clicked', function * () {
-    yield this.app.client.ipcSend('shortcut-focus-url')
-      .waitForElementFocus(urlInput)
+    yield this.app.client
       .setValue(urlInput, 'Page 1')
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
@@ -70,12 +66,7 @@ describe('urlbarSuggestions', function () {
   })
 
   it('navigates to a suggestion with keyboard', function * () {
-    yield this.app.client.ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="4"].active')
-      .ipcSend('shortcut-focus-url')
-      .waitForElementFocus(urlInput)
+    yield this.app.client
       .setValue(urlInput, 'Page 1')
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
@@ -91,12 +82,7 @@ describe('urlbarSuggestions', function () {
 
   it('selects a location auto complete result but not for titles', function * () {
     const page1Url = Brave.server.url('page1.html')
-    yield this.app.client.ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="5"].active')
-      .ipcSend('shortcut-focus-url')
-      .waitForElementFocus(urlInput)
+    yield this.app.client
       .setValue(urlInput, 'http://')
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === page1Url)
@@ -113,12 +99,7 @@ describe('urlbarSuggestions', function () {
     // test that entering a partial URL which matches two options autocompletes initially to 1st option,
     // but switches to other option when that is highlighted, while keeping cursor in same position,
     // so that finally, if the rest of the 1st option is entered via keyboard, it overwrites the suggestion from the mouse
-    yield this.app.client.ipcSend(messages.SHORTCUT_NEW_FRAME)
-      .waitForUrl(Brave.newTabUrl)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.tab[data-frame-key="6"].active')
-      .ipcSend('shortcut-focus-url')
-      .waitForElementFocus(urlInput)
+    yield this.app.client
       .keys(pagePartialUrl)
       .waitUntil(function () {
         return this.getValue(urlInput).then(function (val) {

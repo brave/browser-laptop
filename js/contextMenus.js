@@ -218,7 +218,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   let deleteLabel
   let deleteTag
 
-  if (siteUtil.isBookmark(siteDetail)) {
+  if (siteUtil.isBookmark(siteDetail) && activeFrame) {
     deleteLabel = 'deleteBookmark'
     deleteTag = siteTags.BOOKMARK
   } else if (siteUtil.isFolder(siteDetail)) {
@@ -969,7 +969,8 @@ function onHamburgerMenu (location, e) {
 
 function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
-    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+    const activeFrame = Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') })
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
   } else if (contextMenuType === 'history') {
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps))
   } else if (contextMenuType === 'download') {
