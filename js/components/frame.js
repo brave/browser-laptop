@@ -91,6 +91,7 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.HISTORY_UPDATED, {
         history: this.props.history.toJS()
       })
+      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
     } else if (location === 'about:downloads') {
       this.webview.send(messages.DOWNLOADS_UPDATED, {
         downloads: this.props.downloads.toJS()

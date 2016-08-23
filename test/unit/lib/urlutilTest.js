@@ -143,6 +143,9 @@ describe('urlutil', function () {
     it('returns the host field (including port number)', function () {
       assert.equal(UrlUtil.getHostname('https://brave.com:8080/test/'), 'brave.com:8080')
     })
+    it('allows you to exclude the port number', function () {
+      assert.equal(UrlUtil.getHostname('https://brave.com:8080/test/', true), 'brave.com')
+    })
   })
 
   describe('getHostnamePatterns', function () {
