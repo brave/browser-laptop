@@ -137,7 +137,7 @@ class AddEditBookmark extends ImmutableComponent {
               ? <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
               : null
             }
-            <Button l10nId='save' className={this.bookmarkNameValid ? 'primaryButton' : 'primaryButton disabled'} onClick={this.onSave} />
+            <Button l10nId='save' disabled={!this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
       </div>
