@@ -32,7 +32,6 @@ const session = electron.session
 
 const acorn = require('acorn')
 const ledgerBalance = require('ledger-balance')
-ledgerBalance.roundTrip = roundtrip
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const random = require('random-lib')
@@ -119,7 +118,7 @@ var boot = () => {
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
     try {
-      client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
+      client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
       bootP = false
       return console.log('ledger-client error: ' + ex.toString() + '\n' + ex.stack)
@@ -767,7 +766,9 @@ var callback = (err, result, delayTime) => {
 
 var roundtrip = (params, options, callback) => {
   var i
-  var parts = typeof options.server === 'string' ? url.parse(options.server) : options.server
+  var parts = typeof params.server === 'string' ? url.parse(params.server)
+                : typeof params.server !== 'undefined' ? params.server
+                : typeof options.server === 'string' ? url.parse(options.server) : options.server
 
   parts = underscore.extend(underscore.pick(parts, [ 'protocol', 'hostname', 'port' ]),
                             underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
@@ -918,7 +919,7 @@ var getBalance = () => {
   setTimeout(getBalance, msecs.minute)
   if ((!client) || (!ledgerInfo.address)) return
 
-  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, clientOptions),
+  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
   (err, provider, result) => {
     if (err) return console.log('ledger balance error: ' + err.toString())
 
