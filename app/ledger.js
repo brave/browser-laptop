@@ -63,6 +63,7 @@ const synopsisPath = path.join(app.getPath('userData'), 'ledger-synopsis.json')
  * ledger globals
  */
 
+var bootP = false
 var client
 const clientOptions = { loggingP: true, verboseP: true }
 
@@ -109,16 +110,23 @@ var quit = () => {
 }
 
 var boot = () => {
-  if (client) return
+  if ((bootP) || (client)) return
 
+  bootP = true
   fs.access(statePath, fs.FF_OK, (err) => {
     if (!err) return
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
-    client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
+    try {
+      client = (require('ledger-client'))(null, underscore.extend(clientOptions, { roundtrip: roundtrip }), null)
+    } catch (ex) {
+      return console.log('ledger-client error: ' + ex.toString() + '\n' + err.stack)
+    }
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     getBalance()
+
+    bootP = false
   })
 }
 
@@ -305,7 +313,7 @@ var initialize = (onoff) => {
 
   fs.access(statePath, fs.FF_OK, (err) => {
     if (!err) {
-      console.log('\nfound ' + statePath)
+      if (clientOptions.verboseP) console.log('\nfound ' + statePath)
 
       fs.readFile(statePath, (err, data) => {
         var state
@@ -314,7 +322,7 @@ var initialize = (onoff) => {
 
         try {
           state = JSON.parse(data)
-          console.log('\nstarting up ledger client integration')
+          if (clientOptions.verboseP) console.log('\nstarting up ledger client integration')
         } catch (ex) {
           return console.log('statePath parse error: ' + ex.toString())
         }
@@ -351,14 +359,14 @@ var enable = (onoff) => {
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(synopsisPath, (err, data) => {
-    console.log('\nstarting up ledger publisher integration')
+    if (clientOptions.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
       return updateLedgerInfo()
     }
 
-    console.log('found ' + synopsisPath)
+    if (clientOptions.verboseP) console.log('\nfound ' + synopsisPath)
     try {
       synopsis = new (ledgerPublisher.Synopsis)(data)
     } catch (ex) {
@@ -378,7 +386,7 @@ var enable = (onoff) => {
         return
       }
 
-      console.log('\nfound ' + publisherPath)
+      if (clientOptions.verboseP) console.log('\nfound ' + publisherPath)
       try {
         data = JSON.parse(data)
         underscore.keys(data).sort().forEach((publisher) => {
@@ -618,7 +626,7 @@ var cacheRuleSet = (ruleset) => {
         if ((rule.consequent !== null) || (rule.dom)) return
         if (!rulesolver.resolve(rule.condition, ctx)) return
 
-        console.log('\npurging ' + publisher)
+        if (clientOptions.verboseP) console.log('\npurging ' + publisher)
         delete synopsis.publishers[publisher]
         syncP = true
       })
@@ -700,9 +708,7 @@ var updateLedgerInfo = () => {
     }
   }
 
-/*
-  console.log(JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
- */
+  if (clientOptions.debugP) console.log(JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
 }
@@ -718,8 +724,9 @@ var callback = (err, result, delayTime) => {
   var entries = client && client.report()
   var now = underscore.now()
 
-  if (client.options.verboseP) {
-    console.log('\nledger client callback: errP=' + (!!err) + ' resultP=' + (!!result) + ' delayTime=' + delayTime)
+  if (clientOptions.verboseP) {
+    console.log('\nledger client callback: clientP=' + (!!client) + ' errP=' + (!!err) + ' resultP=' + (!!result) +
+                ' delayTime=' + delayTime)
   }
 
   if (entries) {
@@ -737,9 +744,13 @@ var callback = (err, result, delayTime) => {
     console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
+/* TBD: avoid error lock-up in sync preventing future reconciliations
     return setTimeout(() => {
       if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     }, 1 * msecs.hour)
+ */
+
+    if (typeof delayTime === 'undefined') delayTime = 0
   }
 
   if (!result) return run(delayTime)
@@ -801,7 +812,7 @@ var roundtrip = (params, options, callback) => {
     try {
       callback(null, response, payload)
     } catch (err0) {
-      if (options.verboseP) console.log('callback: ' + err0.toString() + '\n' + err0.stack)
+      if (options.verboseP) console.log('\ncallback: ' + err0.toString() + '\n' + err0.stack)
     }
   })
 
@@ -814,14 +825,14 @@ var roundtrip = (params, options, callback) => {
 }
 
 var run = (delayTime) => {
+  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+
   if ((typeof delayTime === 'undefined') || (!client)) return
 
   var active, state
   var ballots = client.ballots()
   var siteSettings = appStore.getState().get('siteSettings')
   var winners = ((synopsis) && (ballots > 0) && (synopsis.winners(ballots))) || []
-
-  if (client.options.verboseP) console.log('\nledger client run: delayTime=' + delayTime)
 
   try {
     winners.forEach((winner) => {
@@ -914,10 +925,14 @@ var getBalance = () => {
 
     if (result.unconfirmed > 0) {
       ledgerInfo.unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      if (clientOptions.verboseP) console.log('\ngetBalance refreshes ledger info: ' + ledgerInfo.unconfirmed)
       return updateLedgerInfo()
     }
 
-    if (ledgerInfo.unconfirmed !== '0.0000') getPaymentInfo()
+    if (ledgerInfo.unconfirmed === '0.0000') return
+
+    if (clientOptions.verboseP) console.log('\ngetBalance refreshes payment info')
+    getPaymentInfo()
   })
 }
 
@@ -960,7 +975,11 @@ var setPaymentInfo = (amount) => {
   if (isNaN(amount) || (amount <= 0)) return
 
   underscore.extend(bravery.fee, { amount: amount })
-  client.setBraveryProperties(bravery, callback)
+  client.setBraveryProperties(bravery, (err, result) => {
+    if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
+
+    if (result) syncWriter(statePath, result, () => {})
+  })
   if (ledgerInfo.created) getPaymentInfo()
 }
 

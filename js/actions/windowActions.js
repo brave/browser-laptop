@@ -376,6 +376,15 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to the store to clear closed frames
+   */
+  clearClosedFrames: function () {
+    dispatch({
+      actionType: WindowConstants.WINDOW_CLEAR_CLOSED_FRAMES
+    })
+  },
+
+  /**
    * Dispatches a message to the store to set a new frame as the active frame.
    *
    * @param {Object} frameProps - the frame properties for the webview in question.

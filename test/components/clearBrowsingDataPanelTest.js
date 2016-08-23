@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 const {urlInput, clearBrowsingDataPanel} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+const messages = require('../../js/constants/messages')
 
 describe('Clear Browsing Panel', function () {
   function * setup (client) {
@@ -53,6 +54,32 @@ describe('Clear Browsing Panel', function () {
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.sites.length === 0
+          })
+        })
+    })
+    it('Clearing browsing history clears closedFrames', function * () {
+      const page1Url = Brave.server.url('page1.html')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(0)
+        .url(page1Url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 2
+          })
+        })
+        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.closedFrames.length === 1
+          })
+        })
+        .clearAppData({browserHistory: true})
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.closedFrames.length === 0
           })
         })
     })
