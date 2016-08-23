@@ -1,4 +1,4 @@
-/* global describe, it, before */
+/* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
@@ -540,43 +540,32 @@ describe('navigationBar', function () {
   })
 
   describe('search engine go key', function () {
-    Brave.beforeAll(this)
+    Brave.beforeEach(this)
     const entries = searchProviders.providers
 
-    before(function * () {
+    beforeEach(function * () {
       yield setup(this.app.client)
-      yield this.app.client.waitForExist(urlInput)
-      yield this.app.client.waitForElementFocus(urlInput)
-      yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === '')
-      })
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlInput)
+        .waitForElementFocus(urlInput)
     })
 
     entries.forEach((entry) => {
-      describe('each entry', function () {
-        before(function * () {
-          // escape
-          yield this.app.client.ipcSend('shortcut-active-frame-stop')
-          // type go key
-          yield this.app.client.keys(entry.shortcut + ' ')
-        })
-
-        it('sets the value', function * () {
-          yield this.app.client.waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === entry.shortcut)
-          })
-        })
-
-        it('has focus', function * () {
-          yield this.app.client.waitForElementFocus(urlInput)
+      describe(entry.name, function () {
+        beforeEach(function * () {
+          yield this.app.client
+            .keys(entry.shortcut + ' ')
         })
 
         it('has the icon', function * () {
           yield this.app.client
             .waitForExist(urlbarIcon)
-            .getCssProperty(urlbarIcon, 'background-image').then((backgroundImage) =>
-              backgroundImage.value === `url("${entry.image}")`
-            )
+            .waitUntil(function () {
+              return this
+                .getCssProperty(urlbarIcon, 'background-image')
+                .then((backgroundImage) => backgroundImage.value === `url("${entry.image}")`)
+            })
         })
       })
     })
