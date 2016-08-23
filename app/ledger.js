@@ -305,7 +305,7 @@ var initialize = (onoff) => {
 
   if (!onoff) {
     client = null
-    return
+    return appActions.updateLedgerInfo({})
   }
   if (client) return
 
@@ -343,7 +343,9 @@ var initialize = (onoff) => {
       })
       return
     }
+
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
+    appActions.updateLedgerInfo({})
   })
 }
 
