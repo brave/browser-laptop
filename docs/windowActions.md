@@ -256,6 +256,12 @@ Dispatches a message to the store to clear closed frames
 
 
 
+### clearClosedFrames() 
+
+Dispatches a message to the store to clear closed frames
+
+
+
 ### setActiveFrame(frameProps) 
 
 Dispatches a message to the store to set a new frame as the active frame.

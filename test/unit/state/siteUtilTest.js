@@ -154,7 +154,7 @@ describe('siteUtil', function () {
   })
 
   describe('addSite', function () {
-    describe('when adding a new siteDetail', function () {
+    describe('sites list does not have this siteDetail yet', function () {
       it('returns the updated site list which includes the new site', function () {
         const sites = Immutable.fromJS([])
         const siteDetail = Immutable.fromJS({
@@ -166,6 +166,87 @@ describe('siteUtil', function () {
         const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
         const expectedSites = sites.push(siteDetail)
         assert.deepEqual(processedSites, expectedSites)
+      })
+    })
+
+    describe('sites list already has this siteDetail', function () {
+      it('uses the title from the old siteDetail', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: 'new customTitle'
+        })
+        const expectedSiteDetail = Immutable.fromJS({
+          lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          tags: newSiteDetail.get('tags').toJS(),
+          location: newSiteDetail.get('location'),
+          title: oldSiteDetail.get('title'),
+          customTitle: newSiteDetail.get('customTitle')
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSites = Immutable.fromJS([expectedSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+      it('uses the customTitle from the old siteDetail if customTitle is falsey', function () {
+        // NOTE: test can be removed if we resolve https://github.com/brave/browser-laptop/issues/2972
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: ''
+        })
+        const expectedSiteDetail = Immutable.fromJS({
+          lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          tags: newSiteDetail.get('tags').toJS(),
+          location: newSiteDetail.get('location'),
+          title: oldSiteDetail.get('title'),
+          customTitle: oldSiteDetail.get('customTitle')
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSites = Immutable.fromJS([expectedSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+      it('allows you to override the old title with the new title', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: 'new customTitle'
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail, true)
+        const expectedSites = Immutable.fromJS([newSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
     })
   })

@@ -88,13 +88,16 @@ module.exports.getNextFolderId = (sites) => {
  * @param tag The tag to add for this site.
  *   See siteTags.js for supported types. No tag means just a history item.
  * @param originalSiteDetail If specified will modify the specified site detail
+ * @param forceUpdateTitle If true, forcibly use the title from the new siteDetail
  * @return The new sites Immutable object
  */
-module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail, forceUpdateTitle) {
+  // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
   }
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
+  const oldSite = index !== -1 ? sites.getIn([index]) : null
 
   let folderId = siteDetail.get('folderId')
   if (!folderId && tag === siteTags.BOOKMARK_FOLDER) {
@@ -106,18 +109,23 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     tags = tags.toSet().add(tag).toList()
   }
 
-  let oldSite
-  if (index !== -1) {
-    oldSite = sites.getIn([index])
+  // We don't want bookmarks and other site info being renamed on users if they already exist
+  // The name should remain the same while it is bookmarked forever.
+  let newTitle
+  let newCustomTitle
+  if (forceUpdateTitle || !oldSite) {
+    newTitle = siteDetail.get('title')
+    newCustomTitle = siteDetail.get('customTitle')
+  } else {
+    newTitle = oldSite && isBookmark(tags) ? oldSite.get('title') : siteDetail.get('title')
+    newCustomTitle = siteDetail.get('customTitle') || oldSite.get('customTitle')
   }
 
   let site = Immutable.fromJS({
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
-    // We don't want bookmarks and other site info being renamed on users if they already exist
-    // The name should remain the same while it is bookmarked forever.
-    title: oldSite && isBookmark(tags) ? oldSite.get('title') : siteDetail.get('title')
+    title: newTitle
   })
   if (folderId) {
     site = site.set('folderId', Number(folderId))
@@ -126,7 +134,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId') || oldSite.get('parentFolderId')))
   }
   if (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')) {
-    site = site.set('customTitle', siteDetail.get('customTitle') || oldSite.get('customTitle'))
+    site = site.set('customTitle', newCustomTitle)
   }
   if (siteDetail.get('partitionNumber') || oldSite && oldSite.get('partitionNumber')) {
     site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber') || oldSite.get('partitionNumber')))
