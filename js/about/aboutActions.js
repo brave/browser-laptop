@@ -123,8 +123,8 @@ const AboutActions = {
     ipc.send(messages.SET_RESOURCE_ENABLED, resourceName, enabled)
   },
 
-  clearBrowsingDataNow: function () {
-    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
+  clearBrowsingDataNow: function (clearBrowsingDataDetail) {
+    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
   },
 
   createWallet: function () {
