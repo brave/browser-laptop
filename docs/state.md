@@ -148,6 +148,7 @@ AppStore
     'privacy.autocomplete.history-size': number, // Number of autocomplete entries to keep
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
+    'privacy.autofill-enabled': boolean, // true to enable autofill
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
