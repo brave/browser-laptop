@@ -410,6 +410,7 @@ WindowStore
       site: string,
       score: ?
     }
-  }
+  },
+  hasBitcoinHandler: boolean // Whether Brave has a bitcoin: protocol handler
 }
 ```

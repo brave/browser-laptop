@@ -322,6 +322,16 @@ Clears the data specified in dataDetail
 
 
 
+### setBitcoinHandled() 
+
+Sets whether the bitcoin protocol is handled.
+
+**Parameters**
+
+**setBitcoinHandled**: `boolean`, Sets whether the bitcoin protocol is handled.
+
+
+
 
 * * *
 

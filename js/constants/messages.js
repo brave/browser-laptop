@@ -162,7 +162,8 @@ const messages = {
   // Ledger
   LEDGER_PUBLISHER: _,
   LEDGER_UPDATED: _,
-  LEDGER_CREATE_WALLET: _
+  LEDGER_CREATE_WALLET: _,
+  CHECK_BITCOIN_HANDLER: _
 }
 
 module.exports = mapValuesByKeys(messages)

@@ -563,8 +563,25 @@ table.sortableTable {
       text-align: center;
       margin: 0 auto;
     }
+    #bitcoinPaymentURL {
+      cursor: pointer;
+      text-align: left;
+      background-color: @lightGray;
+      &:hover {
+        background-color: @gray;
+      }
+      font-size: 0.9em;
+    }
+    .settingsListTitle {
+      font-weight: 600;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
     span {
       display: inline-block;
+    }
+    a {
+      text-decoration: none;
     }
     img,
     #coinbaseLogo {
@@ -574,15 +591,21 @@ table.sortableTable {
       background-color: @lightGray;
       border: none;
     }
-    button {
-      margin: 2.5em auto;
-      padding-left: 16px;
-      padding-right: 16px;
+    .labelText {
+      font-size: 1em;
+      color: @braveOrange;
+      text-align: left;
+      margin-bottom: 5px;
     }
-    &:last-of-type {
-      button {
-        margin-top: 57px;
-      }
+    .fa {
+      font-size: 1.1em;
+      margin: 5px;
+    }
+    .primaryButton {
+      margin: 1.5em auto;
+      display: block;
+      width: 180px;
+      padding: 4px 0px;
     }
   }
   &.contrast {

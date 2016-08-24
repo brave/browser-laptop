@@ -262,9 +262,6 @@ class BitcoinDashboard extends ImmutableComponent {
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
-  goToURL (url) {
-    window.location.href = url
-  }
   onMessage (e) {
     if (!e.data || e.origin !== config.coinbaseOrigin) {
       return
@@ -292,17 +289,28 @@ class BitcoinDashboard extends ImmutableComponent {
       }
       <div className='board'>
         <div className='panel'>
-          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-          <a href={this.ledgerData.get('paymentURL')}>
-            <img src={this.ledgerData.get('paymentIMG')} alt={'Add Bitcoin'} />
-          </a>
-          <div className='settingsListCopy alt'><span className='settingsListCopy' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address') || 'Not available')} title={'Copy Bitcoin address to clipboard'}>{this.ledgerData.get('address')}</span></div>
-          <button data-l10n-id='bitcoinVisitAccount' onClick={this.goToURL.bind(this, this.ledgerData.get('paymentURL') || 'about:blank')} />
-        </div>
-        <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='moneyAdd' />
           <div id='coinbaseLogo' />
-          <button data-l10n-id='add' onClick={this.props.showOverlay.bind(this)} />
+          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+        </div>
+        <div className='panel'>
+          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
+          <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
+          {
+            this.ledgerData.get('hasBitcoinHandler')
+              ? <div>
+                <a href={this.ledgerData.get('paymentURL')} target='_blank'>
+                  <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
+                </a>
+                <div data-l10n-id='bitcoinAddress' className='labelText' />
+                <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
+                <span>{this.ledgerData.get('address')}</span>
+              </div>
+              : <div>
+                <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
+                <span id='bitcoinPaymentURL' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('paymentURL'))}>{this.ledgerData.get('paymentURL')}</span>
+              </div>
+          }
         </div>
       </div>
     </div>

@@ -367,6 +367,17 @@ const appActions = {
       actionType: AppConstants.APP_CLEAR_DATA,
       clearDataDetail
     })
+  },
+
+  /**
+   * Sets whether the bitcoin protocol is handled.
+   * @param {boolean}
+   */
+  setBitcoinHandled: function (handled) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_BITCOIN_HANDLED,
+      handled
+    })
   }
 }
 

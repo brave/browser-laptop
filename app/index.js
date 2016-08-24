@@ -499,6 +499,12 @@ app.on('ready', () => {
       downloadActions.openDownloadPath(Immutable.fromJS(download))
     })
 
+    ipcMain.on(messages.CHECK_BITCOIN_HANDLER, () => {
+      electron.protocol.isProtocolHandled('bitcoin', (handled) => {
+        appActions.setBitcoinHandled(handled)
+      })
+    })
+
     ipcMain.on(messages.CERT_ERROR_ACCEPTED, (event, url) => {
       try {
         let host = urlParse(url).host
