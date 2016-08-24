@@ -553,12 +553,15 @@ class PaymentsTab extends ImmutableComponent {
     return `${balance} BTC`
   }
 
-  get footerContent () {
-    return <div id='paymentsFooter'>
-      <div data-l10n-id='paymentsFooterText' />
-      <a href='https://www.privateinternetaccess.com/' target='_blank'><img className='largeImg' src='img/private_internet_access.png' /></a>
-      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-right' src='img/bitgo.png' /></a>
-      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-right' src='img/coinbase.png' /></a>
+  get sidebarContent () {
+    return <div id='paymentsSidebar'>
+      <h2 data-l10n-id='paymentsSidebarText1' />
+      <div data-l10n-id='paymentsSidebarText2' />
+      <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA'></div></a>
+      <div data-l10n-id='paymentsSidebarText3' />
+      <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo'></div></a>
+      <div data-l10n-id='paymentsSidebarText4' />
+      <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase'></div></a>
     </div>
   }
 
@@ -617,9 +620,13 @@ class PaymentsTab extends ImmutableComponent {
           : null
         }
       <div className='titleBar'>
-        <div className='sectionTitle pull-left' data-l10n-id='publisherPaymentsTitle' value='publisherPaymentsTitle' />
+        <div className='sectionTitleWrapper pull-left'>
+          <span className='sectionTitle' data-l10n-id='publisherPaymentsTitle' />
+          <span className='sectionSubTitle' data-l10n-id='publisherPaymentsTitleBeta' />
+        </div>
         <div className='pull-left' id='enablePaymentsSwitch'>
-          <SettingCheckbox dataL10nId='enable' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+          <span data-l10n-id='off' />
+          <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           {this.enabled ? <SettingCheckbox dataL10nId='notifications' prefKey={settings.PAYMENTS_NOTIFICATIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} /> : null}
         </div>
       </div>
@@ -629,13 +636,17 @@ class PaymentsTab extends ImmutableComponent {
           : <div className='paymentsMessage'>
             <h3 data-l10n-id='paymentsWelcomeTitle' />
             <div data-l10n-id='paymentsWelcomeText1' />
-            <div data-l10n-id='paymentsWelcomeText2' />
+            <div className='boldText' data-l10n-id='paymentsWelcomeText2' />
             <div data-l10n-id='paymentsWelcomeText3' />
-            <div className='boldText' data-l10n-id='paymentsWelcomeTextBold' />
-            <a href='https://github.com/brave/ledger/blob/master/documentation/Ledger-Principles.md' target='_blank' data-l10n-id='paymentsWelcomeText4' />
+            <div data-l10n-id='paymentsWelcomeText4' />
+            <div>
+              <span data-l10n-id='paymentsWelcomeText5' />&nbsp;
+              <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+              <span data-l10n-id='paymentsWelcomeText6' />
+            </div>
           </div>
         }
-        {this.enabled ? null : this.footerContent}
+        {this.enabled ? null : this.sidebarContent}
     </div>
   }
 }
