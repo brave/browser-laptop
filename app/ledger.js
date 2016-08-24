@@ -711,9 +711,7 @@ var updateLedgerInfo = () => {
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
 
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
-/* YAN: this comment is temporary until the preferences panel for payments can handle only one of these properties defined
-      delete ledgerInfo[protocolHandler.isNavigatorProtocolHandled('', 'bitcoin') ? 'buyURL' : 'paymentURL']
- */
+      if (!protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')) delete ledgerInfo.paymentURL
     }
   }
 
