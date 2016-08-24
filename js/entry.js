@@ -59,7 +59,7 @@ ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
   const windowState = windowStore.getState()
   const activeFrame = FrameStateUtil.getActiveFrame(Immutable.fromJS(windowState))
   const windowData = {
-    location: activeFrame.get('location'),
+    location: activeFrame ? activeFrame.get('location') : null,
     closedFrames: windowState.get('closedFrames').toJS()
   }
   ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)

@@ -9,7 +9,6 @@ const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
-const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
@@ -38,24 +37,10 @@ class NavigationBar extends ImmutableComponent {
     return this.props.activeFrameKey !== undefined && this.props.loading
   }
 
-  onToggleBookmark (isBookmarked) {
-    if (isBookmarked === undefined) {
-      isBookmarked = this.bookmarked
-    }
+  onToggleBookmark () {
+    // trigger the AddEditBookmark modal; saving/deleting takes place there
     const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const hasBookmark = this.props.sites.find(
-      (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
-    )
-    if (!isBookmarked) {
-      appActions.addSite(siteDetail, siteTags.BOOKMARK)
-    }
-    // Show bookmarks toolbar after first bookmark is saved
-    appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !hasBookmark || showBookmarksToolbar)
-    // trigger the AddEditBookmark modal
     windowActions.setBookmarkDetail(siteDetail, siteDetail)
-    // Update checked/unchecked status in the Bookmarks menu
-    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
 
   onReload (e) {
@@ -97,8 +82,8 @@ class NavigationBar extends ImmutableComponent {
   }
 
   componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark(false))
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
     // Set initial checked/unchecked status in Bookmarks menu
     ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
