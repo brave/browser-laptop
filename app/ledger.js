@@ -671,6 +671,7 @@ var ledgerInfo = {
 
   // the desired contribution (the btc value approximates the amount/currency designation)
   btc: undefined,
+  btcPrice: undefined,
   amount: undefined,
   currency: undefined,
 
@@ -689,7 +690,7 @@ var updateLedgerInfo = () => {
 
   if (info) {
     underscore.extend(ledgerInfo,
-                      underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
+                      underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'btcPrice', 'amount', 'currency' ]))
     if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
 
@@ -892,7 +893,7 @@ var getStateInfo = (state) => {
       ballots[ballot.publisher]++
     })
 
-    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction, [ 'viewingId', 'submissionStamp', 'satoshis' ]),
+    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction, [ 'viewingId', 'submissionStamp', 'satoshis', 'btcPrice' ]),
                                                    transaction.fee, { ballots: ballots }))
   }
 
@@ -920,7 +921,10 @@ var getPaymentInfo = () => {
       info.address = client.getWalletAddress()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
-        if ((body.rates) && (body.rates[currency])) info.btc = (amount / body.rates[currency]).toFixed(8)
+        if ((body.rates) && (body.rates[currency])) {
+          info.btcPrice = body.rates[currency]
+          info.btc = (amount / body.rates[currency]).toFixed(8)
+        }
       }
       ledgerInfo._internal.paymentInfo = info
       updateLedgerInfo()
