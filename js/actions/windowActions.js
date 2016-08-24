@@ -960,6 +960,32 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
       clearBrowsingDataDetail
     })
+  },
+
+  /**
+   * Sets the manage autofill address popup detail
+   * @param {Object} currentDetail - Properties of the address to change to
+   * @param {Object} originalDetail - Properties of the address to edit
+   */
+  setAutofillAddressDetail: function (currentDetail, originalDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
+      currentDetail,
+      originalDetail
+    })
+  },
+
+  /**
+   * Sets the manage autofill credit card popup detail
+   * @param {Object} currentDetail - Properties of the credit card to change to
+   * @param {Object} originalDetail - Properties of the credit card to edit
+   */
+  setAutofillCreditCardDetail: function (currentDetail, originalDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
+      currentDetail,
+      originalDetail
+    })
   }
 }
 

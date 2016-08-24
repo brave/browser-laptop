@@ -61,6 +61,7 @@ const spellCheck = require('./spellCheck')
 const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
+const privacy = require('../js/state/privacy')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -254,11 +255,11 @@ app.on('ready', () => {
   app.on('login', (e, webContents, request, authInfo, cb) => {
     e.preventDefault()
     authCallbacks[request.url] = cb
-    BrowserWindow.getAllWindows().map((win) => {
-      win.webContents.send(messages.LOGIN_REQUIRED, {
-        url: request.url,
-        authInfo
-      })
+    let sender = webContents.hostWebContents || webContents
+    sender.send(messages.LOGIN_REQUIRED, {
+      url: request.url,
+      tabId: webContents.getId(),
+      authInfo
     })
   })
   app.on('window-all-closed', () => {
@@ -392,6 +393,7 @@ app.on('ready', () => {
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
     contentSettings.init()
+    privacy.init()
     Extensions.init()
     Filtering.init()
     SiteHacks.init()
@@ -739,6 +741,14 @@ app.on('ready', () => {
       if (prefsRestartCallbacks[message]) {
         prefsRestartCallbacks[message](buttonIndex, persist)
       }
+    })
+
+    ipcMain.on(messages.REMOVE_AUTOFILL_ADDRESS, (e, address) => {
+      appActions.removeAutofillAddress(address)
+    })
+
+    ipcMain.on(messages.REMOVE_AUTOFILL_CREDIT_CARD, (e, card) => {
+      appActions.removeAutofillCreditCard(card)
     })
 
     // Setup the crash handling

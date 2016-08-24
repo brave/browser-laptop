@@ -10,7 +10,11 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
 const siteTags = require('../constants/siteTags')
+const messages = require('../constants/messages')
+const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
+const getSetting = require('../settings').getSetting
+const ipc = global.require('electron').ipcRenderer
 
 class AddEditBookmark extends ImmutableComponent {
   constructor () {
@@ -85,25 +89,38 @@ class AddEditBookmark extends ImmutableComponent {
     const currentDetail = this.props.currentDetail.set('parentFolderId', Number(e.target.value))
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
+  showToolbarOnFirstBookmark () {
+    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
+    const isFirstBookmark = this.props.sites.find(
+      (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
+    )
+    appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !isFirstBookmark || showBookmarksToolbar)
+  }
+  updateMenuBookmarkedStatus (isBookmarked) {
+    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, isBookmarked)
+  }
   onSave () {
     // First check if the title of the currentDetail is set
     if (!this.bookmarkNameValid) {
       return false
     }
 
+    this.showToolbarOnFirstBookmark()
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
+    this.updateMenuBookmarkedStatus(true)
     this.onClose()
   }
   onRemoveBookmark () {
     appActions.removeSite(this.props.currentDetail, siteTags.BOOKMARK)
+    this.updateMenuBookmarkedStatus(false)
     this.onClose()
   }
   get displayBookmarkName () {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
     }
-    return this.props.currentDetail.get('title') || ''
+    return this.props.currentDetail.get('title') || this.props.currentDetail.get('location')
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
@@ -137,7 +154,7 @@ class AddEditBookmark extends ImmutableComponent {
               ? <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
               : null
             }
-            <Button l10nId='save' className={this.bookmarkNameValid ? 'primaryButton' : 'primaryButton disabled'} onClick={this.onSave} />
+            <Button l10nId='save' disabled={!this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
       </div>

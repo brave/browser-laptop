@@ -121,7 +121,16 @@ function registerForBeforeRequest (session) {
         return
       }
     }
-    cb({})
+    // Redirect to non-script version of DDG when it's blocked
+    let url = details.url
+    if (details.resourceType === 'mainFrame' &&
+      url.startsWith('https://duckduckgo.com/?q') &&
+    module.exports.isResourceEnabled('noScript', url)) {
+      url = url.replace('?q=', 'html?q=')
+      cb({redirectURL: url})
+    } else {
+      cb({})
+    }
   })
 }
 
@@ -568,5 +577,58 @@ module.exports.setDefaultZoomLevel = (zoom) => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
     ses.userPrefs.setDefaultZoomLevel(zoom)
+  }
+}
+
+module.exports.addAutofillAddress = (detail) => {
+  let guidMap = {}
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    let guid = ses.autofill.addProfile({
+      full_name: detail.name,
+      company_name: detail.organization,
+      street_address: detail.streetAddress,
+      city: detail.city,
+      state: detail.state,
+      postal_code: detail.postalCode,
+      country_code: detail.country,
+      phone: detail.phone,
+      email: detail.email
+    })
+    guidMap[partition] = guid
+  }
+  return guidMap
+}
+
+module.exports.removeAutofillAddress = (guid) => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    if (guid[partition] !== undefined) {
+      ses.autofill.removeProfile(guid[partition])
+    }
+  }
+}
+
+module.exports.addAutofillCreditCard = (detail) => {
+  let guidMap = {}
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    let guid = ses.autofill.addCreditCard({
+      name: detail.name,
+      card_number: detail.card,
+      expiration_month: detail.month,
+      expiration_year: detail.year
+    })
+    guidMap[partition] = guid
+  }
+  return guidMap
+}
+
+module.exports.removeAutofillCreditCard = (guid) => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    if (guid[partition] !== undefined) {
+      ses.autofill.removeCreditCard(guid[partition])
+    }
   }
 }

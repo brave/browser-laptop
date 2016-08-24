@@ -12,6 +12,7 @@ AppStore
   sites: [{
     location: string,
     title: string,
+    customTitle: string, // User provided title for bookmark; overrides title
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     favicon: string, // URL of the favicon
     lastAccessedTime: number, // datetime.getTime()
@@ -147,6 +148,7 @@ AppStore
     'privacy.autocomplete.history-size': number, // Number of autocomplete entries to keep
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
+    'privacy.autofill-enabled': boolean, // true to enable autofill
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
@@ -169,6 +171,14 @@ AppStore
     locale: string, // en_US, en, or any other locale string
     ignoredWords: Array<string>, // List of words to ignore
     addedWords: Array<string> // List of words to add to the dictionary
+  },
+  autofill: {
+    addresses: [{
+      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    }],
+    creditCards: [{
+      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    }]
   }
 }
 ```
@@ -392,7 +402,8 @@ WindowStore
         currency: string,
         amount: number
       }
-    }
+    },
+    hasBitcoinHandler: boolean, // Whether Brave has a bitcoin: protocol handler
   },
   publisherInfo: {
     synopsis: {
@@ -410,6 +421,25 @@ WindowStore
       site: string,
       score: ?
     }
+  },
+  autofillAddressDetail: {
+    name: string,
+    organization: string,
+    streetAddress: string,
+    city: string,
+    state: string,
+    postalCode: string,
+    country: string,
+    phone: string,
+    email: string,
+    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+  },
+  autofillCreditCardDetail: {
+    name: string,
+    card: string,
+    month: string,
+    year: string,
+    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
   }
 }
 ```

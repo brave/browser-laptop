@@ -48,7 +48,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, undefined, closestDestinationDetail)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail)
     }
   }
 }
@@ -218,7 +218,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   let deleteLabel
   let deleteTag
 
-  if (siteUtil.isBookmark(siteDetail)) {
+  if (siteUtil.isBookmark(siteDetail) && activeFrame) {
     deleteLabel = 'deleteBookmark'
     deleteTag = siteTags.BOOKMARK
   } else if (siteUtil.isFolder(siteDetail)) {
@@ -370,6 +370,35 @@ function usernameTemplateInit (usernames, origin, action) {
         windowActions.setContextMenuDetail()
       }
     })
+  }
+  return items
+}
+
+function autofillTemplateInit (suggestions, frame) {
+  let items = []
+  for (let i = 0; i < suggestions.length; ++i) {
+    let value
+    let frontendId = suggestions[i].frontend_id
+    if (frontendId >= 0) { //  POPUP_ITEM_ID_AUTOCOMPLETE_ENTRY and Autofill Entry
+      value = suggestions[i].value
+    } else if (frontendId === -1) { // POPUP_ITEM_ID_WARNING_MESSAGE
+      value = 'Disabled due to unsecure connection.'
+    } else if (frontendId === -4) { // POPUP_ITEM_ID_CLEAR_FORM
+      value = 'Clear Form'
+    } else if (frontendId === -5) { // POPUP_ITEM_ID_AUTOFILL_OPTIONS
+      value = 'Autofill Settings'
+    }
+    if (frontendId === -3) { // POPUP_ITEM_ID_SEPARATOR
+      items.push(CommonMenu.separatorMenuItem)
+    } else {
+      items.push({
+        label: value,
+        click: (item, focusedWindow) => {
+          ipc.send('autofill-selection-clicked', frame.get('tabId'), value, frontendId, i)
+          windowActions.setContextMenuDetail()
+        }
+      })
+    }
   }
   return items
 }
@@ -887,7 +916,8 @@ function mainTemplateInit (nodeProps, frame) {
             }
           },
           CommonMenu.separatorMenuItem,
-          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false), {
+          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
+          {
             label: locale.translation('find'),
             accelerator: 'CmdOrCtrl+F',
             click: function (item, focusedWindow) {
@@ -969,9 +999,10 @@ function onHamburgerMenu (location, e) {
 
 function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
-    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+    const activeFrame = Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') })
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
   } else if (contextMenuType === 'history') {
-    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps))
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
@@ -1054,6 +1085,15 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
     top: boundingRect.bottom + topOffset,
+    template: menuTemplate
+  }))
+}
+
+function onShowAutofillMenu (suggestions, boundingRect, frame) {
+  const menuTemplate = autofillTemplateInit(suggestions, frame)
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: boundingRect.x,
+    top: boundingRect.y,
     template: menuTemplate
   }))
 }
@@ -1165,6 +1205,7 @@ module.exports = {
   onSiteDetailContextMenu,
   onShowBookmarkFolderMenu,
   onShowUsernameMenu,
+  onShowAutofillMenu,
   onMoreBookmarksMenu,
   onBackButtonHistoryMenu,
   onForwardButtonHistoryMenu

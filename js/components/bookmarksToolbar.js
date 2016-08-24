@@ -147,6 +147,17 @@ class BookmarkToolbarButton extends ImmutableComponent {
       }
     }
 
+    const siteDetailTitle = this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')
+    const siteDetailLocation = this.props.bookmark.get('location')
+    let hoverTitle
+    if (this.isFolder) {
+      hoverTitle = ''
+    } else {
+      hoverTitle = siteDetailTitle
+        ? siteDetailTitle + '\n' + siteDetailLocation
+        : siteDetailLocation
+    }
+
     return <span
       className={cx({
         bookmarkToolbarButton: true,
@@ -157,7 +168,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       })}
       draggable
       ref={(node) => { this.bookmarkNode = node }}
-      title={this.isFolder ? '' : this.props.bookmark.get('title') + '\n' + this.props.bookmark.get('location')}
+      title={hoverTitle}
       onClick={this.onClick}
       onDragStart={this.onDragStart}
       onDragEnd={this.onDragEnd}
@@ -177,7 +188,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       {
         !this.isFolder && showFavicon && showOnlyFavicon
         ? ''
-        : this.props.bookmark.get('customTitle') || this.props.bookmark.get('title') || this.props.bookmark.get('location')
+        : siteDetailTitle || siteDetailLocation
       }
       </span>
       {

@@ -77,6 +77,7 @@ class Frame extends ImmutableComponent {
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
+      ipc.send(messages.CHECK_BITCOIN_HANDLER)
       const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).toJS()
       this.webview.send(messages.LEDGER_UPDATED, ledgerData)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
@@ -91,6 +92,7 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.HISTORY_UPDATED, {
         history: this.props.history.toJS()
       })
+      this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
     } else if (location === 'about:downloads') {
       this.webview.send(messages.DOWNLOADS_UPDATED, {
         downloads: this.props.downloads.toJS()
@@ -105,6 +107,45 @@ class Frame extends ImmutableComponent {
       }
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+    } else if (location === 'about:autofill') {
+      const partition = FrameStateUtil.getPartition(this.frame)
+      if (this.props.autofillAddresses) {
+        const addresses = this.props.autofillAddresses.toJS()
+        let list = []
+        for (let index in addresses) {
+          const address = currentWindow.webContents.session.autofill.getProfile(addresses[index][partition])
+          let addressDetail = {
+            name: address.full_name,
+            organization: address.company_name,
+            streetAddress: address.street_address,
+            city: address.city,
+            state: address.state,
+            postalCode: address.postal_code,
+            country: address.country_code,
+            phone: address.phone,
+            email: address.email,
+            guid: addresses[index]
+          }
+          list.push(addressDetail)
+        }
+        this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
+      }
+      if (this.props.autofillCreditCards) {
+        const creditCards = this.props.autofillCreditCards.toJS()
+        let list = []
+        for (let index in creditCards) {
+          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(creditCards[index][partition])
+          let creditCardDetail = {
+            name: creditCard.name,
+            card: creditCard.card_number,
+            month: creditCard.expiration_month,
+            year: creditCard.expiration_year,
+            guid: creditCards[index]
+          }
+          list.push(creditCardDetail)
+        }
+        this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
+      }
     }
 
     // send state to about pages
@@ -593,6 +634,16 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('page-title-updated', ({title}) => {
       windowActions.setFrameTitle(this.frame, title)
     })
+    this.webview.addEventListener('show-autofill-settings', (e) => {
+      windowActions.newFrame({ location: 'about:autofill' }, true)
+    })
+    this.webview.addEventListener('show-autofill-popup', (e) => {
+      contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
+    })
+    this.webview.addEventListener('hide-autofill-popup', (e) => {
+      // TODO(Anthony): conflict with contextmenu
+      // windowActions.setContextMenuDetail()
+    })
     this.webview.addEventListener('ipc-message', (e) => {
       let method = () => {}
       switch (e.channel) {
@@ -649,7 +700,20 @@ class Frame extends ImmutableComponent {
           }
           break
         case messages.CLEAR_BROWSING_DATA_NOW:
-          windowActions.setClearBrowsingDataDetail({})
+          method = (clearBrowsingDataDetail) =>
+            windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
+          break
+        case messages.ADD_AUTOFILL_ADDRESS:
+          windowActions.setAutofillAddressDetail({}, {})
+          break
+        case messages.EDIT_AUTOFILL_ADDRESS:
+          windowActions.setAutofillAddressDetail(e.args[0], e.args[0])
+          break
+        case messages.ADD_AUTOFILL_CREDIT_CARD:
+          windowActions.setAutofillCreditCardDetail({month: '01', year: new Date().getFullYear().toString()}, {})
+          break
+        case messages.EDIT_AUTOFILL_CREDIT_CARD:
+          windowActions.setAutofillCreditCardDetail(e.args[0], e.args[0])
           break
       }
       method.apply(this, e.args)
@@ -780,6 +844,9 @@ class Frame extends ImmutableComponent {
         this.webview.focus()
       }
       windowActions.setNavigated(e.url, this.props.frameKey, false)
+      // force temporary url display for tabnapping protection
+      windowActions.setMouseInTitlebar(true)
+
       // After navigating to the URL, set correct frame title
       let webContents = this.webview.getWebContents()
       let title = webContents.getTitleAtIndex(webContents.getCurrentEntryIndex())

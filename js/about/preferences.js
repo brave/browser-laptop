@@ -222,7 +222,7 @@ class LedgerTableRow extends ImmutableComponent {
 class LedgerTable extends ImmutableComponent {
   render () {
     const synopsis = this.props.ledgerData.get('synopsis')
-    if (!synopsis) {
+    if (!synopsis || !synopsis.size) {
       return null
     }
     return <div id='ledgerTable'>
@@ -262,9 +262,6 @@ class BitcoinDashboard extends ImmutableComponent {
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
-  goToURL (url) {
-    window.location.href = url
-  }
   onMessage (e) {
     if (!e.data || e.origin !== config.coinbaseOrigin) {
       return
@@ -292,17 +289,28 @@ class BitcoinDashboard extends ImmutableComponent {
       }
       <div className='board'>
         <div className='panel'>
-          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-          <a href={this.ledgerData.get('paymentURL')}>
-            <img src={this.ledgerData.get('paymentIMG')} alt={'Add Bitcoin'} />
-          </a>
-          <div className='settingsListCopy alt'><span className='settingsListCopy' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address') || 'Not available')} title={'Copy Bitcoin address to clipboard'}>{this.ledgerData.get('address')}</span></div>
-          <button data-l10n-id='bitcoinVisitAccount' onClick={this.goToURL.bind(this, this.ledgerData.get('paymentURL') || 'about:blank')} />
-        </div>
-        <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='moneyAdd' />
           <div id='coinbaseLogo' />
-          <button data-l10n-id='add' onClick={this.props.showOverlay.bind(this)} />
+          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+        </div>
+        <div className='panel'>
+          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
+          <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
+          {
+            this.ledgerData.get('hasBitcoinHandler')
+              ? <div>
+                <a href={this.ledgerData.get('paymentURL')} target='_blank'>
+                  <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
+                </a>
+                <div data-l10n-id='bitcoinAddress' className='labelText' />
+                <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
+                <span className='smallText'>{this.ledgerData.get('address')}</span>
+              </div>
+              : <div>
+                <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
+                <span id='bitcoinPaymentURL' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('paymentURL'))}>{this.ledgerData.get('paymentURL')}</span>
+              </div>
+          }
         </div>
       </div>
     </div>
@@ -502,7 +510,7 @@ class SearchTab extends ImmutableComponent {
     return <div>
       <div className='sectionTitle' data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
-        isHover hoverCallback={this.hoverCallback.bind(this)} />
+        addHoverClass onClick={this.hoverCallback.bind(this)} />
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showHistoryMatches' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -881,7 +889,7 @@ class SecurityTab extends ImmutableComponent {
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
   }
   clearBrowsingDataNow () {
-    aboutActions.clearBrowsingDataNow()
+    aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
   onToggleFlash (e) {
     aboutActions.setResourceEnabled(flash, e.target.value)
@@ -928,6 +936,14 @@ class SecurityTab extends ImmutableComponent {
           </label>
           : null
         }
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='autofillSettings' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='enableAutofill' prefKey={settings.AUTOFILL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <Button l10nId='manageAutofillData' className='primaryButton manageAutofillDataButton'
+          onClick={aboutActions.newFrame.bind(null, {
+            location: 'about:autofill'
+          }, true)} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='doNotTrackTitle' />
       <SettingsList>
