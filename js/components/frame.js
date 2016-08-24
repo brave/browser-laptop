@@ -710,7 +710,7 @@ class Frame extends ImmutableComponent {
           windowActions.setAutofillAddressDetail(e.args[0], e.args[0])
           break
         case messages.ADD_AUTOFILL_CREDIT_CARD:
-          windowActions.setAutofillCreditCardDetail({month: '1', year: new Date().getFullYear().toString()}, {})
+          windowActions.setAutofillCreditCardDetail({month: '01', year: new Date().getFullYear().toString()}, {})
           break
         case messages.EDIT_AUTOFILL_CREDIT_CARD:
           windowActions.setAutofillCreditCardDetail(e.args[0], e.args[0])

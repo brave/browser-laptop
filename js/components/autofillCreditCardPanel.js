@@ -58,13 +58,11 @@ class AutofillCreditCardPanel extends ImmutableComponent {
   onClick (e) {
     e.stopPropagation()
   }
-  get displayMonth () {
-    return this.props.currentDetail.get('month').replace('0', '')
-  }
   render () {
     var ExpMonth = []
     for (let i = 1; i <= 12; ++i) {
-      ExpMonth.push(<option value={i}>{i}</option>)
+      let mon = i < 10 ? '0' + i.toString() : i.toString()
+      ExpMonth.push(<option value={mon}>{mon}</option>)
     }
     var ExpYear = []
     var today = new Date()
@@ -89,7 +87,7 @@ class AutofillCreditCardPanel extends ImmutableComponent {
           </div>
           <div id='expirationDate' className='formRow'>
             <label data-l10n-id='expirationDate' htmlFor='expirationDate' />
-            <select value={this.displayMonth}
+            <select value={this.props.currentDetail.get('month')}
               onChange={this.onExpMonthChange} className='formSelect expMonthSelect' >
               {ExpMonth}
             </select>

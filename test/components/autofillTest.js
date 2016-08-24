@@ -154,7 +154,7 @@ describe('Autofill', function () {
     const saveCreditCardButton = '.saveCreditCardButton'
     const cardName = 'Test Card'
     const cardNumber = '1234567890'
-    const expMonth = 10
+    const expMonth = 9
     const expYear = new Date().getFullYear() + 2
     it('Adding Credit Card', function * () {
       yield this.app.client
@@ -169,7 +169,7 @@ describe('Autofill', function () {
         .keys(cardName)
         .click('#creditCardNumber')
         .keys(cardNumber)
-        .selectByValue('.expMonthSelect', expMonth.toString())
+        .selectByValue('.expMonthSelect', expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString())
         .selectByValue('.expYearSelect', expYear.toString())
         .click(saveCreditCardButton)
         .waitUntil(function () {
@@ -181,7 +181,8 @@ describe('Autofill', function () {
         .waitForVisible('.autofillPage')
         .getText('.creditCardName').should.eventually.be.equal(cardName)
         .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
-        .getText('.creditCardPExpirationDate').should.eventually.be.equal(expMonth.toString() + '/' + expYear.toString())
+        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
+          (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
     it('Credit Card form test', function * () {
       const page1Url = 'https://www.roboform.com/filling-test-all-fields'
