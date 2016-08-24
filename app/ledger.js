@@ -867,7 +867,11 @@ var run = (delayTime) => {
   }
 
   if (delayTime === 0) {
-    delayTime = client.timeUntilReconcile()
+    try {
+      delayTime = client.timeUntilReconcile()
+    } catch (ex) {
+      delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
+    }
     if (delayTime === false) delayTime = 0
   }
   if (delayTime > 0) {
