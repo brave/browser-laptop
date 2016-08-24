@@ -79,7 +79,7 @@ describe('Autofill', function () {
         .getText('.email').should.eventually.be.equal(email)
     })
     it('Address form test', function * () {
-      const page1Url = 'https://www.roboform.com/filling-test-all-fields'
+      const page1Url = Brave.server.url('formfill.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(page1Url)
@@ -125,7 +125,7 @@ describe('Autofill', function () {
         .getText('.email').should.eventually.be.equal(email + 'mm')
     })
     it('Edited Address form test', function * () {
-      const page1Url = 'https://www.roboform.com/filling-test-all-fields'
+      const page1Url = Brave.server.url('formfill.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(page1Url)
@@ -185,7 +185,7 @@ describe('Autofill', function () {
           (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
     it('Credit Card form test', function * () {
-      const page1Url = 'https://www.roboform.com/filling-test-all-fields'
+      const page1Url = Brave.server.url('formfill.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(page1Url)
@@ -230,7 +230,7 @@ describe('Autofill', function () {
           (expMonth + 1).toString() + '/' + (expYear + 1).toString())
     })
     it('Edited Credit Card form test', function * () {
-      const page1Url = 'https://www.roboform.com/filling-test-all-fields'
+      const page1Url = Brave.server.url('formfill.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(page1Url)
@@ -245,6 +245,174 @@ describe('Autofill', function () {
         .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber + '123')
         .getValue('[name="42ccexp_mm"]').should.eventually.be.equal((expMonth + 1).toString())
         .getValue('[name="43ccexp_yy"]').should.eventually.be.equal((expYear + 1).toString())
+    })
+    it('Deleting Credit Card', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible('[title="Delete creditCard"]')
+        .click('[title="Delete creditCard"]')
+        .waitForVisible('[data-l10n-id=noCreditCardsSaved]')
+    })
+  })
+
+  describe('Mergeable Data', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+    const page1Url = 'about:autofill'
+    const addAddressButton = '.addAddressButton'
+    const saveAddressButton = '.saveAddressButton'
+    const name = 'Brave Lion'
+    const city = 'San Francisco'
+    const country = 'US'
+    it('Adding Address', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible(addAddressButton)
+        .click(addAddressButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(autofillAddressPanel)
+        .click('#nameOnAddress')
+        .keys(name)
+        .click(saveAddressButton)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.autofill.addresses.length === 1
+          })
+        })
+        .tabByUrl(this.page1Url)
+        .waitForVisible('.autofillPage')
+        .getText('.addressName').should.eventually.be.equal(name)
+    })
+    it('Editing Address', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible('[title="Edit address"]')
+        .click('[title="Edit address"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(autofillAddressPanel)
+        .click('#city')
+        .keys(city)
+        .click('#country')
+        .keys(country)
+        .click(saveAddressButton)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.autofill.addresses.length === 1
+          })
+        })
+        .tabByUrl(this.page1Url)
+        .refresh()
+        .waitForVisible('.autofillPage')
+        .getText('.addressName').should.eventually.be.equal(name)
+        .getText('.city').should.eventually.be.equal(city)
+        .getText('.country').should.eventually.be.equal(country)
+    })
+    it('Address form test', function * () {
+      const page1Url = Brave.server.url('formfill.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible('<form>')
+        .click('[name="04fullname"]')
+        .click('[name="04fullname"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSendRenderer('autofill-selection-clicked', 2, name, 1, 0)
+        .setContextMenuDetail()
+        .tabByUrl(this.page1Url)
+        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
+        .getValue('[name="13adr_city"]').should.eventually.be.equal(city)
+        .getValue('[name="15_country"]').should.eventually.be.equal('United States')
+    })
+    it('Deleting Address', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible('[title="Delete address"]')
+        .click('[title="Delete address"]')
+        .waitForVisible('[data-l10n-id=noAddressesSaved]')
+    })
+    const addCreditCardButton = '.addCreditCardButton'
+    const saveCreditCardButton = '.saveCreditCardButton'
+    const cardName = 'Test Card'
+    const cardNumber = '1234567890'
+    const expMonth = 10
+    const expYear = new Date().getFullYear() + 2
+    it('Adding Credit Card', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible(addCreditCardButton)
+        .click(addCreditCardButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(autofillCreditCardPanel)
+        .click('#nameOnCard')
+        .keys(cardName)
+        .click('#creditCardNumber')
+        .keys(cardNumber)
+        .click(saveCreditCardButton)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.autofill.creditCards.length === 1
+          })
+        })
+        .tabByUrl(this.page1Url)
+        .waitForVisible('.autofillPage')
+        .getText('.creditCardName').should.eventually.be.equal(cardName)
+        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
+        .getText('.creditCardPExpirationDate').should.eventually.be.equal('01/' + new Date().getFullYear().toString())
+    })
+    it('Editing Credit Card', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible('[title="Edit creditCard"]')
+        .click('[title="Edit creditCard"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(autofillCreditCardPanel)
+        .selectByValue('.expMonthSelect', expMonth.toString())
+        .selectByValue('.expYearSelect', expYear.toString())
+        .click(saveCreditCardButton)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.autofill.creditCards.length === 1
+          })
+        })
+        .tabByUrl(this.page1Url)
+        .refresh()
+        .waitForVisible('.autofillPage')
+        .getText('.creditCardName').should.eventually.be.equal(cardName)
+        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
+        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
+          expMonth.toString() + '/' + expYear.toString())
+    })
+    it('Credit Card form test', function * () {
+      const page1Url = Brave.server.url('formfill.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1Url)
+        .url(getTargetAboutUrl(page1Url))
+        .waitForVisible('<form>')
+        .click('[name="41ccnumber"]')
+        .click('[name="41ccnumber"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSendRenderer('autofill-selection-clicked', 2, cardNumber, 65536, 0)
+        .setContextMenuDetail()
+        .tabByUrl(this.page1Url)
+        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
+        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
+        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
     })
     it('Deleting Credit Card', function * () {
       yield this.app.client
