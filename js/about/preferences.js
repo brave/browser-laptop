@@ -313,25 +313,8 @@ class PaymentHistory extends ImmutableComponent {
   get ledgerData () {
     return this.props.ledgerData
   }
-  copyToClipboard (text) {
-    aboutActions.setClipboard(text)
-  }
-  goToURL (url) {
-    window.location.href = url
-  }
-  onMessage (e) {
-    if (!e.data || e.origin !== config.coinbaseOrigin) {
-      return
-    }
-    if (e.data.event === 'modal_closed') {
-      if (this.buyCompleted) {
-        this.props.hideParentOverlay()
-      }
-    }
-  }
-  render () {
-    window.addEventListener('message', this.onMessage.bind(this), false)
 
+  render () {
     const transactions = this.props.ledgerData.get('transactions')
 
     return <div id='paymentHistory'>
