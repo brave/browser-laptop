@@ -21,6 +21,7 @@ const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
+// const tabState = require('./common/state/tabState')
 
 let suffix = ''
 if (process.env.NODE_ENV === 'development') {
@@ -274,6 +275,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
       })
     }
   }
+  // all data in tabs is transient while we make the transition from window to app state
+  delete data.tabs
+  // if (data.tabs) {
+  //   data.tabs = data.tabs.map((tab) => tabState.getPersistentTabState(tab).toJS())
+  // }
 }
 
 /**
@@ -356,6 +362,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     sites: [],
+    tabs: [],
     visits: [],
     settings: {},
     siteSettings: {},

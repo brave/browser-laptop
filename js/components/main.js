@@ -48,8 +48,8 @@ const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../constants/keyCodes')
 
 // State handling
+const basicAuthState = require('../../app/common/state/basicAuthState')
 const FrameStateUtil = require('../state/frameStateUtil')
-
 const searchProviders = require('../data/searchProviders')
 
 // Util
@@ -365,13 +365,6 @@ class Main extends ImmutableComponent {
     ipc.on(messages.SET_SECURITY_STATE, (e, frameKey, securityState) => {
       windowActions.setSecurityState(FrameStateUtil.getFrameByKey(self.props.windowState, frameKey),
                                      securityState)
-    })
-
-    ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, detail.tabId)
-      if (frame) {
-        windowActions.setLoginRequiredDetail(frame, detail)
-      }
     })
 
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
@@ -701,6 +694,7 @@ class Main extends ImmutableComponent {
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
+    const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -817,9 +811,9 @@ class Main extends ImmutableComponent {
             : null
           }
           {
-            activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
-            ? <LoginRequired frameProps={activeFrame} />
-            : null
+            loginRequiredDetail
+              ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+              : null
           }
           {
             this.props.windowState.get('bookmarkDetail')

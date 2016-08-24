@@ -745,13 +745,6 @@ const doAction = (action) => {
                                         action.securityState.certDetails)
       }
       break
-    case WindowConstants.WINDOW_SET_LOGIN_REQUIRED_DETAIL:
-      if (action.detail) {
-        windowState = windowState.setIn(frameStatePathForFrame(action.frameProps).concat(['security', 'loginRequiredDetail']), action.detail)
-      } else {
-        windowState = windowState.deleteIn(frameStatePathForFrame(action.frameProps).concat(['security', 'loginRequiredDetail']))
-      }
-      break
     case WindowConstants.WINDOW_SET_BLOCKED_BY:
       const blockedByPath = ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), action.blockType, 'blocked']
       let blockedBy = windowState.getIn(blockedByPath) || new Immutable.List()

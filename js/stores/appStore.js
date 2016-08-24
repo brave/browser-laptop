@@ -4,6 +4,7 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
+const WindowConstants = require('../constants/windowConstants')
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
@@ -29,6 +30,10 @@ const debounce = require('../lib/debounce.js')
 const isDarwin = process.platform === 'darwin'
 const locale = require('../../app/locale')
 const path = require('path')
+
+// state helpers
+const basicAuthState = require('../../app/common/state/basicAuthState')
+const tabState = require('../../app/common/state/tabState')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -600,6 +605,15 @@ const handleAppAction = (action) => {
         Filtering.removeAutofillCreditCard(action.detail.guid)
         break
       }
+    case AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL:
+      appState = basicAuthState.setLoginRequiredDetail(appState, action.tabId, action.detail)
+      break
+    case AppConstants.APP_SET_LOGIN_RESPONSE_DETAIL:
+      appState = basicAuthState.setLoginResponseDetail(appState, action.tabId, action.detail)
+      break
+    case WindowConstants.WINDOW_CLOSE_FRAME:
+      appState = tabState.closeTab(appState, action.frameProps.get('tabId'))
+      break
     default:
   }
 

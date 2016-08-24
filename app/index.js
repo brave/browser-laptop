@@ -62,6 +62,7 @@ const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
+const basicAuth = require('./browser/basicAuth')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -73,8 +74,6 @@ let lastWindowClosed = false
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
 let errorCerts = {}
-// URLs to callback for auth.
-let authCallbacks = {}
 // Don't show the keytar prompt more than once per 24 hours
 let throttleKeytar = false
 
@@ -252,16 +251,6 @@ app.on('ready', () => {
     })
   })
 
-  app.on('login', (e, webContents, request, authInfo, cb) => {
-    e.preventDefault()
-    authCallbacks[request.url] = cb
-    let sender = webContents.hostWebContents || webContents
-    sender.send(messages.LOGIN_REQUIRED, {
-      url: request.url,
-      tabId: webContents.getId(),
-      authInfo
-    })
-  })
   app.on('window-all-closed', () => {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
@@ -354,21 +343,6 @@ app.on('ready', () => {
     return event.returnValue
   })
 
-  ipcMain.on(messages.LOGIN_RESPONSE, (e, url, username, password) => {
-    if (username || password) {
-      // Having 2 of the same tab URLs open right now, where both require auth
-      // can cause an error / alert here.  Ignore it for now.
-      try {
-        if (authCallbacks[url]) {
-          authCallbacks[url](username, password)
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    delete authCallbacks[url]
-  })
-
   process.on(messages.UNDO_CLOSED_WINDOW, () => {
     if (lastWindowState) {
       appActions.newWindow(undefined, undefined, lastWindowState)
@@ -392,6 +366,7 @@ app.on('ready', () => {
     appActions.setState(Immutable.fromJS(initialState))
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
+    basicAuth.init()
     contentSettings.init()
     privacy.init()
     Extensions.init()

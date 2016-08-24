@@ -312,6 +312,18 @@ Adds a word to the dictionary
 
 
 
+### setLoginRequiredDetail(tabId, detail) 
+
+Adds information about pending basic auth login requests
+
+**Parameters**
+
+**tabId**: `number`, The tabId that generated the request
+
+**detail**: `string`, login request info
+
+
+
 ### clearAppData(clearDataDetail) 
 
 Clears the data specified in dataDetail
