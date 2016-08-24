@@ -401,7 +401,8 @@ WindowStore
         currency: string,
         amount: number
       }
-    }
+    },
+    hasBitcoinHandler: boolean, // Whether Brave has a bitcoin: protocol handler
   },
   publisherInfo: {
     synopsis: {
@@ -420,7 +421,6 @@ WindowStore
       score: ?
     }
   },
-  hasBitcoinHandler: boolean, // Whether Brave has a bitcoin: protocol handler
   autofillAddressDetail: {
     name: string,
     organization: string,

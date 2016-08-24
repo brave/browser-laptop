@@ -961,7 +961,6 @@ class Main extends ImmutableComponent {
               flash={this.props.appState.get('flash')}
               cookieblock={this.props.appState.get('cookieblock')}
               flashInitialized={this.props.appState.get('flashInitialized')}
-              hasBitcoinHandler={this.props.appState.get('hasBitcoinHandler')}
               allSiteSettings={allSiteSettings}
               ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
               publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}

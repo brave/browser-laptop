@@ -138,6 +138,13 @@ var boot = () => {
  */
 
 if (ipc) {
+  ipc.on(messages.CHECK_BITCOIN_HANDLER, () => {
+    if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
+      ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+    }
+  })
+
   ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
     var ctx
 
@@ -695,6 +702,8 @@ var ledgerInfo = {
   buyURL: undefined,
   bravery: undefined,
 
+  hasBitcoinHandler: false,
+
   _internal: {}
 }
 
@@ -709,10 +718,6 @@ var updateLedgerInfo = () => {
                       underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
     if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
-
-    if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
-      if (!protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')) delete ledgerInfo.paymentURL
-    }
   }
 
   if (clientOptions.debugP) {

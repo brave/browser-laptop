@@ -370,17 +370,6 @@ const appActions = {
   },
 
   /**
-   * Sets whether the bitcoin protocol is handled.
-   * @param {boolean}
-   */
-  setBitcoinHandled: function (handled) {
-    AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_BITCOIN_HANDLED,
-      handled
-    })
-  },
-
-  /**
    * Add address data
    * @param {object} detail - the address to add as per doc/state.md's autofillAddressDetail
    * @param {object} originalDetail - the original address before editing

@@ -542,9 +542,6 @@ const handleAppAction = (action) => {
         Filtering.clearStorageData()
       }
       break
-    case AppConstants.APP_SET_BITCOIN_HANDLED:
-      appState = appState.set('hasBitcoinHandler', action.handled)
-      break
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
       {
         const Filtering = require('../../app/filtering')

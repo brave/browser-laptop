@@ -304,7 +304,7 @@ class BitcoinDashboard extends ImmutableComponent {
                 </a>
                 <div data-l10n-id='bitcoinAddress' className='labelText' />
                 <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
-                <span>{this.ledgerData.get('address')}</span>
+                <span className='smallText'>{this.ledgerData.get('address')}</span>
               </div>
               : <div>
                 <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
