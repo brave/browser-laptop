@@ -1,6 +1,8 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
+const assert = require('assert')
+const messages = require('../../js/constants/messages')
 const {urlInput, autofillAddressPanel, autofillCreditCardPanel} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
@@ -251,6 +253,65 @@ describe('Autofill', function () {
         .waitForVisible('[title="Delete creditCard"]')
         .click('[title="Delete creditCard"]')
         .waitForVisible('[data-l10n-id=noCreditCardsSaved]')
+    })
+  })
+
+  describe('prevent autocomplete data leak from private to regular', function () {
+    Brave.beforeAll(this)
+    const url = 'https://yoast.com/research/autocompletetype.php'
+    before(function * () {
+      yield setup(this.app.client)
+    })
+    it('submit form on regular', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('.tab[data-frame-key="2"]')
+        .waitForVisible('webview[partition="persist:default"]')
+        .tabByUrl(this.url)
+        .setValue('[x-autocompletetype="name"]', 'bravery')
+        .click('[value="Submit your name"]')
+        .loadUrl(url)
+        .click('[x-autocompletetype="name"]')
+        .keys('b')
+        .windowByUrl(Brave.browserWindowUrl)
+      let item = yield this.app.client.getText('.contextMenuItemText')
+      assert.equal(item, 'bravery')
+      yield this.app.client.setContextMenuDetail()
+    })
+    it('submit form on private', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPrivate: true })
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('.tab.private[data-frame-key="3"]')
+        .waitForVisible('webview[partition="default"]')
+        .tabByUrl(this.url)
+        .setValue('[x-autocompletetype="name"]', 'bravery2')
+        .click('[value="Submit your name"]')
+        .loadUrl(url)
+        .click('[x-autocompletetype="name"]')
+        .keys('b')
+        .windowByUrl(Brave.browserWindowUrl)
+      let item = yield this.app.client.getText('.contextMenuItemText')
+      assert.equal(item, 'bravery')
+      yield this.app.client.setContextMenuDetail()
+    })
+    it('check on regular', function * () {
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('.tab[data-frame-key="4"]')
+        .waitForVisible('webview[partition="persist:default"]')
+        .tabByUrl(this.url)
+        .click('[x-autocompletetype="name"]')
+        .keys('b')
+        .windowByUrl(Brave.browserWindowUrl)
+      let item = yield this.app.client.getText('.contextMenuItemText')
+      assert.equal(item, 'bravery')
+      yield this.app.client.setContextMenuDetail()
     })
   })
 })
