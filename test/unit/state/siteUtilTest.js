@@ -154,8 +154,8 @@ describe('siteUtil', function () {
   })
 
   describe('addSite', function () {
-    describe('when adding a new siteDetail', function () {
-      it('returns the updated site list which includes the new site', function () {
+    describe('sites list does not have this siteDetail', function () {
+      it('returns updated site list including the new site', function () {
         const sites = Immutable.fromJS([])
         const siteDetail = Immutable.fromJS({
           lastAccessedTime: 123,
@@ -165,7 +165,64 @@ describe('siteUtil', function () {
         })
         const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
         const expectedSites = sites.push(siteDetail)
-        assert.deepEqual(processedSites, expectedSites)
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+    })
+
+    describe('sites list already has this siteDetail', function () {
+      it('uses customTitle, parentFolderId, partitionNumber, and favicon values from old siteDetail if null', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle',
+          partitionNumber: 3,
+          parentFolderId: 8,
+          favicon: 'https://brave.com/favicon.ico'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title'
+        })
+        const expectedSiteDetail = Immutable.fromJS({
+          lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          tags: newSiteDetail.get('tags').toJS(),
+          location: newSiteDetail.get('location'),
+          title: newSiteDetail.get('title'),
+          customTitle: oldSiteDetail.get('customTitle'),
+          partitionNumber: oldSiteDetail.get('partitionNumber'),
+          parentFolderId: oldSiteDetail.get('parentFolderId'),
+          favicon: oldSiteDetail.get('favicon')
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSites = Immutable.fromJS([expectedSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+      it('overrides the old title with the new title', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: 'new customTitle'
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSites = Immutable.fromJS([newSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
     })
   })

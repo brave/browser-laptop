@@ -27,8 +27,9 @@ const isBookmarkFolder = (tags) => {
  * Obtains the index of the location in sites
  *
  * @param sites The application state's Immutable sites list
- * @param siteDetail The details of the site to get the index of
- * @return index of the site or -1 if not found.
+ * @param siteDetail The siteDetails entry to get the index of
+ * @param tags Tag for siteDetail (ex: bookmark). Folders are searched differently than other entries
+ * @return index of the siteDetail or -1 if not found.
  */
 module.exports.getSiteIndex = function (sites, siteDetail, tags) {
   if (!sites || !siteDetail) {
@@ -87,14 +88,16 @@ module.exports.getNextFolderId = (sites) => {
  * @param siteDetails The site details to add a tag to
  * @param tag The tag to add for this site.
  *   See siteTags.js for supported types. No tag means just a history item.
- * @param originalSiteDetail If specified will modify the specified site detail
+ * @param originalSiteDetail If specified, copy some existing attributes from this siteDetail
  * @return The new sites Immutable object
  */
 module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+  // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
   }
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
+  const oldSite = index !== -1 ? sites.getIn([index]) : null
 
   let folderId = siteDetail.get('folderId')
   if (!folderId && tag === siteTags.BOOKMARK_FOLDER) {
@@ -106,27 +109,23 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     tags = tags.toSet().add(tag).toList()
   }
 
-  let oldSite
-  if (index !== -1) {
-    oldSite = sites.getIn([index])
-  }
-
+  // We don't want bookmarks and other site info being renamed on users if they already exist
+  // The name should remain the same while it is bookmarked forever.
+  const customTitle = siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')
   let site = Immutable.fromJS({
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
-    // We don't want bookmarks and other site info being renamed on users if they already exist
-    // The name should remain the same while it is bookmarked forever.
-    title: oldSite && isBookmark(tags) ? oldSite.get('title') : siteDetail.get('title')
+    title: siteDetail.get('title')
   })
   if (folderId) {
     site = site.set('folderId', Number(folderId))
   }
+  if (customTitle) {
+    site = site.set('customTitle', customTitle)
+  }
   if (siteDetail.get('parentFolderId') || oldSite && oldSite.get('parentFolderId')) {
     site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId') || oldSite.get('parentFolderId')))
-  }
-  if (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')) {
-    site = site.set('customTitle', siteDetail.get('customTitle') || oldSite.get('customTitle'))
   }
   if (siteDetail.get('partitionNumber') || oldSite && oldSite.get('partitionNumber')) {
     site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber') || oldSite.get('partitionNumber')))
