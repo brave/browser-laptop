@@ -27,6 +27,8 @@ const Button = require('./button')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
+const AutofillAddressPanel = require('./autofillAddressPanel')
+const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
 const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
@@ -77,6 +79,8 @@ class Main extends ImmutableComponent {
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
+    this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
+    this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onBraveMenu = this.onBraveMenu.bind(this)
@@ -537,6 +541,14 @@ class Main extends ImmutableComponent {
     windowActions.setClearBrowsingDataDetail()
   }
 
+  onHideAutofillAddressPanel () {
+    windowActions.setAutofillAddressDetail()
+  }
+
+  onHideAutofillCreditCardPanel () {
+    windowActions.setAutofillCreditCardDetail()
+  }
+
   onHideNoScript () {
     windowActions.setNoScriptVisible(false)
   }
@@ -683,6 +695,8 @@ class Main extends ImmutableComponent {
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
+    const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
+    const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
@@ -693,6 +707,8 @@ class Main extends ImmutableComponent {
       !siteInfoIsVisible &&
       !braveryPanelIsVisible &&
       !clearBrowsingDataPanelIsVisible &&
+      !autofillAddressPanelIsVisible &&
+      !autofillCreditCardPanelIsVisible &&
       !releaseNotesIsVisible &&
       !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
@@ -782,6 +798,22 @@ class Main extends ImmutableComponent {
             ? <ClearBrowsingDataPanel
               clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
               onHide={this.onHideClearBrowsingDataPanel} />
+            : null
+          }
+          {
+           autofillAddressPanelIsVisible
+            ? <AutofillAddressPanel
+              currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
+              originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
+              onHide={this.onHideAutofillAddressPanel} />
+            : null
+          }
+          {
+           autofillCreditCardPanelIsVisible
+            ? <AutofillCreditCardPanel
+              currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
+              originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
+              onHide={this.onHideAutofillCreditCardPanel} />
             : null
           }
           {
@@ -937,6 +969,8 @@ class Main extends ImmutableComponent {
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
+              autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
+              autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
             />)
         }
         </div>

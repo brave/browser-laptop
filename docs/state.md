@@ -170,6 +170,14 @@ AppStore
     locale: string, // en_US, en, or any other locale string
     ignoredWords: Array<string>, // List of words to ignore
     addedWords: Array<string> // List of words to add to the dictionary
+  },
+  autofill: {
+    addresses: [{
+      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    }],
+    creditCards: [{
+      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    }]
   }
 }
 ```
@@ -412,6 +420,25 @@ WindowStore
       score: ?
     }
   },
-  hasBitcoinHandler: boolean // Whether Brave has a bitcoin: protocol handler
+  hasBitcoinHandler: boolean, // Whether Brave has a bitcoin: protocol handler
+  autofillAddressDetail: {
+    name: string,
+    organization: string,
+    streetAddress: string,
+    city: string,
+    state: string,
+    postalCode: string,
+    country: string,
+    phone: string,
+    email: string,
+    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+  },
+  autofillCreditCardDetail: {
+    name: string,
+    card: string,
+    month: string,
+    year: string,
+    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+  }
 }
 ```

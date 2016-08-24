@@ -741,6 +741,30 @@ Sets the clear browsing data popup detail
 
 
 
+### setAutofillAddressDetail(currentDetail, originalDetail) 
+
+Sets the manage autofill address popup detail
+
+**Parameters**
+
+**currentDetail**: `Object`, Properties of the address to change to
+
+**originalDetail**: `Object`, Properties of the address to edit
+
+
+
+### setAutofillCreditCardDetail(currentDetail, originalDetail) 
+
+Sets the manage autofill credit card popup detail
+
+**Parameters**
+
+**currentDetail**: `Object`, Properties of the credit card to change to
+
+**originalDetail**: `Object`, Properties of the credit card to edit
+
+
+
 
 * * *
 

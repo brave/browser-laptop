@@ -1,0 +1,59 @@
+@import "./common.less";
+
+.autofillPage {
+  margin: 20px;
+
+  .autofillPageContent {
+    border-top: 1px solid @chromeBorderColor;
+
+    .autofillList {
+      padding-top: 10px;
+      overflow: hidden;
+    }
+  }
+}
+
+th {
+  padding: 8px;
+  text-align: left;
+}
+
+tr {
+  cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+
+  padding: 12px;
+  -webkit-user-select: none;
+
+  .autofillItem {
+    display: flex;
+  }
+
+  &:hover :not(th) {
+    background-color: lighten(@highlightBlue, 30%);
+  }
+}
+
+td:not(.autofillActions) {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+.autofillAction {
+  cursor: pointer;
+  padding: 8px;
+  &:hover {
+    background-color: lighten(@highlightBlue, 20%);
+  }
+}
+
+.autofillPageFooter {
+  padding: 10px;
+  margin-bottom: 20px;
+  span {
+    color: grey;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
