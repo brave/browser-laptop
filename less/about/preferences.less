@@ -449,6 +449,39 @@ table.sortableTable {
   overflow-y: scroll;
 }
 
+.modal .dialog.paymentHistory .sectionTitle {
+  text-align: left;
+}
+
+.nextPaymentSubmission span {
+  font-size: 12px;
+}
+
+.modal .dialog.paymentHistory {
+  padding: 0px;
+
+  .dialog-header {
+    background-color: #EEE;
+    height: 20px;
+    padding-bottom: 10px;
+  }
+
+  .dialog-body {
+    background-color: #FFF;
+    height: 300px;
+  }
+
+  .dialog-footer {
+    background-color: #EEE;
+    height: 5px;
+  }
+
+  .dialog-header, .dialog-body, .dialog-footer {
+    padding: 20px;
+  }
+}
+
+
 #paymentsContainer {
   position: relative;
   overflow-x: hidden;
@@ -473,6 +506,28 @@ table.sortableTable {
     margin: 30px 0px;
     tr {
       height: 1em;
+    }
+  }
+
+  #paymentHistory {
+    background-color: #FFF;
+    tr {
+       th {
+         color: @darkGray;
+         font-weight: 500;
+         border-bottom: 2px solid @lightGray;
+         text-align: left;
+         width: 18%;
+       }
+       td {
+          text-align: left;
+          &.narrow {
+            color: @darkGray;
+          }
+          &.wide {
+            color: #777;
+          }
+       }
     }
   }
 
