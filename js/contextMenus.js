@@ -379,7 +379,6 @@ function autofillTemplateInit (suggestions, frame) {
   for (let i = 0; i < suggestions.length; ++i) {
     let value
     let frontendId = suggestions[i].frontend_id
-    console.log(frontendId)
     if (frontendId >= 0) { //  POPUP_ITEM_ID_AUTOCOMPLETE_ENTRY and Autofill Entry
       value = suggestions[i].value
     } else if (frontendId === -1) { // POPUP_ITEM_ID_WARNING_MESSAGE
