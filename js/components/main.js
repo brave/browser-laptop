@@ -14,7 +14,6 @@ const windowActions = require('../actions/windowActions')
 const webviewActions = require('../actions/webviewActions')
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
-const getOrigin = require('../state/siteUtil').getOrigin
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -55,7 +54,6 @@ const searchProviders = require('../data/searchProviders')
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
 const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
-const { getBaseDomain } = require('../lib/baseDomain')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
@@ -366,12 +364,10 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frames = self.props.windowState.get('frames')
-        .filter((frame) => frame.get('location') === detail.url ||
-          getOrigin(frame.get('location')) === getOrigin(detail.url) ||
-        getBaseDomain(getOrigin(frame.get('location'))) === getBaseDomain(getOrigin(detail.url)))
-      frames.forEach((frame) =>
-        windowActions.setLoginRequiredDetail(frame, detail))
+      const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, detail.tabId)
+      if (frame) {
+        windowActions.setLoginRequiredDetail(frame, detail)
+      }
     })
 
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {

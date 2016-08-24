@@ -254,11 +254,11 @@ app.on('ready', () => {
   app.on('login', (e, webContents, request, authInfo, cb) => {
     e.preventDefault()
     authCallbacks[request.url] = cb
-    BrowserWindow.getAllWindows().map((win) => {
-      win.webContents.send(messages.LOGIN_REQUIRED, {
-        url: request.url,
-        authInfo
-      })
+    let sender = webContents.hostWebContents || webContents
+    sender.send(messages.LOGIN_REQUIRED, {
+      url: request.url,
+      tabId: webContents.getId(),
+      authInfo
     })
   })
   app.on('window-all-closed', () => {
