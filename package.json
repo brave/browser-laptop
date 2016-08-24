@@ -133,6 +133,8 @@
     "jsonfile": "^2.2.3",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
+    "level": "^1.4.0",
+    "leveldown": "^1.4.6",
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.4",
     "mockery": "^1.7.0",

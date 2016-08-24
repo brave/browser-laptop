@@ -7,8 +7,10 @@
 
 'use strict'
 var fs = require('fs')
+var path = require('path')
 var parseString = require('xml2js').parseString
 var sqlite3 = require('sqlite3')
+var levelup = require('level')
 
 // Manually exclude sites that are broken until they are fixed in the next
 // HTTPS Everywhere release.
@@ -73,4 +75,76 @@ var db = new sqlite3.Database('httpse.sqlite', function (err) {
       targetStatement.run(target, ids)
     }
   })
+})
+
+const rmDir = function (dirPath) {
+  try {
+    var files = fs.readdirSync(dirPath)
+  } catch (e) {
+    return
+  }
+  if (files.length > 0) {
+    for (var i = 0; i < files.length; i++) {
+      var filePath = path.join(dirPath, files[i])
+      if (fs.statSync(filePath).isFile()) {
+        fs.unlinkSync(filePath)
+      } else {
+        rmDir(filePath)
+      }
+    }
+  }
+  fs.rmdirSync(dirPath)
+}
+
+console.log('creating httpse.leveldb')
+rmDir('./httpse.leveldb')
+
+const httpseLevelDB = levelup('httpse.leveldb', {compression: false, errorIfExists: true})
+
+const ruleSets = {}
+for (var id in rulesets.rulesetStrings) {
+  ruleSets[id] = rulesets.rulesetStrings[id]
+}
+
+let batch = httpseLevelDB.batch()
+for (var target in rulesets.targets) {
+  let targetRuleSets = []
+  rulesets.targets[target].forEach((id) => {
+    let ruleset = ruleSets[id]
+    if (!ruleset.ruleset.$.default_off && !ruleset.ruleset.$.platform) {
+      let rule = {
+        r: ruleset.ruleset.rule.map((rule) => {
+          if (rule.$.from === '^http:' && rule.$.to === 'https:') {
+            return { d: 1 }
+          } else {
+            return { f: rule.$.from, t: rule.$.to }
+          }
+        })
+      }
+      if (ruleset.ruleset.exclusion) {
+        rule.e = ruleset.ruleset.exclusion.map((exclusion) => {
+          return { p: exclusion.$.pattern }
+        })
+      }
+      targetRuleSets = targetRuleSets.concat(rule)
+    }
+  })
+  let reverseTarget = target.split('.').reverse().join('.')
+  if (targetRuleSets.length > 0) {
+    batch.put(reverseTarget, JSON.stringify(targetRuleSets), {sync: true})
+  }
+}
+
+batch.write((err) => {
+  if (err) {
+    console.error(err)
+  } else {
+    httpseLevelDB.close((err) => {
+      if (err) {
+        console.error(err)
+      } else {
+        console.log('done')
+      }
+    })
+  }
 })
