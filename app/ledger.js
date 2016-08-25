@@ -130,7 +130,8 @@ var boot = () => {
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
-    appActions.updateLedgerInfo({ creating: true })
+    ledgerInfo.creating = true
+    updateLedgerInfo()
     try {
       client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
