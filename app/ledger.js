@@ -711,6 +711,7 @@ var ledgerInfo = {
   currency: undefined,
 
   paymentURL: undefined,
+  paymentIMG: undefined,
   buyURL: undefined,
   bravery: undefined,
 
