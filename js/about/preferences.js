@@ -574,6 +574,14 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get paymentHistoryButton () {
+    const walletCreated = this.props.ledgerData.get('created') && !this.props.ledgerData.get('creating')
+    const walletTransactions = this.props.ledgerData.get('transactions')
+    const walletHasTransactions = walletTransactions && walletTransactions.size
+
+    if (!walletCreated || !walletHasTransactions) {
+      return null
+    }
+
     const buttonText = 'viewPaymentHistory'
     const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
     return <Button className='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
