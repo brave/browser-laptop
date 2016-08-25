@@ -631,6 +631,9 @@ class PaymentsTab extends ImmutableComponent {
 
   get paymentHistoryFooter () {
     let ledgerData = this.props.ledgerData
+    if (!ledgerData.get('reconcileStamp')) {
+      return
+    }
     let nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
     return <div className='nextPaymentSubmission'><span>Your next payment submission is {nextReconcileDate}.</span></div>
   }
