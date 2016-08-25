@@ -550,8 +550,9 @@ class PaymentsTab extends ImmutableComponent {
   get footerContent () {
     return <div id='paymentsFooter'>
       <div data-l10n-id='paymentsFooterText' />
-      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-left' src='img/bitgo.png' /></a>
-      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-left' src='img/coinbase.png' /></a>
+      <a href='https://www.privateinternetaccess.com/' target='_blank'><img className='largeImg' src='img/private_internet_access.png' /></a>
+      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-right' src='img/bitgo.png' /></a>
+      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-right' src='img/coinbase.png' /></a>
     </div>
   }
 
