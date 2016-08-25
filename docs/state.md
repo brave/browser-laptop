@@ -384,9 +384,9 @@ WindowStore
   ledgerInfo: {
     creating: boolean,
     created: boolean,
-    delayStamp: timestamp,
-    reconcileStamp: timestamp,
-    reconcileDelay: timestamp,
+    delayStamp: number,
+    reconcileStamp: number,
+    reconcileDelay: number,
     transactions: [ {
       viewingId: string,
       surveyorId: string,
@@ -402,7 +402,7 @@ WindowStore
         satoshis: number,
         fee: number
       },
-      submissionStamp: timestamp,
+      submissionStamp: number,
       submissionId: string,
       count: number,
       satoshis: number,
