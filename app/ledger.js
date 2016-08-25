@@ -124,7 +124,7 @@ var boot = () => {
       appActions.updateLedgerInfo({})
 
       bootP = false
-      return console.log('ledger-client error: ' + ex.toString() + '\n' + ex.stack)
+      return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
     }
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     getBalance()
@@ -338,9 +338,13 @@ var initialize = (onoff) => {
         }
 
         getStateInfo(state)
-        client = (require('ledger-client'))(state.personaId,
-                                            underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
-                                                                clientOptions), state)
+        try {
+          client = (require('ledger-client'))(state.personaId,
+                                              underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
+                                                                  clientOptions), state)
+        } catch (ex) {
+          return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
+        }
         if (client.sync(callback) === true) {
           run(random.randomInt({ min: 1, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
