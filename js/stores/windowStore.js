@@ -165,6 +165,7 @@ const addToHistory = (frameProps) => {
 const newFrame = (frameOpts, openInForeground, insertionIndex) => {
   const frames = windowState.get('frames')
 
+  frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
   if (frameOpts === undefined) {
     frameOpts = {}
   }

@@ -545,9 +545,6 @@ const handleAppAction = (action) => {
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
       {
         const Filtering = require('../../app/filtering')
-        if (appState.getIn(['autofill', 'addresses']) === undefined) {
-          appState = appState.setIn(['autofill', 'addresses'], new Immutable.List())
-        }
         appState = appState.setIn(['autofill', 'addresses'],
           appState.getIn(['autofill', 'addresses']).filterNot((address) => {
             return Immutable.is(address, action.originalDetail.get('guid'))
@@ -567,17 +564,14 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'addresses'],
           appState.getIn(['autofill', 'addresses']).filterNot((address) => {
-            return Immutable.is(address, Immutable.fromJS(action.detail.guid))
+            return Immutable.is(address, Immutable.fromJS(action.detail.get('guid')))
           }))
-        Filtering.removeAutofillAddress(action.detail.guid)
+        Filtering.removeAutofillAddress(action.detail.get('guid').toJS())
         break
       }
     case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
       {
         const Filtering = require('../../app/filtering')
-        if (appState.getIn(['autofill', 'creditCards']) === undefined) {
-          appState = appState.setIn(['autofill', 'creditCards'], new Immutable.List())
-        }
         appState = appState.setIn(['autofill', 'creditCards'],
           appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
             return Immutable.is(card, action.originalDetail.get('guid'))
@@ -597,9 +591,9 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'creditCards'],
           appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
-            return Immutable.is(card, Immutable.fromJS(action.detail.guid))
+            return Immutable.is(card, action.detail.get('guid'))
           }))
-        Filtering.removeAutofillCreditCard(action.detail.guid)
+        Filtering.removeAutofillCreditCard(action.detail.get('guid').toJS())
         break
       }
     default:
