@@ -40,6 +40,8 @@ const underscore = require('underscore')
 const uuid = require('node-uuid')
 
 const appActions = require('../js/actions/appActions')
+const appConstants = require('../js/constants/appConstants')
+const appDispatcher = require('../js/dispatcher/appDispatcher')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
@@ -94,12 +96,23 @@ let addFundsMessage
 let suppressNotifications = false
 let notificationTimeout = null
 
+// TODO(bridiver) - create a better way to get setting changes
+const doAction = (action) => {
+  switch (action.actionType) {
+    case appConstants.APP_CHANGE_SETTING:
+      if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
+      if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
+      break
+    default:
+  }
+}
+
 /*
  * module entry points
  */
-
 var init = () => {
   try {
+    appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
   } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
@@ -168,11 +181,6 @@ if (ipc) {
     ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
 
     event.returnValue = { context: ctx, rules: publisherInfo._internal.ruleset.cooked }
-  })
-
-  ipc.on(messages.CHANGE_SETTING, (event, key, value) => {
-    if (key === settings.PAYMENTS_ENABLED) return initialize(value)
-    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(value)
   })
 
   ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
