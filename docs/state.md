@@ -75,7 +75,8 @@ AppStore
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable adblocking
+    enabled: boolean, // Enable adblocking
+    count: number // Number of blocked ads application wide
   },
   safeBrowsing: {
     etag: string, // last downloaded data file etag
@@ -87,13 +88,15 @@ AppStore
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable tracking protection
+    enabled: boolean, // Enable tracking protection
+    count: number // Number of blocked trackers application wide
   },
   httpsEverywhere: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable HTTPS Everywhere
+    enabled: boolean, // Enable HTTPS Everywhere
+    count: number // Number of HTTPS Everywhere upgrades application wide
   },
   adInsertion: {
     enabled: boolean // Enable ad insertion

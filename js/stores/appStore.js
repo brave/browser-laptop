@@ -460,6 +460,10 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       appState = appState.setIn([action.resourceName, 'enabled'], action.enabled)
       break
+    case AppConstants.APP_ADD_RESOURCE_COUNT:
+      const oldCount = appState.getIn([action.resourceName, 'count']) || 0
+      appState = appState.setIn([action.resourceName, 'count'], oldCount + action.count)
+      break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,
