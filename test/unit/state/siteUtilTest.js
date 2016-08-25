@@ -154,8 +154,8 @@ describe('siteUtil', function () {
   })
 
   describe('addSite', function () {
-    describe('when adding a new siteDetail', function () {
-      it('returns the updated site list which includes the new site', function () {
+    describe('sites list does not have this siteDetail', function () {
+      it('returns updated site list including the new site', function () {
         const sites = Immutable.fromJS([])
         const siteDetail = Immutable.fromJS({
           lastAccessedTime: 123,
@@ -165,7 +165,64 @@ describe('siteUtil', function () {
         })
         const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
         const expectedSites = sites.push(siteDetail)
-        assert.deepEqual(processedSites, expectedSites)
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+    })
+
+    describe('sites list already has this siteDetail', function () {
+      it('uses customTitle, parentFolderId, partitionNumber, and favicon values from old siteDetail if null', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle',
+          partitionNumber: 3,
+          parentFolderId: 8,
+          favicon: 'https://brave.com/favicon.ico'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title'
+        })
+        const expectedSiteDetail = Immutable.fromJS({
+          lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
+          tags: newSiteDetail.get('tags').toJS(),
+          location: newSiteDetail.get('location'),
+          title: newSiteDetail.get('title'),
+          customTitle: oldSiteDetail.get('customTitle'),
+          partitionNumber: oldSiteDetail.get('partitionNumber'),
+          parentFolderId: oldSiteDetail.get('parentFolderId'),
+          favicon: oldSiteDetail.get('favicon')
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSites = Immutable.fromJS([expectedSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+      it('overrides the old title with the new title', function () {
+        const oldSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'old title',
+          customTitle: 'old customTitle'
+        })
+        const newSiteDetail = Immutable.fromJS({
+          lastAccessedTime: 456,
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          title: 'new title',
+          customTitle: 'new customTitle'
+        })
+        const sites = Immutable.fromJS([oldSiteDetail])
+        const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
+        const expectedSites = Immutable.fromJS([newSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
     })
   })
@@ -180,6 +237,28 @@ describe('siteUtil', function () {
       const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail), siteTags.BOOKMARK)
       const expectedSites = sites.setIn([0, 'parentFolderId'], 0).setIn([0, 'tags'], Immutable.List([]))
       assert.deepEqual(processedSites, expectedSites)
+    })
+    describe('called with tag=null/undefined', function () {
+      it('deletes a history entry (has no tags)', function () {
+        const siteDetail = {
+          tags: [],
+          location: testUrl1
+        }
+        const sites = Immutable.fromJS([siteDetail])
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail))
+        assert.deepEqual(processedSites, Immutable.fromJS([]))
+      })
+      it('nulls out the lastAccessedTime for a bookmarked entry (has tag)', function () {
+        const siteDetail = {
+          location: testUrl1,
+          tags: [siteTags.BOOKMARK],
+          lastAccessedTime: 123
+        }
+        const sites = Immutable.fromJS([siteDetail])
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail))
+        const expectedSites = sites.setIn([0, 'lastAccessedTime'], null)
+        assert.deepEqual(processedSites, expectedSites)
+      })
     })
   })
 
@@ -285,19 +364,19 @@ describe('siteUtil', function () {
   })
 
   describe('isFolder', function () {
-    it('returns true if the input is a siteDetail and has a BOOKMARK_FOLDER tag', function () {
+    it('returns true if the input is a siteDetail and has a `BOOKMARK_FOLDER` tag', function () {
       const siteDetail = Immutable.fromJS({
         tags: [siteTags.BOOKMARK_FOLDER]
       })
       assert.equal(siteUtil.isFolder(siteDetail), true)
     })
-    it('returns false if the input does not have a BOOKMARK_FOLDER tag', function () {
+    it('returns false if the input does not have a `BOOKMARK_FOLDER` tag', function () {
       const siteDetail = Immutable.fromJS({
         tags: [siteTags.BOOKMARK]
       })
       assert.equal(siteUtil.isFolder(siteDetail), false)
     })
-    it('returns false if there is no `tags` property', function () {
+    it('returns false if there is not a `tags` property', function () {
       const siteDetail = Immutable.fromJS({
         notTags: null
       })
@@ -308,6 +387,30 @@ describe('siteUtil', function () {
     })
     it('returns false if the input is undefined', function () {
       assert.equal(siteUtil.isFolder(), false)
+    })
+  })
+
+  describe('isBookmark', function () {
+    it('returns true if the input is a siteDetail and has a `BOOKMARK` tag', function () {
+      const siteDetail = Immutable.fromJS({
+        tags: [siteTags.BOOKMARK]
+      })
+      assert.equal(siteUtil.isBookmark(siteDetail), true)
+    })
+    it('returns false if the input does not have a `BOOKMARK` tag', function () {
+      const siteDetail = Immutable.fromJS({
+        tags: [siteTags.BOOKMARK_FOLDER]
+      })
+      assert.equal(siteUtil.isBookmark(siteDetail), false)
+    })
+    it('returns false if there is not a `tags` property', function () {
+      const siteDetail = Immutable.fromJS({
+        notTags: null
+      })
+      assert.equal(siteUtil.isBookmark(siteDetail), false)
+    })
+    it('returns false if the input is falsey', function () {
+      assert.equal(siteUtil.isBookmark(null), false)
     })
   })
 

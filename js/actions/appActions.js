@@ -280,6 +280,28 @@ const appActions = {
   },
 
   /**
+   * Updates ledger information for the payments pane
+   * @param {object} ledgerInfo - the current ledger state
+   */
+  updateLedgerInfo: function (ledgerInfo) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_LEDGER_INFO,
+      ledgerInfo
+    })
+  },
+
+  /**
+   * Updates publisher information for the payments pane
+   * @param {object} publisherInfo - the current publisher synopsis
+   */
+  updatePublisherInfo: function (publisherInfo) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_UPDATE_PUBLISHER_INFO,
+      publisherInfo
+    })
+  },
+
+  /**
    * Shows a message box in the notification bar
    * @param {{message: string, buttons: Array.<string>, frameOrigin: string, options: Object}} detail
    */
@@ -344,6 +366,54 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_CLEAR_DATA,
       clearDataDetail
+    })
+  },
+
+  /**
+   * Add address data
+   * @param {object} detail - the address to add as per doc/state.md's autofillAddressDetail
+   * @param {object} originalDetail - the original address before editing
+   */
+  addAutofillAddress: function (detail, originalDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_AUTOFILL_ADDRESS,
+      detail,
+      originalDetail
+    })
+  },
+
+  /**
+   * Remove address data
+   * @param {object} detail - the address to remove as per doc/state.md's autofillAddressDetail
+   */
+  removeAutofillAddress: function (detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+      detail
+    })
+  },
+
+  /**
+   * Add credit card data
+   * @param {object} detail - the credit card to add as per doc/state.md's autofillCreditCardDetail
+   * @param {object} originalDetail - the original credit card before editing
+   */
+  addAutofillCreditCard: function (detail, originalDetail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD,
+      detail,
+      originalDetail
+    })
+  },
+
+  /**
+   * Remove credit card data
+   * @param {object} detail - the credit card to remove as per doc/state.md's autofillCreditCardDetail
+   */
+  removeAutofillCreditCard: function (detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+      detail
     })
   }
 }

@@ -9,7 +9,10 @@ const getSetting = require('../settings').getSetting
 const urlParse = require('url').parse
 
 const isBookmark = (tags) => {
-  return tags && tags.includes(siteTags.BOOKMARK)
+  if (!tags) {
+    return false
+  }
+  return tags.includes(siteTags.BOOKMARK)
 }
 
 const isBookmarkFolder = (tags) => {
@@ -24,8 +27,9 @@ const isBookmarkFolder = (tags) => {
  * Obtains the index of the location in sites
  *
  * @param sites The application state's Immutable sites list
- * @param siteDetail The details of the site to get the index of
- * @return index of the site or -1 if not found.
+ * @param siteDetail The siteDetails entry to get the index of
+ * @param tags Tag for siteDetail (ex: bookmark). Folders are searched differently than other entries
+ * @return index of the siteDetail or -1 if not found.
  */
 module.exports.getSiteIndex = function (sites, siteDetail, tags) {
   if (!sites || !siteDetail) {
@@ -84,14 +88,16 @@ module.exports.getNextFolderId = (sites) => {
  * @param siteDetails The site details to add a tag to
  * @param tag The tag to add for this site.
  *   See siteTags.js for supported types. No tag means just a history item.
- * @param originalSiteDetail If specified will modify the specified site detail
+ * @param originalSiteDetail If specified, copy some existing attributes from this siteDetail
  * @return The new sites Immutable object
  */
 module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
+  // Get tag from siteDetail object if not passed via tag param
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
   }
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
+  const oldSite = index !== -1 ? sites.getIn([index]) : null
 
   let folderId = siteDetail.get('folderId')
   if (!folderId && tag === siteTags.BOOKMARK_FOLDER) {
@@ -103,27 +109,23 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     tags = tags.toSet().add(tag).toList()
   }
 
-  let oldSite
-  if (index !== -1) {
-    oldSite = sites.getIn([index])
-  }
-
+  // We don't want bookmarks and other site info being renamed on users if they already exist
+  // The name should remain the same while it is bookmarked forever.
+  const customTitle = siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')
   let site = Immutable.fromJS({
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
     location: siteDetail.get('location'),
-    // We don't want bookmarks and other site info being renamed on users if they already exist
-    // The name should remain the same while it is bookmarked forever.
-    title: oldSite && isBookmark(tags) ? oldSite.get('title') : siteDetail.get('title')
+    title: siteDetail.get('title')
   })
   if (folderId) {
     site = site.set('folderId', Number(folderId))
   }
+  if (customTitle) {
+    site = site.set('customTitle', customTitle)
+  }
   if (siteDetail.get('parentFolderId') || oldSite && oldSite.get('parentFolderId')) {
     site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId') || oldSite.get('parentFolderId')))
-  }
-  if (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')) {
-    site = site.set('customTitle', siteDetail.get('customTitle') || oldSite.get('customTitle'))
   }
   if (siteDetail.get('partitionNumber') || oldSite && oldSite.get('partitionNumber')) {
     site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber') || oldSite.get('partitionNumber')))
@@ -152,12 +154,15 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
     return sites
   }
   const tags = sites.getIn([index, 'tags'])
-  // If there are no tags and the removeSite call was called without a specific tag
-  // then remove the entry completely.
   if (tags.size === 0 && !tag) {
-    sites = sites.splice(index, 1)
-    return sites
+    // If called without tags and entry has no tags, remove the entry
+    return sites.splice(index, 1)
+  } else if (tags.size > 0 && !tag) {
+    // If called without tags BUT entry has tags, null out lastAccessedTime.
+    // This is a bookmark entry that we want to clear history for (but NOT delete/untag bookmark)
+    return sites.setIn([index, 'lastAccessedTime'], null)
   }
+  // Else, remove the specified tag
   return sites
     .setIn([index, 'parentFolderId'], 0)
     .setIn([index, 'tags'], tags.toSet().remove(tag).toList())
@@ -270,6 +275,18 @@ module.exports.isEquivalent = function (siteDetail1, siteDetail2) {
     return siteDetail1.get('folderId') === siteDetail2.get('folderId')
   }
   return siteDetail1.get('location') === siteDetail2.get('location') && siteDetail1.get('partitionNumber') === siteDetail2.get('partitionNumber')
+}
+
+/**
+ * Determines if the site detail is a bookmark.
+ * @param siteDetail The site detail to check.
+ * @return true if the site detail has a bookmark tag.
+ */
+module.exports.isBookmark = function (siteDetail) {
+  if (siteDetail) {
+    return isBookmark(siteDetail.get('tags'))
+  }
+  return false
 }
 
 /**

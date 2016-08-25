@@ -9,9 +9,7 @@ const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
-const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
-const {isSiteBookmarked} = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
@@ -39,19 +37,9 @@ class NavigationBar extends ImmutableComponent {
     return this.props.activeFrameKey !== undefined && this.props.loading
   }
 
-  onToggleBookmark (isBookmarked) {
-    if (isBookmarked === undefined) {
-      isBookmarked = this.bookmarked
-    }
+  onToggleBookmark () {
+    // trigger the AddEditBookmark modal; saving/deleting takes place there
     const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const hasBookmark = this.props.sites.find(
-      (site) => site.get('tags').includes(siteTags.BOOKMARK) || site.get('tags').includes(siteTags.BOOKMARK_FOLDER)
-    )
-    if (!isBookmarked) {
-      appActions.addSite(siteDetail, siteTags.BOOKMARK)
-    }
-    appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !hasBookmark || showBookmarksToolbar)
     windowActions.setBookmarkDetail(siteDetail, siteDetail)
   }
 
@@ -76,7 +64,7 @@ class NavigationBar extends ImmutableComponent {
 
   get bookmarked () {
     return this.props.activeFrameKey !== undefined &&
-      isSiteBookmarked(this.props.sites, Immutable.fromJS({
+      siteUtil.isSiteBookmarked(this.props.sites, Immutable.fromJS({
         location: this.props.location,
         partitionNumber: this.props.partitionNumber,
         title: this.props.title
@@ -94,10 +82,10 @@ class NavigationBar extends ImmutableComponent {
   }
 
   componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark(false))
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark(true))
-    // Set initial bookmark status in menu
-    ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
+    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
+    // Set initial checked/unchecked status in Bookmarks menu
+    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
 
   get showNoScriptInfo () {
@@ -111,15 +99,14 @@ class NavigationBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // Update the app menu to reflect whether the current page is bookmarked
     const prevBookmarked = this.props.activeFrameKey !== undefined &&
-      isSiteBookmarked(prevProps.sites, Immutable.fromJS({
+      siteUtil.isSiteBookmarked(prevProps.sites, Immutable.fromJS({
         location: prevProps.location,
         partitionNumber: prevProps.partitionNumber,
         title: prevProps.title
       }))
 
     if (this.bookmarked !== prevBookmarked) {
-      // Used to update the Bookmarks menu (the checked status next to "Bookmark Page")
-      ipc.send(messages.UPDATE_APP_MENU, {bookmarked: this.bookmarked})
+      ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
     }
     if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
       // There are no blocked scripts, so hide the noscript dialog.
@@ -178,7 +165,6 @@ class NavigationBar extends ImmutableComponent {
         endLoadTime={this.props.endLoadTime}
         titleMode={this.titleMode}
         urlbar={this.props.navbar.get('urlbar')}
-        isBlockingScripts={this.props.blockedScripts && this.props.blockedScripts.size > 0}
         />
       {
         isSourceAboutUrl(this.props.location)

@@ -32,7 +32,8 @@ module.exports = {
     maxTopSites: 5
   },
   navigationBar: {
-    defaultSearchSuggestions: false
+    defaultSearchSuggestions: false,
+    maxHistorySites: 10
   },
   defaultOpenSearchPath: 'content/search/google.xml',
   vault: {
@@ -41,5 +42,6 @@ module.exports = {
     replacementUrl: adHost
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
-  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm'
+  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm',
+  coinbaseOrigin: 'https://buy.coinbase.com'
 }

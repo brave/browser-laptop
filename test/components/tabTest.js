@@ -3,7 +3,7 @@
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const {urlInput} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTabTitle} = require('../lib/selectors')
 
 describe('tabs', function () {
   function * setup (client) {
@@ -14,6 +14,48 @@ describe('tabs', function () {
       .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
+
+  describe('back forward actions', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('sets correct title', function * () {
+      var page1 = Brave.server.url('page1.html')
+      var page2 = Brave.server.url('page2.html')
+
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 1')
+        })
+        .tabByIndex(0)
+        .loadUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 2')
+        })
+        .click(backButton)
+        .waitForUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 1')
+        })
+        .click(forwardButton)
+        .waitForUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getText(activeTabTitle)
+            .then((title) => title === 'Page 2')
+        })
+    })
+  })
 
   describe('new tab signal', function () {
     Brave.beforeAll(this)

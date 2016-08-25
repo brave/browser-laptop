@@ -32,7 +32,7 @@ const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const app = electron.app
-const Menu = require('./menu')
+const Menu = require('./browser/menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
@@ -58,8 +58,10 @@ const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
+const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
+const privacy = require('../js/state/privacy')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -253,11 +255,11 @@ app.on('ready', () => {
   app.on('login', (e, webContents, request, authInfo, cb) => {
     e.preventDefault()
     authCallbacks[request.url] = cb
-    BrowserWindow.getAllWindows().map((win) => {
-      win.webContents.send(messages.LOGIN_REQUIRED, {
-        url: request.url,
-        authInfo
-      })
+    let sender = webContents.hostWebContents || webContents
+    sender.send(messages.LOGIN_REQUIRED, {
+      url: request.url,
+      tabId: webContents.getId(),
+      authInfo
     })
   })
   app.on('window-all-closed', () => {
@@ -274,6 +276,10 @@ app.on('ready', () => {
     if (sessionStateStoreCompleteOnQuit) {
       return
     }
+
+    // When the browser is closing we need to send a signal
+    // to record the currently active location in the ledger
+    ledger.quit()
 
     e.preventDefault()
 
@@ -293,6 +299,13 @@ app.on('ready', () => {
       perWindowState.push(data)
     }
     saveIfAllCollected()
+  })
+
+  // Window state is fetched via the renderer process; this is fired once it's retrieved
+  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowData) => {
+    if (windowData) {
+      Menu.rebuild(AppStore.getState(), Immutable.fromJS(windowData))
+    }
   })
 
   ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
@@ -368,8 +381,7 @@ app.on('ready', () => {
     // reset the browser window. This will default to en-US if
     // not yet configured.
     locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      // Initialize after localization strings async loaded
-      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
+      Menu.rebuild(AppStore.getState(), null)
     })
 
     // Do this after loading the state
@@ -381,6 +393,7 @@ app.on('ready', () => {
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
     contentSettings.init()
+    privacy.init()
     Extensions.init()
     Filtering.init()
     SiteHacks.init()
@@ -441,9 +454,9 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.UPDATE_APP_MENU, (e, args) => {
-      if (args && typeof args.bookmarked === 'boolean') {
-        Menu.updateBookmarkedStatus(args.bookmarked)
+    ipcMain.on(messages.UPDATE_MENU_BOOKMARKED_STATUS, (e, isBookmarked) => {
+      if (typeof isBookmarked === 'boolean') {
+        Menu.updateBookmarkedStatus(isBookmarked)
       }
     })
 
@@ -524,8 +537,19 @@ app.on('ready', () => {
 
     // save app state every 5 minutes regardless of update frequency
     setInterval(initiateSessionStateSave, 1000 * 60 * 5)
+
     AppStore.addChangeListener(() => {
-      Menu.init(AppStore.getState().get('settings'), AppStore.getState().get('sites'))
+      if (BrowserWindow.getFocusedWindow()) {
+        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
+      } else {
+        Menu.rebuild(AppStore.getState(), null)
+      }
+    })
+
+    ledger.init()
+
+    ipcMain.on(messages.LEDGER_CREATE_WALLET, () => {
+      ledger.boot()
     })
 
     let masterKey
@@ -717,6 +741,14 @@ app.on('ready', () => {
       if (prefsRestartCallbacks[message]) {
         prefsRestartCallbacks[message](buttonIndex, persist)
       }
+    })
+
+    ipcMain.on(messages.REMOVE_AUTOFILL_ADDRESS, (e, address) => {
+      appActions.removeAutofillAddress(address)
+    })
+
+    ipcMain.on(messages.REMOVE_AUTOFILL_CREDIT_CARD, (e, card) => {
+      appActions.removeAutofillCreditCard(card)
     })
 
     // Setup the crash handling

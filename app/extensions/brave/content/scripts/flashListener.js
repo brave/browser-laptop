@@ -154,7 +154,7 @@ function insertFlashPlaceholders (elem) {
       parent.replaceChild(iframe, el)
     } else {
       // Note when elements are too small so we can improve the heuristic.
-      console.log('got too-small Flash element', obj, height, width)
+      // console.log('got too-small Flash element', obj, height, width)
     }
   })
 }

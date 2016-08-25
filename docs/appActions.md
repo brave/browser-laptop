@@ -240,6 +240,26 @@ Removes a site setting
 
 
 
+### updateLedgerInfo(ledgerInfo) 
+
+Updates ledger information for the payments pane
+
+**Parameters**
+
+**ledgerInfo**: `object`, the current ledger state
+
+
+
+### updatePublisherInfo(publisherInfo) 
+
+Updates publisher information for the payments pane
+
+**Parameters**
+
+**publisherInfo**: `object`, the current publisher synopsis
+
+
+
 ### showMessageBox(detail) 
 
 Shows a message box in the notification bar
@@ -299,6 +319,50 @@ Clears the data specified in dataDetail
 **Parameters**
 
 **clearDataDetail**: `object`, the app data to clear as per doc/state.md's clearBrowsingDataDetail
+
+
+
+### addAutofillAddress(detail, originalDetail) 
+
+Add address data
+
+**Parameters**
+
+**detail**: `object`, the address to add as per doc/state.md's autofillAddressDetail
+
+**originalDetail**: `object`, the original address before editing
+
+
+
+### removeAutofillAddress(detail) 
+
+Remove address data
+
+**Parameters**
+
+**detail**: `object`, the address to remove as per doc/state.md's autofillAddressDetail
+
+
+
+### addAutofillCreditCard(detail, originalDetail) 
+
+Add credit card data
+
+**Parameters**
+
+**detail**: `object`, the credit card to add as per doc/state.md's autofillCreditCardDetail
+
+**originalDetail**: `object`, the original credit card before editing
+
+
+
+### removeAutofillCreditCard(detail) 
+
+Remove credit card data
+
+**Parameters**
+
+**detail**: `object`, the credit card to remove as per doc/state.md's autofillCreditCardDetail
 
 
 

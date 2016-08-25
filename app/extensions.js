@@ -27,7 +27,6 @@ let generateBraveManifest = () => {
         match_about_blank: true,
         js: [
           'content/scripts/util.js',
-          'js/actions/extensionActions.js',
           'content/scripts/navigator.js',
           'content/scripts/blockFlash.js',
           'content/scripts/blockCanvasFingerprinting.js',
@@ -49,11 +48,11 @@ let generateBraveManifest = () => {
           getIndexHTML()
         ],
         js: [
-          'js/actions/extensionActions.js',
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
-          'content/scripts/themeColor.js'
+          'content/scripts/themeColor.js',
+          'content/scripts/pageInformation.js'
         ]
       },
       {
@@ -111,7 +110,8 @@ let generateBraveManifest = () => {
     'form-action': '\'none\'',
     'referrer': 'no-referrer',
     'style-src': '\'self\' \'unsafe-inline\'',
-    'img-src': '* data:'
+    'img-src': '* data:',
+    'frame-src': '\'self\' https://buy.coinbase.com'
   }
 
   if (process.env.NODE_ENV === 'development') {

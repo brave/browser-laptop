@@ -30,10 +30,12 @@ const ipc = electron.ipcRenderer
 const webFrame = electron.webFrame
 const windowStore = require('./stores/windowStore')
 const appStoreRenderer = require('./stores/appStoreRenderer')
+const windowActions = require('./actions/windowActions')
 const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
 const l10n = require('./l10n')
+const FrameStateUtil = require('./state/frameStateUtil')
 
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
@@ -53,14 +55,30 @@ ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
 })
 
+ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
+  const windowState = windowStore.getState()
+  const activeFrame = FrameStateUtil.getActiveFrame(Immutable.fromJS(windowState))
+  const windowData = {
+    location: activeFrame ? activeFrame.get('location') : null,
+    closedFrames: windowState.get('closedFrames').toJS()
+  }
+  ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
+})
+
 if (process.env.NODE_ENV === 'test') {
   window.appStoreRenderer = appStoreRenderer
+  window.windowActions = windowActions
+  window.windowStore = windowStore
 }
 
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
   appStoreRenderer.state = action.stateDiff
     ? appStoreRenderer.state = patch(appStoreRenderer.state, Immutable.fromJS(action.stateDiff))
     : appStoreRenderer.state = Immutable.fromJS(action.state)
+})
+
+ipc.on(messages.CLEAR_CLOSED_FRAMES, () => {
+  windowActions.clearClosedFrames()
 })
 
 window.addEventListener('beforeunload', function () {

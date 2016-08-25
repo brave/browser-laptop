@@ -231,8 +231,11 @@ const UrlUtil = {
    * @param {String} input The input URL.
    * @returns {String} The host name.
    */
-  getHostname: function (input) {
+  getHostname: function (input, excludePort) {
     try {
+      if (excludePort) {
+        return new window.URL(input).hostname
+      }
       return new window.URL(input).host
     } catch (e) {
       return undefined

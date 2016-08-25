@@ -32,6 +32,8 @@ const settings = {
   SHUTDOWN_CLEAR_DOWNLOADS: 'shutdown.clear-downloads',
   SHUTDOWN_CLEAR_CACHE: 'shutdown.clear-cache',
   SHUTDOWN_CLEAR_ALL_SITE_COOKIES: 'shutdown.clear-all-site-cookies',
+  // Autofill
+  AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Security Tab: DEPRECATED but still required (for now)
   PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
   ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
@@ -42,6 +44,10 @@ const settings = {
   SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
   LANGUAGE: 'general.language',
+  // Payments Tab
+  PAYMENTS_ENABLED: 'payments.enabled',
+  PAYMENTS_NOTIFICATIONS: 'payments.notifications',
+  PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',

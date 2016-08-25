@@ -121,7 +121,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
       items = items.concat(suggestions.map((suggestion, i) => {
         const currentIndex = index + i
-        const selected = this.activeIndex === currentIndex + 1 || currentIndex === 0 && this.props.locationValueSuffix
+        const selected = this.activeIndex === currentIndex + 1 || (!this.activeIndex && currentIndex === 0 && this.props.locationValueSuffix)
         return <li data-index={currentIndex + 1}
           onMouseOver={this.onMouseOver.bind(this)}
           onClick={suggestion.onClick}
@@ -164,7 +164,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.updateSuggestions(parseInt(e.target.dataset.index, 10))
   }
 
-  componentDidUpdate (prevProps) {
+  componentWillUpdate (prevProps) {
     if (this.selectedElement) {
       this.selectedElement.scrollIntoView()
     }
@@ -205,6 +205,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       } else {
         windowActions.loadUrl(this.activeFrame, location)
         windowActions.setUrlBarActive(false)
+        windowActions.setUrlBarPreview(null)
         this.blur()
       }
     }
@@ -331,10 +332,6 @@ class UrlBarSuggestions extends ImmutableComponent {
         clickHandler: navigateClickHandler((searchTerms) => {
           let searchURL = this.props.searchSelectEntry
           ? this.props.searchSelectEntry.search : this.props.searchDetail.get('searchURL')
-          if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'DuckDuckGo' &&
-            this.props.isBlockingScripts) {
-            searchURL = searchURL.replace('?q=', 'html?q=')
-          }
           return searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
         })
       }))

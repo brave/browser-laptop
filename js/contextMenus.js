@@ -19,7 +19,7 @@ const siteTags = require('./constants/siteTags')
 const dragTypes = require('./constants/dragTypes')
 const siteUtil = require('./state/siteUtil')
 const downloadUtil = require('./state/downloadUtil')
-const CommonMenu = require('./commonMenu')
+const CommonMenu = require('../app/common/commonMenu')
 const dnd = require('./dnd')
 const dndData = require('./dndData')
 const appStoreRenderer = require('./stores/appStoreRenderer')
@@ -33,6 +33,7 @@ const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
 const currentWindow = require('../app/renderer/currentWindow')
+const config = require('./constants/config')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -47,7 +48,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, undefined, closestDestinationDetail)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail)
     }
   }
 }
@@ -187,7 +188,6 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
       })
     }
     if (menu.length) {
-      console.log('----added sep')
       menu.push(CommonMenu.separatorMenuItem)
     }
   }
@@ -211,12 +211,31 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
   return menu
 }
 
-function bookmarkTemplateInit (siteDetail, activeFrame) {
-  const location = siteDetail.get('location')
-  const isFolder = siteUtil.isFolder(siteDetail)
+function siteDetailTemplateInit (siteDetail, activeFrame) {
+  let isHistoryEntry = false
+  let isFolder = false
+  let isRootFolder = false
+  let deleteLabel
+  let deleteTag
+
+  if (siteUtil.isBookmark(siteDetail) && activeFrame) {
+    deleteLabel = 'deleteBookmark'
+    deleteTag = siteTags.BOOKMARK
+  } else if (siteUtil.isFolder(siteDetail)) {
+    isFolder = true
+    isRootFolder = siteDetail.get('folderId') === 0
+    deleteLabel = 'deleteFolder'
+    deleteTag = siteTags.BOOKMARK_FOLDER
+  } else {
+    isHistoryEntry = true
+    deleteLabel = 'deleteHistoryEntry'
+  }
+
   const template = []
 
   if (!isFolder) {
+    const location = siteDetail.get('location')
+
     template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
       openInNewPrivateTabMenuItem(location),
       openInNewSessionTabMenuItem(location),
@@ -227,28 +246,31 @@ function bookmarkTemplateInit (siteDetail, activeFrame) {
       CommonMenu.separatorMenuItem)
   }
 
-  // We want edit / delete items for everything except for the bookmarks toolbar item
-  if (!isFolder || siteDetail.get('folderId') !== 0) {
+  if (!isRootFolder) {
+    // History can be deleted but not edited
+    // Picking this menu item pops up the AddEditBookmark modal
+    if (!isHistoryEntry) {
+      template.push(
+        {
+          label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
+          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail)
+        },
+        CommonMenu.separatorMenuItem)
+    }
+
     template.push(
       {
-        label: isFolder ? locale.translation('editFolder') : locale.translation('editBookmark'),
-        click: () => {
-          // originalLocation is undefined signifies add mode
-          windowActions.setBookmarkDetail(siteDetail, siteDetail)
-        }
-      })
-
-    template.push(
-      CommonMenu.separatorMenuItem, {
-        label: isFolder ? locale.translation('deleteFolder') : locale.translation('deleteBookmark'),
-        click: () => {
-          appActions.removeSite(siteDetail, siteDetail.get('tags').includes(siteTags.BOOKMARK_FOLDER) ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK)
-        }
-      }, CommonMenu.separatorMenuItem)
+        label: locale.translation(deleteLabel),
+        click: () => appActions.removeSite(siteDetail, deleteTag)
+      },
+      CommonMenu.separatorMenuItem)
   }
 
-  template.push(addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
-    addFolderMenuItem(siteDetail, true))
+  if (!isHistoryEntry) {
+    template.push(
+      addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
+      addFolderMenuItem(siteDetail, true))
+  }
 
   return template
 }
@@ -290,7 +312,7 @@ function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
       icon: showFavicon ? site.get('favicon') : undefined,
       faIcon,
       contextMenu: function (e) {
-        onBookmarkContextMenu(site, activeFrame, e)
+        onSiteDetailContextMenu(site, activeFrame, e)
       },
       dragEnd: function (e) {
         dnd.onDragEnd(dragTypes.BOOKMARK, site, e)
@@ -348,6 +370,35 @@ function usernameTemplateInit (usernames, origin, action) {
         windowActions.setContextMenuDetail()
       }
     })
+  }
+  return items
+}
+
+function autofillTemplateInit (suggestions, frame) {
+  let items = []
+  for (let i = 0; i < suggestions.length; ++i) {
+    let value
+    let frontendId = suggestions[i].frontend_id
+    if (frontendId >= 0) { //  POPUP_ITEM_ID_AUTOCOMPLETE_ENTRY and Autofill Entry
+      value = suggestions[i].value
+    } else if (frontendId === -1) { // POPUP_ITEM_ID_WARNING_MESSAGE
+      value = 'Disabled due to unsecure connection.'
+    } else if (frontendId === -4) { // POPUP_ITEM_ID_CLEAR_FORM
+      value = 'Clear Form'
+    } else if (frontendId === -5) { // POPUP_ITEM_ID_AUTOFILL_OPTIONS
+      value = 'Autofill Settings'
+    }
+    if (frontendId === -3) { // POPUP_ITEM_ID_SEPARATOR
+      items.push(CommonMenu.separatorMenuItem)
+    } else {
+      items.push({
+        label: value,
+        click: (item, focusedWindow) => {
+          ipc.send('autofill-selection-clicked', frame.get('tabId'), value, frontendId, i)
+          windowActions.setContextMenuDetail()
+        }
+      })
+    }
   }
   return items
 }
@@ -533,19 +584,10 @@ function getEditableItems (selection, editFlags) {
 
 function hamburgerTemplateInit (location, e) {
   const template = [
-    {
-      l10nLabelId: 'new',
-      submenu: [
-        CommonMenu.newTabMenuItem(),
-        CommonMenu.newPrivateTabMenuItem(),
-        CommonMenu.newPartitionedTabMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.newWindowMenuItem()
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    CommonMenu.findOnPageMenuItem(),
-    CommonMenu.printMenuItem(),
+    CommonMenu.newTabMenuItem(),
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       l10nLabelId: 'zoom',
@@ -569,7 +611,6 @@ function hamburgerTemplateInit (location, e) {
       }]
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.preferencesMenuItem(),
     {
       label: locale.translation('bookmarks'),
       submenu: [
@@ -586,6 +627,10 @@ function hamburgerTemplateInit (location, e) {
       ]
     },
     CommonMenu.downloadsMenuItem(),
+    CommonMenu.findOnPageMenuItem(),
+    CommonMenu.printMenuItem(),
+    CommonMenu.separatorMenuItem,
+    CommonMenu.preferencesMenuItem(),
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('help'),
@@ -597,7 +642,8 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.reportAnIssueMenuItem(),
         CommonMenu.submitFeedbackMenuItem()
       ]
-    }
+    },
+    CommonMenu.quitMenuItem()
   ]
   return template
 }
@@ -870,7 +916,8 @@ function mainTemplateInit (nodeProps, frame) {
             }
           },
           CommonMenu.separatorMenuItem,
-          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false), {
+          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
+          {
             label: locale.translation('find'),
             accelerator: 'CmdOrCtrl+F',
             click: function (item, focusedWindow) {
@@ -915,7 +962,6 @@ function mainTemplateInit (nodeProps, frame) {
     template.push(
       CommonMenu.separatorMenuItem,
       {
-        // TODO: use locale.translate
         label: passwordManager.get('displayName'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
@@ -953,7 +999,10 @@ function onHamburgerMenu (location, e) {
 
 function onMainContextMenu (nodeProps, frame, contextMenuType) {
   if (contextMenuType === 'bookmark' || contextMenuType === 'bookmark-folder') {
-    onBookmarkContextMenu(Immutable.fromJS(nodeProps), Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') }))
+    const activeFrame = Immutable.fromJS({ location: '', title: '', partitionNumber: frame.get('partitionNumber') })
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
+  } else if (contextMenuType === 'history') {
+    onSiteDetailContextMenu(Immutable.fromJS(nodeProps))
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
@@ -1000,11 +1049,11 @@ function onUrlBarContextMenu (searchDetail, activeFrame, e) {
   inputMenu.destroy()
 }
 
-function onBookmarkContextMenu (siteDetail, activeFrame, e) {
+function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
   if (e) {
     e.stopPropagation()
   }
-  const menu = Menu.buildFromTemplate(bookmarkTemplateInit(siteDetail, activeFrame))
+  const menu = Menu.buildFromTemplate(siteDetailTemplateInit(siteDetail, activeFrame))
   menu.popup(currentWindow)
   menu.destroy()
 }
@@ -1040,6 +1089,15 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
   }))
 }
 
+function onShowAutofillMenu (suggestions, boundingRect, frame) {
+  const menuTemplate = autofillTemplateInit(suggestions, frame)
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: boundingRect.x,
+    top: boundingRect.y,
+    template: menuTemplate
+  }))
+}
+
 function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
   const menuTemplate = moreBookmarksTemplateInit(allBookmarkItems, overflowItems, activeFrame)
   const rect = e.target.getBoundingClientRect()
@@ -1053,8 +1111,9 @@ function onMoreBookmarksMenu (activeFrame, allBookmarkItems, overflowItems, e) {
 function onBackButtonHistoryMenu (activeFrame, history, rect) {
   const menuTemplate = []
 
-  if (activeFrame && history) {
-    for (let index = (history.currentIndex - 1); index > -1; index--) {
+  if (activeFrame && history && history.entries.length > 0) {
+    const stopIndex = Math.max(((history.currentIndex - config.navigationBar.maxHistorySites) - 1), -1)
+    for (let index = (history.currentIndex - 1); index > stopIndex; index--) {
       const url = history.entries[index].url
 
       menuTemplate.push({
@@ -1072,6 +1131,17 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
         }
       })
     }
+
+    // Always display "Show History" link
+    menuTemplate.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('showAllHistory'),
+        click: (e, focusedWindow) => {
+          windowActions.newFrame({ location: 'about:history' })
+          windowActions.setContextMenuDetail()
+        }
+      })
   }
 
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -1084,8 +1154,9 @@ function onBackButtonHistoryMenu (activeFrame, history, rect) {
 function onForwardButtonHistoryMenu (activeFrame, history, rect) {
   const menuTemplate = []
 
-  if (activeFrame && history) {
-    for (let index = (history.currentIndex + 1); index < history.entries.length; index++) {
+  if (activeFrame && history && history.entries.length > 0) {
+    const stopIndex = Math.min(((history.currentIndex + config.navigationBar.maxHistorySites) + 1), history.entries.length)
+    for (let index = (history.currentIndex + 1); index < stopIndex; index++) {
       const url = history.entries[index].url
 
       menuTemplate.push({
@@ -1103,6 +1174,17 @@ function onForwardButtonHistoryMenu (activeFrame, history, rect) {
         }
       })
     }
+
+    // Always display "Show History" link
+    menuTemplate.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('showAllHistory'),
+        click: (e, focusedWindow) => {
+          windowActions.newFrame({ location: 'about:history' })
+          windowActions.setContextMenuDetail()
+        }
+      })
   }
 
   windowActions.setContextMenuDetail(Immutable.fromJS({
@@ -1120,9 +1202,10 @@ module.exports = {
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,
   onUrlBarContextMenu,
-  onBookmarkContextMenu,
+  onSiteDetailContextMenu,
   onShowBookmarkFolderMenu,
   onShowUsernameMenu,
+  onShowAutofillMenu,
   onMoreBookmarksMenu,
   onBackButtonHistoryMenu,
   onForwardButtonHistoryMenu

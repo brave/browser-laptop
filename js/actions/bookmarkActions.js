@@ -5,7 +5,6 @@
 'use strict'
 
 const siteUtil = require('../state/siteUtil')
-const siteTags = require('../constants/siteTags')
 const windowActions = require('./windowActions')
 const eventUtil = require('../lib/eventUtil.js')
 
@@ -13,7 +12,7 @@ const bookmarkActions = {
   openBookmarksInFolder: function (allBookmarkItems, folderDetail) {
     // We have a middle clicked folder
     allBookmarkItems
-      .filter((bookmark) => bookmark.get('parentFolderId') === folderDetail.get('folderId') && bookmark.get('tags').includes(siteTags.BOOKMARK))
+      .filter((bookmark) => bookmark.get('parentFolderId') === folderDetail.get('folderId') && siteUtil.isBookmark(bookmark))
       .forEach((bookmark) =>
         windowActions.newFrame(siteUtil.toFrameOpts(bookmark), false))
   },

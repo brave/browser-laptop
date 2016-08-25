@@ -18,6 +18,7 @@ const ipc = window.chrome.ipc
 
 // Stylesheets
 require('../../less/about/itemList.less')
+require('../../less/about/siteDetails.less')
 require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -179,7 +180,7 @@ class BookmarkFolderList extends ImmutableComponent {
 
 class BookmarksList extends ImmutableComponent {
   render () {
-    return <list className='bookmarkList'>
+    return <list className='siteDetailsList'>
     {
       this.props.bookmarks.map((bookmark) =>
         <BookmarkItem bookmark={bookmark} />)
@@ -203,7 +204,7 @@ class SearchResults extends React.Component {
     })
 
     return (
-      <list className='bookmarkList'>
+      <list className='siteDetailsList'>
       {
         sortedBookmarks.map((bookmark, idx) => <BookmarkItem bookmark={bookmark} inSelectedFolder={selectedFolderIndex.get(idx)} />)
       }
@@ -254,13 +255,13 @@ class AboutBookmarks extends React.Component {
     })
   }
   render () {
-    return <div className='bookmarksPage'>
+    return <div className='siteDetailsPage'>
       <h2 data-l10n-id='folders' />
       <input type='text' className='searchInput' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
       {this.state.search
         ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear'></span>
         : null}
-      <div className='bookmarkPageContent'>
+      <div className='siteDetailsPageContent'>
         <Sticky enabled top={10}>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}

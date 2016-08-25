@@ -13,6 +13,18 @@ body {
   display: none !important; /* for testing/debug only */
 }
 
+#enablePaymentsSwitch {
+  .settingItem {
+    margin-left: 100px;
+    display: inline;
+  }
+}
+
+#fundsAmount {
+  line-height: 2;
+  margin-right: 10px;
+}
+
 .prefTabContainer {
   .sectionTitle {
     color: @braveOrange;
@@ -113,6 +125,9 @@ body {
         &.i-user {
           background: url('../../img/shields.svg') 0 0 / contain no-repeat;
           margin: -3px -1px 0px 1px;
+        }
+        &.i-bitcoin {
+          background: url('../../img/bitcoin.svg') 0 0 / contain no-repeat;
         }
         &.i-refresh {
           background: url('../../img/refresh.svg') 0 0 / contain no-repeat;
@@ -232,6 +247,7 @@ a {
 }
 
 .settingsListTitle,
+.settingsListCopy,
 .settingsListLink,
 .settingsList .settingItem span:not(.browserButton),
 .settingsList em,
@@ -239,6 +255,24 @@ a {
   color: @darkGray;
   font-size: 0.9em;
   margin: 1.2em 2px 7px;
+}
+
+.settingsListCopy {
+  color: @braveOrange;
+  cursor: pointer;
+  font-family: "Lucida Sans Typewriter", "Lucida Console", monaco, "Bitstream Vera Sans Mono", monospace;
+  font-size: 1em;
+
+  &.alt {
+    color: black;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+span.settingsListCopy {
+  background-color: @lightGray;
 }
 
 .settingsListLink {
@@ -249,13 +283,19 @@ a {
     color: black;
     text-decoration: underline;
   }
-
+  cursor: pointer;
   &:hover {
     text-decoration: underline;
   }
 }
 
 span.browserButton.primaryButton.clearBrowsingDataButton {
+  font-size: 0.9em;
+  padding: 5px 20px;
+  margin-top: 20px;
+}
+
+span.browserButton.primaryButton.manageAutofillDataButton {
   font-size: 0.9em;
   padding: 5px 20px;
   margin-top: 20px;
@@ -312,6 +352,10 @@ span.browserButton.primaryButton.clearBrowsingDataButton {
     > input[type="number"] {
       width: 50px;
       min-width: 50px;
+    }
+
+    > select[disabled] {
+      color: #ccc
     }
 
     .checkboxContainer {
@@ -386,11 +430,127 @@ table.sortableTable {
   }
 }
 
-.emptyMessage {
-  text-align: center;
-  margin: 5em 0;
-  font-size: 1.2em;
+.paymentsMessage {
+  background-color: @lightGray;
+  margin: 1em 0;
+  padding: 40px;
+  font-size: 1.1em;
   color: @mediumGray;
+  > div {
+    padding: 0.5em 0;
+  }
+  > h3 {
+    padding-bottom: 0.5em;
+  }
+  .boldText {
+    font-weight: bold;
+    padding-bottom: 1.5em;
+  }
+  height: ~"-webkit-calc(100vh - 270px)";
+  overflow-y: scroll;
+}
+
+#ledgerTable {
+  height: ~"-webkit-calc(100vh - 300px)";
+  overflow-y: scroll;
+}
+
+#paymentsContainer {
+  position: relative;
+  overflow-x: hidden;
+
+  .titleBar {
+    overflow: hidden;
+  }
+
+  & > table,
+  & > table tbody {
+    border: none;
+    padding: 50px;
+    margin: 0 auto;
+    width: 80%;
+  }
+
+  .walletBar {
+    padding: 20px;
+    padding-bottom: 0px;
+    background: @lightGray;
+    border-radius: @bigBorderRadius;
+    margin: 30px 0px;
+    tr {
+      height: 1em;
+    }
+  }
+
+  tr {
+    height: 1.7em;
+
+    th {
+      color: @darkGray;
+      font-weight: 600;
+    }
+
+    &.paymentsDisabled {
+      opacity: 0.6;
+    }
+
+    td {
+      color: @mediumGray;
+      -webkit-font-smoothing: antialiased;
+      text-align: center;
+      width: 8%;
+
+      a {
+        vertical-align: middle;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        img {
+          width: 1.5em;
+          height: 1.5em;
+          margin: -0.375em 0.375em 0 0;
+          vertical-align: middle;
+        }
+      }
+
+      &.narrow {
+        width: 5%;
+      }
+
+      &.wide {
+        width: 20%;
+        text-align: left;
+      }
+
+      input[type='range'] {
+        background: transparent;
+        -webkit-appearance: none;
+        width: 90%;
+        margin: 0 0 0 20%;
+        outline: none;
+
+        &::-webkit-slider-runnable-track {
+          -webkit-appearance: none;
+          background: @gray25;
+          border-radius: 1000px;
+          height: 1em;
+        }
+
+        &::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          background: linear-gradient(to bottom, @braveOrange, @braveDarkOrange);
+          width: 1em;
+          height: 1em;
+          border-radius: 50%;
+          box-shadow: 0 0 6px @black25;
+          cursor: pointer;
+        }
+      }
+    }
+  }
 }
 
 .board {
@@ -409,8 +569,28 @@ table.sortableTable {
       text-align: center;
       margin: 0 auto;
     }
+    #bitcoinPaymentURL {
+      cursor: pointer;
+      text-align: left;
+      background-color: @lightGray;
+      &:hover {
+        background-color: @gray;
+      }
+      font-size: 0.9em;
+    }
+    .smallText {
+      font-size: 0.9em;
+    }
+    .settingsListTitle {
+      font-weight: 600;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
     span {
       display: inline-block;
+    }
+    a {
+      text-decoration: none;
     }
     img,
     #coinbaseLogo {
@@ -420,15 +600,21 @@ table.sortableTable {
       background-color: @lightGray;
       border: none;
     }
-    button {
-      margin: 2.5em auto;
-      padding-left: 16px;
-      padding-right: 16px;
+    .labelText {
+      font-size: 1em;
+      color: @braveOrange;
+      text-align: left;
+      margin-bottom: 5px;
     }
-    &:last-of-type {
-      button {
-        margin-top: 4.3em;
-      }
+    .fa {
+      font-size: 1.1em;
+      margin: 5px;
+    }
+    .primaryButton {
+      margin: 1.5em auto;
+      display: block;
+      width: 180px;
+      padding: 4px 0px;
     }
   }
   &.contrast {
@@ -539,5 +725,26 @@ table.sortableTable {
       width: @switchNubDiameter;
       box-shadow: @switchNubShadow;
     }
+  }
+}
+
+#fundsSelectBox {
+  margin: 0 auto;
+}
+
+#paymentsFooter {
+  opacity: 0.8;
+  img {
+    max-height: 30px;
+    padding: 10px;
+  }
+  .largeImg {
+    max-height: 40px;
+    padding-top: 5px;
+  }
+  div {
+    font-size: 12px;
+    margin-top: 15px;
+    margin-left: 15px;
   }
 }

@@ -26,7 +26,7 @@ sudo dpkg -i ./brave.deb
 ## Fedora AMD64:
 
 ```
-sudo yum install lsb
+sudo dnf install lsb
 wget -O brave.rpm https://laptop-updates.brave.com/latest/fedora64
 sudo rpm -i ./brave.rpm
 ```

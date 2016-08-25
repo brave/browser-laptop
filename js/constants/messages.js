@@ -46,7 +46,6 @@ const messages = {
   QUIT_APPLICATION: _,
   OPEN_BRAVERY_PANEL: _,
   PREFS_RESTART: _,
-  UPDATE_APP_MENU: _, /** @arg {Object} args menu args to update */
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
   LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
   LOGIN_RESPONSE: _,
@@ -110,6 +109,11 @@ const messages = {
   RESPONSE_WINDOW_STATE: _,
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
+  CLEAR_CLOSED_FRAMES: _,
+  // Menu rebuilding
+  REQUEST_MENU_DATA_FOR_WINDOW: _,
+  RESPONSE_MENU_DATA_FOR_WINDOW: _,
+  UPDATE_MENU_BOOKMARKED_STATUS: _, /** @isBookmarked {boolean} should menu show "Bookmark Page" as checked */
   // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
   BLOCKED_PAGE: _,
@@ -118,6 +122,7 @@ const messages = {
   SITE_SETTINGS_UPDATED: _,
   BRAVERY_DEFAULTS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
+  HISTORY_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   // About pages from contentScript
@@ -132,6 +137,15 @@ const messages = {
   CHECK_FLASH_INSTALLED: _,
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,
+  // Autofill
+  ADD_AUTOFILL_ADDRESS: _,
+  REMOVE_AUTOFILL_ADDRESS: _,
+  EDIT_AUTOFILL_ADDRESS: _,
+  ADD_AUTOFILL_CREDIT_CARD: _,
+  REMOVE_AUTOFILL_CREDIT_CARD: _,
+  EDIT_AUTOFILL_CREDIT_CARD: _,
+  AUTOFILL_ADDRESSES_UPDATED: _,
+  AUTOFILL_CREDIT_CARDS_UPDATED: _,
   // HTTPS
   CERT_ERROR_ACCEPTED: _, /** @arg {string} url where a cert error was accepted */
   CHECK_CERT_ERROR_ACCEPTED: _, /** @arg {string} url to check cert error, @arg {number} key of frame */
@@ -153,7 +167,12 @@ const messages = {
   GET_AD_DIV_CANDIDATES: _,
   SET_AD_DIV_CANDIDATES: _,
   // Debugging
-  DEBUG_REACT_PROFILE: _
+  DEBUG_REACT_PROFILE: _,
+  // Ledger
+  LEDGER_PUBLISHER: _,
+  LEDGER_UPDATED: _,
+  LEDGER_CREATE_WALLET: _,
+  CHECK_BITCOIN_HANDLER: _
 }
 
 module.exports = mapValuesByKeys(messages)

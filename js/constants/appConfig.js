@@ -53,7 +53,7 @@ module.exports = {
   },
   httpsEverywhere: {
     url: 'https://s3.amazonaws.com/https-everywhere-data/{version}/httpse.json',
-    version: '5.1.9', // latest stable release from https://eff.org/https-everywhere
+    version: '5.2', // latest major point release from https://eff.org/https-everywhere
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
@@ -100,6 +100,10 @@ module.exports = {
     'bookmarks.toolbar.show': false,
     'bookmarks.toolbar.showFavicon': false,
     'bookmarks.toolbar.showOnlyFavicon': false,
+    'payments.enabled': false,
+    'payments.notifications': false,
+    'payments.contribution-amount': 5, // USD
+    'privacy.autofill-enabled': false,
     'privacy.do-not-track': false,
     'security.passwords.active-password-manager': null, // Set in settings.js by passwordManagerDefault (defaults to built in)
     'security.passwords.manager-enabled': true,
@@ -117,6 +121,7 @@ module.exports = {
     'shutdown.clear-cache': false,
     'shutdown.clear-all-site-cookies': false
   },
+  defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [
     'get.adobe.com', 'adobe.com', 'www.adobe.com', 'helpx.adobe.com'
   ] // hosts to send true UA to

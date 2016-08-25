@@ -7,3 +7,23 @@ module.exports.isForSecondaryAction = (e) =>
   e.ctrlKey && !isDarwin ||
   e.metaKey && isDarwin ||
   e.button === 1
+
+module.exports.eventElHasAncestorWithClasses = (e, classesToCheck) => {
+  let node = e.target
+
+  while (node) {
+    let classMatch = classesToCheck.map(
+      function (className) {
+        return (node.classList ? node.classList.contains(className) : false)
+      }
+    ).includes(true)
+
+    if (classMatch) {
+      return true
+    }
+
+    node = node.parentNode
+  }
+
+  return false
+}

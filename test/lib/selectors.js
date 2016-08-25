@@ -2,6 +2,7 @@ module.exports = {
   urlInput: '#urlInput',
   activeWebview: '.frameWrapper.isActive webview',
   activeTab: '.tab.active',
+  activeTabTitle: '.tab.active .tabTitle',
   activeTabFavicon: '.tab.active .tabIcon',
   pinnedTabs: '.pinnedTabs',
   pinnedTabsTabs: '.pinnedTabs .tab',
@@ -45,5 +46,9 @@ module.exports = {
   saveButton: '[data-l10n-id="save"]',
   minimizeButton: '.min-btn',
   maximizeButton: '.max-btn',
-  closeButton: '.close-btn'
+  closeButton: '.close-btn',
+  clearBrowsingDataButton: '.clearBrowsingDataButton',
+  securityTab: '[data-l10n-id="security"]',
+  autofillAddressPanel: '.autofillAddressPanel',
+  autofillCreditCardPanel: '.autofillCreditCardPanel'
 }

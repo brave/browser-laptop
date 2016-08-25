@@ -59,12 +59,20 @@ const updateNavBarInput = (loc, frameStatePath = activeFrameStatePath()) => {
  * @param suggestionList - The suggestion list to use to figure out the suffix.
  */
 const updateUrlSuffix = (suggestionList) => {
-  const suggestion = suggestionList && suggestionList.get(0)
+  let selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
+
+  if (!selectedIndex) {
+    selectedIndex = 0
+  } else {
+    selectedIndex--
+  }
+
+  const suggestion = suggestionList && suggestionList.get(selectedIndex)
   let suffix = ''
   if (suggestion) {
-    const selectedIndex = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']))
     const autocompleteEnabled = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']))
-    if (!selectedIndex && autocompleteEnabled) {
+
+    if (autocompleteEnabled) {
       const location = windowState.getIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'location']))
       const index = suggestion.location.toLowerCase().indexOf(location.toLowerCase())
       if (index !== -1) {
@@ -432,10 +440,16 @@ const doAction = (action) => {
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
-      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
-
+      // History menu needs update (since it shows "Recently Closed" items)
+      const activeFrameLocation = FrameStateUtil.getActiveFrame(windowState).get('location')
+      const windowData = {
+        location: activeFrameLocation,
+        closedFrames: windowState.get('closedFrames').toJS()
+      }
+      ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
+      let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
       if ((totalOpenTabs % getSetting(settings.TABS_PER_PAGE)) === 0) {
         updateTabPageIndex(FrameStateUtil.getActiveFrame(windowState))
       }
@@ -443,6 +457,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_UNDO_CLOSED_FRAME:
       windowState = windowState.merge(FrameStateUtil.undoCloseFrame(windowState, windowState.get('closedFrames')))
       focusWebview(activeFrameStatePath())
+      break
+    case WindowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
+      windowState = windowState.set('closedFrames', new Immutable.List())
       break
     case WindowConstants.WINDOW_SET_ACTIVE_FRAME:
       if (!action.frameProps) {
@@ -512,6 +529,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), action.selectedIndex)
+
       if (action.suggestionList !== undefined) {
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), action.suggestionList)
       }
@@ -608,11 +626,14 @@ const doAction = (action) => {
       // Check if there's already a frame which is pinned.
       // If so we just want to set it as active.
       const location = action.frameProps.get('location')
-      const alreadyPinnedFrameProps = windowState.get('frames').find((frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location)
+      const alreadyPinnedFrameProps = windowState.get('frames').find(
+        (frame) => frame.get('pinnedLocation') && frame.get('pinnedLocation') === location &&
+          (action.frameProps.get('partitionNumber') || 0) === (frame.get('partitionNumber') || 0))
       if (alreadyPinnedFrameProps && action.isPinned) {
         action.actionType = WindowConstants.WINDOW_CLOSE_FRAME
         doAction(action)
         action.actionType = WindowConstants.WINDOW_SET_ACTIVE_FRAME
+        action.frameProps = alreadyPinnedFrameProps
         doAction(action)
       } else {
         windowState = windowState.setIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps), 'pinnedLocation'],
@@ -682,6 +703,30 @@ const doAction = (action) => {
       } else {
         windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
       }
+      break
+    case WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
+      if (!action.currentDetail && !action.originalDetail) {
+        windowState = windowState.delete('autofillAddressDetail')
+      } else {
+        windowState = windowState.mergeIn(['autofillAddressDetail'], {
+          currentDetail: action.currentDetail,
+          originalDetail: action.originalDetail
+        })
+      }
+      // Since the input values of address are bound, we need to notify the controls sync.
+      windowStore.emitChanges()
+      break
+    case WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL:
+      if (!action.currentDetail && !action.originalDetail) {
+        windowState = windowState.delete('autofillCreditCardDetail')
+      } else {
+        windowState = windowState.mergeIn(['autofillCreditCardDetail'], {
+          currentDetail: action.currentDetail,
+          originalDetail: action.originalDetail
+        })
+      }
+      // Since the input values of credit card are bound, we need to notify the controls sync.
+      windowStore.emitChanges()
       break
     case WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
       windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)

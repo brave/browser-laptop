@@ -106,6 +106,12 @@ var exports = {
       }, message, ...param).then((response) => response.value)
     })
 
+    this.app.client.addCommand('ipcSendRenderer', function (message, ...param) {
+      return this.execute(function (message, ...param) {
+        return require('electron').ipcRenderer.send(message, ...param)
+      }, message, ...param).then((response) => response.value)
+    })
+
     var windowHandlesOrig = this.app.client.windowHandles
     Object.getPrototypeOf(this.app.client).windowHandles = function () {
       return windowHandlesOrig.apply(this)
@@ -190,10 +196,21 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('getWindowState', function () {
+      return this.execute(function () {
+        return window.windowStore.state.toJS()
+      })
+    })
+
+    this.app.client.addCommand('setContextMenuDetail', function () {
+      return this.execute(function () {
+        return window.windowActions.setContextMenuDetail()
+      })
+    })
+
     this.app.client.addCommand('showFindbar', function (show) {
       return this.execute(function (show) {
-        var windowActions = require('../../../js/actions/windowActions')
-        windowActions.setFindbarShown(Object.assign({
+        window.windowActions.setFindbarShown(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
           key: 1
         }), show !== false)
@@ -203,8 +220,7 @@ var exports = {
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
       return this.execute(function (location, isPinned, options) {
         var Immutable = require('immutable')
-        var windowActions = require('../../../js/actions/windowActions')
-        windowActions.setPinned(Immutable.fromJS(Object.assign({
+        window.windowActions.setPinned(Immutable.fromJS(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
           location
         }, options)), isPinned)
@@ -269,6 +285,17 @@ var exports = {
       return this.execute(function (hostPattern, key, value) {
         return require('../../../js/actions/appActions').changeSiteSetting(hostPattern, key, value)
       }, key, value).then((response) => response.value)
+    })
+
+    /**
+     * Clears application data
+     *
+     * @param {object} clearDataDetail - the options to use for clearing
+     */
+    this.app.client.addCommand('clearAppData', function (clearDataDetail) {
+      return this.execute(function (clearDataDetail) {
+        return require('../../../js/actions/appActions').clearAppData(clearDataDetail)
+      }, clearDataDetail).then((response) => response.value)
     })
 
     this.app.client.addCommand('getDefaultWindowHeight', function () {

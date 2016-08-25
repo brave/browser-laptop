@@ -14,7 +14,6 @@ const windowActions = require('../actions/windowActions')
 const webviewActions = require('../actions/webviewActions')
 const contextMenus = require('../contextMenus')
 const getSetting = require('../settings').getSetting
-const getOrigin = require('../state/siteUtil').getOrigin
 
 // Components
 const NavigationBar = require('./navigationBar')
@@ -28,6 +27,8 @@ const Button = require('./button')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
+const AutofillAddressPanel = require('./autofillAddressPanel')
+const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
 const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
@@ -56,7 +57,6 @@ const searchProviders = require('../data/searchProviders')
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
 const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
-const { getBaseDomain } = require('../lib/baseDomain')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
@@ -80,6 +80,8 @@ class Main extends ImmutableComponent {
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
+    this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
+    this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
     this.onBraveMenu = this.onBraveMenu.bind(this)
@@ -314,13 +316,13 @@ class Main extends ImmutableComponent {
       windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setBlockedBy(frameProps, blockType, details.url))
     })
 
     ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) => {
         if (blockType === appConfig.resourceNames.SAFE_BROWSING) {
           // Since Safe Browsing never actually loads the main frame we need to add history here.
@@ -332,7 +334,7 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('location') === details.firstPartyUrl)
+      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
       filteredFrameProps.forEach((frameProps) =>
         windowActions.setRedirectedBy(frameProps, ruleset, details.url))
     })
@@ -367,12 +369,10 @@ class Main extends ImmutableComponent {
     })
 
     ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frames = self.props.windowState.get('frames')
-        .filter((frame) => frame.get('location') === detail.url ||
-          getOrigin(frame.get('location')) === getOrigin(detail.url) ||
-        getBaseDomain(getOrigin(frame.get('location'))) === getBaseDomain(getOrigin(detail.url)))
-      frames.forEach((frame) =>
-        windowActions.setLoginRequiredDetail(frame, detail))
+      const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, detail.tabId)
+      if (frame) {
+        windowActions.setLoginRequiredDetail(frame, detail)
+      }
     })
 
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
@@ -542,6 +542,14 @@ class Main extends ImmutableComponent {
     windowActions.setClearBrowsingDataDetail()
   }
 
+  onHideAutofillAddressPanel () {
+    windowActions.setAutofillAddressDetail()
+  }
+
+  onHideAutofillCreditCardPanel () {
+    windowActions.setAutofillCreditCardDetail()
+  }
+
   onHideNoScript () {
     windowActions.setNoScriptVisible(false)
   }
@@ -684,6 +692,8 @@ class Main extends ImmutableComponent {
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
+    const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
+    const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
@@ -694,6 +704,8 @@ class Main extends ImmutableComponent {
       !siteInfoIsVisible &&
       !braveryPanelIsVisible &&
       !clearBrowsingDataPanelIsVisible &&
+      !autofillAddressPanelIsVisible &&
+      !autofillCreditCardPanelIsVisible &&
       !releaseNotesIsVisible &&
       !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
@@ -761,7 +773,6 @@ class Main extends ImmutableComponent {
             enableNoScript={this.enableNoScript(activeSiteSettings)}
             settings={this.props.appState.get('settings')}
             noScriptIsVisible={noScriptIsVisible}
-            blockedScripts={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
           />
           {
             siteInfoIsVisible
@@ -784,6 +795,22 @@ class Main extends ImmutableComponent {
             ? <ClearBrowsingDataPanel
               clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
               onHide={this.onHideClearBrowsingDataPanel} />
+            : null
+          }
+          {
+           autofillAddressPanelIsVisible
+            ? <AutofillAddressPanel
+              currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
+              originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
+              onHide={this.onHideAutofillAddressPanel} />
+            : null
+          }
+          {
+           autofillCreditCardPanelIsVisible
+            ? <AutofillCreditCardPanel
+              currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
+              originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
+              onHide={this.onHideAutofillCreditCardPanel} />
             : null
           }
           {
@@ -885,13 +912,16 @@ class Main extends ImmutableComponent {
               onCloseFrame={this.onCloseFrame}
               frameKey={frame.get('key')}
               key={frame.get('key')}
-              settings={getBaseUrl(frame.get('location')) === 'about:preferences'
+              settings={getBaseUrl(frame.get('location')) === 'about:preferences' || getBaseUrl(frame.get('location')) === 'about:history'
                 ? this.props.appState.get('settings') || emptyMap
                 : null}
               bookmarks={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK)) || emptyMap
+                : null}
+              history={frame.get('location') === 'about:history'
+                ? this.props.appState.get('sites') || emptyMap
                 : null}
               downloads={this.props.appState.get('downloads') || emptyMap}
               bookmarkFolders={frame.get('location') === 'about:bookmarks'
@@ -930,10 +960,14 @@ class Main extends ImmutableComponent {
               cookieblock={this.props.appState.get('cookieblock')}
               flashInitialized={this.props.appState.get('flashInitialized')}
               allSiteSettings={allSiteSettings}
+              ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
+              publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
               frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
               enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
+              autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
+              autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
             />)
         }
         </div>
