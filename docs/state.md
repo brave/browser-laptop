@@ -15,6 +15,7 @@ AppStore
     customTitle: string, // User provided title for bookmark; overrides title
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     favicon: string, // URL of the favicon
+    themeColor: string, // css compatible color string
     lastAccessedTime: number, // datetime.getTime()
     partitionNumber: number, // Optionally specifies a specific session
     folderId: number, // Set for bookmark folders only
@@ -383,14 +384,36 @@ WindowStore
   ledgerInfo: {
     creating: boolean,
     created: boolean,
+    delayStamp: number,
     reconcileStamp: number,
-    reconcileDelay: ?,
-    delayStamp: ?,
-    transactions: Array,
+    reconcileDelay: number,
+    transactions: [ {
+      viewingId: string,
+      surveyorId: string,
+      contribution: {
+        fiat: {
+          amount: number,
+          currency: string
+        },
+        rates: {
+          [currency]: number // bitcoin value in <currency>
+        },
+        satoshis: number,
+        fee: number
+      },
+      submissionStamp: number,
+      submissionId: string,
+      count: number,
+      satoshis: number,
+      votes: number,
+      ballots: {
+        [publisher]: number
+      }
+    } ... ]
+    address: string,
     balance: string, // balance in BTC
     unconfirmed: string, // unconfirmed balance in BTC
     satoshis: number, // balance as a number of satoshis
-    address: string,
     btc: string, // BTC to pay per month
     amount: number, // currency amount to pay per month
     currency: string, // currency string
@@ -419,7 +442,7 @@ WindowStore
       faviconURL: string,
       verified: boolean,
       site: string,
-      score: ?
+      score: number
     }
   },
   autofillAddressDetail: {
