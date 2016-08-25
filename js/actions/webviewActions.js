@@ -83,7 +83,7 @@ const webviewActions = {
     }
   },
 
-  findInPage (searchString, caseSensitivity, forward, webview) {
+  findInPage: function (searchString, caseSensitivity, forward, webview) {
     webview = webview || getWebview()
     if (!webview) {
       return
@@ -100,7 +100,7 @@ const webviewActions = {
     }
   },
 
-  stopFindInPage (webview) {
+  stopFindInPage: function (webview) {
     webview = webview || getWebview()
     if (!webview) {
       return

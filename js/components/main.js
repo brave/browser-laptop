@@ -633,6 +633,7 @@ class Main extends ImmutableComponent {
   onFindHide () {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     windowActions.setFindbarShown(activeFrame, false)
+    webviewActions.stopFindInPage()
   }
 
   onFind (searchString, caseSensitivity, forward) {
