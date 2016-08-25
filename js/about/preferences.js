@@ -295,21 +295,27 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
         <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
-          <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
           {
-            this.ledgerData.get('hasBitcoinHandler')
+            this.ledgerData.get('address') && this.ledgerData.get('paymentURL')
               ? <div>
-                <a href={this.ledgerData.get('paymentURL')} target='_blank'>
-                  <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
-                </a>
-                <div data-l10n-id='bitcoinAddress' className='labelText' />
-                <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
-                <span className='smallText'>{this.ledgerData.get('address')}</span>
+                <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
+                {
+                  this.ledgerData.get('hasBitcoinHandler')
+                    ? <div>
+                      <a href={this.ledgerData.get('paymentURL')} target='_blank'>
+                        <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
+                      </a>
+                      <div data-l10n-id='bitcoinAddress' className='labelText' />
+                      <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
+                      <span className='smallText'>{this.ledgerData.get('address')}</span>
+                    </div>
+                    : <div>
+                      <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
+                      <span id='bitcoinPaymentURL' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('paymentURL'))}>{this.ledgerData.get('paymentURL')}</span>
+                    </div>
+                }
               </div>
-              : <div>
-                <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
-                <span id='bitcoinPaymentURL' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('paymentURL'))}>{this.ledgerData.get('paymentURL')}</span>
-              </div>
+            : <div data-l10n-id='bitcoinWalletNotAvailable' />
           }
         </div>
       </div>
@@ -550,8 +556,9 @@ class PaymentsTab extends ImmutableComponent {
   get footerContent () {
     return <div id='paymentsFooter'>
       <div data-l10n-id='paymentsFooterText' />
-      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-left' src='img/bitgo.png' /></a>
-      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-left' src='img/coinbase.png' /></a>
+      <a href='https://www.privateinternetaccess.com/' target='_blank'><img className='largeImg' src='img/private_internet_access.png' /></a>
+      <a href='https://www.bitgo.com/' target='_blank'><img className='pull-right' src='img/bitgo.png' /></a>
+      <a href='https://www.coinbase.com/' target='_blank'><img className='pull-right' src='img/coinbase.png' /></a>
     </div>
   }
 

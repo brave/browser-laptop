@@ -396,8 +396,7 @@ WindowStore
           currency: string
         },
         rates: {
-          currency1: number
-          ...
+          [currency]: number // bitcoin value in <currency>
         },
         satoshis: number,
         fee: number
@@ -408,8 +407,7 @@ WindowStore
       satoshis: number,
       votes: number,
       ballots: {
-        publisher1: number
-        ...
+        [publisher]: number
       }
     } ... ]
     address: string,
