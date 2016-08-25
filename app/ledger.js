@@ -801,7 +801,9 @@ var roundtrip = (params, options, callback) => {
                             underscore.omit(params, [ 'headers', 'payload', 'timeout' ]))
 
 // TBD: let the user configure this via preferences [MTR]
-  if ((parts.hostname === 'ledger.brave.com') && (params.useProxy)) parts.hostname = 'ledger-proxy.privateinternetaccess.com'
+/*
+  if ((parts.hostname === 'ledger.brave.com') && (params.useProxy)) parts.hostname = '...'
+ */
 
   i = parts.path.indexOf('?')
   if (i !== -1) {
