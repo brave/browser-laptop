@@ -946,7 +946,7 @@ var getBalance = () => {
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
   (err, provider, result) => {
-    if (err) return console.log('ledger balance error: ' + err.toString())
+    if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
 
     if (typeof result.unconfirmed === 'undefined') return
 
