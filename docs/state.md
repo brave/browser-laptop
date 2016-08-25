@@ -14,6 +14,7 @@ AppStore
     title: string,
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     favicon: string, // URL of the favicon
+    themeColor: string, // css compatible color string
     lastAccessedTime: number, // datetime.getTime()
     partitionNumber: number, // Optionally specifies a specific session
     folderId: number, // Set for bookmark folders only
