@@ -477,9 +477,16 @@ table.sortableTable {
     background: @lightGray;
     border-radius: @bigBorderRadius;
     margin: 30px 0px;
+    th {
+      text-align: left;
+    }
     tr {
       height: 1em;
     }
+  }
+
+  .sort {
+    text-align: left;
   }
 
   tr {
@@ -497,7 +504,7 @@ table.sortableTable {
     td {
       color: @mediumGray;
       -webkit-font-smoothing: antialiased;
-      text-align: center;
+      text-align: left;
       width: 8%;
 
       a {
@@ -726,10 +733,6 @@ table.sortableTable {
       box-shadow: @switchNubShadow;
     }
   }
-}
-
-#fundsSelectBox {
-  margin: 0 auto;
 }
 
 #paymentsFooter {
