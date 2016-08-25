@@ -75,28 +75,28 @@ class AutofillCreditCardPanel extends ImmutableComponent {
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
         <div className='formRow manageAutofillDataTitle' data-l10n-id='editCreditCard' />
         <div className='genericFormTable'>
-          <div id='nameOnCard' className='formRow'>
+          <div id='nameOnCard' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='name' htmlFor='nameOnCard' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
               value={this.props.currentDetail.get('name')} ref={(nameOnCard) => { this.nameOnCard = nameOnCard }} />
           </div>
-          <div id='creditCardNumber' className='formRow'>
+          <div id='creditCardNumber' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='creditCardNumber' htmlFor='creditCardNumber' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCardChange}
               value={this.props.currentDetail.get('card')} />
           </div>
-          <div id='expirationDate' className='formRow'>
+          <div id='expirationDate' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='expirationDate' htmlFor='expirationDate' />
             <select value={this.props.currentDetail.get('month')}
-              onChange={this.onExpMonthChange} className='formSelect expMonthSelect' >
+              onChange={this.onExpMonthChange} className='expMonthSelect' >
               {ExpMonth}
             </select>
             <select value={this.props.currentDetail.get('year')}
-              onChange={this.onExpYearChange} className='formSelect expYearSelect' >
+              onChange={this.onExpYearChange} className='expYearSelect' >
               {ExpYear}
             </select>
           </div>
-          <div className='formRow'>
+          <div className='formRow manageAutofillDataButtons'>
             <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
             <Button l10nId='save' className='primaryButton saveCreditCardButton' onClick={this.onSave} />
           </div>
