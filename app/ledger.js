@@ -130,6 +130,7 @@ var boot = () => {
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
+    ledgerInfo.creating = true
     appActions.updateLedgerInfo({ creating: true })
     try {
       client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
@@ -911,9 +912,8 @@ var getStateInfo = (state) => {
   var info = state.paymentInfo
   var then = underscore.now() - msecs.year
 
-  ledgerInfo.creating = ledgerInfo.created = false
-  if (state.properties.wallet) ledgerInfo.created = true
-  else if (state.persona) ledgerInfo.creating = true
+  ledgerInfo.created = !!state.properties.wallet
+  ledgerInfo.creating = !ledgerInfo.created
 
   ledgerInfo.delayStamp = state.delayStamp
   ledgerInfo.reconcileStamp = state.reconcileStamp
