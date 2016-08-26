@@ -414,6 +414,50 @@ describe('siteUtil', function () {
     })
   })
 
+  describe('isHistoryEntry', function () {
+    it('returns true for a typical history entry', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        lastAccessedTime: 123
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
+    })
+    it('returns true for a bookmark history entry which has lastAccessedTime', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        tags: [siteTags.BOOKMARK],
+        lastAccessedTime: 123
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), true)
+    })
+    it('returns false for a bookmark entry with falsey lastAccessedTime', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        tags: [siteTags.BOOKMARK]
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+    })
+    it('returns false for a bookmarks folder', function () {
+      const siteDetail = Immutable.fromJS({
+        location: testUrl1,
+        tags: [siteTags.BOOKMARK_FOLDER],
+        lastAccessedTime: 123
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+    })
+    it('returns false if input is falsey', function () {
+      assert.equal(siteUtil.isHistoryEntry(null), false)
+      assert.equal(siteUtil.isHistoryEntry(undefined), false)
+    })
+    it('returns false for about: pages', function () {
+      const siteDetail = Immutable.fromJS({
+        location: 'about:fake-page-here',
+        lastAccessedTime: 123
+      })
+      assert.equal(siteUtil.isHistoryEntry(siteDetail), false)
+    })
+  })
+
   describe('getFolders', function () {
   })
 
