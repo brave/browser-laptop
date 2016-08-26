@@ -66,7 +66,10 @@ const synopsisPath = path.join(app.getPath('userData'), 'ledger-synopsis.json')
 
 var bootP = false
 var client
-const clientOptions = { loggingP: true, verboseP: true }
+const clientOptions = { debugP: process.env.LEDGER_DEBUG,
+                        loggingP: process.env.LEDGER_LOGGING,
+                        verboseP: process.env.LEDGER_VERBOSE
+                      }
 
 /*
  * publisher globals
@@ -349,8 +352,7 @@ var initialize = (onoff) => {
         getStateInfo(state)
         try {
           client = (require('ledger-client'))(state.personaId,
-                                              underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
-                                                                  clientOptions), state)
+                                              underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions), state)
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
         }
