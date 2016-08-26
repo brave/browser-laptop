@@ -4,7 +4,11 @@
 
   let aboutEntryPage = 'gen/aboutPages.entry.js'
   if (devServerPort) {
-    aboutEntryPage = 'http://localhost:' + devServerPort + '/' + aboutEntryPage
+    var baseHref = 'http://localhost:' + devServerPort
+    aboutEntryPage = baseHref + '/' + aboutEntryPage
+    var baseNode = document.createElement('base')
+    baseNode.href = baseHref
+    document.getElementsByTagName('head')[0].appendChild(baseNode)
   }
 
   var getFavicon = function(){
