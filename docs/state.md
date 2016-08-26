@@ -177,12 +177,18 @@ AppStore
     addedWords: Array<string> // List of words to add to the dictionary
   },
   autofill: {
-    addresses: [{
-      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
-    }],
-    creditCards: [{
-      Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
-    }]
+    addresses: {
+      guid: [{
+        Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+      }],
+      timestamp: number
+    },
+    creditCards: {
+      guid: [{
+        Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+      }],
+      timestamp: number
+    }
   }
 }
 ```

@@ -367,8 +367,14 @@ module.exports.defaultAppState = () => {
       ignoredWords: []
     },
     autofill: {
-      addresses: [],
-      creditCards: []
+      addresses: {
+        guid: [],
+        timestamp: 0
+      },
+      creditCards: {
+        guid: [],
+        timestamp: 0
+      }
     }
   }
 }
