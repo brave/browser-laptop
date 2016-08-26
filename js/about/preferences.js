@@ -648,8 +648,11 @@ class PaymentsTab extends ImmutableComponent {
     let l10nDataArgs = {
       reconcileDate: nextReconcileDate
     }
-    return <div className='nextPaymentSubmission'>
-      <span data-l10n-id='paymentHistoryFooterText' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+    return <div className='paymentHistoryFooter'>
+      <div className='nextPaymentSubmission'>
+        <span data-l10n-id='paymentHistoryFooterText' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+      </div>
+      <Button l10nId='paymentHistoryOKText' className='okButton primaryButton' onClick={this.props.hideOverlay.bind(this, 'paymentHistory')} />
     </div>
   }
 
