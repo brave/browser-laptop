@@ -939,7 +939,10 @@ var getStateInfo = (state) => {
       ballots[ballot.publisher]++
     })
 
-    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction, [ 'viewingId', 'submissionStamp', 'satoshis' ]),
+    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction,
+                                                                   [ 'viewingId', 'submissionStamp', 'satoshis',
+                                                                     'contribution'
+                                                                   ]),
                                                    transaction.fee, { ballots: ballots }))
   }
 
