@@ -12,6 +12,9 @@ const windowStore = require('../stores/windowStore')
 const dragTypes = require('../constants/dragTypes')
 const cx = require('../lib/classSet')
 
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
+
 const Button = require('./button')
 const Tab = require('./tab')
 const dnd = require('../dnd')
@@ -84,7 +87,16 @@ class Tabs extends ImmutableComponent {
   }
 
   newTab () {
-    windowActions.newFrame()
+    const newTabMode = getSetting(settings.NEWTAB_MODE)
+    alert(newTabMode)
+    switch (newTabMode) {
+      case 'newTabPage':
+        windowActions.newFrame()
+        break
+      case 'homePage':
+        windowActions.newFrame({location: getSetting(settings.HOMEPAGE)})
+        break
+    }
   }
 
   render () {
