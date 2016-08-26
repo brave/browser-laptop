@@ -1200,7 +1200,6 @@ class AboutPreferences extends React.Component {
     if (overlayName === 'addFunds' && isVisible === false) {
       // Hide the child overlay when the parent is closed
       stateDiff['bitcoinOverlayVisible'] = false
-      stateDiff['paymentHistoryOverlayVisible'] = false
     }
     this.setState(stateDiff)
   }
