@@ -639,7 +639,12 @@ class PaymentsTab extends ImmutableComponent {
       return
     }
     let nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
-    return <div className='nextPaymentSubmission'><span>Your next payment submission is {nextReconcileDate}.</span></div>
+    let l10nDataArgs = {
+      reconcileDate: nextReconcileDate
+    }
+    return <div className='nextPaymentSubmission'>
+      <span data-l10n-id='paymentHistoryFooterText' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+    </div>
   }
 
   btcToCurrencyString (btc) {
