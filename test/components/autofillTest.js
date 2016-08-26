@@ -63,7 +63,7 @@ describe('Autofill', function () {
         .click(saveAddressButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.addresses.length === 1
+            return val.value.autofill.addresses.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
@@ -103,13 +103,15 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(autofillAddressPanel)
         .click('#phone')
+        .keys('\uE010') // send END key
         .keys('123')
         .click('#email')
+        .keys('\uE010') // send END key
         .keys('mm')
         .click(saveAddressButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.addresses.length === 1
+            return val.value.autofill.addresses.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
@@ -174,7 +176,7 @@ describe('Autofill', function () {
         .click(saveCreditCardButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.creditCards.length === 1
+            return val.value.autofill.creditCards.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
@@ -211,15 +213,17 @@ describe('Autofill', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(autofillCreditCardPanel)
         .click('#nameOnCard')
+        .keys('\uE010') // send END key
         .keys('123')
         .click('#creditCardNumber')
+        .keys('\uE010') // send END key
         .keys('123')
         .selectByValue('.expMonthSelect', (expMonth + 1).toString())
         .selectByValue('.expYearSelect', (expYear + 1).toString())
         .click(saveCreditCardButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.creditCards.length === 1
+            return val.value.autofill.creditCards.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
@@ -282,7 +286,7 @@ describe('Autofill', function () {
         .click(saveAddressButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.addresses.length === 1
+            return val.value.autofill.addresses.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
@@ -305,11 +309,10 @@ describe('Autofill', function () {
         .click(saveAddressButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.addresses.length === 1
+            return val.value.autofill.addresses.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
-        .refresh()
         .waitForVisible('.autofillPage')
         .getText('.addressName').should.eventually.be.equal(name)
         .getText('.city').should.eventually.be.equal(city)
@@ -363,7 +366,7 @@ describe('Autofill', function () {
         .click(saveCreditCardButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.creditCards.length === 1
+            return val.value.autofill.creditCards.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
@@ -386,11 +389,10 @@ describe('Autofill', function () {
         .click(saveCreditCardButton)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.autofill.creditCards.length === 1
+            return val.value.autofill.creditCards.guid.length === 1
           })
         })
         .tabByUrl(this.page1Url)
-        .refresh()
         .waitForVisible('.autofillPage')
         .getText('.creditCardName').should.eventually.be.equal(cardName)
         .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))

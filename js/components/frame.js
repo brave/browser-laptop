@@ -110,10 +110,11 @@ class Frame extends ImmutableComponent {
     } else if (location === 'about:autofill') {
       const partition = FrameStateUtil.getPartition(this.frame)
       if (this.props.autofillAddresses) {
-        const addresses = this.props.autofillAddresses.toJS()
+        const addresses = this.props.autofillAddresses.get('guid')
         let list = []
-        for (let index in addresses) {
-          const address = currentWindow.webContents.session.autofill.getProfile(addresses[index][partition])
+        addresses.forEach((entry) => {
+          const guid = entry.get(partition)
+          const address = currentWindow.webContents.session.autofill.getProfile(guid)
           let addressDetail = {
             name: address.full_name,
             organization: address.company_name,
@@ -124,26 +125,27 @@ class Frame extends ImmutableComponent {
             country: address.country_code,
             phone: address.phone,
             email: address.email,
-            guid: addresses[index]
+            guid: entry.toJS()
           }
           list.push(addressDetail)
-        }
+        })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
       if (this.props.autofillCreditCards) {
-        const creditCards = this.props.autofillCreditCards.toJS()
+        const creditCards = this.props.autofillCreditCards.get('guid')
         let list = []
-        for (let index in creditCards) {
-          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(creditCards[index][partition])
+        creditCards.forEach((entry) => {
+          const guid = entry.get(partition)
+          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(guid)
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
             month: creditCard.expiration_month,
             year: creditCard.expiration_year,
-            guid: creditCards[index]
+            guid: entry.toJS()
           }
           list.push(creditCardDetail)
-        }
+        })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
     }

@@ -22,11 +22,11 @@ class AddressItem extends ImmutableComponent {
   }
 
   onDelete () {
-    aboutActions.removeAutofillAddress(this.props.address.toJS())
+    aboutActions.removeAutofillAddress(this.props.address)
   }
 
   onEdit () {
-    aboutActions.editAutofillAddress(this.props.address.toJS())
+    aboutActions.editAutofillAddress(this.props.address)
   }
 
   render () {
@@ -63,11 +63,11 @@ class CreditCardItem extends ImmutableComponent {
   }
 
   onDelete () {
-    aboutActions.removeAutofillCreditCard(this.props.creditCard.toJS())
+    aboutActions.removeAutofillCreditCard(this.props.creditCard)
   }
 
   onEdit () {
-    aboutActions.editAutofillCreditCard(this.props.creditCard.toJS())
+    aboutActions.editAutofillCreditCard(this.props.creditCard)
   }
 
   render () {
