@@ -971,6 +971,20 @@ const windowActions = {
       currentDetail,
       originalDetail
     })
+  },
+
+  /**
+   * Sets page url with blocked active mixed content.
+   * @param {Object} frameProps - The frame to set source of
+   * blocked active mixed content on
+   * @param {string} source - Source of blocked active mixed content
+   */
+  setBlockedRunInsecureContent: function (frameProps, source) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT,
+      frameProps,
+      source
+    })
   }
 }
 
