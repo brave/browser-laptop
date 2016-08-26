@@ -1255,10 +1255,7 @@ class AboutPreferences extends React.Component {
 
 let formattedDateFromTimestamp = function (timestamp) {
   var date = new Date(timestamp)
-  var dateStr = date.toDateString()
-  var [month, day, year] = dateStr.split(' ').slice(1)
-  dateStr = month + ' ' + day + ', ' + year
-  return dateStr
+  return date.toLocaleDateString()
 }
 
 module.exports = <AboutPreferences />
