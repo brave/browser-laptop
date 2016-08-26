@@ -40,6 +40,8 @@ const underscore = require('underscore')
 const uuid = require('node-uuid')
 
 const appActions = require('../js/actions/appActions')
+const appConstants = require('../js/constants/appConstants')
+const appDispatcher = require('../js/dispatcher/appDispatcher')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
@@ -94,12 +96,23 @@ let addFundsMessage
 let suppressNotifications = false
 let notificationTimeout = null
 
+// TODO(bridiver) - create a better way to get setting changes
+const doAction = (action) => {
+  switch (action.actionType) {
+    case appConstants.APP_CHANGE_SETTING:
+      if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
+      if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
+      break
+    default:
+  }
+}
+
 /*
  * module entry points
  */
-
 var init = () => {
   try {
+    appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
   } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
@@ -117,6 +130,7 @@ var boot = () => {
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
+    ledgerInfo.creating = true
     appActions.updateLedgerInfo({ creating: true })
     try {
       client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
@@ -124,7 +138,7 @@ var boot = () => {
       appActions.updateLedgerInfo({})
 
       bootP = false
-      return console.log('ledger-client error: ' + ex.toString() + '\n' + ex.stack)
+      return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
     }
     if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     getBalance()
@@ -168,11 +182,6 @@ if (ipc) {
     ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
 
     event.returnValue = { context: ctx, rules: publisherInfo._internal.ruleset.cooked }
-  })
-
-  ipc.on(messages.CHANGE_SETTING, (event, key, value) => {
-    if (key === settings.PAYMENTS_ENABLED) return initialize(value)
-    if (key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(value)
   })
 
   ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
@@ -338,9 +347,13 @@ var initialize = (onoff) => {
         }
 
         getStateInfo(state)
-        client = (require('ledger-client'))(state.personaId,
-                                            underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
-                                                                clientOptions), state)
+        try {
+          client = (require('ledger-client'))(state.personaId,
+                                              underscore.defaults(underscore.extend(state.options, { roundtrip: roundtrip }),
+                                                                  clientOptions), state)
+        } catch (ex) {
+          return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
+        }
         if (client.sync(callback) === true) {
           run(random.randomInt({ min: 1, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
         }
@@ -867,7 +880,11 @@ var run = (delayTime) => {
   }
 
   if (delayTime === 0) {
-    delayTime = client.timeUntilReconcile()
+    try {
+      delayTime = client.timeUntilReconcile()
+    } catch (ex) {
+      delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
+    }
     if (delayTime === false) delayTime = 0
   }
   if (delayTime > 0) {
@@ -895,9 +912,8 @@ var getStateInfo = (state) => {
   var info = state.paymentInfo
   var then = underscore.now() - msecs.year
 
-  ledgerInfo.creating = ledgerInfo.created = false
-  if (state.properties.wallet) ledgerInfo.created = true
-  else if (state.persona) ledgerInfo.creating = true
+  ledgerInfo.created = !!state.properties.wallet
+  ledgerInfo.creating = !ledgerInfo.created
 
   ledgerInfo.delayStamp = state.delayStamp
   ledgerInfo.reconcileStamp = state.reconcileStamp
@@ -923,7 +939,10 @@ var getStateInfo = (state) => {
       ballots[ballot.publisher]++
     })
 
-    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction, [ 'viewingId', 'submissionStamp', 'satoshis' ]),
+    ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction,
+                                                                   [ 'viewingId', 'submissionStamp', 'satoshis',
+                                                                     'contribution'
+                                                                   ]),
                                                    transaction.fee, { ballots: ballots }))
   }
 
@@ -938,7 +957,7 @@ var getBalance = () => {
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
   (err, provider, result) => {
-    if (err) return console.log('ledger balance error: ' + err.toString())
+    if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
 
     if (typeof result.unconfirmed === 'undefined') return
 

@@ -142,7 +142,8 @@ var requestVersionInfo = (done, pingOnly) => {
   var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
   debug(queryString)
 
-  request(queryString, (err, statusCode, body) => {
+  request(queryString, (err, response, body) => {
+    var statusCode = response.statusCode
     appActions.setUpdateLastCheck()
     if (pingOnly) {
       return

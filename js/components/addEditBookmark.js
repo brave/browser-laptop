@@ -34,7 +34,8 @@ class AddEditBookmark extends ImmutableComponent {
   }
 
   get bookmarkNameValid () {
-    return (this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle'))
+    let title = (this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle'))
+    return ((typeof title === 'string') && title.trim().length > 0)
   }
 
   get isFolder () {

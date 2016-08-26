@@ -315,27 +315,26 @@ class Main extends ImmutableComponent {
       windowActions.setActiveFrame(self.props.windowState.getIn(['frames', self.props.windowState.get('frames').size - 1])))
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
-      filteredFrameProps.forEach((frameProps) =>
-        windowActions.setBlockedBy(frameProps, blockType, details.url))
+      const frameProps = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      frameProps && windowActions.setBlockedBy(frameProps, blockType, details.url)
     })
 
     ipc.on(messages.BLOCKED_PAGE, (e, blockType, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
-      filteredFrameProps.forEach((frameProps) => {
-        if (blockType === appConfig.resourceNames.SAFE_BROWSING) {
-          // Since Safe Browsing never actually loads the main frame we need to add history here.
-          // That way about:safebrowsing can figure out the correct location.
-          windowActions.addHistory(frameProps)
-        }
-        windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank')
-      })
+      const frameProps = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      if (!frameProps) {
+        return
+      }
+      if (blockType === appConfig.resourceNames.SAFE_BROWSING) {
+        // Since Safe Browsing never actually loads the main frame we need to add history here.
+        // That way about:safebrowsing can figure out the correct location.
+        windowActions.addHistory(frameProps)
+      }
+      windowActions.loadUrl(frameProps, blockType === appConfig.resourceNames.SAFE_BROWSING ? 'about:safebrowsing' : 'about:blank')
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
-      const filteredFrameProps = this.props.windowState.get('frames').filter((frame) => frame.get('provisionalLocation') === details.firstPartyUrl)
-      filteredFrameProps.forEach((frameProps) =>
-        windowActions.setRedirectedBy(frameProps, ruleset, details.url))
+      const frameProps = FrameStateUtil.getFrameByTabId(self.props.windowState, details.tabId)
+      frameProps && windowActions.setRedirectedBy(frameProps, ruleset, details.url)
     })
 
     ipc.on(messages.SHOW_NOTIFICATION, (e, text) => {
@@ -970,6 +969,9 @@ class Main extends ImmutableComponent {
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
               autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
               autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
+              adblockCount={this.props.appState.getIn(['adblock', 'count'])}
+              trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
+              httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
             />)
         }
         </div>

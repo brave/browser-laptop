@@ -103,7 +103,7 @@ module.exports = {
     'payments.enabled': false,
     'payments.notifications': false,
     'payments.contribution-amount': 5, // USD
-    'privacy.autofill-enabled': false,
+    'privacy.autofill-enabled': true,
     'privacy.do-not-track': false,
     'security.passwords.active-password-manager': null, // Set in settings.js by passwordManagerDefault (defaults to built in)
     'security.passwords.manager-enabled': true,

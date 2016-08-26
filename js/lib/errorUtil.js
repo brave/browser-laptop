@@ -339,7 +339,7 @@ module.exports.errorMap = {
   356: 'quicProtocolError',
   // The HTTP headers were truncated by an EOF.
   357: 'responseHeadersTruncated',
-  // The QUIC crytpo handshake failed.  This means that the server was unable
+  // The QUIC crypto handshake failed.  This means that the server was unable
   // to read any requests sent, so they may be resent.
   358: 'quicHandshakeFailed',
   // Transport security is inadequate for the SPDY version.

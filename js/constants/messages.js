@@ -75,7 +75,6 @@ const messages = {
   SET_CLIPBOARD: _,
   GOT_CANVAS_FINGERPRINTING: _,
   SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
-  SET_RESOURCE_ENABLED: _,
   GO_BACK: _,
   GO_FORWARD: _,
   RELOAD: _,
@@ -98,9 +97,6 @@ const messages = {
   PASSWORD_SITE_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
   DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
-  DELETE_PASSWORD: _, /** @arg {Object} password */
-  DELETE_PASSWORD_SITE: _, /** @arg {string} site */
-  CLEAR_PASSWORDS: _,
   // Init
   INITIALIZE_WINDOW: _,
   INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
@@ -126,11 +122,6 @@ const messages = {
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   // About pages from contentScript
-  CHANGE_SETTING: _,
-  CHANGE_SITE_SETTING: _,
-  REMOVE_SITE_SETTING: _,
-  NEW_FRAME: _,
-  MOVE_SITE: _,
   OPEN_DOWNLOAD_PATH: _,
   RELOAD_URL: _,
   DISPATCH_ACTION: _,
@@ -138,12 +129,6 @@ const messages = {
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,
   // Autofill
-  ADD_AUTOFILL_ADDRESS: _,
-  REMOVE_AUTOFILL_ADDRESS: _,
-  EDIT_AUTOFILL_ADDRESS: _,
-  ADD_AUTOFILL_CREDIT_CARD: _,
-  REMOVE_AUTOFILL_CREDIT_CARD: _,
-  EDIT_AUTOFILL_CREDIT_CARD: _,
   AUTOFILL_ADDRESSES_UPDATED: _,
   AUTOFILL_CREDIT_CARDS_UPDATED: _,
   // HTTPS

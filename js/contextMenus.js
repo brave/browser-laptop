@@ -262,12 +262,12 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       {
         label: locale.translation(deleteLabel),
         click: () => appActions.removeSite(siteDetail, deleteTag)
-      },
-      CommonMenu.separatorMenuItem)
+      })
   }
 
   if (!isHistoryEntry) {
     template.push(
+      CommonMenu.separatorMenuItem,
       addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
       addFolderMenuItem(siteDetail, true))
   }
@@ -375,10 +375,10 @@ function usernameTemplateInit (usernames, origin, action) {
 }
 
 function autofillTemplateInit (suggestions, frame) {
-  let items = []
+  const items = []
   for (let i = 0; i < suggestions.length; ++i) {
     let value
-    let frontendId = suggestions[i].frontend_id
+    const frontendId = suggestions[i].frontend_id
     if (frontendId >= 0) { //  POPUP_ITEM_ID_AUTOCOMPLETE_ENTRY and Autofill Entry
       value = suggestions[i].value
     } else if (frontendId === -1) { // POPUP_ITEM_ID_WARNING_MESSAGE
@@ -1091,9 +1091,13 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
+  const offset = {
+    x: (window.innerWidth - boundingRect.clientWidth),
+    y: (window.innerHeight - boundingRect.clientHeight)
+  }
   windowActions.setContextMenuDetail(Immutable.fromJS({
-    left: boundingRect.x,
-    top: boundingRect.y,
+    left: offset.x + boundingRect.x,
+    top: offset.y + (boundingRect.y + boundingRect.height),
     template: menuTemplate
   }))
 }

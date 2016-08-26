@@ -460,18 +460,6 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.CHANGE_SETTING, (e, key, value) => {
-      appActions.changeSetting(key, value)
-    })
-
-    ipcMain.on(messages.CHANGE_SITE_SETTING, (e, hostPattern, key, value, temp) => {
-      appActions.changeSiteSetting(hostPattern, key, value, temp)
-    })
-
-    ipcMain.on(messages.REMOVE_SITE_SETTING, (e, hostPattern, key) => {
-      appActions.removeSiteSetting(hostPattern, key)
-    })
-
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
     })
@@ -483,18 +471,10 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.SET_RESOURCE_ENABLED, (e, resourceName, enabled) => {
-      appActions.setResourceEnabled(resourceName, enabled)
-    })
-
     ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
       flash.checkFlashInstalled((installed) => {
         e.sender.send(messages.FLASH_UPDATED, installed)
       })
-    })
-
-    ipcMain.on(messages.MOVE_SITE, (e, sourceDetail, destinationDetail, prepend, destinationIsParent) => {
-      appActions.moveSite(Immutable.fromJS(sourceDetail), Immutable.fromJS(destinationDetail), prepend, destinationIsParent)
     })
 
     ipcMain.on(messages.OPEN_DOWNLOAD_PATH, (e, download) => {
@@ -553,15 +533,6 @@ app.on('ready', () => {
     })
 
     let masterKey
-    ipcMain.on(messages.DELETE_PASSWORD, (e, password) => {
-      appActions.deletePassword(password)
-    })
-    ipcMain.on(messages.DELETE_PASSWORD_SITE, (e, origin) => {
-      appActions.changeSiteSetting(origin, 'savePasswords', undefined)
-    })
-    ipcMain.on(messages.CLEAR_PASSWORDS, () => {
-      appActions.clearPasswords()
-    })
     ipcMain.on(messages.DECRYPT_PASSWORD, (e, encrypted, authTag, iv, id) => {
       masterKey = masterKey || getMasterKey()
       if (!masterKey) {
@@ -741,14 +712,6 @@ app.on('ready', () => {
       if (prefsRestartCallbacks[message]) {
         prefsRestartCallbacks[message](buttonIndex, persist)
       }
-    })
-
-    ipcMain.on(messages.REMOVE_AUTOFILL_ADDRESS, (e, address) => {
-      appActions.removeAutofillAddress(address)
-    })
-
-    ipcMain.on(messages.REMOVE_AUTOFILL_CREDIT_CARD, (e, card) => {
-      appActions.removeAutofillCreditCard(card)
     })
 
     // Setup the crash handling

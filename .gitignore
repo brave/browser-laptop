@@ -54,6 +54,7 @@ buildConfig.js
 rulesets.json
 httpse.json
 httpse.sqlite
+httpse.leveldb
 
 # vim swap files
 *.swp

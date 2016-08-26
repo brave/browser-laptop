@@ -460,6 +460,10 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       appState = appState.setIn([action.resourceName, 'enabled'], action.enabled)
       break
+    case AppConstants.APP_ADD_RESOURCE_COUNT:
+      const oldCount = appState.getIn([action.resourceName, 'count']) || 0
+      appState = appState.setIn([action.resourceName, 'count'], oldCount + action.count)
+      break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,
@@ -545,19 +549,17 @@ const handleAppAction = (action) => {
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
       {
         const Filtering = require('../../app/filtering')
-        if (appState.getIn(['autofill', 'addresses']) === undefined) {
-          appState = appState.setIn(['autofill', 'addresses'], new Immutable.List())
-        }
         appState = appState.setIn(['autofill', 'addresses'],
           appState.getIn(['autofill', 'addresses']).filterNot((address) => {
             return Immutable.is(address, action.originalDetail.get('guid'))
           }))
-        if (action.originalDetail.get('guid') !== undefined) {
-          Filtering.removeAutofillAddress(action.originalDetail.get('guid').toJS())
-        }
 
         let addresses = appState.getIn(['autofill', 'addresses'])
         const guid = Filtering.addAutofillAddress(action.detail.toJS())
+        if (action.originalDetail.get('guid') !== undefined &&
+          !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
+          Filtering.removeAutofillAddress(action.originalDetail.get('guid').toJS())
+        }
         appState = appState.setIn(['autofill', 'addresses'], addresses.push(Immutable.fromJS(guid)))
         break
       }
@@ -566,27 +568,25 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'addresses'],
           appState.getIn(['autofill', 'addresses']).filterNot((address) => {
-            return Immutable.is(address, Immutable.fromJS(action.detail.guid))
+            return Immutable.is(address, Immutable.fromJS(action.detail.get('guid')))
           }))
-        Filtering.removeAutofillAddress(action.detail.guid)
+        Filtering.removeAutofillAddress(action.detail.get('guid').toJS())
         break
       }
     case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
       {
         const Filtering = require('../../app/filtering')
-        if (appState.getIn(['autofill', 'creditCards']) === undefined) {
-          appState = appState.setIn(['autofill', 'creditCards'], new Immutable.List())
-        }
         appState = appState.setIn(['autofill', 'creditCards'],
           appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
             return Immutable.is(card, action.originalDetail.get('guid'))
           }))
-        if (action.originalDetail.get('guid') !== undefined) {
-          Filtering.removeAutofillCreditCard(action.originalDetail.get('guid').toJS())
-        }
 
         let creditCards = appState.getIn(['autofill', 'creditCards'])
         const guid = Filtering.addAutofillCreditCard(action.detail.toJS())
+        if (action.originalDetail.get('guid') !== undefined &&
+          !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
+          Filtering.removeAutofillCreditCard(action.originalDetail.get('guid').toJS())
+        }
         appState = appState.setIn(['autofill', 'creditCards'], creditCards.push(Immutable.fromJS(guid)))
         break
       }
@@ -595,9 +595,9 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'creditCards'],
           appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
-            return Immutable.is(card, Immutable.fromJS(action.detail.guid))
+            return Immutable.is(card, action.detail.get('guid'))
           }))
-        Filtering.removeAutofillCreditCard(action.detail.guid)
+        Filtering.removeAutofillCreditCard(action.detail.get('guid').toJS())
         break
       }
     default:
