@@ -19,6 +19,7 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes} = require('../lib/appUrlUtil')
+const searchProviders = require('../data/searchProviders').providers
 const Serializer = require('../dispatcher/serializer')
 
 let windowState = Immutable.fromJS({
@@ -173,6 +174,8 @@ const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   if (openInForeground === undefined) {
     openInForeground = true
   }
+
+  // let defaultUrl = newFrameUrl()
   frameOpts.location = frameOpts.location || config.defaultUrl
   if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
     frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)

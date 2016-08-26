@@ -321,6 +321,7 @@ class Main extends ImmutableComponent {
         }
       }
       let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true || options.openInForeground
+      // let defaultUrl = newFrameUrl()
       const frameOpts = {
         location: url || config.defaultUrl,
         isPrivate: !!options.isPrivate,

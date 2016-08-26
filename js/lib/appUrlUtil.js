@@ -6,6 +6,9 @@ const Immutable = require('immutable')
 const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
+const getSetting = require('../settings').getSetting
+const settings = require('../constants/settings')
+const searchProviders = require('../data/searchProviders').providers
 
 module.exports.fileUrl = (str) => {
   var pathName = path.resolve(str).replace(/\\/g, '/')
@@ -148,3 +151,30 @@ function getHash (input) {
 }
 
 module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'file:', 'view-source:', 'ftp:']
+
+/**
+ * Grabs the url of the new tab
+ */
+ // module.exports.newFrameUrl = function () {
+ //   let newTabMode = getSetting(settings.NEWTAB_MODE)
+ //   let defaultUrl
+ //   switch (newTabMode) {
+ //     case 'newTabPage':
+ //       defaultUrl = 'about:newtab'
+ //       break
+ //     case 'homePage':
+ //       defaultUrl = getSetting(settings.HOMEPAGE)
+ //       break
+ //     case 'defaultSearchEngine':
+ //       let defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
+ //       let defaultSearchEngineSettings = searchProviders.filter(engine => {
+ //         return engine.name === defaultSearchEngine
+ //       })
+ //       defaultUrl = defaultSearchEngineSettings[0].base
+ //       break
+ //     default:
+ //       defaultUrl = ''
+ //       break
+ //   }
+ //   return defaultUrl
+ // }
