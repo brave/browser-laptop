@@ -367,15 +367,7 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get numericDateStr () {
-    var date = new Date(this.timestamp)
-
-    var monthNum = ('0' + (date.getMonth() + 1).toString())
-    monthNum = monthNum.slice(monthNum.length - 2, monthNum.length)
-
-    var dayNum = ('0' + (date.getDate().toString()))
-    dayNum = dayNum.slice(dayNum.length - 2, dayNum.length)
-
-    return monthNum + dayNum + date.getFullYear().toString()
+    return (new Date(this.timestamp)).toLocaleDateString().replace(/\//g, '-')
   }
 
   get ledgerData () {
