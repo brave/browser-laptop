@@ -377,17 +377,21 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get satoshis () {
-    return this.transaction.get('satoshis')
+    return this.transaction.get('contribution').get('satoshis')
+  }
+
+  get currency () {
+    return this.transaction.get('contribution').get('fiat').get('currency')
   }
 
   get totalAmount () {
-    var fiatAmount = this.satoshis * this.ledgerData.get('btcPrice') / 100000000
+    var fiatAmount = this.transaction.get('contribution').get('fiat').get('amount')
     return fiatAmount.toFixed(2)
   }
 
   render () {
     var date = this.formattedDate
-    var totalAmountStr = this.totalAmount + ' ' + this.ledgerData.get('currency')
+    var totalAmountStr = this.totalAmount + ' ' + this.currency
     var receiptFileName = 'brave_ledger' + this.numericDateStr + '.pdf'
 
     return <tr>
