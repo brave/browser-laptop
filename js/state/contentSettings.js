@@ -112,6 +112,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
     flashActive: [{
       setting: 'block',
       primaryPattern: '*'
+    }],
+    runInsecureContent: [{
+      setting: 'block',
+      primaryPattern: '*'
     }]
   }
 
@@ -123,6 +127,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
       // TODO: support temporary override
       addContentSettings(contentSettings.javascript, hostPattern, '*',
         hostSetting.noScript ? 'block' : 'allow')
+    }
+    if (typeof hostSetting.runInsecureContent === 'boolean') {
+      addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',
+        hostSetting.runInsecureContent ? 'allow' : 'block')
     }
     if (hostSetting.cookieControl) {
       if (hostSetting.cookieControl === 'block3rdPartyCookie') {

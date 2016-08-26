@@ -267,8 +267,8 @@ WindowStore
         realm: string
       },
       isExtendedValidation: boolean, // is using https ev
-      activeMixedContent: boolean, // has active mixed content
-      passiveMixedContent: boolean, // has passive mixed content
+      runInsecureContent: boolean, // has active mixed content
+      blockedRunInsecureContent: string, // first domain of blocked active mixed content
     },
     parentFrameKey: number, // the key of the frame this frame was opened from
     modalPromptDetail: {...},

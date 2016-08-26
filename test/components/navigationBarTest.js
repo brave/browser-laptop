@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
-const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked, saveButton} = require('../lib/selectors')
+const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime, navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked, saveButton, allowRunInsecureContentButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
@@ -247,6 +247,10 @@ describe('navigationBar', function () {
           .getAttribute(urlbarIcon, 'class').then((classes) =>
             classes.includes('fa-unlock')
         ))
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="insecureConnection"]')
+        .keys('\uE00C')
     })
     it('Shows secure URL icon', function * () {
       const page1Url = 'https://badssl.com/'
@@ -258,6 +262,10 @@ describe('navigationBar', function () {
           this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
             classes.includes('fa-lock')
           ))
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .keys('\uE00C')
     })
     it('Blocks active mixed content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
@@ -272,6 +280,52 @@ describe('navigationBar', function () {
             color.value === 'rgba(128,128,128,1)'
           )
         })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon)
+        .waitUntil(() =>
+          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
+            classes.includes('fa-lock')
+          ))
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .keys('\uE00C')
+    })
+    it('Temporarily allow active mixed content', function * () {
+      const page1Url = 'https://mixed-script.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl)
+        .url(page1Url)
+        .waitUntil(() => {
+          return this.app.client.execute(() => document.readyState).then((ret) =>
+            ret.value === 'complete'
+          )
+        }).waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(allowRunInsecureContentButton)
+        .click(allowRunInsecureContentButton)
+        .tabByUrl(this.page1Url)
+        .waitUntil(() => {
+          return this.app.client.execute(() => document.readyState).then((ret) =>
+            ret.value === 'complete'
+          )
+        }).waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(255,0,0,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .getAttribute(urlbarIcon, 'class').then((classes) =>
+          classes.includes('fa-unlock')
+        )
+        .waitForVisible('[data-l10n-id="mixedConnection"]')
+        .keys('\uE00C')
     })
   })
 
