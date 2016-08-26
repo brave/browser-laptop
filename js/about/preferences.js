@@ -972,8 +972,8 @@ class PreferenceNavigation extends ImmutableComponent {
       />
       <PreferenceNavigationButton icon='fa-bitcoin'
         dataL10nId='payments'
-        onClick={this.props.changeTab.bind(null, preferenceTabs.PUBLISHERS)}
-        selected={this.props.preferenceTab === preferenceTabs.PUBLISHERS}
+        onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
+        selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
       />
       <PreferenceNavigationButton icon='fa-refresh'
         className='notImplemented'
@@ -1032,6 +1032,7 @@ class AboutPreferences extends React.Component {
   }
 
   changeTab (preferenceTab) {
+    window.location.hash = preferenceTab.toLowerCase()
     this.setState({
       preferenceTab
     })
@@ -1104,7 +1105,7 @@ class AboutPreferences extends React.Component {
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
-      case preferenceTabs.PUBLISHERS:
+      case preferenceTabs.PAYMENTS:
         tab = <PaymentsTab settings={settings} siteSettings={siteSettings}
           braveryDefaults={braveryDefaults} ledgerData={ledgerData}
           onChangeSetting={this.onChangeSetting}

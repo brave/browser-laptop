@@ -199,7 +199,7 @@ if (ipc) {
         let win = electron.BrowserWindow.getFocusedWindow()
         if (win) {
           win.webContents.send(messages.SHORTCUT_NEW_FRAME,
-            'about:preferences#publishers', { singleFrame: true })
+            'about:preferences#payments', { singleFrame: true })
         }
       }
     }
