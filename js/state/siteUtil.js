@@ -303,6 +303,21 @@ module.exports.isFolder = function (siteDetail) {
 }
 
 /**
+ * Determines if the site detail is a history entry.
+ * @param siteDetail The site detail to check.
+ * @return true if the site detail is a history entry.
+ */
+module.exports.isHistoryEntry = function (siteDetail) {
+  if (siteDetail && typeof siteDetail.get('location') === 'string') {
+    if (siteDetail.get('location').startsWith('about:')) {
+      return false
+    }
+    return !!siteDetail.get('lastAccessedTime') && !module.exports.isFolder(siteDetail)
+  }
+  return false
+}
+
+/**
  * Obtains an array of folders
  */
 module.exports.getFolders = function (sites, folderId, parentId, labelPrefix) {

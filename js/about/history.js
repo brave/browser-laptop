@@ -13,6 +13,7 @@ const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
+const siteUtil = require('../state/siteUtil')
 
 const ipc = window.chrome.ipc
 
@@ -71,7 +72,11 @@ class GroupedHistoryList extends ImmutableComponent {
       }
       return result
     })
-    if (reduced) return reduced
+    if (reduced) {
+      return Array.isArray(reduced)
+        ? reduced
+        : [{date: this.getDayString(locale, reduced), entries: [reduced]}]
+    }
     return []
   }
   render () {
@@ -125,7 +130,7 @@ class AboutHistory extends React.Component {
     })
   }
   historyDescendingOrder () {
-    return this.state.history.filter((site) => site.get('lastAccessedTime'))
+    return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
       .sort((left, right) => {
         if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
         if (left.get('lastAccessedTime') > right.get('lastAccessedTime')) return -1
