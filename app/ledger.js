@@ -494,14 +494,20 @@ var synopsisNormalizer = () => {
     publisher = synopsis.publishers[results[i].publisher]
     duration = results[i].duration
 
-    data[i] = { rank: i + 1,
-                // TBD: the `ledger-publisher` package does not currently report `verified` ...
-                verified: publisher.verified || false,
-                site: results[i].publisher, views: results[i].visits, duration: duration,
-                daysSpent: 0, hoursSpent: 0, minutesSpent: 0, secondsSpent: 0,
-                faviconURL: publisher.faviconURL,
-                score: results[i].scores[scorekeeper]
-              }
+    data[i] = {
+      rank: i + 1,
+      // TBD: the `ledger-publisher` package does not currently report `verified` ...
+      verified: publisher.verified || false,
+      site: results[i].publisher,
+      views: results[i].visits,
+      duration: duration,
+      daysSpent: 0,
+      hoursSpent: 0,
+      minutesSpent: 0,
+      secondsSpent: 0,
+      faviconURL: publisher.faviconURL,
+      score: results[i].scores[scorekeeper]
+    }
     if (results[i].protocol) data[i].publisherURL = results[i].protocol + '//' + results[i].publisher
 
     pct[i] = Math.round((results[i].scores[scorekeeper] * 100) / total)
@@ -812,10 +818,14 @@ var roundtrip = (params, options, callback) => {
     parts.pathname = parts.path
   }
 
-  options = { url: url.format(parts), method: params.method, payload: params.payload, responseType: 'text',
-              headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
-              verboseP: options.verboseP
-            }
+  options = {
+    url: url.format(parts),
+    method: params.method,
+    payload: params.payload,
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: options.verboseP
+  }
   request.request(options, (err, response, body) => {
     var payload
 

@@ -81,7 +81,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
     if (isShutdown) {
       p = p.then(module.exports.cleanSessionDataOnShutdown())
     }
-    p = p.then(resolve)
+    p.then(resolve)
       .catch(reject)
   })
 }

@@ -34,8 +34,7 @@ class AddressItem extends ImmutableComponent {
     return <tr className='autofillItem'>
       <td className='autofillActions'>
         <span className='autofillAction fa fa-times' title='Delete address'
-          onClick={this.onDelete}>
-        </span>
+          onClick={this.onDelete} />
       </td>
       <td className='addressName'>{address.get('name')}</td>
       <td className='organization'>{address.get('organization')}</td>
@@ -48,8 +47,7 @@ class AddressItem extends ImmutableComponent {
       <td className='email'>{address.get('email')}</td>
       <td className='autofillActions'>
         <span className='autofillAction fa fa-pencil-square-o' title='Edit address'
-          onClick={this.onEdit}>
-        </span>
+          onClick={this.onEdit} />
       </td>
     </tr>
   }
@@ -75,8 +73,7 @@ class CreditCardItem extends ImmutableComponent {
     return <tr className='autofillItem'>
       <td className='autofillActions'>
         <span className='autofillAction fa fa-times' title='Delete creditCard'
-          onClick={this.onDelete}>
-        </span>
+          onClick={this.onDelete} />
       </td>
       <td className='creditCardName'>{creditCard.get('name')}</td>
       <td className='creditCardNumber'>{
@@ -87,8 +84,7 @@ class CreditCardItem extends ImmutableComponent {
       </td>
       <td className='autofillActions'>
         <span className='autofillAction fa fa-pencil-square-o' title='Edit creditCard'
-          onClick={this.onEdit}>
-        </span>
+          onClick={this.onEdit} />
       </td>
     </tr>
   }
@@ -142,16 +138,16 @@ class AboutAutofill extends React.Component {
       <table className='autofillList'>
         <thead>
           <tr>
-            <th></th>
-            <th data-l10n-id='name'></th>
-            <th data-l10n-id='organization'></th>
-            <th data-l10n-id='streetAddress'></th>
-            <th data-l10n-id='city'></th>
-            <th data-l10n-id='state'></th>
-            <th data-l10n-id='postalCode'></th>
-            <th data-l10n-id='country'></th>
-            <th data-l10n-id='phone'></th>
-            <th data-l10n-id='email'></th>
+            <th />
+            <th data-l10n-id='name' />
+            <th data-l10n-id='organization' />
+            <th data-l10n-id='streetAddress' />
+            <th data-l10n-id='city' />
+            <th data-l10n-id='state' />
+            <th data-l10n-id='postalCode' />
+            <th data-l10n-id='country' />
+            <th data-l10n-id='phone' />
+            <th data-l10n-id='email' />
           </tr>
         </thead>
         <tbody>
@@ -171,10 +167,10 @@ class AboutAutofill extends React.Component {
       <table className='autofillList'>
         <thead>
           <tr>
-            <th></th>
-            <th data-l10n-id='name'></th>
-            <th data-l10n-id='creditCardNumber'></th>
-            <th data-l10n-id='expirationDate'></th>
+            <th />
+            <th data-l10n-id='name' />
+            <th data-l10n-id='creditCardNumber' />
+            <th data-l10n-id='expirationDate' />
           </tr>
         </thead>
         <tbody>
@@ -190,13 +186,13 @@ class AboutAutofill extends React.Component {
     return <div className='autofillPage'>
       <h1 data-l10n-id='autofillTitle' />
       <div className='autofillPageContent'>
-        <div className='autofillPageFooter'></div>
+        <div className='autofillPageFooter' />
         <h2 data-l10n-id='addresses' />
         <div className='autofillPageContent'>
           {savedAddresssPage}
           <Button l10nId='addAddress' className='primaryButton addAddressButton' onClick={this.onAddAddress} />
         </div>
-        <div className='autofillPageFooter'></div>
+        <div className='autofillPageFooter' />
         <h2 data-l10n-id='creditCards' />
         <div className='autofillPageContent'>
           {savedCreditCardsPage}

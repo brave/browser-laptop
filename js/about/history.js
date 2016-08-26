@@ -149,7 +149,7 @@ class AboutHistory extends React.Component {
             <input type='text' className={this.state.search ? 'searchInput' : 'searchInput searchInputPlaceholder'} placeholder='&#xf002;' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
             {
               this.state.search
-              ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear'></span>
+              ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
               : null
             }
           </div>
