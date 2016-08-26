@@ -365,6 +365,10 @@ module.exports.defaultAppState = () => {
     dictionary: {
       addedWords: [],
       ignoredWords: []
+    },
+    autofill: {
+      addresses: [],
+      creditCards: []
     }
   }
 }

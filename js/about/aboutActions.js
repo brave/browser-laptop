@@ -4,6 +4,8 @@
 
 const messages = require('../constants/messages')
 const serializer = require('../dispatcher/serializer')
+const WindowConstants = require('../constants/windowConstants')
+const AppConstants = require('../constants/appConstants')
 const ipc = window.chrome.ipc
 
 const AboutActions = {
@@ -23,7 +25,11 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSetting: function (key, value) {
-    ipc.send(messages.CHANGE_SETTING, key, value)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_CHANGE_SETTING,
+      key,
+      value
+    })
   },
 
   /**
@@ -34,7 +40,12 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSiteSetting: function (hostPattern, key, value) {
-    ipc.send(messages.CHANGE_SITE_SETTING, hostPattern, key, value)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+      hostPattern,
+      key,
+      value
+    })
   },
 
   /**
@@ -44,7 +55,11 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    */
   removeSiteSetting: function (hostPattern, key) {
-    ipc.send(messages.REMOVE_SITE_SETTING, hostPattern, key)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_REMOVE_SITE_SETTING,
+      hostPattern,
+      key
+    })
   },
 
   /**
@@ -53,7 +68,11 @@ const AboutActions = {
    * preserve the about preload script. See #672
    */
   newFrame: function (frameOpts, openInForeground = true) {
-    ipc.sendToHost(messages.NEW_FRAME, frameOpts, openInForeground)
+    AboutActions.dispatchAction({
+      actionType: WindowConstants.WINDOW_NEW_FRAME,
+      frameOpts,
+      openInForeground
+    })
   },
 
   /**
@@ -84,7 +103,13 @@ const AboutActions = {
   },
 
   moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
-    ipc.send(messages.MOVE_SITE, sourceDetail, destinationDetail, prepend, destinationIsParent)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_MOVE_SITE,
+      sourceDetail,
+      destinationDetail,
+      prepend,
+      destinationIsParent
+    })
   },
 
   openDownloadPath: function (download) {
@@ -100,15 +125,24 @@ const AboutActions = {
   },
 
   deletePassword: function (password) {
-    ipc.send(messages.DELETE_PASSWORD, password)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_REMOVE_PASSWORD,
+      password
+    })
   },
 
   deletePasswordSite: function (origin) {
-    ipc.send(messages.DELETE_PASSWORD_SITE, origin)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+      hostPattern: origin,
+      key: 'savePasswords'
+    })
   },
 
   clearPasswords: function () {
-    ipc.send(messages.CLEAR_PASSWORDS)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_CLEAR_PASSWORDS
+    })
   },
 
   checkFlashInstalled: function () {
@@ -120,7 +154,11 @@ const AboutActions = {
   },
 
   setResourceEnabled: function (resourceName, enabled) {
-    ipc.send(messages.SET_RESOURCE_ENABLED, resourceName, enabled)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
+      resourceName,
+      enabled
+    })
   },
 
   clearBrowsingDataNow: function (clearBrowsingDataDetail) {
@@ -139,7 +177,11 @@ const AboutActions = {
    * Open a adding address dialog
    */
   addAutofillAddress: function () {
-    ipc.sendToHost(messages.ADD_AUTOFILL_ADDRESS)
+    AboutActions.dispatchAction({
+      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
+      currentDetail: {},
+      originalDetail: {}
+    })
   },
 
   /**
@@ -148,7 +190,10 @@ const AboutActions = {
    * @param {object} address - address to remove as per doc/state.md's autofillAddressDetail
    */
   removeAutofillAddress: function (address) {
-    ipc.send(messages.REMOVE_AUTOFILL_ADDRESS, address)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+      detail: address
+    })
   },
 
   /**
@@ -157,14 +202,22 @@ const AboutActions = {
    * @param {object} address - address to edit as per doc/state.md's autofillAddressDetail
    */
   editAutofillAddress: function (address) {
-    ipc.sendToHost(messages.EDIT_AUTOFILL_ADDRESS, address)
+    AboutActions.dispatchAction({
+      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
+      currentDetail: address,
+      originalDetail: address
+    })
   },
 
   /**
    * Open a adding credit card dialog
    */
   addAutofillCreditCard: function () {
-    ipc.sendToHost(messages.ADD_AUTOFILL_CREDIT_CARD)
+    AboutActions.dispatchAction({
+      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
+      currentDetail: {month: '01', year: new Date().getFullYear().toString()},
+      originalDetail: {}
+    })
   },
 
   /**
@@ -173,7 +226,10 @@ const AboutActions = {
    * @param {object} card - credit card to remove as per doc/state.md's autofillCreditCardDetail
    */
   removeAutofillCreditCard: function (card) {
-    ipc.send(messages.REMOVE_AUTOFILL_CREDIT_CARD, card)
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+      detail: card
+    })
   },
 
   /**
@@ -182,7 +238,11 @@ const AboutActions = {
    * @param {object} card - credit card to edit as per doc/state.md's autofillCreditCardDetail
    */
   editAutofillCreditCard: function (card) {
-    ipc.sendToHost(messages.EDIT_AUTOFILL_CREDIT_CARD, card)
+    AboutActions.dispatchAction({
+      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
+      currentDetail: card,
+      originalDetail: card
+    })
   }
 }
 module.exports = AboutActions

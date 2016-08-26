@@ -93,53 +93,53 @@ class AutofillAddressPanel extends ImmutableComponent {
       <div className='genericForm manageAutofillData' onClick={this.onClick}>
         <div className='formRow manageAutofillDataTitle' data-l10n-id='editAddress' />
         <div className='genericFormTable'>
-          <div id='nameOnAddress' className='formRow'>
+          <div id='nameOnAddress' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='name' htmlFor='nameOnAddress' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange}
               value={this.props.currentDetail.get('name')}
               ref={(nameOnAddress) => { this.nameOnAddress = nameOnAddress }} />
           </div>
-          <div id='organization' className='formRow'>
+          <div id='organization' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='organization' htmlFor='organization' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onOrganizationChange}
               value={this.props.currentDetail.get('organization')} />
           </div>
-          <div id='streetAddress' className='formRow'>
+          <div id='streetAddress' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='streetAddress' htmlFor='streetAddress' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStreetAddressChange}
               value={this.props.currentDetail.get('streetAddress')} />
           </div>
-          <div id='city' className='formRow'>
+          <div id='city' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='city' htmlFor='city' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCityChange}
               value={this.props.currentDetail.get('city')} />
           </div>
-          <div id='state' className='formRow'>
+          <div id='state' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='state' htmlFor='state' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onStateChange}
               value={this.props.currentDetail.get('state')} />
           </div>
-          <div id='postalCode' className='formRow'>
+          <div id='postalCode' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='postalCode' htmlFor='postalCode' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPostalCodeChange}
               value={this.props.currentDetail.get('postalCode')} />
           </div>
-          <div id='country' className='formRow'>
+          <div id='country' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='country' htmlFor='country' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onCountryChange}
               value={this.props.currentDetail.get('country')} />
           </div>
-          <div id='phone' className='formRow'>
+          <div id='phone' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='phone' htmlFor='phone' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onPhoneChange}
               value={this.props.currentDetail.get('phone')} />
           </div>
-          <div id='email' className='formRow'>
+          <div id='email' className='formRow manageAutofillDataOptions'>
             <label data-l10n-id='email' htmlFor='email' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onEmailChange}
               value={this.props.currentDetail.get('email')} />
           </div>
-          <div className='formRow'>
+          <div className='formRow manageAutofillDataButtons'>
             <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
             <Button l10nId='save' className='primaryButton saveAddressButton' onClick={this.onSave} />
           </div>

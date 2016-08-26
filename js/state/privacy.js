@@ -7,14 +7,10 @@ const AppStore = require('../stores/appStore')
 const AppConstants = require('../constants/appConstants')
 const settings = require('../constants/settings')
 const { registerUserPrefs } = require('./userPrefs')
+const getSetting = require('../settings').getSetting
 
-const getAutofillEnabled = (appState) => {
-  let appSettings = appState.get('settings')
-  return appSettings.get(settings.AUTOFILL_ENABLED)
-}
-
-const getPrivacySettings = (appState) => {
-  return { 'autofill.enabled': getAutofillEnabled(appState) }
+const getPrivacySettings = () => {
+  return { 'autofill.enabled': getSetting(settings.AUTOFILL_ENABLED) }
 }
 
 let updateTrigger
@@ -29,6 +25,6 @@ const doAction = (action) => {
 }
 
 module.exports.init = () => {
-  updateTrigger = registerUserPrefs(() => getPrivacySettings(AppStore.getState()))
+  updateTrigger = registerUserPrefs(() => getPrivacySettings())
   AppDispatcher.register(doAction)
 }

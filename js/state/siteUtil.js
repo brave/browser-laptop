@@ -241,7 +241,8 @@ module.exports.getDetailFromFrame = function (frame, tag) {
     title: frame.get('title'),
     partitionNumber: frame.get('partitionNumber'),
     tags: tag ? [tag] : [],
-    favicon: frame.get('icon')
+    favicon: frame.get('icon'),
+    themeColor: frame.get('themeColor')
   })
 }
 

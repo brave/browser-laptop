@@ -15,6 +15,7 @@ AppStore
     customTitle: string, // User provided title for bookmark; overrides title
     tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
     favicon: string, // URL of the favicon
+    themeColor: string, // css compatible color string
     lastAccessedTime: number, // datetime.getTime()
     partitionNumber: number, // Optionally specifies a specific session
     folderId: number, // Set for bookmark folders only
@@ -74,7 +75,8 @@ AppStore
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable adblocking
+    enabled: boolean, // Enable adblocking
+    count: number // Number of blocked ads application wide
   },
   safeBrowsing: {
     etag: string, // last downloaded data file etag
@@ -86,13 +88,15 @@ AppStore
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable tracking protection
+    enabled: boolean, // Enable tracking protection
+    count: number // Number of blocked trackers application wide
   },
   httpsEverywhere: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable HTTPS Everywhere
+    enabled: boolean, // Enable HTTPS Everywhere
+    count: number // Number of HTTPS Everywhere upgrades application wide
   },
   adInsertion: {
     enabled: boolean // Enable ad insertion
@@ -148,6 +152,7 @@ AppStore
     'privacy.autocomplete.history-size': number, // Number of autocomplete entries to keep
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
+    'privacy.autofill-enabled': boolean, // true to enable autofill
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
@@ -382,14 +387,36 @@ WindowStore
   ledgerInfo: {
     creating: boolean,
     created: boolean,
+    delayStamp: number,
     reconcileStamp: number,
-    reconcileDelay: ?,
-    delayStamp: ?,
-    transactions: Array,
+    reconcileDelay: number,
+    transactions: [ {
+      viewingId: string,
+      surveyorId: string,
+      contribution: {
+        fiat: {
+          amount: number,
+          currency: string
+        },
+        rates: {
+          [currency]: number // bitcoin value in <currency>
+        },
+        satoshis: number,
+        fee: number
+      },
+      submissionStamp: number,
+      submissionId: string,
+      count: number,
+      satoshis: number,
+      votes: number,
+      ballots: {
+        [publisher]: number
+      }
+    } ... ]
+    address: string,
     balance: string, // balance in BTC
     unconfirmed: string, // unconfirmed balance in BTC
     satoshis: number, // balance as a number of satoshis
-    address: string,
     btc: string, // BTC to pay per month
     amount: number, // currency amount to pay per month
     currency: string, // currency string
@@ -418,7 +445,7 @@ WindowStore
       faviconURL: string,
       verified: boolean,
       site: string,
-      score: ?
+      score: number
     }
   },
   autofillAddressDetail: {

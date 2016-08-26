@@ -694,26 +694,9 @@ class Frame extends ImmutableComponent {
         case messages.CAN_SWIPE_FORWARD:
           currentWindow.webContents.send(messages.CAN_SWIPE_FORWARD)
           break
-        case messages.NEW_FRAME:
-          method = (frameOpts, openInForeground) => {
-            windowActions.newFrame(frameOpts, openInForeground)
-          }
-          break
         case messages.CLEAR_BROWSING_DATA_NOW:
           method = (clearBrowsingDataDetail) =>
             windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
-          break
-        case messages.ADD_AUTOFILL_ADDRESS:
-          windowActions.setAutofillAddressDetail({}, {})
-          break
-        case messages.EDIT_AUTOFILL_ADDRESS:
-          windowActions.setAutofillAddressDetail(e.args[0], e.args[0])
-          break
-        case messages.ADD_AUTOFILL_CREDIT_CARD:
-          windowActions.setAutofillCreditCardDetail({month: '01', year: new Date().getFullYear().toString()}, {})
-          break
-        case messages.EDIT_AUTOFILL_CREDIT_CARD:
-          windowActions.setAutofillCreditCardDetail(e.args[0], e.args[0])
           break
       }
       method.apply(this, e.args)

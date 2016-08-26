@@ -168,6 +168,8 @@ const newFrame = (frameOpts, openInForeground, insertionIndex) => {
   if (frameOpts === undefined) {
     frameOpts = {}
   }
+  frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
+
   if (openInForeground === undefined) {
     openInForeground = true
   }
