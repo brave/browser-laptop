@@ -180,6 +180,19 @@ const appActions = {
   },
 
   /**
+  * Checks how many resources were blocked.
+  * @param {string} resourceName - 'adblock', 'trackingProtection', or 'httpsEverywhere'
+  * @param {number} count - number of blocked resources to add to the global count
+  */
+  addResourceCount: function (resourceName, count) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_RESOURCE_COUNT,
+      resourceName,
+      count
+    })
+  },
+
+  /**
    * Sets the update.lastCheckTimestamp to the current
    * epoch timestamp (milliseconds)
    */

@@ -969,6 +969,9 @@ class Main extends ImmutableComponent {
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
               autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
               autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
+              adblockCount={this.props.appState.getIn(['adblock', 'count'])}
+              trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
+              httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
             />)
         }
         </div>
