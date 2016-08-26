@@ -12,14 +12,6 @@
   top: 0;
   right: 0;
 
-  .findButton {
-    margin: 0 2px;
-
-    &.hideButton:not([disabled]):hover {
-      background: @chromeControlsWarningBackground;
-    }
-  }
-
   .searchStringContainer {
     display: inline-block;
     position: relative;
@@ -29,23 +21,31 @@
       margin-right: 5px;
       padding-right: 28px;
     }
-
-    .foundResults {
-      color: #555;
-      font-size: 10px;
-      margin-right: 8px;
-      position: absolute;
-      right: 0;
-      top: 5px;
-    }
   }
+}
 
-  .caseSensitivityContainer {
-    input {
-      margin-right: 6px;
-    }
-    color: white;
-    font-size: 12px;
-    margin-top: 6px;
+.findButton {
+  margin: 0 2px;
+
+  &.hideButton:not([disabled]):hover {
+    background: @chromeControlsWarningBackground;
   }
+}
+
+.foundResults {
+  color: #555;
+  font-size: 10px;
+  margin-right: 8px;
+  position: absolute;
+  right: 0;
+  top: 5px;
+}
+
+.caseSensitivityContainer {
+  input {
+    margin-right: 6px;
+  }
+  color: white;
+  font-size: 12px;
+  margin-top: 6px;
 }

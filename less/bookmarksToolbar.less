@@ -88,38 +88,6 @@
         margin-right: 4px;
       }
     }
-
-    .bookmarkFavicon {
-      background-position: center;
-      background-repeat: no-repeat;
-      display: inline-block;
-      margin-right: 4px;
-    }
-
-    .bookmarkText {
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
-    .bookmarkFolder {
-      font-size: @bookmarksIconSize;
-    }
-
-    .bookmarkFolderChevron {
-      color: #676767;
-      margin-left: var(--bookmark-item-chevron-margin);
-    }
-  }
-
-  .bookmarkButton {
-    box-sizing: border-box;
-    font-size: 14px;
-    height: auto;
-    line-height: 12px;
-    margin-left: auto;
-    margin-right: 5px;
-    width: auto;
-    -webkit-user-select: none;
   }
 
   .overflowIndicator {
@@ -130,4 +98,36 @@
     margin-bottom: auto;
     margin-top: auto;
   }
+}
+
+.bookmarkButton {
+  box-sizing: border-box;
+  font-size: 14px;
+  height: auto;
+  line-height: 12px;
+  margin-left: auto;
+  margin-right: 5px;
+  width: auto;
+  -webkit-user-select: none;
+}
+
+.bookmarkFavicon {
+  background-position: center;
+  background-repeat: no-repeat;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.bookmarkText {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.bookmarkFolder {
+  font-size: @bookmarksIconSize;
+}
+
+.bookmarkFolderChevron {
+  color: #676767;
+  margin-left: var(--bookmark-item-chevron-margin);
 }
