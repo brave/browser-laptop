@@ -44,8 +44,21 @@ class AddEditBookmark extends ImmutableComponent {
   updateFolders (props) {
     this.folders = siteUtil.getFolders(this.props.sites, props.currentDetail.get('folderId'))
   }
+  setDefaultTitle (props) {
+    // Set the default bookmark title to be the url
+    // if the current title is empty during load of the component
+    let title = props.currentDetail.get('title')
+    let location = props.currentDetail.get('location')
+
+    if ((typeof title === 'string') && title.trim().length === 0) {
+      this.onNameChange({target: {
+        value: location
+      }})
+    }
+  }
   componentWillMount () {
     this.updateFolders(this.props)
+    this.setDefaultTitle(this.props)
   }
   componentWillUpdate (nextProps) {
     if (this.props.sites !== nextProps.sites) {
@@ -121,7 +134,7 @@ class AddEditBookmark extends ImmutableComponent {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
     }
-    return this.props.currentDetail.get('title') || this.props.currentDetail.get('location')
+    return this.props.currentDetail.get('title') || ''
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
