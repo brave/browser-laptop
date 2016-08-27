@@ -556,11 +556,11 @@ class PaymentsTab extends ImmutableComponent {
     return <div id='paymentsSidebar'>
       <h2 data-l10n-id='paymentsSidebarText1' />
       <div data-l10n-id='paymentsSidebarText2' />
-      <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA'></div></a>
+      <a href='https://www.privateinternetaccess.com/' target='_blank'><div className='paymentsSidebarPIA' /></a>
       <div data-l10n-id='paymentsSidebarText3' />
-      <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo'></div></a>
+      <a href='https://www.bitgo.com/' target='_blank'><div className='paymentsSidebarBitgo' /></a>
       <div data-l10n-id='paymentsSidebarText4' />
-      <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase'></div></a>
+      <a href='https://www.coinbase.com/' target='_blank'><div className='paymentsSidebarCoinbase' /></a>
     </div>
   }
 
