@@ -14,9 +14,21 @@ body {
 }
 
 #enablePaymentsSwitch {
+  margin: 15px 0 0 100px;
+
+  span {
+    font-weight: bold;
+    color: @gray;
+  }
+
+  label {
+    font-weight: bold;
+    color: @braveOrange;
+  }
+
   .settingItem {
-    margin-left: 100px;
     display: inline;
+    margin-right: 30px;
   }
 }
 
@@ -26,10 +38,27 @@ body {
 }
 
 .prefTabContainer {
-  .sectionTitle {
-    color: @braveOrange;
-    font-size: 1.2em;
-    margin-bottom: 0.7em;
+  .sectionTitleWrapper {
+    position: relative;
+    margin-left: 20px;
+    min-height: 40px;
+    min-width: 240px;
+
+    .sectionTitle {
+      color: @braveOrange;
+      font-size: 28px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .sectionSubTitle {
+      color: @braveOrange;
+      font-size: 15px;
+      position: absolute;
+      bottom: 25px;
+      right: 18px;
+    }
   }
 
   flex-grow: 1;
@@ -289,16 +318,16 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton.primaryButton.clearBrowsingDataButton {
+span.browserButton.primaryButton.addFunds {
   font-size: 0.9em;
-  padding: 5px 20px;
-  margin-top: 20px;
 }
 
-span.browserButton.primaryButton.manageAutofillDataButton {
-  font-size: 0.9em;
-  padding: 5px 20px;
-  margin-top: 20px;
+span.browserButton.primaryButton {
+  .clearBrowsingDataButton, .manageAutofillDataButton {
+    font-size: 0.9em;
+    margin-top: 20px;
+    padding: 5px 20px;
+  }
 }
 
 .settingsList {
@@ -434,26 +463,94 @@ table.sortableTable {
   background-color: @lightGray;
   margin: 1em 0;
   padding: 40px;
-  font-size: 1.1em;
+  font-size: 1.3em;
+  line-height: 1.3em;
   color: @mediumGray;
+  min-width: 440px;
+  max-width: 600px;
+  float: left;
   > div {
     padding: 0.5em 0;
+    font-size: 14px;
   }
   > h3 {
+    font-weight: 200;
+    font-size: 18px;
     padding-bottom: 0.5em;
   }
   .boldText {
     font-weight: bold;
-    padding-bottom: 1.5em;
   }
-  height: ~"-webkit-calc(100vh - 270px)";
-  overflow-y: scroll;
 }
 
 #ledgerTable {
   height: ~"-webkit-calc(100vh - 300px)";
   overflow-y: scroll;
 }
+
+.modal .dialog.paymentHistory .sectionTitle {
+  text-align: left;
+}
+
+span.paymentHistoryButton.browserButton {
+  display: block;
+  color: @braveOrange;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.paymentHistoryFooter span.okButton.primaryButton {
+  background-color: gray;
+  float: right;
+  margin-top: -10px;
+  display: inline;
+  padding-top: 5px;
+  padding-left: 35px;
+  padding-right: 35px;
+  padding-bottom: 5px;
+}
+
+div.nextPaymentSubmission {
+  display: inline;
+}
+.nextPaymentSubmission span {
+  font-size: 12px;
+  display: inline;
+}
+
+.modal .dialog.paymentHistory {
+  padding: 0px;
+  width: 450px;
+
+  .dialog-header {
+    background-color: #EEE;
+    height: 20px;
+    padding-bottom: 10px;
+  }
+
+  .dialog-body {
+    background-color: #FFF;
+    height: 300px;
+    overflow-y: scroll;
+  }
+
+  .dialog-footer {
+    background-color: #EEE;
+    height: 5px;
+  }
+
+  .dialog-header, .dialog-body, .dialog-footer {
+    padding: 20px;
+  }
+}
+
+.modal .dialog:not(.paymentHistory) {
+  .dialog-body {
+    height: 100%;
+    width: 100%;
+  }
+}
+
 
 #paymentsContainer {
   position: relative;
@@ -475,7 +572,7 @@ table.sortableTable {
     padding: 20px;
     padding-bottom: 0px;
     background: @lightGray;
-    border-radius: @bigBorderRadius;
+    border-radius: @borderRadiusUIbox;
     margin: 30px 0px;
     th {
       text-align: left;
@@ -487,6 +584,28 @@ table.sortableTable {
 
   .sort {
     text-align: left;
+  }
+
+  #paymentHistory {
+    background-color: #FFF;
+    tr {
+       th {
+         color: @darkGray;
+         font-weight: 500;
+         border-bottom: 2px solid @lightGray;
+         text-align: left;
+         width: 25%;
+       }
+       td {
+          text-align: left;
+          &.narrow {
+            color: @darkGray;
+          }
+          &.wide {
+            color: #777;
+          }
+       }
+    }
   }
 
   tr {
@@ -506,6 +625,8 @@ table.sortableTable {
       -webkit-font-smoothing: antialiased;
       text-align: left;
       width: 8%;
+      padding-top: 16px;
+      vertical-align: top;
 
       a {
         vertical-align: middle;
@@ -735,23 +856,66 @@ table.sortableTable {
   }
 }
 
-#paymentsFooter {
+#fundsSelectBox {
+  margin: 0 auto;
+}
+
+#paymentsSidebar {
   opacity: 0.8;
-  img {
-    max-height: 30px;
-    padding: 10px;
+  width: 200px;
+  float: left;
+  margin-left: 23px;
+
+  .paymentsSidebarPIA {
+    background-image: -webkit-image-set(url(../../app/extensions/brave/img/private_internet_access.png) 1x,
+                                        url(../../app/extensions/brave/img/private_internet_access_2x.png) 2x);
+    width: 195px;
+    height: 20px;
   }
-  .largeImg {
-    max-height: 40px;
-    padding-top: 5px;
+
+  .paymentsSidebarBitgo {
+    background-image: -webkit-image-set(url(../../app/extensions/brave/img/bitgo.png) 1x,
+                                        url(../../app/extensions/brave/img/bitgo_2x.png) 2x);
+    width: 100px;
+    height: 25px;
+  }
+
+  .paymentsSidebarCoinbase {
+    background-image: -webkit-image-set(url(../../app/extensions/brave/img/coinbase.png) 1x,
+                                        url(../../app/extensions/brave/img/coinbase_2x.png) 2x);
+    width: 100px;
+    height: 35px;
   }
   div {
     font-size: 12px;
-    margin-top: 15px;
-    margin-left: 15px;
+    margin: 50px 0 20px 12px;
+  }
+
+  a {
+    div {
+      margin-top: 0;
+    }
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 200;
+    margin: 70px 0 -15px 12px;
+  }
+
+  a {
+    div {
+      margin-top: 0;
+    }
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 200;
+    margin: 70px 0 -15px 12px;
   }
 }
 
 #fundsSelectBox {
-  margin-top: 32px;
+  margin-top: 0px;
 }

@@ -32,6 +32,7 @@ const session = electron.session
 
 const acorn = require('acorn')
 const ledgerBalance = require('ledger-balance')
+const ledgerClient = require('ledger-client')
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const random = require('random-lib')
@@ -52,13 +53,13 @@ const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
 
 // TBD: remove these post beta [MTR]
-const logPath = path.join(app.getPath('userData'), 'ledger-log.json')
-const publisherPath = path.join(app.getPath('userData'), 'ledger-publisher.json')
-const scoresPath = path.join(app.getPath('userData'), 'ledger-scores.json')
+const logPath = 'ledger-log.json'
+const publisherPath = 'ledger-publisher.json'
+const scoresPath = 'ledger-scores.json'
 
 // TBD: move these to secureState post beta [MTR]
-const statePath = path.join(app.getPath('userData'), 'ledger-state.json')
-const synopsisPath = path.join(app.getPath('userData'), 'ledger-synopsis.json')
+const statePath = 'ledger-state.json'
+const synopsisPath = 'ledger-synopsis.json'
 
 /*
  * ledger globals
@@ -115,6 +116,9 @@ const doAction = (action) => {
  */
 var init = () => {
   try {
+    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_INFO_DEBUG)
+    publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
+
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
   } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
@@ -128,7 +132,7 @@ var boot = () => {
   if ((bootP) || (client)) return
 
   bootP = true
-  fs.access(statePath, fs.FF_OK, (err) => {
+  fs.access(pathName(statePath), fs.FF_OK, (err) => {
     if (!err) return
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
@@ -136,7 +140,7 @@ var boot = () => {
     ledgerInfo.creating = true
     appActions.updateLedgerInfo({ creating: true })
     try {
-      client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
+      client = ledgerClient(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
       appActions.updateLedgerInfo({})
 
@@ -333,11 +337,11 @@ var initialize = (onoff) => {
 
   cacheRuleSet(ledgerPublisher.rules)
 
-  fs.access(statePath, fs.FF_OK, (err) => {
+  fs.access(pathName(statePath), fs.FF_OK, (err) => {
     if (!err) {
-      if (clientOptions.verboseP) console.log('\nfound ' + statePath)
+      if (clientOptions.verboseP) console.log('\nfound ' + pathName(statePath))
 
-      fs.readFile(statePath, (err, data) => {
+      fs.readFile(pathName(statePath), (err, data) => {
         var state
 
         if (err) return console.log('read error: ' + err.toString())
@@ -351,7 +355,7 @@ var initialize = (onoff) => {
 
         getStateInfo(state)
         try {
-          client = (require('ledger-client'))(state.personaId,
+          client = ledgerClient(state.personaId,
                                               underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions), state)
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
@@ -385,7 +389,7 @@ var enable = (onoff) => {
   }
 
   synopsis = new (ledgerPublisher.Synopsis)()
-  fs.readFile(synopsisPath, (err, data) => {
+  fs.readFile(pathName(synopsisPath), (err, data) => {
     if (clientOptions.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
@@ -393,7 +397,7 @@ var enable = (onoff) => {
       return updatePublisherInfo()
     }
 
-    if (clientOptions.verboseP) console.log('\nfound ' + synopsisPath)
+    if (clientOptions.verboseP) console.log('\nfound ' + pathName(synopsisPath))
     try {
       synopsis = new (ledgerPublisher.Synopsis)(data)
     } catch (ex) {
@@ -407,13 +411,13 @@ var enable = (onoff) => {
     // Check if the add funds notification should be shown every 15 minutes
     notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
 
-    fs.readFile(publisherPath, (err, data) => {
+    fs.readFile(pathName(publisherPath), (err, data) => {
       if (err) {
         if (err.code !== 'ENOENT') console.log('publisherPath read error: ' + err.toString())
         return
       }
 
-      if (clientOptions.verboseP) console.log('\nfound ' + publisherPath)
+      if (clientOptions.verboseP) console.log('\nfound ' + pathName(publisherPath))
       try {
         data = JSON.parse(data)
         underscore.keys(data).sort().forEach((publisher) => {
@@ -460,13 +464,13 @@ var updatePublisherInfo = () => {
 
     if (entries.length > 0) data[publisher] = entries
   })
-  syncWriter(publisherPath, data, () => {})
-  syncWriter(scoresPath, synopsis.allN(), () => {})
+  syncWriter(pathName(publisherPath), data, () => {})
+  syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
-  syncWriter(synopsisPath, synopsis, () => {})
+  syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
-  if (clientOptions.debugP) {
+  if (publisherInfo._internal.debugP) {
     console.log('\nupdatePublisherInfo: ' + JSON.stringify(underscore.omit(publisherInfo, [ '_internal' ])))
   }
 
@@ -691,16 +695,28 @@ var ledgerInfo = {
   transactions:
   [
 /*
-    { viewingId       : undefined
-    , submissionStamp : undefined
-    , satoshis        : undefined
-    , currency        : undefined
-    , amount          : undefined
-    , ballots         :
-      { 'publisher1'  : undefined
-        ...
+    {
+      viewingId: undefined,
+      surveyorId: undefined,
+      contribution: {
+        fiat: {
+          amount: undefined,
+          currency: undefined
+        },
+        rates: {
+          [currency]: undefined // bitcoin value in <currency>
+        },
+        satoshis: undefined,
+        fee: undefined
+      },
+      submissionStamp: undefined,
+      submissionId: undefined,
+      count: undefined,
+      satoshis: undefined,
+      votes: undefined,
+      ballots: {
+        [publisher]: undefined
       }
-    }
   , ...
  */
   ],
@@ -732,8 +748,6 @@ var updateLedgerInfo = () => {
   var info = ledgerInfo._internal.paymentInfo
   var now = underscore.now()
 
-  if (!client) return
-
   if (info) {
     underscore.extend(ledgerInfo,
                       underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
@@ -741,7 +755,7 @@ var updateLedgerInfo = () => {
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
   }
 
-  if (clientOptions.debugP) {
+  if (ledgerInfo._internal.debugP) {
     console.log('\nupdateLedgerInfo: ' + JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
   }
 
@@ -772,7 +786,7 @@ var callback = (err, result, delayTime) => {
     if ((i !== 0) && (i !== logs.length)) logs = logs.slice(i)
     if (result) entries.push({ who: 'callback', what: result, when: underscore.now() })
 
-    syncWriter(logPath, entries, { flag: 'a' }, () => {})
+    syncWriter(pathName(logPath), entries, { flag: 'a' }, () => {})
   }
 
   if (err) {
@@ -790,7 +804,7 @@ var callback = (err, result, delayTime) => {
   }
   cacheRuleSet(result.ruleset)
 
-  syncWriter(statePath, result, () => { run(delayTime) })
+  syncWriter(pathName(statePath), result, () => { run(delayTime) })
 }
 
 var roundtrip = (params, options, callback) => {
@@ -826,6 +840,7 @@ var roundtrip = (params, options, callback) => {
     var payload
 
     if ((response) && (options.verboseP)) {
+      console.log('[ response for ' + params.method + ' ' + parts.protocol + '//' + parts.hostname + params.path + ' ]')
       console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
                  ' ' + (response.statusMessage || ''))
       underscore.keys(response.headers).forEach((header) => { console.log('>>> ' + header + ': ' + response.headers[header]) })
@@ -880,7 +895,7 @@ var run = (delayTime) => {
       result = client.vote(winner)
       if (result) state = result
     })
-    if (state) syncWriter(statePath, state, () => {})
+    if (state) syncWriter(pathName(statePath), state, () => {})
   } catch (ex) {
     console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -900,7 +915,7 @@ var run = (delayTime) => {
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
 
-      if (client.sync(callback) === true) return run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
+      if (client.sync(callback) === true) return run(0)
     }, delayTime)
   }
 
@@ -959,7 +974,7 @@ var getBalance = () => {
   setTimeout(getBalance, msecs.minute)
   if (!ledgerInfo.address) return
 
-  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
+  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
   (err, provider, result) => {
     if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
 
@@ -999,7 +1014,9 @@ var getPaymentInfo = () => {
       info.address = client.getWalletAddress()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
-        if ((body.rates) && (body.rates[currency])) info.btc = (amount / body.rates[currency]).toFixed(8)
+        if ((body.rates) && (body.rates[currency])) {
+          info.btc = (amount / body.rates[currency]).toFixed(8)
+        }
       }
       ledgerInfo._internal.paymentInfo = info
       updateLedgerInfo()
@@ -1020,7 +1037,7 @@ var setPaymentInfo = (amount) => {
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
 
-    if (result) syncWriter(statePath, result, () => {})
+    if (result) syncWriter(pathName(statePath), result, () => {})
   })
   if (ledgerInfo.created) getPaymentInfo()
 }
@@ -1074,6 +1091,14 @@ var syncWriter = (path, obj, options, cb) => {
 
     cb(err)
   })
+}
+
+const pathSuffix = (process.env.NODE_ENV === 'development') ? '-dev' : ''
+
+var pathName = (name) => {
+  var parts = path.parse(name)
+
+  return path.join(app.getPath('userData'), parts.name + pathSuffix + parts.ext)
 }
 
 /**

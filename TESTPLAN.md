@@ -11,6 +11,8 @@
  - [ ]  Form fill (Autofill) enhancement ([#860](https://github.com/brave/browser-laptop/issues/860))
  - [ ]  Autofill should not happen on URL bar unless item in autocomplete list is clicked ([#3012](https://github.com/brave/browser-laptop/issues/3012))([#3225](https://github.com/brave/browser-laptop/issues/3225))
  - [ ]  Editing Autofill entries are not saved. Creates a blank entry([#3368](https://github.com/brave/browser-laptop/issues/3368))
+ - [ ]  Brave crashes with segmentation fault when submitting a form ([#3398](https://github.com/brave/browser-laptop/issues/3398))
+ - [ ]  Autofill - Add new entry buttons are not functional ([#3455](https://github.com/brave/browser-laptop/issues/3455))
 
  ### Bookmarks
  - [ ]  Bookmark title is not updated unbookmarking/rebookmarking bug verified ([#3284](https://github.com/brave/browser-laptop/issues/3284))
@@ -24,6 +26,9 @@
  - [ ]  "auto open bookmarks toolbar for the first bookmark" test needs to be updated ([#2941](https://github.com/brave/browser-laptop/issues/2941))
  - [ ]  Bookmarks now show under Bookmarks menu ([#3055](https://github.com/brave/browser-laptop/issues/3055))
  - [ ]  Users can create bookmark folders with no name ([#3188](https://github.com/brave/browser-laptop/issues/3188))([#3190](https://github.com/brave/browser-laptop/issues/3190))
+ - [ ]  Bookmark folder names should contain visible text ([#3347](https://github.com/brave/browser-laptop/issues/3347))([#3412](https://github.com/brave/browser-laptop/issues/3412))
+ - [ ]  If a site does not have a title, the bookmark should default to the url instead. ([#3442](https://github.com/brave/browser-laptop/issues/3442))
+ - [ ]  Bookmark folder cannot be deleted from dialog bug  ([#3409](https://github.com/brave/browser-laptop/issues/3409))
 
  ### History  
  - [ ]  about:history contains bookmark items as browsing history which can't be cleared ([#3330](https://github.com/brave/browser-laptop/issues/3330))
@@ -34,6 +39,10 @@
  - [ ]  Back button history does not hint at options beyond a certain point.  ([#2889](https://github.com/brave/browser-laptop/issues/2889))
  - [ ]  Implement history and Ctrl +Y to bring it up ([#444](https://github.com/brave/browser-laptop/issues/444))
  - [ ]  Adds about:history, sets back/forward nav limit, more efficient dynamic menus ([#3206](https://github.com/brave/browser-laptop/issues/3206))
+ - [ ]  History bugfixes  ([#3459](https://github.com/brave/browser-laptop/issues/3459))
+ - [ ]  Bookmarked about pages appear in the history ([#3366](https://github.com/brave/browser-laptop/issues/3366))
+ - [ ]  Bookmark folders are appearing in browser history ([#3453](https://github.com/brave/browser-laptop/issues/3453))
+ - [ ]  Fixes extra separator in about:history context menu  ([#3444](https://github.com/brave/browser-laptop/issues/3444))
 
  ### Ledger
  - [ ]  Ledger beta integration  ([#3195](https://github.com/brave/browser-laptop/issues/3195))
@@ -41,6 +50,19 @@
  - [ ]  Preferences : Payments : Add Funds - Transfer BTC link goes to jsfiddle ([#3380](https://github.com/brave/browser-laptop/issues/3380))
  - [ ]  Preferences : Payments : Add Funds modal is misaligned ([#3267](https://github.com/brave/browser-laptop/issues/3267))
  - [ ]  Preferences : Payments : monthly budget dropdown is missing units ([#3266](https://github.com/brave/browser-laptop/issues/3266))
+ - [ ]  Duping texts on ledger welcome page in other languages than English ([#3379](https://github.com/brave/browser-laptop/issues/3379))
+ - [ ]  Cannot create wallet in packaged builds bug ledger integration ([#3308](https://github.com/brave/browser-laptop/issues/3308))
+ - [ ]  Left align elements on main ledger screen([#3395](https://github.com/brave/browser-laptop/issues/3395))([#3396](https://github.com/brave/browser-laptop/issues/3396))
+ - [ ]  Monthly budget in payments misaligned ([#3476](https://github.com/brave/browser-laptop/issues/3476))
+ - [ ]  update UX to include transaction history ([#2994](https://github.com/brave/browser-laptop/issues/2994))([#3473](https://github.com/brave/browser-laptop/issues/3473))
+ - [ ]  Existing bitcoin wallet address is not displayed ledger ([#3440](https://github.com/brave/browser-laptop/issues/3440))
+ - [ ]  updateLedgerInfo should run before client is assigned if previous state is present  ([#3470](https://github.com/brave/browser-laptop/issues/3470))
+ - [ ]  update ledger welcome page with adjusted UI layout and partner logos ([#3353](https://github.com/brave/browser-laptop/issues/3353))
+ - [ ]  Ledger logging happens frequently and unrequested on Linux terminal. ([#3452](https://github.com/brave/browser-laptop/issues/3452))
+ - [ ]  use environment variables to control ledger-* package options ([#3462](https://github.com/brave/browser-laptop/issues/3462))
+ - [ ]  Preferences : Payments : Create wallet control text and status flickers when disabling then enabling brave payments. ([#3376](https://github.com/brave/browser-laptop/issues/3376))
+ - [ ]  Browser crashes when trying to signup on Coinbase bug ([#3382](https://github.com/brave/browser-laptop/issues/3382))
+ - [ ]  Windows size grew ~26MB with ledger ([#3475](https://github.com/brave/browser-laptop/issues/3475))
 
  ### Fixes
  - [ ]  Escaping from fullscreen video leaves the browser in fullscreen mode instead of returning to windowed mode. ([#3338](https://github.com/brave/browser-laptop/issues/3338))
@@ -75,3 +97,18 @@
  - [ ]  Market graph on wsj.com ([#2102](https://github.com/brave/browser-laptop/issues/2102))
  - [ ]  Tab-specific notifications should be closed when tab is closed ([#3169](https://github.com/brave/browser-laptop/issues/3169))
  - [ ]  Menu items should work immediately after launch ([#3022](https://github.com/brave/browser-laptop/issues/3022))
+ - [ ]  Update localization files([#3414](https://github.com/brave/browser-laptop/issues/3414))
+ - [ ]  route safebrowsing and httpse messages by tabId ([#3411](https://github.com/brave/browser-laptop/issues/3411))
+ - [ ]  Warning message is not displayed when trying to open excellentmovies.net from URL bar ([#3367](https://github.com/brave/browser-laptop/issues/3367))
+ - [ ]  Update test fails bug Major tests ([#3337](https://github.com/brave/browser-laptop/issues/3337))
+ - [ ]  Retrieve status code from response object in metadata request ([#3407](https://github.com/brave/browser-laptop/issues/3407))
+ - [ ]  Add themeColor data to sites ([#3406](https://github.com/brave/browser-laptop/issues/3406))
+ - [ ]  fixed typo ([#3405](https://github.com/brave/browser-laptop/issues/3405))
+ - [ ]  don't send unnecessary ipc messages ([#3393](https://github.com/brave/browser-laptop/issues/3393))
+ - [ ]  Update test fails bug Major tests ([#3337](https://github.com/brave/browser-laptop/issues/3337))
+ - [ ]  use different file name for development version ([#3472](https://github.com/brave/browser-laptop/issues/3472))
+ - [ ]  redirect to basic auth hangs forever ([#3354](https://github.com/brave/browser-laptop/issues/3354))
+ - [ ]  Improved UI/UX of find bar ([#3315](https://github.com/brave/browser-laptop/issues/3315))
+ - [ ]  Open file action tries to search for the file in the default search engine ([#3296](https://github.com/brave/browser-laptop/issues/3296))
+ - [ ]  Esc handler changes windowed / fullscreen mode depending on permissions ([#3464](https://github.com/brave/browser-laptop/issues/3464))
+ - [ ]  Cannot delete saved passwords on about:passwords  ([#3481](https://github.com/brave/browser-laptop/issues/3481))

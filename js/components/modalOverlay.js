@@ -18,10 +18,19 @@ class ModalOverlay extends ImmutableComponent {
       close = <button type='button' className='close pull-right' onClick={this.props.onHide}><span>&times;</span></button>
       title = <div className='sectionTitle' data-l10n-id={this.props.title} />
     }
-    return <div className='dialog'>
-      {close}
-      {title}
-      {this.props.content}
+    let customTitleClassesStr = (this.props.customTitleClasses ? this.props.customTitleClasses : '')
+
+    return <div className={'dialog ' + customTitleClassesStr}>
+      <div className='dialog-header'>
+        {close}
+        {title}
+      </div>
+      <div className='dialog-body'>
+        {this.props.content}
+      </div>
+      <div className='dialog-footer'>
+        {this.props.footer}
+      </div>
     </div>
   }
 

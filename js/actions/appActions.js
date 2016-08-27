@@ -372,6 +372,27 @@ const appActions = {
   },
 
   /**
+   * Adds information about pending basic auth login requests
+   * @param {number} tabId - The tabId that generated the request
+   * @param {string} detail - login request info
+   */
+  setLoginRequiredDetail: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL,
+      tabId,
+      detail
+    })
+  },
+
+  setLoginResponseDetail: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_LOGIN_RESPONSE_DETAIL,
+      tabId,
+      detail
+    })
+  },
+
+  /**
    * Clears the data specified in dataDetail
    * @param {object} clearDataDetail - the app data to clear as per doc/state.md's clearBrowsingDataDetail
    */
