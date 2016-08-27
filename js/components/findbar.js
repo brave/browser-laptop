@@ -177,7 +177,7 @@ class FindBar extends ImmutableComponent {
     return <div className='findBar' style={findBarStyle} onBlur={this.onBlur}>
       <div className='searchContainer'>
         <div className='searchStringContainer'>
-          <span className='searchStringContainerIcon fa fa-search' />
+          <span className='searchStringContainerIcon fa fa-search'></span>
           <input type='text'
             spellCheck='false'
             ref={(node) => { this.searchInput = node }}
@@ -185,7 +185,7 @@ class FindBar extends ImmutableComponent {
             onChange={this.onChange}
             value={this.searchString} />
           <span className='searchStringContainerIcon fa fa-times'
-            onClick={this.onClear} />
+            onClick={this.onClear}></span>
         </div>
         <span className='findMatchText'>{findMatchText}</span>
         <Button iconClass='findButton fa-caret-down'
@@ -202,7 +202,7 @@ class FindBar extends ImmutableComponent {
           id='caseSensitivityCheckbox'
           checkedOn={this.isCaseSensitive}
           onClick={this.onCaseSensitivityChange} />
-        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarStyle} />
+        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarStyle}></label>
       </div>
       <span className='findButton closeButton'
         style={findBarStyle}
