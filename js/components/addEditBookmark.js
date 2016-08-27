@@ -121,7 +121,7 @@ class AddEditBookmark extends ImmutableComponent {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
     }
-    return this.props.currentDetail.get('title') || this.props.currentDetail.get('location')
+    return this.props.currentDetail.get('title') || ''
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>

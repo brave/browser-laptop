@@ -64,10 +64,10 @@ describe('bookmarks', function () {
         .waitForVisible(saveButton)
     })
 
-    it('fills in the url for the title field', function * () {
+    it('leaves the title field blank', function * () {
       yield this.app.client
         .waitForExist('#bookmarkName input')
-        .getValue('#bookmarkName input').should.eventually.be.equal(this.page1Url)
+        .getValue('#bookmarkName input').should.eventually.be.equal('')
     })
 
     it('fills in the url field', function * () {
