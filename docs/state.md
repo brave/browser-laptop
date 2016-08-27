@@ -392,69 +392,63 @@ WindowStore
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   lastAppVersion: string, // Version of the last file that was saved
   ledgerInfo: {
-    creating: boolean,
-    created: boolean,
-    delayStamp: number,
-    reconcileStamp: number,
-    reconcileDelay: number,
-    transactions: [ {
-      viewingId: string,
-      surveyorId: string,
-      contribution: {
-        fiat: {
-          amount: number,
-          currency: string
+    creating: boolean,          // wallet is being created
+    created: boolean,           // wallet is created
+    reconcileStamp: number,     // timestamp for the next reconcilation
+    transactions: [ {           // contributions reconciling/reconciled
+      viewingId: string,        // UUIDv4 for this contribution
+      contribution: {           // 
+        fiat: {                 // roughly-equivalent fiat amount
+          amount: number,       //   e.g., 5
+          currency: string      //   e.g., "USD"
         },
-        rates: {
-          [currency]: number // bitcoin value in <currency>
+        rates: {                // exchange rate
+          [currency]: number    //   e.g., { "USD": 575.45 }
         },
-        satoshis: number,
-        fee: number
+        satoshis: number,       // actual number of satoshis transferred
+        fee: number             // bitcoin transaction fee 
       },
-      submissionStamp: number,
-      submissionId: string,
-      count: number,
-      satoshis: number,
-      votes: number,
-      ballots: {
-        [publisher]: number
+      submissionStamp: number,  // timestamp for this contribution
+      count: number,            // total number of ballots allowed to be cast
+      ballots: {                // number of ballots cast for each publisher
+        [publisher]: number     //   e.g., "wikipedia.org": 3
       }
-    } ... ]
-    address: string,
-    balance: string, // balance in BTC
-    unconfirmed: string, // unconfirmed balance in BTC
-    satoshis: number, // balance as a number of satoshis
-    btc: string, // BTC to pay per month
-    amount: number, // currency amount to pay per month
-    currency: string, // currency string
-    paymentURL: string,
-    paymentIMG: string,
-    buyURL: string,
-    bravery: {
+    } ],
+    address: string,             // the BTC wallet address (in base58)
+    balance: string,             // confirmed balance in BTC.toFixed(4)
+    unconfirmed: string,         // unconfirmed balance in BTC.toFixed(4)
+    satoshis: number,            // confirmed balance as an integer number of satoshis
+    btc: string,                 // BTC to contribute per reconciliation period
+    amount: number,              // fiat amount to contribute per reconciliation period
+    currency: string,            // fiat currency denominating the amount
+    paymentURL: string,          // bitcoin:...?amount={btc}&label=Brave%20Software
+    buyURL: string,              // URL to buy bitcoin using debit/credit card
+    bravery: {                   // values round-tripped through the ledger-client
       fee: {
-        currency: string,
-        amount: number
+        amount: number,          //   set from `amount` above
+        currency: string         //   set from `currency` above
       }
     },
-    hasBitcoinHandler: boolean, // Whether Brave has a bitcoin: protocol handler
+    hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
+    paymentIMG: string           // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
   },
-  publisherInfo: {
-    synopsis: {
-      hoursSpent: number,
-      minutesSpent: number,
-      secondsSpent: number,
-      daysSpent: number,
-      percentage: number,
-      publisherURL: string,
-      rank: number,
-      views: number,
-      duration: number,
-      faviconURL: string,
-      verified: boolean,
-      site: string,
-      score: number
+  publisherInfo: [               // one entry for each publisher having a non-zero `score`
+    {
+      rank: number,              // i.e., 1, 2, 3, ...
+      verified: boolean,         // there is a verified wallet for this publisher
+      site: string,              // publisher name, e.g., "wikipedia.org"
+      views: number,             // total page-views
+      duration: number,          // total millisecond-views, e.g., 93784000 = 1 day, 2 hours, 3 minutes, 4 seconds
+      daysSpent: number,         //   e.g., 1
+      hoursSpent: number,        //   e.g., 2
+      minutesSpent: number,      //   e.g., 3
+      secondsSpent: number,      //   e.g., 4
+      score: number,             // float indicating the current score
+      percentage: number,        // 0, 1, ... 100
+      publisherURL: string,      // publisher site, e.g., "https://wikipedia.org/"
+      faviconURL: string         // i.e., "data:image/...;base64,..."
     }
-  },
+  ],
   autofillAddressDetail: {
     name: string,
     organization: string,
