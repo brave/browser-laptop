@@ -627,15 +627,16 @@ class Main extends ImmutableComponent {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     windowActions.setFindbarShown(activeFrame, false)
     webviewActions.stopFindInPage()
-    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+    windowActions.setFindDetail(activeFrame, Immutable.fromJS({
       internalFindStatePresent: false
     }))
   }
 
   onFind (searchString, caseSensitivity, forward, findNext) {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
     if (!findNext) {
-      windowActions.setFindDetail(this.frame, Immutable.fromJS({
+      windowActions.setFindDetail(activeFrame, Immutable.fromJS({
         internalFindStatePresent: true
       }))
     }
