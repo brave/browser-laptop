@@ -312,6 +312,23 @@ module.exports.loadAppState = () => {
 
     try {
       data = Object.assign(module.exports.defaultAppState(), JSON.parse(data))
+      // autofill data migration
+      if (Array.isArray(data.autofill.addresses)) {
+        let addresses = exports.defaultAppState().autofill.addresses
+        data.autofill.addresses.forEach((guid) => {
+          addresses.guid.push(guid)
+          addresses.timestamp = new Date().getTime()
+        })
+        data.autofill.addresses = addresses
+      }
+      if (Array.isArray(data.autofill.creditCards)) {
+        let creditCards = exports.defaultAppState().autofill.creditCards
+        data.autofill.creditCards.forEach((guid) => {
+          creditCards.guid.push(guid)
+          creditCards.timestamp = new Date().getTime()
+        })
+        data.autofill.creditCards = creditCards
+      }
       // xml migration
       if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
         data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
