@@ -98,13 +98,15 @@ class Tabs extends ImmutableComponent {
         break
       case 'defaultSearchEngine':
         // "Google"
-        // const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
-        // const searchProviders = searchProviders.providers
-        // alert(searchProviders[0].search)
-        // let engine = searchProviders.filter(engine => {
-        //   return engine.name === defaultSearchEngine
-        // });
-        windowActions.newFrame({location: 'https://www.google.com'})
+        const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
+        const searchProviders = searchProviders.providers
+        let engine = searchProviders.filter(engine => {
+          return engine.name === defaultSearchEngine
+        })
+        windowActions.newFrame({location: engine.base})
+        break
+      default:
+        windowActions.newFrame()
         break
     }
   }
