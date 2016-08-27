@@ -127,7 +127,7 @@ const AboutActions = {
   deletePassword: function (password) {
     AboutActions.dispatchAction({
       actionType: AppConstants.APP_REMOVE_PASSWORD,
-      password
+      passwordDetail: password
     })
   },
 

@@ -152,6 +152,18 @@ Sets whether the resource is enabled or not.
 
 
 
+### addResourceCount(resourceName, count) 
+
+Checks how many resources were blocked.
+
+**Parameters**
+
+**resourceName**: `string`, 'adblock', 'trackingProtection', or 'httpsEverywhere'
+
+**count**: `number`, number of blocked resources to add to the global count
+
+
+
 ### setUpdateLastCheck() 
 
 Sets the update.lastCheckTimestamp to the current
@@ -309,6 +321,18 @@ Adds a word to the dictionary
 **Parameters**
 
 **locale**: `string`, The locale to set for the dictionary
+
+
+
+### setLoginRequiredDetail(tabId, detail) 
+
+Adds information about pending basic auth login requests
+
+**Parameters**
+
+**tabId**: `number`, The tabId that generated the request
+
+**detail**: `string`, login request info
 
 
 

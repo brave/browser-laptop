@@ -180,6 +180,19 @@ const appActions = {
   },
 
   /**
+  * Checks how many resources were blocked.
+  * @param {string} resourceName - 'adblock', 'trackingProtection', or 'httpsEverywhere'
+  * @param {number} count - number of blocked resources to add to the global count
+  */
+  addResourceCount: function (resourceName, count) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_ADD_RESOURCE_COUNT,
+      resourceName,
+      count
+    })
+  },
+
+  /**
    * Sets the update.lastCheckTimestamp to the current
    * epoch timestamp (milliseconds)
    */
@@ -355,6 +368,27 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SET_DICTIONARY,
       locale
+    })
+  },
+
+  /**
+   * Adds information about pending basic auth login requests
+   * @param {number} tabId - The tabId that generated the request
+   * @param {string} detail - login request info
+   */
+  setLoginRequiredDetail: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL,
+      tabId,
+      detail
+    })
+  },
+
+  setLoginResponseDetail: function (tabId, detail) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_LOGIN_RESPONSE_DETAIL,
+      tabId,
+      detail
     })
   },
 

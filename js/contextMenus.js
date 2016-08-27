@@ -262,12 +262,12 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       {
         label: locale.translation(deleteLabel),
         click: () => appActions.removeSite(siteDetail, deleteTag)
-      },
-      CommonMenu.separatorMenuItem)
+      })
   }
 
   if (!isHistoryEntry) {
     template.push(
+      CommonMenu.separatorMenuItem,
       addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
       addFolderMenuItem(siteDetail, true))
   }

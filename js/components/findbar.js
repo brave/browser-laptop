@@ -7,13 +7,16 @@ const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
 const keyCodes = require('../constants/keyCodes')
 const Button = require('./button.js')
+const SwitchControl = require('../components/switchControl')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
+const {getTextColorForBackground} = require('../lib/color')
 
 class FindBar extends ImmutableComponent {
   constructor () {
     super()
     this.onBlur = this.onBlur.bind(this)
+    this.onClear = this.onClear.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onChange = this.onChange.bind(this)
     this.onFindPrev = this.onFindPrev.bind(this)
@@ -35,20 +38,20 @@ class FindBar extends ImmutableComponent {
   onCaseSensitivityChange (e) {
     windowActions.setFindDetail(this.frame, Immutable.fromJS({
       searchString: this.searchString,
-      caseSensitivity: e.target.checked
+      caseSensitivity: !this.isCaseSensitive
     }))
   }
 
   onFindFirst () {
-    this.props.onFind(this.searchString, this.isCaseSensitive)
+    this.props.onFind(this.searchString, this.isCaseSensitive, true, false)
   }
 
   onFindNext () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, true)
+    this.props.onFind(this.searchString, this.isCaseSensitive, true, this.props.findDetail.get('internalFindStatePresent'))
   }
 
   onFindPrev () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, false)
+    this.props.onFind(this.searchString, this.isCaseSensitive, false, this.props.findDetail.get('internalFindStatePresent'))
   }
 
   /**
@@ -97,6 +100,14 @@ class FindBar extends ImmutableComponent {
     windowActions.setFindbarSelected(this.frame, false)
   }
 
+  onClear () {
+    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+      searchString: '',
+      caseSensitivity: this.isCaseSensitive
+    }))
+    this.focus()
+  }
+
   get numberOfMatches () {
     if (!this.props.findDetail || this.props.findDetail.get('numberOfMatches') === undefined) {
       return -1
@@ -125,6 +136,14 @@ class FindBar extends ImmutableComponent {
     return this.props.findDetail.get('searchString')
   }
 
+  get backgroundColor () {
+    return this.props.paintTabs && (this.props.themeColor || this.props.computedThemeColor)
+  }
+
+  get textColor () {
+    return getTextColorForBackground(this.backgroundColor)
+  }
+
   render () {
     let findMatchText
     if (this.numberOfMatches !== -1 && this.activeMatchOrdinal !== -1 && this.searchString) {
@@ -145,39 +164,49 @@ class FindBar extends ImmutableComponent {
         data-l10n-id='findResultMatches' />
     }
 
-    return <div className='findBar' onBlur={this.onBlur}>
-      <div className='searchStringContainer'>
-        <input type='text'
-          spellCheck='false'
-          ref={(node) => { this.searchInput = node }}
-          onKeyDown={this.onKeyDown}
-          onChange={this.onChange}
-          value={this.searchString} />
-          {findMatchText}
-      </div>
-      <Button iconClass='findButton fa-chevron-up'
-        className='findButton smallButton findPrev'
-        disabled={this.numberOfMatches === 0}
+    const backgroundColor = this.backgroundColor
+    let findBarStyle = {}
 
-        onClick={this.onFindPrev} />
-      <Button iconClass='findButton fa-chevron-down'
-        className='findButton smallButton findNext'
-        disabled={this.numberOfMatches === 0}
-        onClick={this.onFindNext} />
-      <Button iconClass='fa-times'
-        className='findButton smallButton hideButton'
-        onClick={this.props.onFindHide} />
-      <div className='caseSensitivityContainer'>
-        <input
+    if (backgroundColor) {
+      findBarStyle = {
+        background: backgroundColor,
+        color: this.textColor
+      }
+    }
+
+    return <div className='findBar' style={findBarStyle} onBlur={this.onBlur}>
+      <div className='searchContainer'>
+        <div className='searchStringContainer'>
+          <span className='searchStringContainerIcon fa fa-search' />
+          <input type='text'
+            spellCheck='false'
+            ref={(node) => { this.searchInput = node }}
+            onKeyDown={this.onKeyDown}
+            onChange={this.onChange}
+            value={this.searchString} />
+          <span className='searchStringContainerIcon fa fa-times'
+            onClick={this.onClear} />
+        </div>
+        <span className='findMatchText'>{findMatchText}</span>
+        <Button iconClass='findButton fa-caret-down'
+          inlineStyles={findBarStyle}
+          className='findButton smallButton findNext'
+          disabled={this.numberOfMatches <= 0}
+          onClick={this.onFindNext} />
+        <Button iconClass='findButton fa-caret-up'
+          inlineStyles={findBarStyle}
+          className='findButton smallButton findPrev'
+          disabled={this.numberOfMatches <= 0}
+          onClick={this.onFindPrev} />
+        <SwitchControl
           id='caseSensitivityCheckbox'
-          type='checkbox'
-          className='caseSensitivityCheckbox'
-          checked={this.isCaseSensitive}
-          onChange={this.onCaseSensitivityChange} />
-        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity'>
-          {'Match case'}
-        </label>
+          checkedOn={this.isCaseSensitive}
+          onClick={this.onCaseSensitivityChange} />
+        <label htmlFor='caseSensitivityCheckbox' data-l10n-id='caseSensitivity' style={findBarStyle} />
       </div>
+      <span className='findButton closeButton'
+        style={findBarStyle}
+        onClick={this.props.onFindHide}>+</span>
     </div>
   }
 }

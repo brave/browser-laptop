@@ -88,6 +88,10 @@ function registerForBeforeRequest (session) {
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
+      const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK
+      const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
+      const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
+
       if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
         continue
       }
@@ -97,6 +101,12 @@ function registerForBeforeRequest (session) {
         let message = details.resourceType === 'mainFrame'
           ? messages.BLOCKED_PAGE
           : messages.BLOCKED_RESOURCE
+
+        // Counts the number of ads and trackers
+        if (isAdBlock || isTracker) {
+          appActions.addResourceCount(results.resourceName, 1)
+        }
+
         BrowserWindow.getAllWindows().forEach((wnd) =>
           wnd.webContents.send(message, results.resourceName, details))
         if (details.resourceType === 'image') {
@@ -114,6 +124,10 @@ function registerForBeforeRequest (session) {
         // Show the ruleset that was applied and the URLs that were upgraded in
         // siteinfo
         if (results.ruleset) {
+          // Counts the number of httpsE redirects
+          if (isHttpsEverywhere) {
+            appActions.addResourceCount(results.resourceName, 1)
+          }
           BrowserWindow.getAllWindows().forEach((wnd) =>
             wnd.webContents.send(messages.HTTPSE_RULE_APPLIED, results.ruleset, details))
         }

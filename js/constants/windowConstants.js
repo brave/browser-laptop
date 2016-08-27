@@ -62,7 +62,6 @@ const windowConstants = {
   WINDOW_SET_BLOCKED_BY: _, // Whether or not to show site info like # of blocked ads
   WINDOW_SET_REDIRECTED_BY: _, // Whether or not to show site info like redirected resources
   WINDOW_SET_SECURITY_STATE: _,
-  WINDOW_SET_LOGIN_REQUIRED_DETAIL: _,
   WINDOW_SET_STATE: _,
   WINDOW_SET_LAST_ZOOM_PERCENTAGE: _,
   WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL: _,

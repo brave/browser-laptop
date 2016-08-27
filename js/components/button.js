@@ -11,18 +11,19 @@ class Button extends ImmutableComponent {
     if (this.props.iconClass) {
       return <span disabled={this.props.disabled}
         data-l10n-id={this.props.l10nId}
+        style={this.props.inlineStyles}
         className={cx({
           browserButton: true,
           fa: true,
           [this.props.iconClass]: !!this.props.iconClass,
           [this.props.className]: !!this.props.className
         })}
-        onClick={this.props.onClick}>
-      </span>
+        onClick={this.props.onClick} />
     }
     return <span disabled={this.props.disabled}
       data-l10n-id={this.props.l10nId}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
+      style={this.props.inlineStyles}
       className={cx({
         browserButton: true,
         [this.props.className]: !!this.props.className

@@ -5,6 +5,7 @@
 const React = require('react')
 const urlParse = require('url').parse
 const windowActions = require('../actions/windowActions')
+const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
@@ -20,8 +21,8 @@ const clipboard = global.require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
+const config = require('../constants/config')
 const settings = require('../constants/settings')
-const FindBar = require('./findbar.js')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
@@ -43,8 +44,6 @@ class Frame extends ImmutableComponent {
   constructor () {
     super()
     this.onUpdateWheelZoom = debounce(this.onUpdateWheelZoom.bind(this), 20)
-    this.onFind = this.onFind.bind(this)
-    this.onFindHide = this.onFindHide.bind(this)
     this.onFocus = this.onFocus.bind(this)
     // Maps notification message to its callback
     this.notificationCallbacks = {}
@@ -110,10 +109,11 @@ class Frame extends ImmutableComponent {
     } else if (location === 'about:autofill') {
       const partition = FrameStateUtil.getPartition(this.frame)
       if (this.props.autofillAddresses) {
-        const addresses = this.props.autofillAddresses.toJS()
+        const addresses = this.props.autofillAddresses.get('guid')
         let list = []
-        for (let index in addresses) {
-          const address = currentWindow.webContents.session.autofill.getProfile(addresses[index][partition])
+        addresses.forEach((entry) => {
+          const guid = entry.get(partition)
+          const address = currentWindow.webContents.session.autofill.getProfile(guid)
           let addressDetail = {
             name: address.full_name,
             organization: address.company_name,
@@ -124,26 +124,27 @@ class Frame extends ImmutableComponent {
             country: address.country_code,
             phone: address.phone,
             email: address.email,
-            guid: addresses[index]
+            guid: entry.toJS()
           }
           list.push(addressDetail)
-        }
+        })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
       if (this.props.autofillCreditCards) {
-        const creditCards = this.props.autofillCreditCards.toJS()
+        const creditCards = this.props.autofillCreditCards.get('guid')
         let list = []
-        for (let index in creditCards) {
-          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(creditCards[index][partition])
+        creditCards.forEach((entry) => {
+          const guid = entry.get(partition)
+          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(guid)
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
             month: creditCard.expiration_month,
             year: creditCard.expiration_year,
-            guid: creditCards[index]
+            guid: entry.toJS()
           }
           list.push(creditCardDetail)
-        }
+        })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
     }
@@ -322,6 +323,19 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  enterHtmlFullScreen () {
+    if (this.webview) {
+      this.webview.executeScriptInTab(config.braveExtensionId, 'document.documentElement.webkitRequestFullScreen()', {})
+      this.webview.focus()
+    }
+  }
+
+  exitHtmlFullScreen () {
+    if (this.webview) {
+      this.webview.executeScriptInTab(config.braveExtensionId, 'document.webkitExitFullscreen()', {})
+    }
+  }
+
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
       if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
@@ -335,11 +349,12 @@ class Frame extends ImmutableComponent {
       }
       // make sure the webview content updates to
       // match the fullscreen state of the frame
-      if (prevProps.isFullScreen !== this.props.isFullScreen) {
-        if (this.props.isFullScreen) {
-          this.webview.executeJavaScript('document.webkitRequestFullscreen()')
+      if (prevProps.isFullScreen !== this.props.isFullScreen ||
+          (this.props.isFullScreen && !this.props.isActive)) {
+        if (this.props.isFullScreen && this.props.isActive) {
+          this.enterHtmlFullScreen()
         } else {
-          this.webview.executeJavaScript('document.webkitExitFullscreen()')
+          this.exitHtmlFullScreen()
         }
       }
       this.webview.setAudioMuted(this.props.audioMuted || false)
@@ -815,7 +830,7 @@ class Frame extends ImmutableComponent {
 
     this.webview.addEventListener('did-navigate', (e) => {
       if (this.props.findbarShown) {
-        this.onFindHide()
+        windowActions.setFindbarShown(this.frame, false)
       }
 
       for (let message in this.notificationCallbacks) {
@@ -976,13 +991,8 @@ class Frame extends ImmutableComponent {
     }
     const searchString = this.props.findDetail && this.props.findDetail.get('searchString')
     if (searchString) {
-      this.onFind(searchString, this.props.findDetail && this.props.findDetail.get('caseSensitivity') || undefined, forward)
+      webviewActions.findInPage(searchString, this.props.findDetail && this.props.findDetail.get('caseSensitivity') || undefined, forward, this.props.findDetail.get('internalFindStatePresent'), this.webview)
     }
-  }
-
-  onFindHide () {
-    windowActions.setFindbarShown(this.frame, false)
-    this.webview.stopFindInPage('keepSelection')
   }
 
   onUpdateWheelZoom () {
@@ -1002,22 +1012,6 @@ class Frame extends ImmutableComponent {
     } else {
       this.wheelDeltaY = 0
     }
-  }
-
-  onFind (searchString, caseSensitivity, forward) {
-    if (searchString) {
-      this.webview.findInPage(searchString, {
-        matchCase: caseSensitivity,
-        forward: forward !== undefined ? forward : true,
-        findNext: forward !== undefined
-      })
-    } else {
-      this.onClearMatch()
-    }
-  }
-
-  onClearMatch () {
-    this.webview.stopFindInPage('clearSelection')
   }
 
   get webRTCPolicy () {
@@ -1043,16 +1037,6 @@ class Frame extends ImmutableComponent {
       {
         this.props.isFullScreen && this.props.showFullScreenWarning
         ? <FullScreenWarning location={this.props.location} />
-        : null
-      }
-      {
-        this.props.findbarShown
-        ? <FindBar
-          onFind={this.onFind}
-          onFindHide={this.onFindHide}
-          frameKey={this.props.frameKey}
-          selected={this.props.findbarSelected}
-          findDetail={this.props.findDetail} />
         : null
       }
       <div ref={(node) => { this.webviewContainer = node }}

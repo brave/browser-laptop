@@ -4,6 +4,7 @@
 
 'use strict'
 const AppConstants = require('../constants/appConstants')
+const WindowConstants = require('../constants/windowConstants')
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
@@ -29,6 +30,10 @@ const debounce = require('../lib/debounce.js')
 const isDarwin = process.platform === 'darwin'
 const locale = require('../../app/locale')
 const path = require('path')
+
+// state helpers
+const basicAuthState = require('../../app/common/state/basicAuthState')
+const tabState = require('../../app/common/state/tabState')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -460,6 +465,10 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       appState = appState.setIn([action.resourceName, 'enabled'], action.enabled)
       break
+    case AppConstants.APP_ADD_RESOURCE_COUNT:
+      const oldCount = appState.getIn([action.resourceName, 'count']) || 0
+      appState = appState.setIn([action.resourceName, 'count'], oldCount + action.count)
+      break
     case AppConstants.APP_SET_DATA_FILE_LAST_CHECK:
       appState = appState.mergeIn([action.resourceName], {
         lastCheckVersion: action.lastCheckVersion,
@@ -545,57 +554,70 @@ const handleAppAction = (action) => {
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
       {
         const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'addresses'],
-          appState.getIn(['autofill', 'addresses']).filterNot((address) => {
+        appState = appState.setIn(['autofill', 'addresses', 'guid'],
+          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((address) => {
             return Immutable.is(address, action.originalDetail.get('guid'))
           }))
 
-        let addresses = appState.getIn(['autofill', 'addresses'])
+        let addresses = appState.getIn(['autofill', 'addresses', 'guid'])
         const guid = Filtering.addAutofillAddress(action.detail.toJS())
         if (action.originalDetail.get('guid') !== undefined &&
           !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
           Filtering.removeAutofillAddress(action.originalDetail.get('guid').toJS())
         }
-        appState = appState.setIn(['autofill', 'addresses'], addresses.push(Immutable.fromJS(guid)))
+        appState = appState.setIn(['autofill', 'addresses', 'guid'], addresses.push(Immutable.fromJS(guid)))
+        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
         break
       }
     case AppConstants.APP_REMOVE_AUTOFILL_ADDRESS:
       {
         const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'addresses'],
-          appState.getIn(['autofill', 'addresses']).filterNot((address) => {
-            return Immutable.is(address, Immutable.fromJS(action.detail.get('guid')))
+        appState = appState.setIn(['autofill', 'addresses', 'guid'],
+          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((address) => {
+            return Immutable.is(address, action.detail.get('guid'))
           }))
         Filtering.removeAutofillAddress(action.detail.get('guid').toJS())
+        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
         break
       }
     case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
       {
         const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'creditCards'],
-          appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
+        appState = appState.setIn(['autofill', 'creditCards', 'guid'],
+          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((card) => {
             return Immutable.is(card, action.originalDetail.get('guid'))
           }))
 
-        let creditCards = appState.getIn(['autofill', 'creditCards'])
+        let creditCards = appState.getIn(['autofill', 'creditCards', 'guid'])
         const guid = Filtering.addAutofillCreditCard(action.detail.toJS())
         if (action.originalDetail.get('guid') !== undefined &&
           !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
           Filtering.removeAutofillCreditCard(action.originalDetail.get('guid').toJS())
         }
-        appState = appState.setIn(['autofill', 'creditCards'], creditCards.push(Immutable.fromJS(guid)))
+        appState = appState.setIn(['autofill', 'creditCards', 'guid'], creditCards.push(Immutable.fromJS(guid)))
+        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
         break
       }
     case AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD:
       {
         const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'creditCards'],
-          appState.getIn(['autofill', 'creditCards']).filterNot((card) => {
+        appState = appState.setIn(['autofill', 'creditCards', 'guid'],
+          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((card) => {
             return Immutable.is(card, action.detail.get('guid'))
           }))
         Filtering.removeAutofillCreditCard(action.detail.get('guid').toJS())
+        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
         break
       }
+    case AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL:
+      appState = basicAuthState.setLoginRequiredDetail(appState, action.tabId, action.detail)
+      break
+    case AppConstants.APP_SET_LOGIN_RESPONSE_DETAIL:
+      appState = basicAuthState.setLoginResponseDetail(appState, action.tabId, action.detail)
+      break
+    case WindowConstants.WINDOW_CLOSE_FRAME:
+      appState = tabState.closeTab(appState, action.frameProps.get('tabId'))
+      break
     default:
   }
 
