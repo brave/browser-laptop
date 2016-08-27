@@ -32,12 +32,10 @@ class AddEditBookmark extends ImmutableComponent {
   get isBlankTab () {
     return ['about:blank', 'about:newtab'].includes(this.props.currentDetail.get('location'))
   }
-
   get bookmarkNameValid () {
     let title = (this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle'))
     return ((typeof title === 'string') && title.trim().length > 0)
   }
-
   get isFolder () {
     return siteUtil.isFolder(this.props.currentDetail)
   }
@@ -102,10 +100,10 @@ class AddEditBookmark extends ImmutableComponent {
   }
   onSave () {
     // First check if the title of the currentDetail is set
-    if (!this.bookmarkNameValid) {
+    if (this.isFolder && !this.bookmarkNameValid) {
       return false
     }
-
+    
     this.showToolbarOnFirstBookmark()
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
@@ -121,7 +119,11 @@ class AddEditBookmark extends ImmutableComponent {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
     }
-    return this.props.currentDetail.get('title') || this.props.currentDetail.get('location')
+    return ''
+  }
+  get placeholderName () {
+    let title = this.props.currentDetail.get('title')
+    return title ? title : this.props.currentDetail.get('location')
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
@@ -129,7 +131,7 @@ class AddEditBookmark extends ImmutableComponent {
         <div className='genericFormTable'>
           <div id='bookmarkName' className='formRow'>
             <label data-l10n-id='nameField' htmlFor='bookmarkName' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
+            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange} placeholder={this.placeholderName} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
           </div>
           {
             !this.isFolder
@@ -155,7 +157,7 @@ class AddEditBookmark extends ImmutableComponent {
               ? <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
               : null
             }
-            <Button l10nId='save' disabled={!this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
+            <Button l10nId='save' disabled={this.isFolder && !this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
           </div>
         </div>
       </div>
