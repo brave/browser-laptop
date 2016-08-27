@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, navigator, navigatorNotBookmarked, saveButton} = require('../lib/selectors')
+const {urlInput, navigator, navigatorNotBookmarked, saveButton, deleteButton} = require('../lib/selectors')
 
 describe('bookmarks', function () {
   function * setup (client) {
@@ -56,6 +56,19 @@ describe('bookmarks', function () {
               .then((val) => val === 'Page 1')
           })
       })
+
+      describe('and then removed', function () {
+        before(function *() {
+          yield this.app.client
+            .click(navigatorNotBookmarked)
+            .waitForExist(deleteButton)
+            .click(deleteButton)
+        })
+        it('removes the bookmark from the toolbar', function * () {
+          yield this.app.client
+            .waitForExist('.bookmarkText', 1000, true)
+        })
+      })
     })
   })
 
@@ -102,6 +115,18 @@ describe('bookmarks', function () {
             return this.getText('.bookmarkText')
               .then((val) => val === page1Url)
           })
+      })
+      describe('and then removed', function () {
+        before(function *() {
+          yield this.app.client
+            .click(navigatorNotBookmarked)
+            .waitForExist(deleteButton)
+            .click(deleteButton)
+        })
+        it('removes the bookmark from the toolbar', function * () {
+          yield this.app.client
+            .waitForExist('.bookmarkText', 1000, true)
+        })
       })
     })
   })
