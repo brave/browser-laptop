@@ -47,8 +47,6 @@ const messages = {
   OPEN_BRAVERY_PANEL: _,
   PREFS_RESTART: _,
   CERT_ERROR: _, /** @arg {Object} details of certificate error */
-  LOGIN_REQUIRED: _, /** @arg {Object} details of the login required request */
-  LOGIN_RESPONSE: _,
   NOTIFICATION_RESPONSE: _, /** @arg {string} message, @arg {number} buttonId, @arg {boolean} persist */
   // Downloads
   SHOW_DOWNLOADS_TOOLBAR: _, /** Ensures the downloads toolbar is visible */

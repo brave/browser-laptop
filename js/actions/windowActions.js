@@ -138,19 +138,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to set the login required detail.
-   * @param {Object} frameProps - The frame where the login required prompt should be shown.
-   * @param {Object} detail - Details of the login required operation.
-   */
-  setLoginRequiredDetail: function (frameProps, detail) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_LOGIN_REQUIRED_DETAIL,
-      frameProps,
-      detail
-    })
-  },
-
-  /**
    * Dispatches a message to the store to set the user entered text for the URL bar.
    * Unlike setLocation and loadUrl, this does not modify the state of src and location.
    *
@@ -323,10 +310,6 @@ const windowActions = {
     if (frameProps && frameProps.get('isFullScreen')) {
       webviewActions.setFullScreen(false)
       this.setFullScreen(frameProps, false)
-    }
-    // Flush out any pending login required prompts
-    if (frameProps && frameProps.getIn(['security', 'loginRequiredDetail'])) {
-      ipc.send(messages.LOGIN_RESPONSE, frameProps.get('location'))
     }
     // Unless a caller explicitly specifies to close a pinned frame, then
     // ignore the call.

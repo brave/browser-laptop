@@ -5,11 +5,8 @@
 const React = require('react')
 const Dialog = require('./dialog')
 const Button = require('./button')
-const windowActions = require('../actions/windowActions')
+const appActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
-const messages = require('../constants/messages')
-const electron = global.require('electron')
-const ipc = electron.ipcRenderer
 const url = require('url')
 
 class LoginRequired extends React.Component {
@@ -32,7 +29,10 @@ class LoginRequired extends React.Component {
     this.focus()
   }
   get detail () {
-    return this.props.frameProps.getIn(['security', 'loginRequiredDetail'])
+    return this.props.loginRequiredDetail
+  }
+  get tabId () {
+    return this.props.tabId
   }
   onKeyDown (e) {
     switch (e.keyCode) {
@@ -45,10 +45,7 @@ class LoginRequired extends React.Component {
     }
   }
   onClose () {
-    const location = this.props.frameProps.get('location')
-    ipc.send(messages.LOGIN_RESPONSE, location)
-    windowActions.setLoginRequiredDetail(this.props.frameProps)
-    windowActions.onWebviewLoadEnd(this.props.frameProps)
+    appActions.setLoginResponseDetail(this.tabId)
   }
   onClick (e) {
     e.stopPropagation()
@@ -69,12 +66,11 @@ class LoginRequired extends React.Component {
       username: '',
       password: ''
     })
-    ipc.send(messages.LOGIN_RESPONSE, this.detail.url, this.state.username, this.state.password)
-    windowActions.setLoginRequiredDetail(this.props.frameProps)
+    appActions.setLoginResponseDetail(this.tabId, this.state)
   }
   render () {
     const l10nArgs = {
-      host: url.resolve(this.props.frameProps.get('location'), '/')
+      host: url.resolve(this.detail.getIn(['request', 'url']), '/')
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
       <div className='genericForm' onClick={this.onClick.bind(this)}>
