@@ -773,13 +773,7 @@ var callback = (err, result, delayTime) => {
     console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
-/* TBD: avoid error lock-up in sync preventing future reconciliations
-    return setTimeout(() => {
-      if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
-    }, 1 * msecs.hour)
- */
-
-    if (typeof delayTime === 'undefined') delayTime = 0
+    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
   }
 
   if (!result) return run(delayTime)
@@ -896,7 +890,7 @@ var run = (delayTime) => {
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
 
-      if (client.sync(callback) === true) return run(0)
+      if (client.sync(callback) === true) return run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     }, delayTime)
   }
 
@@ -934,7 +928,7 @@ var getStateInfo = (state) => {
     if (transaction.stamp < then) break
 
     ballots = underscore.clone(transaction.ballots || {})
-    underscore.keys(state.ballots).forEach((ballot) => {
+    state.ballots.forEach((ballot) => {
       if (ballot.viewingId !== transaction.viewingId) return
 
       if (!ballots[ballot.publisher]) ballots[ballot.publisher] = 0
@@ -942,10 +936,8 @@ var getStateInfo = (state) => {
     })
 
     ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction,
-                                                                   [ 'viewingId', 'submissionStamp', 'satoshis',
-                                                                     'contribution'
-                                                                   ]),
-                                                   transaction.fee, { ballots: ballots }))
+                                                                   [ 'viewingId', 'contribution', 'submissionStamp', 'count' ]),
+                                                                   { ballots: ballots }))
   }
 
   updateLedgerInfo()
