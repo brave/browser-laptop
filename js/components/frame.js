@@ -458,7 +458,10 @@ class Frame extends ImmutableComponent {
         break
       case 'view-source':
         const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        windowActions.newFrame({location: sourceLocation}, true)
+        let src = this.frame.get('src')
+        if (UrlUtil.isHttpAddress(src) && !UrlUtil.isImageAddress(src)) {
+          windowActions.newFrame({location: sourceLocation}, true)
+        }
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':

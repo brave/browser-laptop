@@ -81,6 +81,14 @@ const UrlUtil = {
     }
   },
 
+  isImageAddress (url) {
+    return (url.match(/\.(jpeg|jpg|gif|png|svg|bmp)$/))
+  },
+
+  isHttpAddress (url) {
+    return (url.match(/^https?:\/\/(.*)/))
+  },
+
   /**
    * Checks if a string is not a URL.
    * @param {String} input The input value.
