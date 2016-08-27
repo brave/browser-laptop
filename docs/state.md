@@ -277,7 +277,8 @@ WindowStore
       searchString: string, // the string being searched
       caseSensitivity: boolean, // whether we are doing a case sensitive search
       numberOfMatches: number, // Total number of matches on the page
-      activeMatchOrdinal: number // The current ordinal of the match
+      activeMatchOrdinal: number, // The current ordinal of the match
+      internalFindStatePresent: boolean // true if a find-first (ie findNext: false) call has been made
     }
     unloaded: boolean, // true if the tab is unloaded
 
