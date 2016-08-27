@@ -111,7 +111,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
 
   // We don't want bookmarks and other site info being renamed on users if they already exist
   // The name should remain the same while it is bookmarked forever.
-  const customTitle = siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle')
+  const customTitle = typeof siteDetail.get('customTitle') === 'string' ? siteDetail.get('customTitle') : (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle'))
   let site = Immutable.fromJS({
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
@@ -121,7 +121,7 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (folderId) {
     site = site.set('folderId', Number(folderId))
   }
-  if (customTitle) {
+  if (typeof customTitle === 'string') {
     site = site.set('customTitle', customTitle)
   }
   if (siteDetail.get('parentFolderId') || oldSite && oldSite.get('parentFolderId')) {

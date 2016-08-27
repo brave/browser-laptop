@@ -35,7 +35,7 @@ class AddEditBookmark extends ImmutableComponent {
 
   get bookmarkNameValid () {
     let title = (this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle'))
-    return ((typeof title === 'string') && title.trim().length > 0)
+    return ((typeof title === 'string') && title.trim().length > 0) || !this.isFolder
   }
 
   get isFolder () {
@@ -74,7 +74,7 @@ class AddEditBookmark extends ImmutableComponent {
   }
   onNameChange (e) {
     let currentDetail = this.props.currentDetail
-    if (currentDetail.get('title') === e.target.value) {
+    if (currentDetail.get('title') === e.target.value && e.target.value) {
       currentDetail = currentDetail.delete('customTitle')
     } else {
       currentDetail = currentDetail.set('customTitle', e.target.value)

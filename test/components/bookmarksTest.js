@@ -43,6 +43,20 @@ describe('bookmarks', function () {
         .waitForExist('#bookmarkLocation input')
         .getValue('#bookmarkLocation input').should.eventually.be.equal(this.page1Url)
     })
+
+    describe('saved with a title', function () {
+      before(function * () {
+        yield this.app.client
+          .click(saveButton)
+      })
+      it('displays title', function * () {
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getText('.bookmarkText')
+              .then((val) => val === 'Page 1')
+          })
+      })
+    })
   })
 
   describe('without title', function () {
@@ -61,7 +75,7 @@ describe('bookmarks', function () {
         .waitForExist(navigatorNotBookmarked)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
-        .waitForVisible(saveButton)
+        .waitForVisible(saveButton + ':not([disabled]')
     })
 
     it('leaves the title field blank', function * () {
@@ -74,6 +88,21 @@ describe('bookmarks', function () {
       yield this.app.client
         .waitForExist('#bookmarkLocation input')
         .getValue('#bookmarkLocation input').should.eventually.be.equal(this.page1Url)
+    })
+
+    describe('saved without a title', function () {
+      before(function * () {
+        yield this.app.client
+          .click(saveButton)
+      })
+      it('displays URL', function * () {
+        const page1Url = this.page1Url
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getText('.bookmarkText')
+              .then((val) => val === page1Url)
+          })
+      })
     })
   })
 })
