@@ -634,10 +634,18 @@ class Main extends ImmutableComponent {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     windowActions.setFindbarShown(activeFrame, false)
     webviewActions.stopFindInPage()
+    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+      internalFindStatePresent: false
+    }))
   }
 
-  onFind (searchString, caseSensitivity, forward) {
-    webviewActions.findInPage(searchString, caseSensitivity, forward)
+  onFind (searchString, caseSensitivity, forward, findNext) {
+    webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
+    if (!findNext) {
+      windowActions.setFindDetail(this.frame, Immutable.fromJS({
+        internalFindStatePresent: true
+      }))
+    }
   }
 
   onTabContextMenu (e) {

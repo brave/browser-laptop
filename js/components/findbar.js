@@ -43,15 +43,15 @@ class FindBar extends ImmutableComponent {
   }
 
   onFindFirst () {
-    this.props.onFind(this.searchString, this.isCaseSensitive)
+    this.props.onFind(this.searchString, this.isCaseSensitive, true, false)
   }
 
   onFindNext () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, true)
+    this.props.onFind(this.searchString, this.isCaseSensitive, true, this.props.findDetail.get('internalFindStatePresent'))
   }
 
   onFindPrev () {
-    this.props.onFind(this.searchString, this.isCaseSensitive, false)
+    this.props.onFind(this.searchString, this.isCaseSensitive, false, this.props.findDetail.get('internalFindStatePresent'))
   }
 
   /**

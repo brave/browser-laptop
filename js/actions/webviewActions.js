@@ -83,7 +83,7 @@ const webviewActions = {
     }
   },
 
-  findInPage: function (searchString, caseSensitivity, forward, webview) {
+  findInPage: function (searchString, caseSensitivity, forward, findNext, webview) {
     webview = webview || getWebview()
     if (!webview) {
       return
@@ -92,8 +92,8 @@ const webviewActions = {
     if (searchString) {
       webview.findInPage(searchString, {
         matchCase: caseSensitivity,
-        forward: forward !== undefined ? forward : true,
-        findNext: forward !== undefined
+        forward,
+        findNext
       })
     } else {
       webview.stopFindInPage('clearSelection')
