@@ -375,22 +375,22 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get satoshis () {
-    return this.transaction.get('contribution').get('satoshis')
+    return this.transaction.getIn(['contribution', 'satoshis'])
   }
 
   get currency () {
-    return this.transaction.get('contribution').get('fiat').get('currency')
+    return this.transaction.getIn(['contribution', 'fiat', 'currency'])
   }
 
   get totalAmount () {
-    var fiatAmount = this.transaction.get('contribution').get('fiat').get('amount')
-    return fiatAmount.toFixed(2)
+    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
+    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00')
   }
 
   render () {
     var date = this.formattedDate
-    var totalAmountStr = this.totalAmount + ' ' + this.currency
-    var receiptFileName = 'brave_ledger' + this.numericDateStr + '.pdf'
+    var totalAmountStr = `${this.totalAmount} ${this.currency}`
+    var receiptFileName = `brave_ledger${this.numericDateStr}.pdf`
 
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
@@ -634,7 +634,7 @@ class PaymentsTab extends ImmutableComponent {
   get paymentHistoryFooter () {
     let ledgerData = this.props.ledgerData
     if (!ledgerData.get('reconcileStamp')) {
-      return
+      return null
     }
     let nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
     let l10nDataArgs = {
