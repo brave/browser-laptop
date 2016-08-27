@@ -32,6 +32,7 @@ const session = electron.session
 
 const acorn = require('acorn')
 const ledgerBalance = require('ledger-balance')
+const ledgerClient = require('ledger-client')
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const random = require('random-lib')
@@ -115,6 +116,9 @@ const doAction = (action) => {
  */
 var init = () => {
   try {
+    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_INFO_DEBUG)
+    publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
+
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
   } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
@@ -136,7 +140,7 @@ var boot = () => {
     ledgerInfo.creating = true
     appActions.updateLedgerInfo({ creating: true })
     try {
-      client = (require('ledger-client'))(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
+      client = ledgerClient(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
       appActions.updateLedgerInfo({})
 
@@ -351,7 +355,7 @@ var initialize = (onoff) => {
 
         getStateInfo(state)
         try {
-          client = (require('ledger-client'))(state.personaId,
+          client = ledgerClient(state.personaId,
                                               underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions), state)
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
@@ -466,7 +470,7 @@ var updatePublisherInfo = () => {
   syncWriter(synopsisPath, synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
-  if (clientOptions.debugP) {
+  if (publisherInfo._internal.debugP) {
     console.log('\nupdatePublisherInfo: ' + JSON.stringify(underscore.omit(publisherInfo, [ '_internal' ])))
   }
 
@@ -732,8 +736,6 @@ var updateLedgerInfo = () => {
   var info = ledgerInfo._internal.paymentInfo
   var now = underscore.now()
 
-  if (!client) return
-
   if (info) {
     underscore.extend(ledgerInfo,
                       underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
@@ -741,7 +743,7 @@ var updateLedgerInfo = () => {
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
   }
 
-  if (clientOptions.debugP) {
+  if (ledgerInfo._internal.debugP) {
     console.log('\nupdateLedgerInfo: ' + JSON.stringify(underscore.omit(ledgerInfo, [ '_internal' ]), null, 2))
   }
 
