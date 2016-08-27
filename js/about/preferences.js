@@ -99,7 +99,11 @@ class SettingsList extends ImmutableComponent {
 class SettingItem extends ImmutableComponent {
   render () {
     return <div className='settingItem'>
-      <span data-l10n-id={this.props.dataL10nId} />
+      {
+        this.props.dataL10nId
+          ? <span data-l10n-id={this.props.dataL10nId} />
+          : null
+      }
       {this.props.children}
     </div>
   }
@@ -323,6 +327,80 @@ class BitcoinDashboard extends ImmutableComponent {
   }
 }
 
+class PaymentHistory extends ImmutableComponent {
+  get ledgerData () {
+    return this.props.ledgerData
+  }
+
+  render () {
+    const transactions = this.props.ledgerData.get('transactions')
+
+    return <div id='paymentHistory'>
+      <table className='sort'>
+        <thead>
+          <tr>
+            <th className='sort-header' data-l10n-id='date' />
+            <th className='sort-header' data-l10n-id='totalAmount' />
+          </tr>
+        </thead>
+        <tbody>
+        {
+          transactions.map(function (row) {
+            return <PaymentHistoryRow transaction={row} ledgerData={this.props.ledgerData} />
+          }.bind(this))
+        }
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+class PaymentHistoryRow extends ImmutableComponent {
+
+  get transaction () {
+    return this.props.transaction
+  }
+
+  get timestamp () {
+    return this.transaction.get('submissionStamp')
+  }
+
+  get formattedDate () {
+    return formattedDateFromTimestamp(this.timestamp)
+  }
+
+  get numericDateStr () {
+    return (new Date(this.timestamp)).toLocaleDateString().replace(/\//g, '-')
+  }
+
+  get ledgerData () {
+    return this.props.ledgerData
+  }
+
+  get satoshis () {
+    return this.transaction.getIn(['contribution', 'satoshis'])
+  }
+
+  get currency () {
+    return this.transaction.getIn(['contribution', 'fiat', 'currency'])
+  }
+
+  get totalAmount () {
+    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
+    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00')
+  }
+
+  render () {
+    var date = this.formattedDate
+    var totalAmountStr = `${this.totalAmount} ${this.currency}`
+
+    return <tr>
+      <td className='narrow' data-sort={this.timestamp}>{date}</td>
+      <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
+    </tr>
+  }
+}
+
 class GeneralTab extends ImmutableComponent {
   enabled (keyArray) {
     return keyArray.every((key) => getSetting(key, this.props.settings) === true)
@@ -494,7 +572,21 @@ class PaymentsTab extends ImmutableComponent {
     const onButtonClick = this.props.ledgerData.get('created')
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
-    return <Button l10nId={buttonText} className='primaryButton' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
+    return <Button l10nId={buttonText} className='primaryButton addFunds' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
+  }
+
+  get paymentHistoryButton () {
+    const walletCreated = this.props.ledgerData.get('created') && !this.props.ledgerData.get('creating')
+    const walletTransactions = this.props.ledgerData.get('transactions')
+    const walletHasTransactions = walletTransactions && walletTransactions.size
+
+    if (!walletCreated || !walletHasTransactions) {
+      return null
+    }
+
+    const buttonText = 'viewPaymentHistory'
+    const onButtonClick = this.props.showOverlay.bind(this, 'paymentHistory')
+    return <Button className='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
   }
 
   get walletStatus () {
@@ -535,6 +627,27 @@ class PaymentsTab extends ImmutableComponent {
       hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
   }
 
+  get paymentHistoryContent () {
+    return <PaymentHistory ledgerData={this.props.ledgerData} />
+  }
+
+  get paymentHistoryFooter () {
+    let ledgerData = this.props.ledgerData
+    if (!ledgerData.get('reconcileStamp')) {
+      return null
+    }
+    let nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
+    let l10nDataArgs = {
+      reconcileDate: nextReconcileDate
+    }
+    return <div className='paymentHistoryFooter'>
+      <div className='nextPaymentSubmission'>
+        <span data-l10n-id='paymentHistoryFooterText' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+      </div>
+      <Button l10nId='paymentHistoryOKText' className='okButton primaryButton' onClick={this.props.hideOverlay.bind(this, 'paymentHistory')} />
+    </div>
+  }
+
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
     const currency = this.props.ledgerData.get('currency')
@@ -544,8 +657,7 @@ class PaymentsTab extends ImmutableComponent {
     if (balance === 0) {
       return `0 ${currency}`
     }
-    if (this.props.ledgerData.get('btc') &&
-        typeof this.props.ledgerData.get('amount') === 'number') {
+    if (this.props.ledgerData.get('btc') && typeof this.props.ledgerData.get('amount') === 'number') {
       const btcValue = this.props.ledgerData.get('btc') / this.props.ledgerData.get('amount')
       return `${(balance / btcValue).toFixed(2)} ${currency}`
     }
@@ -584,6 +696,7 @@ class PaymentsTab extends ImmutableComponent {
                 {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
                 </span>
                 {this.walletButton}
+                {this.paymentHistoryButton}
               </td>
               <td>
                 <SettingsList>
@@ -616,6 +729,11 @@ class PaymentsTab extends ImmutableComponent {
         {
         this.enabled && this.props.addFundsOverlayVisible
           ? <ModalOverlay title={'addFunds'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
+          : null
+        }
+        {
+          this.enabled && this.props.paymentHistoryOverlayVisible
+          ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
           : null
         }
       <div className='titleBar'>
@@ -1005,6 +1123,7 @@ class AboutPreferences extends React.Component {
     let hash = window.location.hash ? window.location.hash.slice(1) : ''
     this.state = {
       bitcoinOverlayVisible: false,
+      paymentHistoryOverlayVisible: false,
       addFundsOverlayVisible: false,
       preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
@@ -1118,6 +1237,7 @@ class AboutPreferences extends React.Component {
           braveryDefaults={braveryDefaults} ledgerData={ledgerData}
           onChangeSetting={this.onChangeSetting}
           bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
+          paymentHistoryOverlayVisible={this.state.paymentHistoryOverlayVisible}
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
           hideOverlay={this.setOverlayVisible.bind(this, false)} />
@@ -1141,6 +1261,11 @@ class AboutPreferences extends React.Component {
       </div>
     </div>
   }
+}
+
+let formattedDateFromTimestamp = function (timestamp) {
+  var date = new Date(timestamp)
+  return date.toLocaleDateString()
 }
 
 module.exports = <AboutPreferences />
