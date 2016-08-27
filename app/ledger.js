@@ -828,6 +828,7 @@ var roundtrip = (params, options, callback) => {
     var payload
 
     if ((response) && (options.verboseP)) {
+      console.log('[ response for ' + params.method + ' ' + parts.protocol + '//' + parts.hostname + params.path + ' ]')
       console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
                  ' ' + (response.statusMessage || ''))
       underscore.keys(response.headers).forEach((header) => { console.log('>>> ' + header + ': ' + response.headers[header]) })
@@ -961,7 +962,7 @@ var getBalance = () => {
   setTimeout(getBalance, msecs.minute)
   if (!ledgerInfo.address) return
 
-  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true, roundtrip: roundtrip }, clientOptions),
+  ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
   (err, provider, result) => {
     if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
 
