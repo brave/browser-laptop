@@ -289,16 +289,16 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton.primaryButton.clearBrowsingDataButton {
+span.browserButton.primaryButton.addFunds {
   font-size: 0.9em;
-  padding: 5px 20px;
-  margin-top: 20px;
 }
 
-span.browserButton.primaryButton.manageAutofillDataButton {
-  font-size: 0.9em;
-  padding: 5px 20px;
-  margin-top: 20px;
+span.browserButton.primaryButton {
+  .clearBrowsingDataButton, .manageAutofillDataButton {
+    font-size: 0.9em;
+    margin-top: 20px;
+    padding: 5px 20px;
+  }
 }
 
 .settingsList {
@@ -497,6 +497,7 @@ div.nextPaymentSubmission {
   .dialog-body {
     background-color: #FFF;
     height: 300px;
+    overflow-y: scroll;
   }
 
   .dialog-footer {
@@ -506,6 +507,13 @@ div.nextPaymentSubmission {
 
   .dialog-header, .dialog-body, .dialog-footer {
     padding: 20px;
+  }
+}
+
+.modal .dialog:not(.paymentHistory) {
+  .dialog-body {
+    height: 100%;
+    width: 100%;
   }
 }
 
@@ -583,6 +591,8 @@ div.nextPaymentSubmission {
       -webkit-font-smoothing: antialiased;
       text-align: left;
       width: 8%;
+      padding-top: 16px;
+      vertical-align: top;
 
       a {
         vertical-align: middle;
@@ -830,5 +840,5 @@ div.nextPaymentSubmission {
 }
 
 #fundsSelectBox {
-  margin-top: 32px;
+  margin-top: 0px;
 }

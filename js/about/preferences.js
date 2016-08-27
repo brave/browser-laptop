@@ -99,7 +99,11 @@ class SettingsList extends ImmutableComponent {
 class SettingItem extends ImmutableComponent {
   render () {
     return <div className='settingItem'>
-      <span data-l10n-id={this.props.dataL10nId} />
+      {
+        this.props.dataL10nId
+          ? <span data-l10n-id={this.props.dataL10nId} />
+          : null
+      }
       {this.props.children}
     </div>
   }
@@ -572,7 +576,7 @@ class PaymentsTab extends ImmutableComponent {
     const onButtonClick = this.props.ledgerData.get('created')
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (this.props.ledgerData.get('creating') ? () => {} : this.createWallet)
-    return <Button l10nId={buttonText} className='primaryButton' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
+    return <Button l10nId={buttonText} className='primaryButton addFunds' onClick={onButtonClick.bind(this)} disabled={this.props.ledgerData.get('creating')} />
   }
 
   get paymentHistoryButton () {
