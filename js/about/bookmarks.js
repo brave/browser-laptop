@@ -258,9 +258,11 @@ class AboutBookmarks extends React.Component {
     return <div className='siteDetailsPage'>
       <h2 data-l10n-id='folders' />
       <input type='text' className='searchInput' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
-      {this.state.search
-        ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear'></span>
-        : null}
+      {
+        this.state.search
+        ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
+        : null
+      }
       <div className='siteDetailsPageContent'>
         <Sticky enabled top={10}>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
@@ -269,9 +271,11 @@ class AboutBookmarks extends React.Component {
             isRoot
             selectedFolderId={this.state.selectedFolderId} />
         </Sticky>
-        {this.state.search
-         ? <SearchResults bookmarks={this.searchedBookmarks(this.state.search, this.state.bookmarks)} selectedFolderId={this.state.selectedFolderId} />
-         : <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />}
+        {
+          this.state.search
+          ? <SearchResults bookmarks={this.searchedBookmarks(this.state.search, this.state.bookmarks)} selectedFolderId={this.state.selectedFolderId} />
+          : <BookmarksList bookmarks={this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)} />
+        }
       </div>
     </div>
   }

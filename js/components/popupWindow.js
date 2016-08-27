@@ -66,8 +66,7 @@ class PopupWindow extends ImmutableComponent {
         popupWindow: true,
         reverseExpand: this.props.detail.get('right') !== undefined
       })}
-      style={styles}>
-    </div>
+      style={styles} />
   }
 }
 

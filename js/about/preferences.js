@@ -389,8 +389,7 @@ class SearchSelectEntry extends ImmutableComponent {
 class SearchEntry extends ImmutableComponent {
   render () {
     return <div>
-      <span style={this.props.iconStyle}>
-      </span>
+      <span style={this.props.iconStyle} />
       <span style={{paddingLeft: '5px', verticalAlign: 'middle'}}>{this.props.name}</span>
     </div>
   }
@@ -682,7 +681,7 @@ class SitePermissionsPage extends React.Component {
           Object.keys(permissionNames).map((name) =>
             this.hasEntryForPermission(name)
             ? <li>
-              <div data-l10n-id={name} className='permissionName'></div>
+              <div data-l10n-id={name} className='permissionName' />
               <ul>
               {
                 this.props.siteSettings.map((value, hostPattern) => {
@@ -712,11 +711,11 @@ class SitePermissionsPage extends React.Component {
                     }
                     return <div className='permissionItem'>
                       <span className='fa fa-times permissionAction'
-                        onClick={this.deletePermission.bind(this, name, hostPattern)}></span>
+                        onClick={this.deletePermission.bind(this, name, hostPattern)} />
                       <span className='permissionHost'>{hostPattern + ': '}</span>
                       <span className='permissionStatus'
                         data-l10n-id={statusText}
-                        data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null}></span>
+                        data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null} />
                     </div>
                   }
                   return null
@@ -827,8 +826,7 @@ class SecurityTab extends ImmutableComponent {
           ? <label className='linkTextSmall' data-l10n-id='managePasswords'
             onClick={aboutActions.newFrame.bind(null, {
               location: 'about:passwords'
-            }, true)}>
-          </label>
+            }, true)} />
           : null
         }
         {
@@ -836,8 +834,7 @@ class SecurityTab extends ImmutableComponent {
           ? <label className='linkTextSmall' data-l10n-id='preferences'
             onClick={aboutActions.newFrame.bind(null, {
               location: lastPassPreferencesUrl
-            }, true)}>
-          </label>
+            }, true)} />
           : null
         }
       </SettingsList>

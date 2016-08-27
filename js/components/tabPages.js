@@ -76,8 +76,7 @@ class TabPage extends ImmutableComponent {
         active: this.props.active})}
       onContextMenu={onTabPageContextMenu.bind(this, this.props.frames)}
       onClick={windowActions.setTabPageIndex.bind(this, this.props.index)
-      }>
-    </span>
+      } />
   }
 }
 
