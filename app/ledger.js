@@ -138,11 +138,11 @@ var boot = () => {
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
 
     ledgerInfo.creating = true
-    appActions.updateLedgerInfo({ creating: true })
+    updateLedgerInfo()
     try {
       client = ledgerClient(null, underscore.extend({ roundtrip: roundtrip }, clientOptions), null)
     } catch (ex) {
-      appActions.updateLedgerInfo({})
+      resetLedgerInfo()
 
       bootP = false
       return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
@@ -162,7 +162,7 @@ if (ipc) {
   ipc.on(messages.CHECK_BITCOIN_HANDLER, () => {
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
       ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')
-      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+      updateLedgerInfo()
     }
   })
 
@@ -331,7 +331,8 @@ var initialize = (onoff) => {
 
   if (!onoff) {
     client = null
-    return appActions.updateLedgerInfo({})
+    resetLedgerInfo()
+    return
   }
   if (client) return
 
@@ -374,7 +375,7 @@ var initialize = (onoff) => {
     }
 
     if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
-    appActions.updateLedgerInfo({})
+    resetLedgerInfo()
   })
 }
 
@@ -748,6 +749,10 @@ var updateLedgerInfo = () => {
   }
 
   appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
+}
+
+var resetLedgerInfo = () => {
+  appActions.updateLedgerInfo({})
 }
 
 /*
