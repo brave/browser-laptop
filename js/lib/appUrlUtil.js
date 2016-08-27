@@ -7,7 +7,7 @@ const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
 
-function fileUrl (str) {
+module.exports.fileUrl = (str) => {
   var pathName = path.resolve(str).replace(/\\/g, '/')
 
   // Windows drive letter must be prefixed with a slash
@@ -43,8 +43,8 @@ module.exports.getExtensionsPath = function (extensionDir) {
 
 module.exports.getIndexHTML = function () {
   return process.env.NODE_ENV === 'development'
-    ? fileUrl(path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index-dev.html')
-    : fileUrl(path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html')
+    ? module.exports.fileUrl(path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index-dev.html')
+    : module.exports.fileUrl(path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html')
 }
 
 /**
