@@ -14,6 +14,7 @@ const cx = require('../lib/classSet')
 
 const settings = require('../constants/settings')
 const getSetting = require('../settings').getSetting
+const searchProviders = require('../data/searchProviders')
 
 const Button = require('./button')
 const Tab = require('./tab')
@@ -88,13 +89,22 @@ class Tabs extends ImmutableComponent {
 
   newTab () {
     const newTabMode = getSetting(settings.NEWTAB_MODE)
-    alert(newTabMode)
     switch (newTabMode) {
       case 'newTabPage':
         windowActions.newFrame()
         break
       case 'homePage':
         windowActions.newFrame({location: getSetting(settings.HOMEPAGE)})
+        break
+      case 'defaultSearchEngine':
+        // "Google"
+        // const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
+        // const searchProviders = searchProviders.providers
+        // alert(searchProviders[0].search)
+        // let engine = searchProviders.filter(engine => {
+        //   return engine.name === defaultSearchEngine
+        // });
+        windowActions.newFrame({location: 'https://www.google.com'})
         break
     }
   }
