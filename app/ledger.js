@@ -695,16 +695,28 @@ var ledgerInfo = {
   transactions:
   [
 /*
-    { viewingId       : undefined
-    , submissionStamp : undefined
-    , satoshis        : undefined
-    , currency        : undefined
-    , amount          : undefined
-    , ballots         :
-      { 'publisher1'  : undefined
-        ...
+    {
+      viewingId: undefined,
+      surveyorId: undefined,
+      contribution: {
+        fiat: {
+          amount: undefined,
+          currency: undefined
+        },
+        rates: {
+          [currency]: undefined // bitcoin value in <currency>
+        },
+        satoshis: undefined,
+        fee: undefined
+      },
+      submissionStamp: undefined,
+      submissionId: undefined,
+      count: undefined,
+      satoshis: undefined,
+      votes: undefined,
+      ballots: {
+        [publisher]: undefined
       }
-    }
   , ...
  */
   ],
@@ -1002,7 +1014,9 @@ var getPaymentInfo = () => {
       info.address = client.getWalletAddress()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
-        if ((body.rates) && (body.rates[currency])) info.btc = (amount / body.rates[currency]).toFixed(8)
+        if ((body.rates) && (body.rates[currency])) {
+          info.btc = (amount / body.rates[currency]).toFixed(8)
+        }
       }
       ledgerInfo._internal.paymentInfo = info
       updateLedgerInfo()
