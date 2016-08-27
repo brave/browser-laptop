@@ -182,7 +182,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         : null
       }
       {
-        !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle}></span> : null
+        !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle} /> : null
       }
       <span className='bookmarkText'>
       {
@@ -253,8 +253,8 @@ class BookmarksToolbar extends ImmutableComponent {
       return
     }
 
-    let urls = e.dataTransfer.getData('text/uri-list')
-    urls = urls.split('\n')
+    e.dataTransfer.getData('text/uri-list')
+      .split('\n')
       .map((x) => x.trim())
       .filter((x) => !x.startsWith('#') && x.length > 0)
       .forEach((url) =>

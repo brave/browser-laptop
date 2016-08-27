@@ -157,7 +157,7 @@ class ContextMenuItem extends ImmutableComponent {
           fa: faIcon,
           [faIcon]: !!faIcon
         })}
-          style={iconStyle}></span>
+          style={iconStyle} />
         : null
       }
       <span className='contextMenuItemText'

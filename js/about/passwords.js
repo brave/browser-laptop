@@ -26,8 +26,7 @@ class SiteItem extends React.Component {
     return <tr className='passwordItem'>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-times' title='Remove site'
-          onClick={this.onDelete}>
-        </span>
+          onClick={this.onDelete} />
       </td>
       <td className='passwordOrigin'>{this.props.site}</td>
     </tr>
@@ -90,8 +89,7 @@ class PasswordItem extends React.Component {
     return <tr className='passwordItem'>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-times' title='Delete password'
-          onClick={this.onDelete}>
-        </span>
+          onClick={this.onDelete} />
       </td>
       <td className='passwordOrigin'>{password.get('origin')}</td>
       <td className='passwordUsername'>{password.get('username')}</td>
@@ -100,8 +98,7 @@ class PasswordItem extends React.Component {
       </td>
       <td className='passwordActions'>
         <span className='passwordAction fa fa-clipboard' title='Copy password to clipboard'
-          onClick={this.onCopy}>
-        </span>
+          onClick={this.onCopy} />
       </td>
     </tr>
   }
@@ -158,15 +155,15 @@ class AboutPasswords extends React.Component {
     var savedPasswordsPage = this.isPasswordsEmpty
     ? null
     : <div>
-      <h2 data-l10n-id='savedPasswords'></h2>
+      <h2 data-l10n-id='savedPasswords' />
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
           <thead>
             <tr>
-              <th></th>
-              <th data-l10n-id='passwordsSite'></th>
-              <th data-l10n-id='passwordsUsername'></th>
-              <th data-l10n-id='passwordsPassword'></th>
+              <th />
+              <th data-l10n-id='passwordsSite' />
+              <th data-l10n-id='passwordsUsername' />
+              <th data-l10n-id='passwordsPassword' />
             </tr>
           </thead>
           <tbody>
@@ -180,7 +177,7 @@ class AboutPasswords extends React.Component {
         </table>
         <div className='passwordsPageFooter'>
           <span data-l10n-id='clearPasswords'
-            onClick={this.onClear}></span>
+            onClick={this.onClear} />
         </div>
       </div>
     </div>
@@ -188,7 +185,7 @@ class AboutPasswords extends React.Component {
     var savedSitesPage = this.isSitesEmpty
     ? null
     : <div>
-      <h2 data-l10n-id='passwordSites'></h2>
+      <h2 data-l10n-id='passwordSites' />
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
           <tbody>
@@ -202,11 +199,11 @@ class AboutPasswords extends React.Component {
     </div>
 
     return <div className='passwordsPage'>
-      <h1 data-l10n-id='passwordsTitle'></h1>
-      <div className='passwordInstructions' data-l10n-id='passwordDisableInstructions'></div>
+      <h1 data-l10n-id='passwordsTitle' />
+      <div className='passwordInstructions' data-l10n-id='passwordDisableInstructions' />
       {
         this.isPasswordsEmpty && this.isSitesEmpty
-          ? <div data-l10n-id='noPasswordsSaved'></div>
+          ? <div data-l10n-id='noPasswordsSaved' />
           : [savedPasswordsPage, savedSitesPage]
       }
     </div>

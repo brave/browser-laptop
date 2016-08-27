@@ -17,8 +17,7 @@ class Button extends ImmutableComponent {
           [this.props.iconClass]: !!this.props.iconClass,
           [this.props.className]: !!this.props.className
         })}
-        onClick={this.props.onClick}>
-      </span>
+        onClick={this.props.onClick} />
     }
     return <span disabled={this.props.disabled}
       data-l10n-id={this.props.l10nId}

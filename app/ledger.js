@@ -199,7 +199,7 @@ if (ipc) {
         let win = electron.BrowserWindow.getFocusedWindow()
         if (win) {
           win.webContents.send(messages.SHORTCUT_NEW_FRAME,
-            'about:preferences#publishers', { singleFrame: true })
+            'about:preferences#payments', { singleFrame: true })
         }
       }
     }
@@ -496,14 +496,20 @@ var synopsisNormalizer = () => {
     publisher = synopsis.publishers[results[i].publisher]
     duration = results[i].duration
 
-    data[i] = { rank: i + 1,
-                // TBD: the `ledger-publisher` package does not currently report `verified` ...
-                verified: publisher.verified || false,
-                site: results[i].publisher, views: results[i].visits, duration: duration,
-                daysSpent: 0, hoursSpent: 0, minutesSpent: 0, secondsSpent: 0,
-                faviconURL: publisher.faviconURL,
-                score: results[i].scores[scorekeeper]
-              }
+    data[i] = {
+      rank: i + 1,
+      // TBD: the `ledger-publisher` package does not currently report `verified` ...
+      verified: publisher.verified || false,
+      site: results[i].publisher,
+      views: results[i].visits,
+      duration: duration,
+      daysSpent: 0,
+      hoursSpent: 0,
+      minutesSpent: 0,
+      secondsSpent: 0,
+      faviconURL: publisher.faviconURL,
+      score: results[i].scores[scorekeeper]
+    }
     if (results[i].protocol) data[i].publisherURL = results[i].protocol + '//' + results[i].publisher
 
     pct[i] = Math.round((results[i].scores[scorekeeper] * 100) / total)
@@ -773,13 +779,7 @@ var callback = (err, result, delayTime) => {
     console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
-/* TBD: avoid error lock-up in sync preventing future reconciliations
-    return setTimeout(() => {
-      if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
-    }, 1 * msecs.hour)
- */
-
-    if (typeof delayTime === 'undefined') delayTime = 0
+    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
   }
 
   if (!result) return run(delayTime)
@@ -814,10 +814,14 @@ var roundtrip = (params, options, callback) => {
     parts.pathname = parts.path
   }
 
-  options = { url: url.format(parts), method: params.method, payload: params.payload, responseType: 'text',
-              headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
-              verboseP: options.verboseP
-            }
+  options = {
+    url: url.format(parts),
+    method: params.method,
+    payload: params.payload,
+    responseType: 'text',
+    headers: underscore.defaults(params.headers || {}, { 'content-type': 'application/json; charset=utf-8' }),
+    verboseP: options.verboseP
+  }
   request.request(options, (err, response, body) => {
     var payload
 
@@ -896,7 +900,7 @@ var run = (delayTime) => {
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
 
-      if (client.sync(callback) === true) return run(0)
+      if (client.sync(callback) === true) return run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
     }, delayTime)
   }
 
@@ -934,7 +938,7 @@ var getStateInfo = (state) => {
     if (transaction.stamp < then) break
 
     ballots = underscore.clone(transaction.ballots || {})
-    underscore.keys(state.ballots).forEach((ballot) => {
+    state.ballots.forEach((ballot) => {
       if (ballot.viewingId !== transaction.viewingId) return
 
       if (!ballots[ballot.publisher]) ballots[ballot.publisher] = 0
@@ -942,10 +946,8 @@ var getStateInfo = (state) => {
     })
 
     ledgerInfo.transactions.push(underscore.extend(underscore.pick(transaction,
-                                                                   [ 'viewingId', 'submissionStamp', 'satoshis',
-                                                                     'contribution'
-                                                                   ]),
-                                                   transaction.fee, { ballots: ballots }))
+                                                                   [ 'viewingId', 'contribution', 'submissionStamp', 'count' ]),
+                                                                   { ballots: ballots }))
   }
 
   updateLedgerInfo()

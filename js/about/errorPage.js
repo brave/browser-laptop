@@ -40,9 +40,9 @@ class ErrorPage extends React.Component {
   render () {
     return <div className='errorContent'>
       <div className='errorTitle'>
-        <span className='errorText' data-l10n-id={this.state.title}></span>
+        <span className='errorText' data-l10n-id={this.state.title} />
         <span className='errorUrl'>{this.state.url}</span>
-        <span className='errorText' data-l10n-id={this.state.message}></span>
+        <span className='errorText' data-l10n-id={this.state.message} />
       </div>
       <div className='buttons'>
         {this.showBackButton ? <Button l10nId='back' className='actionButton' onClick={this.reloadPrevious.bind(this)} /> : null}

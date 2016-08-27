@@ -20,6 +20,7 @@ const clipboard = global.require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
+const config = require('../constants/config')
 const settings = require('../constants/settings')
 const FindBar = require('./findbar.js')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
@@ -324,6 +325,19 @@ class Frame extends ImmutableComponent {
     }
   }
 
+  enterHtmlFullScreen () {
+    if (this.webview) {
+      this.webview.executeScriptInTab(config.braveExtensionId, 'document.documentElement.webkitRequestFullScreen()', {})
+      this.webview.focus()
+    }
+  }
+
+  exitHtmlFullScreen () {
+    if (this.webview) {
+      this.webview.executeScriptInTab(config.braveExtensionId, 'document.webkitExitFullscreen()', {})
+    }
+  }
+
   componentDidUpdate (prevProps, prevState) {
     const cb = () => {
       if (this.webRTCPolicy !== this.getWebRTCPolicy()) {
@@ -337,11 +351,12 @@ class Frame extends ImmutableComponent {
       }
       // make sure the webview content updates to
       // match the fullscreen state of the frame
-      if (prevProps.isFullScreen !== this.props.isFullScreen) {
-        if (this.props.isFullScreen) {
-          this.webview.executeJavaScript('document.webkitRequestFullscreen()')
+      if (prevProps.isFullScreen !== this.props.isFullScreen ||
+          (this.props.isFullScreen && !this.props.isActive)) {
+        if (this.props.isFullScreen && this.props.isActive) {
+          this.enterHtmlFullScreen()
         } else {
-          this.webview.executeJavaScript('document.webkitExitFullscreen()')
+          this.exitHtmlFullScreen()
         }
       }
       this.webview.setAudioMuted(this.props.audioMuted || false)
@@ -1048,7 +1063,7 @@ class Frame extends ImmutableComponent {
         : null
       }
       {
-        this.props.findbarShown
+        this.props.findbarShown && !this.props.isFullScreen
         ? <FindBar
           onFind={this.onFind}
           onFindHide={this.onFindHide}

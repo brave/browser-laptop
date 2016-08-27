@@ -561,7 +561,7 @@ const handleAppAction = (action) => {
           Filtering.removeAutofillAddress(action.originalDetail.get('guid').toJS())
         }
         appState = appState.setIn(['autofill', 'addresses', 'guid'], addresses.push(Immutable.fromJS(guid)))
-        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], Immutable.fromJS(new Date().getTime()))
+        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
         break
       }
     case AppConstants.APP_REMOVE_AUTOFILL_ADDRESS:
@@ -572,7 +572,7 @@ const handleAppAction = (action) => {
             return Immutable.is(address, action.detail.get('guid'))
           }))
         Filtering.removeAutofillAddress(action.detail.get('guid').toJS())
-        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], Immutable.fromJS(new Date().getTime()))
+        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
         break
       }
     case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
@@ -590,7 +590,7 @@ const handleAppAction = (action) => {
           Filtering.removeAutofillCreditCard(action.originalDetail.get('guid').toJS())
         }
         appState = appState.setIn(['autofill', 'creditCards', 'guid'], creditCards.push(Immutable.fromJS(guid)))
-        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], Immutable.fromJS(new Date().getTime()))
+        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
         break
       }
     case AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD:
@@ -601,7 +601,7 @@ const handleAppAction = (action) => {
             return Immutable.is(card, action.detail.get('guid'))
           }))
         Filtering.removeAutofillCreditCard(action.detail.get('guid').toJS())
-        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], Immutable.fromJS(new Date().getTime()))
+        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
         break
       }
     default:
