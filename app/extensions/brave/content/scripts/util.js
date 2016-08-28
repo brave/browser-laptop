@@ -20,8 +20,8 @@ function executeScript (code) {
 function isEditable (elem) {
   // TODO: find other node types that are editable
   return ((elem.contentEditable && elem.contentEditable !== 'false' && elem.contentEditable !== 'inherit') ||
-          elem.nodeName === 'INPUT' ||
-          elem.nodeName === 'TEXTAREA')
+          elem.nodeName.toLowerCase() === 'input' ||
+          elem.nodeName.toLowerCase() === 'textarea')
 }
 
 /**
