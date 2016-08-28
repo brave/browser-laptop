@@ -7,7 +7,8 @@ let element
 
 switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:newtab':
-    element = require('./newtab')
+    // element = require('./newtab')
+    element = null
     break
   case 'about:about':
     element = require('./about')
