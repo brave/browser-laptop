@@ -444,7 +444,7 @@ WindowStore
       minutesSpent: number,      //   e.g., 3
       secondsSpent: number,      //   e.g., 4
       score: number,             // float indicating the current score
-      percentage: number,        // 0, 1, ... 100
+      percentage: number,        // i.e., 0, 1, ... 100
       publisherURL: string,      // publisher site, e.g., "https://wikipedia.org/"
       faviconURL: string         // i.e., "data:image/...;base64,..."
     }

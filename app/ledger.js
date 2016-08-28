@@ -116,7 +116,7 @@ const doAction = (action) => {
  */
 var init = () => {
   try {
-    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_INFO_DEBUG)
+    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_CLIENT_DEBUG)
     publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
 
     appDispatcher.register(doAction)
@@ -471,7 +471,12 @@ var updatePublisherInfo = () => {
   publisherInfo.synopsis = synopsisNormalizer()
 
   if (publisherInfo._internal.debugP) {
-    console.log('\nupdatePublisherInfo: ' + JSON.stringify(underscore.omit(publisherInfo, [ '_internal' ])))
+    data = []
+    publisherInfo.synopsis.forEach((entry) => {
+      data.push(underscore.extend(underscore.omit(entry, [ 'faviconURL' ]), { faviconURL: entry.faviconURL && '...' }))
+    })
+
+    console.log('\nupdatePublisherInfo: ' + JSON.stringify(data, null, 2))
   }
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
@@ -976,12 +981,19 @@ var getBalance = () => {
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
   (err, provider, result) => {
+    var unconfirmed
+    var info = ledgerInfo._internal.paymentInfo
+
     if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
 
     if (typeof result.unconfirmed === 'undefined') return
 
     if (result.unconfirmed > 0) {
-      ledgerInfo.unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      if ((info || ledgerInfo).unconfirmed === unconfirmed) return
+
+      ledgerInfo.unconfirmed = unconfirmed
+      if (info) info.unconfirmed = ledgerInfo.unconfirmed
       if (clientOptions.verboseP) console.log('\ngetBalance refreshes ledger info: ' + ledgerInfo.unconfirmed)
       return updateLedgerInfo()
     }
