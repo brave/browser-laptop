@@ -61,7 +61,7 @@ module.exports = {
     enabled: true
   },
   adInsertion: {
-    enabled: true,
+    enabled: false,
     url: adHost
   },
   crashes: {
