@@ -33,7 +33,10 @@ module.exports = [
   'node-gyp',
   'npm',
   '.brave-gyp',
+  '.vscode',
+  '.github',
   'jsdoc',
+  'docs',
   'electron-download',
   'electron-rebuild',
   'electron-packager',
@@ -48,5 +51,7 @@ module.exports = [
   'babel$',
   'babel-(?!polyfill|regenerator-runtime)',
   'jsdom-global',
-  'react-addons-perf'
+  'react-addons-perf',
+  'leveldown',
+  'sqlite3'
 ]

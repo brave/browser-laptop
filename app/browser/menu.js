@@ -13,6 +13,7 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const dialog = electron.dialog
 const appActions = require('../../js/actions/appActions')
+const { fileUrl } = require('../../js/lib/appUrlUtil')
 const menuUtil = require('./lib/menuUtil')
 const getSetting = require('../../js/settings').getSetting
 const locale = require('../locale')
@@ -44,7 +45,7 @@ const createFileSubmenu = (CommonMenu) => {
         }, (paths) => {
           if (paths) {
             paths.forEach((path) => {
-              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, path])
+              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, fileUrl(path)])
             })
           }
         })

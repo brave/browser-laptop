@@ -20,6 +20,7 @@ const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
+const FindBar = require('./findbar.js')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
@@ -49,8 +50,8 @@ const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../constants/keyCodes')
 
 // State handling
+const basicAuthState = require('../../app/common/state/basicAuthState')
 const FrameStateUtil = require('../state/frameStateUtil')
-
 const searchProviders = require('../data/searchProviders')
 
 // Util
@@ -87,6 +88,8 @@ class Main extends ImmutableComponent {
     this.onBraveMenu = this.onBraveMenu.bind(this)
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
+    this.onFind = this.onFind.bind(this)
+    this.onFindHide = this.onFindHide.bind(this)
     this.checkForTitleMode = debounce(this.checkForTitleMode.bind(this), 20)
   }
   registerWindowLevelShortcuts () {
@@ -367,13 +370,6 @@ class Main extends ImmutableComponent {
                                      securityState)
     })
 
-    ipc.on(messages.LOGIN_REQUIRED, (e, detail) => {
-      const frame = FrameStateUtil.getFrameByTabId(self.props.windowState, detail.tabId)
-      if (frame) {
-        windowActions.setLoginRequiredDetail(frame, detail)
-      }
-    })
-
     ipc.on(messages.SHOW_USERNAME_LIST, (e, usernames, origin, action, boundingRect) => {
       const topOffset = this.tabContainer.getBoundingClientRect().top
       contextMenus.onShowUsernameMenu(usernames, origin, action, boundingRect, topOffset)
@@ -624,6 +620,25 @@ class Main extends ImmutableComponent {
     windowActions.setUrlBarActive(false)
   }
 
+  onFindHide () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    windowActions.setFindbarShown(activeFrame, false)
+    webviewActions.stopFindInPage()
+    windowActions.setFindDetail(activeFrame, Immutable.fromJS({
+      internalFindStatePresent: false
+    }))
+  }
+
+  onFind (searchString, caseSensitivity, forward, findNext) {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
+    if (!findNext) {
+      windowActions.setFindDetail(activeFrame, Immutable.fromJS({
+        internalFindStatePresent: true
+      }))
+    }
+  }
+
   onTabContextMenu (e) {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     contextMenus.onTabsToolbarContextMenu(activeFrame, undefined, undefined, e)
@@ -697,6 +712,7 @@ class Main extends ImmutableComponent {
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
+    const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -813,9 +829,9 @@ class Main extends ImmutableComponent {
             : null
           }
           {
-            activeFrame && activeFrame.getIn(['security', 'loginRequiredDetail'])
-            ? <LoginRequired frameProps={activeFrame} />
-            : null
+            loginRequiredDetail
+              ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+              : null
           }
           {
             this.props.windowState.get('bookmarkDetail')
@@ -899,6 +915,20 @@ class Main extends ImmutableComponent {
           activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
           onMenu={this.onHamburgerMenu}
         />
+
+        {
+          activeFrame && activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
+          ? <FindBar
+            paintTabs={getSetting(settings.PAINT_TABS)}
+            themeColor={activeFrame.get('themeColor')}
+            computedThemeColor={activeFrame.get('computedThemeColor')}
+            frameKey={activeFrame.get('key')}
+            selected={activeFrame.get('findbarSelected')}
+            findDetail={activeFrame.get('findDetail')}
+            onFind={this.onFind}
+            onFindHide={this.onFindHide} />
+          : null
+        }
       </div>
       <div className='mainContainer'>
         <div className='tabContainer'
@@ -931,7 +961,6 @@ class Main extends ImmutableComponent {
               isFullScreen={frame.get('isFullScreen')}
               showFullScreenWarning={frame.get('showFullScreenWarning')}
               findbarShown={frame.get('findbarShown')}
-              findbarSelected={frame.get('findbarSelected')}
               findDetail={frame.get('findDetail')}
               hrefPreview={frame.get('hrefPreview')}
               showOnRight={frame.get('showOnRight')}

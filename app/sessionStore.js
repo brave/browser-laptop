@@ -21,6 +21,7 @@ const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
+// const tabState = require('./common/state/tabState')
 
 let suffix = ''
 if (process.env.NODE_ENV === 'development') {
@@ -81,7 +82,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
     if (isShutdown) {
       p = p.then(module.exports.cleanSessionDataOnShutdown())
     }
-    p = p.then(resolve)
+    p.then(resolve)
       .catch(reject)
   })
 }
@@ -274,6 +275,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
       })
     }
   }
+  // all data in tabs is transient while we make the transition from window to app state
+  delete data.tabs
+  // if (data.tabs) {
+  //   data.tabs = data.tabs.map((tab) => tabState.getPersistentTabState(tab).toJS())
+  // }
 }
 
 /**
@@ -312,6 +318,23 @@ module.exports.loadAppState = () => {
 
     try {
       data = Object.assign(module.exports.defaultAppState(), JSON.parse(data))
+      // autofill data migration
+      if (Array.isArray(data.autofill.addresses)) {
+        let addresses = exports.defaultAppState().autofill.addresses
+        data.autofill.addresses.forEach((guid) => {
+          addresses.guid.push(guid)
+          addresses.timestamp = new Date().getTime()
+        })
+        data.autofill.addresses = addresses
+      }
+      if (Array.isArray(data.autofill.creditCards)) {
+        let creditCards = exports.defaultAppState().autofill.creditCards
+        data.autofill.creditCards.forEach((guid) => {
+          creditCards.guid.push(guid)
+          creditCards.timestamp = new Date().getTime()
+        })
+        data.autofill.creditCards = creditCards
+      }
       // xml migration
       if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
         data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
@@ -356,6 +379,7 @@ module.exports.loadAppState = () => {
 module.exports.defaultAppState = () => {
   return {
     sites: [],
+    tabs: [],
     visits: [],
     settings: {},
     siteSettings: {},
@@ -367,8 +391,14 @@ module.exports.defaultAppState = () => {
       ignoredWords: []
     },
     autofill: {
-      addresses: [],
-      creditCards: []
+      addresses: {
+        guid: [],
+        timestamp: 0
+      },
+      creditCards: {
+        guid: [],
+        timestamp: 0
+      }
     }
   }
 }

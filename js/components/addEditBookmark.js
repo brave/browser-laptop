@@ -35,7 +35,7 @@ class AddEditBookmark extends ImmutableComponent {
 
   get bookmarkNameValid () {
     let title = (this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle'))
-    return ((typeof title === 'string') && title.trim().length > 0)
+    return ((typeof title === 'string') && title.trim().length > 0) || !this.isFolder
   }
 
   get isFolder () {
@@ -74,7 +74,7 @@ class AddEditBookmark extends ImmutableComponent {
   }
   onNameChange (e) {
     let currentDetail = this.props.currentDetail
-    if (currentDetail.get('title') === e.target.value) {
+    if (currentDetail.get('title') === e.target.value && e.target.value) {
       currentDetail = currentDetail.delete('customTitle')
     } else {
       currentDetail = currentDetail.set('customTitle', e.target.value)
@@ -113,7 +113,8 @@ class AddEditBookmark extends ImmutableComponent {
     this.onClose()
   }
   onRemoveBookmark () {
-    appActions.removeSite(this.props.currentDetail, siteTags.BOOKMARK)
+    const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
+    appActions.removeSite(this.props.currentDetail, tag)
     this.updateMenuBookmarkedStatus(false)
     this.onClose()
   }
@@ -121,7 +122,7 @@ class AddEditBookmark extends ImmutableComponent {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
       return this.props.currentDetail.get('customTitle')
     }
-    return this.props.currentDetail.get('title') || this.props.currentDetail.get('location')
+    return this.props.currentDetail.get('title') || ''
   }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>

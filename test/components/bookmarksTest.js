@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, navigator, navigatorNotBookmarked, saveButton} = require('../lib/selectors')
+const {urlInput, navigator, navigatorNotBookmarked, saveButton, deleteButton} = require('../lib/selectors')
 
 describe('bookmarks', function () {
   function * setup (client) {
@@ -43,6 +43,33 @@ describe('bookmarks', function () {
         .waitForExist('#bookmarkLocation input')
         .getValue('#bookmarkLocation input').should.eventually.be.equal(this.page1Url)
     })
+
+    describe('saved with a title', function () {
+      before(function * () {
+        yield this.app.client
+          .click(saveButton)
+      })
+      it('displays title', function * () {
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getText('.bookmarkText')
+              .then((val) => val === 'Page 1')
+          })
+      })
+
+      describe('and then removed', function () {
+        before(function * () {
+          yield this.app.client
+            .click(navigatorNotBookmarked)
+            .waitForExist(deleteButton)
+            .click(deleteButton)
+        })
+        it('removes the bookmark from the toolbar', function * () {
+          yield this.app.client
+            .waitForExist('.bookmarkText', 1000, true)
+        })
+      })
+    })
   })
 
   describe('without title', function () {
@@ -61,19 +88,46 @@ describe('bookmarks', function () {
         .waitForExist(navigatorNotBookmarked)
         .moveToObject(navigator)
         .click(navigatorNotBookmarked)
-        .waitForVisible(saveButton)
+        .waitForVisible(saveButton + ':not([disabled]')
     })
 
-    it('fills in the url for the title field', function * () {
+    it('leaves the title field blank', function * () {
       yield this.app.client
         .waitForExist('#bookmarkName input')
-        .getValue('#bookmarkName input').should.eventually.be.equal(this.page1Url)
+        .getValue('#bookmarkName input').should.eventually.be.equal('')
     })
 
     it('fills in the url field', function * () {
       yield this.app.client
         .waitForExist('#bookmarkLocation input')
         .getValue('#bookmarkLocation input').should.eventually.be.equal(this.page1Url)
+    })
+
+    describe('saved without a title', function () {
+      before(function * () {
+        yield this.app.client
+          .click(saveButton)
+      })
+      it('displays URL', function * () {
+        const page1Url = this.page1Url
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getText('.bookmarkText')
+              .then((val) => val === page1Url)
+          })
+      })
+      describe('and then removed', function () {
+        before(function * () {
+          yield this.app.client
+            .click(navigatorNotBookmarked)
+            .waitForExist(deleteButton)
+            .click(deleteButton)
+        })
+        it('removes the bookmark from the toolbar', function * () {
+          yield this.app.client
+            .waitForExist('.bookmarkText', 1000, true)
+        })
+      })
     })
   })
 })
