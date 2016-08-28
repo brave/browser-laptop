@@ -469,15 +469,33 @@ describe('siteUtil', function () {
 
   describe('clearSitesWithoutTags', function () {
     it('does not remove sites which have a valid `tags` property', function () {
-      const sites = [
-        Immutable.fromJS({
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }),
-        Immutable.fromJS({
-          tags: [siteTags.BOOKMARK]
-        })]
+      const sites = Immutable.fromJS([
+        { tags: [siteTags.BOOKMARK_FOLDER] },
+        { tags: [siteTags.BOOKMARK] }
+      ])
       const processedSites = siteUtil.clearSitesWithoutTags(sites)
-      assert.deepEqual(sites, processedSites)
+      assert.deepEqual(processedSites.toJS(), sites.toJS())
+    })
+    it('sets the lastAccessedTime for all entries to null', function () {
+      const sites = Immutable.fromJS([
+        {
+          location: 'location1',
+          tags: [],
+          lastAccessedTime: 123
+        },
+        {
+          location: 'location2',
+          tags: [siteTags.BOOKMARK],
+          lastAccessedTime: 123
+        }
+      ])
+      const expectedSites = Immutable.fromJS([{
+        location: 'location2',
+        tags: [siteTags.BOOKMARK],
+        lastAccessedTime: null
+      }])
+      const processedSites = siteUtil.clearSitesWithoutTags(sites)
+      assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
     })
   })
 

@@ -372,7 +372,13 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
  * @param sites The application state's Immutable sites list.
  */
 module.exports.clearSitesWithoutTags = function (sites) {
-  return sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
+  let clearedSites = sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
+  clearedSites.forEach((site, index) => {
+    if (site.get('lastAccessedTime')) {
+      clearedSites = clearedSites.setIn([index, 'lastAccessedTime'], null)
+    }
+  })
+  return clearedSites
 }
 
 /**
