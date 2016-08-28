@@ -36,6 +36,9 @@
  - Fixed Flash on http://www.y8.com/games/superfighters. ([#3082](https://github.com/brave/browser-laptop/issues/3082))
  - Fixed Bookmarks now show under Bookmarks menu. ([#3055](https://github.com/brave/browser-laptop/issues/3055))
  - Fixed Menu should only be built once. ([#3022](https://github.com/brave/browser-laptop/issues/3022))
+ - Fixed the ability to delete saved passwords. ([#3481](https://github.com/brave/browser-laptop/issues/3481))
+ - Fixed Bookmarks flow for sites without titles. ([#3442](https://github.com/brave/browser-laptop/issues/3442))
+ - Fixed opening files instead of searching for them. ([#3296](https://github.com/brave/browser-laptop/issues/3296))
  - Update to HTTPS Everywhere 5.2.0. ([#2581](https://github.com/brave/browser-laptop/issues/2581))
 
 ## [0.11.5](https://github.com/brave/browser-laptop/releases/v0.11.5dev)
