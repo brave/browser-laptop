@@ -385,10 +385,12 @@ const windowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   setFocusedFrame: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
-      frameProps: frameProps
-    })
+    if (frameProps) {
+      dispatch({
+        actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
+        frameProps: frameProps
+      })
+    }
   },
 
   /**
