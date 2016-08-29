@@ -650,10 +650,7 @@ class PaymentsTab extends ImmutableComponent {
 
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
-    const currency = this.props.ledgerData.get('currency')
-    if (!currency) {
-      return `${balance} BTC`
-    }
+    const currency = this.props.ledgerData.get('currency') || 'USD'
     if (balance === 0) {
       return `0 ${currency}`
     }
