@@ -7,6 +7,9 @@ pids
 *.pid
 *.seed
 
+# Python
+*.pyc
+
 # local vagrant configuration files
 .vagrant
 
