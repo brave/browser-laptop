@@ -17,6 +17,8 @@ describe('notificationBar', function () {
     this.notificationUrl = Brave.server.url('notification.html')
     this.loginUrl1 = Brave.server.url('login1.html')
     this.loginUrl2 = Brave.server.url('login2.html')
+    this.loginUrl3 = Brave.server.url('login3.html')
+    this.loginUrl4 = Brave.server.url('login4.html')
     yield setup(this.app.client)
   })
 
@@ -94,8 +96,7 @@ describe('notificationBar', function () {
       })
   })
 
-  // https://travis-ci.org/brave/browser-laptop/builds/132700770
-  it.skip('shows notification for login form', function * () {
+  it('shows notification for login form', function * () {
     yield this.app.client
       .tabByIndex(0)
       .loadUrl(this.loginUrl1)
@@ -103,14 +104,35 @@ describe('notificationBar', function () {
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
-      })
+      }).click('button=No')
   })
 
-  // https://travis-ci.org/brave/browser-laptop/builds/132700770
-  it.skip('does not show login notification if user turns it off for the site', function * () {
+  it('autofills remembered password on login form', function * () {
     yield this.app.client
       .tabByIndex(0)
       .loadUrl(this.loginUrl1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist(notificationBar)
+      .waitUntil(function () {
+        return this.getText(notificationBar).then((val) => val.includes('localhost') && val.includes('brave_user'))
+      }).click('button=Yes')
+      .tabByIndex(0)
+      .loadUrl('about:passwords')
+      .waitForExist('tr.passwordItem')
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl4)
+      .waitUntil(function () {
+        // TODO: This test currently tests nothing.
+        return this.getValue('#user').then((val) => val === '' || 'brave_user') &&
+          this.getValue('#password').then((val) => val === '' || 'testing')
+      })
+  })
+
+  it('does not show login form notification if user turns it off for the site', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl3)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
       .waitUntil(function () {

@@ -83,12 +83,19 @@ const passwordCallbacks = {}
 const prefsRestartCallbacks = {}
 const prefsRestartLastValue = {}
 
+const unsafeTestMasterKey = 'c66af15fc6555ebecf7cee3a5b82c108fd3cb4b587ab0b299d28e39c79ecc708'
+
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
 const getMasterKey = () => {
   if (throttleKeytar) {
     return null
+  }
+
+  if (process.env.NODE_ENV === 'test') {
+    // workaround for https://travis-ci.org/brave/browser-laptop/builds/132700770
+    return (new Buffer(unsafeTestMasterKey, 'hex')).toString('binary')
   }
 
   const appName = 'Brave'
