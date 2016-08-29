@@ -693,7 +693,10 @@ class PaymentsTab extends ImmutableComponent {
             <tr>
               <td>
                 <span id='fundsAmount'>
-                {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
+                  {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
+                  <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
+                    <span className='fa fa-question-circle fundsFAQ'></span>
+                  </a>
                 </span>
                 {this.walletButton}
                 {this.paymentHistoryButton}
@@ -741,9 +744,11 @@ class PaymentsTab extends ImmutableComponent {
           <span className='sectionTitle' data-l10n-id='publisherPaymentsTitle' />
           <span className='sectionSubTitle' data-l10n-id='publisherPaymentsTitleBeta' />
         </div>
-        <div className='pull-left' id='enablePaymentsSwitch'>
-          <span data-l10n-id='off' />
-          <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <div className='pull-left' id='paymentsSwitches'>
+          <div className='enablePaymentsSwitch'>
+            <span data-l10n-id='off' />
+            <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+          </div>
           {this.enabled ? <SettingCheckbox dataL10nId='notifications' prefKey={settings.PAYMENTS_NOTIFICATIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} /> : null}
         </div>
       </div>
