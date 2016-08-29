@@ -67,12 +67,12 @@ module.exports = {
   'imasdk.googleapis.com': {
     enableForAdblock: true,
     onBeforeRequest: function (details) {
-      if (urlParse(details.firstPartyUrl).hostname !== 'www.y8.com' ||
-          urlParse(details.url).pathname !== '/js/sdkloader/outstream.js') {
-        return
-      }
-      return {
-        cancel: false
+      const hostname = urlParse(details.firstPartyUrl).hostname
+      if (hostname && hostname.endsWith('.y8.com') &&
+          urlParse(details.url).pathname === '/js/sdkloader/outstream.js') {
+        return {
+          cancel: false
+        }
       }
     }
   },
