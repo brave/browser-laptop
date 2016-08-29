@@ -123,9 +123,8 @@ describe('notificationBar', function () {
       .tabByIndex(0)
       .loadUrl(this.loginUrl4)
       .waitUntil(function () {
-        // TODO: This test currently tests nothing.
-        return this.getValue('#user').then((val) => val === '' || 'brave_user') &&
-          this.getValue('#password').then((val) => val === '' || 'testing')
+        return this.getValue('#user').then((val) => val === 'brave_user') &&
+          this.getValue('#password').then((val) => val === 'testing')
       })
   })
 
