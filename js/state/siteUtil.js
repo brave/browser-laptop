@@ -133,6 +133,9 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (siteDetail.get('favicon') || oldSite && oldSite.get('favicon')) {
     site = site.set('favicon', siteDetail.get('favicon') || oldSite.get('favicon'))
   }
+  if (siteDetail.get('themeColor') || oldSite && oldSite.get('themeColor')) {
+    site = site.set('themeColor', siteDetail.get('themeColor') || oldSite.get('themeColor'))
+  }
 
   if (index === -1) {
     return sites.push(site)
@@ -242,7 +245,7 @@ module.exports.getDetailFromFrame = function (frame, tag) {
     partitionNumber: frame.get('partitionNumber'),
     tags: tag ? [tag] : [],
     favicon: frame.get('icon'),
-    themeColor: frame.get('themeColor')
+    themeColor: frame.get('themeColor') || frame.get('computedThemeColor')
   })
 }
 
