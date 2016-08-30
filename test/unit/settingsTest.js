@@ -111,5 +111,16 @@ describe('settings unit test', function () {
       const actualResult = settings.getActivePasswordManager(settingsCollection)
       assert.deepEqual(actualResult, expectedResult)
     })
+
+    it('calls getSetting to get the value (providing a default if none exists)', function () {
+      settingsCollection[settingsConst.ONE_PASSWORD_ENABLED] = true
+      const expectedResult = Immutable.fromJS({
+        name: passwordManagers.ONE_PASSWORD,
+        extensionId: extensionIds[passwordManagers.ONE_PASSWORD],
+        displayName: displayNames[passwordManagers.ONE_PASSWORD]
+      })
+      const actualResult = settings.getActivePasswordManager(settingsCollection)
+      assert.deepEqual(actualResult, expectedResult)
+    })
   })
 })
