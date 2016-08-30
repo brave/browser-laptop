@@ -692,7 +692,7 @@ class PaymentsTab extends ImmutableComponent {
                 <span id='fundsAmount'>
                   {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
                   <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
-                    <span className='fa fa-question-circle fundsFAQ'></span>
+                    <span className='fa fa-question-circle fundsFAQ' />
                   </a>
                 </span>
                 {this.walletButton}
