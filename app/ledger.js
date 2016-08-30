@@ -238,9 +238,6 @@ eventStore.addChangeListener(() => {
     var entry, faviconURL, publisher
     var location = page.url
 
-/*
-    console.log('\npage=' + JSON.stringify(page, null, 2))
- */
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
 
     if (!page.publisher) {
@@ -403,6 +400,7 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
+    if (process.env.NODE_ENV === 'test') synopsis.options.minDuration = 0
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
@@ -467,16 +465,19 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(publisherPath), data, () => {})
   syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
+  if (synopsis.options.minDuration === 0) synopsis.options.minDuration = 8 * msecs.second
   syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
   if (publisherInfo._internal.debugP) {
+/*
     data = []
     publisherInfo.synopsis.forEach((entry) => {
       data.push(underscore.extend(underscore.omit(entry, [ 'faviconURL' ]), { faviconURL: entry.faviconURL && '...' }))
     })
 
     console.log('\nupdatePublisherInfo: ' + JSON.stringify(data, null, 2))
+ */
   }
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
@@ -584,9 +585,10 @@ var visit = (location, timestamp) => {
 
     if (!synopsis) return
 
-/*
-    console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2))
- */
+    if (publisherInfo._internal.debugP) {
+      console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2) +
+                  ' duration=' + (timestamp - currentTimestamp) + ' msec')
+    }
     if ((location === currentLocation) || (!locations[currentLocation])) return
 
     publisher = locations[currentLocation].publisher
@@ -596,6 +598,7 @@ var visit = (location, timestamp) => {
     publishers[publisher][currentLocation] = timestamp
 
     duration = timestamp - currentTimestamp
+    if (publisherInfo._internal.debugP) console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec')
     synopsis.addPublisher(publisher, duration)
     updatePublisherInfo()
   }
@@ -795,7 +798,7 @@ var callback = (err, result, delayTime) => {
   }
 
   if (err) {
-    console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
+    console.log('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
     if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
