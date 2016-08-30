@@ -465,7 +465,6 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(publisherPath), data, () => {})
   syncWriter(pathName(scoresPath), synopsis.allN(), () => {})
 
-  if (synopsis.options.minDuration === 0) synopsis.options.minDuration = 8 * msecs.second
   syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
@@ -1108,7 +1107,7 @@ var syncWriter = (path, obj, options, cb) => {
   })
 }
 
-const pathSuffix = (process.env.NODE_ENV === 'development') ? '-dev' : ''
+const pathSuffix = { development: '-dev', test: '-test' }[process.env.NODE_ENV] || ''
 
 var pathName = (name) => {
   var parts = path.parse(name)
