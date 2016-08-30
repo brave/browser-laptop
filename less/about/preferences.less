@@ -375,7 +375,7 @@ span.browserButton.primaryButton {
       border: solid 1px @lightGray;
       background: white;
       color: @darkGray;
-      box-shadow: @lightBoxShadow;
+      box-shadow: @prefMenuShadow;
       outline: none;
     }
 
@@ -464,11 +464,12 @@ table.sortableTable {
   background-color: @lightGray;
   margin: 1em 0;
   padding: 40px;
+  border-radius: @borderRadiusUIbox;
   font-size: 1.3em;
   line-height: 1.3em;
   color: @mediumGray;
-  min-width: 440px;
-  max-width: 600px;
+  min-width: 400px;
+  max-width: 550px;
   float: left;
   > div {
     padding: 0.5em 0;
@@ -626,7 +627,7 @@ div.nextPaymentSubmission {
       -webkit-font-smoothing: antialiased;
       text-align: left;
       width: 8%;
-      padding-top: 16px;
+      padding-top: 6px;
       vertical-align: top;
 
       a {
