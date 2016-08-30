@@ -18,7 +18,7 @@ body {
 
   .enablePaymentsSwitch {
     float: left;
-    min-width: 210px;
+    min-width: 215px;
     margin-right: 30px;
 
     span {
@@ -329,13 +329,14 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton.primaryButton.addFunds {
-  font-size: 0.9em;
-  margin-right: 50px;
-}
-
 span.browserButton.primaryButton {
-  .clearBrowsingDataButton, .manageAutofillDataButton {
+  &.addFunds {
+    font-size: 0.9em;
+    margin-right: 50px;
+  }
+
+  &.clearBrowsingDataButton,
+  &.manageAutofillDataButton {
     font-size: 0.9em;
     margin-top: 20px;
     padding: 5px 20px;
@@ -597,7 +598,7 @@ div.nextPaymentSubmission {
     td {
       padding: 15px 30px 0 0;
       width: auto;
-      min-width: 210px;
+      min-width: 215px;
     }
     span.browserButton.primaryButton.addFunds {
       margin-right: 0;
