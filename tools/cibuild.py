@@ -63,7 +63,6 @@ if any(not os.environ.has_key(v) for v in deps):
 
 execute(['git', 'pull'])
 execute(['rm', '-Rf', 'node_modules'])
-execute(['rm', '-Rf', os.path.join(os.path.expanduser("~"), '.electron')])
 
 write_npmrc()
 
