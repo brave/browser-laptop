@@ -738,8 +738,8 @@ class PaymentsTab extends ImmutableComponent {
         }
       <div className='titleBar'>
         <div className='sectionTitleWrapper pull-left'>
-          <span className='sectionTitle' data-l10n-id='publisherPaymentsTitle' />
-          <span className='sectionSubTitle' data-l10n-id='publisherPaymentsTitleBeta' />
+          <span className='sectionTitle'>Brave Payments</span>
+          <span className='sectionSubTitle'>beta</span>
         </div>
         <div className='pull-left' id='paymentsSwitches'>
           <div className='enablePaymentsSwitch'>
