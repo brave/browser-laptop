@@ -263,6 +263,25 @@ class BitcoinDashboard extends ImmutableComponent {
   get overlayContent () {
     return <iframe src={this.ledgerData.get('buyURL')} />
   }
+  get canUseCoinbase () {
+    // This assumes amount is USD
+    const amount = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
+    return amount < 6
+  }
+  get coinbasePanel () {
+    if (this.canUseCoinbase) {
+      return <div className='panel'>
+        <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+        <div id='coinbaseLogo' />
+        <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+      </div>
+    } else {
+      return <div className='panel disabledPanel'>
+        <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+        <div data-l10n-id='coinbaseNotAvailable' />
+      </div>
+    }
+  }
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
@@ -284,7 +303,6 @@ class BitcoinDashboard extends ImmutableComponent {
   render () {
     window.addEventListener('message', this.onMessage.bind(this), false)
     var emptyDialog = true
-// if someone can figure out how to get a localized title attribute (bitcoinCopyAddress) here, please do so!
     return <div id='bitcoinDashboard'>
       {
       this.props.bitcoinOverlayVisible
@@ -292,11 +310,7 @@ class BitcoinDashboard extends ImmutableComponent {
         : null
       }
       <div className='board'>
-        <div className='panel'>
-          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div id='coinbaseLogo' />
-          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
-        </div>
+        {this.coinbasePanel}
         <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
           {
@@ -621,6 +635,7 @@ class PaymentsTab extends ImmutableComponent {
 
   get overlayContent () {
     return <BitcoinDashboard ledgerData={this.props.ledgerData}
+      settings={this.props.settings}
       bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
       showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
       hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
