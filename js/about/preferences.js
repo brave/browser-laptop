@@ -213,12 +213,12 @@ class LedgerTableRow extends ImmutableComponent {
     const defaultSiteSetting = true
 
     return <tr className={this.enabled ? '' : 'paymentsDisabled'}>
-      <td className='narrow' data-sort={this.padLeft(rank)}>{rank}</td>
-      <td className='wide'><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
-      <td className='narrow'><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
-      <td data-sort={this.padLeft(views)}>{views}</td>
-      <td data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
-      <td data-sort={this.padLeft(percentage)}>{percentage}</td>
+      <td className='alignRight' data-sort={this.padLeft(rank)}>{rank}</td>
+      <td><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
+      <td><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
+      <td className='alignRight' data-sort={this.padLeft(views)}>{views}</td>
+      <td className='alignRight' data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
+      <td className='alignRight' data-sort={this.padLeft(percentage)}>{percentage}</td>
     </tr>
   }
 }
@@ -409,8 +409,8 @@ class PaymentHistoryRow extends ImmutableComponent {
     var totalAmountStr = `${this.totalAmount} ${this.currency}`
 
     return <tr>
-      <td className='narrow' data-sort={this.timestamp}>{date}</td>
-      <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
+      <td data-sort={this.timestamp}>{date}</td>
+      <td data-sort={this.satoshis}>{totalAmountStr}</td>
     </tr>
   }
 }
