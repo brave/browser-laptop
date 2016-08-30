@@ -38,7 +38,10 @@
     "watch": "webpack-dev-server --inline --hot --colors --content-base=./app/extensions/brave",
     "watch-all": "npm run watch & npm run watch-test",
     "watch-test": "NODE_ENV=test webpack --watch",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "win-fixelectron": "powershell ./tools/windows/fix-electron.ps1",
+    "win-fixnpm": "powershell ./tools/windows/vs2015-sp3-fix-npm.ps1",
+    "win-renpm": "powershell ./tools/windows/re-npm.ps1"
   },
   "repository": "brave/browser-laptop",
   "author": {
