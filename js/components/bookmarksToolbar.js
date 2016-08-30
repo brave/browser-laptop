@@ -18,6 +18,7 @@ const dnd = require('../dnd')
 const dndData = require('../dndData')
 const calculateTextWidth = require('../lib/textCalculator').calculateTextWidth
 const windowStore = require('../stores/windowStore')
+const iconSize = 16
 
 class BookmarkToolbarButton extends ImmutableComponent {
   constructor () {
@@ -124,16 +125,13 @@ class BookmarkToolbarButton extends ImmutableComponent {
   }
 
   render () {
-    let showFavicon = this.props.showFavicon
-    const showOnlyFavicon = this.props.showOnlyFavicon
-
-    const iconSize = 16
+    let showingFavicon = this.props.showFavicon
     let iconStyle = {
       minWidth: iconSize,
       width: iconSize
     }
 
-    if (showFavicon) {
+    if (showingFavicon) {
       let icon = this.props.bookmark.get('favicon')
 
       if (icon) {
@@ -143,7 +141,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
           height: iconSize
         })
       } else if (!this.isFolder) {
-        showFavicon = false
+        showingFavicon = false
       }
     }
 
@@ -164,7 +162,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         draggingOverLeft: this.isDraggingOverLeft && !this.isExpanded,
         draggingOverRight: this.isDraggingOverRight && !this.isExpanded,
         isDragging: this.isDragging,
-        showOnlyFavicon: showFavicon && showOnlyFavicon
+        showOnlyFavicon: this.props.showFavicon && this.props.showOnlyFavicon
       })}
       draggable
       ref={(node) => { this.bookmarkNode = node }}
@@ -177,16 +175,22 @@ class BookmarkToolbarButton extends ImmutableComponent {
       onDragOver={this.onDragOver}
       onContextMenu={this.onContextMenu}>
       {
-        this.isFolder && showFavicon
+        this.isFolder && this.props.showFavicon
         ? <span className='bookmarkFavicon bookmarkFolder fa fa-folder-o' style={iconStyle} />
         : null
       }
       {
-        !this.isFolder && showFavicon ? <span className='bookmarkFavicon' style={iconStyle} /> : null
+        // Fill in a favicon if we want one but there isn't one
+        !this.isFolder && this.props.showFavicon && !showingFavicon
+        ? <span className='bookmarkFavicon bookmarkFile fa fa-file-o' style={iconStyle} />
+        : null
+      }
+      {
+        !this.isFolder && showingFavicon ? <span className='bookmarkFavicon' style={iconStyle} /> : null
       }
       <span className='bookmarkText'>
       {
-        !this.isFolder && showFavicon && showOnlyFavicon
+        this.props.showFavicon && this.props.showOnlyFavicon
         ? ''
         : siteDetailTitle || siteDetailLocation
       }
@@ -283,28 +287,35 @@ class BookmarksToolbar extends ImmutableComponent {
       this.root = window.getComputedStyle(document.querySelector(':root'))
       this.maxWidth = Number.parseInt(this.root.getPropertyValue('--bookmark-item-max-width'), 10)
       this.padding = Number.parseInt(this.root.getPropertyValue('--bookmark-item-padding'), 10) * 2
-      this.toolbarPadding = Number.parseInt(this.root.getPropertyValue('--bookmarks-toolbar-padding'), 10) * 2
-      this.margin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-margin'), 10) * 2
+      // Toolbar padding is only on the left
+      this.toolbarPadding = Number.parseInt(this.root.getPropertyValue('--bookmarks-toolbar-padding'), 10)
+      this.bookmarkItemMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-margin'), 10) * 2
+      // No margin for show only favicons
       this.chevronMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-chevron-margin'), 10)
       this.fontSize = this.root.getPropertyValue('--bookmark-item-font-size')
       this.fontFamily = this.root.getPropertyValue('--default-font-family')
-      this.chevronWidth = this.chevronMargin + calculateTextWidth('\uF078', `${this.fontSize} "FontAwesome"`)
+      this.chevronWidth = this.chevronMargin + Number.parseInt(this.fontSize)
     }
+    const margin = props.showFavicon && props.showOnlyFavicon ? 0 : this.bookmarkItemMargin
     widthAccountedFor += this.toolbarPadding
 
     // Loop through until we fill up the entire bookmark toolbar width
     let i
     for (i = 0; i < noParentItems.size; i++) {
-      const iconWidth = props.showFavicon && (noParentItems.getIn([i, 'favicon']) || noParentItems.getIn([i, 'folderId'])) ? 20 : 0
+      let iconWidth = props.showFavicon ? iconSize : 0
+      // font-awesome file icons are 3px smaller
+      if (props.showFavicon && !noParentItems.getIn([i, 'folderId']) && !noParentItems.getIn([i, 'favicon'])) {
+        iconWidth -= 3
+      }
       const chevronWidth = props.showFavicon && noParentItems.getIn([i, 'folderId']) ? this.chevronWidth : 0
       if (props.showFavicon && props.showOnlyFavicon) {
-        widthAccountedFor += this.padding + iconWidth
+        widthAccountedFor += this.padding + iconWidth + chevronWidth
       } else {
         const text = noParentItems.getIn([i, 'customTitle']) || noParentItems.getIn([i, 'title']) || noParentItems.getIn([i, 'location'])
         widthAccountedFor += Math.min(calculateTextWidth(text, `${this.fontSize} ${this.fontFamily}`) + this.padding + iconWidth + chevronWidth, this.maxWidth)
       }
-      widthAccountedFor += this.margin
-      if (widthAccountedFor >= window.innerWidth - overflowButtonWidth) {
+      widthAccountedFor += margin
+      if (widthAccountedFor >= props.windowWidth - overflowButtonWidth) {
         break
       }
     }
@@ -371,9 +382,10 @@ class BookmarksToolbar extends ImmutableComponent {
       onDragOver={this.onDragOver}
       onContextMenu={this.onContextMenu}>
     {
-        this.bookmarksForToolbar.map((bookmark) =>
+        this.bookmarksForToolbar.map((bookmark, i) =>
           <BookmarkToolbarButton
             ref={(node) => this.bookmarkRefs.push(node)}
+            key={i}
             contextMenuDetail={this.props.contextMenuDetail}
             activeFrameKey={this.props.activeFrameKey}
             draggingOverData={this.props.draggingOverData}
