@@ -13,17 +13,23 @@ body {
   display: none !important; /* for testing/debug only */
 }
 
-#enablePaymentsSwitch {
-  margin: 15px 0 0 100px;
+#paymentsSwitches {
+  margin-top: 15px;
 
-  span {
-    font-weight: bold;
-    color: @gray;
-  }
+  .enablePaymentsSwitch {
+    float: left;
+    min-width: 210px;
+    margin-right: 30px;
 
-  label {
-    font-weight: bold;
-    color: @braveOrange;
+    span {
+      font-weight: bold;
+      color: @gray;
+    }
+
+    label {
+      font-weight: bold;
+      color: @braveOrange;
+    }
   }
 
   .settingItem {
@@ -33,14 +39,19 @@ body {
 }
 
 #fundsAmount {
-  line-height: 2;
   margin-right: 10px;
+
+  .fundsFAQ {
+    position: relative;
+    margin: 0 10px;
+    top: -1px;
+  }
 }
 
 .prefTabContainer {
   .sectionTitleWrapper {
     position: relative;
-    margin-left: 20px;
+    margin-right: 20px;
     min-height: 40px;
     min-width: 240px;
 
@@ -57,7 +68,7 @@ body {
       font-size: 15px;
       position: absolute;
       bottom: 25px;
-      right: 18px;
+      right: 19px;
     }
   }
 
@@ -577,9 +588,23 @@ div.nextPaymentSubmission {
     margin: 30px 0px;
     th {
       text-align: left;
+      font-weight: normal;
     }
     tr {
       height: 1em;
+    }
+    td {
+      padding: 15px 30px 0 0;
+      width: auto;
+      min-width: 210px;
+    }
+    span.browserButton.primaryButton.addFunds {
+      margin-right: 0;
+    }
+    .addFunds {
+      margin: 0;
+      height: 30px;
+      line-height: 30px;
     }
   }
 
@@ -914,4 +939,6 @@ div.nextPaymentSubmission {
 
 #fundsSelectBox {
   margin-top: 0px;
+  min-width: 130px;
+  width: auto;
 }
