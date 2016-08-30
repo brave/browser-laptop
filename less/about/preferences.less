@@ -499,6 +499,14 @@ table.sortableTable {
 #ledgerTable {
   height: ~"-webkit-calc(100vh - 300px)";
   overflow-y: scroll;
+
+  tr {
+    th,
+    td {
+      padding: 0 15px;
+    }
+  }
+
 }
 
 .modal .dialog.paymentHistory .sectionTitle {
@@ -652,7 +660,6 @@ div.nextPaymentSubmission {
       color: @mediumGray;
       -webkit-font-smoothing: antialiased;
       text-align: left;
-      width: 8%;
       vertical-align: top;
 
       a {
@@ -671,13 +678,8 @@ div.nextPaymentSubmission {
         }
       }
 
-      &.narrow {
-        width: 5%;
-      }
-
-      &.wide {
-        width: 20%;
-        text-align: left;
+      &.alignRight {
+        text-align: right;
       }
 
       input[type='range'] {
