@@ -468,16 +468,16 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
-  if (publisherInfo._internal.debugP) {
 /*
+  if (publisherInfo._internal.debugP) {
     data = []
     publisherInfo.synopsis.forEach((entry) => {
       data.push(underscore.extend(underscore.omit(entry, [ 'faviconURL' ]), { faviconURL: entry.faviconURL && '...' }))
     })
 
     console.log('\nupdatePublisherInfo: ' + JSON.stringify(data, null, 2))
- */
   }
+ */
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
 }
@@ -882,6 +882,8 @@ var roundtrip = (params, options, callback) => {
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
+var run0P = false
+
 var run = (delayTime) => {
   if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
 
@@ -917,7 +919,11 @@ var run = (delayTime) => {
   }
   if (delayTime > 0) {
     active = client
+    if (run0P) return console.log('suppress run0')
+
+    run0P = true
     return setTimeout(() => {
+      run0P = false
       if (active !== client) return
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
