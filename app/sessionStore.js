@@ -252,7 +252,12 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
+      // TODO - this should the history methods from siteUtils
       data.sites = data.sites.filter((site) => site && site.tags && site.tags.length)
+      data.sites = data.sites.map((site) => {
+        delete site.lastAccessedTime
+        return site
+      })
     }
   }
   if (data.downloads) {
