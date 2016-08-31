@@ -2,55 +2,37 @@
 
 ## [0.11.6](https://github.com/brave/browser-laptop/releases/v0.11.6dev)
  - Added Ledger beta integration. ([#3195](https://github.com/brave/browser-laptop/issues/3195))
- - Added about:history, sets back/forward nav limit, more efficient dynamic menus. ([#3206](https://github.com/brave/browser-laptop/issues/3206))
- - Added history and Ctrl +Y to bring it up suggestion. ([#444](https://github.com/brave/browser-laptop/issues/444))
- - Changed Hamburger Menu with layout mentioned in #1893. ([#3003](https://github.com/brave/browser-laptop/issues/3003))
- - Changed new tab button too high. ([#3208](https://github.com/brave/browser-laptop/issues/3208))
+ - Added Autofill support. ([#860](https://github.com/brave/browser-laptop/issues/860))
+ - Added about:history and Ctrl +Y to bring it up. ([#444](https://github.com/brave/browser-laptop/issues/444))
+ - Added new look for find bar UI. ([#3159](https://github.com/brave/browser-laptop/issues/3159))
+ - Added bookmarks into the bookmarks menu. ([#1993](https://github.com/brave/browser-laptop/issues/1993))
+ - Optimized HTTPS Everywhere. ([#3215](https://github.com/brave/browser-laptop/issues/3215))
+ - Changed Hamburger Menu with layout. ([#3003](https://github.com/brave/browser-laptop/issues/3003))
  - Changed Back button history does not hint at options beyond a certain point. ([#2889](https://github.com/brave/browser-laptop/issues/2889))
- - Changed Temporarily remove insertions. ([#3211](https://github.com/brave/browser-laptop/issues/3211))
- - Fixed Address bar input ignored if no default search engine set. ([#3254](https://github.com/brave/browser-laptop/issues/3254))
  - Fixed default engine display problem for fresh profile. ([#3275](https://github.com/brave/browser-laptop/issues/3275))
- - Fixed Payments Add Funds modal is misaligned. ([#3267](https://github.com/brave/browser-laptop/issues/3267))
- - Fixed Payments monthly budget dropdown is missing units. ([#3266](https://github.com/brave/browser-laptop/issues/3266))
- - Fixed many things in History. ([#3253](https://github.com/brave/browser-laptop/issues/3253))
- - Fixed URL bar autocomplete mouseover does not interfere with typed URL (fixes #3012) (take 2). ([#3225](https://github.com/brave/browser-laptop/issues/3225))
- - Fixed Autofill on URL bar. ([#3012](https://github.com/brave/browser-laptop/issues/3012))
- - Fixed new tab button position fixes #3208. ([#3213](https://github.com/brave/browser-laptop/issues/3213))
- - Fixed Back/Forward navigation, tab shows page URL instead of page title. ([#3200](https://github.com/brave/browser-laptop/issues/3200))
- - Fixed tab title on back/forward fixes #3200. ([#3202](https://github.com/brave/browser-laptop/issues/3202))
- - Fixed Bookmarks Menu should list the bookmarks like other browsers do enhancement. ([#1993](https://github.com/brave/browser-laptop/issues/1993))
- - Fixed "auto open bookmarks toolbar for the first bookmark" test needs to be updated. ([#2941](https://github.com/brave/browser-laptop/issues/2941))
- - Fixed "Pinning with partitions" test is failing but the functionality works. ([#2942](https://github.com/brave/browser-laptop/issues/2942))
- - Fixed Application icon is with poor resolution on Linux. ([#3229](https://github.com/brave/browser-laptop/issues/3229))
- - Fixed Change the size of the Linux icon fixes #3229. ([#3230](https://github.com/brave/browser-laptop/issues/3230))
- - Fixed Users can create bookmark folders with no name. ([#3188](https://github.com/brave/browser-laptop/issues/3188))
- - Fixed Validate bookmark name before creation Fixes #3188. ([#3190](https://github.com/brave/browser-laptop/issues/3190))
+ - Fixed Address bar input ignored if no default search engine set. ([#3254](https://github.com/brave/browser-laptop/issues/3254))
+ - Fixed URL bar autocomplete mouseover does not interfere with typed URL. ([#3225](https://github.com/brave/browser-laptop/issues/3225))
  - Fixed ETags for data file downloading haven't been working. ([#3222](https://github.com/brave/browser-laptop/issues/3222))
- - Fixed Make targets.host UNIQUE, which auto-creates index. ([#3215](https://github.com/brave/browser-laptop/issues/3215))
- - Fixed Use noScript state per site instead of blocking scripts. ([#3205](https://github.com/brave/browser-laptop/issues/3205))
- - Fixed Non-script version of DuckDuckGo when blocking scripts is not loaded from location bar at first instance. ([#3189](https://github.com/brave/browser-laptop/issues/3189))
+ - Fixed Modals being clipped when the window is narrow. ([#3575](https://github.com/brave/browser-laptop/issues/3575))
+ - Fixed Application icon is with poor resolution on Linux. ([#3229](https://github.com/brave/browser-laptop/issues/3229))
+ - Fixed new tab button too high. ([#3208](https://github.com/brave/browser-laptop/issues/3208))
+ - Fixed new tab button position fixes #3208. ([#3213](https://github.com/brave/browser-laptop/issues/3213))
+ - Fixed flash on http://www.y8.com/games/superfighters does not work. ([#3082](https://github.com/brave/browser-laptop/issues/3082))
+ - Fixed Users can create bookmark folders with no name. ([#3188](https://github.com/brave/browser-laptop/issues/3188))
+ - Fixed Back/Forward navigation, tab shows page URL instead of page title. ([#3200](https://github.com/brave/browser-laptop/issues/3200))
+ - Fixed NoScript version of DuckDuckGo should be used when NoScript is on. ([#3189](https://github.com/brave/browser-laptop/issues/3189))
+ - Fixed Use NoScript state per site instead of blocking scripts. ([#3205](https://github.com/brave/browser-laptop/issues/3205))
  - Fixed Market graph on wsj.com. ([#2102](https://github.com/brave/browser-laptop/issues/2102))
  - Fixed tab-specific notifications should be closed when tab is closed. ([#3169](https://github.com/brave/browser-laptop/issues/3169))
  - Fixed Brave can't handle URLs with whitespace in it. ([#3167](https://github.com/brave/browser-laptop/issues/3167))
- - Fixed Whitespace in url fixes #3167. ([#3168](https://github.com/brave/browser-laptop/issues/3168))
- - Fixed Flash on http://www.y8.com/games/superfighters. ([#3082](https://github.com/brave/browser-laptop/issues/3082))
- - Fixed Bookmarks now show under Bookmarks menu. ([#3055](https://github.com/brave/browser-laptop/issues/3055))
- - Fixed Menu should only be built once. ([#3022](https://github.com/brave/browser-laptop/issues/3022))
- - Fixed the ability to delete saved passwords. ([#3481](https://github.com/brave/browser-laptop/issues/3481))
+ - Fixed Regenerating menu too often. ([#3022](https://github.com/brave/browser-laptop/issues/3022))
  - Fixed Bookmarks flow for sites without titles. ([#3442](https://github.com/brave/browser-laptop/issues/3442))
  - Fixed opening files instead of searching for them. ([#3296](https://github.com/brave/browser-laptop/issues/3296))
- - Fixed Pressing backspace while typing makes the browser go to the previous page ([#3496](https://github.com/brave/browser-laptop/issues/3496))
- - Fixed autocomplete db initialization failing on fresh profile ([#3577](https://github.com/brave/browser-laptop/issues/3577))
- - Fixed username and password field for basic auth dialog not showing up ([#3578](https://github.com/brave/browser-laptop/issues/3578))
- - Fixed Modals being clipped when the window is narrow. ([#3575](https://github.com/brave/browser-laptop/issues/3575))
- - Fixed a lot of things for ledger: ([#3573](https://github.com/brave/browser-laptop/issues/3573))([#3567](https://github.com/brave/browser-laptop/issues/3567))([#3565](https://github.com/brave/browser-laptop/issues/3565))([#3539](https://github.com/brave/browser-laptop/issues/3539))([#3551](https://github.com/brave/browser-laptop/issues/3551))([#3554](https://github.com/brave/browser-laptop/issues/3554))([#3553](https://github.com/brave/browser-laptop/issues/3553))([#3545](https://github.com/brave/browser-laptop/issues/3545))([#3523](https://github.com/brave/browser-laptop/issues/3523))
- - Fixed cropped/narrow buttons in prefs panels via CSS ([#3507](https://github.com/brave/browser-laptop/issues/3563))
- - Fixed after upgrade, context menu for password manager was not showing ([#3549](https://github.com/brave/browser-laptop/issues/3549))
- - Fixed check for valid data before upgrading and assign defaults after cleaning ([#3537](https://github.com/brave/browser-laptop/issues/3537))
- - Fixed tab close causing fullscreen to be exited ([#3519](https://github.com/brave/browser-laptop/issues/3519))
- - Fixed passwords are not saved using default settings ([#3516](https://github.com/brave/browser-laptop/issues/3516))
- - Fixed flash on http://www.y8.com/games/superfighters does not work ([#3082](https://github.com/brave/browser-laptop/issues/3082))
- - Update to HTTPS Everywhere 5.2.0. ([#2581](https://github.com/brave/browser-laptop/issues/2581))
+ - Fixed Pressing backspace while typing makes the browser go to the previous page on some pages. ([#3496](https://github.com/brave/browser-laptop/issues/3496))
+ - Fixed username and password field for basic auth dialog not showing up. ([#3578](https://github.com/brave/browser-laptop/issues/3578))
+ - Fixed after upgrade, context menu for password manager was not showing. ([#3549](https://github.com/brave/browser-laptop/issues/3549))
+ - Fixed passwords are not saved using default settings. ([#3516](https://github.com/brave/browser-laptop/issues/3516))
+ - Upgraded to HTTPS Everywhere 5.2.0. ([#2581](https://github.com/brave/browser-laptop/issues/2581))
 
 ## [0.11.5](https://github.com/brave/browser-laptop/releases/v0.11.5dev)
 - Fixed a top crasher. ([#3054](https://github.com/brave/browser-laptop/issues/3054))
@@ -80,7 +62,7 @@
 - Fix PDF downloading with File > Save Page as. ([#2954](https://github.com/brave/browser-laptop/issues/2954))
 - Fix NoScript should not take effect when shields are down. ([#2950](https://github.com/brave/browser-laptop/issues/2950))
 - Fix undefined error popup caused by zoomed page upgrading. ([#2989](https://github.com/brave/browser-laptop/issues/2989))
-- Upgrade to libchromiumcontent 52.0.2743.116. ([#2964](https://github.com/brave/browser-laptop/issues/2964))
+- Upgraded to libchromiumcontent 52.0.2743.116. ([#2964](https://github.com/brave/browser-laptop/issues/2964))
 
 ## [0.11.2](https://github.com/brave/browser-laptop/releases/v0.11.2dev)
 - Added history on long click over back and forward buttons. ([#1622](https://github.com/brave/browser-laptop/issues/1622))
@@ -114,8 +96,8 @@
 - Fixed "Open Image In New Tab" respecting private / session info. ([#2746](https://github.com/brave/browser-laptop/issues/2746))
 - Fixed pressing down on URL bar now shows autosuggest. ([#2444](https://github.com/brave/browser-laptop/issues/2444))
 - Fixed showing scrollbars in tabs bar in Arch linux. ([#2599](https://github.com/brave/browser-laptop/issues/2599))
-- Upgrade to libchromiumcontent 52.0.2743.82. ([#1592](https://github.com/brave/browser-laptop/issues/1592))
-- Upgrade to Electron 1.3.0. ([#2635](https://github.com/brave/browser-laptop/issues/2635))
+- Upgraded to libchromiumcontent 52.0.2743.82. ([#1592](https://github.com/brave/browser-laptop/issues/1592))
+- Upgraded to Electron 1.3.0. ([#2635](https://github.com/brave/browser-laptop/issues/2635))
 
 ## [0.11.1](https://github.com/brave/browser-laptop/releases/v0.11.1dev)
 - Added built-in PDF reader with PDF.js. Can be disabled in preferences. ([#1084](https://github.com/brave/browser-laptop/issues/1084))
@@ -134,7 +116,7 @@
 - Fixed webRTC fingerprinting blocking. ([#2412](https://github.com/brave/browser-laptop/issues/2412))
 - Fixed find in page highlighting not clearing when find bar is closed. ([#2476](https://github.com/brave/browser-laptop/issues/2476))
 - Fixed two finger swipe gesture on macOS conflicting with scrolling. ([#2577](https://github.com/brave/browser-laptop/issues/2577))
-- Upgrade to Electron 1.2.7. ([#2470](https://github.com/brave/browser-laptop/issues/2470))
+- Upgraded to Electron 1.2.7. ([#2470](https://github.com/brave/browser-laptop/issues/2470))
 
 ## [0.11.0](https://github.com/brave/browser-laptop/releases/v0.11.0dev)
 - Added LastPass support. ([#2316](https://github.com/brave/browser-laptop/issues/2316))
@@ -169,11 +151,11 @@
 - Fixed window titles not showing up in the Window menu in macOS. ([#2192](https://github.com/brave/browser-laptop/issues/2192))
 - Fixed navigation controller sometimes making back button not function correctly. ([#2144](https://github.com/brave/browser-laptop/issues/2144))
 - Fixed Fullscreen mode on Windows so it hides menu bar. ([#2053](https://github.com/brave/browser-laptop/issues/2053))
-- Upgrade to libchromiumcontent 51.0.2704.103. ([#2211](https://github.com/brave/browser-laptop/issues/2211))
-- Upgrade to Electron 1.2.3. ([#2294](https://github.com/brave/browser-laptop/issues/2294))
+- Upgraded to libchromiumcontent 51.0.2704.103. ([#2211](https://github.com/brave/browser-laptop/issues/2211))
+- Upgraded to Electron 1.2.3. ([#2294](https://github.com/brave/browser-laptop/issues/2294))
 
 ## [0.10.3](https://github.com/brave/browser-laptop/releases/v0.10.3dev)
-- Upgrade to libchromiumcontent 51.0.2704.84. ([#2122](https://github.com/brave/browser-laptop/issues/2122))
+- Upgraded to libchromiumcontent 51.0.2704.84. ([#2122](https://github.com/brave/browser-laptop/issues/2122))
 
 ## [0.10.2](https://github.com/brave/browser-laptop/releases/v0.10.2dev)
 - Fixed crash on Windows when clicking on certain link types. ([#2064](https://github.com/brave/browser-laptop/issues/2064))
@@ -198,10 +180,10 @@
 - Fixed contractions showing up as misspelled for spell check. ([#2015](https://github.com/brave/browser-laptop/issues/2015))
 - Fixed non-English spell checking dictionaries. ([#1788](https://github.com/brave/browser-laptop/issues/1788))
 - Possibly fixed intermittent problem with copy on macOS. ([#1060](https://github.com/brave/browser-laptop/issues/1060))
-- Upgrade to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
-- Upgrade to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))
-- Upgrade to Electron 1.2.0. ([#1968](https://github.com/brave/browser-laptop/issues/1968))
-- Upgrade to Node 6.1. ([#1969](https://github.com/brave/browser-laptop/issues/1969))
+- Upgraded to HTTPS Everywhere definitions for 5.1.9. ([#1692](https://github.com/brave/browser-laptop/issues/1692))
+- Upgraded to libchromiumcontent 51.0.2704.63. ([#1405](https://github.com/brave/browser-laptop/issues/1405))
+- Upgraded to Electron 1.2.0. ([#1968](https://github.com/brave/browser-laptop/issues/1968))
+- Upgraded to Node 6.1. ([#1969](https://github.com/brave/browser-laptop/issues/1969))
 - [Various other fixes.](https://github.com/brave/browser-laptop/milestones/0.10.1dev)
 
 ## [0.10.0](https://github.com/brave/browser-laptop/releases/v0.10.0dev)
@@ -217,7 +199,7 @@
 - [Various other fixes.](https://github.com/brave/browser-laptop/issues?q=milestone%3A0.10.0dev+is%3Aclosed)
 
 ## [0.9.6](https://github.com/brave/browser-laptop/releases/v0.9.6dev)
-- Upgrade to libchromiumcontent 50.0.2661.102. ([#1708](https://github.com/brave/browser-laptop/issues/1708))
+- Upgraded to libchromiumcontent 50.0.2661.102. ([#1708](https://github.com/brave/browser-laptop/issues/1708))
 - Fix application sometimes not quitting fully. ([#1540](https://github.com/brave/browser-laptop/issues/1540))
 - Fix for URL bar context menu selection detection. ([#1709](https://github.com/brave/browser-laptop/issues/1709))
 - Fix for disabling extensions without a browser restart. ([#1707](https://github.com/brave/browser-laptop/issues/1707))
@@ -254,8 +236,8 @@
 - More locales added.
 - Added optional Home button.
 - Fixed various bugs.
-- Upgrade to libchromiumcontent 50.0.2661.94.
-- Upgrade to Electron 0.37.7.
+- Upgraded to libchromiumcontent 50.0.2661.94.
+- Upgraded to Electron 0.37.7.
 
 ## [0.9.2](https://github.com/brave/browser-laptop/releases/v0.9.2dev)
 - Added the ability to set Brave as the default browser within Control Panel on Windows.
@@ -268,12 +250,12 @@
 - Block 'javascript:' URLs from being loaded when entered in URL bar.
 - Printing fixed.
 - Fixed various bugs.
-- Upgrade to libchromiumcontent 49.0.2623.112.
-- Upgrade to Electron 0.37.6.
+- Upgraded to libchromiumcontent 49.0.2623.112.
+- Upgraded to Electron 0.37.6.
 
 ## [0.9.1](https://github.com/brave/browser-laptop/releases/v0.9.1dev)
 - Undo closed tab now focuses the webview.
-- Upgrade to React v15 for cleaner DOM and faster performance.
+- Upgraded to React v15 for cleaner DOM and faster performance.
 - Fix for about: pages font size.
 - Fix for clicking on some JavaScript links not working.
 - Fix startup error relating to session storage and passwords saved from forms without actions.
@@ -290,7 +272,7 @@
 - Removed Brave from the User Agent HTTP header to reduce fingerprinting.
 - Windows shortcuts added F12 for developer tools and F11 for fullscreen.
 - Partial extensions support added internally for running some Chrome extensions unmodified.
-- Upgrade to Node 5.10.0.
+- Upgraded to Node 5.10.0.
 
 ## [0.8.3](https://github.com/brave/browser-laptop/releases/v0.8.3dev)
 - Add ability to enable/disable password manager in Preferences
@@ -302,9 +284,9 @@
 - Close other tabs context menu items added.
 - Password saving fixes.
 - Bookmark fixes.
-- Upgrade to libchromiumcontent 49.0.2623.108.
-- Upgrade to Electron 0.37.3.
-- Upgrade to Node 5.9.1.
+- Upgraded to libchromiumcontent 49.0.2623.108.
+- Upgraded to Electron 0.37.3.
+- Upgraded to Node 5.9.1.
 - Fixed various bugs.
 - .deb and .rpm [Linux packages available](https://github.com/brave/browser-laptop/blob/master/docs/linuxInstall.md) for various distros.
 
@@ -322,9 +304,9 @@
 - Various other bug fixes.
 
 ## [0.8.1](https://github.com/brave/browser-laptop/releases/v0.8.1dev)
-- Upgrade to libchromiumcontent 49.0.2623.75.
-- Upgrade to Electron 0.37.2.
-- Upgrade to Node 5.8.
+- Upgraded to libchromiumcontent 49.0.2623.75.
+- Upgraded to Electron 0.37.2.
+- Upgraded to Node 5.8.
 - Basic HTTP authentication now supported.
 - Support for Twitch.tv
 - Fix bookmarks not working after navigating within a page using push state api.
