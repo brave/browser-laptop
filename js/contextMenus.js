@@ -200,14 +200,15 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
       }
     })
   }
-
-  menu.push(CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('downloadItemClearCompleted'),
-      click: () => {
-        appActions.clearCompletedDownloads()
-      }
-    })
+  if (menu.length) {
+    menu.push(CommonMenu.separatorMenuItem)
+  }
+  menu.push({
+    label: locale.translation('downloadItemClearCompleted'),
+    click: () => {
+      appActions.clearCompletedDownloads()
+    }
+  })
   return menu
 }
 
