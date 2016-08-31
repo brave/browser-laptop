@@ -13,6 +13,8 @@
  - [ ]  Editing Autofill entries are not saved. Creates a blank entry([#3368](https://github.com/brave/browser-laptop/issues/3368))
  - [ ]  Brave crashes with segmentation fault when submitting a form ([#3398](https://github.com/brave/browser-laptop/issues/3398))
  - [ ]  Autofill - Add new entry buttons are not functional ([#3455](https://github.com/brave/browser-laptop/issues/3455))
+  - [ ]  Autofill - Values are vacated ([#3491](https://github.com/brave/browser-laptop/issues/3491))
+
 
  ### Bookmarks
  - [ ]  Bookmark title is not updated unbookmarking/rebookmarking bug verified ([#3284](https://github.com/brave/browser-laptop/issues/3284))
@@ -43,6 +45,8 @@
  - [ ]  Bookmarked about pages appear in the history ([#3366](https://github.com/brave/browser-laptop/issues/3366))
  - [ ]  Bookmark folders are appearing in browser history ([#3453](https://github.com/brave/browser-laptop/issues/3453))
  - [ ]  Fixes extra separator in about:history context menu  ([#3444](https://github.com/brave/browser-laptop/issues/3444))
+ - [ ]  Clearing history using modal now clears bookmark timestamps ([#3501](https://github.com/brave/browser-laptop/issues/3501))
+ - [ ]  Clear browser history should work regardless of whether or not the page is bookmarked. bug  ([#3346](https://github.com/brave/browser-laptop/issues/3346))
 
  ### Ledger
  - [ ]  Ledger beta integration  ([#3195](https://github.com/brave/browser-laptop/issues/3195))
@@ -63,6 +67,17 @@
  - [ ]  Preferences : Payments : Create wallet control text and status flickers when disabling then enabling brave payments. ([#3376](https://github.com/brave/browser-laptop/issues/3376))
  - [ ]  Browser crashes when trying to signup on Coinbase bug ([#3382](https://github.com/brave/browser-laptop/issues/3382))
  - [ ]  Windows size grew ~26MB with ledger ([#3475](https://github.com/brave/browser-laptop/issues/3475))
+ - [ ]  Ledger unconfirmed balance fix ([#3495](https://github.com/brave/browser-laptop/issues/3495))
+ - [ ]  Ledger unconfirmed balance takes a long time to show up  ([#3480](https://github.com/brave/browser-laptop/issues/3480))
+ - [ ]  a few minor things ([#3554](https://github.com/brave/browser-laptop/issues/3554))
+ - [ ]  support new Set(...) in ledger publisher ruleset ([#3553](https://github.com/brave/browser-laptop/issues/3553))
+ - [ ]  support new Set(...) in ledger publisher ruleset ([#3545](https://github.com/brave/browser-laptop/issues/3545))
+ - [ ]  Ledger settings box alignment and style corrections ([#3523](https://github.com/brave/browser-laptop/issues/3523))
+ - [ ]  increase back-off when recovering from ledger-client errors ([#3573](https://github.com/brave/browser-laptop/issues/3573))
+ - [ ]  set ledger columns to right-align if appropriate ([#3567](https://github.com/brave/browser-laptop/issues/3567))
+ - [ ]  Preferences : Payments : Text clipping for localized strings. ([#3539](https://github.com/brave/browser-laptop/issues/3539))
+ - [ ]  Stop partner logos from floating below brave payments text ([#3551](https://github.com/brave/browser-laptop/issues/3551))
+ - [ ]  set flags to hide CB button in Add funds… dialog when users chooses 10, 15,or 20 monthly value ([#3565](https://github.com/brave/browser-laptop/issues/3565))
 
  ### Fixes
  - [ ]  Escaping from fullscreen video leaves the browser in fullscreen mode instead of returning to windowed mode. ([#3338](https://github.com/brave/browser-laptop/issues/3338))
@@ -112,3 +127,21 @@
  - [ ]  Open file action tries to search for the file in the default search engine ([#3296](https://github.com/brave/browser-laptop/issues/3296))
  - [ ]  Esc handler changes windowed / fullscreen mode depending on permissions ([#3464](https://github.com/brave/browser-laptop/issues/3464))
  - [ ]  Cannot delete saved passwords on about:passwords  ([#3481](https://github.com/brave/browser-laptop/issues/3481))
+ - [ ]  Chrome.ipc.on is not working ([#3487](https://github.com/brave/browser-laptop/issues/3487))
+ - [ ]  Fix deleting text going back fixes #3496  ([#3497](https://github.com/brave/browser-laptop/issues/3497))
+ - [ ]  Remove placeholder ads by default ([#3506](https://github.com/brave/browser-laptop/issues/3506))
+ - [ ]  Add cibuild script ([#3507](https://github.com/brave/browser-laptop/issues/3507))
+ - [ ]  autocomplete db initialization fails on fresh profile ([#3577](https://github.com/brave/browser-laptop/issues/3577))
+ - [ ]  username and password field for basic auth dialog are not showing up ([#3578](https://github.com/brave/browser-laptop/issues/3578))
+ - [ ]  Modals are uncentered which leads to clipping when the window is narrow. ([#3575](https://github.com/brave/browser-laptop/issues/3575))
+ - [ ]  overflowIndicator not appearing on bookmark toolbar if show only favicon option is enabled ([#3525](https://github.com/brave/browser-laptop/issues/3525))
+ - [ ]  "Show only favicon" option should include folders on bookmark bar ([#3529](https://github.com/brave/browser-laptop/issues/3529))
+ - [ ]  Fix cropped/narrow buttons in prefs panels via CSS ([#3507](https://github.com/brave/browser-laptop/issues/3563))
+ - [ ]  After upgrade, context menu for password manager does not show ([#3549](https://github.com/brave/browser-laptop/issues/3549))
+ - [ ]  check for valid data before upgrading and assign defaults after cleaning ([#3537](https://github.com/brave/browser-laptop/issues/3537))
+ - [ ]  upgrade to 0.11.6 fails ([#3550](https://github.com/brave/browser-laptop/issues/3550))
+ - [ ]  Tab close is causing fullscreen to be exited ([#3519](https://github.com/brave/browser-laptop/issues/3519))
+ - [ ]  Building on Windows requires tedious work-arounds ([#3548](https://github.com/brave/browser-laptop/issues/3548))
+ - [ ]  Passwords are not saved using default settings ([#3516](https://github.com/brave/browser-laptop/issues/3516))
+ - [ ]  Flash on http://www.y8.com/games/superfighters does not work ([#3082](https://github.com/brave/browser-laptop/issues/3082))
+ - [ ]  Update test fails ([#3337](https://github.com/brave/browser-laptop/issues/3337))
