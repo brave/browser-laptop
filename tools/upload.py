@@ -4,8 +4,6 @@ import json
 import os
 from lib.github import GitHub
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 BROWSER_LAPTOP_REPO = 'brave/browser-laptop'
 RELEASE_NAME = ('PRE (DO NOT DOWNLOAD UNLESS YOU ARE TESTING '
@@ -86,14 +84,14 @@ def auth_token():
   assert token, message
   return token
 
-def build_label():
+def release_channel():
   channel = os.environ['CHANNEL']
   message = ('Error: Please set the $CHANNEL '
              'environment variable, which is your release channel')
   assert channel, message
   return channel
 
-def release_channel():
+def build_label():
   build = os.environ['BUILD']
   message = ('Error: Please set the $BUILD '
              'environment variable, which is your build label '
