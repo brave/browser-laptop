@@ -160,6 +160,7 @@ var boot = () => {
 
 if (ipc) {
   ipc.on(messages.CHECK_BITCOIN_HANDLER, () => {
+    // TODO: https://github.com/brave/browser-laptop/issues/3625
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
       ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))

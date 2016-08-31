@@ -263,10 +263,14 @@ class BitcoinDashboard extends ImmutableComponent {
   get overlayContent () {
     return <iframe src={this.ledgerData.get('buyURL')} />
   }
+  get currency () {
+    return this.props.ledgerData.get('currency') || 'USD'
+  }
+  get amount () {
+    return getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
+  }
   get canUseCoinbase () {
-    // This assumes amount is USD
-    const amount = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
-    return amount < 6
+    return this.currency === 'USD' && this.amount < 6
   }
   get coinbasePanel () {
     if (this.canUseCoinbase) {
@@ -314,24 +318,24 @@ class BitcoinDashboard extends ImmutableComponent {
         <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
           {
-            this.ledgerData.get('address') && this.ledgerData.get('paymentURL')
+            this.ledgerData.get('address')
               ? <div>
                 <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
                 {
-                  this.ledgerData.get('hasBitcoinHandler')
+                  this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
                     ? <div>
                       <a href={this.ledgerData.get('paymentURL')} target='_blank'>
                         <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
                       </a>
                       <div data-l10n-id='bitcoinAddress' className='labelText' />
-                      <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
-                      <span className='smallText'>{this.ledgerData.get('address')}</span>
                     </div>
                     : <div>
-                      <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
-                      <span id='bitcoinPaymentURL' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('paymentURL'))}>{this.ledgerData.get('paymentURL')}</span>
+                      <div data-l10n-id='bitcoinPaymentURL'
+                        data-l10n-args={JSON.stringify({amount: `${this.amount} ${this.currency}`})} className='labelText' />
                     </div>
                 }
+                <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
+                <span className='smallText'>{this.ledgerData.get('address')}</span>
               </div>
             : <div data-l10n-id='bitcoinWalletNotAvailable' />
           }
