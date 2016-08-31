@@ -114,6 +114,7 @@ class Frame extends ImmutableComponent {
         addresses.forEach((entry) => {
           const guid = entry.get(partition)
           const address = currentWindow.webContents.session.autofill.getProfile(guid)
+          const valid = Object.getOwnPropertyNames(address).length > 0
           let addressDetail = {
             name: address.full_name,
             organization: address.company_name,
@@ -126,7 +127,11 @@ class Frame extends ImmutableComponent {
             email: address.email,
             guid: entry.toJS()
           }
-          list.push(addressDetail)
+          if (valid) {
+            list.push(addressDetail)
+          } else {
+            appActions.removeAutofillAddress(addressDetail)
+          }
         })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
@@ -136,6 +141,7 @@ class Frame extends ImmutableComponent {
         creditCards.forEach((entry) => {
           const guid = entry.get(partition)
           const creditCard = currentWindow.webContents.session.autofill.getCreditCard(guid)
+          const valid = Object.getOwnPropertyNames(creditCard).length > 0
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
@@ -143,7 +149,11 @@ class Frame extends ImmutableComponent {
             year: creditCard.expiration_year,
             guid: entry.toJS()
           }
-          list.push(creditCardDetail)
+          if (valid) {
+            list.push(creditCardDetail)
+          } else {
+            appActions.removeAutofillCreditCard(creditCardDetail)
+          }
         })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
