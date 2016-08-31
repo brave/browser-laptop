@@ -1082,23 +1082,27 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  */
 function onShowUsernameMenu (usernames, origin, action, boundingRect,
                                     topOffset) {
+  // TODO: magic number
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
-    top: boundingRect.bottom + topOffset,
+    top: boundingRect.bottom + topOffset - downloadsBarOffset,
     template: menuTemplate
   }))
 }
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
+  // TODO: magic number
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
   }
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: offset.x + boundingRect.x,
-    top: offset.y + (boundingRect.y + boundingRect.height),
+    top: offset.y + (boundingRect.y + boundingRect.height) - downloadsBarOffset,
     template: menuTemplate
   }))
 }
