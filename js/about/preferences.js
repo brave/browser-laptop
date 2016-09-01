@@ -733,7 +733,7 @@ class PaymentsTab extends ImmutableComponent {
                   </SettingItem>
                 </SettingsList>
               </td>
-              <td data-l10n-id={this.walletStatus.id}
+              <td id='walletStatus' data-l10n-id={this.walletStatus.id}
                 data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
             </tr>
           </tbody>

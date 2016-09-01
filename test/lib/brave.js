@@ -413,9 +413,21 @@ var exports = {
 
   startApp: function (cleanSessionStore = true) {
     if (cleanSessionStore) {
+      let ledgerDir = path.join(process.env.HOME, '.brave-test-ledger')
       try {
         fs.unlinkSync(path.join(process.env.HOME, '.brave-test-session-store-1'))
       } catch (e) {
+      }
+      try {
+        ['publisher', 'state', 'scores', 'synopsis'].forEach((name) => {
+          try {
+            fs.unlinkSync(path.join(ledgerDir, `ledger-${name}-test.json`))
+          } catch (e) {
+          }
+        })
+      } catch (e) {
+        // probably ledgerDir does not exist yet
+        fs.mkdirSync(ledgerDir)
       }
     }
     this.app = new Application({

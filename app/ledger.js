@@ -1118,8 +1118,11 @@ const pathSuffix = { development: '-dev', test: '-test' }[process.env.NODE_ENV] 
 
 var pathName = (name) => {
   var parts = path.parse(name)
+  var basePath = process.env.NODE_ENV === 'test'
+    ? path.join(process.env.HOME, '.brave-test-ledger')
+    : app.getPath('userData')
 
-  return path.join(app.getPath('userData'), parts.name + pathSuffix + parts.ext)
+  return path.join(basePath, parts.name + pathSuffix + parts.ext)
 }
 
 /**
