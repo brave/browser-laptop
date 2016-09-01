@@ -390,6 +390,16 @@ Remove credit card data
 
 
 
+### windowBlurred(appWindowId) 
+
+Dispatches a message when appWindowId loses focus
+
+**Parameters**
+
+**appWindowId**: `Number`, the unique id of the window
+
+
+
 
 * * *
 

@@ -449,6 +449,18 @@ const appActions = {
       actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail
     })
+  },
+
+  /**
+   * Dispatches a message when appWindowId loses focus
+   *
+   * @param {Number} appWindowId - the unique id of the window
+   */
+  windowBlurred: function (appWindowId) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_WINDOW_BLURRED,
+      appWindowId: appWindowId
+    })
   }
 }
 

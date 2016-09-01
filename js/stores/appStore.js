@@ -151,6 +151,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     mainWindow.setFullScreen(true)
   }
 
+  mainWindow.on('blur', function () {
+    appActions.windowBlurred(mainWindow.id)
+  })
+
   mainWindow.on('focus', function () {
     mainWindow.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
   })
