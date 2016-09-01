@@ -248,6 +248,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
     if (typeof expireTime === 'number' && expireTime < now) {
       delete data.siteSettings[host].flash
     }
+    // Don't write runInsecureContent to session
+    delete data.siteSettings[host].runInsecureContent
   }
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true

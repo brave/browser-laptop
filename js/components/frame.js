@@ -166,13 +166,13 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent() ||
-      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
+    return !this.webview || !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
   }
 
-  allowRunningInsecureContent () {
-    let hack = siteHacks[urlParse(this.props.location).hostname]
-    return !!(hack && hack.allowRunningInsecureContent)
+  runInsecureContent () {
+    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings, this.origin)
+    return activeSiteSettings === undefined
+      ? false : activeSiteSettings.get('runInsecureContent')
   }
 
   allowRunningPlugins (url) {
@@ -262,10 +262,6 @@ class Frame extends ImmutableComponent {
     const hack = siteHacks[parsedUrl.hostname]
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
-    }
-    if (this.allowRunningInsecureContent()) {
-      this.webview.setAttribute('allowRunningInsecureContent', true)
-      this.webview.allowRunningInsecureContent = true
     }
     if (this.allowRunningPlugins()) {
       this.webview.setAttribute('plugins', true)
@@ -584,6 +580,9 @@ class Frame extends ImmutableComponent {
         windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
       }
     })
+    this.webview.addEventListener('did-block-run-insecure-content', (e) => {
+      windowActions.setBlockedRunInsecureContent(this.frame, this.props.location)
+    })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.frame)
       e.preventDefault()
@@ -758,9 +757,12 @@ class Frame extends ImmutableComponent {
           interceptFlash(true, e.url)
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
-        const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
+        windowActions.setBlockedRunInsecureContent(this.frame)
+        const isSecure = parsedUrl.protocol === 'https:' && !this.runInsecureContent()
+        const runInsecureContent = parsedUrl.protocol === 'https:' && this.runInsecureContent()
         windowActions.setSecurityState(this.frame, {
-          secure: isSecure
+          secure: isSecure,
+          runInsecureContent: runInsecureContent
         })
         if (isSecure) {
           // Check that there isn't a cert error.

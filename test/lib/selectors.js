@@ -60,5 +60,6 @@ module.exports = {
   paymentHistoryButton: '.paymentHistoryButton',
   paymentsWelcomePage: '.paymentsMessage',
   autofillAddressPanel: '.autofillAddressPanel',
-  autofillCreditCardPanel: '.autofillCreditCardPanel'
+  autofillCreditCardPanel: '.autofillCreditCardPanel',
+  allowRunInsecureContentButton: '.allowRunInsecureContentButton'
 }
