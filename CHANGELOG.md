@@ -1,8 +1,8 @@
 # Changelog
 
 ## [0.11.6](https://github.com/brave/browser-laptop/releases/v0.11.6dev)
- - Added the ability to pay publishers with the Brave Ledger. ([#3195](https://github.com/brave/browser-laptop/issues/3195))
- - Added Autofill support. ([#860](https://github.com/brave/browser-laptop/issues/860))
+ - Added the ability to pay publishers with the Brave Payments. ([#3195](https://github.com/brave/browser-laptop/issues/3195))
+ - Added form autofill support. ([#860](https://github.com/brave/browser-laptop/issues/860))
  - Added about:history and Ctrl +Y to bring it up. ([#444](https://github.com/brave/browser-laptop/issues/444))
  - Added new look for find bar UI. ([#3159](https://github.com/brave/browser-laptop/issues/3159))
  - Added bookmarks into the bookmarks menu. ([#1993](https://github.com/brave/browser-laptop/issues/1993))
