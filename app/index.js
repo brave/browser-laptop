@@ -63,6 +63,7 @@ const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
+const async = require('async')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -84,6 +85,10 @@ const prefsRestartCallbacks = {}
 const prefsRestartLastValue = {}
 
 const unsafeTestMasterKey = 'c66af15fc6555ebecf7cee3a5b82c108fd3cb4b587ab0b299d28e39c79ecc708'
+
+const sessionStoreQueue = async.queue((task, callback) => {
+  task(callback)
+}, 1)
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
@@ -164,24 +169,34 @@ const saveIfAllCollected = (forceSave) => {
         }
       }
     }
-
-    const logSaveAppStateError = (e) => {
-      console.error('Error saving app state: ', e)
-    }
-    SessionStore.saveAppState(appState, shuttingDown).catch(logSaveAppStateError).then(() => {
-      if (shuttingDown) {
-        sessionStateStoreCompleteOnQuit = true
-        // If there's an update to apply, then do it here.
-        // Otherwise just quit.
-        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
-            appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-          Updater.quitAndInstall()
-        } else {
-          app.quit()
-        }
-      }
-    })
+    sessionStoreQueue.push(saveAppState.bind(null, appState))
   }
+}
+
+const logSaveAppStateError = (e) => {
+  console.error('Error saving app state: ', e)
+}
+
+const saveAppState = (appState, cb) => {
+  SessionStore.saveAppState(appState, shuttingDown).catch((e) => {
+    logSaveAppStateError(e)
+    cb()
+  }).then(() => {
+    if (shuttingDown) {
+      sessionStateStoreCompleteOnQuit = true
+      // If there's an update to apply, then do it here.
+      // Otherwise just quit.
+      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
+          appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
+        Updater.quitAndInstall()
+      } else {
+        app.quit()
+      }
+      // no callback here because we don't want to get a partial write during shutdown
+    } else {
+      cb()
+    }
+  })
 }
 
 /**
@@ -279,7 +294,7 @@ app.on('ready', () => {
 
     e.preventDefault()
 
-    clearTimeout(initiateSessionStateSave)
+    clearInterval(initiateSessionStateSave)
     initiateSessionStateSave(true)
 
     // Just in case a window is not responsive, we don't want to wait forever.
