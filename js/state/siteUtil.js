@@ -375,17 +375,19 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
 }
 
 /**
- * Clears out all sites that have no tags.
+ * Clears history by
+ * - filtering out entries which have no tags
+ * - setting lastAccessedTime to null for remaining entries (bookmarks)
  * @param sites The application state's Immutable sites list.
  */
-module.exports.clearSitesWithoutTags = function (sites) {
-  let clearedSites = sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
-  clearedSites.forEach((site, index) => {
+module.exports.clearHistory = function (sites) {
+  let bookmarks = sites.filter((site) => site.get('tags') && site.get('tags').size > 0)
+  bookmarks.forEach((site, index) => {
     if (site.get('lastAccessedTime')) {
-      clearedSites = clearedSites.setIn([index, 'lastAccessedTime'], null)
+      bookmarks = bookmarks.setIn([index, 'lastAccessedTime'], null)
     }
   })
-  return clearedSites
+  return bookmarks
 }
 
 /**

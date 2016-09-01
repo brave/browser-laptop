@@ -63,11 +63,11 @@ const appActions = {
   },
 
   /**
-   * Clears all sites without tags
+   * Clears history (all sites without tags). Indirectly called by appActions.clearAppData().
    */
-  clearSitesWithoutTags: function () {
+  clearHistory: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS
+      actionType: AppConstants.APP_CLEAR_HISTORY
     })
   },
 
