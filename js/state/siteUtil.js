@@ -82,13 +82,18 @@ module.exports.getNextFolderId = (sites) => {
 }
 
 /**
- * Adds the specified siteDetail to sites
+ * Adds or updates the specified siteDetail in sites.
+ *
+ * Examples of updating:
+ * - editing bookmark in add/edit modal
+ * - when timestamp is added (history entry)
+ * - moving bookmark to/from a folder
  *
  * @param sites The application state's Immutable site list
- * @param siteDetails The site details to add a tag to
- * @param tag The tag to add for this site.
- *   See siteTags.js for supported types. No tag means just a history item.
- * @param originalSiteDetail If specified, copy some existing attributes from this siteDetail
+ * @param siteDetails The site details object to add or update
+ * @param tag The tag to add for this site
+ *   See siteTags.js for supported types. No tag means just a history item
+ * @param originalSiteDetail If specified, use when searching site list
  * @return The new sites Immutable object
  */
 module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
@@ -109,8 +114,6 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     tags = tags.toSet().add(tag).toList()
   }
 
-  // We don't want bookmarks and other site info being renamed on users if they already exist
-  // The name should remain the same while it is bookmarked forever.
   const customTitle = typeof siteDetail.get('customTitle') === 'string' ? siteDetail.get('customTitle') : (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle'))
   let site = Immutable.fromJS({
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
@@ -168,6 +171,7 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   // Else, remove the specified tag
   return sites
     .setIn([index, 'parentFolderId'], 0)
+    .deleteIn([index, 'customTitle'])
     .setIn([index, 'tags'], tags.toSet().remove(tag).toList())
 }
 
