@@ -170,12 +170,11 @@ describe('siteUtil', function () {
     })
 
     describe('sites list already has this siteDetail', function () {
-      it('uses customTitle, parentFolderId, partitionNumber, and favicon values from old siteDetail if null', function () {
+      it('uses parentFolderId, partitionNumber, and favicon values from old siteDetail if null', function () {
         const oldSiteDetail = Immutable.fromJS({
-          lastAccessedTime: 123,
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
-          title: 'old title',
+          title: 'bookmarked site',
           customTitle: 'old customTitle',
           partitionNumber: 3,
           parentFolderId: 8,
@@ -185,7 +184,7 @@ describe('siteUtil', function () {
           lastAccessedTime: 456,
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
-          title: 'new title'
+          title: 'same entry also acts as history entry'
         })
         const expectedSiteDetail = Immutable.fromJS({
           lastAccessedTime: newSiteDetail.get('lastAccessedTime'),
@@ -228,17 +227,32 @@ describe('siteUtil', function () {
   })
 
   describe('removeSite', function () {
-    it('removes the siteDetail from the site list (by removing the tag)', function () {
-      const siteDetail = {
-        tags: [siteTags.BOOKMARK],
-        location: testUrl1
-      }
-      const sites = Immutable.fromJS([siteDetail])
-      const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail), siteTags.BOOKMARK)
-      const expectedSites = sites.setIn([0, 'parentFolderId'], 0).setIn([0, 'tags'], Immutable.List([]))
-      assert.deepEqual(processedSites, expectedSites)
+    describe('tag=truthy', function () {
+      it('removes the tag from the siteDetail', function () {
+        const siteDetail = {
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1
+        }
+        const sites = Immutable.fromJS([siteDetail])
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail), siteTags.BOOKMARK)
+        const expectedSites = sites.setIn([0, 'parentFolderId'], 0).setIn([0, 'tags'], Immutable.List([]))
+        assert.deepEqual(processedSites, expectedSites)
+      })
+      it('removes the customTitle', function () {
+        const siteDetail = {
+          tags: [siteTags.BOOKMARK],
+          location: testUrl1,
+          customTitle: 'customTitle'
+        }
+        const sites = Immutable.fromJS([siteDetail])
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail), siteTags.BOOKMARK)
+        const expectedSites = sites.setIn([0, 'parentFolderId'], 0)
+          .deleteIn([0, 'customTitle'])
+          .setIn([0, 'tags'], Immutable.List([]))
+        assert.deepEqual(processedSites, expectedSites)
+      })
     })
-    describe('called with tag=null/undefined', function () {
+    describe('tag=falsey', function () {
       it('deletes a history entry (has no tags)', function () {
         const siteDetail = {
           tags: [],
