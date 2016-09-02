@@ -288,7 +288,7 @@ exports.init = function (language, cb) {
     propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'password.properties'))
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'))
   }
 
   appendLangProperties(lang)
