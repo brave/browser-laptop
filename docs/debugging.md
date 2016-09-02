@@ -41,6 +41,20 @@ If you'd like to see code run on each page load, you can edit `app/extensions/br
 Calls to `console.log` and related functions go into the per page dev tools console mentioned above.
 
 
+## Debugging Session Data
+
+The session data is stored in OS specific user data directories. Within those directories there will be a `brave` directory for release builds and a `brave-development` directory for dev (from NODE_ENV). If you want to use a different directory for dev you can set the environment variable `BRAVE_USER_DATA_DIR` to the directory you want to use. Each test run goes in a new tmp directory inside the OS specific tmpdir. Normally these directories are removed when the test is finished, but if you want to keep them you can the enviroment variable `KEEP_BRAVE_USER_DATA_DIR` to true.
+
+MacOS
+~/Library/Application Support/brave
+
+Linux
+linux ~/.config/brave
+
+Windows
+C:\Users\username\AppData\Roaming\brave
+
+
 ## Profiling React code
 
 The `Debug` menu has a `Toggle React Profiling` option which will start/stop the React addon for profiling.
