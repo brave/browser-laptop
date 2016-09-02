@@ -1,32 +1,35 @@
 #Debugging
 
-## Debugging the Render processes
+## Debugging the renderer processes
 
-Most of the time you'll be debugging the render process and this can be done with the built in developer tools.
+Most of the time you'll be debugging the renderer process and this can be done with the built in developer tools.
 To open the dev tools use `Shift+F8`.
 
 If you've ever used the built in Chrome developer tools you'll be right at home with a DOM inspector, Network monitor, Sources debugging, Timeline, Resources, Audits, and Console.
 
-The code which runs in render processes is inside of the `js` directory.
+The code which runs in renderer processes is inside of the `js` directory.
 
 Calls to `console.log` and related functions go into the dev tools console mentioned above.
 
 If you're running `npm run watch`, then webpack dev server will ensure that changes to source code will reload the app.
 
-## Debugging the Main process
+## Debugging the browser process in JS
 
-The main process can be debugged with remote developer tools.
+The browser process can be debugged with remote developer tools.
 
 When you run the `npm start` command it will start listening on port `5858`.
-One easy way to start debugging is to `Attach` to the process using [Visual Studio Code](https://code.visualstudio.com/) which works for macOS, Windows, and Linux.
 
-The left hand side of Visual Studio Code has a Debug button.  It allows you to attach the debugging, inspect variables, have a watch window, call stacks, line by line debugging, etc.
+One easy way to start debugging the browser process to `Attach` to, or `Launch` the process using [Visual Studio Code](https://code.visualstudio.com/) which works for macOS, Windows, and Linux.
+Project configurations are already inside the subdirectory `.vscode`, and have been tested with macOS.  It may need tweaking for other platforms.
+Just go to `File | Open...` and select the browser-laptop checked out repo directory.
+
+The left hand side of Visual Studio Code has a Debug Play button.  It allows you to attach or launch in debug mode, inspect variables, have a watch window, call stacks, line by line debugging, etc.
 
 To pause the application before any code runs you can use `npm run start-brk`.
 
 The code which runs in the main process is inside of the `app` directory.
 
-Calls to `console.log` and related functions go into the terminal you did `npm start` from.
+Calls to `console.log` and related functions go into the terminal you did `npm start` from, or if you started within VSCode it will go to inside the `DEBUG CONSOLE`.
 
 Unlike with the renderer process, since the main process isn't using webpack dev server, you will need to restart the app to see your changes.
 The app can be restarted with `Command+Alt+R` when using a development environment.
