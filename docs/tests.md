@@ -34,3 +34,13 @@ You can run a subset of tests which match a `description` or `it` with:
     npm run test -- --grep="expression"
 
 Where `expression` could be for example `^tabs` to match all tests which start with the word tabs. This works for all testing modes (test, unittest, uitest).
+
+## Debugging tests
+
+You can debug tests by using the command `yield this.app.client.debug()` in a test.
+Or most of the time just append `.debug()` to a series of commands.
+
+This will pause the browser from running tests, and you can open up browser dev tools or content dev tools to inspect logs, console, and other things.
+You should act fast or else adjust the timeout or the test will fail though.
+
+To get browser process logs just do `git grep this.app.client.getMainProcessLogs` and uncomment that block of code.

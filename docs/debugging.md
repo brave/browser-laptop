@@ -58,6 +58,10 @@ Windows
 C:\Users\username\AppData\Roaming\brave
 
 
+## Debugging tests
+
+See [tests.md](https://github.com/brave/browser-laptop/blob/master/docs/tests.md).
+
 ## Profiling React code
 
 The `Debug` menu has a `Toggle React Profiling` option which will start/stop the React addon for profiling.
