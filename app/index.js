@@ -28,6 +28,7 @@ var locale = require('./locale')
 
 const Immutable = require('immutable')
 const electron = require('electron')
+const path = require('path')
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
@@ -63,6 +64,14 @@ const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
+
+if (!process.env.BRAVE_USER_DATA_DIR && ['development', 'test'].includes(process.env.NODE_ENV)) {
+  process.env.BRAVE_USER_DATA_DIR = path.join(app.getPath('appData'), app.getName() + '-' + process.env.NODE_ENV)
+}
+
+if (process.env.BRAVE_USER_DATA_DIR) {
+  app.setPath('userData', process.env.BRAVE_USER_DATA_DIR)
+}
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []

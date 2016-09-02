@@ -23,17 +23,13 @@ const sessionStorageVersion = 1
 const filtering = require('./filtering')
 // const tabState = require('./common/state/tabState')
 
-let suffix = ''
-if (process.env.NODE_ENV === 'development') {
-  suffix = '-dev'
-}
-const sessionStorageName = `session-store-${sessionStorageVersion}${suffix}`
-const storagePath = process.env.NODE_ENV !== 'test'
-  ? path.join(app.getPath('userData'), sessionStorageName)
-  : path.join(process.env.HOME, '.brave-test-session-store-1')
 const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
+const sessionStorageName = `session-store-${sessionStorageVersion}`
 
+const getStoragePath = () => {
+  return path.join(app.getPath('userData'), sessionStorageName)
+}
 /**
  * Saves the specified immutable browser state to storage.
  *
@@ -78,7 +74,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
       : path.join(process.env.HOME, '.brave-test-session-store-tmp-' + epochTimestamp)
 
     let p = promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
-      .then(() => promisify(fs.rename, tmpStoragePath, storagePath))
+      .then(() => promisify(fs.rename, tmpStoragePath, getStoragePath()))
     if (isShutdown) {
       p = p.then(module.exports.cleanSessionDataOnShutdown())
     }
@@ -314,7 +310,7 @@ module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
     let data
     try {
-      data = fs.readFileSync(storagePath)
+      data = fs.readFileSync(getStoragePath())
     } catch (e) {
     }
 
