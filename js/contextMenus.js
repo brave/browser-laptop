@@ -946,7 +946,7 @@ function mainTemplateInit (nodeProps, frame) {
     if (!isLink && !isImage) {
       template.push({
         label: locale.translation('viewPageSource'),
-        accelerator: 'CmdOrCtrl+U',
+        accelerator: 'CmdOrCtrl+Alt+U',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
             focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
