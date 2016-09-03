@@ -226,6 +226,9 @@ const UrlUtil = {
    * @returns {String} The view-source URL.
    */
   getViewSourceUrlFromUrl: function (input) {
+    if (this.isImageAddress(input) || !this.isHttpAddress(input)) {
+      return null
+    }
     if (this.isViewSourceUrl(input)) {
       return input
     }
