@@ -13,17 +13,23 @@ body {
   display: none !important; /* for testing/debug only */
 }
 
-#enablePaymentsSwitch {
-  margin: 15px 0 0 100px;
+#paymentsSwitches {
+  margin-top: 15px;
 
-  span {
-    font-weight: bold;
-    color: @gray;
-  }
+  .enablePaymentsSwitch {
+    float: left;
+    min-width: 215px;
+    margin-right: 30px;
 
-  label {
-    font-weight: bold;
-    color: @braveOrange;
+    span {
+      font-weight: bold;
+      color: @gray;
+    }
+
+    label {
+      font-weight: bold;
+      color: @braveOrange;
+    }
   }
 
   .settingItem {
@@ -33,14 +39,19 @@ body {
 }
 
 #fundsAmount {
-  line-height: 2;
   margin-right: 10px;
+
+  .fundsFAQ {
+    position: relative;
+    margin: 0 10px;
+    top: -1px;
+  }
 }
 
 .prefTabContainer {
   .sectionTitleWrapper {
     position: relative;
-    margin-left: 20px;
+    margin-right: 20px;
     min-height: 40px;
     min-width: 240px;
 
@@ -57,7 +68,7 @@ body {
       font-size: 15px;
       position: absolute;
       bottom: 25px;
-      right: 18px;
+      right: 19px;
     }
   }
 
@@ -318,13 +329,14 @@ span.settingsListCopy {
   }
 }
 
-span.browserButton.primaryButton.addFunds {
-  font-size: 0.9em;
-  margin-right: 50px;
-}
-
 span.browserButton.primaryButton {
-  .clearBrowsingDataButton, .manageAutofillDataButton {
+  &.addFunds {
+    font-size: 0.9em;
+    margin-right: 50px;
+  }
+
+  &.clearBrowsingDataButton,
+  &.manageAutofillDataButton {
     font-size: 0.9em;
     margin-top: 20px;
     padding: 5px 20px;
@@ -462,13 +474,13 @@ table.sortableTable {
 
 .paymentsMessage {
   background-color: @lightGray;
+  border-radius: @borderRadiusUIbox;
   margin: 1em 0;
   padding: 40px;
   font-size: 1.3em;
   line-height: 1.3em;
   color: @mediumGray;
-  min-width: 440px;
-  max-width: 600px;
+  width: 500px;
   float: left;
   > div {
     padding: 0.5em 0;
@@ -487,6 +499,14 @@ table.sortableTable {
 #ledgerTable {
   height: ~"-webkit-calc(100vh - 300px)";
   overflow-y: scroll;
+
+  tr {
+    th,
+    td {
+      padding: 0 15px;
+    }
+  }
+
 }
 
 .modal .dialog.paymentHistory .sectionTitle {
@@ -556,6 +576,7 @@ div.nextPaymentSubmission {
 #paymentsContainer {
   position: relative;
   overflow-x: hidden;
+  width: 805px;
 
   .titleBar {
     overflow: hidden;
@@ -577,9 +598,23 @@ div.nextPaymentSubmission {
     margin: 30px 0px;
     th {
       text-align: left;
+      font-weight: normal;
     }
     tr {
       height: 1em;
+    }
+    td {
+      padding: 15px 30px 0 0;
+      width: auto;
+      min-width: 215px;
+    }
+    span.browserButton.primaryButton.addFunds {
+      margin-right: 0;
+    }
+    .addFunds {
+      margin: 0;
+      height: 30px;
+      line-height: 30px;
     }
   }
 
@@ -625,8 +660,6 @@ div.nextPaymentSubmission {
       color: @mediumGray;
       -webkit-font-smoothing: antialiased;
       text-align: left;
-      width: 8%;
-      padding-top: 16px;
       vertical-align: top;
 
       a {
@@ -640,18 +673,13 @@ div.nextPaymentSubmission {
         img {
           width: 1.5em;
           height: 1.5em;
-          margin: -0.375em 0.375em 0 0;
+          margin-right: 6px;
           vertical-align: middle;
         }
       }
 
-      &.narrow {
-        width: 5%;
-      }
-
-      &.wide {
-        width: 20%;
-        text-align: left;
+      &.alignRight {
+        text-align: right;
       }
 
       input[type='range'] {
@@ -752,6 +780,11 @@ div.nextPaymentSubmission {
 
     * {
       color: white;
+    }
+  }
+  .disabledPanel {
+    div:nth-of-type(2) {
+      padding: 15px 5px;
     }
   }
 }
@@ -915,4 +948,6 @@ div.nextPaymentSubmission {
 
 #fundsSelectBox {
   margin-top: 0px;
+  min-width: 130px;
+  width: auto;
 }

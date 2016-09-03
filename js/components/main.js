@@ -881,7 +881,7 @@ class Main extends ImmutableComponent {
             showOnlyFavicon={showOnlyFavicon}
             shouldAllowWindowDrag={shouldAllowWindowDrag}
             activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
-            windowWidth={this.props.appState.get('defaultWindowWidth')}
+            windowWidth={window.innerWidth}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
             sites={this.props.appState.get('sites')} />
           : null
@@ -1006,7 +1006,7 @@ class Main extends ImmutableComponent {
       {
         this.props.windowState.getIn(['ui', 'downloadsToolbar', 'isVisible']) && this.props.appState.get('downloads') && this.props.appState.get('downloads').size > 0
         ? <DownloadsBar
-          windowWidth={this.props.appState.get('defaultWindowWidth')}
+          windowWidth={window.innerWidth}
           downloads={this.props.appState.get('downloads')} />
         : null
       }

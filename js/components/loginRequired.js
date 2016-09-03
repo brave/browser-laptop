@@ -78,13 +78,13 @@ class LoginRequired extends React.Component {
         <div className='genericFormSubtitle' data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
         <div className='genericFormTable'>
           <div id='loginUsername' className='formRow'>
-            <label data-l10n-id='basicAuthUsername' htmlFor='loginUsername' />
+            <label data-l10n-id='basicAuthUsernameLabel' htmlFor='loginUsername' />
             <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onUsernameChange} value={this.state.username} ref={(loginUsername) => { this.loginUsername = loginUsername }} />
           </div>
           {
             !this.isFolder
             ? <div id='loginPassword' className='formRow'>
-              <label data-l10n-id='basicAuthPassword' htmlFor='loginPassword' />
+              <label data-l10n-id='basicAuthPasswordLabel' htmlFor='loginPassword' />
               <input spellCheck='false' type='password' onKeyDown={this.onKeyDown} onChange={this.onPasswordChange} value={this.state.password} />
             </div>
             : null

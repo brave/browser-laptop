@@ -49,7 +49,21 @@ module.exports = {
   closeButton: '.close-btn',
   clearBrowsingDataButton: '.clearBrowsingDataButton',
   securityTab: '[data-l10n-id="security"]',
+  paymentsTab: '[data-l10n-id="payments"]',
+  walletSwitch: '.enablePaymentsSwitch .switchBackground',
+  addFundsButton: '.addFunds',
+  fundsSelectBox: '#fundsSelectBox',
+  paymentsStatus: '#walletStatus',
+  ledgerTable: '.ledgerTable',
+  bitcoinDashboard: '#bitcoinDashboard',
+  modalCloseButton: 'button.close',
+  coinbaseBuyButton: '[data-l10n-id="add"]',
+  paymentQRCode: '[title="Brave wallet QR code"]',
   deleteButton: '[data-l10n-id="delete"]',
+  paymentHistoryButton: '.paymentHistoryButton',
+  paymentsWelcomePage: '.paymentsMessage',
   autofillAddressPanel: '.autofillAddressPanel',
-  autofillCreditCardPanel: '.autofillCreditCardPanel'
+  autofillCreditCardPanel: '.autofillCreditCardPanel',
+  allowRunInsecureContentButton: '.allowRunInsecureContentButton',
+  denyRunInsecureContentButton: '.denyRunInsecureContentButton'
 }

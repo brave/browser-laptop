@@ -12,6 +12,7 @@ const {passwordManagers, defaultPasswordManager} = require('../constants/passwor
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const { registerUserPrefs } = require('./userPrefs')
+const { getSetting } = require('../settings')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -32,7 +33,7 @@ const addContentSettings = (settingList, hostPattern, secondaryPattern = undefin
 const getPasswordManagerEnabled = (appState) => {
   let appSettings = appState.get('settings')
   if (appSettings) {
-    const passwordManager = appSettings.get(settings.ACTIVE_PASSWORD_MANAGER)
+    const passwordManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER, appSettings)
     if (typeof passwordManager === 'string') {
       return passwordManager === passwordManagers.BUILT_IN
     }
@@ -111,6 +112,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
     flashActive: [{
       setting: 'block',
       primaryPattern: '*'
+    }],
+    runInsecureContent: [{
+      setting: 'block',
+      primaryPattern: '*'
     }]
   }
 
@@ -122,6 +127,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
       // TODO: support temporary override
       addContentSettings(contentSettings.javascript, hostPattern, '*',
         hostSetting.noScript ? 'block' : 'allow')
+    }
+    if (typeof hostSetting.runInsecureContent === 'boolean') {
+      addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',
+        hostSetting.runInsecureContent ? 'allow' : 'block')
     }
     if (hostSetting.cookieControl) {
       if (hostSetting.cookieControl === 'block3rdPartyCookie') {

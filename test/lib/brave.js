@@ -5,6 +5,7 @@ require('./coMocha')
 
 const path = require('path')
 const fs = require('fs')
+const os = require('os')
 const {getTargetAboutUrl, isSourceAboutUrl} = require('../../js/lib/appUrlUtil')
 
 var chaiAsPromised = require('chai-as-promised')
@@ -12,6 +13,30 @@ chai.should()
 chai.use(chaiAsPromised)
 
 const Server = require('./server')
+
+const generateUserDataDir = () => {
+  return path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
+}
+
+const rmDir = (dirPath) => {
+  try {
+    var files = fs.readdirSync(dirPath)
+  } catch (e) {
+    console.error(e)
+    return
+  }
+  if (files.length > 0) {
+    for (var i = 0; i < files.length; i++) {
+      var filePath = path.join(dirPath, files[i])
+      if (fs.statSync(filePath).isFile()) {
+        fs.unlinkSync(filePath)
+      } else {
+        rmDir(filePath)
+      }
+    }
+  }
+  fs.rmdirSync(dirPath)
+}
 
 var promiseMapSeries = function (array, iterator) {
   var length = array.length
@@ -26,6 +51,7 @@ var promiseMapSeries = function (array, iterator) {
   return Promise.all(results)
 }
 
+let userDataDir = generateUserDataDir()
 var exports = {
   keys: {
     COMMAND: '\ue03d',
@@ -411,24 +437,29 @@ var exports = {
     this.app.client.waitUntilWindowLoaded().windowByUrl(exports.browserWindowUrl)
   },
 
-  startApp: function (cleanSessionStore = true) {
-    if (cleanSessionStore) {
-      try {
-        fs.unlinkSync(path.join(process.env.HOME, '.brave-test-session-store-1'))
-      } catch (e) {
-      }
+  startApp: function () {
+    if (process.env.KEEP_BRAVE_USER_DATA_DIR) {
+      console.log('BRAVE_USER_DATA_DIR=' + userDataDir)
+    }
+    let env = {
+      NODE_ENV: 'test',
+      BRAVE_USER_DATA_DIR: userDataDir
     }
     this.app = new Application({
       path: './node_modules/.bin/electron',
-      env: {
-        NODE_ENV: 'test'
-      },
-      args: ['./', '--debug=5858', '--enable-logging', '--v=0']
+      env,
+      args: ['./', '--debug=5858', '--enable-logging', '--v=1']
     })
     return this.app.start()
   },
 
-  stopApp: function () {
+  stopApp: function (cleanSessionStore = true) {
+    if (cleanSessionStore) {
+      if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
+        userDataDir && rmDir(userDataDir)
+      }
+      userDataDir = generateUserDataDir()
+    }
     // this.app.client.getMainProcessLogs().then(function (logs) {
     //   logs.forEach(function (log) {
     //     console.log(log)

@@ -267,8 +267,8 @@ WindowStore
         realm: string
       },
       isExtendedValidation: boolean, // is using https ev
-      activeMixedContent: boolean, // has active mixed content
-      passiveMixedContent: boolean, // has passive mixed content
+      runInsecureContent: boolean, // has active mixed content
+      blockedRunInsecureContent: string, // first domain of blocked active mixed content
     },
     parentFrameKey: number, // the key of the frame this frame was opened from
     modalPromptDetail: {...},
@@ -444,7 +444,7 @@ WindowStore
       minutesSpent: number,      //   e.g., 3
       secondsSpent: number,      //   e.g., 4
       score: number,             // float indicating the current score
-      percentage: number,        // 0, 1, ... 100
+      percentage: number,        // i.e., 0, 1, ... 100
       publisherURL: string,      // publisher site, e.g., "https://wikipedia.org/"
       faviconURL: string         // i.e., "data:image/...;base64,..."
     }

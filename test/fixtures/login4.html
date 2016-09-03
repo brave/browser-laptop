@@ -1,0 +1,27 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Login</title>
+</head>
+<body>
+  <div id="content" class="login">
+    <h1>Login</h1>
+    <form method="post" id="acctmgr_loginform" action="/"><div><input type="hidden" name="__FORM_TOKEN" value="foo" /></div>
+      <div>
+        <input type="hidden" name="referer" value="bar" />
+      </div>
+      <div class="textbox">
+        <label for="user">Username:</label><br />
+        <input type="text" id="user" name="user" class="textwidget" />
+      </div>
+      <div class="textbox">
+        <label for="password">Password:</label><br />
+        <input type="password" id="password" name="password" class="textwidget" />
+      </div>
+      <div id="login_options" class="buttons central nav">
+        <input id="submit" type="submit" value="Login" />
+      </div>
+    </form>
+  </div>
+</body>
+</html>

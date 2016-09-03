@@ -48,7 +48,7 @@ module.exports.getSetting = (settingKey, settingsCollection) => {
 }
 
 module.exports.getActivePasswordManager = (settingsCollection) => {
-  const passwordManager = resolveValue(settings.ACTIVE_PASSWORD_MANAGER, settingsCollection)
+  const passwordManager = module.exports.getSetting(settings.ACTIVE_PASSWORD_MANAGER, settingsCollection)
 
   let details = {
     name: passwordManager,

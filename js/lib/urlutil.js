@@ -81,6 +81,14 @@ const UrlUtil = {
     }
   },
 
+  isImageAddress (url) {
+    return (url.match(/\.(jpeg|jpg|gif|png|svg|bmp)$/))
+  },
+
+  isHttpAddress (url) {
+    return (url.match(/^https?:\/\/(.*)/))
+  },
+
   /**
    * Checks if a string is not a URL.
    * @param {String} input The input value.
@@ -218,6 +226,9 @@ const UrlUtil = {
    * @returns {String} The view-source URL.
    */
   getViewSourceUrlFromUrl: function (input) {
+    if (this.isImageAddress(input) || !this.isHttpAddress(input)) {
+      return null
+    }
     if (this.isViewSourceUrl(input)) {
       return input
     }

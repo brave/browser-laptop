@@ -116,7 +116,7 @@ const doAction = (action) => {
  */
 var init = () => {
   try {
-    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_INFO_DEBUG)
+    ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_CLIENT_DEBUG)
     publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
 
     appDispatcher.register(doAction)
@@ -160,6 +160,7 @@ var boot = () => {
 
 if (ipc) {
   ipc.on(messages.CHECK_BITCOIN_HANDLER, () => {
+    // TODO: https://github.com/brave/browser-laptop/issues/3625
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
       ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
@@ -238,9 +239,6 @@ eventStore.addChangeListener(() => {
     var entry, faviconURL, publisher
     var location = page.url
 
-/*
-    console.log('\npage=' + JSON.stringify(page, null, 2))
- */
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
 
     if (!page.publisher) {
@@ -403,6 +401,7 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
+    if (process.env.NODE_ENV === 'test') synopsis.options.minDuration = 0
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
@@ -470,9 +469,16 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
+/*
   if (publisherInfo._internal.debugP) {
-    console.log('\nupdatePublisherInfo: ' + JSON.stringify(underscore.omit(publisherInfo, [ '_internal' ])))
+    data = []
+    publisherInfo.synopsis.forEach((entry) => {
+      data.push(underscore.extend(underscore.omit(entry, [ 'faviconURL' ]), { faviconURL: entry.faviconURL && '...' }))
+    })
+
+    console.log('\nupdatePublisherInfo: ' + JSON.stringify(data, null, 2))
   }
+ */
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
 }
@@ -579,9 +585,10 @@ var visit = (location, timestamp) => {
 
     if (!synopsis) return
 
-/*
-    console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2))
- */
+    if (publisherInfo._internal.debugP) {
+      console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2) +
+                  ' duration=' + (timestamp - currentTimestamp) + ' msec')
+    }
     if ((location === currentLocation) || (!locations[currentLocation])) return
 
     publisher = locations[currentLocation].publisher
@@ -591,6 +598,7 @@ var visit = (location, timestamp) => {
     publishers[publisher][currentLocation] = timestamp
 
     duration = timestamp - currentTimestamp
+    if (publisherInfo._internal.debugP) console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec')
     synopsis.addPublisher(publisher, duration)
     updatePublisherInfo()
   }
@@ -790,10 +798,10 @@ var callback = (err, result, delayTime) => {
   }
 
   if (err) {
-    console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
+    console.log('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
-    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
+    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1 * msecs.minute, max: 10 * msecs.minute })
   }
 
   if (!result) return run(delayTime)
@@ -875,6 +883,8 @@ var roundtrip = (params, options, callback) => {
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
+var run0P = false
+
 var run = (delayTime) => {
   if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
 
@@ -910,7 +920,11 @@ var run = (delayTime) => {
   }
   if (delayTime > 0) {
     active = client
+    if (run0P) return console.log('suppress run0')
+
+    run0P = true
     return setTimeout(() => {
+      run0P = false
       if (active !== client) return
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
@@ -976,12 +990,19 @@ var getBalance = () => {
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
   (err, provider, result) => {
+    var unconfirmed
+    var info = ledgerInfo._internal.paymentInfo
+
     if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
 
     if (typeof result.unconfirmed === 'undefined') return
 
     if (result.unconfirmed > 0) {
-      ledgerInfo.unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      unconfirmed = (result.unconfirmed / 1e8).toFixed(4)
+      if ((info || ledgerInfo).unconfirmed === unconfirmed) return
+
+      ledgerInfo.unconfirmed = unconfirmed
+      if (info) info.unconfirmed = ledgerInfo.unconfirmed
       if (clientOptions.verboseP) console.log('\ngetBalance refreshes ledger info: ' + ledgerInfo.unconfirmed)
       return updateLedgerInfo()
     }
@@ -1093,12 +1114,15 @@ var syncWriter = (path, obj, options, cb) => {
   })
 }
 
-const pathSuffix = (process.env.NODE_ENV === 'development') ? '-dev' : ''
+const pathSuffix = { development: '-dev', test: '-test' }[process.env.NODE_ENV] || ''
 
 var pathName = (name) => {
   var parts = path.parse(name)
+  var basePath = process.env.NODE_ENV === 'test'
+    ? path.join(process.env.HOME, '.brave-test-ledger')
+    : app.getPath('userData')
 
-  return path.join(app.getPath('userData'), parts.name + pathSuffix + parts.ext)
+  return path.join(basePath, parts.name + pathSuffix + parts.ext)
 }
 
 /**

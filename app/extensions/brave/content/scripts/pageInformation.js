@@ -59,6 +59,15 @@
           expr['arguments'].forEach((argument) => { args.push(traverse(argument)) })
           return value[traverse(op1.property, true)].apply(value, args)
 
+        case 'NewExpression':
+          op1 = expr.callee
+          if (op1.type !== 'Identifier') throw new Error('unexpected callee: ' + op1.type)
+          if (op1.name !== 'Set') throw new Error('only new Set(...) is allowed, not new ' + op1.name)
+          args = []
+          expr['arguments'].forEach((argument) => { args.push(traverse(argument)) })
+          if (args.length > 1) throw new Error('Set(...) takes at most one argument')
+          return new Set(args[0])
+
         case 'ConditionalExpression':
           return (traverse(expr.test) ? traverse(expr.consequent) : traverse(expr.alternate))
 

@@ -385,10 +385,12 @@ const windowActions = {
    * @param {Object} frameProps - the frame properties for the webview in question.
    */
   setFocusedFrame: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
-      frameProps: frameProps
-    })
+    if (frameProps) {
+      dispatch({
+        actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
+        frameProps: frameProps
+      })
+    }
   },
 
   /**
@@ -968,6 +970,20 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
       currentDetail,
       originalDetail
+    })
+  },
+
+  /**
+   * Sets page url with blocked active mixed content.
+   * @param {Object} frameProps - The frame to set source of
+   * blocked active mixed content on
+   * @param {string} source - Source of blocked active mixed content
+   */
+  setBlockedRunInsecureContent: function (frameProps, source) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT,
+      frameProps,
+      source
     })
   }
 }
