@@ -1,7 +1,22 @@
 # Changelog
 
 ## [0.12.0](https://github.com/brave/browser-laptop/releases/v0.12.0dev)
-- (todo)
+ - Added shortcut to view page source ([#3685](https://github.com/brave/browser-laptop/issues/3685))
+ - Added extra separator under bookmark menu ([#3666](https://github.com/brave/browser-laptop/issues/3666))
+ - Added an option to temporarily disable mixed content protection enhancement security ([#3443](https://github.com/brave/browser-laptop/issues/3443))
+ - Changed friendlier add funds panel for users without a bitcoin: handler ([#3623](https://github.com/brave/browser-laptop/issues/3623))
+ - Changed search settings panel: search bar options ([#2124](https://github.com/brave/browser-laptop/issues/2124))
+ - Fixed many things for Brave Payments ([#3697](https://github.com/brave/browser-laptop/issues/3697))([#3625](https://github.com/brave/browser-laptop/issues/3625))([#3613](https://github.com/brave/browser-laptop/issues/3613))([#3638](https://github.com/brave/browser-laptop/issues/3638))
+ - Fixed spelling for Ukrainian interface ([#3695](https://github.com/brave/browser-laptop/issues/3695))
+ - Fixed wrong suggestions appearing in the autocomplete list under URL bar ([#3643](https://github.com/brave/browser-laptop/issues/3643))
+ - Fixed potential race condition on session state save ([#3543](https://github.com/brave/browser-laptop/issues/3543))
+ - Fixed passwords.properties not being loaded at app level ([#3671](https://github.com/brave/browser-laptop/issues/3671))
+ - Fixed bookmark customTitle from previously bookmarked entry is no longer re-used ([#3641](https://github.com/brave/browser-laptop/issues/3641))
+ - Fixed found entries on about:history cannot be deleted ([#3566](https://github.com/brave/browser-laptop/issues/3566))
+ - Fixed bookmarked pages not deleted from history after restarting bookmarks ([#3616](https://github.com/brave/browser-laptop/issues/3616))
+ - Fixed clear the lastAccessedTime for all tags when clearing history ([#3620](https://github.com/brave/browser-laptop/issues/3620))
+ - Fixed about:history showing bookmarks when searched ([#3627](https://github.com/brave/browser-laptop/issues/3627))
+
 
 ## [0.11.6](https://github.com/brave/browser-laptop/releases/v0.11.6dev)
  - Added the ability to pay publishers with the Brave Payments. ([#3195](https://github.com/brave/browser-laptop/issues/3195))
