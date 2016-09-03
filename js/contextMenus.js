@@ -870,7 +870,11 @@ function mainTemplateInit (nodeProps, frame) {
       label: locale.translation('redo'),
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
-    }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
+    }, CommonMenu.separatorMenuItem)
+
+    if (editableItems.length > 0) {
+      template.push(...editableItems, CommonMenu.separatorMenuItem)
+    }
   } else if (isTextSelected) {
     if (isDarwin) {
       template.push(showDefinitionMenuItem(nodeProps.selectionText),
