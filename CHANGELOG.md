@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.0](https://github.com/brave/browser-laptop/releases/v0.12.0dev)
+- (todo)
+
 ## [0.11.6](https://github.com/brave/browser-laptop/releases/v0.11.6dev)
  - Added the ability to pay publishers with the Brave Payments. ([#3195](https://github.com/brave/browser-laptop/issues/3195))
  - Added form autofill support. ([#860](https://github.com/brave/browser-laptop/issues/860))
