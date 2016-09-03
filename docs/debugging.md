@@ -17,11 +17,18 @@ If you're running `npm run watch`, then webpack dev server will ensure that chan
 
 The browser process can be debugged with remote developer tools.
 
-When you run the `npm start` command it will start listening on port `5858`.
-
 One easy way to start debugging the browser process to `Attach` to, or `Launch` the process using [Visual Studio Code](https://code.visualstudio.com/) which works for macOS, Windows, and Linux.
 Project configurations are already inside the subdirectory `.vscode`, and have been tested with macOS.  It may need tweaking for other platforms.
-Just go to `File | Open...` and select the browser-laptop checked out repo directory.
+
+Running `Attach` requires that you run the `npm start` command beforehand, so it's listening on port `5858`. `Launch` will start the browser up for you.
+
+When you're ready to get started, go to `File | Open...` and select the browser-laptop checked out repo directory.
+
+**NOTE**: _On macOS, you will need to have the following folders created before `Launch` will work as expected:_
+
+    ~/Library/Application Support/Electron-development/
+
+    ~/Library/Application Support/Electron/
 
 The left hand side of Visual Studio Code has a Debug Play button.  It allows you to attach or launch in debug mode, inspect variables, have a watch window, call stacks, line by line debugging, etc.
 
