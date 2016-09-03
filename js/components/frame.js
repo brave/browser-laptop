@@ -76,7 +76,7 @@ class Frame extends ImmutableComponent {
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
-      ipc.send(messages.CHECK_BITCOIN_HANDLER)
+      ipc.send(messages.CHECK_BITCOIN_HANDLER, FrameStateUtil.getPartition(this.frame))
       const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).toJS()
       this.webview.send(messages.LEDGER_UPDATED, ledgerData)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)

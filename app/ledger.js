@@ -27,7 +27,6 @@ const util = require('util')
 const electron = require('electron')
 const app = electron.app
 const ipc = electron.ipcMain
-const protocolHandler = electron.protocol
 const session = electron.session
 
 const acorn = require('acorn')
@@ -159,10 +158,11 @@ var boot = () => {
  */
 
 if (ipc) {
-  ipc.on(messages.CHECK_BITCOIN_HANDLER, () => {
+  ipc.on(messages.CHECK_BITCOIN_HANDLER, (event, partition) => {
+    const protocolHandler = session.fromPartition(partition).protocol
     // TODO: https://github.com/brave/browser-laptop/issues/3625
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
-      ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')
+      ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('bitcoin')
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
     }
   })
