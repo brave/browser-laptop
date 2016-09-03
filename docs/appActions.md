@@ -50,9 +50,9 @@ Adds a site to the site list
 
 
 
-### clearSitesWithoutTags() 
+### clearHistory() 
 
-Clears all sites without tags
+Clears history (all sites without tags). Indirectly called by appActions.clearAppData().
 
 
 

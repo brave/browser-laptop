@@ -481,13 +481,13 @@ describe('siteUtil', function () {
   describe('filterSitesRelativeTo', function () {
   })
 
-  describe('clearSitesWithoutTags', function () {
+  describe('clearHistory', function () {
     it('does not remove sites which have a valid `tags` property', function () {
       const sites = Immutable.fromJS([
         { tags: [siteTags.BOOKMARK_FOLDER] },
         { tags: [siteTags.BOOKMARK] }
       ])
-      const processedSites = siteUtil.clearSitesWithoutTags(sites)
+      const processedSites = siteUtil.clearHistory(sites)
       assert.deepEqual(processedSites.toJS(), sites.toJS())
     })
     it('sets the lastAccessedTime for all entries to null', function () {
@@ -508,7 +508,7 @@ describe('siteUtil', function () {
         tags: [siteTags.BOOKMARK],
         lastAccessedTime: null
       }])
-      const processedSites = siteUtil.clearSitesWithoutTags(sites)
+      const processedSites = siteUtil.clearHistory(sites)
       assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
     })
   })

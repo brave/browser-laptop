@@ -11,6 +11,7 @@
 // - When all state is collected save it to a JSON file and close the app
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 
+const Immutable = require('immutable')
 const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
@@ -19,6 +20,7 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
+const siteUtil = require('../js/state/siteUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 // const tabState = require('./common/state/tabState')
@@ -250,12 +252,7 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
-      // TODO - this should the history methods from siteUtils
-      data.sites = data.sites.filter((site) => site && site.tags && site.tags.length)
-      data.sites = data.sites.map((site) => {
-        delete site.lastAccessedTime
-        return site
-      })
+      data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
     }
   }
   if (data.downloads) {
