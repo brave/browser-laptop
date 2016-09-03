@@ -60,9 +60,9 @@ class WindowActionBar extends ImmutableComponent {
   render () {
     return <div className='window-header'>
       <div className={this.osClass + ' title-bar-btns'}>
-        <button className={this.buttonClass + ' win-action-btn min-btn'} onClick={this.onMinimizeClick}></button>
-        <button className={this.buttonClass + ' win-action-btn max-btn'} onClick={this.onMaximizeClick}></button>
-        <button className={this.buttonClass + ' win-action-btn close-btn'} onClick={this.onCloseClick}></button>
+        <button className={this.buttonClass + ' win-action-btn min-btn'} onClick={this.onMinimizeClick} />
+        <button className={this.buttonClass + ' win-action-btn max-btn'} onClick={this.onMaximizeClick} />
+        <button className={this.buttonClass + ' win-action-btn close-btn'} onClick={this.onCloseClick} />
       </div>
     </div>
   }
