@@ -44,6 +44,7 @@ const isDarwin = process.platform === 'darwin'
 const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isParent) => {
   return {
     label: locale.translation(label),
+    accelerator: 'CmdOrCtrl+D',
     click: () => {
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
@@ -914,6 +915,7 @@ function mainTemplateInit (nodeProps, frame) {
             }
           }, {
             label: locale.translation('reloadPage'),
+            accelerator: 'CmdOrCtrl+R',
             click: (item, focusedWindow) => {
               if (focusedWindow) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
