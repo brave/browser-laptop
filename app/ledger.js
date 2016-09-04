@@ -146,7 +146,7 @@ var boot = () => {
       bootP = false
       return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
     }
-    if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
+    if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 }) * msecs.minute)
     getBalance()
 
     bootP = false
@@ -358,9 +358,7 @@ var initialize = (onoff) => {
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
         }
-        if (client.sync(callback) === true) {
-          run(random.randomInt({ min: 1, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
-        }
+        if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 }) * msecs.minute)
         cacheRuleSet(state.ruleset)
 
         // Make sure bravery props are up-to-date with user settings
@@ -469,7 +467,6 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
-/*
   if (publisherInfo._internal.debugP) {
     data = []
     publisherInfo.synopsis.forEach((entry) => {
@@ -478,7 +475,6 @@ var updatePublisherInfo = () => {
 
     console.log('\nupdatePublisherInfo: ' + JSON.stringify(data, null, 2))
   }
- */
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
 }
@@ -883,10 +879,10 @@ var roundtrip = (params, options, callback) => {
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
-var run0P = false
+var timeoutId = false
 
 var run = (delayTime) => {
-  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+//  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
 
   if ((typeof delayTime === 'undefined') || (!client)) return
 
@@ -914,23 +910,25 @@ var run = (delayTime) => {
     try {
       delayTime = client.timeUntilReconcile()
     } catch (ex) {
-      delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
+      delayTime = false
     }
-    if (delayTime === false) delayTime = 0
+    if (delayTime === false) delayTime = random.randomInt({ min: 1, max: 10 }) * msecs.minute
   }
   if (delayTime > 0) {
-    active = client
-    if (run0P) return console.log('suppress run0')
+    if (timeoutId) return console.log('\ninterception')
 
-    run0P = true
-    return setTimeout(() => {
-      run0P = false
+    active = client
+    if (delayTime > msecs.day) delayTime = msecs.day
+
+    timeoutId = setTimeout(() => {
+      timeoutId = false
       if (active !== client) return
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
 
       if (client.sync(callback) === true) return run(0)
     }, delayTime)
+    return
   }
 
   if (client.isReadyToReconcile()) return client.reconcile(uuid.v4().toLowerCase(), callback)
