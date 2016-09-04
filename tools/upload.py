@@ -4,23 +4,22 @@ import json
 import os
 from lib.github import GitHub
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-version = json.load(open('package.json'))['version']
 BROWSER_LAPTOP_REPO = 'brave/browser-laptop'
-RELEASE_NAME = 'PRE (DO NOT DOWNLOAD UNLESS YOU ARE TESTING ' \
-  'THIS RELEASE CANDIDATE) Dev Channel Beta'
+RELEASE_NAME = ('PRE (DO NOT DOWNLOAD UNLESS YOU ARE TESTING '
+  'THIS RELEASE CANDIDATE) Dev Channel Beta')
 
 def main():
   github = GitHub(auth_token())
   releases = github.repos(BROWSER_LAPTOP_REPO).releases.get()
+  tag = (json.load(open('package.json'))['version'] +
+    release_channel() + '-' + build_label())
   tag_exists = False
   for release in releases:
-    if not release['draft'] and release['tag_name'] == version:
+    if not release['draft'] and release['tag_name'] == tag:
       tag_exists = True
       break
-  release = create_or_get_release_draft(github, releases, version,
+  release = create_or_get_release_draft(github, releases, tag,
                                         tag_exists)
   for f in get_files_to_upload():
     upload_browser_laptop(github,release, f)
@@ -84,6 +83,21 @@ def auth_token():
              'environment variable, which is your personal token')
   assert token, message
   return token
+
+def release_channel():
+  channel = os.environ['CHANNEL']
+  message = ('Error: Please set the $CHANNEL '
+             'environment variable, which is your release channel')
+  assert channel, message
+  return channel
+
+def build_label():
+  build = os.environ['BUILD']
+  message = ('Error: Please set the $BUILD '
+             'environment variable, which is your build label '
+             'Examples: beta5, or RC1')
+  assert build, message
+  return build
 
 
 if __name__ == '__main__':

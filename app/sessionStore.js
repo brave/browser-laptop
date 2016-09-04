@@ -11,6 +11,7 @@
 // - When all state is collected save it to a JSON file and close the app
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 
+const Immutable = require('immutable')
 const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
@@ -19,21 +20,18 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
 const {tabFromFrame} = require('../js/state/frameStateUtil')
+const siteUtil = require('../js/state/siteUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 // const tabState = require('./common/state/tabState')
 
-let suffix = ''
-if (process.env.NODE_ENV === 'development') {
-  suffix = '-dev'
-}
-const sessionStorageName = `session-store-${sessionStorageVersion}${suffix}`
-const storagePath = process.env.NODE_ENV !== 'test'
-  ? path.join(app.getPath('userData'), sessionStorageName)
-  : path.join(process.env.HOME, '.brave-test-session-store-1')
 const getSetting = require('../js/settings').getSetting
 const promisify = require('../js/lib/promisify')
+const sessionStorageName = `session-store-${sessionStorageVersion}`
 
+const getStoragePath = () => {
+  return path.join(app.getPath('userData'), sessionStorageName)
+}
 /**
  * Saves the specified immutable browser state to storage.
  *
@@ -78,7 +76,7 @@ module.exports.saveAppState = (payload, isShutdown) => {
       : path.join(process.env.HOME, '.brave-test-session-store-tmp-' + epochTimestamp)
 
     let p = promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
-      .then(() => promisify(fs.rename, tmpStoragePath, storagePath))
+      .then(() => promisify(fs.rename, tmpStoragePath, getStoragePath()))
     if (isShutdown) {
       p = p.then(module.exports.cleanSessionDataOnShutdown())
     }
@@ -248,11 +246,13 @@ module.exports.cleanAppData = (data, isShutdown) => {
     if (typeof expireTime === 'number' && expireTime < now) {
       delete data.siteSettings[host].flash
     }
+    // Don't write runInsecureContent to session
+    delete data.siteSettings[host].runInsecureContent
   }
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
-      data.sites = data.sites.filter((site) => site && site.tags && site.tags.length)
+      data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
     }
   }
   if (data.downloads) {
@@ -307,7 +307,7 @@ module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
     let data
     try {
-      data = fs.readFileSync(storagePath)
+      data = fs.readFileSync(getStoragePath())
     } catch (e) {
     }
 

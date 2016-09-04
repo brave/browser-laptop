@@ -4,8 +4,8 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
 
 ## Before you make changes
 
-* Submit a [ticket](https://github.com/brave/browser-laptop/issues) for your issue if one does not already exist. Please include the Brave version, operating system, and steps to reproduce the issue. Note that this is not necessary for trivial changes (spelling fixes, minor documentation changes, etc).
-* For changes to javascript files, we recommend installing a [Standard](http://standardjs.com/) plugin for your preferred text editor in order to ensure code style consistency.
+* Submit a [ticket](https://github.com/brave/browser-laptop/issues) for your issue if one does not already exist. Please include the Brave version, operating system, and steps to reproduce the issue.
+* For changes to JavaScript files, we recommend installing a [Standard](http://standardjs.com/) plugin for your preferred text editor in order to ensure code style consistency.
 
 ## Making changes
 
@@ -27,4 +27,26 @@ Brave welcomes contributions via [pull requests](https://github.com/brave/browse
 
 ## Pull requests
 
-Feel free to tag a Brave employee in the pull request to assign them to review your code. For design-related changes, it is helpful to include screenshots.
+### Each pull request should include
+
+* a descriptive title; this gets used in the [release notes](https://github.com/brave/browser-laptop/releases/tag/0.11.6dev)
+* a short summary of the changes
+* a reference to the issue that it fixes
+* steps to test the fix (if applicable)
+* for design-related changes, it is helpful to include screenshots
+
+Feel free to tag a Brave employee in the pull request to assign them to review your code.
+
+### Employees should
+
+* Assign the issue being fixed to a milestone.
+* Ensure another employee is tagged in the PR to review the code, via the `Auditor: @username` syntax.
+* Flag issues with `qa-steps-specified` if there are special things to test at the issue level. In particular you should always specify this if there’s an upgrade of the session store file.  It’s a signal to QA to make sure they pay extra special attention to this task.
+
+### Considerations before submitting a pull request
+
+* If you made a design or layout change, was there a mock-up provided? Do your changes match it?
+* Does your pull request fix multiple issues? If so, you may consider breaking into separate PRs.
+* Did you include tests? (we currently have both unit tests and web driver tests)
+* Did you manually test your new change?
+* If your change affects session, did you include steps to test? You may also consider manually testing an upgrade.

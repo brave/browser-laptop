@@ -38,8 +38,8 @@ describe('sessionStore', function () {
         .waitUntil(function () {
           return this.getValue(urlInput).then((val) => val === page1Url)
         })
-      yield Brave.stopApp()
-      yield Brave.startApp(false)
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
       yield setup(Brave.app.client)
     })
 
