@@ -407,30 +407,32 @@ function autofillTemplateInit (suggestions, frame) {
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
   const items = []
-  items.push(
-    CommonMenu.newTabMenuItem(frameProps.get('key')),
-    CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('reloadTab'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, frameKey)
+  const location = frameProps.get('location')
+  if (location !== 'about:newtab') {
+    items.push(
+      CommonMenu.newTabMenuItem(frameProps.get('key')),
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('reloadTab'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, frameKey)
+          }
         }
-      }
-    }, {
-      label: locale.translation('clone'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_CLONE, frameKey, {
-            openInForeground: true
-          })
+      }, {
+        label: locale.translation('clone'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_FRAME_CLONE, frameKey, {
+              openInForeground: true
+            })
+          }
         }
-      }
-    })
+      })
+  }
 
   if (!frameProps.get('isPrivate')) {
     const isPinned = frameProps.get('pinnedLocation')
-    const location = frameProps.get('location')
     if (!(location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location))) {
       items.push({
         label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
