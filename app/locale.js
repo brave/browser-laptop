@@ -230,6 +230,7 @@ const availableLanguages = [
   'fr-FR',
   'hi-IN',
   'id-ID',
+  'it',
   'ja-JP',
   'nl-NL',
   'pt-BR',
