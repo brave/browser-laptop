@@ -1,10 +1,27 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const assert = require('assert')
 const messages = require('../../js/constants/messages')
 const {urlInput, autofillAddressPanel, autofillCreditCardPanel} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+
+const addAddressButton = '.addAddressButton'
+const saveAddressButton = '.saveAddressButton'
+const addCreditCardButton = '.addCreditCardButton'
+const saveCreditCardButton = '.saveCreditCardButton'
+const name = 'Brave Lion'
+const organization = 'Brave'
+const streetAddress = '1161 Mission Street, #401'
+const city = 'San Francisco'
+const state = 'CA'
+const postalCode = '94103-1550'
+const country = 'US'
+const phone = '0987654321'
+const email = 'press@brave.com'
+const cardName = 'Test Card'
+const cardNumber = '1234567890'
+const expMonth = 9
+const expYear = new Date().getFullYear() + 2
 
 describe('Autofill', function () {
   function * setup (client) {
@@ -16,28 +33,16 @@ describe('Autofill', function () {
       .waitForVisible(urlInput)
   }
 
-  describe('Data Management', function () {
+  describe('address', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
-    })
-    const page1Url = 'about:autofill'
-    const addAddressButton = '.addAddressButton'
-    const saveAddressButton = '.saveAddressButton'
-    const name = 'Brave Lion'
-    const organization = 'Brave'
-    const streetAddress = '1161 Mission Street, #401'
-    const city = 'San Francisco'
-    const state = 'CA'
-    const postalCode = '94103-1550'
-    const country = 'US'
-    const phone = '0987654321'
-    const email = 'press@brave.com'
-    it('Adding Address', function * () {
+      this.autofillPreferences = 'about:autofill'
+      this.formfill = Brave.server.url('formfill.html')
+
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.autofillPreferences)
         .waitForVisible(addAddressButton)
         .click(addAddressButton)
         .windowByUrl(Brave.browserWindowUrl)
@@ -66,7 +71,11 @@ describe('Autofill', function () {
             return val.value.autofill.addresses.guid.length === 1
           })
         })
-        .tabByUrl(this.page1Url)
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
+    })
+    it('adds an autofill address', function * () {
+      yield this.app.client
         .waitForVisible('.autofillPage')
         .getText('.addressName').should.eventually.be.equal(name)
         .getText('.organization').should.eventually.be.equal(organization)
@@ -78,26 +87,44 @@ describe('Autofill', function () {
         .getText('.phone').should.eventually.be.equal(phone)
         .getText('.email').should.eventually.be.equal(email)
     })
-    it('Address form test', function * () {
-      const page1Url = Brave.server.url('formfill.html')
+    it('autofills the address', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.formfill)
         .waitForVisible('<form>')
         .click('[name="04fullname"]')
         .click('[name="04fullname"]')
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSendRenderer('autofill-selection-clicked', 2, name, 1, 0)
-        .setContextMenuDetail()
-        .tabByUrl(this.page1Url)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
         .getValue('[name="04fullname"]').should.eventually.be.equal(name)
+        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone)
+        .getValue('[name="24emailadr"]').should.eventually.be.equal(email)
+        // TODO(bridiver) - this needs to check all fields
     })
-    it('Editing Address', function * () {
+    it('autofills the address in a private tab', function * () {
       yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
+        .waitForUrl(this.formfill + '?2')
+        .waitForVisible('<form>')
+        .click('[name="04fullname"]')
+        .click('[name="04fullname"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
+        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
+        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone)
+        .getValue('[name="24emailadr"]').should.eventually.be.equal(email)
+        // TODO(bridiver) - this needs to check all fields
+    })
+    it('autofills the updated address when edited', function * () {
+      yield this.app.client
+        // update the address
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.autofillPreferences)
         .waitForVisible('[title="Edit address"]')
         .click('[title="Edit address"]')
         .windowByUrl(Brave.browserWindowUrl)
@@ -114,7 +141,8 @@ describe('Autofill', function () {
             return val.value.autofill.addresses.guid.length === 1
           })
         })
-        .tabByUrl(this.page1Url)
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
         .waitForVisible('.autofillPage')
         .getText('.addressName').should.eventually.be.equal(name)
         .getText('.organization').should.eventually.be.equal(organization)
@@ -125,44 +153,42 @@ describe('Autofill', function () {
         .getText('.country').should.eventually.be.equal(country)
         .getText('.phone').should.eventually.be.equal(phone + '123')
         .getText('.email').should.eventually.be.equal(email + 'mm')
-    })
-    it('Edited Address form test', function * () {
-      const page1Url = Brave.server.url('formfill.html')
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        // fill out the form
+        .loadUrl(this.formfill)
         .waitForVisible('<form>')
         .click('[name="04fullname"]')
         .click('[name="04fullname"]')
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSendRenderer('autofill-selection-clicked', 2, name, 1, 0)
-        .setContextMenuDetail()
-        .tabByUrl(this.page1Url)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
         .getValue('[name="04fullname"]').should.eventually.be.equal(name)
         .getValue('[name="23cellphon"]').should.eventually.be.equal(phone + '123')
         .getValue('[name="24emailadr"]').should.eventually.be.equal(email + 'mm')
+        // TODO(bridiver) - this needs to check all fields
     })
-    it('Deleting Address', function * () {
+    it('deletes the address', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.autofillPreferences)
+        .url(getTargetAboutUrl(this.autofillPreferences))
         .waitForVisible('[title="Delete address"]')
         .click('[title="Delete address"]')
+        .loadUrl(this.autofillPreferences)
         .waitForVisible('[data-l10n-id=noAddressesSaved]')
     })
-    const addCreditCardButton = '.addCreditCardButton'
-    const saveCreditCardButton = '.saveCreditCardButton'
-    const cardName = 'Test Card'
-    const cardNumber = '1234567890'
-    const expMonth = 9
-    const expYear = new Date().getFullYear() + 2
-    it('Adding Credit Card', function * () {
+  })
+
+  describe('credit card', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      this.autofillPreferences = 'about:autofill'
+      this.formfill = Brave.server.url('formfill.html')
+
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.autofillPreferences)
         .waitForVisible(addCreditCardButton)
         .click(addCreditCardButton)
         .windowByUrl(Brave.browserWindowUrl)
@@ -179,35 +205,53 @@ describe('Autofill', function () {
             return val.value.autofill.creditCards.guid.length === 1
           })
         })
-        .tabByUrl(this.page1Url)
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
+    })
+    it('adds an autofill credit card', function * () {
+      yield this.app.client
         .waitForVisible('.autofillPage')
         .getText('.creditCardName').should.eventually.be.equal(cardName)
         .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
         .getText('.creditCardPExpirationDate').should.eventually.be.equal(
           (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
     })
-    it('Credit Card form test', function * () {
-      const page1Url = Brave.server.url('formfill.html')
+    it('autofills the credit card', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.formfill)
         .waitForVisible('<form>')
         .click('[name="41ccnumber"]')
         .click('[name="41ccnumber"]')
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSendRenderer('autofill-selection-clicked', 2, cardNumber, 65536, 0)
-        .setContextMenuDetail()
-        .tabByUrl(this.page1Url)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
         .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
         .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
         .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
     })
-    it('Editing Credit Card', function * () {
+    it('autofills the credit card in a private tab', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
+        .waitForUrl(this.formfill + '?2')
+        .waitForVisible('<form>')
+        .click('[name="41ccnumber"]')
+        .click('[name="41ccnumber"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
+        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
+        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
+        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
+    })
+    it('autofills the updated credit card when edited', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.autofillPreferences)
+        .url(getTargetAboutUrl(this.autofillPreferences))
         .waitForVisible('[title="Edit creditCard"]')
         .click('[title="Edit creditCard"]')
         .windowByUrl(Brave.browserWindowUrl)
@@ -226,263 +270,154 @@ describe('Autofill', function () {
             return val.value.autofill.creditCards.guid.length === 1
           })
         })
-        .tabByUrl(this.page1Url)
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
         .waitForVisible('.autofillPage')
         .getText('.creditCardName').should.eventually.be.equal(cardName + 123)
         .getText('.creditCardNumber').should.eventually.be.equal('***' + (cardNumber + 123).slice(-4))
         .getText('.creditCardPExpirationDate').should.eventually.be.equal(
           (expMonth + 1).toString() + '/' + (expYear + 1).toString())
-    })
-    it('Edited Credit Card form test', function * () {
-      const page1Url = Brave.server.url('formfill.html')
-      yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.formfill)
         .waitForVisible('<form>')
         .click('[name="41ccnumber"]')
         .click('[name="41ccnumber"]')
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSendRenderer('autofill-selection-clicked', 2, cardNumber, 65536, 0)
-        .setContextMenuDetail()
-        .tabByUrl(this.page1Url)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
         .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber + '123')
         .getValue('[name="42ccexp_mm"]').should.eventually.be.equal((expMonth + 1).toString())
         .getValue('[name="43ccexp_yy"]').should.eventually.be.equal((expYear + 1).toString())
+        // TODO(bridiver) this needs to check all fields
     })
-    it('Deleting Credit Card', function * () {
+    it('deletes the credit card', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
+        .loadUrl(this.autofillPreferences)
         .waitForVisible('[title="Delete creditCard"]')
         .click('[title="Delete creditCard"]')
+        .loadUrl(this.autofillPreferences)
         .waitForVisible('[data-l10n-id=noCreditCardsSaved]')
     })
   })
 
-  describe('Mergeable Data', function () {
-    Brave.beforeAll(this)
-    before(function * () {
-      yield setup(this.app.client)
+  describe('ad-hoc autofill', function () {
+    describe('regular tab', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+        this.formfill = Brave.server.url('formfill.html')
+        yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.formfill)
+          .waitForVisible('<form>')
+          .setValue('[name="04fullname"]', 'test')
+          .click('#submit')
+      })
+      it('autofills in regular tab', function * () {
+        yield this.app.client
+          .tabByIndex(0)
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForVisible('.contextMenuItemText')
+          .click('.contextMenuItemText')
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+      })
+      it('autofills in private tab', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { isPrivate: true })
+          .waitForUrl(this.formfill + '?2')
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForVisible('.contextMenuItemText')
+          .click('.contextMenuItemText')
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+      })
     })
-    const page1Url = 'about:autofill'
-    const addAddressButton = '.addAddressButton'
-    const saveAddressButton = '.saveAddressButton'
-    const name = 'Brave Lion'
-    const city = 'San Francisco'
-    const country = 'US'
-    it('Adding Address', function * () {
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible(addAddressButton)
-        .click(addAddressButton)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(autofillAddressPanel)
-        .click('#nameOnAddress')
-        .keys(name)
-        .click(saveAddressButton)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.autofill.addresses.guid.length === 1
-          })
-        })
-        .tabByUrl(this.page1Url)
-        .waitForVisible('.autofillPage')
-        .getText('.addressName').should.eventually.be.equal(name)
+    describe('session tab', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+        this.formfill = Brave.server.url('formfill.html')
+        yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.formfill)
+          .waitForVisible('<form>')
+          .setValue('[name="04fullname"]', 'test')
+          .click('#submit')
+      })
+      it('autofills in regular tab', function * () {
+        yield this.app.client
+          .tabByIndex(0)
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForVisible('.contextMenuItemText')
+          .click('.contextMenuItemText')
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+      })
+      // TODO(bridiver) - session tabs should have autofill data
+      it.skip('autofills in session tab', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { partitionNumber: 3 })
+          .waitForUrl(this.formfill + '?2')
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForVisible('.contextMenuItemText')
+          .click('.contextMenuItemText')
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+      })
     })
-    it('Editing Address', function * () {
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible('[title="Edit address"]')
-        .click('[title="Edit address"]')
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(autofillAddressPanel)
-        .click('#city')
-        .keys(city)
-        .click('#country')
-        .keys(country)
-        .click(saveAddressButton)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.autofill.addresses.guid.length === 1
-          })
-        })
-        .tabByUrl(this.page1Url)
-        .waitForVisible('.autofillPage')
-        .getText('.addressName').should.eventually.be.equal(name)
-        .getText('.city').should.eventually.be.equal(city)
-        .getText('.country').should.eventually.be.equal(country)
-    })
-    it('Address form test', function * () {
-      const page1Url = Brave.server.url('formfill.html')
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible('<form>')
-        .click('[name="04fullname"]')
-        .click('[name="04fullname"]')
-        .windowByUrl(Brave.browserWindowUrl)
-        .ipcSendRenderer('autofill-selection-clicked', 2, name, 1, 0)
-        .setContextMenuDetail()
-        .tabByUrl(this.page1Url)
-        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
-        .getValue('[name="13adr_city"]').should.eventually.be.equal(city)
-        .getValue('[name="15_country"]').should.eventually.be.equal('United States')
-    })
-    it('Deleting Address', function * () {
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible('[title="Delete address"]')
-        .click('[title="Delete address"]')
-        .waitForVisible('[data-l10n-id=noAddressesSaved]')
-    })
-    const addCreditCardButton = '.addCreditCardButton'
-    const saveCreditCardButton = '.saveCreditCardButton'
-    const cardName = 'Test Card'
-    const cardNumber = '1234567890'
-    const expMonth = 10
-    const expYear = new Date().getFullYear() + 2
-    it('Adding Credit Card', function * () {
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible(addCreditCardButton)
-        .click(addCreditCardButton)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(autofillCreditCardPanel)
-        .click('#nameOnCard')
-        .keys(cardName)
-        .click('#creditCardNumber')
-        .keys(cardNumber)
-        .click(saveCreditCardButton)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.autofill.creditCards.guid.length === 1
-          })
-        })
-        .tabByUrl(this.page1Url)
-        .waitForVisible('.autofillPage')
-        .getText('.creditCardName').should.eventually.be.equal(cardName)
-        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
-        .getText('.creditCardPExpirationDate').should.eventually.be.equal('01/' + new Date().getFullYear().toString())
-    })
-    it('Editing Credit Card', function * () {
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible('[title="Edit creditCard"]')
-        .click('[title="Edit creditCard"]')
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible(autofillCreditCardPanel)
-        .selectByValue('.expMonthSelect', expMonth.toString())
-        .selectByValue('.expYearSelect', expYear.toString())
-        .click(saveCreditCardButton)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.autofill.creditCards.guid.length === 1
-          })
-        })
-        .tabByUrl(this.page1Url)
-        .waitForVisible('.autofillPage')
-        .getText('.creditCardName').should.eventually.be.equal(cardName)
-        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
-        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
-          expMonth.toString() + '/' + expYear.toString())
-    })
-    it('Credit Card form test', function * () {
-      const page1Url = Brave.server.url('formfill.html')
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible('<form>')
-        .click('[name="41ccnumber"]')
-        .click('[name="41ccnumber"]')
-        .windowByUrl(Brave.browserWindowUrl)
-        .ipcSendRenderer('autofill-selection-clicked', 2, cardNumber, 65536, 0)
-        .setContextMenuDetail()
-        .tabByUrl(this.page1Url)
-        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
-        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
-        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
-    })
-    it('Deleting Credit Card', function * () {
-      yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(page1Url)
-        .url(getTargetAboutUrl(page1Url))
-        .waitForVisible('[title="Delete creditCard"]')
-        .click('[title="Delete creditCard"]')
-        .waitForVisible('[data-l10n-id=noCreditCardsSaved]')
-    })
-  })
-
-  describe('prevent autocomplete data leak from private to regular', function () {
-    Brave.beforeAll(this)
-    const url = 'https://yoast.com/research/autocompletetype.php'
-    before(function * () {
-      yield setup(this.app.client)
-    })
-    it('submit form on regular', function * () {
-      yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
-        .waitForUrl(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="2"]')
-        .waitForVisible('webview[partition="persist:default"]')
-        .tabByUrl(this.url)
-        .setValue('[x-autocompletetype="name"]', 'bravery')
-        .click('[value="Submit your name"]')
-        .loadUrl(url)
-        .click('[x-autocompletetype="name"]')
-        .keys('b')
-        .windowByUrl(Brave.browserWindowUrl)
-      let item = yield this.app.client.getText('.contextMenuItemText')
-      assert.equal(item, 'bravery')
-      yield this.app.client.setContextMenuDetail()
-    })
-    it('submit form on private', function * () {
-      yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, url, { isPrivate: true })
-        .waitForUrl(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab.private[data-frame-key="3"]')
-        .waitForVisible('webview[partition="default"]')
-        .tabByUrl(this.url)
-        .setValue('[x-autocompletetype="name"]', 'bravery2')
-        .click('[value="Submit your name"]')
-        .loadUrl(url)
-        .click('[x-autocompletetype="name"]')
-        .keys('b')
-        .windowByUrl(Brave.browserWindowUrl)
-      let item = yield this.app.client.getText('.contextMenuItemText')
-      assert.equal(item, 'bravery')
-      yield this.app.client.setContextMenuDetail()
-    })
-    it('check on regular', function * () {
-      yield this.app.client
-        .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
-        .waitForUrl(url)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist('.tab[data-frame-key="4"]')
-        .waitForVisible('webview[partition="persist:default"]')
-        .tabByUrl(this.url)
-        .click('[x-autocompletetype="name"]')
-        .keys('b')
-        .windowByUrl(Brave.browserWindowUrl)
-      let item = yield this.app.client.getText('.contextMenuItemText')
-      assert.equal(item, 'bravery')
-      yield this.app.client.setContextMenuDetail()
+    describe('private tab', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+        this.formfill = Brave.server.url('formfill.html')
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill, { isPrivate: true })
+          .waitForUrl(this.formfill)
+          .waitForVisible('<form>')
+          .setValue('[name="04fullname"]', 'test')
+          .click('#submit')
+      })
+      it('does not autofill in private tab', function * () {
+        yield this.app.client
+          .tabByIndex(1)
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist('contextMenuItemText', 500, true)
+          .tabByIndex(1)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('')
+      })
+      it('does not autofill in regular tab', function * () {
+        yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.formfill + '?2')
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist('contextMenuItemText', 500, true)
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('')
+      })
     })
   })
 })

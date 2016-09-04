@@ -742,6 +742,10 @@ const doAction = (action) => {
         windowState = windowState.setIn(path.concat(['security', 'isSecure']),
                                         action.securityState.secure)
       }
+      if (action.securityState.runInsecureContent !== undefined) {
+        windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
+                                        action.securityState.runInsecureContent)
+      }
       if (action.securityState.certDetails) {
         windowState = windowState.setIn(path.concat(['security', 'certDetails']),
                                         action.securityState.certDetails)
@@ -762,6 +766,17 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         history: addToHistory(action.frameProps)
       })
+      break
+    case WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT:
+      const blockedRunInsecureContentPath =
+        ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
+      if (action.source) {
+        windowState =
+          windowState.setIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']), action.source)
+      } else {
+        windowState =
+          windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
+      }
       break
     default:
   }

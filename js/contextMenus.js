@@ -200,14 +200,15 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
       }
     })
   }
-
-  menu.push(CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('downloadItemClearCompleted'),
-      click: () => {
-        appActions.clearCompletedDownloads()
-      }
-    })
+  if (menu.length) {
+    menu.push(CommonMenu.separatorMenuItem)
+  }
+  menu.push({
+    label: locale.translation('downloadItemClearCompleted'),
+    click: () => {
+      appActions.clearCompletedDownloads()
+    }
+  })
   return menu
 }
 
@@ -869,7 +870,11 @@ function mainTemplateInit (nodeProps, frame) {
       label: locale.translation('redo'),
       accelerator: 'Shift+CmdOrCtrl+Z',
       role: 'redo'
-    }, CommonMenu.separatorMenuItem, ...editableItems, CommonMenu.separatorMenuItem)
+    }, CommonMenu.separatorMenuItem)
+
+    if (editableItems.length > 0) {
+      template.push(...editableItems, CommonMenu.separatorMenuItem)
+    }
   } else if (isTextSelected) {
     if (isDarwin) {
       template.push(showDefinitionMenuItem(nodeProps.selectionText),
@@ -941,6 +946,7 @@ function mainTemplateInit (nodeProps, frame) {
     if (!isLink && !isImage) {
       template.push({
         label: locale.translation('viewPageSource'),
+        accelerator: 'CmdOrCtrl+Alt+U',
         click: (item, focusedWindow) => {
           if (focusedWindow) {
             focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
@@ -1081,23 +1087,27 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  */
 function onShowUsernameMenu (usernames, origin, action, boundingRect,
                                     topOffset) {
+  // TODO: magic number
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
-    top: boundingRect.bottom + topOffset,
+    top: boundingRect.bottom + topOffset - downloadsBarOffset,
     template: menuTemplate
   }))
 }
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
+  // TODO: magic number
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
   }
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: offset.x + boundingRect.x,
-    top: offset.y + (boundingRect.y + boundingRect.height),
+    top: offset.y + (boundingRect.y + boundingRect.height) - downloadsBarOffset,
     template: menuTemplate
   }))
 }

@@ -63,11 +63,11 @@ const appActions = {
   },
 
   /**
-   * Clears all sites without tags
+   * Clears history (all sites without tags). Indirectly called by appActions.clearAppData().
    */
-  clearSitesWithoutTags: function () {
+  clearHistory: function () {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS
+      actionType: AppConstants.APP_CLEAR_HISTORY
     })
   },
 
@@ -448,6 +448,18 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail
+    })
+  },
+
+  /**
+   * Dispatches a message when appWindowId loses focus
+   *
+   * @param {Number} appWindowId - the unique id of the window
+   */
+  windowBlurred: function (appWindowId) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_WINDOW_BLURRED,
+      appWindowId: appWindowId
     })
   }
 }

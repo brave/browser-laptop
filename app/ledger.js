@@ -27,7 +27,6 @@ const util = require('util')
 const electron = require('electron')
 const app = electron.app
 const ipc = electron.ipcMain
-const protocolHandler = electron.protocol
 const session = electron.session
 
 const acorn = require('acorn')
@@ -147,7 +146,7 @@ var boot = () => {
       bootP = false
       return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
     }
-    if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 * msecs.minute }))
+    if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 }) * msecs.minute)
     getBalance()
 
     bootP = false
@@ -159,9 +158,11 @@ var boot = () => {
  */
 
 if (ipc) {
-  ipc.on(messages.CHECK_BITCOIN_HANDLER, () => {
+  ipc.on(messages.CHECK_BITCOIN_HANDLER, (event, partition) => {
+    const protocolHandler = session.fromPartition(partition).protocol
+    // TODO: https://github.com/brave/browser-laptop/issues/3625
     if (typeof protocolHandler.isNavigatorProtocolHandled === 'function') {
-      ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('', 'bitcoin')
+      ledgerInfo.hasBitcoinHandler = protocolHandler.isNavigatorProtocolHandled('bitcoin')
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
     }
   })
@@ -238,9 +239,6 @@ eventStore.addChangeListener(() => {
     var entry, faviconURL, publisher
     var location = page.url
 
-/*
-    console.log('\npage=' + JSON.stringify(page, null, 2))
- */
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
 
     if (!page.publisher) {
@@ -360,9 +358,7 @@ var initialize = (onoff) => {
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
         }
-        if (client.sync(callback) === true) {
-          run(random.randomInt({ min: 1, max: (state.options.debugP ? 5 * msecs.second : 1 * msecs.minute) }))
-        }
+        if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 }) * msecs.minute)
         cacheRuleSet(state.ruleset)
 
         // Make sure bravery props are up-to-date with user settings
@@ -403,6 +399,7 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
+    if (process.env.NODE_ENV === 'test') synopsis.options.minDuration = 0
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
@@ -584,9 +581,10 @@ var visit = (location, timestamp) => {
 
     if (!synopsis) return
 
-/*
-    console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2))
- */
+    if (publisherInfo._internal.debugP) {
+      console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2) +
+                  ' duration=' + (timestamp - currentTimestamp) + ' msec')
+    }
     if ((location === currentLocation) || (!locations[currentLocation])) return
 
     publisher = locations[currentLocation].publisher
@@ -596,6 +594,7 @@ var visit = (location, timestamp) => {
     publishers[publisher][currentLocation] = timestamp
 
     duration = timestamp - currentTimestamp
+    if (publisherInfo._internal.debugP) console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec')
     synopsis.addPublisher(publisher, duration)
     updatePublisherInfo()
   }
@@ -795,10 +794,10 @@ var callback = (err, result, delayTime) => {
   }
 
   if (err) {
-    console.log('ledger client error(1): ' + err.toString() + (err.stack ? ('\n' + err.stack) : ''))
+    console.log('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
-    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
+    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1 * msecs.minute, max: 10 * msecs.minute })
   }
 
   if (!result) return run(delayTime)
@@ -880,8 +879,10 @@ var roundtrip = (params, options, callback) => {
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
+var timeoutId = false
+
 var run = (delayTime) => {
-  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+//  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
 
   if ((typeof delayTime === 'undefined') || (!client)) return
 
@@ -909,19 +910,25 @@ var run = (delayTime) => {
     try {
       delayTime = client.timeUntilReconcile()
     } catch (ex) {
-      delayTime = random.randomInt({ min: 1, max: 10 * msecs.minute })
+      delayTime = false
     }
-    if (delayTime === false) delayTime = 0
+    if (delayTime === false) delayTime = random.randomInt({ min: 1, max: 10 }) * msecs.minute
   }
   if (delayTime > 0) {
+    if (timeoutId) return console.log('\ninterception')
+
     active = client
-    return setTimeout(() => {
+    if (delayTime > msecs.day) delayTime = msecs.day
+
+    timeoutId = setTimeout(() => {
+      timeoutId = false
       if (active !== client) return
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
 
       if (client.sync(callback) === true) return run(0)
     }, delayTime)
+    return
   }
 
   if (client.isReadyToReconcile()) return client.reconcile(uuid.v4().toLowerCase(), callback)
@@ -1105,12 +1112,15 @@ var syncWriter = (path, obj, options, cb) => {
   })
 }
 
-const pathSuffix = (process.env.NODE_ENV === 'development') ? '-dev' : ''
+const pathSuffix = { development: '-dev', test: '-test' }[process.env.NODE_ENV] || ''
 
 var pathName = (name) => {
   var parts = path.parse(name)
+  var basePath = process.env.NODE_ENV === 'test'
+    ? path.join(process.env.HOME, '.brave-test-ledger')
+    : app.getPath('userData')
 
-  return path.join(app.getPath('userData'), parts.name + pathSuffix + parts.ext)
+  return path.join(basePath, parts.name + pathSuffix + parts.ext)
 }
 
 /**

@@ -364,7 +364,7 @@ const createHistorySubmenu = (CommonMenu) => {
 }
 
 const createBookmarksSubmenu = (CommonMenu) => {
-  return [
+  let submenu = [
     {
       label: locale.translation('bookmarkPage'),
       type: 'checkbox',
@@ -386,9 +386,16 @@ const createBookmarksSubmenu = (CommonMenu) => {
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.importBookmarksMenuItem(),
-    CommonMenu.separatorMenuItem
-  ].concat(menuUtil.createBookmarkMenuItems())
+    CommonMenu.importBookmarksMenuItem()
+  ]
+
+  const bookmarks = menuUtil.createBookmarkMenuItems()
+  if (bookmarks.length > 0) {
+    submenu.push(CommonMenu.separatorMenuItem)
+    submenu = submenu.concat(bookmarks)
+  }
+
+  return submenu
 }
 
 const createWindowSubmenu = (CommonMenu) => {

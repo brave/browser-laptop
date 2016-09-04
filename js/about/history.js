@@ -35,7 +35,9 @@ class HistoryDay extends ImmutableComponent {
       <div className='sectionTitle historyDayName'>{this.props.date}</div>
       <SortableTable headings={['time', 'title', 'domain']}
         rows={this.props.entries.map((entry) => [
-          new Date(entry.get('lastAccessedTime')).toLocaleTimeString(),
+          entry.get('lastAccessedTime')
+            ? new Date(entry.get('lastAccessedTime')).toLocaleTimeString()
+            : '',
           entry.get('customTitle') || entry.get('title')
             ? entry.get('customTitle') || entry.get('title')
             : entry.get('location'),
@@ -53,8 +55,10 @@ class HistoryDay extends ImmutableComponent {
 
 class GroupedHistoryList extends ImmutableComponent {
   getDayString (locale, item) {
-    return new Date(item.get('lastAccessedTime'))
-      .toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    const lastAccessedTime = item.get('lastAccessedTime')
+    return lastAccessedTime
+      ? new Date(lastAccessedTime).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+      : ''
   }
   groupEntriesByDay (locale) {
     const reduced = this.props.history.reduce((previousValue, currentValue, currentIndex, array) => {
@@ -159,15 +163,14 @@ class AboutHistory extends React.Component {
 
       <div className='siteDetailsPageContent'>
       {
-        this.state.search
-        ? <GroupedHistoryList
+        <GroupedHistoryList
           languageCodes={this.state.languageCodes}
           settings={this.state.settings}
-          history={this.searchedSiteDetails(this.state.search, this.state.history)} />
-        : <GroupedHistoryList
-          languageCodes={this.state.languageCodes}
-          settings={this.state.settings}
-          history={this.historyDescendingOrder()} />
+          history={
+            this.state.search
+            ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder())
+            : this.historyDescendingOrder()
+          } />
        }
       </div>
     </div>
