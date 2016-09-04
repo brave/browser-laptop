@@ -8,6 +8,7 @@ const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
+const {cookieExceptions} = require('../data/siteHacks')
 const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
@@ -137,6 +138,8 @@ const getContentSettingsFromSiteSettings = (appState) => {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'block')
         addContentSettings(contentSettings.cookies, hostPattern, parseSiteSettingsPattern(hostPattern), 'allow')
         addContentSettings(contentSettings.referer, hostPattern, '*', 'block')
+        cookieExceptions.forEach((exceptionPair) =>
+          addContentSettings(contentSettings.cookies, exceptionPair[0], exceptionPair[1], 'allow'))
       } else {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
         addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
