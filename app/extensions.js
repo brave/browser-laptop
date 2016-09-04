@@ -13,6 +13,9 @@ let generateBraveManifest = () => {
     name: 'brave',
     manifest_version: 2,
     version: '1.0',
+    background: {
+      scripts: [ 'content/scripts/idleHandler.js' ]
+    },
     content_scripts: [
       {
         run_at: 'document_start',
@@ -90,7 +93,7 @@ let generateBraveManifest = () => {
       }
     ],
     permissions: [
-      'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings'
+      'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings', 'idle'
     ],
     externally_connectable: {
       matches: [
