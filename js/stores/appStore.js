@@ -550,6 +550,14 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         Filtering.clearStorageData()
       }
+      if (action.clearDataDetail.get('autocompleteData')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearAutocompleteData()
+      }
+      if (action.clearDataDetail.get('autofillData')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearAutofillData()
+      }
       break
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
       {

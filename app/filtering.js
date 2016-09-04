@@ -646,3 +646,17 @@ module.exports.removeAutofillCreditCard = (guid) => {
     }
   }
 }
+
+module.exports.clearAutocompleteData = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    ses.autofill.clearAutocompleteData()
+  }
+}
+
+module.exports.clearAutofillData = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    ses.autofill.clearAutofillData()
+  }
+}
