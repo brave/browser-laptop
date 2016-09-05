@@ -22,11 +22,11 @@ const Channel = require('./channel')
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
-const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
 
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
 var debug = function (contents) {
+  const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
   fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL)
 }
 
