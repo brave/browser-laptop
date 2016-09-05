@@ -7,8 +7,17 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet.js')
+const KeyCodes = require('../constants/keyCodes')
 
 class ContextMenuItem extends ImmutableComponent {
+  componentDidMount () {
+    window.addEventListener('keydown', this.onKeyDown.bind(this))
+  }
+  onKeyDown (e) {
+    if (e.keyCode === KeyCodes.ESC || e.keyCode === KeyCodes.TAB) {
+      windowActions.setContextMenuDetail()
+    }
+  }
   get submenu () {
     return this.props.contextMenuItem.get('submenu')
   }
