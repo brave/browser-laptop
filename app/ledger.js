@@ -363,7 +363,6 @@ var initialize = (onoff) => {
 
         // Make sure bravery props are up-to-date with user settings
         setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
-        if (state.properties.wallet) getPaymentInfo()
         getBalance()
       })
       return
@@ -803,6 +802,8 @@ var callback = (err, result, delayTime) => {
   if (!result) return run(delayTime)
 
   if ((client) && (result.properties.wallet)) {
+    if (!ledgerInfo.created) setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+
     getStateInfo(result)
     getPaymentInfo()
   }
@@ -1047,6 +1048,8 @@ var getPaymentInfo = () => {
 }
 
 var setPaymentInfo = (amount) => {
+  if (!client) return
+
   var bravery = client.getBraveryProperties()
 
   amount = parseInt(amount, 10)
