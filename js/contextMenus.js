@@ -267,8 +267,10 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   }
 
   if (!isHistoryEntry) {
+    if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
+      template.push(CommonMenu.separatorMenuItem)
+    }
     template.push(
-      CommonMenu.separatorMenuItem,
       addBookmarkMenuItem('addBookmark', siteUtil.getDetailFromFrame(activeFrame, siteTags.BOOKMARK), siteDetail, true),
       addFolderMenuItem(siteDetail, true))
   }
