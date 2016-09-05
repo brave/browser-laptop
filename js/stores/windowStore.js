@@ -172,7 +172,7 @@ const newFrame = (frameOpts, openInForeground, insertionIndex) => {
 
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
   frameOpts.location = frameOpts.location || config.defaultUrl
-	
+
 	if (frameOpts.location && UrlUtil.isURL(frameOpts.location)) {
     frameOpts.location = UrlUtil.getUrlFromInput(frameOpts.location)
   } else {
