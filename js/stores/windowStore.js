@@ -31,7 +31,9 @@ let windowState = Immutable.fromJS({
   ui: {
     tabs: {
     },
-    mouseInTitlebar: false
+    mouseInTitlebar: false,
+    menubar: {
+    }
   },
   searchDetail: null
 })
@@ -777,6 +779,12 @@ const doAction = (action) => {
           windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
       }
       break
+    case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
+      // BSCTODO: ignore if always show menu is enabled
+      const currentStatus = windowState.getIn(['ui', 'menubar', 'isVisible'])
+      windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], !currentStatus)
+      break
+
     default:
   }
 

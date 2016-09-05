@@ -58,30 +58,6 @@ describe('menuUtil', function () {
     mockery.disable()
   })
 
-  describe('getParentMenuDetails', function () {
-    const emptyValue = {
-      menu: null,
-      index: -1
-    }
-    it('returns an object with the electron MenuItem/index based on the label', function () {
-      const menu = menuUtil.getParentMenuDetails(defaultMenu, 'Edit')
-      assert.equal(menu.index, 1)
-      assert.equal(menu.menu, defaultMenu.items[1])
-    })
-    it('returns an object with null/-1 if input menu is not truthy', function () {
-      const menu = menuUtil.getParentMenuDetails(null, 'Edit')
-      assert.deepEqual(menu, emptyValue)
-    })
-    it('returns an object with null/-1 if label is not truthy', function () {
-      const menu = menuUtil.getParentMenuDetails(defaultMenu, undefined)
-      assert.deepEqual(menu, emptyValue)
-    })
-    it('returns an object with null/-1 if label is not found', function () {
-      const menu = menuUtil.getParentMenuDetails(defaultMenu, 'History')
-      assert.deepEqual(menu, emptyValue)
-    })
-  })
-
   describe('getMenuItem', function () {
     it('returns the electron MenuItem based on the label', function () {
       const menuItem = menuUtil.getMenuItem(defaultMenu, 'quit')

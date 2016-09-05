@@ -467,6 +467,17 @@ const appActions = {
   },
 
   /**
+   * Saves current menubar template for use w/ Windows titlebar
+   * @param {Object} menubarTemplate - JSON used to build the menu
+   */
+  setMenubarTemplate: function (menubarTemplate) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_MENUBAR_TEMPLATE,
+      menubarTemplate
+    })
+  },
+
+  /**
    * Dispatches a message when the network is re-connected
    * after being disconnected
    */

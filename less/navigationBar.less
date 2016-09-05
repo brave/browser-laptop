@@ -29,70 +29,236 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
-// Window Header
-.window-header {
+// Window Caption Buttons (for use w/ slim titlebar)
+.windowCaptionButtons {
+  display: inline-block;
+  float: right;
   -webkit-user-select: none;
   -webkit-app-region: drag;
-  height: 18px;
-  padding: 3px 0;
-  margin: 0px;
-  display: flex;
-  line-height: 30px;
+  height: 100%;
 
   .hidden {
     display: none;
   }
 
-  .title-bar-btns {
+  .container {
     -webkit-app-region: no-drag;
   }
 
-  .win-7, .win-10 {
-    margin: -13px 3px 0 0;
+  button.captionButton {
+    outline: none;
+    vertical-align: top;
+  }
 
-    button.win-action-btn {
+  &.fullscreen {
+    .win7 {
+      margin-top: 1px;
+    }
+  }
+
+  .win7 {
+    margin-right: 5px;
+
+    button.captionButton {
       outline: 0;
-      cursor: pointer;
-      width: 45px;
-      height: 23px;
+      height: 18px;
       color: #b1acac;
       background-size: 12px 12px!important;
       background-position: center!important;
-      border: 1px solid #e1e1e1;
+      border: 1px solid #838383;
       display: inline-block;
-      padding: 12px;
+      background-color: #dfdfdf;
+      box-shadow: inset 1px 1px rgba(255, 255, 255, 0.9);
+      width: 25px;
+
+      &.minimize {
+        border-right: 0px;
+        &:hover {
+          background-color: #f5f5f5;
+        }
+        &:active {
+          background-color: #cacacb;
+        }
+        border-radius: 0 0 0 4px;
+
+        .widget {
+          width: 10px;
+          height: 3px;
+          border: 1px solid #838383;
+          background: #f0f0f0;
+          display: inline-block;
+          border-radius: 1px;
+        }
+      }
+
+      &.maximize {
+        border-right: 0px;
+        &:hover {
+          background-color: #f5f5f5;
+          .widget {
+            .widget2 {
+              background-color: #f5f5f5;
+            }
+          }
+        }
+        &:active {
+          background-color: #cacacb;
+          .widget {
+            .widget2 {
+              background-color: #cacacb;
+            }
+          }
+        }
+        &.fullscreen {
+          &:hover {
+            background-color: #e5e5e5;
+          }
+          &:active {
+            background-color: #cacacb;
+          }
+          .widget {
+            .widget1 {
+              width: 8px;
+              top: 2px;
+              left: 8px;
+            }
+            .widget2 {
+              width: 8px;
+              height: 8px;
+              top: -5px;
+              left: 4px;
+              background: #f0f0f0;
+              border-radius: 1px;
+            }
+            .widget3 {
+              display: inline-block;
+              width: 2px;
+              height: 2px;
+              border: 1px solid #838383;
+              background: #f0f0f0;
+              position: relative;
+              top: -20px;
+              left: -3px;
+            }
+          }
+        }
+
+        .widget {
+          .widget1 {
+            width: 10px;
+            height: 8px;
+            border: 1px solid #838383;
+            background: #f0f0f0;
+            position: relative;
+            top: 2px;
+            left: 6px;
+            border-radius: 1px;
+          }
+          .widget2 {
+            width: 4px;
+            height: 2px;
+            border: 1px solid #838383;
+            background-color: #dfdfdf;
+            position: relative;
+            top: -5px;
+            left: 9px;
+            border-radius: 0;
+          }
+          .widget3 { display: none; }
+          .widget4 { display: none; }
+          .widget5 { display: none; }
+        }
+      }
+
+      &.close {
+        width: 43px;
+        border-radius: 0 0 4px 0;
+        &:hover {
+          background-color: #d9504e;
+          .widget {
+            .widget1 { border: 1px solid black; }
+            .widget2 { border: 1px solid black; }
+          }
+        }
+        &:active {
+          background-color: #d7393d;
+          .widget {
+            .widget1 { border: 1px solid black; }
+            .widget2 { border: 1px solid black; }
+          }
+        }
+
+        .widget {
+          width: 11px;
+          height: 11px;
+          display: inline-block;
+          vertical-align: middle;
+
+          .widget1 {
+            width: 10px;
+            height: 2px;
+            background: #f0f0f0;
+            display: inline-block;
+            transform: rotate(45deg);
+            position: relative;
+            top: -6px;
+            left: -2px;
+            border: 1px solid #838383;
+          }
+          .widget2 {
+            width: 10px;
+            height: 2px;
+            background: #f0f0f0;
+            display: inline-block;
+            transform: rotate(315deg);
+            position: relative;
+            top: -21px;
+            left: -2px;
+            border: 1px solid #838383;
+          }
+          .widget3 {
+            width: 10px;
+            height: 2px;
+            background: #f0f0f0;
+            display: inline-block;
+            transform: rotate(45deg);
+            position: relative;
+            top: -37px;
+            left: -2px;
+          }
+        }
+      }
+    }
+  }
+
+  .win10 {
+    button.captionButton {
+      width: 45px;
+      height: 29px;
+      border: 0;
+      background-color: transparent;
 
       &.fullscreen {
         height:21px;
-        padding:6px;
       }
 
-      &.close-btn {
-        background: url('../img/window-actions/windows/10/close-btn.svg') no-repeat;
-        &:hover {
-          background: url('../img/window-actions/windows/10/close-btn-white.svg') no-repeat;
-          background-color: #e5182c;
-        }
-        &:active {
-          background: url('../img/window-actions/windows/10/close-btn-white.svg') no-repeat;
-          background-color: #ef717c;
-        }
-      }
-
-      &.min-btn {
-        border-right: 0px;
-        border-bottom-left-radius: 5px;
-        background: url('../img/window-actions/windows/10/min-btn.svg') no-repeat;
+      &.minimize {
         &:hover {
           background-color: #e5e5e5;
         }
         &:active {
           background-color: #cacacb;
         }
+        .widget {
+          width: 10px;
+          height: 1px;
+          background: black;
+          display: inline-block;
+          vertical-align: middle;
+        }
       }
 
-      &.max-btn {
-        background: url('../img/window-actions/windows/10/max-btn.svg') no-repeat;
+      &.maximize {
         border-right: 0px;
         &:hover {
           background-color: #e5e5e5;
@@ -101,17 +267,118 @@
           background-color: #cacacb;
         }
         &.fullscreen {
-          background: url('../img/window-actions/windows/10/max-btn-fullscreen.svg') no-repeat;
           &:hover {
             background-color: #e5e5e5;
           }
           &:active {
             background-color: #cacacb;
           }
+          .widget {
+            margin-top: 8px;
+            .widget1 { width: 6px; height: 6px; }
+            .widget2 { display: inline-block; }
+            .widget3 {
+              display: inline-block;
+              width: 8px;
+              height: 1px;
+              background: black;
+              position: relative;
+              top: -21px;
+              left: 1px;
+            }
+            .widget4 {
+              display: inline-block;
+              width: 1px;
+              height: 8px;
+              background: black;
+              position: relative;
+              top: -14px;
+              left: 0px;
+            }
+            .widget5 {
+              display: inline-block;
+              width: 2px;
+              height: 1px;
+              background: black;
+              position: relative;
+              top: -14px;
+              left: -2px;
+            }
+          }
+        }
+        .widget {
+          width: 12px;
+          height: 12px;
+          display: inline-block;
+          vertical-align: middle;
+
+          .widget1 {
+            width: 8px;
+            height: 8px;
+            border: 1px solid black;
+            background: none;
+            position: relative;
+          }
+          .widget2 {
+            display: none;
+            width: 1px;
+            height: 2px;
+            background: black;
+            position: relative;
+            top: -20px;
+            left: 2px;
+          }
+          .widget3 { display: none; }
+          .widget4 { display: none; }
+          .widget5 { display: none; }
+        }
+      }
+
+      &.close {
+        &:hover {
+          background-color: #e5182c;
+          .widget {
+            .widget1{ background:white; }
+            .widget2{ background:white; }
+          }
+        }
+        &:active {
+          background-color: #ef717c;
+          .widget {
+            .widget1{ background:white; }
+            .widget2{ background:white; }
+          }
+        }
+        .widget {
+          width: 11px;
+          height: 11px;
+          display: inline-block;
+          vertical-align: middle;
+
+          .widget1 {
+            width: 14px;
+            height: 1px;
+            background: black;
+            display: inline-block;
+            transform: rotate(45deg);
+            position: relative;
+            top: -6px;
+            left: -2px;
+          }
+          .widget2 {
+            width: 14px;
+            height: 1px;
+            background: black;
+            display: inline-block;
+            transform: rotate(315deg);
+            position: relative;
+            top: -21px;
+            left: -2px;
+          }
+          .widget3 { display: none; }
         }
       }
     }
-
   }
 }
 
@@ -120,6 +387,8 @@
 // box on its left has different size than the one on the right.
 // This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
+  clear:both;
+
   // Since we want to keep the navigator centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left

@@ -7,7 +7,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const currentWindow = require('../../app/renderer/currentWindow')
 
-class WindowActionBar extends ImmutableComponent {
+class WindowCaptionButtons extends ImmutableComponent {
   constructor () {
     super()
     this.onDoubleClick = this.onDoubleClick.bind(this)
@@ -23,15 +23,11 @@ class WindowActionBar extends ImmutableComponent {
 
   getPlatformCssClass () {
     switch (os.platform()) {
-      case 'linux':
-        return 'linux'
       case 'win32':
-        if (/10.0./.test(os.release())) {
-          return 'win-10'
-        } else if (/6.1./.test(os.release())) {
-          return 'win-7'
+        if (/6.1./.test(os.release())) {
+          return 'win7'
         } else {
-          return 'win'
+          return 'win10'
         }
       default:
         return 'hidden'
@@ -58,14 +54,14 @@ class WindowActionBar extends ImmutableComponent {
   }
 
   render () {
-    return <div className='window-header'>
-      <div className={this.osClass + ' title-bar-btns'}>
-        <button className={this.buttonClass + ' win-action-btn min-btn'} onClick={this.onMinimizeClick}></button>
-        <button className={this.buttonClass + ' win-action-btn max-btn'} onClick={this.onMaximizeClick}></button>
-        <button className={this.buttonClass + ' win-action-btn close-btn'} onClick={this.onCloseClick}></button>
+    return <div className={this.buttonClass + ' windowCaptionButtons'}>
+      <div className={'container ' + this.osClass}>
+        <button className={this.buttonClass + ' captionButton minimize'} onClick={this.onMinimizeClick}><div className='widget' /></button>
+        <button className={this.buttonClass + ' captionButton maximize'} onClick={this.onMaximizeClick}><div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /><div className='widget4' /><div className='widget5' /></div></button>
+        <button className={this.buttonClass + ' captionButton close'} onClick={this.onCloseClick}><div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /></div></button>
       </div>
     </div>
   }
 }
 
-module.exports = WindowActionBar
+module.exports = WindowCaptionButtons
