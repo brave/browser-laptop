@@ -396,6 +396,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_CLEAR_PASSWORDS:
       appState = appState.set('passwords', new Immutable.List())
       break
+    case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
+      appState = appState.setIn(['about', 'newtab'], action.newTabPageDetail)
+      break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
       if (action.siteDetail.constructor === Immutable.List) {
