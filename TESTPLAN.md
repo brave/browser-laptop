@@ -2,7 +2,8 @@
 
 ## [0.11.6](https://github.com/brave/browser-laptop/releases/v0.11.6dev)
 
- ### Autofill
+### Autofill
+
  - [ ]  Alignment and padding of title on add autofill data popups should match clear browsing data([#3360](https://github.com/brave/browser-laptop/issues/3360))
  - [ ]  Make autofill popup similar to clear browsing data([#3369](https://github.com/brave/browser-laptop/issues/3369))
  - [ ]  Tweaks to fix autofill context menu position ([#3389](https://github.com/brave/browser-laptop/issues/3389))
@@ -13,10 +14,11 @@
  - [ ]  Editing Autofill entries are not saved. Creates a blank entry([#3368](https://github.com/brave/browser-laptop/issues/3368))
  - [ ]  Brave crashes with segmentation fault when submitting a form ([#3398](https://github.com/brave/browser-laptop/issues/3398))
  - [ ]  Autofill - Add new entry buttons are not functional ([#3455](https://github.com/brave/browser-laptop/issues/3455))
-  - [ ]  Autofill - Values are vacated ([#3491](https://github.com/brave/browser-laptop/issues/3491))
+ - [ ]  Autofill - Values are vacated ([#3491](https://github.com/brave/browser-laptop/issues/3491))
 
 
- ### Bookmarks
+### Bookmarks
+
  - [ ]  Bookmark title is not updated unbookmarking/rebookmarking bug verified ([#3284](https://github.com/brave/browser-laptop/issues/3284))
  - [ ]  Adding bookmark will now properly update title + rendering fix ([#3339](https://github.com/brave/browser-laptop/issues/3339))
  - [ ]  bookmark title (onhover) on bookmark bar cannot be updated ([#3080](https://github.com/brave/browser-laptop/issues/3080))
@@ -32,7 +34,8 @@
  - [ ]  If a site does not have a title, the bookmark should default to the url instead. ([#3442](https://github.com/brave/browser-laptop/issues/3442))
  - [ ]  Bookmark folder cannot be deleted from dialog bug  ([#3409](https://github.com/brave/browser-laptop/issues/3409))
 
- ### History  
+### History
+
  - [ ]  about:history contains bookmark items as browsing history which can't be cleared ([#3330](https://github.com/brave/browser-laptop/issues/3330))
  - [ ]  Bookmarked history entries now show context menu in about:history ([#3336](https://github.com/brave/browser-laptop/issues/3336))
  - [ ]  Ctrl + Y is not opening history ([#3312](https://github.com/brave/browser-laptop/issues/3312))
@@ -48,7 +51,8 @@
  - [ ]  Clearing history using modal now clears bookmark timestamps ([#3501](https://github.com/brave/browser-laptop/issues/3501))
  - [ ]  Clear browser history should work regardless of whether or not the page is bookmarked. bug  ([#3346](https://github.com/brave/browser-laptop/issues/3346))
 
- ### Ledger
+### Ledger
+
  - [ ]  Ledger beta integration  ([#3195](https://github.com/brave/browser-laptop/issues/3195))
  - [ ]  Preferences : Payments : Add Funds modal alignment appears to be off for Brave wallet address ([#3378](https://github.com/brave/browser-laptop/issues/3378))
  - [ ]  Preferences : Payments : Add Funds - Transfer BTC link goes to jsfiddle ([#3380](https://github.com/brave/browser-laptop/issues/3380))
@@ -79,7 +83,8 @@
  - [ ]  Stop partner logos from floating below brave payments text ([#3551](https://github.com/brave/browser-laptop/issues/3551))
  - [ ]  set flags to hide CB button in Add funds… dialog when users chooses 10, 15,or 20 monthly value ([#3565](https://github.com/brave/browser-laptop/issues/3565))
 
- ### Fixes
+### Fixes
+
  - [ ]  Escaping from fullscreen video leaves the browser in fullscreen mode instead of returning to windowed mode. ([#3338](https://github.com/brave/browser-laptop/issues/3338))
  - [ ]  Add '.jpg' extension to webpack file-loader ([#3309](https://github.com/brave/browser-laptop/issues/3309))
  - [ ]  Handle non-script version of DDG when blocked at filtering level ([#3293](https://github.com/brave/browser-laptop/issues/3293))

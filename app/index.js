@@ -26,13 +26,21 @@ if (process.platform === 'win32') {
 
 var locale = require('./locale')
 
-const Immutable = require('immutable')
-const electron = require('electron')
 const path = require('path')
+const electron = require('electron')
+const app = electron.app
+// set userData before loading anything else
+if (!process.env.BRAVE_USER_DATA_DIR && ['development', 'test'].includes(process.env.NODE_ENV)) {
+  process.env.BRAVE_USER_DATA_DIR = path.join(app.getPath('appData'), app.getName() + '-' + process.env.NODE_ENV)
+}
+
+if (process.env.BRAVE_USER_DATA_DIR) {
+  app.setPath('userData', process.env.BRAVE_USER_DATA_DIR)
+}
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
-const app = electron.app
+const Immutable = require('immutable')
 const Menu = require('./browser/menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
@@ -65,14 +73,6 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
 const async = require('async')
-
-if (!process.env.BRAVE_USER_DATA_DIR && ['development', 'test'].includes(process.env.NODE_ENV)) {
-  process.env.BRAVE_USER_DATA_DIR = path.join(app.getPath('appData'), app.getName() + '-' + process.env.NODE_ENV)
-}
-
-if (process.env.BRAVE_USER_DATA_DIR) {
-  app.setPath('userData', process.env.BRAVE_USER_DATA_DIR)
-}
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
