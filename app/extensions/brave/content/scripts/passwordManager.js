@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 if (chrome.contentSettings.passwordManager == 'allow') {
-
+  let credentials = {}
   function savePassword(username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
     chrome.ipc.send('save-password', username, pw, origin, action)
   }
@@ -45,11 +45,10 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     }
 
     if (credentials[action]) {
-      credentials[action].push([passwordElem, usernameElem])
-    } else {
-      credentials[action] = [[passwordElem, usernameElem]]
+      return
     }
 
+    credentials[action] = [[passwordElem, usernameElem]]
     // Fill the password immediately if there's only one or if the username
     // is already autofilled
     chrome.ipc.send('get-passwords', formOrigin, action)
@@ -111,17 +110,15 @@ if (chrome.contentSettings.passwordManager == 'allow') {
   function autofillPasswordListener () {
     // Don't autofill on non-HTTP(S) sites for now
     if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
-      return false
+      return
     }
 
     if (document.querySelectorAll('input[type=password]').length === 0) {
-      // No password fields; abort
-      return false
+      // No password fields;
+      return
     }
 
     // Map of action origin to [[password element, username element]]
-    var credentials = {}
-
     var formOrigin = [document.location.protocol, document.location.host].join('//')
     var formNodes = document.querySelectorAll('form')
 
@@ -148,7 +145,6 @@ if (chrome.contentSettings.passwordManager == 'allow') {
         })
       }
     })
-    return true
   }
 
   /**
@@ -262,24 +258,13 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     return passwordNodes
   }
 
-
-  if (autofillPasswordListener() !== true) {
-    setTimeout(() => {
-      // Some pages insert the password form into the DOM after it's loaded
-      var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-          if (mutation.addedNodes.length) {
-            if (autofillPasswordListener() === true) {
-              observer.disconnect()
-            }
-          }
-        })
-      })
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-      })
-    }, 1000)
-  }
+  autofillPasswordListener()
+  let interval = setInterval(autofillPasswordListener, 1000)
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(interval)
+    if (document.visibilityState !== 'hidden') {
+      interval = setInterval(autofillPasswordListener, 1000)
+    }
+  })
 }
 
