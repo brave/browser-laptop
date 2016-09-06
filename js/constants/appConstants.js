@@ -43,7 +43,8 @@ const AppConstants = {
   APP_SET_LOGIN_REQUIRED_DETAIL: _,
   APP_SET_LOGIN_RESPONSE_DETAIL: _,
   APP_WINDOW_BLURRED: _,
-  APP_IDLE_STATE_CHANGED: _
+  APP_IDLE_STATE_CHANGED: _,
+  APP_CHANGE_NEW_TAB_DETAIL: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)

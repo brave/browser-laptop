@@ -189,6 +189,11 @@ AppStore
       }],
       timestamp: number
     }
+  },
+  about: {
+    newtab: {
+      gridLayout: string // 'small', 'medium', 'large'
+    }
   }
 }
 ```
