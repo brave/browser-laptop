@@ -253,6 +253,7 @@ loadAppStatePromise.then((initialState) => {
 })
 
 app.on('ready', () => {
+  let sessionStateSaveInterval = null
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
@@ -303,7 +304,7 @@ app.on('ready', () => {
 
     e.preventDefault()
 
-    clearInterval(initiateSessionStateSave)
+    clearInterval(sessionStateSaveInterval)
     initiateSessionStateSave(true)
 
     // Just in case a window is not responsive, we don't want to wait forever.
@@ -522,7 +523,7 @@ app.on('ready', () => {
     })
 
     // save app state every 5 minutes regardless of update frequency
-    setInterval(initiateSessionStateSave, 1000 * 60 * 5)
+    sessionStateSaveInterval = setInterval(initiateSessionStateSave, 1000 * 60 * 5)
 
     AppStore.addChangeListener(() => {
       if (BrowserWindow.getFocusedWindow()) {
