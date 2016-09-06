@@ -63,6 +63,13 @@ const addPageView = (url) => {
   lastActivePageUrl = url
 }
 
+const windowBlurred = (windowId) => {
+  let windowCount = BrowserWindow.getAllWindows().filter((win) => win.isFocused()).length
+  if (windowCount === 0) {
+    addPageView(null)
+  }
+}
+
 const windowClosed = (windowId) => {
   let windowCount = BrowserWindow.getAllWindows().length
   let win = BrowserWindow.getFocusedWindow()
@@ -100,6 +107,16 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_FOCUSED_FRAME:
       addPageView(action.frameProps.get('location'))
       lastActiveTabId = action.frameProps.get('tabId')
+      break
+    case AppConstants.APP_WINDOW_BLURRED:
+      windowBlurred(action.appWindowId)
+      break
+    case AppConstants.APP_IDLE_STATE_CHANGED:
+      if (action.idleState !== 'active') {
+        addPageView(null)
+      } else {
+        addPageView(lastActivePageUrl)
+      }
       break
     case AppConstants.APP_CLOSE_WINDOW:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {

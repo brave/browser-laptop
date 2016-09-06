@@ -20,7 +20,25 @@ const emptyDataURI = {
   }
 }
 
-module.exports = {
+/**
+ * Holds an array of [Primary URL, subresource URL] to allow 3rd party cookies.
+ * Subresource URL can be '*' or undefined to indicate all.
+ */
+module.exports.cookieExceptions = [
+  ['https://inbox.google.com', 'https://hangouts.google.com'],
+  ['https://mail.google.com', 'https://hangouts.google.com']
+]
+
+/**
+ * Holds an array of [Primary URL, subresource URL] to allow 3rd party localstorage.
+ * Subresource URL can be '*' or undefined to indicate all.
+ */
+module.exports.localStorageExceptions = [
+  ['https://inbox.google.com', 'https://hangouts.google.com'],
+  ['https://mail.google.com', 'https://hangouts.google.com']
+]
+
+module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
   'sp.nasdaq.com': emptyDataURI,
   'forbes.com': {
