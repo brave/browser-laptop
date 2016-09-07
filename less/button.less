@@ -72,7 +72,16 @@ span.browserButton {
   }
 
   &.primaryButton {
-    background-color: @braveOrange;
+    background: linear-gradient(@braveLightOrange, @braveOrange);
+    border: 2px solid transparent;
+    box-shadow: @boxShadow;
+    font-weight: 400;
+
+    &:hover {
+      border: 2px solid white;
+      color: white;
+      cursor: pointer;
+    }
   }
 
   &.actionButton,
@@ -84,6 +93,20 @@ span.browserButton {
     display: block;
     margin-right: 0px;
     margin-left: 0px;
+  }
+
+  &.whiteButton {
+    background: linear-gradient(white, @lightGray);
+    border: 2px solid white;
+    box-shadow: @boxShadow;
+    cursor: pointer;
+    display: block;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 14px;
+    color: @darkGray;
+    width: auto;
+    padding: 3px 35px;
   }
 
   &.secondaryButton {

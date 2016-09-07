@@ -57,18 +57,46 @@
         overflow: hidden;
       }
     }
+
+    .qrcodeOverlay {
+      width: 350px;
+      height: auto;
+      margin: 200px auto;
+      background: white;
+      box-shadow: @boxShadow;
+
+      button.close span {
+        color: @gray;
+        font-size: 2.5em;
+      }
+
+      img {
+        clear: both;
+        display: block;
+        margin: 0 auto;
+        padding: 20px 0 0 0;
+      }
+
+      .dialog-header {
+        padding: 15px;
+      }
+
+      .dialog-footer {
+        background: @gray;
+        padding: 15px;
+      }
+    }
   }
 
   .dialog {
     width: 700px;
     margin: 0 auto;
     margin-top: 100px;
-    background: white;
+    background: linear-gradient(#FFFFFF, #DEDEDE);
     border: solid 1px @lightGray;
     border-radius: @borderRadius;
     box-shadow: @boxShadow;
     z-index: 9000;
-    padding: 20px;
     box-sizing: border-box;
 
     &.fade {
@@ -76,7 +104,10 @@
     }
 
     .sectionTitle {
-      text-align: center;
+      font-size: 22px;
+      color: @darkGray;
+      padding: 35px 0 10px 0;
+      text-indent: 50px;
     }
   }
 
@@ -92,10 +123,11 @@
       cursor: pointer;
       border: none;
       box-shadow: none;
+      margin: 5px;
 
       span {
-        font-size: 2em;
-        color: @braveOrange;
+        font-size: 2.5em;
+        color: @gray;
       }
     }
 

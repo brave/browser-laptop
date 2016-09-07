@@ -260,8 +260,21 @@ class BitcoinDashboard extends ImmutableComponent {
   get ledgerData () {
     return this.props.ledgerData
   }
-  get overlayContent () {
+  get bitcoinOverlayContent () {
     return <iframe src={this.ledgerData.get('buyURL')} />
+  }
+  get qrcodeOverlayContent () {
+    return <div>
+      <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
+      <div className='bitcoinQRTitle' data-l10n-id='bitcoinQR' />
+    </div>
+  }
+  get qrcodeOverlayFooter () {
+    return <div>
+      <div id='coinbaseLogo' />
+      <div id='appstoreLogo' />
+      <div id='playstoreLogo' />
+    </div>
   }
   get currency () {
     return this.props.ledgerData.get('currency') || 'USD'
@@ -275,16 +288,46 @@ class BitcoinDashboard extends ImmutableComponent {
   get coinbasePanel () {
     if (this.canUseCoinbase) {
       return <div className='panel'>
-        <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-        <div id='coinbaseLogo' />
-        <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+        <div className='settingsPanelDivider'>
+          <span className='fa fa-credit-card' />
+          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+          <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
+        </div>
+        <div className='settingsPanelDivider'>
+          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+          <div className='settingsListSubTitle' data-l10n-id='transferTime' />
+        </div>
       </div>
     } else {
       return <div className='panel disabledPanel'>
-        <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-        <div data-l10n-id='coinbaseNotAvailable' />
+        <div className='settingsPanelDivider'>
+          <span className='fa fa-credit-card' />
+          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+          <div className='settingsListSubTitle' data-l10n-id='moneyAddSubTitle' />
+        </div>
+        <div className='settingsPanelDivider'>
+          <div data-l10n-id='coinbaseNotAvailable' />
+        </div>
       </div>
     }
+  }
+  get smartphonePanel () {
+    return <div className='panel'>
+      <div className='settingsPanelDivider'>
+        <span className='fa fa-mobile' />
+        <div className='settingsListTitle' data-l10n-id='smartphoneTitle' />
+      </div>
+      <div className='settingsPanelDivider'>
+        <Button l10nId='displayQRCode' className='primaryButton' onClick={this.props.showQRcode.bind(this)} />
+      </div>
+    </div>
+  }
+  get panelFooter () {
+    return <div className='panelFooter'>
+      <div id='coinbaseLogo' />
+      <span data-l10n-id='coinbaseMessage' />
+      <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+    </div>
   }
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
@@ -310,17 +353,28 @@ class BitcoinDashboard extends ImmutableComponent {
     return <div id='bitcoinDashboard'>
       {
       this.props.bitcoinOverlayVisible
-        ? <ModalOverlay title={'bitcoinBuy'} content={this.overlayContent} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
+        ? <ModalOverlay title={'bitcoinBuy'} content={this.bitcoinOverlayContent} customTitleClasses={'coinbaseOverlay'} emptyDialog={emptyDialog} onHide={this.props.hideOverlay.bind(this)} />
+        : null
+      }
+      {
+        this.props.qrcodeOverlayVisible
+        ? <ModalOverlay content={this.qrcodeOverlayContent} customTitleClasses={'qrcodeOverlay'} footer={this.qrcodeOverlayFooter} onHide={this.props.hideQRcode.bind(this)} />
         : null
       }
       <div className='board'>
         {this.coinbasePanel}
         <div className='panel'>
-          <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
+          <div className='settingsPanelDivider'>
+            <span className='bitcoinIcon fa-stack fa-lg'>
+              <span className='fa fa-circle fa-stack-2x' />
+              <span className='fa fa-bitcoin fa-stack-1x' />
+            </span>
+            <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
+            <div className='settingsListSubTitle' data-l10n-id='bitcoinAddDescription' />
+          </div>
           {
             this.ledgerData.get('address')
-              ? <div>
-                <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
+              ? <div className='settingsPanelDivider'>
                 {
                   this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
                     ? <div>
@@ -330,16 +384,19 @@ class BitcoinDashboard extends ImmutableComponent {
                       <div data-l10n-id='bitcoinAddress' className='labelText' />
                     </div>
                     : <div>
-                      <div data-l10n-id='bitcoinPaymentURL'
-                        data-l10n-args={JSON.stringify({amount: `${this.amount} ${this.currency}`})} className='labelText' />
+                      <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
                     </div>
                 }
-                <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
                 <span className='smallText'>{this.ledgerData.get('address')}</span>
+                <Button className='primaryButton' l10nId='copyToClipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
               </div>
-            : <div data-l10n-id='bitcoinWalletNotAvailable' />
+            : <div className='settingsPanelDivider'>
+              <div data-l10n-id='bitcoinWalletNotAvailable' />
+            </div>
           }
         </div>
+        {this.smartphonePanel}
+        {this.panelFooter}
       </div>
     </div>
   }
@@ -641,8 +698,11 @@ class PaymentsTab extends ImmutableComponent {
     return <BitcoinDashboard ledgerData={this.props.ledgerData}
       settings={this.props.settings}
       bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
+      qrcodeOverlayVisible={this.props.qrcodeOverlayVisible}
       showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
       hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
+      showQRcode={this.props.showOverlay.bind(this, 'qrcode')}
+      hideQRcode={this.props.hideOverlay.bind(this, 'qrcode')}
       hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
   }
 
@@ -1144,6 +1204,7 @@ class AboutPreferences extends React.Component {
     let hash = window.location.hash ? window.location.hash.slice(1) : ''
     this.state = {
       bitcoinOverlayVisible: false,
+      qrcodeOverlayVisible: false,
       paymentHistoryOverlayVisible: false,
       addFundsOverlayVisible: false,
       preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
@@ -1224,8 +1285,9 @@ class AboutPreferences extends React.Component {
     let stateDiff = {}
     stateDiff[`${overlayName}OverlayVisible`] = isVisible
     if (overlayName === 'addFunds' && isVisible === false) {
-      // Hide the child overlay when the parent is closed
+      // Hide the child overlays when the parent is closed
       stateDiff['bitcoinOverlayVisible'] = false
+      stateDiff['qrcodeOverlayVisible'] = false
     }
     this.setState(stateDiff)
   }
@@ -1258,6 +1320,7 @@ class AboutPreferences extends React.Component {
           braveryDefaults={braveryDefaults} ledgerData={ledgerData}
           onChangeSetting={this.onChangeSetting}
           bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
+          qrcodeOverlayVisible={this.state.qrcodeOverlayVisible}
           paymentHistoryOverlayVisible={this.state.paymentHistoryOverlayVisible}
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}

@@ -38,6 +38,30 @@ body {
   }
 }
 
+#coinbaseLogo {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+#appstoreLogo {
+  background: url('../../app/extensions/brave/img/ios_download.svg');
+  width: 130.5px;
+  height: 42.75px;
+  background-size: 130.5px 42.75px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+#playstoreLogo {
+  background: url('../../app/extensions/brave/img/android_download.svg');
+  width: 130.5px;
+  height: 42.75px;
+  background-size: 130.5px 42.75px;
+  display: inline-block;
+}
+
 #fundsAmount {
   margin-right: 10px;
 
@@ -48,10 +72,16 @@ body {
   }
 }
 
+.bitcoinQRTitle {
+  color: @braveOrange;
+  margin-bottom: 70px;
+  text-align: center;
+}
+
 .prefTabContainer {
   .sectionTitleWrapper {
     position: relative;
-    margin-right: 20px;
+    margin-right: 49px;
     min-height: 40px;
     min-width: 240px;
 
@@ -565,7 +595,7 @@ div.nextPaymentSubmission {
   }
 }
 
-.modal .dialog:not(.paymentHistory) {
+.modal .dialog.coinbaseOverlay {
   .dialog-body {
     height: 100%;
     width: 100%;
@@ -606,7 +636,7 @@ div.nextPaymentSubmission {
     td {
       padding: 15px 30px 0 0;
       width: auto;
-      min-width: 215px;
+      min-width: 235px;
     }
     span.browserButton.primaryButton.addFunds {
       margin-right: 0;
@@ -713,22 +743,46 @@ div.nextPaymentSubmission {
 .board {
   overflow-x: hidden;
   clear: both;
-  display: flex;
 
   .panel {
-    flex: 1;
+    background: #FFFFFF;
     position: relative;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 20px 20px 20px 100px;
 
-    * {
-      display: block;
-      text-align: center;
-      margin: 0 auto;
+    .settingsPanelDivider {
+      width: 50%;
+      position: relative;
+      float: left;
+
+      &:nth-child(1) {
+        text-align: left;
+      }
+
+      &:nth-child(2) {
+        text-align: right;
+      }
+      .fa {
+        position: absolute;
+        left: -45px;
+        top: 15px;
+
+        &.fa-credit-card {
+          font-size: 30px;
+        }
+        &.fa-mobile {
+          font-size: 50px;
+        }
+      }
+      .bitcoinIcon {
+        position: absolute;
+        left: -5px;
+        top: 0;
+      }
     }
     #bitcoinPaymentURL {
       cursor: pointer;
-      text-align: left;
       background-color: @lightGray;
       &:hover {
         background-color: @gray;
@@ -736,12 +790,23 @@ div.nextPaymentSubmission {
       font-size: 0.9em;
     }
     .smallText {
-      font-size: 0.9em;
+      font-size: 12px;
+      color: black;
+      margin-bottom: 20px;
     }
     .settingsListTitle {
-      font-weight: 600;
-      font-size: 1em;
+      color: @darkGray;
+      font-weight: bold;
+      font-size: 15px;
       margin-bottom: 15px;
+      padding-right: 25px;
+    }
+    .settingsListSubTitle {
+      color: @darkGray;
+      clear: both;
+      font-weight: normal;
+      font-size: 13px;
+      font-style: italic;
     }
     span {
       display: inline-block;
@@ -749,30 +814,40 @@ div.nextPaymentSubmission {
     a {
       text-decoration: none;
     }
-    img,
-    #coinbaseLogo {
-      width: 150px;
-      height: 150px;
-      margin: 8px auto;
-      background-color: @lightGray;
-      border: none;
-    }
     .labelText {
       font-size: 1em;
       color: @braveOrange;
-      text-align: left;
       margin-bottom: 5px;
     }
-    .fa {
-      font-size: 1.1em;
-      margin: 5px;
+    .bitcoinIcon {
+      .fa-circle {
+        color: @bitcoinOrange;
+      }
+      .fa-bitcoin {
+        color: white;
+        transform: rotate(12deg);
+      }
     }
     .primaryButton {
-      margin: 1.5em auto;
       display: block;
+      float: right;
+      font-size: 14px;
       width: 180px;
       padding: 4px 0px;
+      margin-bottom: 15px;
     }
+
+    &:after {
+      content:" ";
+      display:block;
+      clear:both;
+    }
+  }
+  .panelFooter {
+    color: @darkGray;
+    font-size: 13px;
+    font-style: italic;
+    padding: 20px 20px 20px 50px;
   }
   &.contrast {
     background: @highlightBlue;
@@ -784,7 +859,7 @@ div.nextPaymentSubmission {
   }
   .disabledPanel {
     div:nth-of-type(2) {
-      padding: 15px 5px;
+      padding: 15px 0;
     }
   }
 }
