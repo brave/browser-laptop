@@ -992,7 +992,7 @@ var getBalance = () => {
     var unconfirmed
     var info = ledgerInfo._internal.paymentInfo
 
-    if (err) return console.log('ledger balance error: ' + JSON.stringify(err, null, 2))
+    if (err) return console.log('ledger balance warning: ' + JSON.stringify(err, null, 2))
 
     if (typeof result.unconfirmed === 'undefined') return
 
