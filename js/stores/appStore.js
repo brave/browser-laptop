@@ -155,10 +155,6 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     appActions.windowBlurred(mainWindow.id)
   })
 
-  mainWindow.on('focus', function () {
-    mainWindow.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
-  })
-
   mainWindow.on('resize', function (evt) {
     // the default window size is whatever the last window resize was
     appActions.setDefaultWindowSize(evt.sender.getSize())
@@ -540,7 +536,6 @@ const handleAppAction = (action) => {
       if (action.clearDataDetail.get('browserHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_HISTORY})
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
-        BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW))
       }
       if (action.clearDataDetail.get('downloadHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS})

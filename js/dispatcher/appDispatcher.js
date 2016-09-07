@@ -93,7 +93,11 @@ if (process.type === 'browser') {
     let registrant = event.sender
     const callback = function (payload) {
       try {
-        registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
+        if (registrant.isDestroyed()) {
+          appDispatcher.unregister(callback)
+        } else {
+          registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
+        }
       } catch (e) {
         console.error('unregistering callback', e)
         appDispatcher.unregister(callback)

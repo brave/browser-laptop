@@ -35,7 +35,12 @@ const rmDir = (dirPath) => {
       }
     }
   }
-  fs.rmdirSync(dirPath)
+  try {
+    fs.rmdirSync(dirPath)
+  } catch (e) {
+    console.error(e)
+    return
+  }
 }
 
 var promiseMapSeries = function (array, iterator) {

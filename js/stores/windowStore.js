@@ -442,13 +442,6 @@ const doAction = (action) => {
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
-      // History menu needs update (since it shows "Recently Closed" items)
-      const activeFrameLocation = FrameStateUtil.getActiveFrame(windowState).get('location')
-      const windowData = {
-        location: activeFrameLocation,
-        closedFrames: windowState.get('closedFrames').toJS()
-      }
-      ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
