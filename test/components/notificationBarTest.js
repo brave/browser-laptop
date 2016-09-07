@@ -19,6 +19,7 @@ describe('notificationBar', function () {
     this.loginUrl2 = Brave.server.url('login2.html')
     this.loginUrl3 = Brave.server.url('login3.html')
     this.loginUrl4 = Brave.server.url('login4.html')
+    this.loginUrl5 = Brave.server.url('login5.html')
     yield setup(this.app.client)
   })
 
@@ -124,7 +125,24 @@ describe('notificationBar', function () {
       .loadUrl(this.loginUrl4)
       .waitUntil(function () {
         return this.getValue('#user').then((val) => val === 'brave_user') &&
-          this.getValue('#password').then((val) => val === 'testing')
+          this.getValue('#password').then((val) => val === 'testing') &&
+          this.getValue('#user2').then((val) => val === '') &&
+          this.getValue('#password2').then((val) => val === '')
+      })
+  })
+
+  it('autofills remembered password on login page with multiple forms', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl5)
+      .waitUntil(function () {
+        return this.getValue('#user').then((val) => val === 'brave_user') &&
+          this.getValue('#password').then((val) => val === 'testing') &&
+          this.getValue('#user2').then((val) => val === 'brave_user') &&
+          this.getValue('#password2').then((val) => val === 'testing')
       })
   })
 

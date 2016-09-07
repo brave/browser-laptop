@@ -4,12 +4,9 @@
   <title>Login</title>
 </head>
 <body>
-  <div id="content" class="login">
-    <h1>Login</h1>
-    <form method="post" id="acctmgr_loginform" action="/"><div><input type="hidden" name="__FORM_TOKEN" value="foo" /></div>
-      <div>
-        <input type="hidden" name="referer" value="bar" />
-      </div>
+  <div id="content1" class="login">
+    <h1>Login 1</h1>
+    <form method="post" action="/"><div><input type="hidden" name="__FORM_TOKEN" value="foo" /></div>
       <div class="textbox">
         <label for="user">Username:</label><br />
         <input type="text" id="user" name="user" class="textwidget" />
@@ -25,7 +22,7 @@
   </div>
   <div id="content2" class="login">
     <h1>Login 2</h1>
-    <form method="post" action="/blah"><div><input type="hidden" name="__FORM_TOKEN" value="foo" /></div>
+    <form method="post" action="/"><div><input type="hidden" name="__FORM_TOKEN" value="foo" /></div>
       <div class="textbox">
         <label for="user">Username:</label><br />
         <input type="text" name="user" id='user2' class="textwidget" />

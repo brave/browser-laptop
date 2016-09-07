@@ -4,7 +4,7 @@
 
 if (chrome.contentSettings.passwordManager == 'allow') {
   let credentials = {}
-  function savePassword(username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
+  function savePassword (username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
     chrome.ipc.send('save-password', username, pw, origin, action)
   }
 
@@ -28,12 +28,10 @@ if (chrome.contentSettings.passwordManager == 'allow') {
   /**
    * Try to autofill a form with credentials, using roughly the heuristic from
    * http://mxr.mozilla.org/firefox/source/toolkit/components/passwordmgr/src/nsLoginManager.js
-   * @param {Object.<string, Array.<Element>>} credentials - map of form action
-   *   to password/username elements with that action
    * @param {string} formOrigin - origin of the form
    * @param {Element} form - the form node
    */
-  function tryAutofillForm (credentials, formOrigin, form) {
+  function tryAutofillForm (formOrigin, form) {
     var fields = getFormFields(form, false)
     var action = form.action || document.location.href
     action = normalizeURL(action)
@@ -44,11 +42,24 @@ if (chrome.contentSettings.passwordManager == 'allow') {
       return
     }
 
-    if (credentials[action]) {
-      return
+    if (Array.isArray(credentials[action])) {
+      let isDuplicate = true
+      credentials[action].forEach((elems) => {
+        if (isDuplicate === false) {
+          return
+        } else if (elems[0] !== passwordElem || elems[1] !== usernameElem) {
+          isDuplicate = false
+        }
+      })
+      if (isDuplicate === false) {
+        credentials[action].push([passwordElem, usernameElem])
+      } else {
+        return
+      }
+    } else {
+      credentials[action] = [[passwordElem, usernameElem]]
     }
 
-    credentials[action] = [[passwordElem, usernameElem]]
     // Fill the password immediately if there's only one or if the username
     // is already autofilled
     chrome.ipc.send('get-passwords', formOrigin, action)
@@ -123,7 +134,7 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     var formNodes = document.querySelectorAll('form')
 
     Array.from(formNodes).forEach((form) => {
-      tryAutofillForm(credentials, formOrigin, form)
+      tryAutofillForm(formOrigin, form)
     })
 
     chrome.ipc.on('got-password', (e, username, password, origin, action, isUnique) => {
