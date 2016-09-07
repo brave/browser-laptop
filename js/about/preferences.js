@@ -583,6 +583,25 @@ class PaymentsTab extends ImmutableComponent {
     return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
   }
 
+  get fundsAmount () {
+    if (!this.props.ledgerData.get('created')) {
+      return null
+    }
+
+    return <span id='fundsAmount'>
+      {
+      !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
+        ? <span>
+          {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
+          <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
+            <span className='fa fa-question-circle fundsFAQ' />
+          </a>
+        </span>
+        : <span><span data-l10n-id='accountBalanceLoading' /></span>
+      }
+    </span>
+  }
+
   get walletButton () {
     const buttonText = this.props.ledgerData.get('created')
       ? 'addFundsTitle'
@@ -708,14 +727,15 @@ class PaymentsTab extends ImmutableComponent {
           <tbody>
             <tr>
               <td>
-                <span id='fundsAmount'>
-                  {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
-                  <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
-                    <span className='fa fa-question-circle fundsFAQ' />
-                  </a>
-                </span>
-                {this.walletButton}
-                {this.paymentHistoryButton}
+                {
+                  this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
+                    ? <span data-l10n-id='accountBalanceConnectionError' />
+                    : <span>
+                      {this.fundsAmount}
+                      {this.walletButton}
+                      {this.paymentHistoryButton}
+                    </span>
+                }
               </td>
               <td>
                 <SettingsList>
