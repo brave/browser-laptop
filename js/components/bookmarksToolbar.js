@@ -149,7 +149,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
     const siteDetailLocation = this.props.bookmark.get('location')
     let hoverTitle
     if (this.isFolder) {
-      hoverTitle = ''
+      hoverTitle = siteDetailTitle
     } else {
       hoverTitle = siteDetailTitle
         ? siteDetailTitle + '\n' + siteDetailLocation
