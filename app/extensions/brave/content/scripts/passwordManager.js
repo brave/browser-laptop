@@ -43,12 +43,12 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     }
 
     if (Array.isArray(credentials[action])) {
-      let isDuplicate = true
+      let isDuplicate = false
       credentials[action].forEach((elems) => {
-        if (isDuplicate === false) {
+        if (isDuplicate === true) {
           return
-        } else if (elems[0] !== passwordElem || elems[1] !== usernameElem) {
-          isDuplicate = false
+        } else if (elems[0] === passwordElem && elems[1] === usernameElem) {
+          isDuplicate = true
         }
       })
       if (isDuplicate === false) {
