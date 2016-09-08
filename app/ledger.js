@@ -751,7 +751,7 @@ var ledgerInfo = {
 
   // geoIP/exchange information
   countryCode: undefined,
-  exchangeInfo: undefined,
+  exchangeURL: undefined,
 
   _internal: {
     exchangeExpiry: 0,
@@ -784,10 +784,12 @@ var updateLedgerInfo = () => {
 
       ledgerInfo._internal.exchangeExpiry = now + msecs.day
       roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
+        var exchangeInfo
+
         if (err) console.log('ledger exchange error: ' + JSON.stringify(err, null, 2))
 
-        ledgerInfo._internal.exchanges = body || {}
-        ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
+        exchangeInfo = (body || {})[ledgerInfo.countryCode]
+        if (exchangeInfo) ledgerInfo.exchangeURL = exchangeInfo.buttonURL
         updateLedgerInfo()
       })
     })
