@@ -788,6 +788,7 @@ var updateLedgerInfo = () => {
 
         ledgerInfo._internal.exchanges = body || {}
         ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
+        updateLedgerInfo()
       })
     })
   }
