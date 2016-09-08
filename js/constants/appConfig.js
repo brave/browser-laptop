@@ -119,7 +119,9 @@ module.exports = {
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
-    'shutdown.clear-all-site-cookies': false
+    'shutdown.clear-all-site-cookies': false,
+    'shutdown.clear-autocomplete-data': false,
+    'shutdown.clear-autofill-data': false
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [

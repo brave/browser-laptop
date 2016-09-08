@@ -695,6 +695,19 @@ describe('navigationBar', function () {
         })
       })
     })
+
+    describe('switch to new tab page', function () {
+      before(function * () {
+        yield this.app.client
+          .ipcSend('shortcut-set-active-frame-by-index', 1)
+      })
+
+      it('focuses on the urlbar', function * () {
+        this.app.client
+        .waitForExist('.tab[data-frame-key="1"].active')
+        .waitForElementFocus(urlInput)
+      })
+    })
   })
 
   describe('clicking on navbar', function () {

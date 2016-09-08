@@ -84,8 +84,6 @@ class NavigationBar extends ImmutableComponent {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
-    // Set initial checked/unchecked status in Bookmarks menu
-    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
 
   get showNoScriptInfo () {
@@ -97,17 +95,6 @@ class NavigationBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    // Update the app menu to reflect whether the current page is bookmarked
-    const prevBookmarked = this.props.activeFrameKey !== undefined &&
-      siteUtil.isSiteBookmarked(prevProps.sites, Immutable.fromJS({
-        location: prevProps.location,
-        partitionNumber: prevProps.partitionNumber,
-        title: prevProps.title
-      }))
-
-    if (this.bookmarked !== prevBookmarked) {
-      ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
-    }
     if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
       // There are no blocked scripts, so hide the noscript dialog.
       windowActions.setNoScriptVisible(false)
