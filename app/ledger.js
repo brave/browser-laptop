@@ -1145,7 +1145,7 @@ const notifyAddFunds = () => {
 
   if (ledgerInfo.btc && reconcileStamp &&
       reconcileStamp - underscore.now() < msecs.day &&
-      balance + unconfirmed < Number(ledgerInfo.btc)) {
+      balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
     addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
     appActions.showMessageBox({
       message: addFundsMessage,
