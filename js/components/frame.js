@@ -349,9 +349,18 @@ class Frame extends ImmutableComponent {
       }
       this.webview.setActive(this.props.isActive)
       this.handleShortcut()
+
       // give focus when switching tabs
       if (this.props.isActive && !prevProps.isActive) {
-        this.webview.focus()
+        // If the tab we switch to is a new tab page, give focus
+        // to the UrlBar
+        if (this.props.location === 'about:newtab') {
+          windowActions.setUrlBarActive(true)
+          windowActions.setUrlBarSelected(false)
+        } else {
+          // If it is a regular webpage, just focus the webcontents
+          this.webview.focus()
+        }
       }
       // make sure the webview content updates to
       // match the fullscreen state of the frame
