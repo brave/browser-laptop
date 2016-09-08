@@ -786,7 +786,7 @@ var updateLedgerInfo = () => {
       roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
         if (err) console.log('ledger exchange error: ' + JSON.stringify(err, null, 2))
 
-        ledgerInfo._internal.exchanges = body
+        ledgerInfo._internal.exchanges = body || {}
         ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
         updateLedgerInfo()
       })

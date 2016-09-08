@@ -435,7 +435,7 @@ WindowStore
       }
     },
     hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
-    countryCode:                 // ISO3166 2-letter code for country of browser's location
+    countryCode: string,         // ISO3166 2-letter code for country of browser's location
     exchangeInfo: {              // information about corresponding "friendliest" BTC exchange (suggestions welcome!)
       titleText: string,         // e.g., 'Create an account on ...'
       buttonText: string,        // e.g., 'Create'
