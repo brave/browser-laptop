@@ -413,7 +413,7 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
     0)
   }
 
-  if (!frameProps.get('isPrivate')) {
+  if (!frameProps.get('isPrivate') && frameProps.get('location') !== 'about:newtab') {
     frameProps = frameProps.set('isFullScreen', false)
     closedFrames = closedFrames.push(frameProps)
     if (frameProps.get('thumbnailBlob')) {
