@@ -283,12 +283,15 @@ const appActions = {
    * Removes a site setting
    * @param {string} hostPattern - The host pattern to update the config for
    * @param {string} key - The config key to update
+   * @param {boolean} temp - Whether to change temporary or persistent
+   *   settings. defaults to false (persistent).
    */
-  removeSiteSetting: function (hostPattern, key) {
+  removeSiteSetting: function (hostPattern, key, temp) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
-      key
+      key,
+      temporary: temp || false
     })
   },
 

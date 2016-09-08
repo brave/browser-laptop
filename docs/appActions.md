@@ -240,7 +240,7 @@ Change a hostPattern's config
 
 
 
-### removeSiteSetting(hostPattern, key) 
+### removeSiteSetting(hostPattern, key, temp) 
 
 Removes a site setting
 
@@ -249,6 +249,9 @@ Removes a site setting
 **hostPattern**: `string`, The host pattern to update the config for
 
 **key**: `string`, The config key to update
+
+**temp**: `boolean`, Whether to change temporary or persistent
+  settings. defaults to false (persistent).
 
 
 
