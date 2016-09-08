@@ -104,10 +104,6 @@ const messages = {
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
   CLEAR_CLOSED_FRAMES: _,
-  // Menu rebuilding
-  REQUEST_MENU_DATA_FOR_WINDOW: _,
-  RESPONSE_MENU_DATA_FOR_WINDOW: _,
-  UPDATE_MENU_BOOKMARKED_STATUS: _, /** @isBookmarked {boolean} should menu show "Bookmark Page" as checked */
   // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
   BLOCKED_PAGE: _,
