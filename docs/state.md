@@ -402,7 +402,7 @@ WindowStore
     reconcileStamp: number,     // timestamp for the next reconcilation
     transactions: [ {           // contributions reconciling/reconciled
       viewingId: string,        // UUIDv4 for this contribution
-      contribution: {           // 
+      contribution: {           //
         fiat: {                 // roughly-equivalent fiat amount
           amount: number,       //   e.g., 5
           currency: string      //   e.g., "USD"
@@ -411,7 +411,7 @@ WindowStore
           [currency]: number    //   e.g., { "USD": 575.45 }
         },
         satoshis: number,       // actual number of satoshis transferred
-        fee: number             // bitcoin transaction fee 
+        fee: number             // bitcoin transaction fee
       },
       submissionStamp: number,  // timestamp for this contribution
       count: number,            // total number of ballots allowed to be cast
@@ -435,7 +435,11 @@ WindowStore
       }
     },
     hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
-    paymentIMG: string           // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+    paymentIMG: string,           // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+    error: { // non-null if the last updateLedgerInfo happened concurrently with an error
+      caller: string             // function in which error was handled
+      error: object              // error object returned
+    }
   },
   publisherInfo: [               // one entry for each publisher having a non-zero `score`
     {

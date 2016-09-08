@@ -744,7 +744,8 @@ var ledgerInfo = {
 
   hasBitcoinHandler: false,
 
-  _internal: {}
+  _internal: {},
+  error: null
 }
 
 var updateLedgerInfo = () => {
@@ -1013,6 +1014,20 @@ var getBalance = () => {
   })
 }
 
+var logError = (err, caller) => {
+  if (err) {
+    ledgerInfo.error = {
+      caller: caller,
+      error: err
+    }
+    console.log('Error in %j: %j', caller, err)
+    return true
+  } else {
+    ledgerInfo.error = null
+    return false
+  }
+}
+
 var getPaymentInfo = () => {
   var amount, currency
 
@@ -1028,7 +1043,9 @@ var getPaymentInfo = () => {
     client.getWalletProperties(amount, currency, function (err, body) {
       var info = ledgerInfo._internal.paymentInfo || {}
 
-      if (err) return console.log('getWalletProperties error: ' + err.toString())
+      if (logError(err, 'getWalletProperties')) {
+        return
+      }
 
       info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'balance', 'unconfirmed', 'satoshis' ]))
       info.address = client.getWalletAddress()
@@ -1145,7 +1162,7 @@ const notifyAddFunds = () => {
 
   if (ledgerInfo.btc && reconcileStamp &&
       reconcileStamp - underscore.now() < msecs.day &&
-      balance + unconfirmed < Number(ledgerInfo.btc)) {
+      balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
     addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
     appActions.showMessageBox({
       message: addFundsMessage,

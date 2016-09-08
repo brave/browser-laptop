@@ -10,25 +10,15 @@ class Clock extends React.Component {
     this.state = {}
   }
   get currentTime () {
-    const currentdate = new Date()
-    let hours = currentdate.getHours()
-    let minutes = currentdate.getMinutes()
-    let timeOfDay = (hours < 12) ? 'am' : 'pm'
-    // Set hours to be between 0 - 12
-    // and minutes less than 10 to have a leading zero
-    hours = (hours > 12) ? hours - 12 : hours
-    hours = (hours === 0) ? 12 : hours
-    minutes = (minutes < 10 ? '0' : '') + minutes
+    const date = new Date()
+    const timeOptions = {hour: '2-digit', minute: '2-digit'}
+    const currentTime = date.toLocaleTimeString([], timeOptions)
 
-    return {
-      time: `${hours}:${minutes}`,
-      dayTime: `${timeOfDay}`
-    }
+    return currentTime
   }
   updateClock () {
     this.setState({
-      currentTime: this.currentTime.time,
-      dayTime: this.currentTime.dayTime
+      currentTime: this.currentTime
     })
   }
   componentDidMount () {
@@ -37,7 +27,6 @@ class Clock extends React.Component {
   render () {
     return <div className='clock'>
       <span className='time'>{this.state.currentTime}</span>
-      <span className='dayTime'>{this.state.dayTime}</span>
     </div>
   }
 }
