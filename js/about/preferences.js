@@ -686,6 +686,18 @@ class PaymentsTab extends ImmutableComponent {
     </div>
   }
 
+  get nextReconcileDate () {
+    const ledgerData = this.props.ledgerData
+    if (!ledgerData.get('reconcileStamp')) {
+      return null
+    }
+    const nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
+    const l10nDataArgs = {
+      reconcileDate: nextReconcileDate
+    }
+    return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
+  }
+
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
     const currency = this.props.ledgerData.get('currency') || 'USD'
@@ -753,8 +765,10 @@ class PaymentsTab extends ImmutableComponent {
                   </SettingItem>
                 </SettingsList>
               </td>
-              <td id='walletStatus' data-l10n-id={this.walletStatus.id}
-                data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
+              <td>
+                <div id='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
+                {this.nextReconcileDate}
+              </td>
             </tr>
           </tbody>
         </table>
