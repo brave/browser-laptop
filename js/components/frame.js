@@ -210,6 +210,8 @@ class Frame extends ImmutableComponent {
 
   componentWillUnmount () {
     this.expireFlash(this.origin)
+    // Delete runInsecureContent when the webview is closed
+    appActions.removeSiteSetting(this.origin, 'runInsecureContent')
   }
 
   updateWebview (cb, newSrc) {
@@ -764,7 +766,7 @@ class Frame extends ImmutableComponent {
         const runInsecureContent = parsedUrl.protocol === 'https:' && this.runInsecureContent()
         windowActions.setSecurityState(this.frame, {
           secure: isSecure,
-          runInsecureContent: runInsecureContent
+          runInsecureContent: runInsecureContent ? this.props.location : null
         })
         if (isSecure) {
           // Check that there isn't a cert error.
