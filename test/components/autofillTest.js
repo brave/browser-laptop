@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
-const {urlInput, autofillAddressPanel, autofillCreditCardPanel} = require('../lib/selectors')
+const {urlInput, autofillAddressPanel, autofillCreditCardPanel, clearBrowsingDataButton, securityTab} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 
 const addAddressButton = '.addAddressButton'
@@ -302,6 +302,151 @@ describe('Autofill', function () {
     })
   })
 
+  describe('clear autofill data', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+      this.autofillPreferences = 'about:autofill'
+      this.formfill = Brave.server.url('formfill.html')
+
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
+        .waitForVisible(addAddressButton)
+        .click(addAddressButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(autofillAddressPanel)
+        .click('#nameOnAddress')
+        .keys(name)
+        .click('#organization')
+        .keys(organization)
+        .click('#streetAddress')
+        .keys(streetAddress)
+        .click('#city')
+        .keys(city)
+        .click('#state')
+        .keys(state)
+        .click('#postalCode')
+        .keys(postalCode)
+        .click('#country')
+        .keys(country)
+        .click('#phone')
+        .keys(phone)
+        .click('#email')
+        .keys(email)
+        .click(saveAddressButton)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.autofill.addresses.guid.length === 1
+          })
+        })
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
+        .waitForVisible(addCreditCardButton)
+        .click(addCreditCardButton)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible(autofillCreditCardPanel)
+        .click('#nameOnCard')
+        .keys(cardName)
+        .click('#creditCardNumber')
+        .keys(cardNumber)
+        .selectByValue('.expMonthSelect', expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString())
+        .selectByValue('.expYearSelect', expYear.toString())
+        .click(saveCreditCardButton)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.autofill.creditCards.guid.length === 1
+          })
+        })
+        .tabByIndex(0)
+        .loadUrl(this.autofillPreferences)
+    })
+    it('adds an autofill address', function * () {
+      yield this.app.client
+        .waitForVisible('.autofillPage')
+        .getText('.addressName').should.eventually.be.equal(name)
+        .getText('.organization').should.eventually.be.equal(organization)
+        .getText('.streetAddress').should.eventually.be.equal(streetAddress)
+        .getText('.city').should.eventually.be.equal(city)
+        .getText('.state').should.eventually.be.equal(state)
+        .getText('.postalCode').should.eventually.be.equal(postalCode)
+        .getText('.country').should.eventually.be.equal(country)
+        .getText('.phone').should.eventually.be.equal(phone)
+        .getText('.email').should.eventually.be.equal(email)
+    })
+    it('adds an autofill credit card', function * () {
+      yield this.app.client
+        .waitForVisible('.autofillPage')
+        .getText('.creditCardName').should.eventually.be.equal(cardName)
+        .getText('.creditCardNumber').should.eventually.be.equal('***' + cardNumber.slice(-4))
+        .getText('.creditCardPExpirationDate').should.eventually.be.equal(
+          (expMonth < 10 ? '0' + expMonth.toString() : expMonth.toString()) + '/' + expYear.toString())
+    })
+    it('autofills the address', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.formfill)
+        .waitForVisible('<form>')
+        .click('[name="04fullname"]')
+        .click('[name="04fullname"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
+        .getValue('[name="04fullname"]').should.eventually.be.equal(name)
+        .getValue('[name="23cellphon"]').should.eventually.be.equal(phone)
+        .getValue('[name="24emailadr"]').should.eventually.be.equal(email)
+        // TODO(bridiver) - this needs to check all fields
+    })
+    it('autofills the credit card', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(this.formfill)
+        .waitForVisible('<form>')
+        .click('[name="41ccnumber"]')
+        .click('[name="41ccnumber"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForVisible('.contextMenuItemText')
+        .click('.contextMenuItemText')
+        .tabByUrl(this.formfill)
+        .getValue('[name="41ccnumber"]').should.eventually.be.equal(cardNumber)
+        .getValue('[name="42ccexp_mm"]').should.eventually.be.equal(expMonth.toString())
+        .getValue('[name="43ccexp_yy"]').should.eventually.be.equal(expYear.toString())
+    })
+    it('clear data now', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .waitForVisible(securityTab)
+        .click(securityTab)
+        .waitForVisible(clearBrowsingDataButton)
+        .click(clearBrowsingDataButton)
+        .waitForBrowserWindow()
+        .waitForVisible('.autofillDataSwitch')
+        .click('.autofillDataSwitch .switchMiddle')
+        .waitForVisible('.clearDataButton')
+        .click('.clearDataButton')
+    })
+    it('does not autofill in regular tab', function * () {
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill)
+        .waitForUrl(this.formfill)
+        .waitForVisible('<form>')
+        .click('[name="04fullname"]')
+        .click('[name="04fullname"]')
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('contextMenuItemText', 500, true)
+        .tabByIndex(0)
+        .getValue('[name="04fullname"]').should.eventually.be.equal('')
+        .click('[name="41ccnumber"]')
+        .click('[name="41ccnumber"]')
+        .waitForExist('contextMenuItemText', 500, true)
+        .tabByIndex(0)
+        .getValue('[name="41ccnumber"]').should.eventually.be.equal('')
+    })
+  })
+
   describe('ad-hoc autofill', function () {
     describe('regular tab', function () {
       Brave.beforeAll(this)
@@ -410,6 +555,58 @@ describe('Autofill', function () {
         yield this.app.client
           .tabByIndex(0)
           .loadUrl(this.formfill + '?2')
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist('contextMenuItemText', 500, true)
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('')
+      })
+    })
+    describe('clear autocomplete data', function () {
+      Brave.beforeAll(this)
+      before(function * () {
+        yield setup(this.app.client)
+        this.formfill = Brave.server.url('formfill.html')
+        yield this.app.client
+          .tabByIndex(0)
+          .loadUrl(this.formfill)
+          .waitForVisible('<form>')
+          .setValue('[name="04fullname"]', 'test')
+          .click('#submit')
+      })
+      it('autofills in regular tab', function * () {
+        yield this.app.client
+          .tabByIndex(0)
+          .waitForVisible('<form>')
+          .click('[name="04fullname"]')
+          .click('[name="04fullname"]')
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForVisible('.contextMenuItemText')
+          .click('.contextMenuItemText')
+          .tabByIndex(0)
+          .getValue('[name="04fullname"]').should.eventually.be.equal('test')
+      })
+      it('clear data now', function * () {
+        yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(getTargetAboutUrl('about:preferences'))
+        .waitForVisible(securityTab)
+        .click(securityTab)
+        .waitForVisible(clearBrowsingDataButton)
+        .click(clearBrowsingDataButton)
+        .waitForBrowserWindow()
+        .waitForVisible('.autocompleteDataSwitch')
+        .click('.autocompleteDataSwitch .switchMiddle')
+        .waitForVisible('.clearDataButton')
+        .click('.clearDataButton')
+      })
+      it('does not autofill in regular tab', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill)
+          .waitForUrl(this.formfill)
           .waitForVisible('<form>')
           .click('[name="04fullname"]')
           .click('[name="04fullname"]')

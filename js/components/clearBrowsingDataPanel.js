@@ -18,6 +18,8 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
     this.onToggleCachedImagesAndFiles = this.onToggleSetting.bind(this, 'cachedImagesAndFiles')
     this.onToggleSavedPasswords = this.onToggleSetting.bind(this, 'savedPasswords')
     this.onToggleAllSiteCookies = this.onToggleSetting.bind(this, 'allSiteCookies')
+    this.onToggleAutocompleteData = this.onToggleSetting.bind(this, 'autocompleteData')
+    this.onToggleAutofillData = this.onToggleSetting.bind(this, 'autofillData')
     this.onClear = this.onClear.bind(this)
   }
   onToggleSetting (setting, e) {
@@ -37,6 +39,8 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
           <SwitchControl rightl10nId='cachedImagesAndFiles' checkedOn={this.props.clearBrowsingDataDetail.get('cachedImagesAndFiles')} onClick={this.onToggleCachedImagesAndFiles} />
           <SwitchControl rightl10nId='savedPasswords' checkedOn={this.props.clearBrowsingDataDetail.get('savedPasswords')} onClick={this.onToggleSavedPasswords} />
           <SwitchControl rightl10nId='allSiteCookies' checkedOn={this.props.clearBrowsingDataDetail.get('allSiteCookies')} onClick={this.onToggleAllSiteCookies} />
+          <SwitchControl className='autocompleteDataSwitch' rightl10nId='autocompleteData' checkedOn={this.props.clearBrowsingDataDetail.get('autocompleteData')} onClick={this.onToggleAutocompleteData} />
+          <SwitchControl className='autofillDataSwitch' rightl10nId='autofillData' checkedOn={this.props.clearBrowsingDataDetail.get('autofillData')} onClick={this.onToggleAutofillData} />
         </div>
         <div className='formSection clearBrowsingDataButtons'>
           <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />

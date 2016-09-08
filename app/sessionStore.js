@@ -199,6 +199,14 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   if (clearHistory) {
     perWindowData.closedFrames = []
   }
+  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
+  if (clearAutocompleteData) {
+    filtering.clearAutocompleteData()
+  }
+  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
+  if (clearAutofillData) {
+    filtering.clearAutofillData()
+  }
 
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
