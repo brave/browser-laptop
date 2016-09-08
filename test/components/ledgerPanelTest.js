@@ -58,6 +58,14 @@ describe('Payments Panel', function () {
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
         .click(walletSwitch)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.settings['payments.enabled'] === true &&
+              val.value.settings['payments.notifications'] === true
+          })
+        })
+        .tabByUrl(prefsUrl)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {

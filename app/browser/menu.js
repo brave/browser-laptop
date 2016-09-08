@@ -7,12 +7,17 @@
 const Immutable = require('immutable')
 const electron = require('electron')
 const appConfig = require('../../js/constants/appConfig')
+const appActions = require('../../js/actions/appActions')
+const appConstants = require('../../js/constants/appConstants')
+const appDispatcher = require('../../js/dispatcher/appDispatcher')
+const appStore = require('../../js/stores/appStore')
+const windowConstants = require('../../js/constants/windowConstants')
 const Menu = electron.Menu
-const MenuItem = electron.MenuItem
+const CommonMenu = require('../common/commonMenu')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
+const siteTags = require('../../js/constants/siteTags')
 const dialog = electron.dialog
-const appActions = require('../../js/actions/appActions')
 const { fileUrl } = require('../../js/lib/appUrlUtil')
 const menuUtil = require('./lib/menuUtil')
 const getSetting = require('../../js/settings').getSetting
@@ -21,15 +26,13 @@ const {isSiteBookmarked} = require('../../js/state/siteUtil')
 const isDarwin = process.platform === 'darwin'
 const aboutUrl = 'https://brave.com/'
 
-// Start off with an empty menu
-let appMenu = Menu.buildFromTemplate([])
-Menu.setApplicationMenu(appMenu)
-
-// Value for history menu's "Bookmark Page" menu item; see createBookmarksSubmenu()
-let isBookmarkChecked = false
+let appMenu = null
+// TODO(bridiver) - these should be handled in the appStore
+let closedFrames = {}
+let currentLocation = null
 
 // Submenu initialization
-const createFileSubmenu = (CommonMenu) => {
+const createFileSubmenu = () => {
   const submenu = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
@@ -121,7 +124,7 @@ const createFileSubmenu = (CommonMenu) => {
   return submenu
 }
 
-const createEditSubmenu = (CommonMenu) => {
+const createEditSubmenu = () => {
   const submenu = [
     {
       label: locale.translation('undo'),
@@ -186,7 +189,7 @@ const createEditSubmenu = (CommonMenu) => {
   return submenu
 }
 
-const createViewSubmenu = (CommonMenu) => {
+const createViewSubmenu = () => {
   return [
     {
       label: locale.translation('actualSize'),
@@ -287,7 +290,7 @@ const createViewSubmenu = (CommonMenu) => {
   ]
 }
 
-const createHistorySubmenu = (CommonMenu) => {
+const createHistorySubmenu = () => {
   let submenu = [
     {
       label: locale.translation('home'),
@@ -347,8 +350,7 @@ const createHistorySubmenu = (CommonMenu) => {
       }
     }
   ]
-
-  submenu = submenu.concat(menuUtil.createRecentlyClosedMenuItems())
+  submenu = submenu.concat(menuUtil.createRecentlyClosedMenuItems(Immutable.fromJS(Object.keys(closedFrames).map(key => closedFrames[key]))))
 
   submenu.push(
     // TODO: recently visited
@@ -363,13 +365,17 @@ const createHistorySubmenu = (CommonMenu) => {
   return submenu
 }
 
-const createBookmarksSubmenu = (CommonMenu) => {
+const isCurrentLocationBookmarked = () => {
+  return isSiteBookmarked(appStore.getState().get('sites'), Immutable.fromJS({location: currentLocation}))
+}
+
+const createBookmarksSubmenu = () => {
   let submenu = [
     {
       label: locale.translation('bookmarkPage'),
       type: 'checkbox',
       accelerator: 'CmdOrCtrl+D',
-      checked: isBookmarkChecked, // NOTE: checked status is updated via updateBookmarkedStatus()
+      checked: isCurrentLocationBookmarked(),
       click: function (item, focusedWindow) {
         var msg = item.checked
           ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
@@ -389,7 +395,7 @@ const createBookmarksSubmenu = (CommonMenu) => {
     CommonMenu.importBookmarksMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkMenuItems()
+  const bookmarks = menuUtil.createBookmarkMenuItems(appStore.getState().get('sites'))
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)
@@ -398,7 +404,7 @@ const createBookmarksSubmenu = (CommonMenu) => {
   return submenu
 }
 
-const createWindowSubmenu = (CommonMenu) => {
+const createWindowSubmenu = () => {
   return [
     {
       label: locale.translation('minimize'),
@@ -441,7 +447,7 @@ const createWindowSubmenu = (CommonMenu) => {
   ]
 }
 
-const createHelpSubmenu = (CommonMenu) => {
+const createHelpSubmenu = () => {
   const submenu = [
     CommonMenu.reportAnIssueMenuItem(),
     CommonMenu.separatorMenuItem,
@@ -465,7 +471,7 @@ const createHelpSubmenu = (CommonMenu) => {
   return submenu
 }
 
-const createDebugSubmenu = (CommonMenu) => {
+const createDebugSubmenu = () => {
   return [
     {
       // Makes future renderer processes pause when they are created until a debugger appears.
@@ -510,13 +516,13 @@ const createDebugSubmenu = (CommonMenu) => {
  * Will only build the initial menu, which is mostly static items
  * Dynamic items (Bookmarks, History) get updated w/ updateMenu
  */
-const createMenu = (CommonMenu) => {
+const createMenu = () => {
   const template = [
-    { label: locale.translation('file'), submenu: createFileSubmenu(CommonMenu) },
-    { label: locale.translation('edit'), submenu: createEditSubmenu(CommonMenu) },
-    { label: locale.translation('view'), submenu: createViewSubmenu(CommonMenu) },
-    { label: locale.translation('history'), submenu: createHistorySubmenu(CommonMenu) },
-    { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu(CommonMenu) },
+    { label: locale.translation('file'), submenu: createFileSubmenu() },
+    { label: locale.translation('edit'), submenu: createEditSubmenu() },
+    { label: locale.translation('view'), submenu: createViewSubmenu() },
+    { label: locale.translation('history'), submenu: createHistorySubmenu() },
+    { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu() },
     {
       label: locale.translation('bravery'),
       submenu: [
@@ -524,12 +530,12 @@ const createMenu = (CommonMenu) => {
         CommonMenu.braverySiteMenuItem()
       ]
     },
-    { label: locale.translation('window'), submenu: createWindowSubmenu(CommonMenu), role: 'window' },
-    { label: locale.translation('help'), submenu: createHelpSubmenu(CommonMenu), role: 'help' }
+    { label: locale.translation('window'), submenu: createWindowSubmenu(), role: 'window' },
+    { label: locale.translation('help'), submenu: createHelpSubmenu(), role: 'help' }
   ]
 
   if (process.env.NODE_ENV === 'development') {
-    template.push({ label: 'Debug', submenu: createDebugSubmenu(CommonMenu) })
+    template.push({ label: 'Debug', submenu: createDebugSubmenu() })
   }
 
   if (isDarwin) {
@@ -572,7 +578,7 @@ const createMenu = (CommonMenu) => {
     })
   }
 
-  const oldMenu = appMenu
+  let oldMenu = appMenu
   appMenu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(appMenu)
   if (oldMenu) {
@@ -580,73 +586,64 @@ const createMenu = (CommonMenu) => {
   }
 }
 
-const updateMenu = (CommonMenu, appState, windowData) => {
-  const updated = menuUtil.checkForUpdate(appState, windowData)
-  if (updated.nothingUpdated) {
-    return
+const doAction = (action) => {
+  switch (action.actionType) {
+    case windowConstants.WINDOW_SET_FOCUSED_FRAME:
+      // TODO check/uncheck menu item instead of recreating menu
+      currentLocation = action.frameProps.get('location')
+      let menuItem = menuUtil.getMenuItem(appMenu, locale.translation('bookmarkPage'))
+      menuItem.checked = isCurrentLocationBookmarked()
+      break
+    case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
+      appDispatcher.waitFor([appStore.dispatchToken], () => {
+        delete closedFrames[action.frameProps.get('location')]
+        createMenu()
+      })
+      break
+    case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
+      appDispatcher.waitFor([appStore.dispatchToken], () => {
+        closedFrames = {}
+        createMenu()
+      })
+      break
+    case windowConstants.WINDOW_CLOSE_FRAME:
+      appDispatcher.waitFor([appStore.dispatchToken], () => {
+        if (!action.frameProps.get('isPrivate') && action.frameProps.get('location') !== 'about:newtab') {
+          closedFrames[action.frameProps.get('location')] = action.frameProps
+          createMenu()
+        }
+      })
+      break
+    case appConstants.APP_ADD_SITE:
+      if (action.tag === siteTags.BOOKMARK) {
+        appDispatcher.waitFor([appStore.dispatchToken], () => {
+          createMenu()
+        })
+      }
+      break
+    case appConstants.APP_REMOVE_SITE:
+      if (action.tag === siteTags.BOOKMARK) {
+        appDispatcher.waitFor([appStore.dispatchToken], () => {
+          createMenu()
+        })
+      }
+      break
+    case appConstants.APP_CLEAR_HISTORY:
+      if (action.tag === siteTags.BOOKMARK) {
+        appDispatcher.waitFor([appStore.dispatchToken], () => {
+          createMenu()
+        })
+      }
+      break
+    default:
   }
-
-  // When bookmarks are removed via AppStore (context menu, etc), `isBookmarkChecked` needs to be recalculated
-  if (windowData && windowData.get('location')) {
-    isBookmarkChecked = isSiteBookmarked(appState.get('sites'), Immutable.fromJS({location: windowData.get('location')}))
-  }
-
-  // Only rebuild menus when necessary
-
-  if (updated.settings || updated.closedFrames) {
-    let historyMenu = menuUtil.getParentMenuDetails(appMenu, locale.translation('history'))
-    if (historyMenu && historyMenu.menu && historyMenu.menu.submenu && historyMenu.index !== -1) {
-      const menu = historyMenu.menu.submenu
-      const menuItems = createHistorySubmenu(CommonMenu)
-      menu.clear()
-      menuItems.forEach((item) => menu.append(new MenuItem(item)))
-    }
-  }
-
-  if (updated.sites) {
-    let bookmarksMenu = menuUtil.getParentMenuDetails(appMenu, locale.translation('bookmarks'))
-    if (bookmarksMenu && bookmarksMenu.menu && bookmarksMenu.menu.submenu && bookmarksMenu.index !== -1) {
-      const menu = bookmarksMenu.menu.submenu
-      const menuItems = createBookmarksSubmenu(CommonMenu)
-      menu.clear()
-      menuItems.forEach((item) => menu.append(new MenuItem(item)))
-    }
-  }
-
-  Menu.setApplicationMenu(appMenu)
 }
 
 /**
  * Sets up the menu.
  * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
- * @param {Object} windowData - Information specific to the current window (recently closed tabs, etc)
  */
-module.exports.rebuild = (appState, windowData) => {
-  // The menu will always be called once localization is done
-  // so don't bother loading anything until it is done.
-  if (!locale.initialized) {
-    return
-  }
-
-  // This needs to be within the init method to handle translations
-  const CommonMenu = require('../common/commonMenu')
-  if (appMenu.items.length === 0) {
-    createMenu(CommonMenu)
-  } else {
-    updateMenu(CommonMenu, appState, windowData)
-  }
-}
-
-/**
- * Called from navigationBar.js; used to update bookmarks menu status
- * @param {boolean} isBookmarked - true if the currently viewed site is bookmarked
- */
-module.exports.updateBookmarkedStatus = (isBookmarked) => {
-  const menuItem = menuUtil.getMenuItem(locale.translation('bookmarkPage'))
-  if (menuItem) {
-    menuItem.checked = isBookmarked
-  }
-  // menu may be rebuilt without the location changing
-  // this holds the last known status
-  isBookmarkChecked = isBookmarked
+module.exports.init = (appState) => {
+  createMenu()
+  appDispatcher.register(doAction)
 }

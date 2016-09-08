@@ -270,9 +270,24 @@ const defaultLocale = function () {
 // Initialize translations for a language providing an optional
 // callback executed after the translation caching process
 // is complete.
-exports.init = function (language, cb) {
-  // Default to noop callback
-  cb = cb || function () {}
+exports.init = function (language) {
+  // If this is in the main process
+  if (ipcMain) {
+    // Respond to requests for translations from the renderer process
+    ipcMain.on('translations', function (event, arg) {
+      // Return the entire set of translations synchronously
+      event.returnValue = translations
+    })
+
+    // TODO: There shouldn't need to be a REQUEST_LANGUAGE event at all
+    // Respond to requests for the currently configured language code
+    ipcMain.on(REQUEST_LANGUAGE, function (event) {
+      event.sender.send(LANGUAGE, {
+        langCode: lang,
+        languageCodes: availableLanguages
+      })
+    })
+  }
 
   // Currently selected language identifier I.e. 'en-US'
   lang = language || defaultLocale()
@@ -303,31 +318,11 @@ exports.init = function (language, cb) {
 
   // Translate the renderer identifiers
   var identifiers = rendererIdentifiers()
-  ctx.formatValues.apply(ctx, identifiers).then(function (values) {
+  return ctx.formatValues.apply(ctx, identifiers).then(function (values) {
     // Cache the translations for later retrieval
     values.forEach(function (value, idx) {
       translations[identifiers[idx]] = value
     })
-    // Signal when complete
-    exports.initialized = true
-    cb(translations)
-  })
-}
-
-// If this is in the main process
-if (ipcMain) {
-  // Respond to requests for translations from the renderer process
-  ipcMain.on('translations', function (event, arg) {
-    // Return the entire set of translations synchronously
-    event.returnValue = translations
-  })
-
-  // TODO: There shouldn't need to be a REQUEST_LANGUAGE event at all
-  // Respond to requests for the currently configured language code
-  ipcMain.on(REQUEST_LANGUAGE, function (event) {
-    event.sender.send(LANGUAGE, {
-      langCode: lang,
-      languageCodes: availableLanguages
-    })
+    return lang
   })
 }

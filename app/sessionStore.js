@@ -16,6 +16,7 @@ const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
 const app = electron.app
+const locale = require('./locale')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
@@ -198,6 +199,14 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   if (clearHistory) {
     perWindowData.closedFrames = []
   }
+  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
+  if (clearAutocompleteData) {
+    filtering.clearAutocompleteData()
+  }
+  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
+  if (clearAutofillData) {
+    filtering.clearAutofillData()
+  }
 
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
@@ -308,13 +317,7 @@ module.exports.loadAppState = () => {
     let data
     try {
       data = fs.readFileSync(getStoragePath())
-    } catch (e) {
-    }
-
-    if (!data) {
-      reject()
-      return
-    }
+    } catch (e) {}
 
     try {
       data = JSON.parse(data)
@@ -337,7 +340,6 @@ module.exports.loadAppState = () => {
           data.autofill.creditCards = creditCards
         }
       }
-
       // xml migration
       if (data.settings) {
         if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
@@ -347,35 +349,37 @@ module.exports.loadAppState = () => {
           data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
         }
       }
+      // Clean app data here if it wasn't cleared on shutdown
+      if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
+        module.exports.cleanAppData(data, false)
+      }
+      data = Object.assign(module.exports.defaultAppState(), data)
+      data.cleanedOnShutdown = false
+      // Always recalculate the update status
+      if (data.updates) {
+        const updateStatus = data.updates.status
+        delete data.updates.status
+        // The process always restarts after an update so if the state
+        // indicates that a restart isn't wanted, close right away.
+        if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
+          module.exports.saveAppState(data, true).then(() => {
+            // Exit immediately without doing the session store saving stuff
+            // since we want the same state saved except for the update status
+            app.exit(0)
+          })
+          return
+        }
+      }
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
       console.log('could not parse data: ', data)
-      reject(e)
-      return
+      data = exports.defaultAppState()
     }
-    // Clean app data here if it wasn't cleared on shutdown
-    if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
-      module.exports.cleanAppData(data, false)
-    }
-    data = Object.assign(module.exports.defaultAppState(), data)
-    data.cleanedOnShutdown = false
-    // Always recalculate the update status
-    if (data.updates) {
-      const updateStatus = data.updates.status
-      delete data.updates.status
-      // The process always restarts after an update so if the state
-      // indicates that a restart isn't wanted, close right away.
-      if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-        module.exports.saveAppState(data, true).then(() => {
-          // Exit immediately without doing the session store saving stuff
-          // since we want the same state saved except for the update status
-          app.exit(0)
-        })
-        return
-      }
-    }
-    resolve(data)
+    locale.init(data.settings[settings.LANGUAGE]).then((locale) => {
+      app.setLocale(locale)
+      resolve(data)
+    })
   })
 }
 
