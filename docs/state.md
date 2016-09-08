@@ -436,7 +436,10 @@ WindowStore
     },
     hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
     countryCode: string,         // ISO3166 2-letter code for country of browser's location
-    exchangeURL: string,         // where the button should take the browser for the corresponding "friendliest" BTC exchange (suggestions welcome!)
+    exchangeInfo: {              // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
+      exchangeName: string,      // the name of the BTC exchange
+      exchangeURL: string        // the URL of the BTC exchange
+    },
     paymentIMG: string,          // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
     error: {                     // non-null if the last updateLedgerInfo happened concurrently with an error
       caller: string             // function in which error was handled
