@@ -211,7 +211,8 @@ if (ipc) {
   })
 
   ipc.on(messages.ADD_FUNDS_CLOSED, () => {
-    // TODO
+    if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
+    balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
   })
 }
 
@@ -885,7 +886,7 @@ var roundtrip = (params, options, callback) => {
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
-var timeoutId = false
+var runTimeoutId = false
 
 var run = (delayTime) => {
 //  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
@@ -921,13 +922,13 @@ var run = (delayTime) => {
     if (delayTime === false) delayTime = random.randomInt({ min: 1, max: 10 }) * msecs.minute
   }
   if (delayTime > 0) {
-    if (timeoutId) return console.log('\ninterception')
+    if (runTimeoutId) return console.log('\ninterception')
 
     active = client
     if (delayTime > msecs.day) delayTime = msecs.day
 
-    timeoutId = setTimeout(() => {
-      timeoutId = false
+    runTimeoutId = setTimeout(() => {
+      runTimeoutId = false
       if (active !== client) return
 
       if (!client) return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
@@ -986,10 +987,12 @@ var getStateInfo = (state) => {
   updateLedgerInfo()
 }
 
+var balanceTimeoutId = false
+
 var getBalance = () => {
   if (!client) return
 
-  setTimeout(getBalance, msecs.minute)
+  balanceTimeoutId = setTimeout(getBalance, msecs.minute)
   if (!ledgerInfo.address) return
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
