@@ -435,8 +435,14 @@ WindowStore
       }
     },
     hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
-    paymentIMG: string,           // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
-    error: { // non-null if the last updateLedgerInfo happened concurrently with an error
+    countryCode: string,         // ISO3166 2-letter code for country of browser's location
+    exchangeInfo: {              // information about corresponding "friendliest" BTC exchange (suggestions welcome!)
+      titleText: string,         // e.g., 'Create an account on ...'
+      buttonText: string,        // e.g., 'Create'
+      buttonURL: string,         // where the button should take the browser      
+    }
+    paymentIMG: string,          // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+    error: {                     // non-null if the last updateLedgerInfo happened concurrently with an error
       caller: string             // function in which error was handled
       error: object              // error object returned
     }

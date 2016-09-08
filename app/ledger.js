@@ -32,6 +32,7 @@ const session = electron.session
 const acorn = require('acorn')
 const ledgerBalance = require('ledger-balance')
 const ledgerClient = require('ledger-client')
+const ledgerGeoIP = require('ledger-geoip')
 const ledgerPublisher = require('ledger-publisher')
 const qr = require('qr-image')
 const random = require('random-lib')
@@ -117,10 +118,11 @@ var init = () => {
   try {
     ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_CLIENT_DEBUG)
     publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
+    publisherInfo._internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
 
     appDispatcher.register(doAction)
     initialize(getSetting(settings.PAYMENTS_ENABLED))
-  } catch (ex) { console.log('initialization failed: ' + ex.toString() + '\n' + ex.stack) }
+  } catch (ex) { console.log('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
 }
 
 var quit = () => {
@@ -178,7 +180,7 @@ if (ipc) {
     ctx = url.parse(location, true)
     ctx.TLD = tldjs.getPublicSuffix(ctx.host)
     if (!ctx.TLD) {
-      console.log('\nno TLD for:' + ctx.host)
+      if (publisherInfo._internal.verboseP) console.log('\nno TLD for:' + ctx.host)
       event.returnValue = {}
       return
     }
@@ -269,11 +271,11 @@ eventStore.addChangeListener(() => {
         request.request({ url: url, responseType: 'blob' }, (err, response, blob) => {
           var matchP, prefix, tail
 
-/*
-          console.log('\nresponse: ' + url +
-                      ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 80) + '\nresponse=' +
-                      JSON.stringify(response, null, 2))
- */
+          if (publisherInfo._internal.debugP) {
+            console.log('\nresponse: ' + url +
+                        ' errP=' + (!!err) + ' blob=' + (blob || '').substr(0, 80) + '\nresponse=' +
+                        JSON.stringify(response, null, 2))
+          }
 
           if (err) return console.log('response error: ' + err.toString() + '\n' + err.stack)
 
@@ -303,20 +305,18 @@ eventStore.addChangeListener(() => {
 
           entry.faviconURL = blob
           updatePublisherInfo()
-/*
-          console.log('\n' + publisher + ' synopsis=' +
-                      JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL', 'window' ]),
-                                                       { faviconURL: entry.faviconURL && '... ' }), null, 2))
- */
+          if (publisherInfo._internal.debugP) {
+            console.log('\n' + publisher + ' synopsis=' +
+                        JSON.stringify(underscore.extend(underscore.omit(entry, [ 'faviconURL', 'window' ]),
+                                                         { faviconURL: entry.faviconURL && '... ' }), null, 2))
+          }
         })
       }
 
       faviconURL = page.faviconURL || entry.protocol + '//' + url.parse(location).host + '/favicon.ico'
       entry.faviconURL = null
 
-/*
-      console.log('request: ' + faviconURL)
- */
+      if (publisherInfo._internal.debugP) console.log('request: ' + faviconURL)
       fetch(faviconURL)
     }
   })
@@ -390,14 +390,14 @@ var enable = (onoff) => {
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
-    if (clientOptions.verboseP) console.log('\nstarting up ledger publisher integration')
+    if (publisherInfo._internal.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
       return updatePublisherInfo()
     }
 
-    if (clientOptions.verboseP) console.log('\nfound ' + pathName(synopsisPath))
+    if (publisherInfo._internal.verboseP) console.log('\nfound ' + pathName(synopsisPath))
     try {
       synopsis = new (ledgerPublisher.Synopsis)(data)
     } catch (ex) {
@@ -418,7 +418,7 @@ var enable = (onoff) => {
         return
       }
 
-      if (clientOptions.verboseP) console.log('\nfound ' + pathName(publisherPath))
+      if (publisherInfo._internal.verboseP) console.log('\nfound ' + pathName(publisherPath))
       try {
         data = JSON.parse(data)
         underscore.keys(data).sort().forEach((publisher) => {
@@ -585,7 +585,7 @@ var visit = (location, timestamp) => {
 
     if (!synopsis) return
 
-    if (publisherInfo._internal.debugP) {
+    if (publisherInfo._internal.verboseP) {
       console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2) +
                   ' duration=' + (timestamp - currentTimestamp) + ' msec')
     }
@@ -598,7 +598,7 @@ var visit = (location, timestamp) => {
     publishers[publisher][currentLocation] = timestamp
 
     duration = timestamp - currentTimestamp
-    if (publisherInfo._internal.debugP) console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec')
+    if (publisherInfo._internal.verboseP) console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec')
     synopsis.addPublisher(publisher, duration)
     updatePublisherInfo()
   }
@@ -675,7 +675,7 @@ var cacheRuleSet = (ruleset) => {
         if ((rule.consequent !== null) || (rule.dom)) return
         if (!rulesolver.resolve(rule.condition, ctx)) return
 
-        if (clientOptions.verboseP) console.log('\npurging ' + publisher)
+        if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
         delete synopsis.publishers[publisher]
         syncP = true
       })
@@ -729,7 +729,7 @@ var ledgerInfo = {
  */
   ],
 
-// set from ledger client's state.paymentInfo OR client's getWalletProperties
+  // set from ledger client's state.paymentInfo OR client's getWalletProperties
   // Bitcoin wallet address
   address: undefined,
 
@@ -749,7 +749,15 @@ var ledgerInfo = {
 
   hasBitcoinHandler: false,
 
-  _internal: {},
+  // geoIP/exchange information
+  countryCode: undefined,
+  exchangeInfo: undefined,
+
+  _internal: {
+    exchangeExpiry: 0,
+    exchanges: {},
+    geoipExpiry: 0
+  },
   error: null
 }
 
@@ -762,6 +770,27 @@ var updateLedgerInfo = () => {
                       underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
     if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
+  }
+
+  if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
+    ledgerInfo._internal.geoipExpiry = now + (5 * msecs.minute)
+    return ledgerGeoIP.getGeoIP(client.options, (err, provider, result) => {
+      if (err) console.log('ledger geoip warning: ' + JSON.stringify(err, null, 2))
+      if (result) ledgerInfo.countryCode = result
+
+      ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
+
+      if (now <= ledgerInfo._internal.exchangeExpiry) return updateLedgerInfo()
+
+      ledgerInfo._internal.exchangeExpiry = now + msecs.day
+      roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
+        if (err) console.log('ledger exchange error: ' + JSON.stringify(err, null, 2))
+
+        ledgerInfo._internal.exchanges = body || {}
+        ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
+        updateLedgerInfo()
+      })
+    })
   }
 
   if (ledgerInfo._internal.debugP) {
