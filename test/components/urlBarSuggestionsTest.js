@@ -43,7 +43,7 @@ describe('urlbarSuggestions', function () {
       .waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === 'Page 1')
       })
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
+      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
       .keys('\uE00C')
       .waitUntil(function () {
         return this.isExisting(urlBarSuggestions).then((exists) => exists === false)
@@ -63,16 +63,16 @@ describe('urlbarSuggestions', function () {
 
   it('navigates to a suggestion with keyboard', function * () {
     yield this.app.client
-      .setValue(urlInput, 'Page 1')
+      .setValue(urlInput, 'Page')
       .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === 'Page 1')
+        return this.getValue(urlInput).then((val) => val === 'Page')
       })
       .waitForExist(urlBarSuggestions)
-      .keys('Down arrow')
+      .keys('\uE015')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
-      .keys('Down arrow')
+      .keys('\uE015')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"].selected')
-      .keys('Enter')
+      .keys('\uE007')
       .tabByIndex(1).getUrl().should.become(this.page2Url)
   })
 
