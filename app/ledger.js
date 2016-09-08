@@ -209,6 +209,10 @@ if (ipc) {
       }
     }
   })
+
+  ipc.on(messages.ADD_FUNDS_CLOSED, () => {
+    // TODO
+  })
 }
 
 /*
