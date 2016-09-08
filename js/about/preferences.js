@@ -1250,6 +1250,10 @@ class AboutPreferences extends React.Component {
       stateDiff['bitcoinOverlayVisible'] = false
     }
     this.setState(stateDiff)
+    // Tell ledger when Add Funds overlay is closed
+    if (isVisible === false && overlayName === 'addFunds') {
+      ipc.send(messages.ADD_FUNDS_CLOSED)
+    }
   }
 
   render () {
