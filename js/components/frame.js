@@ -896,6 +896,9 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-finish-load', () => {
       loadEnd(true)
+      if (this.runInsecureContent()) {
+        appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
+      }
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
       windowActions.setNavigated(e.url, this.props.frameKey, true)

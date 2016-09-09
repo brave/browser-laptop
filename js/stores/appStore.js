@@ -483,15 +483,20 @@ const handleAppAction = (action) => {
       handleChangeSettingAction(action.key, action.value)
       break
     case AppConstants.APP_CHANGE_SITE_SETTING:
-      let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-      appState = appState.set(propertyName,
-        siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
-      break
+      {
+        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        appState = appState.set(propertyName,
+          siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
+        break
+      }
     case AppConstants.APP_REMOVE_SITE_SETTING:
-      let newSiteSettings = siteSettings.removeSiteSetting(appState.get('siteSettings'),
-                                                           action.hostPattern, action.key)
-      appState = appState.set('siteSettings', newSiteSettings)
-      break
+      {
+        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
+          action.hostPattern, action.key)
+        appState = appState.set(propertyName, newSiteSettings)
+        break
+      }
     case AppConstants.APP_UPDATE_LEDGER_INFO:
       appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
       break

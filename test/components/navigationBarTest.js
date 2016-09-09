@@ -4,11 +4,13 @@ const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
 const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
-  saveButton, allowRunInsecureContentButton, denyRunInsecureContentButton} = require('../lib/selectors')
+  saveButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
+  denyRunInsecureContentButton, dismissDenyRunInsecureContentButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
 const searchProviders = require('../../js/data/searchProviders')
+const messages = require('../../js/constants/messages')
 
 describe('navigationBar', function () {
   function * setup (client) {
@@ -283,10 +285,10 @@ describe('navigationBar', function () {
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
         .waitForVisible('.runInsecureContentWarning')
-        .waitForVisible(denyRunInsecureContentButton)
+        .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .waitForVisible('[data-l10n-id="secureConnection"]')
-        .click(denyRunInsecureContentButton)
+        .click(dismissAllowRunInsecureContentButton)
         // TODO(bridiver) there is a race condition here because we are waiting for a non-change
         // and we need some way to verify that the page does not reload and allow insecure content
         .tabByUrl(page1Url).waitUntil(() => {
@@ -298,7 +300,7 @@ describe('navigationBar', function () {
         .click(urlbarIcon)
         .waitForExist(urlbarIcon + '.fa-lock')
     })
-    it('Temporarily allow running insecure content', function * () {
+    it('Temporarily allow/deny running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
@@ -311,8 +313,9 @@ describe('navigationBar', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
         .waitForVisible('.runInsecureContentWarning')
-        .waitForVisible(denyRunInsecureContentButton)
+        .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .click(allowRunInsecureContentButton)
         .tabByUrl(this.page1Url)
@@ -322,10 +325,163 @@ describe('navigationBar', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon)
         .click(urlbarIcon)
-        .waitForExist(urlbarIcon + '.fa-unlock')
         .waitForVisible('[data-l10n-id="mixedConnection"]')
-        .keys('\uE00C')
+        .waitForVisible('.denyRunInsecureContentWarning')
+        .waitForVisible(dismissDenyRunInsecureContentButton)
+        .waitForVisible(denyRunInsecureContentButton)
+        .click(denyRunInsecureContentButton)
+        .tabByUrl(this.page1Url)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .waitForExist(urlbarIcon + '.fa-lock')
+    })
+    it('Limit effect of running insecure content in frame', function * () {
+      const page1Url = 'https://mixed-script.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
+        // background color changes when insecure content runs
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon + '.fa-lock')
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible(dismissAllowRunInsecureContentButton)
+        .waitForVisible(allowRunInsecureContentButton)
+        .click(allowRunInsecureContentButton)
+        .tabByIndex(0)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(255,0,0,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 2
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(1)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 3
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(2)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 4
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(3)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+    })
+    it.skip('Limit effect of running insecure content in private frame', function * () {
+      const page1Url = 'https://mixed-script.badssl.com/'
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 2
+          })
+        })
+        // background color changes when insecure content runs
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(1)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon + '.fa-lock')
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible(dismissAllowRunInsecureContentButton)
+        .waitForVisible(allowRunInsecureContentButton)
+        .click(allowRunInsecureContentButton)
+        .tabByUrl(this.page1Url)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(255,0,0,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 3
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(2)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 4
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(3)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 5
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(4)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
     })
   })
 
