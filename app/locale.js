@@ -176,6 +176,8 @@ var rendererIdentifiers = function () {
     'searchSuggestionTitle',
     'topSiteSuggestionTitle',
     'addFundsNotification',
+    'reconciliationNotification',
+    'reviewSites',
     'addFunds',
     'updateLater',
     'updateHello',
