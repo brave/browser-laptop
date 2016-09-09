@@ -128,7 +128,7 @@ var init = () => {
 }
 
 var quit = () => {
-  visit('NOOP', underscore.now())
+  visit('NOOP', underscore.now(), null)
 }
 
 var boot = () => {
@@ -333,7 +333,7 @@ eventStore.addChangeListener(() => {
   })
 
   view = underscore.last(view) || {}
-  visit(view.url || 'NOOP', view.timestamp || underscore.now())
+  visit(view.url || 'NOOP', view.timestamp || underscore.now(), view.tabId)
 })
 
 /*
@@ -438,7 +438,7 @@ var enable = (onoff) => {
           publishers[publisher] = {}
           entries.forEach((entry) => {
             locations[entry.location] = entry
-            publishers[publisher][entry.location] = entry.when
+            publishers[publisher][entry.location] = { timestamp: entry.when, tabIds: [] }
           })
         })
       } catch (ex) {
@@ -470,7 +470,8 @@ var updatePublisherInfo = () => {
     var entries = []
 
     underscore.keys(publishers[publisher]).forEach((location) => {
-      var when = publishers[publisher][location]
+      var when = publishers[publisher][location].timestamp
+
       if (when > then) entries.push({ location: location, when: when })
     })
 
@@ -590,27 +591,34 @@ var synopsisNormalizer = () => {
 var currentLocation = 'NOOP'
 var currentTimestamp = underscore.now()
 
-var visit = (location, timestamp) => {
+var visit = (location, timestamp, tabId) => {
   var setLocation = () => {
-    var duration, publisher
+    var duration, publisher, revisitP
 
     if (!synopsis) return
 
     if (publisherInfo._internal.verboseP) {
       console.log('locations[' + currentLocation + ']=' + JSON.stringify(locations[currentLocation], null, 2) +
-                  ' duration=' + (timestamp - currentTimestamp) + ' msec')
+                  ' duration=' + (timestamp - currentTimestamp) + ' msec' + ' tabId=' + tabId)
     }
-    if ((location === currentLocation) || (!locations[currentLocation])) return
+    if ((location === currentLocation) || (!locations[currentLocation]) || (!tabId)) return
 
     publisher = locations[currentLocation].publisher
     if (!publisher) return
 
     if (!publishers[publisher]) publishers[publisher] = {}
-    publishers[publisher][currentLocation] = timestamp
+    if (!publishers[publisher][currentLocation]) publishers[publisher][currentLocation] = { tabIds: [] }
+    publishers[publisher][currentLocation].timestamp = timestamp
+    revisitP = publishers[publisher][currentLocation].tabIds.indexOf(tabId) !== -1
+    if (!revisitP) publishers[publisher][currentLocation].tabIds.push(tabId)
 
     duration = timestamp - currentTimestamp
-    if (publisherInfo._internal.verboseP) console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec')
-    synopsis.addPublisher(publisher, duration)
+    if (publisherInfo._internal.verboseP) {
+      console.log('\nadd publisher ' + publisher + ': ' + duration + ' msec' + ' revisitP=' + revisitP + ' state=' +
+                  JSON.stringify(underscore.extend({ location: currentLocation }, publishers[publisher][currentLocation]),
+                                 null, 2))
+    }
+    synopsis.addPublisher(publisher, { duration: duration, revisitP: revisitP })
     updatePublisherInfo()
   }
 

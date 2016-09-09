@@ -92,7 +92,7 @@
     "ledger-balance": "^0.8.46",
     "ledger-client": "^0.8.59",
     "ledger-geoip": "https://github.com/brave/ledger-geoip.git",
-    "ledger-publisher": "^0.8.58",
+    "ledger-publisher": "^0.8.61",
     "lru_cache": "^1.0.0",
     "qr-image": "^3.1.0",
     "random-lib": "2.1.0",

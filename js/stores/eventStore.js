@@ -46,7 +46,7 @@ const emitChanges = debounce(eventStore.emitChanges.bind(eventStore), 5)
 let lastActivePageUrl = null
 let lastActiveTabId = null
 
-const addPageView = (url) => {
+const addPageView = (url, tabId) => {
   if (url && isSourceAboutUrl(url)) {
     url = null
   }
@@ -57,7 +57,8 @@ const addPageView = (url) => {
 
   let pageViewEvent = Immutable.fromJS({
     timestamp: new Date().getTime(),
-    url
+    url,
+    tabId
   })
   eventState = eventState.set('page_view', eventState.get('page_view').push(pageViewEvent))
   lastActivePageUrl = url
@@ -66,7 +67,7 @@ const addPageView = (url) => {
 const windowBlurred = (windowId) => {
   let windowCount = BrowserWindow.getAllWindows().filter((win) => win.isFocused()).length
   if (windowCount === 0) {
-    addPageView(null)
+    addPageView(null, null)
   }
 }
 
@@ -81,7 +82,7 @@ const windowClosed = (windowId) => {
   }
 
   if (!win || windowCount === 0) {
-    addPageView(null)
+    addPageView(null, null)
   }
 }
 
@@ -91,7 +92,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
       // create a page view event if this is a page load on the active tabId
       if (!lastActiveTabId || action.frameProps.get('tabId') === lastActiveTabId) {
-        addPageView(action.frameProps.get('location'))
+        addPageView(action.frameProps.get('location'), action.frameProps.get('tabId'))
       }
 
       if (action.isError || isSourceAboutUrl(action.frameProps.get('location'))) {
@@ -105,17 +106,17 @@ const doAction = (action) => {
       eventState = eventState.set('page_load', eventState.get('page_load').push(pageLoadEvent))
       break
     case WindowConstants.WINDOW_SET_FOCUSED_FRAME:
-      addPageView(action.frameProps.get('location'))
       lastActiveTabId = action.frameProps.get('tabId')
+      addPageView(action.frameProps.get('location'), lastActiveTabId)
       break
     case AppConstants.APP_WINDOW_BLURRED:
       windowBlurred(action.appWindowId)
       break
     case AppConstants.APP_IDLE_STATE_CHANGED:
       if (action.idleState !== 'active') {
-        addPageView(null)
+        addPageView(null, null)
       } else {
-        addPageView(lastActivePageUrl)
+        addPageView(lastActivePageUrl, lastActiveTabId)
       }
       break
     case AppConstants.APP_CLOSE_WINDOW:
