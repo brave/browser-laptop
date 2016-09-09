@@ -97,7 +97,9 @@ const msecs = { year: 365 * 24 * 60 * 60 * 1000,
  */
 
 let addFundsMessage
+let reconciliationMessage
 let suppressNotifications = false
+let reconciliationNotificationShown = false
 let notificationTimeout = null
 
 // TODO(bridiver) - create a better way to get setting changes
@@ -195,6 +197,7 @@ if (ipc) {
   })
 
   ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
+    const win = electron.BrowserWindow.getFocusedWindow()
     if (message === addFundsMessage) {
       appActions.hideMessageBox(message)
       if (buttonIndex === 0) {
@@ -203,12 +206,20 @@ if (ipc) {
         setTimeout(() => { suppressNotifications = false }, 6 * msecs.hour)
       } else {
         // Open payments panel
-        let win = electron.BrowserWindow.getFocusedWindow()
         if (win) {
           win.webContents.send(messages.SHORTCUT_NEW_FRAME,
             'about:preferences#payments', { singleFrame: true })
         }
       }
+    } else if (message === reconciliationMessage) {
+      appActions.hideMessageBox(message)
+      if (win) {
+        win.webContents.send(messages.SHORTCUT_NEW_FRAME,
+          'about:preferences#payments', { singleFrame: true })
+      }
+      // If > 24 hours has passed, it might be time to show the reconciliation
+      // message again
+      setTimeout(() => { reconciliationNotificationShown = false }, msecs.day)
     }
   })
 
@@ -409,8 +420,8 @@ var enable = (onoff) => {
     })
     updatePublisherInfo()
 
-    // Check if the add funds notification should be shown every 15 minutes
-    notificationTimeout = setInterval(notifyAddFunds, msecs.minute * 15)
+    // Check if relevant browser notifications should be shown every 15 minutes
+    notificationTimeout = setInterval(showNotifications, msecs.minute * 15)
 
     fs.readFile(pathName(publisherPath), (err, data) => {
       if (err) {
@@ -1194,8 +1205,10 @@ var pathName = (name) => {
 /**
  * Show message that it's time to add funds if reconciliation is less than
  * a day in the future and balance is too low.
+ * 24 hours prior to reconciliation, show message asking user to review
+ * their votes.
  */
-const notifyAddFunds = () => {
+const showNotifications = () => {
   if (!getSetting(settings.PAYMENTS_ENABLED) ||
       !getSetting(settings.PAYMENTS_NOTIFICATIONS) || suppressNotifications) {
     return
@@ -1204,19 +1217,31 @@ const notifyAddFunds = () => {
   const balance = Number(ledgerInfo.balance || 0)
   const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
 
-  if (ledgerInfo.btc && reconcileStamp &&
-      reconcileStamp - underscore.now() < msecs.day &&
-      balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
-    addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
-    appActions.showMessageBox({
-      message: addFundsMessage,
-      buttons: [locale.translation('updateLater'),
-        locale.translation('addFunds')],
-      options: {
-        updateStyle: true, // TODO: Show this in the style of updateBar.less
-        persist: false
-      }
-    })
+  if (reconcileStamp && reconcileStamp - underscore.now() < msecs.day) {
+    if (ledgerInfo.btc &&
+        balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
+      addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
+      appActions.showMessageBox({
+        message: addFundsMessage,
+        buttons: [locale.translation('updateLater'),
+          locale.translation('addFunds')],
+        options: {
+          updateStyle: true, // TODO: Show this in the style of updateBar.less
+          persist: false
+        }
+      })
+    } else if (!reconciliationNotificationShown) {
+      reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
+      appActions.showMessageBox({
+        message: reconciliationMessage,
+        buttons: [locale.translation('reviewSites')],
+        options: {
+          updateStyle: true,
+          persist: false
+        }
+      })
+      reconciliationNotificationShown = true
+    }
   }
 }
 

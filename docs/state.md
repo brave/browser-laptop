@@ -52,7 +52,8 @@ AppStore
       httpsEverywhere: boolean,
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
-      ledgerPayments: boolean // False if site should not be paid by the ledger. Defaults to true.
+      ledgerPayments: boolean, // False if site should not be paid by the ledger. Defaults to true.
+      runInsecureContent: boolean // Allow active mixed content
     }
   },
   temporarySiteSettings: {
@@ -273,7 +274,7 @@ WindowStore
       },
       isExtendedValidation: boolean, // is using https ev
       runInsecureContent: boolean, // has active mixed content
-      blockedRunInsecureContent: string, // first domain of blocked active mixed content
+      blockedRunInsecureContent: Array<string> // sources of blocked active mixed content
     },
     parentFrameKey: number, // the key of the frame this frame was opened from
     modalPromptDetail: {...},

@@ -62,5 +62,7 @@ module.exports = {
   autofillAddressPanel: '.autofillAddressPanel',
   autofillCreditCardPanel: '.autofillCreditCardPanel',
   allowRunInsecureContentButton: '.allowRunInsecureContentButton',
-  denyRunInsecureContentButton: '.denyRunInsecureContentButton'
+  dismissAllowRunInsecureContentButton: '.dismissAllowRunInsecureContentButton',
+  denyRunInsecureContentButton: '.denyRunInsecureContentButton',
+  dismissDenyRunInsecureContentButton: '.dismissDenyRunInsecureContentButton'
 }

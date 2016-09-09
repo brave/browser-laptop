@@ -16,10 +16,18 @@ class SiteInfo extends ImmutableComponent {
   constructor () {
     super()
     this.onAllowRunInsecureContent = this.onAllowRunInsecureContent.bind(this)
+    this.onDenyRunInsecureContent = this.onDenyRunInsecureContent.bind(this)
   }
   onAllowRunInsecureContent () {
-    appActions.changeSiteSetting(siteUtil.getOrigin(this.isBlockedRunInsecureContent), 'runInsecureContent', true)
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.isBlockedRunInsecureContent)
+    appActions.changeSiteSetting(siteUtil.getOrigin(this.location),
+      'runInsecureContent', true, this.isPrivate)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.location)
+    this.props.onHide()
+  }
+  onDenyRunInsecureContent () {
+    appActions.removeSiteSetting(siteUtil.getOrigin(this.location),
+      'runInsecureContent', this.isPrivate)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.location)
     this.props.onHide()
   }
   get isExtendedValidation () {
@@ -27,6 +35,9 @@ class SiteInfo extends ImmutableComponent {
   }
   get isSecure () {
     return this.props.frameProps.getIn(['security', 'isSecure'])
+  }
+  get isPrivate () {
+    return this.props.frameProps.getIn(['isPrivate'])
   }
   get runInsecureContent () {
     return this.props.frameProps.getIn(['security', 'runInsecureContent'])
@@ -36,6 +47,9 @@ class SiteInfo extends ImmutableComponent {
   }
   get partitionNumber () {
     return this.props.frameProps.getIn(['partitionNumber'])
+  }
+  get location () {
+    return this.props.frameProps.getIn(['location'])
   }
   render () {
     let secureIcon
@@ -63,18 +77,33 @@ class SiteInfo extends ImmutableComponent {
         <span data-l10n-args={JSON.stringify(l10nArgs)} data-l10n-id='sessionInfo' /></li>
     }
 
-    let runInsecureContentWarning = null
+    let runInsecureContentInfo = null
     if (this.isBlockedRunInsecureContent) {
-      runInsecureContentWarning =
+      runInsecureContentInfo =
         <li>
           <ul>
             <li><span className='runInsecureContentWarning' data-l10n-id='runInsecureContentWarning' /></li>
             <li>
               <Button l10nId='allowRunInsecureContent' className='secondaryAltButton allowRunInsecureContentButton' onClick={this.onAllowRunInsecureContent} />
-              <Button l10nId='denyRunInsecureContent' className='primaryButton denyRunInsecureContentButton' onClick={this.props.onHide} />
+              <Button l10nId='dismissAllowRunInsecureContent' className='primaryButton dismissAllowRunInsecureContentButton' onClick={this.props.onHide} />
             </li>
           </ul>
         </li>
+    } else if (this.runInsecureContent) {
+      runInsecureContentInfo =
+        <li>
+          <ul>
+            <li><span className='denyRunInsecureContentWarning' data-l10n-id='denyRunInsecureContentWarning' /></li>
+            <li>
+              <Button l10nId='denyRunInsecureContent' className='primaryButton denyRunInsecureContentButton' onClick={this.onDenyRunInsecureContent} />
+              <Button l10nId='dismissDenyRunInsecureContent' className='secondaryAltButton dismissDenyRunInsecureContentButton' onClick={this.props.onHide} />
+            </li>
+          </ul>
+        </li>
+    }
+    // Disable in private mode for now
+    if (this.isPrivate) {
+      runInsecureContentInfo = null
     }
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
@@ -86,7 +115,7 @@ class SiteInfo extends ImmutableComponent {
         partitionInfo
       }
       {
-        runInsecureContentWarning
+        runInsecureContentInfo
       }
       </ul>
     </Dialog>

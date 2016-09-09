@@ -974,7 +974,7 @@ const windowActions = {
   },
 
   /**
-   * Sets page url with blocked active mixed content.
+   * Sets source of blocked active mixed content.
    * @param {Object} frameProps - The frame to set source of
    * blocked active mixed content on
    * @param {string} source - Source of blocked active mixed content

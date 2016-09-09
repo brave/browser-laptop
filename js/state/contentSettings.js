@@ -172,6 +172,7 @@ const getContentSettingsFromSiteSettings = (appState) => {
       addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
     }
   }
+
   return { content_settings: contentSettings }
 }
 

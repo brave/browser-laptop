@@ -592,7 +592,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
-      windowActions.setBlockedRunInsecureContent(this.frame, this.props.location)
+      windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
     })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.frame)
@@ -896,6 +896,9 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-finish-load', () => {
       loadEnd(true)
+      if (this.runInsecureContent()) {
+        appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
+      }
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
       windowActions.setNavigated(e.url, this.props.frameKey, true)
