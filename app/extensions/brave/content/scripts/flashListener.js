@@ -30,16 +30,14 @@ if (chrome.contentSettings.flashActive != 'allow' &&
         }
       })
     }
-    setTimeout(() => {
-      var observer = new window.MutationObserver(function (mutations) {
-        replaceAdobeLinks()
-      })
-      replaceAdobeLinks()
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-      })
-    }, 1000)
+    replaceAdobeLinks()
+    let interval = setInterval(replaceAdobeLinks, 1000)
+    document.addEventListener('visibilitychange', () => {
+      clearInterval(interval)
+      if (document.visibilityState !== 'hidden') {
+        interval = setInterval(replaceAdobeLinks, 1000)
+      }
+    })
   })()
 }
 
@@ -131,7 +129,7 @@ function getFlashObjects (elem) {
  * Inserts Flash placeholders.
  * @param {Element} elem - HTML element to search
  */
-function insertFlashPlaceholders (elem) {
+function insertFlashPlaceholders (elem = document.documentElement) {
   const minWidth = 200
   const minHeight = 100
   let flashObjects = getFlashObjects(elem)
@@ -161,16 +159,12 @@ function insertFlashPlaceholders (elem) {
 
 if (chrome.contentSettings.flashActive != 'allow' ||
     chrome.contentSettings.flashEnabled != 'allow') {
-  insertFlashPlaceholders(document.documentElement)
-  setTimeout(() => {
-    var observer = new window.MutationObserver(function (mutations) {
-      insertFlashPlaceholders(document.documentElement)
-    })
-
-    insertFlashPlaceholders(document.documentElement)
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    })
-  }, 1000)
+  insertFlashPlaceholders()
+  let interval = setInterval(insertFlashPlaceholders, 1000)
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(interval)
+    if (document.visibilityState !== 'hidden') {
+      interval = setInterval(insertFlashPlaceholders, 1000)
+    }
+  })
 }

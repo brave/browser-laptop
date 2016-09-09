@@ -26,7 +26,11 @@ For a more user-friendly download page, [please visit our website](https://brave
 
 You'll need certain packages installed before you can build and run Brave locally.
 
-### All platforms
+### Windows
+
+Please see the [Building on Windows wiki entry](https://github.com/brave/browser-laptop/wiki/Building-on-Windows)
+
+### All other platforms
 
 1. `nodejs` **`>= 6.1`**
 
@@ -35,15 +39,6 @@ You'll need certain packages installed before you can build and run Brave locall
 2. `node-gyp` **`3.3.1`**
 
         sudo npm install -g node-gyp@3.3.1
-
-### Windows
-
-Ensure you also have the following installed (required by node-gyp):
-
-* [Python 2.7](https://www.python.org/downloads/)
-* [Visual Studio 2013 or 2015](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx)
-
-After being installed, Visual Studio 2015 may [require some additional configuration](https://github.com/brave/browser-laptop/wiki/Configuring-Visual-Studio-2015).
 
 ###  Linux
 

@@ -11,10 +11,13 @@ const eventUtil = require('../lib/eventUtil.js')
 const bookmarkActions = {
   openBookmarksInFolder: function (allBookmarkItems, folderDetail) {
     // We have a middle clicked folder
-    allBookmarkItems
-      .filter((bookmark) => bookmark.get('parentFolderId') === folderDetail.get('folderId') && siteUtil.isBookmark(bookmark))
-      .forEach((bookmark) =>
-        windowActions.newFrame(siteUtil.toFrameOpts(bookmark), false))
+    const bookmarks = allBookmarkItems
+      .filter((bookmark) => (bookmark.get('parentFolderId') || 0) === (folderDetail.get('folderId') || 0) && siteUtil.isBookmark(bookmark))
+
+    // Only load the first 25 tabs as loaded
+    bookmarks
+      .forEach((bookmark, i) =>
+        windowActions.newFrame(Object.assign(siteUtil.toFrameOpts(bookmark), {unloaded: i > 25}), false))
   },
 
   /**

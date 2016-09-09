@@ -442,13 +442,6 @@ const doAction = (action) => {
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
-      // History menu needs update (since it shows "Recently Closed" items)
-      const activeFrameLocation = FrameStateUtil.getActiveFrame(windowState).get('location')
-      const windowData = {
-        location: activeFrameLocation,
-        closedFrames: windowState.get('closedFrames').toJS()
-      }
-      ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
@@ -742,6 +735,10 @@ const doAction = (action) => {
         windowState = windowState.setIn(path.concat(['security', 'isSecure']),
                                         action.securityState.secure)
       }
+      if (action.securityState.runInsecureContent !== undefined) {
+        windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
+                                        action.securityState.runInsecureContent)
+      }
       if (action.securityState.certDetails) {
         windowState = windowState.setIn(path.concat(['security', 'certDetails']),
                                         action.securityState.certDetails)
@@ -762,6 +759,17 @@ const doAction = (action) => {
       windowState = windowState.mergeIn(['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)], {
         history: addToHistory(action.frameProps)
       })
+      break
+    case WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT:
+      const blockedRunInsecureContentPath =
+        ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
+      if (action.source) {
+        windowState =
+          windowState.setIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']), action.source)
+      } else {
+        windowState =
+          windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
+      }
       break
     default:
   }

@@ -24,14 +24,21 @@ if (process.platform === 'win32') {
   require('./windowsInit')
 }
 
-var locale = require('./locale')
-
-const Immutable = require('immutable')
+const path = require('path')
 const electron = require('electron')
+const app = electron.app
+// set userData before loading anything else
+if (!process.env.BRAVE_USER_DATA_DIR && ['development', 'test'].includes(process.env.NODE_ENV)) {
+  process.env.BRAVE_USER_DATA_DIR = path.join(app.getPath('appData'), app.getName() + '-' + process.env.NODE_ENV)
+}
+
+if (process.env.BRAVE_USER_DATA_DIR) {
+  app.setPath('userData', process.env.BRAVE_USER_DATA_DIR)
+}
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
-const app = electron.app
+const Immutable = require('immutable')
 const Menu = require('./browser/menu')
 const Updater = require('./updater')
 const messages = require('../js/constants/messages')
@@ -55,14 +62,15 @@ const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
-const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
+const locale = require('./locale')
 const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
+const async = require('async')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -83,12 +91,23 @@ const passwordCallbacks = {}
 const prefsRestartCallbacks = {}
 const prefsRestartLastValue = {}
 
+const unsafeTestMasterKey = 'c66af15fc6555ebecf7cee3a5b82c108fd3cb4b587ab0b299d28e39c79ecc708'
+
+const sessionStoreQueue = async.queue((task, callback) => {
+  task(callback)
+}, 1)
+
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.
  */
 const getMasterKey = () => {
   if (throttleKeytar) {
     return null
+  }
+
+  if (process.env.NODE_ENV === 'test') {
+    // workaround for https://travis-ci.org/brave/browser-laptop/builds/132700770
+    return (new Buffer(unsafeTestMasterKey, 'hex')).toString('binary')
   }
 
   const appName = 'Brave'
@@ -157,24 +176,34 @@ const saveIfAllCollected = (forceSave) => {
         }
       }
     }
-
-    const logSaveAppStateError = (e) => {
-      console.error('Error saving app state: ', e)
-    }
-    SessionStore.saveAppState(appState, shuttingDown).catch(logSaveAppStateError).then(() => {
-      if (shuttingDown) {
-        sessionStateStoreCompleteOnQuit = true
-        // If there's an update to apply, then do it here.
-        // Otherwise just quit.
-        if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
-            appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
-          Updater.quitAndInstall()
-        } else {
-          app.quit()
-        }
-      }
-    })
+    sessionStoreQueue.push(saveAppState.bind(null, appState))
   }
+}
+
+const logSaveAppStateError = (e) => {
+  console.error('Error saving app state: ', e)
+}
+
+const saveAppState = (appState, cb) => {
+  SessionStore.saveAppState(appState, shuttingDown).catch((e) => {
+    logSaveAppStateError(e)
+    cb()
+  }).then(() => {
+    if (shuttingDown) {
+      sessionStateStoreCompleteOnQuit = true
+      // If there's an update to apply, then do it here.
+      // Otherwise just quit.
+      if (appState.updates && (appState.updates.status === UpdateStatus.UPDATE_APPLYING_NO_RESTART ||
+          appState.updates.status === UpdateStatus.UPDATE_APPLYING_RESTART)) {
+        Updater.quitAndInstall()
+      } else {
+        app.quit()
+      }
+      // no callback here because we don't want to get a partial write during shutdown
+    } else {
+      cb()
+    }
+  })
 }
 
 /**
@@ -196,9 +225,7 @@ const initiateSessionStateSave = (beforeQuit) => {
   }
 }
 
-let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
-  return SessionStore.defaultAppState()
-})
+let loadAppStatePromise = SessionStore.loadAppState()
 
 let flashInitialized = false
 
@@ -218,10 +245,10 @@ loadAppStatePromise.then((initialState) => {
       return
     }
   }
-  app.setLocale(initialState.settings[settings.LANGUAGE])
 })
 
 app.on('ready', () => {
+  let sessionStateSaveInterval = null
   app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
@@ -272,7 +299,7 @@ app.on('ready', () => {
 
     e.preventDefault()
 
-    clearTimeout(initiateSessionStateSave)
+    clearInterval(sessionStateSaveInterval)
     initiateSessionStateSave(true)
 
     // Just in case a window is not responsive, we don't want to wait forever.
@@ -288,13 +315,6 @@ app.on('ready', () => {
       perWindowState.push(data)
     }
     saveIfAllCollected()
-  })
-
-  // Window state is fetched via the renderer process; this is fired once it's retrieved
-  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowData) => {
-    if (windowData) {
-      Menu.rebuild(AppStore.getState(), Immutable.fromJS(windowData))
-    }
   })
 
   ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
@@ -351,19 +371,13 @@ app.on('ready', () => {
   })
 
   loadAppStatePromise.then((initialState) => {
-    // Initiate the translation for a configured language and
-    // reset the browser window. This will default to en-US if
-    // not yet configured.
-    locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      Menu.rebuild(AppStore.getState(), null)
-    })
-
     // Do this after loading the state
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
     initialState.flashInitialized = flashInitialized
     appActions.setState(Immutable.fromJS(initialState))
+    Menu.init(initialState, null)
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
     basicAuth.init()
@@ -429,12 +443,6 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.UPDATE_MENU_BOOKMARKED_STATUS, (e, isBookmarked) => {
-      if (typeof isBookmarked === 'boolean') {
-        Menu.updateBookmarkedStatus(isBookmarked)
-      }
-    })
-
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
     })
@@ -491,15 +499,7 @@ app.on('ready', () => {
     })
 
     // save app state every 5 minutes regardless of update frequency
-    setInterval(initiateSessionStateSave, 1000 * 60 * 5)
-
-    AppStore.addChangeListener(() => {
-      if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
-      } else {
-        Menu.rebuild(AppStore.getState(), null)
-      }
-    })
+    sessionStateSaveInterval = setInterval(initiateSessionStateSave, 1000 * 60 * 5)
 
     ledger.init()
 

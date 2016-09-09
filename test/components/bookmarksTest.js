@@ -58,7 +58,7 @@ describe('bookmarks', function () {
       })
 
       describe('and then removed', function () {
-        before(function *() {
+        before(function * () {
           yield this.app.client
             .click(navigatorNotBookmarked)
             .waitForExist(deleteButton)
@@ -117,7 +117,7 @@ describe('bookmarks', function () {
           })
       })
       describe('and then removed', function () {
-        before(function *() {
+        before(function * () {
           yield this.app.client
             .click(navigatorNotBookmarked)
             .waitForExist(deleteButton)

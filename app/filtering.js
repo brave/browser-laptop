@@ -340,7 +340,8 @@ function registerPermissionHandler (session, partition) {
     }
 
     const urlOrigin = getOrigin(url)
-    if (!urlOrigin) {
+    const frameOrigin = getOrigin(embedderOrigin)
+    if (!urlOrigin || !frameOrigin) {
       return
     }
     const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, urlOrigin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
@@ -352,7 +353,7 @@ function registerPermissionHandler (session, partition) {
 
     appActions.showMessageBox({
       buttons: [locale.translation('deny'), locale.translation('allow')],
-      frameOrigin: urlOrigin,
+      frameOrigin,
       options: {
         persist: true
       },
@@ -644,5 +645,19 @@ module.exports.removeAutofillCreditCard = (guid) => {
     if (guid[partition] !== undefined) {
       ses.autofill.removeCreditCard(guid[partition])
     }
+  }
+}
+
+module.exports.clearAutocompleteData = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    ses.autofill.clearAutocompleteData()
+  }
+}
+
+module.exports.clearAutofillData = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    ses.autofill.clearAutofillData()
   }
 }

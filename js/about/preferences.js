@@ -213,12 +213,12 @@ class LedgerTableRow extends ImmutableComponent {
     const defaultSiteSetting = true
 
     return <tr className={this.enabled ? '' : 'paymentsDisabled'}>
-      <td className='narrow' data-sort={this.padLeft(rank)}>{rank}</td>
-      <td className='wide'><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
-      <td className='narrow'><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
-      <td data-sort={this.padLeft(views)}>{views}</td>
-      <td data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
-      <td data-sort={this.padLeft(percentage)}>{percentage}</td>
+      <td className='alignRight' data-sort={this.padLeft(rank)}>{rank}</td>
+      <td><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
+      <td><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
+      <td className='alignRight' data-sort={this.padLeft(views)}>{views}</td>
+      <td className='alignRight' data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
+      <td className='alignRight' data-sort={this.padLeft(percentage)}>{percentage}</td>
     </tr>
   }
 }
@@ -263,6 +263,29 @@ class BitcoinDashboard extends ImmutableComponent {
   get overlayContent () {
     return <iframe src={this.ledgerData.get('buyURL')} />
   }
+  get currency () {
+    return this.props.ledgerData.get('currency') || 'USD'
+  }
+  get amount () {
+    return getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
+  }
+  get canUseCoinbase () {
+    return this.currency === 'USD' && this.amount < 6
+  }
+  get coinbasePanel () {
+    if (this.canUseCoinbase) {
+      return <div className='panel'>
+        <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+        <div id='coinbaseLogo' />
+        <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
+      </div>
+    } else {
+      return <div className='panel disabledPanel'>
+        <div className='settingsListTitle' data-l10n-id='moneyAdd' />
+        <div data-l10n-id='coinbaseNotAvailable' />
+      </div>
+    }
+  }
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
@@ -284,7 +307,6 @@ class BitcoinDashboard extends ImmutableComponent {
   render () {
     window.addEventListener('message', this.onMessage.bind(this), false)
     var emptyDialog = true
-// if someone can figure out how to get a localized title attribute (bitcoinCopyAddress) here, please do so!
     return <div id='bitcoinDashboard'>
       {
       this.props.bitcoinOverlayVisible
@@ -292,32 +314,28 @@ class BitcoinDashboard extends ImmutableComponent {
         : null
       }
       <div className='board'>
-        <div className='panel'>
-          <div className='settingsListTitle' data-l10n-id='moneyAdd' />
-          <div id='coinbaseLogo' />
-          <Button l10nId='add' className='primaryButton' onClick={this.props.showOverlay.bind(this)} />
-        </div>
+        {this.coinbasePanel}
         <div className='panel'>
           <div className='settingsListTitle' data-l10n-id='bitcoinAdd' />
           {
-            this.ledgerData.get('address') && this.ledgerData.get('paymentURL')
+            this.ledgerData.get('address')
               ? <div>
                 <img src={this.ledgerData.get('paymentIMG')} title='Brave wallet QR code' />
                 {
-                  this.ledgerData.get('hasBitcoinHandler')
+                  this.ledgerData.get('hasBitcoinHandler') && this.ledgerData.get('paymentURL')
                     ? <div>
                       <a href={this.ledgerData.get('paymentURL')} target='_blank'>
                         <Button l10nId='bitcoinVisitAccount' className='primaryButton' />
                       </a>
                       <div data-l10n-id='bitcoinAddress' className='labelText' />
-                      <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
-                      <span className='smallText'>{this.ledgerData.get('address')}</span>
                     </div>
                     : <div>
-                      <div data-l10n-id='bitcoinPaymentURL' className='labelText' />
-                      <span id='bitcoinPaymentURL' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('paymentURL'))}>{this.ledgerData.get('paymentURL')}</span>
+                      <div data-l10n-id='bitcoinPaymentURL'
+                        data-l10n-args={JSON.stringify({amount: `${this.amount} ${this.currency}`})} className='labelText' />
                     </div>
                 }
+                <span className='fa fa-clipboard settingsListCopy alt' title='Copy to clipboard' onClick={this.copyToClipboard.bind(this, this.ledgerData.get('address'))} />
+                <span className='smallText'>{this.ledgerData.get('address')}</span>
               </div>
             : <div data-l10n-id='bitcoinWalletNotAvailable' />
           }
@@ -395,8 +413,8 @@ class PaymentHistoryRow extends ImmutableComponent {
     var totalAmountStr = `${this.totalAmount} ${this.currency}`
 
     return <tr>
-      <td className='narrow' data-sort={this.timestamp}>{date}</td>
-      <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
+      <td data-sort={this.timestamp}>{date}</td>
+      <td data-sort={this.satoshis}>{totalAmountStr}</td>
     </tr>
   }
 }
@@ -523,9 +541,9 @@ class SearchTab extends ImmutableComponent {
         addHoverClass onClick={this.hoverCallback.bind(this)} />
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />
       <SettingsList>
+        <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showHistoryMatches' prefKey={settings.HISTORY_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='showBookmarkMatches' prefKey={settings.BOOKMARK_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='offerSearchSuggestions' prefKey={settings.OFFER_SEARCH_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
     </div>
@@ -571,6 +589,25 @@ class PaymentsTab extends ImmutableComponent {
 
   get enabled () {
     return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
+  }
+
+  get fundsAmount () {
+    if (!this.props.ledgerData.get('created')) {
+      return null
+    }
+
+    return <span id='fundsAmount'>
+      {
+      !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
+        ? <span>
+          {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
+          <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
+            <span className='fa fa-question-circle fundsFAQ' />
+          </a>
+        </span>
+        : <span><span data-l10n-id='accountBalanceLoading' /></span>
+      }
+    </span>
   }
 
   get walletButton () {
@@ -629,6 +666,7 @@ class PaymentsTab extends ImmutableComponent {
 
   get overlayContent () {
     return <BitcoinDashboard ledgerData={this.props.ledgerData}
+      settings={this.props.settings}
       bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
       showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
       hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
@@ -656,12 +694,21 @@ class PaymentsTab extends ImmutableComponent {
     </div>
   }
 
+  get nextReconcileDate () {
+    const ledgerData = this.props.ledgerData
+    if (!ledgerData.get('reconcileStamp')) {
+      return null
+    }
+    const nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
+    const l10nDataArgs = {
+      reconcileDate: nextReconcileDate
+    }
+    return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
+  }
+
   btcToCurrencyString (btc) {
     const balance = Number(btc || 0)
-    const currency = this.props.ledgerData.get('currency')
-    if (!currency) {
-      return `${balance} BTC`
-    }
+    const currency = this.props.ledgerData.get('currency') || 'USD'
     if (balance === 0) {
       return `0 ${currency}`
     }
@@ -700,11 +747,15 @@ class PaymentsTab extends ImmutableComponent {
           <tbody>
             <tr>
               <td>
-                <span id='fundsAmount'>
-                {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
-                </span>
-                {this.walletButton}
-                {this.paymentHistoryButton}
+                {
+                  this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
+                    ? <span data-l10n-id='accountBalanceConnectionError' />
+                    : <span>
+                      {this.fundsAmount}
+                      {this.walletButton}
+                      {this.paymentHistoryButton}
+                    </span>
+                }
               </td>
               <td>
                 <SettingsList>
@@ -722,8 +773,10 @@ class PaymentsTab extends ImmutableComponent {
                   </SettingItem>
                 </SettingsList>
               </td>
-              <td data-l10n-id={this.walletStatus.id}
-                data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
+              <td>
+                <div id='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
+                {this.nextReconcileDate}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -746,12 +799,14 @@ class PaymentsTab extends ImmutableComponent {
         }
       <div className='titleBar'>
         <div className='sectionTitleWrapper pull-left'>
-          <span className='sectionTitle' data-l10n-id='publisherPaymentsTitle' />
-          <span className='sectionSubTitle' data-l10n-id='publisherPaymentsTitleBeta' />
+          <span className='sectionTitle'>Brave Payments</span>
+          <span className='sectionSubTitle'>beta</span>
         </div>
-        <div className='pull-left' id='enablePaymentsSwitch'>
-          <span data-l10n-id='off' />
-          <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <div className='pull-left' id='paymentsSwitches'>
+          <div className='enablePaymentsSwitch'>
+            <span data-l10n-id='off' />
+            <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+          </div>
           {this.enabled ? <SettingCheckbox dataL10nId='notifications' prefKey={settings.PAYMENTS_NOTIFICATIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} /> : null}
         </div>
       </div>
@@ -945,6 +1000,8 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='downloadHistory' prefKey={settings.SHUTDOWN_CLEAR_DOWNLOADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='cachedImagesAndFiles' prefKey={settings.SHUTDOWN_CLEAR_CACHE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='allSiteCookies' prefKey={settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='autocompleteData' prefKey={settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='autofillData' prefKey={settings.SHUTDOWN_CLEAR_AUTOFILL_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />
       </SettingsList>
       <div className='sectionTitle' data-l10n-id='passwordsAndForms' />
@@ -1215,6 +1272,10 @@ class AboutPreferences extends React.Component {
       stateDiff['bitcoinOverlayVisible'] = false
     }
     this.setState(stateDiff)
+    // Tell ledger when Add Funds overlay is closed
+    if (isVisible === false && overlayName === 'addFunds') {
+      ipc.send(messages.ADD_FUNDS_CLOSED)
+    }
   }
 
   render () {

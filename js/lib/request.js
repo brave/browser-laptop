@@ -8,11 +8,13 @@ const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
 const util = require('util')
+const urlParse = require('url').parse
 
 /**
  * Sends a network request using Chromium's networks stack instead of Node's.
  * Depends on there being a loaded browser window available.
- * @param {string} url - the url to load
+ * @param {Object|string} options - options object or URL to load
+ * @param {function.<Error, Object, string>} callback
  */
 module.exports.request = (options, callback) => {
   var params
@@ -28,6 +30,11 @@ module.exports.request = (options, callback) => {
     underscore.extend(params, { payload: JSON.stringify(options.payload),
                                 payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
                               })
+  }
+
+  if (process.env.NODE_ENV === 'development' &&
+      urlParse(options.url).protocol === 'http:') {
+    console.log('WARNING: requesting non-HTTPS URL', options.url)
   }
 
   defaultSession.webRequest.fetch(options.url, params, (err, response, body) => {

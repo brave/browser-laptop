@@ -50,9 +50,9 @@ Adds a site to the site list
 
 
 
-### clearSitesWithoutTags() 
+### clearHistory() 
 
-Clears all sites without tags
+Clears history (all sites without tags). Indirectly called by appActions.clearAppData().
 
 
 
@@ -387,6 +387,16 @@ Remove credit card data
 **Parameters**
 
 **detail**: `object`, the credit card to remove as per doc/state.md's autofillCreditCardDetail
+
+
+
+### windowBlurred(appWindowId) 
+
+Dispatches a message when appWindowId loses focus
+
+**Parameters**
+
+**appWindowId**: `Number`, the unique id of the window
 
 
 

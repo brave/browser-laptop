@@ -151,8 +151,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     mainWindow.setFullScreen(true)
   }
 
-  mainWindow.on('focus', function () {
-    mainWindow.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
+  mainWindow.on('blur', function () {
+    appActions.windowBlurred(mainWindow.id)
   })
 
   mainWindow.on('resize', function (evt) {
@@ -392,6 +392,9 @@ const handleAppAction = (action) => {
     case AppConstants.APP_CLEAR_PASSWORDS:
       appState = appState.set('passwords', new Immutable.List())
       break
+    case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
+      appState = appState.setIn(['about', 'newtab'], action.newTabPageDetail)
+      break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
       if (action.siteDetail.constructor === Immutable.List) {
@@ -430,8 +433,8 @@ const handleAppAction = (action) => {
         appState = appState.set('downloads', downloads)
       }
       break
-    case AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS:
-      appState = appState.set('sites', siteUtil.clearSitesWithoutTags(appState.get('sites')))
+    case AppConstants.APP_CLEAR_HISTORY:
+      appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
       break
     case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
       appState = appState.set('defaultWindowWidth', action.size[0])
@@ -531,9 +534,8 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CLEAR_DATA:
       if (action.clearDataDetail.get('browserHistory')) {
-        handleAppAction({actionType: AppConstants.APP_CLEAR_SITES_WITHOUT_TAGS})
+        handleAppAction({actionType: AppConstants.APP_CLEAR_HISTORY})
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
-        BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW))
       }
       if (action.clearDataDetail.get('downloadHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS})
@@ -549,6 +551,14 @@ const handleAppAction = (action) => {
       if (action.clearDataDetail.get('allSiteCookies')) {
         const Filtering = require('../../app/filtering')
         Filtering.clearStorageData()
+      }
+      if (action.clearDataDetail.get('autocompleteData')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearAutocompleteData()
+      }
+      if (action.clearDataDetail.get('autofillData')) {
+        const Filtering = require('../../app/filtering')
+        Filtering.clearAutofillData()
       }
       break
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:

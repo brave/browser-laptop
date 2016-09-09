@@ -8,10 +8,12 @@ const AppConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
 const config = require('../constants/config')
 const settings = require('../constants/settings')
+const {cookieExceptions, localStorageExceptions} = require('../data/siteHacks')
 const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
 const { registerUserPrefs } = require('./userPrefs')
+const { getSetting } = require('../settings')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -32,7 +34,7 @@ const addContentSettings = (settingList, hostPattern, secondaryPattern = undefin
 const getPasswordManagerEnabled = (appState) => {
   let appSettings = appState.get('settings')
   if (appSettings) {
-    const passwordManager = appSettings.get(settings.ACTIVE_PASSWORD_MANAGER)
+    const passwordManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER, appSettings)
     if (typeof passwordManager === 'string') {
       return passwordManager === passwordManagers.BUILT_IN
     }
@@ -42,7 +44,7 @@ const getPasswordManagerEnabled = (appState) => {
 
 const getBlock3rdPartyStorage = (braveryDefaults) => {
   if (braveryDefaults.cookieControl === 'block3rdPartyCookie') {
-    return [
+    const contentSettings = [
       {
         setting: 'block',
         primaryPattern: '*',
@@ -60,6 +62,12 @@ const getBlock3rdPartyStorage = (braveryDefaults) => {
         secondaryPattern: config.coinbaseOrigin
       }
     ]
+    contentSettings.push(...localStorageExceptions.map((exceptionPair) => ({
+      setting: 'allow',
+      primaryPattern: exceptionPair[0],
+      secondaryPattern: exceptionPair[1]
+    })))
+    return contentSettings
   } else {
     return [
       {
@@ -111,6 +119,10 @@ const getContentSettingsFromSiteSettings = (appState) => {
     flashActive: [{
       setting: 'block',
       primaryPattern: '*'
+    }],
+    runInsecureContent: [{
+      setting: 'block',
+      primaryPattern: '*'
     }]
   }
 
@@ -123,11 +135,17 @@ const getContentSettingsFromSiteSettings = (appState) => {
       addContentSettings(contentSettings.javascript, hostPattern, '*',
         hostSetting.noScript ? 'block' : 'allow')
     }
+    if (typeof hostSetting.runInsecureContent === 'boolean') {
+      addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',
+        hostSetting.runInsecureContent ? 'allow' : 'block')
+    }
     if (hostSetting.cookieControl) {
       if (hostSetting.cookieControl === 'block3rdPartyCookie') {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'block')
         addContentSettings(contentSettings.cookies, hostPattern, parseSiteSettingsPattern(hostPattern), 'allow')
         addContentSettings(contentSettings.referer, hostPattern, '*', 'block')
+        cookieExceptions.forEach((exceptionPair) =>
+          addContentSettings(contentSettings.cookies, exceptionPair[0], exceptionPair[1], 'allow'))
       } else {
         addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
         addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')

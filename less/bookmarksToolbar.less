@@ -6,10 +6,10 @@
 
 :root {
   --bookmark-item-max-width: 100px;
-  --bookmark-item-padding: 5px;
+  --bookmark-item-padding: 4px;
   --bookmark-item-margin: 3px;
   --bookmark-item-chevron-margin: 4px;
-  --bookmark-item-font-size: 11px;
+  --bookmark-item-font-size: 16px;
   --bookmarks-toolbar-padding: 10px;
 }
 
@@ -80,12 +80,8 @@
       padding: 2px 4px;
       margin: auto 0px;
 
-      .bookmarkFavicon {
+      .bookmarkFavicon, .bookmarkFile {
         margin-right: 0px;
-      }
-
-      .bookmarkFolder {
-        margin-right: 4px;
       }
     }
 
@@ -102,7 +98,15 @@
     }
 
     .bookmarkFolder {
-      font-size: @bookmarksIconSize;
+      font-size: @bookmarksFolderIconSize;
+      text-align: center;
+      color: @darkGray;
+    }
+
+    .bookmarkFile {
+      font-size: @bookmarksFileIconSize;
+      text-align: center;
+      color: @darkGray;
     }
 
     .bookmarkFolderChevron {

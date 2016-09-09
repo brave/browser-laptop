@@ -124,6 +124,13 @@ const AboutActions = {
     ipc.send(messages.SET_CLIPBOARD, text)
   },
 
+  setNewTabDetail: function (newTabPageDetail) {
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_CHANGE_NEW_TAB_DETAIL,
+      newTabPageDetail
+    })
+  },
+
   deletePassword: function (password) {
     AboutActions.dispatchAction({
       actionType: AppConstants.APP_REMOVE_PASSWORD,

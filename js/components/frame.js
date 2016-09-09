@@ -15,7 +15,7 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
 const messages = require('../constants/messages.js')
 const contextMenus = require('../contextMenus')
-const siteHacks = require('../data/siteHacks')
+const {siteHacks} = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const clipboard = global.require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
@@ -76,7 +76,7 @@ class Frame extends ImmutableComponent {
   updateAboutDetails () {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
-      ipc.send(messages.CHECK_BITCOIN_HANDLER)
+      ipc.send(messages.CHECK_BITCOIN_HANDLER, FrameStateUtil.getPartition(this.frame))
       const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).toJS()
       this.webview.send(messages.LEDGER_UPDATED, ledgerData)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
@@ -114,6 +114,7 @@ class Frame extends ImmutableComponent {
         addresses.forEach((entry) => {
           const guid = entry.get(partition)
           const address = currentWindow.webContents.session.autofill.getProfile(guid)
+          const valid = Object.getOwnPropertyNames(address).length > 0
           let addressDetail = {
             name: address.full_name,
             organization: address.company_name,
@@ -126,7 +127,11 @@ class Frame extends ImmutableComponent {
             email: address.email,
             guid: entry.toJS()
           }
-          list.push(addressDetail)
+          if (valid) {
+            list.push(addressDetail)
+          } else {
+            appActions.removeAutofillAddress(addressDetail)
+          }
         })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
@@ -136,6 +141,7 @@ class Frame extends ImmutableComponent {
         creditCards.forEach((entry) => {
           const guid = entry.get(partition)
           const creditCard = currentWindow.webContents.session.autofill.getCreditCard(guid)
+          const valid = Object.getOwnPropertyNames(creditCard).length > 0
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
@@ -143,7 +149,11 @@ class Frame extends ImmutableComponent {
             year: creditCard.expiration_year,
             guid: entry.toJS()
           }
-          list.push(creditCardDetail)
+          if (valid) {
+            list.push(creditCardDetail)
+          } else {
+            appActions.removeAutofillCreditCard(creditCardDetail)
+          }
         })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
@@ -156,13 +166,13 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview || this.webview.allowRunningInsecureContent !== this.allowRunningInsecureContent() ||
-      !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
+    return !this.webview || !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
   }
 
-  allowRunningInsecureContent () {
-    let hack = siteHacks[urlParse(this.props.location).hostname]
-    return !!(hack && hack.allowRunningInsecureContent)
+  runInsecureContent () {
+    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings, this.origin)
+    return activeSiteSettings === undefined
+      ? false : activeSiteSettings.get('runInsecureContent')
   }
 
   allowRunningPlugins (url) {
@@ -253,10 +263,6 @@ class Frame extends ImmutableComponent {
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
-    if (this.allowRunningInsecureContent()) {
-      this.webview.setAttribute('allowRunningInsecureContent', true)
-      this.webview.allowRunningInsecureContent = true
-    }
     if (this.allowRunningPlugins()) {
       this.webview.setAttribute('plugins', true)
       this.webview.allowRunningPlugins = true
@@ -343,9 +349,18 @@ class Frame extends ImmutableComponent {
       }
       this.webview.setActive(this.props.isActive)
       this.handleShortcut()
+
       // give focus when switching tabs
       if (this.props.isActive && !prevProps.isActive) {
-        this.webview.focus()
+        // If the tab we switch to is a new tab page, give focus
+        // to the UrlBar
+        if (this.props.location === 'about:newtab') {
+          windowActions.setUrlBarActive(true)
+          windowActions.setUrlBarSelected(false)
+        } else {
+          // If it is a regular webpage, just focus the webcontents
+          this.webview.focus()
+        }
       }
       // make sure the webview content updates to
       // match the fullscreen state of the frame
@@ -452,7 +467,9 @@ class Frame extends ImmutableComponent {
         break
       case 'view-source':
         const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
-        windowActions.newFrame({location: sourceLocation}, true)
+        if (sourceLocation !== null) {
+          windowActions.newFrame({location: sourceLocation}, true)
+        }
         // TODO: Make the URL bar show the view-source: prefix
         break
       case 'save':
@@ -573,6 +590,9 @@ class Frame extends ImmutableComponent {
       if (e.details[0] === 'javascript') {
         windowActions.setBlockedBy(this.frame, 'noScript', e.details[1])
       }
+    })
+    this.webview.addEventListener('did-block-run-insecure-content', (e) => {
+      windowActions.setBlockedRunInsecureContent(this.frame, this.props.location)
     })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.frame)
@@ -748,9 +768,12 @@ class Frame extends ImmutableComponent {
           interceptFlash(true, e.url)
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
-        const isSecure = parsedUrl.protocol === 'https:' && !this.allowRunningInsecureContent()
+        windowActions.setBlockedRunInsecureContent(this.frame)
+        const isSecure = parsedUrl.protocol === 'https:' && !this.runInsecureContent()
+        const runInsecureContent = parsedUrl.protocol === 'https:' && this.runInsecureContent()
         windowActions.setSecurityState(this.frame, {
-          secure: isSecure
+          secure: isSecure,
+          runInsecureContent: runInsecureContent
         })
         if (isSecure) {
           // Check that there isn't a cert error.

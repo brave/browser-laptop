@@ -164,23 +164,24 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.updateSuggestions(parseInt(e.target.dataset.index, 10))
   }
 
-  componentWillUpdate (prevProps) {
+  componentWillUpdate (nextProps) {
     if (this.selectedElement) {
       this.selectedElement.scrollIntoView()
     }
 
     // If both the URL is the same and the number of sites to consider is
     // the same then we don't need to regenerate the suggestions list.
-    if (this.props.urlLocation === prevProps.urlLocation &&
-        this.props.sites.size === prevProps.sites.size) {
+    if (this.props.urlLocation === nextProps.urlLocation &&
+        this.props.sites.size === nextProps.sites.size) {
       return
     }
-    this.suggestionList = this.getNewSuggestionList()
-    this.searchXHR()
+    this.suggestionList = this.getNewSuggestionList(nextProps)
+    this.searchXHR(nextProps)
   }
 
-  getNewSuggestionList () {
-    if (!this.props.urlLocation && !this.props.urlPreview) {
+  getNewSuggestionList (props) {
+    props = props || this.props
+    if (!props.urlLocation && !props.urlPreview) {
       return null
     }
 
@@ -210,7 +211,7 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
     }
 
-    const urlLocationLower = this.props.urlLocation.toLowerCase()
+    const urlLocationLower = props.urlLocation.toLowerCase()
     let suggestions = new Immutable.List()
     const defaultme = (x) => x
     const mapListToElements = ({data, maxResults, type, clickHandler = navigateClickHandler,
@@ -258,7 +259,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // bookmarks
     if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
-        data: this.props.sites,
+        data: props.sites,
         maxResults: config.urlBarSuggestions.maxBookmarkSites,
         type: suggestionTypes.BOOKMARK,
         clickHandler: navigateClickHandler((site) => {
@@ -280,7 +281,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     // history
     if (getSetting(settings.HISTORY_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
-        data: this.props.sites,
+        data: props.sites,
         maxResults: config.urlBarSuggestions.maxHistorySites,
         type: suggestionTypes.HISTORY,
         clickHandler: navigateClickHandler((site) => {
@@ -318,20 +319,20 @@ class UrlBarSuggestions extends ImmutableComponent {
         formatTitle: (frame) => frame.get('title'),
         formatUrl: (frame) => frame.get('location'),
         filterValue: (frame) => !isSourceAboutUrl(frame.get('location')) &&
-          frame.get('key') !== this.props.activeFrameKey &&
+          frame.get('key') !== props.activeFrameKey &&
           (frame.get('title') && frame.get('title').toLowerCase().includes(urlLocationLower) ||
           frame.get('location') && frame.get('location').toLowerCase().includes(urlLocationLower))}))
     }
 
     // Search suggestions
-    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS) && this.props.searchResults) {
+    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS) && props.searchResults) {
       suggestions = suggestions.concat(mapListToElements({
-        data: this.props.searchResults,
+        data: props.searchResults,
         maxResults: config.urlBarSuggestions.maxSearch,
         type: suggestionTypes.SEARCH,
         clickHandler: navigateClickHandler((searchTerms) => {
-          let searchURL = this.props.searchSelectEntry
-          ? this.props.searchSelectEntry.search : this.props.searchDetail.get('searchURL')
+          let searchURL = props.searchSelectEntry
+          ? props.searchSelectEntry.search : props.searchDetail.get('searchURL')
           return searchURL.replace('{searchTerms}', encodeURIComponent(searchTerms))
         })
       }))
@@ -365,19 +366,20 @@ class UrlBarSuggestions extends ImmutableComponent {
     windowActions.setUrlBarSuggestions(suggestions, newIndex)
   }
 
-  searchXHR () {
-    let autocompleteURL = this.props.searchSelectEntry
-    ? this.props.searchSelectEntry.autocomplete : this.props.searchDetail.get('autocompleteURL')
+  searchXHR (props) {
+    props = props || this.props
+    let autocompleteURL = props.searchSelectEntry
+    ? props.searchSelectEntry.autocomplete : props.searchDetail.get('autocompleteURL')
     if (!getSetting(settings.OFFER_SEARCH_SUGGESTIONS) || !autocompleteURL) {
       windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
-      this.updateSuggestions(this.props.selectedIndex)
+      this.updateSuggestions(props.selectedIndex)
       return
     }
 
-    let urlLocation = this.props.urlLocation
+    let urlLocation = props.urlLocation
     if (!isUrl(urlLocation) && urlLocation.length > 0) {
-      if (this.props.searchSelectEntry) {
-        const replaceRE = new RegExp('^' + this.props.searchSelectEntry.shortcut + ' ', 'g')
+      if (props.searchSelectEntry) {
+        const replaceRE = new RegExp('^' + props.searchSelectEntry.shortcut + ' ', 'g')
         urlLocation = urlLocation.replace(replaceRE, '')
       }
       const xhr = new window.XMLHttpRequest({mozSystem: true})
@@ -387,11 +389,11 @@ class UrlBarSuggestions extends ImmutableComponent {
       xhr.send()
       xhr.onload = () => {
         windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
-        this.updateSuggestions(this.props.selectedIndex)
+        this.updateSuggestions(props.selectedIndex)
       }
     } else {
       windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
-      this.updateSuggestions(this.props.selectedIndex)
+      this.updateSuggestions(props.selectedIndex)
     }
   }
 }
