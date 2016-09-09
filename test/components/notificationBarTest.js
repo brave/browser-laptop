@@ -46,7 +46,7 @@ describe('notificationBar', function () {
       .loadUrl(this.notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
-      .element('.notificationItem:nth-Child(1) .notificationOptions')
+      .element('.notificationItem:nth-Child(1) .options')
       .click('button=Deny')
       .moveToObject(activeWebview)
       .waitForExist(titleBar)

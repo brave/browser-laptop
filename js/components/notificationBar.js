@@ -33,8 +33,14 @@ class NotificationItem extends ImmutableComponent {
   render () {
     let i = 0
     const options = this.props.detail.get('options')
+    const greeting = this.props.detail.get('greeting')
     return <div className='notificationItem'>
-      <span className='notificationMessage'>{this.props.detail.get('message')}</span>
+      {
+        greeting
+          ? <span className='greeting'>{greeting}</span>
+          : null
+      }
+      <span className='message'>{this.props.detail.get('message')}</span>
       <span className='notificationAdvanced'>
         {
           options.get('advancedText') && options.get('advancedLink')
@@ -42,7 +48,7 @@ class NotificationItem extends ImmutableComponent {
             : null
         }
       </span>
-      <span className='notificationOptions'>
+      <span className='options'>
         {
           options.get('persist')
             ? <span id='rememberOption'>
@@ -55,7 +61,7 @@ class NotificationItem extends ImmutableComponent {
           this.props.detail.get('buttons').map((button) =>
             <button
               type='button'
-              className='notificationButton'
+              className='button'
               onClick={this.clickHandler.bind(this, i++)}>{button}</button>
           )
         }
@@ -77,7 +83,8 @@ class NotificationBar extends ImmutableComponent {
       return null
     }
 
-    return <div className='notificationBar'>
+    const style = 'notificationBar ' + (activeNotifications.get(0).get('options').get('style') || '')
+    return <div className={style}>
     {
       activeNotifications.takeLast(3).map((notificationDetail) =>
         <NotificationItem detail={notificationDetail} />

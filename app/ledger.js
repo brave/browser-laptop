@@ -1222,21 +1222,23 @@ const showNotifications = () => {
         balance + unconfirmed < 0.9 * Number(ledgerInfo.btc)) {
       addFundsMessage = addFundsMessage || locale.translation('addFundsNotification')
       appActions.showMessageBox({
+        greeting: locale.translation('updateHello'),
         message: addFundsMessage,
         buttons: [locale.translation('updateLater'),
           locale.translation('addFunds')],
         options: {
-          updateStyle: true, // TODO: Show this in the style of updateBar.less
+          style: 'greetingStyle',
           persist: false
         }
       })
     } else if (!reconciliationNotificationShown) {
       reconciliationMessage = reconciliationMessage || locale.translation('reconciliationNotification')
       appActions.showMessageBox({
+        greeting: locale.translation('updateHello'),
         message: reconciliationMessage,
         buttons: [locale.translation('reviewSites')],
         options: {
-          updateStyle: true,
+          style: 'greetingStyle',
           persist: false
         }
       })

@@ -127,9 +127,10 @@ AppStore
     buttons: Array<string>,
     frameOrigin: (string|undefined), // origin that the notification is from, or undefined if not applicable.
     options: {
-      persist: boolean, // whether to show a 'Remember this decision' checkbox
       advancedText: string, // more info text
       advancedLink: string, // more info link URL
+      persist: boolean, // whether to show a 'Remember this decision' checkbox
+      style: string // css class for notification bar. See notificationBar.less
     }
   }], // the notifications for the frame. not preserved across restart.
   settings: [{

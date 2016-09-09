@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import "variables.less";
+@import (reference) "button.less";
 
 .notificationBar {
   background-color: #ffefc0;
@@ -11,33 +12,49 @@
   width: 100%;
   padding: 6px 0;
 
+  // e.g. Update available bar
+  &.greetingStyle {
+    background-color: #fff;
+    border-bottom: 1px solid #888;
+    padding: 6px 8px;
+
+    .notificationItem {
+      padding: 2px 24px 2px 12px;
+
+      .button {
+        .browserButton();
+
+        background-color: #eee;
+        border-style: none;
+        float: right;
+        font-size: 14px;
+        height: 25px;
+        line-height: 27px;
+        margin: auto 4px;
+        padding: 0px 25px;
+        width: auto;
+
+        &.primary {
+          background-color: @braveOrange;
+          color: #fff;
+          margin-right: 0px;
+
+          &:hover {
+            background-color: lighten(@braveOrange, 10%);
+            color: #fff !important;
+          }
+          &:active {
+            background-color: darken(@braveOrange, 10%);
+            color: #fff !important;
+          }
+        }
+      }
+    }
+  }
+
   .notificationItem {
-    padding: 0 12px;
+    padding: 0 12px 0 20px;
     line-height: 24px;
-
-    .notificationMessage {
-      color: #000;
-      font-size: 15px;
-      margin: auto 0;
-    }
-
-    .notificationSecondaryButton {
-      background-color: #eee;
-    }
-
-    .notificationButton {
-      padding: 2px 15px;
-      width: auto;
-      margin-right: 10px;
-    }
-
-    .notificationOptions {
-      float: right;
-    }
-
-    .notificationSpacer {
-      flex-grow: 1;
-    }
 
     label {
       font-size: 15px;
@@ -50,8 +67,38 @@
       margin: 0 3px;
     }
 
-    button {
+    .button {
       font-size: 13px;
+      margin-right: 10px;
+      padding: 2px 15px;
+      width: auto;
+    }
+
+    .greeting {
+      color: @braveOrange;
+      font-size: 16px;
+      margin: auto 10px auto 0;
+    }
+
+    .message {
+      color: #000;
+      font-size: 15px;
+      margin: auto 0;
+
+      &.secondary {
+        color: #888;
+        font-size: 14px;
+        padding: 0;
+        margin: auto 0 auto 10px;
+      }
+    }
+
+    .options {
+      float: right;
+    }
+
+    .spacer {
+      flex-grow: 1;
     }
 
     .notificationAdvanced {

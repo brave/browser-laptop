@@ -3,69 +3,12 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import "variables.less";
+@import (reference) "notificationBar.less";
 
 .updateBar {
-  background-color: #fff;
-  border-bottom: 1px solid #888;
-  padding: 8px 20px;
+  &:extend(.notificationBar.greetingStyle);
+  .notificationBar .notificationItem();
+  .notificationBar.greetingStyle  .notificationItem();
 
-  span.browserButton {
-    font-size: 14px;
-    line-height: 27px;
-    height: 25px;
-  }
-
-  >div {
-    display: flex;
-  }
-
-  .updateHello {
-    color: @braveOrange;
-    font-size: 16px;
-    margin: auto 0;
-  }
-
-  .updateMessage {
-    color: #000;
-    font-size: 15px;
-    padding-left: 10px;
-    margin: auto 0;
-  }
-
-  .updateSecondaryButton {
-    background-color: #eee;
-  }
-
-  .updateButton {
-    padding: 0px 25px;
-    float: right;
-    font-size: 14px;
-    width: auto;
-    margin: auto 4px;
-  }
-
-  .updateRequiresRelaunch {
-    color: #888;
-    font-size: 14px;
-    margin: auto 0 auto 10px;
-  }
-
-  .updateSpacer {
-    flex-grow: 1;
-  }
-
-  .updateNowButton {
-    background-color: @braveOrange;
-    color: #fff;
-    margin-right: 0px;
-
-    &:hover {
-      background-color: lighten(@braveOrange, 10%);
-      color: #fff !important;
-    }
-    &:active {
-      background-color: darken(@braveOrange, 10%);
-      color: #fff !important;
-    }
-  }
+  padding: 8px 16px 8px 20px;
 }
