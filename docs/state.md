@@ -274,7 +274,7 @@ WindowStore
       },
       isExtendedValidation: boolean, // is using https ev
       runInsecureContent: boolean, // has active mixed content
-      blockedRunInsecureContent: string, // first domain of blocked active mixed content
+      blockedRunInsecureContent: Array<string> // sources of blocked active mixed content
     },
     parentFrameKey: number, // the key of the frame this frame was opened from
     modalPromptDetail: {...},

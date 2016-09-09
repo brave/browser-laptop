@@ -19,9 +19,9 @@ class SiteInfo extends ImmutableComponent {
     this.onDenyRunInsecureContent = this.onDenyRunInsecureContent.bind(this)
   }
   onAllowRunInsecureContent () {
-    appActions.changeSiteSetting(siteUtil.getOrigin(this.isBlockedRunInsecureContent),
+    appActions.changeSiteSetting(siteUtil.getOrigin(this.location),
       'runInsecureContent', true, this.isPrivate)
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.isBlockedRunInsecureContent)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.location)
     this.props.onHide()
   }
   onDenyRunInsecureContent () {

@@ -764,8 +764,11 @@ const doAction = (action) => {
       const blockedRunInsecureContentPath =
         ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
       if (action.source) {
+        let blockedList = windowState.getIn(
+          blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent'])) || new Immutable.List()
         windowState =
-          windowState.setIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']), action.source)
+          windowState.setIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']),
+            blockedList.push(action.source))
       } else {
         windowState =
           windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))

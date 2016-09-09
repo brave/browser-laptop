@@ -755,7 +755,7 @@ Sets the manage autofill credit card popup detail
 
 ### setBlockedRunInsecureContent(frameProps, source) 
 
-Sets page url with blocked active mixed content.
+Sets source of blocked active mixed content.
 
 **Parameters**
 
