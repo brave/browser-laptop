@@ -8,7 +8,6 @@ const ImmutableComponent = require('../components/immutableComponent')
 class NewTabPage extends ImmutableComponent {
   render () {
     // TODO: Implement some kind of tiles based new tab page
-    return <div />
   }
 }
 
