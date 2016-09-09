@@ -31,7 +31,7 @@
 .dashlane-dialog .form-container{padding-bottom:36px;background-color:#f7f7f7}.dashlane-dialog .header{padding:22px 24px 0}
 .dashlane-dialog .header-img{float:left;margin-top:-3px;margin-left:-4px;background:red;padding-top:52px;padding-left:52px;background:url('assets/dashlane_ico_52.png')}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.dashlane-dialog .header-img{background:url('assets/dashlane_ico_102.png');background-size:52px 52px}
-}.dashlane-dialog .header-text{font-family:'Helvetica Neue','Arial';font-size:18px;line-height:24px;margin-left:59px;font-weight:normal;cursor:default}
+}.dashlane-dialog .header-text{font-family:'Helvetica Neue','Helvetica','Arial',sans-serif;font-size:18px;line-height:24px;margin-left:59px;font-weight:normal;cursor:default}
 .dashlane-dialog .form-top{margin-top:24px;padding:0 24px}.dashlane-dialog .form-bottom{margin-top:14px;padding:0 24px}
 .dashlane-dialog .footer{padding:26px 24px 26px 24px;min-height:16px}.dashlane-dialog .other-link{color:#343434;cursor:pointer}
 .dashlane-dialog .other-link:hover{text-decoration:underline}.dashlane-dialog .popup-button{border:1px solid rgba(0,0,0,0.15);border-radius:5px;padding:7px 11px 7px 11px;cursor:pointer;margin-left:8px;background-color:white;margin-top:-8px;margin-bottom:8px;outline:0;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
@@ -120,64 +120,60 @@ body.popover #save-arrow{display:none}.form-error{border:1px solid red!important
 .card-add:hover{cursor:pointer;border-color:white}.card-add svg{position:absolute;width:27px;height:24px;top:7px;left:7px;fill:#14697f}
 .card-add svg .add-main-icon{fill:#14697f}.card-add svg .add-circle-icon{fill:#20b422}
 .card-add svg .add-plus-icon{fill:white}.card-add .card-title{position:absolute;top:12px;left:44px}
+.top-of-wallet-separator{padding:0 8px;padding-top:1px;clear:both;color:#8b8b8b}
+.top-of-wallet-separator hr{border:0;margin:0;height:1px;background:#525252}.top-of-wallet-separator p{margin:5px 0 10px 0;font-size:10px;text-transform:uppercase}
 img.bank-logo{display:none}.loading-placeholder{position:absolute;top:.75px;left:8.25px;right:8.25px;bottom:14.25px;background-color:#f2f2f2;border-radius:6px}
-.expired-container{position:absolute;top:11.25px;right:7.5px;opacity:.88;padding:3.75px 6.75px 3px 5.25px;line-height:8.25px;background-color:#ff0f10;border-bottom-left-radius:2px;border-top-left-radius:2px;color:#fff;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+.expired-container{position:absolute;top:18.75px;right:0;width:100%;opacity:.8;padding:3px 9px 2.25px 0;font-size:8px;font-weight:bold;line-height:6.75px;background-color:#fa1400;color:#fff;text-align:right;text-overflow:ellipsis;white-space:nowrap}
 .fancy-card{cursor:pointer}.card-last-line .fancy-card{margin-bottom:-13.5px}.fancy-card .hover-mask{position:relative;width:92%;height:88%;left:4%;border-radius:6px;-webkit-transition:background 100ms ease-out;transition:background 100ms ease-out}
-.fancy-card:hover .hover-mask{background:rgba(0,0,0,0.15)}.payment-card{font-size:10px;position:relative;width:198px;height:120.75px;color:white}
-.payment-card .payment-card-bg{position:absolute;width:198px;height:120.75px}.payment-card .payment-card-bg.white,.payment-card .payment-card-bg.silver{color:black}
-.payment-card .payment-card-bg.white .payment-card-name,.payment-card .payment-card-bg.silver .payment-card-name,.payment-card .payment-card-bg.white .expire-label,.payment-card .payment-card-bg.silver .expire-label{text-shadow:0 -1px 0 rgba(255,255,255,0.5)}
-.payment-card .payment-card-bg.amexgreen{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_amexgreen.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.amexgreen{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_amexgreen@2x.png")}
-}.payment-card .payment-card-bg.black{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_black.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.black{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_black@2x.png")}
-}.payment-card .payment-card-bg.blue{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_blue.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.blue{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_blue@2x.png")}
-}.payment-card .payment-card-bg.gold{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_gold.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.gold{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_gold@2x.png")}
-}.payment-card .payment-card-bg.green{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_green.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.green{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_green@2x.png")}
-}.payment-card .payment-card-bg.navy{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_navy.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.navy{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_navy@2x.png")}
-}.payment-card .payment-card-bg.orange{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_orange.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.orange{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_orange@2x.png")}
-}.payment-card .payment-card-bg.red{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_red.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.red{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_red@2x.png")}
-}.payment-card .payment-card-bg.silver{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_silver.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.silver{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_silver@2x.png")}
-}.payment-card .payment-card-bg.white{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_white.png");background-size:198px 120.75px}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-bg.white{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/creditCards/card_design_white@2x.png")}
-}.payment-card .loading-placeholder.amexgreen{background-color:#697a68}.payment-card .loading-placeholder.black{background-color:#444}
-.payment-card .loading-placeholder.blue{background-color:#377cb6}.payment-card .loading-placeholder.gold{background-color:#c9b279}
-.payment-card .loading-placeholder.green{background-color:#199177}.payment-card .loading-placeholder.navy{background-color:#2646f2}
-.payment-card .loading-placeholder.orange{background-color:#e29524}.payment-card .loading-placeholder.red{background-color:#d9303a}
-.payment-card .loading-placeholder.silver{background-color:#c3c3c3}.payment-card .loading-placeholder.white{background-color:#f1f1f1}
-.payment-card .payment-card-logos{position:absolute;top:6.75px;left:17.25px;right:14.25px;height:28.5px}
-.payment-card .payment-card-logos .payment-card-bank{position:absolute;top:0;float:left;height:100%;vertical-align:middle}
-.payment-card .payment-card-logos .payment-card-type{position:absolute;top:0;right:0;height:100%;vertical-align:middle}
-.payment-card .payment-card-logos .alignHelper{display:inline-block;height:100%;vertical-align:middle}
-.payment-card .payment-card-logos .payment-type-white-background{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;height:24.75px;width:38.25px;background-color:white;border-radius:3px;text-align:center}
-.payment-card .payment-card-logos .payment-type-white-background div{width:80%;height:80%;margin:auto;background-size:contain;background-position:50%;background-repeat:no-repeat}
-.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_AMEX div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_AMEX.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_AMEX div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_AMEX@2x.png")}
-}.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_DINERSCLUB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DINERSCLUB.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_DINERSCLUB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DINERSCLUB@2x.png")}
-}.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_DISCOVER div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DISCOVER.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_DISCOVER div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DISCOVER@2x.png")}
-}.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_JCB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_JCB.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_JCB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_JCB@2x.png")}
-}.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_MASTERCARD div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_MASTERCARD.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_MASTERCARD div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_MASTERCARD@2x.png")}
-}.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_PAYPAL div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_PAYPAL.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_PAYPAL div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_PAYPAL@2x.png")}
-}.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_VISA div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_VISA.png")}
-@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-logos .payment-type-white-background.PAYMENT_TYPE_VISA div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_VISA@2x.png")}
-}.payment-card .payment-card-logos .payment-card-type img,.payment-card .payment-card-logos .payment-card-bank img{vertical-align:middle;margin-left:-2.25px}
-.payment-card .payment-card-number,.payment-card .payment-card-expiration-date>.date,.payment-card .payment-card-owner-name{color:white;font-family:'Courier New';text-shadow:1px 1px 1px rgba(0,0,0,0.8)}
-.payment-card .payment-card-number{position:absolute;top:40.5px;left:17.25px;right:14.25px;text-align:center;font-size:14.25px;text-transform:uppercase;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
-.payment-card .payment-card-name{position:absolute;top:57px;right:18.75px;max-width:112.5px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
-.payment-card .payment-card-name,.payment-card .expire-label{text-shadow:0 -1px 0 rgba(0,0,0,0.5)}
-.payment-card .payment-card-expiration-date{position:absolute;bottom:35.25px;left:17.25px}
-.payment-card .payment-card-expiration-date span.date{padding-left:2.25px}.payment-card .payment-card-owner-name{position:absolute;bottom:21.75px;left:17.25px;text-transform:uppercase;max-width:165px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.fancy-card:hover .hover-mask{background:rgba(0,0,0,0.15)}.payment-card{position:relative;width:198px;height:120.75px;font-size:9.375px;font-family:Helvetica,Arial,sans-serif;font-weight:400}
+.payment-card .payment-card-container{position:absolute;top:1px;left:8px;width:181.5px;height:106.5px;border-radius:6px;overflow:hidden}
+.payment-card .payment-card-container.dark{color:white;text-shadow:0 .375px .75px rgba(0,0,0,0.4)}
+.payment-card .payment-card-container.light{color:#3b3b3b;text-shadow:0 .375px .375px rgba(255,255,255,0.6)}
+.payment-card .payment-card-container.rounded_bottom_right_corner{border-bottom-right-radius:49.5px}
+.payment-card .payment-card-container .expired-container{text-shadow:none}.payment-card .payment-card-container .payment-card-bg-element{position:absolute;border-radius:6px;width:100%;height:100%;background-size:100%}
+.payment-card .payment-card-container .payment-card-bg-plain-color{box-shadow:inset 0 0 37.5px 0 rgba(0,0,0,0.15);background-color:#1c70b7}
+.payment-card .payment-card-container .payment-card-bg-plain-color.black{background-color:#3b3b3b}
+.payment-card .payment-card-container .payment-card-bg-plain-color.blue_1{background-color:#1c70b7}
+.payment-card .payment-card-container .payment-card-bg-plain-color.blue_2{background-color:#0e42f8}
+.payment-card .payment-card-container .payment-card-bg-plain-color.gold{background-color:#c9ab63}
+.payment-card .payment-card-container .payment-card-bg-plain-color.green_1{background-color:#82ba3d}
+.payment-card .payment-card-container .payment-card-bg-plain-color.green_2{background-color:#009374}
+.payment-card .payment-card-container .payment-card-bg-plain-color.orange{background-color:#f29100}
+.payment-card .payment-card-container .payment-card-bg-plain-color.red{background-color:#d40000}
+.payment-card .payment-card-container .payment-card-bg-plain-color.silver{background-color:#c0c0c0}
+.payment-card .payment-card-container .payment-card-bg-plain-color.white{background-color:#f0f0f0;border:solid .75px #d1d1d1;width:180px;height:105px}
+.payment-card .payment-card-container .payment-card-content{position:absolute;width:163.5px;height:88.5px;margin:9px}
+.payment-card .payment-card-container .payment-card-logos{position:absolute;top:9px;left:9px;right:9px;height:28.5px}
+.payment-card .payment-card-container .payment-card-logos .payment-card-bank{position:absolute;top:0;float:left;height:100%;vertical-align:middle}
+.payment-card .payment-card-container .payment-card-logos .payment-card-type{position:absolute;top:0;right:0;height:100%;vertical-align:middle}
+.payment-card .payment-card-container .payment-card-logos .alignHelper{display:inline-block;height:100%;vertical-align:middle}
+.payment-card .payment-card-container .payment-card-logos .payment-type-container{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;height:24.75px;width:38.25px;border-radius:3px;text-align:center}
+.payment-card .payment-card-container .payment-card-logos .payment-type-container div{width:80%;height:80%;margin:auto;background-size:contain;background-position:50%;background-repeat:no-repeat}
+.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_AMEX div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_AMEX.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_AMEX div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_AMEX@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_DINERSCLUB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DINERSCLUB.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_DINERSCLUB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DINERSCLUB@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_DISCOVER div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DISCOVER.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_DISCOVER div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_DISCOVER@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_JCB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_JCB.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_JCB div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_JCB@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_MASTERCARD div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_MASTERCARD.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_MASTERCARD div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_MASTERCARD@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_PAYPAL div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_PAYPAL.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_PAYPAL div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_PAYPAL@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_VISA div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_VISA.png")}
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.payment-card .payment-card-container .payment-card-logos .payment-type-container.PAYMENT_TYPE_VISA div{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/paymentTypes/PAYMENT_TYPE_VISA@2x.png")}
+}.payment-card .payment-card-container .payment-card-logos .payment-card-type img,.payment-card .payment-card-container .payment-card-logos .payment-card-bank img{vertical-align:middle;margin-left:-2.25px}
+.payment-card .payment-card-container .payment-card-number{position:absolute;bottom:31.5px;left:0;font-size:13.5px;text-transform:uppercase;font-family:"Courier New",Courier,monospace;width:163.5px;max-width:163.5px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.payment-card .payment-card-container.dark .payment-card-number{text-shadow:0 1.125px .75px rgba(0,0,0,0.4)}
+.payment-card .payment-card-container .payment-card-expiration-date{position:absolute;bottom:13.5px;left:0;max-width:56.25px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.payment-card .payment-card-container .payment-card-expiration-date span.date{padding-left:3px}
+.payment-card .payment-card-container .payment-card-name{position:absolute;bottom:13.5px;left:60.75px;max-width:102.75px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.payment-card .payment-card-container .payment-card-owner-name{position:absolute;bottom:0;left:0;max-width:163.5px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.payment-card .payment-card-container .hover-mask{position:absolute;width:100%;height:100%;top:0;left:0}
+.fancy-card.message{padding:1px 8px 0;height:119.75px;width:182px;color:white}.fancy-card.message .container{width:181.5px;height:106.5px;overflow:hidden}
+.fancy-card.message .container h2{margin:0;margin-bottom:8px;color:#8b8b8b;text-transform:uppercase;font-weight:300;font-size:10px}
+.fancy-card.message .container h1{margin:0;margin-bottom:6px;font-size:14px}.fancy-card.message .container p{margin:0;font-size:12px}
 .bank-statement{font-size:10px;position:relative;width:198px;height:120.75px;color:#424242}
 .bank-statement .loading-placeholder{top:9px}.bank-statement .bank-statement-bg{position:absolute;width:198px;height:120.75px;background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/card_design_account.png");background-size:198px 120.75px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.bank-statement .bank-statement-bg{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/payments/card_design_account@2x.png")}
@@ -201,7 +197,7 @@ img.bank-logo{display:none}.loading-placeholder{position:absolute;top:.75px;left
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.id-card-bg.FR{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs%20custom/id_FR@2x.png")}
 }.id-card-bg.FR .id-card-title,.id-card-bg.FR .id-card-owner-name,.id-card-bg.FR .id-card-birth-date,.id-card-bg.FR .id-card-number{position:absolute;left:17.25px;color:#424242;max-width:153.75px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
 .id-card-bg.FR .id-card-title{top:20.25px;font-weight:bold}.id-card-bg.FR .id-card-owner-name{top:33.75px}
-.id-card-bg.FR .id-card-birth-date{top:47.25px}.id-card-bg.FR .id-card-number{top:88.5px;right:15px;text-align:center;font-family:'Courier New';font-size:12px;color:#575757}
+.id-card-bg.FR .id-card-birth-date{top:47.25px}.id-card-bg.FR .id-card-number{top:88.5px;right:15px;text-align:center;font-family:'Courier New',monospace;font-size:12px;color:#575757}
 .id-card-bg.generic{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs/id_generic.png");background-size:198px 120.75px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.id-card-bg.generic{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs/id_generic@2x.png")}
 }.id-card-bg.generic .id-card-title,.id-card-bg.generic .id-card-owner-name,.id-card-bg.generic .id-card-birth-date,.id-card-bg.generic .id-card-number{position:absolute;left:17.25px;color:#424242;max-width:153.75px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
@@ -258,12 +254,12 @@ img.bank-logo{display:none}.loading-placeholder{position:absolute;top:.75px;left
 .social-security .social-security-bg.FR .social-security-number,.social-security .social-security-bg.FR .social-security-title{display:none}
 .social-security .social-security-bg.GB{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs%20custom/insurance_GB.png");background-size:198px 120.75px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.social-security .social-security-bg.GB{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs%20custom/insurance_GB@2x.png")}
-}.social-security .social-security-bg.GB .social-security-name{bottom:22.5px;left:30px;right:30px;color:white;font-family:'Courier New';overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap}
-.social-security .social-security-bg.GB .social-security-number{top:63px;left:30px;right:30px;color:#676767;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New';font-size:14.25px}
+}.social-security .social-security-bg.GB .social-security-name{bottom:22.5px;left:30px;right:30px;color:white;font-family:'Courier New',monospace;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+.social-security .social-security-bg.GB .social-security-number{top:63px;left:30px;right:30px;color:#676767;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace;font-size:14.25px}
 .social-security .social-security-bg.GB .social-security-title{display:none}.social-security .social-security-bg.US{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs%20custom/insurance_US.png");background-size:198px 120.75px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.social-security .social-security-bg.US{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs%20custom/insurance_US@2x.png")}
 }.social-security .social-security-bg.US .social-security-name{bottom:23.25px;left:30px;right:30px;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;color:#424242}
-.social-security .social-security-bg.US .social-security-number{top:54px;left:30px;right:30px;color:#676767;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New';font-size:14.25px;color:#424242}
+.social-security .social-security-bg.US .social-security-number{top:54px;left:30px;right:30px;color:#676767;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace;font-size:14.25px;color:#424242}
 .social-security .social-security-bg.US .social-security-title{display:none}.social-security .social-security-bg.generic{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs/tax_generic.png");background-size:198px 120.75px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.social-security .social-security-bg.generic{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs/tax_generic@2x.png")}
 }.social-security .social-security-bg.generic .social-security-name,.social-security .social-security-bg.generic .social-security-number,.social-security .social-security-bg.generic .social-security-title{left:16.5px;color:#424242}
@@ -272,7 +268,7 @@ img.bank-logo{display:none}.loading-placeholder{position:absolute;top:.75px;left
 .social-security .social-security-bg.generic .social-security-title{bottom:51px;font-weight:bold}
 .fiscal{font-size:10px;position:relative;width:198px;height:120.75px}.fiscal .fiscal-bg{position:absolute;width:198px;height:120.75px;background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs/tax_generic.png");background-size:198px 120.75px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){.fiscal .fiscal-bg{background-image:url("https://d34nsereb2h0yk.cloudfront.net/fancy-webcards/IDs/tax_generic@2x.png")}
-}.fiscal .fiscal-number{position:absolute;top:19.5px;left:22.5px;right:22.5px;color:#424242;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New';font-size:13.5px}
+}.fiscal .fiscal-number{position:absolute;top:19.5px;left:22.5px;right:22.5px;color:#424242;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace;font-size:13.5px}
 .fiscal .fiscal-title{color:#424242;position:absolute;bottom:24px;left:16.5px;font-weight:bold}
 #autofill-dropdown,#autologin-selection{position:relative;padding:18px 6px 18px 16px;z-index:0}
 #autofill-dropdown.fancy-cards,#autologin-selection.fancy-cards{padding:24px 6px 24px 15px}
@@ -304,8 +300,8 @@ body.popover #autofill-dropdown,body.popover #autologin-selection{background:rgb
 #purchase-receipt-wrapper{position:relative;width:460px;margin:auto}#purchase-receipt-wrapper #receipt-skeumorphism{overflow:hidden}
 #purchase-receipt-wrapper #receipt-skeumorphism svg{width:100%;height:6px;display:block}
 #purchase-receipt-wrapper #purchase-receipt div.header-text{min-height:50px}#purchase-receipt-wrapper #purchase-receipt .option-wrapper{margin-top:3px;margin-left:82px}
-#purchase-receipt-wrapper #purchase-receipt div.header-date{padding-left:10px;line-height:38px;font-family:'PT Mono','Courier New';cursor:default}
-#purchase-receipt-wrapper #purchase-receipt div.footer-total{padding-left:12px;line-height:38px;font-family:'Helvetica Neue','Arial';font-size:18px;cursor:default}
+#purchase-receipt-wrapper #purchase-receipt div.header-date{padding-left:10px;line-height:38px;font-family:'PT Mono','Courier New',monospace;cursor:default}
+#purchase-receipt-wrapper #purchase-receipt div.footer-total{padding-left:12px;line-height:38px;font-family:'Helvetica Neue','Helvetica','Arial',sans-serif;font-size:18px;cursor:default}
 #purchase-receipt-wrapper #purchase-receipt table{margin:0;padding:0;padding-top:12px}
 #purchase-receipt-wrapper #purchase-receipt table td.currenciesSelector .selectable-text{width:85px}
 #purchase-receipt-wrapper #purchase-receipt table td.currenciesSelector .selectable-list-dropdown{width:110px}
@@ -326,7 +322,7 @@ body.popover #autofill-dropdown,body.popover #autologin-selection{background:rgb
 #purchase-receipt-wrapper #purchase-receipt table td.quantityCol input{width:26px;padding-left:24px;text-align:right}
 #purchase-receipt-wrapper #purchase-receipt table td.quantityCol input:hover{background-repeat:no-repeat;background-position:5px 12px}
 #purchase-receipt-wrapper #purchase-receipt table td.quantityCol input:focus{background-color:#d4f3ff;background-image:none}
-#purchase-receipt-wrapper #purchase-receipt table td.priceCol{width:80px}#purchase-receipt-wrapper #purchase-receipt table td.priceCol input{width:89px;margin-right:10px;padding-left:5px;padding-right:5px;color:#00b8ff;text-align:right;font-family:'PT Mono','Courier New';font-weight:bold}
+#purchase-receipt-wrapper #purchase-receipt table td.priceCol{width:80px}#purchase-receipt-wrapper #purchase-receipt table td.priceCol input{width:89px;margin-right:10px;padding-left:5px;padding-right:5px;color:#00b8ff;text-align:right;font-family:'PT Mono','Courier New',monospace;font-weight:bold}
 #purchase-receipt-wrapper #purchase-receipt table td.priceCol input:hover{background:url('assets/pen_blue_ico_14.svg');background-repeat:no-repeat;background-position:5px 12px}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){#purchase-receipt-wrapper #purchase-receipt table td.priceCol .input:hover{background:url('assets/pen_blue_ico_28.svg');background-size:14px 14px}
 }#purchase-receipt-wrapper #purchase-receipt table td.priceCol input:focus{background-color:#d4f3ff;background-image:none}
@@ -354,7 +350,7 @@ body.popover #autofill-dropdown,body.popover #autologin-selection{background:rgb
 #autologin-selection .autologin-selection-container .card-AUTHENTICATION{width:401px}
 #preload{opacity:0}#preload .loader{background:url('assets/loading_animation_web.gif')}
 @media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){#preload .loader-retina{background:url('assets/loading_animation_web@2x.gif')}
-}body,input,button{font-family:'Helvetica Neue','Helvetica','Arial';font-size:14px}
+}body,input,button{font-family:'Helvetica Neue','Helvetica','Arial',sans-serif;font-size:14px}
 input::-ms-clear,input::-ms-reveal{display:none}body{margin:0}body.autofill-dropdown{overflow:hidden}
 html.full-screen{height:100%;background-color:rgba(255,255,255,0);overflow:hidden;-webkit-transition:background-color 200ms ease-out;transition:background-color 200ms ease-out}
 html.active{background-color:rgba(255,255,255,0.5)}#ractive-container.autofill-dropdown{float:left}
