@@ -99,7 +99,7 @@ class Tabs extends ImmutableComponent {
       case 'defaultSearchEngine':
         const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
         let defaultSearchEngineSettings = searchProviders.filter(engine => {
-          return engine.name == defaultSearchEngine
+          return engine.name === defaultSearchEngine
         })
         windowActions.newFrame({location: defaultSearchEngineSettings[0].base})
         break

@@ -237,7 +237,6 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
 
   if (!isFolder) {
     const location = siteDetail.get('location')
-
     template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
       openInNewPrivateTabMenuItem(location),
       openInNewSessionTabMenuItem(location),
