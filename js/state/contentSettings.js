@@ -173,15 +173,6 @@ const getContentSettingsFromSiteSettings = (appState) => {
     }
   }
 
-  // temporarySiteSettings
-  hostSettings = appState.get('temporarySiteSettings').toJS()
-  for (let hostPattern in hostSettings) {
-    let hostSetting = hostSettings[hostPattern]
-    if (typeof hostSetting.runInsecureContent === 'boolean') {
-      addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',
-        hostSetting.runInsecureContent ? 'allow' : 'block')
-    }
-  }
   return { content_settings: contentSettings }
 }
 

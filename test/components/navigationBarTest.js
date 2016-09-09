@@ -360,7 +360,7 @@ describe('navigationBar', function () {
         .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .click(allowRunInsecureContentButton)
-        .tabByUrl(this.page1Url)
+        .tabByIndex(0)
         .waitUntil(() => {
           return this.app.client.getCssProperty('body', 'background-color').then((color) =>
             color.value === 'rgba(255,0,0,1)'
@@ -394,8 +394,22 @@ describe('navigationBar', function () {
             color.value === 'rgba(128,128,128,1)'
           )
         })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 4
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(3)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
     })
-    it('Limit effect of running insecure content in private frame', function * () {
+    it.skip('Limit effect of running insecure content in private frame', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client
         .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
@@ -449,6 +463,20 @@ describe('navigationBar', function () {
         })
         .windowByUrl(Brave.browserWindowUrl)
         .tabByIndex(3)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 5
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(4)
         .waitUntil(() => {
           return this.app.client.getCssProperty('body', 'background-color').then((color) =>
             color.value === 'rgba(128,128,128,1)'

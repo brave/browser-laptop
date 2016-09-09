@@ -764,7 +764,7 @@ class Frame extends ImmutableComponent {
         const runInsecureContent = parsedUrl.protocol === 'https:' && this.runInsecureContent()
         windowActions.setSecurityState(this.frame, {
           secure: isSecure,
-          runInsecureContent: runInsecureContent ? this.props.location : null
+          runInsecureContent: runInsecureContent
         })
         if (isSecure) {
           // Check that there isn't a cert error.

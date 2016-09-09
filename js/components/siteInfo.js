@@ -25,8 +25,9 @@ class SiteInfo extends ImmutableComponent {
     this.props.onHide()
   }
   onDenyRunInsecureContent () {
-    appActions.removeSiteSetting(siteUtil.getOrigin(this.runInsecureContent), 'runInsecureContent')
-    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.runInsecureContent)
+    appActions.removeSiteSetting(siteUtil.getOrigin(this.location),
+      'runInsecureContent', this.isPrivate)
+    ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL, {}, this.location)
     this.props.onHide()
   }
   get isExtendedValidation () {
@@ -46,6 +47,9 @@ class SiteInfo extends ImmutableComponent {
   }
   get partitionNumber () {
     return this.props.frameProps.getIn(['partitionNumber'])
+  }
+  get location () {
+    return this.props.frameProps.getIn(['location'])
   }
   render () {
     let secureIcon
@@ -96,6 +100,10 @@ class SiteInfo extends ImmutableComponent {
             </li>
           </ul>
         </li>
+    }
+    // Disable in private mode for now
+    if (this.isPrivate) {
+      runInsecureContentInfo = null
     }
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
