@@ -234,6 +234,7 @@ const availableLanguages = [
   'id-ID',
   'ja-JP',
   'nl-NL',
+  'ms-MY',
   'pt-BR',
   'sl',
   'ta',
