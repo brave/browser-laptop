@@ -157,26 +157,28 @@ module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chro
 /**
  * Grabs the url of the new tab
  */
- // module.exports.newFrameUrl = function () {
- //   let newTabMode = getSetting(settings.NEWTAB_MODE)
- //   let defaultUrl
- //   switch (newTabMode) {
- //     case 'newTabPage':
- //       defaultUrl = 'about:newtab'
- //       break
- //     case 'homePage':
- //       defaultUrl = getSetting(settings.HOMEPAGE)
- //       break
- //     case 'defaultSearchEngine':
- //       let defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
- //       let defaultSearchEngineSettings = searchProviders.filter(engine => {
- //         return engine.name === defaultSearchEngine
- //       })
- //       defaultUrl = defaultSearchEngineSettings[0].base
- //       break
- //     default:
- //       defaultUrl = ''
- //       break
- //   }
- //   return defaultUrl
- // }
+ function newFrameUrl () {
+   const newTabMode = getSetting(settings.NEWTAB_MODE)
+   let defaultUrl
+   switch (newTabMode) {
+     case 'newTabPage':
+       defaultUrl = 'about:newtab'
+       break
+     case 'homePage':
+       defaultUrl = getSetting(settings.HOMEPAGE)
+       break
+     case 'defaultSearchEngine':
+       let defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
+       let defaultSearchEngineSettings = searchProviders.filter(engine => {
+         return engine.name === defaultSearchEngine
+       })
+       defaultUrl = defaultSearchEngineSettings[0].base
+       break
+     default:
+       defaultUrl = ''
+       break
+   }
+   return defaultUrl
+ }
+
+ module.exports.newFrameUrl = newFrameUrl
