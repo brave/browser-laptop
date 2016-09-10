@@ -285,6 +285,10 @@ class BitcoinDashboard extends ImmutableComponent {
   get canUseCoinbase () {
     return this.currency === 'USD' && this.amount < 6
   }
+  get userInAmerica () {
+    const countryCode = this.props.ledgerData.get('countryCode')
+    return !(countryCode && countryCode !== 'US')
+  }
   get coinbasePanel () {
     if (this.canUseCoinbase) {
       return <div className='panel'>
@@ -307,6 +311,27 @@ class BitcoinDashboard extends ImmutableComponent {
         </div>
         <div className='settingsPanelDivider'>
           <div data-l10n-id='coinbaseNotAvailable' />
+        </div>
+      </div>
+    }
+  }
+  get exchangePanel () {
+    const url = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeURL'])
+    const name = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeName'])
+    // Call coinbasePanel if we don't have the URL or Name
+    if (!url || !name) {
+      return this.coinbasePanel
+    } else {
+      return <div className='panel'>
+        <div className='settingsPanelDivider'>
+          <span className='fa fa-credit-card' />
+          <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
+        </div>
+        <div className='settingsPanelDivider'>
+          <span className='visitText' data-l10n-id='visit' />
+          <a target='_blank' className='browserButton primaryButton' href={url}>
+            {name}
+          </a>
         </div>
       </div>
     }
@@ -362,7 +387,10 @@ class BitcoinDashboard extends ImmutableComponent {
         : null
       }
       <div className='board'>
-        {this.coinbasePanel}
+        { (this.userInAmerica)
+          ? this.coinbasePanel
+          : this.exchangePanel
+        }
         <div className='panel'>
           <div className='settingsPanelDivider'>
             <span className='bitcoinIcon fa-stack fa-lg'>
