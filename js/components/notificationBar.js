@@ -34,7 +34,7 @@ class NotificationItem extends ImmutableComponent {
     let i = 0
     const options = this.props.detail.get('options')
     const greeting = this.props.detail.get('greeting')
-    return <div className='notificationItem'>
+    return <div className={'notificationItem ' + (options.get('style') || '')}>
       {
         greeting
           ? <span className='greeting'>{greeting}</span>
@@ -83,8 +83,7 @@ class NotificationBar extends ImmutableComponent {
       return null
     }
 
-    const style = 'notificationBar ' + (activeNotifications.get(0).get('options').get('style') || '')
-    return <div className={style}>
+    return <div className='notificationBar'>
     {
       activeNotifications.takeLast(3).map((notificationDetail) =>
         <NotificationItem detail={notificationDetail} />

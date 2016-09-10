@@ -6,20 +6,18 @@
 @import (reference) "button.less";
 
 .notificationBar {
-  background-color: #ffefc0;
-  border-bottom: 1px solid #888;
   display: inline-block;
   width: 100%;
-  padding: 6px 0;
 
-  // e.g. Update available bar
-  &.greetingStyle {
-    background-color: #fff;
+  .notificationItem {
+    background-color: #ffefc0;
     border-bottom: 1px solid #888;
-    padding: 6px 8px;
+    line-height: 24px;
+    padding: 6px 12px 6px 20px;
 
-    .notificationItem {
-      padding: 2px 28px 2px 12px;
+    &.greetingStyle {
+      background-color: #fff;
+      padding: 8px 20px 6px 20px;
 
       .button {
         .browserButton();
@@ -49,11 +47,6 @@
         }
       }
     }
-  }
-
-  .notificationItem {
-    padding: 0 12px 0 20px;
-    line-height: 24px;
 
     label {
       font-size: 15px;
