@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.1](https://github.com/brave/browser-laptop/releases/v0.12.1dev)
+- (todo)
+
 ## [0.12.0](https://github.com/brave/browser-laptop/releases/v0.12.0dev)
  - Added an option to temporarily disable mixed content protection enhancement security. ([#3443](https://github.com/brave/browser-laptop/issues/3443))
  - Added shortcut to view page source. ([#3685](https://github.com/brave/browser-laptop/issues/3685))
