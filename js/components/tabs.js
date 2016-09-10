@@ -88,25 +88,7 @@ class Tabs extends ImmutableComponent {
   }
 
   newTab () {
-    const newTabMode = getSetting(settings.NEWTAB_MODE)
-    switch (newTabMode) {
-      case 'newTabPage':
-        windowActions.newFrame()
-        break
-      case 'homePage':
-        windowActions.newFrame({location: getSetting(settings.HOMEPAGE)})
-        break
-      case 'defaultSearchEngine':
-        const defaultSearchEngine = getSetting(settings.DEFAULT_SEARCH_ENGINE)
-        let defaultSearchEngineSettings = searchProviders.filter(engine => {
-          return engine.name === defaultSearchEngine
-        })
-        windowActions.newFrame({location: defaultSearchEngineSettings[0].base})
-        break
-      default:
-        windowActions.newFrame()
-        break
-    }
+    windowActions.newFrame()
   }
 
   render () {
