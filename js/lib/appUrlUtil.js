@@ -157,8 +157,8 @@ module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chro
 /**
  * Grabs the url of the new tab
  */
- function newFrameUrl () {
-   const newTabMode = getSetting(settings.NEWTAB_MODE)
+ module.exports.newFrameUrl = function () {
+   let newTabMode = getSetting(settings.NEWTAB_MODE)
    let defaultUrl
    switch (newTabMode) {
      case 'newTabPage':
@@ -180,5 +180,3 @@ module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chro
    }
    return defaultUrl
  }
-
- module.exports.newFrameUrl = newFrameUrl
