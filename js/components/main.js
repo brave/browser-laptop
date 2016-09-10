@@ -24,7 +24,6 @@ const FindBar = require('./findbar.js')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
-const Menubar = require('../../app/renderer/components/menubar')
 const Button = require('./button')
 const BrowserActionButton = require('../../app/renderer/components/browserActionButton')
 const SiteInfo = require('./siteInfo')
@@ -40,7 +39,8 @@ const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const LongPressButton = require('./longPressButton')
-const WindowCaptionButtons = require('./windowCaptionButtons')
+const Menubar = require('../../app/renderer/components/menubar')
+const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 
 // Constants
 const config = require('../constants/config')
@@ -749,7 +749,7 @@ class Main extends ImmutableComponent {
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
 
     const menubarEnabled = isWindows
-    const menubarVisible = menubarEnabled && this.props.windowState.getIn(['ui', 'menubar', 'isVisible'])
+    const menubarVisible = menubarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
     const menubarTemplate = menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&

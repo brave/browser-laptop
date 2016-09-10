@@ -780,9 +780,10 @@ const doAction = (action) => {
       }
       break
     case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
-      // BSCTODO: ignore if always show menu is enabled
-      const currentStatus = windowState.getIn(['ui', 'menubar', 'isVisible'])
-      windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], !currentStatus)
+      if (getSetting(settings.AUTO_HIDE_MENU)) {
+        const currentStatus = windowState.getIn(['ui', 'menubar', 'isVisible'])
+        windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], !currentStatus)
+      }
       break
 
     default:

@@ -4,8 +4,9 @@
 
 const os = require('os')
 const React = require('react')
-const ImmutableComponent = require('./immutableComponent')
-const currentWindow = require('../../app/renderer/currentWindow')
+const ImmutableComponent = require('../../../js/components/immutableComponent')
+const locale = require('../../../js/l10n')
+const currentWindow = require('../currentWindow')
 
 class WindowCaptionButtons extends ImmutableComponent {
   constructor () {
@@ -56,9 +57,24 @@ class WindowCaptionButtons extends ImmutableComponent {
   render () {
     return <div className={this.buttonClass + ' windowCaptionButtons'}>
       <div className={'container ' + this.osClass}>
-        <button className={this.buttonClass + ' captionButton minimize'} onClick={this.onMinimizeClick}><div className='widget' /></button>
-        <button className={this.buttonClass + ' captionButton maximize'} onClick={this.onMaximizeClick}><div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /><div className='widget4' /><div className='widget5' /></div></button>
-        <button className={this.buttonClass + ' captionButton close'} onClick={this.onCloseClick}><div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /></div></button>
+        <button
+          className={this.buttonClass + ' captionButton minimize'}
+          onClick={this.onMinimizeClick}
+          title={locale.translation('windowCaptionButtonMinimize')}>
+          <div className='widget' />
+        </button>
+        <button
+          className={this.buttonClass + ' captionButton maximize'}
+          onClick={this.onMaximizeClick}
+          title={locale.translation(this.props.windowMaximized ? 'windowCaptionButtonRestore' : 'windowCaptionButtonMaximize')}>
+          <div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /><div className='widget4' /><div className='widget5' /></div>
+        </button>
+        <button
+          className={this.buttonClass + ' captionButton close'}
+          onClick={this.onCloseClick}
+          title={locale.translation('windowCaptionButtonClose')}>
+          <div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /></div>
+        </button>
       </div>
     </div>
   }
