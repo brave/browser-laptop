@@ -56,7 +56,7 @@ const searchProviders = require('../data/searchProviders')
 // Util
 const cx = require('../lib/classSet.js')
 const eventUtil = require('../lib/eventUtil')
-const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage, newFrameUrl } = require('../lib/appUrlUtil')
+const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
 const debounce = require('../lib/debounce.js')
