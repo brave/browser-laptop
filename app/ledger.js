@@ -1224,8 +1224,10 @@ const showNotifications = () => {
       appActions.showMessageBox({
         greeting: locale.translation('updateHello'),
         message: addFundsMessage,
-        buttons: [locale.translation('updateLater'),
-          locale.translation('addFunds')],
+        buttons: [
+          {text: locale.translation('updateLater')},
+          {text: locale.translation('addFunds'), className: 'primary'}
+        ],
         options: {
           style: 'greetingStyle',
           persist: false
@@ -1236,7 +1238,9 @@ const showNotifications = () => {
       appActions.showMessageBox({
         greeting: locale.translation('updateHello'),
         message: reconciliationMessage,
-        buttons: [locale.translation('reviewSites')],
+        buttons: [
+          {text: locale.translation('reviewSites'), className: 'primary'}
+        ],
         options: {
           style: 'greetingStyle',
           persist: false

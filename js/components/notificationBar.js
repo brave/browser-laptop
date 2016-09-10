@@ -61,8 +61,8 @@ class NotificationItem extends ImmutableComponent {
           this.props.detail.get('buttons').map((button) =>
             <button
               type='button'
-              className='button'
-              onClick={this.clickHandler.bind(this, i++)}>{button}</button>
+              className={'button ' + (button.get('className') || '')}
+              onClick={this.clickHandler.bind(this, i++)}>{button.get('text')}</button>
           )
         }
       </span>

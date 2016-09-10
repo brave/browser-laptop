@@ -124,7 +124,10 @@ AppStore
   },
   notifications: [{
     message: string,
-    buttons: Array<string>,
+    buttons: [{
+      text: string, // button text
+      className: string, // button class e.g. 'primary'. see notificationBar.less
+    }],
     frameOrigin: (string|undefined), // origin that the notification is from, or undefined if not applicable.
     options: {
       advancedText: string, // more info text

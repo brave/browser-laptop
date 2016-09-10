@@ -544,7 +544,10 @@ class Frame extends ImmutableComponent {
       const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
       // Show Flash notification bar
       appActions.showMessageBox({
-        buttons: [locale.translation('deny'), locale.translation('allow')],
+        buttons: [
+          {text: locale.translation('deny')},
+          {text: locale.translation('allow')}
+        ],
         message,
         frameOrigin: this.origin,
         options: {

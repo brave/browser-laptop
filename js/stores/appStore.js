@@ -360,7 +360,9 @@ const handleAppAction = (action) => {
         })
 
         appActions.showMessageBox({
-          buttons: [locale.translation('ok')],
+          buttons: [
+            {text: locale.translation('ok')}
+          ],
           options: {
             persist: false
           },
