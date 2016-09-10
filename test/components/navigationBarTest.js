@@ -82,6 +82,31 @@ describe('navigationBar', function () {
       })
     })
 
+    describe('document.write spoofing', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = Brave.server.url('urlbarSpoof.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+          .waitForExist('input')
+          .leftClick('input')
+      })
+
+      it('updates the location in the navbar to blank', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === ''
+            })
+          })
+      })
+    })
+
     describe('page with a title', function () {
       Brave.beforeAll(this)
 
@@ -559,6 +584,29 @@ describe('navigationBar', function () {
   })
 
   describe('submit', function () {
+    describe('page that does not load', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = 'https://bayden.com/test/redir/goscript.aspx'
+        yield setup(this.app.client)
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client.keys(page1)
+        // hit enter
+        yield this.app.client.keys('\uE007')
+      })
+
+      it('clears urlbar if page does not load', function * () {
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              console.log('value', val)
+              return val === ''
+            })
+          })
+      })
+    })
+
     describe('with url input value', function () {
       Brave.beforeAll(this)
 

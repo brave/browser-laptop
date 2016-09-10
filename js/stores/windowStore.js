@@ -293,9 +293,6 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(tabStatePath(action.key), {
           location: action.location
         })
-        // force a navbar update in case this was called from an app
-        // initiated navigation (bookmarks, etc...)
-        updateNavBarInput(action.location, frameStatePath(action.key))
       }
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
