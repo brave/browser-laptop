@@ -204,6 +204,10 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
   return isAncestorFrameKey(frames, parentFrame, parentFrameKey)
 }
 
+function isSessionPartition (partition) {
+  return partition && partition.startsWith('persist:partition-')
+}
+
 function getPartition (frameOpts) {
   let partition = 'persist:default'
   if (frameOpts.get('isPrivate')) {
@@ -491,6 +495,7 @@ module.exports = {
   isAncestorFrameKey,
   isFrameKeyActive,
   isFrameKeyPinned,
+  isSessionPartition,
   getFrameIndex,
   getFrameDisplayIndex,
   getActiveFrameIndex,

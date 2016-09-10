@@ -5,6 +5,7 @@
 'use strict'
 const AppConstants = require('../constants/appConstants')
 const WindowConstants = require('../constants/windowConstants')
+const ExtensionConstants = require('../../app/common/constants/ExtensionConstants')
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
@@ -33,6 +34,7 @@ const path = require('path')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
+const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
 
 // Only used internally
@@ -339,13 +341,11 @@ const handleAppAction = (action) => {
         })
       }
 
-      mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
-        if (isMainFrame) {
-          lastEmittedState = appState
-          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
-          if (action.cb) {
-            action.cb()
-          }
+      mainWindow.webContents.on('did-finish-load', (e) => {
+        lastEmittedState = appState
+        e.sender.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
+        if (action.cb) {
+          action.cb()
         }
       })
       mainWindow.webContents.on('crashed', (e) => {
@@ -632,6 +632,21 @@ const handleAppAction = (action) => {
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
       appState = tabState.closeTab(appState, action.frameProps.get('tabId'))
+      break
+    case ExtensionConstants.BROWSER_ACTION_REGISTERED:
+      appState = extensionState.browserActionRegistered(appState, action)
+      break
+    case ExtensionConstants.BROWSER_ACTION_UPDATED:
+      appState = extensionState.browserActionUpdated(appState, action)
+      break
+    case ExtensionConstants.EXTENSION_INSTALLED:
+      appState = extensionState.extensionInstalled(appState, action)
+      break
+    case ExtensionConstants.EXTENSION_ENABLED:
+      appState = extensionState.extensionEnabled(appState, action)
+      break
+    case ExtensionConstants.EXTENSION_DISABLED:
+      appState = extensionState.extensionDisabled(appState, action)
       break
     default:
   }

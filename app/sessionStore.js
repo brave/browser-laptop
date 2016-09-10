@@ -289,6 +289,8 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // if (data.tabs) {
   //   data.tabs = data.tabs.map((tab) => tabState.getPersistentTabState(tab).toJS())
   // }
+  // TODO(bridiver) - really just need to clear out tabId related stuff
+  delete data.extensions
 }
 
 /**
@@ -390,6 +392,7 @@ module.exports.defaultAppState = () => {
   return {
     sites: [],
     tabs: [],
+    extensions: {},
     visits: [],
     settings: {},
     siteSettings: {},

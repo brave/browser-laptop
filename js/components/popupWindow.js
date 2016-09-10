@@ -13,58 +13,73 @@ const windowActions = require('../actions/windowActions')
  */
 class PopupWindow extends ImmutableComponent {
 
+  componentWillMount () {
+    this.width = this.props.detail.get('width')
+    this.height = this.props.detail.get('height')
+    this.top = this.props.detail.get('top')
+    this.left = this.props.detail.get('left')
+  }
+
   componentDidMount () {
     let src = this.props.detail.get('src')
     if (src) {
       let webview = document.createElement('webview')
       webview.setAttribute('src', src)
-      if (parseInt(this.props.detail.get('height'))) {
-        webview.style.height = this.props.detail.get('height') + 'px'
-      }
-      if (parseInt(this.props.detail.get('width'))) {
-        webview.style.width = this.props.detail.get('width') + 'px'
-      }
+      webview.addEventListener('crashed', () => {
+        windowActions.setPopupWindowDetail()
+      })
       webview.addEventListener('destroyed', () => {
         windowActions.setPopupWindowDetail()
       })
       webview.addEventListener('close', () => {
         windowActions.setPopupWindowDetail()
       })
+      let updateSize = () => {
+        let preferredSize = webview.getPreferredSize()
+        let width = preferredSize.width
+        let height = preferredSize.height
+        if (width !== this.width || height !== this.height) {
+          this.width = width
+          this.height = height
+          webview.style.height = height + 'px'
+          webview.style.width = width + 'px'
+          this.forceUpdate()
+        }
+      }
+      webview.addEventListener('preferred-size-changed', (e) => {
+        updateSize()
+      })
       ReactDOM.findDOMNode(this).appendChild(webview)
     }
   }
 
   render () {
-    const styles = {}
-    if (parseInt(this.props.detail.get('left'))) {
-      styles.left = this.props.detail.get('left')
+    let styles = {}
+    if (parseInt(this.width)) {
+      styles.width = (parseInt(this.width) + 2)
     }
-    if (parseInt(this.props.detail.get('right'))) {
-      styles.right = this.props.detail.get('right')
+    if (parseInt(this.height)) {
+      styles.height = (parseInt(this.height) + 2)
     }
-    if (parseInt(this.props.detail.get('top'))) {
-      styles.top = this.props.detail.get('top')
+    if (parseInt(this.top)) {
+      if (this.top + this.height < window.innerHeight) {
+        styles.top = this.top
+      } else {
+        styles.bottom = 0
+      }
     }
-    if (parseInt(this.props.detail.get('bottom'))) {
-      styles.bottom = this.props.detail.get('bottom')
-    }
-    if (parseInt(this.props.detail.get('height'))) {
-      styles.height = this.props.detail.get('height') + 2
-    }
-    if (parseInt(this.props.detail.get('width'))) {
-      styles.width = this.props.detail.get('width') + 2
-    }
-    if (parseInt(this.props.detail.get('minHeight'))) {
-      styles.minHeight = this.props.detail.get('minHeight') + 2
-    }
-    if (parseInt(this.props.detail.get('maxHeight'))) {
-      styles.maxHeight = this.props.detail.get('maxHeight') + 2
+    if (parseInt(this.left)) {
+      if (this.left + this.width < window.innerWidth) {
+        styles.left = this.left
+      } else {
+        styles.right = 0
+      }
     }
 
     return <div
       className={cx({
         popupWindow: true,
-        reverseExpand: this.props.detail.get('right') !== undefined
+        reverseExpand: styles.right !== undefined
       })}
       style={styles} />
   }

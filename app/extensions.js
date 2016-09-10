@@ -1,10 +1,10 @@
-const electron = require('electron')
-const BrowserWindow = electron.BrowserWindow
+const browserActions = require('./browser/extensions/browserActions')
+const extensionActions = require('./common/actions/extensionActions')
 const AppStore = require('../js/stores/appStore')
 const config = require('../js/constants/config')
+const { fileUrl } = require('../js/lib/appUrlUtil')
 const { getAppUrl, getExtensionsPath, getIndexHTML } = require('../js/lib/appUrlUtil')
 const { getSetting } = require('../js/settings')
-const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const {passwordManagers, extensionIds} = require('../js/constants/passwordManagers')
 
@@ -135,22 +135,18 @@ let generateBraveManifest = () => {
 }
 
 module.exports.init = () => {
-  process.on('chrome-browser-action-popup', function (extensionId, tabId, name, props, popup) {
-    // TODO(bridiver) find window from tabId
-    let win = BrowserWindow.getFocusedWindow()
-    if (!win) {
-      return
-    }
-
-    win.webContents.send(messages.NEW_POPUP_WINDOW, extensionId, popup, props)
-  })
-
+  browserActions.init()
   let installedExtensions = {}
   let extensionInstalled = (installInfo) => {
     if (installInfo.error) {
       console.error(installInfo.error)
+      // TODO(bridiver) extensionActions.extensionInstallFailed
+      return
     }
     installedExtensions[installInfo.id] = installInfo
+    installInfo.base_path = fileUrl(installInfo.base_path)
+
+    extensionActions.extensionInstalled(installInfo.id, installInfo)
   }
 
   let installExtension = (extensionId, path, options = {}) => {
@@ -163,6 +159,7 @@ module.exports.init = () => {
     var installInfo = installedExtensions[extensionId]
     if (installInfo) {
       process.emit('enable-extension', installInfo.id)
+      extensionActions.extensionEnabled(installInfo.id)
     }
   }
 
@@ -170,6 +167,7 @@ module.exports.init = () => {
     var installInfo = installedExtensions[extensionId]
     if (installInfo) {
       process.emit('disable-extension', installInfo.id)
+      extensionActions.extensionDisabled(installInfo.id)
     }
   }
 

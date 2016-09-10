@@ -42,13 +42,7 @@ webFrame.setZoomLevelLimits(0, 0)
 // override any default zoom level changes
 currentWindow.webContents.setZoomLevel(0.0)
 
-// get appStore from url
-ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
-  appStoreRenderer.state = Immutable.fromJS(appState)
-  ReactDOM.render(
-    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
-    document.getElementById('windowContainer'))
-})
+l10n.init()
 
 ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
@@ -74,4 +68,10 @@ window.addEventListener('beforeunload', function () {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-l10n.init()
+// get appStore from url
+ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
+  appStoreRenderer.state = Immutable.fromJS(appState)
+  ReactDOM.render(
+    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
+    document.getElementById('windowContainer'))
+})
