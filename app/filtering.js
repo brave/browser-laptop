@@ -352,7 +352,10 @@ function registerPermissionHandler (session, partition) {
     }
 
     appActions.showMessageBox({
-      buttons: [locale.translation('deny'), locale.translation('allow')],
+      buttons: [
+        {text: locale.translation('deny')},
+        {text: locale.translation('allow')}
+      ],
       frameOrigin,
       options: {
         persist: true

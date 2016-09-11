@@ -421,7 +421,10 @@ app.on('ready', () => {
         appActions.hideMessageBox(message)
       } else {
         appActions.showMessageBox({
-          buttons: [locale.translation('yes'), locale.translation('no')],
+          buttons: [
+            {text: locale.translation('yes')},
+            {text: locale.translation('no')}
+          ],
           options: {
             persist: false
           },
@@ -639,9 +642,9 @@ app.on('ready', () => {
         // Notification not shown already
         appActions.showMessageBox({
           buttons: [
-            locale.translation('yes'),
-            locale.translation('no'),
-            locale.translation('neverForThisSite')
+            {text: locale.translation('yes')},
+            {text: locale.translation('no')},
+            {text: locale.translation('neverForThisSite')}
           ],
           options: {
             persist: false,

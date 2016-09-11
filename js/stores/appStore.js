@@ -360,7 +360,9 @@ const handleAppAction = (action) => {
         })
 
         appActions.showMessageBox({
-          buttons: [locale.translation('ok')],
+          buttons: [
+            {text: locale.translation('ok')}
+          ],
           options: {
             persist: false
           },
@@ -505,13 +507,34 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')
-      appState = appState.set('notifications', notifications.filterNot((notification) => {
+      notifications = notifications.filterNot((notification) => {
         let message = notification.get('message')
         // action.detail is a regular mutable object only when running tests
         return action.detail.get
           ? message === action.detail.get('message')
           : message === action.detail['message']
-      }).push(Immutable.fromJS(action.detail)))
+      })
+
+      // Insert notification next to those with the same style, or at the end
+      let insertIndex = notifications.size
+      const style = action.detail.get
+        ? action.detail.get('options').get('style')
+        : action.detail['options']['style']
+      if (style) {
+        const styleIndex = notifications.findLastIndex((notification) => {
+          return notification.get('options').get('style') === style
+        })
+        if (styleIndex > -1) {
+          insertIndex = styleIndex
+        } else {
+          // Insert after the last notification with a style
+          insertIndex = notifications.findLastIndex((notification) => {
+            return typeof notification.get('options').get('style') === 'string'
+          }) + 1
+        }
+      }
+      notifications = notifications.insert(insertIndex, Immutable.fromJS(action.detail))
+      appState = appState.set('notifications', notifications)
       break
     case AppConstants.APP_HIDE_MESSAGE_BOX:
       appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
