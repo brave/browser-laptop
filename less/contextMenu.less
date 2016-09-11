@@ -145,31 +145,3 @@
     font-size: @bookmarksFolderIconSize;
   }
 }
-
-// Menubar (for use w/ slim titlebar)
-.titlebar {
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
-  height: 29px;
-
-  .menubar {
-    display: inline-block;
-    cursor: default;
-    margin-top: 5px;
-    margin-left: 4px;
-
-    .menubarItem {
-      color: black;
-      font: menu;
-      font-size: 12px;
-      -webkit-app-region: no-drag;
-      padding: 0 10px 1px;
-      border: 1px solid transparent;
-
-      &:hover {
-        background-color: #e5f3ff;
-        border: 1px solid #cce8ff;
-      }
-    }
-  }
-}

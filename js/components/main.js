@@ -784,57 +784,72 @@ class Main extends ImmutableComponent {
         : null
       }
       <div className='top'>
-        {
-          menubarVisible
-            ? <div className='titlebar'>
-              <Menubar template={menubarTemplate} />
-              <WindowCaptionButtons windowMaximized={this.props.windowState.getIn(['ui', 'isMaximized'])} />
+        <div className='navbarCaptionButtonContainer'>
+          <div className='navbarMenubarFlexContainer'>
+            <div className='navbarMenubarBlockContainer'>
+              {
+                menubarVisible
+                  ? <div className='menubarContainer'>
+                    <Menubar template={menubarTemplate} />
+                  </div>
+                  : null
+              }
+              <div className='navigatorWrapper'
+                onDoubleClick={this.onDoubleClick}
+                onDragOver={this.onDragOver}
+                onDrop={this.onDrop}>
+                <div className='backforward'>
+                  <LongPressButton
+                    l10nId='backButton'
+                    className='back fa fa-angle-left'
+                    disabled={!activeFrame || !activeFrame.get('canGoBack')}
+                    onClick={this.onBack}
+                    onLongPress={this.onBackLongPress}
+                  />
+                  <LongPressButton
+                    l10nId='forwardButton'
+                    className='forward fa fa-angle-right'
+                    disabled={!activeFrame || !activeFrame.get('canGoForward')}
+                    onClick={this.onForward}
+                    onLongPress={this.onForwardLongPress}
+                  />
+                </div>
+                <NavigationBar
+                  ref={(node) => { this.navBar = node }}
+                  navbar={activeFrame && activeFrame.get('navbar')}
+                  frames={this.props.windowState.get('frames')}
+                  sites={this.props.appState.get('sites')}
+                  activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+                  location={activeFrame && activeFrame.get('location') || ''}
+                  title={activeFrame && activeFrame.get('title') || ''}
+                  scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
+                  partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
+                  history={activeFrame && activeFrame.get('history') || emptyList}
+                  suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
+                  isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
+                  locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
+                  startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
+                  endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
+                  loading={activeFrame && activeFrame.get('loading')}
+                  mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
+                  searchDetail={this.props.windowState.get('searchDetail')}
+                  enableNoScript={this.enableNoScript(activeSiteSettings)}
+                  settings={this.props.appState.get('settings')}
+                  noScriptIsVisible={noScriptIsVisible}
+                />
+                <div className='topLevelEndButtons'>
+                  <Button iconClass='braveMenu'
+                    l10nId='braveMenu'
+                    className={cx({
+                      navbutton: true,
+                      braveShieldsDisabled,
+                      braveShieldsDown: !braverySettings.shieldsUp
+                    })}
+                    onClick={this.onBraveMenu} />
+                </div>
+              </div>
             </div>
-            : null
-        }
-        <div className='navigatorWrapper'
-          onDoubleClick={this.onDoubleClick}
-          onDragOver={this.onDragOver}
-          onDrop={this.onDrop}>
-          <div className='backforward'>
-            <LongPressButton
-              l10nId='backButton'
-              className='back fa fa-angle-left'
-              disabled={!activeFrame || !activeFrame.get('canGoBack')}
-              onClick={this.onBack}
-              onLongPress={this.onBackLongPress}
-            />
-            <LongPressButton
-              l10nId='forwardButton'
-              className='forward fa fa-angle-right'
-              disabled={!activeFrame || !activeFrame.get('canGoForward')}
-              onClick={this.onForward}
-              onLongPress={this.onForwardLongPress}
-            />
           </div>
-          <NavigationBar
-            ref={(node) => { this.navBar = node }}
-            navbar={activeFrame && activeFrame.get('navbar')}
-            frames={this.props.windowState.get('frames')}
-            sites={this.props.appState.get('sites')}
-            activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
-            location={activeFrame && activeFrame.get('location') || ''}
-            title={activeFrame && activeFrame.get('title') || ''}
-            scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-            partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
-            history={activeFrame && activeFrame.get('history') || emptyList}
-            suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
-            isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
-            locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
-            startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
-            endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
-            loading={activeFrame && activeFrame.get('loading')}
-            mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchDetail={this.props.windowState.get('searchDetail')}
-            enableNoScript={this.enableNoScript(activeSiteSettings)}
-            settings={this.props.appState.get('settings')}
-            noScriptIsVisible={noScriptIsVisible}
-          />
           {
             siteInfoIsVisible
             ? <SiteInfo frameProps={activeFrame}
@@ -919,6 +934,7 @@ class Main extends ImmutableComponent {
               : null
           }
         </div>
+
         <UpdateBar updates={this.props.appState.get('updates')} />
         {
           this.props.appState.get('notifications') && this.props.appState.get('notifications').size && activeFrame

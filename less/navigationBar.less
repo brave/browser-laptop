@@ -29,10 +29,28 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
+// Style adjustments needed for slim titlebar to work properly
+.navbarCaptionButtonContainer {
+  display: flex;
+  border-bottom: 1px solid #aaaaaa;
+}
+
+.navbarMenubarFlexContainer {
+  display: flex;
+  flex: 1;
+  box-sizing: border-box;
+  position: relative;
+  overflow: auto;
+  white-space: nowrap;
+}
+.navbarMenubarBlockContainer {
+  display: block;
+  width: 100%;
+}
+
 // Window Caption Buttons (for use w/ slim titlebar)
 .windowCaptionButtons {
   display: inline-block;
-  float: right;
   -webkit-user-select: none;
   -webkit-app-region: drag;
   height: 100%;
@@ -382,6 +400,34 @@
   }
 }
 
+// Menubar (for use w/ slim titlebar)
+.menubarContainer {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 29px;
+
+  .menubar {
+    display: inline-block;
+    cursor: default;
+    margin-top: 5px;
+    margin-left: 4px;
+
+    .menubarItem {
+      color: black;
+      font: menu;
+      font-size: 12px;
+      -webkit-app-region: no-drag;
+      padding: 0 10px 1px;
+      border: 1px solid transparent;
+
+      &:hover {
+        background-color: #e5f3ff;
+        border: 1px solid #cce8ff;
+      }
+    }
+  }
+}
+
 // Here I grouped the rules to keep the layout of the top bar consistent.
 // The tricky part is to keep the title in `#navigator` centered when the
 // box on its left has different size than the one on the right.
@@ -474,7 +520,6 @@
   justify-content: space-between;
   -webkit-app-region: drag;
   align-items: center;
-  border-bottom: 1px solid #aaaaaa;
   height: @navbarHeight;
   box-sizing: border-box;
 
