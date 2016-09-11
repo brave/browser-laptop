@@ -597,24 +597,26 @@ class Main extends ImmutableComponent {
   }
 
   onMouseDown (e) {
+    // BSCTODO: update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
     while (node) {
       if (node.classList &&
           (node.classList.contains('popupWindow') ||
             node.classList.contains('contextMenu') ||
-            node.classList.contains('extensionButton'))) {
+            node.classList.contains('extensionButton') ||
+            node.classList.contains('menubarItem'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
           e.preventDefault()
         }
+        // Click event is handled downstream
         return
       }
       node = node.parentNode
     }
-    // TODO(bridiver) combine context menu and popup window
-    windowActions.setContextMenuDetail()
-    windowActions.setPopupWindowDetail()
+    // Hide context menus, popup menus, and menu selections
+    windowActions.resetMenuState()
   }
 
   onClickWindow (e) {
@@ -751,6 +753,7 @@ class Main extends ImmutableComponent {
     const menubarEnabled = isWindows
     const menubarVisible = menubarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
     const menubarTemplate = menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null
+    const menubarSelectedLabel = this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel'])
 
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
@@ -790,7 +793,7 @@ class Main extends ImmutableComponent {
               {
                 menubarVisible
                   ? <div className='menubarContainer'>
-                    <Menubar template={menubarTemplate} />
+                    <Menubar template={menubarTemplate} selectedLabel={menubarSelectedLabel} />
                   </div>
                   : null
               }
@@ -838,6 +841,9 @@ class Main extends ImmutableComponent {
                   noScriptIsVisible={noScriptIsVisible}
                 />
                 <div className='topLevelEndButtons'>
+                  {
+                    this.extensionButtons
+                  }
                   <Button iconClass='braveMenu'
                     l10nId='braveMenu'
                     className={cx({
@@ -851,89 +857,76 @@ class Main extends ImmutableComponent {
             </div>
           </div>
           {
-            siteInfoIsVisible
-            ? <SiteInfo frameProps={activeFrame}
-              onHide={this.onHideSiteInfo} />
-            : null
-          }
-          {
-            braveryPanelIsVisible
-            ? <BraveryPanel frameProps={activeFrame}
-              activeRequestedLocation={activeRequestedLocation}
-              braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
-              braverySettings={braverySettings}
-              activeSiteSettings={activeSiteSettings}
-              onHide={this.onHideBraveryPanel} />
-            : null
-          }
-          {
-           clearBrowsingDataPanelIsVisible
-            ? <ClearBrowsingDataPanel
-              clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
-              onHide={this.onHideClearBrowsingDataPanel} />
-            : null
-          }
-          {
-           autofillAddressPanelIsVisible
-            ? <AutofillAddressPanel
-              currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
-              onHide={this.onHideAutofillAddressPanel} />
-            : null
-          }
-          {
-           autofillCreditCardPanelIsVisible
-            ? <AutofillCreditCardPanel
-              currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
-              onHide={this.onHideAutofillCreditCardPanel} />
-            : null
-          }
-          {
-            loginRequiredDetail
-              ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
-              : null
-          }
-          {
-            this.props.windowState.get('bookmarkDetail')
-            ? <AddEditBookmark sites={this.props.appState.get('sites')}
-              currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
-            : null
-          }
-          {
-            noScriptIsVisible
-              ? <NoScriptInfo frameProps={activeFrame}
-                onHide={this.onHideNoScript} />
-              : null
-          }
-          {
-            releaseNotesIsVisible
-            ? <ReleaseNotes
-              metadata={this.props.appState.getIn(['updates', 'metadata'])}
-              onHide={this.onHideReleaseNotes} />
-            : null
-          }
-          <div className='topLevelEndButtons'>
-            {
-              this.extensionButtons
-            }
-            <Button iconClass='braveMenu'
-              l10nId='braveMenu'
-              className={cx({
-                navbutton: true,
-                braveShieldsDisabled,
-                braveShieldsDown: !braverySettings.shieldsUp
-              })}
-              onClick={this.onBraveMenu} />
-          </div>
-          {
-            menubarEnabled && !menubarVisible
+            menubarEnabled
               ? <WindowCaptionButtons windowMaximized={this.props.windowState.getIn(['ui', 'isMaximized'])} />
               : null
           }
         </div>
+        {
+          siteInfoIsVisible
+          ? <SiteInfo frameProps={activeFrame}
+            onHide={this.onHideSiteInfo} />
+          : null
+        }
+        {
+          braveryPanelIsVisible
+          ? <BraveryPanel frameProps={activeFrame}
+            activeRequestedLocation={activeRequestedLocation}
+            braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
+            braverySettings={braverySettings}
+            activeSiteSettings={activeSiteSettings}
+            onHide={this.onHideBraveryPanel} />
+          : null
+        }
+        {
+         clearBrowsingDataPanelIsVisible
+          ? <ClearBrowsingDataPanel
+            clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
+            onHide={this.onHideClearBrowsingDataPanel} />
+          : null
+        }
+        {
+         autofillAddressPanelIsVisible
+          ? <AutofillAddressPanel
+            currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
+            onHide={this.onHideAutofillAddressPanel} />
+          : null
+        }
+        {
+         autofillCreditCardPanelIsVisible
+          ? <AutofillCreditCardPanel
+            currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
+            onHide={this.onHideAutofillCreditCardPanel} />
+          : null
+        }
+        {
+          loginRequiredDetail
+            ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+            : null
+        }
+        {
+          this.props.windowState.get('bookmarkDetail')
+          ? <AddEditBookmark sites={this.props.appState.get('sites')}
+            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
+          : null
+        }
+        {
+          noScriptIsVisible
+            ? <NoScriptInfo frameProps={activeFrame}
+              onHide={this.onHideNoScript} />
+            : null
+        }
+        {
+          releaseNotesIsVisible
+          ? <ReleaseNotes
+            metadata={this.props.appState.getIn(['updates', 'metadata'])}
+            onHide={this.onHideReleaseNotes} />
+          : null
+        }
 
         <UpdateBar updates={this.props.appState.get('updates')} />
         {

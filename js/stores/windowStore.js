@@ -781,8 +781,30 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
       if (getSetting(settings.AUTO_HIDE_MENU)) {
-        const currentStatus = windowState.getIn(['ui', 'menubar', 'isVisible'])
-        windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], !currentStatus)
+        // Close existing context menus
+        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        // Use value if provided; if not, toggle to opposite.
+        if (typeof action.isVisible === 'boolean') {
+          windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], action.isVisible)
+        } else {
+          const currentStatus = windowState.getIn(['ui', 'menubar', 'isVisible'])
+          windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], !currentStatus)
+        }
+      }
+      break
+    case WindowConstants.WINDOW_SET_MENUBAR_ITEM_SELECTED:
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedLabel'],
+        action.label && typeof action.label === 'string'
+        ? action.label
+        : null)
+      break
+    case WindowConstants.WINDOW_RESET_MENU_STATE:
+      doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
+      doAction({actionType: WindowConstants.WINDOW_SET_MENUBAR_ITEM_SELECTED})
+      if (getSetting(settings.AUTO_HIDE_MENU)) {
+        doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
+      } else {
+        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
       }
       break
 

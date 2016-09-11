@@ -40,7 +40,7 @@
   flex: 1;
   box-sizing: border-box;
   position: relative;
-  overflow: auto;
+  overflow: visible;
   white-space: nowrap;
 }
 .navbarMenubarBlockContainer {
@@ -405,6 +405,7 @@
   -webkit-user-select: none;
   -webkit-app-region: drag;
   height: 29px;
+  display: inline-block;
 
   .menubar {
     display: inline-block;
@@ -425,6 +426,11 @@
         border: 1px solid #cce8ff;
       }
     }
+
+    .selected {
+      background-color: #cce8ff !important;
+      border: 1px solid #99d1ff !important;
+    }
   }
 }
 
@@ -433,8 +439,6 @@
 // box on its left has different size than the one on the right.
 // This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
-  clear:both;
-
   // Since we want to keep the navigator centered, we need to calculate the
   // difference between the width of the left box and the width of the right box.
   @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left

@@ -646,7 +646,7 @@ const doAction = (action) => {
         })
       }
       break
-    case windowConstants.WINDOW_CLICK_MENUBAR_ITEM:
+    case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
         const clickedMenuItem = menuUtil.getMenuItem(appMenu, action.label)
         if (clickedMenuItem) {

@@ -371,8 +371,9 @@ WindowStore
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes
     },
-    menubar: {
-      isVisible: boolean // windows only: true if Menubar control is visible
+    menubar: { // windows only
+      isVisible: boolean, // true if Menubar control is visible
+      selectedLabel: string // label of menu that is selected (or null for none selected)
     }
   },
   searchDetail: {
