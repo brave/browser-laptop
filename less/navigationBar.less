@@ -29,6 +29,11 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
+// On Windows, we add extra padding to have spacing match the close button
+.platform--win32 .navigatorWrapper {
+  margin-left: @navbarLeftMarginWindows;
+}
+
 // Style adjustments needed for slim titlebar to work properly
 .navbarCaptionButtonContainer {
   display: flex;
@@ -51,7 +56,6 @@
 // Window Caption Buttons (for use w/ slim titlebar)
 .windowCaptionButtons {
   display: inline-block;
-  -webkit-user-select: none;
   -webkit-app-region: drag;
   height: 100%;
 
@@ -402,16 +406,16 @@
 
 // Menubar (for use w/ slim titlebar)
 .menubarContainer {
-  -webkit-user-select: none;
   -webkit-app-region: drag;
+  width: 100%;
   height: 29px;
   display: inline-block;
+  margin-top: 5px;
+  margin-left: 4px;
 
   .menubar {
     display: inline-block;
     cursor: default;
-    margin-top: 5px;
-    margin-left: 4px;
 
     .menubarItem {
       color: black;

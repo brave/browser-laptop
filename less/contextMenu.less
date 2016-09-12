@@ -10,7 +10,7 @@
   color: black;
   cursor: default;
   display: flex;
-  font-size: 14px;
+  font-size: @contextMenuFontSize;
   &.contextMenuScrollable {
     overflow-y: scroll;
   }
@@ -68,7 +68,6 @@
     }
   }
   box-sizing: border-box;
-  max-width: 300px;
   display: flex;
   align-items: center;
   text-overflow: ellipsis;
@@ -139,9 +138,25 @@
       float: right;
       margin: auto 0 auto 5px;
     }
+    .accelerator {
+      .submenuIndicator;
+      font-size: @contextMenuFontSize;
+      margin-left: 10px;
+    }
   }
 
   .fa {
     font-size: @bookmarksFolderIconSize;
   }
+}
+
+
+// Make context menu style match menubar (Windows only- for use w/ slim titlebar)
+.platform--win32 .contextMenuItem {
+  font: menu;
+  font-size: 12px;
+}
+
+.platform--win32 .accelerator {
+  font: menu;
 }
