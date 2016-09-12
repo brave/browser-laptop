@@ -745,8 +745,12 @@ const searchSelectionMenuItem = (location) => {
     label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
     click: (item, focusedWindow) => {
       if (focusedWindow && location) {
+        let activeFrame = windowStore.getState().get('activeFrameKey')
+        let frame = windowStore.getFrame(activeFrame)
         let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
-        windowActions.newFrame({ location: searchUrl }, true)
+        windowActions.newFrame({ location: searchUrl,
+          isPrivate: frame.get('isPrivate'),
+          partitionNumber: frame.get('partitionNumber') }, true)
       }
     }
   }
@@ -844,10 +848,14 @@ function mainTemplateInit (nodeProps, frame) {
         {
           label: locale.translation('searchImage'),
           click: (item) => {
+            let activeFrame = windowStore.getState().get('activeFrameKey')
+            let frame = windowStore.getFrame(activeFrame)
             let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL'])
               .replace('{searchTerms}', encodeURIComponent(nodeProps.srcURL))
               .replace('?q', 'byimage?image_url')
-            windowActions.newFrame({ location: searchUrl }, true)
+            windowActions.newFrame({ location: searchUrl,
+              isPrivate: frame.get('isPrivate'),
+              partitionNumber: frame.get('partitionNumber')}, true)
           }
         }
       )
