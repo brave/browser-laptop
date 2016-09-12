@@ -6,6 +6,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
 const cx = require('../lib/classSet.js')
+const KeyCodes = require('../constants/keyCodes')
 const windowActions = require('../actions/windowActions')
 
 /**
@@ -20,7 +21,18 @@ class PopupWindow extends ImmutableComponent {
     this.left = this.props.detail.get('left')
   }
 
+  onKeyDown (e) {
+    if (e.keyCode === KeyCodes.ESC || e.keyCode === KeyCodes.TAB) {
+      windowActions.setPopupWindowDetail()
+    }
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('keydown', this.onKeyDown.bind(this))
+  }
+
   componentDidMount () {
+    window.addEventListener('keydown', this.onKeyDown.bind(this))
     let src = this.props.detail.get('src')
     if (src) {
       let webview = document.createElement('webview')
