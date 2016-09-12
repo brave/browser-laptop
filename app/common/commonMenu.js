@@ -349,3 +349,22 @@ module.exports.braveryGlobalMenuItem = () => {
     }
   }
 }
+
+module.exports.braveryPaymentsMenuItem = () => {
+  const label =
+    getSetting(settings.PAYMENTS_ENABLED)
+      ? locale.translation('braveryPayments')
+      : locale.translation('braveryStartUsingPayments')
+  return {
+    label: label,
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:preferences#payments'
+        }))
+      } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences#payments', { singleFrame: true }])
+      }
+    }
+  }
+}

@@ -527,7 +527,8 @@ const createMenu = () => {
       label: locale.translation('bravery'),
       submenu: [
         CommonMenu.braveryGlobalMenuItem(),
-        CommonMenu.braverySiteMenuItem()
+        CommonMenu.braverySiteMenuItem(),
+        CommonMenu.braveryPaymentsMenuItem()
       ]
     },
     { label: locale.translation('window'), submenu: createWindowSubmenu(), role: 'window' },

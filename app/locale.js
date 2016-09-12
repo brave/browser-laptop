@@ -148,6 +148,8 @@ var rendererIdentifiers = function () {
     'bravery',
     'braverySite',
     'braveryGlobal',
+    'braveryPayments',
+    'braveryStartUsingPayments',
     'blockPopups',
     'learnSpelling',
     'ignoreSpelling',
