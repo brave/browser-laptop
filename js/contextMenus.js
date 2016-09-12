@@ -188,12 +188,12 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
-    if (menu.length) {
-      menu.push(CommonMenu.separatorMenuItem)
-    }
   }
 
   if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
+    if (menu.length) {
+      menu.push(CommonMenu.separatorMenuItem)
+    }
     menu.push({
       label: locale.translation('downloadToolbarHide'),
       click: () => {
