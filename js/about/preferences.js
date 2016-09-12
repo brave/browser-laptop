@@ -689,7 +689,7 @@ class PaymentsTab extends ImmutableComponent {
       const transactions = this.props.ledgerData.get('transactions')
       const pendingFunds = Number(this.props.ledgerData.get('unconfirmed') || 0)
       if (pendingFunds + Number(this.props.ledgerData.get('balance') || 0) <
-          Number(this.props.ledgerData.get('btc') || 0)) {
+          0.9 * Number(this.props.ledgerData.get('btc') || 0)) {
         status.id = 'insufficientFundsStatus'
       } else if (pendingFunds > 0) {
         status.id = 'pendingFundsStatus'
