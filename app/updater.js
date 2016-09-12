@@ -89,15 +89,18 @@ exports.init = (platform, arch, ver) => {
   version = ver
 
   var baseUrl = exports.updateUrl(appConfig.updates, platform, arch)
-  debug(`updateUrl = ${baseUrl}`)
 
-  scheduleUpdates()
-
-  // This will fail if we are in dev
-  try {
-    autoUpdater.setFeedURL(baseUrl)
-  } catch (err) {
-    console.log(err)
+  if (baseUrl) {
+    debug(`updateUrl = ${baseUrl}`)
+    scheduleUpdates()
+    // This will fail if we are in dev
+    try {
+      autoUpdater.setFeedURL(baseUrl)
+    } catch (err) {
+      console.log(err)
+    }
+  } else {
+    debug('No updateUrl, not scheduling updates.')
   }
 }
 
