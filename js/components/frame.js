@@ -571,11 +571,11 @@ class Frame extends ImmutableComponent {
             appActions.changeSiteSetting(this.origin, 'flash', 1)
           }
         } else {
-          appActions.hideMessageBox(message)
           if (persist) {
             appActions.changeSiteSetting(this.origin, 'flash', false)
           }
         }
+        appActions.hideMessageBox(message)
       }
     } else {
       flash.checkFlashInstalled((installed) => {
