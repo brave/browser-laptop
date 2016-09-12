@@ -5,7 +5,7 @@
 'use strict'
 const AppConstants = require('../constants/appConstants')
 const WindowConstants = require('../constants/windowConstants')
-const ExtensionConstants = require('../../app/common/constants/ExtensionConstants')
+const ExtensionConstants = require('../../app/common/constants/extensionConstants')
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
