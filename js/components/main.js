@@ -703,6 +703,7 @@ class Main extends ImmutableComponent {
       <BrowserActionButton
         browserAction={browserAction}
         extensionId={id}
+        tabId={this.activeTabId}
         popupWindowSrc={this.props.windowState.getIn(['popupWindowDetail', 'src'])} />
     ).values()
     buttons = Array.from(buttons)

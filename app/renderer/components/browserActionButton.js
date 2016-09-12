@@ -25,7 +25,7 @@ class BrowserActionButton extends ImmutableComponent {
       offsetX: e.nativeEvent.offsetX,
       offsetY: e.nativeEvent.offsetY
     }
-    ipc.send('chrome-browser-action-clicked', id, this.activeTabId, title, props)
+    ipc.send('chrome-browser-action-clicked', id, this.props.tabId, title, props)
   }
 
   render () {
