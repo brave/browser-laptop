@@ -985,8 +985,6 @@ function mainTemplateInit (nodeProps, frame) {
         label: passwordManager.get('displayName'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            nodeProps.height = nodeProps.height
-            nodeProps.width = nodeProps.width
             ipc.send('chrome-browser-action-clicked', passwordManager.get('extensionId'), frame.get('tabId'), passwordManager.get('name'), nodeProps)
           }
         }
