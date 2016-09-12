@@ -54,30 +54,33 @@ let generateBraveManifest = () => {
           'content/scripts/adInsertion.js',
           'content/scripts/passwordManager.js',
           'content/scripts/flashListener.js',
-          'content/scripts/themeColor.js',
           'content/scripts/pageInformation.js'
         ]
       },
       {
         run_at: 'document_end',
+        all_frames: false,
         matches: ['<all_urls>'],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
+          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc',
+          getIndexHTML(),
+          getAppUrl('about-*.html'),
+          getAppUrl('about-*.html') + '#*'
         ],
         exclude_globs: [
-          getIndexHTML()
+          getAppUrl('about-blank.html'),
+          getAppUrl('about-blank.html') + '#*'
         ],
         js: [
-          'content/scripts/spellCheck.js'
+          'content/scripts/spellCheck.js',
+          'content/scripts/themeColor.js'
         ]
       },
       {
         run_at: 'document_start',
         js: [
           'content/scripts/util.js',
-          'content/scripts/spellCheck.js',
-          'content/scripts/inputHandler.js',
-          'content/scripts/themeColor.js'
+          'content/scripts/inputHandler.js'
         ],
         matches: [
           '<all_urls>'
@@ -88,7 +91,8 @@ let generateBraveManifest = () => {
           getAppUrl('about-*.html') + '#*'
         ],
         exclude_globs: [
-          getAppUrl('about-blank.html')
+          getAppUrl('about-blank.html'),
+          getAppUrl('about-blank.html') + '#*'
         ]
       }
     ],
