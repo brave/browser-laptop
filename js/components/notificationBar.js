@@ -35,19 +35,6 @@ class NotificationItem extends ImmutableComponent {
     const options = this.props.detail.get('options')
     const greeting = this.props.detail.get('greeting')
     return <div className={'notificationItem ' + (options.get('style') || '')}>
-      {
-        greeting
-          ? <span className='greeting'>{greeting}</span>
-          : null
-      }
-      <span className='message'>{this.props.detail.get('message')}</span>
-      <span className='notificationAdvanced'>
-        {
-          options.get('advancedText') && options.get('advancedLink')
-            ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
-            : null
-        }
-      </span>
       <span className='options'>
         {
           options.get('persist')
@@ -64,6 +51,19 @@ class NotificationItem extends ImmutableComponent {
               className={'button ' + (button.get('className') || '')}
               onClick={this.clickHandler.bind(this, i++)}>{button.get('text')}</button>
           )
+        }
+      </span>
+      {
+        greeting
+          ? <span className='greeting'>{greeting}</span>
+          : null
+      }
+      <span className='message'>{this.props.detail.get('message')}</span>
+      <span className='notificationAdvanced'>
+        {
+          options.get('advancedText') && options.get('advancedLink')
+            ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
+            : null
         }
       </span>
     </div>
