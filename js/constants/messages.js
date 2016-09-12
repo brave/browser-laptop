@@ -113,6 +113,7 @@ const messages = {
   BRAVERY_DEFAULTS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
   HISTORY_UPDATED: _,
+  EXTENSIONS_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   // About pages from contentScript

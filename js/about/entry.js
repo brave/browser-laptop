@@ -18,6 +18,9 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:bookmarks':
     element = require('./bookmarks')
     break
+  case 'about:extensions':
+    element = require('./extensions')
+    break
   case 'about:downloads':
     element = require('./downloads')
     break

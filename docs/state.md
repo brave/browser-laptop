@@ -11,6 +11,11 @@ AppStore
 {
   extensions: {
     [id]: { // the unique id of the extension
+      id: string,
+      base_path: string,
+      description: string,
+      enabled: boolean,
+      manifest: object,
       browserAction: {
         title: string,
         popup: string,

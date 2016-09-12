@@ -983,6 +983,9 @@ class Main extends ImmutableComponent {
               history={frame.get('location') === 'about:history'
                 ? this.props.appState.get('sites') || emptyMap
                 : null}
+              extensions={frame.get('location') === 'about:extensions'
+                ? this.props.appState.get('extensions') || emptyMap
+                : null}
               downloads={this.props.appState.get('downloads') || emptyMap}
               bookmarkFolders={frame.get('location') === 'about:bookmarks'
                 ? this.props.appState.get('sites')
