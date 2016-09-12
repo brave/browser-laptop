@@ -575,6 +575,17 @@ const windowActions = {
   },
 
   /**
+   * Marks the URL bar as focused or not.
+   *
+   * @param {boolean} isFocused - Whether or not the URL bar should be marked as focused
+   */
+  setUrlBarFocused: function (isFocused) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL_BAR_FOCUSED,
+      isFocused
+    })
+  },
+  /**
    * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
    *
    * @param {Object} frameProps - Properties of the frame in question

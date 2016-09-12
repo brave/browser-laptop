@@ -408,6 +408,16 @@ are no autocomplete results.
 
 
 
+### setUrlBarFocused(isFocused) 
+
+Marks the URL bar as focused or not.
+
+**Parameters**
+
+**isFocused**: `boolean`, Whether or not the URL bar should be marked as focused
+
+
+
 ### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.

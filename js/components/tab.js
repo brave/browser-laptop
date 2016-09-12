@@ -86,8 +86,15 @@ class Tab extends ImmutableComponent {
     dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tab.get('frameKey'), this.draggingOverData, e)
   }
 
-  setActiveFrame () {
+  setActiveFrame (event) {
+    event.stopPropagation()
     windowActions.setActiveFrame(this.frame)
+
+    if (this.frame.get('location') === 'about:newtab') {
+      windowActions.setUrlBarActive(true)
+      windowActions.setUrlBarFocused(true)
+      windowActions.setUrlBarSelected(false)
+    }
   }
 
   onCloseFrame (event) {
