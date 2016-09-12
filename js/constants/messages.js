@@ -114,6 +114,7 @@ const messages = {
   BOOKMARKS_UPDATED: _,
   HISTORY_UPDATED: _,
   EXTENSIONS_UPDATED: _,
+  ADBLOCK_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   // About pages from contentScript

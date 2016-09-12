@@ -96,6 +96,10 @@ class Frame extends ImmutableComponent {
       this.webview.send(messages.EXTENSIONS_UPDATED, {
         extensions: this.props.extensions.toJS()
       })
+    } else if (location === 'about:adblock') {
+      this.webview.send(messages.ADBLOCK_UPDATED, {
+        adblock: this.props.adblock.toJS()
+      })
     } else if (location === 'about:downloads') {
       this.webview.send(messages.DOWNLOADS_UPDATED, {
         downloads: this.props.downloads.toJS()
