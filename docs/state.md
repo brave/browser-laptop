@@ -9,6 +9,20 @@ AppStore
 
 ```javascript
 {
+  extensions: {
+    [id]: { // the unique id of the extension
+      browserAction: {
+        title: string,
+        popup: string,
+        icon: string/object
+      },
+      tabs: {
+        [tabId]: {
+          browserAction: {} // tab specific browser action properties
+        }
+      }
+    }
+  },
   sites: [{
     location: string,
     title: string,

@@ -25,6 +25,7 @@ const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
 const Button = require('./button')
+const BrowserActionButton = require('../../app/renderer/components/browserActionButton')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
@@ -50,6 +51,7 @@ const keyCodes = require('../constants/keyCodes')
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
+const extensionState = require('../../app/common/state/extensionState')
 const FrameStateUtil = require('../state/frameStateUtil')
 const searchProviders = require('../data/searchProviders')
 
@@ -273,12 +275,10 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
       windowActions.setPopupWindowDetail(Immutable.fromJS({
-        left: props.x,
-        top: props.y + 100,
+        left: props.left,
+        top: props.top,
         height: props.height,
         width: props.width,
-        maxHeight: window.innerHeight - 100,
-        minHeight: 400,
         src
       }))
     })
@@ -595,7 +595,9 @@ class Main extends ImmutableComponent {
     let node = e.target
     while (node) {
       if (node.classList &&
-          (node.classList.contains('popupWindow') || node.classList.contains('contextMenu'))) {
+          (node.classList.contains('popupWindow') ||
+            node.classList.contains('contextMenu') ||
+            node.classList.contains('extensionButton'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
@@ -668,6 +670,11 @@ class Main extends ImmutableComponent {
                                                         appConfig))
   }
 
+  get activeTabId () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    return activeFrame && activeFrame.get('tabId')
+  }
+
   get activeSiteSettings () {
     return this.frameSiteSettings(this.activeRequestedLocation)
   }
@@ -685,6 +692,24 @@ class Main extends ImmutableComponent {
 
     const parsedUrl = urlParse(activeRequestedLocation)
     return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && activeRequestedLocation !== 'about:safebrowsing'
+  }
+
+  get extensionButtons () {
+    const enabledExtensions = extensionState.getEnabledExtensions(this.props.appState)
+    const extensionBrowserActions = enabledExtensions
+      .map((extension) => extensionState.getBrowserActionByTabId(this.props.appState, extension.get('id'), this.activeTabId))
+      .filter((browserAction) => browserAction)
+    let buttons = extensionBrowserActions.map((browserAction, id) =>
+      <BrowserActionButton
+        browserAction={browserAction}
+        extensionId={id}
+        popupWindowSrc={this.props.windowState.getIn(['popupWindowDetail', 'src'])} />
+    ).values()
+    buttons = Array.from(buttons)
+    if (buttons.length > 0) {
+      buttons.push(<span className='buttonSeparator' />)
+    }
+    return buttons
   }
 
   render () {
@@ -858,6 +883,9 @@ class Main extends ImmutableComponent {
             : null
           }
           <div className='topLevelEndButtons'>
+            {
+              this.extensionButtons
+            }
             <Button iconClass='braveMenu'
               l10nId='braveMenu'
               className={cx({

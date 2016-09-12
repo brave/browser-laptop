@@ -511,8 +511,7 @@ describe('Autofill', function () {
           .tabByIndex(0)
           .getValue('[name="04fullname"]').should.eventually.be.equal('test')
       })
-      // TODO(bridiver) - session tabs should have autofill data
-      it.skip('autofills in session tab', function * () {
+      it('autofills in session tab', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .ipcSend(messages.SHORTCUT_NEW_FRAME, this.formfill + '?2', { partitionNumber: 3 })
@@ -523,7 +522,7 @@ describe('Autofill', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .waitForVisible('.contextMenuItemText')
           .click('.contextMenuItemText')
-          .tabByIndex(0)
+          .tabByIndex(1)
           .getValue('[name="04fullname"]').should.eventually.be.equal('test')
       })
     })

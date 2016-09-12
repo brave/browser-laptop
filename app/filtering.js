@@ -23,6 +23,7 @@ const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
 const config = require('../js/constants/config')
 const locale = require('./locale')
+const {isSessionPartition} = require('../js/state/frameStateUtil')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
 const app = electron.app
@@ -462,7 +463,11 @@ function initForPartition (partition) {
     registerPermissionHandler,
     registerForHeadersReceived,
     registerForDownloadListener]
-  let ses = session.fromPartition(partition)
+  let options = {}
+  if (isSessionPartition(partition)) {
+    options.parent_partition = ''
+  }
+  let ses = session.fromPartition(partition, options)
   fns.forEach((fn) => { fn(ses, partition) })
 }
 

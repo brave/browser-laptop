@@ -56,10 +56,5 @@ module.exports.getActivePasswordManager = (settingsCollection) => {
     displayName: displayNames[passwordManager]
   }
 
-  if (passwordManager === passwordManagers.LAST_PASS) {
-    details.popupWidth = 350
-    details.popupHeight = 448
-  }
-
   return Immutable.fromJS(details)
 }
