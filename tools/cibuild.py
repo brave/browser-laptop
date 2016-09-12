@@ -63,6 +63,8 @@ if any(not os.environ.has_key(v) for v in deps):
 
 execute(['git', 'pull'])
 execute(['rm', '-Rf', 'node_modules'])
+execute(['rm', '-Rf', 'Brave-%s-%s' % (PLATFORM, TARGET_ARCH)])
+execute(['rm', '-Rf', 'dist'])
 
 write_npmrc()
 
