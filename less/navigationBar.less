@@ -35,11 +35,14 @@
 }
 
 // Style adjustments needed for slim titlebar to work properly
+.platform--win32 div#window.frameless {
+  border: 1px solid #000;
+  box-sizing: border-box;
+}
 .navbarCaptionButtonContainer {
   display: flex;
   border-bottom: 1px solid #aaaaaa;
 }
-
 .navbarMenubarFlexContainer {
   display: flex;
   flex: 1;
