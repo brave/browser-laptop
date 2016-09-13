@@ -79,10 +79,6 @@ class UpdateLog extends ImmutableComponent {
 class UpdateAvailable extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello' />
-      <span className='message' data-l10n-id='updateAvail' />
-      <span className='message secondary' data-l10n-id='updateRequiresRelaunch' />
-      <span className='spacer' />
       <span className='options'>
         {
           this.props.metadata && this.props.metadata.get('notes')
@@ -98,6 +94,10 @@ class UpdateAvailable extends ImmutableComponent {
           l10nId='updateNow'
           onClick={appActions.setUpdateStatus.bind(null, UpdateStatus.UPDATE_APPLYING_RESTART, false, undefined)} />
       </span>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHello' />
+      <span className='message' data-l10n-id='updateAvail' />
+      <span className='message secondary' data-l10n-id='updateRequiresRelaunch' />
+      <span className='spacer' />
     </div>
   }
 }
@@ -105,13 +105,13 @@ class UpdateAvailable extends ImmutableComponent {
 class UpdateChecking extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} />
-      <span className='message' data-l10n-id='updateChecking' />
-      <span className='spacer' />
       <span className='options'>
         <UpdateLog />
         <UpdateHide />
       </span>
+      <UpdateHello updateStatus={this.props.updateStatus} />
+      <span className='message' data-l10n-id='updateChecking' />
+      <span className='spacer' />
     </div>
   }
 }
@@ -119,13 +119,13 @@ class UpdateChecking extends ImmutableComponent {
 class UpdateDownloading extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} />
-      <span className='message' data-l10n-id='updateDownloading' />
-      <span className='spacer' />
       <span className='options'>
         <UpdateLog />
         <UpdateHide />
       </span>
+      <UpdateHello updateStatus={this.props.updateStatus} />
+      <span className='message' data-l10n-id='updateDownloading' />
+      <span className='spacer' />
     </div>
   }
 }
@@ -133,13 +133,13 @@ class UpdateDownloading extends ImmutableComponent {
 class UpdateError extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops' />
-      <span className='message' data-l10n-id='updateError' />
-      <span className='spacer' />
       <span className='options'>
         <UpdateLog />
         <UpdateHide reset />
       </span>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateOops' />
+      <span className='message' data-l10n-id='updateError' />
+      <span className='spacer' />
     </div>
   }
 }
@@ -147,12 +147,12 @@ class UpdateError extends ImmutableComponent {
 class UpdateNotAvailable extends ImmutableComponent {
   render () {
     return <div>
-      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet' />
-      <span className='message' data-l10n-id='updateNotAvail' />
-      <span className='spacer' />
       <span className='options'>
         <UpdateHide reset />
       </span>
+      <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateNotYet' />
+      <span className='message' data-l10n-id='updateNotAvail' />
+      <span className='spacer' />
     </div>
   }
 }
