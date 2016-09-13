@@ -109,6 +109,10 @@ const doAction = (action) => {
       if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
       if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
       break
+    case appConstants.APP_NETWORK_CONNECTED:
+      break
+    case appConstants.APP_NETWORK_DISCONNECTED:
+      break
     default:
   }
 }
