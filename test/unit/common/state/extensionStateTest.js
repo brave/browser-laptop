@@ -274,22 +274,26 @@ describe('extensionState', function () {
   })
 
   describe('getBrowserActionByTabId', function () {
+    before(function () {
+      this.state = defaultAppState.setIn(['extensions', 'abcd'],
+        abcdBrowserAction.setIn(['browserAction', 'tabs', '1'], Immutable.fromJS({
+          title: 'tabTitle'
+        })))
+    })
+
     describe('without tab-specific properties', function () {
       before(function () {
-        this.state = defaultAppState.setIn(['extensions', 'abcd'], abcdBrowserAction)
         this.browserAction = extensionState.getBrowserActionByTabId(this.state, 'abcd', '1')
       })
 
       it('should return the default browserAction properties', function () {
-        assert(Immutable.is(this.browserAction, abcdBrowserAction.get('browserAction')))
+        assert.equal(this.browserAction.get('title'), abcdBrowserAction.getIn(['browserAction', 'title']))
+        assert.equal(this.browserAction.get('popup'), abcdBrowserAction.getIn(['browserAction', 'popup']))
       })
     })
 
     describe('with tab-specific properties', function () {
       before(function () {
-        this.state = defaultAppState.setIn(['extensions', 'abcd'], abcdBrowserAction.setIn(['browserAction', 'tabs', '1'], Immutable.fromJS({
-          title: 'tabTitle'
-        })))
         this.browserAction = extensionState.getBrowserActionByTabId(this.state, 'abcd', '1')
       })
 
@@ -301,12 +305,14 @@ describe('extensionState', function () {
 
     describe('no browser action for the extensionId', function () {
       before(function () {
-        this.state = defaultAppState.setIn(['extensions', 'abcd'], abcdBrowserAction)
-        this.browserAction = extensionState.getBrowserActionByTabId(this.state, 'abcd', '1')
+        let state = this.state.setIn(['extensions', 'abcde'], Immutable.fromJS({}))
+        this.browserAction1 = extensionState.getBrowserActionByTabId(state, 'abcde', '1')
+        this.browserAction2 = extensionState.getBrowserActionByTabId(state, 'abcdef', '1')
       })
 
       it('should return null', function () {
-        assert(this.browserAction, null)
+        assert.equal(this.browserAction1, null)
+        assert.equal(this.browserAction2, null)
       })
     })
   })
