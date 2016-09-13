@@ -364,7 +364,7 @@ class Frame extends ImmutableComponent {
         // to the UrlBar
         if (this.props.location === 'about:newtab') {
           windowActions.setUrlBarActive(true)
-          windowActions.setUrlBarSelected(false)
+          windowActions.setUrlBarFocused(true)
         } else {
           // If it is a regular webpage, just focus the webcontents
           this.webview.focus()

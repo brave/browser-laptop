@@ -555,6 +555,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break
+    case WindowConstants.WINDOW_SET_URL_BAR_FOCUSED:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.isFocused)
+      break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
       windowState = windowState.mergeIn(urlBarPath, {
