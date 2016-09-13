@@ -532,7 +532,9 @@ var synopsisNormalizer = () => {
       faviconURL: publisher.faviconURL,
       score: results[i].scores[scorekeeper]
     }
-    if (results[i].protocol) data[i].publisherURL = results[i].protocol + '//' + results[i].publisher
+    // HACK: Protocol is sometimes blank here, so default to http:// so we can
+    // still generate publisherURL.
+    data[i].publisherURL = (results[i].protocol || 'http:') + '//' + results[i].publisher
 
     pct[i] = Math.round((results[i].scores[scorekeeper] * 100) / total)
 
