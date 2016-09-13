@@ -276,7 +276,7 @@ function registerPermissionHandler (session, partition) {
   const isPrivate = !partition.startsWith('persist:')
   // Keep track of per-site permissions granted for this session.
   let permissions = null
-  session.setPermissionRequestHandler((origin, embedderOrigin, permission, cb) => {
+  session.setPermissionRequestHandler((origin, mainFrameUrl, permission, cb) => {
     if (!permissions) {
       permissions = {
         media: {
@@ -305,7 +305,7 @@ function registerPermissionHandler (session, partition) {
         }
       }
     }
-    const url = origin || embedderOrigin
+    const url = mainFrameUrl || origin
     // Allow notifications for the main app
     if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||
         url.startsWith('chrome-extension://') && permission === 'openExternal') {
@@ -340,12 +340,7 @@ function registerPermissionHandler (session, partition) {
       }
     }
 
-    const urlOrigin = getOrigin(url)
-    const frameOrigin = getOrigin(embedderOrigin)
-    if (!urlOrigin || !frameOrigin) {
-      return
-    }
-    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, urlOrigin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
+    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
     // If this is a duplicate, clear the previous callback and use the new one
     if (permissionCallbacks[message]) {
@@ -357,7 +352,7 @@ function registerPermissionHandler (session, partition) {
         {text: locale.translation('deny')},
         {text: locale.translation('allow')}
       ],
-      frameOrigin,
+      origin,
       options: {
         persist: true
       },
@@ -372,7 +367,7 @@ function registerPermissionHandler (session, partition) {
       cb(result)
       if (persist) {
         // remember site setting for this host over http(s)
-        appActions.changeSiteSetting(urlOrigin, permission + 'Permission', result, isPrivate)
+        appActions.changeSiteSetting(getOrigin(url), permission + 'Permission', result, isPrivate)
       }
     }
   })
