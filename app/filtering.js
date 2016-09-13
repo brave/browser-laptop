@@ -305,13 +305,6 @@ function registerPermissionHandler (session, partition) {
         }
       }
     }
-    const url = mainFrameUrl || origin
-    // Allow notifications for the main app
-    if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||
-        url.startsWith('chrome-extension://') && permission === 'openExternal') {
-      cb(true)
-      return
-    }
 
     if (!permissions[permission]) {
       console.log('WARNING: got unregistered permission request', permission)
@@ -319,10 +312,24 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
+    // TOOD(bridiver) - this seems overly permissive and we should narrow this down
+    // to the specific extension that required it which is most likely PDFJS
+    if (origin.startsWith('chrome-extension://') && permission === 'openExternal') {
+      cb(true)
+      return
+    }
+
+    if (mainFrameUrl === appUrlUtil.getIndexHTML() || origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
+      // lookup, display and store site settings by "Brave Browser"
+      origin = 'Brave Browser'
+      // display on all tabs
+      mainFrameUrl = null
+    }
+
     // Check whether there is a persistent site setting for this host
     const appState = AppStore.getState()
-    const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
-    const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+    const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), origin)
+    const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     const permissionName = permission + 'Permission'
     if (settings) {
       let isAllowed = settings.get(permissionName)
@@ -352,7 +359,7 @@ function registerPermissionHandler (session, partition) {
         {text: locale.translation('deny')},
         {text: locale.translation('allow')}
       ],
-      origin,
+      frameOrigin: getOrigin(mainFrameUrl),
       options: {
         persist: true
       },
@@ -367,7 +374,7 @@ function registerPermissionHandler (session, partition) {
       cb(result)
       if (persist) {
         // remember site setting for this host over http(s)
-        appActions.changeSiteSetting(getOrigin(url), permission + 'Permission', result, isPrivate)
+        appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
       }
     }
   })

@@ -63,7 +63,6 @@ class PasswordItem extends React.Component {
   onCopy () {
     if (this.state.decrypted !== null) {
       aboutActions.setClipboard(this.state.decrypted)
-      aboutActions.showNotification('passwordCopied')
     } else {
       this.decrypt(false)
     }
@@ -74,7 +73,6 @@ class PasswordItem extends React.Component {
       return
     }
     aboutActions.setClipboard(details.decrypted)
-    aboutActions.showNotification('passwordCopied')
     this.setState({
       decrypted: details.decrypted
     })

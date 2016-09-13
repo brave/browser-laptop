@@ -580,8 +580,7 @@ class Frame extends ImmutableComponent {
     } else {
       flash.checkFlashInstalled((installed) => {
         if (installed) {
-          currentWindow.webContents.send(messages.SHOW_NOTIFICATION,
-                                         locale.translation('flashInstalled'))
+          void new window.Notification(locale.translation('flashInstalled'))
         } else if (noFlashCallback) {
           noFlashCallback()
         }
