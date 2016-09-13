@@ -421,7 +421,7 @@ var enable = (onoff) => {
     updatePublisherInfo()
 
     // Check if relevant browser notifications should be shown every 15 minutes
-    notificationTimeout = setInterval(showNotifications, msecs.minute * 15)
+    notificationTimeout = setInterval(showNotifications, 15 * msecs.minute)
 
     fs.readFile(pathName(publisherPath), (err, data) => {
       if (err) {
@@ -632,23 +632,6 @@ var visit = (location, timestamp, tabId) => {
 var cacheRuleSet = (ruleset) => {
   var stewed, syncP
 
-  var prune = function (tree) {
-    var result
-
-    if (util.isArray(tree)) {
-      result = []
-      tree.forEach((branch) => { result.push(prune(branch)) })
-      return result
-    }
-
-    if (typeof tree !== 'object') return tree
-
-    tree = underscore.omit(tree, [ 'start', 'end', 'raw' ])
-    result = {}
-    underscore.keys(tree).forEach((key) => { result[key] = prune(tree[key]) })
-    return result
-  }
-
   if ((!ruleset) || (underscore.isEqual(publisherInfo._internal.ruleset.raw, ruleset))) return
 
   try {
@@ -696,6 +679,7 @@ var cacheRuleSet = (ruleset) => {
 
         if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
         delete synopsis.publishers[publisher]
+        delete publishers[publisher]
         syncP = true
       })
     })
@@ -1170,14 +1154,19 @@ var cacheReturnValue = () => {
 var syncingP = {}
 
 var syncWriter = (path, obj, options, cb) => {
-  if (syncingP[path]) return
-  syncingP[path] = true
-
   if (typeof options === 'function') {
     cb = options
     options = null
   }
   options = underscore.defaults(options || {}, { encoding: 'utf8', mode: parseInt('644', 8) })
+
+  if (syncingP[path]) {
+    if (options.noRetryP) return
+
+    options.noRetryP = true
+    return setTimeout(() => { syncWriter(path, obj, options, cb) }, 5 * msecs.second)
+  }
+  syncingP[path] = true
 
   fs.writeFile(path, JSON.stringify(obj, null, 2), options, (err) => {
     delete syncingP[path]

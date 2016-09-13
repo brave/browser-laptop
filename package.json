@@ -91,7 +91,7 @@
     "l20n": "^3.5.1",
     "ledger-balance": "^0.8.60",
     "ledger-client": "^0.8.70",
-    "ledger-geoip": "^0.8.70",
+    "ledger-geoip": "^0.8.71",
     "ledger-publisher": "^0.8.63",
     "lru_cache": "^1.0.0",
     "qr-image": "^3.1.0",
