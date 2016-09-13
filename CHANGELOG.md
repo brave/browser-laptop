@@ -1,10 +1,10 @@
 # Changelog
 
 ## [0.12.1](https://github.com/brave/browser-laptop/releases/v0.12.1dev)
- - Added about:extensions page. ([#3926](https://github.com/brave/browser-laptop/issues/3926))
  - Added support for extension action buttons for password managers. ([#3867](https://github.com/brave/browser-laptop/issues/3867))([#2224](https://github.com/brave/browser-laptop/issues/2224))
- - Added clear Autofill option. ([#3458](https://github.com/brave/browser-laptop/issues/3458))
  - Added notification to let users know 24 hours before their wallet would be used to pay publishers. ([#3828](https://github.com/brave/browser-laptop/issues/3828))
+ - Added about:extensions page. ([#3926](https://github.com/brave/browser-laptop/issues/3926))
+ - Added clear Autofill option. ([#3458](https://github.com/brave/browser-laptop/issues/3458))
  - Added notification in Brave Payments to inform user of their contribution day. ([#3801](https://github.com/brave/browser-laptop/issues/3801))
  - Added Malay (Malaysia) language. ([#3843](https://github.com/brave/browser-laptop/issues/3843))
  - Fixed numerous things for Brave Payments. ([#3711](https://github.com/brave/browser-laptop/issues/3711))([#3612](https://github.com/brave/browser-laptop/issues/3612))([#3785](https://github.com/brave/browser-laptop/issues/3785))([#3852](https://github.com/brave/browser-laptop/issues/3852))([#3716](https://github.com/brave/browser-laptop/issues/3716))([#3778](https://github.com/brave/browser-laptop/issues/3778))([#3830](https://github.com/brave/browser-laptop/issues/3830))([#3805](https://github.com/brave/browser-laptop/issues/3805))([#3824](https://github.com/brave/browser-laptop/issues/3824))([#3831](https://github.com/brave/browser-laptop/issues/3831))
