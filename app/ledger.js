@@ -1164,7 +1164,6 @@ var syncWriter = (path, obj, options, cb) => {
     if (options.noRetryP) return
 
     options.noRetryP = true
-    console.log('\nretrying ' + path)
     return setTimeout(() => { syncWriter(path, obj, options, cb) }, 5 * msecs.second)
   }
   syncingP[path] = true
