@@ -72,12 +72,21 @@ const windowActions = {
         location
       }, true)
     } else {
-      dispatch({
-        actionType: WindowConstants.WINDOW_SET_URL,
-        location,
-        key: frame.get('key')
-      })
+      this.setUrl(location, frame.get('key'))
     }
+  },
+
+  /**
+   * Dispatches a message to the store to set the new URL.
+   * @param {string} location
+   * @param {number} key
+   */
+  setUrl: function (location, key) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL,
+      location,
+      key
+    })
   },
 
   /**

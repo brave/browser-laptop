@@ -596,12 +596,20 @@ describe('navigationBar', function () {
         yield this.app.client.keys('\uE007')
       })
 
+      it('sets location to new URL immediately', function * () {
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === 'https://bayden.com/test/redir/goscript.aspx'
+            })
+          })
+      })
+
       it('clears urlbar if page does not load', function * () {
         yield this.app.client
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
-              console.log('value', val)
-              return val === ''
+              return val.endsWith('/about-newtab.html')
             })
           })
       })

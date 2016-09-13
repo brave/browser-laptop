@@ -293,6 +293,9 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(tabStatePath(action.key), {
           location: action.location
         })
+        // Show the location for directly-entered URLs before the page finishes
+        // loading
+        updateNavBarInput(action.location, frameStatePath(action.key))
       }
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
