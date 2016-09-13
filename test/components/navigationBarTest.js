@@ -605,11 +605,11 @@ describe('navigationBar', function () {
           })
       })
 
-      it('clears urlbar if page does not load', function * () {
+      it('resets URL to previous location if page does not load', function * () {
         yield this.app.client
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
-              return val.endsWith('/about-newtab.html')
+              return val.endsWith('/about-newtab.html') || val === ''
             })
           })
       })

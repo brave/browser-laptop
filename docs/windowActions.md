@@ -36,6 +36,18 @@ but the location should. For user entered new URLs, both should be updated.
 
 
 
+### setUrl(location, key) 
+
+Dispatches a message to the store to set the new URL.
+
+**Parameters**
+
+**location**: `string`, Dispatches a message to the store to set the new URL.
+
+**key**: `number`, Dispatches a message to the store to set the new URL.
+
+
+
 ### setNavigated(location, key, isNavigatedInPage) 
 
 Dispatches a message to the store to let it know a page has been navigated.
