@@ -150,7 +150,7 @@ var boot = () => {
       bootP = false
       return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
     }
-    if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 }) * msecs.minute)
+    if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
     getBalance()
 
     bootP = false
@@ -374,7 +374,7 @@ var initialize = (onoff) => {
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
         }
-        if (client.sync(callback) === true) run(random.randomInt({ min: 1, max: 10 }) * msecs.minute)
+        if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
         cacheRuleSet(state.ruleset)
 
         // Make sure bravery props are up-to-date with user settings
@@ -850,7 +850,7 @@ var callback = (err, result, delayTime) => {
     console.log('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
-    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1 * msecs.minute, max: 10 * msecs.minute })
+    if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: msecs.minute, max: 10 * msecs.minute })
   }
 
   if (!result) return run(delayTime)
@@ -863,7 +863,8 @@ var callback = (err, result, delayTime) => {
   }
   cacheRuleSet(result.ruleset)
 
-  syncWriter(pathName(statePath), result, () => { run(delayTime) })
+  syncWriter(pathName(statePath), result, () => {})
+  run(delayTime)
 }
 
 var roundtrip = (params, options, callback) => {
@@ -937,7 +938,7 @@ var roundtrip = (params, options, callback) => {
 var runTimeoutId = false
 
 var run = (delayTime) => {
-//  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+  if (clientOptions.verboseP) console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
 
   if ((typeof delayTime === 'undefined') || (!client)) return
 
@@ -967,13 +968,13 @@ var run = (delayTime) => {
     } catch (ex) {
       delayTime = false
     }
-    if (delayTime === false) delayTime = random.randomInt({ min: 1, max: 10 }) * msecs.minute
+    if (delayTime === false) delayTime = random.randomInt({ min: msecs.minute, max: 10 * msecs.minute })
   }
   if (delayTime > 0) {
     if (runTimeoutId) return console.log('\ninterception')
 
     active = client
-    if (delayTime > msecs.day) delayTime = msecs.day
+    if (delayTime > (1 * msecs.hour)) delayTime = random.randomInt({ min: 3 * msecs.minute, max: msecs.hour })
 
     runTimeoutId = setTimeout(() => {
       runTimeoutId = false
@@ -1166,11 +1167,11 @@ var cacheReturnValue = () => {
  * low-level utilities
  */
 
-var syncP = {}
+var syncingP = {}
 
 var syncWriter = (path, obj, options, cb) => {
-  if (syncP[path]) return
-  syncP[path] = true
+  if (syncingP[path]) return
+  syncingP[path] = true
 
   if (typeof options === 'function') {
     cb = options
@@ -1179,7 +1180,7 @@ var syncWriter = (path, obj, options, cb) => {
   options = underscore.defaults(options || {}, { encoding: 'utf8', mode: parseInt('644', 8) })
 
   fs.writeFile(path, JSON.stringify(obj, null, 2), options, (err) => {
-    syncP[path] = false
+    delete syncingP[path]
 
     if (err) console.log('write error: ' + err.toString())
 
