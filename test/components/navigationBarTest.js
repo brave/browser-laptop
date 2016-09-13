@@ -585,31 +585,44 @@ describe('navigationBar', function () {
 
   describe('submit', function () {
     describe('page that does not load', function () {
-      Brave.beforeAll(this)
+      Brave.beforeEach(this)
 
-      before(function * () {
-        var page1 = 'https://bayden.com/test/redir/goscript.aspx'
+      beforeEach(function * () {
+        this.page1 = Brave.server.url('page1.html')
+        this.page2 = 'https://bayden.com/test/redir/goscript.aspx'
         yield setup(this.app.client)
-        yield this.app.client.waitForExist(urlInput)
-        yield this.app.client.keys(page1)
-        // hit enter
-        yield this.app.client.keys('\uE007')
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist(urlInput)
+          .waitForElementFocus(urlInput)
       })
 
-      it('sets location to new URL immediately', function * () {
+      it('sets location to new URL', function * () {
+        const page2 = this.page2
+        yield this.app.client.keys(this.page2)
+        yield this.app.client.keys('\uE007')
         yield this.app.client
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
-              return val === 'https://bayden.com/test/redir/goscript.aspx'
+              return val === page2
             })
           })
       })
 
       it('resets URL to previous location if page does not load', function * () {
+        const page1 = this.page1
+        yield this.app.client.tabByUrl(this.newTabUrl).url(page1).waitForUrl(page1).windowParentByUrl(page1)
+        yield this.app.client
+          .moveToObject(navigator)
+          .waitForExist(urlInput)
+          .click(urlInput)
+        yield selectsText(this.app.client, page1)
+        yield this.app.client.keys(this.page2)
+        yield this.app.client.keys('\uE007')
         yield this.app.client
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => {
-              return val.endsWith('/about-newtab.html') || val === ''
+              return val === page1
             })
           })
       })
