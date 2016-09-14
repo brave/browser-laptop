@@ -219,7 +219,7 @@ if (ipc) {
       }
       // If > 24 hours has passed, it might be time to show the reconciliation
       // message again
-      setTimeout(() => { reconciliationNotificationShown = false }, msecs.day)
+      setTimeout(() => { reconciliationNotificationShown = false }, 1 * msecs.day)
     }
   })
 
@@ -414,7 +414,18 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
-    if (process.env.NODE_ENV === 'test') synopsis.options.minDuration = 0
+    if (process.env.NODE_ENV === 'test') {
+      synopsis.options.minDuration = 0
+      synopsis.options.minPublisherDuration = 0
+      synopsis.options.minPublisherVisits = 0
+    } else {
+      if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
+        synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
+      }
+      if (process.env.LEDGER_PUBLISHER_MIN_VISITS) {
+        synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
+      }
+    }
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
@@ -503,6 +514,9 @@ var synopsisNormalizer = () => {
   results = []
   underscore.keys(synopsis.publishers).forEach((publisher) => {
     if (synopsis.publishers[publisher].scores[scorekeeper] <= 0) return
+
+    if ((synopsis.options.minPublisherDuration > synopsis.publishers[publisher].duration) ||
+        (synopsis.options.minPublisherVisits > synopsis.publishers[publisher].visits)) return
 
     results.push(underscore.extend({ publisher: publisher }, underscore.omit(synopsis.publishers[publisher], 'window')))
   }, synopsis)
@@ -1027,7 +1041,7 @@ var balanceTimeoutId = false
 var getBalance = () => {
   if (!client) return
 
-  balanceTimeoutId = setTimeout(getBalance, msecs.minute)
+  balanceTimeoutId = setTimeout(getBalance, 1 * msecs.minute)
   if (!ledgerInfo.address) return
 
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
@@ -1163,14 +1177,20 @@ var syncWriter = (path, obj, options, cb) => {
   options = underscore.defaults(options || {}, { encoding: 'utf8', mode: parseInt('644', 8) })
 
   if (syncingP[path]) {
-    if (options.noRetryP) return
-
-    options.noRetryP = true
-    return setTimeout(() => { syncWriter(path, obj, options, cb) }, 5 * msecs.second)
+    syncingP[path] = { obj: obj, options: options, cb: cb }
+    if (ledgerInfo._internal.debugP) console.log('deferring ' + path)
+    return
   }
   syncingP[path] = true
 
+  if (ledgerInfo._internal.debugP) console.log('writing ' + path)
   fs.writeFile(path, JSON.stringify(obj, null, 2), options, (err) => {
+    var deferred = syncingP[path]
+
+    if (typeof deferred === 'object') {
+      if (ledgerInfo._internal.debugP) console.log('restarting ' + path)
+      syncWriter(path, deferred.obj, deferred.options, deferred.cb)
+    }
     delete syncingP[path]
 
     if (err) console.log('write error: ' + err.toString())
