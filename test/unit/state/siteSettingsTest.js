@@ -69,6 +69,24 @@ describe('siteSettings', function () {
       assert.strictEqual(setting.get('prop1'), 4)
     })
   })
+  describe('exact URL pattern', function () {
+    before(function () {
+      siteSettingsMap = new Immutable.Map()
+      siteSettingsMap = siteSettings.mergeSiteSetting(siteSettingsMap, 'https://www.brave.com/', 'prop1', 1)
+    })
+    it('Can obtain for the exact URL', function * () {
+      const setting = siteSettings.getSiteSettingsForURL(siteSettingsMap, 'https://www.brave.com/')
+      assert.strictEqual(setting.get('prop1'), 1)
+    })
+    it('Does not obtain for non-equal URL', function * () {
+      const setting = siteSettings.getSiteSettingsForURL(siteSettingsMap, 'https://www.brave.com/projects')
+      assert.strictEqual(setting.get('prop1'), undefined)
+    })
+    it('Does not obtain for origin string', function * () {
+      const setting = siteSettings.getSiteSettingsForURL(siteSettingsMap, 'https://www.brave.com')
+      assert.strictEqual(setting.get('prop1'), undefined)
+    })
+  })
   describe('subdomain wildcards', function () {
     before(function () {
       siteSettingsMap = new Immutable.Map()
