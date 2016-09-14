@@ -562,7 +562,7 @@ const createMenu = () => {
         },
         CommonMenu.separatorMenuItem,
         {
-          label: `Hide ${appConfig.name}`,
+          label: locale.translation('hideBrave'),
           accelerator: 'Command+H',
           role: 'hide'
         }, {
