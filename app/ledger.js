@@ -419,6 +419,9 @@ var enable = (onoff) => {
       synopsis.options.minPublisherDuration = 0
       synopsis.options.minPublisherVisits = 0
     } else {
+      if (process.env.LEDGER_PUBLISHER_VISIT_DURATION) {
+        synopsis.options.minDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_VISIT_DURATION)
+      }
       if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
         synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
       }
