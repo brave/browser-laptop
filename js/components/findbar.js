@@ -188,16 +188,16 @@ class FindBar extends ImmutableComponent {
             onClick={this.onClear} />
         </div>
         <span className='findMatchText'>{findMatchText}</span>
-        <Button iconClass='findButton fa-caret-down'
-          inlineStyles={findBarStyle}
-          className='findButton smallButton findNext'
-          disabled={this.numberOfMatches <= 0}
-          onClick={this.onFindNext} />
         <Button iconClass='findButton fa-caret-up'
           inlineStyles={findBarStyle}
           className='findButton smallButton findPrev'
           disabled={this.numberOfMatches <= 0}
           onClick={this.onFindPrev} />
+        <Button iconClass='findButton fa-caret-down'
+          inlineStyles={findBarStyle}
+          className='findButton smallButton findNext'
+          disabled={this.numberOfMatches <= 0}
+          onClick={this.onFindNext} />
         <SwitchControl
           id='caseSensitivityCheckbox'
           checkedOn={this.isCaseSensitive}
