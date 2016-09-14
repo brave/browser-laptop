@@ -1153,7 +1153,7 @@ var cacheReturnValue = () => {
   }
 }
 
-var networkConnected = () => {
+var networkConnected = underscore.debounce(() => {
   if (!client) return
 
   if (runTimeoutId) {
@@ -1164,7 +1164,7 @@ var networkConnected = () => {
 
   if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
   balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
-}
+}, 1 * msecs.minute, true)
 
 /*
  * low-level utilities
