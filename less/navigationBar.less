@@ -225,6 +225,7 @@
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
+      width: 20px;
     }
   }
 
@@ -250,15 +251,12 @@
       position: absolute;
       top: -2px;
       right: 0;
-    }
 
-    .noScript {
-      font-size: 12px;
-      position: absolute;
-      left: -30px;
-      top: 7px;
-      opacity: 1;
-      color: @braveOrange;
+      .browserButton {
+        font-size: 10px;
+        width: 20px;
+        opacity: 0.6;
+      }
     }
 
     .urlbarIcon {
@@ -279,10 +277,6 @@
     }
 
     .bookmarkButton {
-      transform: scale(0.6);
-      opacity: 0.6;
-      text-align: left;
-
       &:not(.removeBookmarkButton) {
         display: none;
       }
@@ -314,11 +308,6 @@
     font-size: 16px;
     margin-left: 10px;
     color: @braveOrange;
-    opacity: 0.6;
-    &:hover {
-      opacity: 1;
-    }
-    display: inline;
   }
 
   /* Disable selection of button text */
