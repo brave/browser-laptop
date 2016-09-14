@@ -109,11 +109,13 @@ const doAction = (action) => {
       if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
       if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
       break
+
     case appConstants.APP_NETWORK_CONNECTED:
+      setTimeout(networkConnected, 1 * msecs.second)
       break
-    case appConstants.APP_NETWORK_DISCONNECTED:
-      break
+
     default:
+      break
   }
 }
 
@@ -1149,6 +1151,19 @@ var cacheReturnValue = () => {
   } catch (ex) {
     console.log('qr.imageSync error: ' + ex.toString())
   }
+}
+
+var networkConnected = () => {
+  if (!client) return
+
+  if (runTimeoutId) {
+    clearTimeout(runTimeoutId)
+    runTimeoutId = false
+  }
+  if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
+
+  if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
+  balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
 }
 
 /*
