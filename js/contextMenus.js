@@ -409,11 +409,10 @@ function autofillTemplateInit (suggestions, frame) {
 
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
-  const items = []
+  const items = [CommonMenu.newTabMenuItem(frameProps.get('key'))]
   const location = frameProps.get('location')
   if (location !== 'about:newtab') {
     items.push(
-      CommonMenu.newTabMenuItem(frameProps.get('key')),
       CommonMenu.separatorMenuItem,
       {
         label: locale.translation('reloadTab'),
