@@ -87,6 +87,19 @@ function registerForBeforeRequest (session) {
       return
     }
 
+    if (appUrlUtil.isTargetAboutUrl(details.url)) {
+      if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
+        // add webpack dev server port
+        let url = details.url
+        let urlComponents = url.split('#')
+        urlComponents[0] = urlComponents[0] + '?devServerPort=' + (process.env.BRAVE_PORT || process.env.npm_package_config_port)
+        cb({
+          redirectURL: urlComponents.join('#')
+        })
+        return
+      }
+    }
+
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
       const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK

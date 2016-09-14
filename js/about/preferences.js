@@ -1134,7 +1134,7 @@ class SecurityTab extends ImmutableComponent {
             ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
               <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
                 location: 'https://get.adobe.com/flashplayer'
-              })}>{'Adobe'}</span>.</span>
+              }, true)}>{'Adobe'}</span>.</span>
             : <span data-l10n-id='enableFlashSubtextLinux' />
         }
         </span>
