@@ -324,12 +324,15 @@ function registerPermissionHandler (session, partition) {
       origin = 'Brave Browser'
       // display on all tabs
       mainFrameUrl = null
+    } else {
+      // Strip trailing slash
+      origin = getOrigin(origin)
     }
 
     // Check whether there is a persistent site setting for this host
     const appState = AppStore.getState()
-    const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), origin)
-    const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
+    const settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
+    const tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
     const permissionName = permission + 'Permission'
     if (settings) {
       let isAllowed = settings.get(permissionName)
