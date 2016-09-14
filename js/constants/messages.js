@@ -72,7 +72,6 @@ const messages = {
   ENTER_FULL_SCREEN: _,
   SET_CLIPBOARD: _,
   GOT_CANVAS_FINGERPRINTING: _,
-  SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
   GO_BACK: _,
   GO_FORWARD: _,
   RELOAD: _,

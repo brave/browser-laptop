@@ -156,10 +156,6 @@ const AboutActions = {
     ipc.send(messages.CHECK_FLASH_INSTALLED)
   },
 
-  showNotification: function (msg) {
-    ipc.send(messages.SHOW_NOTIFICATION, msg)
-  },
-
   setResourceEnabled: function (resourceName, enabled) {
     AboutActions.dispatchAction({
       actionType: AppConstants.APP_SET_RESOURCE_ENABLED,

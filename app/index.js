@@ -450,13 +450,6 @@ app.on('ready', () => {
       electron.clipboard.writeText(text)
     })
 
-    ipcMain.on(messages.SHOW_NOTIFICATION, (e, msg) => {
-      if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
-                                                          locale.translation(msg))
-      }
-    })
-
     ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
       flash.checkFlashInstalled((installed) => {
         e.sender.send(messages.FLASH_UPDATED, installed)
