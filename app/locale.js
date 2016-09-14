@@ -128,6 +128,7 @@ var rendererIdentifiers = function () {
     'help',
     'sendUsFeedback',
     'services',
+    'hideBrave',
     'hideOthers',
     'showAll',
     'newPrivateTab',
