@@ -387,7 +387,8 @@ class BitcoinDashboard extends ImmutableComponent {
         : null
       }
       <div className='board'>
-        { (this.userInAmerica)
+        {
+          this.userInAmerica
           ? this.coinbasePanel
           : this.exchangePanel
         }
@@ -1342,6 +1343,9 @@ class AboutPreferences extends React.Component {
     }
     if (key === settings.PAYMENTS_ENABLED) {
       this.onChangeSetting(settings.PAYMENTS_NOTIFICATIONS, value)
+      if (value === true) {
+        this.createWallet()
+      }
     }
   }
 
@@ -1357,6 +1361,12 @@ class AboutPreferences extends React.Component {
     // Tell ledger when Add Funds overlay is closed
     if (isVisible === false && overlayName === 'addFunds') {
       ipc.send(messages.ADD_FUNDS_CLOSED)
+    }
+  }
+
+  createWallet () {
+    if (this.state.ledgerData && !this.state.ledgerData.get('created')) {
+      aboutActions.createWallet()
     }
   }
 

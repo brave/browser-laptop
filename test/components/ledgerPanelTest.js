@@ -85,11 +85,12 @@ describe('Payments Panel', function () {
         .waitForVisible(paymentsWelcomePage)
         .click(walletSwitch)
         .waitUntil(function () {
-          return this.getText(paymentsStatus).then((val) => val.includes('get started'))
-        })
-        .click(addFundsButton)
-        .waitUntil(function () {
           return this.getText(paymentsStatus).then((val) => val.includes('Creating'))
+        })
+        .waitUntil(function () {
+          // Note: wallet creation may take a long time, so this test is likely
+          // to time out.
+          return this.getText(addFundsButton).then((val) => val.includes('Add funds'))
         })
     })
   })
