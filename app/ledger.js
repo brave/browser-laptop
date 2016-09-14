@@ -957,7 +957,7 @@ var run = (delayTime) => {
     if (delayTime === false) delayTime = random.randomInt({ min: msecs.minute, max: 10 * msecs.minute })
   }
   if (delayTime > 0) {
-    if (runTimeoutId) return console.log('\ninterception')
+    if (runTimeoutId) return
 
     active = client
     if (delayTime > (1 * msecs.hour)) delayTime = random.randomInt({ min: 3 * msecs.minute, max: msecs.hour })
