@@ -421,6 +421,9 @@ module.exports.getOrigin = function (location) {
   if (typeof location !== 'string') {
     return null
   }
+  if (location.startsWith('file://')) {
+    return 'file:///'
+  }
   let parsed = urlParse(location)
   if (parsed.host && parsed.protocol) {
     return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')

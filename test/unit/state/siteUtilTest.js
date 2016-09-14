@@ -572,6 +572,13 @@ describe('siteUtil', function () {
   })
 
   describe('getOrigin', function () {
+    it('returns file:/// for any file url', function () {
+      assert.strictEqual(siteUtil.getOrigin('file://'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///some'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///some/'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///some/path'), 'file:///')
+    })
     it('gets URL origin for simple url', function () {
       assert.strictEqual(siteUtil.getOrigin('https://abc.bing.com'), 'https://abc.bing.com')
     })
