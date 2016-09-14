@@ -1,0 +1,7 @@
+<script>
+    setTimeout(() => {
+     Notification.requestPermission(function (permission) {
+         document.title = permission
+     })
+    }, 100)
+</script>

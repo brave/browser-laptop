@@ -332,20 +332,26 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
+    // Check whether there is a persistent site setting for this host
+    const appState = AppStore.getState()
+    let settings
+    let tempSettings
     if (mainFrameUrl === appUrlUtil.getIndexHTML() || origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
       // lookup, display and store site settings by "Brave Browser"
       origin = 'Brave Browser'
       // display on all tabs
       mainFrameUrl = null
+      // Lookup by exact host pattern match since 'Brave Browser' is not
+      // a parseable URL
+      settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
+      tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
     } else {
       // Strip trailing slash
       origin = getOrigin(origin)
+      settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), origin)
+      tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     }
 
-    // Check whether there is a persistent site setting for this host
-    const appState = AppStore.getState()
-    const settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
-    const tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
     const permissionName = permission + 'Permission'
     if (settings) {
       let isAllowed = settings.get(permissionName)
@@ -389,7 +395,7 @@ function registerPermissionHandler (session, partition) {
       const result = !!(buttonIndex)
       cb(result)
       if (persist) {
-        // remember site setting for this host over http(s)
+        // remember site setting for this host
         appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
       }
     }

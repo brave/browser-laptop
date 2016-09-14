@@ -315,7 +315,7 @@ var exports = {
     this.app.client.addCommand('changeSiteSetting', function (hostPattern, key, value) {
       return this.execute(function (hostPattern, key, value) {
         return require('../../../js/actions/appActions').changeSiteSetting(hostPattern, key, value)
-      }, key, value).then((response) => response.value)
+      }, hostPattern, key, value).then((response) => response.value)
     })
 
     /**

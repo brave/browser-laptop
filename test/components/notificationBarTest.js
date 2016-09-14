@@ -162,3 +162,31 @@ describe('notificationBar', function () {
       .isExisting(notificationBar).should.eventually.be.false
   })
 })
+
+describe('permissions state', function () {
+  function * setup (client) {
+    yield client
+      .waitUntilWindowLoaded()
+      .waitForBrowserWindow()
+      .waitForVisible('#window')
+      .waitForVisible(urlInput)
+  }
+
+  Brave.beforeAll(this)
+  before(function * () {
+    yield setup(this.app.client)
+  })
+
+  it('applies old saved permissions', function * () {
+    let notificationUrl = Brave.server.url('notificationFail.html')
+    yield this.app.client.changeSiteSetting('https?://localhost:*', 'notificationsPermission', false)
+    yield this.app.client.tabByIndex(0)
+      .loadUrl(notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .moveToObject(activeWebview)
+      .waitForExist(titleBar)
+      .waitUntil(function () {
+        return this.getText(titleBar).then((val) => val.includes('denied'))
+      })
+  })
+})
