@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getSourceAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
+const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
 const { isFrameError } = require('../lib/errorUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -825,7 +825,7 @@ class Frame extends ImmutableComponent {
         interceptFlash(false)
       }
     }
-    const loadFail = (e) => {
+    const loadFail = (e, provisionLoadFailure = false) => {
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
         if (e.validatedURL === aboutUrls.get('about:newtab') ||
@@ -851,12 +851,8 @@ class Frame extends ImmutableComponent {
         })
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
-      } else {
-        const currentLocation = this.webview.getURL()
-        if (currentLocation !== e.validatedURL) {
-          windowActions.setUrl(isTargetAboutUrl(currentLocation)
-            ? getSourceAboutUrl(currentLocation) : currentLocation, this.props.frameKey)
-        }
+      } else if (provisionLoadFailure) {
+        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true)
       }
     }
     this.webview.addEventListener('load-commit', (e) => {
@@ -901,7 +897,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
         loadEnd(false)
-        loadFail(e)
+        loadFail(e, true)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
