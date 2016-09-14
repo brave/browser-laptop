@@ -50,6 +50,7 @@ module.exports.init = () => {
     }
 
     const pepperFlashManifest = JSON.parse(data)
+    app.commandLine.appendSwitch('enable-plugins')
     app.commandLine.appendSwitch('ppapi-flash-path', pepperFlashSystemPluginPath)
     app.commandLine.appendSwitch('ppapi-flash-version', pepperFlashManifest.version)
     return true
