@@ -31,6 +31,7 @@ module.exports = {
   },
   flash: {
     enabled: false,
+    installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash')
   },
   adblock: {

@@ -18,29 +18,6 @@ function showFlashNotification (origin, e) {
   e.stopPropagation()
 }
 
-// Open flash links in the same tab so we can intercept them correctly
-if (chrome.contentSettings.flashActive != 'allow' &&
-    chrome.contentSettings.flashEnabled == 'allow') {
-  (function () {
-    function replaceAdobeLinks () {
-      Array.from(document.querySelectorAll('a')).forEach((elem) => {
-        const href = elem.getAttribute('href')
-        if (isAdobeLink(href)) {
-          elem.onclick = showFlashNotification.bind(null, window.location.origin)
-        }
-      })
-    }
-    replaceAdobeLinks()
-    let interval = setInterval(replaceAdobeLinks, 1000)
-    document.addEventListener('visibilitychange', () => {
-      clearInterval(interval)
-      if (document.visibilityState !== 'hidden') {
-        interval = setInterval(replaceAdobeLinks, 1000)
-      }
-    })
-  })()
-}
-
 /**
  * Whether a src is a .swf file.
  * If so, returns the origin of the file. Otherwise returns false.
@@ -159,6 +136,25 @@ function insertFlashPlaceholders (elem = document.documentElement) {
 
 if (chrome.contentSettings.flashActive != 'allow' ||
     chrome.contentSettings.flashEnabled != 'allow') {
+  // Open flash links in the same tab so we can intercept them correctly
+  (function () {
+    function replaceAdobeLinks () {
+      Array.from(document.querySelectorAll('a')).forEach((elem) => {
+        const href = elem.getAttribute('href')
+        if (isAdobeLink(href)) {
+          elem.onclick = showFlashNotification.bind(null, window.location.origin)
+        }
+      })
+    }
+    replaceAdobeLinks()
+    let interval = setInterval(replaceAdobeLinks, 1000)
+    document.addEventListener('visibilitychange', () => {
+      clearInterval(interval)
+      if (document.visibilityState !== 'hidden') {
+        interval = setInterval(replaceAdobeLinks, 1000)
+      }
+    })
+  })()
   insertFlashPlaceholders()
   let interval = setInterval(insertFlashPlaceholders, 1000)
   document.addEventListener('visibilitychange', () => {

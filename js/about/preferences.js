@@ -1134,7 +1134,7 @@ class SecurityTab extends ImmutableComponent {
           isDarwin || isWindows
             ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
               <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-                location: 'https://get.adobe.com/flashplayer'
+                location: appConfig.flash.installUrl
               }, true)}>{'Adobe'}</span>.</span>
             : <span data-l10n-id='enableFlashSubtextLinux' />
         }

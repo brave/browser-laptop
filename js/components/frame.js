@@ -580,9 +580,20 @@ class Frame extends ImmutableComponent {
     } else {
       flash.checkFlashInstalled((installed) => {
         if (installed) {
-          // disabling notificiations from the main window until we have a
-          // better way to do it
-          // void new window.Notification(locale.translation('flashInstalled'))
+          let message = locale.translation('flashInstalled')
+          appActions.showMessageBox({
+            buttons: [
+              {text: locale.translation('goToPrefs')},
+              {text: locale.translation('goToAdobe')}
+            ],
+            message: message,
+            options: {nonce}
+          })
+          this.notificationCallbacks[message] = (buttonIndex) => {
+            appActions.hideMessageBox(message)
+            const location = buttonIndex === 0 ? 'about:preferences#security' : appConfig.flash.installUrl
+            windowActions.newFrame({ location }, true)
+          }
         } else if (noFlashCallback) {
           noFlashCallback()
         }
@@ -723,7 +734,7 @@ class Frame extends ImmutableComponent {
           break
         case messages.SHOW_FLASH_NOTIFICATION:
           method = (origin) => this.showFlashNotification(origin, () => {
-            windowActions.loadUrl(this.frame, 'https://get.adobe.com/flashplayer/')
+            windowActions.loadUrl(this.frame, appConfig.flash.installUrl)
           })
           break
         case messages.RELOAD:
