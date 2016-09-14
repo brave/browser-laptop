@@ -58,6 +58,9 @@ class PopupWindow extends ImmutableComponent {
           this.forceUpdate()
         }
       }
+      webview.addEventListener('did-attach', () => {
+        webview.enablePreferredSizeMode(true)
+      })
       webview.addEventListener('preferred-size-changed', (e) => {
         updateSize()
       })
