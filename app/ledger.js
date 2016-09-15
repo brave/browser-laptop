@@ -414,6 +414,7 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
+    // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
     if (process.env.NODE_ENV === 'test') {
       synopsis.options.minDuration = 0
       synopsis.options.minPublisherDuration = 0
