@@ -403,6 +403,19 @@ Dispatches a message when appWindowId loses focus
 
 
 
+### networkConnected() 
+
+Dispatches a message when the network is re-connected
+after being disconnected
+
+
+
+### networkDisconnected() 
+
+Dispatches a message when the network is disconnected
+
+
+
 
 * * *
 
