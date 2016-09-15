@@ -464,6 +464,25 @@ const appActions = {
       actionType: AppConstants.APP_WINDOW_BLURRED,
       appWindowId: appWindowId
     })
+  },
+
+  /**
+   * Dispatches a message when the network is re-connected
+   * after being disconnected
+   */
+  networkConnected: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_NETWORK_CONNECTED
+    })
+  },
+
+  /**
+   * Dispatches a message when the network is disconnected
+   */
+  networkDisconnected: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_NETWORK_DISCONNECTED
+    })
   }
 }
 

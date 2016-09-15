@@ -309,6 +309,14 @@ app.on('ready', () => {
     }, appConfig.quitTimeout)
   })
 
+  app.on('network-connected', () => {
+    appActions.networkConnected()
+  })
+
+  app.on('network-disconnected', () => {
+    appActions.networkDisconnected()
+  })
+
   // User initiated exit using File->Quit
   ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
     if (data) {
