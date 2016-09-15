@@ -167,7 +167,7 @@ class NavigationBar extends ImmutableComponent {
               })}
               onClick={this.onNoScript} />
           }
-          <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
+          <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
             className={cx({
               navbutton: true,
               bookmarkButton: true,
