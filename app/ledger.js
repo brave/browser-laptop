@@ -1191,11 +1191,11 @@ var syncWriter = (path, obj, options, cb) => {
   fs.writeFile(path, JSON.stringify(obj, null, 2), options, (err) => {
     var deferred = syncingP[path]
 
+    delete syncingP[path]
     if (typeof deferred === 'object') {
       if (ledgerInfo._internal.debugP) console.log('restarting ' + path)
       syncWriter(path, deferred.obj, deferred.options, deferred.cb)
     }
-    delete syncingP[path]
 
     if (err) console.log('write error: ' + err.toString())
 
