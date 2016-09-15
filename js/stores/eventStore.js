@@ -10,6 +10,7 @@ const Immutable = require('immutable')
 const WindowConstants = require('../constants/windowConstants')
 const debounce = require('../lib/debounce.js')
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
+const { shouldTrackResponseCode } = require('../../app/common/lib/ledgerUtil')
 
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
@@ -89,22 +90,6 @@ const windowClosed = (windowId) => {
 // Register callback to handle all updates
 const doAction = (action) => {
   switch (action.actionType) {
-    case WindowConstants.WINDOW_WEBVIEW_LOAD_END:
-      // create a page view event if this is a page load on the active tabId
-      if (!lastActiveTabId || action.frameProps.get('tabId') === lastActiveTabId) {
-        addPageView(action.frameProps.get('location'), action.frameProps.get('tabId'))
-      }
-
-      if (action.isError || isSourceAboutUrl(action.frameProps.get('location'))) {
-        break
-      }
-
-      let pageLoadEvent = Immutable.fromJS({
-        timestamp: new Date().getTime(),
-        url: action.frameProps.get('location')
-      })
-      eventState = eventState.set('page_load', eventState.get('page_load').push(pageLoadEvent))
-      break
     case WindowConstants.WINDOW_SET_FOCUSED_FRAME:
       lastActiveTabId = action.frameProps.get('tabId')
       addPageView(action.frameProps.get('location'), lastActiveTabId)
@@ -127,6 +112,30 @@ const doAction = (action) => {
     case 'event-set-page-info':
       // retains all past pages, not really sure that's needed... [MTR]
       eventState = eventState.set('page_info', eventState.get('page_info').push(action.pageInfo))
+      break
+    case WindowConstants.WINDOW_GOT_RESPONSE_DETAILS:
+      // Only capture response for the page (not subresources, like images, JavaScript, etc)
+      if (action.details && action.details.get('resourceType') === 'mainFrame') {
+        const pageUrl = action.details.get('originalURL') || action.details.get('newURL')
+
+        // create a page view event if this is a page load on the active tabId
+        if (!lastActiveTabId || action.tabId === lastActiveTabId) {
+          addPageView(pageUrl, action.tabId)
+        }
+
+        const responseCode = action.details.get('httpResponseCode')
+        if (isSourceAboutUrl(pageUrl) || !shouldTrackResponseCode(responseCode)) {
+          break
+        }
+
+        const pageLoadEvent = Immutable.fromJS({
+          timestamp: new Date().getTime(),
+          url: pageUrl,
+          tabId: action.tabId,
+          details: action.details
+        })
+        eventState = eventState.set('page_load', eventState.get('page_load').push(pageLoadEvent))
+      }
       break
     default:
   }
