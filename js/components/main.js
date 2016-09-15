@@ -750,8 +750,8 @@ class Main extends ImmutableComponent {
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
 
-    const menubarEnabled = isWindows
-    const menubarVisible = menubarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
+    const customTitlebarEnabled = isWindows
+    const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
     const menubarTemplate = menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null
     const menubarSelectedLabel = this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel'])
 
@@ -858,7 +858,7 @@ class Main extends ImmutableComponent {
             </div>
           </div>
           {
-            menubarEnabled
+            customTitlebarEnabled
               ? <WindowCaptionButtons windowMaximized={this.props.windowState.getIn(['ui', 'isMaximized'])} />
               : null
           }

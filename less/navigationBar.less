@@ -60,7 +60,6 @@
 .windowCaptionButtons {
   display: inline-block;
   -webkit-app-region: drag;
-  height: 100%;
 
   .hidden {
     display: none;
@@ -82,21 +81,21 @@
   }
 
   .win7 {
-    margin-right: 5px;
+    margin-right: 6px;
 
     button.captionButton {
       outline: 0;
       height: 18px;
       color: #b1acac;
-      background-size: 12px 12px!important;
-      background-position: center!important;
       border: 1px solid #838383;
+      border-top: 0;
       display: inline-block;
-      background-color: #dfdfdf;
+      background-color: #e0e0e0;
       box-shadow: inset 1px 1px rgba(255, 255, 255, 0.9);
       width: 25px;
 
       &.minimize {
+        width: 28px;
         border-right: 0px;
         &:hover {
           background-color: #f5f5f5;
@@ -110,7 +109,7 @@
           width: 10px;
           height: 3px;
           border: 1px solid #838383;
-          background: #f0f0f0;
+          background: #fefefe;
           display: inline-block;
           border-radius: 1px;
         }
@@ -118,6 +117,7 @@
 
       &.maximize {
         border-right: 0px;
+        width: 27px;
         &:hover {
           background-color: #f5f5f5;
           .widget {
@@ -145,14 +145,14 @@
             .widget1 {
               width: 8px;
               top: 2px;
-              left: 8px;
+              left: 10px;
             }
             .widget2 {
               width: 8px;
               height: 8px;
               top: -5px;
-              left: 4px;
-              background: #f0f0f0;
+              left: 6px;
+              background: #fefefe;
               border-radius: 1px;
             }
             .widget3 {
@@ -160,10 +160,10 @@
               width: 2px;
               height: 2px;
               border: 1px solid #838383;
-              background: #f0f0f0;
+              background: #fefefe;
               position: relative;
               top: -20px;
-              left: -3px;
+              left: -2px;
             }
           }
         }
@@ -173,20 +173,20 @@
             width: 10px;
             height: 8px;
             border: 1px solid #838383;
-            background: #f0f0f0;
+            background: #fefefe;
             position: relative;
             top: 2px;
-            left: 6px;
+            left: 7px;
             border-radius: 1px;
           }
           .widget2 {
             width: 4px;
             height: 2px;
             border: 1px solid #838383;
-            background-color: #dfdfdf;
+            background-color: #e0e0e0;
             position: relative;
             top: -5px;
-            left: 9px;
+            left: 10px;
             border-radius: 0;
           }
           .widget3 { display: none; }
@@ -196,61 +196,26 @@
       }
 
       &.close {
-        width: 43px;
+        width: 48px;
         border-radius: 0 0 4px 0;
         &:hover {
           background-color: #d9504e;
-          .widget {
-            .widget1 { border: 1px solid black; }
-            .widget2 { border: 1px solid black; }
-          }
         }
         &:active {
           background-color: #d7393d;
-          .widget {
-            .widget1 { border: 1px solid black; }
-            .widget2 { border: 1px solid black; }
-          }
         }
 
         .widget {
-          width: 11px;
-          height: 11px;
+          background: url('../img/windows/close.svg') no-repeat;
           display: inline-block;
-          vertical-align: middle;
+          height: 12px;
+          width: 12px;
+          position: relative;
+          top: 3px;
 
-          .widget1 {
-            width: 10px;
-            height: 2px;
-            background: #f0f0f0;
-            display: inline-block;
-            transform: rotate(45deg);
-            position: relative;
-            top: -6px;
-            left: -2px;
-            border: 1px solid #838383;
-          }
-          .widget2 {
-            width: 10px;
-            height: 2px;
-            background: #f0f0f0;
-            display: inline-block;
-            transform: rotate(315deg);
-            position: relative;
-            top: -21px;
-            left: -2px;
-            border: 1px solid #838383;
-          }
-          .widget3 {
-            width: 10px;
-            height: 2px;
-            background: #f0f0f0;
-            display: inline-block;
-            transform: rotate(45deg);
-            position: relative;
-            top: -37px;
-            left: -2px;
-          }
+          .widget1 { display:none; }
+          .widget2 { display:none; }
+          .widget3 { display:none; }
         }
       }
     }
@@ -419,6 +384,7 @@
   .menubar {
     display: inline-block;
     cursor: default;
+    -webkit-user-select: none;
 
     .menubarItem {
       color: black;
