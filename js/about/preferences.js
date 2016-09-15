@@ -350,7 +350,7 @@ class BitcoinDashboard extends ImmutableComponent {
   get panelFooter () {
     return <div className='panelFooter'>
       <div id='coinbaseLogo' />
-      <span data-l10n-id='coinbaseMessage' />
+      <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
       <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
     </div>
   }
