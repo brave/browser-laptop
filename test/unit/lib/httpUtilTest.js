@@ -22,6 +22,12 @@ describe('httpUtil test', function () {
         assert.equal(httpUtil.responseHasContent(201), false) // created
         assert.equal(httpUtil.responseHasContent(202), false) // accepted
       })
+      it('returns false for various client error responses (400+)', function () {
+        assert.equal(httpUtil.responseHasContent(400), false) // bad request
+        assert.equal(httpUtil.responseHasContent(401), false) // unauthorized
+        assert.equal(httpUtil.responseHasContent(403), false) // forbidden
+        assert.equal(httpUtil.responseHasContent(404), false) // not found
+      })
       it('returns false for various server side error responses (500-504)', function () {
         assert.equal(httpUtil.responseHasContent(500), false) // internal server error
         assert.equal(httpUtil.responseHasContent(501), false) // not implemented
