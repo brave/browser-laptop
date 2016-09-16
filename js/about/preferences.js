@@ -908,10 +908,11 @@ class PaymentsTab extends ImmutableComponent {
             <div className='boldText' data-l10n-id='paymentsWelcomeText2' />
             <div data-l10n-id='paymentsWelcomeText3' />
             <div data-l10n-id='paymentsWelcomeText4' />
+            <div data-l10n-id='paymentsWelcomeText5' />
             <div>
-              <span data-l10n-id='paymentsWelcomeText5' />&nbsp;
+              <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
               <a href='https://brave.com/Payments_FAQ.html' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
-              <span data-l10n-id='paymentsWelcomeText6' />
+              <span data-l10n-id='paymentsWelcomeText7' />
             </div>
           </div>
         }
