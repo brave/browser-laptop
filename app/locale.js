@@ -145,7 +145,7 @@ var rendererIdentifiers = function () {
     'preferences',
     'settings',
     'bookmarksManager',
-    'importBookmarks',
+    'importBrowserData',
     'reportAnIssue',
     'submitFeedback',
     'bookmarksToolbar',
@@ -212,7 +212,8 @@ var rendererIdentifiers = function () {
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',
     'windowCaptionButtonRestore',
-    'windowCaptionButtonClose'
+    'windowCaptionButtonClose',
+    'closeFirefoxWarning'
   ]
 }
 

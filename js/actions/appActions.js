@@ -407,6 +407,17 @@ const appActions = {
   },
 
   /**
+   * Import browser data specified in selected
+   * @param {object} selected - the browser data to import as per doc/state.md's importBrowserDataSelected
+   */
+  importBrowserData: function (selected) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_IMPORT_BROWSER_DATA,
+      selected
+    })
+  },
+
+  /**
    * Add address data
    * @param {object} detail - the address to add as per doc/state.md's autofillAddressDetail
    * @param {object} originalDetail - the original address before editing

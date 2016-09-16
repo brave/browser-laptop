@@ -62,18 +62,6 @@ const createFileSubmenu = () => {
       }
     },
     CommonMenu.separatorMenuItem,
-    /*
-    {
-      label: locale.translation('importFrom'),
-      visible: false
-      submenu: [
-        {label: 'Google Chrome...'},
-        {label: 'Firefox...'},
-        {label: 'Safari...'}
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    */
     {
       // this should be disabled when
       // no windows are active
@@ -391,9 +379,7 @@ const createBookmarksSubmenu = () => {
     },
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
-    CommonMenu.bookmarksToolbarMenuItem(),
-    CommonMenu.separatorMenuItem,
-    CommonMenu.importBookmarksMenuItem()
+    CommonMenu.bookmarksToolbarMenuItem()
   ]
 
   const bookmarks = menuUtil.createBookmarkMenuItems(appStore.getState().get('sites'))
@@ -472,6 +458,8 @@ const createHelpSubmenu = () => {
   if (!isDarwin) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.checkForUpdateMenuItem())
+    submenu.push(CommonMenu.separatorMenuItem)
+    submenu.push(CommonMenu.importBrowserDataMenuItem())
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.aboutBraveMenuItem())
   }
@@ -554,6 +542,8 @@ const createMenu = () => {
         CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.importBrowserDataMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem(),
         CommonMenu.separatorMenuItem,

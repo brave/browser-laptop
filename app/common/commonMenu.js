@@ -243,31 +243,17 @@ module.exports.passwordsMenuItem = () => {
   }
 }
 
-module.exports.importBookmarksMenuItem = () => {
+module.exports.importBrowserDataMenuItem = () => {
   return {
-    label: locale.translation('importBookmarks'),
+    label: locale.translation('importBrowserData'),
     click: function (item, focusedWindow) {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(undefined, undefined, undefined, function () {
-          // The timeout here isn't necessary but giving the window a bit of time to popup
-          // before the modal file picker pops up seems to work nicer.
-          setTimeout(() =>
-            module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
-        })
-        return
+      if (process.type === 'browser') {
+        process.emit(messages.IMPORT_BROWSER_DATA_NOW)
       } else {
-        setTimeout(() =>
-          module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
+        electron.ipcRenderer.send(messages.IMPORT_BROWSER_DATA_NOW)
       }
     }
   }
-  /*
-  submenu: [
-    {label: 'Google Chrome...'},
-    {label: 'Firefox...'},
-    {label: 'Safari...'}
-  ]
-  */
 }
 
 module.exports.reportAnIssueMenuItem = () => {

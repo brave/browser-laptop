@@ -968,6 +968,28 @@ const windowActions = {
   },
 
   /**
+   * Sets the import browser data popup detail
+   * @param {Array} importBrowserDataDetail - list of supported browsers
+   */
+  setImportBrowserDataDetail: function (importBrowserDataDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL,
+      importBrowserDataDetail
+    })
+  },
+
+  /**
+   * Sets the selected import browser data
+   * @param {Object} selected - selected browser data to import
+   */
+  setImportBrowserDataSelected: function (selected) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED,
+      selected
+    })
+  },
+
+  /**
    * Sets the manage autofill address popup detail
    * @param {Object} currentDetail - Properties of the address to change to
    * @param {Object} originalDetail - Properties of the address to edit

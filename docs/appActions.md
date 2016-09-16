@@ -349,6 +349,16 @@ Clears the data specified in dataDetail
 
 
 
+### importBrowserData(selected) 
+
+Import browser data specified in selected
+
+**Parameters**
+
+**selected**: `object`, the browser data to import as per doc/state.md's importBrowserDataSelected
+
+
+
 ### addAutofillAddress(detail, originalDetail) 
 
 Add address data

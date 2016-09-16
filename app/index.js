@@ -34,6 +34,7 @@ const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Menu = require('./browser/menu')
 const Updater = require('./updater')
+const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
@@ -686,6 +687,10 @@ app.on('ready', () => {
       }
     })
 
+    ipcMain.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
+      Importer.init()
+    })
+
     // Setup the crash handling
     CrashHerald.init()
 
@@ -708,6 +713,11 @@ app.on('ready', () => {
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
         console.log(metadata)
+      })
+
+      // This is fired by a menu entry
+      process.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
+        Importer.init()
       })
     })
   })
