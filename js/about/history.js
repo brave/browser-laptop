@@ -34,10 +34,15 @@ class HistoryDay extends ImmutableComponent {
     return <div>
       <div className='sectionTitle historyDayName'>{this.props.date}</div>
       <SortableTable headings={['time', 'title', 'domain']}
+        defaultHeading='time'
+        defaultHeadingSortOrder='desc'
         rows={this.props.entries.map((entry) => [
-          entry.get('lastAccessedTime')
-            ? new Date(entry.get('lastAccessedTime')).toLocaleTimeString()
-            : '',
+          {
+            html: entry.get('lastAccessedTime')
+              ? new Date(entry.get('lastAccessedTime')).toLocaleTimeString()
+              : '',
+            value: entry.get('lastAccessedTime')
+          },
           entry.get('customTitle') || entry.get('title')
             ? entry.get('customTitle') || entry.get('title')
             : entry.get('location'),

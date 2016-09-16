@@ -600,10 +600,20 @@ class SearchTab extends ImmutableComponent {
         display: 'inline-block',
         verticalAlign: 'middle'
       }
-      array.push([<SearchSelectEntry name={entry.name} settings={this.props.settings} />,
-        <SearchEntry name={entry.name} iconStyle={iconStyle}
-          onChangeSetting={this.props.onChangeSetting} />,
-        <SearchShortcutEntry shortcut={entry.shortcut} />])
+      array.push([
+        {
+          html: <SearchSelectEntry name={entry.name} settings={this.props.settings} />,
+          value: entry.name
+        },
+        {
+          html: <SearchEntry name={entry.name} iconStyle={iconStyle} onChangeSetting={this.props.onChangeSetting} />,
+          value: entry.name
+        },
+        {
+          html: <SearchShortcutEntry shortcut={entry.shortcut} />,
+          value: entry.shortcut
+        }
+      ])
     })
     return array
   }
@@ -616,6 +626,7 @@ class SearchTab extends ImmutableComponent {
     return <div>
       <div className='sectionTitle' data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
+        defaultHeading='searchEngine'
         addHoverClass onClick={this.hoverCallback.bind(this)} />
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />
       <SettingsList>

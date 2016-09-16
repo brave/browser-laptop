@@ -17,11 +17,17 @@ table.sortableTable {
 
     th {
       background: @lightGray;
+      cursor: pointer;
+      text-decoration: underline;
       color: @darkGray;
       text-align: left;
       font-weight: 300;
       padding: 8px;
       box-sizing: border-box;
+
+      &:hover {
+        color: #000;
+      }
     }
 
     td {
