@@ -44,7 +44,7 @@ const defaultOrderLookup = (value) => {
  * Format an electron accelerator in the order you'd expect in a menu
  * Accelerator reference: https://github.com/electron/electron/blob/master/docs/api/accelerator.md
  */
-module.exports.formatAccelerator  = (accelerator) => {
+module.exports.formatAccelerator = (accelerator) => {
   let result = accelerator
   let splitResult = accelerator.split('+')
   // sort in proper order, based on OS

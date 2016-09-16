@@ -119,8 +119,15 @@ class Main extends ImmutableComponent {
             ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT)
           }
           break
+      }
+    })
+    document.addEventListener('keyup', (e) => {
+      const customTitlebar = this.customTitlebar
+      switch (e.which) {
         case keyCodes.ALT:
-          if (isWindows) {
+          if (customTitlebar.enabled) {
+            // BSCTODO: if it's always visible, set a selected item instead
+            e.preventDefault()
             windowActions.toggleMenubarVisible()
           }
           break
@@ -720,6 +727,20 @@ class Main extends ImmutableComponent {
     return buttons
   }
 
+  get customTitlebar () {
+    const customTitlebarEnabled = isWindows
+    const captionButtonsVisible = customTitlebarEnabled && !this.props.windowState.getIn(['ui', 'isFullScreen'])
+    const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
+    return {
+      enabled: customTitlebarEnabled,
+      captionButtonsVisible: captionButtonsVisible,
+      menubarVisible: menubarVisible,
+      menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
+      menubarSelectedLabel: this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel']),
+      isMaximized: this.props.windowState.getIn(['ui', 'isMaximized'])
+    }
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -749,13 +770,7 @@ class Main extends ImmutableComponent {
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
-
-    const customTitlebarEnabled = isWindows
-    const captionButtonsVisible = customTitlebarEnabled && !this.props.windowState.getIn(['ui', 'isFullScreen'])
-    const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
-    const menubarTemplate = menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null
-    const menubarSelectedLabel = this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel'])
-
+    const customTitlebar = this.customTitlebar
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
@@ -770,7 +785,7 @@ class Main extends ImmutableComponent {
     return <div id='window'
       className={cx({
         isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
-        frameless: captionButtonsVisible
+        frameless: customTitlebar.captionButtonsVisible
       })}
       ref={(node) => { this.mainWindow = node }}
       onMouseDown={this.onMouseDown}
@@ -793,9 +808,12 @@ class Main extends ImmutableComponent {
           <div className='navbarMenubarFlexContainer'>
             <div className='navbarMenubarBlockContainer'>
               {
-                menubarVisible
+                customTitlebar.menubarVisible
                   ? <div className='menubarContainer'>
-                    <Menubar template={menubarTemplate} selectedLabel={menubarSelectedLabel} />
+                    <Menubar
+                      template={customTitlebar.menubarTemplate}
+                      selectedLabel={customTitlebar.menubarSelectedLabel}
+                      contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
                   </div>
                   : null
               }
@@ -859,8 +877,8 @@ class Main extends ImmutableComponent {
             </div>
           </div>
           {
-            captionButtonsVisible
-              ? <WindowCaptionButtons windowMaximized={this.props.windowState.getIn(['ui', 'isMaximized'])} />
+            customTitlebar.captionButtonsVisible
+              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
               : null
           }
         </div>

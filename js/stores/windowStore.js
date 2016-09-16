@@ -784,12 +784,14 @@ const doAction = (action) => {
         // Close existing context menus
         doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
         // Use value if provided; if not, toggle to opposite.
-        if (typeof action.isVisible === 'boolean') {
-          windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], action.isVisible)
-        } else {
-          const currentStatus = windowState.getIn(['ui', 'menubar', 'isVisible'])
-          windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], !currentStatus)
+        const newVisibleStatus = typeof action.isVisible === 'boolean'
+          ? action.isVisible
+          : !windowState.getIn(['ui', 'menubar', 'isVisible'])
+        // Clear selection when menu is shown
+        if (newVisibleStatus) {
+          doAction({actionType: WindowConstants.WINDOW_SET_MENUBAR_ITEM_SELECTED})
         }
+        windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
       break
     case WindowConstants.WINDOW_SET_MENUBAR_ITEM_SELECTED:

@@ -7,14 +7,14 @@ require('../braveUnit')
 describe('formatUtil', function () {
   describe('Windows and Linux', function () {
     before(function () {
-      this.originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+      this.originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform')
       Object.defineProperty(process, 'platform', {
         value: 'win32'
-      });
+      })
     })
 
     after(function () {
-      Object.defineProperty(process, 'platform', this.originalPlatform);
+      Object.defineProperty(process, 'platform', this.originalPlatform)
     })
 
     it('puts the modifiers in the correct order', function () {
@@ -29,14 +29,14 @@ describe('formatUtil', function () {
 
   describe('Mac', function () {
     before(function () {
-      this.originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+      this.originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform')
       Object.defineProperty(process, 'platform', {
         value: 'darwin'
-      });
+      })
     })
 
     after(function () {
-      Object.defineProperty(process, 'platform', this.originalPlatform);
+      Object.defineProperty(process, 'platform', this.originalPlatform)
     })
 
     it('replaces the key names with the correct symbols', function () {
