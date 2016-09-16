@@ -4,21 +4,7 @@
 
 'use strict'
 
-/**
- * Returns true if HTTP response code is one we want to collect usage for
- * @param {number} responseCode - HTTP response code to be evaluated
- * @return {boolean} true if the page should be included, false if not
- */
-module.exports.shouldTrackResponseCode = (responseCode) => {
-  switch (responseCode) {
-    case 200: // ok
-    case 203: // non-authoritative
-    case 206: // partial content
-    case 304: // not modified (cached)
-      return true
-  }
-  return false
-}
+const { responseHasContent } = require('./httpUtil')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
@@ -44,11 +30,11 @@ module.exports.shouldTrackView = (view, responseList) => {
     if (!response) continue
 
     const responseUrl = response && response.details
-      ? response.details.originalURL || response.details.newURL
+      ? response.details.newURL
       : null
 
     if (url === responseUrl && response.tabId === tabId) {
-      return module.exports.shouldTrackResponseCode(response.details.httpResponseCode)
+      return responseHasContent(response.details.httpResponseCode)
     }
   }
   return false

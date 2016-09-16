@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 const WindowConstants = require('../constants/windowConstants')
 const debounce = require('../lib/debounce.js')
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
-const { shouldTrackResponseCode } = require('../../app/common/lib/ledgerUtil')
+const { responseHasContent } = require('../../app/common/lib/httpUtil')
 
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
@@ -116,7 +116,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_GOT_RESPONSE_DETAILS:
       // Only capture response for the page (not subresources, like images, JavaScript, etc)
       if (action.details && action.details.get('resourceType') === 'mainFrame') {
-        const pageUrl = action.details.get('originalURL') || action.details.get('newURL')
+        const pageUrl = action.details.get('newURL')
 
         // create a page view event if this is a page load on the active tabId
         if (!lastActiveTabId || action.tabId === lastActiveTabId) {
@@ -124,7 +124,7 @@ const doAction = (action) => {
         }
 
         const responseCode = action.details.get('httpResponseCode')
-        if (isSourceAboutUrl(pageUrl) || !shouldTrackResponseCode(responseCode)) {
+        if (isSourceAboutUrl(pageUrl) || !responseHasContent(responseCode)) {
           break
         }
 
