@@ -21,7 +21,6 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
-const pad = require('underscore.string/pad')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -163,16 +162,16 @@ class SiteSettingCheckbox extends ImmutableComponent {
   }
 }
 
-class LedgerTableRow extends ImmutableComponent {
+class LedgerTable extends ImmutableComponent {
   get synopsis () {
-    return this.props.synopsis
+    return this.props.ledgerData.get('synopsis')
   }
 
-  get formattedTime () {
-    var d = this.synopsis.get('daysSpent')
-    var h = this.synopsis.get('hoursSpent')
-    var m = this.synopsis.get('minutesSpent')
-    var s = this.synopsis.get('secondsSpent')
+  getFormattedTime (synopsis) {
+    var d = synopsis.get('daysSpent')
+    var h = synopsis.get('hoursSpent')
+    var m = synopsis.get('minutesSpent')
+    var s = synopsis.get('secondsSpent')
     if (d << 0 > 364) {
       return '>1y'
     }
@@ -183,14 +182,12 @@ class LedgerTableRow extends ImmutableComponent {
     return (d + h + m + s + '')
   }
 
-  padLeft (v) { return pad(v, 12, '0') }
-
-  get hostPattern () {
-    return `https?://${this.synopsis.get('site')}`
+  getHostPattern (synopsis) {
+    return `https?://${synopsis.get('site')}`
   }
 
-  get enabled () {
-    const hostSettings = this.props.siteSettings.get(this.hostPattern)
+  enabledForSite (synopsis) {
+    const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
     if (hostSettings) {
       const result = hostSettings.get('ledgerPayments')
       if (typeof result === 'boolean') {
@@ -200,54 +197,54 @@ class LedgerTableRow extends ImmutableComponent {
     return true
   }
 
-  render () {
-    const faviconURL = this.synopsis.get('faviconURL') || appConfig.defaultFavicon
-    const rank = this.synopsis.get('rank')
-    const views = this.synopsis.get('views')
-    const duration = this.synopsis.get('duration')
-    const publisherURL = this.synopsis.get('publisherURL')
-    // TODO: This should redistribute percentages accordingly when a site is
-    // enabled/disabled for payments.
-    const percentage = this.synopsis.get('percentage')
-    const site = this.synopsis.get('site')
+  getRow (synopsis) {
+    if (!synopsis || !synopsis.get) {
+      return []
+    }
+    const faviconURL = synopsis.get('faviconURL') || appConfig.defaultFavicon
+    const rank = synopsis.get('rank')
+    const views = synopsis.get('views')
+    const duration = synopsis.get('duration')
+    const publisherURL = synopsis.get('publisherURL')
+    const percentage = synopsis.get('percentage')
+    const site = synopsis.get('site')
     const defaultSiteSetting = true
 
-    return <tr className={this.enabled ? '' : 'paymentsDisabled'}>
-      <td className='alignRight' data-sort={this.padLeft(rank)}>{rank}</td>
-      <td><a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a></td>
-      <td><SiteSettingCheckbox hostPattern={this.hostPattern} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabled} /></td>
-      <td className='alignRight' data-sort={this.padLeft(views)}>{views}</td>
-      <td className='alignRight' data-sort={this.padLeft(duration)}>{this.formattedTime}</td>
-      <td className='alignRight' data-sort={this.padLeft(percentage)}>{percentage}</td>
-    </tr>
+    return [
+      rank,
+      {
+        html: <a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a>,
+        value: site
+      },
+      {
+        html: <SiteSettingCheckbox hostPattern={this.getHostPattern(synopsis)} defaultValue={defaultSiteSetting} prefKey='ledgerPayments' siteSettings={this.props.siteSettings} checked={this.enabledForSite(synopsis)} />,
+        value: this.enabledForSite(synopsis) ? 1 : 0
+      },
+      views,
+      {
+        html: this.getFormattedTime(synopsis),
+        value: duration
+      },
+      percentage
+    ]
   }
-}
 
-class LedgerTable extends ImmutableComponent {
   render () {
-    const synopsis = this.props.ledgerData.get('synopsis')
-    if (!synopsis || !synopsis.size) {
+    if (!this.synopsis || !this.synopsis.size) {
       return null
     }
     return <div id='ledgerTable'>
-      <table className='sort'>
-        <thead>
-          <tr>
-            <th className='sort-header' data-l10n-id='rank' />
-            <th className='sort-header' data-l10n-id='publisher' />
-            <th className='sort-header' data-l10n-id='include' />
-            <th className='sort-header' data-l10n-id='views' />
-            <th className='sort-header' data-l10n-id='timeSpent' />
-            <th className='sort-header'>&#37;</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          synopsis.map((row) => <LedgerTableRow synopsis={row}
-            siteSettings={this.props.siteSettings} />)
+      <SortableTable
+        headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
+        defaultHeading='rank'
+        overrideDefaultStyle
+        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
+        rowClassNames={
+          this.synopsis.map((item) =>
+            this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
         }
-        </tbody>
-      </table>
+        onContextMenu={aboutActions.contextMenu}
+        rows={this.synopsis.map((synopsis) => this.getRow(synopsis)).toJS()} />
     </div>
   }
 }
