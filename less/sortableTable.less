@@ -4,6 +4,18 @@
 
 @import "variables.less";
 
+table.sort {
+  th {
+    cursor: pointer;
+    text-decoration: underline;
+    color: @darkGray;
+
+    &:hover {
+      color: #000;
+    }
+  }
+}
+
 table.sortableTable {
   width: 100%;
   border: solid 1px @lightGray;
@@ -17,7 +29,6 @@ table.sortableTable {
 
     th {
       background: @lightGray;
-      color: @darkGray;
       text-align: left;
       font-weight: 300;
       padding: 8px;

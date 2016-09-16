@@ -5,14 +5,19 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const tableSort = require('tablesort')
+const cx = require('../lib/classSet')
 
-/**
- * Represents a sortable table with supp
- */
+tableSort.extend('number', (item) => {
+  return typeof item === 'number'
+}, (a, b) => {
+  a = isNaN(a) ? 0 : a
+  b = isNaN(b) ? 0 : b
+  return b - a
+})
 
 class SortableTable extends ImmutableComponent {
   componentDidMount (event) {
-    return tableSort(document.getElementsByClassName('sortableTable')[0])
+    return tableSort(this.table)
   }
   get hasClickHandler () {
     return typeof this.props.onClick === 'function'
@@ -21,6 +26,10 @@ class SortableTable extends ImmutableComponent {
     return this.props.columnClassNames &&
       this.props.columnClassNames.length === this.props.headings.length
   }
+  get hasRowClassNames () {
+    return this.props.rowClassNames &&
+      this.props.rowClassNames.length === this.props.rows.length
+  }
   get hasDoubleClickHandler () {
     return typeof this.props.onDoubleClick === 'function'
   }
@@ -28,16 +37,14 @@ class SortableTable extends ImmutableComponent {
     return typeof this.props.onContextMenu === 'function' &&
       typeof this.props.contextMenuName === 'string'
   }
-  getHandlerInput (rows, index) {
-    if (this.props.rowObjects) {
-      return typeof this.props.rowObjects[index].toJS === 'function'
-        ? this.props.rowObjects[index].toJS()
-        : this.props.rowObjects[index]
-    }
-    return rows[index]
-  }
-  getRowAttributes (handlerInput, index) {
+  getRowAttributes (row, index) {
     const rowAttributes = {}
+    const handlerInput = this.props.rowObjects
+      ? (typeof this.props.rowObjects[index].toJS === 'function'
+        ? this.props.rowObjects[index].toJS()
+        : this.props.rowObjects[index])
+      : row
+
     if (this.props.addHoverClass) {
       rowAttributes.className = 'rowHover'
     }
@@ -53,53 +60,51 @@ class SortableTable extends ImmutableComponent {
     return rowAttributes
   }
   render () {
-    let headings = []
-    let rows = []
-    let columnClassNames = []
-
     if (!this.props.headings || !this.props.rows) {
       return false
     }
 
-    if (this.hasColumnClassNames) {
-      this.props.columnClassNames.forEach((className) => columnClassNames.push(className))
-    }
-
-    for (let i = 0; i < this.props.rows.length; i++) {
-      rows[i] = []
-      for (let j = 0; j < this.props.headings.length; j++) {
-        headings[j] = headings[j] || <th className='sort-header' data-l10n-id={this.props.headings[j]} />
-        rows[i][j] = typeof columnClassNames[j] === 'string'
-          ? <td className={columnClassNames[j]} data-sort={this.props.rows[i][j]}>{this.props.rows[i][j] === true ? '✕' : this.props.rows[i][j]}</td>
-          : <td data-sort={this.props.rows[i][j]}>{this.props.rows[i][j] === true ? '✕' : this.props.rows[i][j]}</td>
-      }
-
-      const handlerInput = this.getHandlerInput(rows, i)
-      const rowAttributes = this.getRowAttributes(handlerInput, i)
-
-      rows[i] = rowAttributes.onContextMenu
-      ? <tr {...rowAttributes} data-context-menu-disable>{rows[i]}</tr>
-      : rows[i] = <tr {...rowAttributes}>{rows[i]}</tr>
-    }
-    return <table className='sortableTable sort'>
+    return <table className={cx({
+      sort: true,
+      sortableTable: !this.props.overrideDefaultStyle
+    })}
+      ref={(node) => { this.table = node }}>
       <thead>
         <tr>
-          {headings}
+          {this.props.headings.map((heading, j) => {
+            const firstEntry = this.props.rows[0][j]
+            let dataType = typeof firstEntry
+            if (dataType === 'object' && firstEntry.value) {
+              dataType = typeof firstEntry.value
+            }
+            return <th className={cx({
+              'sort-header': true,
+              'sort-default': heading === this.props.defaultHeading})}
+              data-l10n-id={heading}
+              data-sort-method={dataType === 'number' ? 'number' : undefined}
+              data-sort-order={this.props.defaultHeadingSortOrder} />
+          })}
         </tr>
       </thead>
       <tbody>
-        {rows}
+        {
+          this.props.rows.map((row, i) => {
+            const entry = row.map((item, j) => {
+              const value = typeof item === 'object' ? item.value : item
+              const html = typeof item === 'object' ? item.html : item
+              return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value}>
+                {value === true ? '✕' : html}
+              </td>
+            })
+            const rowAttributes = this.getRowAttributes(row, i)
+            return <tr {...rowAttributes}
+              data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
+              className={this.hasRowClassNames ? this.props.rowClassNames[i] : undefined}>{entry}</tr>
+          })
+        }
       </tbody>
     </table>
   }
-}
-
-SortableTable.defaultProps = {
-  headings: React.PropTypes.array.isRequired,
-  rows: React.PropTypes.array.isRequired,
-  columnClassNames: React.PropTypes.array,
-  addHoverClass: React.PropTypes.bool,
-  contextMenuName: React.PropTypes.string
 }
 
 module.exports = SortableTable
