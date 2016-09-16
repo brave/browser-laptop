@@ -11,7 +11,10 @@ const KeyCodes = require('../constants/keyCodes')
 
 class ContextMenuItem extends ImmutableComponent {
   componentDidMount () {
-    window.addEventListener('keydown', this.onKeyDown.bind(this))
+    window.addEventListener('keydown', this.onKeyDown)
+  }
+  componentWillUnmount () {
+    window.removeEventListener('keydown', this.onKeyDown)
   }
   onKeyDown (e) {
     if (e.keyCode === KeyCodes.ESC || e.keyCode === KeyCodes.TAB) {
