@@ -1037,9 +1037,9 @@ const windowActions = {
    * Used to track which menubar item is currently selected (or null for none selected)
    * @param {string} label - text of the menubar item label that was clicked (file, edit, etc)
    */
-  setMenubarItemSelected: function (label) {
+  setMenubarSelectedLabel: function (label) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_MENUBAR_ITEM_SELECTED,
+      actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL,
       label
     })
   },
@@ -1054,6 +1054,13 @@ const windowActions = {
   resetMenuState: function () {
     dispatch({
       actionType: WindowConstants.WINDOW_RESET_MENU_STATE
+    })
+  },
+
+  setSubmenuSelectedIndex: function (index) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX,
+      index
     })
   },
 

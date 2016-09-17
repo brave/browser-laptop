@@ -40,7 +40,7 @@ const defaultOrderLookup = (value) => {
   }
 }
 
-/*
+/**
  * Format an electron accelerator in the order you'd expect in a menu
  * Accelerator reference: https://github.com/electron/electron/blob/master/docs/api/accelerator.md
  */
@@ -77,4 +77,15 @@ module.exports.formatAccelerator = (accelerator) => {
     result = result.replace('CmdOrCtrl', 'Ctrl')
   }
   return result
+}
+
+/**
+ * Clamp values down to a given range (min/max).
+ * Value is wrapped when out of bounds. ex:
+ *   min-1 = max
+ *   max+1 = min
+ */
+module.exports.wrappingClamp = (value, min, max) => {
+  const range = (max - min) + 1
+  return value - Math.floor((value - min) / range) * range
 }

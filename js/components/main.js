@@ -737,6 +737,7 @@ class Main extends ImmutableComponent {
       menubarVisible: menubarVisible,
       menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
       menubarSelectedLabel: this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel']),
+      menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
       isMaximized: this.props.windowState.getIn(['ui', 'isMaximized'])
     }
   }
@@ -794,7 +795,8 @@ class Main extends ImmutableComponent {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
           lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+          selectedIndex={customTitlebar.menubarSelectedIndex} />
         : null
       }
       {
@@ -813,6 +815,7 @@ class Main extends ImmutableComponent {
                     <Menubar
                       template={customTitlebar.menubarTemplate}
                       selectedLabel={customTitlebar.menubarSelectedLabel}
+                      selectedIndex={customTitlebar.menubarSelectedIndex}
                       contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
                   </div>
                   : null
