@@ -82,7 +82,7 @@ const UrlUtil = {
   },
 
   isImageAddress (url) {
-    return (url.match(/\.(jpeg|jpg|gif|png|svg|bmp)$/))
+    return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/))
   },
 
   isHttpAddress (url) {
