@@ -682,18 +682,16 @@ class PaymentsTab extends ImmutableComponent {
       return null
     }
 
-    return <span id='fundsAmount'>
+    return <div>
       {
       !(this.props.ledgerData.get('balance') === undefined || this.props.ledgerData.get('balance') === null)
-        ? <span>
-          {this.btcToCurrencyString(this.props.ledgerData.get('balance'))}
-          <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
-            <span className='fa fa-question-circle fundsFAQ' />
-          </a>
-        </span>
+        ? <input className='fundsAmount' readOnly value={this.btcToCurrencyString(this.props.ledgerData.get('balance'))} />
         : <span><span data-l10n-id='accountBalanceLoading' /></span>
       }
-    </span>
+      <a href='https://brave.com/Payments_FAQ.html' target='_blank'>
+        <span className='fa fa-question-circle fundsFAQ' />
+      </a>
+    </div>
   }
 
   get walletButton () {
@@ -828,24 +826,13 @@ class PaymentsTab extends ImmutableComponent {
         <table>
           <thead>
             <tr>
-              <th data-l10n-id='accountBalance' />
               <th data-l10n-id='monthlyBudget' />
+              <th data-l10n-id='accountBalance' />
               <th data-l10n-id='status' />
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>
-                {
-                  this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
-                    ? <span data-l10n-id='accountBalanceConnectionError' />
-                    : <span>
-                      {this.fundsAmount}
-                      {this.walletButton}
-                      {this.paymentHistoryButton}
-                    </span>
-                }
-              </td>
               <td>
                 <SettingsList>
                   <SettingItem>
@@ -861,6 +848,21 @@ class PaymentsTab extends ImmutableComponent {
                     </select>
                   </SettingItem>
                 </SettingsList>
+              </td>
+              <td>
+                {
+                  this.props.ledgerData.get('error') && this.props.ledgerData.get('error').get('caller') === 'getWalletProperties'
+                    ? <span data-l10n-id='accountBalanceConnectionError' />
+                    : <span>
+                      <SettingsList>
+                        <SettingItem>
+                          {this.fundsAmount}
+                          {this.walletButton}
+                          {this.paymentHistoryButton}
+                        </SettingItem>
+                      </SettingsList>
+                    </span>
+                }
               </td>
               <td>
                 <div id='walletStatus' data-l10n-id={this.walletStatus.id} data-l10n-args={this.walletStatus.args ? JSON.stringify(this.walletStatus.args) : null} />
