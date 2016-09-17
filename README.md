@@ -118,7 +118,7 @@ By default, we provide pre-built binaries when you `npm install` with our own fo
 If you want to modify the code to Electron itself, then you'll need to build it.  An example of why you might do that would be exposing a new event to the webview from Electron.
 
 Build instructions:
-- [OSX build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
+- [macOS build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
 - [Windows build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-windows.md)
 - [Linux build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-linux.md)
 
@@ -146,7 +146,7 @@ In order do run any build commands, you'll need an environment variable set for 
 
 For more information, see [docs/buildingReleases.md](docs/buildingReleases.md) which has a more detailed overview of our release process.
 
-### OSX:
+### macOS:
 
 From within brave-browser you can create a .app file for distribution:
 
