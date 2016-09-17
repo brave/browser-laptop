@@ -178,6 +178,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     mainWindow.webContents.send('scroll-touch-end')
   })
 
+  mainWindow.on('scroll-touch-edge', function (e) {
+    mainWindow.webContents.send('scroll-touch-edge')
+  })
+
   mainWindow.on('enter-full-screen', function () {
     if (mainWindow.isMenuBarVisible()) {
       mainWindow.setMenuBarVisibility(false)
