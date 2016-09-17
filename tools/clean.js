@@ -40,7 +40,7 @@ module.exports.userData = (file = process.argv[3]) => {
 }
 
 module.exports.sessionStore = () => {
-  module.exports.userData('session-store-1-dev')
+  module.exports.userData('session-store-1')
 }
 
 module.exports.dataFiles = () => {

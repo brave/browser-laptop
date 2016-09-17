@@ -24,17 +24,10 @@ if (process.platform === 'win32') {
   require('./windowsInit')
 }
 
-const path = require('path')
 const electron = require('electron')
 const app = electron.app
 // set userData before loading anything else
-if (!process.env.BRAVE_USER_DATA_DIR && ['development', 'test'].includes(process.env.NODE_ENV)) {
-  process.env.BRAVE_USER_DATA_DIR = path.join(app.getPath('appData'), app.getName() + '-' + process.env.NODE_ENV)
-}
-
-if (process.env.BRAVE_USER_DATA_DIR) {
-  app.setPath('userData', process.env.BRAVE_USER_DATA_DIR)
-}
+require('./browser/lib/patchUserDataDir')
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain

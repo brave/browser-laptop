@@ -1,11 +1,12 @@
 'use strict'
 
-const path = require('path')
-const rimraf = require('../rimraf')
 const electron = require('electron')
 const app = electron.app
 app.setName('brave')
-app.setPath('userData', path.join(app.getPath('appData'), app.getName()))
+require('../../../app/browser/lib/patchUserDataDir')
+
+const path = require('path')
+const rimraf = require('../rimraf')
 
 const cleanUserData = (location) => {
   location = location ? path.join(app.getPath('userData'), location) : app.getPath('userData')
