@@ -2,7 +2,7 @@
 
 Auto updating provides services allowing the browser to automatically check for updates and apply the changes as they become available.
 
-# OSX
+# macOS
 
 After manual installation all subsequent updates will occur automatically via the Squirrel.mac services provided by the Electron (Atom) framework.
 
@@ -18,7 +18,7 @@ The built dmg binary requires its components to be digitally signed before the u
 
   1. Create and download developer certificate from developer.apple.com
 
-     The certificate will be in the form of a .cer file. The cerficate will need to be added to the keychain via the Keychain Access program. Add the certificate in the login section. Note: The Keychain Access program is included in OSX and will by default handle issued .cert files.
+     The certificate will be in the form of a .cer file. The cerficate will need to be added to the keychain via the Keychain Access program. Add the certificate in the login section. Note: The Keychain Access program is included in macOS and will by default handle issued .cert files.
 
   2. Ensure that a private keys exists and is associated with the certificate installed in step 1. A sub section of the certificate will be shown and tagged as a private key. Generating the private key (.p12 file) is a multi-stop process that requires access to the developer.apple.com portal and access to your development machine. It is described in detail at [generating a p12 file](http://appfurnace.com/2015/01/how-do-i-make-a-p12-file/). If you already have access to the private, import it into Keychain Access ensuring it is associated with the Developer certificate.
 

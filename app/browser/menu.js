@@ -179,7 +179,7 @@ const createEditSubmenu = () => {
       accelerator: 'Shift+CmdOrCtrl+G'
     },
     CommonMenu.separatorMenuItem
-    // NOTE: OSX inserts "start dictation" and "emoji and symbols" automatically
+    // NOTE: macOS inserts "start dictation" and "emoji and symbols" automatically
   ]
 
   if (!isDarwin) {
@@ -541,7 +541,7 @@ const createMenu = () => {
 
   if (isDarwin) {
     template.unshift({
-      label: appConfig.name, // Ignored on OSX, which gets this from the app Info.plist file.
+      label: appConfig.name, // Ignored on macOS, which gets this from the app Info.plist file.
       submenu: [
         CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
