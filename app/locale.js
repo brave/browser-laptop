@@ -220,8 +220,7 @@ exports.translation = function (token) {
   if (translations[token]) {
     return translations[token]
   } else {
-    // This will return an identifier in upper case enclosed in square brackets
-    // Useful for determining if a translation was not requested in the menu
+    // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
     // identifiers above.
     return token.toUpperCase()
   }
@@ -231,33 +230,33 @@ exports.translation = function (token) {
 const DEFAULT_LANGUAGE = 'en-US'
 
 const availableLanguages = [
+  'eu',
   'bn-BD',
   'bn-IN',
+  'zh-CN',
   'cs',
-  'de-DE',
+  'nl-NL',
   'en-US',
-  'es',
-  'eu',
   'fr-FR',
+  'de-DE',
   'hi-IN',
   'id-ID',
   'it-IT',
   'ja-JP',
   'ko-KR',
   'ms-MY',
-  'nl-NL',
   'pl-PL',
   'pt-BR',
   'ru',
   'sl',
+  'es',
   'ta',
   'te',
   'tr-TR',
-  'uk',
-  'zh-CN'
+  'uk'
 ]
 
-// Currently configured languages - TODO (make this dynamic)
+// Currently configured languages
 const configuredLanguages = {}
 availableLanguages.forEach(function (lang) {
   configuredLanguages[lang] = true
@@ -284,9 +283,7 @@ const defaultLocale = function () {
   }
 }
 
-// Initialize translations for a language providing an optional
-// callback executed after the translation caching process
-// is complete.
+// Initialize translations for a language
 exports.init = function (language) {
   // If this is in the main process
   if (ipcMain) {
@@ -309,7 +306,7 @@ exports.init = function (language) {
   // Currently selected language identifier I.e. 'en-US'
   lang = language || defaultLocale()
 
-  // Languages to support - TODO retrieve this dynamically
+  // Languages to support
   const langs = availableLanguages.map(function (lang) {
     return { code: lang }
   })
