@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.2](https://github.com/brave/browser-laptop/releases/v0.12.2dev)
+- Added a new look for the Windows browser to remove the titlebar for more content viewing area. ([#3854](https://github.com/brave/browser-laptop/issues/3854))
+- Added the ability to auto update extensions without releases.  ([#4080](https://github.com/brave/browser-laptop/issues/4080))
+- Added the ability to install extensions remotely instead of prepackaging them. ([#4081](https://github.com/brave/browser-laptop/issues/4081))
+- Upgraded to libchromiumcontent 53.0.2785.116. ([#1593](https://github.com/brave/browser-laptop/issues/1593))
+
 ## [0.12.1](https://github.com/brave/browser-laptop/releases/v0.12.1dev)
  - Added support for extension action buttons for password managers. ([#3867](https://github.com/brave/browser-laptop/issues/3867))([#2224](https://github.com/brave/browser-laptop/issues/2224))
  - Added notification to let users know 24 hours before their wallet would be used to pay publishers. ([#3828](https://github.com/brave/browser-laptop/issues/3828))
