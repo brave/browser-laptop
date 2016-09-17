@@ -43,8 +43,8 @@ class HistoryDay extends ImmutableComponent {
               : '',
             value: entry.get('lastAccessedTime')
           },
-          entry.get('customTitle') || entry.get('title')
-            ? entry.get('customTitle') || entry.get('title')
+          entry.get('title')
+            ? entry.get('title')
             : entry.get('location'),
           urlutils.getHostname(entry.get('location'), true)
         ])}
@@ -134,7 +134,7 @@ class AboutHistory extends React.Component {
   }
   searchedSiteDetails (searchTerm, siteDetails) {
     return siteDetails.filter((siteDetail) => {
-      const title = siteDetail.get('customTitle') + siteDetail.get('title') + siteDetail.get('location')
+      const title = siteDetail.get('title') + siteDetail.get('location')
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
