@@ -476,7 +476,12 @@ class Frame extends ImmutableComponent {
       case 'view-source':
         const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         if (sourceLocation !== null) {
-          windowActions.newFrame({location: sourceLocation}, true)
+          windowActions.newFrame({
+            location: sourceLocation,
+            isPrivate: this.frame.get('isPrivate'),
+            partitionNumber: this.frame.get('partitionNumber'),
+            parentFrameKey: this.frame.get('key')
+          }, true)
         }
         // TODO: Make the URL bar show the view-source: prefix
         break
