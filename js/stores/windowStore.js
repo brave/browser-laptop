@@ -19,7 +19,7 @@ const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
 
-const { l10nErrorText } = require('../lib/errorUtil')
+const { l10nErrorText } = require('../../app/common/lib/httpUtil')
 const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes } = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 

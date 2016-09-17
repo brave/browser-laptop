@@ -1005,6 +1005,14 @@ const windowActions = {
       frameProps,
       source
     })
+  },
+
+  gotResponseDetails: function (tabId, details) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_GOT_RESPONSE_DETAILS,
+      tabId,
+      details
+    })
   }
 }
 

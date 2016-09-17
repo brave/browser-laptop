@@ -392,3 +392,19 @@ module.exports.errorMap = {
   // Failed to sort addresses according to RFC3484.
   806: 'dnsSortError'
 }
+
+/**
+ * Returns true if HTTP response code is one we want to collect usage for
+ * @param {number} responseCode - HTTP response code to be evaluated
+ * @return {boolean} true if the code represents one w/ content, false if not
+ */
+module.exports.responseHasContent = (responseCode) => {
+  switch (responseCode) {
+    case 200: // ok
+    case 203: // non-authoritative
+    case 206: // partial content
+    case 304: // not modified (cached)
+      return true
+  }
+  return false
+}

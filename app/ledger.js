@@ -51,6 +51,7 @@ const locale = require('./locale')
 const appStore = require('../js/stores/appStore')
 const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
+const ledgerUtil = require('./common/lib/ledgerUtil')
 
 // TBD: remove these post beta [MTR]
 const logPath = 'ledger-log.json'
@@ -254,8 +255,10 @@ underscore.keys(fileTypes).forEach((fileType) => {
 signatureMax = Math.ceil(signatureMax * 1.5)
 
 eventStore.addChangeListener(() => {
-  var view = eventStore.getState().toJS().page_view
-  var info = eventStore.getState().toJS().page_info
+  const eventState = eventStore.getState().toJS()
+  var view = eventState.page_view
+  var info = eventState.page_info
+  var pageLoad = eventState.page_load
 
   if ((!synopsis) || (!util.isArray(info))) return
 
@@ -339,7 +342,9 @@ eventStore.addChangeListener(() => {
   })
 
   view = underscore.last(view) || {}
-  visit(view.url || 'NOOP', view.timestamp || underscore.now(), view.tabId)
+  if (ledgerUtil.shouldTrackView(view, pageLoad)) {
+    visit(view.url || 'NOOP', view.timestamp || underscore.now(), view.tabId)
+  }
 })
 
 /*

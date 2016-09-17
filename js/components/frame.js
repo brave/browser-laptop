@@ -24,7 +24,7 @@ const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
-const { isFrameError } = require('../lib/errorUtil')
+const { isFrameError } = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
 const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
@@ -965,7 +965,9 @@ class Frame extends ImmutableComponent {
         }))
       }
     })
-
+    this.webview.addEventListener('did-get-response-details', (details) => {
+      windowActions.gotResponseDetails(this.frame.get('tabId'), details)
+    })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }
