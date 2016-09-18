@@ -16,6 +16,10 @@ const browserActionDefaults = Immutable.fromJS({
 
 const extensionState = {
 
+  getExtensions: (state) => {
+    return state.get('extensions')
+  },
+
   getEnabledExtensions: (state) => {
     return state.get('extensions').filter((installInfo, extensionId) => {
       return installInfo.get('enabled') === true
