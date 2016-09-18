@@ -405,7 +405,7 @@ const createBookmarksSubmenu = () => {
 }
 
 const createWindowSubmenu = () => {
-  return [
+  const submenu = [
     {
       label: locale.translation('minimize'),
       accelerator: 'CmdOrCtrl+M',
@@ -438,13 +438,20 @@ const createWindowSubmenu = () => {
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.downloadsMenuItem(),
-    CommonMenu.passwordsMenuItem(),
-    CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('bringAllToFront'),
-      role: 'front'
-    }
+    CommonMenu.passwordsMenuItem()
   ]
+
+  if (isDarwin) {
+    submenu.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('bringAllToFront'),
+        role: 'front'
+      }
+    )
+  }
+
+  return submenu
 }
 
 const createHelpSubmenu = () => {
