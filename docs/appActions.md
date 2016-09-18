@@ -403,6 +403,16 @@ Dispatches a message when appWindowId loses focus
 
 
 
+### setMenubarTemplate(menubarTemplate) 
+
+Saves current menubar template for use w/ Windows titlebar
+
+**Parameters**
+
+**menubarTemplate**: `Object`, JSON used to build the menu
+
+
+
 ### networkConnected() 
 
 Dispatches a message when the network is re-connected

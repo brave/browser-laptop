@@ -126,9 +126,35 @@ class Main extends ImmutableComponent {
       switch (e.which) {
         case keyCodes.ALT:
           if (customTitlebar.enabled) {
-            // BSCTODO: if it's always visible, set a selected item instead
             e.preventDefault()
-            windowActions.toggleMenubarVisible()
+
+            const menubarTemplate = this.props.appState.getIn(['menu', 'template'])
+            const defaultLabel = menubarTemplate.getIn([0, 'label'])
+
+            if (getSetting(settings.AUTO_HIDE_MENU)) {
+              windowActions.toggleMenubarVisible(null, defaultLabel)
+            } else {
+              if (customTitlebar.menubarSelectedLabel) {
+                windowActions.setMenubarSelectedLabel()
+                windowActions.setContextMenuDetail()
+              } else {
+                windowActions.setMenubarSelectedLabel(defaultLabel)
+              }
+            }
+          }
+          break
+        case keyCodes.ESC:
+          if (customTitlebar.enabled) {
+            if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedLabel) {
+              e.preventDefault()
+              windowActions.toggleMenubarVisible(false)
+              break
+            }
+            if (customTitlebar.menubarSelectedLabel) {
+              e.preventDefault()
+              windowActions.setMenubarSelectedLabel()
+              windowActions.setContextMenuDetail()
+            }
           }
           break
       }
@@ -816,7 +842,9 @@ class Main extends ImmutableComponent {
                       template={customTitlebar.menubarTemplate}
                       selectedLabel={customTitlebar.menubarSelectedLabel}
                       selectedIndex={customTitlebar.menubarSelectedIndex}
-                      contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
+                      contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+                      autohide={getSetting(settings.AUTO_HIDE_MENU)}
+                      activeFrame={activeFrame} />
                   </div>
                   : null
               }

@@ -4,6 +4,13 @@
 
 @import "variables.less";
 
+// (Windows) Tabs row not right-clickable unless it has no-drag
+.platform--win32 .tabStripContainer {
+  &.allowDragging {
+    -webkit-app-region: no-drag !important;
+  }
+}
+
 .tabs {
   background: @tabsBackground;
   box-sizing: border-box;

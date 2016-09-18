@@ -789,7 +789,11 @@ const doAction = (action) => {
           : !windowState.getIn(['ui', 'menubar', 'isVisible'])
         // Clear selection when menu is shown
         if (newVisibleStatus) {
-          doAction({actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL})
+          const actionProps = { actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL }
+          if (action.defaultLabel) {
+            actionProps.label = action.defaultLabel
+          }
+          doAction(actionProps)
         }
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }

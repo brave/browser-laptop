@@ -650,7 +650,8 @@ const doAction = (action) => {
       appDispatcher.waitFor([appStore.dispatchToken], () => {
         const clickedMenuItem = menuUtil.getMenuItem(appMenu, action.label)
         if (clickedMenuItem) {
-          clickedMenuItem.click(clickedMenuItem, BrowserWindow.getFocusedWindow())
+          const focusedWindow = BrowserWindow.getFocusedWindow()
+          clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)
         }
       })
       break

@@ -257,7 +257,7 @@ function windowDefaults () {
     show: false,
     width: appState.get('defaultWindowWidth'),
     height: appState.get('defaultWindowHeight'),
-    minWidth: 480,
+    minWidth: isWindows ? 640 : 480, // Windows has caption buttons (min/max/close) which take extra space
     minHeight: 300,
     minModalHeight: 100,
     minModalWidth: 100,

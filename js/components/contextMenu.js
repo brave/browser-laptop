@@ -213,7 +213,6 @@ class ContextMenuSingle extends ImmutableComponent {
       styles.top = this.props.y
     }
     let index = 0
-    const selectedIndex = this.props.selectedIndex
     return <div role='list' className={cx({
       contextMenuSingle: true,
       isSubmenu: this.props.submenuIndex !== 0

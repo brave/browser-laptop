@@ -18,7 +18,7 @@
   }
 }
 
-// On MacOS we need to keep a padding left to avoid overlapping
+// (macOS) We need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .backforward {
   margin-left: @navbarLeftMarginDarwin;
@@ -29,16 +29,26 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
-// On Windows, we add extra padding to have spacing match the close button
+// (Windows) Add extra padding to have spacing match the close button
 .platform--win32 .navigatorWrapper {
   margin-left: @navbarLeftMarginWindows;
 }
-
-// Style adjustments needed for slim titlebar to work properly
+// (Windows) Style adjustments needed for slim titlebar to work properly
 .platform--win32 div#window.frameless {
   border: 1px solid #000;
   box-sizing: border-box;
 }
+// (Windows) Extension button not clickable unless it has no-drag
+.platform--win32 .extensionButton {
+  -webkit-app-region: no-drag !important;
+}
+// (Windows) remove margin next to brave button when lower than 720px
+.platform--win32 .navigatorWrapper .topLevelEndButtons {
+  @media (max-width: @windowsMinimumViewport) {
+    margin-left: 0;
+  }
+}
+
 .navbarCaptionButtonContainer {
   display: flex;
   border-bottom: 1px solid #aaaaaa;

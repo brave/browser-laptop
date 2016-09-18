@@ -811,7 +811,7 @@ Called from the Menubar control, handled in menu.js
 
 
 
-### setMenubarItemSelected(label) 
+### setMenubarSelectedLabel(label) 
 
 (Windows only)
 Used to track which menubar item is currently selected (or null for none selected)
