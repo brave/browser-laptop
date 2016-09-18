@@ -133,6 +133,7 @@ class Main extends ImmutableComponent {
     var swipeGesture = false
     var canSwipeBack = false
     var canSwipeForward = false
+    var isSwipeOnEdge = false
     var deltaX = 0
     var deltaY = 0
     var startTime = 0
@@ -192,14 +193,15 @@ class Main extends ImmutableComponent {
       if (swipeGesture &&
         systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
         trackingFingers = true
+        isSwipeOnEdge = false
         startTime = (new Date()).getTime()
       }
     })
     ipc.on('scroll-touch-end', function () {
-      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50) {
-        if (deltaX > 100 && canSwipeForward) {
+      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50 && isSwipeOnEdge) {
+        if (deltaX > 70 && canSwipeForward) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -100 && canSwipeBack) {
+        } else if (deltaX < -70 && canSwipeBack) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
@@ -209,6 +211,9 @@ class Main extends ImmutableComponent {
       deltaX = 0
       deltaY = 0
       startTime = 0
+    })
+    ipc.on('scroll-touch-edge', function () {
+      isSwipeOnEdge = true
     })
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
   }
