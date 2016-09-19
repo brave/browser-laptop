@@ -9,6 +9,8 @@ const settings = require('../js/constants/settings')
 const {passwordManagers, extensionIds} = require('../js/constants/passwordManagers')
 const appStore = require('../js/stores/appStore')
 const extensionState = require('./common/state/extensionState')
+const fs = require('fs')
+const path = require('path')
 
 let generateBraveManifest = () => {
   let baseManifest = {
@@ -141,41 +143,41 @@ let generateBraveManifest = () => {
 }
 
 module.exports.init = () => {
-  const installedExtensions = {}
+  const loadedExtensions = {}
   const registeredExtensions = {}
   browserActions.init()
 
-  const defaultSession = require('electron').session.defaultSession
-  defaultSession.updateClient.on('component-checking-for-updates', () => {
+  const {componentUpdater} = require('electron')
+  componentUpdater.on('component-checking-for-updates', () => {
     // console.log('checking for update')
   })
-  defaultSession.updateClient.on('component-update-found', () => {
+  componentUpdater.on('component-update-found', () => {
     // console.log('update-found')
   })
-  defaultSession.updateClient.on('component-update-ready', () => {
+  componentUpdater.on('component-update-ready', () => {
     // console.log('update-ready')
   })
-  defaultSession.updateClient.on('component-update-updated', (e, extensionId, version) => {
+  componentUpdater.on('component-update-updated', (e, extensionId, version) => {
     // console.log('update-updated', extensionId, version)
   })
-  defaultSession.updateClient.on('component-ready', (e, extensionId, extensionPath) => {
+  componentUpdater.on('component-ready', (e, extensionId, extensionPath) => {
     // console.log('component-ready', extensionId, extensionPath)
-    // Re-setup the installedExtensions info if it exists
-    delete installedExtensions[extensionId]
-    installExtension(extensionId, extensionPath)
+    // Re-setup the loadedExtensions info if it exists
+    delete loadedExtensions[extensionId]
+    loadExtension(extensionId, extensionPath)
   })
-  defaultSession.updateClient.on('component-not-updated', () => {
+  componentUpdater.on('component-not-updated', () => {
     // console.log('update-not-updated')
   })
-  defaultSession.updateClient.on('component-registered', (e, extensionId) => {
+  componentUpdater.on('component-registered', (e, extensionId) => {
     // console.log('component-registered')
     const extensions = extensionState.getExtensions(appStore.getState())
     const extensionPath = extensions.getIn([extensionId, 'filePath'])
     // If we don't have info on the extension yet, check for an update / install
     if (!extensionPath) {
-      defaultSession.updateClient.install(extensionId)
+      componentUpdater.checkNow(extensionId)
     } else {
-      installExtension(extensionId, extensionPath)
+      loadExtension(extensionId, extensionPath)
     }
   })
 
@@ -185,23 +187,37 @@ module.exports.init = () => {
       // TODO(bridiver) extensionActions.extensionInstallFailed
       return
     }
-    installedExtensions[installInfo.id] = installInfo
+    loadedExtensions[installInfo.id] = installInfo
     installInfo.filePath = installInfo.base_path
     installInfo.base_path = fileUrl(installInfo.base_path)
     extensionActions.extensionInstalled(installInfo.id, installInfo)
     enableExtension(installInfo.id)
   }
 
-  let installExtension = (extensionId, path, options = {}) => {
-    if (!installedExtensions[extensionId]) {
-      process.emit('load-extension', path, options, extensionInstalled)
+  let loadExtension = (extensionId, extensionPath, options = {}) => {
+    if (!loadedExtensions[extensionId]) {
+      if (extensionId === config.braveExtensionId) {
+        process.emit('load-extension', extensionPath, options, extensionInstalled)
+        return
+      }
+      // Verify we don't have info about an extension which doesn't exist
+      // on disk anymore.  It will crash if it doesn't exist, so this is
+      // just a safety net.
+      fs.exists(path.join(extensionPath, 'manifest.json'), (exists) => {
+        if (exists) {
+          process.emit('load-extension', extensionPath, options, extensionInstalled)
+        } else {
+          delete loadedExtensions[extensionId]
+          componentUpdater.checkNow(extensionId)
+        }
+      })
     } else {
       enableExtension(extensionId)
     }
   }
 
   let enableExtension = (extensionId) => {
-    var installInfo = installedExtensions[extensionId]
+    var installInfo = loadedExtensions[extensionId]
     if (installInfo) {
       process.emit('enable-extension', installInfo.id)
       extensionActions.extensionEnabled(installInfo.id)
@@ -209,7 +225,7 @@ module.exports.init = () => {
   }
 
   let disableExtension = (extensionId) => {
-    var installInfo = installedExtensions[extensionId]
+    var installInfo = loadedExtensions[extensionId]
     if (installInfo) {
       process.emit('disable-extension', installInfo.id)
       extensionActions.extensionDisabled(installInfo.id)
@@ -219,20 +235,20 @@ module.exports.init = () => {
   let registerExtension = (extensionId) => {
     const extensions = extensionState.getExtensions(appStore.getState())
     if (!registeredExtensions[extensionId]) {
-      defaultSession.updateClient.registerComponent(extensionId)
+      componentUpdater.registerComponent(extensionId)
       registeredExtensions[extensionId] = true
     } else {
       const extensionPath = extensions.getIn([extensionId, 'filePath'])
       if (extensionPath) {
         // Otheriwse just install it
-        installExtension(extensionId, extensionPath)
+        loadExtension(extensionId, extensionPath)
       }
     }
   }
 
   // Manually install only the braveExtension
   registeredExtensions[config.braveExtensionId] = true
-  installExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
+  loadExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
 
   let registerExtensions = () => {
     if (getSetting(settings.PDFJS_ENABLED)) {
