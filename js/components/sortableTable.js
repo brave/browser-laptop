@@ -64,46 +64,52 @@ class SortableTable extends ImmutableComponent {
       return false
     }
 
-    return <table className={cx({
-      sort: true,
-      sortableTable: !this.props.overrideDefaultStyle
-    })}
-      ref={(node) => { this.table = node }}>
-      <thead>
-        <tr>
-          {this.props.headings.map((heading, j) => {
-            const firstEntry = this.props.rows[0][j]
-            let dataType = typeof firstEntry
-            if (dataType === 'object' && firstEntry.value) {
-              dataType = typeof firstEntry.value
+    return <div className='fixed-table-container'>
+      <div className='table-header' />
+      <div className='fixed-table-container-inner'>
+        <table className={cx({
+          sort: true,
+          sortableTable: !this.props.overrideDefaultStyle
+        })}
+          ref={(node) => { this.table = node }}>
+          <thead>
+            <tr>
+              {this.props.headings.map((heading, j) => {
+                const firstEntry = this.props.rows[0][j]
+                let dataType = typeof firstEntry
+                if (dataType === 'object' && firstEntry.value) {
+                  dataType = typeof firstEntry.value
+                }
+                return <th className={cx({
+                  'sort-header': true,
+                  'sort-default': heading === this.props.defaultHeading})}
+                  data-sort-method={dataType === 'number' ? 'number' : undefined}
+                  data-sort-order={this.props.defaultHeadingSortOrder}>
+                  <div className='th-inner' data-l10n-id={heading} />
+                </th>
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              this.props.rows.map((row, i) => {
+                const entry = row.map((item, j) => {
+                  const value = typeof item === 'object' ? item.value : item
+                  const html = typeof item === 'object' ? item.html : item
+                  return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value}>
+                    {value === true ? '✕' : html}
+                  </td>
+                })
+                const rowAttributes = this.getRowAttributes(row, i)
+                return <tr {...rowAttributes}
+                  data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
+                  className={this.hasRowClassNames ? this.props.rowClassNames[i] : undefined}>{entry}</tr>
+              })
             }
-            return <th className={cx({
-              'sort-header': true,
-              'sort-default': heading === this.props.defaultHeading})}
-              data-l10n-id={heading}
-              data-sort-method={dataType === 'number' ? 'number' : undefined}
-              data-sort-order={this.props.defaultHeadingSortOrder} />
-          })}
-        </tr>
-      </thead>
-      <tbody>
-        {
-          this.props.rows.map((row, i) => {
-            const entry = row.map((item, j) => {
-              const value = typeof item === 'object' ? item.value : item
-              const html = typeof item === 'object' ? item.html : item
-              return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value}>
-                {value === true ? '✕' : html}
-              </td>
-            })
-            const rowAttributes = this.getRowAttributes(row, i)
-            return <tr {...rowAttributes}
-              data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
-              className={this.hasRowClassNames ? this.props.rowClassNames[i] : undefined}>{entry}</tr>
-          })
-        }
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+    </div>
   }
 }
 
