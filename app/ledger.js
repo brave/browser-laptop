@@ -111,6 +111,18 @@ const doAction = (action) => {
       if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
       break
 
+    case appConstants.APP_CHANGE_SITE_SETTING:
+      if (action.key === 'ledgerPaymentsShown') {
+        // TODO
+      }
+      break
+
+    case appConstants.APP_REMOVE_SITE_SETTING:
+      if (action.key === 'ledgerPaymentsShown') {
+        // TODO
+      }
+      break
+
     case appConstants.APP_NETWORK_CONNECTED:
       setTimeout(networkConnected, 1 * msecs.second)
       break
@@ -967,7 +979,9 @@ var run = (delayTime) => {
       var result
       var siteSetting = siteSettings.get(`https?://${winner}`)
 
-      if ((siteSetting) && (siteSetting.get('ledgerPayments') === false)) return
+      if ((siteSetting) &&
+          (siteSetting.get('ledgerPayments') === false ||
+           siteSetting.get('ledgerPaymentsShown') === false)) return
 
       result = client.vote(winner)
       if (result) state = result

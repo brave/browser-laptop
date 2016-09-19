@@ -1021,6 +1021,8 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
   } else if (contextMenuType === 'history') {
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps))
+  } else if (contextMenuType === 'synopsis') {
+    onLedgerContextMenu(nodeProps.location, nodeProps.hostPattern)
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
@@ -1072,6 +1074,22 @@ function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
     e.stopPropagation()
   }
   const menu = Menu.buildFromTemplate(siteDetailTemplateInit(siteDetail, activeFrame))
+  menu.popup(currentWindow)
+  menu.destroy()
+}
+
+function onLedgerContextMenu (location, hostPattern) {
+  const template = [openInNewTabMenuItem(location),
+    openInNewPrivateTabMenuItem(location),
+    openInNewSessionTabMenuItem(location),
+    copyAddressMenuItem('copyLinkAddress', location),
+    CommonMenu.separatorMenuItem,
+    {
+      label: locale.translation('deleteLedgerEntry'),
+      click: () => appActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+    }
+  ]
+  const menu = Menu.buildFromTemplate(template)
   menu.popup(currentWindow)
   menu.destroy()
 }

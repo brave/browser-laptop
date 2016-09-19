@@ -197,8 +197,19 @@ class LedgerTable extends ImmutableComponent {
     return true
   }
 
+  shouldShow (synopsis) {
+    const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
+    if (hostSettings) {
+      const result = hostSettings.get('ledgerPaymentsShown')
+      if (typeof result === 'boolean') {
+        return result
+      }
+    }
+    return true
+  }
+
   getRow (synopsis) {
-    if (!synopsis || !synopsis.get) {
+    if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
     }
     const faviconURL = synopsis.get('faviconURL') || appConfig.defaultFavicon
@@ -244,6 +255,13 @@ class LedgerTable extends ImmutableComponent {
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
         }
         onContextMenu={aboutActions.contextMenu}
+        contextMenuName='synopsis'
+        rowObjects={this.synopsis.map((entry) => {
+          return {
+            hostPattern: this.getHostPattern(entry),
+            location: entry.get('publisherURL')
+          }
+        }).toJS()}
         rows={this.synopsis.map((synopsis) => this.getRow(synopsis)).toJS()} />
     </div>
   }

@@ -72,6 +72,7 @@ AppStore
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
       ledgerPayments: boolean, // False if site should not be paid by the ledger. Defaults to true.
+      ledgerPaymentsShown: boolean, // False if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
       runInsecureContent: boolean // Allow active mixed content
     }
   },
