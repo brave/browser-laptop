@@ -82,6 +82,8 @@ class Menubar extends ImmutableComponent {
   constructor () {
     super()
     this.onKeyDown = this.onKeyDown.bind(this)
+  }
+  componentWillMount () {
     document.addEventListener('keydown', this.onKeyDown)
   }
   componentWillUnmount () {
@@ -97,22 +99,17 @@ class Menubar extends ImmutableComponent {
     return this.getTemplateByLabel(this.props.selectedLabel)
   }
   get selectedTemplateItemsOnly () {
-    // this exclude the separators
-    return this.selectedTemplate.reduce((previousValue, currentValue, currentIndex, array) => {
-      const result = currentIndex === 1 ? [] : previousValue
-      if (currentIndex === 1 && previousValue.get('type') !== separatorMenuItem.type) {
-        result.push(previousValue)
-      }
-      if (currentValue.get('type') !== separatorMenuItem.type) {
-        result.push(currentValue)
-      }
-      return result
+    // exclude the separators AND items that are not visible
+    return this.selectedTemplate.filter((element) => {
+      if (element.get('type') === separatorMenuItem.type) return false
+      if (element.has('visible')) return element.get('visible')
+      return true
     })
   }
   get selectedIndexMax () {
     const result = this.selectedTemplateItemsOnly
-    if (result && Array.isArray(result)) {
-      return result.length
+    if (result && result.size && result.size > 0) {
+      return result.size
     }
     return 0
   }

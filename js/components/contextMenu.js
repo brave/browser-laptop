@@ -212,13 +212,19 @@ class ContextMenuSingle extends ImmutableComponent {
     if (this.props.y) {
       styles.top = this.props.y
     }
+    const visibleMenuItems = this.props.template.filter((element) => {
+      return element.has('visible')
+        ? element.get('visible')
+        : true
+    })
+
     let index = 0
     return <div role='list' className={cx({
       contextMenuSingle: true,
       isSubmenu: this.props.submenuIndex !== 0
     })} style={styles}>
       {
-        this.props.template.map((contextMenuItem) => {
+        visibleMenuItems.map((contextMenuItem) => {
           let props = {
             contextMenuItem: contextMenuItem,
             submenuIndex: this.props.submenuIndex,

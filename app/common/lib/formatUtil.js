@@ -17,6 +17,7 @@ const macOrderLookup = (value) => {
       return 2
     case 'Super':
     case 'CmdOrCtrl':
+    case 'CommandOrControl':
     case 'Command':
     case 'Cmd':
       return 3
@@ -27,6 +28,7 @@ const macOrderLookup = (value) => {
 const defaultOrderLookup = (value) => {
   switch (value) {
     case 'CmdOrCtrl':
+    case 'CommandOrControl':
     case 'Control':
     case 'Ctrl':
       return 0
@@ -57,6 +59,7 @@ module.exports.formatAccelerator = (accelerator) => {
     })
     // NOTE: these characters might only show properly on Mac
     result = splitResult.join('')
+    result = result.replace('CommandOrControl', '⌘')
     result = result.replace('CmdOrCtrl', '⌘')
     result = result.replace('Command', '⌘')
     result = result.replace('Cmd', '⌘')
@@ -74,10 +77,13 @@ module.exports.formatAccelerator = (accelerator) => {
       return -1
     })
     result = splitResult.join('+')
+    result = result.replace('CommandOrControl', 'Ctrl')
     result = result.replace('CmdOrCtrl', 'Ctrl')
+    result = result.replace('Control', 'Ctrl')
   }
   return result
 }
+
 
 /**
  * Clamp values down to a given range (min/max).
