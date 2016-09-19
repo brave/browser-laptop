@@ -128,7 +128,7 @@ class Menubar extends ImmutableComponent {
       case keyCodes.ENTER:
         e.preventDefault()
         if (this.selectedTemplate) {
-          const selectedLabel = this.selectedTemplateItemsOnly[this.props.selectedIndex].get('label')
+          const selectedLabel = this.selectedTemplateItemsOnly.getIn([this.props.selectedIndex, 'label'])
           windowActions.clickMenubarSubmenu(selectedLabel)
           windowActions.resetMenuState()
         }

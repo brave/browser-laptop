@@ -128,8 +128,9 @@ class Main extends ImmutableComponent {
           if (customTitlebar.enabled) {
             e.preventDefault()
 
-            const menubarTemplate = this.props.appState.getIn(['menu', 'template'])
-            const defaultLabel = menubarTemplate.getIn([0, 'label'])
+            const defaultLabel = customTitlebar.menubarTemplate
+              ? customTitlebar.menubarTemplate.getIn([0, 'label'])
+              : null
 
             if (getSetting(settings.AUTO_HIDE_MENU)) {
               windowActions.toggleMenubarVisible(null, defaultLabel)

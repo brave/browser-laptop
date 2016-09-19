@@ -84,7 +84,6 @@ module.exports.formatAccelerator = (accelerator) => {
   return result
 }
 
-
 /**
  * Clamp values down to a given range (min/max).
  * Value is wrapped when out of bounds. ex:
