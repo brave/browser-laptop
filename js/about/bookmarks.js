@@ -254,10 +254,13 @@ class AboutBookmarks extends React.Component {
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
+  componentDidMount () {
+    this.refs.bookmarkSearch.focus()
+  }
   render () {
     return <div className='siteDetailsPage'>
       <h2 data-l10n-id='folders' />
-      <input type='text' className='searchInput' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
+      <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
       {
         this.state.search
         ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
