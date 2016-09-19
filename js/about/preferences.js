@@ -616,7 +616,7 @@ class SearchTab extends ImmutableComponent {
   }
 
   hoverCallback (rows) {
-    this.props.onChangeSetting(settings.DEFAULT_SEARCH_ENGINE, rows[1].props.children.props.name)
+    this.props.onChangeSetting(settings.DEFAULT_SEARCH_ENGINE, rows[1].value)
   }
 
   render () {

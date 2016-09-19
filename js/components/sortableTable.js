@@ -99,7 +99,8 @@ class SortableTable extends ImmutableComponent {
             const rowAttributes = this.getRowAttributes(row, i)
             return <tr {...rowAttributes}
               data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
-              className={this.hasRowClassNames ? this.props.rowClassNames[i] : undefined}>{entry}</tr>
+              className={this.hasRowClassNames ? this.props.rowClassNames[i] + ' ' + rowAttributes.className
+                : rowAttributes.className}>{entry}</tr>
           })
         }
       </tbody>
