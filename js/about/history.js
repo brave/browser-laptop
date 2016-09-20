@@ -92,10 +92,10 @@ class GroupedHistoryList extends ImmutableComponent {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const userLanguage = getSetting(settings.LANGUAGE, this.props.settings)
     return <list className='historyList'>
-    {
-      this.groupEntriesByDay(userLanguage || defaultLanguage).map((groupedEntry) =>
-        <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries} />)
-    }
+      {
+        this.groupEntriesByDay(userLanguage || defaultLanguage).map((groupedEntry) =>
+          <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries} />)
+      }
     </list>
   }
 }
@@ -167,16 +167,16 @@ class AboutHistory extends React.Component {
       </div>
 
       <div className='siteDetailsPageContent'>
-      {
-        <GroupedHistoryList
-          languageCodes={this.state.languageCodes}
-          settings={this.state.settings}
-          history={
-            this.state.search
-            ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder())
-            : this.historyDescendingOrder()
-          } />
-       }
+        {
+          <GroupedHistoryList
+            languageCodes={this.state.languageCodes}
+            settings={this.state.settings}
+            history={
+              this.state.search
+              ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder())
+              : this.historyDescendingOrder()
+            } />
+         }
       </div>
     </div>
   }

@@ -108,15 +108,15 @@ class SiteInfo extends ImmutableComponent {
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
       <ul onClick={(e) => e.stopPropagation()}>
-      {
-        secureIcon
-      }
-      {
-        partitionInfo
-      }
-      {
-        runInsecureContentInfo
-      }
+        {
+          secureIcon
+        }
+        {
+          partitionInfo
+        }
+        {
+          runInsecureContentInfo
+        }
       </ul>
     </Dialog>
   }

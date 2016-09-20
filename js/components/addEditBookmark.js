@@ -138,9 +138,9 @@ class AddEditBookmark extends ImmutableComponent {
             <select value={this.props.currentDetail.get('parentFolderId')}
               onChange={this.onParentFolderChange} >
               <option value='0' data-l10n-id='bookmarksToolbar' />
-            {
-              this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
-            }
+              {
+                this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
+              }
             </select>
           </div>
           <div className='formRow'>

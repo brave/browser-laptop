@@ -84,11 +84,11 @@ class NotificationBar extends ImmutableComponent {
     }
 
     return <div className='notificationBar'>
-    {
-      activeNotifications.takeLast(3).map((notificationDetail) =>
-        <NotificationItem detail={notificationDetail} />
-      )
-    }
+      {
+        activeNotifications.takeLast(3).map((notificationDetail) =>
+          <NotificationItem detail={notificationDetail} />
+        )
+      }
     </div>
   }
 }

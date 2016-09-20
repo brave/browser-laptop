@@ -965,77 +965,77 @@ class Main extends ImmutableComponent {
       <div className='mainContainer'>
         <div className='tabContainer'
           ref={(node) => { this.tabContainer = node }}>
-        {
-          sortedFrames.map((frame) =>
-            <Frame
-              ref={(node) => { this.frames[frame.get('key')] = node }}
-              prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
-              onCloseFrame={this.onCloseFrame}
-              frameKey={frame.get('key')}
-              key={frame.get('key')}
-              settings={getBaseUrl(frame.get('location')) === 'about:preferences' || getBaseUrl(frame.get('location')) === 'about:history'
-                ? this.props.appState.get('settings') || emptyMap
-                : null}
-              bookmarks={frame.get('location') === 'about:bookmarks'
-                ? this.props.appState.get('sites')
-                    .filter((site) => site.get('tags')
-                      .includes(siteTags.BOOKMARK)) || emptyMap
-                : null}
-              history={frame.get('location') === 'about:history'
-                ? this.props.appState.get('sites') || emptyMap
-                : null}
-              extensions={frame.get('location') === 'about:extensions'
-                ? this.props.appState.get('extensions') || emptyMap
-                : null}
-              downloads={this.props.appState.get('downloads') || emptyMap}
-              bookmarkFolders={frame.get('location') === 'about:bookmarks'
-                ? this.props.appState.get('sites')
-                    .filter((site) => site.get('tags')
-                      .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
-                : null}
-              isFullScreen={frame.get('isFullScreen')}
-              showFullScreenWarning={frame.get('showFullScreenWarning')}
-              findbarShown={frame.get('findbarShown')}
-              findDetail={frame.get('findDetail')}
-              hrefPreview={frame.get('hrefPreview')}
-              showOnRight={frame.get('showOnRight')}
-              location={frame.get('location')}
-              isPrivate={frame.get('isPrivate')}
-              partitionNumber={frame.get('partitionNumber')}
-              activeShortcut={frame.get('activeShortcut')}
-              activeShortcutDetails={frame.get('activeShortcutDetails')}
-              provisionalLocation={frame.get('provisionalLocation')}
-              pinnedLocation={frame.get('pinnedLocation')}
-              src={frame.get('src')}
-              guestInstanceId={frame.get('guestInstanceId')}
-              tabId={frame.get('tabId')}
-              aboutDetails={frame.get('aboutDetails')}
-              unloaded={frame.get('unloaded')}
-              audioMuted={frame.get('audioMuted')}
-              passwords={this.props.appState.get('passwords')}
-              adblock={this.props.appState.get('adblock')}
-              safeBrowsing={this.props.appState.get('safeBrowsing')}
-              httpsEverywhere={this.props.appState.get('httpsEverywhere')}
-              trackingProtection={this.props.appState.get('trackingProtection')}
-              adInsertion={this.props.appState.get('adInsertion')}
-              noScript={this.props.appState.get('noScript')}
-              flash={this.props.appState.get('flash')}
-              cookieblock={this.props.appState.get('cookieblock')}
-              flashInitialized={this.props.appState.get('flashInitialized')}
-              allSiteSettings={allSiteSettings}
-              ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
-              publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
-              frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
-              enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
-              isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
-              isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
-              autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
-              autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
-              adblockCount={this.props.appState.getIn(['adblock', 'count'])}
-              trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
-              httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
-            />)
-        }
+          {
+            sortedFrames.map((frame) =>
+              <Frame
+                ref={(node) => { this.frames[frame.get('key')] = node }}
+                prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
+                onCloseFrame={this.onCloseFrame}
+                frameKey={frame.get('key')}
+                key={frame.get('key')}
+                settings={getBaseUrl(frame.get('location')) === 'about:preferences' || getBaseUrl(frame.get('location')) === 'about:history'
+                  ? this.props.appState.get('settings') || emptyMap
+                  : null}
+                bookmarks={frame.get('location') === 'about:bookmarks'
+                  ? this.props.appState.get('sites')
+                      .filter((site) => site.get('tags')
+                        .includes(siteTags.BOOKMARK)) || emptyMap
+                  : null}
+                history={frame.get('location') === 'about:history'
+                  ? this.props.appState.get('sites') || emptyMap
+                  : null}
+                extensions={frame.get('location') === 'about:extensions'
+                  ? this.props.appState.get('extensions') || emptyMap
+                  : null}
+                downloads={this.props.appState.get('downloads') || emptyMap}
+                bookmarkFolders={frame.get('location') === 'about:bookmarks'
+                  ? this.props.appState.get('sites')
+                      .filter((site) => site.get('tags')
+                        .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
+                  : null}
+                isFullScreen={frame.get('isFullScreen')}
+                showFullScreenWarning={frame.get('showFullScreenWarning')}
+                findbarShown={frame.get('findbarShown')}
+                findDetail={frame.get('findDetail')}
+                hrefPreview={frame.get('hrefPreview')}
+                showOnRight={frame.get('showOnRight')}
+                location={frame.get('location')}
+                isPrivate={frame.get('isPrivate')}
+                partitionNumber={frame.get('partitionNumber')}
+                activeShortcut={frame.get('activeShortcut')}
+                activeShortcutDetails={frame.get('activeShortcutDetails')}
+                provisionalLocation={frame.get('provisionalLocation')}
+                pinnedLocation={frame.get('pinnedLocation')}
+                src={frame.get('src')}
+                guestInstanceId={frame.get('guestInstanceId')}
+                tabId={frame.get('tabId')}
+                aboutDetails={frame.get('aboutDetails')}
+                unloaded={frame.get('unloaded')}
+                audioMuted={frame.get('audioMuted')}
+                passwords={this.props.appState.get('passwords')}
+                adblock={this.props.appState.get('adblock')}
+                safeBrowsing={this.props.appState.get('safeBrowsing')}
+                httpsEverywhere={this.props.appState.get('httpsEverywhere')}
+                trackingProtection={this.props.appState.get('trackingProtection')}
+                adInsertion={this.props.appState.get('adInsertion')}
+                noScript={this.props.appState.get('noScript')}
+                flash={this.props.appState.get('flash')}
+                cookieblock={this.props.appState.get('cookieblock')}
+                flashInitialized={this.props.appState.get('flashInitialized')}
+                allSiteSettings={allSiteSettings}
+                ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
+                publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
+                frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
+                enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
+                isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
+                isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
+                autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
+                autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
+                adblockCount={this.props.appState.getIn(['adblock', 'count'])}
+                trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
+                httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
+              />)
+          }
         </div>
       </div>
       {

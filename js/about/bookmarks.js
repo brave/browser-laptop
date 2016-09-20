@@ -73,18 +73,18 @@ class BookmarkItem extends ImmutableComponent {
       data-context-menu-disable
       draggable='true'
       onDoubleClick={this.navigate.bind(this)}>
-    {
-      this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')
-      ? <span className='aboutListItem' title={this.props.bookmark.get('location')}>
-        <span className='aboutItemTitle'>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
-        {partitionNumberInfo}
-        <span className='aboutItemSeparator'>-</span><span className='aboutItemLocation'>{this.props.bookmark.get('location')}</span>
-      </span>
-      : <span className='aboutListItem' title={this.props.bookmark.get('location')}>
-        <span>{this.props.bookmark.get('location')}</span>
-        {partitionNumberInfo}
-      </span>
-    }
+      {
+        this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')
+        ? <span className='aboutListItem' title={this.props.bookmark.get('location')}>
+          <span className='aboutItemTitle'>{this.props.bookmark.get('customTitle') || this.props.bookmark.get('title')}</span>
+          {partitionNumberInfo}
+          <span className='aboutItemSeparator'>-</span><span className='aboutItemLocation'>{this.props.bookmark.get('location')}</span>
+        </span>
+        : <span className='aboutListItem' title={this.props.bookmark.get('location')}>
+          <span>{this.props.bookmark.get('location')}</span>
+          {partitionNumberInfo}
+        </span>
+      }
     </div>
   }
 }
@@ -181,10 +181,10 @@ class BookmarkFolderList extends ImmutableComponent {
 class BookmarksList extends ImmutableComponent {
   render () {
     return <list className='siteDetailsList'>
-    {
-      this.props.bookmarks.map((bookmark) =>
-        <BookmarkItem bookmark={bookmark} />)
-    }
+      {
+        this.props.bookmarks.map((bookmark) =>
+          <BookmarkItem bookmark={bookmark} />)
+      }
     </list>
   }
 }
@@ -205,9 +205,9 @@ class SearchResults extends React.Component {
 
     return (
       <list className='siteDetailsList'>
-      {
-        sortedBookmarks.map((bookmark, idx) => <BookmarkItem bookmark={bookmark} inSelectedFolder={selectedFolderIndex.get(idx)} />)
-      }
+        {
+          sortedBookmarks.map((bookmark, idx) => <BookmarkItem bookmark={bookmark} inSelectedFolder={selectedFolderIndex.get(idx)} />)
+        }
       </list>
     )
   }

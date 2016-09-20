@@ -189,11 +189,11 @@ class BookmarkToolbarButton extends ImmutableComponent {
         !this.isFolder && showingFavicon ? <span className='bookmarkFavicon' style={iconStyle} /> : null
       }
       <span className='bookmarkText'>
-      {
-        this.props.showFavicon && this.props.showOnlyFavicon
-        ? ''
-        : siteDetailTitle || siteDetailLocation
-      }
+        {
+          this.props.showFavicon && this.props.showOnlyFavicon
+          ? ''
+          : siteDetailTitle || siteDetailLocation
+        }
       </span>
       {
         this.isFolder
@@ -381,28 +381,28 @@ class BookmarksToolbar extends ImmutableComponent {
       onDragEnter={this.onDragEnter}
       onDragOver={this.onDragOver}
       onContextMenu={this.onContextMenu}>
-    {
-        this.bookmarksForToolbar.map((bookmark, i) =>
-          <BookmarkToolbarButton
-            ref={(node) => this.bookmarkRefs.push(node)}
-            key={i}
-            contextMenuDetail={this.props.contextMenuDetail}
-            activeFrameKey={this.props.activeFrameKey}
-            draggingOverData={this.props.draggingOverData}
-            openContextMenu={this.openContextMenu}
-            clickBookmarkItem={this.clickBookmarkItem}
-            showBookmarkFolderMenu={this.showBookmarkFolderMenu}
-            bookmark={bookmark}
-            showFavicon={this.props.showFavicon}
-            showOnlyFavicon={this.props.showOnlyFavicon} />)
-    }
-    {
-      this.overflowBookmarkItems.size !== 0
-      ? <Button iconClass='overflowIndicator fa-angle-double-right'
-        onClick={this.onMoreBookmarksMenu}
-        className='bookmarkButton' />
-      : null
-    }
+      {
+          this.bookmarksForToolbar.map((bookmark, i) =>
+            <BookmarkToolbarButton
+              ref={(node) => this.bookmarkRefs.push(node)}
+              key={i}
+              contextMenuDetail={this.props.contextMenuDetail}
+              activeFrameKey={this.props.activeFrameKey}
+              draggingOverData={this.props.draggingOverData}
+              openContextMenu={this.openContextMenu}
+              clickBookmarkItem={this.clickBookmarkItem}
+              showBookmarkFolderMenu={this.showBookmarkFolderMenu}
+              bookmark={bookmark}
+              showFavicon={this.props.showFavicon}
+              showOnlyFavicon={this.props.showOnlyFavicon} />)
+      }
+      {
+        this.overflowBookmarkItems.size !== 0
+        ? <Button iconClass='overflowIndicator fa-angle-double-right'
+          onClick={this.onMoreBookmarksMenu}
+          className='bookmarkButton' />
+        : null
+      }
     </div>
   }
 }

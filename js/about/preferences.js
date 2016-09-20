@@ -474,11 +474,11 @@ class PaymentHistory extends ImmutableComponent {
           </tr>
         </thead>
         <tbody>
-        {
-          transactions.map(function (row) {
-            return <PaymentHistoryRow transaction={row} ledgerData={this.props.ledgerData} />
-          }.bind(this))
-        }
+          {
+            transactions.map(function (row) {
+              return <PaymentHistoryRow transaction={row} ledgerData={this.props.ledgerData} />
+            }.bind(this))
+          }
         </tbody>
       </table>
     </div>
@@ -588,8 +588,8 @@ class GeneralTab extends ImmutableComponent {
 class SearchSelectEntry extends ImmutableComponent {
   render () {
     return <div>
-    {getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings) === this.props.name
-      ? <span className='fa fa-check-square' id='searchSelectIcon' /> : null}
+      {getSetting(settings.DEFAULT_SEARCH_ENGINE, this.props.settings) === this.props.name
+        ? <span className='fa fa-check-square' id='searchSelectIcon' /> : null}
     </div>
   }
 }
@@ -907,16 +907,16 @@ class PaymentsTab extends ImmutableComponent {
 
   render () {
     return <div id='paymentsContainer'>
-        {
-        this.enabled && this.props.addFundsOverlayVisible
-          ? <ModalOverlay title={'addFunds'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
-          : null
-        }
-        {
-          this.enabled && this.props.paymentHistoryOverlayVisible
-          ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
-          : null
-        }
+      {
+      this.enabled && this.props.addFundsOverlayVisible
+        ? <ModalOverlay title={'addFunds'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
+        : null
+      }
+      {
+        this.enabled && this.props.paymentHistoryOverlayVisible
+        ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
+        : null
+      }
       <div className='titleBar'>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
@@ -930,7 +930,7 @@ class PaymentsTab extends ImmutableComponent {
           {this.enabled ? <SettingCheckbox dataL10nId='notifications' prefKey={settings.PAYMENTS_NOTIFICATIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} /> : null}
         </div>
       </div>
-        {
+      {
         this.enabled
           ? this.enabledContent
           : <div className='paymentsMessage'>
@@ -946,8 +946,8 @@ class PaymentsTab extends ImmutableComponent {
               <span data-l10n-id='paymentsWelcomeText7' />
             </div>
           </div>
-        }
-        {this.enabled ? null : this.sidebarContent}
+      }
+      {this.enabled ? null : this.sidebarContent}
     </div>
   }
 }
@@ -997,53 +997,53 @@ class SitePermissionsPage extends React.Component {
             ? <li>
               <div data-l10n-id={name} className='permissionName' />
               <ul>
-              {
-                this.props.siteSettings.map((value, hostPattern) => {
-                  if (!value.size) {
-                    return null
-                  }
-                  const granted = value.get(name)
-                  if (this.props.defaults &&
-                      this.props.defaults.get(name) === granted &&
-                      granted !== undefined) {
-                    return null
-                  }
-                  let statusText = ''
-                  let statusArgs
-                  if (this.props.names[name].includes(typeof granted)) {
-                    if (name === 'flash') {
-                      if (granted === 1) {
-                        // Flash is allowed just one time
-                        statusText = 'flashAllowOnce'
-                      } else if (granted === false) {
-                        // Flash installer is never intercepted
-                        statusText = 'alwaysDeny'
-                      } else {
-                        // Show the number of days/hrs/min til expiration
-                        statusText = 'flashAllowAlways'
-                        statusArgs = {
-                          time: new Date(granted).toLocaleString()
-                        }
-                      }
-                    } else if (typeof granted === 'string') {
-                      statusText = granted
-                    } else if (!this.props.defaults) {
-                      statusText = granted ? 'alwaysAllow' : 'alwaysDeny'
-                    } else {
-                      statusText = granted ? 'on' : 'off'
+                {
+                  this.props.siteSettings.map((value, hostPattern) => {
+                    if (!value.size) {
+                      return null
                     }
-                    return <div className='permissionItem'>
-                      <span className='fa fa-times permissionAction'
-                        onClick={this.deletePermission.bind(this, name, hostPattern)} />
-                      <span className='permissionHost'>{hostPattern + ': '}</span>
-                      <span className='permissionStatus'
-                        data-l10n-id={statusText}
-                        data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null} />
-                    </div>
-                  }
-                  return null
-                })
-              }
+                    const granted = value.get(name)
+                    if (this.props.defaults &&
+                        this.props.defaults.get(name) === granted &&
+                        granted !== undefined) {
+                      return null
+                    }
+                    let statusText = ''
+                    let statusArgs
+                    if (this.props.names[name].includes(typeof granted)) {
+                      if (name === 'flash') {
+                        if (granted === 1) {
+                          // Flash is allowed just one time
+                          statusText = 'flashAllowOnce'
+                        } else if (granted === false) {
+                          // Flash installer is never intercepted
+                          statusText = 'alwaysDeny'
+                        } else {
+                          // Show the number of days/hrs/min til expiration
+                          statusText = 'flashAllowAlways'
+                          statusArgs = {
+                            time: new Date(granted).toLocaleString()
+                          }
+                        }
+                      } else if (typeof granted === 'string') {
+                        statusText = granted
+                      } else if (!this.props.defaults) {
+                        statusText = granted ? 'alwaysAllow' : 'alwaysDeny'
+                      } else {
+                        statusText = granted ? 'on' : 'off'
+                      }
+                      return <div className='permissionItem'>
+                        <span className='fa fa-times permissionAction'
+                          onClick={this.deletePermission.bind(this, name, hostPattern)} />
+                        <span className='permissionHost'>{hostPattern + ': '}</span>
+                        <span className='permissionStatus'
+                          data-l10n-id={statusText}
+                          data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null} />
+                      </div>
+                    }
+                    return null
+                  })
+                }
               </ul>
             </li>
             : null)
@@ -1185,14 +1185,14 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.props.flashInstalled} />
         <span className='subtext'>
           <span className='fa fa-info-circle' id='flashInfoIcon' />
-        {
-          isDarwin || isWindows
-            ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
-              <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
-                location: appConfig.flash.installUrl
-              }, true)}>{'Adobe'}</span>.</span>
-            : <span data-l10n-id='enableFlashSubtextLinux' />
-        }
+          {
+            isDarwin || isWindows
+              ? <span><span data-l10n-id='enableFlashSubtext' />&nbsp;
+                <span className='linkText' onClick={aboutActions.newFrame.bind(null, {
+                  location: appConfig.flash.installUrl
+                }, true)}>{'Adobe'}</span>.</span>
+              : <span data-l10n-id='enableFlashSubtextLinux' />
+          }
         </span>
       </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />

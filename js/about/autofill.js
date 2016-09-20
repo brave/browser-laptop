@@ -151,12 +151,12 @@ class AboutAutofill extends React.Component {
           </tr>
         </thead>
         <tbody>
-        {
-          this.state.addressesDetails.sort((a, b) => {
-            return a.get('name') > b.get('name') ? 1 : -1
-          }).map((item) =>
-            <AddressItem address={item} />)
-        }
+          {
+            this.state.addressesDetails.sort((a, b) => {
+              return a.get('name') > b.get('name') ? 1 : -1
+            }).map((item) =>
+              <AddressItem address={item} />)
+          }
         </tbody>
       </table>
     </div>
@@ -174,12 +174,12 @@ class AboutAutofill extends React.Component {
           </tr>
         </thead>
         <tbody>
-        {
-          this.state.creditCardsDetails.sort((a, b) => {
-            return a.get('name') > b.get('name') ? 1 : -1
-          }).map((item) =>
-            <CreditCardItem creditCard={item} />)
-        }
+          {
+            this.state.creditCardsDetails.sort((a, b) => {
+              return a.get('name') > b.get('name') ? 1 : -1
+            }).map((item) =>
+              <CreditCardItem creditCard={item} />)
+          }
         </tbody>
       </table>
     </div>

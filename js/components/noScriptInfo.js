@@ -51,13 +51,13 @@ class NoScriptInfo extends ImmutableComponent {
         <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
           data-l10n-id={this.numberBlocked === 1 ? 'scriptBlocked' : 'scriptsBlocked'} />
         <div>
-        {
-          // TODO: restore the allow-once button
-          // TODO: If this is a private tab, this should only allow scripts
-          // temporarily. Depends on #1824
-          <Button l10nId='allow' className='actionButton'
-            onClick={this.onAllow.bind(this, false)} />
-        }
+          {
+            // TODO: restore the allow-once button
+            // TODO: If this is a private tab, this should only allow scripts
+            // temporarily. Depends on #1824
+            <Button l10nId='allow' className='actionButton'
+              onClick={this.onAllow.bind(this, false)} />
+          }
         </div>
       </div>
     </Dialog>

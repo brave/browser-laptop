@@ -29,13 +29,13 @@ class SwitchControl extends ImmutableComponent {
       large: this.props.large,
       hasTopText: this.props.topl10nId
     })}>
-    {
-      this.props.leftl10nId && this.props.topl10nId
-      ? <div className='switchControlText'><div className='switchControlLeftText'><div className='switchSpacer'>&nbsp;</div><span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} /></div></div>
-      : (this.props.leftl10nId
-        ? <span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} />
-        : null)
-    }
+      {
+        this.props.leftl10nId && this.props.topl10nId
+        ? <div className='switchControlText'><div className='switchControlLeftText'><div className='switchSpacer'>&nbsp;</div><span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} /></div></div>
+        : (this.props.leftl10nId
+          ? <span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} />
+          : null)
+      }
       <div className='switchMiddle'>
         {
           this.props.topl10nId

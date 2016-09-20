@@ -92,17 +92,17 @@ class TabPages extends ImmutableComponent {
       }
     }
     return <div className='tabPageWrap'>
-    {
-      tabPageCount > 1 &&
-      Array.from(new Array(tabPageCount)).map((x, i) =>
-        <TabPage
-          key={`tabPage-${i}`}
-          frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
-          previewTabPage={this.props.previewTabPage}
-          index={i}
-          sourceDragFromPageIndex={sourceDragFromPageIndex}
-          active={this.props.tabPageIndex === i} />)
-    }
+      {
+        tabPageCount > 1 &&
+        Array.from(new Array(tabPageCount)).map((x, i) =>
+          <TabPage
+            key={`tabPage-${i}`}
+            frames={this.props.frames.slice(i * this.props.tabsPerTabPage, i * this.props.tabsPerTabPage + this.props.tabsPerTabPage)}
+            previewTabPage={this.props.previewTabPage}
+            index={i}
+            sourceDragFromPageIndex={sourceDragFromPageIndex}
+            active={this.props.tabPageIndex === i} />)
+      }
     </div>
   }
 }

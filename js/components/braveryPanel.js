@@ -208,52 +208,52 @@ class BraveryPanel extends ImmutableComponent {
         </div>
         <div className='braveryPanelBody'>
           <ul>
-          {
-            this.isBlockedAdsShown
-            ? <li><ul>
             {
-              this.isBlockingAds
-              ? this.blockedAds.map((site) => <li key={site}>{site}</li>)
+              this.isBlockedAdsShown
+              ? <li><ul>
+                {
+                  this.isBlockingAds
+                  ? this.blockedAds.map((site) => <li key={site}>{site}</li>)
+                  : null
+                }
+                {
+                  this.isBlockingTrackedContent
+                  ? this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
+                  : null
+                }
+              </ul></li>
               : null
             }
             {
-              this.isBlockingTrackedContent
-              ? this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
+              this.isRedirectingResources && this.isHttpseShown
+              ? <li><ul>
+                {
+                  this.redirectedResourcesSet.map((site) =>
+                    <li key={site}>{site}</li>)
+                }
+              </ul></li>
               : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isRedirectingResources && this.isHttpseShown
-            ? <li><ul>
             {
-              this.redirectedResourcesSet.map((site) =>
-                <li key={site}>{site}</li>)
+              this.isBlockingScripts && this.isBlockedScriptsShown
+              ? <li><ul>
+                {
+                  this.blockedScripts.map((site) =>
+                    <li key={site}>{site}</li>)
+                }
+              </ul></li>
+              : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isBlockingScripts && this.isBlockedScriptsShown
-            ? <li><ul>
             {
-              this.blockedScripts.map((site) =>
-                <li key={site}>{site}</li>)
+              this.isBlockingFingerprinting && this.isFpShown
+              ? <li><ul>
+                {
+                  this.blockedFingerprinting.map((site) =>
+                    <li key={site}>{site}</li>)
+                }
+              </ul></li>
+              : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isBlockingFingerprinting && this.isFpShown
-            ? <li><ul>
-            {
-              this.blockedFingerprinting.map((site) =>
-                <li key={site}>{site}</li>)
-            }
-            </ul></li>
-            : null
-          }
           </ul>
           <div className={cx({
             braveryAdvancedTitle: true,

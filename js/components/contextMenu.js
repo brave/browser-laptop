@@ -130,13 +130,13 @@ class ContextMenuItem extends ImmutableComponent {
     } else if (this.props.contextMenuItem.get('type') === 'multi') {
       return <div className='contextMenuItem multiContextMenuItem'>
         <span className='multiItemTitle' data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')} />
-      {
-        this.props.contextMenuItem.get('submenu').map((subItem) =>
-          <div className='contextMenuSubItem'
-            onClick={this.onClick.bind(this, subItem.get('click'), false)}>
-            <span data-l10n-id={subItem.get('l10nLabelId')}>{this.getLabelForItem(subItem)}</span>
-          </div>)
-      }
+        {
+          this.props.contextMenuItem.get('submenu').map((subItem) =>
+            <div className='contextMenuSubItem'
+              onClick={this.onClick.bind(this, subItem.get('click'), false)}>
+              <span data-l10n-id={subItem.get('l10nLabelId')}>{this.getLabelForItem(subItem)}</span>
+            </div>)
+        }
       </div>
     }
     return <div className={cx({
@@ -199,14 +199,14 @@ class ContextMenuSingle extends ImmutableComponent {
       contextMenuSingle: true,
       isSubmenu: this.props.submenuIndex !== 0
     })} style={styles}>
-    {
-      this.props.template.map((contextMenuItem) =>
-        <ContextMenuItem contextMenuItem={contextMenuItem}
-          submenuIndex={this.props.submenuIndex}
-          lastZoomPercentage={this.props.lastZoomPercentage}
-          contextMenuDetail={this.props.contextMenuDetail}
-        />)
-    }
+      {
+        this.props.template.map((contextMenuItem) =>
+          <ContextMenuItem contextMenuItem={contextMenuItem}
+            submenuIndex={this.props.submenuIndex}
+            lastZoomPercentage={this.props.lastZoomPercentage}
+            contextMenuDetail={this.props.contextMenuDetail}
+          />)
+      }
     </div>
   }
 }

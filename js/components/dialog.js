@@ -35,7 +35,7 @@ class Dialog extends ImmutableComponent {
       ref={(node) => { this.dialog = node }}
       onKeyDown={this.onKeyDown.bind(this)}
       onClick={this.onClick.bind(this)}>
-        {this.props.children}
+      {this.props.children}
     </div>
   }
 }

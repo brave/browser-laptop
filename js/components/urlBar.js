@@ -399,44 +399,44 @@ class UrlBar extends ImmutableComponent {
             marginRight: '3px'
           } : {}
         } />
-        {
-          this.props.titleMode
-          ? <div id='titleBar'>
-            <span><strong>{this.hostValue}</strong></span>
-            <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
-            <span>{this.titleValue}</span>
-          </div>
-          : <input type='text'
-            spellCheck='false'
-            disabled={this.props.location === undefined && this.loadTime === ''}
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            onKeyDown={this.onKeyDown}
-            onChange={this.onChange}
-            onClick={this.onClick}
-            onContextMenu={this.onContextMenu}
-            value={this.locationValue + this.props.locationValueSuffix}
-            data-l10n-id='urlbar'
-            className={cx({
-              insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
-              private: this.private,
-              testHookLoadDone: !this.props.loading
-            })}
-            id='urlInput'
-            readOnly={this.props.titleMode}
-            ref={(node) => { this.urlInput = node }} />
-        }
+      {
+        this.props.titleMode
+        ? <div id='titleBar'>
+          <span><strong>{this.hostValue}</strong></span>
+          <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
+          <span>{this.titleValue}</span>
+        </div>
+        : <input type='text'
+          spellCheck='false'
+          disabled={this.props.location === undefined && this.loadTime === ''}
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          onKeyDown={this.onKeyDown}
+          onChange={this.onChange}
+          onClick={this.onClick}
+          onContextMenu={this.onContextMenu}
+          value={this.locationValue + this.props.locationValueSuffix}
+          data-l10n-id='urlbar'
+          className={cx({
+            insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
+            private: this.private,
+            testHookLoadDone: !this.props.loading
+          })}
+          id='urlInput'
+          readOnly={this.props.titleMode}
+          ref={(node) => { this.urlInput = node }} />
+      }
       <legend />
-        {
-          this.props.titleMode || this.aboutPage
-          ? null
-          : <span className={cx({
-            'loadTime': true,
-            'onFocus': this.props.urlbar.get('active')
-          })}>{this.loadTime}</span>
-        }
+      {
+        this.props.titleMode || this.aboutPage
+        ? null
+        : <span className={cx({
+          'loadTime': true,
+          'onFocus': this.props.urlbar.get('active')
+        })}>{this.loadTime}</span>
+      }
 
-        {
+      {
           // TODO(for perf!): urlLocation shouldn't be passed into UrlBarSuggestions props.
           // `urlLocation` usage should be refactored out into UrlBar.
           // Passing it in causes uneeded extra renders for UrlBarSuggestions.
