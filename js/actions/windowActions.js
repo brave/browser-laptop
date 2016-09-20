@@ -1046,7 +1046,7 @@ const windowActions = {
   },
 
   /**
-   * Used by main.js when click happens on content area (not on a link or react control).
+   * Used by `main.js` when click happens on content area (not on a link or react control).
    * - closes context menu
    * - closes popup menu
    * - nulls out menubar item selected (Windows only)
@@ -1058,6 +1058,13 @@ const windowActions = {
     })
   },
 
+  /**
+   * (Windows only)
+   * Used to track selected index of a context menu
+   * Needed because arrow keys can be used to navigate the custom menu
+   * @param {number} index - zero based index of the item.
+   *   Index excludes menu separators and hidden items.
+   */
   setSubmenuSelectedIndex: function (index) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX,
@@ -1065,6 +1072,27 @@ const windowActions = {
     })
   },
 
+  /**
+   * (Windows only at the moment)
+   * Used to track last selected element (typically the URL bar or the frame)
+   * Important because focus is lost when using the custom menu and needs
+   * to be returned in order for the cut/copy operation to work
+   * @param {string} selector - selector used w/ querySelectorAll to return focus
+   *   after a menu item is selected (via the custom titlebar / menubar)
+   */
+  setLastFocusedSelector: function (selector) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR,
+      selector
+    })
+  },
+
+  /**
+   * Used to get response details (such as the HTTP response code) from a response
+   * See `eventStore.js` for an example use-case
+   * @param {number} tabId - the tab id to set
+   * @param {Object} details - object containing response details
+   */
   gotResponseDetails: function (tabId, details) {
     dispatch({
       actionType: WindowConstants.WINDOW_GOT_RESPONSE_DETAILS,

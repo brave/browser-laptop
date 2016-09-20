@@ -121,16 +121,18 @@ class Main extends ImmutableComponent {
           break
       }
     })
-    document.addEventListener('keyup', (e) => {
-      const customTitlebar = this.customTitlebar
-      switch (e.which) {
-        case keyCodes.ALT:
-          if (customTitlebar.enabled) {
+  }
+
+  registerCustomTitlebarHandlers () {
+    if (this.customTitlebar.enabled) {
+      document.addEventListener('keyup', (e) => {
+        const customTitlebar = this.customTitlebar
+        switch (e.which) {
+          case keyCodes.ALT:
             e.preventDefault()
 
-            const defaultLabel = customTitlebar.menubarTemplate
-              ? customTitlebar.menubarTemplate.getIn([0, 'label'])
-              : null
+            const menubarTemplate = this.props.appState.getIn(['menu', 'template'])
+            const defaultLabel = menubarTemplate.getIn([0, 'label'])
 
             if (getSetting(settings.AUTO_HIDE_MENU)) {
               windowActions.toggleMenubarVisible(null, defaultLabel)
@@ -142,10 +144,8 @@ class Main extends ImmutableComponent {
                 windowActions.setMenubarSelectedLabel(defaultLabel)
               }
             }
-          }
-          break
-        case keyCodes.ESC:
-          if (customTitlebar.enabled) {
+            break
+          case keyCodes.ESC:
             if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedLabel) {
               e.preventDefault()
               windowActions.toggleMenubarVisible(false)
@@ -156,10 +156,25 @@ class Main extends ImmutableComponent {
               windowActions.setMenubarSelectedLabel()
               windowActions.setContextMenuDetail()
             }
+            break
+        }
+      })
+
+      document.addEventListener('focus', (e) => {
+        let selector = document.activeElement.id
+          ? '#' + document.activeElement.id
+          : null
+
+        if (!selector && document.activeElement.tagName === 'WEBVIEW') {
+          const frameKeyAttribute = document.activeElement.getAttribute('data-frame-key')
+          if (frameKeyAttribute) {
+            selector = 'webview[data-frame-key="' + frameKeyAttribute + '"]'
           }
-          break
-      }
-    })
+        }
+
+        windowActions.setLastFocusedSelector(selector)
+      }, true)
+    }
   }
 
   exitFullScreen () {
@@ -298,6 +313,7 @@ class Main extends ImmutableComponent {
   componentDidMount () {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
+    this.registerCustomTitlebarHandlers()
 
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
@@ -765,6 +781,7 @@ class Main extends ImmutableComponent {
       menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
       menubarSelectedLabel: this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel']),
       menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
+      lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
       isMaximized: this.props.windowState.getIn(['ui', 'isMaximized'])
     }
   }
@@ -845,7 +862,7 @@ class Main extends ImmutableComponent {
                       selectedIndex={customTitlebar.menubarSelectedIndex}
                       contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
                       autohide={getSetting(settings.AUTO_HIDE_MENU)}
-                      activeFrame={activeFrame} />
+                      lastFocusedSelector={customTitlebar.lastFocusedSelector} />
                   </div>
                   : null
               }

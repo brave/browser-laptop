@@ -824,11 +824,51 @@ Used to track which menubar item is currently selected (or null for none selecte
 
 ### resetMenuState() 
 
-Used by main.js when click happens on content area (not on a link or react control).
+Used by `main.js` when click happens on content area (not on a link or react control).
 - closes context menu
 - closes popup menu
 - nulls out menubar item selected (Windows only)
 - hides menubar if auto-hide preference is set (Windows only)
+
+
+
+### setSubmenuSelectedIndex(index) 
+
+(Windows only)
+Used to track selected index of a context menu
+Needed because arrow keys can be used to navigate the custom menu
+
+**Parameters**
+
+**index**: `number`, zero based index of the item.
+  Index excludes menu separators and hidden items.
+
+
+
+### setLastFocusedSelector(selector) 
+
+(Windows only at the moment)
+Used to track last selected element (typically the URL bar or the frame)
+Important because focus is lost when using the custom menu and needs
+to be returned in order for the cut/copy operation to work
+
+**Parameters**
+
+**selector**: `string`, selector used w/ querySelectorAll to return focus
+  after a menu item is selected (via the custom titlebar / menubar)
+
+
+
+### gotResponseDetails(tabId, details) 
+
+Used to get response details (such as the HTTP response code) from a response
+See `eventStore.js` for an example use-case
+
+**Parameters**
+
+**tabId**: `number`, the tab id to set
+
+**details**: `Object`, object containing response details
 
 
 

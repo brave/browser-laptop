@@ -821,6 +821,9 @@ const doAction = (action) => {
         ? null
         : proposedIndex)
       break
+    case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
+      windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
+      break
 
     default:
   }
