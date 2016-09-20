@@ -29,26 +29,40 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
-// (Windows) Add extra padding to have spacing match the close button
-.platform--win32 .navigatorWrapper {
-  margin-left: @navbarLeftMarginWindows;
-}
-// (Windows) Style adjustments needed for slim titlebar to work properly
-.platform--win32 div#window.frameless {
-  border: 1px solid #000;
-  box-sizing: border-box;
-}
-// (Windows) Extension button not clickable unless it has no-drag
-.platform--win32 .extensionButton {
-  -webkit-app-region: no-drag !important;
-}
-// (Windows) remove margin next to brave button when lower than 720px
-.platform--win32 .navigatorWrapper .topLevelEndButtons {
-  @media (max-width: @windowsMinimumViewport) {
-    margin-left: 0;
+// Windows specific fixes
+.platform--win32 {
+  .navigatorWrapper {
+    margin-left: @navbarLeftMarginWindows;
+  }
+
+  div#window.frameless {
+    border: 1px solid #000;
+    box-sizing: border-box;
+  }
+
+  // Extension button not clickable unless it has no-drag
+  .extensionButton {
+    -webkit-app-region: no-drag !important;
+  }
+
+  // changes to ensure window can be as small as 480px wide
+  // and still be useable and have the caption buttons intact
+  @media (max-width: @breakpointExtensionButtonPadding) {
+    .navigatorWrapper .topLevelEndButtons {
+      margin-left: 0;
+    }
+  }
+  @media (max-width: @breakpointSmallWin32) {
+    .loadTime { display: none; }
+    #urlInput { max-width: 75px; }
+    #titleBar { width: 100px; }
+  }
+  @media (max-width: @breakpointTinyWin32) {
+    #urlInput { max-width: 50px; }
   }
 }
 
+// Styles had to be reworked to properly position the new caption buttons for Windows
 .navbarCaptionButtonContainer {
   display: flex;
   border-bottom: 1px solid #aaaaaa;
