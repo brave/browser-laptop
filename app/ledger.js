@@ -105,10 +105,32 @@ let notificationTimeout = null
 
 // TODO(bridiver) - create a better way to get setting changes
 const doAction = (action) => {
+  var i, publisher
+
   switch (action.actionType) {
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
       if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
+      break
+
+    case appConstants.APP_CHANGE_SITE_SETTING:
+      if (action.key === 'ledgerPaymentsShown') {
+        if (action.value === false) {
+          i = action.hostPattern.indexOf('://')
+          if (i !== -1) {
+            publisher = action.hostPattern.substr(i + 3)
+            delete synopsis.publishers[publisher]
+            delete publishers[publisher]
+            updatePublisherInfo()
+          }
+        }
+      }
+      break
+
+    case appConstants.APP_REMOVE_SITE_SETTING:
+      if (action.key === 'ledgerPaymentsShown') {
+        // TODO
+      }
       break
 
     case appConstants.APP_NETWORK_CONNECTED:
@@ -263,7 +285,7 @@ eventStore.addChangeListener(() => {
   if ((!synopsis) || (!util.isArray(info))) return
 
   info.forEach((page) => {
-    var entry, faviconURL, publisher
+    var entry, faviconURL, publisher, siteSetting
     var location = page.url
 
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
@@ -271,6 +293,10 @@ eventStore.addChangeListener(() => {
     if (!page.publisher) {
       try {
         publisher = ledgerPublisher.getPublisher(location)
+        if (publisher) {
+          siteSetting = appStore.getState().get('siteSettings').get(`https?://${publisher}`)
+          if ((siteSetting) && (siteSetting.get('ledgerPaymentsShown') === false)) publisher = null
+        }
         if (publisher) page.publisher = publisher
       } catch (ex) {
         console.log('getPublisher error for ' + location + ': ' + ex.toString())
@@ -967,7 +993,9 @@ var run = (delayTime) => {
       var result
       var siteSetting = siteSettings.get(`https?://${winner}`)
 
-      if ((siteSetting) && (siteSetting.get('ledgerPayments') === false)) return
+      if ((siteSetting) &&
+          (siteSetting.get('ledgerPayments') === false ||
+           siteSetting.get('ledgerPaymentsShown') === false)) return
 
       result = client.vote(winner)
       if (result) state = result

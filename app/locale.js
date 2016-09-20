@@ -51,6 +51,7 @@ var rendererIdentifiers = function () {
     'deleteFolder',
     'deleteBookmark',
     'deleteHistoryEntry',
+    'deleteLedgerEntry',
     'editFolder',
     'editBookmark',
     'unmuteTabs',

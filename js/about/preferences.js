@@ -58,6 +58,17 @@ const permissionNames = {
   'flash': ['boolean', 'number']
 }
 
+const braveryPermissionNames = {
+  'ledgerPaymentsShown': ['boolean', 'number'],
+  'shieldsUp': ['boolean'],
+  'adControl': ['string'],
+  'cookieControl': ['string'],
+  'safeBrowsing': ['boolean'],
+  'httpsEverywhere': ['boolean'],
+  'fingerprintingProtection': ['boolean'],
+  'noScript': ['boolean']
+}
+
 const changeSetting = (cb, key, e) => {
   if (e.target.type === 'checkbox') {
     cb(key, e.target.value)
@@ -197,8 +208,19 @@ class LedgerTable extends ImmutableComponent {
     return true
   }
 
+  shouldShow (synopsis) {
+    const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
+    if (hostSettings) {
+      const result = hostSettings.get('ledgerPaymentsShown')
+      if (typeof result === 'boolean') {
+        return result
+      }
+    }
+    return true
+  }
+
   getRow (synopsis) {
-    if (!synopsis || !synopsis.get) {
+    if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
     }
     const faviconURL = synopsis.get('faviconURL') || appConfig.defaultFavicon
@@ -244,6 +266,13 @@ class LedgerTable extends ImmutableComponent {
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
         }
         onContextMenu={aboutActions.contextMenu}
+        contextMenuName='synopsis'
+        rowObjects={this.synopsis.map((entry) => {
+          return {
+            hostPattern: this.getHostPattern(entry),
+            location: entry.get('publisherURL')
+          }
+        }).toJS()}
         rows={this.synopsis.map((synopsis) => this.getRow(synopsis)).toJS()} />
     </div>
   }
@@ -934,7 +963,7 @@ class SyncTab extends ImmutableComponent {
 class SitePermissionsPage extends React.Component {
   hasEntryForPermission (name) {
     return this.props.siteSettings.some((value) => {
-      return value.get && permissionNames[name] ? permissionNames[name].includes(typeof value.get(name)) : false
+      return value.get && this.props.names[name] ? this.props.names[name].includes(typeof value.get(name)) : false
     })
   }
 
@@ -942,8 +971,8 @@ class SitePermissionsPage extends React.Component {
     // Check whether there is at least one permission set
     return this.props.siteSettings.some((value) => {
       if (value && value.get) {
-        for (let name in permissionNames) {
-          if (permissionNames[name].includes(typeof value.get(name))) {
+        for (let name in this.props.names) {
+          if (this.props.names[name].includes(typeof value.get(name))) {
             return true
           }
         }
@@ -959,10 +988,11 @@ class SitePermissionsPage extends React.Component {
   render () {
     return this.isPermissionsNonEmpty()
     ? <div id='sitePermissionsPage'>
-      <div className='sectionTitle' data-l10n-id='sitePermissions' />
+      <div className='sectionTitle'
+        data-l10n-id={this.props.defaults ? 'sitePermissionsExceptions' : 'sitePermissions'} />
       <ul className='sitePermissions'>
         {
-          Object.keys(permissionNames).map((name) =>
+          Object.keys(this.props.names).map((name) =>
             this.hasEntryForPermission(name)
             ? <li>
               <div data-l10n-id={name} className='permissionName' />
@@ -973,9 +1003,14 @@ class SitePermissionsPage extends React.Component {
                     return null
                   }
                   const granted = value.get(name)
-                  if (permissionNames[name].includes(typeof granted)) {
-                    let statusText
-                    let statusArgs
+                  if (this.props.defaults &&
+                      this.props.defaults.get(name) === granted &&
+                      granted !== undefined) {
+                    return null
+                  }
+                  let statusText = ''
+                  let statusArgs
+                  if (this.props.names[name].includes(typeof granted)) {
                     if (name === 'flash') {
                       if (granted === 1) {
                         // Flash is allowed just one time
@@ -990,8 +1025,12 @@ class SitePermissionsPage extends React.Component {
                           time: new Date(granted).toLocaleString()
                         }
                       }
-                    } else {
+                    } else if (typeof granted === 'string') {
+                      statusText = granted
+                    } else if (!this.props.defaults) {
                       statusText = granted ? 'alwaysAllow' : 'alwaysDeny'
+                    } else {
+                      statusText = granted ? 'on' : 'off'
                     }
                     return <div className='permissionItem'>
                       <span className='fa fa-times permissionAction'
@@ -1066,6 +1105,11 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScript' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+      <SitePermissionsPage siteSettings={this.props.siteSettings}
+        names={braveryPermissionNames}
+        defaults={this.props.braveryDefaults.merge({
+          ledgerPaymentsShown: true, shieldsUp: true})
+        } />
     </div>
   }
 }
@@ -1151,7 +1195,7 @@ class SecurityTab extends ImmutableComponent {
         }
         </span>
       </SettingsList>
-      <SitePermissionsPage siteSettings={this.props.siteSettings} />
+      <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
     </div>
   }
 }
