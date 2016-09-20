@@ -251,6 +251,60 @@ describe('siteUtil', function () {
           .setIn([0, 'tags'], Immutable.List([]))
         assert.deepEqual(processedSites, expectedSites)
       })
+      it('removes folder and its children', function () {
+        const sites = Immutable.fromJS([
+          {
+            folderId: 1,
+            parentFolderId: 0,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            folderId: 2,
+            parentFolderId: 1,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            parentFolderId: 1,
+            location: testUrl1,
+            tags: [siteTags.BOOKMARK]
+          },
+          {
+            parentFolderId: 2,
+            location: testUrl2,
+            tags: [siteTags.BOOKMARK]
+          }
+        ])
+        const siteDetail = {
+          folderId: 1,
+          parentFolderId: 0,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail), siteTags.BOOKMARK_FOLDER)
+        const expectedSites = Immutable.fromJS([
+          {
+            folderId: 1,
+            parentFolderId: 0,
+            tags: Immutable.List([])
+          },
+          {
+            folderId: 2,
+            parentFolderId: 0,
+            tags: Immutable.List([])
+          },
+          {
+            parentFolderId: 0,
+            location: testUrl1,
+            tags: Immutable.List([])
+          },
+          {
+            parentFolderId: 0,
+            location: testUrl2,
+            tags: Immutable.List([])
+          }
+        ])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
     })
     describe('tag=falsey', function () {
       it('deletes a history entry (has no tags)', function () {

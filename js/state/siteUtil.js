@@ -159,7 +159,18 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   if (index === -1) {
     return sites
   }
+
   const tags = sites.getIn([index, 'tags'])
+  if (isBookmarkFolder(tags)) {
+    const folderId = sites.getIn([index, 'folderId'])
+    const childSites = sites.filter((site) => site.get('parentFolderId') === folderId)
+    childSites.forEach((site) => {
+      const tags = site.get('tags')
+      tags.forEach((tag) => {
+        sites = module.exports.removeSite(sites, site, tag)
+      })
+    })
+  }
   if (tags.size === 0 && !tag) {
     // If called without tags and entry has no tags, remove the entry
     return sites.splice(index, 1)
