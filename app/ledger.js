@@ -105,6 +105,8 @@ let notificationTimeout = null
 
 // TODO(bridiver) - create a better way to get setting changes
 const doAction = (action) => {
+  var i, publisher
+
   switch (action.actionType) {
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
@@ -113,7 +115,15 @@ const doAction = (action) => {
 
     case appConstants.APP_CHANGE_SITE_SETTING:
       if (action.key === 'ledgerPaymentsShown') {
-        // TODO
+        if (action.value === false) {
+          i = action.hostPattern.indexOf('://')
+          if (i !== -1) {
+            publisher = action.hostPattern.substr(i + 3)
+            delete synopsis.publishers[publisher]
+            delete publishers[publisher]
+            updatePublisherInfo()
+          }
+        }
       }
       break
 
@@ -275,7 +285,7 @@ eventStore.addChangeListener(() => {
   if ((!synopsis) || (!util.isArray(info))) return
 
   info.forEach((page) => {
-    var entry, faviconURL, publisher
+    var entry, faviconURL, publisher, siteSetting
     var location = page.url
 
     if ((location.match(/^about/)) || ((locations[location]) && (locations[location].publisher))) return
@@ -283,6 +293,10 @@ eventStore.addChangeListener(() => {
     if (!page.publisher) {
       try {
         publisher = ledgerPublisher.getPublisher(location)
+        if (publisher) {
+          siteSetting = appStore.getState().get('siteSettings').get(`https?://${publisher}`)
+          if ((siteSetting) && (siteSetting.get('ledgerPaymentsShown') === false)) publisher = null
+        }
         if (publisher) page.publisher = publisher
       } catch (ex) {
         console.log('getPublisher error for ' + location + ': ' + ex.toString())
