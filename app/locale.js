@@ -192,6 +192,7 @@ var rendererIdentifiers = function () {
     'notificationPasswordWithUserName',
     'notificationPassword',
     'notificationPasswordSettings',
+    'notificationPaymentDone',
     'prefsRestart',
     'yes',
     'no',
