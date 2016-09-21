@@ -42,10 +42,11 @@ module.exports.init = () => {
 
     let redirectURL
     let cancel
+    const firstPartyUrl = Filtering.getMainFrameUrl(details)
     if (hack && hack.onBeforeRequest &&
         (hack.enableForAll ||
-         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, details.firstPartyUrl) ||
-         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, details.firstPartyUrl))) {
+         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, firstPartyUrl) ||
+         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, firstPartyUrl))) {
       const result = hack.onBeforeRequest.call(this, details)
       if (result && result.redirectURL) {
         redirectURL = result.redirectURL

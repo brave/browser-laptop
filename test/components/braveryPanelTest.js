@@ -76,6 +76,18 @@ describe('Bravery Panel', function () {
             .then((blocked) => blocked === '1')
         })
     })
+    it('detects blocked elements in iframe', function * () {
+      const url = Brave.server.url('slashdot.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+      yield openBraveMenu(this.app.client)
+      yield this.app.client
+        .waitUntil(function () {
+          return this.getText(adsBlockedStat)
+            .then((blocked) => Number(blocked) > 10)
+        })
+    })
     it('detects https upgrades', function * () {
       yield waitForDataFile(this.app.client, 'httpsEverywhere')
       const url = Brave.server.url('httpsEverywhere.html')

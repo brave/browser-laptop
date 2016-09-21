@@ -28,7 +28,7 @@ const whitelistHosts = ['disqus.com', 'a.disquscdn.com']
 
 const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
-    const firstPartyUrl = URL.parse(details.firstPartyUrl)
+    const firstPartyUrl = URL.parse(Filtering.getMainFrameUrl(details))
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
     const urlHost = URL.parse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&

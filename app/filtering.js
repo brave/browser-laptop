@@ -8,6 +8,7 @@ const messages = require('../js/constants/messages')
 const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
+const webContents = electron.webContents
 const AppStore = require('../js/stores/appStore')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
@@ -81,11 +82,12 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  */
 function registerForBeforeRequest (session) {
   session.webRequest.onBeforeRequest((details, cb) => {
-    // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       cb({})
       return
     }
+
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
 
     if (appUrlUtil.isTargetAboutUrl(details.url)) {
       if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
@@ -106,7 +108,7 @@ function registerForBeforeRequest (session) {
       const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
       const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
 
-      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
         continue
       }
       if (results.cancel) {
@@ -171,7 +173,7 @@ function registerForBeforeRedirect (session) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       return
     }
     for (let i = 0; i < beforeRedirectFilteringFns.length; i++) {
@@ -197,7 +199,7 @@ function registerForBeforeSendHeaders (session) {
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       cb({})
       return
     }
@@ -217,9 +219,11 @@ function registerForBeforeSendHeaders (session) {
       requestHeaders['User-Agent'] = spoofedUserAgent
     }
 
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
+
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
         continue
       }
       if (results.cancel) {
@@ -231,12 +235,12 @@ function registerForBeforeSendHeaders (session) {
       }
     }
 
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl)) {
-      if (module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl)) {
+      if (module.exports.isThirdPartyHost(urlParse(firstPartyUrl || '').hostname,
                                           parsedUrl.hostname)) {
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
-            getOrigin(details.firstPartyUrl) !== pdfjsOrigin) {
+            getOrigin(firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&
@@ -262,13 +266,14 @@ function registerForHeadersReceived (session) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onHeadersReceived(function (details, cb) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       cb({})
       return
     }
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
         continue
       }
       if (results.responseHeaders) {
@@ -674,4 +679,19 @@ module.exports.clearAutofillData = () => {
     let ses = registeredSessions[partition]
     ses.autofill.clearAutofillData()
   }
+}
+
+module.exports.getMainFrameUrl = (details) => {
+  if (details.resourceType === 'mainFrame') {
+    return details.url
+  }
+  const tabId = details.tabId
+  const wc = webContents.getAllWebContents()
+  if (wc && tabId) {
+    const content = wc.find((item) => item.getId() === tabId)
+    if (content) {
+      return content.getURL()
+    }
+  }
+  return null
 }
