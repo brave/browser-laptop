@@ -99,6 +99,7 @@ const msecs = { year: 365 * 24 * 60 * 60 * 1000,
 
 let addFundsMessage
 let reconciliationMessage
+let notificationPaymentDoneMessage
 let suppressNotifications = false
 let reconciliationNotificationShown = false
 let notificationTimeout = null
@@ -249,6 +250,8 @@ if (ipc) {
       // If > 24 hours has passed, it might be time to show the reconciliation
       // message again
       setTimeout(() => { reconciliationNotificationShown = false }, 1 * msecs.day)
+    } else if (message === notificationPaymentDoneMessage) {
+      appActions.hideMessageBox(message)
     }
   })
 
@@ -1076,7 +1079,26 @@ var getStateInfo = (state) => {
                                                                    { ballots: ballots }))
   }
 
+  observeTransactions(state.transactions)
   updateLedgerInfo()
+}
+
+// Observe ledger client state.transactions for changes.
+// Called by getStateInfo(). Updated state provided by ledger-client.
+var cachedTransactions = null
+var observeTransactions = (transactions) => {
+  if (underscore.isEqual(cachedTransactions, transactions)) {
+    return
+  }
+  // Notify the user of new transactions.
+  if (getSetting(settings.PAYMENTS_NOTIFICATIONS) && cachedTransactions !== null) {
+    const newTransactions = underscore.difference(transactions, cachedTransactions)
+    if (newTransactions.length > 0) {
+      const newestTransaction = newTransactions[newTransactions.length - 1]
+      showNotificationPaymentDone(newestTransaction.contribution.fiat)
+    }
+  }
+  cachedTransactions = underscore.clone(transactions)
 }
 
 var balanceTimeoutId = false
@@ -1315,6 +1337,24 @@ const showNotifications = () => {
       reconciliationNotificationShown = true
     }
   }
+}
+
+// Called from observeTransactions() when we see a new payment (transaction).
+const showNotificationPaymentDone = (transactionContributionFiat) => {
+  notificationPaymentDoneMessage = locale.translation('notificationPaymentDone')
+    .replace(/{{\s*amount\s*}}/, transactionContributionFiat.amount)
+    .replace(/{{\s*currency\s*}}/, transactionContributionFiat.currency)
+  appActions.showMessageBox({
+    greeting: locale.translation('updateHello'),
+    message: notificationPaymentDoneMessage,
+    buttons: [
+      {text: locale.translation('Ok'), className: 'primary'}
+    ],
+    options: {
+      style: 'greetingStyle',
+      persist: false
+    }
+  })
 }
 
 module.exports = {
