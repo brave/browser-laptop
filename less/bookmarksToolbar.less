@@ -13,6 +13,13 @@
   --bookmarks-toolbar-padding: 10px;
 }
 
+// (Windows) Bookmarks toolbar not right-clickable unless it has no-drag
+.platform--win32 .bookmarksToolbar {
+  &.allowDragging {
+    -webkit-app-region: no-drag !important;
+  }
+}
+
 .bookmarksToolbar {
   background: @toolbarBackground;
   border-bottom: 1px solid #aaaaaa;

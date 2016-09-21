@@ -8,6 +8,8 @@ const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet.js')
 const KeyCodes = require('../constants/keyCodes')
+const { formatAccelerator } = require('../../app/common/lib/formatUtil')
+const separatorMenuItem = require('../../app/common/commonMenu').separatorMenuItem
 
 class ContextMenuItem extends ImmutableComponent {
   componentDidMount () {
@@ -27,11 +29,20 @@ class ContextMenuItem extends ImmutableComponent {
   get hasSubmenu () {
     return this.submenu && this.submenu.size > 0
   }
+  get accelerator () {
+    const accelerator = this.props.contextMenuItem.get('accelerator')
+    return accelerator && typeof accelerator === 'string'
+      ? accelerator.trim()
+      : null
+  }
+  get hasAccelerator () {
+    return this.accelerator !== null
+  }
   onClick (clickAction, shouldHide, e) {
     e.stopPropagation()
     if (clickAction) {
       if (shouldHide) {
-        windowActions.setContextMenuDetail()
+        windowActions.resetMenuState()
       }
       clickAction(e)
     }
@@ -143,7 +154,8 @@ class ContextMenuItem extends ImmutableComponent {
       contextMenuItem: true,
       hasFaIcon: faIcon,
       checkedMenuItem: this.props.contextMenuItem.get('checked'),
-      hasIcon: icon || faIcon
+      hasIcon: icon || faIcon,
+      selectedByKeyboard: this.props.selected
     })}
       role='listitem'
       draggable={this.props.contextMenuItem.get('draggable')}
@@ -180,7 +192,12 @@ class ContextMenuItem extends ImmutableComponent {
           <span className='submenuIndicatorSpacer' />
           <span className='submenuIndicator fa fa-chevron-right' />
         </span>
-        : null
+        : this.hasAccelerator
+          ? <span className='submenuIndicatorContainer'>
+            <span className='submenuIndicatorSpacer' />
+            <span className='accelerator'>{formatAccelerator(this.accelerator)}</span>
+          </span>
+          : null
       }
     </div>
   }
@@ -195,17 +212,33 @@ class ContextMenuSingle extends ImmutableComponent {
     if (this.props.y) {
       styles.top = this.props.y
     }
+    const visibleMenuItems = this.props.template.filter((element) => {
+      return element.has('visible')
+        ? element.get('visible')
+        : true
+    })
+
+    let index = 0
     return <div role='list' className={cx({
       contextMenuSingle: true,
       isSubmenu: this.props.submenuIndex !== 0
     })} style={styles}>
       {
-        this.props.template.map((contextMenuItem) =>
-          <ContextMenuItem contextMenuItem={contextMenuItem}
-            submenuIndex={this.props.submenuIndex}
-            lastZoomPercentage={this.props.lastZoomPercentage}
-            contextMenuDetail={this.props.contextMenuDetail}
-          />)
+        visibleMenuItems.map((contextMenuItem) => {
+          let props = {
+            contextMenuItem: contextMenuItem,
+            submenuIndex: this.props.submenuIndex,
+            lastZoomPercentage: this.props.lastZoomPercentage,
+            contextMenuDetail: this.props.contextMenuDetail,
+            selected: false
+          }
+          // don't count separators when finding selectedIndex
+          if (contextMenuItem.get('type') !== separatorMenuItem.type) {
+            props.selected = index === this.props.selectedIndex
+            index++
+          }
+          return <ContextMenuItem {...props} />
+        })
       }
     </div>
   }
@@ -216,7 +249,7 @@ class ContextMenuSingle extends ImmutableComponent {
  */
 class ContextMenu extends ImmutableComponent {
   onClick () {
-    windowActions.setContextMenuDetail()
+    windowActions.resetMenuState()
   }
   get openedSubmenuDetails () {
     return this.props.contextMenuDetail.get('openedSubmenuDetails') || new Immutable.List()
@@ -252,14 +285,16 @@ class ContextMenu extends ImmutableComponent {
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         lastZoomPercentage={this.props.lastZoomPercentage}
-        template={this.props.contextMenuDetail.get('template')} />
+        template={this.props.contextMenuDetail.get('template')}
+        selectedIndex={this.props.selectedIndex} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
             submenuIndex={i + 1}
             lastZoomPercentage={this.props.lastZoomPercentage}
             template={openedSubmenuDetail.get('template')}
-            y={openedSubmenuDetail.get('y')} />)
+            y={openedSubmenuDetail.get('y')}
+            selectedIndex={this.props.selectedIndex} />)
       }
     </div>
   }

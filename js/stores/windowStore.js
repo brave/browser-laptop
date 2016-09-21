@@ -31,7 +31,9 @@ let windowState = Immutable.fromJS({
   ui: {
     tabs: {
     },
-    mouseInTitlebar: false
+    mouseInTitlebar: false,
+    menubar: {
+    }
   },
   searchDetail: null
 })
@@ -777,6 +779,52 @@ const doAction = (action) => {
           windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
       }
       break
+    case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
+      if (getSetting(settings.AUTO_HIDE_MENU)) {
+        // Close existing context menus
+        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        // Use value if provided; if not, toggle to opposite.
+        const newVisibleStatus = typeof action.isVisible === 'boolean'
+          ? action.isVisible
+          : !windowState.getIn(['ui', 'menubar', 'isVisible'])
+        // Clear selection when menu is shown
+        if (newVisibleStatus) {
+          const actionProps = { actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL }
+          if (action.defaultLabel) {
+            actionProps.label = action.defaultLabel
+          }
+          doAction(actionProps)
+        }
+        windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
+      }
+      break
+    case WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL:
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedLabel'],
+        action.label && typeof action.label === 'string'
+        ? action.label
+        : null)
+      break
+    case WindowConstants.WINDOW_RESET_MENU_STATE:
+      doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
+      doAction({actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL})
+      if (getSetting(settings.AUTO_HIDE_MENU)) {
+        doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
+      } else {
+        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+      }
+      doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      break
+    case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
+      const proposedIndex = Number(action.index)
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
+        isNaN(proposedIndex)
+        ? null
+        : proposedIndex)
+      break
+    case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
+      windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
+      break
+
     default:
   }
 

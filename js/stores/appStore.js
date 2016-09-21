@@ -28,7 +28,6 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
-const isDarwin = process.platform === 'darwin'
 const locale = require('../../app/locale')
 const path = require('path')
 
@@ -36,6 +35,8 @@ const path = require('path')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
+const isDarwin = process.platform === 'darwin'
+const isWindows = process.platform === 'win32'
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -136,7 +137,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     titleBarStyle: 'hidden-inset',
     autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
-    webPreferences: defaults.webPreferences
+    webPreferences: defaults.webPreferences,
+    frame: !isWindows
   }
 
   if (process.platform === 'linux') {
@@ -144,6 +146,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   }
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
+
+  mainWindow.setMenuBarVisibility(true)
 
   if (windowState.ui && windowState.ui.isMaximized) {
     mainWindow.maximize()
@@ -674,6 +678,9 @@ const handleAppAction = (action) => {
       break
     case ExtensionConstants.EXTENSION_DISABLED:
       appState = extensionState.extensionDisabled(appState, action)
+      break
+    case AppConstants.APP_SET_MENUBAR_TEMPLATE:
+      appState = appState.setIn(['menu', 'template'], action.menubarTemplate)
       break
     default:
   }

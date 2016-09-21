@@ -219,6 +219,9 @@ AppStore
     newtab: {
       gridLayout: string // 'small', 'medium', 'large'
     }
+  },
+  menubar: {
+    template: object // windows only: template object with Menubar control
   }
 }
 ```
@@ -367,6 +370,12 @@ WindowStore
     },
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes
+    },
+    menubar: { // windows only
+      isVisible: boolean, // true if Menubar control is visible
+      selectedLabel: string, // label of menu that is selected (or null for none selected)
+      selectedIndex: number, // index of the selected context menu item
+      lastFocusedSelector: string // selector for the last selected element (browser ui, not frame content)
     }
   },
   searchDetail: {

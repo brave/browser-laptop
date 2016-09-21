@@ -18,6 +18,7 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
 const dialog = electron.dialog
+const BrowserWindow = electron.BrowserWindow
 const { fileUrl } = require('../../js/lib/appUrlUtil')
 const menuUtil = require('./lib/menuUtil')
 const getSetting = require('../../js/settings').getSetting
@@ -586,6 +587,8 @@ const createMenu = () => {
     })
   }
 
+  appActions.setMenubarTemplate(Immutable.fromJS(template))
+
   let oldMenu = appMenu
   appMenu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(appMenu)
@@ -642,6 +645,15 @@ const doAction = (action) => {
           createMenu()
         })
       }
+      break
+    case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:
+      appDispatcher.waitFor([appStore.dispatchToken], () => {
+        const clickedMenuItem = menuUtil.getMenuItem(appMenu, action.label)
+        if (clickedMenuItem) {
+          const focusedWindow = BrowserWindow.getFocusedWindow()
+          clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)
+        }
+      })
       break
     default:
   }

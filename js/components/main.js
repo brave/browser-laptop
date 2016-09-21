@@ -39,6 +39,8 @@ const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const LongPressButton = require('./longPressButton')
+const Menubar = require('../../app/renderer/components/menubar')
+const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 
 // Constants
 const config = require('../constants/config')
@@ -48,6 +50,7 @@ const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../constants/keyCodes')
+const isWindows = process.platform === 'win32'
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -118,6 +121,60 @@ class Main extends ImmutableComponent {
           break
       }
     })
+  }
+
+  registerCustomTitlebarHandlers () {
+    if (this.customTitlebar.enabled) {
+      document.addEventListener('keyup', (e) => {
+        const customTitlebar = this.customTitlebar
+        switch (e.which) {
+          case keyCodes.ALT:
+            e.preventDefault()
+
+            const menubarTemplate = this.props.appState.getIn(['menu', 'template'])
+            const defaultLabel = menubarTemplate.getIn([0, 'label'])
+
+            if (getSetting(settings.AUTO_HIDE_MENU)) {
+              windowActions.toggleMenubarVisible(null, defaultLabel)
+            } else {
+              if (customTitlebar.menubarSelectedLabel) {
+                windowActions.setMenubarSelectedLabel()
+                windowActions.setContextMenuDetail()
+              } else {
+                windowActions.setMenubarSelectedLabel(defaultLabel)
+              }
+            }
+            break
+          case keyCodes.ESC:
+            if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedLabel) {
+              e.preventDefault()
+              windowActions.toggleMenubarVisible(false)
+              break
+            }
+            if (customTitlebar.menubarSelectedLabel) {
+              e.preventDefault()
+              windowActions.setMenubarSelectedLabel()
+              windowActions.setContextMenuDetail()
+            }
+            break
+        }
+      })
+
+      document.addEventListener('focus', (e) => {
+        let selector = document.activeElement.id
+          ? '#' + document.activeElement.id
+          : null
+
+        if (!selector && document.activeElement.tagName === 'WEBVIEW') {
+          const frameKeyAttribute = document.activeElement.getAttribute('data-frame-key')
+          if (frameKeyAttribute) {
+            selector = 'webview[data-frame-key="' + frameKeyAttribute + '"]'
+          }
+        }
+
+        windowActions.setLastFocusedSelector(selector)
+      }, true)
+    }
   }
 
   exitFullScreen () {
@@ -256,6 +313,7 @@ class Main extends ImmutableComponent {
   componentDidMount () {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
+    this.registerCustomTitlebarHandlers()
 
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
@@ -585,32 +643,30 @@ class Main extends ImmutableComponent {
     if (!e.target.className.includes('navigatorWrapper')) {
       return
     }
-    if (currentWindow.isMaximized()) {
-      currentWindow.maximize()
-    } else {
-      currentWindow.unmaximize()
-    }
+    return (!currentWindow.isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
   }
 
   onMouseDown (e) {
+    // BSCTODO: update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
     while (node) {
       if (node.classList &&
           (node.classList.contains('popupWindow') ||
             node.classList.contains('contextMenu') ||
-            node.classList.contains('extensionButton'))) {
+            node.classList.contains('extensionButton') ||
+            node.classList.contains('menubarItem'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
           e.preventDefault()
         }
+        // Click event is handled downstream
         return
       }
       node = node.parentNode
     }
-    // TODO(bridiver) combine context menu and popup window
-    windowActions.setContextMenuDetail()
-    windowActions.setPopupWindowDetail()
+    // Hide context menus, popup menus, and menu selections
+    windowActions.resetMenuState()
   }
 
   onClickWindow (e) {
@@ -714,6 +770,22 @@ class Main extends ImmutableComponent {
     return buttons
   }
 
+  get customTitlebar () {
+    const customTitlebarEnabled = isWindows
+    const captionButtonsVisible = customTitlebarEnabled && !this.props.windowState.getIn(['ui', 'isFullScreen'])
+    const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
+    return {
+      enabled: customTitlebarEnabled,
+      captionButtonsVisible: captionButtonsVisible,
+      menubarVisible: menubarVisible,
+      menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
+      menubarSelectedLabel: this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel']),
+      menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
+      lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
+      isMaximized: this.props.windowState.getIn(['ui', 'isMaximized'])
+    }
+  }
+
   render () {
     const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
       ? 1 : b.get('key') > a.get('key') ? -1 : 0
@@ -743,7 +815,7 @@ class Main extends ImmutableComponent {
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
-
+    const customTitlebar = this.customTitlebar
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
@@ -757,7 +829,8 @@ class Main extends ImmutableComponent {
 
     return <div id='window'
       className={cx({
-        isFullScreen: activeFrame && activeFrame.get('isFullScreen')
+        isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
+        frameless: customTitlebar.captionButtonsVisible
       })}
       ref={(node) => { this.mainWindow = node }}
       onMouseDown={this.onMouseDown}
@@ -766,7 +839,8 @@ class Main extends ImmutableComponent {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
           lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+          selectedIndex={customTitlebar.menubarSelectedIndex} />
         : null
       }
       {
@@ -776,128 +850,153 @@ class Main extends ImmutableComponent {
         : null
       }
       <div className='top'>
-        <div className='navigatorWrapper'
-          onDoubleClick={this.onDoubleClick}
-          onDragOver={this.onDragOver}
-          onDrop={this.onDrop}>
-          <div className='backforward'>
-            <LongPressButton
-              l10nId='backButton'
-              className='back fa fa-angle-left'
-              disabled={!activeFrame || !activeFrame.get('canGoBack')}
-              onClick={this.onBack}
-              onLongPress={this.onBackLongPress}
-            />
-            <LongPressButton
-              l10nId='forwardButton'
-              className='forward fa fa-angle-right'
-              disabled={!activeFrame || !activeFrame.get('canGoForward')}
-              onClick={this.onForward}
-              onLongPress={this.onForwardLongPress}
-            />
+        <div className='navbarCaptionButtonContainer'>
+          <div className='navbarMenubarFlexContainer'>
+            <div className='navbarMenubarBlockContainer'>
+              {
+                customTitlebar.menubarVisible
+                  ? <div className='menubarContainer'>
+                    <Menubar
+                      template={customTitlebar.menubarTemplate}
+                      selectedLabel={customTitlebar.menubarSelectedLabel}
+                      selectedIndex={customTitlebar.menubarSelectedIndex}
+                      contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+                      autohide={getSetting(settings.AUTO_HIDE_MENU)}
+                      lastFocusedSelector={customTitlebar.lastFocusedSelector} />
+                  </div>
+                  : null
+              }
+              <div className='navigatorWrapper'
+                onDoubleClick={this.onDoubleClick}
+                onDragOver={this.onDragOver}
+                onDrop={this.onDrop}>
+                <div className='backforward'>
+                  <LongPressButton
+                    l10nId='backButton'
+                    className='back fa fa-angle-left'
+                    disabled={!activeFrame || !activeFrame.get('canGoBack')}
+                    onClick={this.onBack}
+                    onLongPress={this.onBackLongPress}
+                  />
+                  <LongPressButton
+                    l10nId='forwardButton'
+                    className='forward fa fa-angle-right'
+                    disabled={!activeFrame || !activeFrame.get('canGoForward')}
+                    onClick={this.onForward}
+                    onLongPress={this.onForwardLongPress}
+                  />
+                </div>
+                <NavigationBar
+                  ref={(node) => { this.navBar = node }}
+                  navbar={activeFrame && activeFrame.get('navbar')}
+                  frames={this.props.windowState.get('frames')}
+                  sites={this.props.appState.get('sites')}
+                  activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+                  location={activeFrame && activeFrame.get('location') || ''}
+                  title={activeFrame && activeFrame.get('title') || ''}
+                  scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
+                  partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
+                  history={activeFrame && activeFrame.get('history') || emptyList}
+                  suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
+                  isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
+                  locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
+                  startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
+                  endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
+                  loading={activeFrame && activeFrame.get('loading')}
+                  mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
+                  searchDetail={this.props.windowState.get('searchDetail')}
+                  enableNoScript={this.enableNoScript(activeSiteSettings)}
+                  settings={this.props.appState.get('settings')}
+                  noScriptIsVisible={noScriptIsVisible}
+                />
+                <div className='topLevelEndButtons'>
+                  {
+                    this.extensionButtons
+                  }
+                  <Button iconClass='braveMenu'
+                    l10nId='braveMenu'
+                    className={cx({
+                      navbutton: true,
+                      braveShieldsDisabled,
+                      braveShieldsDown: !braverySettings.shieldsUp
+                    })}
+                    onClick={this.onBraveMenu} />
+                </div>
+              </div>
+            </div>
           </div>
-          <NavigationBar
-            ref={(node) => { this.navBar = node }}
-            navbar={activeFrame && activeFrame.get('navbar')}
-            frames={this.props.windowState.get('frames')}
-            sites={this.props.appState.get('sites')}
-            activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
-            location={activeFrame && activeFrame.get('location') || ''}
-            title={activeFrame && activeFrame.get('title') || ''}
-            scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-            partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
-            history={activeFrame && activeFrame.get('history') || emptyList}
-            suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
-            isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
-            locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
-            startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
-            endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
-            loading={activeFrame && activeFrame.get('loading')}
-            mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchDetail={this.props.windowState.get('searchDetail')}
-            enableNoScript={this.enableNoScript(activeSiteSettings)}
-            settings={this.props.appState.get('settings')}
-            noScriptIsVisible={noScriptIsVisible}
-          />
           {
-            siteInfoIsVisible
-            ? <SiteInfo frameProps={activeFrame}
-              onHide={this.onHideSiteInfo} />
-            : null
-          }
-          {
-            braveryPanelIsVisible
-            ? <BraveryPanel frameProps={activeFrame}
-              activeRequestedLocation={activeRequestedLocation}
-              braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
-              braverySettings={braverySettings}
-              activeSiteSettings={activeSiteSettings}
-              onHide={this.onHideBraveryPanel} />
-            : null
-          }
-          {
-           clearBrowsingDataPanelIsVisible
-            ? <ClearBrowsingDataPanel
-              clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
-              onHide={this.onHideClearBrowsingDataPanel} />
-            : null
-          }
-          {
-           autofillAddressPanelIsVisible
-            ? <AutofillAddressPanel
-              currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
-              onHide={this.onHideAutofillAddressPanel} />
-            : null
-          }
-          {
-           autofillCreditCardPanelIsVisible
-            ? <AutofillCreditCardPanel
-              currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
-              onHide={this.onHideAutofillCreditCardPanel} />
-            : null
-          }
-          {
-            loginRequiredDetail
-              ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+            customTitlebar.captionButtonsVisible
+              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
               : null
           }
-          {
-            this.props.windowState.get('bookmarkDetail')
-            ? <AddEditBookmark sites={this.props.appState.get('sites')}
-              currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
-            : null
-          }
-          {
-            noScriptIsVisible
-              ? <NoScriptInfo frameProps={activeFrame}
-                onHide={this.onHideNoScript} />
-              : null
-          }
-          {
-            releaseNotesIsVisible
-            ? <ReleaseNotes
-              metadata={this.props.appState.getIn(['updates', 'metadata'])}
-              onHide={this.onHideReleaseNotes} />
-            : null
-          }
-          <div className='topLevelEndButtons'>
-            {
-              this.extensionButtons
-            }
-            <Button iconClass='braveMenu'
-              l10nId='braveMenu'
-              className={cx({
-                navbutton: true,
-                braveShieldsDisabled,
-                braveShieldsDown: !braverySettings.shieldsUp
-              })}
-              onClick={this.onBraveMenu} />
-          </div>
         </div>
+        {
+          siteInfoIsVisible
+          ? <SiteInfo frameProps={activeFrame}
+            onHide={this.onHideSiteInfo} />
+          : null
+        }
+        {
+          braveryPanelIsVisible
+          ? <BraveryPanel frameProps={activeFrame}
+            activeRequestedLocation={activeRequestedLocation}
+            braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
+            braverySettings={braverySettings}
+            activeSiteSettings={activeSiteSettings}
+            onHide={this.onHideBraveryPanel} />
+          : null
+        }
+        {
+         clearBrowsingDataPanelIsVisible
+          ? <ClearBrowsingDataPanel
+            clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
+            onHide={this.onHideClearBrowsingDataPanel} />
+          : null
+        }
+        {
+         autofillAddressPanelIsVisible
+          ? <AutofillAddressPanel
+            currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
+            onHide={this.onHideAutofillAddressPanel} />
+          : null
+        }
+        {
+         autofillCreditCardPanelIsVisible
+          ? <AutofillCreditCardPanel
+            currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
+            onHide={this.onHideAutofillCreditCardPanel} />
+          : null
+        }
+        {
+          loginRequiredDetail
+            ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+            : null
+        }
+        {
+          this.props.windowState.get('bookmarkDetail')
+          ? <AddEditBookmark sites={this.props.appState.get('sites')}
+            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
+          : null
+        }
+        {
+          noScriptIsVisible
+            ? <NoScriptInfo frameProps={activeFrame}
+              onHide={this.onHideNoScript} />
+            : null
+        }
+        {
+          releaseNotesIsVisible
+          ? <ReleaseNotes
+            metadata={this.props.appState.getIn(['updates', 'metadata'])}
+            onHide={this.onHideReleaseNotes} />
+          : null
+        }
+
         <UpdateBar updates={this.props.appState.get('updates')} />
         {
           this.props.appState.get('notifications') && this.props.appState.get('notifications').size && activeFrame

@@ -10,6 +10,7 @@ const KeyCodes = {
   SHIFT: 16,
   BACKSPACE: 8,
   CTRL: 17,
+  ALT: 18,
   DELETE: 46,
   CMD1: 91,
   CMD2: 93,

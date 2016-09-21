@@ -11,31 +11,6 @@ const siteUtil = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
 
 /**
- * Get an electron MenuItem object for the PARENT menu (File, Edit, etc) based on its label
- * @param {string} label - the text associated with the menu
- * NOTE: label may be a localized string
- */
-module.exports.getParentMenuDetails = (appMenu, label) => {
-  let menuIndex = -1
-  let menuItem = null
-
-  if (label && appMenu && appMenu.items && appMenu.items.length > 0) {
-    menuIndex = appMenu.items.findIndex(function (item, index) {
-      return item && item.label === label
-    })
-
-    if (menuIndex !== -1) {
-      menuItem = appMenu.items[menuIndex]
-    }
-  }
-
-  return {
-    menu: menuItem,
-    index: menuIndex
-  }
-}
-
-/**
  * Get the an electron MenuItem object from a Menu based on its label
  * @param {string} label - the text associated with the menu
  * NOTE: label may be a localized string
