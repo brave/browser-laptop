@@ -1070,7 +1070,7 @@ var observeTransactions = (transactions) => {
       showNotificationPaymentDone(newestTransaction.contribution.fiat)
     }
   }
-  cachedTransactions = transactions
+  cachedTransactions = underscore.clone(transactions)
 }
 
 var balanceTimeoutId = false
