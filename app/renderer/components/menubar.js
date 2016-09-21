@@ -192,20 +192,20 @@ class Menubar extends ImmutableComponent {
   }
   render () {
     return <div className='menubar'>
-    {
-      this.props.template.map((menubarItem) => {
-        let props = {
-          label: menubarItem.get('label'),
-          submenu: menubarItem.get('submenu').toJS(),
-          menubar: this,
-          lastFocusedSelector: this.props.lastFocusedSelector
-        }
-        if (props.label === this.props.selectedLabel) {
-          props.selected = true
-        }
-        return <MenubarItem {...props} />
-      })
-    }
+      {
+        this.props.template.map((menubarItem) => {
+          let props = {
+            label: menubarItem.get('label'),
+            submenu: menubarItem.get('submenu').toJS(),
+            menubar: this,
+            lastFocusedSelector: this.props.lastFocusedSelector
+          }
+          if (props.label === this.props.selectedLabel) {
+            props.selected = true
+          }
+          return <MenubarItem {...props} />
+        })
+      }
     </div>
   }
 }
