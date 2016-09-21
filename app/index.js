@@ -241,9 +241,39 @@ loadAppStatePromise.then((initialState) => {
   }
 })
 
+const notifyCertError = (webContents, url, error, cert) => {
+  console.log('notify cert error')
+  errorCerts[url] = {
+    subjectName: cert.subjectName,
+    issuerName: cert.issuerName,
+    serialNumber: cert.serialNumber,
+    validStart: cert.validStart,
+    validExpiry: cert.validExpiry,
+    fingerprint: cert.fingerprint
+  }
+
+  // Tell the page to show an unlocked icon. Note this is sent to the main
+  // window webcontents, not the webview webcontents
+  let sender = webContents.hostWebContents || webContents
+  sender.send(messages.CERT_ERROR, {
+    url,
+    error,
+    cert,
+    tabId: webContents.getId()
+  })
+}
+
 app.on('ready', () => {
   let sessionStateSaveInterval = null
-  app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
+  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, cb) => {
+    // ignore transparency errors for now because we are blocking
+    // sites that Chrome isn't for some reason (ex: http://www.mint.com)
+    if (error === 'net::ERR_CERTIFICATE_TRANSPARENCY_REQUIRED') {
+      e.preventDefault()
+      cb(true)
+      return
+    }
+
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
@@ -252,24 +282,12 @@ app.on('ready', () => {
       return
     }
 
-    errorCerts[url] = {
-      subjectName: cert.subjectName,
-      issuerName: cert.issuerName,
-      serialNumber: cert.serialNumber,
-      validStart: cert.validStart,
-      validExpiry: cert.validExpiry,
-      fingerprint: cert.fingerprint
+    if (resourceType !== 'mainFrame') {
+      // Block subresources with certificate errors
+      return
     }
 
-    // Tell the page to show an unlocked icon. Note this is sent to the main
-    // window webcontents, not the webview webcontents
-    let sender = webContents.hostWebContents || webContents
-    sender.send(messages.CERT_ERROR, {
-      url,
-      error,
-      cert,
-      tabId: webContents.getId()
-    })
+    notifyCertError(webContents, url, error, cert)
   })
 
   app.on('window-all-closed', () => {
