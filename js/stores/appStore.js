@@ -597,6 +597,18 @@ const handleAppAction = (action) => {
         Filtering.clearAutofillData()
       }
       break
+    case AppConstants.APP_IMPORT_BROWSER_DATA:
+      {
+        const importer = require('../../app/importer')
+        if (action.selected.get('type') === 5) {
+          if (action.selected.get('favorites')) {
+            importer.importHTML(action.selected)
+          }
+        } else {
+          importer.importData(action.selected)
+        }
+        break
+      }
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
       {
         const Filtering = require('../../app/filtering')

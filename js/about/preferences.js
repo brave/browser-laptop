@@ -532,6 +532,15 @@ class PaymentHistoryRow extends ImmutableComponent {
 }
 
 class GeneralTab extends ImmutableComponent {
+  constructor (e) {
+    super()
+    this.importBrowserDataNow = this.importBrowserDataNow.bind(this)
+  }
+
+  importBrowserDataNow () {
+    aboutActions.importBrowerDataNow()
+  }
+
   enabled (keyArray) {
     return keyArray.every((key) => getSetting(key, this.props.settings) === true)
   }
@@ -581,6 +590,9 @@ class GeneralTab extends ImmutableComponent {
         }
         <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+      <div className='sectionTitle' data-l10n-id='importBrowserData' />
+      <Button l10nId='importNow' className='primaryButton importNowButton'
+        onClick={this.importBrowserDataNow} />
     </SettingsList>
   }
 }

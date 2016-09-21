@@ -751,6 +751,26 @@ Sets the clear browsing data popup detail
 
 
 
+### setImportBrowserDataDetail(importBrowserDataDetail) 
+
+Sets the import browser data popup detail
+
+**Parameters**
+
+**importBrowserDataDetail**: `Array`, list of supported browsers
+
+
+
+### setImportBrowserDataSelected(selected) 
+
+Sets the selected import browser data
+
+**Parameters**
+
+**selected**: `Object`, selected browser data to import
+
+
+
 ### setAutofillAddressDetail(currentDetail, originalDetail) 
 
 Sets the manage autofill address popup detail

@@ -168,6 +168,10 @@ const AboutActions = {
     ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
   },
 
+  importBrowerDataNow: function () {
+    ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
+  },
+
   createWallet: function () {
     ipc.send(messages.LEDGER_CREATE_WALLET)
   },

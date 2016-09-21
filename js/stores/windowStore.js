@@ -13,7 +13,6 @@ const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
-const importFromHTML = require('../lib/importer').importFromHTML
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
@@ -704,6 +703,20 @@ const doAction = (action) => {
         windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
       }
       break
+    case WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
+      if (!action.importBrowserDataDetail) {
+        windowState = windowState.delete('importBrowserDataDetail')
+      } else {
+        windowState = windowState.set('importBrowserDataDetail', Immutable.fromJS(action.importBrowserDataDetail))
+      }
+      break
+    case WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED:
+      if (!action.selected) {
+        windowState = windowState.delete('importBrowserDataSelected')
+      } else {
+        windowState = windowState.set('importBrowserDataSelected', Immutable.fromJS(action.selected))
+      }
+      break
     case WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('autofillAddressDetail')
@@ -848,21 +861,6 @@ ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDe
     actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
     clearBrowsingDataDetail
   })
-})
-
-ipc.on(messages.IMPORT_BOOKMARKS, () => {
-  const dialog = require('electron').remote.dialog
-  const files = dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{
-      name: 'HTML',
-      extensions: ['html', 'htm']
-    }]
-  })
-  if (files && files.length > 0) {
-    const file = files[0]
-    importFromHTML(file)
-  }
 })
 
 const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev', 'clone']
