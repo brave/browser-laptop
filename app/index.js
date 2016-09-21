@@ -242,7 +242,6 @@ loadAppStatePromise.then((initialState) => {
 })
 
 const notifyCertError = (webContents, url, error, cert) => {
-  console.log('notify cert error')
   errorCerts[url] = {
     subjectName: cert.subjectName,
     issuerName: cert.issuerName,
