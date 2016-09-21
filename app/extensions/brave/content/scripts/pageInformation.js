@@ -136,7 +136,7 @@
   if (node) results.faviconURL = node.getAttribute('href')
 
   var pubinfo = chrome.ipc.sendSync('ledger-publisher', document.location.href)
-  if ((!pubinfo) || (!pubinfo.context) || (!pubinfo.rules)) return console.log('no pubinfo avaialble')
+  if ((!pubinfo) || (!pubinfo.context) || (!pubinfo.rules)) return console.log('no pubinfo available')
 
   var context = pubinfo.context
   var rules = pubinfo.rules
