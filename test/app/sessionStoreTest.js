@@ -60,4 +60,45 @@ describe('sessionStore', function () {
       yield Brave.app.client.waitForExist(navigatorBookmarked)
     })
   })
+
+  describe('firstRunTimestamp', function () {
+    Brave.beforeAllServerSetup(this)
+    before(function * () {
+      // AY: Why do I need to start, stop and start for this to work properly?
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+    })
+
+    after(function * () {
+      yield Brave.stopApp()
+    })
+
+    it('sets it once', function * () {
+      const timestamp = new Date().getTime()
+      let firstRunTimestamp
+      yield Brave.app.client
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            firstRunTimestamp = val.value.firstRunTimestamp
+            return (
+              firstRunTimestamp > (timestamp - 30 * 1000) &&
+              firstRunTimestamp <= timestamp
+            )
+          })
+        })
+
+      yield Brave.stopApp(false)
+      yield Brave.startApp()
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return (val.value.firstRunTimestamp === firstRunTimestamp)
+          })
+        })
+    })
+  })
 })

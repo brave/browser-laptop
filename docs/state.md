@@ -9,6 +9,7 @@ AppStore
 
 ```javascript
 {
+  firstRunTimestamp: integer,
   extensions: {
     [id]: { // the unique id of the extension
       id: string,
