@@ -51,7 +51,9 @@ const windowActions = {
     location = location.trim()
     let newFrame = false
     if (frame.get('pinnedLocation') && location !== 'about:certerror' &&
-        frame.get('location') !== 'about:certerror') {
+        frame.get('location') !== 'about:certerror' &&
+        location !== 'about:error' &&
+        frame.get('location') !== 'about:error') {
       try {
         const origin1 = new window.URL(frame.get('location')).origin
         const origin2 = new window.URL(location).origin
