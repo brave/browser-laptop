@@ -55,7 +55,7 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   render () {
-    return <div className={this.buttonClass + ' windowCaptionButtons'}>
+    return <div className={this.buttonClass + ' windowCaptionButtons' + (this.props.shouldAllowWindowDrag ? ' allowDragging' : '')}>
       <div className={'container ' + this.osClass}>
         <button
           className={this.buttonClass + ' captionButton minimize'}
