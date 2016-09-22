@@ -831,17 +831,6 @@ Called from the Menubar control, handled in menu.js
 
 
 
-### setMenubarSelectedLabel(label) 
-
-(Windows only)
-Used to track which menubar item is currently selected (or null for none selected)
-
-**Parameters**
-
-**label**: `string`, text of the menubar item label that was clicked (file, edit, etc)
-
-
-
 ### resetMenuState() 
 
 Used by `main.js` when click happens on content area (not on a link or react control).

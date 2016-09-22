@@ -374,8 +374,7 @@ WindowStore
     },
     menubar: { // windows only
       isVisible: boolean, // true if Menubar control is visible
-      selectedLabel: string, // label of menu that is selected (or null for none selected)
-      selectedIndex: number, // index of the selected context menu item
+      selectedIndex: Array<number>, // indices of the selected menu item(s) (or null for none selected)
       lastFocusedSelector: string // selector for the last selected element (browser ui, not frame content)
     }
   },

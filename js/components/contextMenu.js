@@ -75,9 +75,13 @@ class ContextMenuItem extends ImmutableComponent {
     }
     windowActions.setContextMenuDetail()
   }
+
   onMouseEnter (e) {
     let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
-    openedSubmenuDetails = openedSubmenuDetails ? openedSubmenuDetails.splice(this.props.submenuIndex, this.props.contextMenuDetail.get('openedSubmenuDetails').size) : new Immutable.List()
+    openedSubmenuDetails = openedSubmenuDetails
+      ? openedSubmenuDetails.splice(this.props.submenuIndex, this.props.contextMenuDetail.get('openedSubmenuDetails').size)
+      : new Immutable.List()
+
     if (this.hasSubmenu) {
       let node = e.target
       while (node && node.classList && !node.classList.contains('contextMenuItem')) {
@@ -286,7 +290,7 @@ class ContextMenu extends ImmutableComponent {
         submenuIndex={0}
         lastZoomPercentage={this.props.lastZoomPercentage}
         template={this.props.contextMenuDetail.get('template')}
-        selectedIndex={this.props.selectedIndex} />
+        selectedIndex={this.props.selectedIndex ? this.props.selectedIndex[0] : null} />
       {
         this.openedSubmenuDetails.map((openedSubmenuDetail, i) =>
           <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
@@ -294,7 +298,10 @@ class ContextMenu extends ImmutableComponent {
             lastZoomPercentage={this.props.lastZoomPercentage}
             template={openedSubmenuDetail.get('template')}
             y={openedSubmenuDetail.get('y')}
-            selectedIndex={this.props.selectedIndex} />)
+            selectedIndex={
+              this.props.selectedIndex && (i + 1) < this.props.selectedIndex.length
+                ? this.props.selectedIndex[i + 1]
+                : null} />)
       }
     </div>
   }
