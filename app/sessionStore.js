@@ -356,9 +356,6 @@ module.exports.loadAppState = () => {
         module.exports.cleanAppData(data, false)
       }
       data = Object.assign(module.exports.defaultAppState(), data)
-      if (!data.firstRunTimestamp) {
-        data.firstRunTimestamp = new Date().getTime()
-      }
       data.cleanedOnShutdown = false
       // Always recalculate the update status
       if (data.updates) {
@@ -393,6 +390,7 @@ module.exports.loadAppState = () => {
  */
 module.exports.defaultAppState = () => {
   return {
+    firstRunTimestamp: new Date().getTime(),
     sites: [],
     tabs: [],
     extensions: {},
