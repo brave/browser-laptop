@@ -69,11 +69,39 @@ class ImportBrowserDataPanel extends ImmutableComponent {
     this.props.onHide()
   }
   onChange (e) {
-    windowActions.setImportBrowserDataSelected(
-      this.props.importBrowserDataSelected.set('index', e.target.value))
+    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('index', e.target.value)
+    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('history', false)
+    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('favorites', false)
+    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('mergeFavorites', false)
+    this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('cookies', false)
+    let importBrowserDataSelected = this.props.importBrowserDataSelected
+    if (this.supportHistory) {
+      importBrowserDataSelected = importBrowserDataSelected.set('history', true)
+    }
+    if (this.supportFavorites) {
+      importBrowserDataSelected = importBrowserDataSelected.set('favorites', true)
+      importBrowserDataSelected = importBrowserDataSelected.set('mergeFavorites', true)
+    }
+    if (this.supportCookies) {
+      importBrowserDataSelected = importBrowserDataSelected.set('cookies', true)
+    }
+    windowActions.setImportBrowserDataSelected(importBrowserDataSelected)
   }
   get selectedBrowser () {
     let index = this.props.importBrowserDataSelected.get('index')
+    if (index === undefined) {
+      this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('index', '0')
+      if (this.supportHistory) {
+        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('history', true)
+      }
+      if (this.supportFavorites) {
+        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('favorites', true)
+        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('mergeFavorites', true)
+      }
+      if (this.supportCookies) {
+        this.props.importBrowserDataSelected = this.props.importBrowserDataSelected.set('cookies', true)
+      }
+    }
     return index !== undefined ? index : '0'
   }
   render () {
