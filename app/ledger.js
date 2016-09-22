@@ -139,6 +139,7 @@ const doAction = (action) => {
           i = action.hostPattern.indexOf('://')
           if (i !== -1) {
             publisher = action.hostPattern.substr(i + 3)
+            if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
             delete synopsis.publishers[publisher]
             delete publishers[publisher]
             updatePublisherInfo()
@@ -793,9 +794,7 @@ var ledgerInfo = {
   creating: false,
   created: false,
 
-  delayStamp: undefined,
   reconcileStamp: undefined,
-  reconcileDelay: undefined,
 
   transactions:
   [
@@ -1084,9 +1083,7 @@ var getStateInfo = (state) => {
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
 
-  ledgerInfo.delayStamp = state.delayStamp
   ledgerInfo.reconcileStamp = state.reconcileStamp
-  ledgerInfo.reconcileDelay = state.prepareTransaction && state.delayStamp
 
   if (info) {
     ledgerInfo._internal.paymentInfo = info
