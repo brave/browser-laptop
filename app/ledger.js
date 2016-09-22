@@ -1313,11 +1313,8 @@ var syncWriter = (path, obj, options, cb) => {
 
 var pathName = (name) => {
   var parts = path.parse(name)
-  var basePath = process.env.NODE_ENV === 'test'
-    ? path.join(process.env.HOME, '.brave-test-ledger')
-    : app.getPath('userData')
 
-  return path.join(basePath, parts.name + parts.ext)
+  return path.join(app.getPath('userData'), parts.name + parts.ext)
 }
 
 /**
