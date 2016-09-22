@@ -845,8 +845,10 @@ class Main extends ImmutableComponent {
         isFullScreen: this.props.windowState.getIn(['ui', 'isFullScreen']),
         frameless: customTitlebar.captionButtonsVisible,
         visible: this.props.windowState.getIn(['ui', 'isFullScreen']) &&
-         (activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])) ||
-         (this.props.windowState.getIn(['ui', 'mouseInTitlebar']))
+         (
+            (activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])) ||
+            (this.props.windowState.getIn(['ui', 'mouseInTitlebar']))
+         )
       })}
       ref={(node) => { this.mainWindow = node }}
       onMouseDown={this.onMouseDown}
