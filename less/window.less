@@ -35,7 +35,16 @@ html,
 
   &.isFullScreen {
     .top, .downloadsBar, .hrefPreview {
-      display: none;
+      transition: all 0.4s ease-out;
+      opacity: 0;
+      max-height: 0px;
+    }
+  }
+
+  &.visible {
+    .top, .downloadsBar, .hrefPreview {
+      max-height: 500px;
+      opacity: 1;
     }
   }
 }

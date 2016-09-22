@@ -519,7 +519,7 @@ class Main extends ImmutableComponent {
     }
 
     const height = navigator.getBoundingClientRect().bottom
-    if (this.pageY < height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
+    if (this.pageY <= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== true) {
       windowActions.setMouseInTitlebar(true)
     } else if (this.pageY === undefined || this.pageY >= height && this.props.windowState.getIn(['ui', 'mouseInTitlebar']) !== false) {
       windowActions.setMouseInTitlebar(false)
@@ -843,7 +843,10 @@ class Main extends ImmutableComponent {
     return <div id='window'
       className={cx({
         isFullScreen: this.props.windowState.getIn(['ui', 'isFullScreen']),
-        frameless: customTitlebar.captionButtonsVisible
+        frameless: customTitlebar.captionButtonsVisible,
+        visible: this.props.windowState.getIn(['ui', 'isFullScreen']) &&
+         (activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'focused'])) ||
+         (this.props.windowState.getIn(['ui', 'mouseInTitlebar']))
       })}
       ref={(node) => { this.mainWindow = node }}
       onMouseDown={this.onMouseDown}
