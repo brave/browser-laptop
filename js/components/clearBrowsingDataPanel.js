@@ -30,7 +30,9 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
   onClear () {
     appActions.clearAppData(this.props.clearBrowsingDataDetail)
     this.props.onHide()
-    if (this.props.clearBrowsingDataDetail.get('allSiteCookies')) {
+    let detail = this.props.clearBrowsingDataDetail
+    if (detail.get('allSiteCookies') && detail.get('browserHistory') &&
+        detail.get('cachedImagesAndFiles')) {
       ipc.send(messages.PREFS_RESTART)
     }
   }
