@@ -97,20 +97,6 @@ describe('Payments Panel', function () {
 })
 
 describe('synopsis', function () {
-  function * newFrame (client, frameKey = 2) {
-    yield client
-      .ipcSend('shortcut-new-frame')
-      // wait for correct urlInput based on frameKey
-      .waitUntil(function () {
-        return this.getTabCount().then((count) => {
-          return count === frameKey
-        })
-      })
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForVisible('div[id="navigator"][data-frame-key="' + frameKey + '"] ' + urlInput)
-      .waitForElementFocus(urlInput)
-  }
-
   Brave.beforeAll(this)
 
   before(function * () {
@@ -125,9 +111,6 @@ describe('synopsis', function () {
       .waitUntil(function () {
         return this.getText(paymentsStatus).then((val) => val.includes('Creating'))
       })
-      .waitUntil(function () {
-        return this.getText(addFundsButton).then((val) => val.includes('Add funds'))
-      })
   })
 
   it('no table if empty synopsis', function * () {
@@ -135,22 +118,72 @@ describe('synopsis', function () {
       .isExisting(ledgerTable).then((isExisting) => isExisting === false)
   })
 
-  it.skip('creates synopsis table after visiting a site', function * () {
-    // TODO (mrose17): re-enable this test once ledger properly ignores the 8
-    // second pageview limit during tests
+  it('creates synopsis table after visiting a site', function * () {
+    var site1 = 'http://web.mit.edu/zyan/Public/wait.html'
     yield this.app.client
-      .url('http://web.mit.edu/zyan/Public/wait.html')
+      .url(site1)
       .waitUntil(function () {
         return this.getText('div').then((val) => val === 'done')
       })
       .windowByUrl(Brave.browserWindowUrl)
-    yield newFrame(this.app.client)
-    yield this.app.client
-      .tabByUrl(Brave.newTabUrl)
+      .tabByUrl(site1)
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
-      .waitForExist(ledgerTable)
-      .then((isExisting) => isExisting === true)
+      .waitUntil(function () {
+        return this.elements(ledgerTable + ' tr').then((response) => {
+          return response.value.length === 2
+        })
+      })
+  })
+
+  it('can sort synopsis table', function * () {
+    var site1 = 'http://web.mit.edu/zyan/Public/wait.html'
+    var site2 = 'http://example.com'
+    var site3 = 'https://eff.org'
+    yield this.app.client
+      .url(site1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByUrl(site1)
+      .url(site2)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByUrl(site2)
+      .url(site3)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByUrl(site3)
+      .loadUrl(prefsUrl)
+      .waitForVisible(paymentsTab)
+      .click(paymentsTab)
+      .click('[data-l10n-id="publisher"]')
+      .waitUntil(function () {
+        return this.getText(ledgerTable + ' a').then((text) => {
+          return text[0] === 'eff.org' && text[2] === 'mit.edu'
+        })
+      })
+      .click('[data-l10n-id="publisher"]')
+      .waitUntil(function () {
+        return this.getText(ledgerTable + ' a').then((text) => {
+          return text[2] === 'eff.org' && text[0] === 'mit.edu'
+        })
+      })
+  })
+
+  it('can disable site', function * () {
+    var site1 = 'https://eff.org'
+    yield this.app.client
+      .url(site1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByUrl(site1)
+      .loadUrl(prefsUrl)
+      .waitForVisible(paymentsTab)
+      .click(paymentsTab)
+      .click('[data-l10n-id="publisher"]')
+      .click(ledgerTable + ' .switchBackground')
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.siteSettings['https?://eff.org'].ledgerPayments === false
+        })
+      })
   })
 })

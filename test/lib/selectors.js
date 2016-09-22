@@ -54,7 +54,7 @@ module.exports = {
   addFundsButton: '.addFunds',
   fundsSelectBox: '#fundsSelectBox',
   paymentsStatus: '#walletStatus',
-  ledgerTable: '.ledgerTable',
+  ledgerTable: '#ledgerTable',
   bitcoinDashboard: '#bitcoinDashboard',
   modalCloseButton: 'button.close',
   coinbaseBuyButton: '[data-l10n-id="add"]',
