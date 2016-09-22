@@ -473,10 +473,30 @@ var enable = (onoff) => {
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
+    var initSynopsis = () => {
+      // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
+      if (process.env.NODE_ENV === 'test') {
+        synopsis.options.minDuration = 0
+        synopsis.options.minPublisherDuration = 0
+        synopsis.options.minPublisherVisits = 0
+      } else {
+        if (process.env.LEDGER_PUBLISHER_VISIT_DURATION) {
+          synopsis.options.minDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_VISIT_DURATION)
+        }
+        if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
+          synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
+        }
+        if (process.env.LEDGER_PUBLISHER_MIN_VISITS) {
+          synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
+        }
+      }
+    }
+
     if (publisherInfo._internal.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
+      initSynopsis()
       return updatePublisherInfo()
     }
 
@@ -486,22 +506,7 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
-    // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
-    if (process.env.NODE_ENV === 'test') {
-      synopsis.options.minDuration = 0
-      synopsis.options.minPublisherDuration = 0
-      synopsis.options.minPublisherVisits = 0
-    } else {
-      if (process.env.LEDGER_PUBLISHER_VISIT_DURATION) {
-        synopsis.options.minDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_VISIT_DURATION)
-      }
-      if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
-        synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
-      }
-      if (process.env.LEDGER_PUBLISHER_MIN_VISITS) {
-        synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
-      }
-    }
+    initSynopsis()
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
