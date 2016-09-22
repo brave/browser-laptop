@@ -938,8 +938,10 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
-      windowActions.setNavigated(e.url, this.props.frameKey, true)
-      loadEnd(true)
+      if (e.isMainFrame) {
+        windowActions.setNavigated(e.url, this.props.frameKey, true)
+        loadEnd(true)
+      }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
       windowActions.setFullScreen(this.frame, true, true)
