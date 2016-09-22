@@ -1,9 +1,23 @@
 # Changelog
 
 ## [0.12.2](https://github.com/brave/browser-laptop/releases/v0.12.2dev)
+- Added the ability to import data from other browsers ([#428](https://github.com/brave/browser-laptop/issues/428))([#4049](https://github.com/brave/browser-laptop/issues/4049))([#4154](https://github.com/brave/browser-laptop/issues/4154))
 - Added a new look for the Windows browser to remove the titlebar for more content viewing area. ([#3854](https://github.com/brave/browser-laptop/issues/3854))
 - Added the ability to auto update extensions without releases.  ([#4080](https://github.com/brave/browser-laptop/issues/4080))
 - Added the ability to install extensions remotely instead of prepackaging them. ([#4081](https://github.com/brave/browser-laptop/issues/4081))
+- Added instant search results for bookmarks ([#4097](https://github.com/brave/browser-laptop/issues/4097))([#2778](https://github.com/brave/browser-laptop/issues/2778))
+- Added the option to clear site-specific settings ([#2545](https://github.com/brave/browser-laptop/issues/2545))
+- Fixed various things for Brave Payments ([#4038](https://github.com/brave/browser-laptop/issues/4038))([#3781](https://github.com/brave/browser-laptop/issues/3781))([#4046](https://github.com/brave/browser-laptop/issues/4046))([#4057](https://github.com/brave/browser-laptop/issues/4057))([#3963](https://github.com/brave/browser-laptop/issues/3963))([#4040](https://github.com/brave/browser-laptop/issues/4040))([#4043](https://github.com/brave/browser-laptop/issues/4043))([#4071](https://github.com/brave/browser-laptop/issues/4071))([#4068](https://github.com/brave/browser-laptop/issues/4068))([#4067](https://github.com/brave/browser-laptop/issues/4067))([#4039](https://github.com/brave/browser-laptop/issues/4039))([#3792](https://github.com/brave/browser-laptop/issues/3792))([#4032](https://github.com/brave/browser-laptop/issues/4032))([#3759](https://github.com/brave/browser-laptop/issues/3759))([#4132](https://github.com/brave/browser-laptop/issues/4132))
+- Fixed browser history sorting ([#4047](https://github.com/brave/browser-laptop/issues/4047))
+- Fixed browser history listing ([#4048](https://github.com/brave/browser-laptop/issues/4048))([#4029](https://github.com/brave/browser-laptop/issues/4029))
+- Fixed viewing source on SVG files ([#4056](https://github.com/brave/browser-laptop/issues/4056))
+- Fixed viewing source during private sessions ([#4077](https://github.com/brave/browser-laptop/issues/4077))
+- Fixed language sorting ([#4055](https://github.com/brave/browser-laptop/issues/4055))
+- Fixed geolocation ([#3825](https://github.com/brave/browser-laptop/issues/3825))
+- Fixed left-right gesture for navigation ([#2548](https://github.com/brave/browser-laptop/issues/2548))([#4064](https://github.com/brave/browser-laptop/issues/4064))
+- Fixed deleting bookmark folders and their contents ([#4124](https://github.com/brave/browser-laptop/issues/4124))
+- Fixed deleted bookmark items from showing in URL suggestions ([#3763](https://github.com/brave/browser-laptop/issues/3763))
+- Fixed search engine selection ([#4099](https://github.com/brave/browser-laptop/issues/4099))
 - Upgraded to libchromiumcontent 53.0.2785.116. ([#1593](https://github.com/brave/browser-laptop/issues/1593))
 
 ## [0.12.1](https://github.com/brave/browser-laptop/releases/v0.12.1dev)
