@@ -379,7 +379,9 @@ const createBookmarksSubmenu = () => {
     },
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
-    CommonMenu.bookmarksToolbarMenuItem()
+    CommonMenu.bookmarksToolbarMenuItem(),
+    CommonMenu.separatorMenuItem,
+    CommonMenu.importBrowserDataMenuItem()
   ]
 
   const bookmarks = menuUtil.createBookmarkMenuItems(appStore.getState().get('sites'))
@@ -458,8 +460,6 @@ const createHelpSubmenu = () => {
   if (!isDarwin) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.checkForUpdateMenuItem())
-    submenu.push(CommonMenu.separatorMenuItem)
-    submenu.push(CommonMenu.importBrowserDataMenuItem())
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.aboutBraveMenuItem())
   }

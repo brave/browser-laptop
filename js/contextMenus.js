@@ -620,7 +620,9 @@ function hamburgerTemplateInit (location, e) {
       label: locale.translation('bookmarks'),
       submenu: [
         CommonMenu.bookmarksManagerMenuItem(),
-        CommonMenu.bookmarksToolbarMenuItem()
+        CommonMenu.bookmarksToolbarMenuItem(),
+        CommonMenu.separatorMenuItem,
+        CommonMenu.importBrowserDataMenuItem()
       ]
     }, {
       label: locale.translation('bravery'),
@@ -642,8 +644,6 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.checkForUpdateMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.importBrowserDataMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.reportAnIssueMenuItem(),
         CommonMenu.submitFeedbackMenuItem()
