@@ -204,15 +204,11 @@ AppStore
   },
   autofill: {
     addresses: {
-      guid: [{
-        Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
-      }],
+      guid: Array<string>, // List of id used to access the autofill entry in database
       timestamp: number
     },
     creditCards: {
-      guid: [{
-        Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
-      }],
+      guid: Array<string>, // List of id used to access the autofill entry in database
       timestamp: number
     }
   },
@@ -507,14 +503,14 @@ WindowStore
     country: string,
     phone: string,
     email: string,
-    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    guid: string // id used to access the autofill entry in database
   },
   autofillCreditCardDetail: {
     name: string,
     card: string,
     month: string,
     year: string,
-    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    guid: string // id used to access the autofill entry in database
   },
   importBrowserDataDetail: [
     {
