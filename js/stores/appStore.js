@@ -613,17 +613,14 @@ const handleAppAction = (action) => {
       {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'addresses', 'guid'],
-          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((address) => {
-            return Immutable.is(address, action.originalDetail.get('guid'))
+          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((guid) => {
+            return guid === action.originalDetail.get('guid')
           }))
 
-        let addresses = appState.getIn(['autofill', 'addresses', 'guid'])
-        const guid = Filtering.addAutofillAddress(action.detail.toJS())
-        if (action.originalDetail.get('guid') !== undefined &&
-          !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
-          Filtering.removeAutofillAddress(action.originalDetail.get('guid').toJS())
-        }
-        appState = appState.setIn(['autofill', 'addresses', 'guid'], addresses.push(Immutable.fromJS(guid)))
+        let guids = appState.getIn(['autofill', 'addresses', 'guid'])
+        const guid = Filtering.addAutofillAddress(action.detail.toJS(),
+          action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+        appState = appState.setIn(['autofill', 'addresses', 'guid'], guids.push(guid))
         appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
         break
       }
@@ -631,10 +628,10 @@ const handleAppAction = (action) => {
       {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'addresses', 'guid'],
-          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((address) => {
-            return Immutable.is(address, action.detail.get('guid'))
+          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((guid) => {
+            return guid === action.detail.get('guid')
           }))
-        Filtering.removeAutofillAddress(action.detail.get('guid').toJS())
+        Filtering.removeAutofillAddress(action.detail.get('guid'))
         appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
         break
       }
@@ -642,17 +639,14 @@ const handleAppAction = (action) => {
       {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'creditCards', 'guid'],
-          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((card) => {
-            return Immutable.is(card, action.originalDetail.get('guid'))
+          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((guid) => {
+            return guid === action.originalDetail.get('guid')
           }))
 
-        let creditCards = appState.getIn(['autofill', 'creditCards', 'guid'])
-        const guid = Filtering.addAutofillCreditCard(action.detail.toJS())
-        if (action.originalDetail.get('guid') !== undefined &&
-          !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
-          Filtering.removeAutofillCreditCard(action.originalDetail.get('guid').toJS())
-        }
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'], creditCards.push(Immutable.fromJS(guid)))
+        let guids = appState.getIn(['autofill', 'creditCards', 'guid'])
+        const guid = Filtering.addAutofillCreditCard(action.detail.toJS(),
+          action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+        appState = appState.setIn(['autofill', 'creditCards', 'guid'], guids.push(guid))
         appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
         break
       }
@@ -660,10 +654,10 @@ const handleAppAction = (action) => {
       {
         const Filtering = require('../../app/filtering')
         appState = appState.setIn(['autofill', 'creditCards', 'guid'],
-          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((card) => {
-            return Immutable.is(card, action.detail.get('guid'))
+          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((guid) => {
+            return guid === action.detail.get('guid')
           }))
-        Filtering.removeAutofillCreditCard(action.detail.get('guid').toJS())
+        Filtering.removeAutofillCreditCard(action.detail.get('guid'))
         appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
         break
       }

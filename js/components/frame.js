@@ -115,13 +115,12 @@ class Frame extends ImmutableComponent {
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
     } else if (location === 'about:autofill') {
-      const partition = FrameStateUtil.getPartition(this.frame)
       if (this.props.autofillAddresses) {
-        const addresses = this.props.autofillAddresses.get('guid')
+        const guids = this.props.autofillAddresses.get('guid')
         let list = []
-        addresses.forEach((entry) => {
-          const guid = entry.get(partition)
-          const address = currentWindow.webContents.session.autofill.getProfile(guid)
+        guids.forEach((entry) => {
+          console.log(entry)
+          const address = currentWindow.webContents.session.autofill.getProfile(entry)
           const valid = Object.getOwnPropertyNames(address).length > 0
           let addressDetail = {
             name: address.full_name,
@@ -133,7 +132,7 @@ class Frame extends ImmutableComponent {
             country: address.country_code,
             phone: address.phone,
             email: address.email,
-            guid: entry.toJS()
+            guid: entry
           }
           if (valid) {
             list.push(addressDetail)
@@ -144,18 +143,17 @@ class Frame extends ImmutableComponent {
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
       if (this.props.autofillCreditCards) {
-        const creditCards = this.props.autofillCreditCards.get('guid')
+        const guids = this.props.autofillCreditCards.get('guid')
         let list = []
-        creditCards.forEach((entry) => {
-          const guid = entry.get(partition)
-          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(guid)
+        guids.forEach((entry) => {
+          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(entry)
           const valid = Object.getOwnPropertyNames(creditCard).length > 0
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
             month: creditCard.expiration_month,
             year: creditCard.expiration_year,
-            guid: entry.toJS()
+            guid: entry
           }
           if (valid) {
             list.push(creditCardDetail)

@@ -627,57 +627,39 @@ module.exports.setDefaultZoomLevel = (zoom) => {
   }
 }
 
-module.exports.addAutofillAddress = (detail) => {
-  let guidMap = {}
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    let guid = ses.autofill.addProfile({
-      full_name: detail.name,
-      company_name: detail.organization,
-      street_address: detail.streetAddress,
-      city: detail.city,
-      state: detail.state,
-      postal_code: detail.postalCode,
-      country_code: detail.country,
-      phone: detail.phone,
-      email: detail.email
-    })
-    guidMap[partition] = guid
-  }
-  return guidMap
+module.exports.addAutofillAddress = (detail, oldGuid) => {
+  let guid = session.defaultSession.autofill.addProfile({
+    full_name: detail.name,
+    company_name: detail.organization,
+    street_address: detail.streetAddress,
+    city: detail.city,
+    state: detail.state,
+    postal_code: detail.postalCode,
+    country_code: detail.country,
+    phone: detail.phone,
+    email: detail.email,
+    guid: oldGuid
+  })
+  return guid
 }
 
 module.exports.removeAutofillAddress = (guid) => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    if (guid[partition] !== undefined) {
-      ses.autofill.removeProfile(guid[partition])
-    }
-  }
+  session.defaultSession.autofill.removeProfile(guid)
 }
 
-module.exports.addAutofillCreditCard = (detail) => {
-  let guidMap = {}
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    let guid = ses.autofill.addCreditCard({
-      name: detail.name,
-      card_number: detail.card,
-      expiration_month: detail.month,
-      expiration_year: detail.year
-    })
-    guidMap[partition] = guid
-  }
-  return guidMap
+module.exports.addAutofillCreditCard = (detail, oldGuid) => {
+  let guid = session.defaultSession.autofill.addCreditCard({
+    name: detail.name,
+    card_number: detail.card,
+    expiration_month: detail.month,
+    expiration_year: detail.year,
+    guid: oldGuid
+  })
+  return guid
 }
 
 module.exports.removeAutofillCreditCard = (guid) => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    if (guid[partition] !== undefined) {
-      ses.autofill.removeCreditCard(guid[partition])
-    }
-  }
+  session.defaultSession.autofill.removeCreditCard(guid)
 }
 
 module.exports.clearAutocompleteData = () => {
