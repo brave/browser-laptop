@@ -1036,11 +1036,10 @@ const windowActions = {
    * Dispatches a message to indicate the custom rendered Menubar should be toggled (shown/hidden)
    * @param {boolean} isVisible (optional)
    */
-  toggleMenubarVisible: function (isVisible, defaultLabel) {
+  toggleMenubarVisible: function (isVisible) {
     dispatch({
       actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE,
-      isVisible,
-      defaultLabel
+      isVisible
     })
   },
 
@@ -1053,18 +1052,6 @@ const windowActions = {
   clickMenubarSubmenu: function (label) {
     dispatch({
       actionType: WindowConstants.WINDOW_CLICK_MENUBAR_SUBMENU,
-      label
-    })
-  },
-
-  /**
-   * (Windows only)
-   * Used to track which menubar item is currently selected (or null for none selected)
-   * @param {string} label - text of the menubar item label that was clicked (file, edit, etc)
-   */
-  setMenubarSelectedLabel: function (label) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL,
       label
     })
   },

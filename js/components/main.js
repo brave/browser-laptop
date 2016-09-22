@@ -133,29 +133,26 @@ class Main extends ImmutableComponent {
           case keyCodes.ALT:
             e.preventDefault()
 
-            const menubarTemplate = this.props.appState.getIn(['menu', 'template'])
-            const defaultLabel = menubarTemplate.getIn([0, 'label'])
-
             if (getSetting(settings.AUTO_HIDE_MENU)) {
-              windowActions.toggleMenubarVisible(null, defaultLabel)
+              windowActions.toggleMenubarVisible(null)
             } else {
-              if (customTitlebar.menubarSelectedLabel) {
-                windowActions.setMenubarSelectedLabel()
+              if (customTitlebar.menubarSelectedIndex) {
+                windowActions.setSubmenuSelectedIndex()
                 windowActions.setContextMenuDetail()
               } else {
-                windowActions.setMenubarSelectedLabel(defaultLabel)
+                windowActions.setSubmenuSelectedIndex([0])
               }
             }
             break
           case keyCodes.ESC:
-            if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedLabel) {
+            if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedIndex) {
               e.preventDefault()
               windowActions.toggleMenubarVisible(false)
               break
             }
-            if (customTitlebar.menubarSelectedLabel) {
+            if (customTitlebar.menubarSelectedIndex) {
               e.preventDefault()
-              windowActions.setMenubarSelectedLabel()
+              windowActions.setSubmenuSelectedIndex()
               windowActions.setContextMenuDetail()
             }
             break
@@ -785,13 +782,16 @@ class Main extends ImmutableComponent {
     const customTitlebarEnabled = isWindows
     const captionButtonsVisible = customTitlebarEnabled && !this.props.windowState.getIn(['ui', 'isFullScreen'])
     const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
+    const selectedIndex = this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex'])
     return {
       enabled: customTitlebarEnabled,
       captionButtonsVisible: captionButtonsVisible,
       menubarVisible: menubarVisible,
       menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
-      menubarSelectedLabel: this.props.windowState.getIn(['ui', 'menubar', 'selectedLabel']),
-      menubarSelectedIndex: this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex']),
+      menubarSelectedIndex: selectedIndex,
+      contextMenuSelectedIndex: typeof selectedIndex === 'object' && Array.isArray(selectedIndex) && selectedIndex.length > 1
+        ? selectedIndex.slice(1)
+        : null,
       lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
       isMaximized: this.props.windowState.getIn(['ui', 'isMaximized'])
     }
@@ -853,7 +853,7 @@ class Main extends ImmutableComponent {
         ? <ContextMenu
           lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
           contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-          selectedIndex={customTitlebar.menubarSelectedIndex} />
+          selectedIndex={customTitlebar.contextMenuSelectedIndex} />
         : null
       }
       {
@@ -871,7 +871,6 @@ class Main extends ImmutableComponent {
                   ? <div className='menubarContainer'>
                     <Menubar
                       template={customTitlebar.menubarTemplate}
-                      selectedLabel={customTitlebar.menubarSelectedLabel}
                       selectedIndex={customTitlebar.menubarSelectedIndex}
                       contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
                       autohide={getSetting(settings.AUTO_HIDE_MENU)}

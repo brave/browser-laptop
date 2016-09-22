@@ -802,24 +802,13 @@ const doAction = (action) => {
           : !windowState.getIn(['ui', 'menubar', 'isVisible'])
         // Clear selection when menu is shown
         if (newVisibleStatus) {
-          const actionProps = { actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL }
-          if (action.defaultLabel) {
-            actionProps.label = action.defaultLabel
-          }
-          doAction(actionProps)
+          doAction({ actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX, index: [0] })
         }
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
       break
-    case WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL:
-      windowState = windowState.setIn(['ui', 'menubar', 'selectedLabel'],
-        action.label && typeof action.label === 'string'
-        ? action.label
-        : null)
-      break
     case WindowConstants.WINDOW_RESET_MENU_STATE:
       doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
-      doAction({actionType: WindowConstants.WINDOW_SET_MENUBAR_SELECTED_LABEL})
       if (getSetting(settings.AUTO_HIDE_MENU)) {
         doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
       } else {
@@ -828,11 +817,10 @@ const doAction = (action) => {
       doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
       break
     case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
-      const proposedIndex = Number(action.index)
       windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
-        isNaN(proposedIndex)
-        ? null
-        : proposedIndex)
+        Array.isArray(action.index)
+        ? action.index
+        : null)
       break
     case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)

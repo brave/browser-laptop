@@ -24,6 +24,21 @@ const defaultMenu = {
           { label: 'paste', temp: 4 }
         ]
       }
+    },
+    {
+      label: 'Bookmarks',
+      submenu: {
+        items: [
+          {
+            label: 'bookmark folder 1',
+            submenu: {
+              items: [
+                { label: 'my bookmark', url: 'https://brave.com' }
+              ]
+            }
+          }
+        ]
+      }
     }
   ]
 }
@@ -66,6 +81,10 @@ describe('menuUtil', function () {
     it('returns null if label is not found', function () {
       const menuItem = menuUtil.getMenuItem(defaultMenu, 'not-in-here')
       assert.equal(menuItem, null)
+    })
+    it('searches the menu recursively based on the label', function () {
+      const menuItem = menuUtil.getMenuItem(defaultMenu, 'my bookmark')
+      assert.equal(menuItem.url, 'https://brave.com')
     })
   })
 

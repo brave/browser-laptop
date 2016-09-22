@@ -18,10 +18,12 @@ const locale = require('../../locale')
 module.exports.getMenuItem = (appMenu, label) => {
   if (appMenu && appMenu.items && appMenu.items.length > 0) {
     for (let i = 0; i < appMenu.items.length; i++) {
-      const menuItem = appMenu.items[i].submenu && appMenu.items[i].submenu.items.find(function (item) {
-        return item && item.label === label
-      })
-      if (menuItem) return menuItem
+      const item = appMenu.items[i]
+      if (item && item.label === label) return item
+      if (item.submenu) {
+        const nestedItem = module.exports.getMenuItem(item.submenu, label)
+        if (nestedItem) return nestedItem
+      }
     }
   }
   return null
