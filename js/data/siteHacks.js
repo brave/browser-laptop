@@ -116,5 +116,9 @@ module.exports.siteHacks = {
   },
   'play.spotify.com': {
     enableFlashCTP: true
+  },
+  'player.siriusxm.com': {
+    enableFlashCTP: true,
+    redirectURL: 'https://player.siriusxm.com'
   }
 }
