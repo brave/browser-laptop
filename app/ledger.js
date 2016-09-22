@@ -110,7 +110,24 @@ let notificationTimeout = null
 const doAction = (action) => {
   var i, publisher
 
+/* TBD: handle
+
+    { actionType: "window-set-blocked-by"
+    , frameProps:
+      { audioPlaybackActive: true
+        ...
+      }
+    , ...
+    }
+ */
+  if (publisherInfo._internal.verboseP) {
+    console.log('\napplication event: ' + JSON.stringify(underscore.pick(action, [ 'actionType', 'key' ]), null, 2))
+  }
   switch (action.actionType) {
+    case appConstants.APP_IDLE_STATE_CHANGED:
+      visit('NOOP', underscore.now(), null)
+      break
+
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
       if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
