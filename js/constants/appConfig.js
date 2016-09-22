@@ -68,6 +68,9 @@ module.exports = {
   crashes: {
     crashSubmitUrl: crashURL
   },
+  payments: {
+    delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10 // 10 days (from firstRunTimestamp)
+  },
   updates: {
     // Check for front end updates every hour
     appUpdateCheckFrequency: 1000 * 60 * 60,
@@ -103,6 +106,7 @@ module.exports = {
     'bookmarks.toolbar.showOnlyFavicon': false,
     'payments.enabled': false,
     'payments.notifications': false,
+    'payments.notificationTryPaymentsDismissed': false, // True if you dismiss the message or enable Payments
     'payments.contribution-amount': 5, // USD
     'privacy.autofill-enabled': true,
     'privacy.do-not-track': false,

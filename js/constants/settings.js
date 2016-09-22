@@ -49,6 +49,7 @@ const settings = {
   // Payments Tab
   PAYMENTS_ENABLED: 'payments.enabled',
   PAYMENTS_NOTIFICATIONS: 'payments.notifications',
+  PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED: 'payments.notificationTryPaymentsDismissed',
   PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
