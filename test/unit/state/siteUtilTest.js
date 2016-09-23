@@ -161,7 +161,9 @@ describe('siteUtil', function () {
           lastAccessedTime: 123,
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
-          title: 'sample'
+          title: 'sample',
+          parentFolderId: 0,
+          partitionNumber: 0
         })
         const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
         const expectedSites = sites.push(siteDetail)
@@ -220,6 +222,45 @@ describe('siteUtil', function () {
         const sites = Immutable.fromJS([oldSiteDetail])
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = Immutable.fromJS([newSiteDetail])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+      it('remove duplicate folder', function () {
+        const sites = Immutable.fromJS([
+          {
+            lastAccessedTime: 123,
+            title: 'folder1',
+            folderId: 1,
+            parentFolderId: 0,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            lastAccessedTime: 123,
+            title: 'folder2',
+            folderId: 2,
+            parentFolderId: 1,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            lastAccessedTime: 123,
+            title: 'bookmark1',
+            parentFolderId: 1,
+            location: testUrl1,
+            tags: [siteTags.BOOKMARK]
+          },
+          {
+            lastAccessedTime: 123,
+            title: 'bookmark2',
+            parentFolderId: 2,
+            location: testUrl2,
+            tags: [siteTags.BOOKMARK]
+          }
+        ])
+        let processedSites = sites
+        sites.forEach((site) => {
+          processedSites = siteUtil.addSite(processedSites, site)
+        })
+        const expectedSites = sites
         // toJS needed because immutable ownerID :(
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
