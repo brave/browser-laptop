@@ -58,7 +58,7 @@ class Window extends React.Component {
     // Possible values for process.platform are:
     // darwin, freebsd, linux, sunos, win32
     // https://nodejs.org/api/process.html#process_process_platform
-    classes['platform--darwin' + process.platform] = true
+    classes['platform--' + process.platform] = true
 
     return <div id='windowContainer' className={cx(classes)} >
       <Main windowState={this.state.immutableData.windowState}
