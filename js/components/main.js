@@ -838,7 +838,8 @@ class Main extends ImmutableComponent {
       !autofillCreditCardPanelIsVisible &&
       !releaseNotesIsVisible &&
       !noScriptIsVisible &&
-      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
+      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail']) &&
+      !customTitlebar.menubarSelectedIndex
 
     return <div id='window'
       className={cx({
@@ -873,7 +874,10 @@ class Main extends ImmutableComponent {
             <div className='navbarMenubarBlockContainer'>
               {
                 customTitlebar.menubarVisible
-                  ? <div className='menubarContainer'>
+                  ? <div className={cx({
+                    allowDragging: shouldAllowWindowDrag,
+                    menubarContainer: true
+                  })}>
                     <Menubar
                       template={customTitlebar.menubarTemplate}
                       selectedIndex={customTitlebar.menubarSelectedIndex}
@@ -944,7 +948,7 @@ class Main extends ImmutableComponent {
           </div>
           {
             customTitlebar.captionButtonsVisible
-              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
+              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} shouldAllowWindowDrag={shouldAllowWindowDrag} />
               : null
           }
         </div>

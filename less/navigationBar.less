@@ -56,9 +56,23 @@
     .loadTime { display: none; }
     #urlInput { max-width: 75px; }
     #titleBar { width: 100px; }
+    .menubarContainer {
+      .menubar {
+        .menubarItem {
+          padding: 0 5px 1px;
+        }
+      }
+    }
   }
   @media (max-width: @breakpointTinyWin32) {
     #urlInput { max-width: 50px; }
+    .menubarContainer {
+      .menubar {
+        .menubarItem {
+          padding: 0 3px 1px;
+        }
+      }
+    }
   }
 }
 
@@ -83,7 +97,15 @@
 // Window Caption Buttons (for use w/ slim titlebar)
 .windowCaptionButtons {
   display: inline-block;
-  -webkit-app-region: drag;
+
+  &.allowDragging {
+    -webkit-app-region: drag;
+    >* {
+      -webkit-app-region: no-drag;
+    }
+  }
+
+  white-space: nowrap;
 
   .hidden {
     display: none;
@@ -111,10 +133,10 @@
       outline: 0;
       height: 18px;
       color: #b1acac;
-      border: 1px solid #838383;
+      border: 1px solid #adadad;
       border-top: 0;
       display: inline-block;
-      background-color: #e0e0e0;
+      background-color: #f5f5f5;
       box-shadow: inset 1px 1px rgba(255, 255, 255, 0.9);
       width: 25px;
 
@@ -122,7 +144,7 @@
         width: 28px;
         border-right: 0px;
         &:hover {
-          background-color: #f5f5f5;
+          background-color: #fff;
         }
         &:active {
           background-color: #cacacb;
@@ -133,7 +155,7 @@
           width: 10px;
           height: 3px;
           border: 1px solid #838383;
-          background: #fefefe;
+          background: #fff;
           display: inline-block;
           border-radius: 1px;
         }
@@ -143,10 +165,10 @@
         border-right: 0px;
         width: 27px;
         &:hover {
-          background-color: #f5f5f5;
+          background-color: #fff;
           .widget {
             .widget2 {
-              background-color: #f5f5f5;
+              background-color: #fff;
             }
           }
         }
@@ -176,7 +198,7 @@
               height: 8px;
               top: -5px;
               left: 6px;
-              background: #fefefe;
+              background: #fff;
               border-radius: 1px;
             }
             .widget3 {
@@ -184,7 +206,7 @@
               width: 2px;
               height: 2px;
               border: 1px solid #838383;
-              background: #fefefe;
+              background: #fff;
               position: relative;
               top: -20px;
               left: -2px;
@@ -197,7 +219,7 @@
             width: 10px;
             height: 8px;
             border: 1px solid #838383;
-            background: #fefefe;
+            background: #fff;
             position: relative;
             top: 2px;
             left: 7px;
@@ -207,7 +229,7 @@
             width: 4px;
             height: 2px;
             border: 1px solid #838383;
-            background-color: #e0e0e0;
+            background-color: #f5f5f5;
             position: relative;
             top: -5px;
             left: 10px;
@@ -269,6 +291,8 @@
           background: black;
           display: inline-block;
           vertical-align: middle;
+          position: relative;
+          left: -1px;
         }
       }
 
@@ -386,8 +410,8 @@
             display: inline-block;
             transform: rotate(315deg);
             position: relative;
-            top: -21px;
-            left: -2px;
+            top: -6px;
+            left: -16px;
           }
           .widget3 { display: none; }
         }
@@ -398,12 +422,18 @@
 
 // Menubar (for use w/ slim titlebar)
 .menubarContainer {
-  -webkit-app-region: drag;
   width: 100%;
   height: 29px;
   display: inline-block;
   margin-top: 5px;
   margin-left: 4px;
+
+  &.allowDragging {
+    -webkit-app-region: drag;
+    >* {
+      -webkit-app-region: no-drag;
+    }
+  }
 
   .menubar {
     display: inline-block;

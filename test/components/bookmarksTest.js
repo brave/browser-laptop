@@ -25,9 +25,9 @@ describe('bookmarks', function () {
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(this.page1Url)
         .windowParentByUrl(this.page1Url)
+        .waitForVisible(navigator)
         .moveToObject(navigator)
-        .waitForExist(navigatorNotBookmarked)
-        .moveToObject(navigator)
+        .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
         .waitForVisible(saveButton)
     })
@@ -49,6 +49,7 @@ describe('bookmarks', function () {
         yield this.app.client
           .click(saveButton)
       })
+
       it('displays title', function * () {
         yield this.app.client
           .waitUntil(function () {
@@ -60,8 +61,11 @@ describe('bookmarks', function () {
       describe('and then removed', function () {
         before(function * () {
           yield this.app.client
+            .waitForVisible(navigator)
+            .moveToObject(navigator)
+            .waitForVisible(navigatorNotBookmarked)
             .click(navigatorNotBookmarked)
-            .waitForExist(deleteButton)
+            .waitForVisible(deleteButton)
             .click(deleteButton)
         })
         it('removes the bookmark from the toolbar', function * () {

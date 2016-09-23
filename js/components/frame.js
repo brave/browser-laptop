@@ -119,7 +119,6 @@ class Frame extends ImmutableComponent {
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
         guids.forEach((entry) => {
-          console.log(entry)
           const address = currentWindow.webContents.session.autofill.getProfile(entry)
           const valid = Object.getOwnPropertyNames(address).length > 0
           let addressDetail = {
@@ -541,8 +540,10 @@ class Frame extends ImmutableComponent {
    *   can either be main frame or subframe.
    * @param {function=} noFlashCallback - Optional callback to run if Flash is not
    *   installed
+   * @param {function=} flashCallback - Optional callback to run if Flash is
+   *   accepted
    */
-  showFlashNotification (origin, noFlashCallback) {
+  showFlashNotification (origin, noFlashCallback, flashCallback) {
     if (!origin || !UrlUtil.shouldInterceptFlash(origin)) {
       noFlashCallback()
       return
@@ -572,6 +573,9 @@ class Frame extends ImmutableComponent {
             appActions.changeSiteSetting(this.origin, 'flash', Date.now() + 7 * 24 * 1000 * 3600)
           } else {
             appActions.changeSiteSetting(this.origin, 'flash', 1)
+          }
+          if (flashCallback) {
+            flashCallback()
           }
         } else {
           if (persist) {
@@ -763,7 +767,7 @@ class Frame extends ImmutableComponent {
       method.apply(this, e.args)
     })
 
-    const interceptFlash = (stopCurrentLoad, adobeUrl) => {
+    const interceptFlash = (stopCurrentLoad, adobeUrl, redirectUrl) => {
       if (!this.origin) {
         return
       }
@@ -780,6 +784,10 @@ class Frame extends ImmutableComponent {
       this.showFlashNotification(this.origin, () => {
         if (stopCurrentLoad && adobeUrl) {
           windowActions.loadUrl(this.frame, adobeUrl)
+        }
+      }, () => {
+        if (redirectUrl) {
+          windowActions.loadUrl(this.frame, redirectUrl)
         }
       })
     }
@@ -838,7 +846,7 @@ class Frame extends ImmutableComponent {
       if (hack && hack.enableFlashCTP &&
           !this.webview.allowRunningPlugins && this.props.flashInitialized) {
         // Fix #3011
-        interceptFlash(false)
+        interceptFlash(false, undefined, hack.redirectURL)
       }
     }
     const loadFail = (e, provisionLoadFailure = false) => {
@@ -927,8 +935,10 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
-      windowActions.setNavigated(e.url, this.props.frameKey, true)
-      loadEnd(true)
+      if (e.isMainFrame) {
+        windowActions.setNavigated(e.url, this.props.frameKey, true)
+        loadEnd(true)
+      }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
       windowActions.setFullScreen(this.frame, true, true)

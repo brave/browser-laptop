@@ -9,6 +9,8 @@ const Button = require('./button')
 const SwitchControl = require('./switchControl')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
+const ipc = global.require('electron').ipcRenderer
+const messages = require('../constants/messages')
 
 class ClearBrowsingDataPanel extends ImmutableComponent {
   constructor () {
@@ -28,6 +30,11 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
   onClear () {
     appActions.clearAppData(this.props.clearBrowsingDataDetail)
     this.props.onHide()
+    let detail = this.props.clearBrowsingDataDetail
+    if (detail.get('allSiteCookies') && detail.get('browserHistory') &&
+        detail.get('cachedImagesAndFiles')) {
+      ipc.send(messages.PREFS_RESTART)
+    }
   }
   render () {
     return <Dialog onHide={this.props.onHide} className='clearBrowsingDataPanel' isClickDismiss>

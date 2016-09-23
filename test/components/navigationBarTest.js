@@ -107,6 +107,30 @@ describe('navigationBar', function () {
       })
     })
 
+    describe('iframe navigation', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = Brave.server.url('in_page_nav.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+      })
+
+      it('location does not change', function * () {
+        var page1 = Brave.server.url('in_page_nav.html')
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === page1
+            })
+          })
+      })
+    })
+
     describe('page with a title', function () {
       Brave.beforeAll(this)
 

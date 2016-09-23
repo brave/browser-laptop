@@ -17,7 +17,7 @@ describe('about:adblock', function () {
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="1"]')
       .tabByIndex(0)
-      .url(url)
+      .loadUrl(url)
   })
 
   it('lists adblock count', function * () {

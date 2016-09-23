@@ -341,6 +341,28 @@ module.exports.loadAppState = () => {
           })
           data.autofill.creditCards = creditCards
         }
+        if (data.autofill.addresses.guid) {
+          let guids = []
+          data.autofill.addresses.guid.forEach((guid) => {
+            if (typeof guid === 'object') {
+              guids.push(guid['persist:default'])
+            } else {
+              guids.push(guid)
+            }
+          })
+          data.autofill.addresses.guid = guids
+        }
+        if (data.autofill.creditCards.guid) {
+          let guids = []
+          data.autofill.creditCards.guid.forEach((guid) => {
+            if (typeof guid === 'object') {
+              guids.push(guid['persist:default'])
+            } else {
+              guids.push(guid)
+            }
+          })
+          data.autofill.creditCards.guid = guids
+        }
       }
       // xml migration
       if (data.settings) {
@@ -356,9 +378,6 @@ module.exports.loadAppState = () => {
         module.exports.cleanAppData(data, false)
       }
       data = Object.assign(module.exports.defaultAppState(), data)
-      if (!data.firstRunTimestamp) {
-        data.firstRunTimestamp = new Date().getTime()
-      }
       data.cleanedOnShutdown = false
       // Always recalculate the update status
       if (data.updates) {
@@ -393,6 +412,7 @@ module.exports.loadAppState = () => {
  */
 module.exports.defaultAppState = () => {
   return {
+    firstRunTimestamp: new Date().getTime(),
     sites: [],
     tabs: [],
     extensions: {},

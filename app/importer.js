@@ -10,7 +10,7 @@ const dialog = electron.dialog
 const BrowserWindow = electron.BrowserWindow
 const session = electron.session
 const Immutable = require('immutable')
-const showImportWarning = require('./aboutDialog').showImportWarning
+const { showImportWarning, showImportSuccess } = require('./aboutDialog')
 const siteUtil = require('../js/state/siteUtil')
 const AppStore = require('../js/stores/appStore')
 const siteTags = require('../js/constants/siteTags')
@@ -178,4 +178,11 @@ importer.on('add-cookies', (e, cookies) => {
 
 importer.on('show-warning-dialog', (e) => {
   showImportWarning()
+})
+
+importer.on('import-success', (e) => {
+  showImportSuccess()
+})
+
+importer.on('import-dismiss', (e) => {
 })

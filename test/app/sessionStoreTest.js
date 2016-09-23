@@ -64,10 +64,6 @@ describe('sessionStore', function () {
   describe('firstRunTimestamp', function () {
     Brave.beforeAllServerSetup(this)
     before(function * () {
-      // AY: Why do I need to start, stop and start for this to work properly?
-      yield Brave.startApp()
-      yield setup(Brave.app.client)
-      yield Brave.stopApp(false)
       yield Brave.startApp()
       yield setup(Brave.app.client)
     })

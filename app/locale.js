@@ -217,7 +217,8 @@ var rendererIdentifiers = function () {
     'windowCaptionButtonMaximize',
     'windowCaptionButtonRestore',
     'windowCaptionButtonClose',
-    'closeFirefoxWarning'
+    'closeFirefoxWarning',
+    'importSuccess'
   ]
 }
 

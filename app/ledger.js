@@ -110,7 +110,24 @@ let notificationTimeout = null
 const doAction = (action) => {
   var i, publisher
 
+/* TBD: handle
+
+    { actionType: "window-set-blocked-by"
+    , frameProps:
+      { audioPlaybackActive: true
+        ...
+      }
+    , ...
+    }
+ */
+  if (publisherInfo._internal.verboseP) {
+    console.log('\napplication event: ' + JSON.stringify(underscore.pick(action, [ 'actionType', 'key' ]), null, 2))
+  }
   switch (action.actionType) {
+    case appConstants.APP_IDLE_STATE_CHANGED:
+      visit('NOOP', underscore.now(), null)
+      break
+
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
       if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
@@ -122,6 +139,7 @@ const doAction = (action) => {
           i = action.hostPattern.indexOf('://')
           if (i !== -1) {
             publisher = action.hostPattern.substr(i + 3)
+            if (publisherInfo._internal.verboseP) console.log('\npurging ' + publisher)
             delete synopsis.publishers[publisher]
             delete publishers[publisher]
             updatePublisherInfo()
@@ -456,10 +474,30 @@ var enable = (onoff) => {
 
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
+    var initSynopsis = () => {
+      // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
+      if (process.env.NODE_ENV === 'test') {
+        synopsis.options.minDuration = 0
+        synopsis.options.minPublisherDuration = 0
+        synopsis.options.minPublisherVisits = 0
+      } else {
+        if (process.env.LEDGER_PUBLISHER_VISIT_DURATION) {
+          synopsis.options.minDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_VISIT_DURATION)
+        }
+        if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
+          synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
+        }
+        if (process.env.LEDGER_PUBLISHER_MIN_VISITS) {
+          synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
+        }
+      }
+    }
+
     if (publisherInfo._internal.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
       if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
+      initSynopsis()
       return updatePublisherInfo()
     }
 
@@ -469,22 +507,7 @@ var enable = (onoff) => {
     } catch (ex) {
       console.log('synopsisPath parse error: ' + ex.toString())
     }
-    // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
-    if (process.env.NODE_ENV === 'test') {
-      synopsis.options.minDuration = 0
-      synopsis.options.minPublisherDuration = 0
-      synopsis.options.minPublisherVisits = 0
-    } else {
-      if (process.env.LEDGER_PUBLISHER_VISIT_DURATION) {
-        synopsis.options.minDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_VISIT_DURATION)
-      }
-      if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
-        synopsis.options.minPublisherDuration = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
-      }
-      if (process.env.LEDGER_PUBLISHER_MIN_VISITS) {
-        synopsis.options.minPublisherVisits = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_VISITS)
-      }
-    }
+    initSynopsis()
     underscore.keys(synopsis.publishers).forEach((publisher) => {
       if (synopsis.publishers[publisher].faviconURL === null) delete synopsis.publishers[publisher].faviconURL
     })
@@ -771,9 +794,7 @@ var ledgerInfo = {
   creating: false,
   created: false,
 
-  delayStamp: undefined,
   reconcileStamp: undefined,
-  reconcileDelay: undefined,
 
   transactions:
   [
@@ -1062,9 +1083,7 @@ var getStateInfo = (state) => {
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
 
-  ledgerInfo.delayStamp = state.delayStamp
   ledgerInfo.reconcileStamp = state.reconcileStamp
-  ledgerInfo.reconcileDelay = state.prepareTransaction && state.delayStamp
 
   if (info) {
     ledgerInfo._internal.paymentInfo = info
@@ -1291,11 +1310,8 @@ var syncWriter = (path, obj, options, cb) => {
 
 var pathName = (name) => {
   var parts = path.parse(name)
-  var basePath = process.env.NODE_ENV === 'test'
-    ? path.join(process.env.HOME, '.brave-test-ledger')
-    : app.getPath('userData')
 
-  return path.join(basePath, parts.name + parts.ext)
+  return path.join(app.getPath('userData'), parts.name + parts.ext)
 }
 
 /**
