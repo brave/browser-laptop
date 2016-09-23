@@ -6,6 +6,20 @@
 
 * * *
 
+### onDispatchComplete(cb) 
+
+Calls the supplied callback function when dispatching is complete for all stores. This
+method does not wait for UI or other updates that are triggered as a result of the
+state changes triggered by the action
+
+Usage: appActions.onDispatchComplete(fn).newWindow(...)
+
+**Parameters**
+
+**cb**: `function`, Callback
+
+
+
 ### setState(appState) 
 
 Dispatches an event to the main process to replace the app state
