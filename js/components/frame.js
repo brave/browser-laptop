@@ -119,7 +119,6 @@ class Frame extends ImmutableComponent {
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
         guids.forEach((entry) => {
-          console.log(entry)
           const address = currentWindow.webContents.session.autofill.getProfile(entry)
           const valid = Object.getOwnPropertyNames(address).length > 0
           let addressDetail = {
