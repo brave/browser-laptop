@@ -26,11 +26,29 @@ module.exports = { "providers" :
       "shortcut" : "d"
     },
     {
+      "name" : "GitHub",
+      "image" : "https://assets-cdn.github.com/favicon.ico",
+      "search" : "https://github.com/search?q={searchTerms}",
+      "shortcut" : "gh"
+    },
+    {
       "name" : "Google",
       "image" : "https://www.google.com/favicon.ico",
       "search" : "https://www.google.com/search?q={searchTerms}",
       "autocomplete" : "https://suggestqueries.google.com/complete/search?client=chrome&q={searchTerms}",
       "shortcut" : "g"
+    },
+    {
+      "name" : "Stack Overflow",
+      "image" : "https://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico",
+      "search" : "https://stackoverflow.com/search?q={searchTerms}",
+      "shortcut" : "s"
+    },
+    {
+      "name" : "Mozilla Developer Network (MDN)",
+      "image" : "https://developer.cdn.mozilla.net/static/img/favicon32.png",
+      "search" : "https://developer.mozilla.org/search?q={searchTerms}",
+      "shortcut" : "m"
     },
     {
       "name" : "Twitter",
