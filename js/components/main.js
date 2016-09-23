@@ -843,7 +843,8 @@ class Main extends ImmutableComponent {
 
     return <div id='window'
       className={cx({
-        isFullScreen: this.props.windowState.getIn(['ui', 'isFullScreen']),
+        isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
+        isWindowFullScreen: this.props.windowState.getIn(['ui', 'isFullScreen']),
         frameless: customTitlebar.captionButtonsVisible,
         visible: this.props.windowState.getIn(['ui', 'isFullScreen']) &&
          (

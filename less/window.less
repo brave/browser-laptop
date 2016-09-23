@@ -32,6 +32,12 @@ html,
   height: 100%;
   overflow: hidden;
   width: 100%;
+
+  &.isFullScreen {
+     .top, .downloadsBar, .hrefPreview {
+       display: none;
+     }
+   }
 }
 
 #windowContainer {
@@ -41,7 +47,7 @@ html,
 
   .platform--linux, .platform--win32 {
     #window {
-      &.isFullScreen {
+      &.isWindowFullScreen {
         .top, .downloadsBar, .hrefPreview {
           transition: all 0.4s ease-out;
           opacity: 0;
