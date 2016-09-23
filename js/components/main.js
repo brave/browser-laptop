@@ -60,12 +60,12 @@ const FrameStateUtil = require('../state/frameStateUtil')
 const searchProviders = require('../data/searchProviders')
 
 // Util
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
 const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const currentWindow = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
@@ -866,78 +866,81 @@ class Main extends ImmutableComponent {
       <div className='top'>
         <div className='navbarCaptionButtonContainer'>
           <div className='navbarMenubarFlexContainer'>
-            <div className='navbarMenubarBlockContainer'>
-              {
-                customTitlebar.menubarVisible
-                  ? <div className={cx({
-                    allowDragging: shouldAllowWindowDrag,
-                    menubarContainer: true
-                  })}>
-                    <Menubar
-                      template={customTitlebar.menubarTemplate}
-                      selectedIndex={customTitlebar.menubarSelectedIndex}
-                      contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-                      autohide={getSetting(settings.AUTO_HIDE_MENU)}
-                      lastFocusedSelector={customTitlebar.lastFocusedSelector} />
-                  </div>
-                  : null
-              }
-              <div className='navigatorWrapper'
-                onDoubleClick={this.onDoubleClick}
-                onDragOver={this.onDragOver}
-                onDrop={this.onDrop}>
-                <div className='backforward'>
-                  <LongPressButton
-                    l10nId='backButton'
-                    className='back fa fa-angle-left'
-                    disabled={!activeFrame || !activeFrame.get('canGoBack')}
-                    onClick={this.onBack}
-                    onLongPress={this.onBackLongPress}
-                  />
-                  <LongPressButton
-                    l10nId='forwardButton'
-                    className='forward fa fa-angle-right'
-                    disabled={!activeFrame || !activeFrame.get('canGoForward')}
-                    onClick={this.onForward}
-                    onLongPress={this.onForwardLongPress}
-                  />
+            {
+              customTitlebar.menubarVisible
+                ? <div className='menubarContainer'>
+                  <Menubar
+                    template={customTitlebar.menubarTemplate}
+                    selectedIndex={customTitlebar.menubarSelectedIndex}
+                    contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+                    autohide={getSetting(settings.AUTO_HIDE_MENU)}
+                    lastFocusedSelector={customTitlebar.lastFocusedSelector} />
+                  <div className={cx({
+                    deadArea: true,
+                    allowDragging: shouldAllowWindowDrag
+                  })} />
                 </div>
-                <NavigationBar
-                  ref={(node) => { this.navBar = node }}
-                  navbar={activeFrame && activeFrame.get('navbar')}
-                  frames={this.props.windowState.get('frames')}
-                  sites={this.props.appState.get('sites')}
-                  activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
-                  location={activeFrame && activeFrame.get('location') || ''}
-                  title={activeFrame && activeFrame.get('title') || ''}
-                  scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-                  partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
-                  history={activeFrame && activeFrame.get('history') || emptyList}
-                  suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
-                  isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
-                  locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
-                  startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
-                  endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
-                  loading={activeFrame && activeFrame.get('loading')}
-                  mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-                  searchDetail={this.props.windowState.get('searchDetail')}
-                  enableNoScript={this.enableNoScript(activeSiteSettings)}
-                  settings={this.props.appState.get('settings')}
-                  noScriptIsVisible={noScriptIsVisible}
+                : null
+            }
+            <div className='navigatorWrapper'
+              onDoubleClick={this.onDoubleClick}
+              onDragOver={this.onDragOver}
+              onDrop={this.onDrop}>
+              <div className='backforward'>
+                <LongPressButton
+                  l10nId='backButton'
+                  className='back fa fa-angle-left'
+                  disabled={!activeFrame || !activeFrame.get('canGoBack')}
+                  onClick={this.onBack}
+                  onLongPress={this.onBackLongPress}
                 />
-                <div className='topLevelEndButtons'>
-                  {
-                    this.extensionButtons
-                  }
-                  <Button iconClass='braveMenu'
-                    l10nId='braveMenu'
-                    className={cx({
-                      navbutton: true,
-                      braveShieldsDisabled,
-                      braveShieldsDown: !braverySettings.shieldsUp
-                    })}
-                    onClick={this.onBraveMenu} />
-                </div>
+                <LongPressButton
+                  l10nId='forwardButton'
+                  className='forward fa fa-angle-right'
+                  disabled={!activeFrame || !activeFrame.get('canGoForward')}
+                  onClick={this.onForward}
+                  onLongPress={this.onForwardLongPress}
+                />
+              </div>
+              <NavigationBar
+                ref={(node) => { this.navBar = node }}
+                navbar={activeFrame && activeFrame.get('navbar')}
+                frames={this.props.windowState.get('frames')}
+                sites={this.props.appState.get('sites')}
+                activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+                location={activeFrame && activeFrame.get('location') || ''}
+                title={activeFrame && activeFrame.get('title') || ''}
+                scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
+                partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
+                history={activeFrame && activeFrame.get('history') || emptyList}
+                suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
+                isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
+                locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
+                startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
+                endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
+                loading={activeFrame && activeFrame.get('loading')}
+                mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
+                searchDetail={this.props.windowState.get('searchDetail')}
+                enableNoScript={this.enableNoScript(activeSiteSettings)}
+                settings={this.props.appState.get('settings')}
+                noScriptIsVisible={noScriptIsVisible}
+              />
+              <div className='topLevelEndButtons'>
+                <div className={cx({
+                  deadArea: true,
+                  allowDragging: shouldAllowWindowDrag
+                })} />
+                {
+                  this.extensionButtons
+                }
+                <Button iconClass='braveMenu'
+                  l10nId='braveMenu'
+                  className={cx({
+                    navbutton: true,
+                    braveShieldsDisabled,
+                    braveShieldsDown: !braverySettings.shieldsUp
+                  })}
+                  onClick={this.onBraveMenu} />
               </div>
             </div>
           </div>

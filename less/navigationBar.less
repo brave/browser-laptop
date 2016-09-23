@@ -31,25 +31,21 @@
 
 // Windows specific fixes
 .platform--win32 {
-  .navigatorWrapper {
-    margin-left: @navbarLeftMarginWindows;
-  }
-
   div#window.frameless {
     border: 1px solid #000;
     box-sizing: border-box;
   }
 
-  // Extension button not clickable unless it has no-drag
-  .extensionButton {
-    -webkit-app-region: no-drag !important;
+  .navbarMenubarFlexContainer {
+    padding-left: 5px;
+    padding-top: 5px;
   }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
   @media (max-width: @breakpointExtensionButtonPadding) {
-    .navigatorWrapper .topLevelEndButtons {
-      margin-left: 0;
+    .navigatorWrapper .topLevelEndButtons .deadArea {
+      width: 0;
     }
   }
   @media (max-width: @breakpointSmallWin32) {
@@ -84,6 +80,7 @@
 .navbarMenubarFlexContainer {
   display: flex;
   flex: 1;
+  flex-direction: column;
   box-sizing: border-box;
   position: relative;
   overflow: visible;
@@ -96,23 +93,13 @@
 
 // Window Caption Buttons (for use w/ slim titlebar)
 .windowCaptionButtons {
-  display: inline-block;
-
-  &.allowDragging {
-    -webkit-app-region: drag;
-    >* {
-      -webkit-app-region: no-drag;
-    }
-  }
+  display: flex;
+  flex-direction: column;
 
   white-space: nowrap;
 
   .hidden {
     display: none;
-  }
-
-  .container {
-    -webkit-app-region: no-drag;
   }
 
   button.captionButton {
@@ -124,6 +111,11 @@
     .win7 {
       margin-top: 1px;
     }
+  }
+
+  .container {
+    display: flex;
+    flex-grow: 0;
   }
 
   .win7 {
@@ -418,27 +410,30 @@
       }
     }
   }
+
+  .deadArea {
+    display: flex;
+    flex-grow:1;
+    &.allowDragging {
+      -webkit-app-region: drag;
+      >* {
+        -webkit-app-region: no-drag;
+      }
+    }
+  }
 }
 
 // Menubar (for use w/ slim titlebar)
 .menubarContainer {
   width: 100%;
-  height: 29px;
-  display: inline-block;
-  margin-top: 5px;
-  margin-left: 4px;
-
-  &.allowDragging {
-    -webkit-app-region: drag;
-    >* {
-      -webkit-app-region: no-drag;
-    }
-  }
+  display: flex;
+  flex-direction: row;
 
   .menubar {
-    display: inline-block;
+    display: flex;
     cursor: default;
     -webkit-user-select: none;
+    flex-grow: 0;
 
     .menubarItem {
       color: black;
@@ -457,6 +452,17 @@
     .selected {
       background-color: #cce8ff !important;
       border: 1px solid #99d1ff !important;
+    }
+  }
+  .deadArea {
+    display: flex;
+    flex-grow: 1;
+
+    &.allowDragging {
+      -webkit-app-region: drag;
+      >* {
+        -webkit-app-region: no-drag;
+      }
     }
   }
 }
@@ -522,7 +528,7 @@
   // Buttons on the right
   .topLevelEndButtons {
     display: flex;
-    margin-left: @navbarBraveButtonMarginLeft;
+    flex-direction: row;
 
     .braveMenu {
       width: @navbarBraveButtonWidth;
@@ -543,13 +549,25 @@
         opacity: 0.4;
       }
     }
+
+    .deadArea {
+      display: flex;
+      flex-grow: 0;
+      width: @navbarBraveButtonMarginLeft;
+
+      &.allowDragging {
+        -webkit-app-region: drag;
+        >* {
+          -webkit-app-region: no-drag;
+        }
+      }
+    }
   }
 }
 
 
 .navigatorWrapper {
   justify-content: space-between;
-  -webkit-app-region: drag;
   align-items: center;
   height: @navbarHeight;
   box-sizing: border-box;
