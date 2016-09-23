@@ -7,6 +7,7 @@ const React = require('react')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const locale = require('../../../js/l10n')
 const currentWindow = require('../currentWindow')
+const cx = require('../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {
   constructor () {
@@ -18,8 +19,10 @@ class WindowCaptionButtons extends ImmutableComponent {
     this.osClass = this.getPlatformCssClass()
   }
 
-  get buttonClass () {
-    return (this.props.windowMaximized ? 'fullscreen' : '')
+  get maximizeTitle () {
+    return this.props.windowMaximized
+      ? 'windowCaptionButtonRestore'
+      : 'windowCaptionButtonMaximize'
   }
 
   getPlatformCssClass () {
@@ -55,26 +58,56 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   render () {
-    return <div className={this.buttonClass + ' windowCaptionButtons' + (this.props.shouldAllowWindowDrag ? ' allowDragging' : '')}>
+    return <div className={cx({
+        fullscreen: this.props.windowMaximized,
+        windowCaptionButtons: true
+      })}>
       <div className={'container ' + this.osClass}>
         <button
-          className={this.buttonClass + ' captionButton minimize'}
+          className={cx({
+            fullscreen: this.props.windowMaximized,
+            captionButton: true,
+            minimize: true
+          })}
           onClick={this.onMinimizeClick}
           title={locale.translation('windowCaptionButtonMinimize')}>
           <div className='widget' />
         </button>
         <button
-          className={this.buttonClass + ' captionButton maximize'}
+          className={cx({
+            fullscreen: this.props.windowMaximized,
+            captionButton: true,
+            maximize: true
+          })}
           onClick={this.onMaximizeClick}
-          title={locale.translation(this.props.windowMaximized ? 'windowCaptionButtonRestore' : 'windowCaptionButtonMaximize')}>
-          <div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /><div className='widget4' /><div className='widget5' /></div>
+          title={locale.translation(this.maximizeTitle)}>
+          <div className='widget'>
+            <div className='widget1' />
+            <div className='widget2' />
+            <div className='widget3' />
+            <div className='widget4' />
+            <div className='widget5' />
+          </div>
         </button>
         <button
-          className={this.buttonClass + ' captionButton close'}
+          className={cx({
+            fullscreen: this.props.windowMaximized,
+            captionButton: true,
+            close: true
+          })}
           onClick={this.onCloseClick}
           title={locale.translation('windowCaptionButtonClose')}>
-          <div className='widget'><div className='widget1' /><div className='widget2' /><div className='widget3' /></div>
+          <div className='widget'>
+            <div className='widget1' />
+            <div className='widget2' />
+            <div className='widget3' />
+          </div>
         </button>
+      </div>
+      <div className={cx({
+        deadArea: true,
+        allowDragging: this.props.shouldAllowWindowDrag
+      })}>
       </div>
     </div>
   }
