@@ -1034,7 +1034,7 @@ class Main extends ImmutableComponent {
             draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
-            shouldAllowWindowDrag={shouldAllowWindowDrag}
+            shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
             activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
             windowWidth={window.innerWidth}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
@@ -1043,7 +1043,7 @@ class Main extends ImmutableComponent {
         }
         <div className={cx({
           tabPages: true,
-          allowDragging: shouldAllowWindowDrag,
+          allowDragging: shouldAllowWindowDrag && !isWindows,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
           onContextMenu={this.onTabContextMenu}>
@@ -1058,7 +1058,7 @@ class Main extends ImmutableComponent {
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
-          shouldAllowWindowDrag={shouldAllowWindowDrag}
+          shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}

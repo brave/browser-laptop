@@ -157,12 +157,14 @@
 
 
 // Make context menu style match menubar (Windows only- for use w/ slim titlebar)
-.platform--win32 .contextMenuItem {
-  font: menu;
-  font-size: 12px;
-}
+.platform--win32 {
+  .contextMenuItem {
+    font: menu;
+    font-size: 12px;
+  }
 
-.platform--win32 .accelerator {
-  font: menu;
-  font-size: 12px !important;
+  .accelerator {
+    font: menu;
+    font-size: 12px !important;
+  }
 }
