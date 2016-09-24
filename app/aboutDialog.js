@@ -21,7 +21,7 @@ ${locale.translation('updateChannel')}: ${Channel.channel()}
 
 ${locale.translation('licenseText')}`,
       icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
-      buttons: ['Ok']
+      buttons: [locale.translation('licenseTextOk')]
     })
   }, 50)
 }
@@ -35,7 +35,7 @@ module.exports.showImportWarning = function () {
       title: 'Brave',
       message: `${locale.translation('closeFirefoxWarning')}`,
       icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
-      buttons: ['Ok']
+      buttons: [locale.translation('closeFirefoxWarningOk')]
     })
   }, 50)
 }
@@ -49,7 +49,7 @@ module.exports.showImportSuccess = function () {
       title: 'Brave',
       message: `${locale.translation('importSuccess')}`,
       icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
-      buttons: ['Ok']
+      buttons: [locale.translation('importSuccessOk')]
     })
   }, 50)
 }
