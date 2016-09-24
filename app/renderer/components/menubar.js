@@ -10,26 +10,33 @@ const separatorMenuItem = require('../../common/commonMenu').separatorMenuItem
 const keyCodes = require('../../../js/constants/keyCodes')
 const { wrappingClamp } = require('../../common/lib/formatUtil')
 
+const bindClickHandler = (contextMenu, lastFocusedSelector) => {
+  if (contextMenu.type === separatorMenuItem.type) {
+    return contextMenu
+  }
+  contextMenu.click = function (e) {
+    e.preventDefault()
+    if (lastFocusedSelector) {
+      // Send focus back to the active web frame
+      const results = document.querySelectorAll(lastFocusedSelector)
+      if (results.length === 1) results[0].focus()
+    }
+    windowActions.clickMenubarSubmenu(contextMenu.label)
+  }
+  if (contextMenu.submenu) {
+    contextMenu.submenu = contextMenu.submenu.map((submenuItem) => {
+      return bindClickHandler(submenuItem, lastFocusedSelector)
+    })
+  }
+  return contextMenu
+}
+
 const showContextMenu = (rect, submenu, lastFocusedSelector) => {
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: rect.left,
     top: rect.bottom,
     template: submenu.map((submenuItem) => {
-      if (submenuItem.type === separatorMenuItem.type) {
-        return submenuItem
-      }
-      submenuItem.click = function (e) {
-        e.preventDefault()
-        if (lastFocusedSelector) {
-          // Send focus back to the active web frame
-          const results = document.querySelectorAll(lastFocusedSelector)
-          if (results.length === 1) {
-            results[0].focus()
-          }
-        }
-        windowActions.clickMenubarSubmenu(submenuItem.label)
-      }
-      return submenuItem
+      return bindClickHandler(submenuItem, lastFocusedSelector)
     })
   }))
 }
