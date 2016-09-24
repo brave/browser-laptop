@@ -471,6 +471,7 @@ class PaymentHistory extends ImmutableComponent {
           <tr>
             <th className='sort-header' data-l10n-id='date' />
             <th className='sort-header' data-l10n-id='totalAmount' />
+            <th className='sort-header' data-l10n-id='receiptLink' />
           </tr>
         </thead>
         <tbody>
@@ -523,10 +524,12 @@ class PaymentHistoryRow extends ImmutableComponent {
   render () {
     var date = this.formattedDate
     var totalAmountStr = `${this.totalAmount} ${this.currency}`
+    var receiptFileName = `brave_ledger${this.numericDateStr}.csv`
 
     return <tr>
-      <td data-sort={this.timestamp}>{date}</td>
-      <td data-sort={this.satoshis}>{totalAmountStr}</td>
+      <td className='narrow' data-sort={this.timestamp}>{date}</td>
+      <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
+      <td className='wide'>{receiptFileName}</td>
     </tr>
   }
 }
