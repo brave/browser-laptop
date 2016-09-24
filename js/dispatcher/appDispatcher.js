@@ -5,23 +5,13 @@
 const Serializer = require('./serializer')
 const messages = require('../constants/messages')
 const electron = process.type === 'renderer' ? global.require('electron') : require('electron')
-const uuid = require('uuid').v4
-
 'use strict'
-
-const serializePayload = (payload, dispatchId = null) => {
-  if (dispatchId && !payload.dispatchId) {
-    payload.dispatchId = dispatchId
-  }
-  return Serializer.serialize(payload)
-}
 
 class AppDispatcher {
 
   constructor () {
-    this.callbacks = {}
-    this.promises = {}
-    this.notifyOnDispatchCompleteFn = null
+    this.callbacks = []
+    this.promises = []
   }
 
   /**
@@ -32,21 +22,20 @@ class AppDispatcher {
    * @param {function} callback The callback to be registered.
    * @return {number} The index of the callback within the _callbacks array.
    */
-  register (callback, token = uuid()) {
+  register (callback) {
     if (process.type === 'renderer') {
       const ipc = electron.ipcRenderer
-      ipc.send('app-dispatcher-register', token)
+      ipc.send('app-dispatcher-register')
     }
-    this.callbacks[token] = callback
-    return token
+    this.callbacks.push(callback)
+    return this.callbacks.length - 1 // index
   }
 
-  unregister (token) {
-    if (process.type === 'renderer') {
-      const ipc = electron.ipcRenderer
-      ipc.send('app-dispatcher-unregister', token)
+  unregister (callback) {
+    const index = this.callbacks.indexOf(callback)
+    if (index !== -1) {
+      this.callbacks.splice(index, 1)
     }
-    delete this.callbacks[token]
   }
 
   /**
@@ -62,61 +51,31 @@ class AppDispatcher {
     if (payload.actionType === undefined) {
       throw new Error('Dispatcher: Undefined action for payload', payload)
     }
-
-    // First create map of promises for callbacks to reference.
-    const resolves = {}
-    const rejects = {}
-    for (var token in this.callbacks) {
-      this.promises[token] = new Promise(function (resolve, reject) {
-        resolves[token] = resolve
-        rejects[token] = reject
+    // First create array of promises for callbacks to reference.
+    const resolves = []
+    const rejects = []
+    this.promises = this.callbacks.map(function (_, i) {
+      return new Promise(function (resolve, reject) {
+        resolves[i] = resolve
+        rejects[i] = reject
       })
-    }
-
-    let dispatchId = uuid()
-
-    if (this.notifyOnDispatchCompleteFn && process.type === 'renderer') {
-      let cb = this.notifyOnDispatchCompleteFn
-      const ipc = electron.ipcRenderer
-      // wait for all the local handlers
-      let dispatchedCallback = (evt, dispatchedActionId) => {
-        // in the renderer process we only have to wait
-        // for the main process
-        if (dispatchId === dispatchedActionId) {
-          this.waitFor(Object.keys(this.promises), cb)
-          ipc.removeListener('app-dispatcher-action-dispatched', dispatchedCallback)
-        }
-      }
-      ipc.on('app-dispatcher-action-dispatched', dispatchedCallback)
-    }
-
+    })
     // Dispatch to callbacks and resolve/reject promises.
-    for (token in this.callbacks) {
-      let callback = this.callbacks[token]
+    this.callbacks.forEach(function (callback, i) {
       // Callback can return an obj, to resolve, or a promise, to chain.
       // See waitFor() for why this might be useful.
       Promise.resolve(callback(payload)).then(function () {
-        resolves[token](payload)
+        resolves[i](payload)
       }, function () {
-        rejects[token](new Error('Dispatcher callback unsuccessful'))
+        rejects[i](new Error('Dispatcher callback unsuccessful'))
       })
-    }
+    })
+    this.promises = []
 
     if (process.type === 'renderer') {
       const ipc = electron.ipcRenderer
-      ipc.send(messages.DISPATCH_ACTION, serializePayload(payload, dispatchId), !!this.notifyOnDispatchCompleteFn)
+      ipc.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
     }
-
-    this.promises = {}
-
-    return dispatchId
-  }
-
-  notifyOnDispatchComplete (fn, cb) {
-    this.notifyOnDispatchCompleteFn = cb
-    const returnVal = fn()
-    this.notifyOnDispatchCompleteFn = null
-    return returnVal
   }
 
   waitFor (promiseIndexes, callback) {
@@ -130,57 +89,49 @@ const appDispatcher = new AppDispatcher()
 if (process.type === 'browser') {
   const electron = require('electron')
   const ipcMain = electron.ipcMain
-  ipcMain.on('app-dispatcher-unregister', (event, token) => {
-    appDispatcher.unregister(token)
-  })
-  ipcMain.on('app-dispatcher-register', (event, token) => {
+  ipcMain.on('app-dispatcher-register', (event) => {
     let registrant = event.sender
     const callback = function (payload) {
       try {
         if (registrant.isDestroyed()) {
-          appDispatcher.unregister(token)
+          appDispatcher.unregister(callback)
         } else {
-          registrant.send(messages.DISPATCH_ACTION, serializePayload(payload))
+          registrant.send(messages.DISPATCH_ACTION, Serializer.serialize(payload))
         }
       } catch (e) {
         console.error('unregistering callback', e)
-        appDispatcher.unregister(token)
+        appDispatcher.unregister(callback)
       }
     }
     event.sender.on('crashed', () => {
-      appDispatcher.unregister(token)
+      appDispatcher.unregister(callback)
     })
     event.sender.on('destroyed', () => {
-      appDispatcher.unregister(token)
+      appDispatcher.unregister(callback)
     })
-    appDispatcher.register(callback, token)
+    appDispatcher.register(callback)
   })
 
-  ipcMain.on(messages.DISPATCH_ACTION, (event, payload, notifyOnDispatchComplete) => {
+  ipcMain.on(messages.DISPATCH_ACTION, (event, payload) => {
     payload = Serializer.deserialize(payload)
 
     let queryInfo = payload.queryInfo || payload.frameProps || (payload.queryInfo = {})
     queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
-    let sender = event.sender
     if (event.sender.hostWebContents) {
-      sender = event.sender.hostWebContents
       // received from an extension
       // only extension messages will have a hostWebContents
-      let win = require('electron').BrowserWindow.fromWebContents(sender)
+      let win = require('electron').BrowserWindow.fromWebContents(event.sender.hostWebContents)
       // default to the windowId of the hostWebContents
       queryInfo.windowId = queryInfo.windowId || win.id
       // add queryInfo if we only had frameProps before
       payload.queryInfo = queryInfo
 
-      appDispatcher.dispatch(payload, sender)
+      appDispatcher.dispatch(payload, event.sender.hostWebContents)
     } else {
       // received from a browser window
       if (event.sender.id !== queryInfo.windowId) {
-        appDispatcher.dispatch(payload, sender)
+        appDispatcher.dispatch(payload, event.sender)
       }
-    }
-    if (notifyOnDispatchComplete && payload.dispatchId) {
-      sender.send('app-dispatcher-action-dispatched', payload.dispatchId)
     }
   })
 }
