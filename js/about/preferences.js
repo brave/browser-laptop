@@ -471,6 +471,7 @@ class PaymentHistory extends ImmutableComponent {
           <tr>
             <th className='sort-header' data-l10n-id='date' />
             <th className='sort-header' data-l10n-id='totalAmount' />
+            <th className='sort-header' data-l10n-id='receiptLink' />
           </tr>
         </thead>
         <tbody>
@@ -520,13 +521,26 @@ class PaymentHistoryRow extends ImmutableComponent {
     return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00')
   }
 
+  get viewingId () {
+    return this.transaction.get('viewingId')
+  }
+
+  get receiptFileName () {
+    return `brave_ledger${this.numericDateStr}.csv`
+  }
+
+  onReceiptLinkClick () {
+    aboutActions.receiptLinkClick(this.viewingId, this.receiptFileName)
+  }
+
   render () {
     var date = this.formattedDate
     var totalAmountStr = `${this.totalAmount} ${this.currency}`
 
     return <tr>
-      <td data-sort={this.timestamp}>{date}</td>
-      <td data-sort={this.satoshis}>{totalAmountStr}</td>
+      <td className='narrow' data-sort={this.timestamp}>{date}</td>
+      <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
+      <td className='wide'><a onClick={this.onReceiptLinkClick.bind(this)}>{this.receiptFileName}</a></td>
     </tr>
   }
 }
