@@ -59,9 +59,9 @@ class WindowCaptionButtons extends ImmutableComponent {
 
   render () {
     return <div className={cx({
-        fullscreen: this.props.windowMaximized,
-        windowCaptionButtons: true
-      })}>
+      fullscreen: this.props.windowMaximized,
+      windowCaptionButtons: true
+    })}>
       <div className={'container ' + this.osClass}>
         <button
           className={cx({
@@ -107,8 +107,7 @@ class WindowCaptionButtons extends ImmutableComponent {
       <div className={cx({
         deadArea: true,
         allowDragging: this.props.shouldAllowWindowDrag
-      })}>
-      </div>
+      })} />
     </div>
   }
 }
