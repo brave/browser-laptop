@@ -286,6 +286,19 @@ if (ipc) {
     if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
     balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
   })
+
+  ipc.on(messages.OPEN_LEDGER_TRANSACTION_CSV, (event, viewingIds, csvFilename) => {
+    if (client) {
+      var txCsvText = client._getTransactionCSVText(viewingIds)
+      csvFilename = csvFilename || 'ledgerCsvExport.csv'
+
+      let savePath = pathName(csvFilename)
+
+      fs.writeFileSync(savePath, txCsvText)
+      const win = electron.BrowserWindow.getFocusedWindow()
+      win.webContents.send(messages.SHORTCUT_NEW_FRAME, ('file://' + savePath), { singleFrame: true })
+    }
+  })
 }
 
 /*
