@@ -218,7 +218,10 @@ var rendererIdentifiers = function () {
     'windowCaptionButtonRestore',
     'windowCaptionButtonClose',
     'closeFirefoxWarning',
-    'importSuccess'
+    'importSuccess',
+    'licenseTextOk',
+    'closeFirefoxWarningOk',
+    'importSuccessOk'
   ]
 }
 
