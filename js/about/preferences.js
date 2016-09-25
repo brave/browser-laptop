@@ -540,7 +540,7 @@ class PaymentHistoryRow extends ImmutableComponent {
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
       <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide' onClick={this.onReceiptLinkClick.bind(this)}>{this.receiptFileName}</td>
+      <td className='wide'><a onClick={this.onReceiptLinkClick.bind(this)}>{this.receiptFileName}</a></td>
     </tr>
   }
 }
