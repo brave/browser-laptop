@@ -109,11 +109,11 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     folderId = module.exports.getNextFolderId(sites)
   }
 
-  // Remve duplicate folder
+  // Remove duplicate folder
   if (!oldSite && tag === siteTags.BOOKMARK_FOLDER) {
     const dupFolder = sites.find((site) => isBookmarkFolder(site.get('tags')) &&
       site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
-      site.get('title') === siteDetail.get('title'))
+      site.get('customTitle') === siteDetail.get('customTitle'))
     if (dupFolder) {
       sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER)
     }
