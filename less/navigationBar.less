@@ -37,9 +37,12 @@
   }
 
   .navbarMenubarFlexContainer {
+    overflow: hidden;
     padding-left: 5px;
     padding-top: 5px;
   }
+  
+  #urlInput { width: 100%; }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
@@ -49,8 +52,6 @@
     }
   }
   @media (max-width: @breakpointSmallWin32) {
-    .loadTime { display: none; }
-    #urlInput { max-width: 75px; }
     #titleBar { width: 100px; }
     .menubarContainer {
       .menubar {
@@ -61,7 +62,7 @@
     }
   }
   @media (max-width: @breakpointTinyWin32) {
-    #urlInput { max-width: 50px; }
+    .loadTime { display: none; }
     .menubarContainer {
       .menubar {
         .menubarItem {
