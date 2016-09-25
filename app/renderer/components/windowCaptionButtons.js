@@ -104,10 +104,6 @@ class WindowCaptionButtons extends ImmutableComponent {
           </div>
         </button>
       </div>
-      <div className={cx({
-        deadArea: true,
-        allowDragging: this.props.shouldAllowWindowDrag
-      })} />
     </div>
   }
 }
