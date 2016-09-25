@@ -113,7 +113,7 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
         parentFolderId = nextFolderId++
         pathMap[parentFolder] = parentFolderId
         const folder = {
-          title: parentFolder,
+          customTitle: parentFolder,
           folderId: parentFolderId,
           parentFolderId: pathMap[bookmarks[i].path[pathLen - 2]] === undefined ? topLevelFolderId : pathMap[bookmarks[i].path[pathLen - 2]],
           lastAccessedTime: (new Date()).getTime(),
@@ -126,7 +126,7 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
       const folderId = nextFolderId++
       pathMap[bookmarks[i].title] = folderId
       const folder = {
-        title: bookmarks[i].title,
+        customTitle: bookmarks[i].title,
         folderId: folderId,
         parentFolderId: parentFolderId,
         lastAccessedTime: bookmarks[i].creation_time * 1000,

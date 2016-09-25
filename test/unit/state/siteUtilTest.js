@@ -229,14 +229,16 @@ describe('siteUtil', function () {
         const sites = Immutable.fromJS([
           {
             lastAccessedTime: 123,
-            title: 'folder1',
+            customTitle: 'folder1',
+            title: undefined,
             folderId: 1,
             parentFolderId: 0,
             tags: [siteTags.BOOKMARK_FOLDER]
           },
           {
             lastAccessedTime: 123,
-            title: 'folder2',
+            customTitle: 'folder2',
+            title: undefined,
             folderId: 2,
             parentFolderId: 1,
             tags: [siteTags.BOOKMARK_FOLDER]
