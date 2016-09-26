@@ -148,6 +148,20 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
 })
 
 importer.on('add-favicons', (e, detail) => {
+  let faviconMap = {}
+  detail.forEach((entry) => {
+    faviconMap[entry.urls[0]] = entry.favicon_url
+  })
+  let sites = AppStore.getState().get('sites')
+  sites = sites.map((site) => {
+    if (site.get('favicon') === undefined && site.get('location') !== undefined &&
+      faviconMap[site.get('location')] !== undefined) {
+      return site.set('favicon', faviconMap[site.get('location')])
+    } else {
+      return site
+    }
+  })
+  appActions.addSite(sites)
 })
 
 importer.on('add-keywords', (e, templateUrls, uniqueOnHostAndPath) => {
