@@ -56,9 +56,6 @@ importer.on('update-supported-browsers', (e, detail) => {
   }
 })
 
-importer.on('show-warning-dialog', (e) => {
-})
-
 importer.on('add-password-form', (e, detail) => {
 })
 
@@ -78,13 +75,36 @@ importer.on('add-history-page', (e, history, visitSource) => {
 importer.on('add-homepage', (e, detail) => {
 })
 
+const getParentFolderId = (path, pathMap, sites, topLevelFolderId, nextFolderIdObject) => {
+  const pathLen = path.length
+  if (!pathLen) {
+    return topLevelFolderId
+  }
+  const parentFolder = path.pop()
+  let parentFolderId = pathMap[parentFolder]
+  if (parentFolderId === undefined) {
+    parentFolderId = nextFolderIdObject.id++
+    pathMap[parentFolder] = parentFolderId
+    const folder = {
+      customTitle: parentFolder,
+      folderId: parentFolderId,
+      parentFolderId: getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject),
+      lastAccessedTime: (new Date()).getTime(),
+      tags: [siteTags.BOOKMARK_FOLDER]
+    }
+    sites.push(folder)
+  }
+  return parentFolderId
+}
+
 importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
   let nextFolderId = siteUtil.getNextFolderId(AppStore.getState().get('sites'))
+  let nextFolderIdObject = { id: nextFolderId }
   let pathMap = {}
   let sites = []
   let topLevelFolderId = 0
   if (!isMergeFavorites) {
-    topLevelFolderId = nextFolderId++
+    topLevelFolderId = nextFolderIdObject.id++
     sites.push({
       title: topLevelFolder,
       folderId: topLevelFolderId,
@@ -104,26 +124,10 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
     pathMap['Links'] = 0 // Edge, IE
   }
   for (let i = 0; i < bookmarks.length; ++i) {
-    const pathLen = bookmarks[i].path.length
-    let parentFolderId = topLevelFolderId
-    if (pathLen) {
-      const parentFolder = bookmarks[i].path[pathLen - 1]
-      parentFolderId = pathMap[parentFolder]
-      if (parentFolderId === undefined) {
-        parentFolderId = nextFolderId++
-        pathMap[parentFolder] = parentFolderId
-        const folder = {
-          customTitle: parentFolder,
-          folderId: parentFolderId,
-          parentFolderId: pathMap[bookmarks[i].path[pathLen - 2]] === undefined ? topLevelFolderId : pathMap[bookmarks[i].path[pathLen - 2]],
-          lastAccessedTime: (new Date()).getTime(),
-          tags: [siteTags.BOOKMARK_FOLDER]
-        }
-        sites.push(folder)
-      }
-    }
+    let path = bookmarks[i].path
+    let parentFolderId = getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject)
     if (bookmarks[i].is_folder) {
-      const folderId = nextFolderId++
+      const folderId = nextFolderIdObject.id++
       pathMap[bookmarks[i].title] = folderId
       const folder = {
         customTitle: bookmarks[i].title,
