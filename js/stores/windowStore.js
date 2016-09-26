@@ -345,6 +345,11 @@ const doAction = (action) => {
       if (!(action.location === 'about:newtab' && !FrameStateUtil.getActiveFrame(windowState).get('canGoForward'))) {
         updateNavBarInput(action.location, frameStatePath(key))
       }
+
+      if (!windowState.getIn(['ui', 'isFullScreen'])) {
+        // force temporary url display for tabnapping protection
+        windowState = windowState.setIn(['ui', 'mouseInTitlebar'], true)
+      }
       break
     case WindowConstants.WINDOW_SET_NAVBAR_INPUT:
       updateNavBarInput(action.location)
