@@ -21,7 +21,7 @@ const whitelistHosts = ['connect.facebook.net', 'connect.facebook.com', 'staticx
 
 const startTrackingProtection = (wnd) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
-    const firstPartyUrl = URL.parse(details.firstPartyUrl)
+    const firstPartyUrl = URL.parse(Filtering.getMainFrameUrl(details))
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
     if (firstPartyUrlHost.startsWith('www.')) {
       firstPartyUrlHost = firstPartyUrlHost.substring(4)
