@@ -354,7 +354,6 @@ class BitcoinDashboard extends ImmutableComponent {
           <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
         </div>
         <div className='settingsPanelDivider'>
-          <span className='visitText' data-l10n-id='visit' />
           <a target='_blank' className='browserButton primaryButton' href={url}>
             {name}
           </a>
