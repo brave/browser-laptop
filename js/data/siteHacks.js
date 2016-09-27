@@ -114,6 +114,17 @@ module.exports.siteHacks = {
        }
     }
   },
+  'twitter.com': {
+    onBeforeSendHeaders: function(details) {
+      if (details.requestHeaders.Referer &&
+        details.requestHeaders.Referer.startsWith('https://twitter.com/') &&
+        details.url.startsWith('https://mobile.twitter.com/')) {
+        return {
+          cancel: true
+        }
+      }
+    }
+  },
   'play.spotify.com': {
     enableFlashCTP: true
   },

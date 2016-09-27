@@ -25,15 +25,22 @@ module.exports.init = () => {
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
     let customCookie
+    let cancel
+    const firstPartyUrl = Filtering.getMainFrameUrl(details)
     if (hack && hack.onBeforeSendHeaders) {
       const result = hack.onBeforeSendHeaders.call(this, details)
       if (result && result.customCookie) {
         customCookie = result.customCookie
+      } else if (Filtering.isResourceEnabled(appConfig.resourceNames.NOSCRIPT, firstPartyUrl) &&
+        result && result.cancel) {
+        // cancel is only called on Twitter where noscript is enabled
+        cancel = true
       }
     }
     return {
       resourceName,
-      customCookie
+      customCookie,
+      cancel
     }
   })
   Filtering.registerBeforeRequestFilteringCB((details) => {
