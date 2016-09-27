@@ -871,9 +871,9 @@ class Main extends ImmutableComponent {
       }
       <div className='top'>
         <div className={cx({
-            navbarCaptionButtonContainer: true,
-            allowDragging: shouldAllowWindowDrag
-          })}>
+          navbarCaptionButtonContainer: true,
+          allowDragging: shouldAllowWindowDrag
+        })}>
           <div className='navbarMenubarFlexContainer'>
             {
               customTitlebar.menubarVisible
