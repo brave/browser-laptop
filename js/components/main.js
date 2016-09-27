@@ -870,7 +870,10 @@ class Main extends ImmutableComponent {
         : null
       }
       <div className='top'>
-        <div className='navbarCaptionButtonContainer'>
+        <div className={cx({
+            navbarCaptionButtonContainer: true,
+            allowDragging: shouldAllowWindowDrag
+          })}>
           <div className='navbarMenubarFlexContainer'>
             {
               customTitlebar.menubarVisible
@@ -881,10 +884,6 @@ class Main extends ImmutableComponent {
                     contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
                     autohide={getSetting(settings.AUTO_HIDE_MENU)}
                     lastFocusedSelector={customTitlebar.lastFocusedSelector} />
-                  <div className={cx({
-                    deadArea: true,
-                    allowDragging: shouldAllowWindowDrag
-                  })} />
                 </div>
                 : null
             }
@@ -933,7 +932,7 @@ class Main extends ImmutableComponent {
               />
               <div className='topLevelEndButtons'>
                 <div className={cx({
-                  deadArea: true,
+                  extraDragArea: true,
                   allowDragging: shouldAllowWindowDrag
                 })} />
                 {
@@ -952,7 +951,7 @@ class Main extends ImmutableComponent {
           </div>
           {
             customTitlebar.captionButtonsVisible
-              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} shouldAllowWindowDrag={shouldAllowWindowDrag} />
+              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
               : null
           }
         </div>
@@ -1052,7 +1051,7 @@ class Main extends ImmutableComponent {
         }
         <div className={cx({
           tabPages: true,
-          allowDragging: shouldAllowWindowDrag && !isWindows,
+          allowDragging: shouldAllowWindowDrag,
           singlePage: nonPinnedFrames.size <= tabsPerPage
         })}
           onContextMenu={this.onTabContextMenu}>
@@ -1067,7 +1066,7 @@ class Main extends ImmutableComponent {
         </div>
         <TabsToolbar
           paintTabs={getSetting(settings.PAINT_TABS)}
-          shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
+          shouldAllowWindowDrag={shouldAllowWindowDrag}
           draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.TAB && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
           previewTabs={getSetting(settings.SHOW_TAB_PREVIEWS)}
           tabsPerTabPage={tabsPerPage}

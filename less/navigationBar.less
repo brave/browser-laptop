@@ -51,7 +51,7 @@
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
   @media (max-width: @breakpointExtensionButtonPadding) {
-    .navigatorWrapper .topLevelEndButtons .deadArea {
+    .navigatorWrapper .topLevelEndButtons .extraDragArea {
       width: 0;
     }
   }
@@ -81,6 +81,10 @@
 .navbarCaptionButtonContainer {
   display: flex;
   border-bottom: 1px solid #aaaaaa;
+
+  &.allowDragging {
+    -webkit-app-region: drag;
+  }
 }
 .navbarMenubarFlexContainer {
   display: flex;
@@ -100,7 +104,6 @@
 .windowCaptionButtons {
   display: flex;
   flex-direction: column;
-
   white-space: nowrap;
 
   .hidden {
@@ -121,6 +124,7 @@
   .container {
     display: flex;
     flex-grow: 0;
+    -webkit-app-region: no-drag;
   }
 
   .win7 {
@@ -415,17 +419,6 @@
       }
     }
   }
-
-  .deadArea {
-    display: flex;
-    flex-grow:1;
-    &.allowDragging {
-      -webkit-app-region: drag;
-      >* {
-        -webkit-app-region: no-drag;
-      }
-    }
-  }
 }
 
 // Menubar (for use w/ slim titlebar)
@@ -457,17 +450,6 @@
     .selected {
       background-color: #cce8ff !important;
       border: 1px solid #99d1ff !important;
-    }
-  }
-  .deadArea {
-    display: flex;
-    flex-grow: 1;
-
-    &.allowDragging {
-      -webkit-app-region: drag;
-      >* {
-        -webkit-app-region: no-drag;
-      }
     }
   }
 }
@@ -535,6 +517,10 @@
     display: flex;
     flex-direction: row;
 
+    .extensionButton {
+      -webkit-app-region: no-drag;
+    }
+
     .braveMenu {
       width: @navbarBraveButtonWidth;
       margin-right: @navbarButtonSpacing;
@@ -555,17 +541,10 @@
       }
     }
 
-    .deadArea {
+    .extraDragArea {
       display: flex;
       flex-grow: 0;
       width: @navbarBraveButtonMarginLeft;
-
-      &.allowDragging {
-        -webkit-app-region: drag;
-        >* {
-          -webkit-app-region: no-drag;
-        }
-      }
     }
   }
 }
