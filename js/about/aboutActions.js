@@ -176,6 +176,10 @@ const AboutActions = {
     ipc.send(messages.LEDGER_CREATE_WALLET)
   },
 
+  receiptLinkClick: function (viewingId, receiptFileName) {
+    ipc.send(messages.OPEN_LEDGER_TRANSACTION_CSV, viewingId, receiptFileName)
+  },
+
   setLedgerEnabled: function (enabled) {
     ipc.send(messages.LEDGER_ENABLE, enabled)
   },
