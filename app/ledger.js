@@ -129,8 +129,16 @@ const doAction = (action) => {
       break
 
     case appConstants.APP_CHANGE_SETTING:
-      if (action.key === settings.PAYMENTS_ENABLED) return initialize(action.value)
-      if (action.key === settings.PAYMENTS_CONTRIBUTION_AMOUNT) return setPaymentInfo(action.value)
+      switch (action.key) {
+        case settings.PAYMENTS_ENABLED:
+          initialize(action.value, 'changeSettingPaymentsEnabled')
+          break
+        case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
+          setPaymentInfo(action.value)
+          break
+        default:
+          break
+      }
       break
 
     case appConstants.APP_CHANGE_SITE_SETTING:
@@ -407,8 +415,8 @@ eventStore.addChangeListener(() => {
  * module initialization
  */
 
-var initialize = (onoff) => {
-  enable(onoff)
+var initialize = (paymentsEnabled, reason) => {
+  enable(paymentsEnabled)
 
   // Check if relevant browser notifications should be shown every 15 minutes
   if (notificationTimeout) {
@@ -416,7 +424,7 @@ var initialize = (onoff) => {
   }
   notificationTimeout = setInterval(showNotifications, 15 * msecs.minute)
 
-  if (!onoff) {
+  if (!paymentsEnabled) {
     client = null
     return appActions.updateLedgerInfo({})
   }
@@ -441,9 +449,27 @@ var initialize = (onoff) => {
         }
 
         getStateInfo(state)
+
         try {
           client = ledgerClient(state.personaId,
-                                              underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions), state)
+                                underscore.extend(state.options, { roundtrip: roundtrip }, clientOptions),
+                                state)
+
+          // Scenario: User enables Payments, disables it, waits 30+ days, then
+          // enables it again -> reconcileStamp is in the past.
+          // In this case reset reconcileStamp to the future.
+          if (reason === 'changeSettingPaymentsEnabled') {
+            let timeUntilReconcile = client.timeUntilReconcile()
+            if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < 0) {
+              client.setTimeUntilReconcile(null, (_, stateResult) => {
+                if (!stateResult) {
+                  return
+                }
+                ledgerInfo.reconcileStamp = stateResult.reconcileStamp
+                syncWriter(pathName(statePath), stateResult, () => {})
+              })
+            }
+          }
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
         }
@@ -462,12 +488,12 @@ var initialize = (onoff) => {
   })
 }
 
-var enable = (onoff) => {
-  if (onoff && !getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
+var enable = (paymentsEnabled) => {
+  if (paymentsEnabled && !getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
   }
 
-  if (!onoff) {
+  if (!paymentsEnabled) {
     synopsis = null
     return updatePublisherInfo()
   }
