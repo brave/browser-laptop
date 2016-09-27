@@ -15,6 +15,9 @@ const UrlUtil = require('../lib/urlutil')
 const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 
+const settings = require('../constants/settings')
+const getSetting = require('../settings').getSetting
+
 function dispatch (action) {
   AppDispatcher.dispatch(action)
 }
@@ -288,7 +291,7 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_NEW_FRAME,
       frameOpts: frameOpts,
-      openInForeground
+      openInForeground: openInForeground || getSetting(settings.SWITCH_TO_NEW_TABS)
     })
   },
 
@@ -303,7 +306,7 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_CLONE_FRAME,
       frameOpts: frameProps.toJS ? frameProps.toJS() : frameProps,
       guestInstanceId,
-      openInForeground
+      openInForeground: openInForeground || getSetting(settings.SWITCH_TO_NEW_TABS)
     })
   },
 
