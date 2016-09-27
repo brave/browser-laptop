@@ -230,8 +230,8 @@ describe('navigationBar', function () {
           })
         yield this.app.client
           .tabByUrl(this.page)
-          .waitForExist('#top_link')
-          .leftClick('#top_link')
+          .waitForExist('#bottom_link')
+          .leftClick('#bottom_link')
           .windowParentByUrl(this.page + '#top')
       })
 
@@ -247,12 +247,12 @@ describe('navigationBar', function () {
           })
       })
 
-      it('updates the webview src', function * () {
-        var page = this.page
+      it('scrolls to the url fragment', function * () {
         yield this.app.client
-          .waitUntil(function () {
-            return this.getAttribute(activeWebview, 'src').then((src) => src === page + '#top')
-          })
+          .tabByUrl(this.page)
+          // should scroll to bottom and top will not be visible because the div height is 99999px
+          .waitForVisible('#bottom', 1000)
+          .waitForVisible('#top', 500, false)
       })
     })
   })
