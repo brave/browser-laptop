@@ -18,6 +18,11 @@
   }
 }
 
+// All platforms - media queries
+@media (max-width: @breakpointNarrowViewport) {
+  .loadTime { display: none; }
+}
+
 // (macOS) We need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .backforward {
@@ -40,7 +45,7 @@
     padding-left: 5px;
     padding-top: 5px;
   }
-  
+
   #urlInput { width: 100%; }
 
   // changes to ensure window can be as small as 480px wide
