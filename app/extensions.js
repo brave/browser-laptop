@@ -2,11 +2,15 @@ const browserActions = require('./browser/extensions/browserActions')
 const extensionActions = require('./common/actions/extensionActions')
 const AppStore = require('../js/stores/appStore')
 const config = require('../js/constants/config')
-const { fileUrl } = require('../js/lib/appUrlUtil')
-const { getAppUrl, getExtensionsPath, getIndexHTML } = require('../js/lib/appUrlUtil')
-const { getSetting } = require('../js/settings')
+const {fileUrl} = require('../js/lib/appUrlUtil')
+const {getAppUrl, getExtensionsPath, getIndexHTML} = require('../js/lib/appUrlUtil')
+const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
 const {passwordManagers, extensionIds} = require('../js/constants/passwordManagers')
+const appStore = require('../js/stores/appStore')
+const extensionState = require('./common/state/extensionState')
+const fs = require('fs')
+const path = require('path')
 
 let generateBraveManifest = () => {
   let baseManifest = {
@@ -139,28 +143,81 @@ let generateBraveManifest = () => {
 }
 
 module.exports.init = () => {
+  const loadedExtensions = {}
+  const registeredExtensions = {}
   browserActions.init()
-  let installedExtensions = {}
+
+  const {componentUpdater} = require('electron')
+  componentUpdater.on('component-checking-for-updates', () => {
+    // console.log('checking for update')
+  })
+  componentUpdater.on('component-update-found', () => {
+    // console.log('update-found')
+  })
+  componentUpdater.on('component-update-ready', () => {
+    // console.log('update-ready')
+  })
+  componentUpdater.on('component-update-updated', (e, extensionId, version) => {
+    // console.log('update-updated', extensionId, version)
+  })
+  componentUpdater.on('component-ready', (e, extensionId, extensionPath) => {
+    // console.log('component-ready', extensionId, extensionPath)
+    // Re-setup the loadedExtensions info if it exists
+    delete loadedExtensions[extensionId]
+    loadExtension(extensionId, extensionPath)
+  })
+  componentUpdater.on('component-not-updated', () => {
+    // console.log('update-not-updated')
+  })
+  componentUpdater.on('component-registered', (e, extensionId) => {
+    // console.log('component-registered')
+    const extensions = extensionState.getExtensions(appStore.getState())
+    const extensionPath = extensions.getIn([extensionId, 'filePath'])
+    // If we don't have info on the extension yet, check for an update / install
+    if (!extensionPath) {
+      componentUpdater.checkNow(extensionId)
+    } else {
+      loadExtension(extensionId, extensionPath)
+    }
+  })
+
   let extensionInstalled = (installInfo) => {
     if (installInfo.error) {
       console.error(installInfo.error)
       // TODO(bridiver) extensionActions.extensionInstallFailed
       return
     }
-    installedExtensions[installInfo.id] = installInfo
+    loadedExtensions[installInfo.id] = installInfo
+    installInfo.filePath = installInfo.base_path
     installInfo.base_path = fileUrl(installInfo.base_path)
-
     extensionActions.extensionInstalled(installInfo.id, installInfo)
+    enableExtension(installInfo.id)
   }
 
-  let installExtension = (extensionId, path, options = {}) => {
-    if (!installedExtensions[extensionId]) {
-      process.emit('load-extension', path, options, extensionInstalled)
+  let loadExtension = (extensionId, extensionPath, options = {}) => {
+    if (!loadedExtensions[extensionId]) {
+      if (extensionId === config.braveExtensionId) {
+        process.emit('load-extension', extensionPath, options, extensionInstalled)
+        return
+      }
+      // Verify we don't have info about an extension which doesn't exist
+      // on disk anymore.  It will crash if it doesn't exist, so this is
+      // just a safety net.
+      fs.exists(path.join(extensionPath, 'manifest.json'), (exists) => {
+        if (exists) {
+          process.emit('load-extension', extensionPath, options, extensionInstalled)
+        } else {
+          delete loadedExtensions[extensionId]
+          componentUpdater.checkNow(extensionId)
+        }
+      })
+    } else {
+      enableExtension(extensionId)
     }
   }
 
   let enableExtension = (extensionId) => {
-    var installInfo = installedExtensions[extensionId]
+    var installInfo = loadedExtensions[extensionId]
     if (installInfo) {
       process.emit('enable-extension', installInfo.id)
       extensionActions.extensionEnabled(installInfo.id)
@@ -168,49 +225,58 @@ module.exports.init = () => {
   }
 
   let disableExtension = (extensionId) => {
-    var installInfo = installedExtensions[extensionId]
+    var installInfo = loadedExtensions[extensionId]
     if (installInfo) {
       process.emit('disable-extension', installInfo.id)
       extensionActions.extensionDisabled(installInfo.id)
     }
   }
 
-  let enableExtensions = () => {
-    installExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
+  let registerExtension = (extensionId) => {
+    const extensions = extensionState.getExtensions(appStore.getState())
+    if (!registeredExtensions[extensionId]) {
+      componentUpdater.registerComponent(extensionId)
+      registeredExtensions[extensionId] = true
+    } else {
+      const extensionPath = extensions.getIn([extensionId, 'filePath'])
+      if (extensionPath) {
+        // Otheriwse just install it
+        loadExtension(extensionId, extensionPath)
+      }
+    }
+  }
 
+  // Manually install only the braveExtension
+  registeredExtensions[config.braveExtensionId] = true
+  loadExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
+
+  let registerExtensions = () => {
     if (getSetting(settings.PDFJS_ENABLED)) {
-      installExtension(config.PDFJSExtensionId, getExtensionsPath('pdfjs'))
-      enableExtension(config.PDFJSExtensionId)
+      registerExtension(config.PDFJSExtensionId)
     } else {
       disableExtension(config.PDFJSExtensionId)
     }
 
     const activePasswordManager = getSetting(settings.ACTIVE_PASSWORD_MANAGER)
     if (activePasswordManager === passwordManagers.ONE_PASSWORD) {
-      installExtension(extensionIds[passwordManagers.ONE_PASSWORD], getExtensionsPath('1password'))
-      enableExtension(extensionIds[passwordManagers.ONE_PASSWORD])
+      registerExtension(extensionIds[passwordManagers.ONE_PASSWORD])
     } else {
       disableExtension(extensionIds[passwordManagers.ONE_PASSWORD])
     }
 
     if (activePasswordManager === passwordManagers.DASHLANE) {
-      installExtension(extensionIds[passwordManagers.DASHLANE], getExtensionsPath('dashlane'))
-      enableExtension(extensionIds[passwordManagers.DASHLANE])
+      registerExtension(extensionIds[passwordManagers.DASHLANE])
     } else {
       disableExtension(extensionIds[passwordManagers.DASHLANE])
     }
 
     if (activePasswordManager === passwordManagers.LAST_PASS) {
-      installExtension(extensionIds[passwordManagers.LAST_PASS], getExtensionsPath('lastpass'))
-      enableExtension(extensionIds[passwordManagers.LAST_PASS])
+      registerExtension(extensionIds[passwordManagers.LAST_PASS])
     } else {
       disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
   }
 
-  enableExtensions()
-
-  AppStore.addChangeListener(() => {
-    enableExtensions()
-  })
+  registerExtensions()
+  AppStore.addChangeListener(registerExtensions)
 }

@@ -12,6 +12,7 @@ class Button extends ImmutableComponent {
       return <span disabled={this.props.disabled}
         data-l10n-id={this.props.l10nId}
         style={this.props.inlineStyles}
+        data-button-value={this.props.dataButtonValue}
         className={cx({
           browserButton: true,
           fa: true,

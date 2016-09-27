@@ -39,6 +39,7 @@ class BrowserActionButton extends ImmutableComponent {
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center'
       }}
+      dataButtonValue={this.props.extensionId}
       onClick={this.onClicked.bind(this, this.props.extensionId, this.props.browserAction.get('title'))} />
   }
 }
