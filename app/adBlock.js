@@ -28,7 +28,14 @@ const whitelistHosts = ['disqus.com', 'a.disquscdn.com']
 
 const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   Filtering.registerBeforeRequestFilteringCB((details) => {
-    const firstPartyUrl = URL.parse(Filtering.getMainFrameUrl(details))
+    const mainFrameUrl = Filtering.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!mainFrameUrl) {
+      return {
+        resourceName: module.exports.resourceName
+      }
+    }
+    const firstPartyUrl = URL.parse(mainFrameUrl)
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
     const urlHost = URL.parse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&

@@ -26,7 +26,14 @@ module.exports.init = () => {
     let hack = siteHacks[domain]
     let customCookie
     let cancel
-    const firstPartyUrl = Filtering.getMainFrameUrl(details)
+    const mainFrameUrl = Filtering.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!mainFrameUrl) {
+      return {
+        resourceName: module.exports.resourceName
+      }
+    }
+    const firstPartyUrl = URL.parse(mainFrameUrl)
     if (hack && hack.onBeforeSendHeaders) {
       const result = hack.onBeforeSendHeaders.call(this, details)
       if (result && result.customCookie) {
@@ -49,7 +56,14 @@ module.exports.init = () => {
 
     let redirectURL
     let cancel
-    const firstPartyUrl = Filtering.getMainFrameUrl(details)
+    const mainFrameUrl = Filtering.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!mainFrameUrl) {
+      return {
+        resourceName: module.exports.resourceName
+      }
+    }
+    const firstPartyUrl = URL.parse(mainFrameUrl)
     if (hack && hack.onBeforeRequest &&
         (hack.enableForAll ||
          hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, firstPartyUrl) ||
