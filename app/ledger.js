@@ -121,7 +121,7 @@ const doAction = (action) => {
     , ...
     }
  */
-  if (publisherInfo._internal.verboseP) {
+  if (publisherInfo._internal.debugP) {
     console.log('\napplication event: ' + JSON.stringify(underscore.pick(action, [ 'actionType', 'key' ]), null, 2))
   }
   switch (action.actionType) {
@@ -902,7 +902,8 @@ var updateLedgerInfo = () => {
 
   if (info) {
     underscore.extend(ledgerInfo,
-                      underscore.pick(info, [ 'address', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount', 'currency' ]))
+                      underscore.pick(info, [ 'address', 'passphrase', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount',
+                                              'currency' ]))
     if ((!info.buyURLExpires) || (info.buyURLExpires > now)) ledgerInfo.buyURL = info.buyURL
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
   }
@@ -1240,6 +1241,7 @@ var getPaymentInfo = () => {
 
       info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'balance', 'unconfirmed', 'satoshis' ]))
       info.address = client.getWalletAddress()
+      info.passphrase = client.getWalletPassphrase()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
         if ((body.rates) && (body.rates[currency])) {

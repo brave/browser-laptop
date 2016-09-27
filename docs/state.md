@@ -450,6 +450,7 @@ WindowStore
       }
     } ],
     address: string,             // the BTC wallet address (in base58)
+    passphrase: string,          // the BTC wallet passphrase
     balance: string,             // confirmed balance in BTC.toFixed(4)
     unconfirmed: string,         // unconfirmed balance in BTC.toFixed(4)
     satoshis: number,            // confirmed balance as an integer number of satoshis
