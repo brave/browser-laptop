@@ -106,7 +106,7 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
   if (!isMergeFavorites) {
     topLevelFolderId = nextFolderIdObject.id++
     sites.push({
-      title: topLevelFolder,
+      customTitle: topLevelFolder,
       folderId: topLevelFolderId,
       parentFolderId: 0,
       lastAccessedTime: (new Date()).getTime(),
