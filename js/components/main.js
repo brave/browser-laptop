@@ -35,7 +35,7 @@ const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
 const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
-const BookmarksToolbar = require('./bookmarksToolbar')
+const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
@@ -1027,7 +1027,8 @@ class Main extends ImmutableComponent {
             activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
             windowWidth={window.innerWidth}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-            sites={this.props.appState.get('sites')} />
+            sites={this.props.appState.get('sites')}
+            selectedFolderId={this.props.windowState.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])} />
           : null
         }
         <div className={cx({

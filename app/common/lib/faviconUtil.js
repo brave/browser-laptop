@@ -2,16 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const {isSourceAboutUrl} = require('./appUrlUtil')
-const UrlUtil = require('./urlutil')
+const { isSourceAboutUrl } = require('../../../js/lib/appUrlUtil')
+const UrlUtil = require('../../../js/lib/urlutil')
 
-module.exports = function getFavicon (frameProps, iconHref) {
+module.exports.iconSize = 16
+
+module.exports.getFavicon = (frameProps, iconHref) => {
   return new Promise((resolve, reject) => {
     if (!frameProps.get('location')) {
       resolve(null)
     }
 
-    const size = window.devicePixelRatio * 16
+    const size = window.devicePixelRatio * module.exports.iconSize
     const resolution = '#-moz-resolution=' + size + ',' + size
 
     // Default to favicon.ico if we can't find an icon.

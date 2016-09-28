@@ -818,6 +818,7 @@ const doAction = (action) => {
         doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
       }
       doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      doAction({actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
       break
     case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
       windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
@@ -827,6 +828,9 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
+      break
+    case WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
+      windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
       break
 
     default:

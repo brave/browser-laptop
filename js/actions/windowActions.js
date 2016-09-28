@@ -1121,6 +1121,13 @@ const windowActions = {
       tabId,
       details
     })
+  },
+
+  setBookmarksToolbarSelectedFolderId: function (folderId) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
+      folderId
+    })
   }
 }
 
