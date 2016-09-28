@@ -998,8 +998,13 @@ class SitePermissionsPage extends React.Component {
     return this.props.siteSettings.some((value) => {
       if (value && value.get) {
         for (let name in this.props.names) {
-          if (this.props.names[name].includes(typeof value.get(name))) {
-            return true
+          const granted = value.get(name)
+          if (this.props.names[name].includes(typeof granted)) {
+            if (this.props.defaults) {
+              return this.props.defaults.get(name) !== granted
+            } else {
+              return true
+            }
           }
         }
       }
