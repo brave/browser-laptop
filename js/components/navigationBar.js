@@ -112,12 +112,11 @@ class NavigationBar extends ImmutableComponent {
       className={cx({
         titleMode: this.titleMode
       })}>
-      {
-        isSourceAboutUrl(this.props.location) || this.titleMode
-        ? null
-        : <div className='startButtons'>
-          {
-            this.loading
+      <div className='startButtons'>
+        {
+          isSourceAboutUrl(this.props.location) || this.titleMode
+          ? <span className='browserButton' />
+          : this.loading
             ? <Button iconClass='fa-times'
               l10nId='reloadButton'
               className='navbutton stop-button'
@@ -126,9 +125,8 @@ class NavigationBar extends ImmutableComponent {
               l10nId='reloadButton'
               className='navbutton reload-button'
               onClick={this.onReload} />
-          }
-        </div>
-      }
+        }
+      </div>
       {
         !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
         ? <Button iconClass='fa-home'
@@ -155,7 +153,9 @@ class NavigationBar extends ImmutableComponent {
         />
       {
         isSourceAboutUrl(this.props.location)
-        ? null
+        ? <div className='endButtons'>
+          <span className='browserButton' />
+        </div>
         : <div className='endButtons'>
           {
             !this.showNoScriptInfo
