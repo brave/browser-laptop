@@ -26,7 +26,8 @@ var exclusions = {
   'Vodafone.ie.xml': 'breaks pagination on http://shop.vodafone.ie/shop/phonesAndPlans/phonesAndPlansHome.jsp?subPage=phones&planFilter=onAccount',
   'IDownloadBlog.xml': 'breaks http://www.idownloadblog.com/',
   'EBay_static.com.xml': 'breaks suggested product image previews',
-  'Cisco.xml': 'breaks http://www.cisco.com/c/m/en_us/training-events/events-webinars/techwise-tv/listings.html'
+  'Cisco.xml': 'breaks http://www.cisco.com/c/m/en_us/training-events/events-webinars/techwise-tv/listings.html',
+  'GQ.xml': 'mixed content on gq.com'
 }
 
 var rulesets = JSON.parse(fs.readFileSync('rulesets.json', 'utf8'))
