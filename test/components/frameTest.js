@@ -310,6 +310,11 @@ describe('resource loading', function () {
   it('loads a PDF', function * () {
     let url = Brave.server.url('img/test.pdf')
     yield this.app.client
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
+        })
+      })
       .tabByIndex(0)
       .url(url)
       .waitForVisible('#viewerContainer')
