@@ -35,6 +35,20 @@ class BookmarkToolbarButton extends ImmutableComponent {
   get activeFrame () {
     return windowStore.getFrame(this.props.activeFrameKey)
   }
+
+  showBookmarkFolderMenu (e) {
+    e.target = ReactDOM.findDOMNode(this)
+
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
+
+    const xPos = (e.target.getBoundingClientRect().left | 0) - 2
+    const yPos = (e.target.parentNode.getBoundingClientRect().bottom | 0) - 1
+
+    this.props.showBookmarkFolderMenu(this.props.bookmark, xPos, yPos)
+  }
+
   onClick (e) {
     if (!this.props.clickBookmarkItem(this.props.bookmark, e) &&
         this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
@@ -42,9 +56,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
         windowActions.setContextMenuDetail()
         return
       }
-      e.target = ReactDOM.findDOMNode(this)
-      this.props.showBookmarkFolderMenu(this.props.bookmark, e)
-      return
+      this.showBookmarkFolderMenu(e)
     }
   }
 
@@ -53,12 +65,10 @@ class BookmarkToolbarButton extends ImmutableComponent {
     if (this.props.selectedFolderId) {
       if (this.isFolder && this.props.selectedFolderId !== this.props.bookmark.get('folderId')) {
         // Auto-expand the menu if user mouses over another folder
-        e.target = ReactDOM.findDOMNode(this)
-        this.props.showBookmarkFolderMenu(this.props.bookmark, e)
+        this.showBookmarkFolderMenu(e)
       } else if (!this.isFolder && this.props.selectedFolderId !== -1) {
         // Hide the currently expanded menu if user mouses over a non-folder
-        windowActions.setBookmarksToolbarSelectedFolderId(-1)
-        windowActions.setContextMenuDetail()
+        windowActions.onMouseOverBookmarkFolder(-1)
       }
     }
   }
@@ -287,9 +297,8 @@ class BookmarksToolbar extends ImmutableComponent {
   clickBookmarkItem (bookmark, e) {
     return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)
   }
-  showBookmarkFolderMenu (bookmark, e) {
-    windowActions.setBookmarksToolbarSelectedFolderId(bookmark.get('folderId'))
-    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
+  showBookmarkFolderMenu (bookmark, xPos, yPos) {
+    windowActions.onMouseOverBookmarkFolder(bookmark.get('folderId'), this.bookmarks, bookmark, this.activeFrame, xPos, yPos)
   }
   updateBookmarkData (props) {
     this.bookmarks = siteUtil.getBookmarks(props.sites)
