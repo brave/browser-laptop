@@ -232,7 +232,7 @@ describe('navigationBar', function () {
           .tabByUrl(this.page)
           .waitForExist('#bottom_link')
           .leftClick('#bottom_link')
-          .windowParentByUrl(this.page + '#top')
+          .windowParentByUrl(this.page + '#bottom')
       })
 
       it('updates the location in the navbar', function * () {
@@ -243,7 +243,7 @@ describe('navigationBar', function () {
           .moveToObject(titleBar)
           .waitForExist(urlInput)
           .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === page + '#top')
+            return this.getValue(urlInput).then((val) => val === page + '#bottom')
           })
       })
 
