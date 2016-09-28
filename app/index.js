@@ -265,14 +265,6 @@ const notifyCertError = (webContents, url, error, cert) => {
 app.on('ready', () => {
   let sessionStateSaveInterval = null
   app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, cb) => {
-    // ignore transparency errors for now because we are blocking
-    // sites that Chrome isn't for some reason (ex: http://www.mint.com)
-    if (error === 'net::ERR_CERTIFICATE_TRANSPARENCY_REQUIRED') {
-      e.preventDefault()
-      cb(true)
-      return
-    }
-
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
