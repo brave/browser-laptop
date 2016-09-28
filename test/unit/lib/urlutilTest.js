@@ -207,7 +207,7 @@ describe('urlutil', function () {
 
   describe('getLocationIfPDF', function () {
     it('gets location for PDF JS URL', function () {
-      assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://oemmndcbldboiebfnladdacbdfmadadm/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
+      assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
         'https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf')
     })
     it('does not modify location for non-pdf URL', function () {

@@ -27,7 +27,7 @@ describe('about:extensions', function () {
     })
     it('installs by default', function * () {
       yield this.app.client
-        .waitForVisible('[data-extension-id="oemmndcbldboiebfnladdacbdfmadadm"]')
+        .waitForVisible('[data-extension-id="jdbefljfgobbmcidnmpjamcbhnbphjnb"]')
     })
   })
   describe('1Password', function () {
