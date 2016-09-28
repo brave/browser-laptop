@@ -564,13 +564,20 @@
     z-index: @zindexNavigationBar;
     transition: margin @transitionDuration ease-in-out;
 
+    span.forward {
+      opacity: 0;
+    }
+
+    span.back {
+      opacity: 0.2;
+    }
+
     span {
       -webkit-app-region: no-drag;
       -webkit-user-select: none;
       color: @buttonColor;
       border-radius: 50%;
       font-weight: 300;
-      opacity: 0.2;
 
       &:not([disabled]) {
         opacity: 0.85;
@@ -823,4 +830,3 @@
   height: 27px;
   margin-top: 3px;
 }
-
