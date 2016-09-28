@@ -154,7 +154,11 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
 importer.on('add-favicons', (e, detail) => {
   let faviconMap = {}
   detail.forEach((entry) => {
-    faviconMap[entry.urls[0]] = entry.favicon_url
+    if (entry.favicon_url.startsWith('made-up-favicon:')) {
+      faviconMap[entry.urls[0]] = entry.png_data
+    } else {
+      faviconMap[entry.urls[0]] = entry.favicon_url
+    }
   })
   let sites = AppStore.getState().get('sites')
   sites = sites.map((site) => {
