@@ -22,23 +22,16 @@ module.exports.init = () => {
       }
     }
 
+    // This filter only applies to top-level requests, so details.url == mainFrameUrl
     let domain = URL.parse(details.url).hostname.split('.').slice(-2).join('.')
     let hack = siteHacks[domain]
     let customCookie
     let cancel
-    const mainFrameUrl = Filtering.getMainFrameUrl(details)
-    // this can happen if the tab is closed and the webContents is no longer available
-    if (!mainFrameUrl) {
-      return {
-        resourceName: module.exports.resourceName
-      }
-    }
-    const firstPartyUrl = URL.parse(mainFrameUrl)
     if (hack && hack.onBeforeSendHeaders) {
       const result = hack.onBeforeSendHeaders.call(this, details)
       if (result && result.customCookie) {
         customCookie = result.customCookie
-      } else if (Filtering.isResourceEnabled(appConfig.resourceNames.NOSCRIPT, firstPartyUrl) &&
+      } else if (Filtering.isResourceEnabled(appConfig.resourceNames.NOSCRIPT, 'https://twitter.com/') &&
         result && result.cancel) {
         // cancel is only called on Twitter where noscript is enabled
         cancel = true
@@ -63,11 +56,10 @@ module.exports.init = () => {
         resourceName: module.exports.resourceName
       }
     }
-    const firstPartyUrl = URL.parse(mainFrameUrl)
     if (hack && hack.onBeforeRequest &&
         (hack.enableForAll ||
-         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, firstPartyUrl) ||
-         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, firstPartyUrl))) {
+         hack.enableForAdblock && Filtering.isResourceEnabled(appConfig.resourceNames.ADBLOCK, mainFrameUrl) ||
+         hack.enableForTrackingProtection && Filtering.isResourceEnabled(appConfig.resourceNames.TRACKING_PROTECTION, mainFrameUrl))) {
       const result = hack.onBeforeRequest.call(this, details)
       if (result && result.redirectURL) {
         redirectURL = result.redirectURL
