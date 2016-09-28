@@ -9,6 +9,7 @@ const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet.js')
+const transactionsToCSVDataURL = require('../lib/ledgerExportUtil.js').transactionsToCSVDataURL
 const { getZoomValuePercentage } = require('../lib/zoom')
 const config = require('../constants/config')
 const appConfig = require('../constants/appConfig')
@@ -529,8 +530,8 @@ class PaymentHistoryRow extends ImmutableComponent {
     return `brave_ledger${this.numericDateStr}.csv`
   }
 
-  onReceiptLinkClick () {
-    aboutActions.receiptLinkClick(this.viewingId, this.receiptFileName)
+  get dataURL () {
+    return transactionsToCSVDataURL(this.transaction.toJS())
   }
 
   render () {
@@ -540,7 +541,7 @@ class PaymentHistoryRow extends ImmutableComponent {
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
       <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide'><a onClick={this.onReceiptLinkClick.bind(this)}>{this.receiptFileName}</a></td>
+      <td className='wide'><a href={this.dataURL} download={this.receiptFileName}>{this.receiptFileName}</a></td>
     </tr>
   }
 }
