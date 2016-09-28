@@ -763,6 +763,14 @@ class Frame extends ImmutableComponent {
           method = (clearBrowsingDataDetail) =>
             windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
           break
+        case messages.AUTOFILL_SET_ADDRESS:
+          method = (currentDetail, originalDetail) =>
+            windowActions.setAutofillAddressDetail(currentDetail, originalDetail)
+          break
+        case messages.AUTOFILL_SET_CREDIT_CARD:
+          method = (currentDetail, originalDetail) =>
+            windowActions.setAutofillCreditCardDetail(currentDetail, originalDetail)
+          break
       }
       method.apply(this, e.args)
     })
