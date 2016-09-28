@@ -12,7 +12,8 @@ const windowActions = require('../actions/windowActions')
 const Main = require('./main')
 const SiteTags = require('../constants/siteTags')
 const config = require('../constants/config')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
+const { getPlatformStyles } = require('../../app/common/lib/platformUtil')
 
 class Window extends React.Component {
   constructor (props) {
@@ -55,10 +56,10 @@ class Window extends React.Component {
     let classes = {}
     classes['windowContainer'] = true
 
-    // Possible values for process.platform are:
-    // darwin, freebsd, linux, sunos, win32
-    // https://nodejs.org/api/process.html#process_process_platform
-    classes['platform--' + process.platform] = true
+    const platformClasses = getPlatformStyles()
+    platformClasses.forEach((className) => {
+      classes[className] = true
+    })
 
     return <div id='windowContainer' className={cx(classes)} >
       <Main windowState={this.state.immutableData.windowState}

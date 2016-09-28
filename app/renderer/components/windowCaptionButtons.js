@@ -16,26 +16,12 @@ class WindowCaptionButtons extends ImmutableComponent {
     this.onMinimizeClick = this.onMinimizeClick.bind(this)
     this.onMaximizeClick = this.onMaximizeClick.bind(this)
     this.onCloseClick = this.onCloseClick.bind(this)
-    this.osClass = this.getPlatformCssClass()
   }
 
   get maximizeTitle () {
     return this.props.windowMaximized
       ? 'windowCaptionButtonRestore'
       : 'windowCaptionButtonMaximize'
-  }
-
-  getPlatformCssClass () {
-    switch (os.platform()) {
-      case 'win32':
-        if (/6.1./.test(os.release())) {
-          return 'win7'
-        } else {
-          return 'win10'
-        }
-      default:
-        return 'hidden'
-    }
   }
 
   onMinimizeClick (e) {
@@ -62,7 +48,7 @@ class WindowCaptionButtons extends ImmutableComponent {
       fullscreen: this.props.windowMaximized,
       windowCaptionButtons: true
     })}>
-      <div className={'container ' + this.osClass}>
+      <div className='container'>
         <button
           className={cx({
             fullscreen: this.props.windowMaximized,
