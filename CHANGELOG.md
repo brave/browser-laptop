@@ -1,7 +1,18 @@
 # Changelog
 
 ## [0.12.3](https://github.com/brave/browser-laptop/releases/v0.12.3dev)
-- TODO
+- Added auto updating extensions ([#4080](https://github.com/brave/browser-laptop/issues/4080))
+- Added search shortcuts for MDN, GitHub, and Stack Overflow ([#4213](https://github.com/brave/browser-laptop/issues/4213))
+- Fixed various things for importing data from other browsers ([#4275](https://github.com/brave/browser-laptop/issues/4275))([#4293](https://github.com/brave/browser-laptop/issues/4293))([#4291](https://github.com/brave/browser-laptop/issues/4291))([#4270](https://github.com/brave/browser-laptop/issues/4270))([#4271](https://github.com/brave/browser-laptop/issues/4271))
+- Fixed various things for the Address bar ([#4309](https://github.com/brave/browser-laptop/issues/4309)) ([#4303](https://github.com/brave/browser-laptop/issues/4303))([#4315](https://github.com/brave/browser-laptop/issues/4315))([#4273](https://github.com/brave/browser-laptop/issues/4273))
+ - Fixed various things for the toolbar ([#4306](https://github.com/brave/browser-laptop/issues/4306))([#4272](https://github.com/brave/browser-laptop/issues/4272))([#1046](https://github.com/brave/browser-laptop/issues/1046))([#4126](https://github.com/brave/browser-laptop/issues/4126))
+- Fixed various things for the titlebar ([#4188](https://github.com/brave/browser-laptop/issues/4284))([#4175](https://github.com/brave/browser-laptop/issues/4175))([#4144](https://github.com/brave/browser-laptop/issues/4144))([#4296](https://github.com/brave/browser-laptop/issues/4296))([#4235](https://github.com/brave/browser-laptop/issues/4235))
+- Fixed various things for Brave Payments ([#4058](https://github.com/brave/browser-laptop/issues/4058))([#4085](https://github.com/brave/browser-laptop/issues/4085))([#4314](https://github.com/brave/browser-laptop/issues/4314))([#3477](https://github.com/brave/browser-laptop/issues/3477))([#4312](https://github.com/brave/browser-laptop/issues/4312))([#4316](https://github.com/brave/browser-laptop/issues/4316))
+- Fixed redirection on Twitter when blocking scripts ([#2884](https://github.com/brave/browser-laptop/issues/2884))
+- Fixed HTTPS count from being shown even when its disabled ([#4300](https://github.com/brave/browser-laptop/issues/4300))
+- Security: Fixed unsafe use of first party url ([#4145](https://github.com/brave/browser-laptop/issues/4145))([#4137](https://github.com/brave/browser-laptop/issues/4137))
+- Fixed showing top panel in fullscreen on mouse over ([#4193](https://github.com/brave/browser-laptop/issues/4193))([#4234](https://github.com/brave/browser-laptop/issues/4234))
+- Updated translations ([#4308](https://github.com/brave/browser-laptop/issues/4308))
 
 ## [0.12.2](https://github.com/brave/browser-laptop/releases/v0.12.2dev)
 - Added the ability to import data from other browsers ([#428](https://github.com/brave/browser-laptop/issues/428))([#4049](https://github.com/brave/browser-laptop/issues/4049))([#4154](https://github.com/brave/browser-laptop/issues/4154))
