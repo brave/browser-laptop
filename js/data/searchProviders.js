@@ -40,7 +40,7 @@ module.exports = { "providers" :
     },
     {
       "name" : "Stack Overflow",
-      "image" : "https://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico",
+      "image" : "https://cdn.sstatic.net/sites/stackoverflow/img/favicon.ico",
       "search" : "https://stackoverflow.com/search?q={searchTerms}",
       "shortcut" : ":s"
     },
