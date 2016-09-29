@@ -616,14 +616,14 @@ const doAction = (action) => {
       })
       break
     case appConstants.APP_ADD_SITE:
-      if (action.tag === siteTags.BOOKMARK) {
+      if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
         appDispatcher.waitFor([appStore.dispatchToken], () => {
           createMenu()
         })
       }
       break
     case appConstants.APP_REMOVE_SITE:
-      if (action.tag === siteTags.BOOKMARK) {
+      if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
         appDispatcher.waitFor([appStore.dispatchToken], () => {
           createMenu()
         })
