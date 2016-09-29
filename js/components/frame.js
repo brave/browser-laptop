@@ -901,6 +901,8 @@ class Frame extends ImmutableComponent {
         this.webview.focus()
       }
       windowActions.setNavigated(e.url, this.props.frameKey, false)
+      // force temporary url display for tabnapping protection
+      windowActions.setMouseInTitlebar(true)
 
       // After navigating to the URL, set correct frame title
       let webContents = this.webview.getWebContents()
