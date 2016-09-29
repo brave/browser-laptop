@@ -187,8 +187,6 @@ class Main extends ImmutableComponent {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
     var swipeGesture = false
-    var canSwipeBack = false
-    var canSwipeForward = false
     var isSwipeOnEdge = false
     var deltaX = 0
     var deltaY = 0
@@ -200,11 +198,6 @@ class Main extends ImmutableComponent {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
         time = (new Date()).getTime() - startTime
-        if (deltaX > 0) {
-          webviewActions.checkSwipe(false)
-        } else if (deltaX < 0) {
-          webviewActions.checkSwipe(true)
-        }
       }
     })
     ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
@@ -233,12 +226,6 @@ class Main extends ImmutableComponent {
         }, true)
       }
     })
-    ipc.on(messages.CAN_SWIPE_BACK, (e) => {
-      canSwipeBack = true
-    })
-    ipc.on(messages.CAN_SWIPE_FORWARD, (e) => {
-      canSwipeForward = true
-    })
     ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
       swipeGesture = true
     })
@@ -255,15 +242,13 @@ class Main extends ImmutableComponent {
     })
     ipc.on('scroll-touch-end', function () {
       if (time > 50 && trackingFingers && Math.abs(deltaY) < 50 && isSwipeOnEdge) {
-        if (deltaX > 70 && canSwipeForward) {
+        if (deltaX > 70) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -70 && canSwipeBack) {
+        } else if (deltaX < -70) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
       trackingFingers = false
-      canSwipeBack = false
-      canSwipeForward = false
       deltaX = 0
       deltaY = 0
       startTime = 0

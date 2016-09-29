@@ -760,12 +760,6 @@ class Frame extends ImmutableComponent {
             }
           }
           break
-        case messages.CAN_SWIPE_BACK:
-          currentWindow.webContents.send(messages.CAN_SWIPE_BACK)
-          break
-        case messages.CAN_SWIPE_FORWARD:
-          currentWindow.webContents.send(messages.CAN_SWIPE_FORWARD)
-          break
         case messages.CLEAR_BROWSING_DATA_NOW:
           method = (clearBrowsingDataDetail) =>
             windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
