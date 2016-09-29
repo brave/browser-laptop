@@ -22,6 +22,7 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
+const moment = require('moment')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -825,9 +826,10 @@ class PaymentsTab extends ImmutableComponent {
     if (!ledgerData.get('reconcileStamp')) {
       return null
     }
-    let nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
-    let l10nDataArgs = {
-      reconcileDate: nextReconcileDate
+    const timestamp = ledgerData.get('reconcileStamp')
+    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
+    const l10nDataArgs = {
+      reconcileDate: nextReconcileDateRelative
     }
     return <div className='paymentHistoryFooter'>
       <div className='nextPaymentSubmission'>
@@ -842,9 +844,10 @@ class PaymentsTab extends ImmutableComponent {
     if (!ledgerData.get('reconcileStamp')) {
       return null
     }
-    const nextReconcileDate = formattedDateFromTimestamp(ledgerData.get('reconcileStamp'))
+    const timestamp = ledgerData.get('reconcileStamp')
+    const nextReconcileDateRelative = formattedTimeFromNow(timestamp)
     const l10nDataArgs = {
-      reconcileDate: nextReconcileDate
+      reconcileDate: nextReconcileDateRelative
     }
     return <div className='nextReconcileDate' data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id='statusNextReconcileDate' />
   }
@@ -1385,7 +1388,8 @@ class AboutPreferences extends React.Component {
     ipc.on(messages.FLASH_UPDATED, (e, flashInstalled) => {
       this.setState({ flashInstalled })
     })
-    ipc.on(messages.LANGUAGE, (e, {languageCodes}) => {
+    ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
+      moment.locale(langCode)
       this.setState({ languageCodes })
     })
     ipc.send(messages.REQUEST_LANGUAGE)
@@ -1512,9 +1516,12 @@ class AboutPreferences extends React.Component {
   }
 }
 
-let formattedDateFromTimestamp = function (timestamp) {
-  var date = new Date(timestamp)
-  return date.toLocaleDateString()
+function formattedDateFromTimestamp (timestamp) {
+  return moment(new Date(timestamp)).format('YYYY-MM-DD')
+}
+
+function formattedTimeFromNow (timestamp) {
+  return moment(new Date(timestamp)).fromNow()
 }
 
 module.exports = <AboutPreferences />
