@@ -94,6 +94,7 @@
     "ledger-geoip": "^0.8.72",
     "ledger-publisher": "^0.8.74",
     "lru_cache": "^1.0.0",
+    "moment": "^2.15.1",
     "qr-image": "^3.1.0",
     "random-lib": "2.1.0",
     "react": "^15.0.1",
