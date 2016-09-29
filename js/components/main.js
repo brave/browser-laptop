@@ -780,7 +780,7 @@ class Main extends ImmutableComponent {
 
   get customTitlebar () {
     const customTitlebarEnabled = isWindows
-    const captionButtonsVisible = customTitlebarEnabled && !this.props.windowState.getIn(['ui', 'isFullScreen'])
+    const captionButtonsVisible = customTitlebarEnabled
     const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
     const selectedIndex = this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex'])
     return {
