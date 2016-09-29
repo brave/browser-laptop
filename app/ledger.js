@@ -53,7 +53,6 @@ const appStore = require('../js/stores/appStore')
 const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
 const ledgerUtil = require('./common/lib/ledgerUtil')
-const base64Encode = require('../js/lib/base64').encode
 
 // TBD: remove these post beta [MTR]
 const logPath = 'ledger-log.json'
@@ -294,18 +293,6 @@ if (ipc) {
   ipc.on(messages.ADD_FUNDS_CLOSED, () => {
     if (balanceTimeoutId) clearTimeout(balanceTimeoutId)
     balanceTimeoutId = setTimeout(getBalance, 5 * msecs.second)
-  })
-
-  ipc.on(messages.OPEN_LEDGER_TRANSACTION_CSV, (event, viewingIds, csvFilename) => {
-    if (client) {
-      let txCsvText = client.getTransactionCSVText(viewingIds)
-      let txCsvTextDataURI = 'data:text/csv;base64,' + base64Encode(txCsvText)
-
-      const win = electron.BrowserWindow.getFocusedWindow()
-      if (win && win.webContents) {
-        win.webContents.downloadURL(txCsvTextDataURI)
-      }
-    }
   })
 }
 
