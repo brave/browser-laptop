@@ -201,7 +201,7 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
  *
  * @param {Object[]} transactions - array of transactions
  * @param {string[]=} viewingIds - OPTIONAL array/string with one or more viewingIds to filter transactions by (if empty, uses all tx)
- * @param (boolean=) addTotalRow - OPTIONAL boolean indicating whether to add a TOTALS row (defaults false)
+ * @param {boolean=} addTotalRow - OPTIONAL boolean indicating whether to add a TOTALS row (defaults false)
  **/
 let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
   let txContribData = getPublisherVoteData(transactions, viewingIds)
@@ -213,7 +213,8 @@ let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
     return (a && typeof a === 'string' ? a : '').localeCompare(b && typeof b === 'string' ? b : '')
   })
 
-  var currency = txContribData[publishers[0]].contribution.currency
+  var currency = (publishers.length ? txContribData[publishers[0]].contribution.currency : 'USD')
+
   var headerRow = ['Publisher', 'Votes', 'Fraction', 'BTC', currency].join(',')
 
   var totalsRow = {
@@ -248,7 +249,8 @@ let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
            ].join(',')
   }))
 
-  if (addTotalRow) {
+  // note: do NOT add a total row if only header row is present (no data case)
+  if (addTotalRow && rows.length > 1) {
     rows.push([
       totalsRow.label,
       totalsRow.votes,
@@ -269,17 +271,19 @@ let getTransactionCSVRows = function (transactions, viewingIds, addTotalRow) {
  *
  * @param {Object[]} transactions - array of transactions
  * @param {string[]=} viewingIds - OPTIONAL array/string with one or more viewingIds to filter transactions by (if empty, uses all tx)
- * @param (boolean=) addTotalRow - OPTIONAL boolean indicating whether to add a TOTALS row (defaults false)
+ * @param {boolean=} addTotalRow - OPTIONAL boolean indicating whether to add a TOTALS row (defaults false)
+ *
+ * returns a CSV with only a header row if input is empty or invalid
  **/
 let getTransactionCSVText = function (transactions, viewingIds, addTotalRow) {
   return getTransactionCSVRows(transactions, viewingIds, addTotalRow).join('\n')
 }
 
 module.exports = {
-  transactionsToCSVDataURL: transactionsToCSVDataURL,
-  getTransactionCSVText: getTransactionCSVText,
-  getTransactionCSVRows: getTransactionCSVRows,
-  getPublisherVoteData: getPublisherVoteData,
-  getTransactionsByViewingIds: getTransactionsByViewingIds,
-  getTotalContribution: getTotalContribution
+  transactionsToCSVDataURL,
+  getTransactionCSVText,
+  getTransactionCSVRows,
+  getPublisherVoteData,
+  getTransactionsByViewingIds,
+  getTotalContribution
 }
