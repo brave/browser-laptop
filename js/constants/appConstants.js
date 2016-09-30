@@ -32,12 +32,17 @@ const AppConstants = {
   APP_CLEAR_DATA: _,
   APP_IMPORT_BROWSER_DATA: _,
   APP_UPDATE_LEDGER_INFO: _,
+  APP_LEDGER_RECOVERY_SUCCEEDED: _,
+  APP_LEDGER_RECOVERY_FAILED: _,
   APP_UPDATE_PUBLISHER_INFO: _,
   APP_SHOW_MESSAGE_BOX: _, /** @param {Object} detail */
   APP_HIDE_MESSAGE_BOX: _, /** @param {string} message */
   APP_CLEAR_MESSAGE_BOXES: _, /** @param {string} origin */
   APP_ADD_WORD: _, /** @param {string} word, @param {boolean} learn */
   APP_SET_DICTIONARY: _, /** @param {string} locale */
+  APP_BACKUP_KEYS: _,
+  APP_RECOVER_WALLET: _,
+  APP_CLEAR_RECOVERY: _,
   APP_ADD_AUTOFILL_ADDRESS: _,
   APP_REMOVE_AUTOFILL_ADDRESS: _,
   APP_ADD_AUTOFILL_CREDIT_CARD: _,

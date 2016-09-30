@@ -721,13 +721,51 @@ class TabsTab extends ImmutableComponent {
 class PaymentsTab extends ImmutableComponent {
   constructor () {
     super()
+
+    this.printKeys = this.printKeys.bind(this)
+    this.saveKeys = this.saveKeys.bind(this)
     this.createWallet = this.createWallet.bind(this)
+    this.recoverWallet = this.recoverWallet.bind(this)
+    this.handleFirstRecoveryKeyChange = this.handleFirstRecoveryKeyChange.bind(this)
+    this.handleSecondRecoveryKeyChange = this.handleSecondRecoveryKeyChange.bind(this)
   }
 
   createWallet () {
     if (!this.props.ledgerData.get('created')) {
       aboutActions.createWallet()
     }
+  }
+
+  handleFirstRecoveryKeyChange (e) {
+    this.setState({FirstRecoveryKey: e.target.value})
+  }
+
+  handleSecondRecoveryKeyChange (e) {
+    this.setState({SecondRecoveryKey: e.target.value})
+  }
+
+  recoverWallet () {
+    aboutActions.ledgerRecoverWallet(this.state.FirstRecoveryKey, this.state.SecondRecoveryKey)
+  }
+
+  copyToClipboard (text) {
+    aboutActions.setClipboard(text)
+  }
+
+  generateKeyFile (backupAction) {
+    aboutActions.ledgerGenerateKeyFile(backupAction)
+  }
+
+  clearRecoveryStatus () {
+    aboutActions.clearRecoveryStatus()
+  }
+
+  printKeys () {
+    this.generateKeyFile('print')
+  }
+
+  saveKeys () {
+    this.generateKeyFile('save')
   }
 
   get enabled () {
@@ -839,6 +877,143 @@ class PaymentsTab extends ImmutableComponent {
     </div>
   }
 
+  get advancedSettingsContent () {
+    const minDuration = this.props.ledgerData.get('minDuration')
+    const minPublisherVisits = this.props.ledgerData.get('minPublisherVisits')
+
+    return <div className='board'>
+      <div className='panel advancedSettings'>
+        <div className='settingsPanelDivider'>
+          <div data-l10n-id='minimumPageTimeSetting' />
+          <SettingsList>
+            <SettingItem>
+              <select
+                defaultValue={minDuration || 8}
+                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISIT_TIME)}>>
+                <option value='5'>5 seconds</option>
+                <option value='8'>8 seconds</option>
+                <option value='60'>1 minute</option>
+              </select>
+            </SettingItem>
+          </SettingsList>
+          <div data-l10n-id='minimumVisitsSetting' />
+          <SettingsList>
+            <SettingItem>
+              <select
+                defaultValue={minPublisherVisits || 5}
+                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISTS)}>>>
+                <option value='2'>2 visits</option>
+                <option value='5'>5 visits</option>
+                <option value='10'>10 visits</option>
+              </select>
+            </SettingItem>
+          </SettingsList>
+        </div>
+        <div className='settingsPanelDivider'>
+          {this.enabled
+            ? <SettingCheckbox
+              dataL10nId='notifications'
+              prefKey={settings.PAYMENTS_NOTIFICATIONS}
+              settings={this.props.settings}
+              onChangeSetting={this.props.onChangeSetting} />
+            : null}
+        </div>
+      </div>
+    </div>
+  }
+
+  get advancedSettingsFooter () {
+    return <div className='panel advancedSettingsFooter'>
+      <Button l10nId='backupLedger' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'ledgerBackup')} />
+      <Button l10nId='recoverLedger' className='primaryButton' onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')} />
+      <Button l10nId='done' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'advancedSettings')} />
+    </div>
+  }
+
+  get ledgerBackupContent () {
+    const paymentId = this.props.ledgerData.get('paymentId')
+    const passphrase = this.props.ledgerData.get('passphrase')
+
+    return <div className='board'>
+      <div className='panel'>
+        <span data-l10n-id='ledgerBackupContent' />
+        <div className='copyKeyContainer'>
+          <div className='copyContainer'>
+            <Button l10nId='copy' className='whiteButton inlineButton' onClick={this.copyToClipboard.bind(this, paymentId)} />
+          </div>
+          <div className='keyContainer'>
+            <h3 data-l10n-id='firstKey' />
+            <span>{paymentId}</span>
+          </div>
+        </div>
+        <div className='copyKeyContainer'>
+          <div className='copyContainer'>
+            <Button l10nId='copy' className='whiteButton inlineButton' onClick={this.copyToClipboard.bind(this, passphrase)} />
+          </div>
+          <div className='keyContainer'>
+            <h3 data-l10n-id='secondKey' />
+            <span>{passphrase}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  get ledgerBackupFooter () {
+    return <div className='panel advancedSettingsFooter'>
+      <Button l10nId='printKeys' className='primaryButton' onClick={this.printKeys} />
+      <Button l10nId='saveRecoveryFile' className='primaryButton' onClick={this.saveKeys} />
+      <Button l10nId='done' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
+    </div>
+  }
+
+  get ledgerRecoveryContent () {
+    const l10nDataArgs = {
+      balance: this.props.ledgerData.get('balance')
+    }
+    return <div className='board'>
+      {
+        this.props.ledgerData.get('recoverySucceeded') === true
+        ? <div className='recoveryOverlay'>
+          <h1>Success!</h1>
+          <p className='spaceAround' data-l10n-id='balanceRecovered' data-l10n-args={JSON.stringify(l10nDataArgs)} />
+          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
+        </div>
+        : null
+      }
+      {
+        this.props.ledgerData.get('recoverySucceeded') === false
+        ? <div className='recoveryOverlay'>
+          <h1>Recovery failed</h1>
+          <p className='spaceAround'>Please re-enter keys or try different keys.</p>
+          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
+        </div>
+        : null
+      }
+      <div className='panel recoveryContent'>
+        <h4 data-l10n-id='ledgerRecoverySubtitle' />
+        <span data-l10n-id='ledgerRecoveryContent' />
+        <SettingsList>
+          <SettingItem>
+            <h3 data-l10n-id='firstRecoveryKey' />
+            <input onChange={this.handleFirstRecoveryKeyChange} type='text' />
+            <h3 data-l10n-id='secondRecoveryKey' />
+            <input onChange={this.handleSecondRecoveryKeyChange} type='text' />
+          </SettingItem>
+        </SettingsList>
+      </div>
+    </div>
+  }
+
+  get ledgerRecoveryFooter () {
+    return <div className='panel advancedSettingsFooter'>
+      <div className='recoveryFooterButtons'>
+        <Button l10nId='recover' className='primaryButton' onClick={this.recoverWallet} />
+        <Button l10nId='cancel' className='whiteButton inlineButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
+      </div>
+    </div>
+  }
+
   get nextReconcileDate () {
     const ledgerData = this.props.ledgerData
     if (!ledgerData.get('reconcileStamp')) {
@@ -947,6 +1122,21 @@ class PaymentsTab extends ImmutableComponent {
         ? <ModalOverlay title={'paymentHistoryTitle'} customTitleClasses={'paymentHistory'} content={this.paymentHistoryContent} footer={this.paymentHistoryFooter} onHide={this.props.hideOverlay.bind(this, 'paymentHistory')} />
         : null
       }
+      {
+        this.enabled && this.props.advancedSettingsOverlayVisible
+        ? <ModalOverlay title={'advancedSettingsTitle'} content={this.advancedSettingsContent} footer={this.advancedSettingsFooter} onHide={this.props.hideOverlay.bind(this, 'advancedSettings')} />
+        : null
+      }
+      {
+        this.enabled && this.props.ledgerBackupOverlayVisible
+        ? <ModalOverlay title={'ledgerBackupTitle'} content={this.ledgerBackupContent} footer={this.ledgerBackupFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')} />
+        : null
+      }
+      {
+        this.enabled && this.props.ledgerRecoveryOverlayVisible
+        ? <ModalOverlay title={'ledgerRecoveryTitle'} content={this.ledgerRecoveryContent} footer={this.ledgerRecoveryFooter} onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
+        : null
+      }
       <div className='titleBar'>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
@@ -957,7 +1147,7 @@ class PaymentsTab extends ImmutableComponent {
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           </div>
-          {this.enabled ? <SettingCheckbox dataL10nId='notifications' prefKey={settings.PAYMENTS_NOTIFICATIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} /> : null}
+          <Button l10nId='advancedSettings' className='whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} />
         </div>
       </div>
       {
@@ -1387,6 +1577,9 @@ class AboutPreferences extends React.Component {
       bitcoinOverlayVisible: false,
       qrcodeOverlayVisible: false,
       paymentHistoryOverlayVisible: false,
+      advancedSettingsOverlayVisible: false,
+      ledgerBackupOverlayVisible: false,
+      ledgerRecoveryOverlayVisible: false,
       addFundsOverlayVisible: false,
       preferenceTab: hash.toUpperCase() in preferenceTabs ? hash : preferenceTabs.GENERAL,
       hintNumber: this.getNextHintNumber(),
@@ -1395,7 +1588,9 @@ class AboutPreferences extends React.Component {
       settings: Immutable.Map(),
       siteSettings: Immutable.Map(),
       braveryDefaults: Immutable.Map(),
-      ledgerData: Immutable.Map()
+      ledgerData: Immutable.Map(),
+      firstRecoveryKey: '',
+      secondRecoveryKey: ''
     }
     aboutActions.checkFlashInstalled()
 
@@ -1415,7 +1610,6 @@ class AboutPreferences extends React.Component {
       this.setState({ flashInstalled })
     })
     ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
-      moment.locale(langCode)
       this.setState({ languageCodes })
     })
     ipc.send(messages.REQUEST_LANGUAGE)
@@ -1515,9 +1709,14 @@ class AboutPreferences extends React.Component {
         tab = <PaymentsTab settings={settings} siteSettings={siteSettings}
           braveryDefaults={braveryDefaults} ledgerData={ledgerData}
           onChangeSetting={this.onChangeSetting}
+          firstRecoveryKey={this.state.firstRecoveryKey}
+          secondRecoveryKey={this.state.secondRecoveryKey}
           bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
           qrcodeOverlayVisible={this.state.qrcodeOverlayVisible}
           paymentHistoryOverlayVisible={this.state.paymentHistoryOverlayVisible}
+          advancedSettingsOverlayVisible={this.state.advancedSettingsOverlayVisible}
+          ledgerBackupOverlayVisible={this.state.ledgerBackupOverlayVisible}
+          ledgerRecoveryOverlayVisible={this.state.ledgerRecoveryOverlayVisible}
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
           hideOverlay={this.setOverlayVisible.bind(this, false)} />

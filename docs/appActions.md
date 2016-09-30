@@ -104,6 +104,18 @@ Dispatches a message to clear all completed downloads
 
 
 
+### ledgerRecoverySucceeded() 
+
+Dispatches a message to clear all completed downloads
+
+
+
+### ledgerRecoveryFailed() 
+
+Dispatches a message to clear all completed downloads
+
+
+
 ### setDefaultWindowSize(size) 
 
 Sets the default window size

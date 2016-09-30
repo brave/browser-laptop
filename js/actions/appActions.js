@@ -127,6 +127,24 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to clear all completed downloads
+   */
+  ledgerRecoverySucceeded: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_LEDGER_RECOVERY_SUCCEEDED
+    })
+  },
+
+  /**
+   * Dispatches a message to clear all completed downloads
+   */
+  ledgerRecoveryFailed: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_LEDGER_RECOVERY_FAILED
+    })
+  },
+
+  /**
    * Sets the default window size
    * @param {Array} size - [width, height]
    */

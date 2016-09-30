@@ -88,6 +88,36 @@ const aboutActions = {
   },
 
   /**
+   * Generates a file with the users backup keys
+   */
+  ledgerGenerateKeyFile: function (backupAction) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_BACKUP_KEYS,
+      backupAction
+    })
+  },
+
+  /**
+   * Recover wallet by merging old wallet into new one
+   */
+  ledgerRecoverWallet: function (firstRecoveryKey, secondRecoveryKey) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      firstRecoveryKey,
+      secondRecoveryKey
+    })
+  },
+
+  /**
+   * Clear wallet recovery status
+   */
+  clearRecoveryStatus: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_RECOVERY
+    })
+  },
+
+  /**
    * Click through a certificate error.
    *
    * @param {string} url - The URL with the cert error

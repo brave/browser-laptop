@@ -461,14 +461,15 @@ WindowStore
       exchangeName: string,      // the name of the BTC exchange
       exchangeURL: string        // the URL of the BTC exchange
     },
+    recoverySucceeded: boolean   // the status of an attempted recovery
     paymentIMG: string,          // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
     error: {                     // non-null if the last updateLedgerInfo happened concurrently with an error
       caller: string             // function in which error was handled
       error: object              // error object returned
     }
   },
-  publisherInfo: [               // one entry for each publisher having a non-zero `score`
-    {
+  publisherInfo: {
+    synopsis: [ { // one entry for each publisher having a non-zero `score`
       rank: number,              // i.e., 1, 2, 3, ...
       verified: boolean,         // there is a verified wallet for this publisher
       site: string,              // publisher name, e.g., "wikipedia.org"
@@ -482,8 +483,12 @@ WindowStore
       percentage: number,        // i.e., 0, 1, ... 100
       publisherURL: string,      // publisher site, e.g., "https://wikipedia.org/"
       faviconURL: string         // i.e., "data:image/...;base64,..."
+    } ],
+    synopsisOptions: {
+      minDuration: number,       // e.g., 8000 for 8 seconds
+      minPublisherVisits: number // e.g., 0
     }
-  ],
+  }
   autofillAddressDetail: {
     name: string,
     organization: string,
