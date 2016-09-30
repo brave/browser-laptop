@@ -778,13 +778,16 @@ function mainTemplateInit (nodeProps, frame) {
       click: () => {
         appActions.changeSiteSetting(pageOrigin, 'flash', 1)
       }
-    }, {
-      label: locale.translation('allowFlashAlways'),
-      click: () => {
-        const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
-        appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
-      }
     })
+    if (!frame.get('isPrivate')) {
+      template.push({
+        label: locale.translation('allowFlashAlways'),
+        click: () => {
+          const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
+          appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
+        }
+      })
+    }
     return template
   }
 

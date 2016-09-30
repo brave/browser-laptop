@@ -715,10 +715,6 @@ class Main extends ImmutableComponent {
   }
 
   get allSiteSettings () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    if (activeFrame && activeFrame.get('isPrivate')) {
-      return this.props.appState.get('temporarySiteSettings')
-    }
     return this.props.appState.get('siteSettings')
   }
 
