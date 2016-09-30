@@ -20,6 +20,7 @@ const {passwordManagers, extensionIds} = require('../constants/passwordManagers'
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
+const FixedHeaderTable = require('../components/fixedHeaderTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 const moment = require('moment')
@@ -258,11 +259,11 @@ class LedgerTable extends ImmutableComponent {
       return null
     }
     return <div id='ledgerTable'>
-      <SortableTable
+      <FixedHeaderTable
         headings={['rank', 'publisher', 'include', 'views', 'timeSpent', 'percentage']}
         defaultHeading='rank'
         overrideDefaultStyle
-        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', 'alignRight']}
+        columnClassNames={['alignRight', '', '', 'alignRight', 'alignRight', '']}
         rowClassNames={
           this.synopsis.map((item) =>
             this.enabledForSite(item) ? '' : 'paymentsDisabled').toJS()
