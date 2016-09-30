@@ -130,10 +130,9 @@ const getContentSettingsFromSiteSettings = (appState) => {
   // We do 2 passes for setting content settings. On the first pass we consider all shield types.
   for (let hostPattern in hostSettings) {
     let hostSetting = hostSettings[hostPattern]
-    if (typeof hostSetting.noScript === 'boolean') {
-      // TODO: support temporary override
+    if (['number', 'boolean'].includes(typeof hostSetting.noScript)) {
       addContentSettings(contentSettings.javascript, hostPattern, '*',
-        hostSetting.noScript ? 'block' : 'allow')
+        hostSetting.noScript === true ? 'block' : 'allow')
     }
     if (typeof hostSetting.runInsecureContent === 'boolean') {
       addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',

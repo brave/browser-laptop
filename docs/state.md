@@ -68,7 +68,7 @@ AppStore
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
       safeBrowsing: boolean,
-      noScript: boolean,
+      noScript: (number|boolean), // true = block scripts, false = allow, 0 = allow once, 1 = allow until restart
       httpsEverywhere: boolean,
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
@@ -79,6 +79,7 @@ AppStore
   },
   temporarySiteSettings: {
     // Same as above but never gets written to disk
+    // XXX: This was intended for Private Browsing but is currently unused.
   },
   visits: [{
     location: string,

@@ -200,21 +200,26 @@ class Frame extends ImmutableComponent {
     return false
   }
 
-  expireFlash (origin) {
+  expireContentSettings (origin) {
     // Expired Flash settings should be deleted when the webview is
-    // navigated or closed.
+    // navigated or closed. Same for NoScript's allow-once option.
     const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
                                                              origin)
-    if (activeSiteSettings && typeof activeSiteSettings.get('flash') === 'number') {
+    if (!activeSiteSettings) {
+      return
+    }
+    if (typeof activeSiteSettings.get('flash') === 'number') {
       if (activeSiteSettings.get('flash') < Date.now()) {
-        // Expired entry. Remove it.
         appActions.removeSiteSetting(origin, 'flash')
       }
+    }
+    if (activeSiteSettings.get('noScript') === 0) {
+      appActions.removeSiteSetting(origin, 'noScript')
     }
   }
 
   componentWillUnmount () {
-    this.expireFlash(this.origin)
+    this.expireContentSettings(this.origin)
   }
 
   updateWebview (cb, newSrc) {
@@ -381,10 +386,10 @@ class Frame extends ImmutableComponent {
       this.updateAboutDetails()
     }
 
-    // For cross-origin navigation, clear temp Flash approvals
+    // For cross-origin navigation, clear temp approvals
     const prevOrigin = siteUtil.getOrigin(prevProps.location)
     if (this.origin !== prevOrigin) {
-      this.expireFlash(prevOrigin)
+      this.expireContentSettings(prevOrigin)
     }
 
     if (this.props.src !== prevProps.src) {

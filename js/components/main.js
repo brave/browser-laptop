@@ -620,7 +620,7 @@ class Main extends ImmutableComponent {
   }
 
   enableNoScript (settings) {
-    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript
+    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript === true
   }
 
   onCloseFrame (activeFrameProps) {
@@ -1008,6 +1008,7 @@ class Main extends ImmutableComponent {
         {
           noScriptIsVisible
             ? <NoScriptInfo frameProps={activeFrame}
+              noScriptGlobalEnabled={this.props.appState.getIn(['noScript', 'enabled'])}
               onHide={this.onHideNoScript} />
             : null
         }

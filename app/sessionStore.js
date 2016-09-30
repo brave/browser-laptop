@@ -248,15 +248,23 @@ module.exports.cleanAppData = (data, isShutdown) => {
     data.perWindowState.forEach((perWindowState) =>
       module.exports.cleanPerWindowData(perWindowState, isShutdown))
   }
-  // Delete expired Flash approvals
+  // Delete expired Flash and NoScript allow-once approvals
   let now = Date.now()
   for (var host in data.siteSettings) {
     let expireTime = data.siteSettings[host].flash
     if (typeof expireTime === 'number' && expireTime < now) {
       delete data.siteSettings[host].flash
     }
+    let noScript = data.siteSettings[host].noScript
+    if (typeof noScript === 'number') {
+      delete data.siteSettings[host].noScript
+    }
     // Don't write runInsecureContent to session
     delete data.siteSettings[host].runInsecureContent
+    // If the site setting is empty, delete it for privacy
+    if (Object.keys(data.siteSettings[host]).length === 0) {
+      delete data.siteSettings[host]
+    }
   }
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true

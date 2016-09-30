@@ -68,7 +68,7 @@ const braveryPermissionNames = {
   'safeBrowsing': ['boolean'],
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['boolean'],
-  'noScript': ['boolean']
+  'noScript': ['boolean', 'number']
 }
 
 const changeSetting = (cb, key, e) => {
@@ -1049,7 +1049,7 @@ class SitePermissionsPage extends React.Component {
                       if (name === 'flash') {
                         if (granted === 1) {
                           // Flash is allowed just one time
-                          statusText = 'flashAllowOnce'
+                          statusText = 'allowOnce'
                         } else if (granted === false) {
                           // Flash installer is never intercepted
                           statusText = 'alwaysDeny'
@@ -1059,6 +1059,12 @@ class SitePermissionsPage extends React.Component {
                           statusArgs = {
                             time: new Date(granted).toLocaleString()
                           }
+                        }
+                      } else if (name === 'noScript' && typeof granted === 'number') {
+                        if (granted === 1) {
+                          statusText = 'allowUntilRestart'
+                        } else if (granted === 0) {
+                          statusText = 'allowOnce'
                         }
                       } else if (typeof granted === 'string') {
                         statusText = granted

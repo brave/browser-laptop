@@ -137,8 +137,6 @@ const messages = {
   HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
   // Extensions
   NEW_POPUP_WINDOW: _,
-  // NoScript
-  TEMPORARY_ALLOW_SCRIPTS: _, /** @arg {string} origin to allow scripts on */
   // Localization
   LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
   REQUEST_LANGUAGE: _,
