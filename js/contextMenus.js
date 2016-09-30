@@ -555,6 +555,15 @@ function getMisspelledSuggestions (selection, isMisspelled, suggestions) {
   return items
 }
 
+function newTabMenuTemplateInit (location, e) {
+  const template = [
+    CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newPartitionedTabMenuItem(),
+    CommonMenu.newWindowMenuItem()
+  ]
+  return template
+}
+
 function getEditableItems (selection, editFlags) {
   const hasSelection = selection.length > 0
   const hasClipboard = clipboard.readText().length > 0
@@ -1042,6 +1051,16 @@ function onTabContextMenu (frameProps, e) {
   tabMenu.destroy()
 }
 
+function onNewTabContextMenu (rect) {
+  const menuTemplate = newTabMenuTemplateInit(rect)
+
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: rect.left,
+    top: rect.bottom + 2,
+    template: menuTemplate
+  }))
+}
+
 function onTabsToolbarContextMenu (activeFrame, closestDestinationDetail, isParent, e) {
   e.stopPropagation()
   const tabsToolbarMenu = Menu.buildFromTemplate(tabsToolbarTemplateInit(activeFrame, closestDestinationDetail, isParent))
@@ -1245,6 +1264,7 @@ module.exports = {
   onHamburgerMenu,
   onMainContextMenu,
   onTabContextMenu,
+  onNewTabContextMenu,
   onTabsToolbarContextMenu,
   onDownloadsToolbarContextMenu,
   onTabPageContextMenu,
