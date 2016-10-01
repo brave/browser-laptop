@@ -1,4 +1,4 @@
-/* global describe, it */
+/* global describe, it, before */
 const assert = require('assert')
 const underscore = require('underscore')
 
@@ -225,44 +225,93 @@ describe('ledger export utilities test', function () {
   })
 
   describe('getPublisherVoteData', function () {
-    it('should return a contribution object with 1 key per publisher', function () {
-      assert(false, 'test not yet impl')
+    let publisherData
+    let publishers
+
+    before(function () {
+      publisherData = ledgerExportUtil.getPublisherVoteData(exampleTransactions)
+      if (publisherData && typeof publisherData === 'object') {
+        publishers = underscore.keys(publisherData)
+      }
+    })
+    it('should return a publisher data object with 1 key per publisher', function () {
+      assert(!!publisherData, 'returned publisher data should exist')
+      assert.equal(typeof publisherData, 'object', 'returned publisher data should be an object')
+
+      let publishers = underscore.keys(publisherData)
+
+      assert(!!publishers && underscore.isArray(publishers))
+
+      assert.equal(publishers.length, NUM_PUBLISHERS, 'there should be 1 key per publisher')
+
+      publishers.forEach(function (publisher) {
+        let value = publisherData[publisher]
+        assert(!!value, `publisher "${publisher}" does not have a value associated with it`)
+        assert.equal(typeof value, 'object', `publisher "${publisher}" has a value that is not an object associated with it (value: "${value}")`)
+      })
     })
 
     describe('each publisher value', function () {
       it('should have "votes" (type number) defined', function () {
-        assert(false, 'test not yet impl')
+        publishers.forEach(function (publisher) {
+          assert(typeof publisherData[publisher].votes, 'number')
+        })
       })
 
       it('should have "fraction" (type number) defined', function () {
-        assert(false, 'test not yet impl')
+        publishers.forEach(function (publisher) {
+          assert(typeof publisherData[publisher].fraction, 'number')
+        })
       })
 
       it('should have "contribution" (type object) defined', function () {
-        assert(false, 'test not yet impl')
+        publishers.forEach(function (publisher) {
+          assert(typeof publisherData[publisher].contribution, 'object')
+        })
       })
 
       describe('each publisher->contribution entry', function () {
         it('should have "satoshis" (type number) defined', function () {
-          assert(false, 'test not yet impl')
+          publishers.forEach(function (publisher) {
+            let publisherContributionEntry = publisherData[publisher].contribution
+            assert(typeof publisherContributionEntry.satoshis, 'number')
+          })
         })
 
         it('should have "fiat" (type number) defined', function () {
-          assert(false, 'test not yet impl')
+          publishers.forEach(function (publisher) {
+            let publisherContributionEntry = publisherData[publisher].contribution
+            assert(typeof publisherContributionEntry.fiat, 'number')
+          })
         })
 
         it('should have "currency" (type string) defined', function () {
-          assert(false, 'test not yet impl')
+          publishers.forEach(function (publisher) {
+            let publisherContributionEntry = publisherData[publisher].contribution
+            assert(typeof publisherContributionEntry.currency, 'string')
+          })
         })
       })
     })
 
     it('the sum of the "fraction" value across all publisher entries should be 1', function () {
-      assert(false, 'test not yet impl')
+      let fractionSum = 0
+      publishers.forEach(function (publisher) {
+        fractionSum += publisherData[publisher].fraction
+      })
+      assert.equal(fractionSum, 1)
     })
 
     it('the sum of the "votes" value across all publisher entries should be equal to the overall "votes" entry for the transaction object given as input', function () {
-      assert(false, 'test not yet impl')
+      let txLevelVotesSum = 0
+      exampleTransactions.forEach(function (tx) {
+        txLevelVotesSum += tx.votes
+      })
+      let votesSum = 0
+      publishers.forEach(function (publisher) {
+        votesSum += publisherData[publisher].votes
+      })
+      assert.equal(votesSum, txLevelVotesSum)
     })
   })
 
