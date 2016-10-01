@@ -234,6 +234,7 @@ describe('ledger export utilities test', function () {
         publishers = underscore.keys(publisherData)
       }
     })
+
     it('should return a publisher data object with 1 key per publisher', function () {
       assert(!!publisherData, 'returned publisher data should exist')
       assert.equal(typeof publisherData, 'object', 'returned publisher data should be an object')
@@ -252,15 +253,17 @@ describe('ledger export utilities test', function () {
     })
 
     describe('each publisher value', function () {
-      it('should have "votes" (type number) defined', function () {
+      it('should have "votes" (type number, >= 0) defined', function () {
         publishers.forEach(function (publisher) {
           assert(typeof publisherData[publisher].votes, 'number')
+          assert(publisherData[publisher].votes >= 0)
         })
       })
 
-      it('should have "fraction" (type number) defined', function () {
+      it('should have "fraction" (type number, >= 0) defined', function () {
         publishers.forEach(function (publisher) {
           assert(typeof publisherData[publisher].fraction, 'number')
+          assert(publisherData[publisher].fraction >= 0)
         })
       })
 
@@ -271,17 +274,19 @@ describe('ledger export utilities test', function () {
       })
 
       describe('each publisher->contribution entry', function () {
-        it('should have "satoshis" (type number) defined', function () {
+        it('should have "satoshis" (type number, >= 0) defined', function () {
           publishers.forEach(function (publisher) {
             let publisherContributionEntry = publisherData[publisher].contribution
             assert(typeof publisherContributionEntry.satoshis, 'number')
+            assert(publisherContributionEntry.satoshis >= 0)
           })
         })
 
-        it('should have "fiat" (type number) defined', function () {
+        it('should have "fiat" (type number, >= 0) defined', function () {
           publishers.forEach(function (publisher) {
             let publisherContributionEntry = publisherData[publisher].contribution
             assert(typeof publisherContributionEntry.fiat, 'number')
+            assert(publisherContributionEntry.fiat >= 0)
           })
         })
 
@@ -341,21 +346,38 @@ describe('ledger export utilities test', function () {
   })
 
   describe('getTotalContribution', function () {
+/**
+  var totalContribution = {
+    satoshis: 0,
+    fiat: { amount: 0, currency: null },
+    fee: 0
+  }
+**/
+    let contributionData
+
+    before(function () {
+      contributionData = ledgerExportUtil.getTotalContribution(exampleTransactions)
+    })
+
     it('returns a total contribution object', function () {
-      assert(false, 'test not yet impl')
+      assert.equal(typeof contributionData, 'object')
     })
 
     describe('total contribution object', function () {
-      it('has a key "satoshis" associated with value of number (positive integer)', function () {
-        assert(false, 'test not yet impl')
+      it('has a key "satoshis" with value of type number (>= 0)', function () {
+        assert.equal(typeof contributionData.satoshis, 'number')
+        assert(contributionData.satoshis >= 0)
       })
 
       it('has a key "fiat" associated with an object containing two subkeys, "amount" (number) and "currency" (string)', function () {
-        assert(false, 'test not yet impl')
+        assert.equal(typeof contributionData.fiat, 'object', 'should have a key "fiat" with an object associated')
+        assert.equal(typeof contributionData.fiat.amount, 'number', 'should have a key "amount" with value of type "number"')
+        assert.equal(typeof contributionData.fiat.currency, 'string', 'should have a key "amount" with value of type "string"')
       })
 
-      it('has a key, fee with a value of type number (positive integer)', function () {
-        assert(false, 'test not yet impl')
+      it('has a key, fee with value of type number (>= 0)', function () {
+        assert.equal(typeof contributionData.fee, 'number')
+        assert(contributionData.fee >= 0)
       })
     })
   })
