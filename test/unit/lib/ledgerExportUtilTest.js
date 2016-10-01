@@ -106,21 +106,21 @@ describe('ledger export utilities test', function () {
 
     it('returns a CSV with the same number of columns in every row', function () {
       let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
-      
+
       let rows = output.split('\n')
 
       for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
         let row = rows[rowIdx]
         assert(!!row, `expected row ${rowIdx} to exist`)
         let cols = row.split(',')
-        assert.equal(cols.length, CSV_COLUMN_COUNT, `expected row ${rowIdx} / ${rows.length} to have ${CSV_COLUMN_COUNT} columns`)
+        assert.equal(cols.length, CSV_COLUMN_COUNT, `expected row ${rowIdx} to have ${CSV_COLUMN_COUNT} columns`)
       }
     })
 
     it('returns a CSV with expected data types for each column in every row', function () {
       let ADD_TOTAL_ROW = true
       let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions, null, ADD_TOTAL_ROW)
-      
+
       let rows = output.split('\n')
 
       let COLUMN_LABELS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['FIAT'])
@@ -132,9 +132,9 @@ describe('ledger export utilities test', function () {
         for (var colIdx = 0; colIdx < cols.length; colIdx++) {
           let colVal = cols[colIdx]
 
-          if (CSV_EXPECTED_COLUMN_DATATYPES[colIdx] === 'number'
-              && `${parseFloat(colVal)}` === colVal) {
-            colVal = parseFloat(colVal)
+          if (CSV_EXPECTED_COLUMN_DATATYPES[colIdx] === 'number' &&
+              `${parseFloat(colVal)}` === colVal) {
+              colVal = parseFloat(colVal)
           }
 
           let columnDatatype = typeof colVal
@@ -146,7 +146,7 @@ describe('ledger export utilities test', function () {
     it('returns same CSV for an array containing one transaction and a single transaction object', function () {
       let singleTxOutput = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
       let arrayWithSingleTxOutput = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
-      
+
       assert.equal(singleTxOutput, arrayWithSingleTxOutput)
     })
 
@@ -156,7 +156,7 @@ describe('ledger export utilities test', function () {
 
       // output with NO TOTAL ROW
       var output = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
-      
+
       var rows = output.split('\n')
       assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_NO_TOTAL)
 
@@ -165,16 +165,111 @@ describe('ledger export utilities test', function () {
       rows = output.split('\n')
       assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_WITH_TOTAL)
     })
+
+    it('returns CSV text matching the CSV rows returned by getTransactionCSVRows', function () {
+      assert(false, 'test not yet impl')
+    })
+  })
+
+  describe('getTransactionCSVRows', function () {
+    it('for empty input, returns an array containing only the expected CSV header row', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('returns a CSV row array, where the first row is the expected header row up to the currency column (which varies)', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('returns a CSV row array with the same number of columns in every row', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('returns a CSV row array with expected data types for each column in every row', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('returns the same output for a single transaction input as an array of 1 element and a plain transaction object', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('given a transaction, returns an array containing the right number of CSV rows: 1 header row, 1 row per publisher, and if addTotalRow===true, 1 row with totals', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('when argument addTotalRow===true, there should be a total row with correct totals for each column after "Publisher"', function () {
+      assert(false, 'test not yet impl')
+    })
+  })
+
+  describe('getPublisherVoteData', function () {
+    it('should return a contribution object with 1 key per publisher', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    describe('each publisher value', function () {
+      it('should have "votes" (type number) defined', function () {
+        assert(false, 'test not yet impl')
+      })
+
+      it('should have "fraction" (type number) defined', function () {
+        assert(false, 'test not yet impl')
+      })
+
+      it('should have "contribution" (type object) defined', function () {
+        assert(false, 'test not yet impl')
+      })
+
+      describe('each publisher->contribution entry', function () {
+        it('should have "satoshis" (type number) defined', function () {
+          assert(false, 'test not yet impl')
+        })
+
+        it('should have "fiat" (type number) defined', function () {
+          assert(false, 'test not yet impl')
+        })
+
+        it('should have "currency" (type string) defined', function () {
+          assert(false, 'test not yet impl')
+        })
+      })
+    })
+
+    it('the sum of the "fraction" value across all publisher entries should be 1', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('the sum of the "votes" value across all publisher entries should be equal to the overall "votes" entry for the transaction object given as input', function () {
+      assert(false, 'test not yet impl')
+    })
+  })
+
+  describe('getTransactionsByViewingIds', function () {
+    it('given a single viewingId as a string, it filters a transactions array for that transaction', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    it('given viewingIds as an array, it filters a transactions array those transactions', function () {
+      assert(false, 'test not yet impl')
+    })
+  })
+
+  describe('getTotalContribution', function () {
+    it('returns a total contribution object', function () {
+      assert(false, 'test not yet impl')
+    })
+
+    describe('total contribution object', function () {
+      it('has a key "satoshis" associated with value of number (positive integer)', function () {
+        assert(false, 'test not yet impl')
+      })
+
+      it('has a key "fiat" associated with an object containing two subkeys, "amount" (number) and "currency" (string)', function () {
+        assert(false, 'test not yet impl')
+      })
+
+      it('has a key, fee with a value of type number (positive integer)', function () {
+        assert(false, 'test not yet impl')
+      })
+    })
   })
 })
-
-/**
-{
-  transactionsToCSVDataURL,
-  getTransactionCSVText,
-  getTransactionCSVRows,
-  getPublisherVoteData,
-  getTransactionsByViewingIds,
-  getTotalContribution
-}
-**/
