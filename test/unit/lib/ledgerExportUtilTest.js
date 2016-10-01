@@ -316,12 +316,27 @@ describe('ledger export utilities test', function () {
   })
 
   describe('getTransactionsByViewingIds', function () {
-    it('given a single viewingId as a string, it filters a transactions array for that transaction', function () {
-      assert(false, 'test not yet impl')
+    it('given a single viewingId as a string, it returns an array containing just that transaction (if it exists)', function () {
+      const EXAMPLE_VIEWING_ID = exampleTransactions[0].viewingId
+      let filteredTxArr = ledgerExportUtil.getTransactionsByViewingIds(exampleTransactions, EXAMPLE_VIEWING_ID)
+
+      assert(underscore.isArray(filteredTxArr), 'it should return an array')
+      assert.equal(filteredTxArr.length, 1, 'it should contain a single transaction when a viewingId present in original array is provided')
+      assert.deepEqual(filteredTxArr[0], exampleTransactions[0], 'it should return the correct transaction object from the array')
+
+      let emptyFilteredTxArr = ledgerExportUtil.getTransactionsByViewingIds(exampleTransactions, 'INVALID VIEWING ID')
+      assert(underscore.isArray(emptyFilteredTxArr), 'it should return an array')
+      assert.equal(emptyFilteredTxArr.length, 0, 'it should be an empty array when a viewingId NOT present in original array is provided')
     })
 
-    it('given viewingIds as an array, it filters a transactions array those transactions', function () {
-      assert(false, 'test not yet impl')
+    it('given viewingIds as an array, it filters a transactions array for those transactions', function () {
+      // TODO: NEED MORE TRANSACTIONS IN EXAMPLE DATA TO REALLY MAKE THIS A GOOD TEST
+      const EXAMPLE_VIEWING_IDS = [exampleTransactions[0].viewingId, 'INVALID VIEWING ID EXAMPLE']
+      let filteredTxArr = ledgerExportUtil.getTransactionsByViewingIds(exampleTransactions, EXAMPLE_VIEWING_IDS)
+
+      assert(underscore.isArray(filteredTxArr), 'it should return an array')
+      assert.equal(filteredTxArr.length, 1, 'the returned array should contain only transactions with matching viewingIds')
+      assert.deepEqual(filteredTxArr[0], exampleTransactions[0], 'it should return the correct transaction object from the array')
     })
   })
 
