@@ -9,7 +9,8 @@ const base64Encode = require('../../../js/lib/base64').encode
 
 const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction', 'BTC']
 const CSV_HEADER_ROW_PREFIX = CSV_HEADER_ROW_PREFIX_COLUMNS.join(',')
-const DEFAULT_CSV_HEADER_ROW = CSV_HEADER_ROW_PREFIX + ',USD'
+const DEFAULT_CSV_HEADER_ROW_COLUMNS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['USD'])
+const DEFAULT_CSV_HEADER_ROW = DEFAULT_CSV_HEADER_ROW_COLUMNS.join(',')
 const CSV_COLUMN_COUNT = DEFAULT_CSV_HEADER_ROW.split(',').length
 const EMPTY_CSV = DEFAULT_CSV_HEADER_ROW
 // N.B. the expected datatype for the 'USD'/fiat column is a 'string' because it is of form '5.00 USD'
@@ -97,11 +98,8 @@ describe('ledger export utilities test', function () {
       assert(!!output, 'expected CsV output to exist')
 
       let rows = output.split('\n')
-      assert(!!rows && rows.length, 'expected CSV output to have at least one newline-separated row(s)`')
 
-      let headerRow = rows[0]
-      assert(!!headerRow, 'expected header row to exist')
-      assert.equal(headerRow.slice(0, CSV_HEADER_ROW_PREFIX.length), CSV_HEADER_ROW_PREFIX)
+      checkHeaderRowPrefixForRows(rows)
     })
 
     it('returns a CSV with the same number of columns in every row', function () {
@@ -109,12 +107,7 @@ describe('ledger export utilities test', function () {
 
       let rows = output.split('\n')
 
-      for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
-        let row = rows[rowIdx]
-        assert(!!row, `expected row ${rowIdx} to exist`)
-        let cols = row.split(',')
-        assert.equal(cols.length, CSV_COLUMN_COUNT, `expected row ${rowIdx} to have ${CSV_COLUMN_COUNT} columns`)
-      }
+      checkColumnCountsForRows(rows)
     })
 
     it('returns a CSV with expected data types for each column in every row', function () {
@@ -123,24 +116,7 @@ describe('ledger export utilities test', function () {
 
       let rows = output.split('\n')
 
-      let COLUMN_LABELS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['FIAT'])
-      // start at rowIdx = 1 to SKIP the header row
-      for (var rowIdx = 1; rowIdx < rows.length; rowIdx++) {
-        let row = rows[rowIdx]
-        assert(!!row, `expected row ${rowIdx} to exist`)
-        let cols = row.split(',')
-        for (var colIdx = 0; colIdx < cols.length; colIdx++) {
-          let colVal = cols[colIdx]
-
-          if (CSV_EXPECTED_COLUMN_DATATYPES[colIdx] === 'number' &&
-              `${parseFloat(colVal)}` === colVal) {
-              colVal = parseFloat(colVal)
-          }
-
-          let columnDatatype = typeof colVal
-          assert.equal(columnDatatype, CSV_EXPECTED_COLUMN_DATATYPES[colIdx], `expected ${COLUMN_LABELS[colIdx]} column (value = ${cols[colIdx]}) for row ${rowIdx} to be type "${CSV_EXPECTED_COLUMN_DATATYPES[colIdx]}" , but found type "${columnDatatype}"`)
-        }
-      }
+      checkColumnDatatypesForRows(rows)
     })
 
     it('returns same CSV for an array containing one transaction and a single transaction object', function () {
@@ -167,37 +143,84 @@ describe('ledger export utilities test', function () {
     })
 
     it('returns CSV text matching the CSV rows returned by getTransactionCSVRows', function () {
-      assert(false, 'test not yet impl')
+      let ADD_TOTAL_ROW = true
+      let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions, null, ADD_TOTAL_ROW)
+
+      let rows = output.split('\n')
+
+      let expectedOutputRows = ledgerExportUtil.getTransactionCSVRows(exampleTransactions, null, ADD_TOTAL_ROW)
+      assert.deepEqual(rows, expectedOutputRows)
+    })
+
+    it('when argument addTotalRow===true, there should be a total row with correct totals for each numeric column', function () {
+      let ADD_TOTAL_ROW = true
+      let output = ledgerExportUtil.getTransactionCSVText(exampleTransaction, null, ADD_TOTAL_ROW)
+
+      let rows = output.split('\n')
+
+      checkTotalRow(rows)
     })
   })
 
   describe('getTransactionCSVRows', function () {
     it('for empty input, returns an array containing only the expected CSV header row', function () {
-      assert(false, 'test not yet impl')
+      let output
+
+      output = ledgerExportUtil.getTransactionCSVRows(undefined)
+      assert.deepEqual(output, [DEFAULT_CSV_HEADER_ROW])
+
+      output = ledgerExportUtil.getTransactionCSVRows(null)
+      assert.deepEqual(output, [DEFAULT_CSV_HEADER_ROW])
+
+      output = ledgerExportUtil.getTransactionCSVRows([])
+      assert.deepEqual(output, [DEFAULT_CSV_HEADER_ROW])
     })
 
     it('returns a CSV row array, where the first row is the expected header row up to the currency column (which varies)', function () {
-      assert(false, 'test not yet impl')
+      let rows = ledgerExportUtil.getTransactionCSVRows(exampleTransactions)
+
+      checkHeaderRowPrefixForRows(rows)
     })
 
     it('returns a CSV row array with the same number of columns in every row', function () {
-      assert(false, 'test not yet impl')
+      let rows = ledgerExportUtil.getTransactionCSVRows(exampleTransactions)
+
+      checkColumnCountsForRows(rows)
     })
 
     it('returns a CSV row array with expected data types for each column in every row', function () {
-      assert(false, 'test not yet impl')
+      let rows = ledgerExportUtil.getTransactionCSVRows(exampleTransactions)
+
+      checkColumnDatatypesForRows(rows)
     })
 
     it('returns the same output for a single transaction input as an array of 1 element and a plain transaction object', function () {
-      assert(false, 'test not yet impl')
+      let singleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
+      let arrayWithSingleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
+
+      assert.deepEqual(singleTxRows, arrayWithSingleTxRows)
     })
 
     it('given a transaction, returns an array containing the right number of CSV rows: 1 header row, 1 row per publisher, and if addTotalRow===true, 1 row with totals', function () {
-      assert(false, 'test not yet impl')
+      const EXPECTED_CSV_ROW_COUNT_NO_TOTAL = 1 + NUM_PUBLISHERS
+      const EXPECTED_CSV_ROW_COUNT_WITH_TOTAL = 1 + NUM_PUBLISHERS + 1
+
+      // output with NO TOTAL ROW
+      var rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction)
+
+      assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_NO_TOTAL)
+
+      let ADD_TOTAL_ROW = true
+      rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, ADD_TOTAL_ROW)
+
+      assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_WITH_TOTAL)
     })
 
-    it('when argument addTotalRow===true, there should be a total row with correct totals for each column after "Publisher"', function () {
-      assert(false, 'test not yet impl')
+    it('when argument addTotalRow===true, there should be a total row with correct totals for each numeric column', function () {
+      let ADD_TOTAL_ROW = true
+      let rows = ledgerExportUtil.getTransactionCSVRows(exampleTransaction, null, ADD_TOTAL_ROW)
+
+      checkTotalRow(rows)
     })
   })
 
@@ -273,3 +296,78 @@ describe('ledger export utilities test', function () {
     })
   })
 })
+
+function checkColumnCountsForRows (rows) {
+  for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+    let row = rows[rowIdx]
+    assert(!!row, `expected row ${rowIdx} to exist`)
+
+    let cols = row.split(',')
+    assert.equal(cols.length, CSV_COLUMN_COUNT, `expected row ${rowIdx} to have ${CSV_COLUMN_COUNT} columns`)
+  }
+}
+
+function checkHeaderRowPrefixForRows (rows) {
+  assert(!!rows && rows.length, 'expected output to have at least one row')
+
+  let headerRow = rows[0]
+  assert(!!headerRow, 'expected header row to exist')
+  assert.equal(headerRow.slice(0, CSV_HEADER_ROW_PREFIX.length), CSV_HEADER_ROW_PREFIX)
+}
+
+function checkColumnDatatypesForRows (rows) {
+  let COLUMN_LABELS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['FIAT'])
+  // start at rowIdx = 1 to SKIP the header row
+  for (var rowIdx = 1; rowIdx < rows.length; rowIdx++) {
+    let row = rows[rowIdx]
+    assert(!!row, `expected row ${rowIdx} to exist`)
+    let cols = row.split(',')
+    for (var colIdx = 0; colIdx < cols.length; colIdx++) {
+      let colVal = cols[colIdx]
+
+      if (CSV_EXPECTED_COLUMN_DATATYPES[colIdx] === 'number' &&
+          `${parseFloat(colVal)}` === colVal) {
+        colVal = parseFloat(colVal)
+      }
+
+      let columnDatatype = typeof colVal
+      assert.equal(columnDatatype, CSV_EXPECTED_COLUMN_DATATYPES[colIdx], `expected ${COLUMN_LABELS[colIdx]} column (value = ${cols[colIdx]}) for row ${rowIdx} to be type "${CSV_EXPECTED_COLUMN_DATATYPES[colIdx]}" , but found type "${columnDatatype}"`)
+    }
+  }
+}
+
+function checkTotalRow (rows) {
+  let totalRow = rows[rows.length - 1]
+
+  let totalRowColumns = totalRow.split(',')
+
+  for (var colIdx = 0; colIdx < totalRowColumns.length; colIdx++) {
+    let expectedColType = CSV_EXPECTED_COLUMN_DATATYPES[colIdx]
+
+    if (expectedColType === 'number') {
+      let totalRowValue = parseFloat(totalRowColumns[colIdx])
+      checkCSVColumnTotal(rows.slice(1, rows.length - 1), colIdx, totalRowValue)
+    }
+  }
+}
+
+function checkCSVColumnTotal (rows, colIdx, expectedTotal) {
+  let sum = 0
+
+  for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+    let row = rows[rowIdx]
+    let cols = row.split(',')
+
+    let colVal = (cols || [])[colIdx]
+    assert(colVal === 0 || (!!colVal), `value for row ${rowIdx}, column ${colIdx} is not defined!`)
+
+    let parsedColVal = parseFloat(colVal)
+    assert(`${parsedColVal}` === colVal, `value (${colVal}) for row ${rowIdx}, column ${colIdx} is not numeric`)
+
+    sum += parsedColVal
+  }
+
+  assert.equal(sum, expectedTotal, `Sum for column ${colIdx} across ${rows.length} rows does not match expected value`)
+  let columnNames = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['Fiat'])
+  console.log(`\tSum for column ${columnNames[colIdx]} (#${colIdx}) across ${rows.length} rows (=${sum}) matches expected total (${expectedTotal})`)
+}
