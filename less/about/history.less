@@ -27,6 +27,7 @@ body {
     .sectionTitle {
       font-size: 28px;
       display: inline-block;
+      -webkit-user-select: none;
     }
     .headerActions {
       float: right;
@@ -45,7 +46,14 @@ body {
           height: 22px;
         }
         .searchInputPlaceholder {
+          color: @gray;
+          float: none;
           font-family: FontAwesome;
+          left: -35px;
+          margin: 0;
+          padding: 0;
+          position: relative;
+          width: 0;
         }
         .searchInputClear {
           float: none;
@@ -67,7 +75,7 @@ body {
 
   .siteDetailsPageContent {
     border-top: 0px;
-    margin-top: 15px;
+    margin-top: 50px;
     display: block;
     clear: both;
 
@@ -75,52 +83,54 @@ body {
       font-size: 16px;
       margin-bottom: 12px;
       padding-left: 40px;
+      -webkit-user-select: none;
     }
 
     .sortableTable {
       border-spacing: 0px;
+      cursor: default;
 
+      // Trash can icon in Time column header
+      th:first-of-type:before {
+        content: "\f1f8";
+        font-family: FontAwesome;
+        margin-right: 13px;
+      }
+      th:hover:first-of-type:before {
+        color: #000;
+      }
+
+      // Time visited
       .time {
-        color: #656565;
+        font-size: 11pt;
         font-weight: 800;
         text-align: center;
         width: 154px;
+
+        // Delete button
+        .deleteEntry {
+          color: transparent;
+          float: left;
+          margin-left: 8px;
+          margin-top: 1px;
+        }
+        &:hover .deleteEntry{
+          color: @gray;
+        }
       }
+
+      // Entry title
       .title {
         max-width: 415px;
         text-overflow: ellipsis;
         overflow: hidden;
+        font-size: 11pt;
+        white-space: nowrap;
       }
+
+      // Entry domain
       .domain {
-      }
-    }
-
-    .historyList {
-      padding-top: 10px;
-      overflow: hidden;
-
-      .listItem {
-        display: flex;
-        height: 1rem;
-        padding-left: 5px;
-
-        &:hover {
-          background: #ffcc99;
-        }
-        .aboutListItem {
-          align-items: center;
-        }
-        .aboutItemLocation {
-          margin-left: 10px;
-        }
-        .aboutItemDate {
-          color: #aaa;
-          margin-right: 10px;
-        }
-      }
-
-      .sortableTable {
-        cursor: default;
+        font-size: 11pt;
       }
     }
   }
