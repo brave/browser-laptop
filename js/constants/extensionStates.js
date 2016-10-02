@@ -9,7 +9,6 @@ const extensionStates = {
   REGISTERING: _,
   REGISTERED: _,
   LOADING: _,
-  LOADED: _,
   ENABLED: _,
   DISABLED: _,
   INSTALL_FAILED: _

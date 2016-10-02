@@ -154,10 +154,10 @@ const extensionInfo = {
     return this.extensionState[extensionId] === extensionStates.LOADING
   },
   isLoaded: function (extensionId) {
-    return [extensionStates.LOADED, extensionStates.ENABLED, extensionStates.DISABLED].includes(this.extensionState[extensionId])
+    return [extensionStates.ENABLED, extensionStates.DISABLED].includes(this.extensionState[extensionId])
   },
   isRegistered: function (extensionId) {
-    return [extensionStates.REGISTERED, extensionStates.LOADING, extensionStates.LOADED, extensionStates.ENABLED, extensionStates.DISABLED].includes(this.extensionState[extensionId])
+    return [extensionStates.REGISTERED, extensionStates.LOADING, extensionStates.ENABLED, extensionStates.DISABLED].includes(this.extensionState[extensionId])
   },
   isRegistering: function (extensionId) {
     return this.extensionState[extensionId] === extensionStates.REGISTERING
@@ -178,7 +178,7 @@ const extensionInfo = {
 module.exports.init = () => {
   browserActions.init()
 
-  const {componentUpdater} = require('electron')
+  const {componentUpdater, session} = require('electron')
   componentUpdater.on('component-checking-for-updates', () => {
     // console.log('checking for update')
   })
@@ -201,40 +201,40 @@ module.exports.init = () => {
     // console.log('update-not-updated')
   })
   componentUpdater.on('component-registered', (e, extensionId) => {
-    extensionInfo.setState(extensionId, extensionStates.REGISTERED)
     const extensions = extensionState.getExtensions(appStore.getState())
     const extensionPath = extensions.getIn([extensionId, 'filePath'])
     // If we don't have info on the extension yet, check for an update / install
     if (!extensionPath) {
       componentUpdater.checkNow(extensionId)
     } else {
+      extensionInfo.setState(extensionId, extensionStates.REGISTERED)
       loadExtension(extensionId, extensionPath)
     }
   })
 
-  const extensionLoaded = (installInfo) => {
-    if (installInfo.error) {
-      console.error(installInfo.error)
-      if (installInfo.id) {
-        extensionInfo.setState(installInfo.id, extensionStates.INSTALL_FAILED)
-      } else {
-        extensionInfo.setState(installInfo.id, undefined)
-      }
-      return
-    }
-    extensionInfo.setState(installInfo.id, extensionStates.LOADED)
+  process.on('extension-load-error', (error) => {
+    console.error(error)
+  })
+
+  process.on('extension-unloaded', (extensionId) => {
+    extensionInfo.setState(extensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(extensionId)
+  })
+
+  process.on('extension-ready', (installInfo) => {
+    extensionInfo.setState(installInfo.id, extensionStates.ENABLED)
     extensionInfo.setInstallInfo(installInfo.id, installInfo)
     installInfo.filePath = installInfo.base_path
     installInfo.base_path = fileUrl(installInfo.base_path)
     extensionActions.extensionInstalled(installInfo.id, installInfo)
-    enableExtension(installInfo.id)
-  }
+    extensionActions.extensionEnabled(installInfo.id)
+  })
 
-  let loadExtension = (extensionId, extensionPath, options = {}) => {
+  let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
       if (extensionId === config.braveExtensionId) {
-        process.emit('load-extension', extensionPath, options, extensionLoaded)
+        session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         return
       }
       // Verify we don't have info about an extension which doesn't exist
@@ -242,7 +242,7 @@ module.exports.init = () => {
       // just a safety net.
       fs.exists(path.join(extensionPath, 'manifest.json'), (exists) => {
         if (exists) {
-          process.emit('load-extension', extensionPath, options, extensionLoaded)
+          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         } else {
           // This is an error condition, but we can recover.
           extensionInfo.setState(extensionId, undefined)
@@ -255,21 +255,11 @@ module.exports.init = () => {
   }
 
   let enableExtension = (extensionId) => {
-    if (extensionInfo.isLoaded(extensionId) && !extensionInfo.isEnabled(extensionId)) {
-      extensionInfo.setState(extensionId, extensionStates.ENABLED)
-      const installInfo = extensionInfo.getInstallInfo(extensionId)
-      process.emit('enable-extension', installInfo.id)
-      extensionActions.extensionEnabled(installInfo.id)
-    }
+    session.defaultSession.extensions.enable(extensionId)
   }
 
   let disableExtension = (extensionId) => {
-    if (extensionInfo.isLoaded(extensionId) && !extensionInfo.isDisabled(extensionId)) {
-      extensionInfo.setState(extensionId, extensionStates.DISABLED)
-      const installInfo = extensionInfo.getInstallInfo(extensionId)
-      process.emit('disable-extension', installInfo.id)
-      extensionActions.extensionDisabled(installInfo.id)
-    }
+    session.defaultSession.extensions.disable(extensionId)
   }
 
   let registerExtension = (extensionId) => {
@@ -288,7 +278,7 @@ module.exports.init = () => {
 
   // Manually install only the braveExtension
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.braveExtensionId, getExtensionsPath('brave'), {manifest_location: 'component', manifest: generateBraveManifest()})
+  loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
 
   let registerExtensions = () => {
     if (getSetting(settings.PDFJS_ENABLED)) {
