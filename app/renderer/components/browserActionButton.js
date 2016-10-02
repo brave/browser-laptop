@@ -12,7 +12,12 @@ const extensionState = require('../../common/state/extensionState')
 const windowActions = require('../../../js/actions/windowActions')
 
 class BrowserActionButton extends ImmutableComponent {
-  onClicked (id, title, e) {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick (e) {
     if (/^chrome-extension/.test(this.props.popupWindowSrc)) {
       windowActions.setPopupWindowDetail()
       return
@@ -25,7 +30,7 @@ class BrowserActionButton extends ImmutableComponent {
       offsetX: e.nativeEvent.offsetX,
       offsetY: e.nativeEvent.offsetY
     }
-    ipc.send('chrome-browser-action-clicked', id, this.props.tabId, title, props)
+    ipc.send('chrome-browser-action-clicked', this.props.extensionId, this.props.tabId, this.props.browserAction.get('title'), props)
   }
 
   render () {
@@ -40,7 +45,7 @@ class BrowserActionButton extends ImmutableComponent {
         backgroundPosition: 'center'
       }}
       dataButtonValue={this.props.extensionId}
-      onClick={this.onClicked.bind(this, this.props.extensionId, this.props.browserAction.get('title'))} />
+      onClick={this.onClick} />
   }
 }
 
