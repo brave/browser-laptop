@@ -501,7 +501,7 @@ class Main extends ImmutableComponent {
         windowActions.savePosition(event.sender.getPosition())
       }, 1000)
     })
-
+    // Full screen as in F11 (not full screen on a video)
     currentWindow.on('enter-full-screen', function (event) {
       windowActions.setWindowFullScreen(true)
     })
@@ -789,7 +789,7 @@ class Main extends ImmutableComponent {
         ? selectedIndex.slice(1)
         : null,
       lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
-      isMaximized: this.props.windowState.getIn(['ui', 'isMaximized'])
+      isMaximized: currentWindow.isMaximized() || currentWindow.isFullScreen()
     }
   }
 

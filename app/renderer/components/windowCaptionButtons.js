@@ -43,6 +43,12 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   onMaximizeClick (e) {
+    if (currentWindow.isFullScreen()) {
+      // If full screen, toggle full screen status and restore window (make smaller)
+      currentWindow.setFullScreen(false)
+      if (currentWindow.isMaximized()) currentWindow.unmaximize()
+      return false
+    }
     return (!currentWindow.isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
   }
 
