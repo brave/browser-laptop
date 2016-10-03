@@ -9,7 +9,7 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const webContents = electron.webContents
-const AppStore = require('../js/stores/appStore')
+const appStore = require('../js/stores/appStore')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const downloadStates = require('../js/constants/downloadStates')
@@ -31,6 +31,7 @@ const app = electron.app
 const uuid = require('node-uuid')
 const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
+const {adBlockResourceName} = require('./adBlock')
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
@@ -104,7 +105,7 @@ function registerForBeforeRequest (session) {
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
-      const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK
+      const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK || appConfig[results.resourceName] && appConfig[results.resourceName].resourceType === adBlockResourceName
       const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
       const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
 
@@ -123,8 +124,16 @@ function registerForBeforeRequest (session) {
           appActions.addResourceCount(results.resourceName, 1)
         }
 
+        let parentResourceName = results.resourceName
+        // Adblock can have many different resource names for each alternate
+        // data file. But we always want the per level reporting to report
+        // it into the window adblock stats.
+        if (isAdBlock) {
+          parentResourceName = appConfig.resourceNames.ADBLOCK
+        }
+
         BrowserWindow.getAllWindows().forEach((wnd) =>
-          wnd.webContents.send(message, results.resourceName, details))
+          wnd.webContents.send(message, parentResourceName, details))
         if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {
@@ -338,7 +347,7 @@ function registerPermissionHandler (session, partition) {
     }
 
     // Check whether there is a persistent site setting for this host
-    const appState = AppStore.getState()
+    const appState = appStore.getState()
     let settings
     let tempSettings
     if (mainFrameUrl === appUrlUtil.getIndexHTML() || origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
@@ -432,7 +441,7 @@ function updateDownloadState (downloadId, item, state) {
     return
   }
 
-  const downloadItemStartTime = AppStore.getState().getIn(['downloads', downloadId, 'startTime'])
+  const downloadItemStartTime = appStore.getState().getIn(['downloads', downloadId, 'startTime'])
   appActions.mergeDownloadDetail(downloadId, {
     startTime: downloadItemStartTime || new Date().getTime(),
     savePath: item.getSavePath(),
@@ -464,7 +473,7 @@ function registerForDownloadListener (session) {
     }
     item.on('updated', function () {
       let state = downloadStates.IN_PROGRESS
-      const downloadItem = AppStore.getState().getIn(['downloads', downloadId])
+      const downloadItem = appStore.getState().getIn(['downloads', downloadId])
       if (downloadItem && downloadItem.get('state') === downloadStates.PAUSED) {
         state = downloadStates.PAUSED
       }
@@ -561,7 +570,7 @@ module.exports.isResourceEnabled = (resourceName, url) => {
     return true
   }
 
-  const appState = AppStore.getState()
+  const appState = appStore.getState()
   const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
   const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
 
@@ -571,7 +580,10 @@ module.exports.isResourceEnabled = (resourceName, url) => {
   }
 
   if ((resourceName === appConfig.resourceNames.ADBLOCK ||
-       resourceName === appConfig.resourceNames.TRACKING_PROTECTION)) {
+      appConfig[resourceName] &&
+        appConfig[resourceName].enabled &&
+        appConfig[resourceName].resourceType === adBlockResourceName ||
+      resourceName === appConfig.resourceNames.TRACKING_PROTECTION)) {
     // Check the resource vs the ad control setting
     if (braverySettings.adControl === 'allowAdsAndTracking') {
       return false

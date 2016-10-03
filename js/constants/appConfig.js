@@ -22,6 +22,7 @@ module.exports = {
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
+    // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
     enabled: true
@@ -35,8 +36,9 @@ module.exports = {
     url: getTargetAboutUrl('about:flash')
   },
   adblock: {
+    alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/2/{uuid}.dat',
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
-    version: '1',
+    version: '2',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },

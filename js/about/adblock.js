@@ -6,25 +6,56 @@
 const React = require('react')
 const Immutable = require('immutable')
 const messages = require('../constants/messages')
+const getSetting = require('../settings').getSetting
+const aboutActions = require('./aboutActions')
+const ImmutableComponent = require('../components/immutableComponent')
+const SwitchControl = require('../components/switchControl')
 
 const ipc = window.chrome.ipc
 
 // Stylesheets
+require('../../less/switchControls.less')
 require('../../less/about/itemList.less')
 require('../../less/about/adblock.less')
+
+class AdBlockItem extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+  }
+  onClick (e) {
+    aboutActions.updateAdblockDataFiles(this.props.resource.get('uuid'), e.target.value)
+  }
+  get prefKey () {
+    return `adblock.${this.props.resource.get('uuid')}.enabled`
+  }
+  render () {
+    return <div>
+      <SwitchControl id={this.props.resource.get('uuid')}
+        rightText={this.props.resource.get('title')}
+        className={`switch-${this.props.resource.get('uuid')}`}
+        disabled={this.props.disabled}
+        onClick={this.onClick}
+        checkedOn={getSetting(this.prefKey, this.props.settings)} />
+    </div>
+  }
+}
 
 class AboutAdBlock extends React.Component {
   constructor () {
     super()
     this.state = {
-      adblock: Immutable.Map()
+      adblock: Immutable.Map(),
+      resources: Immutable.List()
     }
     ipc.on(messages.ADBLOCK_UPDATED, (e, detail) => {
       if (!detail) {
         return
       }
       this.setState({
-        adblock: Immutable.fromJS(detail.adblock)
+        adblock: Immutable.fromJS(detail.adblock),
+        settings: Immutable.fromJS(detail.settings),
+        resources: Immutable.fromJS(detail.resources || [])
       })
     })
   }
@@ -46,6 +77,18 @@ class AboutAdBlock extends React.Component {
               ? <div className='adblockLastETag'><span data-l10n-id='lastCheckETagLabel' /> <span>{this.state.adblock.get('etag')}</span></div>
               : null
             }
+            <h3 data-l10n-id='additionalFilterLists' />
+            <div className='adblockSubtext' data-l10n-id='adblockTooManyListsWarning' />
+            <div className='adblockLists'>
+              {
+                this.state.resources.map((resource) =>
+                  <AdBlockItem resource={resource}
+                    settings={this.state.settings} />)
+              }
+            </div>
+            <h3 data-l10n-id='customFilters' />
+            <div className='adblockSubtext' data-l10n-id='customFilterDescription' />
+            <textarea className='customFiltersInput' cols='100' rows='10' />
           </div>
         </div>
       </list>

@@ -98,7 +98,9 @@ class Frame extends ImmutableComponent {
       })
     } else if (location === 'about:adblock') {
       this.webview.send(messages.ADBLOCK_UPDATED, {
-        adblock: this.props.adblock.toJS()
+        adblock: this.props.adblock.toJS(),
+        settings: this.props.settings ? this.props.settings.toJS() : null,
+        resources: require('abp-filter-parser-cpp/lib/regions')
       })
     } else if (location === 'about:downloads') {
       this.webview.send(messages.DOWNLOADS_UPDATED, {

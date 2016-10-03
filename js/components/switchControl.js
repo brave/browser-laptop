@@ -50,14 +50,14 @@ class SwitchControl extends ImmutableComponent {
         </div>
       </div>
       {
-        this.props.rightl10nId && this.props.topl10nId
-        ? <div className='switchControlText'><div className='switchControlRightText'><div className='switchSpacer'>&nbsp;</div><span className='switchControlRightText' data-l10n-id={this.props.rightl10nId} /></div></div>
+        (this.props.rightl10nId || this.props.rightText) && this.props.topl10nId
+        ? <div className='switchControlText'><div className='switchControlRightText'><div className='switchSpacer'>&nbsp;</div><span className='switchControlRightText' data-l10n-id={this.props.rightl10nId} >{this.props.rightText || ''}</span></div></div>
         : <div className='switchControlRight'>
-          {this.props.rightl10nId && !this.props.onInfoClick
-          ? <span className='switchControlRightText' data-l10n-id={this.props.rightl10nId} />
+          {(this.props.rightl10nId || this.props.rightText) && !this.props.onInfoClick
+          ? <span className='switchControlRightText' data-l10n-id={this.props.rightl10nId}>{this.props.rightText || ''}</span>
           : null}
-          {this.props.rightl10nId && this.props.onInfoClick
-          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId} /><span className='fa fa-question-circle info clickable' onClick={this.props.onInfoClick} /></div>
+          {(this.props.rightl10nId || this.props.rightText) && this.props.onInfoClick
+          ? <div className='switchControlRightText'><span data-l10n-id={this.props.rightl10nId}>{this.props.rightText}</span><span className='fa fa-question-circle info clickable' onClick={this.props.onInfoClick} /></div>
           : null}
         </div>
       }

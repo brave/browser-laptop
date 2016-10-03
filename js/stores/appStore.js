@@ -707,6 +707,15 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_MENUBAR_TEMPLATE:
       appState = appState.setIn(['menu', 'template'], action.menubarTemplate)
       break
+    case AppConstants.APP_UPDATE_ADBLOCK_DATAFILES:
+      const adblock = require('../../app/adblock')
+      adblock.updateAdblockDataFiles(action.uuid, action.enable)
+      handleAppAction({
+        actionType: AppConstants.APP_CHANGE_SETTING,
+        key: `adblock.${action.uuid}.enabled`,
+        value: action.enable
+      })
+      return
     default:
   }
 

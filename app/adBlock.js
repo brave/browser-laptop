@@ -10,6 +10,14 @@ const ABPFilterParser = ABPFilterParserLib.ABPFilterParser
 const FilterOptions = ABPFilterParserLib.FilterOptions
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
+const appConfig = require('../js/constants/appConfig')
+// Maintains a map between a resource uuid and an adblock instance
+const adblockInstances = new Map()
+const defaultAdblock = new ABPFilterParser()
+const defaultSafeBrowsing = new ABPFilterParser()
+const regions = require('abp-filter-parser-cpp/lib/regions')
+const getSetting = require('../js/settings').getSetting
+
 module.exports.adBlockResourceName = 'adblock'
 module.exports.safeBrowsingResourceName = 'safeBrowsing'
 
@@ -54,13 +62,39 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
   })
 }
 
-module.exports.initInstance = (resourceName, shouldCheckMainFrame) => {
-  let adblock = new ABPFilterParser()
-  DataFile.init(resourceName, startAdBlocking.bind(null, adblock, resourceName, shouldCheckMainFrame),
-                (data) => adblock.deserialize(data))
+module.exports.initInstance = (parser, resourceName, shouldCheckMainFrame) => {
+  DataFile.init(resourceName, startAdBlocking.bind(null, parser, resourceName, shouldCheckMainFrame),
+                (data) => parser.deserialize(data))
   return module.exports
 }
 
-module.exports.init = () => module.exports
-    .initInstance(module.exports.adBlockResourceName, false)
-    .initInstance(module.exports.safeBrowsingResourceName, true)
+module.exports.init = () => {
+  module.exports
+    .initInstance(defaultAdblock, module.exports.adBlockResourceName, false)
+    .initInstance(defaultSafeBrowsing, module.exports.safeBrowsingResourceName, true)
+  // Initialize the regional adblock files that are enabled
+  regions
+    .filter((region) => getSetting(`adblock.${region.uuid}.enabled`))
+    .forEach((region) => module.exports.updateAdblockDataFiles(region.uuid, true))
+}
+
+/**
+ * Adds an additional adblock resource to download and initialize
+ * @param uuid - The uuid of the adblock datafile resource
+ * @param forAdblock - true if main frame URLs should be blocked
+ */
+module.exports.updateAdblockDataFiles = (uuid, enabled, version = 1, shouldCheckMainFrame = false) => {
+  appConfig[uuid] = {
+    resourceType: module.exports.adBlockResourceName,
+    enabled,
+    msBetweenRechecks: 1000 * 60 * 60 * 24,
+    url: appConfig.adblock.alternateDataFiles.replace('{uuid}', uuid),
+    version
+  }
+
+  if (!adblockInstances.has(uuid)) {
+    const parser = new ABPFilterParser()
+    adblockInstances.set(uuid, parser)
+    module.exports.initInstance(parser, uuid, shouldCheckMainFrame)
+  }
+}
