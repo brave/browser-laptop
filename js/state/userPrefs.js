@@ -45,19 +45,19 @@ const runCallback = (cb, name, incognito) => {
 
   if (name) {
     if (prefs[name]) {
-      setUserPref(name, prefs[name], incognito)
+      module.exports.setUserPref(name, prefs[name], incognito)
       return true
     }
     return false
   }
 
   for (name in prefs) {
-    setUserPref(name, prefs[name], incognito)
+    module.exports.setUserPref(name, prefs[name], incognito)
   }
   return true
 }
 
-const setUserPref = (path, value, incognito = false) => {
+module.exports.setUserPref = (path, value, incognito = false) => {
   let partitions = incognito ? Object.keys(registeredPrivateSessions) : Object.keys(registeredSessions)
   partitions.forEach((partition) => {
     setUserPrefType(registeredSessions[partition], path, value)

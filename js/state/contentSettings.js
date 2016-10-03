@@ -12,7 +12,7 @@ const {cookieExceptions, localStorageExceptions} = require('../data/siteHacks')
 const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
-const { registerUserPrefs } = require('./userPrefs')
+const { setUserPref } = require('./userPrefs')
 const { getSetting } = require('../settings')
 
 // backward compatibility with appState siteSettings
@@ -126,7 +126,7 @@ const hostSettingsToContentSettings = (hostSettings, contentSettings) => {
   }
 }
 
-const getContentSettingsFromSiteSettings = (appState) => {
+const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
   let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
 
   let contentSettings = {
@@ -174,34 +174,42 @@ const getContentSettingsFromSiteSettings = (appState) => {
   }
 
   hostSettingsToContentSettings(appState.get('siteSettings').toJS(), contentSettings)
-  hostSettingsToContentSettings(appState.get('temporarySiteSettings').toJS(), contentSettings)
-
+  if (isPrivate) {
+    hostSettingsToContentSettings(appState.get('temporarySiteSettings').toJS(), contentSettings)
+    return { content_settings: contentSettings }
+  }
   return { content_settings: contentSettings }
 }
-
-let updateTrigger
 
 // Register callback to handle all updates
 const doAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_CHANGE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger('content_settings', action.temporary)
+        if (action.temporary) {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState(), true).content_settings, true)
+        } else {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
+        }
       })
       break
     case AppConstants.APP_REMOVE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger('content_settings', action.temporary)
+        if (action.temporary) {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState(), true).content_settings, true)
+        } else {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
+        }
       })
       break
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger()
+        setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
       })
       break
     case AppConstants.APP_CHANGE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger()
+        setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
       })
       break
     default:
@@ -209,6 +217,5 @@ const doAction = (action) => {
 }
 
 module.exports.init = () => {
-  updateTrigger = registerUserPrefs(() => getContentSettingsFromSiteSettings(AppStore.getState()))
   AppDispatcher.register(doAction)
 }
