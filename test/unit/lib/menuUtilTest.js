@@ -55,17 +55,7 @@ describe('menuUtil', function () {
       useCleanCache: true
     })
 
-    const fakeElectron = {
-      ipcMain: {
-        on: function () { }
-      },
-      remote: {
-        app: { }
-      },
-      app: { }
-    }
-
-    mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('electron', require('./fakeElectron'))
     menuUtil = require('../../../app/browser/lib/menuUtil')
   })
 
