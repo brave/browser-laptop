@@ -101,10 +101,6 @@ class SiteInfo extends ImmutableComponent {
           </ul>
         </li>
     }
-    // Disable in private mode for now
-    if (this.isPrivate) {
-      runInsecureContentInfo = null
-    }
 
     return <Dialog onHide={this.props.onHide} className='siteInfo' isClickDismiss>
       <ul onClick={(e) => e.stopPropagation()}>

@@ -79,6 +79,53 @@ const getBlock3rdPartyStorage = (braveryDefaults) => {
   }
 }
 
+const hostSettingsToContentSettings = (hostSettings, contentSettings) => {
+  // We do 2 passes for setting content settings. On the first pass we consider all shield types.
+  for (let hostPattern in hostSettings) {
+    let hostSetting = hostSettings[hostPattern]
+    if (['number', 'boolean'].includes(typeof hostSetting.noScript)) {
+      addContentSettings(contentSettings.javascript, hostPattern, '*',
+        hostSetting.noScript === true ? 'block' : 'allow')
+    }
+    if (typeof hostSetting.runInsecureContent === 'boolean') {
+      addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',
+        hostSetting.runInsecureContent ? 'allow' : 'block')
+    }
+    if (hostSetting.cookieControl) {
+      if (hostSetting.cookieControl === 'block3rdPartyCookie') {
+        addContentSettings(contentSettings.cookies, hostPattern, '*', 'block')
+        addContentSettings(contentSettings.cookies, hostPattern, parseSiteSettingsPattern(hostPattern), 'allow')
+        addContentSettings(contentSettings.referer, hostPattern, '*', 'block')
+        cookieExceptions.forEach((exceptionPair) =>
+          addContentSettings(contentSettings.cookies, exceptionPair[0], exceptionPair[1], 'allow'))
+      } else {
+        addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
+        addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
+      }
+    }
+    if (typeof hostSetting.fingerprintingProtection === 'boolean') {
+      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', hostSetting.fingerprintingProtection ? 'block' : 'allow')
+    }
+    if (hostSetting.adControl) {
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
+    }
+    if (typeof hostSetting.flash === 'number') {
+      addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
+    }
+  }
+  // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
+  for (let hostPattern in hostSettings) {
+    let hostSetting = hostSettings[hostPattern]
+    if (hostSetting.shieldsUp === false) {
+      addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.adInsertion, hostPattern, '*', 'block')
+      addContentSettings(contentSettings.javascript, hostPattern, '*', 'allow')
+      addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
+    }
+  }
+}
+
 const getContentSettingsFromSiteSettings = (appState) => {
   let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
 
@@ -126,51 +173,8 @@ const getContentSettingsFromSiteSettings = (appState) => {
     }]
   }
 
-  let hostSettings = appState.get('siteSettings').toJS()
-  // We do 2 passes for setting content settings. On the first pass we consider all shield types.
-  for (let hostPattern in hostSettings) {
-    let hostSetting = hostSettings[hostPattern]
-    if (['number', 'boolean'].includes(typeof hostSetting.noScript)) {
-      addContentSettings(contentSettings.javascript, hostPattern, '*',
-        hostSetting.noScript === true ? 'block' : 'allow')
-    }
-    if (typeof hostSetting.runInsecureContent === 'boolean') {
-      addContentSettings(contentSettings.runInsecureContent, hostPattern, '*',
-        hostSetting.runInsecureContent ? 'allow' : 'block')
-    }
-    if (hostSetting.cookieControl) {
-      if (hostSetting.cookieControl === 'block3rdPartyCookie') {
-        addContentSettings(contentSettings.cookies, hostPattern, '*', 'block')
-        addContentSettings(contentSettings.cookies, hostPattern, parseSiteSettingsPattern(hostPattern), 'allow')
-        addContentSettings(contentSettings.referer, hostPattern, '*', 'block')
-        cookieExceptions.forEach((exceptionPair) =>
-          addContentSettings(contentSettings.cookies, exceptionPair[0], exceptionPair[1], 'allow'))
-      } else {
-        addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
-        addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
-      }
-    }
-    if (typeof hostSetting.fingerprintingProtection === 'boolean') {
-      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', hostSetting.fingerprintingProtection ? 'block' : 'allow')
-    }
-    if (hostSetting.adControl) {
-      addContentSettings(contentSettings.adInsertion, hostPattern, '*', hostSetting.adControl === 'showBraveAds' ? 'allow' : 'block')
-    }
-    if (typeof hostSetting.flash === 'number') {
-      addContentSettings(contentSettings.flashActive, hostPattern, '*', 'allow')
-    }
-  }
-  // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
-  for (let hostPattern in hostSettings) {
-    let hostSetting = hostSettings[hostPattern]
-    if (hostSetting.shieldsUp === false) {
-      addContentSettings(contentSettings.cookies, hostPattern, '*', 'allow')
-      addContentSettings(contentSettings.canvasFingerprinting, hostPattern, '*', 'allow')
-      addContentSettings(contentSettings.adInsertion, hostPattern, '*', 'block')
-      addContentSettings(contentSettings.javascript, hostPattern, '*', 'allow')
-      addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
-    }
-  }
+  hostSettingsToContentSettings(appState.get('siteSettings').toJS(), contentSettings)
+  hostSettingsToContentSettings(appState.get('temporarySiteSettings').toJS(), contentSettings)
 
   return { content_settings: contentSettings }
 }

@@ -210,11 +210,11 @@ class Frame extends ImmutableComponent {
     }
     if (typeof activeSiteSettings.get('flash') === 'number') {
       if (activeSiteSettings.get('flash') < Date.now()) {
-        appActions.removeSiteSetting(origin, 'flash')
+        appActions.removeSiteSetting(origin, 'flash', this.props.isPrivate)
       }
     }
     if (activeSiteSettings.get('noScript') === 0) {
-      appActions.removeSiteSetting(origin, 'noScript')
+      appActions.removeSiteSetting(origin, 'noScript', this.props.isPrivate)
     }
   }
 
@@ -314,7 +314,7 @@ class Frame extends ImmutableComponent {
 
   get zoomLevel () {
     const zoom = this.props.frameSiteSettings && this.props.frameSiteSettings.get('zoomLevel')
-    appActions.removeSiteSetting(this.origin, 'zoomLevel')
+    appActions.removeSiteSetting(this.origin, 'zoomLevel', this.props.isPrivate)
     return zoom
   }
 

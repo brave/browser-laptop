@@ -75,6 +75,9 @@ class BraveryPanel extends ImmutableComponent {
   get isFpShown () {
     return this.props.braveryPanelDetail.get('expandFp')
   }
+  get isPrivate () {
+    return this.props.frameProps.getIn(['isPrivate'])
+  }
   get redirectedResources () {
     return this.props.frameProps.get('httpsEverywhere')
   }
@@ -144,7 +147,7 @@ class BraveryPanel extends ImmutableComponent {
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`
     }
-    appActions.changeSiteSetting(ruleKey, setting, e.target.value)
+    appActions.changeSiteSetting(ruleKey, setting, e.target.value, this.isPrivate)
     this.onReload()
   }
   get displayHost () {

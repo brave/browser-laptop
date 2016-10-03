@@ -715,6 +715,10 @@ class Main extends ImmutableComponent {
   }
 
   get allSiteSettings () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    if (activeFrame && activeFrame.get('isPrivate')) {
+      return this.props.appState.get('temporarySiteSettings')
+    }
     return this.props.appState.get('siteSettings')
   }
 
@@ -741,11 +745,6 @@ class Main extends ImmutableComponent {
   }
 
   get braveShieldsDisabled () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    if (activeFrame && activeFrame.get('isPrivate')) {
-      return true
-    }
-
     const activeRequestedLocation = this.activeRequestedLocation
     if (!activeRequestedLocation) {
       return true
