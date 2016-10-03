@@ -6,18 +6,35 @@
 'use strict'
 
 let ready = false
-// TODO(bridiver) - this should also send a notification to Brave
-process.on('uncaughtException', function (error) {
+
+// Setup the crash handling
+const CrashHerald = require('./crash-herald')
+CrashHerald.init()
+
+const handleUncaughtError = (error) => {
   var message, ref, stack
   stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
   message = 'Uncaught Exception:\n' + stack
   console.error('An uncaught exception occurred in the main process ' + message)
-  setTimeout(() => {
-    if (!ready) {
-      console.error('Process failed to load within 60 seconds')
-      process.exit(1)
-    }
-  }, 60 * 1000)
+
+  // TODO(bridiver) - this should also send a notification to Brave
+
+  if (!ready) {
+    console.error('Waiting 60 seconds for process to load')
+    setTimeout(() => {
+      if (!ready) {
+        console.error('Process failed to load within 60 seconds')
+        process.exit(1)
+      }
+    }, 60 * 1000)
+  }
+}
+process.on('uncaughtException', function (error) {
+  handleUncaughtError(error)
+})
+
+process.on('unhandledRejection', function (error, promise) {
+  handleUncaughtError(error)
 })
 
 if (process.platform === 'win32') {
@@ -41,7 +58,6 @@ const appActions = require('../js/actions/appActions')
 const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
-const CrashHerald = require('./crash-herald')
 const PackageLoader = require('./package-loader')
 const Extensions = require('./extensions')
 const Filtering = require('./filtering')
@@ -413,7 +429,6 @@ app.on('ready', () => {
       })
     }
     process.emit(messages.APP_INITIALIZED)
-    ready = true
 
     if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({
@@ -700,9 +715,6 @@ app.on('ready', () => {
       Importer.init()
     })
 
-    // Setup the crash handling
-    CrashHerald.init()
-
     // This loads package.json into an object
     // TODO: Seems like this can be done with app.getVersion() insteand?
     PackageLoader.load((err, pack) => {
@@ -729,5 +741,6 @@ app.on('ready', () => {
         Importer.init()
       })
     })
+    ready = true
   })
 })
