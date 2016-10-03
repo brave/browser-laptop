@@ -484,12 +484,17 @@ class Main extends ImmutableComponent {
     }
 
     // Handlers for saving window state
+    // TODO: revisit this code when window state moves to appStore
     currentWindow.on('maximize', function () {
       windowActions.setMaximizeState(true)
     })
 
     currentWindow.on('unmaximize', function () {
       windowActions.setMaximizeState(false)
+    })
+
+    currentWindow.on('resize', function (event) {
+      windowActions.saveSize(event.sender.getSize())
     })
 
     let moveTimeout = null

@@ -611,6 +611,16 @@ Saves the position of the window in the window state
 
 
 
+### saveSize(size) 
+
+Saves the size (width, height) of the window in the window state
+
+**Parameters**
+
+**size**: `Array`, [x, y]
+
+
+
 ### setWindowFullScreen(isFullScreen) 
 
 Sets the fullscreen state of the window
