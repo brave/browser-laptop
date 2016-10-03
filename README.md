@@ -79,11 +79,12 @@ Some platforms are available as pre-configured VMs. See the [readme](https://git
 
 ## Development
 
-You will also have to have two terminal tabs up to run Brave. One for Brave to watch for changes to the code, and one to run Brave.
-
-To run a development version of the browser, run the following on the command line:
+To run a development version of the browser requires a few steps. The easiest way is just to use two 
+terminals. One terminal can be used just to watch for changes to the code
 
     npm run watch
+
+Now actually run Brave in another terminal
 
     npm start
 
