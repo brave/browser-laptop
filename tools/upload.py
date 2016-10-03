@@ -12,7 +12,7 @@ RELEASE_NAME = ('PRE (DO NOT DOWNLOAD UNLESS YOU ARE TESTING '
 def main():
   github = GitHub(auth_token())
   releases = github.repos(BROWSER_LAPTOP_REPO).releases.get()
-  tag = (json.load(open('package.json'))['version'] +
+  tag = ('v' + json.load(open('package.json'))['version'] +
     release_channel() + '-' + build_label())
   tag_exists = False
   for release in releases:
