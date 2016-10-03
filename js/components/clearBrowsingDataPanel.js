@@ -22,6 +22,7 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
     this.onToggleAllSiteCookies = this.onToggleSetting.bind(this, 'allSiteCookies')
     this.onToggleAutocompleteData = this.onToggleSetting.bind(this, 'autocompleteData')
     this.onToggleAutofillData = this.onToggleSetting.bind(this, 'autofillData')
+    this.onToggleSavedSiteSettings = this.onToggleSetting.bind(this, 'savedSiteSettings')
     this.onClear = this.onClear.bind(this)
   }
   onToggleSetting (setting, e) {
@@ -48,6 +49,7 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
           <SwitchControl rightl10nId='allSiteCookies' checkedOn={this.props.clearBrowsingDataDetail.get('allSiteCookies')} onClick={this.onToggleAllSiteCookies} />
           <SwitchControl className='autocompleteDataSwitch' rightl10nId='autocompleteData' checkedOn={this.props.clearBrowsingDataDetail.get('autocompleteData')} onClick={this.onToggleAutocompleteData} />
           <SwitchControl className='autofillDataSwitch' rightl10nId='autofillData' checkedOn={this.props.clearBrowsingDataDetail.get('autofillData')} onClick={this.onToggleAutofillData} />
+          <SwitchControl className='siteSettingsSwitch' rightl10nId='savedSiteSettings' checkedOn={this.props.clearBrowsingDataDetail.get('savedSiteSettings')} onClick={this.onToggleSavedSiteSettings} />
         </div>
         <div className='formSection clearBrowsingDataButtons'>
           <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />

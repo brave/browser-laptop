@@ -199,14 +199,6 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
   if (clearHistory) {
     perWindowData.closedFrames = []
   }
-  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
-  if (clearAutocompleteData) {
-    filtering.clearAutocompleteData()
-  }
-  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
-  if (clearAutofillData) {
-    filtering.clearAutofillData()
-  }
 
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
@@ -247,6 +239,18 @@ module.exports.cleanAppData = (data, isShutdown) => {
   if (data.perWindowState) {
     data.perWindowState.forEach((perWindowState) =>
       module.exports.cleanPerWindowData(perWindowState, isShutdown))
+  }
+  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
+  if (clearAutocompleteData) {
+    filtering.clearAutocompleteData()
+  }
+  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
+  if (clearAutofillData) {
+    filtering.clearAutofillData()
+  }
+  const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
+  if (clearSiteSettings) {
+    data.siteSettings = {}
   }
   // Delete expired Flash and NoScript allow-once approvals
   let now = Date.now()

@@ -596,6 +596,10 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         Filtering.clearAutofillData()
       }
+      if (action.clearDataDetail.get('savedSiteSettings')) {
+        appState = appState.set('siteSettings', Immutable.Map())
+        appState = appState.set('temporarySiteSettings', Immutable.Map())
+      }
       break
     case AppConstants.APP_IMPORT_BROWSER_DATA:
       {

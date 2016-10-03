@@ -34,6 +34,7 @@ const settings = {
   SHUTDOWN_CLEAR_ALL_SITE_COOKIES: 'shutdown.clear-all-site-cookies',
   SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA: 'shutdown.clear-autocomplete-data',
   SHUTDOWN_CLEAR_AUTOFILL_DATA: 'shutdown.clear-autofill-data',
+  SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Security Tab: DEPRECATED but still required (for now)
