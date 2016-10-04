@@ -12,7 +12,7 @@ const {cookieExceptions, localStorageExceptions} = require('../data/siteHacks')
 const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
-const { registerUserPrefs } = require('./userPrefs')
+const { setUserPref } = require('./userPrefs')
 const { getSetting } = require('../settings')
 
 // backward compatibility with appState siteSettings
@@ -79,54 +79,8 @@ const getBlock3rdPartyStorage = (braveryDefaults) => {
   }
 }
 
-const getContentSettingsFromSiteSettings = (appState) => {
-  let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
-
-  let contentSettings = {
-    cookies: getBlock3rdPartyStorage(braveryDefaults),
-    referer: [{
-      setting: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? 'block' : 'allow',
-      primaryPattern: '*'
-    }],
-    adInsertion: [{
-      setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
-      primaryPattern: '*'
-    }],
-    passwordManager: [{
-      setting: getPasswordManagerEnabled(appState) ? 'allow' : 'block',
-      primaryPattern: '*'
-    }],
-    javascript: [{
-      setting: braveryDefaults.noScript ? 'block' : 'allow',
-      primaryPattern: '*'
-    }, {
-      setting: 'allow',
-      secondaryPattern: '*',
-      primaryPattern: 'file:///*'
-    }, {
-      setting: 'allow',
-      secondaryPattern: '*',
-      primaryPattern: 'chrome-extension://*'
-    }],
-    canvasFingerprinting: [{
-      setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
-      primaryPattern: '*'
-    }],
-    flashEnabled: [{
-      setting: braveryDefaults.flash ? 'allow' : 'block',
-      primaryPattern: '*'
-    }],
-    flashActive: [{
-      setting: 'block',
-      primaryPattern: '*'
-    }],
-    runInsecureContent: [{
-      setting: 'block',
-      primaryPattern: '*'
-    }]
-  }
-
-  let hostSettings = appState.get('siteSettings').toJS()
+const hostSettingsToContentSettings = (hostSettings, contentSettingsSource) => {
+  let contentSettings = contentSettingsSource
   // We do 2 passes for setting content settings. On the first pass we consider all shield types.
   for (let hostPattern in hostSettings) {
     let hostSetting = hostSettings[hostPattern]
@@ -171,33 +125,95 @@ const getContentSettingsFromSiteSettings = (appState) => {
       addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
     }
   }
-
-  return { content_settings: contentSettings }
+  return contentSettings
 }
 
-let updateTrigger
+const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
+  let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
+
+  const contentSettings = {
+    cookies: getBlock3rdPartyStorage(braveryDefaults),
+    referer: [{
+      setting: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? 'block' : 'allow',
+      primaryPattern: '*'
+    }],
+    adInsertion: [{
+      setting: braveryDefaults.adControl === 'showBraveAds' ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    passwordManager: [{
+      setting: getPasswordManagerEnabled(appState) ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    javascript: [{
+      setting: braveryDefaults.noScript ? 'block' : 'allow',
+      primaryPattern: '*'
+    }, {
+      setting: 'allow',
+      secondaryPattern: '*',
+      primaryPattern: 'file:///*'
+    }, {
+      setting: 'allow',
+      secondaryPattern: '*',
+      primaryPattern: 'chrome-extension://*'
+    }],
+    canvasFingerprinting: [{
+      setting: braveryDefaults.fingerprintingProtection ? 'block' : 'allow',
+      primaryPattern: '*'
+    }],
+    flashEnabled: [{
+      setting: braveryDefaults.flash ? 'allow' : 'block',
+      primaryPattern: '*'
+    }],
+    flashActive: [{
+      setting: 'block',
+      primaryPattern: '*'
+    }],
+    runInsecureContent: [{
+      setting: 'block',
+      primaryPattern: '*'
+    }]
+  }
+
+  const regularSettings = hostSettingsToContentSettings(appState.get('siteSettings').toJS(), contentSettings)
+  if (isPrivate) {
+    const privateSettings =
+      hostSettingsToContentSettings(appState.get('siteSettings').merge(appState.get('temporarySiteSettings')).toJS(),
+        contentSettings)
+    return { content_settings: privateSettings }
+  }
+  return { content_settings: regularSettings }
+}
 
 // Register callback to handle all updates
 const doAction = (action) => {
   switch (action.actionType) {
     case AppConstants.APP_CHANGE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger('content_settings', action.temporary)
+        if (action.temporary) {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState(), true).content_settings, true)
+        } else {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
+        }
       })
       break
     case AppConstants.APP_REMOVE_SITE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger('content_settings', action.temporary)
+        if (action.temporary) {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState(), true).content_settings, true)
+        } else {
+          setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
+        }
       })
       break
     case AppConstants.APP_SET_RESOURCE_ENABLED:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger()
+        setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
       })
       break
     case AppConstants.APP_CHANGE_SETTING:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        updateTrigger()
+        setUserPref('content_settings', getContentSettingsFromSiteSettings(AppStore.getState()).content_settings)
       })
       break
     default:
@@ -205,6 +221,5 @@ const doAction = (action) => {
 }
 
 module.exports.init = () => {
-  updateTrigger = registerUserPrefs(() => getContentSettingsFromSiteSettings(AppStore.getState()))
   AppDispatcher.register(doAction)
 }
