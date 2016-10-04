@@ -6,9 +6,7 @@
 
 table.sort {
   th {
-    cursor: pointer;
-    text-decoration: underline;
-    color: @darkGray;
+    color: @gray;
 
     &:hover {
       color: #000;
@@ -28,21 +26,38 @@ table.sortableTable {
     padding: 5px 20px;
 
     th {
-      background: @lightGray;
+      background: linear-gradient(to bottom, @lightGray, @veryLightGray);
+      border-top: 1px solid @gray;
       text-align: left;
       font-weight: 300;
       padding: 8px;
       box-sizing: border-box;
+      -webkit-user-select: none;
+
+      &:after {
+        font-family: FontAwesome;
+        font-size: 8pt;
+        margin-top: 3px;
+        margin-right: 3px;
+        float: right;
+      }
+
+      &.sort-up:after {
+        content: "\f077";
+      }
+
+      &.sort-down:after {
+        content: "\f078";
+      }
+    }
+    th + th {
+      border-left: 1px solid @braveOrange;
     }
 
     td {
       color: @mediumGray;
       -webkit-font-smoothing: antialiased;
       width: auto;
-
-      &:not(:first-of-type) {
-        border-bottom: solid 1px @lightGray;
-      }
 
       &:nth-of-type(2) {
         width: 60%;

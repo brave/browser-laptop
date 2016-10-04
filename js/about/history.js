@@ -23,6 +23,37 @@ require('../../less/about/siteDetails.less')
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
+class DeleteHistoryEntryButton extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+  }
+
+  onClick (e) {
+    if (e && e.preventDefault) {
+      e.preventDefault()
+    }
+    // BSCTODO: ...
+  }
+
+  render () {
+    return <div className='fa fa-times deleteEntry' onClick={this.onClick} />
+  }
+}
+
+class HistoryTimeCell extends ImmutableComponent {
+  render () {
+    return <div>
+      <DeleteHistoryEntryButton siteDetail={this.props.siteDetail} />
+      {
+        this.props.siteDetail.get('lastAccessedTime')
+          ? new Date(this.props.siteDetail.get('lastAccessedTime')).toLocaleTimeString()
+          : ''
+      }
+    </div>
+  }
+}
+
 class HistoryDay extends ImmutableComponent {
   navigate (entry) {
     aboutActions.newFrame({
@@ -38,9 +69,7 @@ class HistoryDay extends ImmutableComponent {
         defaultHeadingSortOrder='desc'
         rows={this.props.entries.map((entry) => [
           {
-            html: entry.get('lastAccessedTime')
-              ? new Date(entry.get('lastAccessedTime')).toLocaleTimeString()
-              : '',
+            cell: <HistoryTimeCell siteDetail={entry} />,
             value: entry.get('lastAccessedTime')
           },
           entry.get('title')
@@ -155,11 +184,11 @@ class AboutHistory extends React.Component {
         <div data-l10n-id='history' className='sectionTitle' />
         <div className='headerActions'>
           <div className='searchWrapper'>
-            <input type='text' className={this.state.search ? 'searchInput' : 'searchInput searchInputPlaceholder'} placeholder='&#xf002;' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
+            <input type='text' className='searchInput' id='historySearch' placeholder='Search' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
             {
               this.state.search
               ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
-              : null
+              : <span className='fa fa-search searchInputPlaceholder' />
             }
           </div>
           <Button l10nId='clearBrowsingDataNow' className='primaryButton clearBrowsingDataButton' onClick={this.clearBrowsingDataNow} />

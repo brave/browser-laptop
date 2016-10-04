@@ -92,8 +92,12 @@ class SortableTable extends ImmutableComponent {
             const entry = row.map((item, j) => {
               const value = typeof item === 'object' ? item.value : item
               const html = typeof item === 'object' ? item.html : item
+              const cell = typeof item === 'object' ? item.cell : item
+
               return <td className={this.hasColumnClassNames ? this.props.columnClassNames[j] : undefined} data-sort={value}>
-                {value === true ? '✕' : html}
+                {
+                  cell || (value === true ? '✕' : html)
+                }
               </td>
             })
             const rowAttributes = this.getRowAttributes(row, i)
