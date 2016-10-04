@@ -896,6 +896,12 @@ function mainTemplateInit (nodeProps, frame) {
       template.push(showDefinitionMenuItem(nodeProps.selectionText),
         CommonMenu.separatorMenuItem
       )
+      if (isLink) {
+        template.push(addBookmarkMenuItem('bookmarkLink', {
+          location: nodeProps.linkURL,
+          tags: [siteTags.BOOKMARK]
+        }, false))
+      }
     }
 
     template.push(searchSelectionMenuItem(nodeProps.selectionText), {
