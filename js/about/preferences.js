@@ -1040,7 +1040,7 @@ class SitePermissionsPage extends React.Component {
                   (
                   <span className='clearAllLink' data-l10n-id='clearAll'
                     onClick={this.clearPermissions.bind(this, name)} />
-                  )'
+                  )
                 </span>
               </div>
               <ul>
