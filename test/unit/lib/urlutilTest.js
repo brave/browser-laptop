@@ -75,6 +75,9 @@ describe('urlutil', function () {
     it('returns false when input is chrome-extension', function () {
       assert.equal(UrlUtil.isNotURL('chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/cast_sender.js'), false)
     })
+    it('returns false when input is mailto', function () {
+      assert.equal(UrlUtil.isNotURL('mailto:brian@brave.com'), false)
+    })
     describe('search query', function () {
       it('returns true when input starts with ?', function () {
         assert.equal(UrlUtil.isNotURL('?brave'), true)
