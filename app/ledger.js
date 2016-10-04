@@ -131,7 +131,7 @@ const doAction = (action) => {
     case appConstants.APP_CHANGE_SETTING:
       switch (action.key) {
         case settings.PAYMENTS_ENABLED:
-          initialize(action.value, 'changeSettingPaymentsEnabled')
+          initialize(action.value)
           break
         case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
           setPaymentInfo(action.value)
@@ -415,7 +415,7 @@ eventStore.addChangeListener(() => {
  * module initialization
  */
 
-var initialize = (paymentsEnabled, reason) => {
+var initialize = (paymentsEnabled) => {
   enable(paymentsEnabled)
 
   // Check if relevant browser notifications should be shown every 15 minutes
