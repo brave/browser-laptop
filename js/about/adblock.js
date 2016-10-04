@@ -6,6 +6,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const messages = require('../constants/messages')
+const {ADBLOCK_CUSTOM_RULES} = require('../constants/settings')
 const getSetting = require('../settings').getSetting
 const aboutActions = require('./aboutActions')
 const ImmutableComponent = require('../components/immutableComponent')
@@ -44,6 +45,7 @@ class AdBlockItem extends ImmutableComponent {
 class AboutAdBlock extends React.Component {
   constructor () {
     super()
+    this.onChangeCustomFilters = this.onChangeCustomFilters.bind(this)
     this.state = {
       adblock: Immutable.Map(),
       resources: Immutable.List()
@@ -88,11 +90,22 @@ class AboutAdBlock extends React.Component {
             </div>
             <h3 data-l10n-id='customFilters' />
             <div className='adblockSubtext' data-l10n-id='customFilterDescription' />
-            <textarea className='customFiltersInput' cols='100' rows='10' />
+            <textarea
+              onChange={this.onChangeCustomFilters}
+              value={getSetting(ADBLOCK_CUSTOM_RULES, this.state.settings) || ''}
+              className='customFiltersInput'
+              cols='100'
+              rows='10' />
           </div>
         </div>
       </list>
     </div>
+  }
+  onChangeCustomFilters (e) {
+    this.setState({
+      settings: this.state.settings.set(ADBLOCK_CUSTOM_RULES, e.target.value)
+    })
+    aboutActions.updateCustomAdblockRules(e.target.value)
   }
 }
 

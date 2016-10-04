@@ -716,6 +716,16 @@ const handleAppAction = (action) => {
         value: action.enable
       })
       return
+    case AppConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES: {
+      const adblock = require('../../app/adblock')
+      adblock.updateAdblockCustomRules(action.rules)
+      handleAppAction({
+        actionType: AppConstants.APP_CHANGE_SETTING,
+        key: settings.ADBLOCK_CUSTOM_RULES,
+        value: action.rules
+      })
+      return
+    }
     default:
   }
 

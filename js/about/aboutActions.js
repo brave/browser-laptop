@@ -261,6 +261,18 @@ const aboutActions = {
       uuid,
       enable
     })
+  },
+
+  /**
+   * Dispatches an event to the renderer process to register or deregister a datafile
+   *
+   * @param {rules} ABP filter syntax rule string
+   */
+  updateCustomAdblockRules: function (rules) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES,
+      rules
+    })
   }
 }
 module.exports = aboutActions

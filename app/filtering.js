@@ -120,16 +120,17 @@ function registerForBeforeRequest (session) {
           : messages.BLOCKED_RESOURCE
 
         // Counts the number of ads and trackers
-        if (isAdBlock || isTracker) {
-          appActions.addResourceCount(results.resourceName, 1)
-        }
-
         let parentResourceName = results.resourceName
+
         // Adblock can have many different resource names for each alternate
         // data file. But we always want the per level reporting to report
         // it into the window adblock stats.
         if (isAdBlock) {
           parentResourceName = appConfig.resourceNames.ADBLOCK
+        }
+
+        if (isAdBlock || isTracker) {
+          appActions.addResourceCount(parentResourceName, 1)
         }
 
         BrowserWindow.getAllWindows().forEach((wnd) =>
