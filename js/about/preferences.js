@@ -1158,11 +1158,13 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScript' onChange={this.onToggleNoScript} />
         <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem>
+          <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:adblock'
+            }, true)} />
+        </SettingItem>
       </SettingsList>
-      <Button l10nId='manageAdblockSettings' className='primaryButton manageAdblockSettings'
-        onClick={aboutActions.newFrame.bind(null, {
-          location: 'about:adblock'
-        }, true)} />
       <SitePermissionsPage siteSettings={this.props.siteSettings}
         names={braveryPermissionNames}
         defaults={this.props.braveryDefaults.merge({
