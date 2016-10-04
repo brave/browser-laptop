@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.4](https://github.com/brave/browser-laptop/releases/v0.12.4dev)
+- TODO
+
 ## [0.12.3](https://github.com/brave/browser-laptop/releases/v0.12.3dev)
 - Added the ability to import data from other browsers ([#428](https://github.com/brave/browser-laptop/issues/428))([#4049](https://github.com/brave/browser-laptop/issues/4049))([#4154](https://github.com/brave/browser-laptop/issues/4154))
 - Added a new look for the Windows browser to remove the titlebar for more content viewing area. ([#3854](https://github.com/brave/browser-laptop/issues/3854))
