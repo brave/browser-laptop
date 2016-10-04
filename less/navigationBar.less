@@ -583,7 +583,7 @@
       -webkit-app-region: no-drag;
       -webkit-user-select: none;
       color: @buttonColor;
-      border-radius: 50%;
+      border-radius: 4px;
       font-weight: 300;
       opacity: 0.2;
 
@@ -600,7 +600,7 @@
 
     .back,
     .forward {
-      font-size: 35px;
+      font-size: 25px;
       text-align: center;
     }
   }
@@ -610,7 +610,7 @@
   width: 0; // Fixes #4298
   align-items: center;
   justify-content: center;
-  height: 24px;
+  height: 25px;
   padding: 0 10px;
 
   display: flex;
@@ -626,9 +626,9 @@
     content: ' ';
     position: absolute;
     background: #fff;
-    border: 2px solid @focusUrlbarOutline;
+    border: 1px solid @focusUrlbarOutline;
     border-radius: 4px;
-    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline, inset 0 1px 8px rgba(0, 137, 255, 0.5);
+    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline, inset 0 1px 8px rgba(0, 137, 255, 0.1);
     color: #333;
     outline: none;
     top: 0;
@@ -641,7 +641,7 @@
   #navigator:not(.titleMode) & {
     background: white;
     border-radius: @borderRadiusURL;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), inset 0 1px 0 rgba(0,0,0,0.05), inset 0 1px 1px rgba(0,0,0,0.1);
     color: @chromeText;
   }
   @media (max-width: @breakpointNarrowViewport) {
@@ -686,11 +686,15 @@
       display: inline-block;
       background:rgba(243, 243, 243, 0);
       color: @chromeText;
-      font-size: 15px;
+      font-size: 13px;
       max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      strong {
+        font-weight: 600;
+      }
     }
 
     .endButtons {
@@ -706,7 +710,7 @@
 
       &[class*=" fa-"] {
         margin-right: 5px;
-        margin-top: 3px;
+        margin-top: 1px;
         font-size: 14px;
         min-height: 12px;
         color: @chromeText;
@@ -781,7 +785,7 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 3px 0 0 3px;
+    margin: 2px 0 0 3px;
     outline: none;
     text-overflow: ellipsis;
     flex-grow: 1;
@@ -835,7 +839,5 @@
                                       url(../app/extensions/brave/img/braveBtn2x.png) 2x,
                                       url(../app/extensions/brave/img/braveBtn3x.png) 3x);
   background-repeat: no-repeat;
-  height: 27px;
-  margin-top: 3px;
+  height: 24px;
 }
-
