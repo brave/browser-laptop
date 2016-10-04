@@ -80,9 +80,10 @@ class SortableTable extends ImmutableComponent {
             return <th className={cx({
               'sort-header': true,
               'sort-default': heading === this.props.defaultHeading})}
-              data-l10n-id={heading}
               data-sort-method={dataType === 'number' ? 'number' : undefined}
-              data-sort-order={this.props.defaultHeadingSortOrder} />
+              data-sort-order={this.props.defaultHeadingSortOrder}>
+              <div className='th-inner' data-l10n-id={heading} />
+            </th>
           })}
         </tr>
       </thead>
