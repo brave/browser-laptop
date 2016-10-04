@@ -4,8 +4,6 @@
 
 'use strict'
 
-const messages = require('../constants/messages.js')
-
 const getWebview = () =>
   document.querySelector('.frameWrapper.isActive webview')
 
@@ -50,21 +48,6 @@ const webviewActions = {
     const webview = getWebview()
     if (webview) {
       webview.showDefinitionForSelection()
-    }
-  },
-
-  /**
-   * Check two-finger gesture swipe back/forward ability
-   * @param {bool} back - true for back, false for forward
-   */
-  checkSwipe: function (back) {
-    const webview = getWebview()
-    if (webview) {
-      if (back) {
-        webview.send(messages.CHECK_SWIPE_BACK)
-      } else {
-        webview.send(messages.CHECK_SWIPE_FORWARD)
-      }
     }
   },
 
