@@ -196,11 +196,7 @@ const AboutActions = {
    * Open a adding address dialog
    */
   addAutofillAddress: function () {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail: {},
-      originalDetail: {}
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_ADDRESS, {}, {})
   },
 
   /**
@@ -221,22 +217,15 @@ const AboutActions = {
    * @param {object} address - address to edit as per doc/state.md's autofillAddressDetail
    */
   editAutofillAddress: function (address) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail: address,
-      originalDetail: address
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_ADDRESS, address.toJS(), address.toJS())
   },
 
   /**
    * Open a adding credit card dialog
    */
   addAutofillCreditCard: function () {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail: {month: '01', year: new Date().getFullYear().toString()},
-      originalDetail: {}
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD,
+      {month: '01', year: new Date().getFullYear().toString()}, {})
   },
 
   /**
@@ -257,11 +246,7 @@ const AboutActions = {
    * @param {object} card - credit card to edit as per doc/state.md's autofillCreditCardDetail
    */
   editAutofillCreditCard: function (card) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail: card,
-      originalDetail: card
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD, card.toJS(), card.toJS())
   }
 }
 module.exports = AboutActions
