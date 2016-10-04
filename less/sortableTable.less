@@ -17,9 +17,12 @@ table.sort {
 table.sortableTable {
   width: 100%;
   border: solid 1px @lightGray;
-  border-radius: @borderRadius;
+  border-bottom-left-radius: @borderRadius;
+  border-bottom-right-radius: @borderRadius;
   margin-bottom: 40px;
   box-shadow: @softBoxShadow;
+  cursor: default;
+  border-spacing: 0;
 
   tr {
     height: 1.7em;
@@ -32,7 +35,11 @@ table.sortableTable {
       font-weight: 300;
       padding: 8px;
       box-sizing: border-box;
-      -webkit-user-select: none;
+
+      .th-inner {
+        display: inline-block;
+        -webkit-user-select: none;
+      }
 
       &:after {
         font-family: FontAwesome;

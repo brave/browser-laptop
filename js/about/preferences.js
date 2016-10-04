@@ -681,7 +681,8 @@ class SearchTab extends ImmutableComponent {
       <div className='sectionTitle' data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
         defaultHeading='searchEngine'
-        addHoverClass onClick={this.hoverCallback.bind(this)} />
+        addHoverClass onClick={this.hoverCallback.bind(this)}
+        columnClassNames={['default', 'searchEngine', 'engineGoKey']} />
       <div className='sectionTitle' data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
