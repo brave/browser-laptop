@@ -5,7 +5,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const KeyCodes = require('../constants/keyCodes')
 const windowActions = require('../actions/windowActions')
 

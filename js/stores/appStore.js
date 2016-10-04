@@ -27,7 +27,7 @@ const getSetting = require('../settings').getSetting
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const locale = require('../../app/locale')
 const path = require('path')
 

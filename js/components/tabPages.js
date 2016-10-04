@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const windowActions = require('../actions/windowActions')
 const dragTypes = require('../constants/dragTypes')
 const {onTabPageContextMenu} = require('../contextMenus')

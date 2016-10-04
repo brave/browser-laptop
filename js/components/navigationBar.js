@@ -6,7 +6,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
 const windowActions = require('../actions/windowActions')

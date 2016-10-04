@@ -12,7 +12,7 @@ const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
 const aboutActions = require('./aboutActions')
 const dndData = require('../dndData')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 
 const ipc = window.chrome.ipc
 

@@ -8,7 +8,7 @@ const ImmutableComponent = require('./immutableComponent')
 
 const windowActions = require('../actions/windowActions')
 const dragTypes = require('../constants/dragTypes')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const {getTextColorForBackground} = require('../lib/color')
 const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 

@@ -51,7 +51,7 @@ const getSetting = require('../js/settings').getSetting
 const locale = require('./locale')
 const appStore = require('../js/stores/appStore')
 const eventStore = require('../js/stores/eventStore')
-const rulesolver = require('./extensions/brave/content/scripts/pageInformation.js')
+const rulesolver = require('./extensions/brave/content/scripts/pageInformation')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 
 // TBD: remove these post beta [MTR]

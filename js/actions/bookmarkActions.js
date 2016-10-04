@@ -6,7 +6,7 @@
 
 const siteUtil = require('../state/siteUtil')
 const windowActions = require('./windowActions')
-const eventUtil = require('../lib/eventUtil.js')
+const eventUtil = require('../lib/eventUtil')
 
 const bookmarkActions = {
   openBookmarksInFolder: function (allBookmarkItems, folderDetail) {

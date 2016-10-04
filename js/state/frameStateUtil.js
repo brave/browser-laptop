@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const config = require('../constants/config.js')
+const config = require('../constants/config')
 const urlParse = require('url').parse
 
 const matchFrame = (queryInfo, frame) => {

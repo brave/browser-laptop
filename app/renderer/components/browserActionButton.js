@@ -7,7 +7,7 @@ const ImmutableComponent = require('../../../js/components/immutableComponent')
 const electron = global.require('electron')
 const ipc = electron.ipcRenderer
 const Button = require('../../../js/components/button')
-const cx = require('../../../js/lib/classSet.js')
+const cx = require('../../../js/lib/classSet')
 const extensionState = require('../../common/state/extensionState')
 const windowActions = require('../../../js/actions/windowActions')
 

@@ -8,7 +8,7 @@ const AppStore = require('./appStore')
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const WindowConstants = require('../constants/windowConstants')
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const { isSourceAboutUrl } = require('../lib/appUrlUtil')
 const { responseHasContent } = require('../../app/common/lib/httpUtil')
 

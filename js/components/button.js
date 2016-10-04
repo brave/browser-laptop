@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 
 class Button extends ImmutableComponent {
   render () {

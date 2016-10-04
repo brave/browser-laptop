@@ -11,7 +11,7 @@ const FilterOptions = ABPFilterParserLib.FilterOptions
 const DataFile = require('./dataFile')
 const Filtering = require('./filtering')
 const appConfig = require('../js/constants/appConfig')
-const debounce = require('../js/lib/debounce.js')
+const debounce = require('../js/lib/debounce')
 // Maintains a map between a resource uuid and an adblock instance
 const adblockInstances = new Map()
 const defaultAdblock = new ABPFilterParser()

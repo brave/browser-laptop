@@ -9,10 +9,10 @@ const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../constants/keyCodes')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const ipc = global.require('electron').ipcRenderer
 
-const UrlBarSuggestions = require('./urlBarSuggestions.js')
+const UrlBarSuggestions = require('./urlBarSuggestions')
 const messages = require('../constants/messages')
 const dragTypes = require('../constants/dragTypes')
 const { getSetting } = require('../settings')

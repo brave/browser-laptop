@@ -4,7 +4,7 @@ const underscore = require('underscore')
 
 require('../braveUnit')
 
-const ledgerExportUtil = require('../../../js/lib/ledgerExportUtil.js')
+const ledgerExportUtil = require('../../../js/lib/ledgerExportUtil')
 const base64Encode = require('../../../js/lib/base64').encode
 
 const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction', 'BTC']
