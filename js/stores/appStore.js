@@ -708,7 +708,7 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['menu', 'template'], action.menubarTemplate)
       break
     case AppConstants.APP_UPDATE_ADBLOCK_DATAFILES:
-      const adblock = require('../../app/adblock')
+      const adblock = require('../../app/adBlock')
       adblock.updateAdblockDataFiles(action.uuid, action.enable)
       handleAppAction({
         actionType: AppConstants.APP_CHANGE_SETTING,
@@ -717,7 +717,7 @@ const handleAppAction = (action) => {
       })
       return
     case AppConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES: {
-      const adblock = require('../../app/adblock')
+      const adblock = require('../../app/adBlock')
       adblock.updateAdblockCustomRules(action.rules)
       handleAppAction({
         actionType: AppConstants.APP_CHANGE_SETTING,
