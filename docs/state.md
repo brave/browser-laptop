@@ -218,8 +218,8 @@ AppStore
       gridLayout: string // 'small', 'medium', 'large'
     }
   },
-  menubar: {
-    template: object // windows only: template object with Menubar control
+  menu: {
+    template: object // used on Windows and by our tests: template object with Menubar control
   }
 }
 ```
