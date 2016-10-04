@@ -54,21 +54,6 @@ const webviewActions = {
   },
 
   /**
-   * Check two-finger gesture swipe back/forward ability
-   * @param {bool} back - true for back, false for forward
-   */
-  checkSwipe: function (back) {
-    const webview = getWebview()
-    if (webview) {
-      if (back) {
-        webview.send(messages.CHECK_SWIPE_BACK)
-      } else {
-        webview.send(messages.CHECK_SWIPE_FORWARD)
-      }
-    }
-  },
-
-  /**
    * Set/unset webkit fullscreen status
    * @param {Boolean} isFullScreen - fullscreen state to go to
    */

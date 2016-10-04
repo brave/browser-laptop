@@ -156,17 +156,3 @@ document.addEventListener('keydown', (e /*: Event*/) => {
       break
   }
 })
-
-chrome.ipc.on('check-swipe-back', (e) => {
-  if (document.scrollingElement.scrollLeft === 0) {
-    chrome.ipc.sendToHost('can-swipe-back')
-  }
-})
-
-chrome.ipc.on('check-swipe-forward', (e) => {
-  const scrollEle = document.scrollingElement
-  if (scrollEle.scrollLeft === 0 ||
-    scrollEle.scrollLeft === (scrollEle.scrollWidth - scrollEle.clientWidth)) {
-    chrome.ipc.sendToHost('can-swipe-forward')
-  }
-})
