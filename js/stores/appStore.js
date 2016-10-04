@@ -27,11 +27,15 @@ const getSetting = require('../settings').getSetting
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const locale = require('../../app/locale')
 const path = require('path')
 const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
+
+const basicAuth = require('../../app/browser/basicAuth')
+const tabs = require('../../app/browser/tabs')
+const windows = require('../../app/browser/windows')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -39,6 +43,8 @@ const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
+const windowState = require('../../app/common/state/windowState')
+
 const isDarwin = process.platform === 'darwin'
 const isWindows = process.platform === 'win32'
 
@@ -49,6 +55,7 @@ const defaultProtocols = ['https', 'http']
 
 let appState
 let lastEmittedState
+let shuttingDown = false
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -346,18 +353,28 @@ function handleChangeSettingAction (settingKey, settingValue) {
 }
 
 const handleAppAction = (action) => {
+  if (shuttingDown) {
+    return
+  }
+
   const ledger = require('../../app/ledger')
 
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
       appState = action.appState
+      windows.init(appState, action)
+      tabs.init(appState, action)
+      basicAuth.init(appState, action)
+      break
+    case AppConstants.APP_SHUTTING_DOWN:
+      shuttingDown = true
       break
     case AppConstants.APP_NEW_WINDOW:
       const frameOpts = action.frameOpts && action.frameOpts.toJS()
       const browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
-      const windowState = action.restoredState || {}
+      const newWindowState = action.restoredState || {}
 
-      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts, windowState)
+      const mainWindow = createWindow(browserOpts, windowDefaults(), frameOpts, newWindowState)
       const homepageSetting = getSetting(settings.HOMEPAGE)
 
       // initialize frames state
@@ -408,8 +425,16 @@ const handleAppAction = (action) => {
       mainWindow.show()
       break
     case AppConstants.APP_CLOSE_WINDOW:
-      const appWindow = BrowserWindow.fromId(action.appWindowId)
-      appWindow.close()
+      appState = windows.closeWindow(appState, action)
+      break
+    case AppConstants.APP_WINDOW_CLOSED:
+      appState = windowState.removeWindow(appState, action)
+      break
+    case AppConstants.APP_WINDOW_CREATED:
+      appState = windowState.maybeCreateWindow(appState, action)
+      break
+    case AppConstants.APP_WINDOW_UPDATED:
+      appState = windowState.maybeCreateWindow(appState, action)
       break
     case AppConstants.APP_ADD_PASSWORD:
       // If there is already an entry for this exact origin, action, and
@@ -709,13 +734,13 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], date)
       break
     case AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL:
-      appState = basicAuthState.setLoginRequiredDetail(appState, action.tabId, action.detail)
+      appState = basicAuthState.setLoginRequiredDetail(appState, action)
       break
     case AppConstants.APP_SET_LOGIN_RESPONSE_DETAIL:
-      appState = basicAuthState.setLoginResponseDetail(appState, action.tabId, action.detail)
+      appState = basicAuth.setLoginResponseDetail(appState, action)
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
-      appState = tabState.closeTab(appState, action.frameProps.get('tabId'))
+      appState = tabState.closeFrame(appState, action)
       break
     case ExtensionConstants.BROWSER_ACTION_REGISTERED:
       appState = extensionState.browserActionRegistered(appState, action)
@@ -780,10 +805,23 @@ const handleAppAction = (action) => {
       appState = appState.set('sites', siteUtil.updateSiteFavicon(appState.get('sites'), action.frameProps.get('location'), action.favicon))
       appState = aboutNewTabState.setSites(appState, action)
       break
-    case WindowConstants.WINDOW_SET_NAVIGATED:
-      if (!action.isNavigatedInPage) {
-        appState = extensionState.browserActionUpdated(appState, action)
-      }
+    case AppConstants.APP_NEW_TAB:
+      appState = tabs.newTab(appState, action)
+      break
+    case AppConstants.APP_TAB_CREATED:
+      appState = tabState.maybeCreateTab(appState, action)
+      break
+    case AppConstants.APP_TAB_UPDATED:
+      appState = tabState.maybeCreateTab(appState, action)
+      break
+    case AppConstants.APP_CLOSE_TAB:
+      appState = tabs.removeTab(appState, action)
+      break
+    case AppConstants.APP_TAB_CLOSED:
+      appState = tabState.removeTab(appState, action)
+      break
+    case WindowConstants.WINDOW_SET_AUDIO_MUTED:
+      appState = tabs.setAudioMuted(appState, action)
       break
     case AppConstants.APP_RENDER_URL_TO_PDF:
       const pdf = require('../../app/pdf')

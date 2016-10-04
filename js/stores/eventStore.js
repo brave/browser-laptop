@@ -95,7 +95,7 @@ const doAction = (action) => {
       addPageView(action.frameProps.get('location'), lastActiveTabId)
       break
     case AppConstants.APP_WINDOW_BLURRED:
-      windowBlurred(action.appWindowId)
+      windowBlurred(action.windowId)
       break
     case AppConstants.APP_IDLE_STATE_CHANGED:
       if (action.idleState !== 'active') {
@@ -106,7 +106,7 @@ const doAction = (action) => {
       break
     case AppConstants.APP_CLOSE_WINDOW:
       AppDispatcher.waitFor([AppStore.dispatchToken], () => {
-        windowClosed(action.appWindowId)
+        windowClosed(action.windowId)
       })
       break
     case 'event-set-page-info':
