@@ -58,6 +58,11 @@ function navbarHeight () {
 const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   const parentWindowKey = browserOpts.parentWindowKey
 
+  if (windowState.ui && windowState.ui.size) {
+    browserOpts.width = firstDefinedValue(browserOpts.width, windowState.ui.size[0])
+    browserOpts.height = firstDefinedValue(browserOpts.height, windowState.ui.size[1])
+  }
+
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
   // height and innerHeight are the frame webview size
   browserOpts.height = firstDefinedValue(browserOpts.height, browserOpts.innerHeight)

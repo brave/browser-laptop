@@ -671,6 +671,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SAVE_POSITION:
       windowState = windowState.setIn(['ui', 'position'], action.position)
       break
+    case WindowConstants.WINDOW_SAVE_SIZE:
+      windowState = windowState.setIn(['ui', 'size'], action.size)
+      break
     case WindowConstants.WINDOW_SET_FULLSCREEN_STATE:
       windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
       break

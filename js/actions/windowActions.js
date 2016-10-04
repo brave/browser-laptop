@@ -808,6 +808,17 @@ const windowActions = {
   },
 
   /**
+   * Saves the size (width, height) of the window in the window state
+   * @param {Array} size - [x, y]
+   */
+  saveSize: function (size) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SAVE_SIZE,
+      size
+    })
+  },
+
+  /**
    * Sets the fullscreen state of the window
    * @param {boolean} isFullScreen - true if window is fullscreen
    */
