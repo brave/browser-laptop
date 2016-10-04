@@ -458,17 +458,19 @@ var initialize = (paymentsEnabled, reason) => {
           // Scenario: User enables Payments, disables it, waits 30+ days, then
           // enables it again -> reconcileStamp is in the past.
           // In this case reset reconcileStamp to the future.
-          if (reason === 'changeSettingPaymentsEnabled') {
-            let timeUntilReconcile = client.timeUntilReconcile()
-            if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < 0) {
-              client.setTimeUntilReconcile(null, (_, stateResult) => {
-                if (!stateResult) {
-                  return
-                }
-                ledgerInfo.reconcileStamp = stateResult.reconcileStamp
-                syncWriter(pathName(statePath), stateResult, () => {})
-              })
-            }
+          let timeUntilReconcile = client.timeUntilReconcile()
+          let ledgerWindow = (synopsis.options.numFrames - 1) * synopsis.options.frameSize
+          if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
+            client.setTimeUntilReconcile(null, (err, stateResult) => {
+              if (err) return console.log('ledger setTimeUntilReconcile error: ' + err.toString())
+
+              if (!stateResult) {
+                return
+              }
+              getStateInfo(stateResult)
+
+              syncWriter(pathName(statePath), stateResult, () => {})
+            })
           }
         } catch (ex) {
           return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
