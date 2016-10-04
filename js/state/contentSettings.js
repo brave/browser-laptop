@@ -79,7 +79,8 @@ const getBlock3rdPartyStorage = (braveryDefaults) => {
   }
 }
 
-const hostSettingsToContentSettings = (hostSettings, contentSettings) => {
+const hostSettingsToContentSettings = (hostSettings, contentSettingsSource) => {
+  let contentSettings = contentSettingsSource
   // We do 2 passes for setting content settings. On the first pass we consider all shield types.
   for (let hostPattern in hostSettings) {
     let hostSetting = hostSettings[hostPattern]
@@ -124,12 +125,13 @@ const hostSettingsToContentSettings = (hostSettings, contentSettings) => {
       addContentSettings(contentSettings.referer, hostPattern, '*', 'allow')
     }
   }
+  return contentSettings
 }
 
 const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
   let braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
 
-  let contentSettings = {
+  const contentSettings = {
     cookies: getBlock3rdPartyStorage(braveryDefaults),
     referer: [{
       setting: braveryDefaults.cookieControl === 'block3rdPartyCookie' ? 'block' : 'allow',
@@ -173,12 +175,14 @@ const getContentSettingsFromSiteSettings = (appState, isPrivate = false) => {
     }]
   }
 
-  hostSettingsToContentSettings(appState.get('siteSettings').toJS(), contentSettings)
+  const regularSettings = hostSettingsToContentSettings(appState.get('siteSettings').toJS(), contentSettings)
   if (isPrivate) {
-    hostSettingsToContentSettings(appState.get('temporarySiteSettings').toJS(), contentSettings)
-    return { content_settings: contentSettings }
+    const privateSettings =
+      hostSettingsToContentSettings(appState.get('siteSettings').merge(appState.get('temporarySiteSettings')).toJS(),
+        contentSettings)
+    return { content_settings: privateSettings }
   }
-  return { content_settings: contentSettings }
+  return { content_settings: regularSettings }
 }
 
 // Register callback to handle all updates
