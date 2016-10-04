@@ -5,11 +5,17 @@ const Immutable = require('immutable')
 const assert = require('assert')
 
 const defaultAppState = Immutable.fromJS({
+  windows: [{
+    windowId: 1,
+    windowUUID: 'uuid'
+  }],
   tabs: []
 })
 
 const defaultTab = Immutable.fromJS({
   tabId: 1,
+  windowId: 1,
+  windowUUID: 'uuid',
   loginRequiredDetail: {
     request: { url: 'someurl' },
     authInfo: { authInfoProp: 'value' }
@@ -21,10 +27,11 @@ describe('basicAuthState', function () {
     describe('`tabId` exists in appState with loginRequiredDetail', function () {
       before(function () {
         this.appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
-        this.appState = basicAuthState.setLoginResponseDetail(this.appState, 1, {
-          username: 'username',
-          password: 'password'
-        })
+        this.appState = basicAuthState.setLoginResponseDetail(this.appState, {tabId: 1,
+          detail: {
+            username: 'username',
+            password: 'password'
+          }})
       })
 
       it('removes the login detail', function () {
@@ -37,10 +44,11 @@ describe('basicAuthState', function () {
     describe('`tabId` exists in appState with no loginRequiredDetail', function () {
       before(function () {
         this.appState = defaultAppState.set('tabs', Immutable.fromJS([{ tabId: 1 }]))
-        this.appState = basicAuthState.setLoginResponseDetail(this.appState, 1, {
-          username: 'username',
-          password: 'password'
-        })
+        this.appState = basicAuthState.setLoginResponseDetail(this.appState, {tabId: 1,
+          detail: {
+            username: 'username',
+            password: 'password'
+          }})
       })
 
       it('returns the unmodified appState', function () {
@@ -52,10 +60,11 @@ describe('basicAuthState', function () {
 
     describe('`tabId` does not exist in appState', function () {
       before(function () {
-        this.appState = basicAuthState.setLoginResponseDetail(defaultAppState, 1, {
-          username: 'username',
-          password: 'password'
-        })
+        this.appState = basicAuthState.setLoginResponseDetail(defaultAppState, {tabId: 1,
+          detail: {
+            username: 'username',
+            password: 'password'
+          }})
       })
 
       it('returns the unmodified appState', function () {
@@ -71,7 +80,7 @@ describe('basicAuthState', function () {
     describe('with null detail', function () {
       before(function () {
         this.appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
-        this.appState = basicAuthState.setLoginRequiredDetail(this.appState, 1, null)
+        this.appState = basicAuthState.setLoginRequiredDetail(this.appState, {tabId: 1})
       })
 
       it('removes the login detail', function () {
@@ -84,7 +93,7 @@ describe('basicAuthState', function () {
     describe('with empty detail', function () {
       before(function () {
         this.appState = defaultAppState.set('tabs', Immutable.fromJS([defaultTab]))
-        this.appState = basicAuthState.setLoginRequiredDetail(this.appState, 1, {})
+        this.appState = basicAuthState.setLoginRequiredDetail(this.appState, {tabId: 1, detail: {}})
       })
 
       it('removes the login detail', function () {
@@ -101,10 +110,11 @@ describe('basicAuthState', function () {
             tabId: 1
           }
         ]))
-        this.appState = basicAuthState.setLoginRequiredDetail(this.appState, 1, {
-          request: { url: 'someurl' },
-          authInfo: { authInfoProp: 'value' }
-        })
+        this.appState = basicAuthState.setLoginRequiredDetail(this.appState, {tabId: 1,
+          detail: {
+            request: { url: 'someurl' },
+            authInfo: { authInfoProp: 'value' }
+          }})
       })
 
       it('sets the login detail for `tabId` in the appState', function () {
@@ -118,18 +128,15 @@ describe('basicAuthState', function () {
 
     describe('`tabId` does not exist in appState', function () {
       before(function () {
-        this.appState = basicAuthState.setLoginRequiredDetail(defaultAppState, 1, {
-          request: { url: 'someurl' },
-          authInfo: { authInfoProp: 'value' }
-        })
+        this.appState = basicAuthState.setLoginRequiredDetail(defaultAppState, {tabId: 1,
+          detail: {
+            request: { url: 'someurl' },
+            authInfo: { authInfoProp: 'value' }
+          }})
       })
 
-      it('creates a new tab in the appState and sets the login detail', function () {
-        let tab = tabState.getByTabId(this.appState, 1)
-        assert(tab)
-        let loginRequiredDetail = tab.get('loginRequiredDetail')
-        assert.equal('someurl', loginRequiredDetail.getIn(['request', 'url']))
-        assert.equal('value', loginRequiredDetail.getIn(['authInfo', 'authInfoProp']))
+      it('returns the state', function () {
+        assert.equal(defaultAppState, this.appState)
       })
     })
   })
