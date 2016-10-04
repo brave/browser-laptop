@@ -75,7 +75,7 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
-    "abp-filter-parser-cpp": "1.1.x",
+    "abp-filter-parser-cpp": "1.2.x",
     "acorn": "3.2.0",
     "async": "^2.0.1",
     "electron-localshortcut": "^0.6.0",

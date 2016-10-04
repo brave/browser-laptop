@@ -51,7 +51,9 @@ const AppConstants = {
   APP_CHANGE_NEW_TAB_DETAIL: _,
   APP_TAB_CREATED: _,
   APP_TAB_DESTROYED: _,
-  APP_SET_MENUBAR_TEMPLATE: _
+  APP_SET_MENUBAR_TEMPLATE: _,
+  APP_UPDATE_ADBLOCK_DATAFILES: _,
+  APP_UPDATE_ADBLOCK_CUSTOM_RULES: _
 }
 
 module.exports = mapValuesByKeys(AppConstants)

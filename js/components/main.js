@@ -1099,7 +1099,7 @@ class Main extends ImmutableComponent {
                 onCloseFrame={this.onCloseFrame}
                 frameKey={frame.get('key')}
                 key={frame.get('key')}
-                settings={getBaseUrl(frame.get('location')) === 'about:preferences' || getBaseUrl(frame.get('location')) === 'about:history'
+                settings={['about:preferences', 'about:history', 'about:adblock'].includes(getBaseUrl(frame.get('location')))
                   ? this.props.appState.get('settings') || emptyMap
                   : null}
                 bookmarks={frame.get('location') === 'about:bookmarks'

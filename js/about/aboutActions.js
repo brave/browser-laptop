@@ -4,11 +4,11 @@
 
 const messages = require('../constants/messages')
 const serializer = require('../dispatcher/serializer')
-const WindowConstants = require('../constants/windowConstants')
-const AppConstants = require('../constants/appConstants')
+const windowConstants = require('../constants/windowConstants')
+const appConstants = require('../constants/appConstants')
 const ipc = window.chrome.ipc
 
-const AboutActions = {
+const aboutActions = {
   /**
    * Dispatches a window action
    * @param {string} key - The settings key to change the value on
@@ -25,8 +25,8 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSetting: function (key, value) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SETTING,
       key,
       value
     })
@@ -40,8 +40,8 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSiteSetting: function (hostPattern, key, value) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
       value
@@ -55,8 +55,8 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    */
   removeSiteSetting: function (hostPattern, key) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
       key
     })
@@ -68,7 +68,7 @@ const AboutActions = {
    * @param {string} key - The settings key to remove
    */
   clearSiteSettings: function (key) {
-    AboutActions.dispatchAction({
+    aboutActions.dispatchAction({
       actionType: AppConstants.APP_CLEAR_SITE_SETTINGS,
       key
     })
@@ -80,8 +80,8 @@ const AboutActions = {
    * preserve the about preload script. See #672
    */
   newFrame: function (frameOpts, openInForeground = true) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_NEW_FRAME,
+    aboutActions.dispatchAction({
+      actionType: windowConstants.WINDOW_NEW_FRAME,
       frameOpts,
       openInForeground
     })
@@ -115,8 +115,8 @@ const AboutActions = {
   },
 
   moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_MOVE_SITE,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_MOVE_SITE,
       sourceDetail,
       destinationDetail,
       prepend,
@@ -137,30 +137,30 @@ const AboutActions = {
   },
 
   setNewTabDetail: function (newTabPageDetail) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_NEW_TAB_DETAIL,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_NEW_TAB_DETAIL,
       newTabPageDetail
     })
   },
 
   deletePassword: function (password) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_PASSWORD,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_PASSWORD,
       passwordDetail: password
     })
   },
 
   deletePasswordSite: function (origin) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern: origin,
       key: 'savePasswords'
     })
   },
 
   clearPasswords: function () {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CLEAR_PASSWORDS
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_PASSWORDS
     })
   },
 
@@ -169,8 +169,8 @@ const AboutActions = {
   },
 
   setResourceEnabled: function (resourceName, enabled) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_SET_RESOURCE_ENABLED,
       resourceName,
       enabled
     })
@@ -205,8 +205,8 @@ const AboutActions = {
    * @param {object} address - address to remove as per doc/state.md's autofillAddressDetail
    */
   removeAutofillAddress: function (address) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_AUTOFILL_ADDRESS,
       detail: address
     })
   },
@@ -234,8 +234,8 @@ const AboutActions = {
    * @param {object} card - credit card to remove as per doc/state.md's autofillCreditCardDetail
    */
   removeAutofillCreditCard: function (card) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail: card
     })
   },
@@ -247,6 +247,32 @@ const AboutActions = {
    */
   editAutofillCreditCard: function (card) {
     ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD, card.toJS(), card.toJS())
+  },
+
+  /**
+   * Dispatches an event to the browser process to register or deregister a datafile
+   *
+   * @param {uuid} The unique ID of the adblock datafile
+   * @param {enable} true if the adBlock data file should be used
+   */
+  updateAdblockDataFiles: function (uuid, enable) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_DATAFILES,
+      uuid,
+      enable
+    })
+  },
+
+  /**
+   * Dispatches an event to the renderer process to register or deregister a datafile
+   *
+   * @param {rules} ABP filter syntax rule string
+   */
+  updateCustomAdblockRules: function (rules) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES,
+      rules
+    })
   }
 }
-module.exports = AboutActions
+module.exports = aboutActions

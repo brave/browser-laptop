@@ -1,6 +1,5 @@
 const browserActions = require('./browser/extensions/browserActions')
 const extensionActions = require('./common/actions/extensionActions')
-const AppStore = require('../js/stores/appStore')
 const config = require('../js/constants/config')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getAppUrl, getExtensionsPath, getIndexHTML} = require('../js/lib/appUrlUtil')
@@ -308,5 +307,5 @@ module.exports.init = () => {
   }
 
   registerExtensions()
-  AppStore.addChangeListener(registerExtensions)
+  appStore.addChangeListener(registerExtensions)
 }
