@@ -1245,9 +1245,15 @@ var getPaymentInfo = () => {
 }
 
 var setPaymentInfo = (amount) => {
+  var bravery
+
   if (!client) return
 
-  var bravery = client.getBraveryProperties()
+  try { bravery = client.getBraveryProperties() } catch (ex) {
+// wallet being created...
+
+    return setTimeout(function () { setPaymentInfo(amount) }, 2 * msecs.second)
+  }
 
   amount = parseInt(amount, 10)
   if (isNaN(amount) || (amount <= 0)) return
