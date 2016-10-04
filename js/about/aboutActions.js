@@ -264,7 +264,7 @@ const aboutActions = {
   },
 
   /**
-   * Dispatches an event to the renderer process to register or deregister a datafile
+   * Dispatches an event to the renderer process to update custom adblock rules.
    *
    * @param {rules} ABP filter syntax rule string
    */

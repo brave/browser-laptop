@@ -101,7 +101,7 @@ AppStore
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable the resoruce
+    enabled: boolean, // Enable the resource
     count: number // Number of blocked ads application wide
   },
   adInsertion: {

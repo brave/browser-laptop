@@ -580,11 +580,11 @@ module.exports.isResourceEnabled = (resourceName, url) => {
     return false
   }
 
-  if ((resourceName === appConfig.resourceNames.ADBLOCK ||
+  if (resourceName === appConfig.resourceNames.ADBLOCK ||
       appConfig[resourceName] &&
         appConfig[resourceName].enabled &&
         appConfig[resourceName].resourceType === adBlockResourceName ||
-      resourceName === appConfig.resourceNames.TRACKING_PROTECTION)) {
+      resourceName === appConfig.resourceNames.TRACKING_PROTECTION) {
     // Check the resource vs the ad control setting
     if (braverySettings.adControl === 'allowAdsAndTracking') {
       return false
