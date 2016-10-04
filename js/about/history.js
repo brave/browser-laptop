@@ -33,7 +33,7 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
-    console.log('perform the delete here: ' + JSON.stringify(this.props.siteDetail))
+    // BSCTODO: ...
   }
 
   render () {

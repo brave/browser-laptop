@@ -90,16 +90,6 @@ body {
       border-spacing: 0px;
       cursor: default;
 
-      // Trash can icon in Time column header
-      th:first-of-type:before {
-        content: "\f1f8";
-        font-family: FontAwesome;
-        margin-right: 13px;
-      }
-      th:hover:first-of-type:before {
-        color: #000;
-      }
-
       // Time visited
       .time {
         font-size: 11pt;
@@ -109,10 +99,7 @@ body {
 
         // Delete button
         .deleteEntry {
-          color: transparent;
-          float: left;
-          margin-left: 8px;
-          margin-top: 1px;
+          display: none;
         }
         &:hover .deleteEntry{
           color: @gray;
