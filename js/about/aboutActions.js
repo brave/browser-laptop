@@ -69,7 +69,7 @@ const aboutActions = {
    */
   clearSiteSettings: function (key) {
     aboutActions.dispatchAction({
-      actionType: AppConstants.APP_CLEAR_SITE_SETTINGS,
+      actionType: appConstants.APP_CLEAR_SITE_SETTINGS,
       key
     })
   },
