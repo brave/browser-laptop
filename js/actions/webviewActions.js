@@ -4,8 +4,6 @@
 
 'use strict'
 
-const messages = require('../constants/messages')
-
 const getWebview = () =>
   document.querySelector('.frameWrapper.isActive webview')
 
