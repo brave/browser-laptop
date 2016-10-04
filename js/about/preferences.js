@@ -528,7 +528,7 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get receiptFileName () {
-    return `brave_ledger${this.numericDateStr}.csv`
+    return `Brave_Payments_${this.numericDateStr}.csv`
   }
 
   get dataURL () {
