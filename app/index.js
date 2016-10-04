@@ -76,9 +76,7 @@ const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
-const basicAuth = require('./browser/basicAuth')
 const async = require('async')
-const tabs = require('./browser/tabs')
 const settings = require('../js/constants/settings')
 const webtorrent = require('./browser/webtorrent')
 
@@ -295,7 +293,6 @@ app.on('ready', () => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
-      e.preventDefault()
       cb(true)
       return
     }
@@ -318,6 +315,7 @@ app.on('ready', () => {
   })
 
   app.on('before-quit', (e) => {
+    appActions.shuttingDown()
     shuttingDown = true
     if (sessionStateStoreCompleteOnQuit) {
       return
@@ -417,8 +415,6 @@ app.on('ready', () => {
     Menu.init(initialState, null)
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
-    tabs.init()
-    basicAuth.init()
     contentSettings.init()
     privacy.init()
     Autofill.init()

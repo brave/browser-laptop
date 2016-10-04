@@ -1,112 +1,180 @@
-const {app, BrowserWindow, session, webContents} = require('electron')
-const extensions = process.atomBinding('extension')
-const { getBraveExtIndexHTML } = require('../../js/lib/appUrlUtil')
+const {app, extensions} = require('electron')
+const appActions = require('../../js/actions/appActions')
+const { makeImmutable } = require('../common/state/immutableUtil')
+const tabState = require('../common/state/tabState')
 
 let currentWebContents = {}
-let activeTab = null
 
 const cleanupWebContents = (tabId) => {
   delete currentWebContents[tabId]
+  setImmediate(() => {
+    appActions.tabClosed({ tabId })
+  })
 }
 
-const tabs = {
-  init: () => {
+const getTabValue = function (tabId) {
+  let tab = api.getWebContents(tabId)
+  if (tab) {
+    return makeImmutable(extensions.tabValue(tab))
+  }
+}
+
+const createInternal = (createProperties, tab, cb = null) => {
+  return new Promise((resolve, reject) => {
+    tab.once('did-attach', () => {
+      cb && cb(tab)
+    })
+    tab.once('did-fail-provisional-load', (e) => {
+      resolve(tab, e)
+    })
+    tab.once('did-fail-load', (e) => {
+      resolve(tab, e)
+    })
+    tab.once('did-finish-load', (e) => {
+      resolve(tab, e)
+    })
+    let openerTab = extensions.getOpener(createProperties)
+    extensions.openTab(tab, createProperties, openerTab)
+  })
+}
+
+const updateTab = (tabId) => {
+  let tabValue = getTabValue(tabId)
+  if (tabValue) {
+    setImmediate(() => {
+      appActions.tabUpdated(tabValue)
+    })
+  }
+}
+
+const api = {
+  init: (state, action) => {
     app.on('web-contents-created', function (event, tab) {
       // TODO(bridiver) - also exclude extension action windows??
-      if (extensions.isBackgroundPage(tab) || tab.getURL() === getBraveExtIndexHTML()) {
+      if (extensions.isBackgroundPage(tab) || !tab.hostWebContents) {
         return
       }
       let tabId = tab.getId()
-      tab.on('destroyed', cleanupWebContents.bind(null, tabId))
-      tab.on('crashed', cleanupWebContents.bind(null, tabId))
-      tab.on('close', cleanupWebContents.bind(null, tabId))
+      tab.once('destroyed', cleanupWebContents.bind(null, tabId))
+      tab.once('crashed', cleanupWebContents.bind(null, tabId))
+      tab.once('close', cleanupWebContents.bind(null, tabId))
       tab.on('set-active', function (evt, active) {
-        if (active) {
-          activeTab = tab
+        updateTab(tabId)
+      })
+      tab.on('page-favicon-updated', function (e, favicons) {
+        if (favicons && favicons.length > 0) {
+          tab.setTabValues({
+            faviconUrl: favicons[0]
+          })
+          updateTab(tabId)
         }
       })
-      tab.on('new-window', (e, url, frameName, disposition, options = {}) => {
-        let userGesture = options.userGesture
-        if (userGesture === false) {
-          e.preventDefault()
+      tab.on('unresponsive', () => {
+        console.log('unresponsive')
+      })
+      tab.on('responsive', () => {
+        console.log('responsive')
+      })
+      tab.on('did-attach', () => {
+        updateTab(tabId)
+      })
+      tab.on('did-detach', () => {
+        updateTab(tabId)
+      })
+      tab.on('page-title-updated', function () {
+        updateTab(tabId)
+      })
+      tab.on('did-fail-load', function () {
+        updateTab(tabId)
+      })
+      tab.on('did-fail-provisional-load', function () {
+        updateTab(tabId)
+      })
+      tab.on('did-stop-loading', function () {
+        updateTab(tabId)
+      })
+      tab.on('navigation-entry-commited', function (evt, url) {
+        updateTab(tabId)
+      })
+      tab.on('did-navigate', function (evt, url) {
+        updateTab(tabId)
+      })
+      tab.on('load-start', function (evt, url, isMainFrame, isErrorPage) {
+        if (isMainFrame) {
+          updateTab(tabId)
         }
       })
+      tab.on('did-finish-load', function () {
+        updateTab(tabId)
+      })
+
       currentWebContents[tabId] = tab
+      let tabValue = getTabValue(tabId)
+      if (tabValue) {
+        setImmediate(() => {
+          appActions.tabCreated(tabValue)
+        })
+      }
     })
+
+    return state
   },
 
   getWebContents: (tabId) => {
     return currentWebContents[tabId]
   },
 
-  create: (createProperties) => {
-    return new Promise((resolve, reject) => {
-      // TODO(bridiver) - make this available from electron
-      var payload = {}
-      process.emit('ELECTRON_GUEST_VIEW_MANAGER_NEXT_INSTANCE_ID', payload)
-      var guestInstanceId = payload.returnValue
+  setAudioMuted: (state, action) => {
+    action = makeImmutable(action)
+    let frameProps = action.get('frameProps')
+    let muted = action.get('muted')
+    let tabId = frameProps.get('tabId')
+    let webContents = api.getWebContents(tabId)
+    if (webContents) {
+      webContents.setAudioMuted(muted)
+      let tabValue = getTabValue(tabId)
+      return tabState.updateTab(state, { tabValue })
+    }
+  },
 
-      let win = BrowserWindow.getFocusedWindow()
-      let windowId = createProperties.windowId
-      if (windowId && windowId !== -2) {
-        win = BrowserWindow.fromId(windowId) || win
-      }
-      if (!win) {
-        reject('Could not find a window for new tab')
-        return
-      }
-      let opener = null
-      let newSession = session.defaultSession
-      let openerTabId = createProperties.openerTabId
-      if (openerTabId) {
-        opener = tabs.getWebContents(openerTabId)
-        if (!opener) {
-          reject('Opener does not exist')
-          return
-        }
-        // only use the opener if it is in the same window
-        if (opener.webContents.hostWebContents !== win.webContents) {
-          reject('Opener must be in the same window as new tab')
-          return
-        }
-      }
-
-      opener = opener || activeTab
-      if (opener) {
-        newSession = opener.session
-      } else {
-        reject('Could not find an opener for new tab')
-        return
-      }
-
-      let webPreferences = {
-        isGuest: true,
-        embedder: win.webContents,
-        session: newSession,
-        guestInstanceId,
-        delayedLoadUrl: createProperties.url || 'about:newtab'
-      }
-      webPreferences = Object.assign({}, opener.getWebPreferences(), webPreferences)
-      let guest = webContents.create(webPreferences)
-      process.emit('ELECTRON_GUEST_VIEW_MANAGER_REGISTER_GUEST', { sender: opener }, guest, guestInstanceId)
-
-      guest.once('did-finish-load', () => {
-        resolve(guest)
-      })
-      let active = createProperties.active !== false
-      if (!active) {
-        active = createProperties.selected !== false
-      }
-      let disposition = active ? 'foreground-tab' : 'background-tab'
-
-      process.emit('ELECTRON_GUEST_VIEW_MANAGER_TAB_OPEN',
-        { sender: opener }, // event
-        'about:blank',
-        '',
-        disposition,
-        { webPreferences: guest.getWebPreferences() })
+  newTab: (state, action) => {
+    action = makeImmutable(action)
+    let createProperties = action.get('createProperties')
+    createProperties = makeImmutable(createProperties).toJS()
+    let guest = extensions.registerGuest(createProperties)
+    createInternal(createProperties, guest).catch((err) => {
+      console.error(err)
+      // TODO(bridiver) - report the error
     })
+    let tab = guest.webContents
+    let tabValue = getTabValue(tab)
+    return tabState.maybeCreateTab(state, { tabValue })
+  },
+
+  closeTab: (state, action) => {
+    action = makeImmutable(action)
+    let tabId = action.get('tabId')
+    let tab = api.getWebContents(tabId)
+    try {
+      if (!tab.isDestroyed()) {
+        tab.close()
+      }
+    } catch (e) {
+      // ignore
+    }
+    return tabState.removeTabByTabId(state, tabId)
+  },
+
+  create: (createProperties, cb = null) => {
+    try {
+      createProperties = makeImmutable(createProperties).toJS()
+      let guest = extensions.registerGuest(createProperties)
+      return createInternal(createProperties, guest, cb)
+    } catch (e) {
+      cb && cb()
+      return new Promise((resolve, reject) => { reject(e.message) })
+    }
   }
 }
 
-module.exports = tabs
+module.exports = api
