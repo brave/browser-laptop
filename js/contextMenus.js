@@ -776,7 +776,7 @@ function mainTemplateInit (nodeProps, frame) {
     template.push({
       label: locale.translation('allowFlashOnce'),
       click: () => {
-        appActions.changeSiteSetting(pageOrigin, 'flash', 1)
+        appActions.changeSiteSetting(pageOrigin, 'flash', 1, frame.get('isPrivate'))
       }
     })
     if (!frame.get('isPrivate')) {
