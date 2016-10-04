@@ -63,6 +63,18 @@ const AboutActions = {
   },
 
   /**
+   * Dispatches an event to the renderer process to remove all site settings
+   *
+   * @param {string} key - The settings key to remove
+   */
+  clearSiteSettings: function (key) {
+    AboutActions.dispatchAction({
+      actionType: AppConstants.APP_CLEAR_SITE_SETTINGS,
+      key
+    })
+  },
+
+  /**
    * Loads a URL in a new frame in a safe way.
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672

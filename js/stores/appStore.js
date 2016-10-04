@@ -507,6 +507,16 @@ const handleAppAction = (action) => {
         appState = appState.set(propertyName, newSiteSettings)
         break
       }
+    case AppConstants.APP_CLEAR_SITE_SETTINGS:
+      {
+        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        let newSiteSettings = new Immutable.Map()
+        appState.get(propertyName).map((entry, hostPattern) => {
+          newSiteSettings = newSiteSettings.set(hostPattern, entry.delete(action.key))
+        })
+        appState = appState.set(propertyName, newSiteSettings)
+        break
+      }
     case AppConstants.APP_UPDATE_LEDGER_INFO:
       appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
       break

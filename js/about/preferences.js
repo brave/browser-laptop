@@ -1020,6 +1020,10 @@ class SitePermissionsPage extends React.Component {
     aboutActions.removeSiteSetting(hostPattern, name)
   }
 
+  clearPermissions (name) {
+    aboutActions.clearSiteSettings(name)
+  }
+
   render () {
     return this.isPermissionsNonEmpty()
     ? <div id='sitePermissionsPage'>
@@ -1030,7 +1034,15 @@ class SitePermissionsPage extends React.Component {
           Object.keys(this.props.names).map((name) =>
             this.hasEntryForPermission(name)
             ? <li>
-              <div data-l10n-id={name} className='permissionName' />
+              <div>
+                <span data-l10n-id={name} className='permissionName' />
+                <span className='clearAll'>
+                  (
+                  <span className='clearAllLink' data-l10n-id='clearAll'
+                    onClick={this.clearPermissions.bind(this, name)} />
+                  )'
+                </span>
+              </div>
               <ul>
                 {
                   this.props.siteSettings.map((value, hostPattern) => {
