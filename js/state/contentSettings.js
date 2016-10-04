@@ -12,8 +12,8 @@ const {cookieExceptions, localStorageExceptions} = require('../data/siteHacks')
 const {passwordManagers, defaultPasswordManager} = require('../constants/passwordManagers')
 const urlParse = require('url').parse
 const siteSettings = require('./siteSettings')
-const { setUserPref } = require('./userPrefs')
-const { getSetting } = require('../settings')
+const {setUserPref} = require('./userPrefs')
+const {getSetting} = require('../settings')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {

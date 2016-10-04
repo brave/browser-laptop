@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { zoom } = require('../constants/config')
+const {zoom} = require('../constants/config')
 
 // Each zoomLevel is multiplied by 20 to get the percentage offset from 100
 module.exports.getZoomValuePercentage = (zoomLevel) =>

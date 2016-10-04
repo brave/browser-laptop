@@ -1,8 +1,8 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const { getTargetAboutUrl } = require('../../js/lib/appUrlUtil')
-const { errorContent, errorUrl } = require('../lib/selectors')
+const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
+const {errorContent, errorUrl} = require('../lib/selectors')
 
 describe('errorPage', function () {
   Brave.beforeAll(this)

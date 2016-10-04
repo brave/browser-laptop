@@ -9,8 +9,8 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const WindowConstants = require('../constants/windowConstants')
 const debounce = require('../lib/debounce')
-const { isSourceAboutUrl } = require('../lib/appUrlUtil')
-const { responseHasContent } = require('../../app/common/lib/httpUtil')
+const {isSourceAboutUrl} = require('../lib/appUrlUtil')
+const {responseHasContent} = require('../../app/common/lib/httpUtil')
 
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow

@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
-const { aboutUrls, isNavigatableAboutPage } = require('../lib/appUrlUtil')
+const {aboutUrls, isNavigatableAboutPage} = require('../lib/appUrlUtil')
 
 class AboutAbout extends ImmutableComponent {
   render () {

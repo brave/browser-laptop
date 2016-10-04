@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const { activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar, backButton, forwardButton } = require('../lib/selectors')
+const {activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar, backButton, forwardButton} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 

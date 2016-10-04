@@ -1,6 +1,6 @@
 const ReactDOM = require('react-dom')
-const { getSourceAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
-const { ABOUT_COMPONENT_INITIALIZED } = require('../constants/messages')
+const {getSourceAboutUrl, getBaseUrl} = require('../lib/appUrlUtil')
+const {ABOUT_COMPONENT_INITIALIZED} = require('../constants/messages')
 const ipc = window.chrome.ipc
 
 let element

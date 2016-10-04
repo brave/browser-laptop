@@ -11,7 +11,7 @@ const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
 const urlParse = require('url').parse
-const { navigatableTypes } = require('../js/lib/appUrlUtil')
+const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const isDarwin = process.platform === 'darwin'
 let appInitialized = false
 

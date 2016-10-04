@@ -1,5 +1,5 @@
 const extensionActions = require('../../common/actions/extensionActions')
-const { makeImmutable } = require('../../common/state/immutableUtil')
+const {makeImmutable} = require('../../common/state/immutableUtil')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const messages = require('../../../js/constants/messages')

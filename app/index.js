@@ -241,7 +241,7 @@ let flashInitialized = false
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
-  const { HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED } = require('../js/constants/settings')
+  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED} = require('../js/constants/settings')
   if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
     app.disableHardwareAcceleration()
   }

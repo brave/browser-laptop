@@ -2,8 +2,8 @@
 
 require('babel-polyfill')
 
-const { getZoomValuePercentage, getNextZoomLevel } = require('../../js/lib/zoom')
-const { zoom } = require('../../js/constants/config')
+const {getZoomValuePercentage, getNextZoomLevel} = require('../../js/lib/zoom')
+const {zoom} = require('../../js/constants/config')
 const assert = require('assert')
 
 describe('zoom', function () {

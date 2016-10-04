@@ -15,7 +15,7 @@ const ipc = global.require('electron').ipcRenderer
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const messages = require('../constants/messages')
 const dragTypes = require('../constants/dragTypes')
-const { getSetting } = require('../settings')
+const {getSetting} = require('../settings')
 const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
@@ -27,7 +27,7 @@ const UrlUtil = require('../lib/urlutil')
 const EventUtil = require('../lib/eventUtil')
 const eventElHasAncestorWithClasses = EventUtil.eventElHasAncestorWithClasses
 
-const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
+const {isUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
   constructor () {

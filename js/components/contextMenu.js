@@ -8,7 +8,7 @@ const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet')
 const KeyCodes = require('../constants/keyCodes')
-const { formatAccelerator } = require('../../app/common/lib/formatUtil')
+const {formatAccelerator} = require('../../app/common/lib/formatUtil')
 const separatorMenuItem = require('../../app/common/commonMenu').separatorMenuItem
 
 class ContextMenuItem extends ImmutableComponent {

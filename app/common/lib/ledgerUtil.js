@@ -4,7 +4,7 @@
 
 'use strict'
 
-const { responseHasContent } = require('./httpUtil')
+const {responseHasContent} = require('./httpUtil')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)

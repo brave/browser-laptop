@@ -13,7 +13,7 @@ const Main = require('./main')
 const SiteTags = require('../constants/siteTags')
 const config = require('../constants/config')
 const cx = require('../lib/classSet')
-const { getPlatformStyles } = require('../../app/common/lib/platformUtil')
+const {getPlatformStyles} = require('../../app/common/lib/platformUtil')
 
 class Window extends React.Component {
   constructor (props) {
