@@ -118,7 +118,7 @@ class NavigationBar extends ImmutableComponent {
           ? <span className='browserButton' />
           : this.loading
             ? <Button iconClass='fa-times'
-              l10nId='reloadButton'
+              l10nId='stopButton'
               className='navbutton stop-button'
               onClick={this.onStop} />
             : <Button iconClass='fa-repeat'
