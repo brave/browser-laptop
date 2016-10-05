@@ -126,15 +126,15 @@ class NavigationBar extends ImmutableComponent {
               className='navbutton reload-button'
               onClick={this.onReload} />
         }
+        {
+          !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+          ? <Button iconClass='fa-home'
+            l10nId='homeButton'
+            className='navbutton homeButton'
+            onClick={this.onHome} />
+          : null
+        }
       </div>
-      {
-        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-        ? <Button iconClass='fa-home'
-          l10nId='homeButton'
-          className='navbutton homeButton'
-          onClick={this.onHome} />
-        : null
-      }
       <UrlBar ref='urlBar'
         sites={this.props.sites}
         activeFrameKey={this.props.activeFrameKey}
