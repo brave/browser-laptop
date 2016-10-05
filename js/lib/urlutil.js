@@ -103,8 +103,8 @@ const UrlUtil = {
     const caseDomain = /^[\w]{2,5}:\/\/[^\s\/]+\//
     // for cases, quoted strings
     const case1Reg = /^".*"$/
-    // for cases, ?abc and "a? b" which should searching query
-    const case2Reg = /^(\?)|(\?.+\s)/
+    // for cases, ?abc, "a? b", ".abc" and "abc." which should searching query
+    const case2Reg = /^(\?)|(\?.+\s)|^(\.)|(\.)$/
     // for cases, pure string
     const case3Reg = /[\?\.\/\s:]/
     // for cases, data:uri, view-source:uri and about
