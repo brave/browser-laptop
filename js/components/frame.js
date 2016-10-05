@@ -988,7 +988,9 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-get-response-details', (details) => {
-      windowActions.gotResponseDetails(this.frame.get('tabId'), details)
+      if (this.frame) {
+        windowActions.gotResponseDetails(this.frame.get('tabId'), details)
+      }
     })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))

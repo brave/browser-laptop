@@ -72,7 +72,10 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.ctrlKey = e.ctrlKey
     this.metaKey = e.metaKey
     this.shiftKey = e.shiftKey
-    ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
+    const node = ReactDOM.findDOMNode(this)
+    if (node) {
+      node.getElementsByClassName('selected')[0].click()
+    }
   }
 
   // Whether the suggestions box should be rendered

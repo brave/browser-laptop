@@ -158,6 +158,9 @@ function findDisplayIndexForFrameKey (frames, key) {
  * Obtains the frameProps index in the frames
  */
 function getFramePropsIndex (frames, frameProps) {
+  if (!frameProps) {
+    return -1
+  }
   let queryInfo = frameProps.toJS ? frameProps.toJS() : frameProps
   if (queryInfo.tabId) {
     queryInfo = {
