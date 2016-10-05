@@ -76,8 +76,6 @@ class WindowCaptionButtons extends ImmutableComponent {
             <div className='widget1' />
             <div className='widget2' />
             <div className='widget3' />
-            <div className='widget4' />
-            <div className='widget5' />
           </div>
         </button>
         <button
@@ -88,11 +86,7 @@ class WindowCaptionButtons extends ImmutableComponent {
           })}
           onClick={this.onCloseClick}
           title={locale.translation('windowCaptionButtonClose')}>
-          <div className='widget'>
-            <div className='widget1' />
-            <div className='widget2' />
-            <div className='widget3' />
-          </div>
+          <div className='widget' />
         </button>
       </div>
     </div>
