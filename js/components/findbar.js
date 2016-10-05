@@ -22,6 +22,7 @@ class FindBar extends ImmutableComponent {
     this.onFindPrev = this.onFindPrev.bind(this)
     this.onFindNext = this.onFindNext.bind(this)
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
+    this.didFrameChange = true
   }
 
   get frame () {
@@ -65,6 +66,10 @@ class FindBar extends ImmutableComponent {
 
   componentDidMount () {
     this.focus()
+  }
+
+  componentWillUpdate (nextProps) {
+    this.didFrameChange = nextProps.frameKey !== this.props.frameKey
   }
 
   componentDidUpdate (prevProps) {
@@ -174,6 +179,10 @@ class FindBar extends ImmutableComponent {
       }
     }
 
+    const inputValue = this.didFrameChange
+      ? this.searchString || undefined
+      : undefined
+
     return <div className='findBar' style={findBarStyle} onBlur={this.onBlur}>
       <div className='searchContainer'>
         <div className='searchStringContainer'>
@@ -181,9 +190,9 @@ class FindBar extends ImmutableComponent {
           <input type='text'
             spellCheck='false'
             ref={(node) => { this.searchInput = node }}
+            value={inputValue}
             onKeyDown={this.onKeyDown}
-            onChange={this.onChange}
-            value={this.searchString} />
+            onKeyUp={this.onChange} />
           <span className='searchStringContainerIcon fa fa-times'
             onClick={this.onClear} />
         </div>

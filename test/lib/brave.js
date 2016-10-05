@@ -243,13 +243,13 @@ var exports = {
       })
     })
 
-    this.app.client.addCommand('showFindbar', function (show) {
-      return this.execute(function (show) {
+    this.app.client.addCommand('showFindbar', function (show, key = 1) {
+      return this.execute(function (show, key) {
         window.windowActions.setFindbarShown(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
-          key: 1
+          key
         }), show !== false)
-      }, show)
+      }, show, key)
     })
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {

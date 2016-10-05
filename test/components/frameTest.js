@@ -111,6 +111,41 @@ describe('findbar', function () {
     match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '2 of 2')
   })
+
+  it('remembers findbar input when switching frames', function * () {
+    const url = Brave.server.url('find_in_page.html')
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+    yield this.app.client
+      .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
+      .windowParentByUrl(url)
+      .waitUntil(function () {
+        return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === url)
+      })
+      .waitForElementFocus('webview[data-frame-key="2"]')
+    yield this.app.client
+      .showFindbar(true, 2)
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'abc')
+      .click('.tab')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
+      .click('.closeTab')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'abc')
+      })
+      .showFindbar(false, 2)
+      .waitUntil(function () {
+        return this.element(findBarInput).then((val) => val.value === null)
+      })
+      .showFindbar(true, 2)
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'abc')
+      })
+  })
 })
 
 describe('clone tab', function () {
