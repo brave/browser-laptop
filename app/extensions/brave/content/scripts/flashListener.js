@@ -147,20 +147,20 @@ if (chrome.contentSettings.flashActive != 'allow' ||
       })
     }
     replaceAdobeLinks()
-    let interval = setInterval(replaceAdobeLinks, 1000)
+    let interval = setInterval(replaceAdobeLinks, 3000)
     document.addEventListener('visibilitychange', () => {
       clearInterval(interval)
       if (document.visibilityState !== 'hidden') {
-        interval = setInterval(replaceAdobeLinks, 1000)
+        interval = setInterval(replaceAdobeLinks, 3000)
       }
     })
   })()
   insertFlashPlaceholders()
-  let interval = setInterval(insertFlashPlaceholders, 1000)
+  let interval = setInterval(insertFlashPlaceholders, 3000)
   document.addEventListener('visibilitychange', () => {
     clearInterval(interval)
     if (document.visibilityState !== 'hidden') {
-      interval = setInterval(insertFlashPlaceholders, 1000)
+      interval = setInterval(insertFlashPlaceholders, 3000)
     }
   })
 }

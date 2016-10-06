@@ -270,11 +270,11 @@ if (chrome.contentSettings.passwordManager == 'allow') {
   }
 
   autofillPasswordListener()
-  let interval = setInterval(autofillPasswordListener, 1000)
+  let interval = setInterval(autofillPasswordListener, 3000)
   document.addEventListener('visibilitychange', () => {
     clearInterval(interval)
     if (document.visibilityState !== 'hidden') {
-      interval = setInterval(autofillPasswordListener, 1000)
+      interval = setInterval(autofillPasswordListener, 3000)
     }
   })
 }
