@@ -86,6 +86,7 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
   defaultSettings: {
+    'adblock.customRules': '',
     'general.language': null, // null means to use the OS lang
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
@@ -128,7 +129,8 @@ module.exports = {
     'shutdown.clear-cache': false,
     'shutdown.clear-all-site-cookies': false,
     'shutdown.clear-autocomplete-data': false,
-    'shutdown.clear-autofill-data': false
+    'shutdown.clear-autofill-data': false,
+    'shutdown.clear-site-settings': false
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [
