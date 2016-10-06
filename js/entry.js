@@ -21,6 +21,13 @@ require('../less/notificationBar.less')
 require('../less/addEditBookmark.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
+if (process.platform === 'darwin') {
+  // Setup the crash handling for mac renderer processes
+  // https://github.com/electron/electron/blob/master/docs/api/crash-reporter.md#crashreporterstartoptions
+  const CrashHerald = require('../app/crash-herald')
+  CrashHerald.init()
+}
+
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
