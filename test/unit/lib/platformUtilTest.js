@@ -36,7 +36,7 @@ describe('platformUtil', function () {
   describe('getPlatformStyles', function () {
     it('prepends style with platform--', function () {
       const result = platformUtil.getPlatformStyles()
-      assert.equal(result[0], 'platform--win32')
+      assert.equal(result[0].match(/^platform--/), 'platform--')
     })
     it('returns the style "win7" for Windows 7', function () {
       loadMocks(mockWin7)
