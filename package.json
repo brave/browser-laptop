@@ -80,7 +80,7 @@
     "async": "^2.0.1",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
-    "electron-squirrel-startup": "^1.0.0",
+    "electron-squirrel-startup": "brave/electron-squirrel-startup",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
