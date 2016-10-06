@@ -615,6 +615,19 @@ const doAction = (action) => {
         appDispatcher.waitFor([appStore.dispatchToken], () => {
           createMenu()
         })
+      } else if (action.siteDetail.constructor === Immutable.List && action.tag === undefined) {
+        let shouldRebuild = false
+        action.siteDetail.forEach((site) => {
+          const tag = site.getIn(['tags', 0])
+          if (tag === siteTags.BOOKMARK || tag === siteTags.BOOKMARK_FOLDER) {
+            shouldRebuild = true
+          }
+        })
+        if (shouldRebuild) {
+          appDispatcher.waitFor([appStore.dispatchToken], () => {
+            createMenu()
+          })
+        }
       }
       break
     case appConstants.APP_REMOVE_SITE:

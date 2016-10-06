@@ -287,6 +287,17 @@ var exports = {
     })
 
     /**
+     * Adds a list sites to the sites list, including bookmark and foler.
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     */
+    this.app.client.addCommand('addSiteList', function (siteDetail) {
+      return this.execute(function (siteDetail) {
+        return require('../../../js/actions/appActions').addSite(siteDetail)
+      }, siteDetail).then((response) => response.value)
+    })
+
+    /**
      * Removes a site from the sites list, or removes a bookmark.
      *
      * @param {object} siteDetail - Properties for the frame to add
