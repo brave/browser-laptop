@@ -1,6 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
+const Immutable = require('immutable')
 const {urlInput, navigator, navigatorNotBookmarked, saveButton, deleteButton} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 
@@ -191,6 +192,44 @@ describe('bookmark tests', function () {
                 return item.label === bookmarkTitle
               })
               if (bookmark) return true
+            }
+            return false
+          })
+        })
+    })
+
+    it('rebuilds the menu when add a list of items', function * () {
+      const bookmarkTitle = 'bookmark-rebuild-menu-demo'
+      const folderName = 'bookmark-folder-rebuild-menu-demo'
+      const sites = Immutable.fromJS([
+        {
+          customTitle: folderName,
+          folderId: 1,
+          parentFolderId: 0,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        },
+        {
+          lastAccessedTime: 123,
+          title: bookmarkTitle,
+          location: 'https://brave.com',
+          tags: [siteTags.BOOKMARK]
+        }
+      ])
+      yield this.app.client
+        .addSiteList(sites)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            const bookmarksMenu = val.value.menu.template.find((item) => {
+              return item.label === 'Bookmarks'
+            })
+            if (bookmarksMenu && bookmarksMenu.submenu) {
+              const bookmark = bookmarksMenu.submenu.find((item) => {
+                return item.label === bookmarkTitle
+              })
+              const bookmarkFolder = bookmarksMenu.submenu.find((item) => {
+                return item.label === folderName
+              })
+              if (bookmark && bookmarkFolder) return true
             }
             return false
           })
