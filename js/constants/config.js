@@ -43,5 +43,6 @@ module.exports = {
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
   PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
+  widevineComponentId: 'oimompecagnajdejgnnjijobebaeigek',
   coinbaseOrigin: 'https://buy.coinbase.com'
 }

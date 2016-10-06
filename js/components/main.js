@@ -1166,6 +1166,7 @@ class Main extends ImmutableComponent {
                 adInsertion={this.props.appState.get('adInsertion')}
                 noScript={this.props.appState.get('noScript')}
                 flash={this.props.appState.get('flash')}
+                widevine={this.props.appState.get('widevine')}
                 cookieblock={this.props.appState.get('cookieblock')}
                 flashInitialized={this.props.appState.get('flashInitialized')}
                 allSiteSettings={allSiteSettings}
