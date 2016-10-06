@@ -156,8 +156,9 @@ class UrlBarSuggestions extends ImmutableComponent {
     addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
     addToItems(topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
     const documentHeight = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--navbar-height'), 10)
+    const menuHeight = this.props.menubarVisible ? 30 : 0
     return <ul className='urlBarSuggestions' style={{
-      maxHeight: document.documentElement.offsetHeight - documentHeight - 2
+      maxHeight: document.documentElement.offsetHeight - documentHeight - 2 - menuHeight
     }}>
       {items}
     </ul>

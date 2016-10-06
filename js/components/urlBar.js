@@ -453,7 +453,8 @@ class UrlBar extends ImmutableComponent {
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}
             searchSelectEntry={this.searchSelectEntry}
-            previewActiveIndex={this.props.previewActiveIndex || 0} />
+            previewActiveIndex={this.props.previewActiveIndex || 0}
+            menubarVisible={this.props.menubarVisible} />
           : null
         }
     </form>

@@ -908,6 +908,7 @@ class Main extends ImmutableComponent {
                 enableNoScript={this.enableNoScript(activeSiteSettings)}
                 settings={this.props.appState.get('settings')}
                 noScriptIsVisible={noScriptIsVisible}
+                menubarVisible={customTitlebar.menubarVisible}
               />
               <div className='topLevelEndButtons'>
                 <div className={cx({
