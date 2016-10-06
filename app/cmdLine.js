@@ -45,7 +45,7 @@ const focusOrOpenWindow = function (url) {
 
 const isProtocolHandled = (protocol) => {
   protocol = (protocol || '').split(':')[0]
-  return navigatableTypes.includes(protocol) ||
+  return navigatableTypes.includes(`${protocol}:`) ||
       electron.session.defaultSession.protocol.isNavigatorProtocolHandled(protocol)
 }
 
