@@ -189,8 +189,6 @@
                 border-radius: 0;
               }
               .widget3 { display: none; }
-              .widget4 { display: none; }
-              .widget5 { display: none; }
             }
           }
 
@@ -211,10 +209,6 @@
               width: 12px;
               position: relative;
               top: 3px;
-
-              .widget1 { display:none; }
-              .widget2 { display:none; }
-              .widget3 { display:none; }
             }
           }
         }
@@ -243,13 +237,19 @@
             &:active {
               background-color: #cacacb;
             }
+            &.fullscreen {
+              .widget {
+                top: 5px;
+                left: -2px;
+              }
+            }
             .widget {
-              width: 10px;
-              height: 1px;
-              background: black;
+              background: url('../img/windows/win10_minimize.svg') no-repeat;
               display: inline-block;
-              vertical-align: middle;
+              height: 10px;
+              width: 10px;
               position: relative;
+              top: 4px;
               left: -1px;
             }
           }
@@ -270,108 +270,57 @@
                 background-color: #cacacb;
               }
               .widget {
-                margin-top: 8px;
-                .widget1 { width: 6px; height: 6px; }
-                .widget2 { display: inline-block; }
-                .widget3 {
-                  display: inline-block;
-                  width: 8px;
-                  height: 1px;
-                  background: black;
-                  position: relative;
-                  top: -21px;
-                  left: 1px;
-                }
-                .widget4 {
-                  display: inline-block;
-                  width: 1px;
-                  height: 8px;
-                  background: black;
-                  position: relative;
-                  top: -14px;
-                  left: 0px;
-                }
-                .widget5 {
-                  display: inline-block;
-                  width: 2px;
-                  height: 1px;
-                  background: black;
-                  position: relative;
-                  top: -14px;
-                  left: -2px;
-                }
+                background: url('../img/windows/win10_restore.svg') no-repeat;
+                display: inline-block;
+                height: 10px;
+                width: 10px;
+                position: relative;
+                top: 0px;
+                left: -2px;
               }
             }
             .widget {
-              width: 12px;
-              height: 12px;
+              background: url('../img/windows/win10_expand.svg') no-repeat;
               display: inline-block;
-              vertical-align: middle;
+              height: 10px;
+              width: 10px;
+              position: relative;
+              top: -1px;
+              left: -1px;
 
-              .widget1 {
-                width: 8px;
-                height: 8px;
-                border: 1px solid black;
-                background: none;
-                position: relative;
-              }
-              .widget2 {
-                display: none;
-                width: 1px;
-                height: 2px;
-                background: black;
-                position: relative;
-                top: -20px;
-                left: 2px;
-              }
+              .widget1 { display: none; }
+              .widget2 { display: none; }
               .widget3 { display: none; }
-              .widget4 { display: none; }
-              .widget5 { display: none; }
             }
           }
 
           &.close {
+            width: 46px;
             &:hover {
               background-color: #e5182c;
               .widget {
-                .widget1{ background:white; }
-                .widget2{ background:white; }
+                background: url('../img/windows/win10_close_white.svg') no-repeat;
+              }
+            }
+            &:not(:hover) {
+              .widget {
+                background: url('../img/windows/win10_close.svg') no-repeat;
               }
             }
             &:active {
               background-color: #ef717c;
-              .widget {
-                .widget1{ background:white; }
-                .widget2{ background:white; }
-              }
+            }
+            &.fullscreen {
+              top: 0px;
+              width: 45px;
             }
             .widget {
-              width: 11px;
-              height: 11px;
               display: inline-block;
-              vertical-align: middle;
-
-              .widget1 {
-                width: 14px;
-                height: 1px;
-                background: black;
-                display: inline-block;
-                transform: rotate(45deg);
-                position: relative;
-                top: -6px;
-                left: -2px;
-              }
-              .widget2 {
-                width: 14px;
-                height: 1px;
-                background: black;
-                display: inline-block;
-                transform: rotate(315deg);
-                position: relative;
-                top: -6px;
-                left: -16px;
-              }
-              .widget3 { display: none; }
+              height: 10px;
+              left: -1px;
+              position: relative;
+              top: -1px;
+              width: 10px;
             }
           }
         }
