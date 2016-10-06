@@ -48,7 +48,7 @@ class UrlBar extends ImmutableComponent {
     return windowStore.getFrame(this.props.activeFrameKey)
   }
 
-  isActive () {
+  get isActive () {
     return this.props.urlbar.get('active')
   }
 
@@ -370,6 +370,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
+    const value = !this.isActive || this.props.locationValueSuffix.length > 0
+      ? this.locationValue + this.props.locationValueSuffix
+      : undefined
     return <form
       className='urlbarForm'
       action='#'
@@ -412,10 +415,10 @@ class UrlBar extends ImmutableComponent {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onKeyDown={this.onKeyDown}
-          onChange={this.onChange}
+          onKeyUp={this.onChange}
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
-          value={this.locationValue + this.props.locationValueSuffix}
+          value={value}
           data-l10n-id='urlbar'
           className={cx({
             insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
