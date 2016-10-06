@@ -273,6 +273,15 @@ const aboutActions = {
       actionType: appConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES,
       rules
     })
+  },
+
+  /**
+   * Dispatches a message to submit feedback
+   */
+  submitFeedback: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_SUBMIT_FEEDBACK
+    })
   }
 }
 module.exports = aboutActions

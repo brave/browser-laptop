@@ -4,7 +4,6 @@
 
 'use strict'
 
-const appConfig = require('../../js/constants/appConfig')
 const appActions = require('../../js/actions/appActions')
 const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
@@ -270,7 +269,7 @@ module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
     click: function () {
-      electron.shell.openExternal(appConfig.contactUrl)
+      appActions.submitFeedback()
     }
   }
 }

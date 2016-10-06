@@ -436,6 +436,12 @@ Dispatches a message when the network is disconnected
 
 
 
+### submitFeedback() 
+
+Dispatches a message to submit feedback
+
+
+
 
 * * *
 

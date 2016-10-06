@@ -505,6 +505,15 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_NETWORK_DISCONNECTED
     })
+  },
+
+  /**
+   * Dispatches a message to submit feedback
+   */
+  submitFeedback: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SUBMIT_FEEDBACK
+    })
   }
 }
 

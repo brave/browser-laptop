@@ -1323,7 +1323,7 @@ class HelpfulHints extends ImmutableComponent {
       </span>
       <div data-l10n-id={`hint${this.props.hintNumber}`} />
       <div className='helpfulHintsBottom'>
-        <a data-l10n-id='sendUsFeedback' href={appConfig.contactUrl} />
+        <a data-l10n-id='sendUsFeedback' onClick={aboutActions.submitFeedback} />
       </div>
     </div>
   }

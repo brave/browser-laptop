@@ -547,12 +547,7 @@ const createMenu = () => {
         CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem(),
         CommonMenu.separatorMenuItem,
-        {
-          label: locale.translation('sendUsFeedback'),
-          click: function () {
-            electron.shell.openExternal(appConfig.contactUrl)
-          }
-        },
+        CommonMenu.submitFeedbackMenuItem(),
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('services'),
