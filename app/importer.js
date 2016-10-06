@@ -16,8 +16,12 @@ const AppStore = require('../js/stores/appStore')
 const siteTags = require('../js/constants/siteTags')
 const appActions = require('../js/actions/appActions')
 const messages = require('../js/constants/messages')
+const settings = require('../js/constants/settings')
+const getSetting = require('../js/settings').getSetting
 
 var isMergeFavorites = false
+var isImportingBookmarks = false
+var hasBookmarks
 
 exports.init = () => {
   importer.initialize()
@@ -27,15 +31,27 @@ exports.importData = (selected) => {
   if (selected.get('mergeFavorites')) {
     isMergeFavorites = true
   }
+  if (selected.get('favorites')) {
+    isImportingBookmarks = true
+    const sites = AppStore.getState().get('sites')
+    hasBookmarks = sites.find(
+      (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
+    )
+  }
   if (selected !== undefined) {
     importer.importData(selected.toJS())
   }
 }
 
 exports.importHTML = (selected) => {
+  isImportingBookmarks = true
   if (selected.get('mergeFavorites')) {
     isMergeFavorites = true
   }
+  const sites = AppStore.getState().get('sites')
+  hasBookmarks = sites.find(
+    (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
+  )
   const files = dialog.showOpenDialog({
     properties: ['openFile'],
     filters: [{
@@ -51,6 +67,7 @@ exports.importHTML = (selected) => {
 
 importer.on('update-supported-browsers', (e, detail) => {
   isMergeFavorites = false
+  isImportingBookmarks = false
   if (BrowserWindow.getFocusedWindow()) {
     BrowserWindow.getFocusedWindow().webContents.send(messages.IMPORTER_LIST, detail)
   }
@@ -203,6 +220,12 @@ importer.on('show-warning-dialog', (e) => {
 })
 
 importer.on('import-success', (e) => {
+  if (isImportingBookmarks) {
+    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
+    if (!showBookmarksToolbar && !hasBookmarks) {
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+    }
+  }
   showImportSuccess()
 })
 
