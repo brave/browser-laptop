@@ -18,8 +18,6 @@ const siteUtil = require('../state/siteUtil')
 const ipc = window.chrome.ipc
 
 // Stylesheets
-require('../../less/about/itemList.less')
-require('../../less/about/siteDetails.less')
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -149,7 +147,7 @@ class AboutHistory extends React.Component {
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.clearBrowsingDataNow = this.clearBrowsingDataNow.bind(this)
     this.state = {
-      history: Immutable.Map(),
+      history: Immutable.List(),
       search: '',
       settings: Immutable.Map(),
       languageCodes: Immutable.Map()
@@ -180,7 +178,7 @@ class AboutHistory extends React.Component {
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
-  historyDescendingOrder () {
+  get historyDescendingOrder () {
     return this.state.history.filter((site) => siteUtil.isHistoryEntry(site))
       .sort((left, right) => {
         if (left.get('lastAccessedTime') < right.get('lastAccessedTime')) return 1
@@ -191,13 +189,16 @@ class AboutHistory extends React.Component {
   clearBrowsingDataNow () {
     aboutActions.clearBrowsingDataNow({browserHistory: true})
   }
+  componentDidMount () {
+    this.refs.historySearch.focus()
+  }
   render () {
     return <div className='siteDetailsPage'>
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='history' className='sectionTitle' />
         <div className='headerActions'>
           <div className='searchWrapper'>
-            <input type='text' className='searchInput' id='historySearch' placeholder='Search' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
+            <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
             {
               this.state.search
               ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
@@ -209,16 +210,14 @@ class AboutHistory extends React.Component {
       </div>
 
       <div className='siteDetailsPageContent'>
-        {
-          <GroupedHistoryList
-            languageCodes={this.state.languageCodes}
-            settings={this.state.settings}
-            history={
-              this.state.search
-              ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder())
-              : this.historyDescendingOrder()
-            } />
-         }
+        <GroupedHistoryList
+          languageCodes={this.state.languageCodes}
+          settings={this.state.settings}
+          history={
+            this.state.search
+            ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder)
+            : this.historyDescendingOrder
+          } />
       </div>
     </div>
   }

@@ -1,91 +1,9 @@
-@import "./itemList.less";
-/*@import "./preferences.less";*/
-@import "./common.less";
-
-strong, div, span, li, em, p, a {
-  font-weight: 200;
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  background: @veryLightGray;
-}
+@import "./siteDetails.less";
 
 .siteDetailsPage {
-  margin: 0;
-  padding-top: 40px;
   min-width: 704px;
 
-  /*name/color taken from preferences.less*/
-  .sectionTitle {
-    color: @braveOrange;
-  }
-
-  .siteDetailsPageHeader {
-    padding: 0 40px;
-
-    .sectionTitle {
-      font-size: 28px;
-      display: inline-block;
-      -webkit-user-select: none;
-    }
-    .headerActions {
-      float: right;
-
-      .searchWrapper {
-        display: inline-block;
-
-        /*overridden from siteDetails.less*/
-        input.searchInput {
-          float: none;
-          padding: 5px;
-          margin-top: 0;
-          margin-right: 12px;
-          font-size: 16px;
-          min-width: 280px;
-          height: 22px;
-        }
-        .searchInputPlaceholder {
-          color: @gray;
-          float: none;
-          font-family: FontAwesome;
-          left: -35px;
-          margin: 0;
-          padding: 0;
-          position: relative;
-          width: 0;
-        }
-        .searchInputClear {
-          float: none;
-          margin: 0;
-          padding: 0;
-          width: 0;
-          position: relative;
-          left: -35px;
-        }
-      }
-      /*copied from preferences.less*/
-      span.browserButton.primaryButton.clearBrowsingDataButton {
-        font-size: 0.9em;
-        padding: 5px 20px;
-        margin: 0;
-      }
-    }
-  }
-
   .siteDetailsPageContent {
-    border-top: 0px;
-    margin-top: 50px;
-    display: block;
-    clear: both;
-
-    .sectionTitle {
-      font-size: 16px;
-      margin-bottom: 12px;
-      padding-left: 40px;
-      -webkit-user-select: none;
-    }
-
     .sortableTable {
       // Time visited
       .time {
@@ -93,6 +11,7 @@ body {
         font-weight: 800;
         text-align: center;
         width: 154px;
+        white-space: nowrap;
 
         // Delete button
         .deleteEntry {
@@ -105,10 +24,10 @@ body {
 
       // Entry title
       .title {
-        max-width: 415px;
-        text-overflow: ellipsis;
-        overflow: hidden;
         font-size: 11pt;
+        max-width: 415px;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
       }
 

@@ -1,25 +1,87 @@
 @import "./itemList.less";
+@import "./common.less";
+
+strong, div, span, li, em, p, a {
+  font-weight: 200;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: @veryLightGray;
+}
+
+/*name/color taken from preferences.less*/
+.sectionTitle {
+  color: @braveOrange;
+  cursor: default;
+  -webkit-user-select: none;
+}
 
 .siteDetailsPage {
-  margin: 20px;
+  margin: 0;
+  padding-top: 40px;
 
-  .siteDetailsPageContent {
-    border-top: 1px solid @chromeBorderColor;
-    display: flex;
+  .siteDetailsPageHeader {
+    padding: 0 40px;
 
-    .siteDetailsList {
-      padding-top: 10px;
-      overflow: hidden;
+    .sectionTitle {
+      font-size: 28px;
+      display: inline-block;
+    }
+    .headerActions {
+      float: right;
 
-      .listItem {
-        display: flex;
-        height: 1rem;
+      .searchWrapper {
+        display: inline-block;
 
-        .aboutListItem {
-          align-items: center;
-          min-width: 0;
+        /*overridden from siteDetails.less*/
+        input.searchInput {
+          float: none;
+          padding: 5px;
+          margin-top: 0;
+          margin-right: 12px;
+          font-size: 16px;
+          min-width: 280px;
+          height: 22px;
+        }
+        .searchInputPlaceholder {
+          color: @gray;
+          float: none;
+          font-family: FontAwesome;
+          left: -35px;
+          margin: 0;
+          padding: 0;
+          position: relative;
+          width: 0;
+        }
+        .searchInputClear {
+          float: none;
+          margin: 0;
+          padding: 0;
+          width: 0;
+          position: relative;
+          left: -35px;
         }
       }
+      /*copied from preferences.less*/
+      span.browserButton.primaryButton.clearBrowsingDataButton {
+        font-size: 0.9em;
+        padding: 5px 20px;
+        margin: 0;
+      }
+    }
+  }
+
+  .siteDetailsPageContent {
+    border-top: 0px;
+    margin-top: 28px;
+    display: block;
+    clear: both;
+
+    .sectionTitle {
+      font-size: 16px;
+      margin-bottom: 12px;
+      padding-left: 40px;
     }
   }
 }
