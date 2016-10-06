@@ -123,6 +123,7 @@ module.exports = {
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
     'advanced.smooth-scroll-enabled': false,
+    'advanced.send-crash-reports': true,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
