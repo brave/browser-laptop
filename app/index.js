@@ -82,6 +82,9 @@ const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
 const async = require('async')
 
+// temporary fix for #4517, #4518 and #4472
+app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
+
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
 let sessionStateStoreCompleteOnQuit = false
