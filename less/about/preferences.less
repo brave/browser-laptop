@@ -571,45 +571,16 @@ table.sortableTable {
     td {
       padding: 0 15px;
     }
-  }
+    .th-inner {
+      font-weight: bold;
 
-  .fixed-table-container {
-    height: 500px;
-    position: relative;
-
-    .table-header {
-      height: 30px;
-      background: @veryLightGray;
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-    }
-
-    .fixed-table-container-inner {
-      overflow-x: hidden;
-      overflow-y: auto;
-      height: 100%;
-
-      table {
-        width: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-
-        .th-inner {
-          color: @darkGray;
-          cursor: default;
-          font-weight: 600;
-          position: absolute;
-          top: 0;
-          line-height: 30px;
-          z-index: 9;
-          background: @veryLightGray;
-          -webkit-user-select: none;
-        }
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
       }
     }
   }
+
 }
 
 .modal .dialog.paymentHistory .sectionTitle {
