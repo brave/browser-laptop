@@ -10,7 +10,6 @@ describe('urlbarSuggestions', function () {
       .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 

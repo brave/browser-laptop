@@ -12,7 +12,6 @@ describe('tab pages', function () {
       .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)

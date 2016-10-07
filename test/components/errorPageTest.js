@@ -2,7 +2,7 @@
 
 const Brave = require('../lib/brave')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
-const {errorContent, errorUrl} = require('../lib/selectors')
+const {errorContent, errorUrl, urlInput} = require('../lib/selectors')
 
 describe('errorPage', function () {
   Brave.beforeAll(this)
@@ -11,7 +11,7 @@ describe('errorPage', function () {
     yield this.app.client
       .waitUntilWindowLoaded()
       .waitForBrowserWindow()
-      .waitForVisible('#window')
+      .waitForVisible(urlInput)
   })
 
   describe('DNS error', function () {

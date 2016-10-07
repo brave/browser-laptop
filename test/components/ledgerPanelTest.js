@@ -11,7 +11,6 @@ function * setup (client) {
     .waitUntilWindowLoaded()
     .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
-    .waitForVisible('#window')
     .waitForVisible(urlInput)
 }
 

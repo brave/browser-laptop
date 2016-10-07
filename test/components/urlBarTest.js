@@ -9,7 +9,6 @@ describe('urlBar', function () {
       .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForEnabled(urlInput)
   }
 

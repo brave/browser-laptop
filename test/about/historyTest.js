@@ -13,7 +13,6 @@ describe('about:history', function () {
       .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
       .windowByUrl(Brave.browserWindowUrl)
       .addSite({ location: 'https://brave.com', title: 'Brave' })

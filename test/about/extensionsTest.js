@@ -13,7 +13,6 @@ describe('about:extensions', function () {
       .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="1"]')

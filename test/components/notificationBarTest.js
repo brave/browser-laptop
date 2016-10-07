@@ -8,7 +8,6 @@ describe('notificationBar', function () {
     yield client
       .waitUntilWindowLoaded()
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 
@@ -168,7 +167,6 @@ describe('permissions state', function () {
     yield client
       .waitUntilWindowLoaded()
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 

@@ -10,7 +10,6 @@ describe('sessionStore', function () {
     yield client
       .waitUntilWindowLoaded()
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 

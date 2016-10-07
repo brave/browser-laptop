@@ -11,7 +11,6 @@ describe('bookmark tests', function () {
       .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForEnabled(urlInput)
   }
 
