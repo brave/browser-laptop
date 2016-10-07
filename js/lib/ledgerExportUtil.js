@@ -279,11 +279,46 @@ let getTransactionCSVText = function (transactions, viewingIds, addTotalRow) {
   return getTransactionCSVRows(transactions, viewingIds, addTotalRow).join('\n')
 }
 
+/**
+ * Adds an `exportFilenamePrefix` field to the provided transaction(s)
+ * of form `Brave_Payments_${MM-D(D)-YYYY}`, with "_<n>" added for the nth time a date occurs (n > 1)
+ *
+ * @param {Object[]} transactions - an array of transaction(s) or single transaction object
+ */
+let addExportFilenamePrefixToTransactions = function (transactions) {
+  if (!transactions) {
+    return transactions
+  }
+
+  if (!underscore.isArray(transactions)) {
+    transactions = [transactions]
+  }
+
+  var dateCountMap = {}
+
+  return transactions.map(function (transaction) {
+    let timestamp = transaction.submissionStamp
+    let numericDateStr = (new Date(timestamp)).toLocaleDateString().replace(/\//g, '-')
+
+    let dateCount = (dateCountMap[numericDateStr] ? dateCountMap[numericDateStr] : 1)
+    dateCountMap[numericDateStr] = dateCount + 1
+
+    if (dateCount > 1) {
+      numericDateStr = `${numericDateStr}_${dateCount}`
+    }
+
+    transaction.exportFilenamePrefix = `Brave_Payments_${numericDateStr}`
+
+    return transaction
+  })
+}
+
 module.exports = {
   transactionsToCSVDataURL,
   getTransactionCSVText,
   getTransactionCSVRows,
   getPublisherVoteData,
   getTransactionsByViewingIds,
-  getTotalContribution
+  getTotalContribution,
+  addExportFilenamePrefixToTransactions
 }

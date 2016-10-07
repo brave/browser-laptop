@@ -9,7 +9,9 @@ const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
 const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet')
-const transactionsToCSVDataURL = require('../lib/ledgerExportUtil').transactionsToCSVDataURL
+const ledgerExportUtil = require('../lib/ledgerExportUtil')
+const transactionsToCSVDataURL = ledgerExportUtil.transactionsToCSVDataURL
+const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 const {getZoomValuePercentage} = require('../lib/zoom')
 const config = require('../constants/config')
 const appConfig = require('../constants/appConfig')
@@ -465,7 +467,9 @@ class PaymentHistory extends ImmutableComponent {
   }
 
   render () {
-    const transactions = this.props.ledgerData.get('transactions')
+    const transactions = Immutable.fromJS(
+        addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
+    )
 
     return <div id='paymentHistory'>
       <table className='sort'>
@@ -502,10 +506,6 @@ class PaymentHistoryRow extends ImmutableComponent {
     return formattedDateFromTimestamp(this.timestamp)
   }
 
-  get numericDateStr () {
-    return (new Date(this.timestamp)).toLocaleDateString().replace(/\//g, '-')
-  }
-
   get ledgerData () {
     return this.props.ledgerData
   }
@@ -528,7 +528,7 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get receiptFileName () {
-    return `Brave_Payments_${this.numericDateStr}.csv`
+    return `${this.transaction.get('exportFilenamePrefix')}.csv`
   }
 
   get dataURL () {
