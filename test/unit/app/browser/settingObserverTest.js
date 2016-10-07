@@ -5,7 +5,7 @@ const assert = require('assert')
 
 require('../../braveUnit')
 
-describe('setting observer unit test', function () {
+describe.skip('setting observer unit test', function () {
   let appActions
   let settingObserver
   before(function () {
