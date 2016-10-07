@@ -891,7 +891,7 @@ See `eventStore.js` for an example use-case
 
 
 
-### onMouseOverBookmarkFolder(folderId, bookmarks, bookmark, activeFrame, xPos, yPos) 
+### onMouseOverBookmarkFolder(folderId, bookmarks, bookmark, xPos, yPos) 
 
 Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
 
@@ -903,8 +903,6 @@ Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks to
 **bookmarks**: `Object`, all of the users bookmarks
 
 **bookmark**: `Object`, the object representing the selected folder
-
-**activeFrame**: `Object`, active frame for the window
 
 **xPos**: `number`, x position of the left corner of the context mennu
 

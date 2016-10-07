@@ -32,9 +32,6 @@ class BookmarkToolbarButton extends ImmutableComponent {
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
   }
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
-  }
 
   showBookmarkFolderMenu (e) {
     e.target = ReactDOM.findDOMNode(this)
@@ -46,7 +43,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
     const xPos = (e.target.getBoundingClientRect().left | 0) - 2
     const yPos = (e.target.parentNode.getBoundingClientRect().bottom | 0) - 1
 
-    this.props.showBookmarkFolderMenu(this.props.bookmark, xPos, yPos)
+    windowActions.onMouseOverBookmarkFolder(this.props.bookmark.get('folderId'), this.props.sites, this.props.bookmark, xPos, yPos)
   }
 
   onClick (e) {
@@ -87,7 +84,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       e.target = ReactDOM.findDOMNode(this)
       if (dnd.isMiddle(e.target, e.clientX)) {
         e.target.getBoundingClientRect
-        this.props.showBookmarkFolderMenu(this.props.bookmark, e)
+        this.showBookmarkFolderMenu(e)
         windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
           expanded: true
         })
@@ -241,7 +238,6 @@ class BookmarksToolbar extends ImmutableComponent {
     this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
     this.openContextMenu = this.openContextMenu.bind(this)
     this.clickBookmarkItem = this.clickBookmarkItem.bind(this)
-    this.showBookmarkFolderMenu = this.showBookmarkFolderMenu.bind(this)
   }
   get activeFrame () {
     return windowStore.getFrame(this.props.activeFrameKey)
@@ -296,9 +292,6 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   clickBookmarkItem (bookmark, e) {
     return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)
-  }
-  showBookmarkFolderMenu (bookmark, xPos, yPos) {
-    windowActions.onMouseOverBookmarkFolder(bookmark.get('folderId'), this.bookmarks, bookmark, this.activeFrame, xPos, yPos)
   }
   updateBookmarkData (props) {
     this.bookmarks = siteUtil.getBookmarks(props.sites)
@@ -414,12 +407,11 @@ class BookmarksToolbar extends ImmutableComponent {
               ref={(node) => this.bookmarkRefs.push(node)}
               key={i}
               contextMenuDetail={this.props.contextMenuDetail}
-              activeFrameKey={this.props.activeFrameKey}
               draggingOverData={this.props.draggingOverData}
               openContextMenu={this.openContextMenu}
               clickBookmarkItem={this.clickBookmarkItem}
-              showBookmarkFolderMenu={this.showBookmarkFolderMenu}
               bookmark={bookmark}
+              sites={this.bookmarks}
               showFavicon={this.props.showFavicon}
               showOnlyFavicon={this.props.showOnlyFavicon}
               selectedFolderId={this.props.selectedFolderId} />)

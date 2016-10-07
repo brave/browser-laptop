@@ -238,16 +238,33 @@ const newFrame = (frameOpts, openInForeground, insertionIndex) => {
 const windowStore = new WindowStore()
 const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
 
-const showContextMenu = (detail) => {
-  windowState = windowState.set('contextMenuDetail', detail)
+const showContextMenu = (action) => {
+  windowState = windowState.set('contextMenuDetail', action.detail)
   // Drag and drop bookmarks code expects this to be set sync
   windowStore.emitChanges()
 }
 
-const hideContextMenu = () => {
+const hideContextMenu = (action) => {
   windowState = windowState.delete('contextMenuDetail')
   // Drag and drop bookmarks code expects this to be set sync
   windowStore.emitChanges()
+}
+
+const onMouseOverBookmarkFolder = (action) => {
+  windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
+
+  if (action.folderId && action.folderId !== -1) {
+    const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+    showContextMenu({
+      detail: Immutable.fromJS({
+        left: action.xPos,
+        top: action.yPos,
+        template: showBookmarkFolderInit(action.bookmarks, action.bookmark, activeFrame)
+      })
+    })
+  } else if (action.folderId === -1) {
+    hideContextMenu(action)
+  }
 }
 
 // Register callback to handle all updates
@@ -617,9 +634,9 @@ const doAction = (action) => {
       return
     case WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
-        hideContextMenu()
+        hideContextMenu(action)
       } else {
-        showContextMenu(action.detail)
+        showContextMenu(action)
       }
       return
     case WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
@@ -807,7 +824,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
       if (getSetting(settings.AUTO_HIDE_MENU)) {
-        hideContextMenu()
+        hideContextMenu(action)
         // Use value if provided; if not, toggle to opposite.
         const newVisibleStatus = typeof action.isVisible === 'boolean'
           ? action.isVisible
@@ -824,7 +841,7 @@ const doAction = (action) => {
       if (getSetting(settings.AUTO_HIDE_MENU)) {
         doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
       } else {
-        hideContextMenu()
+        hideContextMenu(action)
       }
       doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
       doAction({actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
@@ -840,16 +857,7 @@ const doAction = (action) => {
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
       break
     case WindowConstants.WINDOW_ON_MOUSE_OVER_BOOKMARK_FOLDER:
-      windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
-      if (action.folderId && action.folderId !== -1) {
-        showContextMenu(Immutable.fromJS({
-          left: action.xPos,
-          top: action.yPos,
-          template: showBookmarkFolderInit(action.bookmarks, action.bookmark, action.activeFrame)
-        }))
-      } else if (action.folderId === -1) {
-        hideContextMenu()
-      }
+      onMouseOverBookmarkFolder(action)
       break
 
     default:

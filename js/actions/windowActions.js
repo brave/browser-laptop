@@ -1129,17 +1129,15 @@ const windowActions = {
    *   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
    * @param {Object} bookmarks - all of the users bookmarks
    * @param {Object} bookmark - the object representing the selected folder
-   * @param {Object} activeFrame - active frame for the window
    * @param {number} xPos - x position of the left corner of the context mennu
    * @param {number} yPos - y position of the top corner of the context menu
    */
-  onMouseOverBookmarkFolder: function (folderId, bookmarks, bookmark, activeFrame, xPos, yPos) {
+  onMouseOverBookmarkFolder: function (folderId, bookmarks, bookmark, xPos, yPos) {
     dispatch({
       actionType: WindowConstants.WINDOW_ON_MOUSE_OVER_BOOKMARK_FOLDER,
       folderId,
       bookmarks,
       bookmark,
-      activeFrame,
       xPos,
       yPos
     })
