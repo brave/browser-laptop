@@ -6,6 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const tableSort = require('tablesort')
 const cx = require('../lib/classSet')
+const eventUtil = require('../lib/eventUtil')
 
 tableSort.extend('number', (item) => {
   return typeof item === 'number'
@@ -16,8 +17,81 @@ tableSort.extend('number', (item) => {
 })
 
 class SortableTable extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onClick = this.onClick.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+  }
   componentDidMount (event) {
     return tableSort(this.table)
+  }
+  onClick (e) {
+    const targetElement = e.target.parentNode
+
+    if (eventUtil.isForSecondaryAction(e)) {
+      if (targetElement.className.includes(' selected')) {
+        targetElement.className = targetElement.className.replace(' selected', '')
+      } else {
+        targetElement.className += ' ' + 'selected'
+      }
+    } else if (e.shiftKey) {
+      const selected = document.querySelectorAll('.selected')
+      const targetID = targetElement.id
+      const tableEntries = targetElement.parentNode.childNodes
+      selected.forEach((entry) => {
+        if (entry.id === targetID) {
+          if (entry.rowIndex < targetElement.rowIndex) {
+            for (let i = entry.rowIndex - 1; i < targetElement.rowIndex; ++i) {
+              if (!tableEntries[i].className.includes(' selected')) {
+                tableEntries[i].className += ' ' + 'selected'
+              }
+            }
+          } else if (entry.rowIndex > targetElement.rowIndex) {
+            for (let i = targetElement.rowIndex - 1; i < entry.rowIndex; ++i) {
+              if (!tableEntries[i].className.includes(' selected')) {
+                tableEntries[i].className += ' ' + 'selected'
+              }
+            }
+          }
+        }
+      })
+    } else {
+      let sameTarget = false
+      const selected = document.querySelectorAll('.selected')
+      selected.forEach((entry) => {
+        entry.className = entry.className.replace(' selected', '')
+        if (entry === targetElement) {
+          sameTarget = true
+        }
+      })
+      if (!sameTarget) {
+        targetElement.className += ' ' + 'selected'
+      }
+    }
+  }
+  onContextMenu (e) {
+    const selected = document.querySelectorAll('.selected')
+    let handlerInputs = []
+    selected.forEach((entry) => {
+      entry.className = entry.className.replace(' selected', '')
+      const tableID = entry.id
+      const index = entry.rowIndex - 1
+      const handlerInput = this.props.totalRowObjects
+        ? (typeof this.props.totalRowObjects[parseInt(tableID)][index].toJS === 'function'
+          ? this.props.totalRowObjects[parseInt(tableID)][index].toJS()
+          : this.props.totalRowObjects[parseInt(tableID)][index])
+        : null
+      if (handlerInput) {
+        handlerInputs.push(handlerInput)
+      }
+    })
+    if (handlerInputs.length && this.hasContextMenu) {
+      if (handlerInputs.length === 1) {
+        this.props.onContextMenu(handlerInputs[0], this.props.contextMenuName, e)
+      } else {
+        this.props.onContextMenu(handlerInputs, this.props.contextMenuName, e)
+      }
+    }
   }
   get hasClickHandler () {
     return typeof this.props.onClick === 'function'
@@ -105,9 +179,12 @@ class SortableTable extends ImmutableComponent {
             return row.length
               ? <tr {...rowAttributes}
                 data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
-                className={this.hasRowClassNames ? this.props.rowClassNames[i] + ' ' + rowAttributes.className
-                  : rowAttributes.className}>{entry}</tr>
-             : null
+                id={this.props.tableID}
+                className={this.hasRowClassNames
+                  ? this.props.rowClassNames[i] + ' ' + rowAttributes.className
+                  : rowAttributes.className} onClick={this.props.multiSelect ? this.onClick : undefined}
+                onContextMenu={this.props.multiSelect ? this.onContextMenu : undefined}>{entry}</tr>
+              : null
           })
         }
       </tbody>

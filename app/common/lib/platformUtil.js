@@ -27,9 +27,11 @@ module.exports.getPlatformStyles = () => {
 }
 
 module.exports.isDarwin = () => {
-  return os.platform() === 'darwin'
+  return os.platform() === 'darwin' ||
+    navigator.platform === 'MacIntel'
 }
 
 module.exports.isWindows = () => {
-  return os.platform() === 'win32'
+  return os.platform() === 'win32' ||
+    navigator.platform === 'Win32'
 }

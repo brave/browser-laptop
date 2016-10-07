@@ -366,6 +366,12 @@ var exports = {
       }).then((response) => response.value)
     })
 
+    this.app.client.addCommand('isDarwin', function () {
+      return this.execute(function () {
+        return navigator.platform === 'MacIntel'
+      }).then((response) => response.value)
+    })
+
     this.app.client.addCommand('getPrimaryDisplayWidth', function () {
       return this.execute(function () {
         let screen = require('electron').screen
