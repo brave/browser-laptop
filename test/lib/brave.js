@@ -1,4 +1,3 @@
-require('babel-polyfill')
 var Application = require('spectron').Application
 var chai = require('chai')
 require('./coMocha')
