@@ -26,10 +26,8 @@ const setupCrashReporting = () => {
   if (process.platform === 'darwin') {
     // Setup the crash handling for mac renderer processes
     // https://github.com/electron/electron/blob/master/docs/api/crash-reporter.md#crashreporterstartoptions
-    console.log('Renderer crash reporting initialized')
+    console.log('macOS renderer crash reporting initialized')
     require('../app/crash-herald').init()
-  } else {
-    console.log(`Unsupported crash reporting platform ${process.platform} for renderer crashes`)
   }
 }
 
