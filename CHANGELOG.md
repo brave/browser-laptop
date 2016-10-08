@@ -2,6 +2,7 @@
 
 ## [0.12.4](https://github.com/brave/browser-laptop/releases/v0.12.4dev)
 - Added regional adblocking (Access via about:adblock or in preferences). These are special rules which focus on blocking ads for non-US sites. ([#4489](https://github.com/brave/browser-laptop/issues/4489))([#1357](https://github.com/brave/browser-laptop/issues/1357))
+- Added the ability to define custom adblock rules. ([#4620](https://github.com/brave/browser-laptop/issues/4620))
 - Added bravery panel settings for private tabs. ([#4468](https://github.com/brave/browser-laptop/issues/4468))([#1824](https://github.com/brave/browser-laptop/issues/1824))
 - Added Bookmark This Page option to context menu. ([#3807](https://github.com/brave/browser-laptop/issues/3807))
 - Added the ability to clear site exceptions. ([#4174](https://github.com/brave/browser-laptop/issues/4174))([#4134](https://github.com/brave/browser-laptop/issues/4134))
