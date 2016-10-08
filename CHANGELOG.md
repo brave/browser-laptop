@@ -1,7 +1,7 @@
 # Changelog
 
 ## [0.12.4](https://github.com/brave/browser-laptop/releases/v0.12.4dev)
-- Added regional adblocking. These are special rules which focus on blocking ads for non-US sites. ([#4489](https://github.com/brave/browser-laptop/issues/4489))([#1357](https://github.com/brave/browser-laptop/issues/1357))
+- Added regional adblocking (Access via about:adblock or in preferences). These are special rules which focus on blocking ads for non-US sites. ([#4489](https://github.com/brave/browser-laptop/issues/4489))([#1357](https://github.com/brave/browser-laptop/issues/1357))
 - Added bravery panel settings for private tabs. ([#4468](https://github.com/brave/browser-laptop/issues/4468))([#1824](https://github.com/brave/browser-laptop/issues/1824))
 - Added Bookmark This Page option to context menu. ([#3807](https://github.com/brave/browser-laptop/issues/3807))
 - Added the ability to clear site exceptions. ([#4174](https://github.com/brave/browser-laptop/issues/4174))([#4134](https://github.com/brave/browser-laptop/issues/4134))
@@ -23,6 +23,7 @@
 - Fixed various history issues. ([#4488](https://github.com/brave/browser-laptop/issues/4488))
 - Fixed favicons showing and hiding on bookmarks toolbar. ([#4339](https://github.com/brave/browser-laptop/issues/4339))([#4345](https://github.com/brave/browser-laptop/issues/4345))
 - Fixed selecting text on a page opened in a new tab. ([#4517](https://github.com/brave/browser-laptop/issues/4517))
+- Upgraded to libchromiumcontent 53.0.2785.143. ([#4618](https://github.com/brave/browser-laptop/issues/4618))
 
 ## [0.12.3](https://github.com/brave/browser-laptop/releases/v0.12.3dev)
 - Added the ability to import data from other browsers. ([#428](https://github.com/brave/browser-laptop/issues/428))([#4049](https://github.com/brave/browser-laptop/issues/4049))([#4154](https://github.com/brave/browser-laptop/issues/4154))
