@@ -33,6 +33,7 @@ const path = require('path')
 const {channel} = require('../../app/channel')
 const os = require('os')
 const autofill = require('../../app/autofill')
+// const suggestion = require('../lib/suggestion')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -429,7 +430,7 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', new Immutable.List())
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      appState = appState.setIn(['about', 'newtab'], action.newTabPageDetail)
+      appState = appState.mergeIn(['about', 'newtab'], action.newTabPageDetail)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -447,12 +448,26 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
+      let newVisitedSites = appState.getIn(['about', 'newtab', 'sites'])
+      newVisitedSites = newVisitedSites.unshift(action.siteDetail)
+      // Filter duplicated entries by its location
+      newVisitedSites = newVisitedSites.filter((set => site => !set.has(site.get('location')) && set.add(site.get('location')))(new Set()))
+      newVisitedSites = newVisitedSites.take(18)
+      // TODO: @cezaraugusto.
+      // Sort should respect unshift and don't prioritize bookmarks
+      // |
+      // V
+      // .sort(suggestion.sortByAccessCountWithAgeDecay)
+
+      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.addSite(newVisitedSites, action.siteDetail, action.tag, action.originalSiteDetail))
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
+      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.removeSite(appState.getIn(['about', 'newtab', 'sites']), action.siteDetail, action.tag))
       break
     case AppConstants.APP_MOVE_SITE:
       appState = appState.set('sites', siteUtil.moveSite(appState.get('sites'), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
+      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.moveSite(appState.getIn(['about', 'newtab', 'sites']), action.sourceDetail, action.destinationDetail, action.prepend, action.destinationIsParent, false))
       break
     case AppConstants.APP_MERGE_DOWNLOAD_DETAIL:
       if (action.downloadDetail) {

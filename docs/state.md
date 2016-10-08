@@ -161,6 +161,7 @@ AppStore
     // See defaults in js/constants/appConfig.js
     'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
     'general.homepage': string, // URL of the user's homepage
+    'general.newtab-mode': string,  // One of: newTabPage, homePage, defaultSearchEngine
     'general.show-home-button': boolean, // true if the home button should be shown
     'general.useragent.value': (undefined|string), // custom user agent value
     'general.downloads.default-save-path': string, // default path for saving files
@@ -219,10 +220,10 @@ AppStore
   },
   about: {
     newtab: {
-      gridLayoutSize: [string], // 'small', 'medium', 'large'
-      sites: [list], // List of accessed sites to be used on gridLayout
-      ignoredTopSites: [list], // List of ignored sites
-      pinnedTopSites: [list], // List of pinned sites
+      gridLayoutSize: string, // 'small', 'medium', 'large'
+      sites: [string], // List of sites to be used on gridLayout
+      ignoredTopSites: [string], // List of ignored sites
+      pinnedTopSites: [string] // List of pinned sites
     }
   },
   menu: {

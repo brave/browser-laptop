@@ -33,6 +33,7 @@ const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
 const appStoreRenderer = require('../stores/appStoreRenderer')
 const siteSettings = require('../state/siteSettings')
+const addSiteDebounced = debounce((frame) => appActions.addSite(siteUtil.getDetailFromFrame(frame)), 1000)
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -120,6 +121,13 @@ class Frame extends ImmutableComponent {
       }
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
+    } else if (location === 'about:newtab') {
+      this.webview.send(messages.NEWTAB_DATA_UPDATED, {
+        trackedBlockersCount: this.props.trackedBlockersCount,
+        adblockCount: this.props.adblockCount,
+        httpsUpgradedCount: this.props.httpsUpgradedCount,
+        newTabDetail: this.props.newTabDetail.toJS()
+      })
     } else if (location === 'about:autofill') {
       const defaultSession = global.require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
@@ -943,7 +951,8 @@ class Frame extends ImmutableComponent {
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
       if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
         // Register the site for recent history for navigation bar
-        appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+        addSiteDebounced(this.frame)
+        // appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
       }
 
       const hack = siteHacks[parsedUrl.hostname]

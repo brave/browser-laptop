@@ -1214,6 +1214,7 @@ class Main extends ImmutableComponent {
                 adblockCount={this.props.appState.getIn(['adblock', 'count'])}
                 trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
                 httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
+                newTabDetail={frame.get('location') === 'about:newtab' ? this.props.appState.getIn(['about', 'newtab']) : null}
               />)
           }
         </div>
