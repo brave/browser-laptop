@@ -284,14 +284,18 @@ let getTransactionCSVText = function (transactions, viewingIds, addTotalRow) {
  * of form `Brave_Payments_${MM-D(D)-YYYY}`, with "_<n>" added for the nth time a date occurs (n > 1)
  *
  * @param {Object[]} transactions - an array of transaction(s) or single transaction object
+ *
+ * @returns {Object[]} transactions (with each element having an added field `exportFilenamePrefix`)
  */
 let addExportFilenamePrefixToTransactions = function (transactions) {
-  if (!transactions) {
-    return transactions
-  }
+  transactions = transactions || []
 
   if (!underscore.isArray(transactions)) {
     transactions = [transactions]
+  }
+
+  if (!transactions.length) {
+    return transactions
   }
 
   var dateCountMap = {}
