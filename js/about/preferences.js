@@ -20,6 +20,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
+const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
@@ -138,7 +139,14 @@ class SettingCheckbox extends ImmutableComponent {
   }
 
   render () {
-    return <div style={this.props.style} className='settingItem'>
+    const props = {
+      style: this.props.style,
+      className: 'settingItem'
+    }
+    if (this.props.id) {
+      props.id = this.props.id
+    }
+    return <div {...props}>
       <SwitchControl id={this.props.prefKey}
         disabled={this.props.disabled}
         onClick={this.onClick}
@@ -572,10 +580,22 @@ class GeneralTab extends ImmutableComponent {
   constructor (e) {
     super()
     this.importBrowserDataNow = this.importBrowserDataNow.bind(this)
+    this.onChangeSetting = this.onChangeSetting.bind(this)
   }
 
   importBrowserDataNow () {
-    aboutActions.importBrowerDataNow()
+    aboutActions.importBrowserDataNow()
+  }
+
+  onChangeSetting (key, value) {
+    // disable "SHOW_HOME_BUTTON" if it's enabled and homepage is blank
+    if (key === settings.HOMEPAGE && getSetting(settings.SHOW_HOME_BUTTON, this.props.settings)) {
+      const homepage = value && value.trim()
+      if (!homepage || !homepage.length) {
+        this.props.onChangeSetting(settings.SHOW_HOME_BUTTON, false)
+      }
+    }
+    this.props.onChangeSetting(key, value)
   }
 
   enabled (keyArray) {
@@ -588,7 +608,12 @@ class GeneralTab extends ImmutableComponent {
         <option data-l10n-id={lc} value={lc} />
       )
     })
+    const homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
+    const homepage = homepageValue && homepageValue.trim()
+    const disableShowHomeButton = !homepage || !homepage.length
+    const disableBookmarksBarSelect = !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR, this.props.settings)
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
+
     return <SettingsList>
       <div className='sectionTitle' data-l10n-id='generalSettings' />
       <SettingsList>
@@ -604,7 +629,26 @@ class GeneralTab extends ImmutableComponent {
           <input spellCheck='false'
             data-l10n-id='homepageInput'
             value={getSetting(settings.HOMEPAGE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.HOMEPAGE)} />
+            onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
+        </SettingItem>
+        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON}
+          settings={this.props.settings} onChangeSetting={this.props.onChangeSetting}
+          disabled={disableShowHomeButton} />
+        {
+          isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        }
+        <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem dataL10nId='bookmarkToolbarSettings'>
+          <select id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
+            disabled={disableBookmarksBarSelect}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)} >
+            <option data-l10n-id='bookmarksBarTextOnly' value={bookmarksToolbarMode.TEXT_ONLY} />
+            <option data-l10n-id='bookmarksBarTextAndFavicon' value={bookmarksToolbarMode.TEXT_AND_FAVICONS} />
+            <option data-l10n-id='bookmarksBarFaviconOnly' value={bookmarksToolbarMode.FAVICONS_ONLY} />
+          </select>
+          <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
+            prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
         <SettingItem dataL10nId='selectedLanguage'>
           <select value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
@@ -612,24 +656,11 @@ class GeneralTab extends ImmutableComponent {
             {languageOptions}
           </select>
         </SettingItem>
+        <SettingItem dataL10nId='importBrowserData'>
+          <Button l10nId='importNow' className='primaryButton importNowButton'
+            onClick={this.importBrowserDataNow} />
+        </SettingItem>
       </SettingsList>
-      <div className='sectionTitle' data-l10n-id='bookmarkToolbarSettings' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='bookmarkToolbar' prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='bookmarkToolbarShowOnlyFavicon' style={{ display: this.enabled([settings.SHOW_BOOKMARKS_TOOLBAR, settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON]) ? 'block' : 'none' }} prefKey={settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-      <div className='sectionTitle' data-l10n-id='appearanceSettings' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        {
-          isDarwin ? null : <SettingCheckbox dataL10nId='autoHideMenuBar' prefKey={settings.AUTO_HIDE_MENU} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        }
-        <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-      </SettingsList>
-      <div className='sectionTitle' data-l10n-id='importBrowserData' />
-      <Button l10nId='importNow' className='primaryButton importNowButton'
-        onClick={this.importBrowserDataNow} />
     </SettingsList>
   }
 }

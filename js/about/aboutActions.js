@@ -210,7 +210,7 @@ const aboutActions = {
     ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
   },
 
-  importBrowerDataNow: function () {
+  importBrowserDataNow: function () {
     ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
   },
 

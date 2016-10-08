@@ -34,6 +34,7 @@ const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
 const currentWindow = require('../app/renderer/currentWindow')
 const config = require('./constants/config')
+const bookmarksToolbarMode = require('../app/common/constants/bookmarksToolbarMode')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -337,7 +338,8 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 }
 
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
-  const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+  const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
   return items.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     let faIcon

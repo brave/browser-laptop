@@ -11,6 +11,9 @@ const settings = {
   DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.default-save-path',
   AUTO_HIDE_MENU: 'general.autohide-menu',
   DISABLE_TITLE_MODE: 'general.disable-title-mode',
+  BOOKMARKS_TOOLBAR_MODE: 'general.bookmarks-toolbar-mode',
+  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
+  LANGUAGE: 'general.language',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
@@ -37,16 +40,6 @@ const settings = {
   SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
-  // Security Tab: DEPRECATED but still required (for now)
-  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
-  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
-  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
-  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
-  // Other settings
-  SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
-  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
-  SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
-  LANGUAGE: 'general.language',
   // Payments Tab
   PAYMENTS_ENABLED: 'payments.enabled',
   PAYMENTS_NOTIFICATIONS: 'payments.notifications',
@@ -61,7 +54,21 @@ const settings = {
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
-  MINIMUM_VISTS: 'advanced.minimum-visits'
+  MINIMUM_VISTS: 'advanced.minimum-visits',
+
+  // DEPRECATED settings
+  // ########################
+  // these constants should not appear outside of this file, ../settings.js, and our tests
+  // NOTE: these settings rely on default values being set in ./appConfig.js
+  // ########################
+  // > phased out with 0.11.4
+  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
+  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
+  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
+  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
+  // > phased out with 0.12.5
+  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
+  SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon'
 }
 
 module.exports = settings
