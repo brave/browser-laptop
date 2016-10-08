@@ -50,7 +50,8 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
-const keyCodes = require('../constants/keyCodes')
+const keyCodes = require('../../app/common/constants/keyCodes')
+const keyLocations = require('../../app/common/constants/keyLocations')
 const isWindows = process.platform === 'win32'
 
 // State handling
@@ -131,6 +132,11 @@ class Main extends ImmutableComponent {
         const customTitlebar = this.customTitlebar
         switch (e.which) {
           case keyCodes.ALT:
+            // Ignore right alt (AltGr)
+            if (e.location === keyLocations.DOM_KEY_LOCATION_RIGHT) {
+              break
+            }
+
             e.preventDefault()
 
             if (getSetting(settings.AUTO_HIDE_MENU)) {

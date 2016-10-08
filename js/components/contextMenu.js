@@ -7,7 +7,7 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const cx = require('../lib/classSet')
-const KeyCodes = require('../constants/keyCodes')
+const KeyCodes = require('../../app/common/constants/keyCodes')
 const {formatAccelerator} = require('../../app/common/lib/formatUtil')
 const separatorMenuItem = require('../../app/common/commonMenu').separatorMenuItem
 
