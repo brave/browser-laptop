@@ -112,6 +112,7 @@ const messages = {
   ADBLOCK_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
+  NEWTAB_DATA_UPDATED: _,
   // About pages from contentScript
   OPEN_DOWNLOAD_PATH: _,
   RELOAD_URL: _,

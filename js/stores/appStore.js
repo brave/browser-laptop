@@ -410,7 +410,7 @@ const handleAppAction = (action) => {
       appState = appState.set('passwords', new Immutable.List())
       break
     case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      appState = appState.setIn(['about', 'newtab'], action.newTabPageDetail)
+      appState = appState.mergeIn(['about', 'newtab'], action.newTabPageDetail)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -428,6 +428,13 @@ const handleAppAction = (action) => {
       if (oldSiteSize !== appState.get('sites').size) {
         filterOutNonRecents()
       }
+      let newVisitedSites = appState.getIn(['about', 'newtab', 'sites'])
+      newVisitedSites = newVisitedSites.unshift(action.siteDetail)
+      // sites, siteDetail, tag, originalSiteDetail
+      // Filter duplicated visitedSites by its location
+      newVisitedSites = newVisitedSites.filter((set => site => !set.has(site.get('location')) && set.add(site.get('location')))(new Set()))
+      newVisitedSites = newVisitedSites.take(18)
+      appState = appState.setIn(['about', 'newtab', 'sites'], siteUtil.addSite(newVisitedSites, action.siteDetail, action.tag, action.originalSiteDetail))
       break
     case AppConstants.APP_REMOVE_SITE:
       appState = appState.set('sites', siteUtil.removeSite(appState.get('sites'), action.siteDetail, action.tag))
