@@ -95,7 +95,8 @@ class AboutAdBlock extends React.Component {
               value={getSetting(ADBLOCK_CUSTOM_RULES, this.state.settings) || ''}
               className='customFiltersInput'
               cols='100'
-              rows='10' />
+              rows='10'
+              spellCheck='false' />
           </div>
         </div>
       </list>
