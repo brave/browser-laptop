@@ -85,11 +85,15 @@ module.exports = {
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
+  urlSuggestions: {
+    ageDecayConstant: 50
+  },
   defaultSettings: {
     'adblock.customRules': '',
     'general.language': null, // null means to use the OS lang
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
+    'general.newtab-mode': 'newTabPage',
     'general.show-home-button': false,
     'general.useragent.value': null, // Set at runtime
     'general.autohide-menu': true,

@@ -155,6 +155,10 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (siteDetail.get('themeColor') || oldSite && oldSite.get('themeColor')) {
     site = site.set('themeColor', siteDetail.get('themeColor') || oldSite.get('themeColor'))
   }
+  if (site.get('tags').size === 0) {
+    // Increment the visit count for history items
+    site = site.set('count', ((oldSite || site).get('count') || 0) + 1)
+  }
 
   if (index === -1) {
     return sites.push(site)

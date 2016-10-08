@@ -451,6 +451,14 @@ module.exports.defaultAppState = () => {
         timestamp: 0
       }
     },
-    menubar: {}
+    menubar: {},
+    about: {
+      newtab: {
+        gridLayoutSize: 'small',
+        sites: [],
+        ignoredTopSites: [],
+        pinnedTopSites: []
+      }
+    }
   }
 }
