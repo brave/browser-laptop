@@ -9,7 +9,6 @@ let ready = false
 
 // Setup the crash handling
 const CrashHerald = require('./crash-herald')
-CrashHerald.init()
 
 const handleUncaughtError = (error) => {
   var message, ref, stack
@@ -244,9 +243,15 @@ let flashInitialized = false
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
-  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED} = require('../js/constants/settings')
+  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
   if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
     app.disableHardwareAcceleration()
+  }
+  if (initialState.settings[SEND_CRASH_REPORTS] !== false) {
+    console.log('Crash reporting enabled')
+    CrashHerald.init()
+  } else {
+    console.log('Crash reporting disabled')
   }
   if (initialState.settings[SMOOTH_SCROLL_ENABLED] === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')

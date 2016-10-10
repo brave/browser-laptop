@@ -176,6 +176,7 @@ AppStore
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
+    'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
     'shutdown.clear-history': boolean, // true to clear history on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
