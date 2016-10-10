@@ -359,6 +359,9 @@ WindowStore
       isVisible: boolean, // true if Menubar control is visible
       selectedIndex: Array<number>, // indices of the selected menu item(s) (or null for none selected)
       lastFocusedSelector: string // selector for the last selected element (browser ui, not frame content)
+    },
+    bookmarksToolbar: {
+      selectedFolderId: number // folderId from the siteDetail of the currently expanded folder
     }
   },
   searchDetail: {

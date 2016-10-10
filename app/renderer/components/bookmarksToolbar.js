@@ -4,26 +4,27 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const ImmutableComponent = require('./immutableComponent')
-const contextMenus = require('../contextMenus')
-const windowActions = require('../actions/windowActions')
-const bookmarkActions = require('../actions/bookmarkActions')
-const appActions = require('../actions/appActions')
-const siteTags = require('../constants/siteTags')
-const siteUtil = require('../state/siteUtil')
-const dragTypes = require('../constants/dragTypes')
-const Button = require('../components/button')
-const cx = require('../lib/classSet')
-const dnd = require('../dnd')
-const dndData = require('../dndData')
-const calculateTextWidth = require('../lib/textCalculator').calculateTextWidth
-const windowStore = require('../stores/windowStore')
-const iconSize = 16
+const ImmutableComponent = require('../../../js/components/immutableComponent')
+const contextMenus = require('../../../js/contextMenus')
+const windowActions = require('../../../js/actions/windowActions')
+const bookmarkActions = require('../../../js/actions/bookmarkActions')
+const appActions = require('../../../js/actions/appActions')
+const siteTags = require('../../../js/constants/siteTags')
+const siteUtil = require('../../../js/state/siteUtil')
+const dragTypes = require('../../../js/constants/dragTypes')
+const Button = require('../../../js/components/button')
+const cx = require('../../../js/lib/classSet')
+const dnd = require('../../../js/dnd')
+const dndData = require('../../../js/dndData')
+const calculateTextWidth = require('../../../js/lib/textCalculator').calculateTextWidth
+const windowStore = require('../../../js/stores/windowStore')
+const iconSize = require('../../common/lib/faviconUtil').iconSize
 
 class BookmarkToolbarButton extends ImmutableComponent {
   constructor () {
     super()
     this.onClick = this.onClick.bind(this)
+    this.onMouseOver = this.onMouseOver.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragEnter = this.onDragEnter.bind(this)
@@ -31,9 +32,20 @@ class BookmarkToolbarButton extends ImmutableComponent {
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
   }
-  get activeFrame () {
-    return windowStore.getFrame(this.props.activeFrameKey)
+
+  showBookmarkFolderMenu (e) {
+    e.target = ReactDOM.findDOMNode(this)
+
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
+
+    const xPos = (e.target.getBoundingClientRect().left | 0) - 2
+    const yPos = (e.target.parentNode.getBoundingClientRect().bottom | 0) - 1
+
+    windowActions.onMouseOverBookmarkFolder(this.props.bookmark.get('folderId'), this.props.sites, this.props.bookmark, xPos, yPos)
   }
+
   onClick (e) {
     if (!this.props.clickBookmarkItem(this.props.bookmark, e) &&
         this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
@@ -41,9 +53,20 @@ class BookmarkToolbarButton extends ImmutableComponent {
         windowActions.setContextMenuDetail()
         return
       }
-      e.target = ReactDOM.findDOMNode(this)
-      this.props.showBookmarkFolderMenu(this.props.bookmark, e)
-      return
+      this.showBookmarkFolderMenu(e)
+    }
+  }
+
+  onMouseOver (e) {
+    // Behavior when a bookmarks toolbar folder has its list expanded
+    if (this.props.selectedFolderId) {
+      if (this.isFolder && this.props.selectedFolderId !== this.props.bookmark.get('folderId')) {
+        // Auto-expand the menu if user mouses over another folder
+        this.showBookmarkFolderMenu(e)
+      } else if (!this.isFolder && this.props.selectedFolderId !== -1) {
+        // Hide the currently expanded menu if user mouses over a non-folder
+        windowActions.onMouseOverBookmarkFolder(-1)
+      }
     }
   }
 
@@ -61,7 +84,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       e.target = ReactDOM.findDOMNode(this)
       if (dnd.isMiddle(e.target, e.clientX)) {
         e.target.getBoundingClientRect
-        this.props.showBookmarkFolderMenu(this.props.bookmark, e)
+        this.showBookmarkFolderMenu(e)
         windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
           expanded: true
         })
@@ -168,6 +191,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       ref={(node) => { this.bookmarkNode = node }}
       title={hoverTitle}
       onClick={this.onClick}
+      onMouseOver={this.onMouseOver}
       onDragStart={this.onDragStart}
       onDragEnd={this.onDragEnd}
       onDragEnter={this.onDragEnter}
@@ -214,7 +238,6 @@ class BookmarksToolbar extends ImmutableComponent {
     this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
     this.openContextMenu = this.openContextMenu.bind(this)
     this.clickBookmarkItem = this.clickBookmarkItem.bind(this)
-    this.showBookmarkFolderMenu = this.showBookmarkFolderMenu.bind(this)
   }
   get activeFrame () {
     return windowStore.getFrame(this.props.activeFrameKey)
@@ -269,9 +292,6 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   clickBookmarkItem (bookmark, e) {
     return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)
-  }
-  showBookmarkFolderMenu (bookmark, e) {
-    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
   }
   updateBookmarkData (props) {
     this.bookmarks = siteUtil.getBookmarks(props.sites)
@@ -387,14 +407,14 @@ class BookmarksToolbar extends ImmutableComponent {
               ref={(node) => this.bookmarkRefs.push(node)}
               key={i}
               contextMenuDetail={this.props.contextMenuDetail}
-              activeFrameKey={this.props.activeFrameKey}
               draggingOverData={this.props.draggingOverData}
               openContextMenu={this.openContextMenu}
               clickBookmarkItem={this.clickBookmarkItem}
-              showBookmarkFolderMenu={this.showBookmarkFolderMenu}
               bookmark={bookmark}
+              sites={this.bookmarks}
               showFavicon={this.props.showFavicon}
-              showOnlyFavicon={this.props.showOnlyFavicon} />)
+              showOnlyFavicon={this.props.showOnlyFavicon}
+              selectedFolderId={this.props.selectedFolderId} />)
       }
       {
         this.overflowBookmarkItems.size !== 0

@@ -17,10 +17,10 @@ const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
-
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
+const { showBookmarkFolderInit } = require('../contextMenus')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -237,6 +237,35 @@ const newFrame = (frameOpts, openInForeground, insertionIndex) => {
 
 const windowStore = new WindowStore()
 const emitChanges = debounce(windowStore.emitChanges.bind(windowStore), 5)
+
+const showContextMenu = (action) => {
+  windowState = windowState.set('contextMenuDetail', action.detail)
+  // Drag and drop bookmarks code expects this to be set sync
+  windowStore.emitChanges()
+}
+
+const hideContextMenu = (action) => {
+  windowState = windowState.delete('contextMenuDetail')
+  // Drag and drop bookmarks code expects this to be set sync
+  windowStore.emitChanges()
+}
+
+const onMouseOverBookmarkFolder = (action) => {
+  windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
+
+  if (action.folderId && action.folderId !== -1) {
+    const activeFrame = FrameStateUtil.getActiveFrame(windowState)
+    showContextMenu({
+      detail: Immutable.fromJS({
+        left: action.xPos,
+        top: action.yPos,
+        template: showBookmarkFolderInit(action.bookmarks, action.bookmark, activeFrame)
+      })
+    })
+  } else if (action.folderId === -1) {
+    hideContextMenu(action)
+  }
+}
 
 // Register callback to handle all updates
 const doAction = (action) => {
@@ -605,12 +634,10 @@ const doAction = (action) => {
       return
     case WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (!action.detail) {
-        windowState = windowState.delete('contextMenuDetail')
+        hideContextMenu(action)
       } else {
-        windowState = windowState.set('contextMenuDetail', action.detail)
+        showContextMenu(action)
       }
-      // Drag and drop bookmarks code expects this to be set sync
-      windowStore.emitChanges()
       return
     case WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {
@@ -797,8 +824,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
       if (getSetting(settings.AUTO_HIDE_MENU)) {
-        // Close existing context menus
-        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        hideContextMenu(action)
         // Use value if provided; if not, toggle to opposite.
         const newVisibleStatus = typeof action.isVisible === 'boolean'
           ? action.isVisible
@@ -815,9 +841,11 @@ const doAction = (action) => {
       if (getSetting(settings.AUTO_HIDE_MENU)) {
         doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
       } else {
-        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        hideContextMenu(action)
       }
       doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      doAction({actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
+      windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], null)
       break
     case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
       windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
@@ -827,6 +855,9 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
       windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
+      break
+    case WindowConstants.WINDOW_ON_MOUSE_OVER_BOOKMARK_FOLDER:
+      onMouseOverBookmarkFolder(action)
       break
 
     default:

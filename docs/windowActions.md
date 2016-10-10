@@ -891,6 +891,25 @@ See `eventStore.js` for an example use-case
 
 
 
+### onMouseOverBookmarkFolder(folderId, bookmarks, bookmark, xPos, yPos) 
+
+Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
+
+**Parameters**
+
+**folderId**: `number`, from the siteDetail for the bookmark folder
+  If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
+
+**bookmarks**: `Object`, all of the users bookmarks
+
+**bookmark**: `Object`, the object representing the selected folder
+
+**xPos**: `number`, x position of the left corner of the context mennu
+
+**yPos**: `number`, y position of the top corner of the context menu
+
+
+
 
 * * *
 
