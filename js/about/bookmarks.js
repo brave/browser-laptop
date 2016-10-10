@@ -169,18 +169,19 @@ class BookmarksList extends ImmutableComponent {
     }
   }
   render () {
-    const props = !this.props.sortable ? {
-      sortingDisabled: true
+    const props = !this.props.draggable ? {
+      sortingDisabled: !this.props.sortable
     } : {
       onDoubleClick: this.onDoubleClick,
       onDragStart: this.onDragStart,
       onDragOver: this.onDragOver,
       onDrop: this.onDrop,
-      sortingDisabled: false
+      sortingDisabled: !this.props.sortable
     }
 
     return <div>
       <SortableTable headings={['Title', 'Last Visited']}
+        defaultHeading='Title'
         rows={this.props.bookmarks.map((entry) => [
           {
             cell: <BookmarkTitleCell siteDetail={entry} />,
@@ -192,11 +193,12 @@ class BookmarksList extends ImmutableComponent {
           }
         ])}
         rowObjects={this.props.bookmarks}
-        defaultHeading='Title'
+        columnClassNames={['title', 'date']}
+        tableID={this.props.tableID}
         addHoverClass
+        multiSelect
         onDoubleClick={this.onDoubleClick}
         {...props}
-        columnClassNames={['title', 'date']}
         contextMenuName='bookmark'
         onContextMenu={aboutActions.contextMenu} />
     </div>
@@ -288,7 +290,9 @@ class AboutBookmarks extends React.Component {
               ? this.searchedBookmarks(this.state.search, this.state.bookmarks)
               : this.bookmarksInFolder
             }
-            sortable={!this.state.search} />
+            sortable={false}
+            draggable={!this.state.search}
+            tableID={this.selectedFolderId} />
         </div>
       </div>
     </div>

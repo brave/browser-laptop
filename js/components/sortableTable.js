@@ -27,7 +27,13 @@ class SortableTable extends ImmutableComponent {
     return tableSort(this.table)
   }
   onClick (e) {
-    const targetElement = e.target.parentNode
+    // Work backwards until element is TR
+    let targetElement = e.target
+    while (targetElement) {
+      if (targetElement.tagName === 'TR') break
+      targetElement = targetElement.parentNode
+    }
+    if (!targetElement) return
 
     if (eventUtil.isForSecondaryAction(e)) {
       if (targetElement.className.includes(' selected')) {
@@ -81,7 +87,12 @@ class SortableTable extends ImmutableComponent {
         ? (typeof this.props.totalRowObjects[parseInt(tableID)][index].toJS === 'function'
           ? this.props.totalRowObjects[parseInt(tableID)][index].toJS()
           : this.props.totalRowObjects[parseInt(tableID)][index])
-        : null
+        : (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
+          ? (typeof this.props.rowObjects.toJS === 'function'
+            ? this.props.rowObjects.get(index).toJS()
+            : this.props.rowObjects[index])
+          : null
+
       if (handlerInput) {
         handlerInputs.push(handlerInput)
       }
