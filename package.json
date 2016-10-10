@@ -7,6 +7,7 @@
     "port": "8080"
   },
   "scripts": {
+    "add-simulated-payment-history": "node ./tools/addSimulatedPaymentHistory.js",
     "build-installer": "node ./tools/buildInstaller.js",
     "build-package": "node ./tools/buildPackage.js",
     "check-security": "nsp check",
