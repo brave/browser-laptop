@@ -6,7 +6,7 @@ const keyLocations = {
   DOM_KEY_LOCATION_STANDARD: 0,
   DOM_KEY_LOCATION_LEFT: 1,
   DOM_KEY_LOCATION_RIGHT: 2,
-  DOM_KEY_LOCATION_STANDARD: 3,
+  DOM_KEY_LOCATION_NUMPAD: 3
 }
 
 module.exports = keyLocations
