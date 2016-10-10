@@ -215,6 +215,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
 function siteDetailTemplateInit (siteDetail, activeFrame) {
   let isHistoryEntry = false
+  let isHistoryEntries = false
   let isFolder = false
   let isRootFolder = false
   let deleteLabel
@@ -228,21 +229,43 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     isRootFolder = siteDetail.get('folderId') === 0
     deleteLabel = 'deleteFolder'
     deleteTag = siteTags.BOOKMARK_FOLDER
-  } else {
+  } else if (siteUtil.isHistoryEntry(siteDetail)) {
     isHistoryEntry = true
     deleteLabel = 'deleteHistoryEntry'
+  } else if (Immutable.List.isList(siteDetail)) {
+    isHistoryEntries = true
+    siteDetail.forEach((site) => {
+      if (!siteUtil.isHistoryEntry(site)) {
+        isHistoryEntries = false
+      }
+    })
+    deleteLabel = 'deleteHistoryEntries'
   }
 
   const template = []
 
   if (!isFolder) {
-    const location = siteDetail.get('location')
+    if (!Immutable.List.isList(siteDetail)) {
+      const location = siteDetail.get('location')
 
-    template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
-      openInNewPrivateTabMenuItem(location),
-      openInNewSessionTabMenuItem(location),
-      copyAddressMenuItem('copyLinkAddress', location),
-      CommonMenu.separatorMenuItem)
+      template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
+        openInNewPrivateTabMenuItem(location),
+        openInNewSessionTabMenuItem(location),
+        copyAddressMenuItem('copyLinkAddress', location),
+        CommonMenu.separatorMenuItem)
+    } else {
+      let locations = []
+      let partitionNumbers = []
+      siteDetail.forEach((site) => {
+        locations.push(site.get('location'))
+        partitionNumbers.push(site.get('partitionNumber'))
+      })
+
+      template.push(openInNewTabMenuItem(locations, undefined, partitionNumbers),
+        openInNewPrivateTabMenuItem(locations),
+        openInNewSessionTabMenuItem(locations),
+        CommonMenu.separatorMenuItem)
+    }
   } else {
     template.push(openAllInNewTabsMenuItem(appStoreRenderer.state.get('sites'), siteDetail),
       CommonMenu.separatorMenuItem)
@@ -251,7 +274,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   if (!isRootFolder) {
     // History can be deleted but not edited
     // Picking this menu item pops up the AddEditBookmark modal
-    if (!isHistoryEntry) {
+    if (!isHistoryEntry && !isHistoryEntries) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
@@ -263,11 +286,17 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     template.push(
       {
         label: locale.translation(deleteLabel),
-        click: () => appActions.removeSite(siteDetail, deleteTag)
+        click: () => {
+          if (Immutable.List.isList(siteDetail)) {
+            siteDetail.forEach((site) => appActions.removeSite(site, deleteTag))
+          } else {
+            appActions.removeSite(siteDetail, deleteTag)
+          }
+        }
       })
   }
 
-  if (!isHistoryEntry) {
+  if (!isHistoryEntry && !isHistoryEntries) {
     if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
       template.push(CommonMenu.separatorMenuItem)
     }
@@ -656,10 +685,26 @@ function hamburgerTemplateInit (location, e) {
 
 const openInNewTabMenuItem = (location, isPrivate, partitionNumber, parentFrameKey) => {
   let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-  return {
-    label: locale.translation('openInNewTab'),
-    click: () => {
-      windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, openInForeground)
+  if (Array.isArray(location) && Array.isArray(partitionNumber)) {
+    return {
+      label: locale.translation('openInNewTabs'),
+      click: () => {
+        for (let i = 0; i < location.length; ++i) {
+          windowActions.newFrame(
+            { location: location[i],
+              isPrivate,
+              partitionNumber: partitionNumber[i],
+              parentFrameKey },
+            openInForeground)
+        }
+      }
+    }
+  } else {
+    return {
+      label: locale.translation('openInNewTab'),
+      click: () => {
+        windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, openInForeground)
+      }
     }
   }
 }
@@ -675,14 +720,29 @@ const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
 
 const openInNewPrivateTabMenuItem = (location, parentFrameKey) => {
   let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-  return {
-    label: locale.translation('openInNewPrivateTab'),
-    click: () => {
-      windowActions.newFrame({
-        location,
-        isPrivate: true,
-        parentFrameKey
-      }, openInForeground)
+  if (Array.isArray(location)) {
+    return {
+      label: locale.translation('openInNewPrivateTabs'),
+      click: () => {
+        for (let i = 0; i < location.length; ++i) {
+          windowActions.newFrame({
+            location: location[i],
+            isPrivate: true,
+            parentFrameKey
+          }, openInForeground)
+        }
+      }
+    }
+  } else {
+    return {
+      label: locale.translation('openInNewPrivateTab'),
+      click: () => {
+        windowActions.newFrame({
+          location,
+          isPrivate: true,
+          parentFrameKey
+        }, openInForeground)
+      }
     }
   }
 }
@@ -698,14 +758,29 @@ const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
 
 const openInNewSessionTabMenuItem = (location, parentFrameKey) => {
   let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-  return {
-    label: locale.translation('openInNewSessionTab'),
-    click: (item, focusedWindow) => {
-      windowActions.newFrame({
-        location,
-        isPartitioned: true,
-        parentFrameKey
-      }, openInForeground)
+  if (Array.isArray(location)) {
+    return {
+      label: locale.translation('openInNewSessionTabs'),
+      click: (item, focusedWindow) => {
+        for (let i = 0; i < location.length; ++i) {
+          windowActions.newFrame({
+            location: location[i],
+            isPartitioned: true,
+            parentFrameKey
+          }, openInForeground)
+        }
+      }
+    }
+  } else {
+    return {
+      label: locale.translation('openInNewSessionTab'),
+      click: (item, focusedWindow) => {
+        windowActions.newFrame({
+          location,
+          isPartitioned: true,
+          parentFrameKey
+        }, openInForeground)
+      }
     }
   }
 }

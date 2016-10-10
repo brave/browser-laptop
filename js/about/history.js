@@ -78,8 +78,11 @@ class HistoryDay extends ImmutableComponent {
           urlutils.getHostname(entry.get('location'), true)
         ])}
         rowObjects={this.props.entries}
+        totalRowObjects={this.props.totalEntries}
+        tableID={this.props.tableID}
         columnClassNames={['time', 'title', 'domain']}
         addHoverClass
+        multiSelect
         onDoubleClick={this.navigate}
         contextMenuName='history'
         onContextMenu={aboutActions.contextMenu} />
@@ -117,13 +120,23 @@ class GroupedHistoryList extends ImmutableComponent {
     }
     return []
   }
+  totalEntries (local) {
+    const origin = this.groupEntriesByDay(local)
+    let result = []
+    origin.forEach((entry) => {
+      result.push(entry.entries)
+    })
+    return result
+  }
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const userLanguage = getSetting(settings.LANGUAGE, this.props.settings)
+    let index = 0
     return <list className='historyList'>
       {
         this.groupEntriesByDay(userLanguage || defaultLanguage).map((groupedEntry) =>
-          <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries} />)
+          <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries}
+            totalEntries={this.totalEntries(userLanguage || defaultLanguage)} tableID={index++} />)
       }
     </list>
   }

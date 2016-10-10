@@ -95,7 +95,25 @@ table.sortableTable {
       }
     }
   }
-}
-tr.rowHover:hover {
-  background: #ffcc99;
+  tr.rowHover:hover {
+    background: #ffcc99;
+    &.selected {
+      background: @braveOrange;
+      td {
+        color: @lightGray;
+      }
+      div {
+        color: @lightGray;
+      }
+    }
+  }
+  tr.selected {
+    background: @braveLightOrange;
+    td {
+      color: #d9d9d9;
+    }
+    div {
+      color: #d9d9d9;
+    }
+  }
 }
