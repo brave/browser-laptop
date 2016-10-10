@@ -1,6 +1,7 @@
 /* global describe, it, before */
 const assert = require('assert')
 const underscore = require('underscore')
+const uuid = require('node-uuid')
 
 require('../braveUnit')
 
@@ -19,6 +20,9 @@ const CSV_EXPECTED_COLUMN_DATATYPES = ['string', 'number', 'number', 'number', '
 const CSV_CONTENT_TYPE = 'text/csv'
 const CSV_DATA_URI_PREFIX = 'data:' + CSV_CONTENT_TYPE + ';base64,'
 const EMPTY_CSV_DATA_URL = CSV_DATA_URI_PREFIX + base64Encode(EMPTY_CSV)
+
+const EXPORT_FILENAME_CONST_PREFIX_PART = 'Brave_Payments_'
+const EXPORT_FILENAME_PREFIX_EXPECTED_FORM = `${EXPORT_FILENAME_CONST_PREFIX_PART}\${MM-D(D)-YYYY}`
 
 const exampleTransactions = require('./exampleLedgerData').transactions
 const exampleTransaction = exampleTransactions[0]
@@ -381,7 +385,91 @@ describe('ledger export utilities test', function () {
       })
     })
   })
+
+  describe('addExportFilenamePrefixToTransactions', function () {
+    it('should return an empty array if not passed any transactions (empty array, null, or undefined input)', function () {
+      let output
+
+      output = ledgerExportUtil.addExportFilenamePrefixToTransactions([])
+      assert(output && underscore.isArray(output) && output.length === 0, 'should return an empty array when given an empty array as input')
+
+      output = ledgerExportUtil.addExportFilenamePrefixToTransactions(undefined)
+      assert(output && underscore.isArray(output) && output.length === 0, 'should return an empty array when given undefined as input')
+
+      output = ledgerExportUtil.addExportFilenamePrefixToTransactions(null)
+      assert(output && underscore.isArray(output) && output.length === 0, 'should return an empty array when given null as input')
+    })
+
+    it('should return the same output for a single transaction given as an array or single object', function () {
+      let txs = [cloneTransactionWithNewViewingId(exampleTransaction)]
+      assert(txs[0] && !txs[0].exportFilenamePrefix, 'the example transaction should not already have "exportFilenamePrefix" defined')
+
+      let outputFromArray = ledgerExportUtil.addExportFilenamePrefixToTransactions(txs)
+      let outputFromObject = ledgerExportUtil.addExportFilenamePrefixToTransactions(txs[0])
+
+      assert.deepEqual(outputFromArray, outputFromObject, 'the same output should be returned for an array with 1 transaction and the transaction object itself')
+    })
+
+    it(`should add a field "exportFilenamePrefix" to each transaction with correct form ("${EXPORT_FILENAME_PREFIX_EXPECTED_FORM}")`, function () {
+      let txs = [cloneTransactionWithNewViewingId(exampleTransaction)]
+      assert(txs[0] && !txs[0].exportFilenamePrefix, 'the example transaction should not already have "exportFilenamePrefix" defined')
+      txs = ledgerExportUtil.addExportFilenamePrefixToTransactions(txs)
+
+      let tx = txs[0]
+      let timestamp = tx.submissionStamp
+      let dateStr = (new Date(timestamp)).toLocaleDateString().replace(/\//g, '-')
+      let expectedExportFilenamePrefix = `${EXPORT_FILENAME_CONST_PREFIX_PART}${dateStr}`
+
+      assert.equal(typeof tx.exportFilenamePrefix, 'string', 'transaction should have "exportFilenamePrefix" field with type "string"')
+      assert.equal(tx.exportFilenamePrefix, expectedExportFilenamePrefix, `"exportFilenamePrefix" field should have expected form: "${EXPORT_FILENAME_PREFIX_EXPECTED_FORM}", here with date string = "${dateStr}"`)
+    })
+
+    it('should add a distinct suffix ("_<n>") to "exportFilenamePrefix" when multiple transactions occur on same day to ensure the field value is unique', function () {
+      // create 3 clone transactions identical except for viewingId
+      //  -> these will all have a submissionStamp corresponding to the same DAY
+      let txs = [cloneTransactionWithNewViewingId(exampleTransaction), cloneTransactionWithNewViewingId(exampleTransaction), cloneTransactionWithNewViewingId(exampleTransaction)]
+
+      let sameDaySubmissionStamp = txs[0].submissionStamp
+
+      // add one more clone transaction but modify the date to be a day later
+      //  -> this should NOT get the distinguishing suffix
+      let txOnDifferentDate = cloneTransactionWithNewViewingId(exampleTransaction)
+      txOnDifferentDate.submissionStamp += 1000 * 3600 * 48 // shift by 48 hours (2 days)
+      txs.push(txOnDifferentDate)
+
+      txs.forEach(function (tx) {
+        assert(tx && !tx.exportFilenamePrefix, 'the example transactions should not already have "exportFilenamePrefix" defined')
+      })
+
+      txs = ledgerExportUtil.addExportFilenamePrefixToTransactions(txs)
+
+      let numSameDayTxProcessed = 0
+      txs.forEach(function (tx, idx) {
+        assert.equal(typeof tx.exportFilenamePrefix, 'string', 'each transactions should now have a "exportFilenamePrefix" field of type "string" defined')
+
+        if (tx.submissionStamp === sameDaySubmissionStamp) {
+          numSameDayTxProcessed++
+        }
+
+        let firstTransactionForDate = !idx || tx.submissionStamp !== sameDaySubmissionStamp
+        if (firstTransactionForDate) {
+          let errMessage = `the first transaction for a given date should NOT have the distinguishing "_<n>" suffix: "${tx.exportFilenamePrefix}" (tx idx = ${idx})`
+          assert.equal(tx.exportFilenamePrefix.slice(tx.exportFilenamePrefix.length - 2).indexOf('_'), -1, errMessage)
+        } else { // if 2nd or 3rd transaction on a given date...
+          assert.equal(tx.exportFilenamePrefix.slice(tx.exportFilenamePrefix.length - 2), `_${numSameDayTxProcessed}`, 'the second and third transaction for a given date SHOULD have the suffix "_<n>"')
+        }
+      })
+    })
+  })
 })
+
+// clone a transaction but give it a unique viewingId
+function cloneTransactionWithNewViewingId (tx) {
+  let cloneTx = underscore.clone(tx)
+  cloneTx.viewingId = uuid.v4().toLowerCase()
+
+  return cloneTx
+}
 
 function checkColumnCountsForRows (rows) {
   for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
