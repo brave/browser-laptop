@@ -118,10 +118,9 @@ class GroupedHistoryList extends ImmutableComponent {
     }
     return []
   }
-  totalEntries (local) {
-    const origin = this.groupEntriesByDay(local)
-    let result = []
-    origin.forEach((entry) => {
+  totalEntries (entriesByDay) {
+    const result = []
+    entriesByDay.forEach((entry) => {
       result.push(entry.entries)
     })
     return result
@@ -129,12 +128,13 @@ class GroupedHistoryList extends ImmutableComponent {
   render () {
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const userLanguage = getSetting(settings.LANGUAGE, this.props.settings)
+    const entriesByDay = this.groupEntriesByDay(userLanguage || defaultLanguage)
     let index = 0
     return <list className='historyList'>
       {
-        this.groupEntriesByDay(userLanguage || defaultLanguage).map((groupedEntry) =>
+        entriesByDay.map((groupedEntry) =>
           <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries}
-            totalEntries={this.totalEntries(userLanguage || defaultLanguage)} tableID={index++} />)
+            totalEntries={this.totalEntries(entriesByDay)} tableID={index++} />)
       }
     </list>
   }
