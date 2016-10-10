@@ -1,4 +1,4 @@
-const TxHelpers = require('../../js/lib/transactionHelpers')
+const TxHelpers = require('./transactionHelpers')
 
 let currentTimestamp = (new Date()).getTime()
 
