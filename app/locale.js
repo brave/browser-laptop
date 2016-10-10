@@ -231,9 +231,13 @@ var lang = 'en-US'
 
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
-exports.translation = function (token) {
+exports.translation = function (token, replacements = {}) {
   if (translations[token]) {
-    return translations[token]
+    let returnVal = translations[token]
+    for (var key in replacements) {
+      returnVal = returnVal.replace(new RegExp('{{\\s*' + key + '\\s*}}'), replacements[key])
+    }
+    return returnVal
   } else {
     // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
     // identifiers above.
