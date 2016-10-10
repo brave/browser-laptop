@@ -23,13 +23,21 @@ function addSimulatedLedgerTransactions (numTx) {
   let userDataPath = app.getPath('userData')
   let ledgerStatePath = path.join(userDataPath, 'ledger-state.json')
 
-  let ledgerState = JSON.parse(fs.readFileSync(ledgerStatePath).toString())
+  try {
+    let ledgerState = JSON.parse(fs.readFileSync(ledgerStatePath).toString())
 
-  let simulatedTransactions = simulateLedgerTransactions(numTx)
+    let simulatedTransactions = simulateLedgerTransactions(numTx)
 
-  ledgerState.transactions = (ledgerState.transactions || []).concat(simulatedTransactions)
+    ledgerState.transactions = (ledgerState.transactions || []).concat(simulatedTransactions)
 
-  fs.writeFileSync(ledgerStatePath, JSON.stringify(ledgerState, null, 2))
+    fs.writeFileSync(ledgerStatePath, JSON.stringify(ledgerState, null, 2))
+
+    console.log(`Updated Ledger data file at ${ledgerStatePath}`)
+  } catch (exc) {
+    console.error('ERROR in addSimulatedLedgerTransactions: could not find/open/parse Ledger data file.')
+    console.error(`Expected path to Ledger data file: ${ledgerStatePath}`)
+    console.error('Probable solution: Run Brave and enable Payments, then execute this script. Enabling/disabling Payments (or restarting Brave) should then show the generated transactions in Brave.')
+  }
 }
 
 app.on('ready', () => {

@@ -7,4 +7,4 @@ if (process.argv[2]) {
   cmd += ' ' + process.argv[2]
 }
 
-runUtilApp(cmd)
+runUtilApp(cmd, undefined, ['inherit', 'inherit', 'inherit'])

@@ -20,6 +20,7 @@ const transactionSchema = Joi.object().keys({
   submissionStamp: Joi.date().timestamp().required(),
   /** submissionId is 32 bytes, 64 chars hex-encoded **/
   submissionId: Joi.string().hex().length(32, 'hex').required(),
+  submissionDate: Joi.date(),
   count: Joi.number().integer().min(0),
 
   /** credential:
