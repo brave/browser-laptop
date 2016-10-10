@@ -275,13 +275,12 @@ module.exports.submitFeedbackMenuItem = () => {
 }
 
 module.exports.bookmarksToolbarMenuItem = () => {
-  const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
     label: locale.translation('bookmarksToolbar'),
     type: 'checkbox',
-    checked: showBookmarksToolbar,
+    checked: getSetting(settings.SHOW_BOOKMARKS_TOOLBAR),
     click: (item, focusedWindow) => {
-      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR))
     }
   }
 }
