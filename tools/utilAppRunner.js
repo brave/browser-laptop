@@ -3,7 +3,6 @@ const proc = require('child_process')
 
 function runUtilApp (cmd, file) {
   console.log('runUtilApp: ')
-  console.log(JSON.stringify(arguments, null, 2))
 
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
   const utilAppDir = path.join(__dirname, 'lib', 'utilApp')
