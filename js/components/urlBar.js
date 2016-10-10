@@ -8,7 +8,7 @@ const urlParse = require('url').parse
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
-const KeyCodes = require('../constants/keyCodes')
+const KeyCodes = require('../../app/common/constants/keyCodes')
 const cx = require('../lib/classSet')
 const ipc = global.require('electron').ipcRenderer
 

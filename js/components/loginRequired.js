@@ -6,7 +6,7 @@ const React = require('react')
 const Dialog = require('./dialog')
 const Button = require('./button')
 const appActions = require('../actions/appActions')
-const KeyCodes = require('../constants/keyCodes')
+const KeyCodes = require('../../app/common/constants/keyCodes')
 const url = require('url')
 
 class LoginRequired extends React.Component {

@@ -7,7 +7,7 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../../../js/components/immutableComponent')
 const windowActions = require('../../../js/actions/windowActions')
 const separatorMenuItem = require('../../common/commonMenu').separatorMenuItem
-const keyCodes = require('../../../js/constants/keyCodes')
+const keyCodes = require('../../common/constants/keyCodes')
 const {wrappingClamp} = require('../../common/lib/formatUtil')
 
 const bindClickHandler = (contextMenu, lastFocusedSelector) => {
