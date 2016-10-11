@@ -146,7 +146,11 @@ class BookmarkTitleCell extends ImmutableComponent {
 }
 
 class BookmarksList extends ImmutableComponent {
-  onDoubleClick (entry) {
+  onDoubleClick (entry, e) {
+    if (e && e.preventDefault) {
+      e.preventDefault()
+    }
+
     aboutActions.newFrame({
       location: entry.location,
       partitionNumber: entry.partitionNumber
