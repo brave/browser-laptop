@@ -2,7 +2,9 @@
 
 ## About tests
 
-Tests use the [mocha test framework](https://mochajs.org/).
+Tests use the [mocha test framework](https://mochajs.org/). Start by installing mocha globally:
+
+    npm install --global mocha
 
 Most tests use [webdriver.io](http://webdriver.io/) framework (via [Spectron](https://github.com/electron/spectron) to bring up the browser and run through the tests.
 
