@@ -645,55 +645,6 @@ module.exports.setDefaultZoomLevel = (zoom) => {
   }
 }
 
-module.exports.addAutofillAddress = (detail, oldGuid) => {
-  let guid = session.defaultSession.autofill.addProfile({
-    full_name: detail.name,
-    company_name: detail.organization,
-    street_address: detail.streetAddress,
-    city: detail.city,
-    state: detail.state,
-    postal_code: detail.postalCode,
-    country_code: detail.country,
-    phone: detail.phone,
-    email: detail.email,
-    guid: oldGuid
-  })
-  return guid
-}
-
-module.exports.removeAutofillAddress = (guid) => {
-  session.defaultSession.autofill.removeProfile(guid)
-}
-
-module.exports.addAutofillCreditCard = (detail, oldGuid) => {
-  let guid = session.defaultSession.autofill.addCreditCard({
-    name: detail.name,
-    card_number: detail.card,
-    expiration_month: detail.month,
-    expiration_year: detail.year,
-    guid: oldGuid
-  })
-  return guid
-}
-
-module.exports.removeAutofillCreditCard = (guid) => {
-  session.defaultSession.autofill.removeCreditCard(guid)
-}
-
-module.exports.clearAutocompleteData = () => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    ses.autofill.clearAutocompleteData()
-  }
-}
-
-module.exports.clearAutofillData = () => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    ses.autofill.clearAutofillData()
-  }
-}
-
 module.exports.getMainFrameUrl = (details) => {
   if (details.resourceType === 'mainFrame') {
     return details.url

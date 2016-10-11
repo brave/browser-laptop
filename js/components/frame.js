@@ -117,12 +117,12 @@ class Frame extends ImmutableComponent {
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
     } else if (location === 'about:autofill') {
+      const defaultSession = global.require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
         const guids = this.props.autofillAddresses.get('guid')
         let list = []
         guids.forEach((entry) => {
-          const address = currentWindow.webContents.session.autofill.getProfile(entry)
-          const valid = Object.getOwnPropertyNames(address).length > 0
+          const address = defaultSession.autofill.getProfile(entry)
           let addressDetail = {
             name: address.full_name,
             organization: address.company_name,
@@ -135,11 +135,7 @@ class Frame extends ImmutableComponent {
             email: address.email,
             guid: entry
           }
-          if (valid) {
-            list.push(addressDetail)
-          } else {
-            appActions.removeAutofillAddress(addressDetail)
-          }
+          list.push(addressDetail)
         })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
@@ -147,8 +143,7 @@ class Frame extends ImmutableComponent {
         const guids = this.props.autofillCreditCards.get('guid')
         let list = []
         guids.forEach((entry) => {
-          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(entry)
-          const valid = Object.getOwnPropertyNames(creditCard).length > 0
+          const creditCard = defaultSession.autofill.getCreditCard(entry)
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
@@ -156,11 +151,7 @@ class Frame extends ImmutableComponent {
             year: creditCard.expiration_year,
             guid: entry
           }
-          if (valid) {
-            list.push(creditCardDetail)
-          } else {
-            appActions.removeAutofillCreditCard(creditCardDetail)
-          }
+          list.push(creditCardDetail)
         })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }

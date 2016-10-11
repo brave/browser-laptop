@@ -24,6 +24,7 @@ const {tabFromFrame} = require('../js/state/frameStateUtil')
 const siteUtil = require('../js/state/siteUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
+const autofill = require('./autofill')
 // const tabState = require('./common/state/tabState')
 
 const getSetting = require('../js/settings').getSetting
@@ -246,11 +247,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
   }
   const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
   if (clearAutocompleteData) {
-    filtering.clearAutocompleteData()
+    autofill.clearAutocompleteData()
   }
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
   if (clearAutofillData) {
-    filtering.clearAutofillData()
+    autofill.clearAutofillData()
   }
   const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
   if (clearSiteSettings) {

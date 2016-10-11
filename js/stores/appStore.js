@@ -32,6 +32,7 @@ const locale = require('../../app/locale')
 const path = require('path')
 const {channel} = require('../../app/channel')
 const os = require('os')
+const autofill = require('../../app/autofill')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -623,12 +624,10 @@ const handleAppAction = (action) => {
         Filtering.clearStorageData()
       }
       if (action.clearDataDetail.get('autocompleteData')) {
-        const Filtering = require('../../app/filtering')
-        Filtering.clearAutocompleteData()
+        autofill.clearAutocompleteData()
       }
       if (action.clearDataDetail.get('autofillData')) {
-        const Filtering = require('../../app/filtering')
-        Filtering.clearAutofillData()
+        autofill.clearAutofillData()
       }
       if (action.clearDataDetail.get('savedSiteSettings')) {
         appState = appState.set('siteSettings', Immutable.Map())
@@ -648,57 +647,26 @@ const handleAppAction = (action) => {
         break
       }
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'addresses', 'guid'],
-          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((guid) => {
-            return guid === action.originalDetail.get('guid')
-          }))
-
-        let guids = appState.getIn(['autofill', 'addresses', 'guid'])
-        const guid = Filtering.addAutofillAddress(action.detail.toJS(),
-          action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
-        appState = appState.setIn(['autofill', 'addresses', 'guid'], guids.push(guid))
-        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.addAutofillAddress(action.detail.toJS(),
+        action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+      break
     case AppConstants.APP_REMOVE_AUTOFILL_ADDRESS:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'addresses', 'guid'],
-          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((guid) => {
-            return guid === action.detail.get('guid')
-          }))
-        Filtering.removeAutofillAddress(action.detail.get('guid'))
-        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.removeAutofillAddress(action.detail.get('guid'))
+      break
     case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'],
-          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((guid) => {
-            return guid === action.originalDetail.get('guid')
-          }))
-
-        let guids = appState.getIn(['autofill', 'creditCards', 'guid'])
-        const guid = Filtering.addAutofillCreditCard(action.detail.toJS(),
-          action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'], guids.push(guid))
-        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.addAutofillCreditCard(action.detail.toJS(),
+        action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+      break
     case AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'],
-          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((guid) => {
-            return guid === action.detail.get('guid')
-          }))
-        Filtering.removeAutofillCreditCard(action.detail.get('guid'))
-        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.removeAutofillCreditCard(action.detail.get('guid'))
+      break
+    case AppConstants.APP_AUTOFILL_DATA_CHANGED:
+      const date = new Date().getTime()
+      appState = appState.setIn(['autofill', 'addresses', 'guid'], action.addressGuids)
+      appState = appState.setIn(['autofill', 'addresses', 'timestamp'], date)
+      appState = appState.setIn(['autofill', 'creditCards', 'guid'], action.creditCardGuids)
+      appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], date)
+      break
     case AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL:
       appState = basicAuthState.setLoginRequiredDetail(appState, action.tabId, action.detail)
       break

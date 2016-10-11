@@ -484,6 +484,19 @@ const appActions = {
   },
 
   /**
+   * Autofill data changed
+   * @param {Array} addressGuids - the guid array to access address entries in autofill DB
+   * @param {Array} creditCardGuids - the guid array to access credit card entries in autofill DB
+   */
+  autofillDataChanged: function (addressGuids, creditCardGuids) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_AUTOFILL_DATA_CHANGED,
+      addressGuids,
+      creditCardGuids
+    })
+  },
+
+  /**
    * Dispatches a message when appWindowId loses focus
    *
    * @param {Number} appWindowId - the unique id of the window
