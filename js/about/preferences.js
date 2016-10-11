@@ -18,6 +18,7 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
@@ -300,11 +301,15 @@ class BitcoinDashboard extends ImmutableComponent {
     </div>
   }
   get qrcodeOverlayFooter () {
-    return <div>
-      <div id='coinbaseLogo' />
-      <div id='appstoreLogo' />
-      <div id='playstoreLogo' />
-    </div>
+    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
+      return <div>
+        <div id='coinbaseLogo' />
+        <a href='https://itunes.apple.com/us/app/coinbase-bitcoin-wallet/id886427730?mt=8' target='_blank' id='appstoreLogo' />
+        <a href='https://play.google.com/store/apps/details?id=com.coinbase.android' target='_blank' id='playstoreLogo' />
+      </div>
+    } else {
+      return null
+    }
   }
   get currency () {
     return this.props.ledgerData.get('currency') || 'USD'
@@ -318,6 +323,19 @@ class BitcoinDashboard extends ImmutableComponent {
   get userInAmerica () {
     const countryCode = this.props.ledgerData.get('countryCode')
     return !(countryCode && countryCode !== 'US')
+  }
+  get worldWidePanel () {
+    return <div className='panel'>
+      <div className='settingsPanelDivider'>
+        <span className='fa fa-credit-card' />
+        <div className='settingsListTitle' data-l10n-id='outsideUSAPayment' />
+      </div>
+      <div className='settingsPanelDivider'>
+        <a target='_blank' className='browserButton primaryButton' href='https://www.buybitcoinworldwide.com/'>
+          buybitcoinworldwide.com
+        </a>
+      </div>
+    </div>
   }
   get coinbasePanel () {
     if (this.canUseCoinbase) {
@@ -348,9 +366,9 @@ class BitcoinDashboard extends ImmutableComponent {
   get exchangePanel () {
     const url = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeURL'])
     const name = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeName'])
-    // Call coinbasePanel if we don't have the URL or Name
+    // Call worldWidePanel if we don't have the URL or Name
     if (!url || !name) {
-      return this.coinbasePanel
+      return this.worldWidePanel
     } else {
       return <div className='panel'>
         <div className='settingsPanelDivider'>
@@ -377,11 +395,15 @@ class BitcoinDashboard extends ImmutableComponent {
     </div>
   }
   get panelFooter () {
-    return <div className='panelFooter'>
-      <div id='coinbaseLogo' />
-      <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
-      <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
-    </div>
+    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
+      return <div className='panelFooter'>
+        <div id='coinbaseLogo' />
+        <span className='coinbaseMessage' data-l10n-id='coinbaseMessage' />
+        <Button l10nId='done' className='pull-right whiteButton' onClick={this.props.hideParentOverlay} />
+      </div>
+    } else {
+      return null
+    }
   }
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
@@ -843,6 +865,14 @@ class PaymentsTab extends ImmutableComponent {
       siteSettings={this.props.siteSettings} />
   }
 
+  get overlayTitle () {
+    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
+      return 'addFunds'
+    } else {
+      return 'addFundsAlternate'
+    }
+  }
+
   get overlayContent () {
     return <BitcoinDashboard ledgerData={this.props.ledgerData}
       settings={this.props.settings}
@@ -1114,7 +1144,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div id='paymentsContainer'>
       {
       this.enabled && this.props.addFundsOverlayVisible
-        ? <ModalOverlay title={'addFunds'} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
+        ? <ModalOverlay title={this.overlayTitle} content={this.overlayContent} onHide={this.props.hideOverlay.bind(this, 'addFunds')} />
         : null
       }
       {
