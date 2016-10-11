@@ -13,7 +13,6 @@ const aboutActions = require('./aboutActions')
 const dndData = require('../dndData')
 const cx = require('../lib/classSet')
 const SortableTable = require('../components/sortableTable')
-const Button = require('../components/button')
 const siteUtil = require('../state/siteUtil')
 const iconSize = 16
 
@@ -59,7 +58,13 @@ class BookmarkFolderItem extends ImmutableComponent {
           listItem: true,
           selected: this.props.selected
         })}>
-        <span className='bookmarkFolderIcon fa fa-folder-o' />
+
+        <span className={cx({
+          bookmarkFolderIcon: true,
+          fa: true,
+          'fa-folder-o': !this.props.selected,
+          'fa-folder-open-o': this.props.selected
+        })} />
         <span data-l10n-id={this.props.dataL10nId}>
           {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}</span>
       </div>
@@ -200,7 +205,6 @@ class BookmarksList extends ImmutableComponent {
         columnClassNames={['title', 'date']}
         tableID={this.props.tableID}
         addHoverClass
-        multiSelect
         onDoubleClick={this.onDoubleClick}
         {...props}
         contextMenuName='bookmark'
@@ -265,6 +269,7 @@ class AboutBookmarks extends React.Component {
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='bookmarkManager' className='sectionTitle' />
         <div className='headerActions'>
+          <span l10nId='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
           <div className='searchWrapper'>
             <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
             {
@@ -273,13 +278,12 @@ class AboutBookmarks extends React.Component {
               : <span className='fa fa-search searchInputPlaceholder' />
             }
           </div>
-          <Button l10nId='importBrowserData' className='primaryButton clearBrowsingDataButton' onClick={this.importBrowserData} />
         </div>
       </div>
 
       <div className='siteDetailsPageContent'>
         <div className='folderView'>
-          <div data-l10n-id='folders' className='sectionTitle' />
+          <div data-l10n-id='folders' className='columnHeader' />
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
             allBookmarkFolders={this.state.bookmarkFolders}
@@ -287,7 +291,6 @@ class AboutBookmarks extends React.Component {
             selectedFolderId={this.state.selectedFolderId} />
         </div>
         <div className='organizeView'>
-          <div data-l10n-id='organize' className='sectionTitle' />
           <BookmarksList
             bookmarks={
               this.state.search
