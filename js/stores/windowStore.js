@@ -430,6 +430,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_NEW_FRAME:
       newFrame(action.frameOpts, action.openInForeground)
       break
+    case WindowConstants.WINDOW_VIEW_KEY:
+      newFrame(action.frameOpts, action.openInForeground)
+      break
     case WindowConstants.WINDOW_CLONE_FRAME:
       let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
       newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground, insertionIndex)

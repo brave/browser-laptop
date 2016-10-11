@@ -1106,6 +1106,9 @@ class Main extends ImmutableComponent {
                 extensions={frame.get('location') === 'about:extensions'
                   ? this.props.appState.get('extensions') || emptyMap
                   : null}
+                preferencesData={frame.get('location') === 'about:preferences#payments'
+                  ? this.props.appState.getIn(['ui', 'about', 'preferences']) || emptyMap
+                  : null}
                 downloads={this.props.appState.get('downloads') || emptyMap}
                 bookmarkFolders={frame.get('location') === 'about:bookmarks'
                   ? this.props.appState.get('sites')

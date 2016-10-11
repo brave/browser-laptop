@@ -53,6 +53,8 @@ const appStore = require('../js/stores/appStore')
 const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation')
 const ledgerUtil = require('./common/lib/ledgerUtil')
+const Tabs = require('./browser/tabs')
+const {fileUrl} = require('../js/lib/appUrlUtil')
 
 // TBD: remove these post beta [MTR]
 const logPath = 'ledger-log.json'
@@ -133,9 +135,25 @@ const doAction = (action) => {
         case settings.PAYMENTS_ENABLED:
           initialize(action.value)
           break
+
         case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
           setPaymentInfo(action.value)
           break
+
+        case settings.MINIMUM_VISIT_TIME:
+          if (action.value <= 0) break
+
+          synopsis.options.minDuration = action.value
+          updatePublisherInfo()
+          break
+
+        case settings.MINIMUM_VISTS:
+          if (action.value <= 0) break
+
+          synopsis.options.minPublisherVisits = action.value
+          updatePublisherInfo()
+          break
+
         default:
           break
       }
@@ -213,6 +231,51 @@ var boot = () => {
 
     bootP = false
   })
+}
+
+/*
+ * Print or Save Recovery Keys
+ */
+
+var backupKeys = (appState, action) => {
+  const paymentId = appState.getIn(['ledgerInfo', 'paymentId'])
+  const passphrase = appState.getIn(['ledgerInfo', 'passphrase'])
+  const message = locale.translation('ledgerBackupText', {paymentId, passphrase})
+  const filePath = path.join(app.getPath('userData'), '/brave_wallet_recovery.txt')
+
+  fs.writeFile(filePath, message, (err) => {
+    if (err) {
+      console.log(err)
+    } else {
+      Tabs.create({url: fileUrl(filePath)}).then((webContents) => {
+        if (action.backupAction === 'print') {
+          webContents.print({silent: false, printBackground: false})
+        } else {
+          webContents.downloadURL(fileUrl(filePath))
+        }
+      }).catch((err) => {
+        console.error(err)
+      })
+    }
+  })
+
+  return appState
+}
+
+/*
+ * Recover Ledger Keys
+ */
+
+var recoverKeys = (appState, action) => {
+  client.recoverWallet(action.firstRecoveryKey, action.secondRecoveryKey, (err, body) => {
+    if (err) {
+      setImmediate(() => appActions.ledgerRecoveryFailed())
+    } else {
+      setImmediate(() => appActions.ledgerRecoverySucceeded())
+    }
+  })
+
+  return appState
 }
 
 /*
@@ -571,6 +634,8 @@ var enable = (paymentsEnabled) => {
  */
 
 var publisherInfo = {
+  options: undefined,
+
   synopsis: undefined,
 
   _internal: {
@@ -601,13 +666,15 @@ var updatePublisherInfo = () => {
   syncWriter(pathName(synopsisPath), synopsis, () => {})
   publisherInfo.synopsis = synopsisNormalizer()
 
+  publisherInfo.synopsisOptions = synopsis.options
+
   if (publisherInfo._internal.debugP) {
     data = []
     publisherInfo.synopsis.forEach((entry) => {
       data.push(underscore.extend(underscore.omit(entry, [ 'faviconURL' ]), { faviconURL: entry.faviconURL && '...' }))
     })
 
-    console.log('\nupdatePublisherInfo: ' + JSON.stringify(data, null, 2))
+    console.log('\nupdatePublisherInfo: ' + JSON.stringify({ options: publisherInfo.synopsisOptions, synopsis: data }, null, 2))
   }
 
   appActions.updatePublisherInfo(underscore.omit(publisherInfo, [ '_internal' ]))
@@ -871,6 +938,14 @@ var ledgerInfo = {
   buyURL: undefined,
   bravery: undefined,
 
+  // wallet credentials
+  paymentId: undefined,
+  passphrase: undefined,
+
+  // advanced ledger settings
+  minDuration: undefined,
+  minPublisherVisits: undefined,
+
   hasBitcoinHandler: false,
 
   // geoIP/exchange information
@@ -1109,6 +1184,12 @@ var getStateInfo = (state) => {
   var info = state.paymentInfo
   var then = underscore.now() - msecs.year
 
+  ledgerInfo.paymentId = state.properties.wallet.paymentId
+  ledgerInfo.passphrase = state.properties.wallet.keychains.passphrase
+
+  ledgerInfo.minDuration = synopsis.options.minDuration
+  ledgerInfo.minPublisherVisits = synopsis.options.minPublisherVisits
+
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
 
@@ -1230,7 +1311,6 @@ var getPaymentInfo = () => {
 
       info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'balance', 'unconfirmed', 'satoshis' ]))
       info.address = client.getWalletAddress()
-      info.passphrase = client.getWalletPassphrase()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
         if ((body.rates) && (body.rates[currency])) {
@@ -1452,6 +1532,8 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
 
 module.exports = {
   init: init,
+  recoverKeys: recoverKeys,
+  backupKeys: backupKeys,
   quit: quit,
   boot: boot
 }

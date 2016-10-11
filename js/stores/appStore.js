@@ -27,7 +27,7 @@ const getSetting = require('../settings').getSetting
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
-const debounce = require('../lib/debounce')
+const debounce = require('../lib/debounce.js')
 const locale = require('../../app/locale')
 const path = require('path')
 const {channel} = require('../../app/channel')
@@ -328,6 +328,8 @@ function handleChangeSettingAction (settingKey, settingValue) {
 }
 
 const handleAppAction = (action) => {
+  const ledger = require('../../app/ledger')
+
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
       appState = action.appState
@@ -584,6 +586,21 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SET_DICTIONARY:
       appState = appState.setIn(['dictionary', 'locale'], action.locale)
+      break
+    case AppConstants.APP_BACKUP_KEYS:
+      appState = ledger.backupKeys(appState, action)
+      break
+    case AppConstants.APP_RECOVER_WALLET:
+      appState = ledger.recoverKeys(appState, action)
+      break
+    case AppConstants.APP_LEDGER_RECOVERY_SUCCEEDED:
+      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], true)
+      break
+    case AppConstants.APP_LEDGER_RECOVERY_FAILED:
+      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], false)
+      break
+    case AppConstants.APP_CLEAR_RECOVERY:
+      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], undefined)
       break
     case AppConstants.APP_CLEAR_DATA:
       if (action.clearDataDetail.get('browserHistory')) {

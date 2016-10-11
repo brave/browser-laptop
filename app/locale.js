@@ -56,6 +56,7 @@ var rendererIdentifiers = function () {
     'deleteHistoryEntry',
     'deleteHistoryEntries',
     'deleteLedgerEntry',
+    'ledgerBackupText',
     'editFolder',
     'editBookmark',
     'unmuteTabs',
@@ -233,13 +234,19 @@ var ctx = null
 var translations = {}
 var lang = 'en-US'
 
+// todo: FSI/PDI stripping can probably be replaced once
+// https://github.com/l20n/l20n.js/commit/2fea50bf43c43a8e930a519a37f0f64f3626e885
+// is released
+const FSI = '\u2068'
+const PDI = '\u2069'
+
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
 exports.translation = function (token, replacements = {}) {
   if (translations[token]) {
     let returnVal = translations[token]
     for (var key in replacements) {
-      returnVal = returnVal.replace(new RegExp('{{\\s*' + key + '\\s*}}'), replacements[key])
+      returnVal = returnVal.replace(new RegExp(FSI + '{{\\s*' + key + '\\s*}}' + PDI), replacements[key])
     }
     return returnVal
   } else {
