@@ -116,4 +116,14 @@ table.sortableTable {
       color: #d9d9d9;
     }
   }
+
+  &:not(.sort) {
+    th.sort-up:after {
+      content: '';
+    }
+
+    th.sort-down:after {
+      content: '';
+    }
+  }
 }

@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 const tableSort = require('tablesort')
 const cx = require('../lib/classSet')
@@ -26,7 +27,13 @@ class SortableTable extends ImmutableComponent {
     return tableSort(this.table)
   }
   onClick (e) {
-    const targetElement = e.target.parentNode
+    // Work backwards until element is TR
+    let targetElement = e.target
+    while (targetElement) {
+      if (targetElement.tagName === 'TR') break
+      targetElement = targetElement.parentNode
+    }
+    if (!targetElement) return
 
     if (eventUtil.isForSecondaryAction(e)) {
       if (targetElement.className.includes(' selected')) {
@@ -80,7 +87,12 @@ class SortableTable extends ImmutableComponent {
         ? (typeof this.props.totalRowObjects[parseInt(tableID)][index].toJS === 'function'
           ? this.props.totalRowObjects[parseInt(tableID)][index].toJS()
           : this.props.totalRowObjects[parseInt(tableID)][index])
-        : null
+        : (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
+          ? (typeof this.props.rowObjects.toJS === 'function'
+            ? this.props.rowObjects.get(index).toJS()
+            : this.props.rowObjects[index])
+          : null
+
       if (handlerInput) {
         handlerInputs.push(handlerInput)
       }
@@ -104,32 +116,49 @@ class SortableTable extends ImmutableComponent {
     return this.props.rowClassNames &&
       this.props.rowClassNames.length === this.props.rows.length
   }
-  get hasDoubleClickHandler () {
-    return typeof this.props.onDoubleClick === 'function'
-  }
   get hasContextMenu () {
     return typeof this.props.onContextMenu === 'function' &&
       typeof this.props.contextMenuName === 'string'
   }
+  get sortingDisabled () {
+    if (typeof this.props.sortingDisabled === 'boolean') {
+      return this.props.sortingDisabled
+    }
+    return false
+  }
   getRowAttributes (row, index) {
     const rowAttributes = {}
-    const handlerInput = this.props.rowObjects
-      ? (typeof this.props.rowObjects[index].toJS === 'function'
-        ? this.props.rowObjects[index].toJS()
+    const handlerInput = this.props.rowObjects &&
+      (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
+      ? (typeof this.props.rowObjects.toJS === 'function'
+        ? this.props.rowObjects.get(index).toJS()
         : this.props.rowObjects[index])
       : row
 
     if (this.props.addHoverClass) {
       rowAttributes.className = 'rowHover'
     }
-    if (this.hasClickHandler) {
-      rowAttributes.onClick = this.props.onClick.bind(this, handlerInput)
-    }
-    if (this.hasDoubleClickHandler) {
-      rowAttributes.onDoubleClick = this.props.onDoubleClick.bind(this, handlerInput)
-    }
     if (this.hasContextMenu) {
       rowAttributes.onContextMenu = this.props.onContextMenu.bind(this, handlerInput, this.props.contextMenuName)
+    }
+    // Bindings for row-specific event handlers
+    if (typeof this.props.onClick === 'function') {
+      rowAttributes.onClick = this.props.onClick.bind(this, handlerInput)
+    }
+    if (typeof this.props.onDoubleClick === 'function') {
+      rowAttributes.onDoubleClick = this.props.onDoubleClick.bind(this, handlerInput)
+    }
+    if (typeof this.props.onDragStart === 'function') {
+      rowAttributes.onDragStart = this.props.onDragStart.bind(this, Immutable.fromJS(handlerInput))
+      rowAttributes.draggable = true
+    }
+    if (typeof this.props.onDragOver === 'function') {
+      rowAttributes.onDragOver = this.props.onDragOver.bind(this, Immutable.fromJS(handlerInput))
+      rowAttributes.draggable = true
+    }
+    if (typeof this.props.onDrop === 'function') {
+      rowAttributes.onDrop = this.props.onDrop.bind(this, Immutable.fromJS(handlerInput))
+      rowAttributes.draggable = true
     }
     return rowAttributes
   }
@@ -137,23 +166,24 @@ class SortableTable extends ImmutableComponent {
     if (!this.props.headings || !this.props.rows) {
       return false
     }
-
     return <table className={cx({
-      sort: true,
+      sort: !this.sortingDisabled,
       sortableTable: !this.props.overrideDefaultStyle
     })}
       ref={(node) => { this.table = node }}>
       <thead>
         <tr>
           {this.props.headings.map((heading, j) => {
-            const firstEntry = this.props.rows[0][j]
+            const firstEntry = this.props.rows.length > 0
+              ? this.props.rows[0][j]
+              : undefined
             let dataType = typeof firstEntry
             if (dataType === 'object' && firstEntry.value) {
               dataType = typeof firstEntry.value
             }
             return <th className={cx({
               'sort-header': true,
-              'sort-default': heading === this.props.defaultHeading})}
+              'sort-default': this.sortingDisabled || heading === this.props.defaultHeading})}
               data-sort-method={dataType === 'number' ? 'number' : undefined}
               data-sort-order={this.props.defaultHeadingSortOrder}>
               <div className='th-inner' data-l10n-id={heading} />
@@ -175,14 +205,20 @@ class SortableTable extends ImmutableComponent {
                 }
               </td>
             })
-            const rowAttributes = this.getRowAttributes(row, i)
+            const rowAttributes = row.length
+              ? this.getRowAttributes(row, i)
+              : null
             return row.length
               ? <tr {...rowAttributes}
                 data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
                 id={this.props.tableID}
-                className={this.hasRowClassNames
+                className={
+                  (this.hasRowClassNames
                   ? this.props.rowClassNames[i] + ' ' + rowAttributes.className
-                  : rowAttributes.className} onClick={this.props.multiSelect ? this.onClick : undefined}
+                  : rowAttributes.className) +
+                  (this.sortingDisabled ? ' no-sort' : '')
+                }
+                onClick={this.props.multiSelect ? this.onClick : undefined}
                 onContextMenu={this.props.multiSelect ? this.onContextMenu : undefined}>{entry}</tr>
               : null
           })
