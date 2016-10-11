@@ -14,7 +14,7 @@ const dndData = require('../dndData')
 const cx = require('../lib/classSet')
 const SortableTable = require('../components/sortableTable')
 const siteUtil = require('../state/siteUtil')
-const iconSize = 16
+const iconSize = require('../../app/common/lib/faviconUtil').iconSize
 
 const ipc = window.chrome.ipc
 
@@ -54,6 +54,7 @@ class BookmarkFolderItem extends ImmutableComponent {
         onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmarkFolder.toJS(), 'bookmark-folder')}
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
         draggable={this.props.draggable !== false ? 'true' : 'false'}
+        data-folder-id={this.props.bookmarkFolder.get('folderId')}
         className={cx({
           listItem: true,
           selected: this.props.selected
@@ -66,7 +67,8 @@ class BookmarkFolderItem extends ImmutableComponent {
           'fa-folder-open-o': this.props.selected
         })} />
         <span data-l10n-id={this.props.dataL10nId}>
-          {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}</span>
+          {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}
+        </span>
       </div>
       {
         childBookmarkFolders.size > 0
@@ -194,7 +196,7 @@ class BookmarksList extends ImmutableComponent {
         rows={this.props.bookmarks.map((entry) => [
           {
             cell: <BookmarkTitleCell siteDetail={entry} />,
-            value: entry.get('customTitle') || entry.get('title')
+            value: entry.get('customTitle') || entry.get('title') || entry.get('location')
           },
           {
             html: new Date(entry.get('lastAccessedTime')).toLocaleString(),
@@ -269,7 +271,6 @@ class AboutBookmarks extends React.Component {
       <div className='siteDetailsPageHeader'>
         <div data-l10n-id='bookmarkManager' className='sectionTitle' />
         <div className='headerActions'>
-          <span l10nId='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
           <div className='searchWrapper'>
             <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
             {
@@ -283,7 +284,10 @@ class AboutBookmarks extends React.Component {
 
       <div className='siteDetailsPageContent'>
         <div className='folderView'>
-          <div data-l10n-id='folders' className='columnHeader' />
+          <div className='columnHeader'>
+            <span data-l10n-id='folders' />
+            <span data-l10n-id='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
+          </div>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
             allBookmarkFolders={this.state.bookmarkFolders}
