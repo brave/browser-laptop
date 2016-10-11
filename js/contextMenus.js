@@ -1178,6 +1178,20 @@ function onLedgerContextMenu (location, hostPattern) {
   menu.destroy()
 }
 
+function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
+  if (e && e.stopPropagation) {
+    e.stopPropagation()
+  }
+  const menuTemplate = showBookmarkFolderInit(bookmarks, bookmark, activeFrame)
+  const rectLeft = e.target.getBoundingClientRect()
+  const rectBottom = e.target.parentNode.getBoundingClientRect()
+  windowActions.setContextMenuDetail(Immutable.fromJS({
+    left: (rectLeft.left | 0) - 2,
+    top: (rectBottom.bottom | 0) - 1,
+    template: menuTemplate
+  }))
+}
+
 /**
  * @param {Object} usernames - map of username to plaintext password
  * @param {string} origin - origin of the form
@@ -1317,10 +1331,10 @@ module.exports = {
   onTabPageContextMenu,
   onUrlBarContextMenu,
   onSiteDetailContextMenu,
+  onShowBookmarkFolderMenu,
   onShowUsernameMenu,
   onShowAutofillMenu,
   onMoreBookmarksMenu,
   onBackButtonHistoryMenu,
-  onForwardButtonHistoryMenu,
-  showBookmarkFolderInit
+  onForwardButtonHistoryMenu
 }

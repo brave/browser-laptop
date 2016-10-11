@@ -32,20 +32,9 @@ class BookmarkToolbarButton extends ImmutableComponent {
     this.onDragOver = this.onDragOver.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
   }
-
-  showBookmarkFolderMenu (e) {
-    e.target = ReactDOM.findDOMNode(this)
-
-    if (e && e.stopPropagation) {
-      e.stopPropagation()
-    }
-
-    const xPos = (e.target.getBoundingClientRect().left | 0) - 2
-    const yPos = (e.target.parentNode.getBoundingClientRect().bottom | 0) - 1
-
-    windowActions.onMouseOverBookmarkFolder(this.props.bookmark.get('folderId'), this.props.sites, this.props.bookmark, xPos, yPos)
+  get activeFrame () {
+    return windowStore.getFrame(this.props.activeFrameKey)
   }
-
   onClick (e) {
     if (!this.props.clickBookmarkItem(this.props.bookmark, e) &&
         this.props.bookmark.get('tags').includes(siteTags.BOOKMARK_FOLDER)) {
@@ -53,7 +42,9 @@ class BookmarkToolbarButton extends ImmutableComponent {
         windowActions.setContextMenuDetail()
         return
       }
-      this.showBookmarkFolderMenu(e)
+      e.target = ReactDOM.findDOMNode(this)
+      this.props.showBookmarkFolderMenu(this.props.bookmark, e)
+      return
     }
   }
 
@@ -62,10 +53,12 @@ class BookmarkToolbarButton extends ImmutableComponent {
     if (this.props.selectedFolderId) {
       if (this.isFolder && this.props.selectedFolderId !== this.props.bookmark.get('folderId')) {
         // Auto-expand the menu if user mouses over another folder
-        this.showBookmarkFolderMenu(e)
+        e.target = ReactDOM.findDOMNode(this)
+        this.props.showBookmarkFolderMenu(this.props.bookmark, e)
       } else if (!this.isFolder && this.props.selectedFolderId !== -1) {
         // Hide the currently expanded menu if user mouses over a non-folder
-        windowActions.onMouseOverBookmarkFolder(-1)
+        windowActions.setBookmarksToolbarSelectedFolderId(-1)
+        windowActions.setContextMenuDetail()
       }
     }
   }
@@ -84,7 +77,7 @@ class BookmarkToolbarButton extends ImmutableComponent {
       e.target = ReactDOM.findDOMNode(this)
       if (dnd.isMiddle(e.target, e.clientX)) {
         e.target.getBoundingClientRect
-        this.showBookmarkFolderMenu(e)
+        this.props.showBookmarkFolderMenu(this.props.bookmark, e)
         windowActions.setIsBeingDraggedOverDetail(dragTypes.BOOKMARK, this.props.bookmark, {
           expanded: true
         })
@@ -238,6 +231,7 @@ class BookmarksToolbar extends ImmutableComponent {
     this.onMoreBookmarksMenu = this.onMoreBookmarksMenu.bind(this)
     this.openContextMenu = this.openContextMenu.bind(this)
     this.clickBookmarkItem = this.clickBookmarkItem.bind(this)
+    this.showBookmarkFolderMenu = this.showBookmarkFolderMenu.bind(this)
   }
   get activeFrame () {
     return windowStore.getFrame(this.props.activeFrameKey)
@@ -292,6 +286,10 @@ class BookmarksToolbar extends ImmutableComponent {
   }
   clickBookmarkItem (bookmark, e) {
     return bookmarkActions.clickBookmarkItem(this.bookmarks, bookmark, this.activeFrame, e)
+  }
+  showBookmarkFolderMenu (bookmark, e) {
+    windowActions.setBookmarksToolbarSelectedFolderId(bookmark.get('folderId'))
+    contextMenus.onShowBookmarkFolderMenu(this.bookmarks, bookmark, this.activeFrame, e)
   }
   updateBookmarkData (props) {
     this.bookmarks = siteUtil.getBookmarks(props.sites)
@@ -407,11 +405,12 @@ class BookmarksToolbar extends ImmutableComponent {
               ref={(node) => this.bookmarkRefs.push(node)}
               key={i}
               contextMenuDetail={this.props.contextMenuDetail}
+              activeFrameKey={this.props.activeFrameKey}
               draggingOverData={this.props.draggingOverData}
               openContextMenu={this.openContextMenu}
               clickBookmarkItem={this.clickBookmarkItem}
+              showBookmarkFolderMenu={this.showBookmarkFolderMenu}
               bookmark={bookmark}
-              sites={this.bookmarks}
               showFavicon={this.props.showFavicon}
               showOnlyFavicon={this.props.showOnlyFavicon}
               selectedFolderId={this.props.selectedFolderId} />)
