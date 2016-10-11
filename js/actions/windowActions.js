@@ -1127,19 +1127,11 @@ const windowActions = {
    * Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
    * @param {number} folderId - from the siteDetail for the bookmark folder
    *   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
-   * @param {Object} bookmarks - all of the users bookmarks
-   * @param {Object} bookmark - the object representing the selected folder
-   * @param {number} xPos - x position of the left corner of the context mennu
-   * @param {number} yPos - y position of the top corner of the context menu
    */
-  onMouseOverBookmarkFolder: function (folderId, bookmarks, bookmark, xPos, yPos) {
+  setBookmarksToolbarSelectedFolderId: function (folderId) {
     dispatch({
-      actionType: WindowConstants.WINDOW_ON_MOUSE_OVER_BOOKMARK_FOLDER,
-      folderId,
-      bookmarks,
-      bookmark,
-      xPos,
-      yPos
+      actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
+      folderId
     })
   }
 }
