@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.5](https://github.com/brave/browser-laptop/releases/v0.12.5dev)
+- TODO
+
 ## [0.12.4](https://github.com/brave/browser-laptop/releases/v0.12.4dev)
 - Added regional adblocking (Access via about:adblock or in preferences). These are special rules which focus on blocking ads for non-US sites. ([#4489](https://github.com/brave/browser-laptop/issues/4489))([#1357](https://github.com/brave/browser-laptop/issues/1357))
 - Added the ability to define custom adblock rules. ([#4620](https://github.com/brave/browser-laptop/issues/4620))
