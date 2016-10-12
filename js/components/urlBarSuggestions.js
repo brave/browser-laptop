@@ -262,28 +262,6 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
     }
 
-    // bookmarks
-    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
-      suggestions = suggestions.concat(mapListToElements({
-        data: props.sites,
-        maxResults: config.urlBarSuggestions.maxBookmarkSites,
-        type: suggestionTypes.BOOKMARK,
-        clickHandler: navigateClickHandler((site) => {
-          return site.get('location')
-        }),
-        sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title'),
-        formatUrl: (site) => site.get('location'),
-        filterValue: (site) => {
-          const title = site.get('title') || ''
-          const location = site.get('location') || ''
-          return (title.toLowerCase().includes(urlLocationLower) ||
-            location.toLowerCase().includes(urlLocationLower)) &&
-            site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
-        }
-      }))
-    }
-
     // history
     if (getSetting(settings.HISTORY_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
@@ -302,6 +280,28 @@ class UrlBarSuggestions extends ImmutableComponent {
           return (title.toLowerCase().includes(urlLocationLower) ||
             location.toLowerCase().includes(urlLocationLower)) &&
             (!site.get('tags') || site.get('tags').size === 0)
+        }
+      }))
+    }
+
+        // bookmarks
+    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
+      suggestions = suggestions.concat(mapListToElements({
+        data: props.sites,
+        maxResults: config.urlBarSuggestions.maxBookmarkSites,
+        type: suggestionTypes.BOOKMARK,
+        clickHandler: navigateClickHandler((site) => {
+          return site.get('location')
+        }),
+        sortHandler: sortBasedOnLocationPos,
+        formatTitle: (site) => site.get('title'),
+        formatUrl: (site) => site.get('location'),
+        filterValue: (site) => {
+          const title = site.get('title') || ''
+          const location = site.get('location') || ''
+          return (title.toLowerCase().includes(urlLocationLower) ||
+            location.toLowerCase().includes(urlLocationLower)) &&
+            site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
         }
       }))
     }
