@@ -9,7 +9,6 @@ const {urlInput, tabsTabs, pinnedTabsTabs} = require('../lib/selectors')
 describe('pinnedTabs', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)

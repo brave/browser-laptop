@@ -8,7 +8,6 @@ const messages = require('../../js/constants/messages')
 describe('Clear Browsing Panel', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)

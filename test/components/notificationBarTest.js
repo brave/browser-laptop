@@ -6,7 +6,6 @@ const {activeWebview, notificationBar, titleBar, urlInput} = require('../lib/sel
 describe('notificationBar', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
   }
@@ -165,7 +164,6 @@ describe('notificationBar', function () {
 describe('permissions state', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
   }

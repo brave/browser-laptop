@@ -8,7 +8,6 @@ const {urlInput, backButton, forwardButton, activeTabTitle} = require('../lib/se
 describe('tabs', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)

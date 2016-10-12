@@ -458,8 +458,6 @@ var exports = {
             })
         })
     })
-
-    this.app.client.waitUntilWindowLoaded().windowByUrl(exports.browserWindowUrl)
   },
 
   startApp: function () {
@@ -471,6 +469,9 @@ var exports = {
       BRAVE_USER_DATA_DIR: userDataDir
     }
     this.app = new Application({
+      waitforInterval: 100,
+      waitforTimeout: 1000,
+      quitTimeout: 0,
       path: './node_modules/.bin/electron',
       env,
       args: ['./', '--debug=5858', '--enable-logging', '--v=1']
@@ -479,12 +480,16 @@ var exports = {
   },
 
   stopApp: function (cleanSessionStore = true) {
-    if (cleanSessionStore) {
-      if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
-        userDataDir && rmDir(userDataDir)
+    let stop = this.app.stop().then((app) => {
+      if (cleanSessionStore) {
+        if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
+          userDataDir && rmDir(userDataDir)
+        }
+        userDataDir = generateUserDataDir()
       }
-      userDataDir = generateUserDataDir()
-    }
+      return app
+    })
+
     // this.app.client.getMainProcessLogs().then(function (logs) {
     //   logs.forEach(function (log) {
     //     console.log(log)
@@ -495,7 +500,7 @@ var exports = {
     //     console.log(log)
     //   })
     // })
-    return this.app.stop()
+    return stop
   }
 }
 

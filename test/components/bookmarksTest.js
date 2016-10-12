@@ -8,7 +8,6 @@ const siteTags = require('../../js/constants/siteTags')
 describe('bookmark tests', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForEnabled(urlInput)

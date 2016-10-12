@@ -8,7 +8,6 @@ const prefsUrl = 'about:preferences'
 
 function * setup (client) {
   yield client
-    .waitUntilWindowLoaded()
     .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
@@ -39,6 +38,7 @@ describe('Payments Panel', function () {
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
@@ -56,6 +56,7 @@ describe('Payments Panel', function () {
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
@@ -65,6 +66,7 @@ describe('Payments Panel', function () {
           })
         })
         .tabByUrl(prefsUrl)
+        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
@@ -82,6 +84,7 @@ describe('Payments Panel', function () {
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .waitUntil(function () {
           return this.getText(paymentsStatus).then((val) => val.includes('Creating'))
@@ -106,6 +109,7 @@ describe('synopsis', function () {
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
       .waitForVisible(paymentsWelcomePage)
+      .waitForVisible(walletSwitch)
       .click(walletSwitch)
       .waitUntil(function () {
         return this.getText(paymentsStatus).then((val) => val.includes('Creating'))
@@ -153,6 +157,7 @@ describe('synopsis', function () {
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
+      .waitForVisible('[data-l10n-id="publisher"]')
       .click('[data-l10n-id="publisher"]')
       .waitUntil(function () {
         return this.getText(ledgerTable + ' a').then((text) => {
@@ -176,7 +181,9 @@ describe('synopsis', function () {
       .loadUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
+      .waitForVisible('[data-l10n-id="publisher"]')
       .click('[data-l10n-id="publisher"]')
+      .waitForVisible(ledgerTable + ' .switchBackground')
       .click(ledgerTable + ' .switchBackground')
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {

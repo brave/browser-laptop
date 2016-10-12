@@ -166,10 +166,16 @@ describe('clone tab', function () {
     })
 
     it('opens a new foreground tab', function * () {
+      let url1 = this.url1
       yield this.app.client
         .waitUntil(function () {
           return this.getTabCount().then((count) => {
             return count === 2
+          })
+        })
+        .waitUntil(function () {
+          return this.tabByIndex(1).getUrl().then((url) => {
+            return url === url1
           })
         })
         .windowByUrl(Brave.browserWindowUrl)
@@ -194,7 +200,6 @@ describe('clone tab', function () {
 
       yield setup(this.app.client)
       yield this.app.client
-        .waitUntilWindowLoaded()
         .windowByUrl(Brave.browserWindowUrl)
         .waitForUrl(Brave.newTabUrl)
         .url(this.clickWithTargetPage)
@@ -301,8 +306,7 @@ describe('view source', function () {
     yield setup(this.app.client)
     yield this.app.client
       .tabByIndex(0)
-      .url(this.url)
-      .waitForUrl(this.url)
+      .loadUrl(this.url)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="1"]')
       .waitForExist(this.webview1)
@@ -311,6 +315,11 @@ describe('view source', function () {
   it('should open in new tab', function * () {
     yield this.app.client
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .waitUntil(function () {
+        return this.getTabCount().then((count) => {
+          return count === 2
+        })
+      })
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(this.webview2)
   })
@@ -319,6 +328,11 @@ describe('view source', function () {
     yield this.app.client
       .setPinned(this.url, true)
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .waitUntil(function () {
+        return this.getTabCount().then((count) => {
+          return count === 2
+        })
+      })
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(this.webview2)
   })
@@ -359,7 +373,6 @@ describe('resource loading', function () {
 
 function * setup (client) {
   yield client
-    .waitUntilWindowLoaded()
     .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
     .waitForVisible(urlInput)

@@ -10,31 +10,30 @@ describe('application window', function () {
 
     it('opens a window and loads the UI', function * () {
       yield this.app.client
-        .waitUntilWindowLoaded()
         .waitForUrl(Brave.newTabUrl)
-        .windowByUrl(Brave.browserWindowUrl)
+        .windowByIndex(0)
         .waitForVisible(activeWebview)
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
+        .windowByIndex(0)
         .getWindowCount().should.become(1)
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .isWindowMinimized().should.eventually.be.false
+        .windowByIndex(0)
+        .browserWindow.isMinimized().should.eventually.be.false
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .isWindowDevToolsOpened().should.eventually.be.false
+        .windowByIndex(0)
+        .browserWindow.isDevToolsOpened().should.eventually.be.false
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .isWindowVisible().should.eventually.be.true
+        .windowByIndex(0)
+        .browserWindow.isVisible().should.eventually.be.true
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .isWindowFocused().should.eventually.be.true
+        .windowByIndex(0)
+        .browserWindow.isFocused().should.eventually.be.true
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .getWindowWidth().should.eventually.be.getDefaultWindowWidth()
+        .windowByIndex(0)
+        .browserWindow.getBounds().should.eventually.have.property('width').should.eventually.be.getDefaultWindowWidth()
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
-        .getWindowHeight().should.eventually.be.getDefaultWindowHeight()
+        .windowByIndex(0)
+        .browserWindow.getBounds().should.eventually.have.property('height').should.eventually.be.getDefaultWindowHeight()
     })
   })
 
@@ -44,7 +43,6 @@ describe('application window', function () {
 
       before(function * () {
         yield this.app.client
-          .waitUntilWindowLoaded()
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
           .newWindowAction()
@@ -54,23 +52,22 @@ describe('application window', function () {
             })
           })
           .windowByIndex(1)
-          .waitUntilWindowLoaded()
       })
 
       it('offsets from the focused window', function * () {
         yield this.app.client
-          .windowByIndex(1).getWindowBounds().then((res) => res.x).should.eventually.be
-          .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
+          .windowByIndex(1).browserWindow.getBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(0).browserWindow.getBounds().then((res) => res.x + 20)
         yield this.app.client
-          .windowByIndex(1).getWindowBounds().then((res) => res.y).should.eventually.be
-          .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
+          .windowByIndex(1).browserWindow.getBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(0).browserWindow.getBounds().then((res) => res.y + 20)
       })
 
       it('has the default width and height', function * () {
         yield this.app.client
-          .windowByIndex(1).getWindowWidth().should.eventually.be.getDefaultWindowWidth()
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('width').should.eventually.be.getDefaultWindowWidth()
         yield this.app.client
-          .windowByIndex(1).getWindowHeight().should.eventually.be.getDefaultWindowHeight()
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('height').should.eventually.be.getDefaultWindowHeight()
       })
     })
 
@@ -79,7 +76,6 @@ describe('application window', function () {
 
       before(function * () {
         yield this.app.client
-          .waitUntilWindowLoaded()
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
           .resizeWindow(600, 700)
@@ -90,22 +86,21 @@ describe('application window', function () {
             })
           })
           .windowByIndex(1)
-          .waitUntilWindowLoaded()
       })
 
       it('offsets from the focused window', function * () {
         yield this.app.client
-          .windowByIndex(1).getWindowBounds().then((res) => res.x).should.eventually.be
-          .windowByIndex(0).getWindowBounds().then((res) => res.x + 20)
+          .windowByIndex(1).browserWindow.getBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(0).browserWindow.getBounds().then((res) => res.x + 20)
         yield this.app.client
-          .windowByIndex(1).getWindowBounds().then((res) => res.y).should.eventually.be
-          .windowByIndex(0).getWindowBounds().then((res) => res.y + 20)
+          .windowByIndex(1).browserWindow.getBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(0).browserWindow.getBounds().then((res) => res.y + 20)
       })
 
       it('has the width and height of the last window resize', function * () {
-        yield this.app.client.windowByIndex(1)
-          .getWindowWidth().should.become(600)
-          .getWindowHeight().should.become(700)
+        yield this.app.client
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('width').should.become(600)
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('height').should.become(700)
       })
     })
 
@@ -114,10 +109,9 @@ describe('application window', function () {
 
       before(function * () {
         yield this.app.client
-          .waitUntilWindowLoaded()
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
-          .maximizeWindow()
+          .maximize()
           .newWindowAction()
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
@@ -125,24 +119,23 @@ describe('application window', function () {
             })
           })
           .windowByIndex(1) // the new browser window
-          .waitUntilWindowLoaded()
           .waitForVisible(activeWebview)
       })
 
       it('is maximized', function * () {
         yield this.app.client
-          .windowByIndex(1).getWindowWidth().should.eventually.be.getPrimaryDisplayWidth()
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('width').should.eventually.be.getPrimaryDisplayWidth()
         yield this.app.client
-          .windowByIndex(1).getWindowHeight().should.eventually.be.getPrimaryDisplayHeight()
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('height').should.eventually.be.getPrimaryDisplayHeight()
       })
 
       it('opens without an offset', function * () {
         yield this.app.client
-          .windowByIndex(1).getWindowBounds().then((res) => res.x).should.eventually.be
-          .windowByIndex(0).getWindowBounds().then((res) => res.x)
+          .windowByIndex(1).browserWindow.getBounds().then((res) => res.x).should.eventually.be
+          .windowByIndex(0).browserWindow.getBounds().then((res) => res.x)
         yield this.app.client
-          .windowByIndex(1).getWindowBounds().then((res) => res.y).should.eventually.be
-          .windowByIndex(0).getWindowBounds().then((res) => res.y)
+          .windowByIndex(1).browserWindow.getBounds().then((res) => res.y).should.eventually.be
+          .windowByIndex(0).browserWindow.getBounds().then((res) => res.y)
       })
     })
   })
@@ -153,26 +146,23 @@ describe('application window', function () {
 
       before(function * () {
         yield this.app.client
-          .waitUntilWindowLoaded()
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
           .resizeWindow(600, 700)
-          .waitUntilWindowLoaded()
       })
 
       it('should be maximized when maximize button is clicked', function * () {
         yield this.app.client
           .click(maximizeButton)
-          .windowByIndex(0)
-           .getWindowWidth().should.eventually.be.getPrimaryDisplayWidth()
-          .getWindowHeight().should.eventually.be.getPrimaryDisplayHeight()
+          .windowByIndex(0).browserWindow.getBounds().should.eventually.have.property('width').should.eventually.be.getPrimaryDisplayWidth()
+          .windowByIndex(0).browserWindow.getBounds().should.eventually.have.property('height').should.eventually.be.getPrimaryDisplayHeight()
       })
 
       it('should be minimized when minimize button is clicked', function * () {
         yield this.app.client
               .click(minimizeButton)
               .waitUntil(function () {
-                return this.windowByIndex(0).isWindowMinimized()
+                return this.windowByIndex(0).browserWindow.isMinimized()
               })
       })
 
@@ -186,7 +176,6 @@ describe('application window', function () {
             })
           })
           .windowByIndex(1)
-          .waitUntilWindowLoaded()
           .click(closeButton)
           .waitUntil(function () {
             return this.getWindowCount().then((count) => {
@@ -205,7 +194,6 @@ describe('application window', function () {
         this.page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(Brave.server.url('window_open.html'))
@@ -234,19 +222,19 @@ describe('application window', function () {
       it('sets the width and height', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowHeight().should.eventually.be.equal(375) // height plus navbar
+          .browserWindow.getBounds().should.eventually.have.property('height').should.eventually.be.equal(375) // height plus navbar
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowWidth().should.eventually.be.equal(480)
+          .browserWindow.getBounds().should.eventually.have.property('width').should.eventually.be.equal(480)
       })
 
       it('sets the window position', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowBounds().then((res) => res.x).should.eventually.be.equal(0)
+          .browserWindow.getBounds().then((res) => res.x).should.eventually.be.equal(0)
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowBounds().then((res) => res.y).should.eventually.be.equal(100)
+          .browserWindow.getBounds().then((res) => res.y).should.eventually.be.equal(100)
       })
     })
 
@@ -275,10 +263,10 @@ describe('application window', function () {
       it('has a min width of 480 and height of 300', function * () {
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowHeight().should.become(300)
+          .browserWindow.getBounds().should.eventually.have.property('height').should.become(300)
         yield this.app.client
           .windowParentByUrl(this.page1)
-          .getWindowWidth().should.become(480)
+          .browserWindow.getBounds().should.eventually.have.property('width').should.become(480)
       })
     })
 
@@ -323,7 +311,6 @@ describe('application window', function () {
         this.page1 = Brave.server.urlWithIpAddress('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.window_open_page)
@@ -410,7 +397,6 @@ describe('application window', function () {
         var page1 = this.page1 // for wait closure
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.window_open_page)
@@ -528,7 +514,6 @@ describe('application window', function () {
       this.page1 = Brave.server.urlWithIpAddress('page1.html')
 
       yield this.app.client
-        .waitUntilWindowLoaded()
         .waitForUrl(Brave.newTabUrl)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible(activeWebview)
@@ -565,7 +550,6 @@ describe('application window', function () {
         var page1 = Brave.server.url('page1.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .waitForUrl(Brave.newTabUrl)
           .windowByUrl(Brave.browserWindowUrl)
           .waitForVisible(activeWebview)
@@ -608,7 +592,6 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
@@ -660,7 +643,6 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
@@ -688,7 +670,6 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
@@ -716,7 +697,6 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)
@@ -745,7 +725,6 @@ describe('application window', function () {
         this.page2 = Brave.server.url('page2.html')
 
         yield this.app.client
-          .waitUntilWindowLoaded()
           .windowByUrl(Brave.browserWindowUrl)
           .waitForUrl(Brave.newTabUrl)
           .url(this.clickWithTargetPage)

@@ -10,7 +10,6 @@ const aboutExtensionsUrl = getTargetAboutUrl('about:extensions')
 describe('about:extensions', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)

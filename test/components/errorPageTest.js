@@ -9,7 +9,6 @@ describe('errorPage', function () {
 
   before(function * () {
     yield this.app.client
-      .waitUntilWindowLoaded()
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
   })

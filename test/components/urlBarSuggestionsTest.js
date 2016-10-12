@@ -7,7 +7,6 @@ const {urlInput, urlBarSuggestions} = require('../lib/selectors')
 describe('urlbarSuggestions', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)

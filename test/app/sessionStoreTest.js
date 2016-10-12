@@ -7,23 +7,17 @@ const siteTags = require('../../js/constants/siteTags')
 describe('sessionStore', function () {
   function * setup (client) {
     Brave.addCommands()
-    yield client
-      .waitUntilWindowLoaded()
-      .waitForBrowserWindow()
-      .waitForVisible(urlInput)
   }
 
   describe('state is preserved', function () {
     Brave.beforeAllServerSetup(this)
     before(function * () {
       const page1Url = Brave.server.url('page1.html')
-      this.timeout(30000)
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client
-        .tabByUrl(Brave.newTabUrl)
-        .url(page1Url)
-        .waitForUrl(page1Url)
+        .waitForUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
         .windowParentByUrl(page1Url)
         .moveToObject(navigator)
         .waitForExist(navigatorNotBookmarked)
@@ -31,11 +25,11 @@ describe('sessionStore', function () {
         location: page1Url,
         title: 'some page'
       }, siteTags.BOOKMARK)
-      yield Brave.app.client
-        .moveToObject(navigator)
-        .waitForExist(navigatorBookmarked)
         .waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === page1Url)
+          return this.getAppState().then((val) => {
+            let state = val.value
+            return state.sites.length === 1 && state.sites[0].location === page1Url
+          })
         })
       yield Brave.stopApp(false)
       yield Brave.startApp()
@@ -49,6 +43,8 @@ describe('sessionStore', function () {
     it('windowState by preserving open page', function * () {
       const page1Url = Brave.server.url('page1.html')
       yield Brave.app.client
+        .waitForUrl(page1Url)
+        .waitForBrowserWindow()
         .moveToObject(urlInput)
         .waitUntil(function () {
           return this.getValue(urlInput).then((val) => val === page1Url)
@@ -56,7 +52,9 @@ describe('sessionStore', function () {
     })
 
     it('appstate by preserving a bookmark', function * () {
-      yield Brave.app.client.waitForExist(navigatorBookmarked)
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .waitForExist(navigatorBookmarked)
     })
   })
 
@@ -75,6 +73,8 @@ describe('sessionStore', function () {
       const timestamp = new Date().getTime()
       let firstRunTimestamp
       yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             firstRunTimestamp = val.value.firstRunTimestamp
@@ -89,6 +89,8 @@ describe('sessionStore', function () {
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return (val.value.firstRunTimestamp === firstRunTimestamp)

@@ -26,7 +26,6 @@ const expYear = new Date().getFullYear() + 2
 describe('Autofill', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)

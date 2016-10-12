@@ -15,7 +15,6 @@ const messages = require('../../js/constants/messages')
 describe('navigationBar', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForEnabled(urlInput)
@@ -883,6 +882,9 @@ describe('navigationBar', function () {
       // tab with typing
       yield newFrame(this.app.client, 2)
       yield this.app.client
+        .waitUntil(function () {
+          return this.getTabCount().then((count) => count === 2)
+        })
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.keys('a').getValue(urlInput).then((val) => val === 'a')
@@ -890,6 +892,9 @@ describe('navigationBar', function () {
       // tab with loaded url
       yield newFrame(this.app.client, 3)
       yield this.app.client
+        .waitUntil(function () {
+          return this.getTabCount().then((count) => count === 3)
+        })
         .tabByIndex(2)
         .url(Brave.server.url('page1.html'))
         .waitForUrl(Brave.server.url('page1.html'))
