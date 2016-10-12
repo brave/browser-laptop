@@ -89,6 +89,11 @@ function registerForBeforeRequest (session) {
     }
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
+      return
+    }
 
     if (appUrlUtil.isTargetAboutUrl(details.url)) {
       if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
@@ -230,6 +235,11 @@ function registerForBeforeSendHeaders (session) {
     }
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
+      return
+    }
 
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
@@ -281,6 +291,11 @@ function registerForHeadersReceived (session) {
       return
     }
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
+      return
+    }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details)
       if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
