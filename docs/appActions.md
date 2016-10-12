@@ -415,6 +415,18 @@ Remove credit card data
 
 
 
+### autofillDataChanged(addressGuids, creditCardGuids) 
+
+Autofill data changed
+
+**Parameters**
+
+**addressGuids**: `Array`, the guid array to access address entries in autofill DB
+
+**creditCardGuids**: `Array`, the guid array to access credit card entries in autofill DB
+
+
+
 ### windowBlurred(appWindowId) 
 
 Dispatches a message when appWindowId loses focus
