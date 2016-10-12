@@ -23,12 +23,12 @@ wget -O brave.deb https://laptop-updates.brave.com/latest/mint64
 sudo dpkg -i ./brave.deb
 ```
 
-## Fedora AMD64:
+## Fedora x86_64:
 
 ```
 sudo dnf install lsb
 wget -O brave.rpm https://laptop-updates.brave.com/latest/fedora64
-sudo rpm -i ./brave.rpm
+sudo dnf install ./brave.rpm
 ```
 
 ## OpenSUSE AMD64:
