@@ -218,8 +218,8 @@ class SortableTable extends ImmutableComponent {
                   : rowAttributes.className) +
                   (this.sortingDisabled ? ' no-sort' : '')
                 }
-                onClick={this.props.multiSelect ? this.onClick : undefined}
-                onContextMenu={this.props.multiSelect ? this.onContextMenu : undefined}>{entry}</tr>
+                onClick={this.props.multiSelect ? this.onClick : rowAttributes.onClick}
+                onContextMenu={this.props.multiSelect ? this.onContextMenu : rowAttributes.onContextMenu}>{entry}</tr>
               : null
           })
         }
