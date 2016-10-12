@@ -155,7 +155,7 @@ describe('siteUtil', function () {
 
   describe('addSite', function () {
     describe('sites list does not have this siteDetail', function () {
-      it('returns updated site list including the new site', function () {
+      it('returns updated site list including the new bookmark site', function () {
         const sites = Immutable.fromJS([])
         const siteDetail = Immutable.fromJS({
           lastAccessedTime: 123,
@@ -166,6 +166,24 @@ describe('siteUtil', function () {
           partitionNumber: 0
         })
         const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
+        const expectedSites = sites.push(siteDetail)
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
+    })
+
+    describe('with a new history item', function () {
+      it('returns updated site list including the new site', function () {
+        const sites = Immutable.fromJS([])
+        const siteDetail = Immutable.fromJS({
+          lastAccessedTime: 123,
+          tags: [],
+          location: testUrl1,
+          title: 'sample',
+          parentFolderId: 0,
+          partitionNumber: 0,
+          count: 1
+        })
+        const processedSites = siteUtil.addSite(sites, siteDetail)
         const expectedSites = sites.push(siteDetail)
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })

@@ -21,6 +21,7 @@ const eventUtil = require('../lib/eventUtil')
 const cx = require('../lib/classSet')
 const locale = require('../l10n')
 const windowStore = require('../stores/windowStore')
+const suggestion = require('../lib/suggestion')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
@@ -149,8 +150,8 @@ class UrlBarSuggestions extends ImmutableComponent {
       }))
       index += suggestions.size
     }
-    addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
     addToItems(historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
+    addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
     addToItems(aboutPagesSuggestions, 'aboutPagesTitle', locale.translation('aboutPagesSuggestionTitle'), null)
     addToItems(tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
     addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
@@ -254,8 +255,9 @@ class UrlBarSuggestions extends ImmutableComponent {
         if (pos1 - pos2 !== 0) {
           return pos1 - pos2
         } else {
-          // If there's a tie on the match location, use the shorter URL
-          return s1.get('location').length - s2.get('location').length
+          // If there's a tie on the match location, use the age
+          // decay modified access count
+          return suggestion.sortByAccessCountWithAgeDecay(s1, s2)
         }
       }
     }
