@@ -27,14 +27,14 @@
         box-sizing: border-box;
         border-right: 1px solid @braveOrange;
         padding-left: 10px;
+        -webkit-user-select: none;
+        cursor: default;
 
         .clearBrowsingDataButton {
-          font-size: 24px;
-          margin: 0;
+          color: @buttonColor;
           float: right;
-          position: relative;
-          top: -2px;
-          color: @gray;
+          font-size: 20px;
+          margin: 0;
         }
         .clearBrowsingDataButton:hover {
           color: #000;
@@ -43,9 +43,12 @@
 
       > .bookmarkFolderList {
         display: block;
-        border-top: solid 1px @gray;
         border-right: 1px solid @braveOrange;
         height: 100%;
+
+        .listItem >* {
+          color: @buttonColor;
+        }
       }
 
       .bookmarkFolderList {
@@ -64,8 +67,6 @@
       flex-grow: 5;
 
       .sortableTable {
-        border: 0;
-        box-shadow: none;
         -webkit-user-select: none;
         th:nth-of-type(2), td.date {
           width: 250px;

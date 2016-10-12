@@ -86,8 +86,16 @@ class BookmarkFolderList extends ImmutableComponent {
   render () {
     return <list className='bookmarkFolderList'>
       {
+        this.props.isRoot && this.props.search
+        ? <div role='listitem' className='listItem selected'>
+          <span className='bookmarkFolderIcon fa fa-search' />
+          <span data-l10n-id='allFolders' />
+        </div>
+        : null
+      }
+      {
         this.props.isRoot
-        ? <BookmarkFolderItem selected={this.props.selectedFolderId === 0}
+        ? <BookmarkFolderItem selected={!this.props.search && this.props.selectedFolderId === 0}
           dataL10nId='bookmarksToolbar'
           draggable={false}
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
@@ -100,7 +108,7 @@ class BookmarkFolderList extends ImmutableComponent {
         this.props.bookmarkFolders.map((bookmarkFolder) =>
           <BookmarkFolderItem bookmarkFolder={bookmarkFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
-            selected={this.props.selectedFolderId === bookmarkFolder.get('folderId')}
+            selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
             selectedFolderId={this.props.selectedFolderId}
             onChangeSelectedFolder={this.props.onChangeSelectedFolder} />)
       }
@@ -292,7 +300,8 @@ class AboutBookmarks extends React.Component {
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
             allBookmarkFolders={this.state.bookmarkFolders}
             isRoot
-            selectedFolderId={this.state.selectedFolderId} />
+            selectedFolderId={this.state.selectedFolderId}
+            search={this.state.search} />
         </div>
         <div className='organizeView'>
           <BookmarksList
