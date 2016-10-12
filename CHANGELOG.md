@@ -1,7 +1,19 @@
 # Changelog
 
 ## [0.12.5](https://github.com/brave/browser-laptop/releases/v0.12.5dev)
-- TODO
+- Added recovery and backup of Brave Wallet ([#4369](https://github.com/brave/browser-laptop/issues/4369))([#3350](https://github.com/brave/browser-laptop/issues/3350))
+- Added opt-out for crash reporting ([#4479](https://github.com/brave/browser-laptop/issues/4479))([#4606](https://github.com/brave/browser-laptop/issues/4606))
+- Added numerous UI style changes ([#4627](https://github.com/brave/browser-laptop/issues/4627))([#4624](https://github.com/brave/browser-laptop/issues/4624))([#4566](https://github.com/brave/browser-laptop/issues/4566))([#4603](https://github.com/brave/browser-laptop/issues/4603))([#4562](https://github.com/brave/browser-laptop/issues/4562))([#4616](https://github.com/brave/browser-laptop/issues/4616))([#4537](https://github.com/brave/browser-laptop/issues/4537))([#1725](https://github.com/brave/browser-laptop/issues/1725))([#4614](https://github.com/brave/browser-laptop/issues/4614))([#4658](https://github.com/brave/browser-laptop/issues/4658))([#4636](https://github.com/brave/browser-laptop/issues/4636))([#4292](https://github.com/brave/browser-laptop/issues/4292))
+- Added the ability to disable spellcheck for custom filters list ([#4637](https://github.com/brave/browser-laptop/issues/4637))([#4619](https://github.com/brave/browser-laptop/issues/4619))
+- Added multi-select deletion and drag and drop in about:history ([#3949](https://github.com/brave/browser-laptop/issues/3949))([#4607](https://github.com/brave/browser-laptop/issues/4607))
+- Fixed about:bookmarks favicon display ([#1994](https://github.com/brave/browser-laptop/issues/1994))
+- Fixed the ability to change default search via preferences ([#4695](https://github.com/brave/browser-laptop/issues/4695))([#4696](https://github.com/brave/browser-laptop/issues/4696))
+- Fixed Brave Wallet showing coinbase as an option for unsupported countries ([#4615](https://github.com/brave/browser-laptop/issues/4615))
+- Fixed double clicking bookmark in bookmark manager opening many many tabs ([#4523](https://github.com/brave/browser-laptop/issues/4523))
+- Fixed toggling Bookmarks Toolbar from "Bookmarks" menu ([#3356](https://github.com/brave/browser-laptop/issues/3356))
+- Fixed bookmarks toolbar "hover after click" behavior on folders ([#4361](https://github.com/brave/browser-laptop/issues/4361))
+- Fixed an edge case of multiple Payment History receipts being generated on the same day ([#4632](https://github.com/brave/browser-laptop/issues/4632))([#4605](https://github.com/brave/browser-laptop/issues/4605))
+- Fixed Windows titlebar to ignore right alt key (AltGr) ([#4628](https://github.com/brave/browser-laptop/issues/4628))([#4626](https://github.com/brave/browser-laptop/issues/4626))
 
 ## [0.12.4](https://github.com/brave/browser-laptop/releases/v0.12.4dev)
 - Added regional adblocking (Access via about:adblock or in preferences). These are special rules which focus on blocking ads for non-US sites. ([#4489](https://github.com/brave/browser-laptop/issues/4489))([#1357](https://github.com/brave/browser-laptop/issues/1357))
