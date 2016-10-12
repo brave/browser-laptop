@@ -44,6 +44,10 @@ Please see the [Building on Windows wiki entry](https://github.com/brave/browser
 
 * `apt-get install libgnome-keyring-dev build-essential`
 
+OR
+
+* `dnf install libgnome-keyring-devel rpm-build`
+
 ## Installation
 
 After installing the prerequisites:

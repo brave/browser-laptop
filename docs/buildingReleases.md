@@ -51,6 +51,7 @@ Check virus scan: https://www.virustotal.com/en/
 ```
 ./node_modules/.bin/webpack
 CHANNEL=dev npm run build-package
+CHANNEL=dev npm run build-installer
 tar -jcvf Brave.tar.bz2 ./Brave-linux-x64
 ```
 

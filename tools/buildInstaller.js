@@ -82,7 +82,7 @@ if (isDarwin) {
   }, (e) => console.log(`No dice: ${e.message}`))
 } else if (isLinux) {
   console.log('Install with sudo dpkg -i dist/brave_' + VersionInfo.braveVersion + '_amd64.deb')
-  console.log('Or install with sudo rpm -i dist/brave_' + VersionInfo.braveVersion + '.amd64.rpm')
+  console.log('Or install with sudo dnf install dist/brave_' + VersionInfo.braveVersion + '.x86_64.rpm')
   cmds = [
     // .deb file
     'electron-installer-debian' +
@@ -94,7 +94,7 @@ if (isDarwin) {
     'electron-installer-redhat' +
       ' --src Brave-linux-x64/' +
       ' --dest dist/' +
-      ' --arch amd64' +
+      ' --arch x86_64' +
       ' --config res/linuxPackaging.json',
     // .tar.bz2 file
     'tar -jcvf dist/Brave.tar.bz2 ./Brave-linux-x64'
