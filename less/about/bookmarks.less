@@ -11,6 +11,7 @@
 
   .siteDetailsPageContent {
     display: flex;
+    flex-wrap: wrap;
     height: 100%;
 
     .folderView {
@@ -60,13 +61,11 @@
       }
     }
     .organizeView {
-      min-width:500px;
-      flex-grow: 2;
+      flex-grow: 5;
 
       .sortableTable {
         border: 0;
         box-shadow: none;
-        table-layout: fixed;
         -webkit-user-select: none;
         th:nth-of-type(2), td.date {
           width: 250px;
