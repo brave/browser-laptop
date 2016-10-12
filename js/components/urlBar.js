@@ -48,7 +48,7 @@ class UrlBar extends ImmutableComponent {
     return windowStore.getFrame(this.props.activeFrameKey)
   }
 
-  isActive () {
+  get isActive () {
     return this.props.urlbar.get('active')
   }
 
@@ -285,12 +285,17 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    this.updateDOM()
     // Select the part of the URL which was an autocomplete suffix.
-    if (this.urlInput && this.props.locationValueSuffix.length > 0) {
-      const len = this.urlInput.value.length
+    if (this.urlInput && this.props.locationValueSuffix.length > 0 &&
+      this.props.urlbar.get('location') !== prevProps.urlbar.get('location')) {
       const suffixLen = this.props.locationValueSuffix.length
+      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+      const len = this.urlInput.value.length
       this.urlInput.setSelectionRange(len - suffixLen, len)
+    }
+    if (this.isSelected() !== prevProps.urlbar.get('selected') ||
+      this.isFocused() !== prevProps.urlbar.get('focused')) {
+      this.updateDOM()
     }
   }
 
@@ -370,6 +375,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
+    const value = !this.isActive
+      ? this.locationValue + this.props.locationValueSuffix
+      : undefined
     return <form
       className='urlbarForm'
       action='#'
@@ -412,10 +420,10 @@ class UrlBar extends ImmutableComponent {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onKeyDown={this.onKeyDown}
-          onChange={this.onChange}
+          onKeyUp={this.onChange}
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
-          value={this.locationValue + this.props.locationValueSuffix}
+          value={value}
           data-l10n-id='urlbar'
           className={cx({
             insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
