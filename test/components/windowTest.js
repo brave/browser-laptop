@@ -111,6 +111,7 @@ describe('application window', function () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
           .windowByIndex(0)
+          .browserWindow
           .maximize()
           .newWindowAction()
           .waitUntil(function () {
