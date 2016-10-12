@@ -23,7 +23,6 @@
 - Fixed Submit Feedback link. ([#4487](https://github.com/brave/browser-laptop/issues/4487))
 - Fixed exiting fullscreen with UI buttons. ([#4416](https://github.com/brave/browser-laptop/issues/4416))([#4463](https://github.com/brave/browser-laptop/issues/4463))
 - Fixed autofill when opened from about:about. ([#4350](https://github.com/brave/browser-laptop/issues/4350))([#4357](https://github.com/brave/browser-laptop/issues/4357))
-- Fixed history list showing duplicates. ([#3848](https://github.com/brave/browser-laptop/issues/3848))
 - Fixed various history issues. ([#4488](https://github.com/brave/browser-laptop/issues/4488))
 - Fixed favicons showing and hiding on bookmarks toolbar. ([#4339](https://github.com/brave/browser-laptop/issues/4339))([#4345](https://github.com/brave/browser-laptop/issues/4345))
 - Fixed selecting text on a page opened in a new tab. ([#4517](https://github.com/brave/browser-laptop/issues/4517))
