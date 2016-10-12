@@ -50,7 +50,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, false)
     }
   }
 }
@@ -63,7 +63,7 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
       if (isParent) {
         emptyFolder = emptyFolder.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail)
+      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail, false)
     }
   }
 }
@@ -285,7 +285,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
-          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail)
+          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail, null, true)
         },
         CommonMenu.separatorMenuItem)
     }

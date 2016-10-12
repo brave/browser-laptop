@@ -15,6 +15,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = global.require('electron').ipcRenderer
 const {isSourceAboutUrl} = require('../lib/appUrlUtil')
+const AddEditBookmark = require('./addEditBookmark')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const getSetting = require('../settings').getSetting
@@ -38,9 +39,10 @@ class NavigationBar extends ImmutableComponent {
   }
 
   onToggleBookmark () {
+    const editing = this.bookmarked
     // trigger the AddEditBookmark modal; saving/deleting takes place there
     const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    windowActions.setBookmarkDetail(siteDetail, siteDetail)
+    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing)
   }
 
   onReload (e) {
@@ -73,6 +75,7 @@ class NavigationBar extends ImmutableComponent {
 
   get titleMode () {
     return this.props.mouseInTitlebar === false &&
+      !this.props.bookmarkDetail &&
       this.props.title &&
       !['about:blank', 'about:newtab'].includes(this.props.location) &&
       !this.loading &&
@@ -112,10 +115,23 @@ class NavigationBar extends ImmutableComponent {
       className={cx({
         titleMode: this.titleMode
       })}>
+      {
+        this.props.bookmarkDetail
+        ? <AddEditBookmark sites={this.props.sites}
+          currentDetail={this.props.bookmarkDetail.get('currentDetail')}
+          originalDetail={this.props.bookmarkDetail.get('originalDetail')}
+          destinationDetail={this.props.bookmarkDetail.get('destinationDetail')}
+          shouldShowLocation={this.props.bookmarkDetail.get('shouldShowLocation')}
+          withStopButton={!isSourceAboutUrl(this.props.location)}
+          withHomeButton={getSetting(settings.SHOW_HOME_BUTTON)}
+          withoutButtons={isSourceAboutUrl(this.props.location) && !getSetting(settings.SHOW_HOME_BUTTON)}
+          />
+        : null
+        }
       <div className='startButtons'>
         {
           isSourceAboutUrl(this.props.location) || this.titleMode
-          ? <span className='browserButton' />
+          ? null
           : this.loading
             ? <Button iconClass='fa-times'
               l10nId='stopButton'
@@ -134,6 +150,17 @@ class NavigationBar extends ImmutableComponent {
             onClick={this.onHome} />
           : null
         }
+        <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
+          className={cx({
+            navbutton: true,
+            bookmarkButton: true,
+            removeBookmarkButton: this.bookmarked,
+            withStopButton: !isSourceAboutUrl(this.props.location),
+            withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
+            withoutButtons: isSourceAboutUrl(this.props.location) && !getSetting(settings.SHOW_HOME_BUTTON)
+          })}
+          l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+          onClick={this.onToggleBookmark} />
       </div>
       <UrlBar ref='urlBar'
         sites={this.props.sites}
@@ -168,14 +195,6 @@ class NavigationBar extends ImmutableComponent {
               })}
               onClick={this.onNoScript} />
           }
-          <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
-            className={cx({
-              navbutton: true,
-              bookmarkButton: true,
-              removeBookmarkButton: this.bookmarked
-            })}
-            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-            onClick={this.onToggleBookmark} />
         </div>
       }
     </div>

@@ -372,6 +372,7 @@ WindowStore
   bookmarkDetail: {
     currentDetail: Object, // Detail of the current bookmark which is in add/edit mode
     originalDetails: Object // Detail of the original bookmark to edit
+    shouldShowLocation: Boolean // Whether or not to show the URL input
   },
   braveryPanelDetail: {
     advancedControls: boolean, // If specified, indicates if advanced controls should be shown
