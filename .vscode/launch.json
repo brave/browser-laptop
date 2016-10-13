@@ -22,7 +22,7 @@
 			// Environment variables passed to the program.
 			"env": {
 				"NODE_ENV": "development",
-				"npm_package_config_port": 8080
+				"npm_package_config_port": "8080"
 			},
 			// Use JavaScript source maps (if they exist).
 			"sourceMaps": true,
@@ -50,7 +50,7 @@
 			// Environment variables passed to the program.
 			"env": {
 				"NODE_ENV": "production",
-				"npm_package_config_port": 8080
+				"npm_package_config_port": "8080"
 			},
 			// Use JavaScript source maps (if they exist).
 			"sourceMaps": true,
