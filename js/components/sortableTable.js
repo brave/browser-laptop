@@ -83,10 +83,11 @@ class SortableTable extends ImmutableComponent {
       entry.className = entry.className.replace(' selected', '')
       const tableID = entry.id
       const index = entry.rowIndex - 1
+      const globalIndex = parseInt(entry.getAttribute('data-global-index'))
       const handlerInput = this.props.totalRowObjects
-        ? (typeof this.props.totalRowObjects[parseInt(tableID)][index].toJS === 'function'
-          ? this.props.totalRowObjects[parseInt(tableID)][index].toJS()
-          : this.props.totalRowObjects[parseInt(tableID)][index])
+        ? (typeof this.props.totalRowObjects[parseInt(tableID)][globalIndex].toJS === 'function'
+          ? this.props.totalRowObjects[parseInt(tableID)][globalIndex].toJS()
+          : this.props.totalRowObjects[parseInt(tableID)][globalIndex])
         : (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
           ? (typeof this.props.rowObjects.toJS === 'function'
             ? this.props.rowObjects.get(index).toJS()
@@ -212,6 +213,7 @@ class SortableTable extends ImmutableComponent {
               ? <tr {...rowAttributes}
                 data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
                 id={this.props.tableID}
+                data-global-index={i}
                 className={
                   (this.hasRowClassNames
                   ? this.props.rowClassNames[i] + ' ' + rowAttributes.className
