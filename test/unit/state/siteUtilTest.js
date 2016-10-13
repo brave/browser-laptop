@@ -5,10 +5,29 @@ const siteUtil = require('../../../js/state/siteUtil')
 const assert = require('assert')
 const Immutable = require('immutable')
 
-const testUrl1 = 'https://brave.com/'
-const testUrl2 = 'http://example.com/'
-
 describe('siteUtil', function () {
+  const testUrl1 = 'https://brave.com/'
+  const testUrl2 = 'http://example.com/'
+  const emptySites = Immutable.fromJS([])
+  const bookmarkAllFields = Immutable.fromJS({
+    lastAccessedTime: 123,
+    tags: [siteTags.BOOKMARK],
+    location: testUrl1,
+    title: 'sample',
+    parentFolderId: 0,
+    partitionNumber: 0
+  })
+  const bookmarkMinFields = Immutable.fromJS({
+    location: testUrl1,
+    title: 'sample',
+    parentFolderId: 0
+  })
+  const folderMinFields = Immutable.fromJS({
+    customTitle: 'folder1',
+    parentFolderId: 0,
+    tags: [siteTags.BOOKMARK_FOLDER]
+  })
+
   describe('getSiteIndex', function () {
     it('returns -1 if sites is falsey', function () {
       const siteDetail = Immutable.fromJS({
@@ -154,26 +173,6 @@ describe('siteUtil', function () {
   })
 
   describe('addSite', function () {
-    const emptySites = Immutable.fromJS([])
-    const bookmarkAllFields = Immutable.fromJS({
-      lastAccessedTime: 123,
-      tags: [siteTags.BOOKMARK],
-      location: testUrl1,
-      title: 'sample',
-      parentFolderId: 0,
-      partitionNumber: 0
-    })
-    const bookmarkMinFields = Immutable.fromJS({
-      location: testUrl1,
-      title: 'sample',
-      parentFolderId: 0
-    })
-    const folderMinFields = Immutable.fromJS({
-      customTitle: 'folder1',
-      parentFolderId: 0,
-      tags: [siteTags.BOOKMARK_FOLDER]
-    })
-
     it('gets the tag from siteDetail if not provided', function () {
       const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)
       const expectedSites = Immutable.fromJS([bookmarkAllFields])
@@ -428,6 +427,27 @@ describe('siteUtil', function () {
   })
 
   describe('moveSite', function () {
+    it('does not allow you to move a bookmark folder into itself', function () {
+      // Add a new bookmark folder
+      let processedSites = siteUtil.addSite(emptySites, folderMinFields)
+      const folderId = processedSites.getIn([0, 'folderId'])
+      const bookmark = Immutable.fromJS({
+        lastAccessedTime: 123,
+        title: 'bookmark1',
+        parentFolderId: folderId,
+        location: testUrl1,
+        tags: [siteTags.BOOKMARK]
+      })
+      // Add a bookmark into that folder
+      processedSites = siteUtil.addSite(processedSites, bookmark)
+      const bookmarkFolder = processedSites.get(0)
+
+      // Usage taken from Bookmark Manager, which calls aboutActions.moveSite
+      processedSites = siteUtil.moveSite(processedSites, bookmarkFolder, bookmarkFolder, false, true, false)
+      const siteIndex = siteUtil.getSiteIndex(processedSites, bookmarkFolder, siteTags.BOOKMARK_FOLDER)
+
+      assert.notEqual(processedSites.getIn([siteIndex, 'parentFolderId']), processedSites.getIn([siteIndex, 'folderId']))
+    })
   })
 
   describe('getDetailFromFrame', function () {

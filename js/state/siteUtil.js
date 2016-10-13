@@ -240,7 +240,8 @@ function fillParentFolders (parentFolderIds, bookmarkFolder, allBookmarks) {
 module.exports.moveSite = function (sites, sourceDetail, destinationDetail, prepend, destinationIsParent, disallowReparent) {
   // Disallow loops
   let parentFolderIds = []
-  if (destinationDetail.get('parentFolderId') && sourceDetail.get('folderId')) {
+  if (typeof destinationDetail.get('parentFolderId') === 'number' &&
+      typeof sourceDetail.get('folderId') === 'number') {
     fillParentFolders(parentFolderIds, destinationDetail, sites)
     if (sourceDetail.get('folderId') === destinationDetail.get('folderId') ||
         parentFolderIds.includes(sourceDetail.get('folderId'))) {

@@ -37,14 +37,17 @@ class BookmarkFolderItem extends ImmutableComponent {
 
   onDrop (e) {
     const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+
     if (bookmark) {
+      // Don't allow a bookmark folder to be moved into itself
+      if (bookmark.get('folderId') === this.props.bookmarkFolder.get('folderId')) {
+        return
+      }
       aboutActions.moveSite(bookmark.toJS(), this.props.bookmarkFolder.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), true)
     }
   }
   render () {
-    const childBookmarkFolders = this.props.bookmarkFolder.get('folderId') === -1
-      ? []
-      : this.props.allBookmarkFolders
+    const childBookmarkFolders = this.props.allBookmarkFolders
           .filter((bookmarkFolder) => (bookmarkFolder.get('parentFolderId') || 0) === this.props.bookmarkFolder.get('folderId'))
     return <div>
       <div role='listitem'
@@ -106,7 +109,9 @@ class BookmarkFolderList extends ImmutableComponent {
       }
       {
         this.props.bookmarkFolders.map((bookmarkFolder) =>
-          <BookmarkFolderItem bookmarkFolder={bookmarkFolder}
+          this.props.isRoot && bookmarkFolder.get('parentFolderId') === -1
+          ? null
+          : <BookmarkFolderItem bookmarkFolder={bookmarkFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
             selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
             selectedFolderId={this.props.selectedFolderId}
