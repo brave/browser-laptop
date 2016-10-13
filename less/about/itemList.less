@@ -5,13 +5,13 @@ list .listItem {
   overflow: hidden;
   white-space: nowrap;
 
-  padding: 12px;
+  padding: 8px 12px;
   -webkit-user-select: none;
   &:hover {
-    background-color: lighten(@highlightBlue, 30%);
+    background-color: @lightGray;
   }
   &.selected {
-    background-color: lighten(@highlightBlue, 20%);
+    background-color: lighten(@gray, 20%);
   }
   .aboutListItem {
     display: flex;

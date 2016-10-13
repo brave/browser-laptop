@@ -34,14 +34,10 @@ describe('about:history', function () {
       .waitForVisible('table.sortableTable td.title[data-sort="customTest"]', 1000, true)
   })
 
-  // shows ordered by date
-
   it('defaults to sorting table by time DESC', function * () {
     yield this.app.client
-      .waitForVisible('table.sortableTable thead tr th.sort-up[data-l10n-id="time"]')
+      .waitForVisible('table.sortableTable thead tr th.sort-up div[data-l10n-id="time"]')
   })
-
-  // search box
 
   // Multi Select
   it('Simulate cmd/control click behavior', function * () {

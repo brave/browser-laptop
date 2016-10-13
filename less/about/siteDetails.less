@@ -19,10 +19,10 @@ body {
 
 .siteDetailsPage {
   margin: 0;
-  padding-top: 20px;
+  padding-top: 24px;
 
   .siteDetailsPageHeader {
-    padding: 0 40px;
+    padding: 0 @aboutPageSectionPadding;
 
     .sectionTitle {
       font-size: 24px;
@@ -74,22 +74,16 @@ body {
 
   .siteDetailsPageContent {
     border-top: 0px;
-    margin-top: 28px;
+    margin-top: 24px;
     display: block;
     clear: both;
 
     .sectionTitle {
       font-size: 16px;
       margin-bottom: 12px;
-      padding-left: 40px;
+      padding-left: @aboutPageSectionPadding;
     }
   }
-}
-
-.searchInput {
-  float: right;
-  padding: 5px;
-  margin-top: -35px;
 }
 
 .searchInputClear {

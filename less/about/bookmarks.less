@@ -1,13 +1,22 @@
 @import "./siteDetails.less";
 
 .siteDetailsPage {
+  .siteDetailsPageHeader {
+    .headerActions {
+      input.searchInput {
+        margin-right: 0 !important;
+      }
+    }
+  }
+
   .siteDetailsPageContent {
     display: flex;
+    flex-wrap: wrap;
     height: 100%;
 
     .folderView {
       min-width: 220px;
-      flex-grow: 0;
+      flex-grow: 1;
 
       .columnHeader {
         background: linear-gradient(to bottom, @lightGray, @veryLightGray);
@@ -18,23 +27,35 @@
         box-sizing: border-box;
         border-right: 1px solid @braveOrange;
         padding-left: 10px;
+        -webkit-user-select: none;
+        cursor: default;
+
+        .clearBrowsingDataButton {
+          color: @buttonColor;
+          float: right;
+          font-size: 20px;
+          margin: 0;
+        }
+        .clearBrowsingDataButton:hover {
+          color: #000;
+        }
       }
 
       > .bookmarkFolderList {
         display: block;
-        border-top: solid 1px @gray;
         border-right: 1px solid @braveOrange;
         height: 100%;
+
+        .listItem >* {
+          color: @buttonColor;
+        }
       }
 
       .bookmarkFolderList {
         .listItem {
           height: 1rem;
-          &:hover {
-            background-color: #ffcc99 !important;
-          }
-          &.selected {
-            background-color: lighten(@braveOrange, 20%) !important;
+          &.selected >* {
+            font-weight: 800;
           }
         }
         .bookmarkFolderIcon {
@@ -43,12 +64,9 @@
       }
     }
     .organizeView {
-      flex-grow: 1;
+      flex-grow: 5;
 
       .sortableTable {
-        border: 0;
-        box-shadow: none;
-        table-layout: fixed;
         -webkit-user-select: none;
         th:nth-of-type(2), td.date {
           width: 250px;

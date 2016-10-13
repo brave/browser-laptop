@@ -6,7 +6,7 @@
 
 table.sort {
   th {
-    color: @gray;
+    color: @buttonColor;
 
     &:hover {
       color: #000;
@@ -16,11 +16,7 @@ table.sort {
 
 table.sortableTable {
   width: 100%;
-  border: solid 1px @lightGray;
-  border-bottom-left-radius: @borderRadius;
-  border-bottom-right-radius: @borderRadius;
   margin-bottom: 40px;
-  box-shadow: @softBoxShadow;
   cursor: default;
   border-spacing: 0;
 
@@ -96,24 +92,24 @@ table.sortableTable {
     }
   }
   tr.rowHover:hover {
-    background: #ffcc99;
+    background: @lightGray;
     &.selected {
       background: @braveOrange;
       td {
-        color: @lightGray;
+        color: white;
       }
       div {
-        color: @lightGray;
+        color: white;
       }
     }
   }
   tr.selected {
-    background: @braveLightOrange;
+    background-color: lighten(@gray, 20%);
     td {
-      color: #d9d9d9;
+      color: @buttonColor;
     }
     div {
-      color: #d9d9d9;
+      color: @buttonColor;
     }
   }
 
