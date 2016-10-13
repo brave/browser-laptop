@@ -95,6 +95,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   onKeyDown (e) {
+    if (!this.isActive) {
+      windowActions.setUrlBarActive(true)
+    }
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         windowActions.setUrlBarActive(false)
@@ -242,8 +245,16 @@ class UrlBar extends ImmutableComponent {
   }
 
   onChange (e) {
-    windowActions.setUrlBarSelected(false)
-    windowActions.setUrlBarActive(true)
+    switch (e.keyCode) {
+      case KeyCodes.UP:
+      case KeyCodes.DOWN:
+      case KeyCodes.ESC:
+        return
+    }
+
+    if (this.isSelected()) {
+      windowActions.setUrlBarSelected(false)
+    }
     windowActions.setNavBarUserInput(e.target.value)
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
@@ -271,6 +282,7 @@ class UrlBar extends ImmutableComponent {
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
+      windowActions.setUrlBarActive(true)
       this.updateLocationToSuggestion()
       windowActions.setUrlBarSelected(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
@@ -287,11 +299,14 @@ class UrlBar extends ImmutableComponent {
   componentDidUpdate (prevProps) {
     // Select the part of the URL which was an autocomplete suffix.
     if (this.urlInput && this.props.locationValueSuffix.length > 0 &&
-      this.props.urlbar.get('location') !== prevProps.urlbar.get('location')) {
+      (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
+       this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
       const suffixLen = this.props.locationValueSuffix.length
       this.urlInput.value = this.locationValue + this.props.locationValueSuffix
       const len = this.urlInput.value.length
       this.urlInput.setSelectionRange(len - suffixLen, len)
+    } else if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
     }
     if (this.isSelected() !== prevProps.urlbar.get('selected') ||
       this.isFocused() !== prevProps.urlbar.get('focused')) {
@@ -375,9 +390,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
-    const value = !this.isActive
-      ? this.locationValue + this.props.locationValueSuffix
-      : undefined
+    const value = this.isActive || (!this.locationValue && this.isFocused())
+      ? undefined
+      : this.locationValue + this.props.locationValueSuffix
     return <form
       className='urlbarForm'
       action='#'
