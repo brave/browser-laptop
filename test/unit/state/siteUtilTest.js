@@ -154,24 +154,122 @@ describe('siteUtil', function () {
   })
 
   describe('addSite', function () {
-    describe('sites list does not have this siteDetail', function () {
-      it('returns updated site list including the new site', function () {
-        const sites = Immutable.fromJS([])
-        const siteDetail = Immutable.fromJS({
-          lastAccessedTime: 123,
-          tags: [siteTags.BOOKMARK],
-          location: testUrl1,
-          title: 'sample',
-          parentFolderId: 0,
-          partitionNumber: 0
+    const emptySites = Immutable.fromJS([])
+    const bookmarkAllFields = Immutable.fromJS({
+      lastAccessedTime: 123,
+      tags: [siteTags.BOOKMARK],
+      location: testUrl1,
+      title: 'sample',
+      parentFolderId: 0,
+      partitionNumber: 0
+    })
+    const bookmarkMinFields = Immutable.fromJS({
+      location: testUrl1,
+      title: 'sample',
+      parentFolderId: 0
+    })
+    const folderMinFields = Immutable.fromJS({
+      customTitle: 'folder1',
+      parentFolderId: 0,
+      tags: [siteTags.BOOKMARK_FOLDER]
+    })
+
+    it('gets the tag from siteDetail if not provided', function () {
+      const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields)
+      const expectedSites = Immutable.fromJS([bookmarkAllFields])
+      assert.deepEqual(processedSites.getIn([0, 'tags']), expectedSites.getIn([0, 'tags']))
+    })
+
+    describe('for new entries (oldSite is null)', function () {
+      describe('when adding bookmark', function () {
+        it('preserves existing siteDetail fields', function () {
+          const processedSites = siteUtil.addSite(emptySites, bookmarkAllFields, siteTags.BOOKMARK)
+          const expectedSites = Immutable.fromJS([bookmarkAllFields])
+          assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
         })
-        const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
-        const expectedSites = sites.push(siteDetail)
-        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+        it('sets default values for lastAccessedTime and tag when they are missing', function () {
+          const processedSites = siteUtil.addSite(emptySites, bookmarkMinFields, siteTags.BOOKMARK)
+          assert.equal(!!processedSites.getIn([0, 'lastAccessedTime']), true)
+          assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [siteTags.BOOKMARK])
+        })
+      })
+
+      describe('when adding bookmark folder', function () {
+        it('assigns a folderId', function () {
+          const processedSites = siteUtil.addSite(emptySites, folderMinFields)
+          const folderId = processedSites.getIn([0, 'folderId'])
+          assert.equal(folderId, 1)
+        })
+        it('allows for new folders to use the same customTitle as an existing folder', function () {
+          // Add a new bookmark folder
+          let processedSites = siteUtil.addSite(emptySites, folderMinFields)
+          const folderId = processedSites.getIn([0, 'folderId'])
+          const bookmark = Immutable.fromJS({
+            lastAccessedTime: 123,
+            title: 'bookmark1',
+            parentFolderId: folderId,
+            location: testUrl1,
+            tags: [siteTags.BOOKMARK]
+          })
+          // Add a bookmark into that folder
+          processedSites = siteUtil.addSite(processedSites, bookmark)
+          assert.equal(processedSites.size, 2)
+          assert.equal(processedSites.getIn([1, 'parentFolderId']), folderId)
+
+          // Add another bookmark folder with the same name / parentFolderId
+          processedSites = siteUtil.addSite(processedSites, folderMinFields)
+          assert.equal(processedSites.size, 3)
+          const folderId2 = processedSites.getIn([2, 'folderId'])
+          assert.equal(folderId === folderId2, false)
+
+          // Ensure fields for both folders are still in sites array
+          assert.equal(processedSites.getIn([0, 'customTitle']), processedSites.getIn([2, 'customTitle']))
+          assert.deepEqual(processedSites.getIn([0, 'tags']), processedSites.getIn([2, 'tags']))
+        })
+        it('calls removeSite on bookmark folders which have the same customTitle/parentFolderId', function () {
+          const sites = Immutable.fromJS([
+            {
+              lastAccessedTime: 123,
+              customTitle: 'folder1',
+              title: undefined,
+              folderId: 1,
+              parentFolderId: 0,
+              tags: [siteTags.BOOKMARK_FOLDER]
+            },
+            {
+              lastAccessedTime: 123,
+              customTitle: 'folder2',
+              title: undefined,
+              folderId: 2,
+              parentFolderId: 1,
+              tags: [siteTags.BOOKMARK_FOLDER]
+            },
+            {
+              lastAccessedTime: 123,
+              title: 'bookmark1',
+              parentFolderId: 1,
+              location: testUrl1,
+              tags: [siteTags.BOOKMARK]
+            },
+            {
+              lastAccessedTime: 123,
+              title: 'bookmark2',
+              parentFolderId: 2,
+              location: testUrl2,
+              tags: [siteTags.BOOKMARK]
+            }
+          ])
+          let processedSites = sites
+          sites.forEach((site) => {
+            processedSites = siteUtil.addSite(processedSites, site)
+          })
+          const expectedSites = sites
+          assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+        })
       })
     })
 
-    describe('sites list already has this siteDetail', function () {
+    describe('for existing entries (oldSite is an existing siteDetail)', function () {
       it('uses parentFolderId, partitionNumber, and favicon values from old siteDetail if null', function () {
         const oldSiteDetail = Immutable.fromJS({
           tags: [siteTags.BOOKMARK],
@@ -201,7 +299,6 @@ describe('siteUtil', function () {
         const sites = Immutable.fromJS([oldSiteDetail])
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = Immutable.fromJS([expectedSiteDetail])
-        // toJS needed because immutable ownerID :(
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
       it('overrides the old title with the new title', function () {
@@ -222,48 +319,6 @@ describe('siteUtil', function () {
         const sites = Immutable.fromJS([oldSiteDetail])
         const processedSites = siteUtil.addSite(sites, newSiteDetail, siteTags.BOOKMARK, oldSiteDetail)
         const expectedSites = Immutable.fromJS([newSiteDetail])
-        // toJS needed because immutable ownerID :(
-        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
-      })
-      it('remove duplicate folder', function () {
-        const sites = Immutable.fromJS([
-          {
-            lastAccessedTime: 123,
-            customTitle: 'folder1',
-            title: undefined,
-            folderId: 1,
-            parentFolderId: 0,
-            tags: [siteTags.BOOKMARK_FOLDER]
-          },
-          {
-            lastAccessedTime: 123,
-            customTitle: 'folder2',
-            title: undefined,
-            folderId: 2,
-            parentFolderId: 1,
-            tags: [siteTags.BOOKMARK_FOLDER]
-          },
-          {
-            lastAccessedTime: 123,
-            title: 'bookmark1',
-            parentFolderId: 1,
-            location: testUrl1,
-            tags: [siteTags.BOOKMARK]
-          },
-          {
-            lastAccessedTime: 123,
-            title: 'bookmark2',
-            parentFolderId: 2,
-            location: testUrl2,
-            tags: [siteTags.BOOKMARK]
-          }
-        ])
-        let processedSites = sites
-        sites.forEach((site) => {
-          processedSites = siteUtil.addSite(processedSites, site)
-        })
-        const expectedSites = sites
-        // toJS needed because immutable ownerID :(
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
     })
@@ -345,7 +400,6 @@ describe('siteUtil', function () {
             tags: Immutable.List([])
           }
         ])
-        // toJS needed because immutable ownerID :(
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
     })
