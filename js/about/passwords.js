@@ -63,7 +63,6 @@ class PasswordItem extends React.Component {
   onCopy () {
     if (this.state.decrypted !== null) {
       aboutActions.setClipboard(this.state.decrypted)
-      aboutActions.showNotification('passwordCopied')
     } else {
       this.decrypt(false)
     }
@@ -74,7 +73,6 @@ class PasswordItem extends React.Component {
       return
     }
     aboutActions.setClipboard(details.decrypted)
-    aboutActions.showNotification('passwordCopied')
     this.setState({
       decrypted: details.decrypted
     })
@@ -167,12 +165,12 @@ class AboutPasswords extends React.Component {
             </tr>
           </thead>
           <tbody>
-          {
-            this.state.passwordDetails.sort((a, b) => {
-              return a.get('origin') > b.get('origin') ? 1 : -1
-            }).map((item) =>
-              <PasswordItem password={item} id={counter++} />)
-          }
+            {
+              this.state.passwordDetails.sort((a, b) => {
+                return a.get('origin') > b.get('origin') ? 1 : -1
+              }).map((item) =>
+                <PasswordItem password={item} id={counter++} />)
+            }
           </tbody>
         </table>
         <div className='passwordsPageFooter'>
@@ -189,10 +187,10 @@ class AboutPasswords extends React.Component {
       <div className='passwordsPageContent'>
         <table className='passwordsList'>
           <tbody>
-          {
-            this.state.disabledSiteDetails.map((item, site) =>
-              <SiteItem site={site} />)
-          }
+            {
+              this.state.disabledSiteDetails.map((item, site) =>
+                <SiteItem site={site} />)
+            }
           </tbody>
         </table>
       </div>

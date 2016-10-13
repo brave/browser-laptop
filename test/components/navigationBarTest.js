@@ -4,19 +4,19 @@ const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
 const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
-  saveButton, allowRunInsecureContentButton, denyRunInsecureContentButton} = require('../lib/selectors')
+  saveButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
+  denyRunInsecureContentButton, dismissDenyRunInsecureContentButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
 const searchProviders = require('../../js/data/searchProviders')
+const messages = require('../../js/constants/messages')
 
 describe('navigationBar', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForEnabled(urlInput)
   }
 
@@ -77,6 +77,55 @@ describe('navigationBar', function () {
           .ipcSend('shortcut-focus-url')
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
+          })
+      })
+    })
+
+    describe('document.write spoofing', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = Brave.server.url('urlbarSpoof.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+          .waitForExist('input')
+          .leftClick('input')
+      })
+
+      it('updates the location in the navbar to blank', function * () {
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === ''
+            })
+          })
+      })
+    })
+
+    describe('iframe navigation', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = Brave.server.url('in_page_nav.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+      })
+
+      it('location does not change', function * () {
+        var page1 = Brave.server.url('in_page_nav.html')
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === page1
+            })
           })
       })
     })
@@ -180,9 +229,9 @@ describe('navigationBar', function () {
           })
         yield this.app.client
           .tabByUrl(this.page)
-          .waitForExist('#top_link')
-          .leftClick('#top_link')
-          .windowParentByUrl(this.page + '#top')
+          .waitForExist('#bottom_link')
+          .leftClick('#bottom_link')
+          .windowParentByUrl(this.page + '#bottom')
       })
 
       it('updates the location in the navbar', function * () {
@@ -193,16 +242,16 @@ describe('navigationBar', function () {
           .moveToObject(titleBar)
           .waitForExist(urlInput)
           .waitUntil(function () {
-            return this.getValue(urlInput).then((val) => val === page + '#top')
+            return this.getValue(urlInput).then((val) => val === page + '#bottom')
           })
       })
 
-      it('updates the webview src', function * () {
-        var page = this.page
+      it('scrolls to the url fragment', function * () {
         yield this.app.client
-          .waitUntil(function () {
-            return this.getAttribute(activeWebview, 'src').then((src) => src === page + '#top')
-          })
+          .tabByUrl(this.page)
+          // should scroll to bottom and top will not be visible because the div height is 99999px
+          .waitForVisible('#bottom', 1000)
+          .waitForVisible('#top', 500, false)
       })
     })
   })
@@ -284,10 +333,10 @@ describe('navigationBar', function () {
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
         .waitForVisible('.runInsecureContentWarning')
-        .waitForVisible(denyRunInsecureContentButton)
+        .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .waitForVisible('[data-l10n-id="secureConnection"]')
-        .click(denyRunInsecureContentButton)
+        .click(dismissAllowRunInsecureContentButton)
         // TODO(bridiver) there is a race condition here because we are waiting for a non-change
         // and we need some way to verify that the page does not reload and allow insecure content
         .tabByUrl(page1Url).waitUntil(() => {
@@ -299,7 +348,7 @@ describe('navigationBar', function () {
         .click(urlbarIcon)
         .waitForExist(urlbarIcon + '.fa-lock')
     })
-    it('Temporarily allow running insecure content', function * () {
+    it('Temporarily allow/deny running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
@@ -312,8 +361,9 @@ describe('navigationBar', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist(urlbarIcon + '.fa-lock')
         .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
         .waitForVisible('.runInsecureContentWarning')
-        .waitForVisible(denyRunInsecureContentButton)
+        .waitForVisible(dismissAllowRunInsecureContentButton)
         .waitForVisible(allowRunInsecureContentButton)
         .click(allowRunInsecureContentButton)
         .tabByUrl(this.page1Url)
@@ -323,10 +373,163 @@ describe('navigationBar', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon)
         .click(urlbarIcon)
-        .waitForExist(urlbarIcon + '.fa-unlock')
         .waitForVisible('[data-l10n-id="mixedConnection"]')
-        .keys('\uE00C')
+        .waitForVisible('.denyRunInsecureContentWarning')
+        .waitForVisible(dismissDenyRunInsecureContentButton)
+        .waitForVisible(denyRunInsecureContentButton)
+        .click(denyRunInsecureContentButton)
+        .tabByUrl(this.page1Url)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .click(urlbarIcon)
+        .waitForExist(urlbarIcon + '.fa-lock')
+    })
+    it('Limit effect of running insecure content in frame', function * () {
+      const page1Url = 'https://mixed-script.badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl)
+        .loadUrl(page1Url)
+        // background color changes when insecure content runs
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon + '.fa-lock')
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible(dismissAllowRunInsecureContentButton)
+        .waitForVisible(allowRunInsecureContentButton)
+        .click(allowRunInsecureContentButton)
+        .tabByIndex(0)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(255,0,0,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 2
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(1)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 3
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(2)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 4
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(3)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+    })
+    it.skip('Limit effect of running insecure content in private frame', function * () {
+      const page1Url = 'https://mixed-script.badssl.com/'
+      yield this.app.client
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 2
+          })
+        })
+        // background color changes when insecure content runs
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(1)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(urlbarIcon + '.fa-lock')
+        .click(urlbarIcon)
+        .waitForVisible('[data-l10n-id="secureConnection"]')
+        .waitForVisible('.runInsecureContentWarning')
+        .waitForVisible(dismissAllowRunInsecureContentButton)
+        .waitForVisible(allowRunInsecureContentButton)
+        .click(allowRunInsecureContentButton)
+        .tabByUrl(this.page1Url)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(255,0,0,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url)
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 3
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(2)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { isPrivate: true })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 4
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(3)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, page1Url, { partitionNumber: 1 })
+        .waitUntil(function () {
+          return this.getWindowState().then((val) => {
+            return val.value.frames.length === 5
+          })
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(4)
+        .waitUntil(() => {
+          return this.app.client.getCssProperty('body', 'background-color').then((color) =>
+            color.value === 'rgba(128,128,128,1)'
+          )
+        })
     })
   })
 
@@ -404,6 +607,50 @@ describe('navigationBar', function () {
   })
 
   describe('submit', function () {
+    describe('page that does not load', function () {
+      Brave.beforeEach(this)
+
+      beforeEach(function * () {
+        this.page1 = Brave.server.url('page1.html')
+        this.page2 = 'https://bayden.com/test/redir/goscript.aspx'
+        yield setup(this.app.client)
+        yield this.app.client
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitForExist(urlInput)
+          .waitForElementFocus(urlInput)
+      })
+
+      it('sets location to new URL', function * () {
+        const page2 = this.page2
+        yield this.app.client.keys(this.page2)
+        yield this.app.client.keys('\uE007')
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === page2
+            })
+          })
+      })
+
+      it('resets URL to previous location if page does not load', function * () {
+        const page1 = this.page1
+        yield this.app.client.tabByUrl(this.newTabUrl).url(page1).waitForUrl(page1).windowParentByUrl(page1)
+        yield this.app.client
+          .moveToObject(navigator)
+          .waitForExist(urlInput)
+          .click(urlInput)
+        yield selectsText(this.app.client, page1)
+        yield this.app.client.keys(this.page2)
+        yield this.app.client.keys('\uE007')
+        yield this.app.client
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val === page1
+            })
+          })
+      })
+    })
+
     describe('with url input value', function () {
       Brave.beforeAll(this)
 
@@ -647,6 +894,9 @@ describe('navigationBar', function () {
       // tab with typing
       yield newFrame(this.app.client, 2)
       yield this.app.client
+        .waitUntil(function () {
+          return this.getTabCount().then((count) => count === 2)
+        })
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.keys('a').getValue(urlInput).then((val) => val === 'a')
@@ -654,6 +904,9 @@ describe('navigationBar', function () {
       // tab with loaded url
       yield newFrame(this.app.client, 3)
       yield this.app.client
+        .waitUntil(function () {
+          return this.getTabCount().then((count) => count === 3)
+        })
         .tabByIndex(2)
         .url(Brave.server.url('page1.html'))
         .waitForUrl(Brave.server.url('page1.html'))
@@ -707,6 +960,19 @@ describe('navigationBar', function () {
         this.app.client.waitUntil(function () {
           return this.getAttribute(':focus', 'src').then((src) => src === Brave.server.url('page1.html'))
         })
+      })
+    })
+
+    describe('switch to new tab page', function () {
+      before(function * () {
+        yield this.app.client
+          .ipcSend('shortcut-set-active-frame-by-index', 1)
+      })
+
+      it('focuses on the urlbar', function * () {
+        this.app.client
+        .waitForExist('.tab[data-frame-key="1"].active')
+        .waitForElementFocus(urlInput)
       })
     })
   })

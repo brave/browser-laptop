@@ -38,26 +38,60 @@ body {
   }
 }
 
-#fundsAmount {
+#coinbaseLogo {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
   margin-right: 10px;
+}
 
-  .fundsFAQ {
-    position: relative;
-    margin: 0 10px;
-    top: -1px;
-  }
+.coinbaseMessage {
+  display: inline-block;
+  max-width: 450px;
+}
+
+#appstoreLogo {
+  background: url('../../app/extensions/brave/img/ios_download.svg');
+  width: 130.5px;
+  height: 42.75px;
+  background-size: 130.5px 42.75px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+#playstoreLogo {
+  background: url('../../app/extensions/brave/img/android_download.svg');
+  width: 130.5px;
+  height: 42.75px;
+  background-size: 130.5px 42.75px;
+  display: inline-block;
+}
+
+.bitcoinQRTitle {
+  color: @braveOrange;
+  margin-bottom: 70px;
+  text-align: center;
+}
+
+.sectionTitle {
+  color: @darkGray;
+  cursor: default;
+  font-size: 1.2em;
+  margin-bottom: 0.7em;
+  -webkit-user-select: none;
 }
 
 .prefTabContainer {
   .sectionTitleWrapper {
     position: relative;
-    margin-right: 20px;
+    margin-right: 49px;
     min-height: 40px;
     min-width: 240px;
 
     .sectionTitle {
       color: @braveOrange;
       font-size: 28px;
+      margin-bottom: 0;
       position: absolute;
       bottom: 0;
       left: 0;
@@ -103,7 +137,7 @@ body {
 }
 
 .prefAside {
-  background: linear-gradient(#A7AAA9, #83858A);
+  background: linear-gradient(@gray, @mediumGray);
   box-shadow: @insetShadow;
   position: fixed;
   z-index: 600;
@@ -336,6 +370,7 @@ span.browserButton.primaryButton {
   }
 
   &.clearBrowsingDataButton,
+  &.importNowButton,
   &.manageAutofillDataButton {
     font-size: 0.9em;
     margin-top: 20px;
@@ -376,8 +411,8 @@ span.browserButton.primaryButton {
       margin-left: 10px;
     }
 
-    > input,
-    > select {
+    input,
+    select {
       display: block;
       border-radius: @borderRadius;
       height: 2.25em;
@@ -387,21 +422,32 @@ span.browserButton.primaryButton {
       border: solid 1px @lightGray;
       background: white;
       color: @darkGray;
-      box-shadow: @lightBoxShadow;
       outline: none;
     }
 
-    > input[type="number"] {
+    input {
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    }
+
+    select  {
+      box-shadow: @lightBoxShadow;
+    }
+
+    input[type="number"] {
       width: 50px;
       min-width: 50px;
     }
 
-    > select[disabled] {
+    select[disabled] {
       color: #ccc
     }
 
     .checkboxContainer {
       width: 100px;
+    }
+
+    .manageAdblockSettings {
+      margin-top: 1em;
     }
   }
 
@@ -443,8 +489,17 @@ input[type="checkbox"][disabled] {
 }
 
 .permissionName {
+  font-weight: 600;
+}
+
+.clearAll {
+  cursor: pointer;
+  color: @gray;
+}
+
+.clearAllLink {
   text-decoration: underline;
-  margin-top: 10px;
+  color: @gray;
 }
 
 .permissionStatus {
@@ -455,6 +510,9 @@ input[type="checkbox"][disabled] {
   font-size: 16px;
   list-style: none;
   margin: 20px;
+  ul {
+    margin-bottom: 10px;
+  }
 }
 
 .permissionAction {
@@ -469,6 +527,16 @@ table.sortableTable {
     text-align: center;
     color: @braveOrange;
     font-weight: 800;
+  }
+
+  .default {
+    width: 150px;
+  }
+  .searchEngine {
+    width: 304px !important;
+  }
+  .engineGoKey {
+    width: 250px;
   }
 }
 
@@ -497,13 +565,19 @@ table.sortableTable {
 }
 
 #ledgerTable {
-  height: ~"-webkit-calc(100vh - 300px)";
-  overflow-y: scroll;
 
   tr {
     th,
     td {
       padding: 0 15px;
+    }
+    .th-inner {
+      font-weight: bold;
+
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
   }
 
@@ -528,7 +602,6 @@ span.paymentHistoryButton.browserButton {
   padding-top: 5px;
   padding-left: 35px;
   padding-right: 35px;
-  padding-bottom: 5px;
 }
 
 div.nextPaymentSubmission {
@@ -541,7 +614,6 @@ div.nextPaymentSubmission {
 
 .modal .dialog.paymentHistory {
   padding: 0px;
-  width: 450px;
 
   .dialog-header {
     background-color: #EEE;
@@ -565,7 +637,7 @@ div.nextPaymentSubmission {
   }
 }
 
-.modal .dialog:not(.paymentHistory) {
+.modal .dialog.coinbaseOverlay {
   .dialog-body {
     height: 100%;
     width: 100%;
@@ -598,7 +670,6 @@ div.nextPaymentSubmission {
     margin: 30px 0px;
     th {
       text-align: left;
-      font-weight: normal;
     }
     tr {
       height: 1em;
@@ -606,15 +677,31 @@ div.nextPaymentSubmission {
     td {
       padding: 15px 30px 0 0;
       width: auto;
-      min-width: 215px;
+      min-width: 235px;
     }
     span.browserButton.primaryButton.addFunds {
       margin-right: 0;
     }
+    .fundsAmount {
+      display: inline;
+      margin: 0;
+      width: auto;
+    }
+    .fundsFAQ {
+      display: inline;
+      position: relative;
+      top: 1px;
+      left: 5px;
+    }
     .addFunds {
       margin: 0;
       height: 30px;
-      line-height: 30px;
+      line-height: 24px;
+      box-sizing: border-box;
+    }
+    .nextReconcileDate {
+      font-size: 14px;
+      margin: 10px 0;
     }
   }
 
@@ -630,7 +717,7 @@ div.nextPaymentSubmission {
          font-weight: 500;
          border-bottom: 2px solid @lightGray;
          text-align: left;
-         width: 25%;
+         width: 18%;
        }
        td {
           text-align: left;
@@ -710,25 +797,69 @@ div.nextPaymentSubmission {
   }
 }
 
+#bitcoinDashboard {
+  .board {
+    .panel {
+      padding-left: 100px;
+    }
+  }
+}
+
 .board {
   overflow-x: hidden;
   clear: both;
-  display: flex;
 
   .panel {
-    flex: 1;
+    background: #FFFFFF;
     position: relative;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 20px;
 
-    * {
-      display: block;
-      text-align: center;
-      margin: 0 auto;
+    &.advancedSettings {
+      padding-left: 50px;
+      padding-right: 50px;
+
+      select {
+        width: 100%;
+      }
+    }
+
+    .settingsPanelDivider {
+      width: 50%;
+      position: relative;
+      float: left;
+
+      .settingsListTitle {
+        margin-top: 0;
+      }
+
+      &:nth-child(1) {
+        text-align: left;
+      }
+
+      &:nth-child(2) {
+        text-align: right;
+      }
+      .fa {
+        position: absolute;
+        left: -45px;
+
+        &.fa-credit-card {
+          font-size: 30px;
+        }
+        &.fa-mobile {
+          font-size: 50px;
+        }
+      }
+      .bitcoinIcon {
+        position: absolute;
+        left: -5px;
+        top: 0;
+      }
     }
     #bitcoinPaymentURL {
       cursor: pointer;
-      text-align: left;
       background-color: @lightGray;
       &:hover {
         background-color: @gray;
@@ -736,12 +867,24 @@ div.nextPaymentSubmission {
       font-size: 0.9em;
     }
     .smallText {
-      font-size: 0.9em;
+      font-size: 12px;
+      color: black;
+      margin-bottom: 20px;
     }
     .settingsListTitle {
-      font-weight: 600;
-      font-size: 1em;
+      color: @darkGray;
+      font-weight: bold;
+      font-size: 15px;
       margin-bottom: 15px;
+      padding-right: 25px;
+    }
+    .settingsListSubTitle {
+      color: @darkGray;
+      clear: both;
+      font-weight: normal;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.3em;
     }
     span {
       display: inline-block;
@@ -749,30 +892,66 @@ div.nextPaymentSubmission {
     a {
       text-decoration: none;
     }
-    img,
-    #coinbaseLogo {
-      width: 150px;
-      height: 150px;
-      margin: 8px auto;
-      background-color: @lightGray;
-      border: none;
-    }
     .labelText {
+      clear: both;
       font-size: 1em;
       color: @braveOrange;
-      text-align: left;
       margin-bottom: 5px;
     }
-    .fa {
-      font-size: 1.1em;
-      margin: 5px;
+    .bitcoinIcon {
+      .fa-circle {
+        color: @bitcoinOrange;
+      }
+      .fa-bitcoin {
+        color: white;
+        transform: rotate(12deg);
+      }
     }
     .primaryButton {
-      margin: 1.5em auto;
       display: block;
+      float: right;
+      font-size: 14px;
       width: 180px;
       padding: 4px 0px;
+      margin-bottom: 15px;
     }
+
+    &:after {
+      content:" ";
+      display:block;
+      clear:both;
+    }
+
+    .ledgerBackupContent {
+      width: 75%;
+      margin: 0 auto;
+      display: block;
+      line-height: 1.3em;
+      margin-bottom: 60px;
+    }
+
+    .copyKeyContainer {
+      display: flex;
+      justify-content: space-between;
+      width: 75%;
+      margin: 20px auto;
+
+      .copyContainer {
+        margin-top: 35px;
+      }
+
+      .keyContainer {
+        h3 {
+          margin-bottom: 15px;
+        }
+      }
+    }
+  }
+  .panelFooter {
+    color: @darkGray;
+    font-size: 13px;
+    font-style: italic;
+    padding: 20px 20px 20px 50px;
   }
   &.contrast {
     background: @highlightBlue;
@@ -784,8 +963,30 @@ div.nextPaymentSubmission {
   }
   .disabledPanel {
     div:nth-of-type(2) {
-      padding: 15px 5px;
+      padding: 15px 0;
     }
+  }
+
+  .recoveryContent {
+    h4,
+    span {
+      margin-bottom: 20px;
+    }
+  }
+
+  .recoveryFooterButtons {
+    float: right;
+  }
+}
+
+.advancedSettingsFooter {
+  padding: 20px 100px;
+  text-align: right;
+}
+
+.recoveryOverlay {
+  .spaceAround {
+    margin: 50px auto;
   }
 }
 
@@ -948,6 +1149,5 @@ div.nextPaymentSubmission {
 
 #fundsSelectBox {
   margin-top: 0px;
-  min-width: 130px;
   width: auto;
 }

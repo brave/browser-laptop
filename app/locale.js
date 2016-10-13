@@ -18,6 +18,8 @@ var rendererIdentifiers = function () {
     'confirmClearPasswords',
     'passwordCopied',
     'flashInstalled',
+    'goToPrefs',
+    'goToAdobe',
     'allowFlashPlayer',
     'about',
     'aboutApp',
@@ -37,8 +39,11 @@ var rendererIdentifiers = function () {
     'allowFlashAlways',
     'openInNewWindow',
     'openInNewSessionTab',
+    'openInNewSessionTabs',
     'openInNewPrivateTab',
+    'openInNewPrivateTabs',
     'openInNewTab',
+    'openInNewTabs',
     'openAllInTabs',
     'disableAdBlock',
     'disableTrackingProtection',
@@ -49,6 +54,9 @@ var rendererIdentifiers = function () {
     'deleteFolder',
     'deleteBookmark',
     'deleteHistoryEntry',
+    'deleteHistoryEntries',
+    'deleteLedgerEntry',
+    'ledgerBackupText',
     'editFolder',
     'editBookmark',
     'unmuteTabs',
@@ -128,6 +136,7 @@ var rendererIdentifiers = function () {
     'help',
     'sendUsFeedback',
     'services',
+    'hideBrave',
     'hideOthers',
     'showAll',
     'newPrivateTab',
@@ -141,13 +150,15 @@ var rendererIdentifiers = function () {
     'preferences',
     'settings',
     'bookmarksManager',
-    'importBookmarks',
+    'importBrowserData',
     'reportAnIssue',
     'submitFeedback',
     'bookmarksToolbar',
     'bravery',
     'braverySite',
     'braveryGlobal',
+    'braveryPayments',
+    'braveryStartUsingPayments',
     'blockPopups',
     'learnSpelling',
     'ignoreSpelling',
@@ -176,15 +187,24 @@ var rendererIdentifiers = function () {
     'searchSuggestionTitle',
     'topSiteSuggestionTitle',
     'addFundsNotification',
+    'reconciliationNotification',
+    'reviewSites',
     'addFunds',
+    'copyToClipboard',
+    'smartphoneTitle',
+    'displayQRCode',
     'updateLater',
     'updateHello',
     'notificationPasswordWithUserName',
     'notificationPassword',
     'notificationPasswordSettings',
+    'notificationPaymentDone',
+    'notificationTryPayments',
+    'notificationTryPaymentsYes',
     'prefsRestart',
     'yes',
     'no',
+    'noThanks',
     'neverForThisSite',
     'passwordsManager',
     'downloadItemPause',
@@ -196,7 +216,17 @@ var rendererIdentifiers = function () {
     'downloadItemDelete',
     'downloadItemClear',
     'downloadToolbarHide',
-    'downloadItemClearCompleted'
+    'downloadItemClearCompleted',
+    // Caption buttons in titlebar (min/max/close - Windows only)
+    'windowCaptionButtonMinimize',
+    'windowCaptionButtonMaximize',
+    'windowCaptionButtonRestore',
+    'windowCaptionButtonClose',
+    'closeFirefoxWarning',
+    'importSuccess',
+    'licenseTextOk',
+    'closeFirefoxWarningOk',
+    'importSuccessOk'
   ]
 }
 
@@ -204,14 +234,23 @@ var ctx = null
 var translations = {}
 var lang = 'en-US'
 
+// todo: FSI/PDI stripping can probably be replaced once
+// https://github.com/l20n/l20n.js/commit/2fea50bf43c43a8e930a519a37f0f64f3626e885
+// is released
+const FSI = '\u2068'
+const PDI = '\u2069'
+
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
-exports.translation = function (token) {
+exports.translation = function (token, replacements = {}) {
   if (translations[token]) {
-    return translations[token]
+    let returnVal = translations[token]
+    for (var key in replacements) {
+      returnVal = returnVal.replace(new RegExp(FSI + '{{\\s*' + key + '\\s*}}' + PDI), replacements[key])
+    }
+    return returnVal
   } else {
-    // This will return an identifier in upper case enclosed in square brackets
-    // Useful for determining if a translation was not requested in the menu
+    // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
     // identifiers above.
     return token.toUpperCase()
   }
@@ -221,26 +260,33 @@ exports.translation = function (token) {
 const DEFAULT_LANGUAGE = 'en-US'
 
 const availableLanguages = [
+  'eu',
   'bn-BD',
   'bn-IN',
+  'zh-CN',
   'cs',
-  'de-DE',
+  'nl-NL',
   'en-US',
-  'es',
   'fr-FR',
+  'de-DE',
   'hi-IN',
   'id-ID',
+  'it-IT',
   'ja-JP',
-  'nl-NL',
+  'ko-KR',
+  'ms-MY',
+  'pl-PL',
   'pt-BR',
+  'ru',
   'sl',
+  'es',
   'ta',
   'te',
   'tr-TR',
   'uk'
 ]
 
-// Currently configured languages - TODO (make this dynamic)
+// Currently configured languages
 const configuredLanguages = {}
 availableLanguages.forEach(function (lang) {
   configuredLanguages[lang] = true
@@ -267,17 +313,30 @@ const defaultLocale = function () {
   }
 }
 
-// Initialize translations for a language providing an optional
-// callback executed after the translation caching process
-// is complete.
-exports.init = function (language, cb) {
-  // Default to noop callback
-  cb = cb || function () {}
+// Initialize translations for a language
+exports.init = function (language) {
+  // If this is in the main process
+  if (ipcMain) {
+    // Respond to requests for translations from the renderer process
+    ipcMain.on('translations', function (event, arg) {
+      // Return the entire set of translations synchronously
+      event.returnValue = translations
+    })
+
+    // TODO: There shouldn't need to be a REQUEST_LANGUAGE event at all
+    // Respond to requests for the currently configured language code
+    ipcMain.on(REQUEST_LANGUAGE, function (event) {
+      event.sender.send(LANGUAGE, {
+        langCode: lang,
+        languageCodes: availableLanguages
+      })
+    })
+  }
 
   // Currently selected language identifier I.e. 'en-US'
   lang = language || defaultLocale()
 
-  // Languages to support - TODO retrieve this dynamically
+  // Languages to support
   const langs = availableLanguages.map(function (lang) {
     return { code: lang }
   })
@@ -303,31 +362,11 @@ exports.init = function (language, cb) {
 
   // Translate the renderer identifiers
   var identifiers = rendererIdentifiers()
-  ctx.formatValues.apply(ctx, identifiers).then(function (values) {
+  return ctx.formatValues.apply(ctx, identifiers).then(function (values) {
     // Cache the translations for later retrieval
     values.forEach(function (value, idx) {
       translations[identifiers[idx]] = value
     })
-    // Signal when complete
-    exports.initialized = true
-    cb(translations)
-  })
-}
-
-// If this is in the main process
-if (ipcMain) {
-  // Respond to requests for translations from the renderer process
-  ipcMain.on('translations', function (event, arg) {
-    // Return the entire set of translations synchronously
-    event.returnValue = translations
-  })
-
-  // TODO: There shouldn't need to be a REQUEST_LANGUAGE event at all
-  // Respond to requests for the currently configured language code
-  ipcMain.on(REQUEST_LANGUAGE, function (event) {
-    event.sender.send(LANGUAGE, {
-      langCode: lang,
-      languageCodes: availableLanguages
-    })
+    return lang
   })
 }

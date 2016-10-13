@@ -21,6 +21,21 @@ require('../less/notificationBar.less')
 require('../less/addEditBookmark.less')
 require('../node_modules/font-awesome/css/font-awesome.css')
 
+// Enable or disable crash reporting based on platform
+const setupCrashReporting = () => {
+  if (process.platform === 'darwin') {
+    // Setup the crash handling for mac renderer processes
+    // https://github.com/electron/electron/blob/master/docs/api/crash-reporter.md#crashreporterstartoptions
+    console.log('macOS renderer crash reporting initialized')
+    require('../app/crash-herald').init()
+  }
+}
+
+// Notify that renderer crash reporting is disabled
+const disableCrashReporting = () => {
+  console.log('Disabling renderer crash reporting')
+}
+
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Window = require('./components/window')
@@ -35,7 +50,6 @@ const messages = require('./constants/messages')
 const Immutable = require('immutable')
 const patch = require('immutablepatch')
 const l10n = require('./l10n')
-const FrameStateUtil = require('./state/frameStateUtil')
 
 // don't allow scaling or zooming of the ui
 webFrame.setPageScaleLimits(1, 1)
@@ -43,26 +57,10 @@ webFrame.setZoomLevelLimits(0, 0)
 // override any default zoom level changes
 currentWindow.webContents.setZoomLevel(0.0)
 
-// get appStore from url
-ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
-  appStoreRenderer.state = Immutable.fromJS(appState)
-  ReactDOM.render(
-    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
-    document.getElementById('windowContainer'))
-})
+l10n.init()
 
 ipc.on(messages.REQUEST_WINDOW_STATE, () => {
   ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS())
-})
-
-ipc.on(messages.REQUEST_MENU_DATA_FOR_WINDOW, () => {
-  const windowState = windowStore.getState()
-  const activeFrame = FrameStateUtil.getActiveFrame(Immutable.fromJS(windowState))
-  const windowData = {
-    location: activeFrame ? activeFrame.get('location') : null,
-    closedFrames: windowState.get('closedFrames').toJS()
-  }
-  ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
 })
 
 if (process.env.NODE_ENV === 'test') {
@@ -85,4 +83,16 @@ window.addEventListener('beforeunload', function () {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 
-l10n.init()
+// get appStore from url
+ipc.on(messages.INITIALIZE_WINDOW, (e, disposition, appState, frames, initWindowState) => {
+  // Configure renderer crash reporting
+  if (appState.settings[require('./constants/settings').SEND_CRASH_REPORTS] !== false) {
+    setupCrashReporting()
+  } else {
+    disableCrashReporting()
+  }
+  appStoreRenderer.state = Immutable.fromJS(appState)
+  ReactDOM.render(
+    <Window includePinnedSites={disposition !== 'new-popup'} frames={frames} initWindowState={initWindowState} />,
+    document.getElementById('windowContainer'))
+})

@@ -51,7 +51,9 @@ const windowActions = {
     location = location.trim()
     let newFrame = false
     if (frame.get('pinnedLocation') && location !== 'about:certerror' &&
-        frame.get('location') !== 'about:certerror') {
+        frame.get('location') !== 'about:certerror' &&
+        location !== 'about:error' &&
+        frame.get('location') !== 'about:error') {
       try {
         const origin1 = new window.URL(frame.get('location')).origin
         const origin2 = new window.URL(location).origin
@@ -72,12 +74,21 @@ const windowActions = {
         location
       }, true)
     } else {
-      dispatch({
-        actionType: WindowConstants.WINDOW_SET_URL,
-        location,
-        key: frame.get('key')
-      })
+      this.setUrl(location, frame.get('key'))
     }
+  },
+
+  /**
+   * Dispatches a message to the store to set the new URL.
+   * @param {string} location
+   * @param {number} key
+   */
+  setUrl: function (location, key) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL,
+      location,
+      key
+    })
   },
 
   /**
@@ -575,6 +586,17 @@ const windowActions = {
   },
 
   /**
+   * Marks the URL bar as focused or not.
+   *
+   * @param {boolean} isFocused - Whether or not the URL bar should be marked as focused
+   */
+  setUrlBarFocused: function (isFocused) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_URL_BAR_FOCUSED,
+      isFocused
+    })
+  },
+  /**
    * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
    *
    * @param {Object} frameProps - Properties of the frame in question
@@ -786,6 +808,17 @@ const windowActions = {
   },
 
   /**
+   * Saves the size (width, height) of the window in the window state
+   * @param {Array} size - [x, y]
+   */
+  saveSize: function (size) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SAVE_SIZE,
+      size
+    })
+  },
+
+  /**
    * Sets the fullscreen state of the window
    * @param {boolean} isFullScreen - true if window is fullscreen
    */
@@ -948,6 +981,28 @@ const windowActions = {
   },
 
   /**
+   * Sets the import browser data popup detail
+   * @param {Array} importBrowserDataDetail - list of supported browsers
+   */
+  setImportBrowserDataDetail: function (importBrowserDataDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL,
+      importBrowserDataDetail
+    })
+  },
+
+  /**
+   * Sets the selected import browser data
+   * @param {Object} selected - selected browser data to import
+   */
+  setImportBrowserDataSelected: function (selected) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED,
+      selected
+    })
+  },
+
+  /**
    * Sets the manage autofill address popup detail
    * @param {Object} currentDetail - Properties of the address to change to
    * @param {Object} originalDetail - Properties of the address to edit
@@ -974,7 +1029,7 @@ const windowActions = {
   },
 
   /**
-   * Sets page url with blocked active mixed content.
+   * Sets source of blocked active mixed content.
    * @param {Object} frameProps - The frame to set source of
    * blocked active mixed content on
    * @param {string} source - Source of blocked active mixed content
@@ -984,6 +1039,99 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT,
       frameProps,
       source
+    })
+  },
+
+  /**
+   * (Windows only)
+   * Dispatches a message to indicate the custom rendered Menubar should be toggled (shown/hidden)
+   * @param {boolean} isVisible (optional)
+   */
+  toggleMenubarVisible: function (isVisible) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE,
+      isVisible
+    })
+  },
+
+  /**
+   * (Windows only)
+   * Used to trigger the click() action for a menu
+   * Called from the Menubar control, handled in menu.js
+   * @param {string} label - text of the label that was clicked
+   */
+  clickMenubarSubmenu: function (label) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_CLICK_MENUBAR_SUBMENU,
+      label
+    })
+  },
+
+  /**
+   * Used by `main.js` when click happens on content area (not on a link or react control).
+   * - closes context menu
+   * - closes popup menu
+   * - nulls out menubar item selected (Windows only)
+   * - hides menubar if auto-hide preference is set (Windows only)
+   */
+  resetMenuState: function () {
+    dispatch({
+      actionType: WindowConstants.WINDOW_RESET_MENU_STATE
+    })
+  },
+
+  /**
+   * (Windows only)
+   * Used to track selected index of a context menu
+   * Needed because arrow keys can be used to navigate the custom menu
+   * @param {number} index - zero based index of the item.
+   *   Index excludes menu separators and hidden items.
+   */
+  setSubmenuSelectedIndex: function (index) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX,
+      index
+    })
+  },
+
+  /**
+   * (Windows only at the moment)
+   * Used to track last selected element (typically the URL bar or the frame)
+   * Important because focus is lost when using the custom menu and needs
+   * to be returned in order for the cut/copy operation to work
+   * @param {string} selector - selector used w/ querySelectorAll to return focus
+   *   after a menu item is selected (via the custom titlebar / menubar)
+   */
+  setLastFocusedSelector: function (selector) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR,
+      selector
+    })
+  },
+
+  /**
+   * Used to get response details (such as the HTTP response code) from a response
+   * See `eventStore.js` for an example use-case
+   * @param {number} tabId - the tab id to set
+   * @param {Object} details - object containing response details
+   */
+  gotResponseDetails: function (tabId, details) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_GOT_RESPONSE_DETAILS,
+      tabId,
+      details
+    })
+  },
+
+  /**
+   * Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
+   * @param {number} folderId - from the siteDetail for the bookmark folder
+   *   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
+   */
+  setBookmarksToolbarSelectedFolderId: function (folderId) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
+      folderId
     })
   }
 }

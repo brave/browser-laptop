@@ -8,17 +8,17 @@ const ReactDOM = require('react-dom')
 const windowActions = require('../actions/windowActions')
 const ImmutableComponent = require('./immutableComponent')
 
-const config = require('../constants/config.js')
-const top500 = require('./../data/top500.js')
+const config = require('../constants/config')
+const top500 = require('./../data/top500')
 const {aboutUrls, isNavigatableAboutPage, isSourceAboutUrl, isUrl} = require('../lib/appUrlUtil')
 const Immutable = require('immutable')
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const suggestionTypes = require('../constants/suggestionTypes')
 const getSetting = require('../settings').getSetting
-const eventUtil = require('../lib/eventUtil.js')
-const cx = require('../lib/classSet.js')
+const eventUtil = require('../lib/eventUtil')
+const cx = require('../lib/classSet')
 const locale = require('../l10n')
 const windowStore = require('../stores/windowStore')
 
@@ -72,7 +72,10 @@ class UrlBarSuggestions extends ImmutableComponent {
     this.ctrlKey = e.ctrlKey
     this.metaKey = e.metaKey
     this.shiftKey = e.shiftKey
-    ReactDOM.findDOMNode(this).getElementsByClassName('selected')[0].click()
+    const node = ReactDOM.findDOMNode(this)
+    if (node) {
+      node.getElementsByClassName('selected')[0].click()
+    }
   }
 
   // Whether the suggestions box should be rendered
@@ -153,8 +156,9 @@ class UrlBarSuggestions extends ImmutableComponent {
     addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
     addToItems(topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
     const documentHeight = Number.parseInt(window.getComputedStyle(document.querySelector(':root')).getPropertyValue('--navbar-height'), 10)
+    const menuHeight = this.props.menubarVisible ? 30 : 0
     return <ul className='urlBarSuggestions' style={{
-      maxHeight: document.documentElement.offsetHeight - documentHeight - 2
+      maxHeight: document.documentElement.offsetHeight - documentHeight - 2 - menuHeight
     }}>
       {items}
     </ul>

@@ -9,6 +9,8 @@ const Button = require('./button')
 const SwitchControl = require('./switchControl')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
+const ipc = global.require('electron').ipcRenderer
+const messages = require('../constants/messages')
 
 class ClearBrowsingDataPanel extends ImmutableComponent {
   constructor () {
@@ -18,6 +20,9 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
     this.onToggleCachedImagesAndFiles = this.onToggleSetting.bind(this, 'cachedImagesAndFiles')
     this.onToggleSavedPasswords = this.onToggleSetting.bind(this, 'savedPasswords')
     this.onToggleAllSiteCookies = this.onToggleSetting.bind(this, 'allSiteCookies')
+    this.onToggleAutocompleteData = this.onToggleSetting.bind(this, 'autocompleteData')
+    this.onToggleAutofillData = this.onToggleSetting.bind(this, 'autofillData')
+    this.onToggleSavedSiteSettings = this.onToggleSetting.bind(this, 'savedSiteSettings')
     this.onClear = this.onClear.bind(this)
   }
   onToggleSetting (setting, e) {
@@ -26,6 +31,11 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
   onClear () {
     appActions.clearAppData(this.props.clearBrowsingDataDetail)
     this.props.onHide()
+    let detail = this.props.clearBrowsingDataDetail
+    if (detail.get('allSiteCookies') && detail.get('browserHistory') &&
+        detail.get('cachedImagesAndFiles')) {
+      ipc.send(messages.PREFS_RESTART)
+    }
   }
   render () {
     return <Dialog onHide={this.props.onHide} className='clearBrowsingDataPanel' isClickDismiss>
@@ -37,6 +47,9 @@ class ClearBrowsingDataPanel extends ImmutableComponent {
           <SwitchControl rightl10nId='cachedImagesAndFiles' checkedOn={this.props.clearBrowsingDataDetail.get('cachedImagesAndFiles')} onClick={this.onToggleCachedImagesAndFiles} />
           <SwitchControl rightl10nId='savedPasswords' checkedOn={this.props.clearBrowsingDataDetail.get('savedPasswords')} onClick={this.onToggleSavedPasswords} />
           <SwitchControl rightl10nId='allSiteCookies' checkedOn={this.props.clearBrowsingDataDetail.get('allSiteCookies')} onClick={this.onToggleAllSiteCookies} />
+          <SwitchControl className='autocompleteDataSwitch' rightl10nId='autocompleteData' checkedOn={this.props.clearBrowsingDataDetail.get('autocompleteData')} onClick={this.onToggleAutocompleteData} />
+          <SwitchControl className='autofillDataSwitch' rightl10nId='autofillData' checkedOn={this.props.clearBrowsingDataDetail.get('autofillData')} onClick={this.onToggleAutofillData} />
+          <SwitchControl className='siteSettingsSwitch' rightl10nId='savedSiteSettings' checkedOn={this.props.clearBrowsingDataDetail.get('savedSiteSettings')} onClick={this.onToggleSavedSiteSettings} />
         </div>
         <div className='formSection clearBrowsingDataButtons'>
           <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />

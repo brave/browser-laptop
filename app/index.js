@@ -6,51 +6,59 @@
 'use strict'
 
 let ready = false
-// TODO(bridiver) - this should also send a notification to Brave
-process.on('uncaughtException', function (error) {
+
+// Setup the crash handling
+const CrashHerald = require('./crash-herald')
+
+const handleUncaughtError = (error) => {
   var message, ref, stack
   stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
   message = 'Uncaught Exception:\n' + stack
   console.error('An uncaught exception occurred in the main process ' + message)
-  setTimeout(() => {
-    if (!ready) {
-      console.error('Process failed to load within 60 seconds')
-      process.exit(1)
-    }
-  }, 60 * 1000)
+
+  // TODO(bridiver) - this should also send a notification to Brave
+
+  if (!ready) {
+    console.error('Waiting 60 seconds for process to load')
+    setTimeout(() => {
+      if (!ready) {
+        console.error('Process failed to load within 60 seconds')
+        process.exit(1)
+      }
+    }, 60 * 1000)
+  }
+}
+process.on('uncaughtException', function (error) {
+  handleUncaughtError(error)
+})
+
+process.on('unhandledRejection', function (error, promise) {
+  handleUncaughtError(error)
 })
 
 if (process.platform === 'win32') {
   require('./windowsInit')
 }
 
-var locale = require('./locale')
-
-const path = require('path')
 const electron = require('electron')
 const app = electron.app
 // set userData before loading anything else
-if (!process.env.BRAVE_USER_DATA_DIR && ['development', 'test'].includes(process.env.NODE_ENV)) {
-  process.env.BRAVE_USER_DATA_DIR = path.join(app.getPath('appData'), app.getName() + '-' + process.env.NODE_ENV)
-}
-
-if (process.env.BRAVE_USER_DATA_DIR) {
-  app.setPath('userData', process.env.BRAVE_USER_DATA_DIR)
-}
+require('./browser/lib/patchUserDataDir')
 const BrowserWindow = electron.BrowserWindow
 const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const Immutable = require('immutable')
 const Menu = require('./browser/menu')
 const Updater = require('./updater')
+const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appConfig = require('../js/constants/appConfig')
 const appActions = require('../js/actions/appActions')
 const downloadActions = require('../js/actions/downloadActions')
 const SessionStore = require('./sessionStore')
 const AppStore = require('../js/stores/appStore')
-const CrashHerald = require('./crash-herald')
 const PackageLoader = require('./package-loader')
+const Autofill = require('./autofill')
 const Extensions = require('./extensions')
 const Filtering = require('./filtering')
 const TrackingProtection = require('./trackingProtection')
@@ -64,15 +72,19 @@ const showAbout = require('./aboutDialog').showAbout
 const urlParse = require('url').parse
 const CryptoUtil = require('../js/lib/cryptoUtil')
 const keytar = require('keytar')
-const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
+const locale = require('./locale')
 const ledger = require('./ledger')
 const flash = require('../js/flash')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
 const async = require('async')
+const tabs = require('./browser/tabs')
+
+// temporary fix for #4517, #4518 and #4472
+app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -227,17 +239,21 @@ const initiateSessionStateSave = (beforeQuit) => {
   }
 }
 
-let loadAppStatePromise = SessionStore.loadAppState().catch(() => {
-  return SessionStore.defaultAppState()
-})
+let loadAppStatePromise = SessionStore.loadAppState()
 
 let flashInitialized = false
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialState) => {
-  const { HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED } = require('../js/constants/settings')
+  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
   if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
     app.disableHardwareAcceleration()
+  }
+  if (initialState.settings[SEND_CRASH_REPORTS] !== false) {
+    console.log('Crash reporting enabled')
+    CrashHerald.init()
+  } else {
+    console.log('Crash reporting disabled')
   }
   if (initialState.settings[SMOOTH_SCROLL_ENABLED] === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')
@@ -249,11 +265,32 @@ loadAppStatePromise.then((initialState) => {
       return
     }
   }
-  app.setLocale(initialState.settings[settings.LANGUAGE])
 })
 
+const notifyCertError = (webContents, url, error, cert) => {
+  errorCerts[url] = {
+    subjectName: cert.subjectName,
+    issuerName: cert.issuerName,
+    serialNumber: cert.serialNumber,
+    validStart: cert.validStart,
+    validExpiry: cert.validExpiry,
+    fingerprint: cert.fingerprint
+  }
+
+  // Tell the page to show an unlocked icon. Note this is sent to the main
+  // window webcontents, not the webview webcontents
+  let sender = webContents.hostWebContents || webContents
+  sender.send(messages.CERT_ERROR, {
+    url,
+    error,
+    cert,
+    tabId: webContents.getId()
+  })
+}
+
 app.on('ready', () => {
-  app.on('certificate-error', (e, webContents, url, error, cert, cb) => {
+  let sessionStateSaveInterval = null
+  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, cb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
@@ -262,24 +299,12 @@ app.on('ready', () => {
       return
     }
 
-    errorCerts[url] = {
-      subjectName: cert.subjectName,
-      issuerName: cert.issuerName,
-      serialNumber: cert.serialNumber,
-      validStart: cert.validStart,
-      validExpiry: cert.validExpiry,
-      fingerprint: cert.fingerprint
+    if (resourceType !== 'mainFrame') {
+      // Block subresources with certificate errors
+      return
     }
 
-    // Tell the page to show an unlocked icon. Note this is sent to the main
-    // window webcontents, not the webview webcontents
-    let sender = webContents.hostWebContents || webContents
-    sender.send(messages.CERT_ERROR, {
-      url,
-      error,
-      cert,
-      tabId: webContents.getId()
-    })
+    notifyCertError(webContents, url, error, cert)
   })
 
   app.on('window-all-closed', () => {
@@ -303,7 +328,7 @@ app.on('ready', () => {
 
     e.preventDefault()
 
-    clearInterval(initiateSessionStateSave)
+    clearInterval(sessionStateSaveInterval)
     initiateSessionStateSave(true)
 
     // Just in case a window is not responsive, we don't want to wait forever.
@@ -313,19 +338,20 @@ app.on('ready', () => {
     }, appConfig.quitTimeout)
   })
 
+  app.on('network-connected', () => {
+    appActions.networkConnected()
+  })
+
+  app.on('network-disconnected', () => {
+    appActions.networkDisconnected()
+  })
+
   // User initiated exit using File->Quit
   ipcMain.on(messages.RESPONSE_WINDOW_STATE, (wnd, data) => {
     if (data) {
       perWindowState.push(data)
     }
     saveIfAllCollected()
-  })
-
-  // Window state is fetched via the renderer process; this is fired once it's retrieved
-  ipcMain.on(messages.RESPONSE_MENU_DATA_FOR_WINDOW, (wnd, windowData) => {
-    if (windowData) {
-      Menu.rebuild(AppStore.getState(), Immutable.fromJS(windowData))
-    }
   })
 
   ipcMain.on(messages.LAST_WINDOW_STATE, (wnd, data) => {
@@ -382,24 +408,20 @@ app.on('ready', () => {
   })
 
   loadAppStatePromise.then((initialState) => {
-    // Initiate the translation for a configured language and
-    // reset the browser window. This will default to en-US if
-    // not yet configured.
-    locale.init(initialState.settings[settings.LANGUAGE], (strings) => {
-      Menu.rebuild(AppStore.getState(), null)
-    })
-
     // Do this after loading the state
     // For tests we always want to load default app state
     const loadedPerWindowState = initialState.perWindowState
     delete initialState.perWindowState
     initialState.flashInitialized = flashInitialized
     appActions.setState(Immutable.fromJS(initialState))
+    Menu.init(initialState, null)
     return loadedPerWindowState
   }).then((loadedPerWindowState) => {
+    tabs.init()
     basicAuth.init()
     contentSettings.init()
     privacy.init()
+    Autofill.init()
     Extensions.init()
     Filtering.init()
     SiteHacks.init()
@@ -419,7 +441,6 @@ app.on('ready', () => {
       })
     }
     process.emit(messages.APP_INITIALIZED)
-    ready = true
 
     if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({
@@ -438,7 +459,10 @@ app.on('ready', () => {
         appActions.hideMessageBox(message)
       } else {
         appActions.showMessageBox({
-          buttons: [locale.translation('yes'), locale.translation('no')],
+          buttons: [
+            {text: locale.translation('yes')},
+            {text: locale.translation('no')}
+          ],
           options: {
             persist: false
           },
@@ -460,21 +484,8 @@ app.on('ready', () => {
       }
     })
 
-    ipcMain.on(messages.UPDATE_MENU_BOOKMARKED_STATUS, (e, isBookmarked) => {
-      if (typeof isBookmarked === 'boolean') {
-        Menu.updateBookmarkedStatus(isBookmarked)
-      }
-    })
-
     ipcMain.on(messages.SET_CLIPBOARD, (e, text) => {
       electron.clipboard.writeText(text)
-    })
-
-    ipcMain.on(messages.SHOW_NOTIFICATION, (e, msg) => {
-      if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.SHOW_NOTIFICATION,
-                                                          locale.translation(msg))
-      }
     })
 
     ipcMain.on(messages.CHECK_FLASH_INSTALLED, (e) => {
@@ -522,15 +533,7 @@ app.on('ready', () => {
     })
 
     // save app state every 5 minutes regardless of update frequency
-    setInterval(initiateSessionStateSave, 1000 * 60 * 5)
-
-    AppStore.addChangeListener(() => {
-      if (BrowserWindow.getFocusedWindow()) {
-        BrowserWindow.getFocusedWindow().webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
-      } else {
-        Menu.rebuild(AppStore.getState(), null)
-      }
-    })
+    sessionStateSaveInterval = setInterval(initiateSessionStateSave, 1000 * 60 * 5)
 
     ledger.init()
 
@@ -670,9 +673,9 @@ app.on('ready', () => {
         // Notification not shown already
         appActions.showMessageBox({
           buttons: [
-            locale.translation('yes'),
-            locale.translation('no'),
-            locale.translation('neverForThisSite')
+            {text: locale.translation('yes')},
+            {text: locale.translation('no')},
+            {text: locale.translation('neverForThisSite')}
           ],
           options: {
             persist: false,
@@ -720,8 +723,9 @@ app.on('ready', () => {
       }
     })
 
-    // Setup the crash handling
-    CrashHerald.init()
+    ipcMain.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
+      Importer.init()
+    })
 
     // This loads package.json into an object
     // TODO: Seems like this can be done with app.getVersion() insteand?
@@ -743,6 +747,12 @@ app.on('ready', () => {
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
         console.log(metadata)
       })
+
+      // This is fired by a menu entry
+      process.on(messages.IMPORT_BROWSER_DATA_NOW, () => {
+        Importer.init()
+      })
     })
+    ready = true
   })
 })

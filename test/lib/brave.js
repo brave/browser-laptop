@@ -1,4 +1,3 @@
-require('babel-polyfill')
 var Application = require('spectron').Application
 var chai = require('chai')
 require('./coMocha')
@@ -28,14 +27,23 @@ const rmDir = (dirPath) => {
   if (files.length > 0) {
     for (var i = 0; i < files.length; i++) {
       var filePath = path.join(dirPath, files[i])
-      if (fs.statSync(filePath).isFile()) {
-        fs.unlinkSync(filePath)
-      } else {
-        rmDir(filePath)
+      try {
+        if (fs.statSync(filePath).isFile()) {
+          fs.unlinkSync(filePath)
+        } else {
+          rmDir(filePath)
+        }
+      } catch (e) {
+        console.warn(e)
       }
     }
   }
-  fs.rmdirSync(dirPath)
+  try {
+    fs.rmdirSync(dirPath)
+  } catch (e) {
+    console.error(e)
+    return
+  }
 }
 
 var promiseMapSeries = function (array, iterator) {
@@ -234,13 +242,13 @@ var exports = {
       })
     })
 
-    this.app.client.addCommand('showFindbar', function (show) {
-      return this.execute(function (show) {
+    this.app.client.addCommand('showFindbar', function (show, key = 1) {
+      return this.execute(function (show, key) {
         window.windowActions.setFindbarShown(Object.assign({
           windowId: require('electron').remote.getCurrentWindow().id,
-          key: 1
+          key
         }), show !== false)
-      }, show)
+      }, show, key)
     })
 
     this.app.client.addCommand('setPinned', function (location, isPinned, options = {}) {
@@ -278,6 +286,17 @@ var exports = {
     })
 
     /**
+     * Adds a list sites to the sites list, including bookmark and foler.
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     */
+    this.app.client.addCommand('addSiteList', function (siteDetail) {
+      return this.execute(function (siteDetail) {
+        return require('../../../js/actions/appActions').addSite(siteDetail)
+      }, siteDetail).then((response) => response.value)
+    })
+
+    /**
      * Removes a site from the sites list, or removes a bookmark.
      *
      * @param {object} siteDetail - Properties for the frame to add
@@ -310,7 +329,7 @@ var exports = {
     this.app.client.addCommand('changeSiteSetting', function (hostPattern, key, value) {
       return this.execute(function (hostPattern, key, value) {
         return require('../../../js/actions/appActions').changeSiteSetting(hostPattern, key, value)
-      }, key, value).then((response) => response.value)
+      }, hostPattern, key, value).then((response) => response.value)
     })
 
     /**
@@ -344,6 +363,12 @@ var exports = {
       return this.execute(function () {
         let screen = require('electron').screen
         return screen.getPrimaryDisplay().bounds.height
+      }).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('isDarwin', function () {
+      return this.execute(function () {
+        return navigator.platform === 'MacIntel'
       }).then((response) => response.value)
     })
 
@@ -433,8 +458,6 @@ var exports = {
             })
         })
     })
-
-    this.app.client.waitUntilWindowLoaded().windowByUrl(exports.browserWindowUrl)
   },
 
   startApp: function () {
@@ -446,6 +469,9 @@ var exports = {
       BRAVE_USER_DATA_DIR: userDataDir
     }
     this.app = new Application({
+      waitforInterval: 100,
+      waitforTimeout: 1000,
+      quitTimeout: 0,
       path: './node_modules/.bin/electron',
       env,
       args: ['./', '--debug=5858', '--enable-logging', '--v=1']
@@ -454,12 +480,16 @@ var exports = {
   },
 
   stopApp: function (cleanSessionStore = true) {
-    if (cleanSessionStore) {
-      if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
-        userDataDir && rmDir(userDataDir)
+    let stop = this.app.stop().then((app) => {
+      if (cleanSessionStore) {
+        if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
+          userDataDir && rmDir(userDataDir)
+        }
+        userDataDir = generateUserDataDir()
       }
-      userDataDir = generateUserDataDir()
-    }
+      return app
+    })
+
     // this.app.client.getMainProcessLogs().then(function (logs) {
     //   logs.forEach(function (log) {
     //     console.log(log)
@@ -470,7 +500,7 @@ var exports = {
     //     console.log(log)
     //   })
     // })
-    return this.app.stop()
+    return stop
   }
 }
 

@@ -1,12 +1,13 @@
 {
   "name": "brave",
-  "version": "0.12.0",
+  "version": "0.12.5",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
     "port": "8080"
   },
   "scripts": {
+    "add-simulated-payment-history": "node ./tools/addSimulatedPaymentHistory.js",
     "build-installer": "node ./tools/buildInstaller.js",
     "build-package": "node ./tools/buildPackage.js",
     "check-security": "nsp check",
@@ -15,7 +16,7 @@
     "clean-adblock-data": "node ./tools/clean.js userData ABPFilterParserData.dat",
     "clean-httpse-data": "node ./tools/clean.js userData httpse.json",
     "clean-sb-data": "node ./tools/clean.js userData SafeBrowsingData.dat",
-    "clean-session-store": "node ./tools/clean.js userData session-store-1-dev",
+    "clean-session-store": "node ./tools/clean.js userData session-store-1",
     "clean-tp-data": "node ./tools/clean.js userData TrackingProtection.dat",
     "docs": "jsdox js/actions/appActions.js js/actions/windowActions.js --output docs",
     "download-languages": "node ./tools/downloadLanguages",
@@ -26,9 +27,9 @@
     "preload-httpse": "node ./preload-httpse.js",
     "start": "node ./tools/start.js --debug=5858 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck",
-    "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js')",
-    "unittest": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find ./test/unit -name '*Test.js')",
-    "uitest": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*Test.js' -not -path 'test/unit/*')",
+    "test": "NODE_ENV=test mocha --require babel-register --require babel-polyfill 'test/**/*Test.js'",
+    "unittest": "NODE_ENV=test mocha --require babel-register --require babel-polyfill 'test/unit/**/*Test.js'",
+    "uitest": "NODE_ENV=test mocha --require babel-register --require babel-polyfill --recursive $(find test -name '*Test.js' -not -path 'test/unit/*')",
     "update-pdfjs": "rm -r app/extensions/pdfjs/; cp -r ../pdf.js/build/chromium/ app/extensions/pdfjs/",
     "vagrant-destroy-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant destroy",
     "vagrant-halt-linux": "VAGRANT_CWD=./test/vms/vagrant/ubuntu-14.04 vagrant halt",
@@ -75,12 +76,12 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
-    "abp-filter-parser-cpp": "1.1.x",
+    "abp-filter-parser-cpp": "1.2.x",
     "acorn": "3.2.0",
     "async": "^2.0.1",
     "electron-localshortcut": "^0.6.0",
     "electron-prebuilt": "brave/electron-prebuilt",
-    "electron-squirrel-startup": "^1.0.0",
+    "electron-squirrel-startup": "brave/electron-squirrel-startup",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
     "font-awesome-webpack": "0.0.4",
@@ -89,15 +90,16 @@
     "immutablepatch": "^0.2.2",
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
-    "ledger-balance": "^0.8.46",
-    "ledger-client": "^0.8.59",
-    "ledger-publisher": "^0.8.58",
+    "ledger-balance": "^0.8.61",
+    "ledger-client": "^0.8.83",
+    "ledger-geoip": "^0.8.72",
+    "ledger-publisher": "^0.8.75",
     "lru_cache": "^1.0.0",
+    "moment": "^2.15.1",
     "qr-image": "^3.1.0",
     "random-lib": "2.1.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
-    "react-stickynode": "1.1.x",
     "spellchecker": "^3.3.1",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",
@@ -105,7 +107,6 @@
     "tldjs": "1.6.2",
     "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
-    "underscore.string": "^3.3.4",
     "url-loader": "^0.5.7"
   },
   "devDependencies": {
@@ -150,9 +151,9 @@
     "nsp": "^2.2.0",
     "pre-commit": "brave/pre-commit",
     "react-addons-perf": "^15.2.1",
-    "spectron": "^1.37.0",
+    "spectron": "brave/spectron",
     "sqlite3": "^3.1.1",
-    "standard": "^8.0.0",
+    "standard": "8.1.0",
     "style-loader": "^0.13.0",
     "webdriverio": "4.2.5",
     "webpack": "^1.12.9",
@@ -162,7 +163,7 @@
   },
   "optionalDependencies": {
     "electron-installer-debian": "^0.3.0",
-    "electron-installer-redhat": "^0.2.0"
+    "electron-installer-redhat": "^0.3.0"
   },
   "standard": {
     "ignore": [

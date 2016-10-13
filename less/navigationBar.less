@@ -18,7 +18,12 @@
   }
 }
 
-// On MacOS we need to keep a padding left to avoid overlapping
+// All platforms - media queries
+@media (max-width: @breakpointNarrowViewport) {
+  .loadTime { display: none; }
+}
+
+// (macOS) We need to keep a padding left to avoid overlapping
 // with the window buttons to close/maximize/minimize the window.
 .platform--darwin .navigatorWrapper .backforward {
   margin-left: @navbarLeftMarginDarwin;
@@ -29,6 +34,383 @@
                  - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
+// Windows specific styles
+.platform--win32 {
+  div#window.frameless {
+    border: 1px solid #000;
+    box-sizing: border-box;
+  }
+
+  .backforward {
+    padding-left: 5px;
+  }
+
+  #urlInput { width: 100%; }
+
+  // changes to ensure window can be as small as 480px wide
+  // and still be useable and have the caption buttons intact
+  @media (max-width: @breakpointExtensionButtonPadding) {
+    .navigatorWrapper .topLevelEndButtons .extraDragArea {
+      width: 0;
+    }
+  }
+  @media (max-width: @breakpointSmallWin32) {
+    #titleBar { width: 100px; }
+    .menubarContainer {
+      .menubar {
+        .menubarItem {
+          padding: 0 5px 1px;
+        }
+      }
+    }
+  }
+  @media (max-width: @breakpointTinyWin32) {
+    .loadTime { display: none; }
+    .menubarContainer {
+      .menubar {
+        .menubarItem {
+          padding: 0 3px 1px;
+        }
+      }
+    }
+  }
+
+  // Windows 7 specific styles
+  &.win7 {
+    .windowCaptionButtons {
+      > .container {
+        margin-right: 6px;
+
+        button.captionButton {
+          outline: 0;
+          height: 18px;
+          color: #b1acac;
+          border: 1px solid #adadad;
+          border-top: 0;
+          display: inline-block;
+          background-color: #f5f5f5;
+          box-shadow: inset 1px 1px rgba(255, 255, 255, 0.9);
+          width: 25px;
+
+          &.minimize {
+            width: 28px;
+            border-right: 0px;
+            &:hover {
+              background-color: #fff;
+            }
+            &:active {
+              background-color: #cacacb;
+            }
+            border-radius: 0 0 0 4px;
+
+            .widget {
+              width: 10px;
+              height: 3px;
+              border: 1px solid #838383;
+              background: #fff;
+              display: inline-block;
+              border-radius: 1px;
+            }
+          }
+
+          &.maximize {
+            border-right: 0px;
+            width: 27px;
+            &:hover {
+              background-color: #fff;
+              .widget {
+                .widget2 {
+                  background-color: #fff;
+                }
+              }
+            }
+            &:active {
+              background-color: #cacacb;
+              .widget {
+                .widget2 {
+                  background-color: #cacacb;
+                }
+              }
+            }
+            &.fullscreen {
+              &:hover {
+                background-color: #e5e5e5;
+              }
+              &:active {
+                background-color: #cacacb;
+              }
+              .widget {
+                .widget1 {
+                  width: 8px;
+                  top: 2px;
+                  left: 10px;
+                }
+                .widget2 {
+                  width: 8px;
+                  height: 8px;
+                  top: -5px;
+                  left: 6px;
+                  background: #fff;
+                  border-radius: 1px;
+                }
+                .widget3 {
+                  display: inline-block;
+                  width: 2px;
+                  height: 2px;
+                  border: 1px solid #838383;
+                  background: #fff;
+                  position: relative;
+                  top: -20px;
+                  left: -2px;
+                }
+              }
+            }
+
+            .widget {
+              .widget1 {
+                width: 10px;
+                height: 8px;
+                border: 1px solid #838383;
+                background: #fff;
+                position: relative;
+                top: 2px;
+                left: 7px;
+                border-radius: 1px;
+              }
+              .widget2 {
+                width: 4px;
+                height: 2px;
+                border: 1px solid #838383;
+                background-color: #f5f5f5;
+                position: relative;
+                top: -5px;
+                left: 10px;
+                border-radius: 0;
+              }
+              .widget3 { display: none; }
+            }
+          }
+
+          &.close {
+            width: 48px;
+            border-radius: 0 0 4px 0;
+            &:hover {
+              background-color: #d9504e;
+            }
+            &:active {
+              background-color: #d7393d;
+            }
+
+            .widget {
+              background: url('../img/windows/close.svg') no-repeat;
+              display: inline-block;
+              height: 12px;
+              width: 12px;
+              position: relative;
+              top: 3px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Windows 10 specific styles
+  &.win10 {
+    .windowCaptionButtons {
+      > .container {
+        button.captionButton {
+          width: 45px;
+          height: 29px;
+          border: 0;
+          background-color: transparent;
+
+          &.fullscreen {
+            height:21px;
+          }
+
+          &.minimize {
+            &:hover {
+              background-color: #e5e5e5;
+            }
+            &:active {
+              background-color: #cacacb;
+            }
+            &.fullscreen {
+              .widget {
+                top: 5px;
+                left: -2px;
+              }
+            }
+            .widget {
+              background: url('../img/windows/win10_minimize.svg') no-repeat;
+              display: inline-block;
+              height: 10px;
+              width: 10px;
+              position: relative;
+              top: 4px;
+              left: -1px;
+            }
+          }
+
+          &.maximize {
+            border-right: 0px;
+            &:hover {
+              background-color: #e5e5e5;
+            }
+            &:active {
+              background-color: #cacacb;
+            }
+            &.fullscreen {
+              &:hover {
+                background-color: #e5e5e5;
+              }
+              &:active {
+                background-color: #cacacb;
+              }
+              .widget {
+                background: url('../img/windows/win10_restore.svg') no-repeat;
+                display: inline-block;
+                height: 10px;
+                width: 10px;
+                position: relative;
+                top: 0px;
+                left: -2px;
+              }
+            }
+            .widget {
+              background: url('../img/windows/win10_expand.svg') no-repeat;
+              display: inline-block;
+              height: 10px;
+              width: 10px;
+              position: relative;
+              top: -1px;
+              left: -1px;
+
+              .widget1 { display: none; }
+              .widget2 { display: none; }
+              .widget3 { display: none; }
+            }
+          }
+
+          &.close {
+            width: 46px;
+            &:hover {
+              background-color: #e5182c;
+              .widget {
+                background: url('../img/windows/win10_close_white.svg') no-repeat;
+              }
+            }
+            &:not(:hover) {
+              .widget {
+                background: url('../img/windows/win10_close.svg') no-repeat;
+              }
+            }
+            &:active {
+              background-color: #ef717c;
+            }
+            &.fullscreen {
+              top: 0px;
+              width: 45px;
+            }
+            .widget {
+              display: inline-block;
+              height: 10px;
+              left: -1px;
+              position: relative;
+              top: -1px;
+              width: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styles had to be reworked to properly position the new caption buttons for Windows
+.navbarCaptionButtonContainer {
+  display: flex;
+  border-bottom: 1px solid #aaaaaa;
+
+  &.allowDragging {
+    -webkit-app-region: drag;
+  }
+}
+.navbarMenubarFlexContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+}
+.navbarMenubarBlockContainer {
+  display: block;
+  width: 100%;
+}
+
+// Window Caption Buttons (for use w/ slim titlebar)
+.windowCaptionButtons {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+
+  .hidden {
+    display: none;
+  }
+
+  button.captionButton {
+    outline: none;
+    vertical-align: top;
+  }
+
+  &.fullscreen {
+    .win7 {
+      margin-top: 1px;
+    }
+  }
+
+  .container {
+    display: flex;
+    flex-grow: 0;
+    -webkit-app-region: no-drag;
+  }
+}
+
+// Menubar (for use w/ slim titlebar)
+.menubarContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+
+  .menubar {
+    display: flex;
+    cursor: default;
+    -webkit-user-select: none;
+    flex-grow: 0;
+
+    .menubarItem {
+      color: black;
+      font: menu;
+      font-size: 12px;
+      -webkit-app-region: no-drag;
+      padding: 0 10px 1px;
+      border: 1px solid transparent;
+
+      &:hover {
+        background-color: #e5f3ff;
+        border: 1px solid #cce8ff;
+      }
+    }
+
+    .selected {
+      background-color: #cce8ff !important;
+      border: 1px solid #99d1ff !important;
+    }
+  }
+}
 
 // Here I grouped the rules to keep the layout of the top bar consistent.
 // The tricky part is to keep the title in `#navigator` centered when the
@@ -91,10 +473,14 @@
   // Buttons on the right
   .topLevelEndButtons {
     display: flex;
+    flex-direction: row;
+
+    .extensionButton {
+      -webkit-app-region: no-drag;
+    }
 
     .braveMenu {
       width: @navbarBraveButtonWidth;
-      margin-left: @navbarBraveButtonMarginLeft;
       margin-right: @navbarButtonSpacing;
       -webkit-app-region: no-drag;
       -webkit-user-select: none;
@@ -112,15 +498,19 @@
         opacity: 0.4;
       }
     }
+
+    .extraDragArea {
+      display: flex;
+      flex-grow: 0;
+      width: @navbarBraveButtonMarginLeft;
+    }
   }
 }
 
 
 .navigatorWrapper {
   justify-content: space-between;
-  -webkit-app-region: drag;
   align-items: center;
-  border-bottom: 1px solid #aaaaaa;
   height: @navbarHeight;
   box-sizing: border-box;
 
@@ -136,7 +526,7 @@
       -webkit-app-region: no-drag;
       -webkit-user-select: none;
       color: @buttonColor;
-      border-radius: 50%;
+      border-radius: 4px;
       font-weight: 300;
       opacity: 0.2;
 
@@ -153,16 +543,17 @@
 
     .back,
     .forward {
-      font-size: 35px;
+      font-size: 28px;
       text-align: center;
     }
   }
 }
 
 .urlbarForm {
+  width: 0; // Fixes #4298
   align-items: center;
   justify-content: center;
-  height: 24px;
+  height: 25px;
   padding: 0 10px;
 
   display: flex;
@@ -178,10 +569,9 @@
     content: ' ';
     position: absolute;
     background: #fff;
-    border: 2px solid @focusUrlbarOutline;
+    border: 1px solid @focusUrlbarOutline;
     border-radius: 4px;
-    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline;
-    box-shadow: inset 0 1px 8px rgba(0, 137, 255, 0.5);
+    box-shadow: 0 0 1px @focusUrlbarOutline, inset 0 0 2px @focusUrlbarOutline, inset 0 1px 8px rgba(0, 137, 255, 0.1);
     color: #333;
     outline: none;
     top: 0;
@@ -194,7 +584,7 @@
   #navigator:not(.titleMode) & {
     background: white;
     border-radius: @borderRadiusURL;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), inset 0 1px 0 rgba(0,0,0,0.05), inset 0 1px 1px rgba(0,0,0,0.1);
     color: @chromeText;
   }
   @media (max-width: @breakpointNarrowViewport) {
@@ -239,25 +629,19 @@
       display: inline-block;
       background:rgba(243, 243, 243, 0);
       color: @chromeText;
-      font-size: 15px;
+      font-size: 13px;
       max-width: 100%;
       overflow-x: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      strong {
+        font-weight: 600;
+      }
     }
 
     .endButtons {
-      position: absolute;
-      top: -2px;
-      right: 0;
-    }
-
-    .noScript {
-      font-size: 12px;
-      position: absolute;
-      left: -30px;
-      opacity: 1;
-      color: @braveOrange;
+      display: none;
     }
 
     .urlbarIcon {
@@ -269,7 +653,7 @@
 
       &[class*=" fa-"] {
         margin-right: 5px;
-        margin-top: 3px;
+        margin-top: 1px;
         font-size: 14px;
         min-height: 12px;
         color: @chromeText;
@@ -278,10 +662,6 @@
     }
 
     .bookmarkButton {
-      transform: scale(0.6);
-      opacity: 0.6;
-      text-align: left;
-
       &:not(.removeBookmarkButton) {
         display: none;
       }
@@ -313,11 +693,6 @@
     font-size: 16px;
     margin-left: 10px;
     color: @braveOrange;
-    opacity: 0.6;
-    &:hover {
-      opacity: 1;
-    }
-    display: inline;
   }
 
   /* Disable selection of button text */
@@ -353,7 +728,7 @@
     cursor: text;
     font-size: @defaultFontSize;
     font-weight: normal;
-    margin: 3px 0 0 3px;
+    margin: 2px 0 0 3px;
     outline: none;
     text-overflow: ellipsis;
     flex-grow: 1;
@@ -407,7 +782,5 @@
                                       url(../app/extensions/brave/img/braveBtn2x.png) 2x,
                                       url(../app/extensions/brave/img/braveBtn3x.png) 3x);
   background-repeat: no-repeat;
-  height: 27px;
-  margin-top: 3px;
+  height: 24px;
 }
-

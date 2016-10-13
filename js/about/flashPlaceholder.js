@@ -76,13 +76,13 @@ class FlashPlaceholder extends ImmutableComponent {
         <img src='img/bravePluginAlert.png' />
         <div id='flashRightClick'>{flashRightClick}</div>
         <div className='flashSubtext'>
-        {
-          flashEnabled
-          ? flashSubtext
-          : <span>
-            To run Flash, enable it in <span className='linkText' onClick={this.onPrefsClick}>Preferences</span>.
-          </span>
-        }
+          {
+            flashEnabled
+            ? flashSubtext
+            : <span>
+              To run Flash, enable it in <span className='linkText' onClick={this.onPrefsClick}>Preferences</span>.
+            </span>
+          }
         </div>
       </div>
       {

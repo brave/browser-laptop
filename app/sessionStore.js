@@ -16,6 +16,7 @@ const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
 const app = electron.app
+const locale = require('./locale')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
@@ -23,6 +24,7 @@ const {tabFromFrame} = require('../js/state/frameStateUtil')
 const siteUtil = require('../js/state/siteUtil')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
+const autofill = require('./autofill')
 // const tabState = require('./common/state/tabState')
 
 const getSetting = require('../js/settings').getSetting
@@ -232,6 +234,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
   data.temporarySiteSettings = {}
   // Delete Flash state since this is checked on startup
   delete data.flashInitialized
+  // Delete Recovery status on shut down
+  try {
+    delete data.ui.about.preferences.recoverySucceeded
+  } catch (e) {}
   // We used to store a huge list of IDs but we didn't use them.
   // Get rid of them here.
   delete data.windows
@@ -239,15 +245,35 @@ module.exports.cleanAppData = (data, isShutdown) => {
     data.perWindowState.forEach((perWindowState) =>
       module.exports.cleanPerWindowData(perWindowState, isShutdown))
   }
-  // Delete expired Flash approvals
+  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
+  if (clearAutocompleteData) {
+    autofill.clearAutocompleteData()
+  }
+  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
+  if (clearAutofillData) {
+    autofill.clearAutofillData()
+  }
+  const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
+  if (clearSiteSettings) {
+    data.siteSettings = {}
+  }
+  // Delete expired Flash and NoScript allow-once approvals
   let now = Date.now()
   for (var host in data.siteSettings) {
     let expireTime = data.siteSettings[host].flash
     if (typeof expireTime === 'number' && expireTime < now) {
       delete data.siteSettings[host].flash
     }
+    let noScript = data.siteSettings[host].noScript
+    if (typeof noScript === 'number') {
+      delete data.siteSettings[host].noScript
+    }
     // Don't write runInsecureContent to session
     delete data.siteSettings[host].runInsecureContent
+    // If the site setting is empty, delete it for privacy
+    if (Object.keys(data.siteSettings[host]).length === 0) {
+      delete data.siteSettings[host]
+    }
   }
   if (data.sites) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
@@ -280,6 +306,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
   // if (data.tabs) {
   //   data.tabs = data.tabs.map((tab) => tabState.getPersistentTabState(tab).toJS())
   // }
+  if (data.extensions) {
+    Object.keys(data.extensions).forEach((extensionId) => {
+      delete data.extensions[extensionId].tabs
+    })
+  }
 }
 
 /**
@@ -308,13 +339,7 @@ module.exports.loadAppState = () => {
     let data
     try {
       data = fs.readFileSync(getStoragePath())
-    } catch (e) {
-    }
-
-    if (!data) {
-      reject()
-      return
-    }
+    } catch (e) {}
 
     try {
       data = JSON.parse(data)
@@ -336,8 +361,29 @@ module.exports.loadAppState = () => {
           })
           data.autofill.creditCards = creditCards
         }
+        if (data.autofill.addresses.guid) {
+          let guids = []
+          data.autofill.addresses.guid.forEach((guid) => {
+            if (typeof guid === 'object') {
+              guids.push(guid['persist:default'])
+            } else {
+              guids.push(guid)
+            }
+          })
+          data.autofill.addresses.guid = guids
+        }
+        if (data.autofill.creditCards.guid) {
+          let guids = []
+          data.autofill.creditCards.guid.forEach((guid) => {
+            if (typeof guid === 'object') {
+              guids.push(guid['persist:default'])
+            } else {
+              guids.push(guid)
+            }
+          })
+          data.autofill.creditCards.guid = guids
+        }
       }
-
       // xml migration
       if (data.settings) {
         if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
@@ -347,35 +393,37 @@ module.exports.loadAppState = () => {
           data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
         }
       }
+      // Clean app data here if it wasn't cleared on shutdown
+      if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
+        module.exports.cleanAppData(data, false)
+      }
+      data = Object.assign(module.exports.defaultAppState(), data)
+      data.cleanedOnShutdown = false
+      // Always recalculate the update status
+      if (data.updates) {
+        const updateStatus = data.updates.status
+        delete data.updates.status
+        // The process always restarts after an update so if the state
+        // indicates that a restart isn't wanted, close right away.
+        if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
+          module.exports.saveAppState(data, true).then(() => {
+            // Exit immediately without doing the session store saving stuff
+            // since we want the same state saved except for the update status
+            app.exit(0)
+          })
+          return
+        }
+      }
     } catch (e) {
       // TODO: Session state is corrupted, maybe we should backup this
       // corrupted value for people to report into support.
       console.log('could not parse data: ', data)
-      reject(e)
-      return
+      data = exports.defaultAppState()
     }
-    // Clean app data here if it wasn't cleared on shutdown
-    if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
-      module.exports.cleanAppData(data, false)
-    }
-    data = Object.assign(module.exports.defaultAppState(), data)
-    data.cleanedOnShutdown = false
-    // Always recalculate the update status
-    if (data.updates) {
-      const updateStatus = data.updates.status
-      delete data.updates.status
-      // The process always restarts after an update so if the state
-      // indicates that a restart isn't wanted, close right away.
-      if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-        module.exports.saveAppState(data, true).then(() => {
-          // Exit immediately without doing the session store saving stuff
-          // since we want the same state saved except for the update status
-          app.exit(0)
-        })
-        return
-      }
-    }
-    resolve(data)
+    locale.init(data.settings[settings.LANGUAGE]).then((locale) => {
+      app.setLocale(locale)
+      resolve(data)
+    })
   })
 }
 
@@ -384,8 +432,10 @@ module.exports.loadAppState = () => {
  */
 module.exports.defaultAppState = () => {
   return {
+    firstRunTimestamp: new Date().getTime(),
     sites: [],
     tabs: [],
+    extensions: {},
     visits: [],
     settings: {},
     siteSettings: {},
@@ -405,6 +455,7 @@ module.exports.defaultAppState = () => {
         guid: [],
         timestamp: 0
       }
-    }
+    },
+    menubar: {}
   }
 }

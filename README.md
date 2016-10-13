@@ -44,6 +44,10 @@ Please see the [Building on Windows wiki entry](https://github.com/brave/browser
 
 * `apt-get install libgnome-keyring-dev build-essential`
 
+OR
+
+* `dnf install libgnome-keyring-devel rpm-build`
+
 ## Installation
 
 After installing the prerequisites:
@@ -79,11 +83,12 @@ Some platforms are available as pre-configured VMs. See the [readme](https://git
 
 ## Development
 
-You will also have to have two terminal tabs up to run Brave. One for Brave to watch for changes to the code, and one to run Brave.
-
-To run a development version of the browser, run the following on the command line:
+To run a development version of the browser requires a few steps. The easiest way is just to use two 
+terminals. One terminal can be used just to watch for changes to the code
 
     npm run watch
+
+Now actually run Brave in another terminal
 
     npm start
 
@@ -118,7 +123,7 @@ By default, we provide pre-built binaries when you `npm install` with our own fo
 If you want to modify the code to Electron itself, then you'll need to build it.  An example of why you might do that would be exposing a new event to the webview from Electron.
 
 Build instructions:
-- [OSX build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
+- [macOS build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
 - [Windows build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-windows.md)
 - [Linux build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-linux.md)
 
@@ -146,7 +151,7 @@ In order do run any build commands, you'll need an environment variable set for 
 
 For more information, see [docs/buildingReleases.md](docs/buildingReleases.md) which has a more detailed overview of our release process.
 
-### OSX:
+### macOS:
 
 From within brave-browser you can create a .app file for distribution:
 

@@ -99,11 +99,11 @@ class DownloadItem extends ImmutableComponent {
               this.props.download.get('filename')
             }
           </div>
-        {
-          this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
-          ? <div className='downloadState' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
-          : null
-        }
+          {
+            this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
+            ? <div className='downloadState' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
+            : null
+          }
         </span>
         <span className='downloadArrow fa-caret-down fa' />
       </div>
@@ -121,17 +121,17 @@ class DownloadsBar extends ImmutableComponent {
     return <div className='downloadsBar'
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, undefined, undefined)}>
       <div className='downloadItems'>
-      {
-        this.props.downloads
-          .sort((x, y) => x.get('startTime') - y.get('startTime'))
-          .skip(this.props.downloads.size - numItems)
-          .reverse()
-          .map((download, downloadId) =>
-            <DownloadItem download={download}
-              windowWidth={this.props.windowWidth}
-              downloadId={downloadId}
-              downloadsSize={this.props.downloads.size} />)
-      }
+        {
+          this.props.downloads
+            .sort((x, y) => x.get('startTime') - y.get('startTime'))
+            .skip(this.props.downloads.size - numItems)
+            .reverse()
+            .map((download, downloadId) =>
+              <DownloadItem download={download}
+                windowWidth={this.props.windowWidth}
+                downloadId={downloadId}
+                downloadsSize={this.props.downloads.size} />)
+        }
       </div>
       <div className='downloadBarButtons'>
         <Button iconClass='fa-times'

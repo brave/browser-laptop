@@ -9,25 +9,25 @@ const webviewActions = require('../actions/webviewActions')
 const appActions = require('../actions/appActions')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const siteUtil = require('../state/siteUtil')
 const FrameStateUtil = require('../state/frameStateUtil')
 const UrlUtil = require('../lib/urlutil')
-const messages = require('../constants/messages.js')
+const messages = require('../constants/messages')
 const contextMenus = require('../contextMenus')
 const {siteHacks} = require('../data/siteHacks')
 const ipc = global.require('electron').ipcRenderer
 const clipboard = global.require('electron').clipboard
 const FullScreenWarning = require('./fullScreenWarning')
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
-const { isFrameError } = require('../lib/errorUtil')
+const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage} = require('../lib/appUrlUtil')
+const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
-const { getSiteSettingsForHostPattern } = require('../state/siteSettings')
+const {getSiteSettingsForHostPattern} = require('../state/siteSettings')
 const flash = require('../flash')
 const currentWindow = require('../../app/renderer/currentWindow')
 const windowStore = require('../stores/windowStore')
@@ -77,7 +77,7 @@ class Frame extends ImmutableComponent {
     let location = getBaseUrl(this.props.location)
     if (location === 'about:preferences') {
       ipc.send(messages.CHECK_BITCOIN_HANDLER, FrameStateUtil.getPartition(this.frame))
-      const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).toJS()
+      const ledgerData = this.props.ledgerInfo.merge(this.props.publisherInfo).merge(this.props.preferencesData).toJS()
       this.webview.send(messages.LEDGER_UPDATED, ledgerData)
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
       this.webview.send(messages.SITE_SETTINGS_UPDATED, this.props.allSiteSettings ? this.props.allSiteSettings.toJS() : null)
@@ -92,6 +92,16 @@ class Frame extends ImmutableComponent {
         history: this.props.history.toJS()
       })
       this.webview.send(messages.SETTINGS_UPDATED, this.props.settings ? this.props.settings.toJS() : null)
+    } else if (location === 'about:extensions') {
+      this.webview.send(messages.EXTENSIONS_UPDATED, {
+        extensions: this.props.extensions.toJS()
+      })
+    } else if (location === 'about:adblock') {
+      this.webview.send(messages.ADBLOCK_UPDATED, {
+        adblock: this.props.adblock.toJS(),
+        settings: this.props.settings ? this.props.settings.toJS() : null,
+        resources: require('abp-filter-parser-cpp/lib/regions')
+      })
     } else if (location === 'about:downloads') {
       this.webview.send(messages.DOWNLOADS_UPDATED, {
         downloads: this.props.downloads.toJS()
@@ -107,14 +117,12 @@ class Frame extends ImmutableComponent {
     } else if (location === 'about:flash') {
       this.webview.send(messages.BRAVERY_DEFAULTS_UPDATED, this.braveryDefaults)
     } else if (location === 'about:autofill') {
-      const partition = FrameStateUtil.getPartition(this.frame)
+      const defaultSession = global.require('electron').remote.session.defaultSession
       if (this.props.autofillAddresses) {
-        const addresses = this.props.autofillAddresses.get('guid')
+        const guids = this.props.autofillAddresses.get('guid')
         let list = []
-        addresses.forEach((entry) => {
-          const guid = entry.get(partition)
-          const address = currentWindow.webContents.session.autofill.getProfile(guid)
-          const valid = Object.getOwnPropertyNames(address).length > 0
+        guids.forEach((entry) => {
+          const address = defaultSession.autofill.getProfile(entry)
           let addressDetail = {
             name: address.full_name,
             organization: address.company_name,
@@ -125,35 +133,25 @@ class Frame extends ImmutableComponent {
             country: address.country_code,
             phone: address.phone,
             email: address.email,
-            guid: entry.toJS()
+            guid: entry
           }
-          if (valid) {
-            list.push(addressDetail)
-          } else {
-            appActions.removeAutofillAddress(addressDetail)
-          }
+          list.push(addressDetail)
         })
         this.webview.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
       }
       if (this.props.autofillCreditCards) {
-        const creditCards = this.props.autofillCreditCards.get('guid')
+        const guids = this.props.autofillCreditCards.get('guid')
         let list = []
-        creditCards.forEach((entry) => {
-          const guid = entry.get(partition)
-          const creditCard = currentWindow.webContents.session.autofill.getCreditCard(guid)
-          const valid = Object.getOwnPropertyNames(creditCard).length > 0
+        guids.forEach((entry) => {
+          const creditCard = defaultSession.autofill.getCreditCard(entry)
           let creditCardDetail = {
             name: creditCard.name,
             card: creditCard.card_number,
             month: creditCard.expiration_month,
             year: creditCard.expiration_year,
-            guid: entry.toJS()
+            guid: entry
           }
-          if (valid) {
-            list.push(creditCardDetail)
-          } else {
-            appActions.removeAutofillCreditCard(creditCardDetail)
-          }
+          list.push(creditCardDetail)
         })
         this.webview.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
       }
@@ -195,21 +193,26 @@ class Frame extends ImmutableComponent {
     return false
   }
 
-  expireFlash (origin) {
+  expireContentSettings (origin) {
     // Expired Flash settings should be deleted when the webview is
-    // navigated or closed.
+    // navigated or closed. Same for NoScript's allow-once option.
     const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
                                                              origin)
-    if (activeSiteSettings && typeof activeSiteSettings.get('flash') === 'number') {
+    if (!activeSiteSettings) {
+      return
+    }
+    if (typeof activeSiteSettings.get('flash') === 'number') {
       if (activeSiteSettings.get('flash') < Date.now()) {
-        // Expired entry. Remove it.
-        appActions.removeSiteSetting(origin, 'flash')
+        appActions.removeSiteSetting(origin, 'flash', this.props.isPrivate)
       }
+    }
+    if (activeSiteSettings.get('noScript') === 0) {
+      appActions.removeSiteSetting(origin, 'noScript', this.props.isPrivate)
     }
   }
 
   componentWillUnmount () {
-    this.expireFlash(this.origin)
+    this.expireContentSettings(this.origin)
   }
 
   updateWebview (cb, newSrc) {
@@ -304,7 +307,7 @@ class Frame extends ImmutableComponent {
 
   get zoomLevel () {
     const zoom = this.props.frameSiteSettings && this.props.frameSiteSettings.get('zoomLevel')
-    appActions.removeSiteSetting(this.origin, 'zoomLevel')
+    appActions.removeSiteSetting(this.origin, 'zoomLevel', this.props.isPrivate)
     return zoom
   }
 
@@ -349,9 +352,18 @@ class Frame extends ImmutableComponent {
       }
       this.webview.setActive(this.props.isActive)
       this.handleShortcut()
+
       // give focus when switching tabs
       if (this.props.isActive && !prevProps.isActive) {
-        this.webview.focus()
+        // If the tab we switch to is a new tab page, give focus
+        // to the UrlBar
+        if (this.props.location === 'about:newtab') {
+          windowActions.setUrlBarActive(true)
+          windowActions.setUrlBarFocused(true)
+        } else {
+          // If it is a regular webpage, just focus the webcontents
+          this.webview.focus()
+        }
       }
       // make sure the webview content updates to
       // match the fullscreen state of the frame
@@ -367,10 +379,10 @@ class Frame extends ImmutableComponent {
       this.updateAboutDetails()
     }
 
-    // For cross-origin navigation, clear temp Flash approvals
+    // For cross-origin navigation, clear temp approvals
     const prevOrigin = siteUtil.getOrigin(prevProps.location)
     if (this.origin !== prevOrigin) {
-      this.expireFlash(prevOrigin)
+      this.expireContentSettings(prevOrigin)
     }
 
     if (this.props.src !== prevProps.src) {
@@ -459,7 +471,12 @@ class Frame extends ImmutableComponent {
       case 'view-source':
         const sourceLocation = UrlUtil.getViewSourceUrlFromUrl(this.webview.getURL())
         if (sourceLocation !== null) {
-          windowActions.newFrame({location: sourceLocation}, true)
+          windowActions.newFrame({
+            location: sourceLocation,
+            isPrivate: this.frame.get('isPrivate'),
+            partitionNumber: this.frame.get('partitionNumber'),
+            parentFrameKey: this.frame.get('key')
+          }, true)
         }
         // TODO: Make the URL bar show the view-source: prefix
         break
@@ -521,8 +538,10 @@ class Frame extends ImmutableComponent {
    *   can either be main frame or subframe.
    * @param {function=} noFlashCallback - Optional callback to run if Flash is not
    *   installed
+   * @param {function=} flashCallback - Optional callback to run if Flash is
+   *   accepted
    */
-  showFlashNotification (origin, noFlashCallback) {
+  showFlashNotification (origin, noFlashCallback, flashCallback) {
     if (!origin || !UrlUtil.shouldInterceptFlash(origin)) {
       noFlashCallback()
       return
@@ -535,7 +554,10 @@ class Frame extends ImmutableComponent {
       const message = locale.translation('allowFlashPlayer').replace(/{{\s*origin\s*}}/, this.origin)
       // Show Flash notification bar
       appActions.showMessageBox({
-        buttons: [locale.translation('deny'), locale.translation('allow')],
+        buttons: [
+          {text: locale.translation('deny')},
+          {text: locale.translation('allow')}
+        ],
         message,
         frameOrigin: this.origin,
         options: {
@@ -550,18 +572,33 @@ class Frame extends ImmutableComponent {
           } else {
             appActions.changeSiteSetting(this.origin, 'flash', 1)
           }
+          if (flashCallback) {
+            flashCallback()
+          }
         } else {
-          appActions.hideMessageBox(message)
           if (persist) {
             appActions.changeSiteSetting(this.origin, 'flash', false)
           }
         }
+        appActions.hideMessageBox(message)
       }
     } else {
       flash.checkFlashInstalled((installed) => {
         if (installed) {
-          currentWindow.webContents.send(messages.SHOW_NOTIFICATION,
-                                         locale.translation('flashInstalled'))
+          let message = locale.translation('flashInstalled')
+          appActions.showMessageBox({
+            buttons: [
+              {text: locale.translation('goToPrefs')},
+              {text: locale.translation('goToAdobe')}
+            ],
+            message: message,
+            options: {nonce}
+          })
+          this.notificationCallbacks[message] = (buttonIndex) => {
+            appActions.hideMessageBox(message)
+            const location = buttonIndex === 0 ? 'about:preferences#security' : appConfig.flash.installUrl
+            windowActions.newFrame({ location }, true)
+          }
         } else if (noFlashCallback) {
           noFlashCallback()
         }
@@ -583,7 +620,7 @@ class Frame extends ImmutableComponent {
       }
     })
     this.webview.addEventListener('did-block-run-insecure-content', (e) => {
-      windowActions.setBlockedRunInsecureContent(this.frame, this.props.location)
+      windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
     })
     this.webview.addEventListener('context-menu', (e) => {
       contextMenus.onMainContextMenu(e.params, this.frame)
@@ -702,7 +739,7 @@ class Frame extends ImmutableComponent {
           break
         case messages.SHOW_FLASH_NOTIFICATION:
           method = (origin) => this.showFlashNotification(origin, () => {
-            windowActions.loadUrl(this.frame, 'https://get.adobe.com/flashplayer/')
+            windowActions.loadUrl(this.frame, appConfig.flash.installUrl)
           })
           break
         case messages.RELOAD:
@@ -714,21 +751,23 @@ class Frame extends ImmutableComponent {
             }
           }
           break
-        case messages.CAN_SWIPE_BACK:
-          currentWindow.webContents.send(messages.CAN_SWIPE_BACK)
-          break
-        case messages.CAN_SWIPE_FORWARD:
-          currentWindow.webContents.send(messages.CAN_SWIPE_FORWARD)
-          break
         case messages.CLEAR_BROWSING_DATA_NOW:
           method = (clearBrowsingDataDetail) =>
             windowActions.setClearBrowsingDataDetail(clearBrowsingDataDetail)
+          break
+        case messages.AUTOFILL_SET_ADDRESS:
+          method = (currentDetail, originalDetail) =>
+            windowActions.setAutofillAddressDetail(currentDetail, originalDetail)
+          break
+        case messages.AUTOFILL_SET_CREDIT_CARD:
+          method = (currentDetail, originalDetail) =>
+            windowActions.setAutofillCreditCardDetail(currentDetail, originalDetail)
           break
       }
       method.apply(this, e.args)
     })
 
-    const interceptFlash = (stopCurrentLoad, adobeUrl) => {
+    const interceptFlash = (stopCurrentLoad, adobeUrl, redirectUrl) => {
       if (!this.origin) {
         return
       }
@@ -745,6 +784,10 @@ class Frame extends ImmutableComponent {
       this.showFlashNotification(this.origin, () => {
         if (stopCurrentLoad && adobeUrl) {
           windowActions.loadUrl(this.frame, adobeUrl)
+        }
+      }, () => {
+        if (redirectUrl) {
+          windowActions.loadUrl(this.frame, redirectUrl)
         }
       })
     }
@@ -803,10 +846,10 @@ class Frame extends ImmutableComponent {
       if (hack && hack.enableFlashCTP &&
           !this.webview.allowRunningPlugins && this.props.flashInitialized) {
         // Fix #3011
-        interceptFlash(false)
+        interceptFlash(false, undefined, hack.redirectURL)
       }
     }
-    const loadFail = (e) => {
+    const loadFail = (e, provisionLoadFailure = false) => {
       if (isFrameError(e.errorCode)) {
         // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
         if (e.validatedURL === aboutUrls.get('about:newtab') ||
@@ -832,6 +875,8 @@ class Frame extends ImmutableComponent {
         })
         windowActions.loadUrl(this.frame, 'about:error')
         appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
+      } else if (provisionLoadFailure) {
+        windowActions.setNavigated(this.webview.getURL(), this.props.frameKey, true)
       }
     }
     this.webview.addEventListener('load-commit', (e) => {
@@ -876,7 +921,7 @@ class Frame extends ImmutableComponent {
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
         loadEnd(false)
-        loadFail(e)
+        loadFail(e, true)
       }
     })
     this.webview.addEventListener('did-fail-load', (e) => {
@@ -887,10 +932,15 @@ class Frame extends ImmutableComponent {
     })
     this.webview.addEventListener('did-finish-load', () => {
       loadEnd(true)
+      if (this.runInsecureContent()) {
+        appActions.removeSiteSetting(this.origin, 'runInsecureContent', this.props.isPrivate)
+      }
     })
     this.webview.addEventListener('did-navigate-in-page', (e) => {
-      windowActions.setNavigated(e.url, this.props.frameKey, true)
-      loadEnd(true)
+      if (e.isMainFrame) {
+        windowActions.setNavigated(e.url, this.props.frameKey, true)
+        loadEnd(true)
+      }
     })
     this.webview.addEventListener('enter-html-full-screen', () => {
       windowActions.setFullScreen(this.frame, true, true)
@@ -928,7 +978,11 @@ class Frame extends ImmutableComponent {
         }))
       }
     })
-
+    this.webview.addEventListener('did-get-response-details', (details) => {
+      if (this.frame) {
+        windowActions.gotResponseDetails(this.frame.get('tabId'), details)
+      }
+    })
     // Handle zoom using Ctrl/Cmd and the mouse wheel.
     this.webview.addEventListener('mousewheel', this.onMouseWheel.bind(this))
   }

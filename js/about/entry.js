@@ -1,6 +1,6 @@
 const ReactDOM = require('react-dom')
-const { getSourceAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
-const { ABOUT_COMPONENT_INITIALIZED } = require('../constants/messages')
+const {getSourceAboutUrl, getBaseUrl} = require('../lib/appUrlUtil')
+const {ABOUT_COMPONENT_INITIALIZED} = require('../constants/messages')
 const ipc = window.chrome.ipc
 
 let element
@@ -17,6 +17,12 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
     break
   case 'about:bookmarks':
     element = require('./bookmarks')
+    break
+  case 'about:extensions':
+    element = require('./extensions')
+    break
+  case 'about:adblock':
+    element = require('./adblock')
     break
   case 'about:downloads':
     element = require('./downloads')

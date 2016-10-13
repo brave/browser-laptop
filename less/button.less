@@ -13,13 +13,21 @@
   padding: 0px 20px;
 }
 
-span.browserButton {
+span.buttonSeparator {
+  width: 1px;
+  border-left: 1px solid @gray;
+  margin: 4px 3px 4px 3px;
+}
+
+a.browserButton,
+span.browserButton,
+.browserButton {
   cursor: default;
   display: inline-block;
-  line-height: 30px;
-  width: 30px;
-  height: 28px;
-  font-size: 16px;
+  line-height: 25px;
+  width: 25px;
+  height: 25px;
+  font-size: 15px;
   color: @buttonColor;
   border-radius: @borderRadius;
   margin: 0 3px;
@@ -46,11 +54,10 @@ span.browserButton {
 
   &.newFrameButton {
     font-size: 0px;
-    width: 23px;
-    height: 23px;
-    margin: 0px;
+    width: 24px;
+    height: 100%;
     opacity: 0.5;
-    background: url('../img/icon_new_frame.svg') 0 0 / contain no-repeat;
+    background: url('../img/icon_new_frame.svg') 50% 20% scroll / 20px no-repeat;
     &:hover {
       opacity: 0.8;
     }
@@ -72,7 +79,18 @@ span.browserButton {
   }
 
   &.primaryButton {
-    background-color: @braveOrange;
+    background: linear-gradient(@braveLightOrange, @braveOrange);
+    border: 2px solid transparent;
+    border-top: 2px solid @braveLightOrange;
+    border-bottom: 2px solid @braveOrange;
+    box-shadow: @buttonShadow;
+    font-weight: 400;
+
+    &:hover {
+      border: 2px solid white;
+      color: white;
+      cursor: pointer;
+    }
   }
 
   &.actionButton,
@@ -84,6 +102,24 @@ span.browserButton {
     display: block;
     margin-right: 0px;
     margin-left: 0px;
+  }
+
+  &.whiteButton {
+    background: linear-gradient(white, @lightGray);
+    border: 2px solid white;
+    box-shadow: @buttonShadow;
+    cursor: pointer;
+    display: block;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 14px;
+    color: @darkGray;
+    width: auto;
+    padding: 3px 35px;
+  }
+
+  &.inlineButton {
+    display: inline;
   }
 
   &.secondaryButton {

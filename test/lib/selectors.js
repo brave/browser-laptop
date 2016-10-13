@@ -1,4 +1,7 @@
 module.exports = {
+  minimizeButton: '.min-btn',
+  maximizeButton: '.max-btn',
+  closeButton: '.close-btn',
   urlInput: '#urlInput',
   activeWebview: '.frameWrapper.isActive webview',
   activeTab: '.tab.active',
@@ -51,7 +54,7 @@ module.exports = {
   addFundsButton: '.addFunds',
   fundsSelectBox: '#fundsSelectBox',
   paymentsStatus: '#walletStatus',
-  ledgerTable: '.ledgerTable',
+  ledgerTable: '#ledgerTable',
   bitcoinDashboard: '#bitcoinDashboard',
   modalCloseButton: 'button.close',
   coinbaseBuyButton: '[data-l10n-id="add"]',
@@ -62,5 +65,7 @@ module.exports = {
   autofillAddressPanel: '.autofillAddressPanel',
   autofillCreditCardPanel: '.autofillCreditCardPanel',
   allowRunInsecureContentButton: '.allowRunInsecureContentButton',
-  denyRunInsecureContentButton: '.denyRunInsecureContentButton'
+  dismissAllowRunInsecureContentButton: '.dismissAllowRunInsecureContentButton',
+  denyRunInsecureContentButton: '.denyRunInsecureContentButton',
+  dismissDenyRunInsecureContentButton: '.dismissDenyRunInsecureContentButton'
 }

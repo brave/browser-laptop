@@ -33,16 +33,9 @@ class NotificationItem extends ImmutableComponent {
   render () {
     let i = 0
     const options = this.props.detail.get('options')
-    return <div className='notificationItem'>
-      <span className='notificationMessage'>{this.props.detail.get('message')}</span>
-      <span className='notificationAdvanced'>
-        {
-          options.get('advancedText') && options.get('advancedLink')
-            ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
-            : null
-        }
-      </span>
-      <span className='notificationOptions'>
+    const greeting = this.props.detail.get('greeting')
+    return <div className={'notificationItem ' + (options.get('style') || '')}>
+      <span className='options'>
         {
           options.get('persist')
             ? <span id='rememberOption'>
@@ -55,9 +48,22 @@ class NotificationItem extends ImmutableComponent {
           this.props.detail.get('buttons').map((button) =>
             <button
               type='button'
-              className='notificationButton'
-              onClick={this.clickHandler.bind(this, i++)}>{button}</button>
+              className={'button ' + (button.get('className') || '')}
+              onClick={this.clickHandler.bind(this, i++)}>{button.get('text')}</button>
           )
+        }
+      </span>
+      {
+        greeting
+          ? <span className='greeting'>{greeting}</span>
+          : null
+      }
+      <span className='message'>{this.props.detail.get('message')}</span>
+      <span className='notificationAdvanced'>
+        {
+          options.get('advancedText') && options.get('advancedLink')
+            ? <span onClick={this.openAdvanced.bind(this)}>{options.get('advancedText')}</span>
+            : null
         }
       </span>
     </div>
@@ -78,11 +84,11 @@ class NotificationBar extends ImmutableComponent {
     }
 
     return <div className='notificationBar'>
-    {
-      activeNotifications.takeLast(3).map((notificationDetail) =>
-        <NotificationItem detail={notificationDetail} />
-      )
-    }
+      {
+        activeNotifications.takeLast(3).map((notificationDetail) =>
+          <NotificationItem detail={notificationDetail} />
+        )
+      }
     </div>
   }
 }

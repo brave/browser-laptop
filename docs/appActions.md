@@ -104,6 +104,18 @@ Dispatches a message to clear all completed downloads
 
 
 
+### ledgerRecoverySucceeded() 
+
+Dispatches a message to clear all completed downloads
+
+
+
+### ledgerRecoveryFailed() 
+
+Dispatches a message to clear all completed downloads
+
+
+
 ### setDefaultWindowSize(size) 
 
 Sets the default window size
@@ -240,7 +252,7 @@ Change a hostPattern's config
 
 
 
-### removeSiteSetting(hostPattern, key) 
+### removeSiteSetting(hostPattern, key, temp) 
 
 Removes a site setting
 
@@ -249,6 +261,9 @@ Removes a site setting
 **hostPattern**: `string`, The host pattern to update the config for
 
 **key**: `string`, The config key to update
+
+**temp**: `boolean`, Whether to change temporary or persistent
+  settings. defaults to false (persistent).
 
 
 
@@ -346,6 +361,16 @@ Clears the data specified in dataDetail
 
 
 
+### importBrowserData(selected) 
+
+Import browser data specified in selected
+
+**Parameters**
+
+**selected**: `object`, the browser data to import as per doc/state.md's importBrowserDataSelected
+
+
+
 ### addAutofillAddress(detail, originalDetail) 
 
 Add address data
@@ -390,6 +415,18 @@ Remove credit card data
 
 
 
+### autofillDataChanged(addressGuids, creditCardGuids) 
+
+Autofill data changed
+
+**Parameters**
+
+**addressGuids**: `Array`, the guid array to access address entries in autofill DB
+
+**creditCardGuids**: `Array`, the guid array to access credit card entries in autofill DB
+
+
+
 ### windowBlurred(appWindowId) 
 
 Dispatches a message when appWindowId loses focus
@@ -397,6 +434,35 @@ Dispatches a message when appWindowId loses focus
 **Parameters**
 
 **appWindowId**: `Number`, the unique id of the window
+
+
+
+### setMenubarTemplate(menubarTemplate) 
+
+Saves current menubar template for use w/ Windows titlebar
+
+**Parameters**
+
+**menubarTemplate**: `Object`, JSON used to build the menu
+
+
+
+### networkConnected() 
+
+Dispatches a message when the network is re-connected
+after being disconnected
+
+
+
+### networkDisconnected() 
+
+Dispatches a message when the network is disconnected
+
+
+
+### submitFeedback() 
+
+Dispatches a message to submit feedback
 
 
 

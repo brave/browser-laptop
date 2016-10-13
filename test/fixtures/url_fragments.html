@@ -4,9 +4,11 @@
   <title>url fragments</title>
 </head>
 <body>
-  <a id="top_link" href="#top">Top</a>
-  <a id="bottom_link" href="#bottom">Bottom</a>
-  <div id="top">top</div>
-  <div id="bottom">bottom</div>
+  <div style="position:relative; height: 99999px">
+    <a id="top_link" href="#top">Top</a>
+    <a id="bottom_link" href="#bottom">Bottom</a>
+    <div id="top">top</div>
+    <div id="bottom" style="background-color:red; position: absolute; bottom: 0; left: 0">bottom</div>
+  </div>
 </body>
 </html>

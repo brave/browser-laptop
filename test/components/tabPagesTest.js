@@ -9,10 +9,8 @@ const assert = require('assert')
 describe('tab pages', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
       .waitForUrl(Brave.newTabUrl)
       .windowByUrl(Brave.browserWindowUrl)

@@ -9,6 +9,26 @@ AppStore
 
 ```javascript
 {
+  firstRunTimestamp: integer,
+  extensions: {
+    [id]: { // the unique id of the extension
+      id: string,
+      base_path: string,
+      description: string,
+      enabled: boolean,
+      manifest: object,
+      browserAction: {
+        title: string,
+        popup: string,
+        icon: string/object
+      },
+      tabs: {
+        [tabId]: {
+          browserAction: {} // tab specific browser action properties
+        }
+      }
+    }
+  },
   sites: [{
     location: string,
     title: string,
@@ -48,15 +68,18 @@ AppStore
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
       safeBrowsing: boolean,
-      noScript: boolean,
+      noScript: (number|boolean), // true = block scripts, false = allow, 0 = allow once, 1 = allow until restart
       httpsEverywhere: boolean,
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
-      ledgerPayments: boolean // False if site should not be paid by the ledger. Defaults to true.
+      ledgerPayments: boolean, // False if site should not be paid by the ledger. Defaults to true.
+      ledgerPaymentsShown: boolean, // False if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
+      runInsecureContent: boolean // Allow active mixed content
     }
   },
   temporarySiteSettings: {
     // Same as above but never gets written to disk
+    // XXX: This was intended for Private Browsing but is currently unused.
   },
   visits: [{
     location: string,
@@ -71,32 +94,15 @@ AppStore
     authTag: string, // AES-GCM authentication data, binary-encoded
     iv: string // AES-GCM initialization vector, binary-encoded
   }],
-  adblock: {
+  // resourceIdentifier is one of: `adblock`, `safeBrowsing`, `trackingProtection`,
+  //   `httpsEverywhere`, or another additional resource by name such as
+  //   adblock regional resource files.
+  [resourceIdentifier]: {
     etag: string, // last downloaded data file etag
     lastCheckVersion: string, // last checked data file version
     lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable adblocking
+    enabled: boolean, // Enable the resource
     count: number // Number of blocked ads application wide
-  },
-  safeBrowsing: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable adblocking
-  },
-  trackingProtection: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable tracking protection
-    count: number // Number of blocked trackers application wide
-  },
-  httpsEverywhere: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable HTTPS Everywhere
-    count: number // Number of HTTPS Everywhere upgrades application wide
   },
   adInsertion: {
     enabled: boolean // Enable ad insertion
@@ -123,12 +129,16 @@ AppStore
   },
   notifications: [{
     message: string,
-    buttons: Array<string>,
+    buttons: [{
+      text: string, // button text
+      className: string, // button class e.g. 'primary'. see notificationBar.less
+    }],
     frameOrigin: (string|undefined), // origin that the notification is from, or undefined if not applicable.
     options: {
-      persist: boolean, // whether to show a 'Remember this decision' checkbox
       advancedText: string, // more info text
       advancedLink: string, // more info link URL
+      persist: boolean, // whether to show a 'Remember this decision' checkbox
+      style: string // css class for notification bar. See notificationBar.less
     }
   }], // the notifications for the frame. not preserved across restart.
   settings: [{
@@ -166,10 +176,12 @@ AppStore
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
+    'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
     'shutdown.clear-history': boolean, // true to clear history on shutdown
     'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
+    'adblock.customRules': string, // custom rules in ABP filter syntax
   }],
   dictionary: {
     locale: string, // en_US, en, or any other locale string
@@ -178,17 +190,21 @@ AppStore
   },
   autofill: {
     addresses: {
-      guid: [{
-        Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
-      }],
+      guid: Array<string>, // List of id used to access the autofill entry in database
       timestamp: number
     },
     creditCards: {
-      guid: [{
-        Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
-      }],
+      guid: Array<string>, // List of id used to access the autofill entry in database
       timestamp: number
     }
+  },
+  about: {
+    newtab: {
+      gridLayout: string // 'small', 'medium', 'large'
+    }
+  },
+  menu: {
+    template: object // used on Windows and by our tests: template object with Menubar control
   }
 }
 ```
@@ -268,7 +284,7 @@ WindowStore
       },
       isExtendedValidation: boolean, // is using https ev
       runInsecureContent: boolean, // has active mixed content
-      blockedRunInsecureContent: string, // first domain of blocked active mixed content
+      blockedRunInsecureContent: Array<string> // sources of blocked active mixed content
     },
     parentFrameKey: number, // the key of the frame this frame was opened from
     modalPromptDetail: {...},
@@ -310,7 +326,8 @@ WindowStore
   closedFrames: [], // holds the same type of frame objects as above
   ui: {
     isMaximized: boolean, // true if window is maximized
-    position: array, // last known window position
+    position: array, // last known window position [x, y]
+    size: array, // last known window size [x, y]
     isFullScreen: boolean, // true if window is fullscreen
     mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
     dragging: {
@@ -337,6 +354,14 @@ WindowStore
     },
     releaseNotes: {
       isVisible: boolean, // Whether or not to show release notes
+    },
+    menubar: { // windows only
+      isVisible: boolean, // true if Menubar control is visible
+      selectedIndex: Array<number>, // indices of the selected menu item(s) (or null for none selected)
+      lastFocusedSelector: string // selector for the last selected element (browser ui, not frame content)
+    },
+    bookmarksToolbar: {
+      selectedFolderId: number // folderId from the siteDetail of the currently expanded folder
     }
   },
   searchDetail: {
@@ -397,7 +422,7 @@ WindowStore
     reconcileStamp: number,     // timestamp for the next reconcilation
     transactions: [ {           // contributions reconciling/reconciled
       viewingId: string,        // UUIDv4 for this contribution
-      contribution: {           // 
+      contribution: {           //
         fiat: {                 // roughly-equivalent fiat amount
           amount: number,       //   e.g., 5
           currency: string      //   e.g., "USD"
@@ -406,7 +431,7 @@ WindowStore
           [currency]: number    //   e.g., { "USD": 575.45 }
         },
         satoshis: number,       // actual number of satoshis transferred
-        fee: number             // bitcoin transaction fee 
+        fee: number             // bitcoin transaction fee
       },
       submissionStamp: number,  // timestamp for this contribution
       count: number,            // total number of ballots allowed to be cast
@@ -415,6 +440,7 @@ WindowStore
       }
     } ],
     address: string,             // the BTC wallet address (in base58)
+    passphrase: string,          // the BTC wallet passphrase
     balance: string,             // confirmed balance in BTC.toFixed(4)
     unconfirmed: string,         // unconfirmed balance in BTC.toFixed(4)
     satoshis: number,            // confirmed balance as an integer number of satoshis
@@ -430,10 +456,20 @@ WindowStore
       }
     },
     hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
-    paymentIMG: string           // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+    countryCode: string,         // ISO3166 2-letter code for country of browser's location
+    exchangeInfo: {              // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
+      exchangeName: string,      // the name of the BTC exchange
+      exchangeURL: string        // the URL of the BTC exchange
+    },
+    recoverySucceeded: boolean   // the status of an attempted recovery
+    paymentIMG: string,          // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+    error: {                     // non-null if the last updateLedgerInfo happened concurrently with an error
+      caller: string             // function in which error was handled
+      error: object              // error object returned
+    }
   },
-  publisherInfo: [               // one entry for each publisher having a non-zero `score`
-    {
+  publisherInfo: {
+    synopsis: [ { // one entry for each publisher having a non-zero `score`
       rank: number,              // i.e., 1, 2, 3, ...
       verified: boolean,         // there is a verified wallet for this publisher
       site: string,              // publisher name, e.g., "wikipedia.org"
@@ -447,8 +483,12 @@ WindowStore
       percentage: number,        // i.e., 0, 1, ... 100
       publisherURL: string,      // publisher site, e.g., "https://wikipedia.org/"
       faviconURL: string         // i.e., "data:image/...;base64,..."
+    } ],
+    synopsisOptions: {
+      minDuration: number,       // e.g., 8000 for 8 seconds
+      minPublisherVisits: number // e.g., 0
     }
-  ],
+  }
   autofillAddressDetail: {
     name: string,
     organization: string,
@@ -459,14 +499,32 @@ WindowStore
     country: string,
     phone: string,
     email: string,
-    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    guid: string // id used to access the autofill entry in database
   },
   autofillCreditCardDetail: {
     name: string,
     card: string,
     month: string,
     year: string,
-    guid: Object.<string, <string>> // map of (partition, id) used to access the autofill entry in database
+    guid: string // id used to access the autofill entry in database
+  },
+  importBrowserDataDetail: [
+    {
+      index: string,
+      type: number,
+      name: string,
+      history: boolean,
+      favorites: boolean,
+      cookies: boolean
+    }
+  ],
+  importBrowserDataSelected: {
+    index: string,
+    type: number,
+    history: boolean,
+    favorites: boolean,
+    mergeFavorites: boolean,
+    cookies: boolean
   }
 }
 ```

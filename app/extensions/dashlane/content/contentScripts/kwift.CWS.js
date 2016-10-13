@@ -1,2 +1,0 @@
-(function(){var a=chrome.extension.connect({name:"fromInjectedTo"});document.getElementById("uninstall-extension").addEventListener("click",function(b){a.postMessage("action=uninstallExtension")
-})})();

@@ -20,24 +20,28 @@ const NavigationBar = require('./navigationBar')
 const Frame = require('./frame')
 const TabPages = require('./tabPages')
 const TabsToolbar = require('./tabsToolbar')
-const FindBar = require('./findbar.js')
+const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
 const NotificationBar = require('./notificationBar')
 const DownloadsBar = require('./downloadsBar')
 const Button = require('./button')
+const BrowserActionButton = require('../../app/renderer/components/browserActionButton')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
+const ImportBrowserDataPanel = require('../../app/renderer/components/importBrowserDataPanel')
 const AutofillAddressPanel = require('./autofillAddressPanel')
 const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
 const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
-const BookmarksToolbar = require('./bookmarksToolbar')
+const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar')
 const ContextMenu = require('./contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const LongPressButton = require('./longPressButton')
+const Menubar = require('../../app/renderer/components/menubar')
+const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
 
 // Constants
 const config = require('../constants/config')
@@ -46,20 +50,23 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteTags = require('../constants/siteTags')
 const dragTypes = require('../constants/dragTypes')
-const keyCodes = require('../constants/keyCodes')
+const keyCodes = require('../../app/common/constants/keyCodes')
+const keyLocations = require('../../app/common/constants/keyLocations')
+const isWindows = process.platform === 'win32'
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
+const extensionState = require('../../app/common/state/extensionState')
 const FrameStateUtil = require('../state/frameStateUtil')
 const searchProviders = require('../data/searchProviders')
 
 // Util
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const eventUtil = require('../lib/eventUtil')
-const { isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage } = require('../lib/appUrlUtil')
+const {isIntermediateAboutPage, getBaseUrl, isNavigatableAboutPage} = require('../lib/appUrlUtil')
 const siteSettings = require('../state/siteSettings')
 const urlParse = require('url').parse
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const currentWindow = require('../../app/renderer/currentWindow')
 const emptyMap = new Immutable.Map()
 const emptyList = new Immutable.List()
@@ -80,6 +87,7 @@ class Main extends ImmutableComponent {
     this.onHideSiteInfo = this.onHideSiteInfo.bind(this)
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
+    this.onHideImportBrowserDataPanel = this.onHideImportBrowserDataPanel.bind(this)
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
@@ -118,6 +126,62 @@ class Main extends ImmutableComponent {
     })
   }
 
+  registerCustomTitlebarHandlers () {
+    if (this.customTitlebar.enabled) {
+      document.addEventListener('keyup', (e) => {
+        const customTitlebar = this.customTitlebar
+        switch (e.which) {
+          case keyCodes.ALT:
+            // Ignore right alt (AltGr)
+            if (e.location === keyLocations.DOM_KEY_LOCATION_RIGHT) {
+              break
+            }
+
+            e.preventDefault()
+
+            if (getSetting(settings.AUTO_HIDE_MENU)) {
+              windowActions.toggleMenubarVisible(null)
+            } else {
+              if (customTitlebar.menubarSelectedIndex) {
+                windowActions.setSubmenuSelectedIndex()
+                windowActions.setContextMenuDetail()
+              } else {
+                windowActions.setSubmenuSelectedIndex([0])
+              }
+            }
+            break
+          case keyCodes.ESC:
+            if (getSetting(settings.AUTO_HIDE_MENU) && customTitlebar.menubarVisible && !customTitlebar.menubarSelectedIndex) {
+              e.preventDefault()
+              windowActions.toggleMenubarVisible(false)
+              break
+            }
+            if (customTitlebar.menubarSelectedIndex) {
+              e.preventDefault()
+              windowActions.setSubmenuSelectedIndex()
+              windowActions.setContextMenuDetail()
+            }
+            break
+        }
+      })
+
+      document.addEventListener('focus', (e) => {
+        let selector = document.activeElement.id
+          ? '#' + document.activeElement.id
+          : null
+
+        if (!selector && document.activeElement.tagName === 'WEBVIEW') {
+          const frameKeyAttribute = document.activeElement.getAttribute('data-frame-key')
+          if (frameKeyAttribute) {
+            selector = 'webview[data-frame-key="' + frameKeyAttribute + '"]'
+          }
+        }
+
+        windowActions.setLastFocusedSelector(selector)
+      }, true)
+    }
+  }
+
   exitFullScreen () {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     if (activeFrame && activeFrame.get('isFullScreen')) {
@@ -129,8 +193,7 @@ class Main extends ImmutableComponent {
     // Navigates back/forward on macOS two-finger swipe
     var trackingFingers = false
     var swipeGesture = false
-    var canSwipeBack = false
-    var canSwipeForward = false
+    var isSwipeOnEdge = false
     var deltaX = 0
     var deltaY = 0
     var startTime = 0
@@ -141,11 +204,6 @@ class Main extends ImmutableComponent {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
         time = (new Date()).getTime() - startTime
-        if (deltaX > 0) {
-          webviewActions.checkSwipe(false)
-        } else if (deltaX < 0) {
-          webviewActions.checkSwipe(true)
-        }
       }
     })
     ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
@@ -174,12 +232,6 @@ class Main extends ImmutableComponent {
         }, true)
       }
     })
-    ipc.on(messages.CAN_SWIPE_BACK, (e) => {
-      canSwipeBack = true
-    })
-    ipc.on(messages.CAN_SWIPE_FORWARD, (e) => {
-      canSwipeForward = true
-    })
     ipc.on(messages.ENABLE_SWIPE_GESTURE, (e) => {
       swipeGesture = true
     })
@@ -190,23 +242,25 @@ class Main extends ImmutableComponent {
       if (swipeGesture &&
         systemPreferences.isSwipeTrackingFromScrollEventsEnabled()) {
         trackingFingers = true
+        isSwipeOnEdge = false
         startTime = (new Date()).getTime()
       }
     })
     ipc.on('scroll-touch-end', function () {
-      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50) {
-        if (deltaX > 100 && canSwipeForward) {
+      if (time > 50 && trackingFingers && Math.abs(deltaY) < 50 && isSwipeOnEdge) {
+        if (deltaX > 70) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -100 && canSwipeBack) {
+        } else if (deltaX < -70) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
       trackingFingers = false
-      canSwipeBack = false
-      canSwipeForward = false
       deltaX = 0
       deltaY = 0
       startTime = 0
+    })
+    ipc.on('scroll-touch-edge', function () {
+      isSwipeOnEdge = true
     })
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
   }
@@ -249,6 +303,7 @@ class Main extends ImmutableComponent {
   componentDidMount () {
     this.registerSwipeListener()
     this.registerWindowLevelShortcuts()
+    this.registerCustomTitlebarHandlers()
 
     ipc.on(messages.SHORTCUT_NEW_FRAME, (event, url, options = {}) => {
       if (options.singleFrame) {
@@ -273,12 +328,10 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.NEW_POPUP_WINDOW, function (evt, extensionId, src, props) {
       windowActions.setPopupWindowDetail(Immutable.fromJS({
-        left: props.x,
-        top: props.y + 100,
+        left: props.left,
+        top: props.top,
         height: props.height,
         width: props.width,
-        maxHeight: window.innerHeight - 100,
-        minHeight: 400,
         src
       }))
     })
@@ -340,10 +393,6 @@ class Main extends ImmutableComponent {
       frameProps && windowActions.setRedirectedBy(frameProps, ruleset, details.url)
     })
 
-    ipc.on(messages.SHOW_NOTIFICATION, (e, text) => {
-      void new window.Notification(text)
-    })
-
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BACK, this.onBack)
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
 
@@ -376,6 +425,11 @@ class Main extends ImmutableComponent {
 
     ipc.on(messages.HIDE_CONTEXT_MENU, () => {
       windowActions.setContextMenuDetail()
+    })
+
+    ipc.on(messages.IMPORTER_LIST, (e, detail) => {
+      windowActions.setImportBrowserDataDetail(detail)
+      windowActions.setImportBrowserDataSelected({})
     })
 
     this.loadSearchProviders()
@@ -421,12 +475,17 @@ class Main extends ImmutableComponent {
     }
 
     // Handlers for saving window state
+    // TODO: revisit this code when window state moves to appStore
     currentWindow.on('maximize', function () {
       windowActions.setMaximizeState(true)
     })
 
     currentWindow.on('unmaximize', function () {
       windowActions.setMaximizeState(false)
+    })
+
+    currentWindow.on('resize', function (event) {
+      windowActions.saveSize(event.sender.getSize())
     })
 
     let moveTimeout = null
@@ -438,7 +497,7 @@ class Main extends ImmutableComponent {
         windowActions.savePosition(event.sender.getPosition())
       }, 1000)
     })
-
+    // Full screen as in F11 (not full screen on a video)
     currentWindow.on('enter-full-screen', function (event) {
       windowActions.setWindowFullScreen(true)
     })
@@ -536,6 +595,10 @@ class Main extends ImmutableComponent {
     windowActions.setClearBrowsingDataDetail()
   }
 
+  onHideImportBrowserDataPanel () {
+    windowActions.setImportBrowserDataDetail()
+  }
+
   onHideAutofillAddressPanel () {
     windowActions.setAutofillAddressDetail()
   }
@@ -553,7 +616,7 @@ class Main extends ImmutableComponent {
   }
 
   enableNoScript (settings) {
-    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript
+    return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript === true
   }
 
   onCloseFrame (activeFrameProps) {
@@ -584,30 +647,30 @@ class Main extends ImmutableComponent {
     if (!e.target.className.includes('navigatorWrapper')) {
       return
     }
-    if (currentWindow.isMaximized()) {
-      currentWindow.maximize()
-    } else {
-      currentWindow.unmaximize()
-    }
+    return (!currentWindow.isMaximized()) ? currentWindow.maximize() : currentWindow.unmaximize()
   }
 
   onMouseDown (e) {
+    // BSCTODO: update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
     while (node) {
       if (node.classList &&
-          (node.classList.contains('popupWindow') || node.classList.contains('contextMenu'))) {
+          (node.classList.contains('popupWindow') ||
+            node.classList.contains('contextMenu') ||
+            node.classList.contains('extensionButton') ||
+            node.classList.contains('menubarItem'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
           e.preventDefault()
         }
+        // Click event is handled downstream
         return
       }
       node = node.parentNode
     }
-    // TODO(bridiver) combine context menu and popup window
-    windowActions.setContextMenuDetail()
-    windowActions.setPopupWindowDetail()
+    // Hide context menus, popup menus, and menu selections
+    windowActions.resetMenuState()
   }
 
   onClickWindow (e) {
@@ -650,7 +713,7 @@ class Main extends ImmutableComponent {
   get allSiteSettings () {
     const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
     if (activeFrame && activeFrame.get('isPrivate')) {
-      return this.props.appState.get('temporarySiteSettings')
+      return this.props.appState.get('siteSettings').mergeDeep(this.props.appState.get('temporarySiteSettings'))
     }
     return this.props.appState.get('siteSettings')
   }
@@ -668,16 +731,16 @@ class Main extends ImmutableComponent {
                                                         appConfig))
   }
 
+  get activeTabId () {
+    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
+    return activeFrame && activeFrame.get('tabId')
+  }
+
   get activeSiteSettings () {
     return this.frameSiteSettings(this.activeRequestedLocation)
   }
 
   get braveShieldsDisabled () {
-    const activeFrame = FrameStateUtil.getActiveFrame(this.props.windowState)
-    if (activeFrame && activeFrame.get('isPrivate')) {
-      return true
-    }
-
     const activeRequestedLocation = this.activeRequestedLocation
     if (!activeRequestedLocation) {
       return true
@@ -685,6 +748,44 @@ class Main extends ImmutableComponent {
 
     const parsedUrl = urlParse(activeRequestedLocation)
     return parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && activeRequestedLocation !== 'about:safebrowsing'
+  }
+
+  get extensionButtons () {
+    const enabledExtensions = extensionState.getEnabledExtensions(this.props.appState)
+    const extensionBrowserActions = enabledExtensions
+      .map((extension) => extensionState.getBrowserActionByTabId(this.props.appState, extension.get('id'), this.activeTabId))
+      .filter((browserAction) => browserAction)
+    let buttons = extensionBrowserActions.map((browserAction, id) =>
+      <BrowserActionButton
+        browserAction={browserAction}
+        extensionId={id}
+        tabId={this.activeTabId}
+        popupWindowSrc={this.props.windowState.getIn(['popupWindowDetail', 'src'])} />
+    ).values()
+    buttons = Array.from(buttons)
+    if (buttons.length > 0) {
+      buttons.push(<span className='buttonSeparator' />)
+    }
+    return buttons
+  }
+
+  get customTitlebar () {
+    const customTitlebarEnabled = isWindows
+    const captionButtonsVisible = customTitlebarEnabled
+    const menubarVisible = customTitlebarEnabled && (!getSetting(settings.AUTO_HIDE_MENU) || this.props.windowState.getIn(['ui', 'menubar', 'isVisible']))
+    const selectedIndex = this.props.windowState.getIn(['ui', 'menubar', 'selectedIndex'])
+    return {
+      enabled: customTitlebarEnabled,
+      captionButtonsVisible: captionButtonsVisible,
+      menubarVisible: menubarVisible,
+      menubarTemplate: menubarVisible ? this.props.appState.getIn(['menu', 'template']) : null,
+      menubarSelectedIndex: selectedIndex,
+      contextMenuSelectedIndex: typeof selectedIndex === 'object' && Array.isArray(selectedIndex) && selectedIndex.length > 1
+        ? selectedIndex.slice(1)
+        : null,
+      lastFocusedSelector: this.props.windowState.getIn(['ui', 'menubar', 'lastFocusedSelector']),
+      isMaximized: currentWindow.isMaximized() || currentWindow.isFullScreen()
+    }
   }
 
   render () {
@@ -709,6 +810,7 @@ class Main extends ImmutableComponent {
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
+    const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const activeRequestedLocation = this.activeRequestedLocation
@@ -716,21 +818,24 @@ class Main extends ImmutableComponent {
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
-
+    const customTitlebar = this.customTitlebar
     const shouldAllowWindowDrag = !this.props.windowState.get('contextMenuDetail') &&
       !this.props.windowState.get('bookmarkDetail') &&
       !siteInfoIsVisible &&
       !braveryPanelIsVisible &&
       !clearBrowsingDataPanelIsVisible &&
+      !importBrowserDataPanelIsVisible &&
       !autofillAddressPanelIsVisible &&
       !autofillCreditCardPanelIsVisible &&
       !releaseNotesIsVisible &&
       !noScriptIsVisible &&
-      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail'])
+      activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail']) &&
+      !customTitlebar.menubarSelectedIndex
 
     return <div id='window'
       className={cx({
-        isFullScreen: activeFrame && activeFrame.get('isFullScreen')
+        isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
+        frameless: customTitlebar.captionButtonsVisible
       })}
       ref={(node) => { this.mainWindow = node }}
       onMouseDown={this.onMouseDown}
@@ -739,7 +844,8 @@ class Main extends ImmutableComponent {
         this.props.windowState.get('contextMenuDetail')
         ? <ContextMenu
           lastZoomPercentage={activeFrame && activeFrame.get('lastZoomPercentage')}
-          contextMenuDetail={this.props.windowState.get('contextMenuDetail')} />
+          contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+          selectedIndex={customTitlebar.contextMenuSelectedIndex} />
         : null
       }
       {
@@ -749,125 +855,167 @@ class Main extends ImmutableComponent {
         : null
       }
       <div className='top'>
-        <div className='navigatorWrapper'
-          onDoubleClick={this.onDoubleClick}
-          onDragOver={this.onDragOver}
-          onDrop={this.onDrop}>
-          <div className='backforward'>
-            <LongPressButton
-              l10nId='backButton'
-              className='back fa fa-angle-left'
-              disabled={!activeFrame || !activeFrame.get('canGoBack')}
-              onClick={this.onBack}
-              onLongPress={this.onBackLongPress}
-            />
-            <LongPressButton
-              l10nId='forwardButton'
-              className='forward fa fa-angle-right'
-              disabled={!activeFrame || !activeFrame.get('canGoForward')}
-              onClick={this.onForward}
-              onLongPress={this.onForwardLongPress}
-            />
+        <div className={cx({
+          navbarCaptionButtonContainer: true,
+          allowDragging: shouldAllowWindowDrag
+        })}>
+          <div className='navbarMenubarFlexContainer'>
+            {
+              customTitlebar.menubarVisible
+                ? <div className='menubarContainer'>
+                  <Menubar
+                    template={customTitlebar.menubarTemplate}
+                    selectedIndex={customTitlebar.menubarSelectedIndex}
+                    contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
+                    autohide={getSetting(settings.AUTO_HIDE_MENU)}
+                    lastFocusedSelector={customTitlebar.lastFocusedSelector} />
+                </div>
+                : null
+            }
+            <div className='navigatorWrapper'
+              onDoubleClick={this.onDoubleClick}
+              onDragOver={this.onDragOver}
+              onDrop={this.onDrop}>
+              <div className='backforward'>
+                <LongPressButton
+                  l10nId='backButton'
+                  className='back fa fa-angle-left'
+                  disabled={!activeFrame || !activeFrame.get('canGoBack')}
+                  onClick={this.onBack}
+                  onLongPress={this.onBackLongPress}
+                />
+                <LongPressButton
+                  l10nId='forwardButton'
+                  className='forward fa fa-angle-right'
+                  disabled={!activeFrame || !activeFrame.get('canGoForward')}
+                  onClick={this.onForward}
+                  onLongPress={this.onForwardLongPress}
+                />
+              </div>
+              <NavigationBar
+                ref={(node) => { this.navBar = node }}
+                navbar={activeFrame && activeFrame.get('navbar')}
+                frames={this.props.windowState.get('frames')}
+                sites={this.props.appState.get('sites')}
+                activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
+                location={activeFrame && activeFrame.get('location') || ''}
+                title={activeFrame && activeFrame.get('title') || ''}
+                scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
+                partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
+                history={activeFrame && activeFrame.get('history') || emptyList}
+                suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
+                isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
+                locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
+                startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
+                endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
+                loading={activeFrame && activeFrame.get('loading')}
+                mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
+                searchDetail={this.props.windowState.get('searchDetail')}
+                enableNoScript={this.enableNoScript(activeSiteSettings)}
+                settings={this.props.appState.get('settings')}
+                noScriptIsVisible={noScriptIsVisible}
+                menubarVisible={customTitlebar.menubarVisible}
+              />
+              <div className='topLevelEndButtons'>
+                <div className={cx({
+                  extraDragArea: true,
+                  allowDragging: shouldAllowWindowDrag
+                })} />
+                {
+                  this.extensionButtons
+                }
+                <Button iconClass='braveMenu'
+                  l10nId='braveMenu'
+                  className={cx({
+                    navbutton: true,
+                    braveShieldsDisabled,
+                    braveShieldsDown: !braverySettings.shieldsUp
+                  })}
+                  onClick={this.onBraveMenu} />
+              </div>
+            </div>
           </div>
-          <NavigationBar
-            ref={(node) => { this.navBar = node }}
-            navbar={activeFrame && activeFrame.get('navbar')}
-            frames={this.props.windowState.get('frames')}
-            sites={this.props.appState.get('sites')}
-            activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
-            location={activeFrame && activeFrame.get('location') || ''}
-            title={activeFrame && activeFrame.get('title') || ''}
-            scriptsBlocked={activeFrame && activeFrame.getIn(['noScript', 'blocked'])}
-            partitionNumber={activeFrame && activeFrame.get('partitionNumber') || 0}
-            history={activeFrame && activeFrame.get('history') || emptyList}
-            suggestionIndex={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex']) || 0}
-            isSecure={activeFrame && activeFrame.getIn(['security', 'isSecure'])}
-            locationValueSuffix={activeFrame && activeFrame.getIn(['navbar', 'urlbar', 'suggestions', 'urlSuffix']) || ''}
-            startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
-            endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
-            loading={activeFrame && activeFrame.get('loading')}
-            mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
-            searchDetail={this.props.windowState.get('searchDetail')}
-            enableNoScript={this.enableNoScript(activeSiteSettings)}
-            settings={this.props.appState.get('settings')}
-            noScriptIsVisible={noScriptIsVisible}
-          />
           {
-            siteInfoIsVisible
-            ? <SiteInfo frameProps={activeFrame}
-              onHide={this.onHideSiteInfo} />
-            : null
-          }
-          {
-            braveryPanelIsVisible
-            ? <BraveryPanel frameProps={activeFrame}
-              activeRequestedLocation={activeRequestedLocation}
-              braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
-              braverySettings={braverySettings}
-              activeSiteSettings={activeSiteSettings}
-              onHide={this.onHideBraveryPanel} />
-            : null
-          }
-          {
-           clearBrowsingDataPanelIsVisible
-            ? <ClearBrowsingDataPanel
-              clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
-              onHide={this.onHideClearBrowsingDataPanel} />
-            : null
-          }
-          {
-           autofillAddressPanelIsVisible
-            ? <AutofillAddressPanel
-              currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
-              onHide={this.onHideAutofillAddressPanel} />
-            : null
-          }
-          {
-           autofillCreditCardPanelIsVisible
-            ? <AutofillCreditCardPanel
-              currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
-              onHide={this.onHideAutofillCreditCardPanel} />
-            : null
-          }
-          {
-            loginRequiredDetail
-              ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+            customTitlebar.captionButtonsVisible
+              ? <WindowCaptionButtons windowMaximized={customTitlebar.isMaximized} />
               : null
           }
-          {
-            this.props.windowState.get('bookmarkDetail')
-            ? <AddEditBookmark sites={this.props.appState.get('sites')}
-              currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-              originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-              destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
-            : null
-          }
-          {
-            noScriptIsVisible
-              ? <NoScriptInfo frameProps={activeFrame}
-                onHide={this.onHideNoScript} />
-              : null
-          }
-          {
-            releaseNotesIsVisible
-            ? <ReleaseNotes
-              metadata={this.props.appState.getIn(['updates', 'metadata'])}
-              onHide={this.onHideReleaseNotes} />
-            : null
-          }
-          <div className='topLevelEndButtons'>
-            <Button iconClass='braveMenu'
-              l10nId='braveMenu'
-              className={cx({
-                navbutton: true,
-                braveShieldsDisabled,
-                braveShieldsDown: !braverySettings.shieldsUp
-              })}
-              onClick={this.onBraveMenu} />
-          </div>
         </div>
+        {
+          siteInfoIsVisible
+          ? <SiteInfo frameProps={activeFrame}
+            onHide={this.onHideSiteInfo} />
+          : null
+        }
+        {
+          braveryPanelIsVisible
+          ? <BraveryPanel frameProps={activeFrame}
+            activeRequestedLocation={activeRequestedLocation}
+            braveryPanelDetail={this.props.windowState.get('braveryPanelDetail')}
+            braverySettings={braverySettings}
+            activeSiteSettings={activeSiteSettings}
+            onHide={this.onHideBraveryPanel} />
+          : null
+        }
+        {
+         clearBrowsingDataPanelIsVisible
+          ? <ClearBrowsingDataPanel
+            clearBrowsingDataDetail={this.props.windowState.get('clearBrowsingDataDetail')}
+            onHide={this.onHideClearBrowsingDataPanel} />
+          : null
+        }
+        {
+          importBrowserDataPanelIsVisible
+          ? <ImportBrowserDataPanel
+            importBrowserDataDetail={this.props.windowState.get('importBrowserDataDetail')}
+            importBrowserDataSelected={this.props.windowState.get('importBrowserDataSelected')}
+            onHide={this.onHideImportBrowserDataPanel} />
+          : null
+        }
+        {
+         autofillAddressPanelIsVisible
+          ? <AutofillAddressPanel
+            currentDetail={this.props.windowState.getIn(['autofillAddressDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['autofillAddressDetail', 'originalDetail'])}
+            onHide={this.onHideAutofillAddressPanel} />
+          : null
+        }
+        {
+         autofillCreditCardPanelIsVisible
+          ? <AutofillCreditCardPanel
+            currentDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['autofillCreditCardDetail', 'originalDetail'])}
+            onHide={this.onHideAutofillCreditCardPanel} />
+          : null
+        }
+        {
+          loginRequiredDetail
+            ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
+            : null
+        }
+        {
+          this.props.windowState.get('bookmarkDetail')
+          ? <AddEditBookmark sites={this.props.appState.get('sites')}
+            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
+          : null
+        }
+        {
+          noScriptIsVisible
+            ? <NoScriptInfo frameProps={activeFrame}
+              noScriptGlobalEnabled={this.props.appState.getIn(['noScript', 'enabled'])}
+              onHide={this.onHideNoScript} />
+            : null
+        }
+        {
+          releaseNotesIsVisible
+          ? <ReleaseNotes
+            metadata={this.props.appState.getIn(['updates', 'metadata'])}
+            onHide={this.onHideReleaseNotes} />
+          : null
+        }
+
         <UpdateBar updates={this.props.appState.get('updates')} />
         {
           this.props.appState.get('notifications') && this.props.appState.get('notifications').size && activeFrame
@@ -881,11 +1029,12 @@ class Main extends ImmutableComponent {
             draggingOverData={this.props.windowState.getIn(['ui', 'dragging', 'draggingOver', 'dragType']) === dragTypes.BOOKMARK && this.props.windowState.getIn(['ui', 'dragging', 'draggingOver'])}
             showFavicon={showFavicon}
             showOnlyFavicon={showOnlyFavicon}
-            shouldAllowWindowDrag={shouldAllowWindowDrag}
+            shouldAllowWindowDrag={shouldAllowWindowDrag && !isWindows}
             activeFrameKey={activeFrame && activeFrame.get('key') || undefined}
             windowWidth={window.innerWidth}
             contextMenuDetail={this.props.windowState.get('contextMenuDetail')}
-            sites={this.props.appState.get('sites')} />
+            sites={this.props.appState.get('sites')}
+            selectedFolderId={this.props.windowState.getIn(['ui', 'bookmarksToolbar', 'selectedFolderId'])} />
           : null
         }
         <div className={cx({
@@ -935,74 +1084,80 @@ class Main extends ImmutableComponent {
       <div className='mainContainer'>
         <div className='tabContainer'
           ref={(node) => { this.tabContainer = node }}>
-        {
-          sortedFrames.map((frame) =>
-            <Frame
-              ref={(node) => { this.frames[frame.get('key')] = node }}
-              prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
-              onCloseFrame={this.onCloseFrame}
-              frameKey={frame.get('key')}
-              key={frame.get('key')}
-              settings={getBaseUrl(frame.get('location')) === 'about:preferences' || getBaseUrl(frame.get('location')) === 'about:history'
-                ? this.props.appState.get('settings') || emptyMap
-                : null}
-              bookmarks={frame.get('location') === 'about:bookmarks'
-                ? this.props.appState.get('sites')
-                    .filter((site) => site.get('tags')
-                      .includes(siteTags.BOOKMARK)) || emptyMap
-                : null}
-              history={frame.get('location') === 'about:history'
-                ? this.props.appState.get('sites') || emptyMap
-                : null}
-              downloads={this.props.appState.get('downloads') || emptyMap}
-              bookmarkFolders={frame.get('location') === 'about:bookmarks'
-                ? this.props.appState.get('sites')
-                    .filter((site) => site.get('tags')
-                      .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
-                : null}
-              isFullScreen={frame.get('isFullScreen')}
-              showFullScreenWarning={frame.get('showFullScreenWarning')}
-              findbarShown={frame.get('findbarShown')}
-              findDetail={frame.get('findDetail')}
-              hrefPreview={frame.get('hrefPreview')}
-              showOnRight={frame.get('showOnRight')}
-              location={frame.get('location')}
-              isPrivate={frame.get('isPrivate')}
-              partitionNumber={frame.get('partitionNumber')}
-              activeShortcut={frame.get('activeShortcut')}
-              activeShortcutDetails={frame.get('activeShortcutDetails')}
-              provisionalLocation={frame.get('provisionalLocation')}
-              pinnedLocation={frame.get('pinnedLocation')}
-              src={frame.get('src')}
-              guestInstanceId={frame.get('guestInstanceId')}
-              tabId={frame.get('tabId')}
-              aboutDetails={frame.get('aboutDetails')}
-              unloaded={frame.get('unloaded')}
-              audioMuted={frame.get('audioMuted')}
-              passwords={this.props.appState.get('passwords')}
-              adblock={this.props.appState.get('adblock')}
-              safeBrowsing={this.props.appState.get('safeBrowsing')}
-              httpsEverywhere={this.props.appState.get('httpsEverywhere')}
-              trackingProtection={this.props.appState.get('trackingProtection')}
-              adInsertion={this.props.appState.get('adInsertion')}
-              noScript={this.props.appState.get('noScript')}
-              flash={this.props.appState.get('flash')}
-              cookieblock={this.props.appState.get('cookieblock')}
-              flashInitialized={this.props.appState.get('flashInitialized')}
-              allSiteSettings={allSiteSettings}
-              ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
-              publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
-              frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
-              enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
-              isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
-              isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
-              autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
-              autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
-              adblockCount={this.props.appState.getIn(['adblock', 'count'])}
-              trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
-              httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
-            />)
-        }
+          {
+            sortedFrames.map((frame) =>
+              <Frame
+                ref={(node) => { this.frames[frame.get('key')] = node }}
+                prefOpenInForeground={getSetting(settings.SWITCH_TO_NEW_TABS)}
+                onCloseFrame={this.onCloseFrame}
+                frameKey={frame.get('key')}
+                key={frame.get('key')}
+                settings={['about:preferences', 'about:history', 'about:adblock'].includes(getBaseUrl(frame.get('location')))
+                  ? this.props.appState.get('settings') || emptyMap
+                  : null}
+                bookmarks={frame.get('location') === 'about:bookmarks'
+                  ? this.props.appState.get('sites')
+                      .filter((site) => site.get('tags')
+                        .includes(siteTags.BOOKMARK)) || emptyMap
+                  : null}
+                history={frame.get('location') === 'about:history'
+                  ? this.props.appState.get('sites') || emptyMap
+                  : null}
+                extensions={frame.get('location') === 'about:extensions'
+                  ? this.props.appState.get('extensions') || emptyMap
+                  : null}
+                preferencesData={frame.get('location') === 'about:preferences#payments'
+                  ? this.props.appState.getIn(['ui', 'about', 'preferences']) || emptyMap
+                  : null}
+                downloads={this.props.appState.get('downloads') || emptyMap}
+                bookmarkFolders={frame.get('location') === 'about:bookmarks'
+                  ? this.props.appState.get('sites')
+                      .filter((site) => site.get('tags')
+                        .includes(siteTags.BOOKMARK_FOLDER)) || emptyMap
+                  : null}
+                isFullScreen={frame.get('isFullScreen')}
+                showFullScreenWarning={frame.get('showFullScreenWarning')}
+                findbarShown={frame.get('findbarShown')}
+                findDetail={frame.get('findDetail')}
+                hrefPreview={frame.get('hrefPreview')}
+                showOnRight={frame.get('showOnRight')}
+                location={frame.get('location')}
+                isPrivate={frame.get('isPrivate')}
+                partitionNumber={frame.get('partitionNumber')}
+                activeShortcut={frame.get('activeShortcut')}
+                activeShortcutDetails={frame.get('activeShortcutDetails')}
+                provisionalLocation={frame.get('provisionalLocation')}
+                pinnedLocation={frame.get('pinnedLocation')}
+                src={frame.get('src')}
+                guestInstanceId={frame.get('guestInstanceId')}
+                tabId={frame.get('tabId')}
+                aboutDetails={frame.get('aboutDetails')}
+                unloaded={frame.get('unloaded')}
+                audioMuted={frame.get('audioMuted')}
+                passwords={this.props.appState.get('passwords')}
+                adblock={this.props.appState.get('adblock')}
+                safeBrowsing={this.props.appState.get('safeBrowsing')}
+                httpsEverywhere={this.props.appState.get('httpsEverywhere')}
+                trackingProtection={this.props.appState.get('trackingProtection')}
+                adInsertion={this.props.appState.get('adInsertion')}
+                noScript={this.props.appState.get('noScript')}
+                flash={this.props.appState.get('flash')}
+                cookieblock={this.props.appState.get('cookieblock')}
+                flashInitialized={this.props.appState.get('flashInitialized')}
+                allSiteSettings={allSiteSettings}
+                ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
+                publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
+                frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
+                enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
+                isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
+                isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
+                autofillCreditCards={this.props.appState.getIn(['autofill', 'creditCards'])}
+                autofillAddresses={this.props.appState.getIn(['autofill', 'addresses'])}
+                adblockCount={this.props.appState.getIn(['adblock', 'count'])}
+                trackedBlockersCount={this.props.appState.getIn(['trackingProtection', 'count'])}
+                httpsUpgradedCount={this.props.appState.getIn(['httpsEverywhere', 'count'])}
+              />)
+          }
         </div>
       </div>
       {

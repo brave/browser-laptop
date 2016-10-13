@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 
 class Button extends ImmutableComponent {
   render () {
@@ -12,6 +12,7 @@ class Button extends ImmutableComponent {
       return <span disabled={this.props.disabled}
         data-l10n-id={this.props.l10nId}
         style={this.props.inlineStyles}
+        data-button-value={this.props.dataButtonValue}
         className={cx({
           browserButton: true,
           fa: true,

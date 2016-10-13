@@ -5,22 +5,20 @@
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const WindowConstants = require('../constants/windowConstants')
-const config = require('../constants/config.js')
+const config = require('../constants/config')
 const settings = require('../constants/settings')
 const Immutable = require('immutable')
 const FrameStateUtil = require('../state/frameStateUtil')
 const ipc = global.require('electron').ipcRenderer
 const messages = require('../constants/messages')
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
-const importFromHTML = require('../lib/importer').importFromHTML
 const UrlUtil = require('../lib/urlutil')
 const urlParse = require('url').parse
 const currentWindow = require('../../app/renderer/currentWindow')
 const {tabFromFrame} = require('../state/frameStateUtil')
-
-const { l10nErrorText } = require('../lib/errorUtil')
-const { aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes } = require('../lib/appUrlUtil')
+const {l10nErrorText} = require('../../app/common/lib/httpUtil')
+const {aboutUrls, getSourceAboutUrl, isIntermediateAboutPage, navigatableTypes} = require('../lib/appUrlUtil')
 const Serializer = require('../dispatcher/serializer')
 
 let windowState = Immutable.fromJS({
@@ -31,7 +29,9 @@ let windowState = Immutable.fromJS({
   ui: {
     tabs: {
     },
-    mouseInTitlebar: false
+    mouseInTitlebar: false,
+    menubar: {
+    }
   },
   searchDetail: null
 })
@@ -293,8 +293,8 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(tabStatePath(action.key), {
           location: action.location
         })
-        // force a navbar update in case this was called from an app
-        // initiated navigation (bookmarks, etc...)
+        // Show the location for directly-entered URLs before the page finishes
+        // loading
         updateNavBarInput(action.location, frameStatePath(action.key))
       }
       break
@@ -430,6 +430,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_NEW_FRAME:
       newFrame(action.frameOpts, action.openInForeground)
       break
+    case WindowConstants.WINDOW_VIEW_KEY:
+      newFrame(action.frameOpts, action.openInForeground)
+      break
     case WindowConstants.WINDOW_CLONE_FRAME:
       let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
       newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground, insertionIndex)
@@ -442,13 +445,6 @@ const doAction = (action) => {
       windowState = windowState.merge(FrameStateUtil.removeFrame(windowState.get('frames'), windowState.get('tabs'),
         windowState.get('closedFrames'), frameProps.set('closedAtIndex', index),
         activeFrameKey))
-      // History menu needs update (since it shows "Recently Closed" items)
-      const activeFrameLocation = FrameStateUtil.getActiveFrame(windowState).get('location')
-      const windowData = {
-        location: activeFrameLocation,
-        closedFrames: windowState.get('closedFrames').toJS()
-      }
-      ipc.send(messages.RESPONSE_MENU_DATA_FOR_WINDOW, windowData)
       // If we reach the limit of opened tabs per page while closing tabs, switch to
       // the active tab's page otherwise the user will hang on empty page
       let totalOpenTabs = windowState.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
@@ -565,6 +561,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break
+    case WindowConstants.WINDOW_SET_URL_BAR_FOCUSED:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'focused']), action.isFocused)
+      break
     case WindowConstants.WINDOW_SET_URL_BAR_SELECTED:
       const urlBarPath = activeFrameStatePath().concat(['navbar', 'urlbar'])
       windowState = windowState.mergeIn(urlBarPath, {
@@ -674,6 +673,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SAVE_POSITION:
       windowState = windowState.setIn(['ui', 'position'], action.position)
       break
+    case WindowConstants.WINDOW_SAVE_SIZE:
+      windowState = windowState.setIn(['ui', 'size'], action.size)
+      break
     case WindowConstants.WINDOW_SET_FULLSCREEN_STATE:
       windowState = windowState.setIn(['ui', 'isFullScreen'], action.isFullScreen)
       break
@@ -704,6 +706,20 @@ const doAction = (action) => {
         windowState = windowState.delete('clearBrowsingDataDetail')
       } else {
         windowState = windowState.set('clearBrowsingDataDetail', Immutable.fromJS(action.clearBrowsingDataDetail))
+      }
+      break
+    case WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL:
+      if (!action.importBrowserDataDetail) {
+        windowState = windowState.delete('importBrowserDataDetail')
+      } else {
+        windowState = windowState.set('importBrowserDataDetail', Immutable.fromJS(action.importBrowserDataDetail))
+      }
+      break
+    case WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED:
+      if (!action.selected) {
+        windowState = windowState.delete('importBrowserDataSelected')
+      } else {
+        windowState = windowState.set('importBrowserDataSelected', Immutable.fromJS(action.selected))
       }
       break
     case WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
@@ -771,13 +787,54 @@ const doAction = (action) => {
       const blockedRunInsecureContentPath =
         ['frames', FrameStateUtil.getFramePropsIndex(windowState.get('frames'), action.frameProps)]
       if (action.source) {
+        let blockedList = windowState.getIn(
+          blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent'])) || new Immutable.List()
         windowState =
-          windowState.setIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']), action.source)
+          windowState.setIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']),
+            blockedList.push(action.source))
       } else {
         windowState =
           windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
       }
       break
+    case WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
+      if (getSetting(settings.AUTO_HIDE_MENU)) {
+        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+        // Use value if provided; if not, toggle to opposite.
+        const newVisibleStatus = typeof action.isVisible === 'boolean'
+          ? action.isVisible
+          : !windowState.getIn(['ui', 'menubar', 'isVisible'])
+        // Clear selection when menu is shown
+        if (newVisibleStatus) {
+          doAction({ actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX, index: [0] })
+        }
+        windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
+      }
+      break
+    case WindowConstants.WINDOW_RESET_MENU_STATE:
+      doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
+      if (getSetting(settings.AUTO_HIDE_MENU)) {
+        doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
+      } else {
+        doAction({actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+      }
+      doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
+      doAction({actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
+      windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], null)
+      break
+    case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],
+        Array.isArray(action.index)
+        ? action.index
+        : null)
+      break
+    case WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR:
+      windowState = windowState.setIn(['ui', 'menubar', 'lastFocusedSelector'], action.selector)
+      break
+    case WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
+      windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
+      break
+
     default:
   }
 
@@ -801,21 +858,6 @@ ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e, clearBrowsingDataDe
     actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
     clearBrowsingDataDetail
   })
-})
-
-ipc.on(messages.IMPORT_BOOKMARKS, () => {
-  const dialog = require('electron').remote.dialog
-  const files = dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{
-      name: 'HTML',
-      extensions: ['html', 'htm']
-    }]
-  })
-  if (files && files.length > 0) {
-    const file = files[0]
-    importFromHTML(file)
-  }
 })
 
 const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev', 'clone']

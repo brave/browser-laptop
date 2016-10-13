@@ -21,7 +21,35 @@ ${locale.translation('updateChannel')}: ${Channel.channel()}
 
 ${locale.translation('licenseText')}`,
       icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
-      buttons: ['Ok']
+      buttons: [locale.translation('licenseTextOk')]
+    })
+  }, 50)
+}
+
+module.exports.showImportWarning = function () {
+  // The timeout is in case there's a call just after the modal to hide the menu.
+  // showMessageBox is a modal and blocks everything otherwise, so menu would remain open
+  // while the dialog is displayed.
+  setTimeout(() => {
+    dialog.showMessageBox({
+      title: 'Brave',
+      message: `${locale.translation('closeFirefoxWarning')}`,
+      icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
+      buttons: [locale.translation('closeFirefoxWarningOk')]
+    })
+  }, 50)
+}
+
+module.exports.showImportSuccess = function () {
+  // The timeout is in case there's a call just after the modal to hide the menu.
+  // showMessageBox is a modal and blocks everything otherwise, so menu would remain open
+  // while the dialog is displayed.
+  setTimeout(() => {
+    dialog.showMessageBox({
+      title: 'Brave',
+      message: `${locale.translation('importSuccess')}`,
+      icon: path.join(__dirname, '..', 'app', 'extensions', 'brave', 'img', 'braveAbout.png'),
+      buttons: [locale.translation('importSuccessOk')]
     })
   }, 50)
 }

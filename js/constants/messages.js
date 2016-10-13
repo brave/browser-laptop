@@ -72,14 +72,9 @@ const messages = {
   ENTER_FULL_SCREEN: _,
   SET_CLIPBOARD: _,
   GOT_CANVAS_FINGERPRINTING: _,
-  SHOW_NOTIFICATION: _, /** @arg {string} l10n id of desktop notification message */
   GO_BACK: _,
   GO_FORWARD: _,
   RELOAD: _,
-  CAN_SWIPE_BACK: _,
-  CAN_SWIPE_FORWARD: _,
-  CHECK_SWIPE_BACK: _,
-  CHECK_SWIPE_FORWARD: _,
   ENABLE_SWIPE_GESTURE: _,
   DISABLE_SWIPE_GESTURE: _,
   SHOW_FLASH_NOTIFICATION: _,
@@ -104,10 +99,6 @@ const messages = {
   LAST_WINDOW_STATE: _,
   UNDO_CLOSED_WINDOW: _,
   CLEAR_CLOSED_FRAMES: _,
-  // Menu rebuilding
-  REQUEST_MENU_DATA_FOR_WINDOW: _,
-  RESPONSE_MENU_DATA_FOR_WINDOW: _,
-  UPDATE_MENU_BOOKMARKED_STATUS: _, /** @isBookmarked {boolean} should menu show "Bookmark Page" as checked */
   // Ad block, safebrowsing, and tracking protection
   BLOCKED_RESOURCE: _,
   BLOCKED_PAGE: _,
@@ -117,6 +108,8 @@ const messages = {
   BRAVERY_DEFAULTS_UPDATED: _,
   BOOKMARKS_UPDATED: _,
   HISTORY_UPDATED: _,
+  EXTENSIONS_UPDATED: _,
+  ADBLOCK_UPDATED: _,
   DOWNLOADS_UPDATED: _,
   FLASH_UPDATED: _,
   // About pages from contentScript
@@ -126,7 +119,11 @@ const messages = {
   CHECK_FLASH_INSTALLED: _,
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,
+  IMPORT_BROWSER_DATA_NOW: _,
+  IMPORTER_LIST: _,
   // Autofill
+  AUTOFILL_SET_ADDRESS: _,
+  AUTOFILL_SET_CREDIT_CARD: _,
   AUTOFILL_ADDRESSES_UPDATED: _,
   AUTOFILL_CREDIT_CARDS_UPDATED: _,
   // HTTPS
@@ -136,12 +133,8 @@ const messages = {
   SET_CERT_ERROR_DETAIL: _,
   SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
   HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
-  // Bookmarks
-  IMPORT_BOOKMARKS: _,
   // Extensions
   NEW_POPUP_WINDOW: _,
-  // NoScript
-  TEMPORARY_ALLOW_SCRIPTS: _, /** @arg {string} origin to allow scripts on */
   // Localization
   LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
   REQUEST_LANGUAGE: _,
@@ -155,7 +148,8 @@ const messages = {
   LEDGER_PUBLISHER: _,
   LEDGER_UPDATED: _,
   LEDGER_CREATE_WALLET: _,
-  CHECK_BITCOIN_HANDLER: _
+  CHECK_BITCOIN_HANDLER: _,
+  ADD_FUNDS_CLOSED: _
 }
 
 module.exports = mapValuesByKeys(messages)

@@ -72,12 +72,12 @@ module.exports.init = () => {
   contractions.forEach((word) => contractionSet.add(word.replace(/'.*/, '')))
 
   const availableDictionaries = spellchecker.getAvailableDictionaries()
-  let dict = getSetting(settings.LANGUAGE) || app.getLocale().replace('-', '_')
+  let dict = (getSetting(settings.LANGUAGE) || app.getLocale()).replace('-', '_')
   if (availableDictionaries.includes(dict)) {
     dictionaryLocale = dict
     spellchecker.setDictionary(dict)
   } else {
-    dict = dict.split('-')[0]
+    dict = dict.split('_')[0]
     if (availableDictionaries.includes(dict)) {
       dictionaryLocale = dict
       spellchecker.setDictionary(dict)

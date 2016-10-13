@@ -3,8 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 if (chrome.contentSettings.passwordManager == 'allow') {
-
-  function savePassword(username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
+  let credentials = {}
+  function savePassword (username/*: ?string*/, pw/*: string*/, origin/*: string*/, action/*: string*/) {
     chrome.ipc.send('save-password', username, pw, origin, action)
   }
 
@@ -28,12 +28,10 @@ if (chrome.contentSettings.passwordManager == 'allow') {
   /**
    * Try to autofill a form with credentials, using roughly the heuristic from
    * http://mxr.mozilla.org/firefox/source/toolkit/components/passwordmgr/src/nsLoginManager.js
-   * @param {Object.<string, Array.<Element>>} credentials - map of form action
-   *   to password/username elements with that action
    * @param {string} formOrigin - origin of the form
    * @param {Element} form - the form node
    */
-  function tryAutofillForm (credentials, formOrigin, form) {
+  function tryAutofillForm (formOrigin, form) {
     var fields = getFormFields(form, false)
     var action = form.action || document.location.href
     action = normalizeURL(action)
@@ -44,8 +42,20 @@ if (chrome.contentSettings.passwordManager == 'allow') {
       return
     }
 
-    if (credentials[action]) {
-      credentials[action].push([passwordElem, usernameElem])
+    if (Array.isArray(credentials[action])) {
+      let isDuplicate = false
+      credentials[action].forEach((elems) => {
+        if (isDuplicate === true) {
+          return
+        } else if (elems[0] === passwordElem && elems[1] === usernameElem) {
+          isDuplicate = true
+        }
+      })
+      if (isDuplicate === false) {
+        credentials[action].push([passwordElem, usernameElem])
+      } else {
+        return
+      }
     } else {
       credentials[action] = [[passwordElem, usernameElem]]
     }
@@ -111,22 +121,20 @@ if (chrome.contentSettings.passwordManager == 'allow') {
   function autofillPasswordListener () {
     // Don't autofill on non-HTTP(S) sites for now
     if (document.location.protocol !== 'http:' && document.location.protocol !== 'https:') {
-      return false
+      return
     }
 
     if (document.querySelectorAll('input[type=password]').length === 0) {
-      // No password fields; abort
-      return false
+      // No password fields;
+      return
     }
 
     // Map of action origin to [[password element, username element]]
-    var credentials = {}
-
     var formOrigin = [document.location.protocol, document.location.host].join('//')
     var formNodes = document.querySelectorAll('form')
 
     Array.from(formNodes).forEach((form) => {
-      tryAutofillForm(credentials, formOrigin, form)
+      tryAutofillForm(formOrigin, form)
     })
 
     chrome.ipc.on('got-password', (e, username, password, origin, action, isUnique) => {
@@ -148,7 +156,6 @@ if (chrome.contentSettings.passwordManager == 'allow') {
         })
       }
     })
-    return true
   }
 
   /**
@@ -262,24 +269,13 @@ if (chrome.contentSettings.passwordManager == 'allow') {
     return passwordNodes
   }
 
-
-  if (autofillPasswordListener() !== true) {
-    setTimeout(() => {
-      // Some pages insert the password form into the DOM after it's loaded
-      var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-          if (mutation.addedNodes.length) {
-            if (autofillPasswordListener() === true) {
-              observer.disconnect()
-            }
-          }
-        })
-      })
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-      })
-    }, 1000)
-  }
+  autofillPasswordListener()
+  let interval = setInterval(autofillPasswordListener, 3000)
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(interval)
+    if (document.visibilityState !== 'hidden') {
+      interval = setInterval(autofillPasswordListener, 3000)
+    }
+  })
 }
 

@@ -21,24 +21,41 @@ class NoScriptInfo extends ImmutableComponent {
     return siteUtil.getOrigin(this.props.frameProps.get('location'))
   }
 
+  get isPrivate () {
+    return this.props.frameProps.get('isPrivate')
+  }
+
   reload () {
     ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD)
   }
 
-  onAllowOnce () {
+  onAllow (setting) {
     if (!this.origin) {
       return
     }
-    ipc.send(messages.TEMPORARY_ALLOW_SCRIPTS, this.origin)
+    appActions.changeSiteSetting(this.origin, 'noScript', setting)
     this.reload()
   }
 
-  onAllow (temp) {
-    if (!this.origin) {
-      return
+  get buttons () {
+    if (!this.props.noScriptGlobalEnabled) {
+      // NoScript is not turned on globally
+      return <div><Button l10nId='allow' className='actionButton'
+        onClick={this.onAllow.bind(this, false)} /></div>
+    } else {
+      return <div>
+        <Button l10nId='allowScriptsOnce' className='actionButton'
+          onClick={this.onAllow.bind(this, 0)} />
+        {this.isPrivate
+          ? null
+          : <div>
+            <div><Button l10nId='allowScriptsTemp' className='subtleButton'
+              onClick={this.onAllow.bind(this, 1)} /></div>
+            <div><Button l10nId='allow' className='subtleButton'
+              onClick={this.onAllow.bind(this, false)} /></div>
+          </div>}
+      </div>
     }
-    appActions.changeSiteSetting(this.origin, 'noScript', false, temp)
-    this.reload()
   }
 
   render () {
@@ -50,21 +67,14 @@ class NoScriptInfo extends ImmutableComponent {
       <div>
         <div className='truncate' data-l10n-args={JSON.stringify(l10nArgs)}
           data-l10n-id={this.numberBlocked === 1 ? 'scriptBlocked' : 'scriptsBlocked'} />
-        <div>
-        {
-          // TODO: restore the allow-once button
-          // TODO: If this is a private tab, this should only allow scripts
-          // temporarily. Depends on #1824
-          <Button l10nId='allow' className='actionButton'
-            onClick={this.onAllow.bind(this, false)} />
-        }
-        </div>
+        {this.buttons}
       </div>
     </Dialog>
   }
 }
 
 NoScriptInfo.propTypes = {
+  noScriptGlobalEnabled: React.PropTypes.bool,
   frameProps: React.PropTypes.object,
   onHide: React.PropTypes.func
 }

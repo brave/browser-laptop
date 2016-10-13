@@ -188,12 +188,12 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
         click: downloadActions.clearDownload.bind(null, downloads, downloadId)
       })
     }
-    if (menu.length) {
-      menu.push(CommonMenu.separatorMenuItem)
-    }
   }
 
   if (windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible'])) {
+    if (menu.length) {
+      menu.push(CommonMenu.separatorMenuItem)
+    }
     menu.push({
       label: locale.translation('downloadToolbarHide'),
       click: () => {
@@ -215,6 +215,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
 function siteDetailTemplateInit (siteDetail, activeFrame) {
   let isHistoryEntry = false
+  let isHistoryEntries = false
   let isFolder = false
   let isRootFolder = false
   let deleteLabel
@@ -228,21 +229,43 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     isRootFolder = siteDetail.get('folderId') === 0
     deleteLabel = 'deleteFolder'
     deleteTag = siteTags.BOOKMARK_FOLDER
-  } else {
+  } else if (siteUtil.isHistoryEntry(siteDetail)) {
     isHistoryEntry = true
     deleteLabel = 'deleteHistoryEntry'
+  } else if (Immutable.List.isList(siteDetail)) {
+    isHistoryEntries = true
+    siteDetail.forEach((site) => {
+      if (!siteUtil.isHistoryEntry(site)) {
+        isHistoryEntries = false
+      }
+    })
+    deleteLabel = 'deleteHistoryEntries'
   }
 
   const template = []
 
   if (!isFolder) {
-    const location = siteDetail.get('location')
+    if (!Immutable.List.isList(siteDetail)) {
+      const location = siteDetail.get('location')
 
-    template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
-      openInNewPrivateTabMenuItem(location),
-      openInNewSessionTabMenuItem(location),
-      copyAddressMenuItem('copyLinkAddress', location),
-      CommonMenu.separatorMenuItem)
+      template.push(openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
+        openInNewPrivateTabMenuItem(location),
+        openInNewSessionTabMenuItem(location),
+        copyAddressMenuItem('copyLinkAddress', location),
+        CommonMenu.separatorMenuItem)
+    } else {
+      let locations = []
+      let partitionNumbers = []
+      siteDetail.forEach((site) => {
+        locations.push(site.get('location'))
+        partitionNumbers.push(site.get('partitionNumber'))
+      })
+
+      template.push(openInNewTabMenuItem(locations, undefined, partitionNumbers),
+        openInNewPrivateTabMenuItem(locations),
+        openInNewSessionTabMenuItem(locations),
+        CommonMenu.separatorMenuItem)
+    }
   } else {
     template.push(openAllInNewTabsMenuItem(appStoreRenderer.state.get('sites'), siteDetail),
       CommonMenu.separatorMenuItem)
@@ -251,7 +274,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   if (!isRootFolder) {
     // History can be deleted but not edited
     // Picking this menu item pops up the AddEditBookmark modal
-    if (!isHistoryEntry) {
+    if (!isHistoryEntry && !isHistoryEntries) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
@@ -263,11 +286,17 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     template.push(
       {
         label: locale.translation(deleteLabel),
-        click: () => appActions.removeSite(siteDetail, deleteTag)
+        click: () => {
+          if (Immutable.List.isList(siteDetail)) {
+            siteDetail.forEach((site) => appActions.removeSite(site, deleteTag))
+          } else {
+            appActions.removeSite(siteDetail, deleteTag)
+          }
+        }
       })
   }
 
-  if (!isHistoryEntry) {
+  if (!isHistoryEntry && !isHistoryEntries) {
     if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
       template.push(CommonMenu.separatorMenuItem)
     }
@@ -409,31 +438,32 @@ function autofillTemplateInit (suggestions, frame) {
 
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
-  const items = []
-  items.push(
-    CommonMenu.newTabMenuItem(frameProps.get('key')),
-    CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('reloadTab'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, frameKey)
+  const items = [CommonMenu.newTabMenuItem(frameProps.get('key'))]
+  const location = frameProps.get('location')
+  if (location !== 'about:newtab') {
+    items.push(
+      CommonMenu.separatorMenuItem,
+      {
+        label: locale.translation('reloadTab'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_FRAME_RELOAD, frameKey)
+          }
         }
-      }
-    }, {
-      label: locale.translation('clone'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          focusedWindow.webContents.send(messages.SHORTCUT_FRAME_CLONE, frameKey, {
-            openInForeground: true
-          })
+      }, {
+        label: locale.translation('clone'),
+        click: (item, focusedWindow) => {
+          if (focusedWindow) {
+            focusedWindow.webContents.send(messages.SHORTCUT_FRAME_CLONE, frameKey, {
+              openInForeground: true
+            })
+          }
         }
-      }
-    })
+      })
+  }
 
   if (!frameProps.get('isPrivate')) {
     const isPinned = frameProps.get('pinnedLocation')
-    const location = frameProps.get('location')
     if (!(location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location))) {
       items.push({
         label: locale.translation(isPinned ? 'unpinTab' : 'pinTab'),
@@ -621,13 +651,14 @@ function hamburgerTemplateInit (location, e) {
         CommonMenu.bookmarksManagerMenuItem(),
         CommonMenu.bookmarksToolbarMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.importBookmarksMenuItem()
+        CommonMenu.importBrowserDataMenuItem()
       ]
     }, {
       label: locale.translation('bravery'),
       submenu: [
         CommonMenu.braveryGlobalMenuItem(),
-        CommonMenu.braverySiteMenuItem()
+        CommonMenu.braverySiteMenuItem(),
+        CommonMenu.braveryPaymentsMenuItem()
       ]
     },
     CommonMenu.downloadsMenuItem(),
@@ -654,10 +685,26 @@ function hamburgerTemplateInit (location, e) {
 
 const openInNewTabMenuItem = (location, isPrivate, partitionNumber, parentFrameKey) => {
   let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-  return {
-    label: locale.translation('openInNewTab'),
-    click: () => {
-      windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, openInForeground)
+  if (Array.isArray(location) && Array.isArray(partitionNumber)) {
+    return {
+      label: locale.translation('openInNewTabs'),
+      click: () => {
+        for (let i = 0; i < location.length; ++i) {
+          windowActions.newFrame(
+            { location: location[i],
+              isPrivate,
+              partitionNumber: partitionNumber[i],
+              parentFrameKey },
+            openInForeground)
+        }
+      }
+    }
+  } else {
+    return {
+      label: locale.translation('openInNewTab'),
+      click: () => {
+        windowActions.newFrame({ location, isPrivate, partitionNumber, parentFrameKey }, openInForeground)
+      }
     }
   }
 }
@@ -673,14 +720,29 @@ const openAllInNewTabsMenuItem = (allSites, folderDetail) => {
 
 const openInNewPrivateTabMenuItem = (location, parentFrameKey) => {
   let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-  return {
-    label: locale.translation('openInNewPrivateTab'),
-    click: () => {
-      windowActions.newFrame({
-        location,
-        isPrivate: true,
-        parentFrameKey
-      }, openInForeground)
+  if (Array.isArray(location)) {
+    return {
+      label: locale.translation('openInNewPrivateTabs'),
+      click: () => {
+        for (let i = 0; i < location.length; ++i) {
+          windowActions.newFrame({
+            location: location[i],
+            isPrivate: true,
+            parentFrameKey
+          }, openInForeground)
+        }
+      }
+    }
+  } else {
+    return {
+      label: locale.translation('openInNewPrivateTab'),
+      click: () => {
+        windowActions.newFrame({
+          location,
+          isPrivate: true,
+          parentFrameKey
+        }, openInForeground)
+      }
     }
   }
 }
@@ -696,14 +758,29 @@ const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
 
 const openInNewSessionTabMenuItem = (location, parentFrameKey) => {
   let openInForeground = getSetting(settings.SWITCH_TO_NEW_TABS) === true
-  return {
-    label: locale.translation('openInNewSessionTab'),
-    click: (item, focusedWindow) => {
-      windowActions.newFrame({
-        location,
-        isPartitioned: true,
-        parentFrameKey
-      }, openInForeground)
+  if (Array.isArray(location)) {
+    return {
+      label: locale.translation('openInNewSessionTabs'),
+      click: (item, focusedWindow) => {
+        for (let i = 0; i < location.length; ++i) {
+          windowActions.newFrame({
+            location: location[i],
+            isPartitioned: true,
+            parentFrameKey
+          }, openInForeground)
+        }
+      }
+    }
+  } else {
+    return {
+      label: locale.translation('openInNewSessionTab'),
+      click: (item, focusedWindow) => {
+        windowActions.newFrame({
+          location,
+          isPartitioned: true,
+          parentFrameKey
+        }, openInForeground)
+      }
     }
   }
 }
@@ -745,8 +822,12 @@ const searchSelectionMenuItem = (location) => {
     label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
     click: (item, focusedWindow) => {
       if (focusedWindow && location) {
+        let activeFrame = windowStore.getState().get('activeFrameKey')
+        let frame = windowStore.getFrame(activeFrame)
         let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
-        windowActions.newFrame({ location: searchUrl }, true)
+        windowActions.newFrame({ location: searchUrl,
+          isPrivate: frame.get('isPrivate'),
+          partitionNumber: frame.get('partitionNumber') }, true)
       }
     }
   }
@@ -770,15 +851,18 @@ function mainTemplateInit (nodeProps, frame) {
     template.push({
       label: locale.translation('allowFlashOnce'),
       click: () => {
-        appActions.changeSiteSetting(pageOrigin, 'flash', 1)
-      }
-    }, {
-      label: locale.translation('allowFlashAlways'),
-      click: () => {
-        const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
-        appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
+        appActions.changeSiteSetting(pageOrigin, 'flash', 1, frame.get('isPrivate'))
       }
     })
+    if (!frame.get('isPrivate')) {
+      template.push({
+        label: locale.translation('allowFlashAlways'),
+        click: () => {
+          const expirationTime = Date.now() + 7 * 24 * 3600 * 1000
+          appActions.changeSiteSetting(pageOrigin, 'flash', expirationTime)
+        }
+      })
+    }
     return template
   }
 
@@ -844,10 +928,14 @@ function mainTemplateInit (nodeProps, frame) {
         {
           label: locale.translation('searchImage'),
           click: (item) => {
+            let activeFrame = windowStore.getState().get('activeFrameKey')
+            let frame = windowStore.getFrame(activeFrame)
             let searchUrl = windowStore.getState().getIn(['searchDetail', 'searchURL'])
               .replace('{searchTerms}', encodeURIComponent(nodeProps.srcURL))
               .replace('?q', 'byimage?image_url')
-            windowActions.newFrame({ location: searchUrl }, true)
+            windowActions.newFrame({ location: searchUrl,
+              isPrivate: frame.get('isPrivate'),
+              partitionNumber: frame.get('partitionNumber')}, true)
           }
         }
       )
@@ -883,6 +971,12 @@ function mainTemplateInit (nodeProps, frame) {
       template.push(showDefinitionMenuItem(nodeProps.selectionText),
         CommonMenu.separatorMenuItem
       )
+      if (isLink) {
+        template.push(addBookmarkMenuItem('bookmarkLink', {
+          location: nodeProps.linkURL,
+          tags: [siteTags.BOOKMARK]
+        }, false))
+      }
     }
 
     template.push(searchSelectionMenuItem(nodeProps.selectionText), {
@@ -975,8 +1069,6 @@ function mainTemplateInit (nodeProps, frame) {
         label: passwordManager.get('displayName'),
         click: (item, focusedWindow) => {
           if (focusedWindow) {
-            nodeProps.height = passwordManager.get('popupHeight') || nodeProps.height
-            nodeProps.width = passwordManager.get('popupWidth') || nodeProps.width
             ipc.send('chrome-browser-action-clicked', passwordManager.get('extensionId'), frame.get('tabId'), passwordManager.get('name'), nodeProps)
           }
         }
@@ -1013,6 +1105,8 @@ function onMainContextMenu (nodeProps, frame, contextMenuType) {
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps), activeFrame)
   } else if (contextMenuType === 'history') {
     onSiteDetailContextMenu(Immutable.fromJS(nodeProps))
+  } else if (contextMenuType === 'synopsis') {
+    onLedgerContextMenu(nodeProps.location, nodeProps.hostPattern)
   } else if (contextMenuType === 'download') {
     onDownloadsToolbarContextMenu(nodeProps.downloadId, Immutable.fromJS(nodeProps))
   } else {
@@ -1064,6 +1158,22 @@ function onSiteDetailContextMenu (siteDetail, activeFrame, e) {
     e.stopPropagation()
   }
   const menu = Menu.buildFromTemplate(siteDetailTemplateInit(siteDetail, activeFrame))
+  menu.popup(currentWindow)
+  menu.destroy()
+}
+
+function onLedgerContextMenu (location, hostPattern) {
+  const template = [openInNewTabMenuItem(location),
+    openInNewPrivateTabMenuItem(location),
+    openInNewSessionTabMenuItem(location),
+    copyAddressMenuItem('copyLinkAddress', location),
+    CommonMenu.separatorMenuItem,
+    {
+      label: locale.translation('deleteLedgerEntry'),
+      click: () => appActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+    }
+  ]
+  const menu = Menu.buildFromTemplate(template)
   menu.popup(currentWindow)
   menu.destroy()
 }

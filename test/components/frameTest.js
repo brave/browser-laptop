@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const { activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar, backButton, forwardButton } = require('../lib/selectors')
+const {activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar, backButton, forwardButton} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
@@ -111,6 +111,41 @@ describe('findbar', function () {
     match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '2 of 2')
   })
+
+  it('remembers findbar input when switching frames', function * () {
+    const url = Brave.server.url('find_in_page.html')
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+    yield this.app.client
+      .ipcSend(messages.SHORTCUT_NEW_FRAME, url)
+      .windowParentByUrl(url)
+      .waitUntil(function () {
+        return this.getAttribute('webview[data-frame-key="2"]', 'src').then((src) => src === url)
+      })
+      .waitForElementFocus('webview[data-frame-key="2"]')
+    yield this.app.client
+      .showFindbar(true, 2)
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'abc')
+      .click('.tab')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'test')
+      })
+      .click('.closeTab')
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'abc')
+      })
+      .showFindbar(false, 2)
+      .waitUntil(function () {
+        return this.element(findBarInput).then((val) => val.value === null)
+      })
+      .showFindbar(true, 2)
+      .waitUntil(function () {
+        return this.getValue(findBarInput).then((val) => val === 'abc')
+      })
+  })
 })
 
 describe('clone tab', function () {
@@ -131,10 +166,16 @@ describe('clone tab', function () {
     })
 
     it('opens a new foreground tab', function * () {
+      let url1 = this.url1
       yield this.app.client
         .waitUntil(function () {
           return this.getTabCount().then((count) => {
             return count === 2
+          })
+        })
+        .waitUntil(function () {
+          return this.tabByIndex(1).getUrl().then((url) => {
+            return url === url1
           })
         })
         .windowByUrl(Brave.browserWindowUrl)
@@ -159,7 +200,6 @@ describe('clone tab', function () {
 
       yield setup(this.app.client)
       yield this.app.client
-        .waitUntilWindowLoaded()
         .windowByUrl(Brave.browserWindowUrl)
         .waitForUrl(Brave.newTabUrl)
         .url(this.clickWithTargetPage)
@@ -266,8 +306,7 @@ describe('view source', function () {
     yield setup(this.app.client)
     yield this.app.client
       .tabByIndex(0)
-      .url(this.url)
-      .waitForUrl(this.url)
+      .loadUrl(this.url)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist('.tab[data-frame-key="1"]')
       .waitForExist(this.webview1)
@@ -276,6 +315,11 @@ describe('view source', function () {
   it('should open in new tab', function * () {
     yield this.app.client
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .waitUntil(function () {
+        return this.getTabCount().then((count) => {
+          return count === 2
+        })
+      })
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(this.webview2)
   })
@@ -284,6 +328,11 @@ describe('view source', function () {
     yield this.app.client
       .setPinned(this.url, true)
       .ipcSend(messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE)
+      .waitUntil(function () {
+        return this.getTabCount().then((count) => {
+          return count === 2
+        })
+      })
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(this.webview2)
   })
@@ -310,6 +359,12 @@ describe('resource loading', function () {
   it('loads a PDF', function * () {
     let url = Brave.server.url('img/test.pdf')
     yield this.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitUntil(function () {
+        return this.getAppState().then((val) => {
+          return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
+        })
+      })
       .tabByIndex(0)
       .url(url)
       .waitForVisible('#viewerContainer')
@@ -318,9 +373,7 @@ describe('resource loading', function () {
 
 function * setup (client) {
   yield client
-    .waitUntilWindowLoaded()
     .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
-    .waitForVisible('#window')
     .waitForVisible(urlInput)
 }

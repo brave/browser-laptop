@@ -26,12 +26,7 @@ module.exports.getAppUrl = function (relativeUrl) {
     relativeUrl = ''
   }
 
-  let url = 'chrome-extension://' + config.braveExtensionId + '/' + relativeUrl
-  if (process.env.NODE_ENV === 'development') {
-    url += '?devServerPort=' + (process.env.BRAVE_PORT || process.env.npm_package_config_port)
-  }
-
-  return url
+  return 'chrome-extension://' + config.braveExtensionId + '/' + relativeUrl
 }
 
 module.exports.getExtensionsPath = function (extensionDir) {
@@ -61,6 +56,8 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:history': module.exports.getAppUrl('about-history.html'),
   'about:bookmarks': module.exports.getAppUrl('about-bookmarks.html'),
   'about:downloads': module.exports.getAppUrl('about-downloads.html'),
+  'about:extensions': module.exports.getAppUrl('about-extensions.html'),
+  'about:adblock': module.exports.getAppUrl('about-adblock.html'),
   'about:newtab': module.exports.getAppUrl('about-newtab.html'),
   'about:preferences': module.exports.getAppUrl('about-preferences.html'),
   'about:config': module.exports.getAppUrl('about-config.html'),
@@ -138,7 +135,7 @@ module.exports.isUrl = function (input) {
  * Gets base url from an about: url or its target mapping.
  */
 function getBaseUrl (input) {
-  return (typeof input === 'string') ? input.split('#')[0] : ''
+  return (typeof input === 'string') ? input.split(/#|\?/)[0] : ''
 }
 module.exports.getBaseUrl = getBaseUrl
 

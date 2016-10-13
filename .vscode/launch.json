@@ -31,6 +31,34 @@
 			"outDir": null
 		},
 		{
+			// Name of configuration; appears in the launch configuration drop down menu.
+			"name": "Launch macOS packaged",
+			// Type of configuration.
+			"type": "node",
+			// Workspace relative or absolute path to the program.
+			"program": "${workspaceRoot}/Brave-darwin-x64/Brave.app/Contents/Resources/app.asar/app/index.js",
+			// Automatically stop program after launch.
+			"stopOnEntry": false,
+			// Command line arguments passed to the program.
+			"args": [".", "-enable-logging", "--v=0", "--enable-dcheck"],
+			// Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
+			"cwd": "${workspaceRoot}",
+			// Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.
+			"runtimeExecutable": "${workspaceRoot}/Brave-darwin-x64/Brave.app/Contents/MacOS/Brave",
+			// Optional arguments passed to the runtime executable.
+			"runtimeArgs": [],
+			// Environment variables passed to the program.
+			"env": {
+				"NODE_ENV": "production",
+				"npm_package_config_port": 8080
+			},
+			// Use JavaScript source maps (if they exist).
+			"sourceMaps": true,
+			"port": 5858,
+			// If JavaScript source maps are enabled, the generated code is expected in this directory.
+			"outDir": null
+		},
+		{
 			"name": "Attach",
 			"type": "node",
 			// TCP/IP address. Default is "localhost".

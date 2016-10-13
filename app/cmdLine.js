@@ -11,7 +11,7 @@ const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
 const urlParse = require('url').parse
-const { navigatableTypes } = require('../js/lib/appUrlUtil')
+const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const isDarwin = process.platform === 'darwin'
 let appInitialized = false
 
@@ -43,19 +43,25 @@ const focusOrOpenWindow = function (url) {
   return true
 }
 
+const isProtocolHandled = (protocol) => {
+  protocol = (protocol || '').split(':')[0]
+  return navigatableTypes.includes(`${protocol}:`) ||
+      electron.session.defaultSession.protocol.isNavigatorProtocolHandled(protocol)
+}
+
 // Checks an array of arguments if it can find a url
 const getUrlFromCommandLine = (argv) => {
   if (argv) {
     if (argv.length === 2 && !argv[1].startsWith('-')) {
       const parsedUrl = urlParse(argv[1])
-      if (navigatableTypes.includes(parsedUrl.protocol)) {
+      if (isProtocolHandled(parsedUrl.protocol)) {
         return argv[1]
       }
     }
     const index = argv.indexOf('--')
     if (index !== -1 && index + 1 < argv.length && !argv[index + 1].startsWith('-')) {
       const parsedUrl = urlParse(argv[index + 1])
-      if (navigatableTypes.includes(parsedUrl.protocol)) {
+      if (isProtocolHandled(parsedUrl.protocol)) {
         return argv[index + 1]
       }
     }
@@ -68,7 +74,7 @@ if (!isDarwin) {
   const openUrl = getUrlFromCommandLine(process.argv)
   if (openUrl) {
     const parsedUrl = urlParse(openUrl)
-    if (navigatableTypes.includes(parsedUrl.protocol)) {
+    if (isProtocolHandled(parsedUrl.protocol)) {
       module.exports.newWindowURL = openUrl
     }
   }
@@ -101,7 +107,7 @@ app.on('will-finish-launching', () => {
   app.on('open-url', (event, path) => {
     event.preventDefault()
     const parsedUrl = urlParse(path)
-    if (navigatableTypes.includes(parsedUrl.protocol)) {
+    if (isProtocolHandled(parsedUrl.protocol)) {
       if (!focusOrOpenWindow(path)) {
         module.exports.newWindowURL = path
       }

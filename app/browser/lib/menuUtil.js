@@ -10,34 +10,6 @@ const eventUtil = require('../../../js/lib/eventUtil')
 const siteUtil = require('../../../js/state/siteUtil')
 const locale = require('../../locale')
 
-// States which can trigger dynamic menus to change
-let lastSettingsState, lastSites, lastClosedFrames
-
-/**
- * Get an electron MenuItem object for the PARENT menu (File, Edit, etc) based on its label
- * @param {string} label - the text associated with the menu
- * NOTE: label may be a localized string
- */
-module.exports.getParentMenuDetails = (appMenu, label) => {
-  let menuIndex = -1
-  let menuItem = null
-
-  if (label && appMenu && appMenu.items && appMenu.items.length > 0) {
-    menuIndex = appMenu.items.findIndex(function (item, index) {
-      return item && item.label === label
-    })
-
-    if (menuIndex !== -1) {
-      menuItem = appMenu.items[menuIndex]
-    }
-  }
-
-  return {
-    menu: menuItem,
-    index: menuIndex
-  }
-}
-
 /**
  * Get the an electron MenuItem object from a Menu based on its label
  * @param {string} label - the text associated with the menu
@@ -46,52 +18,15 @@ module.exports.getParentMenuDetails = (appMenu, label) => {
 module.exports.getMenuItem = (appMenu, label) => {
   if (appMenu && appMenu.items && appMenu.items.length > 0) {
     for (let i = 0; i < appMenu.items.length; i++) {
-      const menuItem = appMenu.items[i].submenu && appMenu.items[i].submenu.items.find(function (item) {
-        return item && item.label === label
-      })
-      if (menuItem) return menuItem
+      const item = appMenu.items[i]
+      if (item && item.label === label) return item
+      if (item.submenu) {
+        const nestedItem = module.exports.getMenuItem(item.submenu, label)
+        if (nestedItem) return nestedItem
+      }
     }
   }
   return null
-}
-
-/**
- * Check for uneeded updates.
- * Updating the menu when it is not needed causes the menu to close if expanded
- * and also causes menu clicks to not work.  So we don't want to update it a lot.
- * Should only be updated when appState or windowState change (for history or bookmarks)
- * NOTE: settingsState is not used directly; it gets used indirectly via getSetting()
- * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
- * @param {Object} windowData - Information specific to the current window (recently closed tabs, etc)
- */
-module.exports.checkForUpdate = (appState, windowData) => {
-  const updated = {
-    nothing: true,
-    settings: false,
-    sites: false,
-    closedFrames: false
-  }
-
-  if (appState && appState.get('settings') !== lastSettingsState) {
-    // Currently only used for the HOMEPAGE value (bound to history menu)
-    lastSettingsState = appState.get('settings')
-    updated.nothing = false
-    updated.settings = true
-  }
-
-  if (appState && appState.get('sites') !== lastSites) {
-    lastSites = appState.get('sites')
-    updated.nothing = false
-    updated.sites = true
-  }
-
-  if (windowData && windowData.get('closedFrames') !== lastClosedFrames) {
-    lastClosedFrames = windowData.get('closedFrames')
-    updated.nothing = false
-    updated.closedFrames = true
-  }
-
-  return updated
 }
 
 const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
@@ -131,14 +66,11 @@ const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
   return payload
 }
 
-module.exports.createBookmarkMenuItems = () => {
-  if (lastSites) {
-    return createBookmarkMenuItems(siteUtil.getBookmarks(lastSites))
-  }
-  return []
+module.exports.createBookmarkMenuItems = (sites) => {
+  return createBookmarkMenuItems(siteUtil.getBookmarks(sites))
 }
 
-module.exports.createRecentlyClosedMenuItems = () => {
+module.exports.createRecentlyClosedMenuItems = (lastClosedFrames) => {
   const payload = []
   if (lastClosedFrames && lastClosedFrames.size > 0) {
     payload.push(

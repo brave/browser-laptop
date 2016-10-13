@@ -5,8 +5,8 @@
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
 const Immutable = require('immutable')
-const keyCodes = require('../constants/keyCodes')
-const Button = require('./button.js')
+const keyCodes = require('../../app/common/constants/keyCodes')
+const Button = require('./button')
 const SwitchControl = require('../components/switchControl')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
@@ -22,6 +22,7 @@ class FindBar extends ImmutableComponent {
     this.onFindPrev = this.onFindPrev.bind(this)
     this.onFindNext = this.onFindNext.bind(this)
     this.onCaseSensitivityChange = this.onCaseSensitivityChange.bind(this)
+    this.didFrameChange = true
   }
 
   get frame () {
@@ -65,6 +66,10 @@ class FindBar extends ImmutableComponent {
 
   componentDidMount () {
     this.focus()
+  }
+
+  componentWillUpdate (nextProps) {
+    this.didFrameChange = nextProps.frameKey !== this.props.frameKey
   }
 
   componentDidUpdate (prevProps) {
@@ -174,6 +179,10 @@ class FindBar extends ImmutableComponent {
       }
     }
 
+    const inputValue = this.didFrameChange
+      ? this.searchString || undefined
+      : undefined
+
     return <div className='findBar' style={findBarStyle} onBlur={this.onBlur}>
       <div className='searchContainer'>
         <div className='searchStringContainer'>
@@ -181,23 +190,23 @@ class FindBar extends ImmutableComponent {
           <input type='text'
             spellCheck='false'
             ref={(node) => { this.searchInput = node }}
+            value={inputValue}
             onKeyDown={this.onKeyDown}
-            onChange={this.onChange}
-            value={this.searchString} />
+            onKeyUp={this.onChange} />
           <span className='searchStringContainerIcon fa fa-times'
             onClick={this.onClear} />
         </div>
         <span className='findMatchText'>{findMatchText}</span>
-        <Button iconClass='findButton fa-caret-down'
-          inlineStyles={findBarStyle}
-          className='findButton smallButton findNext'
-          disabled={this.numberOfMatches <= 0}
-          onClick={this.onFindNext} />
         <Button iconClass='findButton fa-caret-up'
           inlineStyles={findBarStyle}
           className='findButton smallButton findPrev'
           disabled={this.numberOfMatches <= 0}
           onClick={this.onFindPrev} />
+        <Button iconClass='findButton fa-caret-down'
+          inlineStyles={findBarStyle}
+          className='findButton smallButton findNext'
+          disabled={this.numberOfMatches <= 0}
+          onClick={this.onFindNext} />
         <SwitchControl
           id='caseSensitivityCheckbox'
           checkedOn={this.isCaseSensitive}

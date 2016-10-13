@@ -23,7 +23,11 @@ var exclusions = {
   'TMZ.com.xml': 'breaks www.tmz.com',
   'BusinessInsider.xml': 'breaks http://www.businessinsider.com/silicon-valley-100-2016-6?op=0',
   'Tesco.xml': 'breaks tesco.com due to CSP mismatch',
-  'Vodafone.ie.xml': 'breaks pagination on http://shop.vodafone.ie/shop/phonesAndPlans/phonesAndPlansHome.jsp?subPage=phones&planFilter=onAccount'
+  'Vodafone.ie.xml': 'breaks pagination on http://shop.vodafone.ie/shop/phonesAndPlans/phonesAndPlansHome.jsp?subPage=phones&planFilter=onAccount',
+  'IDownloadBlog.xml': 'breaks http://www.idownloadblog.com/',
+  'EBay_static.com.xml': 'breaks suggested product image previews',
+  'Cisco.xml': 'breaks http://www.cisco.com/c/m/en_us/training-events/events-webinars/techwise-tv/listings.html',
+  'GQ.xml': 'mixed content on gq.com'
 }
 
 var rulesets = JSON.parse(fs.readFileSync('rulesets.json', 'utf8'))

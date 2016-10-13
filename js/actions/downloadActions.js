@@ -29,7 +29,6 @@ const appActions = require('../actions/appActions')
 const messages = require('../constants/messages')
 const fs = require('fs')
 const path = require('path')
-const locale = require('../l10n')
 
 /**
   * Creates an action function for the specified app download action
@@ -44,7 +43,9 @@ const downloadActions = {
   resumeDownload: appActionForDownload(appDownloadActions.RESUME),
   copyLinkToClipboard: function (download) {
     clipboard.writeText(download.get('url'))
-    void new window.Notification(locale.translation('urlCopied'))
+    // disabling notificiations from the main window until we have a
+    // better way to do it
+    // void new window.Notification(locale.translation('urlCopied'))
   },
   openDownloadPath: function (download) {
     fs.exists(download.get('savePath'), (exists) => {

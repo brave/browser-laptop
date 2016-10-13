@@ -75,6 +75,9 @@ class BraveryPanel extends ImmutableComponent {
   get isFpShown () {
     return this.props.braveryPanelDetail.get('expandFp')
   }
+  get isPrivate () {
+    return this.props.frameProps.getIn(['isPrivate'])
+  }
   get redirectedResources () {
     return this.props.frameProps.get('httpsEverywhere')
   }
@@ -144,7 +147,7 @@ class BraveryPanel extends ImmutableComponent {
     if (setting !== 'noScript' && (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')) {
       ruleKey = `https?://${parsedUrl.host}`
     }
-    appActions.changeSiteSetting(ruleKey, setting, e.target.value)
+    appActions.changeSiteSetting(ruleKey, setting, e.target.value, this.isPrivate)
     this.onReload()
   }
   get displayHost () {
@@ -208,52 +211,52 @@ class BraveryPanel extends ImmutableComponent {
         </div>
         <div className='braveryPanelBody'>
           <ul>
-          {
-            this.isBlockedAdsShown
-            ? <li><ul>
             {
-              this.isBlockingAds
-              ? this.blockedAds.map((site) => <li key={site}>{site}</li>)
+              this.isBlockedAdsShown
+              ? <li><ul>
+                {
+                  this.isBlockingAds
+                  ? this.blockedAds.map((site) => <li key={site}>{site}</li>)
+                  : null
+                }
+                {
+                  this.isBlockingTrackedContent
+                  ? this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
+                  : null
+                }
+              </ul></li>
               : null
             }
             {
-              this.isBlockingTrackedContent
-              ? this.blockedByTrackingList.map((site) => <li key={site}>{site}</li>)
+              this.isRedirectingResources && this.isHttpseShown
+              ? <li><ul>
+                {
+                  this.redirectedResourcesSet.map((site) =>
+                    <li key={site}>{site}</li>)
+                }
+              </ul></li>
               : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isRedirectingResources && this.isHttpseShown
-            ? <li><ul>
             {
-              this.redirectedResourcesSet.map((site) =>
-                <li key={site}>{site}</li>)
+              this.isBlockingScripts && this.isBlockedScriptsShown
+              ? <li><ul>
+                {
+                  this.blockedScripts.map((site) =>
+                    <li key={site}>{site}</li>)
+                }
+              </ul></li>
+              : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isBlockingScripts && this.isBlockedScriptsShown
-            ? <li><ul>
             {
-              this.blockedScripts.map((site) =>
-                <li key={site}>{site}</li>)
+              this.isBlockingFingerprinting && this.isFpShown
+              ? <li><ul>
+                {
+                  this.blockedFingerprinting.map((site) =>
+                    <li key={site}>{site}</li>)
+                }
+              </ul></li>
+              : null
             }
-            </ul></li>
-            : null
-          }
-          {
-            this.isBlockingFingerprinting && this.isFpShown
-            ? <li><ul>
-            {
-              this.blockedFingerprinting.map((site) =>
-                <li key={site}>{site}</li>)
-            }
-            </ul></li>
-            : null
-          }
           </ul>
           <div className={cx({
             braveryAdvancedTitle: true,

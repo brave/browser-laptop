@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const config = require('../constants/config.js')
+const config = require('../constants/config')
 const urlParse = require('url').parse
 
 const matchFrame = (queryInfo, frame) => {
@@ -158,6 +158,9 @@ function findDisplayIndexForFrameKey (frames, key) {
  * Obtains the frameProps index in the frames
  */
 function getFramePropsIndex (frames, frameProps) {
+  if (!frameProps) {
+    return -1
+  }
   let queryInfo = frameProps.toJS ? frameProps.toJS() : frameProps
   if (queryInfo.tabId) {
     queryInfo = {
@@ -202,6 +205,10 @@ function isAncestorFrameKey (frames, frame, parentFrameKey) {
     return false
   }
   return isAncestorFrameKey(frames, parentFrame, parentFrameKey)
+}
+
+function isSessionPartition (partition) {
+  return partition && partition.startsWith('persist:partition-')
 }
 
 function getPartition (frameOpts) {
@@ -413,7 +420,7 @@ function removeFrame (frames, tabs, closedFrames, frameProps, activeFrameKey) {
     0)
   }
 
-  if (!frameProps.get('isPrivate')) {
+  if (!frameProps.get('isPrivate') && frameProps.get('location') !== 'about:newtab') {
     frameProps = frameProps.set('isFullScreen', false)
     closedFrames = closedFrames.push(frameProps)
     if (frameProps.get('thumbnailBlob')) {
@@ -491,6 +498,7 @@ module.exports = {
   isAncestorFrameKey,
   isFrameKeyActive,
   isFrameKeyPinned,
+  isSessionPartition,
   getFrameIndex,
   getFrameDisplayIndex,
   getActiveFrameIndex,

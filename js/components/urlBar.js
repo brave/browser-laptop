@@ -8,14 +8,14 @@ const urlParse = require('url').parse
 const ImmutableComponent = require('./immutableComponent')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
-const KeyCodes = require('../constants/keyCodes')
-const cx = require('../lib/classSet.js')
+const KeyCodes = require('../../app/common/constants/keyCodes')
+const cx = require('../lib/classSet')
 const ipc = global.require('electron').ipcRenderer
 
-const UrlBarSuggestions = require('./urlBarSuggestions.js')
+const UrlBarSuggestions = require('./urlBarSuggestions')
 const messages = require('../constants/messages')
 const dragTypes = require('../constants/dragTypes')
-const { getSetting } = require('../settings')
+const {getSetting} = require('../settings')
 const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
@@ -27,7 +27,7 @@ const UrlUtil = require('../lib/urlutil')
 const EventUtil = require('../lib/eventUtil')
 const eventElHasAncestorWithClasses = EventUtil.eventElHasAncestorWithClasses
 
-const { isUrl, isIntermediateAboutPage } = require('../lib/appUrlUtil')
+const {isUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 
 class UrlBar extends ImmutableComponent {
   constructor () {
@@ -48,7 +48,7 @@ class UrlBar extends ImmutableComponent {
     return windowStore.getFrame(this.props.activeFrameKey)
   }
 
-  isActive () {
+  get isActive () {
     return this.props.urlbar.get('active')
   }
 
@@ -95,6 +95,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   onKeyDown (e) {
+    if (!this.isActive) {
+      windowActions.setUrlBarActive(true)
+    }
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         windowActions.setUrlBarActive(false)
@@ -242,8 +245,16 @@ class UrlBar extends ImmutableComponent {
   }
 
   onChange (e) {
-    windowActions.setUrlBarSelected(false)
-    windowActions.setUrlBarActive(true)
+    switch (e.keyCode) {
+      case KeyCodes.UP:
+      case KeyCodes.DOWN:
+      case KeyCodes.ESC:
+        return
+    }
+
+    if (this.isSelected()) {
+      windowActions.setUrlBarSelected(false)
+    }
     windowActions.setNavBarUserInput(e.target.value)
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
@@ -271,6 +282,7 @@ class UrlBar extends ImmutableComponent {
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
+      windowActions.setUrlBarActive(true)
       this.updateLocationToSuggestion()
       windowActions.setUrlBarSelected(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
@@ -285,12 +297,20 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    this.updateDOM()
     // Select the part of the URL which was an autocomplete suffix.
-    if (this.urlInput && this.props.locationValueSuffix.length > 0) {
-      const len = this.urlInput.value.length
+    if (this.urlInput && this.props.locationValueSuffix.length > 0 &&
+      (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
+       this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
       const suffixLen = this.props.locationValueSuffix.length
+      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+      const len = this.urlInput.value.length
       this.urlInput.setSelectionRange(len - suffixLen, len)
+    } else if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+    }
+    if (this.isSelected() !== prevProps.urlbar.get('selected') ||
+      this.isFocused() !== prevProps.urlbar.get('focused')) {
+      this.updateDOM()
     }
   }
 
@@ -370,6 +390,9 @@ class UrlBar extends ImmutableComponent {
   }
 
   render () {
+    const value = this.isActive || (!this.locationValue && this.isFocused())
+      ? undefined
+      : this.locationValue + this.props.locationValueSuffix
     return <form
       className='urlbarForm'
       action='#'
@@ -399,44 +422,44 @@ class UrlBar extends ImmutableComponent {
             marginRight: '3px'
           } : {}
         } />
-        {
-          this.props.titleMode
-          ? <div id='titleBar'>
-            <span><strong>{this.hostValue}</strong></span>
-            <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
-            <span>{this.titleValue}</span>
-          </div>
-          : <input type='text'
-            spellCheck='false'
-            disabled={this.props.location === undefined && this.loadTime === ''}
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-            onKeyDown={this.onKeyDown}
-            onChange={this.onChange}
-            onClick={this.onClick}
-            onContextMenu={this.onContextMenu}
-            value={this.locationValue + this.props.locationValueSuffix}
-            data-l10n-id='urlbar'
-            className={cx({
-              insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
-              private: this.private,
-              testHookLoadDone: !this.props.loading
-            })}
-            id='urlInput'
-            readOnly={this.props.titleMode}
-            ref={(node) => { this.urlInput = node }} />
-        }
+      {
+        this.props.titleMode
+        ? <div id='titleBar'>
+          <span><strong>{this.hostValue}</strong></span>
+          <span>{this.hostValue && this.titleValue ? ' | ' : ''}</span>
+          <span>{this.titleValue}</span>
+        </div>
+        : <input type='text'
+          spellCheck='false'
+          disabled={this.props.location === undefined && this.loadTime === ''}
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+          onKeyDown={this.onKeyDown}
+          onKeyUp={this.onChange}
+          onClick={this.onClick}
+          onContextMenu={this.onContextMenu}
+          value={value}
+          data-l10n-id='urlbar'
+          className={cx({
+            insecure: !this.props.isSecure && this.props.loading === false && !this.isHTTPPage,
+            private: this.private,
+            testHookLoadDone: !this.props.loading
+          })}
+          id='urlInput'
+          readOnly={this.props.titleMode}
+          ref={(node) => { this.urlInput = node }} />
+      }
       <legend />
-        {
-          this.props.titleMode || this.aboutPage
-          ? null
-          : <span className={cx({
-            'loadTime': true,
-            'onFocus': this.props.urlbar.get('active')
-          })}>{this.loadTime}</span>
-        }
+      {
+        this.props.titleMode || this.aboutPage
+        ? null
+        : <span className={cx({
+          'loadTime': true,
+          'onFocus': this.props.urlbar.get('active')
+        })}>{this.loadTime}</span>
+      }
 
-        {
+      {
           // TODO(for perf!): urlLocation shouldn't be passed into UrlBarSuggestions props.
           // `urlLocation` usage should be refactored out into UrlBar.
           // Passing it in causes uneeded extra renders for UrlBarSuggestions.
@@ -453,7 +476,8 @@ class UrlBar extends ImmutableComponent {
             urlLocation={this.props.urlbar.get('location')}
             urlPreview={this.props.urlbar.get('urlPreview')}
             searchSelectEntry={this.searchSelectEntry}
-            previewActiveIndex={this.props.previewActiveIndex || 0} />
+            previewActiveIndex={this.props.previewActiveIndex || 0}
+            menubarVisible={this.props.menubarVisible} />
           : null
         }
     </form>

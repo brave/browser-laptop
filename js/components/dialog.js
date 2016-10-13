@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const KeyCodes = require('../constants/keyCodes')
+const KeyCodes = require('../../app/common/constants/keyCodes')
 
 /**
  * Represents a popup dialog
@@ -35,7 +35,7 @@ class Dialog extends ImmutableComponent {
       ref={(node) => { this.dialog = node }}
       onKeyDown={this.onKeyDown.bind(this)}
       onClick={this.onClick.bind(this)}>
-        {this.props.children}
+      {this.props.children}
     </div>
   }
 }

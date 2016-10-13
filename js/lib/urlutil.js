@@ -82,7 +82,7 @@ const UrlUtil = {
   },
 
   isImageAddress (url) {
-    return (url.match(/\.(jpeg|jpg|gif|png|svg|bmp)$/))
+    return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/))
   },
 
   isHttpAddress (url) {
@@ -103,12 +103,12 @@ const UrlUtil = {
     const caseDomain = /^[\w]{2,5}:\/\/[^\s\/]+\//
     // for cases, quoted strings
     const case1Reg = /^".*"$/
-    // for cases, ?abc and "a? b" which should searching query
-    const case2Reg = /^(\?)|(\?.+\s)/
+    // for cases, ?abc, "a? b", ".abc" and "abc." which should searching query
+    const case2Reg = /^(\?)|(\?.+\s)|^(\.)|(\.)$/
     // for cases, pure string
     const case3Reg = /[\?\.\/\s:]/
     // for cases, data:uri, view-source:uri and about
-    const case4Reg = /^data|view-source|about|chrome-extension:.*/
+    const case4Reg = /^data|view-source|mailto|about|chrome-extension:.*/
 
     let str = input.trim()
     let scheme = this.getScheme(str)

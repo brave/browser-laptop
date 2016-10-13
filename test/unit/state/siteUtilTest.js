@@ -161,7 +161,9 @@ describe('siteUtil', function () {
           lastAccessedTime: 123,
           tags: [siteTags.BOOKMARK],
           location: testUrl1,
-          title: 'sample'
+          title: 'sample',
+          parentFolderId: 0,
+          partitionNumber: 0
         })
         const processedSites = siteUtil.addSite(sites, siteDetail, siteTags.BOOKMARK)
         const expectedSites = sites.push(siteDetail)
@@ -223,6 +225,47 @@ describe('siteUtil', function () {
         // toJS needed because immutable ownerID :(
         assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
+      it('remove duplicate folder', function () {
+        const sites = Immutable.fromJS([
+          {
+            lastAccessedTime: 123,
+            customTitle: 'folder1',
+            title: undefined,
+            folderId: 1,
+            parentFolderId: 0,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            lastAccessedTime: 123,
+            customTitle: 'folder2',
+            title: undefined,
+            folderId: 2,
+            parentFolderId: 1,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            lastAccessedTime: 123,
+            title: 'bookmark1',
+            parentFolderId: 1,
+            location: testUrl1,
+            tags: [siteTags.BOOKMARK]
+          },
+          {
+            lastAccessedTime: 123,
+            title: 'bookmark2',
+            parentFolderId: 2,
+            location: testUrl2,
+            tags: [siteTags.BOOKMARK]
+          }
+        ])
+        let processedSites = sites
+        sites.forEach((site) => {
+          processedSites = siteUtil.addSite(processedSites, site)
+        })
+        const expectedSites = sites
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
+      })
     })
   })
 
@@ -250,6 +293,60 @@ describe('siteUtil', function () {
           .deleteIn([0, 'customTitle'])
           .setIn([0, 'tags'], Immutable.List([]))
         assert.deepEqual(processedSites, expectedSites)
+      })
+      it('removes folder and its children', function () {
+        const sites = Immutable.fromJS([
+          {
+            folderId: 1,
+            parentFolderId: 0,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            folderId: 2,
+            parentFolderId: 1,
+            tags: [siteTags.BOOKMARK_FOLDER]
+          },
+          {
+            parentFolderId: 1,
+            location: testUrl1,
+            tags: [siteTags.BOOKMARK]
+          },
+          {
+            parentFolderId: 2,
+            location: testUrl2,
+            tags: [siteTags.BOOKMARK]
+          }
+        ])
+        const siteDetail = {
+          folderId: 1,
+          parentFolderId: 0,
+          tags: [siteTags.BOOKMARK_FOLDER]
+        }
+        const processedSites = siteUtil.removeSite(sites, Immutable.fromJS(siteDetail), siteTags.BOOKMARK_FOLDER)
+        const expectedSites = Immutable.fromJS([
+          {
+            folderId: 1,
+            parentFolderId: 0,
+            tags: Immutable.List([])
+          },
+          {
+            folderId: 2,
+            parentFolderId: 0,
+            tags: Immutable.List([])
+          },
+          {
+            parentFolderId: 0,
+            location: testUrl1,
+            tags: Immutable.List([])
+          },
+          {
+            parentFolderId: 0,
+            location: testUrl2,
+            tags: Immutable.List([])
+          }
+        ])
+        // toJS needed because immutable ownerID :(
+        assert.deepEqual(processedSites.toJS(), expectedSites.toJS())
       })
     })
     describe('tag=falsey', function () {
@@ -572,6 +669,13 @@ describe('siteUtil', function () {
   })
 
   describe('getOrigin', function () {
+    it('returns file:/// for any file url', function () {
+      assert.strictEqual(siteUtil.getOrigin('file://'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///some'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///some/'), 'file:///')
+      assert.strictEqual(siteUtil.getOrigin('file:///some/path'), 'file:///')
+    })
     it('gets URL origin for simple url', function () {
       assert.strictEqual(siteUtil.getOrigin('https://abc.bing.com'), 'https://abc.bing.com')
     })

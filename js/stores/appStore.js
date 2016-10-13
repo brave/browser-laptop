@@ -5,6 +5,7 @@
 'use strict'
 const AppConstants = require('../constants/appConstants')
 const WindowConstants = require('../constants/windowConstants')
+const ExtensionConstants = require('../../app/common/constants/extensionConstants')
 const AppDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
@@ -27,13 +28,18 @@ const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce.js')
-const isDarwin = process.platform === 'darwin'
 const locale = require('../../app/locale')
 const path = require('path')
+const {channel} = require('../../app/channel')
+const os = require('os')
+const autofill = require('../../app/autofill')
 
 // state helpers
 const basicAuthState = require('../../app/common/state/basicAuthState')
+const extensionState = require('../../app/common/state/extensionState')
 const tabState = require('../../app/common/state/tabState')
+const isDarwin = process.platform === 'darwin'
+const isWindows = process.platform === 'win32'
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -54,6 +60,11 @@ function navbarHeight () {
 
 const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   const parentWindowKey = browserOpts.parentWindowKey
+
+  if (windowState.ui && windowState.ui.size) {
+    browserOpts.width = firstDefinedValue(browserOpts.width, windowState.ui.size[0])
+    browserOpts.height = firstDefinedValue(browserOpts.height, windowState.ui.size[1])
+  }
 
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
   // height and innerHeight are the frame webview size
@@ -134,7 +145,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     titleBarStyle: 'hidden-inset',
     autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
-    webPreferences: defaults.webPreferences
+    webPreferences: defaults.webPreferences,
+    frame: !isWindows
   }
 
   if (process.platform === 'linux') {
@@ -142,6 +154,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   }
 
   let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts))
+
+  mainWindow.setMenuBarVisibility(true)
 
   if (windowState.ui && windowState.ui.isMaximized) {
     mainWindow.maximize()
@@ -153,10 +167,6 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   mainWindow.on('blur', function () {
     appActions.windowBlurred(mainWindow.id)
-  })
-
-  mainWindow.on('focus', function () {
-    mainWindow.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW)
   })
 
   mainWindow.on('resize', function (evt) {
@@ -178,6 +188,10 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   mainWindow.on('scroll-touch-end', function (e) {
     mainWindow.webContents.send('scroll-touch-end')
+  })
+
+  mainWindow.on('scroll-touch-edge', function (e) {
+    mainWindow.webContents.send('scroll-touch-edge')
   })
 
   mainWindow.on('enter-full-screen', function () {
@@ -315,6 +329,8 @@ function handleChangeSettingAction (settingKey, settingValue) {
 }
 
 const handleAppAction = (action) => {
+  const ledger = require('../../app/ledger')
+
   switch (action.actionType) {
     case AppConstants.APP_SET_STATE:
       appState = action.appState
@@ -343,13 +359,11 @@ const handleAppAction = (action) => {
         })
       }
 
-      mainWindow.webContents.on('did-frame-finish-load', (e, isMainFrame) => {
-        if (isMainFrame) {
-          lastEmittedState = appState
-          mainWindow.webContents.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
-          if (action.cb) {
-            action.cb()
-          }
+      mainWindow.webContents.on('did-finish-load', (e) => {
+        lastEmittedState = appState
+        e.sender.send(messages.INITIALIZE_WINDOW, browserOpts.disposition, appState.toJS(), frames, action.restoredState)
+        if (action.cb) {
+          action.cb()
         }
       })
       mainWindow.webContents.on('crashed', (e) => {
@@ -364,7 +378,9 @@ const handleAppAction = (action) => {
         })
 
         appActions.showMessageBox({
-          buttons: [locale.translation('ok')],
+          buttons: [
+            {text: locale.translation('ok')}
+          ],
           options: {
             persist: false
           },
@@ -395,6 +411,9 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_CLEAR_PASSWORDS:
       appState = appState.set('passwords', new Immutable.List())
+      break
+    case AppConstants.APP_CHANGE_NEW_TAB_DETAIL:
+      appState = appState.setIn(['about', 'newtab'], action.newTabPageDetail)
       break
     case AppConstants.APP_ADD_SITE:
       const oldSiteSize = appState.get('sites').size
@@ -484,15 +503,30 @@ const handleAppAction = (action) => {
       handleChangeSettingAction(action.key, action.value)
       break
     case AppConstants.APP_CHANGE_SITE_SETTING:
-      let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-      appState = appState.set(propertyName,
-        siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
-      break
+      {
+        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        appState = appState.set(propertyName,
+          siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value))
+        break
+      }
     case AppConstants.APP_REMOVE_SITE_SETTING:
-      let newSiteSettings = siteSettings.removeSiteSetting(appState.get('siteSettings'),
-                                                           action.hostPattern, action.key)
-      appState = appState.set('siteSettings', newSiteSettings)
-      break
+      {
+        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
+          action.hostPattern, action.key)
+        appState = appState.set(propertyName, newSiteSettings)
+        break
+      }
+    case AppConstants.APP_CLEAR_SITE_SETTINGS:
+      {
+        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
+        let newSiteSettings = new Immutable.Map()
+        appState.get(propertyName).map((entry, hostPattern) => {
+          newSiteSettings = newSiteSettings.set(hostPattern, entry.delete(action.key))
+        })
+        appState = appState.set(propertyName, newSiteSettings)
+        break
+      }
     case AppConstants.APP_UPDATE_LEDGER_INFO:
       appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
       break
@@ -501,13 +535,34 @@ const handleAppAction = (action) => {
       break
     case AppConstants.APP_SHOW_MESSAGE_BOX:
       let notifications = appState.get('notifications')
-      appState = appState.set('notifications', notifications.filterNot((notification) => {
+      notifications = notifications.filterNot((notification) => {
         let message = notification.get('message')
         // action.detail is a regular mutable object only when running tests
         return action.detail.get
           ? message === action.detail.get('message')
           : message === action.detail['message']
-      }).push(Immutable.fromJS(action.detail)))
+      })
+
+      // Insert notification next to those with the same style, or at the end
+      let insertIndex = notifications.size
+      const style = action.detail.get
+        ? action.detail.get('options').get('style')
+        : action.detail['options']['style']
+      if (style) {
+        const styleIndex = notifications.findLastIndex((notification) => {
+          return notification.get('options').get('style') === style
+        })
+        if (styleIndex > -1) {
+          insertIndex = styleIndex
+        } else {
+          // Insert after the last notification with a style
+          insertIndex = notifications.findLastIndex((notification) => {
+            return typeof notification.get('options').get('style') === 'string'
+          }) + 1
+        }
+      }
+      notifications = notifications.insert(insertIndex, Immutable.fromJS(action.detail))
+      appState = appState.set('notifications', notifications)
       break
     case AppConstants.APP_HIDE_MESSAGE_BOX:
       appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
@@ -533,11 +588,25 @@ const handleAppAction = (action) => {
     case AppConstants.APP_SET_DICTIONARY:
       appState = appState.setIn(['dictionary', 'locale'], action.locale)
       break
+    case AppConstants.APP_BACKUP_KEYS:
+      appState = ledger.backupKeys(appState, action)
+      break
+    case AppConstants.APP_RECOVER_WALLET:
+      appState = ledger.recoverKeys(appState, action)
+      break
+    case AppConstants.APP_LEDGER_RECOVERY_SUCCEEDED:
+      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], true)
+      break
+    case AppConstants.APP_LEDGER_RECOVERY_FAILED:
+      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], false)
+      break
+    case AppConstants.APP_CLEAR_RECOVERY:
+      appState = appState.setIn(['ui', 'about', 'preferences', 'recoverySucceeded'], undefined)
+      break
     case AppConstants.APP_CLEAR_DATA:
       if (action.clearDataDetail.get('browserHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_HISTORY})
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
-        BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.REQUEST_MENU_DATA_FOR_WINDOW))
       }
       if (action.clearDataDetail.get('downloadHistory')) {
         handleAppAction({actionType: AppConstants.APP_CLEAR_COMPLETED_DOWNLOADS})
@@ -554,65 +623,50 @@ const handleAppAction = (action) => {
         const Filtering = require('../../app/filtering')
         Filtering.clearStorageData()
       }
+      if (action.clearDataDetail.get('autocompleteData')) {
+        autofill.clearAutocompleteData()
+      }
+      if (action.clearDataDetail.get('autofillData')) {
+        autofill.clearAutofillData()
+      }
+      if (action.clearDataDetail.get('savedSiteSettings')) {
+        appState = appState.set('siteSettings', Immutable.Map())
+        appState = appState.set('temporarySiteSettings', Immutable.Map())
+      }
       break
+    case AppConstants.APP_IMPORT_BROWSER_DATA:
+      {
+        const importer = require('../../app/importer')
+        if (action.selected.get('type') === 5) {
+          if (action.selected.get('favorites')) {
+            importer.importHTML(action.selected)
+          }
+        } else {
+          importer.importData(action.selected)
+        }
+        break
+      }
     case AppConstants.APP_ADD_AUTOFILL_ADDRESS:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'addresses', 'guid'],
-          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((address) => {
-            return Immutable.is(address, action.originalDetail.get('guid'))
-          }))
-
-        let addresses = appState.getIn(['autofill', 'addresses', 'guid'])
-        const guid = Filtering.addAutofillAddress(action.detail.toJS())
-        if (action.originalDetail.get('guid') !== undefined &&
-          !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
-          Filtering.removeAutofillAddress(action.originalDetail.get('guid').toJS())
-        }
-        appState = appState.setIn(['autofill', 'addresses', 'guid'], addresses.push(Immutable.fromJS(guid)))
-        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.addAutofillAddress(action.detail.toJS(),
+        action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+      break
     case AppConstants.APP_REMOVE_AUTOFILL_ADDRESS:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'addresses', 'guid'],
-          appState.getIn(['autofill', 'addresses', 'guid']).filterNot((address) => {
-            return Immutable.is(address, action.detail.get('guid'))
-          }))
-        Filtering.removeAutofillAddress(action.detail.get('guid').toJS())
-        appState = appState.setIn(['autofill', 'addresses', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.removeAutofillAddress(action.detail.get('guid'))
+      break
     case AppConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'],
-          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((card) => {
-            return Immutable.is(card, action.originalDetail.get('guid'))
-          }))
-
-        let creditCards = appState.getIn(['autofill', 'creditCards', 'guid'])
-        const guid = Filtering.addAutofillCreditCard(action.detail.toJS())
-        if (action.originalDetail.get('guid') !== undefined &&
-          !Immutable.is(Immutable.fromJS(guid), action.originalDetail.get('guid'))) {
-          Filtering.removeAutofillCreditCard(action.originalDetail.get('guid').toJS())
-        }
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'], creditCards.push(Immutable.fromJS(guid)))
-        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.addAutofillCreditCard(action.detail.toJS(),
+        action.originalDetail.get('guid') === undefined ? '-1' : action.originalDetail.get('guid'))
+      break
     case AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD:
-      {
-        const Filtering = require('../../app/filtering')
-        appState = appState.setIn(['autofill', 'creditCards', 'guid'],
-          appState.getIn(['autofill', 'creditCards', 'guid']).filterNot((card) => {
-            return Immutable.is(card, action.detail.get('guid'))
-          }))
-        Filtering.removeAutofillCreditCard(action.detail.get('guid').toJS())
-        appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], new Date().getTime())
-        break
-      }
+      autofill.removeAutofillCreditCard(action.detail.get('guid'))
+      break
+    case AppConstants.APP_AUTOFILL_DATA_CHANGED:
+      const date = new Date().getTime()
+      appState = appState.setIn(['autofill', 'addresses', 'guid'], action.addressGuids)
+      appState = appState.setIn(['autofill', 'addresses', 'timestamp'], date)
+      appState = appState.setIn(['autofill', 'creditCards', 'guid'], action.creditCardGuids)
+      appState = appState.setIn(['autofill', 'creditCards', 'timestamp'], date)
+      break
     case AppConstants.APP_SET_LOGIN_REQUIRED_DETAIL:
       appState = basicAuthState.setLoginRequiredDetail(appState, action.tabId, action.detail)
       break
@@ -621,6 +675,53 @@ const handleAppAction = (action) => {
       break
     case WindowConstants.WINDOW_CLOSE_FRAME:
       appState = tabState.closeTab(appState, action.frameProps.get('tabId'))
+      break
+    case ExtensionConstants.BROWSER_ACTION_REGISTERED:
+      appState = extensionState.browserActionRegistered(appState, action)
+      break
+    case ExtensionConstants.BROWSER_ACTION_UPDATED:
+      appState = extensionState.browserActionUpdated(appState, action)
+      break
+    case ExtensionConstants.EXTENSION_INSTALLED:
+      appState = extensionState.extensionInstalled(appState, action)
+      break
+    case ExtensionConstants.EXTENSION_ENABLED:
+      appState = extensionState.extensionEnabled(appState, action)
+      break
+    case ExtensionConstants.EXTENSION_DISABLED:
+      appState = extensionState.extensionDisabled(appState, action)
+      break
+    case AppConstants.APP_SET_MENUBAR_TEMPLATE:
+      appState = appState.setIn(['menu', 'template'], action.menubarTemplate)
+      break
+    case AppConstants.APP_UPDATE_ADBLOCK_DATAFILES:
+      const adblock = require('../../app/adBlock')
+      adblock.updateAdblockDataFiles(action.uuid, action.enable)
+      handleAppAction({
+        actionType: AppConstants.APP_CHANGE_SETTING,
+        key: `adblock.${action.uuid}.enabled`,
+        value: action.enable
+      })
+      return
+    case AppConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES: {
+      const adblock = require('../../app/adBlock')
+      adblock.updateAdblockCustomRules(action.rules)
+      handleAppAction({
+        actionType: AppConstants.APP_CHANGE_SETTING,
+        key: settings.ADBLOCK_CUSTOM_RULES,
+        value: action.rules
+      })
+      return
+    }
+    case AppConstants.APP_SUBMIT_FEEDBACK:
+      let platform = os.platform()
+      if (platform === 'darwin') {
+        platform = 'macOS'
+      } else if (platform === 'windows') {
+        platform = 'Windows'
+      }
+      const subject = encodeURIComponent(`Brave ${platform} ${os.arch()} ${app.getVersion()}${channel()} feedback`)
+      electron.shell.openExternal(`${appConfig.contactUrl}?subject=${subject}`)
       break
     default:
   }

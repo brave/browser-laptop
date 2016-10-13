@@ -6,7 +6,7 @@ const React = require('react')
 const Immutable = require('immutable')
 const ImmutableComponent = require('./immutableComponent')
 
-const cx = require('../lib/classSet.js')
+const cx = require('../lib/classSet')
 const Button = require('./button')
 const UrlBar = require('./urlBar')
 const windowActions = require('../actions/windowActions')
@@ -14,7 +14,7 @@ const siteTags = require('../constants/siteTags')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = global.require('electron').ipcRenderer
-const { isSourceAboutUrl } = require('../lib/appUrlUtil')
+const {isSourceAboutUrl} = require('../lib/appUrlUtil')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const getSetting = require('../settings').getSetting
@@ -84,8 +84,6 @@ class NavigationBar extends ImmutableComponent {
   componentDidMount () {
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK, () => this.onToggleBookmark())
     ipc.on(messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK, () => this.onToggleBookmark())
-    // Set initial checked/unchecked status in Bookmarks menu
-    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
   }
 
   get showNoScriptInfo () {
@@ -97,17 +95,6 @@ class NavigationBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    // Update the app menu to reflect whether the current page is bookmarked
-    const prevBookmarked = this.props.activeFrameKey !== undefined &&
-      siteUtil.isSiteBookmarked(prevProps.sites, Immutable.fromJS({
-        location: prevProps.location,
-        partitionNumber: prevProps.partitionNumber,
-        title: prevProps.title
-      }))
-
-    if (this.bookmarked !== prevBookmarked) {
-      ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, this.bookmarked)
-    }
     if (this.props.noScriptIsVisible && !this.showNoScriptInfo) {
       // There are no blocked scripts, so hide the noscript dialog.
       windowActions.setNoScriptVisible(false)
@@ -125,31 +112,29 @@ class NavigationBar extends ImmutableComponent {
       className={cx({
         titleMode: this.titleMode
       })}>
-      {
-        isSourceAboutUrl(this.props.location) || this.titleMode
-        ? null
-        : <div className='startButtons'>
+      <div className='startButtons'>
         {
-          this.loading
-          ? <Button iconClass='fa-times'
-            l10nId='reloadButton'
-            className='navbutton stop-button'
-            onClick={this.onStop} />
-          : <Button iconClass='fa-repeat'
-            l10nId='reloadButton'
-            className='navbutton reload-button'
-            onClick={this.onReload} />
+          isSourceAboutUrl(this.props.location) || this.titleMode
+          ? <span className='browserButton' />
+          : this.loading
+            ? <Button iconClass='fa-times'
+              l10nId='stopButton'
+              className='navbutton stop-button'
+              onClick={this.onStop} />
+            : <Button iconClass='fa-repeat'
+              l10nId='reloadButton'
+              className='navbutton reload-button'
+              onClick={this.onReload} />
         }
-        </div>
-      }
-      {
-        !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-        ? <Button iconClass='fa-home'
-          l10nId='homeButton'
-          className='navbutton homeButton'
-          onClick={this.onHome} />
-        : null
-      }
+        {
+          !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+          ? <Button iconClass='fa-home'
+            l10nId='homeButton'
+            className='navbutton homeButton'
+            onClick={this.onHome} />
+          : null
+        }
+      </div>
       <UrlBar ref='urlBar'
         sites={this.props.sites}
         activeFrameKey={this.props.activeFrameKey}
@@ -165,10 +150,13 @@ class NavigationBar extends ImmutableComponent {
         endLoadTime={this.props.endLoadTime}
         titleMode={this.titleMode}
         urlbar={this.props.navbar.get('urlbar')}
+        menubarVisible={this.props.menubarVisible}
         />
       {
         isSourceAboutUrl(this.props.location)
-        ? null
+        ? <div className='endButtons'>
+          <span className='browserButton' />
+        </div>
         : <div className='endButtons'>
           {
             !this.showNoScriptInfo
@@ -180,7 +168,7 @@ class NavigationBar extends ImmutableComponent {
               })}
               onClick={this.onNoScript} />
           }
-          <Button iconClass={this.titleMode ? 'fa-star' : 'fa-star-o'}
+          <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
             className={cx({
               navbutton: true,
               bookmarkButton: true,

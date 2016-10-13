@@ -75,12 +75,21 @@ describe('urlutil', function () {
     it('returns false when input is chrome-extension', function () {
       assert.equal(UrlUtil.isNotURL('chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/cast_sender.js'), false)
     })
+    it('returns false when input is mailto', function () {
+      assert.equal(UrlUtil.isNotURL('mailto:brian@brave.com'), false)
+    })
     describe('search query', function () {
       it('returns true when input starts with ?', function () {
         assert.equal(UrlUtil.isNotURL('?brave'), true)
       })
       it('returns true when input has a question mark followed by a space', function () {
         assert.equal(UrlUtil.isNotURL('? brave'), true)
+      })
+      it('returns true when input starts with .', function () {
+        assert.equal(UrlUtil.isNotURL('.brave'), true)
+      })
+      it('returns true when input end with .', function () {
+        assert.equal(UrlUtil.isNotURL('brave.'), true)
       })
     })
     it('returns false when input is a valid URL', function () {
@@ -207,7 +216,7 @@ describe('urlutil', function () {
 
   describe('getLocationIfPDF', function () {
     it('gets location for PDF JS URL', function () {
-      assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://oemmndcbldboiebfnladdacbdfmadadm/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
+      assert.equal(UrlUtil.getLocationIfPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf'),
         'https://www.blackhat.co…king-Kernel-Address-Space-Layout-Randomization-KASLR-With-Intel-TSX-wp.pdf')
     })
     it('does not modify location for non-pdf URL', function () {

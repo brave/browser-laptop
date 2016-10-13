@@ -11,7 +11,7 @@ To create a new release of `brave/electron` for use in `brave/electron-prebuilt`
 - Clone electron with `git clone --recursive git@github.com:brave/electron`
 - Rebase `brave/electron`'s commits to the upstream tag you'd like to create a release for.  e.g. `git rebase v0.37.2`
 - Make sure the submodule dependencies in `vendor/` are up to date.
-- For Linux and OSX builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> LIBCHROMIUMCONTENT_MIRROR=https://s3.amazonaws.com/brave-laptop-binaries/libchromiumcontent ./script/cibuild`.  Replace `<your-github-token>` with a token generated from https://github.com/settings/tokens
+- For Linux and macOS builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> LIBCHROMIUMCONTENT_MIRROR=https://s3.amazonaws.com/brave-laptop-binaries/libchromiumcontent ./script/cibuild`.  Replace `<your-github-token>` with a token generated from https://github.com/settings/tokens
 - For Windows builds, run `ELECTRON_RELEASE=1 ATOM_SHELL_GITHUB_TOKEN=<your-github-token> LIBCHROMIUMCONTENT_MIRROR=https://s3.amazonaws.com/brave-laptop-binaries/libchromiumcontent npm run cibuild-windows`.
 - Manually download the release zip to a subfolder of `brave/browser-laptop-releases` and push it out.
 - Mark the release draft as completed in the `brave/electron` repository releases page.
@@ -51,6 +51,7 @@ Check virus scan: https://www.virustotal.com/en/
 ```
 ./node_modules/.bin/webpack
 CHANNEL=dev npm run build-package
+CHANNEL=dev npm run build-installer
 tar -jcvf Brave.tar.bz2 ./Brave-linux-x64
 ```
 

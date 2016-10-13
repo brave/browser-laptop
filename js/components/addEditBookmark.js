@@ -8,13 +8,11 @@ const Dialog = require('./dialog')
 const Button = require('./button')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
-const KeyCodes = require('../constants/keyCodes')
+const KeyCodes = require('../../app/common/constants/keyCodes')
 const siteTags = require('../constants/siteTags')
-const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
 const getSetting = require('../settings').getSetting
-const ipc = global.require('electron').ipcRenderer
 
 class AddEditBookmark extends ImmutableComponent {
   constructor () {
@@ -97,9 +95,6 @@ class AddEditBookmark extends ImmutableComponent {
     )
     appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !isFirstBookmark || showBookmarksToolbar)
   }
-  updateMenuBookmarkedStatus (isBookmarked) {
-    ipc.send(messages.UPDATE_MENU_BOOKMARKED_STATUS, isBookmarked)
-  }
   onSave () {
     // First check if the title of the currentDetail is set
     if (!this.bookmarkNameValid) {
@@ -109,13 +104,11 @@ class AddEditBookmark extends ImmutableComponent {
     this.showToolbarOnFirstBookmark()
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
-    this.updateMenuBookmarkedStatus(true)
     this.onClose()
   }
   onRemoveBookmark () {
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.removeSite(this.props.currentDetail, tag)
-    this.updateMenuBookmarkedStatus(false)
     this.onClose()
   }
   get displayBookmarkName () {
@@ -145,9 +138,9 @@ class AddEditBookmark extends ImmutableComponent {
             <select value={this.props.currentDetail.get('parentFolderId')}
               onChange={this.onParentFolderChange} >
               <option value='0' data-l10n-id='bookmarksToolbar' />
-            {
-              this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
-            }
+              {
+                this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
+              }
             </select>
           </div>
           <div className='formRow'>

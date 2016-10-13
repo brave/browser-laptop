@@ -6,9 +6,13 @@
 
 function debounce (fn, bufferInterval, ...args) {
   let timeout
-  return () => {
+  return (...args2) => {
     clearTimeout(timeout)
-    timeout = setTimeout(fn.apply.bind(fn, this, args), bufferInterval)
+    let a = args || []
+    if (args2 && args2.constructor === Array) {
+      a = a.concat(args2)
+    }
+    timeout = setTimeout(fn.apply.bind(fn, this, a), bufferInterval)
   }
 }
 

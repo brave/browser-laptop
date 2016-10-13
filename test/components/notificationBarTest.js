@@ -6,9 +6,7 @@ const {activeWebview, notificationBar, titleBar, urlInput} = require('../lib/sel
 describe('notificationBar', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 
@@ -19,6 +17,7 @@ describe('notificationBar', function () {
     this.loginUrl2 = Brave.server.url('login2.html')
     this.loginUrl3 = Brave.server.url('login3.html')
     this.loginUrl4 = Brave.server.url('login4.html')
+    this.loginUrl5 = Brave.server.url('login5.html')
     yield setup(this.app.client)
   })
 
@@ -45,7 +44,7 @@ describe('notificationBar', function () {
       .loadUrl(this.notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
-      .element('.notificationItem:nth-Child(1) .notificationOptions')
+      .element('.notificationItem:nth-Child(1) .options')
       .click('button=Deny')
       .moveToObject(activeWebview)
       .waitForExist(titleBar)
@@ -124,7 +123,24 @@ describe('notificationBar', function () {
       .loadUrl(this.loginUrl4)
       .waitUntil(function () {
         return this.getValue('#user').then((val) => val === 'brave_user') &&
-          this.getValue('#password').then((val) => val === 'testing')
+          this.getValue('#password').then((val) => val === 'testing') &&
+          this.getValue('#user2').then((val) => val === '') &&
+          this.getValue('#password2').then((val) => val === '')
+      })
+  })
+
+  it('autofills remembered password on login page with multiple forms', function * () {
+    yield this.app.client
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .tabByIndex(0)
+      .loadUrl(this.loginUrl5)
+      .waitUntil(function () {
+        return this.getValue('#user').then((val) => val === 'brave_user') &&
+          this.getValue('#password').then((val) => val === 'testing') &&
+          this.getValue('#user2').then((val) => val === 'brave_user') &&
+          this.getValue('#password2').then((val) => val === 'testing')
       })
   })
 
@@ -142,5 +158,31 @@ describe('notificationBar', function () {
       .loadUrl(this.loginUrl2)
       .windowByUrl(Brave.browserWindowUrl)
       .isExisting(notificationBar).should.eventually.be.false
+  })
+})
+
+describe('permissions state', function () {
+  function * setup (client) {
+    yield client
+      .waitForBrowserWindow()
+      .waitForVisible(urlInput)
+  }
+
+  Brave.beforeAll(this)
+  before(function * () {
+    yield setup(this.app.client)
+  })
+
+  it('applies old saved permissions', function * () {
+    let notificationUrl = Brave.server.url('notificationFail.html')
+    yield this.app.client.changeSiteSetting('https?://localhost:*', 'notificationsPermission', false)
+    yield this.app.client.tabByIndex(0)
+      .loadUrl(notificationUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .moveToObject(activeWebview)
+      .waitForExist(titleBar)
+      .waitUntil(function () {
+        return this.getText(titleBar).then((val) => val.includes('denied'))
+      })
   })
 })

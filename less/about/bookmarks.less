@@ -1,23 +1,106 @@
-@import "./itemList.less";
+@import "./siteDetails.less";
 
 .siteDetailsPage {
-  .siteDetailsPageContent {
-    .bookmarkFolderList {
-      min-width: 220px;
-
-      .listItem {
-        border-right: 1px solid @chromeBorderColor;
-        height: 1rem;
-      }
-
-      .bookmarkFolderIcon {
-        margin-right: 5px;
+  .siteDetailsPageHeader {
+    .headerActions {
+      input.searchInput {
+        margin-right: 0 !important;
       }
     }
+  }
 
-    .sticky-outer-wrapper {
+  .siteDetailsPageContent {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+
+    .folderView {
       min-width: 220px;
-      padding-top: 10px;
+      flex-grow: 1;
+
+      .columnHeader {
+        background: linear-gradient(to bottom, @lightGray, @veryLightGray);
+        border-top: 1px solid @gray;
+        text-align: left;
+        font-weight: 300;
+        padding: 8px;
+        box-sizing: border-box;
+        border-right: 1px solid @braveOrange;
+        padding-left: 10px;
+        -webkit-user-select: none;
+        cursor: default;
+
+        .clearBrowsingDataButton {
+          color: @buttonColor;
+          float: right;
+          font-size: 20px;
+          margin: 0;
+        }
+        .clearBrowsingDataButton:hover {
+          color: #000;
+        }
+      }
+
+      > .bookmarkFolderList {
+        display: block;
+        border-right: 1px solid @braveOrange;
+        height: 100%;
+
+        .listItem >* {
+          color: @buttonColor;
+        }
+      }
+
+      .bookmarkFolderList {
+        .listItem {
+          height: 1rem;
+          &.selected >* {
+            font-weight: 800;
+          }
+        }
+        .bookmarkFolderIcon {
+          margin-right: 5px;
+        }
+      }
+    }
+    .organizeView {
+      flex-grow: 5;
+
+      .sortableTable {
+        -webkit-user-select: none;
+        th:nth-of-type(2), td.date {
+          width: 250px;
+        }
+        td {
+          font-size: 11pt;
+          padding-left: 10px;
+          white-space: nowrap;
+          max-width: 0;
+          .bookmarkFavicon {
+            display: inline-block;
+            margin-right: 5px;
+          }
+          .bookmarkLocation {
+            color: @gray;
+            margin-left: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: none;
+          }
+        }
+        .title {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          span {
+            vertical-align: middle;
+          }
+        }
+        tr:hover {
+          .bookmarkLocation {
+            display: inline-block;
+          }
+        }
+      }
     }
   }
 }

@@ -18,31 +18,6 @@ function showFlashNotification (origin, e) {
   e.stopPropagation()
 }
 
-// Open flash links in the same tab so we can intercept them correctly
-if (chrome.contentSettings.flashActive != 'allow' &&
-    chrome.contentSettings.flashEnabled == 'allow') {
-  (function () {
-    function replaceAdobeLinks () {
-      Array.from(document.querySelectorAll('a')).forEach((elem) => {
-        const href = elem.getAttribute('href')
-        if (isAdobeLink(href)) {
-          elem.onclick = showFlashNotification.bind(null, window.location.origin)
-        }
-      })
-    }
-    setTimeout(() => {
-      var observer = new window.MutationObserver(function (mutations) {
-        replaceAdobeLinks()
-      })
-      replaceAdobeLinks()
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-      })
-    }, 1000)
-  })()
-}
-
 /**
  * Whether a src is a .swf file.
  * If so, returns the origin of the file. Otherwise returns false.
@@ -131,7 +106,7 @@ function getFlashObjects (elem) {
  * Inserts Flash placeholders.
  * @param {Element} elem - HTML element to search
  */
-function insertFlashPlaceholders (elem) {
+function insertFlashPlaceholders (elem = document.documentElement) {
   const minWidth = 200
   const minHeight = 100
   let flashObjects = getFlashObjects(elem)
@@ -161,16 +136,31 @@ function insertFlashPlaceholders (elem) {
 
 if (chrome.contentSettings.flashActive != 'allow' ||
     chrome.contentSettings.flashEnabled != 'allow') {
-  insertFlashPlaceholders(document.documentElement)
-  setTimeout(() => {
-    var observer = new window.MutationObserver(function (mutations) {
-      insertFlashPlaceholders(document.documentElement)
+  // Open flash links in the same tab so we can intercept them correctly
+  (function () {
+    function replaceAdobeLinks () {
+      Array.from(document.querySelectorAll('a')).forEach((elem) => {
+        const href = elem.getAttribute('href')
+        if (isAdobeLink(href)) {
+          elem.onclick = showFlashNotification.bind(null, window.location.origin)
+        }
+      })
+    }
+    replaceAdobeLinks()
+    let interval = setInterval(replaceAdobeLinks, 3000)
+    document.addEventListener('visibilitychange', () => {
+      clearInterval(interval)
+      if (document.visibilityState !== 'hidden') {
+        interval = setInterval(replaceAdobeLinks, 3000)
+      }
     })
-
-    insertFlashPlaceholders(document.documentElement)
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    })
-  }, 1000)
+  })()
+  insertFlashPlaceholders()
+  let interval = setInterval(insertFlashPlaceholders, 3000)
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(interval)
+    if (document.visibilityState !== 'hidden') {
+      interval = setInterval(insertFlashPlaceholders, 3000)
+    }
+  })
 }

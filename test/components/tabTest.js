@@ -8,10 +8,8 @@ const {urlInput, backButton, forwardButton, activeTabTitle} = require('../lib/se
 describe('tabs', function () {
   function * setup (client) {
     yield client
-      .waitUntilWindowLoaded()
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
-      .waitForVisible('#window')
       .waitForVisible(urlInput)
   }
 
@@ -192,7 +190,7 @@ describe('tabs', function () {
       yield this.app.client
         .waitForBrowserWindow()
         .waitForExist('.tab.active[data-frame-key="1"]')
-        .ipcSend(messages.SHORTCUT_NEW_FRAME)
+        .ipcSend(messages.SHORTCUT_NEW_FRAME, Brave.server.url('page1.html'))
         .waitUntil(function () {
           return this.waitForUrl(Brave.newTabUrl).getTabCount().then((count) => count === tabCountBeforeTabClose)
         })

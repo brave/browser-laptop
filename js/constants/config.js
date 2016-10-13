@@ -42,6 +42,6 @@ module.exports = {
     replacementUrl: adHost
   },
   braveExtensionId: 'mnojpmjdmbbfmejpflffifhffcmidifd',
-  PDFJSExtensionId: 'oemmndcbldboiebfnladdacbdfmadadm',
+  PDFJSExtensionId: 'jdbefljfgobbmcidnmpjamcbhnbphjnb',
   coinbaseOrigin: 'https://buy.coinbase.com'
 }

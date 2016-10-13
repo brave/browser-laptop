@@ -4,7 +4,6 @@
 
 'use strict'
 
-const appConfig = require('../../js/constants/appConfig')
 const appActions = require('../../js/actions/appActions')
 const messages = require('../../js/constants/messages')
 const Immutable = require('immutable')
@@ -243,31 +242,17 @@ module.exports.passwordsMenuItem = () => {
   }
 }
 
-module.exports.importBookmarksMenuItem = () => {
+module.exports.importBrowserDataMenuItem = () => {
   return {
-    label: locale.translation('importBookmarks'),
+    label: locale.translation('importBrowserData'),
     click: function (item, focusedWindow) {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        appActions.newWindow(undefined, undefined, undefined, function () {
-          // The timeout here isn't necessary but giving the window a bit of time to popup
-          // before the modal file picker pops up seems to work nicer.
-          setTimeout(() =>
-            module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
-        })
-        return
+      if (process.type === 'browser') {
+        process.emit(messages.IMPORT_BROWSER_DATA_NOW)
       } else {
-        setTimeout(() =>
-          module.exports.sendToFocusedWindow(BrowserWindow.getAllWindows()[0], [messages.IMPORT_BOOKMARKS]), 100)
+        electron.ipcRenderer.send(messages.IMPORT_BROWSER_DATA_NOW)
       }
     }
   }
-  /*
-  submenu: [
-    {label: 'Google Chrome...'},
-    {label: 'Firefox...'},
-    {label: 'Safari...'}
-  ]
-  */
 }
 
 module.exports.reportAnIssueMenuItem = () => {
@@ -284,19 +269,18 @@ module.exports.submitFeedbackMenuItem = () => {
   return {
     label: locale.translation('submitFeedback'),
     click: function () {
-      electron.shell.openExternal(appConfig.contactUrl)
+      appActions.submitFeedback()
     }
   }
 }
 
 module.exports.bookmarksToolbarMenuItem = () => {
-  const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
   return {
     label: locale.translation('bookmarksToolbar'),
     type: 'checkbox',
-    checked: showBookmarksToolbar,
+    checked: getSetting(settings.SHOW_BOOKMARKS_TOOLBAR),
     click: (item, focusedWindow) => {
-      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !showBookmarksToolbar)
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR))
     }
   }
 }
@@ -345,6 +329,25 @@ module.exports.braveryGlobalMenuItem = () => {
         }))
       } else {
         module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences#shields', { singleFrame: true }])
+      }
+    }
+  }
+}
+
+module.exports.braveryPaymentsMenuItem = () => {
+  const label =
+    getSetting(settings.PAYMENTS_ENABLED)
+      ? locale.translation('braveryPayments')
+      : locale.translation('braveryStartUsingPayments')
+  return {
+    label: label,
+    click: (item, focusedWindow) => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        appActions.newWindow(Immutable.fromJS({
+          location: 'about:preferences#payments'
+        }))
+      } else {
+        module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, 'about:preferences#payments', { singleFrame: true }])
       }
     }
   }

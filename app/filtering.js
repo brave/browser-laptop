@@ -8,7 +8,8 @@ const messages = require('../js/constants/messages')
 const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
-const AppStore = require('../js/stores/appStore')
+const webContents = electron.webContents
+const appStore = require('../js/stores/appStore')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const downloadStates = require('../js/constants/downloadStates')
@@ -23,12 +24,14 @@ const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
 const config = require('../js/constants/config')
 const locale = require('./locale')
+const {isSessionPartition} = require('../js/state/frameStateUtil')
 const ipcMain = electron.ipcMain
 const dialog = electron.dialog
 const app = electron.app
 const uuid = require('node-uuid')
 const path = require('path')
 const getOrigin = require('../js/state/siteUtil').getOrigin
+const {adBlockResourceName} = require('./adBlock')
 
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
@@ -80,19 +83,38 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  */
 function registerForBeforeRequest (session) {
   session.webRequest.onBeforeRequest((details, cb) => {
-    // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       cb({})
       return
     }
 
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
+      return
+    }
+
+    if (appUrlUtil.isTargetAboutUrl(details.url)) {
+      if (process.env.NODE_ENV === 'development' && !details.url.match(/devServerPort/)) {
+        // add webpack dev server port
+        let url = details.url
+        let urlComponents = url.split('#')
+        urlComponents[0] = urlComponents[0] + '?devServerPort=' + (process.env.BRAVE_PORT || process.env.npm_package_config_port)
+        cb({
+          redirectURL: urlComponents.join('#')
+        })
+        return
+      }
+    }
+
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
       let results = beforeRequestFilteringFns[i](details)
-      const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK
+      const isAdBlock = results.resourceName === appConfig.resourceNames.ADBLOCK || appConfig[results.resourceName] && appConfig[results.resourceName].resourceType === adBlockResourceName
       const isHttpsEverywhere = results.resourceName === appConfig.resourceNames.HTTPS_EVERYWHERE
       const isTracker = results.resourceName === appConfig.resourceNames.TRACKING_PROTECTION
 
-      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
         continue
       }
       if (results.cancel) {
@@ -103,12 +125,21 @@ function registerForBeforeRequest (session) {
           : messages.BLOCKED_RESOURCE
 
         // Counts the number of ads and trackers
+        let parentResourceName = results.resourceName
+
+        // Adblock can have many different resource names for each alternate
+        // data file. But we always want the per level reporting to report
+        // it into the window adblock stats.
+        if (isAdBlock) {
+          parentResourceName = appConfig.resourceNames.ADBLOCK
+        }
+
         if (isAdBlock || isTracker) {
-          appActions.addResourceCount(results.resourceName, 1)
+          appActions.addResourceCount(parentResourceName, 1)
         }
 
         BrowserWindow.getAllWindows().forEach((wnd) =>
-          wnd.webContents.send(message, results.resourceName, details))
+          wnd.webContents.send(message, parentResourceName, details))
         if (details.resourceType === 'image') {
           cb({ redirectURL: transparent1pxGif })
         } else {
@@ -157,7 +188,7 @@ function registerForBeforeRedirect (session) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       return
     }
     for (let i = 0; i < beforeRedirectFilteringFns.length; i++) {
@@ -183,7 +214,7 @@ function registerForBeforeSendHeaders (session) {
 
   session.webRequest.onBeforeSendHeaders(function (details, cb) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       cb({})
       return
     }
@@ -203,9 +234,16 @@ function registerForBeforeSendHeaders (session) {
       requestHeaders['User-Agent'] = spoofedUserAgent
     }
 
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
+      return
+    }
+
     for (let i = 0; i < beforeSendHeadersFilteringFns.length; i++) {
       let results = beforeSendHeadersFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
         continue
       }
       if (results.cancel) {
@@ -217,12 +255,12 @@ function registerForBeforeSendHeaders (session) {
       }
     }
 
-    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, details.firstPartyUrl)) {
-      if (module.exports.isThirdPartyHost(urlParse(details.firstPartyUrl || '').hostname,
+    if (module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl)) {
+      if (module.exports.isThirdPartyHost(urlParse(firstPartyUrl || '').hostname,
                                           parsedUrl.hostname)) {
         // Clear cookie and referer on third-party requests
         if (requestHeaders['Cookie'] &&
-            getOrigin(details.firstPartyUrl) !== pdfjsOrigin) {
+            getOrigin(firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
         if (requestHeaders['Referer'] &&
@@ -248,13 +286,19 @@ function registerForHeadersReceived (session) {
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onHeadersReceived(function (details, cb) {
     // Using an electron binary which isn't from Brave
-    if (!details.firstPartyUrl || shouldIgnoreUrl(details.url)) {
+    if (shouldIgnoreUrl(details.url)) {
       cb({})
+      return
+    }
+    const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    // this can happen if the tab is closed and the webContents is no longer available
+    if (!firstPartyUrl) {
+      cb({ cancel: true })
       return
     }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details)
-      if (!module.exports.isResourceEnabled(results.resourceName, details.firstPartyUrl)) {
+      if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl)) {
         continue
       }
       if (results.responseHeaders) {
@@ -275,7 +319,7 @@ function registerPermissionHandler (session, partition) {
   const isPrivate = !partition.startsWith('persist:')
   // Keep track of per-site permissions granted for this session.
   let permissions = null
-  session.setPermissionRequestHandler((origin, embedderOrigin, permission, cb) => {
+  session.setPermissionRequestHandler((origin, mainFrameUrl, permission, cb) => {
     if (!permissions) {
       permissions = {
         media: {
@@ -304,13 +348,6 @@ function registerPermissionHandler (session, partition) {
         }
       }
     }
-    const url = origin || embedderOrigin
-    // Allow notifications for the main app
-    if (url === appUrlUtil.getIndexHTML() && permission === 'notifications' ||
-        url.startsWith('chrome-extension://') && permission === 'openExternal') {
-      cb(true)
-      return
-    }
 
     if (!permissions[permission]) {
       console.log('WARNING: got unregistered permission request', permission)
@@ -318,10 +355,33 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
+    // TOOD(bridiver) - this seems overly permissive and we should narrow this down
+    // to the specific extension that required it which is most likely PDFJS
+    if (origin.startsWith('chrome-extension://') && permission === 'openExternal') {
+      cb(true)
+      return
+    }
+
     // Check whether there is a persistent site setting for this host
-    const appState = AppStore.getState()
-    const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
-    const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+    const appState = appStore.getState()
+    let settings
+    let tempSettings
+    if (mainFrameUrl === appUrlUtil.getIndexHTML() || origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
+      // lookup, display and store site settings by "Brave Browser"
+      origin = 'Brave Browser'
+      // display on all tabs
+      mainFrameUrl = null
+      // Lookup by exact host pattern match since 'Brave Browser' is not
+      // a parseable URL
+      settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), origin)
+      tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), origin)
+    } else {
+      // Strip trailing slash
+      origin = getOrigin(origin)
+      settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), origin)
+      tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
+    }
+
     const permissionName = permission + 'Permission'
     if (settings) {
       let isAllowed = settings.get(permissionName)
@@ -339,11 +399,7 @@ function registerPermissionHandler (session, partition) {
       }
     }
 
-    const urlOrigin = getOrigin(url)
-    if (!urlOrigin) {
-      return
-    }
-    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, urlOrigin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
+    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
     // If this is a duplicate, clear the previous callback and use the new one
     if (permissionCallbacks[message]) {
@@ -351,8 +407,11 @@ function registerPermissionHandler (session, partition) {
     }
 
     appActions.showMessageBox({
-      buttons: [locale.translation('deny'), locale.translation('allow')],
-      frameOrigin: urlOrigin,
+      buttons: [
+        {text: locale.translation('deny')},
+        {text: locale.translation('allow')}
+      ],
+      frameOrigin: getOrigin(mainFrameUrl),
       options: {
         persist: true
       },
@@ -366,8 +425,8 @@ function registerPermissionHandler (session, partition) {
       const result = !!(buttonIndex)
       cb(result)
       if (persist) {
-        // remember site setting for this host over http(s)
-        appActions.changeSiteSetting(urlOrigin, permission + 'Permission', result, isPrivate)
+        // remember site setting for this host
+        appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
       }
     }
   })
@@ -398,7 +457,7 @@ function updateDownloadState (downloadId, item, state) {
     return
   }
 
-  const downloadItemStartTime = AppStore.getState().getIn(['downloads', downloadId, 'startTime'])
+  const downloadItemStartTime = appStore.getState().getIn(['downloads', downloadId, 'startTime'])
   appActions.mergeDownloadDetail(downloadId, {
     startTime: downloadItemStartTime || new Date().getTime(),
     savePath: item.getSavePath(),
@@ -430,7 +489,7 @@ function registerForDownloadListener (session) {
     }
     item.on('updated', function () {
       let state = downloadStates.IN_PROGRESS
-      const downloadItem = AppStore.getState().getIn(['downloads', downloadId])
+      const downloadItem = appStore.getState().getIn(['downloads', downloadId])
       if (downloadItem && downloadItem.get('state') === downloadStates.PAUSED) {
         state = downloadStates.PAUSED
       }
@@ -458,7 +517,11 @@ function initForPartition (partition) {
     registerPermissionHandler,
     registerForHeadersReceived,
     registerForDownloadListener]
-  let ses = session.fromPartition(partition)
+  let options = {}
+  if (isSessionPartition(partition)) {
+    options.parent_partition = ''
+  }
+  let ses = session.fromPartition(partition, options)
   fns.forEach((fn) => { fn(ses, partition) })
 }
 
@@ -523,7 +586,7 @@ module.exports.isResourceEnabled = (resourceName, url) => {
     return true
   }
 
-  const appState = AppStore.getState()
+  const appState = appStore.getState()
   const settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
   const braverySettings = siteSettings.activeSettings(settings, appState, appConfig)
 
@@ -532,8 +595,11 @@ module.exports.isResourceEnabled = (resourceName, url) => {
     return false
   }
 
-  if ((resourceName === appConfig.resourceNames.ADBLOCK ||
-       resourceName === appConfig.resourceNames.TRACKING_PROTECTION)) {
+  if (resourceName === appConfig.resourceNames.ADBLOCK ||
+      appConfig[resourceName] &&
+        appConfig[resourceName].enabled &&
+        appConfig[resourceName].resourceType === adBlockResourceName ||
+      resourceName === appConfig.resourceNames.TRACKING_PROTECTION) {
     // Check the resource vs the ad control setting
     if (braverySettings.adControl === 'allowAdsAndTracking') {
       return false
@@ -594,55 +660,17 @@ module.exports.setDefaultZoomLevel = (zoom) => {
   }
 }
 
-module.exports.addAutofillAddress = (detail) => {
-  let guidMap = {}
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    let guid = ses.autofill.addProfile({
-      full_name: detail.name,
-      company_name: detail.organization,
-      street_address: detail.streetAddress,
-      city: detail.city,
-      state: detail.state,
-      postal_code: detail.postalCode,
-      country_code: detail.country,
-      phone: detail.phone,
-      email: detail.email
-    })
-    guidMap[partition] = guid
+module.exports.getMainFrameUrl = (details) => {
+  if (details.resourceType === 'mainFrame') {
+    return details.url
   }
-  return guidMap
-}
-
-module.exports.removeAutofillAddress = (guid) => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    if (guid[partition] !== undefined) {
-      ses.autofill.removeProfile(guid[partition])
+  const tabId = details.tabId
+  const wc = webContents.getAllWebContents()
+  if (wc && tabId) {
+    const content = wc.find((item) => item.getId() === tabId)
+    if (content) {
+      return content.getURL()
     }
   }
-}
-
-module.exports.addAutofillCreditCard = (detail) => {
-  let guidMap = {}
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    let guid = ses.autofill.addCreditCard({
-      name: detail.name,
-      card_number: detail.card,
-      expiration_month: detail.month,
-      expiration_year: detail.year
-    })
-    guidMap[partition] = guid
-  }
-  return guidMap
-}
-
-module.exports.removeAutofillCreditCard = (guid) => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    if (guid[partition] !== undefined) {
-      ses.autofill.removeCreditCard(guid[partition])
-    }
-  }
+  return null
 }

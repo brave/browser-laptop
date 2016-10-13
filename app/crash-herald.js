@@ -11,7 +11,9 @@ exports.init = () => {
     companyName: 'Brave.com',
     submitURL: appConfig.crashes.crashSubmitUrl,
     autoSubmit: true,
-    ignoreSystemCrashHandler: true
+    extra: {
+      node_env: process.env.NODE_ENV
+    }
   }
   crashReporter.start(options)
 }

@@ -127,6 +127,24 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to clear all completed downloads
+   */
+  ledgerRecoverySucceeded: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_LEDGER_RECOVERY_SUCCEEDED
+    })
+  },
+
+  /**
+   * Dispatches a message to clear all completed downloads
+   */
+  ledgerRecoveryFailed: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_LEDGER_RECOVERY_FAILED
+    })
+  },
+
+  /**
    * Sets the default window size
    * @param {Array} size - [width, height]
    */
@@ -283,12 +301,15 @@ const appActions = {
    * Removes a site setting
    * @param {string} hostPattern - The host pattern to update the config for
    * @param {string} key - The config key to update
+   * @param {boolean} temp - Whether to change temporary or persistent
+   *   settings. defaults to false (persistent).
    */
-  removeSiteSetting: function (hostPattern, key) {
+  removeSiteSetting: function (hostPattern, key, temp) {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
-      key
+      key,
+      temporary: temp || false
     })
   },
 
@@ -404,6 +425,17 @@ const appActions = {
   },
 
   /**
+   * Import browser data specified in selected
+   * @param {object} selected - the browser data to import as per doc/state.md's importBrowserDataSelected
+   */
+  importBrowserData: function (selected) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_IMPORT_BROWSER_DATA,
+      selected
+    })
+  },
+
+  /**
    * Add address data
    * @param {object} detail - the address to add as per doc/state.md's autofillAddressDetail
    * @param {object} originalDetail - the original address before editing
@@ -452,6 +484,19 @@ const appActions = {
   },
 
   /**
+   * Autofill data changed
+   * @param {Array} addressGuids - the guid array to access address entries in autofill DB
+   * @param {Array} creditCardGuids - the guid array to access credit card entries in autofill DB
+   */
+  autofillDataChanged: function (addressGuids, creditCardGuids) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_AUTOFILL_DATA_CHANGED,
+      addressGuids,
+      creditCardGuids
+    })
+  },
+
+  /**
    * Dispatches a message when appWindowId loses focus
    *
    * @param {Number} appWindowId - the unique id of the window
@@ -460,6 +505,45 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_WINDOW_BLURRED,
       appWindowId: appWindowId
+    })
+  },
+
+  /**
+   * Saves current menubar template for use w/ Windows titlebar
+   * @param {Object} menubarTemplate - JSON used to build the menu
+   */
+  setMenubarTemplate: function (menubarTemplate) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SET_MENUBAR_TEMPLATE,
+      menubarTemplate
+    })
+  },
+
+  /**
+   * Dispatches a message when the network is re-connected
+   * after being disconnected
+   */
+  networkConnected: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_NETWORK_CONNECTED
+    })
+  },
+
+  /**
+   * Dispatches a message when the network is disconnected
+   */
+  networkDisconnected: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_NETWORK_DISCONNECTED
+    })
+  },
+
+  /**
+   * Dispatches a message to submit feedback
+   */
+  submitFeedback: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_SUBMIT_FEEDBACK
     })
   }
 }

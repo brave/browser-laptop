@@ -32,6 +32,9 @@ const settings = {
   SHUTDOWN_CLEAR_DOWNLOADS: 'shutdown.clear-downloads',
   SHUTDOWN_CLEAR_CACHE: 'shutdown.clear-cache',
   SHUTDOWN_CLEAR_ALL_SITE_COOKIES: 'shutdown.clear-all-site-cookies',
+  SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA: 'shutdown.clear-autocomplete-data',
+  SHUTDOWN_CLEAR_AUTOFILL_DATA: 'shutdown.clear-autofill-data',
+  SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Security Tab: DEPRECATED but still required (for now)
@@ -47,12 +50,17 @@ const settings = {
   // Payments Tab
   PAYMENTS_ENABLED: 'payments.enabled',
   PAYMENTS_NOTIFICATIONS: 'payments.notifications',
+  PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED: 'payments.notificationTryPaymentsDismissed',
   PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   // Advanced settings
   HARDWARE_ACCELERATION_ENABLED: 'advanced.hardware-acceleration-enabled',
   PDFJS_ENABLED: 'advanced.pdfjs-enabled',
   DEFAULT_ZOOM_LEVEL: 'advanced.default-zoom-level',
-  SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled'
+  SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled',
+  SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
+  ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
+  MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
+  MINIMUM_VISTS: 'advanced.minimum-visits'
 }
 
 module.exports = settings

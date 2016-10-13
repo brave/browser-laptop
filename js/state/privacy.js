@@ -6,7 +6,7 @@ const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const AppConstants = require('../constants/appConstants')
 const settings = require('../constants/settings')
-const { registerUserPrefs } = require('./userPrefs')
+const {registerUserPrefs} = require('./userPrefs')
 const getSetting = require('../settings').getSetting
 
 const getPrivacySettings = () => {

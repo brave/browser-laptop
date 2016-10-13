@@ -61,17 +61,17 @@ class PinnedTabs extends ImmutableComponent {
     return <div className='pinnedTabs'
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}>
-       {
-          this.props.pinnedTabs
-            .map((tab) =>
-              <Tab ref={(node) => this.tabRefs.push(node)}
-                draggingOverData={this.props.draggingOverData}
-                tab={tab}
-                key={'tab-' + tab.get('frameKey')}
-                paintTabs={this.props.paintTabs}
-                previewTabs={this.props.previewTabs}
-                isActive={this.props.activeFrameKey === tab.get('frameKey')}
-                partOfFullPageSet={this.props.partOfFullPageSet} />)
+      {
+         this.props.pinnedTabs
+           .map((tab) =>
+             <Tab ref={(node) => this.tabRefs.push(node)}
+               draggingOverData={this.props.draggingOverData}
+               tab={tab}
+               key={'tab-' + tab.get('frameKey')}
+               paintTabs={this.props.paintTabs}
+               previewTabs={this.props.previewTabs}
+               isActive={this.props.activeFrameKey === tab.get('frameKey')}
+               partOfFullPageSet={this.props.partOfFullPageSet} />)
       }
     </div>
   }

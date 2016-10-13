@@ -109,6 +109,16 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
     folderId = module.exports.getNextFolderId(sites)
   }
 
+  // Remove duplicate folder
+  if (!oldSite && tag === siteTags.BOOKMARK_FOLDER) {
+    const dupFolder = sites.find((site) => isBookmarkFolder(site.get('tags')) &&
+      site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
+      site.get('customTitle') === siteDetail.get('customTitle'))
+    if (dupFolder) {
+      sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER)
+    }
+  }
+
   let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
   if (tag) {
     tags = tags.toSet().add(tag).toList()
@@ -118,20 +128,26 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   let site = Immutable.fromJS({
     lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
     tags,
-    location: siteDetail.get('location'),
     title: siteDetail.get('title')
   })
+  if (siteDetail.get('location')) {
+    site = site.set('location', siteDetail.get('location'))
+  }
   if (folderId) {
     site = site.set('folderId', Number(folderId))
   }
   if (typeof customTitle === 'string') {
     site = site.set('customTitle', customTitle)
   }
-  if (siteDetail.get('parentFolderId') || oldSite && oldSite.get('parentFolderId')) {
-    site = site.set('parentFolderId', Number(siteDetail.get('parentFolderId') || oldSite.get('parentFolderId')))
+  if (siteDetail.get('parentFolderId') !== undefined || oldSite && oldSite.get('parentFolderId')) {
+    let parentFolderId = siteDetail.get('parentFolderId') !== undefined
+      ? siteDetail.get('parentFolderId') : oldSite.get('parentFolderId')
+    site = site.set('parentFolderId', Number(parentFolderId))
   }
-  if (siteDetail.get('partitionNumber') || oldSite && oldSite.get('partitionNumber')) {
-    site = site.set('partitionNumber', Number(siteDetail.get('partitionNumber') || oldSite.get('partitionNumber')))
+  if (siteDetail.get('partitionNumber') !== undefined || oldSite && oldSite.get('partitionNumber')) {
+    let partitionNumber = siteDetail.get('partitionNumber') !== undefined
+    ? siteDetail.get('partitionNumber') : oldSite.get('partitionNumber')
+    site = site.set('partitionNumber', Number(partitionNumber))
   }
   if (siteDetail.get('favicon') || oldSite && oldSite.get('favicon')) {
     site = site.set('favicon', siteDetail.get('favicon') || oldSite.get('favicon'))
@@ -159,7 +175,18 @@ module.exports.removeSite = function (sites, siteDetail, tag) {
   if (index === -1) {
     return sites
   }
+
   const tags = sites.getIn([index, 'tags'])
+  if (isBookmarkFolder(tags)) {
+    const folderId = sites.getIn([index, 'folderId'])
+    const childSites = sites.filter((site) => site.get('parentFolderId') === folderId)
+    childSites.forEach((site) => {
+      const tags = site.get('tags')
+      tags.forEach((tag) => {
+        sites = module.exports.removeSite(sites, site, tag)
+      })
+    })
+  }
   if (tags.size === 0 && !tag) {
     // If called without tags and entry has no tags, remove the entry
     return sites.splice(index, 1)
@@ -420,6 +447,9 @@ module.exports.getOrigin = function (location) {
   // Returns scheme + hostname + port
   if (typeof location !== 'string') {
     return null
+  }
+  if (location.startsWith('file://')) {
+    return 'file:///'
   }
   let parsed = urlParse(location)
   if (parsed.host && parsed.protocol) {

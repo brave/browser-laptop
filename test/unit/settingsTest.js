@@ -98,20 +98,6 @@ describe('settings unit test', function () {
       assert.deepEqual(actualResult, expectedResult)
     })
 
-    it('returns popup dimensions for LastPass', function () {
-      settingsCollection[settingsConst.ACTIVE_PASSWORD_MANAGER] = passwordManagers.LAST_PASS
-
-      const expectedResult = Immutable.fromJS({
-        name: passwordManagers.LAST_PASS,
-        extensionId: extensionIds[passwordManagers.LAST_PASS],
-        displayName: displayNames[passwordManagers.LAST_PASS],
-        popupWidth: 350,
-        popupHeight: 448
-      })
-      const actualResult = settings.getActivePasswordManager(settingsCollection)
-      assert.deepEqual(actualResult, expectedResult)
-    })
-
     it('calls getSetting to get the value (providing a default if none exists)', function () {
       settingsCollection[settingsConst.ONE_PASSWORD_ENABLED] = true
       const expectedResult = Immutable.fromJS({

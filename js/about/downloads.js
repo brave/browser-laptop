@@ -30,13 +30,13 @@ class DownloadItem extends ImmutableComponent {
       onContextMenu={aboutActions.contextMenu.bind(this, contextMenuDownload, 'download')}
       data-context-menu-disable
       onDoubleClick={aboutActions.openDownloadPath.bind(this, this.props.download)}>
-    {
-      <div className='aboutListItem' title={this.props.download.get('url')}>
-        <div className='aboutItemTitle'>{this.props.download.get('filename')}</div>
-        <div className='aboutItemTitle' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
-        <div className='aboutItemLocation'>{this.props.download.get('url')}</div>
-      </div>
-    }
+      {
+        <div className='aboutListItem' title={this.props.download.get('url')}>
+          <div className='aboutItemTitle'>{this.props.download.get('filename')}</div>
+          <div className='aboutItemTitle' data-l10n-id={downloadUtil.getL10nId(this.props.download)} data-l10n-args={JSON.stringify(l10nStateArgs)} />
+          <div className='aboutItemLocation'>{this.props.download.get('url')}</div>
+        </div>
+      }
     </div>
   }
 }
@@ -44,12 +44,12 @@ class DownloadItem extends ImmutableComponent {
 class DownloadsList extends ImmutableComponent {
   render () {
     return <list className='downloadList'>
-    {
-      this.props.downloads.size > 0
-      ? this.props.downloads.map((download, downloadId) =>
-        <DownloadItem download={download} downloadId={downloadId} />)
-      : <div className='downloadList' data-l10n-id='noDownloads' />
-    }
+      {
+        this.props.downloads.size > 0
+        ? this.props.downloads.map((download, downloadId) =>
+          <DownloadItem download={download} downloadId={downloadId} />)
+        : <div className='downloadList' data-l10n-id='noDownloads' />
+      }
     </list>
   }
 }

@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-const { getTargetAboutUrl } = require('../lib/appUrlUtil')
+const {getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 // BRAVE_UPDATE_HOST should be set to the host name for the auto-updater server
 const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
@@ -22,6 +22,7 @@ module.exports = {
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
+    // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
     enabled: true
@@ -31,11 +32,13 @@ module.exports = {
   },
   flash: {
     enabled: false,
+    installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash')
   },
   adblock: {
+    alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/2/{uuid}.dat',
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
-    version: '1',
+    version: '2',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
@@ -67,6 +70,9 @@ module.exports = {
   crashes: {
     crashSubmitUrl: crashURL
   },
+  payments: {
+    delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10 // 10 days (from firstRunTimestamp)
+  },
   updates: {
     // Check for front end updates every hour
     appUpdateCheckFrequency: 1000 * 60 * 60,
@@ -80,6 +86,7 @@ module.exports = {
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
   defaultSettings: {
+    'adblock.customRules': '',
     'general.language': null, // null means to use the OS lang
     'general.startup-mode': 'lastTime',
     'general.homepage': 'https://www.brave.com',
@@ -102,6 +109,7 @@ module.exports = {
     'bookmarks.toolbar.showOnlyFavicon': false,
     'payments.enabled': false,
     'payments.notifications': false,
+    'payments.notificationTryPaymentsDismissed': false, // True if you dismiss the message or enable Payments
     'payments.contribution-amount': 5, // USD
     'privacy.autofill-enabled': true,
     'privacy.do-not-track': false,
@@ -116,10 +124,16 @@ module.exports = {
     'advanced.default-zoom-level': null,
     'advanced.pdfjs-enabled': true,
     'advanced.smooth-scroll-enabled': false,
+    'advanced.send-crash-reports': true,
+    'advanced.minimum-visit-time': 8,
+    'advanced.minimum-visits': 5,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
-    'shutdown.clear-all-site-cookies': false
+    'shutdown.clear-all-site-cookies': false,
+    'shutdown.clear-autocomplete-data': false,
+    'shutdown.clear-autofill-data': false,
+    'shutdown.clear-site-settings': false
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [

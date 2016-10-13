@@ -4,11 +4,11 @@
 
 const messages = require('../constants/messages')
 const serializer = require('../dispatcher/serializer')
-const WindowConstants = require('../constants/windowConstants')
-const AppConstants = require('../constants/appConstants')
+const windowConstants = require('../constants/windowConstants')
+const appConstants = require('../constants/appConstants')
 const ipc = window.chrome.ipc
 
-const AboutActions = {
+const aboutActions = {
   /**
    * Dispatches a window action
    * @param {string} key - The settings key to change the value on
@@ -25,8 +25,8 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSetting: function (key, value) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SETTING,
       key,
       value
     })
@@ -40,8 +40,8 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSiteSetting: function (hostPattern, key, value) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
       value
@@ -55,9 +55,21 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    */
   removeSiteSetting: function (hostPattern, key) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
+      key
+    })
+  },
+
+  /**
+   * Dispatches an event to the renderer process to remove all site settings
+   *
+   * @param {string} key - The settings key to remove
+   */
+  clearSiteSettings: function (key) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_SITE_SETTINGS,
       key
     })
   },
@@ -68,10 +80,40 @@ const AboutActions = {
    * preserve the about preload script. See #672
    */
   newFrame: function (frameOpts, openInForeground = true) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_NEW_FRAME,
+    aboutActions.dispatchAction({
+      actionType: windowConstants.WINDOW_NEW_FRAME,
       frameOpts,
       openInForeground
+    })
+  },
+
+  /**
+   * Generates a file with the users backup keys
+   */
+  ledgerGenerateKeyFile: function (backupAction) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_BACKUP_KEYS,
+      backupAction
+    })
+  },
+
+  /**
+   * Recover wallet by merging old wallet into new one
+   */
+  ledgerRecoverWallet: function (firstRecoveryKey, secondRecoveryKey) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      firstRecoveryKey,
+      secondRecoveryKey
+    })
+  },
+
+  /**
+   * Clear wallet recovery status
+   */
+  clearRecoveryStatus: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_RECOVERY
     })
   },
 
@@ -103,8 +145,8 @@ const AboutActions = {
   },
 
   moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_MOVE_SITE,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_MOVE_SITE,
       sourceDetail,
       destinationDetail,
       prepend,
@@ -124,24 +166,31 @@ const AboutActions = {
     ipc.send(messages.SET_CLIPBOARD, text)
   },
 
+  setNewTabDetail: function (newTabPageDetail) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_NEW_TAB_DETAIL,
+      newTabPageDetail
+    })
+  },
+
   deletePassword: function (password) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_PASSWORD,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_PASSWORD,
       passwordDetail: password
     })
   },
 
   deletePasswordSite: function (origin) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern: origin,
       key: 'savePasswords'
     })
   },
 
   clearPasswords: function () {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CLEAR_PASSWORDS
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_PASSWORDS
     })
   },
 
@@ -149,13 +198,9 @@ const AboutActions = {
     ipc.send(messages.CHECK_FLASH_INSTALLED)
   },
 
-  showNotification: function (msg) {
-    ipc.send(messages.SHOW_NOTIFICATION, msg)
-  },
-
   setResourceEnabled: function (resourceName, enabled) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_SET_RESOURCE_ENABLED,
       resourceName,
       enabled
     })
@@ -163,6 +208,10 @@ const AboutActions = {
 
   clearBrowsingDataNow: function (clearBrowsingDataDetail) {
     ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
+  },
+
+  importBrowerDataNow: function () {
+    ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
   },
 
   createWallet: function () {
@@ -177,11 +226,7 @@ const AboutActions = {
    * Open a adding address dialog
    */
   addAutofillAddress: function () {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail: {},
-      originalDetail: {}
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_ADDRESS, {}, {})
   },
 
   /**
@@ -190,8 +235,8 @@ const AboutActions = {
    * @param {object} address - address to remove as per doc/state.md's autofillAddressDetail
    */
   removeAutofillAddress: function (address) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_AUTOFILL_ADDRESS,
       detail: address
     })
   },
@@ -202,22 +247,15 @@ const AboutActions = {
    * @param {object} address - address to edit as per doc/state.md's autofillAddressDetail
    */
   editAutofillAddress: function (address) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail: address,
-      originalDetail: address
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_ADDRESS, address.toJS(), address.toJS())
   },
 
   /**
    * Open a adding credit card dialog
    */
   addAutofillCreditCard: function () {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail: {month: '01', year: new Date().getFullYear().toString()},
-      originalDetail: {}
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD,
+      {month: '01', year: new Date().getFullYear().toString()}, {})
   },
 
   /**
@@ -226,8 +264,8 @@ const AboutActions = {
    * @param {object} card - credit card to remove as per doc/state.md's autofillCreditCardDetail
    */
   removeAutofillCreditCard: function (card) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail: card
     })
   },
@@ -238,11 +276,42 @@ const AboutActions = {
    * @param {object} card - credit card to edit as per doc/state.md's autofillCreditCardDetail
    */
   editAutofillCreditCard: function (card) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail: card,
-      originalDetail: card
+    ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD, card.toJS(), card.toJS())
+  },
+
+  /**
+   * Dispatches an event to the browser process to register or deregister a datafile
+   *
+   * @param {uuid} The unique ID of the adblock datafile
+   * @param {enable} true if the adBlock data file should be used
+   */
+  updateAdblockDataFiles: function (uuid, enable) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_DATAFILES,
+      uuid,
+      enable
+    })
+  },
+
+  /**
+   * Dispatches an event to the renderer process to update custom adblock rules.
+   *
+   * @param {rules} ABP filter syntax rule string
+   */
+  updateCustomAdblockRules: function (rules) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES,
+      rules
+    })
+  },
+
+  /**
+   * Dispatches a message to submit feedback
+   */
+  submitFeedback: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_SUBMIT_FEEDBACK
     })
   }
 }
-module.exports = AboutActions
+module.exports = aboutActions

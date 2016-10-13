@@ -4,21 +4,21 @@
 
 const React = require('react')
 const ImmutableComponent = require('../components/immutableComponent')
-const { aboutUrls, isNavigatableAboutPage } = require('../lib/appUrlUtil')
+const {aboutUrls, isNavigatableAboutPage} = require('../lib/appUrlUtil')
 
 class AboutAbout extends ImmutableComponent {
   render () {
     return <div>
       <h1 data-l10n-id='listOfAboutPages' />
       <ul>
-      {
-      aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
-        <li>
-          <a href={aboutUrls.get(aboutSourceUrl)} target='_blank'>
-            {aboutSourceUrl}
-          </a>
-        </li>)
-      }
+        {
+        aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
+          <li>
+            <a href={aboutUrls.get(aboutSourceUrl)} target='_blank'>
+              {aboutSourceUrl}
+            </a>
+          </li>)
+        }
       </ul>
     </div>
   }

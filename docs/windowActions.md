@@ -36,6 +36,18 @@ but the location should. For user entered new URLs, both should be updated.
 
 
 
+### setUrl(location, key) 
+
+Dispatches a message to the store to set the new URL.
+
+**Parameters**
+
+**location**: `string`, Dispatches a message to the store to set the new URL.
+
+**key**: `number`, Dispatches a message to the store to set the new URL.
+
+
+
 ### setNavigated(location, key, isNavigatedInPage) 
 
 Dispatches a message to the store to let it know a page has been navigated.
@@ -408,6 +420,16 @@ are no autocomplete results.
 
 
 
+### setUrlBarFocused(isFocused) 
+
+Marks the URL bar as focused or not.
+
+**Parameters**
+
+**isFocused**: `boolean`, Whether or not the URL bar should be marked as focused
+
+
+
 ### setActiveFrameShortcut(frameProps, activeShortcut, activeShortcutDetails) 
 
 Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
@@ -589,6 +611,16 @@ Saves the position of the window in the window state
 
 
 
+### saveSize(size) 
+
+Saves the size (width, height) of the window in the window state
+
+**Parameters**
+
+**size**: `Array`, [x, y]
+
+
+
 ### setWindowFullScreen(isFullScreen) 
 
 Sets the fullscreen state of the window
@@ -729,6 +761,26 @@ Sets the clear browsing data popup detail
 
 
 
+### setImportBrowserDataDetail(importBrowserDataDetail) 
+
+Sets the import browser data popup detail
+
+**Parameters**
+
+**importBrowserDataDetail**: `Array`, list of supported browsers
+
+
+
+### setImportBrowserDataSelected(selected) 
+
+Sets the selected import browser data
+
+**Parameters**
+
+**selected**: `Object`, selected browser data to import
+
+
+
 ### setAutofillAddressDetail(currentDetail, originalDetail) 
 
 Sets the manage autofill address popup detail
@@ -755,7 +807,7 @@ Sets the manage autofill credit card popup detail
 
 ### setBlockedRunInsecureContent(frameProps, source) 
 
-Sets page url with blocked active mixed content.
+Sets source of blocked active mixed content.
 
 **Parameters**
 
@@ -763,6 +815,90 @@ Sets page url with blocked active mixed content.
 blocked active mixed content on
 
 **source**: `string`, Source of blocked active mixed content
+
+
+
+### toggleMenubarVisible(isVisible) 
+
+(Windows only)
+Dispatches a message to indicate the custom rendered Menubar should be toggled (shown/hidden)
+
+**Parameters**
+
+**isVisible**: `boolean`, (optional)
+
+
+
+### clickMenubarSubmenu(label) 
+
+(Windows only)
+Used to trigger the click() action for a menu
+Called from the Menubar control, handled in menu.js
+
+**Parameters**
+
+**label**: `string`, text of the label that was clicked
+
+
+
+### resetMenuState() 
+
+Used by `main.js` when click happens on content area (not on a link or react control).
+- closes context menu
+- closes popup menu
+- nulls out menubar item selected (Windows only)
+- hides menubar if auto-hide preference is set (Windows only)
+
+
+
+### setSubmenuSelectedIndex(index) 
+
+(Windows only)
+Used to track selected index of a context menu
+Needed because arrow keys can be used to navigate the custom menu
+
+**Parameters**
+
+**index**: `number`, zero based index of the item.
+  Index excludes menu separators and hidden items.
+
+
+
+### setLastFocusedSelector(selector) 
+
+(Windows only at the moment)
+Used to track last selected element (typically the URL bar or the frame)
+Important because focus is lost when using the custom menu and needs
+to be returned in order for the cut/copy operation to work
+
+**Parameters**
+
+**selector**: `string`, selector used w/ querySelectorAll to return focus
+  after a menu item is selected (via the custom titlebar / menubar)
+
+
+
+### gotResponseDetails(tabId, details) 
+
+Used to get response details (such as the HTTP response code) from a response
+See `eventStore.js` for an example use-case
+
+**Parameters**
+
+**tabId**: `number`, the tab id to set
+
+**details**: `Object`, object containing response details
+
+
+
+### setBookmarksToolbarSelectedFolderId(folderId) 
+
+Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
+
+**Parameters**
+
+**folderId**: `number`, from the siteDetail for the bookmark folder
+  If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
 
 
 
