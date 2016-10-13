@@ -85,6 +85,9 @@ module.exports = {
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
+  urlSuggestions: {
+    ageDecayConstant: 50
+  },
   defaultSettings: {
     'adblock.customRules': '',
     'general.language': null, // null means to use the OS lang
