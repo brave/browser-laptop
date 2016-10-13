@@ -111,6 +111,7 @@ index 78a80c6..dfa9f03 100755
 
 -  env['GYP_GENERATORS'] = 'ninja'
 +  env['GYP_GENERATORS'] = 'ninja,xcode-ninja'
++  # For Visual Studio on Windows, use msvs-ninja instead
 
    if sys.platform in ['win32', 'cygwin']:
      # Do not let Chromium download their own toolchains.
