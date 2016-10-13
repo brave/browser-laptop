@@ -81,6 +81,53 @@ module.exports.getNextFolderId = (sites) => {
   return (maxIdItem ? (maxIdItem.get('folderId') || 0) : 0) + 1
 }
 
+// Some details can be copied from the existing siteDetail if null
+// ex: parentFolderId, partitionNumber, and favicon
+const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
+  let tags = oldSiteDetail && oldSiteDetail.get('tags') || new Immutable.List()
+  if (tag) {
+    tags = tags.toSet().add(tag).toList()
+  }
+
+  const customTitle = typeof newSiteDetail.get('customTitle') === 'string'
+    ? newSiteDetail.get('customTitle')
+    : (newSiteDetail.get('customTitle') || oldSiteDetail && oldSiteDetail.get('customTitle'))
+
+  let site = Immutable.fromJS({
+    lastAccessedTime: newSiteDetail.get('lastAccessedTime') || new Date().getTime(),
+    tags,
+    title: newSiteDetail.get('title')
+  })
+
+  if (newSiteDetail.get('location')) {
+    site = site.set('location', newSiteDetail.get('location'))
+  }
+  if (folderId) {
+    site = site.set('folderId', Number(folderId))
+  }
+  if (typeof customTitle === 'string') {
+    site = site.set('customTitle', customTitle)
+  }
+  if (newSiteDetail.get('parentFolderId') !== undefined || oldSiteDetail && oldSiteDetail.get('parentFolderId')) {
+    let parentFolderId = newSiteDetail.get('parentFolderId') !== undefined
+      ? newSiteDetail.get('parentFolderId') : oldSiteDetail.get('parentFolderId')
+    site = site.set('parentFolderId', Number(parentFolderId))
+  }
+  if (newSiteDetail.get('partitionNumber') !== undefined || oldSiteDetail && oldSiteDetail.get('partitionNumber')) {
+    let partitionNumber = newSiteDetail.get('partitionNumber') !== undefined
+    ? newSiteDetail.get('partitionNumber') : oldSiteDetail.get('partitionNumber')
+    site = site.set('partitionNumber', Number(partitionNumber))
+  }
+  if (newSiteDetail.get('favicon') || oldSiteDetail && oldSiteDetail.get('favicon')) {
+    site = site.set('favicon', newSiteDetail.get('favicon') || oldSiteDetail.get('favicon'))
+  }
+  if (newSiteDetail.get('themeColor') || oldSiteDetail && oldSiteDetail.get('themeColor')) {
+    site = site.set('themeColor', newSiteDetail.get('themeColor') || oldSiteDetail.get('themeColor'))
+  }
+
+  return site
+}
+
 /**
  * Adds or updates the specified siteDetail in sites.
  *
@@ -101,65 +148,32 @@ module.exports.addSite = function (sites, siteDetail, tag, originalSiteDetail) {
   if (tag === undefined) {
     tag = siteDetail.getIn(['tags', 0])
   }
+
   const index = module.exports.getSiteIndex(sites, originalSiteDetail || siteDetail, tag)
   const oldSite = index !== -1 ? sites.getIn([index]) : null
-
   let folderId = siteDetail.get('folderId')
-  if (!folderId && tag === siteTags.BOOKMARK_FOLDER) {
-    folderId = module.exports.getNextFolderId(sites)
-  }
 
-  // Remove duplicate folder
-  if (!oldSite && tag === siteTags.BOOKMARK_FOLDER) {
-    const dupFolder = sites.find((site) => isBookmarkFolder(site.get('tags')) &&
-      site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
-      site.get('customTitle') === siteDetail.get('customTitle'))
-    if (dupFolder) {
-      sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER)
+  if (tag === siteTags.BOOKMARK_FOLDER) {
+    if (!oldSite && folderId) {
+      // Remove duplicate folder (needed for import)
+      const dupFolder = sites.find((site) => isBookmarkFolder(site.get('tags')) &&
+        site.get('parentFolderId') === siteDetail.get('parentFolderId') &&
+        site.get('customTitle') === siteDetail.get('customTitle'))
+      if (dupFolder) {
+        sites = module.exports.removeSite(sites, dupFolder, siteTags.BOOKMARK_FOLDER)
+      }
+    } else if (!folderId) {
+      // Assign an id if this is a new folder
+      folderId = module.exports.getNextFolderId(sites)
     }
   }
 
-  let tags = index !== -1 && sites.getIn([index, 'tags']) || new Immutable.List()
-  if (tag) {
-    tags = tags.toSet().add(tag).toList()
-  }
-
-  const customTitle = typeof siteDetail.get('customTitle') === 'string' ? siteDetail.get('customTitle') : (siteDetail.get('customTitle') || oldSite && oldSite.get('customTitle'))
-  let site = Immutable.fromJS({
-    lastAccessedTime: siteDetail.get('lastAccessedTime') || new Date().getTime(),
-    tags,
-    title: siteDetail.get('title')
-  })
-  if (siteDetail.get('location')) {
-    site = site.set('location', siteDetail.get('location'))
-  }
-  if (folderId) {
-    site = site.set('folderId', Number(folderId))
-  }
-  if (typeof customTitle === 'string') {
-    site = site.set('customTitle', customTitle)
-  }
-  if (siteDetail.get('parentFolderId') !== undefined || oldSite && oldSite.get('parentFolderId')) {
-    let parentFolderId = siteDetail.get('parentFolderId') !== undefined
-      ? siteDetail.get('parentFolderId') : oldSite.get('parentFolderId')
-    site = site.set('parentFolderId', Number(parentFolderId))
-  }
-  if (siteDetail.get('partitionNumber') !== undefined || oldSite && oldSite.get('partitionNumber')) {
-    let partitionNumber = siteDetail.get('partitionNumber') !== undefined
-    ? siteDetail.get('partitionNumber') : oldSite.get('partitionNumber')
-    site = site.set('partitionNumber', Number(partitionNumber))
-  }
-  if (siteDetail.get('favicon') || oldSite && oldSite.get('favicon')) {
-    site = site.set('favicon', siteDetail.get('favicon') || oldSite.get('favicon'))
-  }
-  if (siteDetail.get('themeColor') || oldSite && oldSite.get('themeColor')) {
-    site = site.set('themeColor', siteDetail.get('themeColor') || oldSite.get('themeColor'))
-  }
-
+  let site = mergeSiteDetails(oldSite, siteDetail, tag, folderId)
   if (index === -1) {
+    // Insert new entry
     return sites.push(site)
   }
-
+  // Update existing entry
   return sites.setIn([index], site)
 }
 
