@@ -1,6 +1,10 @@
 (function () {
   var queryString = window.location.search
-  var devServerPort = queryString && queryString.match(/devServerPort=([^&]*)/)[1]
+  var portMatch = queryString && queryString.match(/devServerPort=([0-9]+)/)
+  var devServerPort
+  if (portMatch) {
+    devServerPort = portMatch[1]
+  }
 
   let aboutEntryPage = 'gen/aboutPages.entry.js'
   if (devServerPort) {
