@@ -1,5 +1,5 @@
 /* global describe, it */
-const suggestion = require('../../../js/lib/suggestion')
+const suggestion = require('../../../app/renderer/lib/suggestion')
 const assert = require('assert')
 
 require('../braveUnit')

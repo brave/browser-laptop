@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const appConfig = require('../constants/appConfig')
+const appConfig = require('../../../js/constants/appConfig')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))

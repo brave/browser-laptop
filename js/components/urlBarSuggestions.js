@@ -21,7 +21,7 @@ const eventUtil = require('../lib/eventUtil')
 const cx = require('../lib/classSet')
 const locale = require('../l10n')
 const windowStore = require('../stores/windowStore')
-const suggestion = require('../lib/suggestion')
+const suggestion = require('../../app/renderer/lib/suggestion')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
