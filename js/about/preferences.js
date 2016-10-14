@@ -4,6 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
+const ReactDOMServer = require('react-dom/server')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
@@ -11,6 +12,7 @@ const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../lib/ledgerExportUtil')
 const transactionsToCSVDataURL = ledgerExportUtil.transactionsToCSVDataURL
+const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 const {getZoomValuePercentage} = require('../lib/zoom')
 const config = require('../constants/config')
@@ -549,11 +551,19 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get receiptFileName () {
-    return `${this.transaction.get('exportFilenamePrefix')}.csv`
+    return `${this.transaction.get('exportFilenamePrefix')}.pdf`
   }
 
-  get dataURL () {
+  get htmlDataURL () {
+    return 'data:text/html,' + encodeURIComponent(ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} />))
+  }
+
+  get csvDataURL () {
     return transactionsToCSVDataURL(this.transaction.toJS())
+  }
+
+  generatePDF () {
+    ipc.send(messages.RENDER_URL_TO_PDF, this.htmlDataURL, this.receiptFileName)
   }
 
   render () {
@@ -563,8 +573,190 @@ class PaymentHistoryRow extends ImmutableComponent {
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
       <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide'><a href={this.dataURL} download={this.receiptFileName}>{this.receiptFileName}</a></td>
+      <td className='wide'><a onClick={this.generatePDF.bind(this)}>{this.receiptFileName}</a></td>
     </tr>
+  }
+}
+
+class ContributionStatement extends ImmutableComponent {
+  get transaction () {
+    return this.props.transaction
+  }
+
+  get timestamp () {
+    return this.transaction.get('submissionStamp')
+  }
+
+  get formattedDate () {
+    return formattedDateFromTimestamp(this.timestamp)
+  }
+
+  get formattedTime () {
+    return formattedTimeFromTimestamp(this.timestamp)
+  }
+
+  get ContributionStatementHeader () {
+    let containerStyle = {'margin-top': '25px', 'margin-bottom': '25px', 'width': '100%'}
+
+    return (
+      <div className='titleBar contributionStatementHeader' style={containerStyle}>
+        <div className='sectionTitleWrapper pull-left'>
+          <span className='sectionTitle'>Brave Payments</span>
+          <span className='sectionSubTitle'>beta</span>
+        </div>
+        <div className='sectionTitleWrapper pull-right'>
+          <span className='sectionTitle smaller pull-right' style={{'white-space': 'nowrap'}}>Contribution Statement</span>
+        </div>
+      </div>
+     )
+  }
+
+  get contributionDate () {
+    return this.formattedDate
+  }
+
+  get contributionTime () {
+    return this.formattedTime
+  }
+
+  get contributionAmount () {
+    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
+    var currency = this.transaction.getIn(['contribution', 'fiat', 'currency']) || 'USD'
+    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00') + ' ' + currency
+  }
+
+  get ContributionStatementSummaryBox () {
+    let leftColumnStyle = {'text-align': 'right', 'padding': '10px', 'margin': '10px', 'background-color': '#f7f7f7'}
+    let rightColumnStyle = {'text-align': 'center', 'padding': '10px', 'margin': '10px', 'border-style': 'solid', 'border-width': '3px', 'border-color': '#e7e7e7', 'font-weight': 'bold'}
+    let containerStyle = {'margin-top': '25px', 'margin-bottom': '25px'}
+
+    return (
+      <div className='pull-right' style={containerStyle}>
+        <table className='contributionStatementSummaryBox'>
+          <tbody>
+            <tr><td style={leftColumnStyle}>Contribution Date</td><td style={rightColumnStyle}>{this.contributionDate}</td></tr>
+            <tr><td style={leftColumnStyle}>Contribution Time</td><td style={rightColumnStyle}>{this.contributionTime}</td></tr>
+            <tr><td style={leftColumnStyle}>Contribution Amount</td><td style={rightColumnStyle}>{this.contributionAmount}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  get lastContributionHumanFormattedDate () {
+    return ''
+  }
+
+  get thisContributionHumanFormattedDate () {
+    return ''
+  }
+
+  get rows () {
+    return getTransactionCSVRows(this.transaction.toJS(), undefined, false).map(function (row) {
+      return row.split(',')
+    }).slice(1)
+  }
+
+  get ContributionStatementDetailTable () {
+    let detailTableStyle = {'width': '100%', 'border-width': '5px', 'border-style': 'solid', 'border-color': '#f7f7f7'}
+    let detailTableContainerStyle = {'margin-top': '25px', 'margin-bottom': '25px'}
+
+    return (
+      <div style={detailTableContainerStyle}>
+        <div className='pull-right'>{ this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }</div>
+        <div>
+          <table className='contributionStatementDetailTable' style={detailTableStyle}>
+            <thead>
+              <tr style={{'text-align': 'right', 'background-color': '#f7f7f7'}}>
+                <th>Rank</th>
+                <th style={{'text-align': 'left', 'padding-left': '15px'}}>Site</th>
+                <th>% Paid</th>
+                <th>$ Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+              this.rows.map(function (row, idx) {
+                return (
+                  <tr style={{'text-align': 'right'}}>
+                    <td style={{'width': '15px'}}>{idx}</td>
+                    <td style={{'text-align': 'left', 'padding-left': '15px'}}>{row[0]}</td>
+                    <td>{(parseFloat(row[2]) * 100).toFixed(2)}</td>
+                    <td>{row[4]}</td>
+                  </tr>
+                )
+              })
+             }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  get ContributionStatementFooterNoteBox () {
+    return (<div />)
+  }
+
+  get ContributionStatementPageFooter () {
+    return (<div />)
+  }
+
+  get staticStyles () {
+    return (
+      <style>
+        {"\n\
+* {\n\
+  color: #3B3B3B;\n\
+  font-family: Arial;\n\
+  margin: 0;\n\
+  padding: 0;\n\
+}\n\
+.sectionTitleWrapper .sectionSubTitle {\n\
+  color: #ff5000;\n\
+  font-size: 15px;\n\
+  bottom: 25px;\n\
+  right: 19px;\n\
+}\n\
+  .pull-left {\n\
+  float: left;\n\
+}\n\
+  .pull-right {\n\
+  float: right;\n\
+}\n\
+.sectionTitleWrapper .sectionTitle {\n\
+  color: #ff5000;\n\
+  font-size: 28px;\n\
+}\n\
+      "}
+      </style>
+    )
+  }
+
+  render () {
+    let topLevelStyle = {'position': 'relative', 'width': '805px', 'overflow-x': 'hidden', 'display': 'block', 'background-color': '#ffffff', 'height': '100%', 'padding': '10px'}
+    let sectionDivStyle = { margin: 0, padding: 0, clear: 'left' }
+
+    return (
+      <div className='contributionStatementContainer' style={topLevelStyle}>
+        { this.staticStyles }
+        <div style={sectionDivStyle}>
+          {this.ContributionStatementHeader}
+        </div>
+        <div style={sectionDivStyle}>
+          {this.ContributionStatementSummaryBox}
+        </div>
+        <div style={sectionDivStyle}>
+          {this.ContributionStatementDetailTable}
+        </div>
+        <div style={sectionDivStyle}>
+          {this.ContributionStatementFooterNoteBox}
+        </div>
+        <div style={sectionDivStyle}>
+          {this.ContributionStatementPageFooter}
+        </div>
+      </div>
+    )
   }
 }
 
@@ -1774,6 +1966,10 @@ class AboutPreferences extends React.Component {
 
 function formattedDateFromTimestamp (timestamp) {
   return moment(new Date(timestamp)).format('YYYY-MM-DD')
+}
+
+function formattedTimeFromTimestamp (timestamp) {
+  return moment(new Date(timestamp)).format('HH:mm a')
 }
 
 function formattedTimeFromNow (timestamp) {

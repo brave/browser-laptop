@@ -192,10 +192,10 @@ let getPublisherVoteData = function getPublisherVoteData (transactions, viewingI
  * Generates a contribution breakdown by publisher in an array of CSV rows from an array of transactions
  * @example
  * txUtil.getTransactionCSVRows(client.state.transactions)
- * // [ 'Publisher,Votes,Fraction,BTC,USD',
- * //   'chronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD',
- * //   'waitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD',
- * //   'archlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD',
+ * // [ ['Publisher,Votes,Fraction,BTC,USD'],
+ * //   ['chronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD'],
+ * //   ['waitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD'],
+ * //   ['archlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD'],
  * //   /.../
  * // ]
  *
