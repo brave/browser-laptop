@@ -545,6 +545,27 @@ const appActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.APP_SUBMIT_FEEDBACK
     })
+  },
+
+  /**
+   * Dispatch a message to set default browser
+   *
+   * @param {boolean} useBrave - whether set Brave as default browser
+   */
+  defaultBrowserUpdated: function (useBrave) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_DEFAULT_BROWSER_UPDATED,
+      useBrave
+    })
+  },
+
+  /**
+   * Dispatch a message to indicate default browser check is complete
+   */
+  defaultBrowserCheckComplete: function () {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE
+    })
   }
 }
 

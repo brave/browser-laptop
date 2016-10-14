@@ -150,6 +150,8 @@ AppStore
     'general.downloads.default-save-path': string, // default path for saving files
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
     'general.disable-title-mode': boolean, // true if title mode should always be disabled
+    'general.check-default-on-startup': boolean, // true to check whether brave is default browser on startup
+    'general.is-default-browser': boolean, // true if brave is default browser
     'search.default-search-engine': string, // name of search engine, from js/data/searchProviders.js
     'search.offer-search-suggestions': boolean, // true if suggestions should be offered from the default search engine when available.
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
@@ -205,7 +207,8 @@ AppStore
   },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
-  }
+  },
+  defaultBrowserCheckComplete: boolean // true to indicate default browser check is complete
 }
 ```
 
@@ -527,6 +530,12 @@ WindowStore
     favorites: boolean,
     mergeFavorites: boolean,
     cookies: boolean
+  },
+  modalDialogDetail: {
+    [className]: {
+      Object // props
+    },
+    ...
   }
 }
 ```

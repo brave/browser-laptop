@@ -41,6 +41,7 @@ const NoScriptInfo = require('./noScriptInfo')
 const LongPressButton = require('./longPressButton')
 const Menubar = require('../../app/renderer/components/menubar')
 const WindowCaptionButtons = require('../../app/renderer/components/windowCaptionButtons')
+const CheckDefaultBrowserDialog = require('../../app/renderer/components/checkDefaultBrowserDialog')
 
 // Constants
 const config = require('../constants/config')
@@ -59,6 +60,7 @@ const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const FrameStateUtil = require('../state/frameStateUtil')
 const searchProviders = require('../data/searchProviders')
+const defaultBrowserState = require('../../app/common/state/defaultBrowserState')
 
 // Util
 const cx = require('../lib/classSet')
@@ -92,6 +94,7 @@ class Main extends ImmutableComponent {
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
     this.onHideReleaseNotes = this.onHideReleaseNotes.bind(this)
+    this.onHideCheckDefaultBrowserDialog = this.onHideCheckDefaultBrowserDialog.bind(this)
     this.onBraveMenu = this.onBraveMenu.bind(this)
     this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
     this.onTabContextMenu = this.onTabContextMenu.bind(this)
@@ -623,6 +626,10 @@ class Main extends ImmutableComponent {
     windowActions.setReleaseNotesVisible(false)
   }
 
+  onHideCheckDefaultBrowserDialog () {
+    windowActions.setModalDialogDetail('checkDefaultBrowserDialog')
+  }
+
   enableNoScript (settings) {
     return siteSettings.activeSettings(settings, this.props.appState, appConfig).noScript === true
   }
@@ -826,6 +833,8 @@ class Main extends ImmutableComponent {
     const activeRequestedLocation = this.activeRequestedLocation
     const noScriptIsVisible = this.props.windowState.getIn(['ui', 'noScriptInfo', 'isVisible'])
     const releaseNotesIsVisible = this.props.windowState.getIn(['ui', 'releaseNotes', 'isVisible'])
+    const checkDefaultBrowserDialogIsVisible =
+      currentWindow.isFocused() && defaultBrowserState.shouldDisplayDialog(this.props.appState)
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, this.props.appState, appConfig)
     const loginRequiredDetail = activeFrame ? basicAuthState.getLoginRequiredDetail(this.props.appState, activeFrame.get('tabId')) : null
     const customTitlebar = this.customTitlebar
@@ -838,6 +847,7 @@ class Main extends ImmutableComponent {
       !autofillAddressPanelIsVisible &&
       !autofillCreditCardPanelIsVisible &&
       !releaseNotesIsVisible &&
+      !checkDefaultBrowserDialogIsVisible &&
       !noScriptIsVisible &&
       activeFrame && !activeFrame.getIn(['security', 'loginRequiredDetail']) &&
       !customTitlebar.menubarSelectedIndex
@@ -1017,6 +1027,17 @@ class Main extends ImmutableComponent {
             metadata={this.props.appState.getIn(['updates', 'metadata'])}
             onHide={this.onHideReleaseNotes} />
           : null
+        }
+        {
+          checkDefaultBrowserDialogIsVisible
+            ? <CheckDefaultBrowserDialog
+              checkDefaultOnStartup={
+                this.props.windowState.getIn(['modalDialogDetail', 'checkDefaultBrowserDialog']) === undefined
+                ? getSetting(settings.CHECK_DEFAULT_ON_STARTUP)
+                : this.props.windowState.getIn(['modalDialogDetail', 'checkDefaultBrowserDialog', 'checkDefaultOnStartup'])
+              }
+              onHide={this.onHideCheckDefaultBrowserDialog} />
+            : null
         }
 
         <UpdateBar updates={this.props.appState.get('updates')} />

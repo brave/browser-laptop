@@ -328,6 +328,16 @@ const aboutActions = {
       originalDetail,
       destinationDetail
     })
+  },
+
+  /**
+   * Dispatch a message to set default browser
+   */
+  setAsDefaultBrowser: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_DEFAULT_BROWSER_UPDATED,
+      useBrave: true
+    })
   }
 }
 module.exports = aboutActions
