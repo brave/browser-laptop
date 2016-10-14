@@ -488,7 +488,17 @@ function updateDownloadState (downloadId, item, state) {
 function registerForDownloadListener (session) {
   session.on('will-download', function (event, item, webContents) {
     const win = BrowserWindow.getFocusedWindow()
-    const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), item.getFilename())
+
+    // special handling for data URLs where another 'will-download' event handler is trying to suggest a filename via item.setSavePath
+    // see the IPC handler for RENDER_URL_TO_PDF in app/index.js for example
+    let itemFilename
+    if (item.getURL().match(/^data:/) && item.getSavePath()) {
+      itemFilename = path.basename(item.getSavePath())
+    } else {
+      itemFilename = item.getFilename()
+    }
+
+    const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), itemFilename)
     const savePath = dialog.showSaveDialog(win, { defaultPath })
     // User cancelled out of save dialog prompt
     if (!savePath) {

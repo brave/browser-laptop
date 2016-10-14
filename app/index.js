@@ -83,6 +83,7 @@ const async = require('async')
 const tabs = require('./browser/tabs')
 const settings = require('../js/constants/settings')
 const webtorrent = require('./browser/webtorrent')
+const base64Encode = require('../js/lib/base64').encode
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')

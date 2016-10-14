@@ -4,6 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
+const ReactDOMServer = require('react-dom/server')
 const ImmutableComponent = require('../components/immutableComponent')
 const Immutable = require('immutable')
 const SwitchControl = require('../components/switchControl')
@@ -11,6 +12,7 @@ const ModalOverlay = require('../components/modalOverlay')
 const cx = require('../lib/classSet')
 const ledgerExportUtil = require('../lib/ledgerExportUtil')
 const transactionsToCSVDataURL = ledgerExportUtil.transactionsToCSVDataURL
+const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 const {getZoomValuePercentage} = require('../lib/zoom')
 const config = require('../constants/config')
@@ -588,11 +590,20 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get receiptFileName () {
-    return `${this.transaction.get('exportFilenamePrefix')}.csv`
+    return `${this.transaction.get('exportFilenamePrefix')}.pdf`
   }
 
-  get dataURL () {
+  get htmlDataURL () {
+    let dataURL = 'data:text/html,' + encodeURIComponent('<html><head><meta charset="UTF-8" /></head><body style="-webkit-print-color-adjust:exact">' + ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} synopsis={this.ledgerData.get('synopsis')} />) + '</body></html>')
+    return dataURL
+  }
+
+  get csvDataURL () {
     return transactionsToCSVDataURL(this.transaction.toJS())
+  }
+
+  renderPdf () {
+    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName)
   }
 
   render () {
@@ -602,8 +613,353 @@ class PaymentHistoryRow extends ImmutableComponent {
     return <tr>
       <td className='narrow' data-sort={this.timestamp}>{date}</td>
       <td className='wide' data-sort={this.satoshis}>{totalAmountStr}</td>
-      <td className='wide'><a href={this.dataURL} download={this.receiptFileName}>{this.receiptFileName}</a></td>
+      <td className='wide'><a onClick={this.renderPdf.bind(this)}>{this.receiptFileName}</a></td>
     </tr>
+  }
+}
+
+class ContributionStatement extends ImmutableComponent {
+  componentWillMount () {
+    let synopsis = this.synopsis
+
+    let publisherMap = {}
+
+    synopsis.forEach((synopsisRow) => {
+      publisherMap[synopsisRow.get('publisherURL')] = synopsisRow.toJS()
+    })
+
+    this.setState({
+      publisherSynopsisMap: publisherMap
+    })
+  }
+
+  get transaction () {
+    return this.props.transaction
+  }
+
+  get synopsis () {
+    return this.props.synopsis
+  }
+
+  get publisherSynopsisMap () {
+    return this.state.publisherSynopsisMap
+  }
+
+  get timestamp () {
+    return this.transaction.get('submissionStamp')
+  }
+
+  get formattedDate () {
+    return formattedDateFromTimestamp(this.timestamp)
+  }
+
+  get formattedTime () {
+    return formattedTimeFromTimestamp(this.timestamp)
+  }
+
+  get ContributionStatementHeader () {
+    return (
+      <div className='titleBar contributionStatementHeader'>
+        <div className='sectionTitleWrapper pull-left'>
+          <div id='braveLogo' />
+          <span className='sectionTitle'>Brave Payments</span>
+          <span className='sectionSubTitle'>beta</span>
+        </div>
+        <div className='sectionTitleWrapper pull-right'>
+          <span className='sectionTitle smaller pull-right'>Contribution Statement</span>
+        </div>
+      </div>
+     )
+  }
+
+  get contributionDate () {
+    return this.formattedDate
+  }
+
+  get contributionTime () {
+    return this.formattedTime
+  }
+
+  get contributionAmount () {
+    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
+    var currency = this.transaction.getIn(['contribution', 'fiat', 'currency']) || 'USD'
+    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00') + ' ' + currency
+  }
+
+  get ContributionStatementSummaryBox () {
+    return (
+      <div className='contributionStatementSummaryBox pull-right'>
+        <table className='contributionStatementSummaryBoxTable'>
+          <tbody>
+            <tr><td className='leftColumn'>Contribution Date</td><td className='rightColumn'>{this.contributionDate}</td></tr>
+            <tr><td className='leftColumn'>Contribution Time</td><td className='rightColumn'>{this.contributionTime}</td></tr>
+            <tr><td className='leftColumn'>Contribution Amount</td><td className='rightColumn'>{this.contributionAmount}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  get lastContributionHumanFormattedDate () {
+    return ''
+  }
+
+  get thisContributionHumanFormattedDate () {
+    return ''
+  }
+
+  get rows () {
+    const sortPublishersByContribution = true
+    const addTotalsRow = false
+    return getTransactionCSVRows(this.transaction.toJS(), undefined, addTotalsRow, sortPublishersByContribution).map(function (row) {
+      return row.split(',')
+    }).slice(1)
+  }
+
+  get ContributionStatementDetailTable () {
+    return (
+      <div className='contributionStatementDetailTableContainer'>
+        <div className='pull-right'>{ this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }</div>
+        <div>
+          <table className='contributionStatementDetailTable'>
+            <thead>
+              <tr className='detailTableRow'>
+                <th className='rankColumn'>Rank</th>
+                <th className='siteColumn'>Site</th>
+                <th className='fractionColumn'>% Paid</th>
+                <th className='fiatColumn'>$ Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+              this.rows.map(function (row, idx) {
+                let publisherSynopsis = this.synopsis[row.siteColumn] || {}
+
+                let verified = publisherSynopsis.verified
+                let site = row[0]
+                let fractionStr = (parseFloat(row[2]) * 100).toFixed(2)
+                let fiatStr = row[4]
+
+                return (
+                  <tr className='detailTableRow'>
+                    <td className='rankColumn'>{idx + 1}</td>
+                    <td className='siteColumn'>{verified ? <span className='verified' /> : null}<span className='site'>{site}</span></td>
+                    <td className='fractionColumn'>{fractionStr}</td>
+                    <td className='fiatColumn'>{fiatStr}</td>
+                  </tr>
+                )
+              }.bind(this))
+             }
+            </tbody>
+          </table>
+          <div className='verifiedExplainer'><span className='verified' /> = publisher has verified their wallet</div>
+        </div>
+      </div>
+    )
+  }
+
+  get ContributionStatementFooterNoteBox () {
+    return (
+      <div className='footerNoteBox'>
+        <span className='noteHeading'>Note:</span>
+        <br />
+        <span className='noteBody'>
+        To protect your privacy, this Brave Payments contribution statement is not saved, recorded or logged anywhere other than on your device (this computer). It cannot be retrieved from Brave in the event of data loss on your device.
+        </span>
+      </div>
+    )
+  }
+
+  get ContributionStatementPageFooter () {
+    return (
+      <div className='pageFooterBox'>
+        <span className='pageFooterBody'> &copy; 2016 Brave Software. Brave is a registered trademark of Brave Software. Site names may be trademarks or registered trademarks of the site owner.</span>
+      </div>
+    )
+  }
+
+  get staticStyles () {
+    /** since the ContributionStatement is rendered into a PDF from a self-contained data URL, we have to hardcode all the requisite CSS like this **/
+    return (
+      <style dangerouslySetInnerHTML={{__html: '\n\
+* {\n\
+  color: #3B3B3B;\n\
+  font-family: Arial;\n\
+  margin: 0;\n\
+  padding: 0;\n\
+}\n\
+.contributionStatementContainer {\n\
+  position: relative;\n\
+  width: 805px;\n\
+  overflow-x: hidden;\n\
+  display: block;\n\
+  background-color: #ffffff;\n\
+  padding: 10px;\n\
+}\n\
+.contributionStatementSection {\n\
+  margin: 0;\n\
+  padding: 0;\n\
+  clear: left;\n\
+}\n\
+.sectionTitleWrapper .sectionTitle {\n\
+  color: #3B3B3B;\n\
+  font-size: 28px;\n\
+}\n\
+.sectionTitleWrapper #braveLogo + span.sectionTitle {\n\
+  display: inline-block;\n\
+  vertical-align: middle;\n\
+  top: -20px;\n\
+  left: 5px;\n\
+  position: relative;\n\
+}\n\
+.sectionTitleWrapper .sectionSubTitle {\n\
+  color: #ff5000;\n\
+  font-size: 15px;\n\
+  top: -35px;\n\
+  right: 5px;\n\
+  position: relative;\n\
+}\n\
+.sectionTitleWrapper.pull-right {\n\
+  margin-top: 15px;\n\
+}\n\
+.sectionTitleWrapper .sectionTitle.smaller {\n\
+  white-space: nowrap;\n\
+}\n\
+.contributionStatementDetailTableContainer {\n\
+  margin-top: 25px;\n\
+  margin-bottom: 25px;\n\
+}\n\
+.contributionStatementDetailTable {\n\
+  width: 100%;\n\
+  border-width: 5px;\n\
+  border-style: solid;\n\
+  border-color: #f7f7f7;\n\
+}\n\
+.contributionStatementDetailTable tbody:before {\n\
+  line-height: 0.5em;\n\
+  content: "_";\n\
+  display: block;\n\
+  color: white;\n\
+}\n\
+.contributionStatementDetailTable thead tr.detailTableRow, .contributionStatementDetailTable tbody tr.detailTableRow {\n\
+  text-align: right;\n\
+}\n\
+.contributionStatementDetailTable thead tr.detailTableRow {\n\
+  background-color: #f7f7f7;\n\
+}\n\
+.detailTableRow th.rankColumn, .detailTableRow td.rankColumn {\n\
+  width: 30px;\n\
+}\n\
+.detailTableRow th.siteColumn, .detailTableRow td.siteColumn {\n\
+  text-align: left;\n\
+  padding-left: 40px;\n\
+}\n\
+.contributionStatementSummaryBox {\n\
+  margin-top: 25px;\n\
+  margin-bottom: 25px;\n\
+}\n\
+.contributionStatementSummaryBoxTable tbody tr td.leftColumn {\n\
+  text-align: right;\n\
+  padding: 10px;\n\
+  margin: 10px;\n\
+  background-color: #f7f7f7;\n\
+}\n\
+.contributionStatementSummaryBoxTable tbody tr td.rightColumn {\n\
+  text-align: center;\n\
+  padding: 10px;\n\
+  margin: 10px;\n\
+  border-style: solid;\n\
+  border-width: 3px;\n\
+  border-color: #e7e7e7;\n\
+  font-weight: bold;\n\
+}\n\
+.contributionStatementHeader {\n\
+  margin-top: 25px;\n\
+  margin-bottom: 25px;\n\
+  width: 100%;\n\
+}\n\
+.pull-left {\n\
+  float: left;\n\
+}\n\
+.pull-right {\n\
+  float: right;\n\
+}\n\
+      #braveLogo {\n\
+background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD0AAABICAYAAABFjf2bAAAACXBIWXMAAAsTAAALEwEAmpwYAAA7lGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxMTEgNzkuMTU4MzI1LCAyMDE1LzA5LzEwLTAxOjEwOjIwICAgICAgICAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIKICAgICAgICAgICAgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiCiAgICAgICAgICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICAgICAgICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgICAgICAgICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICAgICAgICAgICB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iCiAgICAgICAgICAgIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIgogICAgICAgICAgICB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyI+CiAgICAgICAgIDx4bXBNTTpEb2N1bWVudElEPmFkb2JlOmRvY2lkOnBob3Rvc2hvcDpjNGIzNDYyNi01ZGE2LTExNzktOGI5Ny04N2NjOWE1MjlkZjE8L3htcE1NOkRvY3VtZW50SUQ+CiAgICAgICAgIDx4bXBNTTpJbnN0YW5jZUlEPnhtcC5paWQ6NDZjYTg0ZTktNjA0Yy00YjUzLTk1NzktZTBlOTk5YzUwZTIyPC94bXBNTTpJbnN0YW5jZUlEPgogICAgICAgICA8eG1wTU06RGVyaXZlZEZyb20gcmRmOnBhcnNlVHlwZT0iUmVzb3VyY2UiPgogICAgICAgICAgICA8c3RSZWY6aW5zdGFuY2VJRD5hZG9iZTpkb2NpZDpwaG90b3Nob3A6ZDZjZjFlNjQtMDM5MC0xMTc5LTkwYzItYTg4ZWRjMTExZDM1PC9zdFJlZjppbnN0YW5jZUlEPgogICAgICAgICAgICA8c3RSZWY6ZG9jdW1lbnRJRD5hZG9iZTpkb2NpZDpwaG90b3Nob3A6ZDZjZjFlNjQtMDM5MC0xMTc5LTkwYzItYTg4ZWRjMTExZDM1PC9zdFJlZjpkb2N1bWVudElEPgogICAgICAgICA8L3htcE1NOkRlcml2ZWRGcm9tPgogICAgICAgICA8eG1wTU06T3JpZ2luYWxEb2N1bWVudElEPnhtcC5kaWQ6ODFGRjFENjNCQzEyMTFFNTkzN0JFRDI2NEE0RTU0REI8L3htcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD4KICAgICAgICAgPHhtcE1NOkhpc3Rvcnk+CiAgICAgICAgICAgIDxyZGY6U2VxPgogICAgICAgICAgICAgICA8cmRmOmxpIHJkZjpwYXJzZVR5cGU9IlJlc291cmNlIj4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OmFjdGlvbj5zYXZlZDwvc3RFdnQ6YWN0aW9uPgogICAgICAgICAgICAgICAgICA8c3RFdnQ6aW5zdGFuY2VJRD54bXAuaWlkOmFhYmE3NjNjLTBmMGQtNGNhMC04NWJiLTVlOWYwYzM5M2EwOTwvc3RFdnQ6aW5zdGFuY2VJRD4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OndoZW4+MjAxNi0wNS0xOVQxODo1MDowNi0wNzowMDwvc3RFdnQ6d2hlbj4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OnNvZnR3YXJlQWdlbnQ+QWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCk8L3N0RXZ0OnNvZnR3YXJlQWdlbnQ+CiAgICAgICAgICAgICAgICAgIDxzdEV2dDpjaGFuZ2VkPi88L3N0RXZ0OmNoYW5nZWQ+CiAgICAgICAgICAgICAgIDwvcmRmOmxpPgogICAgICAgICAgICAgICA8cmRmOmxpIHJkZjpwYXJzZVR5cGU9IlJlc291cmNlIj4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OmFjdGlvbj5zYXZlZDwvc3RFdnQ6YWN0aW9uPgogICAgICAgICAgICAgICAgICA8c3RFdnQ6aW5zdGFuY2VJRD54bXAuaWlkOjQ2Y2E4NGU5LTYwNGMtNGI1My05NTc5LWUwZTk5OWM1MGUyMjwvc3RFdnQ6aW5zdGFuY2VJRD4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OndoZW4+MjAxNi0wNS0xOVQxODo1MDowNi0wNzowMDwvc3RFdnQ6d2hlbj4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OnNvZnR3YXJlQWdlbnQ+QWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCk8L3N0RXZ0OnNvZnR3YXJlQWdlbnQ+CiAgICAgICAgICAgICAgICAgIDxzdEV2dDpjaGFuZ2VkPi88L3N0RXZ0OmNoYW5nZWQ+CiAgICAgICAgICAgICAgIDwvcmRmOmxpPgogICAgICAgICAgICA8L3JkZjpTZXE+CiAgICAgICAgIDwveG1wTU06SGlzdG9yeT4KICAgICAgICAgPHhtcDpDcmVhdG9yVG9vbD5BZG9iZSBQaG90b3Nob3AgQ0MgMjAxNSAoTWFjaW50b3NoKTwveG1wOkNyZWF0b3JUb29sPgogICAgICAgICA8eG1wOkNyZWF0ZURhdGU+MjAxNi0wMS0yNlQyMToyNjoyOC0wODowMDwveG1wOkNyZWF0ZURhdGU+CiAgICAgICAgIDx4bXA6TW9kaWZ5RGF0ZT4yMDE2LTA1LTE5VDE4OjUwOjA2LTA3OjAwPC94bXA6TW9kaWZ5RGF0ZT4KICAgICAgICAgPHhtcDpNZXRhZGF0YURhdGU+MjAxNi0wNS0xOVQxODo1MDowNi0wNzowMDwveG1wOk1ldGFkYXRhRGF0ZT4KICAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9wbmc8L2RjOmZvcm1hdD4KICAgICAgICAgPHBob3Rvc2hvcDpDb2xvck1vZGU+MzwvcGhvdG9zaG9wOkNvbG9yTW9kZT4KICAgICAgICAgPHRpZmY6T3JpZW50YXRpb24+MTwvdGlmZjpPcmllbnRhdGlvbj4KICAgICAgICAgPHRpZmY6WFJlc29sdXRpb24+NzIwMDAwLzEwMDAwPC90aWZmOlhSZXNvbHV0aW9uPgogICAgICAgICA8dGlmZjpZUmVzb2x1dGlvbj43MjAwMDAvMTAwMDA8L3RpZmY6WVJlc29sdXRpb24+CiAgICAgICAgIDx0aWZmOlJlc29sdXRpb25Vbml0PjI8L3RpZmY6UmVzb2x1dGlvblVuaXQ+CiAgICAgICAgIDxleGlmOkNvbG9yU3BhY2U+NjU1MzU8L2V4aWY6Q29sb3JTcGFjZT4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjYxPC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxZRGltZW5zaW9uPjcyPC9leGlmOlBpeGVsWURpbWVuc2lvbj4KICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9InciPz7B5c20AAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAET4SURBVHgBAOhEF7sA739JAO9/SQDvf0kA739JAO9/SQDvhUsA8IpMAPGPTgDwl00A75hMAPCWTQDwlU0A8JdNAPChRgDwokUA8aNEAPOqOwD0sDAA97cgBvi6GbL4uRrs+Lka5Pi5Guj4uRrn+Lka5vi5Gun4uRrv+Lka7/i5Gu/4uRrv+Lka7/i5Gu/4uRrv+Lka7/i5Gu/4uRrv+Lka7/i5Guv4uRrm+Lka5/i5Gu/4uhm197cgB/SwMADzqjsA8aREAO+fSQDvnkoA8JZNAPCVTQDwlk0A75lLAPCXTQDxj04A8IpMAO+FSwDvf0kA739JAO9/SQDvf0kA739JAADvf0kA739JAO9/SQDvf0kA739JAO+FSwDwikwA8Y9OAPCXTQDvmEwA8JZNAPCVTQDwl00A8KFGAPCiRQDxo0QA86o7APSwLgD1tCix9bMo//WzKf/1syn/9bMp//WzKf/1syn/9bMp//WzKf/1syn/9bMp//WzKf/1syn/9bMp//WzKf/1syn/9bMp//WzKf/1syn/9bMp//WzKf/1syn/9bMp//WzKP/1tCiz9LAuAPOqOwDxpEQA759JAO+eSgDwlk0A8JVNAPCWTQDvmUsA8JdNAPGPTgDwikwA74VLAO9/SQDvf0kA739JAO9/SQDvf0kAAO9/SQDvf0kA739JAO9/SQDvf0kA74VLAPCKTADxj04A8JdNAO+YTADwlk0A8JVNAPCXTQDwoUYA8KJFAPGjRADzrDkA9K8ynfSuNf/zrTX/8601//OtNf/zrTX/8601//OtNf/zrTX/8601//OtNf/zrTX/8601//OtNf/zrTX/8601//OtNf/zrTX/8601//OtNf/zrTX/8601//OtNf/zrTX/8601//SuNf/0rzKh86w5APGkRADvn0kA755KAPCWTQDwlU0A8JZNAO+ZSwDwl00A8Y9OAPCKTADvhUsA739JAO9/SQDvf0kA739JAO9/SQAA739JAO9/SQDvf0kA739JAO9/SQDvhUsA8IpMAPGPTgDwl00A75hMAPCWTQDwlU0A8JdNAPCiRQDwo0QA8aRCAPKoPofyqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD//8qg///KoP//yqD6L8aRCAO+fSADvnkoA8JZNAPCVTQDwlk0A75lLAPCXTQDxj04A8IpMAO+FSwDvf0kA739JAO9/SQDvf0kA739JAADvf0kA739JAO9/SQDvf0kA739JAO+FSwDwikwA8Y9OAPCXTQDvmEwA8JZNAPCVTQDwl00A8J9HAPChRQDwo0V08KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokb/8KJG//CiRv/wokV976FIAO+fSQDwlk0A8JVNAPCWTQDvmUsA8JdNAPGPTgDwikwA74VLAO9/SQDvf0kA739JAO9/SQDvf0kAAO9/SQDvf0kA739JAO9/SQDvf0kA74VLAPCKTADxj04A8JdNAO+YTADwlk0A8JZNAPCWTQDwlkwA75xLYe+dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnUv/751L/++dS//vnkpt8JpLAPCWTQDwlk0A8JZNAO+aSwDwl00A8Y9OAPCKTADvhUsA739JAO9/SQDvf0kA739JAO9/SQAA739JAO9/SQDvf0kA739JAO9/SQDvhUsA8IpMAPGQTgDwl00D75hNbfCXTWLwl0068JdNEvCXTVDwmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wmEz/8JhM//CYTP/wlk1f8JdNJfCXTUrwl01w75hMefCXTQbxkE4A8IpMAO+FSwDvf0kA739JAO9/SQDvf0kA739JAADvf0kA739JAO9/SQDvf0kA739JAO+FSwDwikwA8ZFNAPGUTqnxk07/8ZNO//GTTv/xk07m8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07/8ZNO//GTTv/xk07z8ZNO//GTTv/xk07/8ZROr/GRTQDwikwA74VLAO9/SQDvf0kA739JAO9/SQDvf0kAAO9/SQDvf0kA739JAO9/SQDvf0kA74VLAPCLTADwjU2h8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8IxN//CMTf/wjE3/8I1Nq/CLTADvhUsA739JAO9/SQDvf0kA739JAO9/SQAA739JAO9/SQDvf0kA739JAO+ASgDvhksA74hMmu+HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HS//ugUT/7n9A/+6CRP/vh0v/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74dM/++HTP/vh0z/74hMou+GSwDvgEoA739JAO9/SQDvf0kA739JAADvgEkA74BJAO+ASQDvgEkA74BKB+6DS5bugkr/7oJK/+6CSv/ugkr/7oJK/+6CSv/ugkr/7oNM/+18Qv/tdTn/7Xc7/+17Qf/uf0f/7oJK/+6CS//ugkr/7oJK/+6CS//ugkv/7n5E/+13O//tczX/7HM1/++ETf/wjVr/74NN/+xzNf/tczX/7Xc7/+5+RP/ugkv/7oJL/+6CSv/ugkr/7oJL/+6CSv/uf0b/7XtA/+13O//tdTj/7XxC/+6DTP/ugkr/7oJK/+6CSv/ugkr/7oJK/+6CSv/ugkr/7oNLo++ASgvvgEkA74BJAO+ASQDvgEkAAPB9SQDwfUkA8H1JAPB9SQDwfUlU8H1J//B9Sf/wfUn/8H1J//B9Sf/wfUn/8H1J//B+Sv/vdD3/8YFO//Sed//yi13/8X5K/+9wN//uaCz/720z/+90Pf/weEL/73I6/+5oLP/wdD3/8oxe//aujf/61ML//eri//7z7//96uL/+tTC//aujP/yjF3/8HQ9/+5oLP/vcjr/8HhB/+90PP/vbTL/7mgs/+9xOf/xf0z/8o1g//Shev/xgU//73Q8//B+Sv/wfUn/8H1J//B9Sf/wfUn/8H1J//B9Sf/wfUn/8H1JU/B9SQDwfUkA8H1JAPB9SQAA8HpHAPB6RwDwekcA8HpHAPB6R0LxeUf/8XlH//F5R//xeUf/8XlH//F5R//xekj/8HM///BuOP/61MT////////6+P/85Nr/+cy5//i5nv/1o4H/8ope//F8S//zjWP/9rKU//vVxf//+vn////////////////////////////////////////6+P/71cX/9rKU//OOY//xfU3/84xg//Wlg//3uqD/+s68//zm3f///Pz///////rUxf/wbzn/8HM+//F6SP/xeUf/8XlH//F5R//xeUf/8XlH//F5R//wekc78HpHAPB6RwDwekcA8HpHAADydkUA8nZFAPJ2RQDydkUA8nZFB/J1ROLydUT/8nVE//J1RP/ydUT/8nZF//JzQf/wYSr/+buj///////////////////////////////////////+9/T//u/q///6+f////////////////////////////////////////////////////////////////////////r5//7w6///+PX///////////////////////////////////////m7o//xYir/8nNB//J2Rf/ydUT/8nVE//J1RP/ydUT/8nVE3vJ2RQLydkUA8nZFAPJ2RQDydkUAAPRwQAD0cEAA9HBAAPRwQAD0cEAF83FA4vNxQP/zcUD/83FA//NxQP/0cUD/8loi//eeff////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////iff//yWiL/9HFA//NxQP/zcUD/83FA//NxQP/zcUDi9HBAB/RwQAD0cEAA9HBAAPRwQAAA9Wo6APVqOgD1ajoA9Wo6APRsPIb0bDz/9Gw8//RsPP/0bDz/9G4+//NbJv/2f1b///f0//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////f0//aAV//zWyb/9G4+//RsPP/0bDz/9Gw8//RsPP/0bDyL9Wo6APVqOgD1ajoA9Wo6AAD1ZzYA9Wc2APVnNgD1Zzch9Gk5+/RpOf/0aTn/9Gk5//RqOv/0Xyz/82Eu//3m3////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////ebf//NiMP/0Xyz/9Go6//RpOf/0aTn/9Gk5//RpOf31Zzck9Wc2APVnNgD1ZzYAAPZmNAD2ZjQA9mY0APVmNa31ZjX/9WY1//VmNf/1Zjb/9WMy//RTHP/7wKz/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+8Kv//RTHP/1YzL/9WY2//VmNf/1ZjX/9WY1//VmNbL2ZjQA9WY1APVmNQAA92IwAPdiMAD3YjBC9mMx//ZjMf/2YzH/9mMx//djMf/1TRT/+ZFu///////////////////////+8ez/+7CX//mUcv/6lHL/+ZJv//iFXv/4g1z/+pp5//zFs///9vT///////////////////////////////////////////////////////////////////////718v/8xLH/+ph3//iDW//4hF3/+ZBt//mRb//5k2//+6+W//7x7P//////////////////////+ZNw//VNFP/3YzH/9mMx//ZjMf/2YzH/9mMx//diMEf3YC0A92AtAAD4XigA+F8qAPhfLdH4Xy3/+F8t//hfLf/4YS7/91Ia//hhL//+7ef////////////////////////49v/8wa3/+YRd//dRGv/2PAD/9kAD//ZJDv/2SRD/91Md//huP//7nn///dHC//////////////////////////////////////////////////3Qwv/7nX7/+Gw+//dTHP/2ShD/9kkO//ZAA//1PQD/91Ue//mHYP/8xLD///j2////////////////////////7un/+GMx//dRGv/4YS7/+F8t//hfLf/4Xy3/+F8s1vhdKgD4XSkAAPhcIQD4XiRk+F4m//hdJv/4XSb/+F4m//hbI//3Rwj//caz/////////////////////////////////////////////u/q//y/qf/6hVv/+Fge//dFBP/3TQ//904S//dHCf/3Sg3/+YJW//7z7/////////////////////////////7z7v/5gVX/90oM//dICf/3ThL/900P//dFBP/4WSD/+ode//3Brf//8u3////////////////////////////////////////////9ybb/90gJ//hbI//4Xib/+F0m//hdJv/4Xib/+F4ma/hdJAAA+FshEfhbIu34WyH/+Fsh//hbIf/4WyH/90oK//qJX//////////////////////////////////////////////////////////////////93M///KmK//lyP//4UBH/+E0O//hWGv/3QQD//dnL/////////////////////////////dnK//dCAP/4Vxr/+E0O//hQEv/5c0H//KuM//3e0v/////////////////////////////////////////////////////////////////6iF3/90oJ//hbIf/4WyH/+Fsh//hbIf/4WyHx+FsgFAD5WRyR+Vkd//lZHf/5WR3/+Vkd//lVFv/5VRf//t/T//////////////////////////////////////////////////////////////////////////////n3//3Gsv/7cT7/+UQD//pjKv//7+n/////////////////////////////7+n/+mMq//lEA//7cj///ci0///6+P////////////////////////////////////////////////////////////////////////////7e0v/5Vxn/+VQW//lZHf/5WR3/+Vkd//lZHf/5WRyZAPpXF/D6Vxf/+lcX//pXF//6Vxf/+ksG//pxO//////////////////////////////////////////////////////////////////////////////////////////////38//6Vxr/+3Q////////////////////////////////////////7dD//+lca///49P////////////////////////////////////////////////////////////////////////////////////////////t0QP/6SgX/+lcX//pXF//6Vxf/+lcX//pXF/EA+1UPt/tVD//7VQ//+1UP//tVD//7SgD/+28w//////////////////////////////////////////////////////////////////////////////////////////////////yLW//8hVL///////////////////////////////////////yFUv/8jFv/////////////////////////////////////////////////////////////////////////////////////////////////+28w//tKAP/7VQ//+1UP//tVD//7VQ//+1UPtAD8VAN0/FQD//xUA//8VAP//FQD//xRAP/8SgH//8Wn/////////////////////////////////////////////////////////////////////////////////////////////YpS//2rhP///////////////////////////////////////a2F//2JUf/////////////////////////////////////////////////////////////////////////////////////////////Co//8SQD//FEA//xUA//8VAP//FQD//xUA//8VARyAP1TADv9UwD//VMA//1TAP/9UwD//VMA//1IAP/9TAD//9jC///////////////////////////////////////////////////////////////////////////////////w6f/9YhX//97N////////////////////////////////////////39D//WAT///v6P/////////////////////////////////////////////////////////////////////////////////+07v//UkA//1JAP/9UwD//VMA//1TAP/9UwD//VMA//1TADsA/lIAB/5SAOT+UgD//lIA//5SAP/+UgD//lQA//5CAP/+Tgr//9C2/////////////////////////////////////////////////////////////////////////////ql///5dEf///fz////////////////////////////////////////9/P/+XRH//qh8/////////////////////////////////////////////////////////////////////////////86z//5MBv/+QgD//lQA//5SAP/+UgD//lIA//5SAP/+UgDk/lIABgD/UQAA/1EArP9RAP//UQD//1EA//9RAP//UQD//1MA//9BAP//SwT//8Wp////////////////////////////////////////////////////////////////////////XBP//39E//////////////////////////////////////////////////+BRv//WxH////////////////////////////////////////////////////////////////////////Cpf//SQH//0IA//9TAP//UQD//1EA//9RAP//UQD//1EA//9RAKz/UQAAAP9QAAD/UABn/1AA//9QAP//UAD//1AA//9QAP//UQD//1IA//9DAP//PwD//76d/////////////////////////////////////////////////////////////9XC//8qAP//vp///////////////////////////////////////////////////7+i//8qAP//07//////////////////////////////////////////////////////////////vJr//z8A//9DAP//UgD//1EA//9QAP//UAD//1AA//9QAP//UAD//1AAZ/9QAAAA/lEAAP5RACr+UQD//lEA//5RAP/+UQD//lEA//5RAP/+UQD//lMA//5EAP/+PgD//7SO///////////////////////////////////////////////////////+kFv//iwA//+vi///9O/////////////////////////////////////////18P//sIz//iwA//6NWP///////////////////////////////////////////////////////7GL//49AP/+RQD//lMA//5RAP/+UQD//lEA//5RAP/+UQD//lEA//5RAP/+UQAq/lEAAAD/UAAA/1AABP9QANf/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1IA//9GAP//PwD//6Z///////////////////////////////////////////////////+Yaf//LgD//00A//9kHP//hE3//6N7//+9n///zLX//8Gl//+pgf//iFP//2Ue//9NAP//LgD//5ho//////////////////////////////////////////////////+lfP//PgD//0cA//9SAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA2P9QAAT/UAAAAP9PAAD/TwAA/08An/9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//1EA//9HAP//NgD//55x//////////////////////////////////////////////Hq//9xNP//MQD//0EA//89AP//NQD//z0A//9HAP//PwD//zQA//88AP//QQD//zEA//9wNP//8er/////////////////////////////////////////////nW///zcA//9HAP//UQD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwCh/08AAP9PAAAA/08AAP9PAAD/TwBh/08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//1EA//9IAP//MgD//5hp///+/v////////////////////////////////////////z4//+IVf//NgD//0oA//9RAP//TAD//0kA//9MAP//UAD//0oA//81AP//h1T///z4/////////////////////////////////////////v7//5do//8zAP//SQD//1EA//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAGP/TwAA/08AAAD/TwAA/08AAP9PACP/TwD8/08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//1AA//9FAP//QgD//9nH//////////////////////////////////////////////////+bcP//OAD//0YA//9RAP//TwD//1EA//9GAP//OAD//5lu///////////////////////////////////////////////////byv//QwD//0UA//9QAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD9/08AJP9PAAD/TwAAAP9PAAD/TwAA/08AAP9PAM7/TwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//0cA//9OAP//49b///////////////////////////////////////////////////////+wjf//QAD//0EA//9TAP//QgD//z4A//+ui////////////////////////////////////////////////////////+bb//9QA///RgD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAND/TwAA/08AAP9PAAAA/08AAP9PAAD/TwAA/08Ajv9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9RAP//NgD//4tW///////////////////////////////////////////////////////////////////Eqf//UAv//0IA//9QCf//w6b//////////////////////////////////////////////////////////////////45b//82AP//UAD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwD//08AkP9PAAD/TwAA/08AAAD/TwAA/08AAP9PAAD/TwBX/04A//9OAP//TgD//04A//9OAP//TgD//04A//9OAP//TgD//0oA//9BAP//0r3///////////////////////////////////////////////////////////////////////+2kv//GAD//7OO////////////////////////////////////////////////////////////////////////1sP//0MA//9JAP//TgD//04A//9OAP//TgD//04A//9OAP//TgD//04A//9OAP//TwBZ/08AAP9PAAD/TwAAAP9OAAD/TgAA/04AAP9OABz/TgD3/04A//9OAP//TgD//04A//9OAP//TgD//04A//9OAP//PAD//20n/////////////////////////////////////////////////////////////////////////////6B2//8fAP//nXH/////////////////////////////////////////////////////////////////////////////cCz//zsA//9OAP//TgD//04A//9OAP//TgD//04A//9OAP//TgD//04A+P9OAB//TgAA/04AAP9OAAAA/04AAP9OAAD/TgAA/04AAP9PAMr/TwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//86AP//f0T///////////////////////////////////////////////////////////////////////+le///QQD//0sA//9AAP//oXf///////////////////////////////////////////////////////////////////////+CSf//OwD//08A//9PAP//TwD//08A//9PAP//TwD//08A//9PAP//TwDM/04AAP9OAAD/TgAA/04AAAD/UAAA/1AAAP9QAAD/UAAA/1AAh/9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//0EA//9nIP//+vj/////////////////////////////////////////////////////////////lWf//zoA//9JAP//UwD//0oA//85AP//kWL/////////////////////////////////////////////////////////////+/r//2kj//9AAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAIr/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UABG/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//TQD//z0A///Irf//////////////////////////////////////////////////+fT//4pX//8zAP//PgD//0AA//8/AP//PwD//z4A//8zAP//hlP///fy///////////////////////////////////////////////////Lsv//PgD//00A//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AASv9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QABL/UADx/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9RAP//PgD//2ko///+/f///////////////////////////////////////9G6//9oJf//JgD//zMA//9cFf//lGT//8On//+XZ///XRf//zQA//8mAP//ZB///821//////////////////////////////////////////3//2or//89AP//UQD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAPL/UAAU/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QALz/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//PQD//4BK///59f///////////////////////9C9//+FU///NAD//zEA//9tL///tZL//+7n///////////////////w6f//t5X//28z//8zAP//MgD//4FP///Nt/////////////////////////r2//+BS///PQD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAwP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAgv9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1EA//9PAP//OgD//3I5///czP//+PX//9G7//98R///NgD//yYA//9tNP//vqL///z6/////////////////////////////////////////vv//8Ko//90PP//KQD//zIA//93QP//z7j///fz///by///czr//zoA//9PAP//UQD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UACG/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAA+/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1EA//9QAP//PQD//08A//9pIP//PQD//yMA//9mIv//v6L////////////////////////////////////////////////////////////////////////Irv//cTL//ycA//85AP//aB///04A//89AP//UAD//1EA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAEP/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UQAA/1EAAP9RAAD/UQAA/1EAAP9RAAz/UQDo/1EA//9RAP//UQD//1EA//9RAP//UQD//1EA//9RAP//UQD//1EA//9SAP//SQD//zgA//9ZEv//wKD///37////////////////////////////////////////////////////////////////////////////////////////zrf//18c//83AP//SQD//1IA//9RAP//UQD//1EA//9RAP//UQD//1EA//9RAP//UQD//1EA//9RAP//UQDr/1EADv9RAAD/UQAA/1EAAP9RAAD/UQAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAKz/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//PwD//2wn////////////////////////////////////////////////////////////////////////////////////////////////////////bi3//0AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QALH/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAc/9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//QwD//20z///ezf//////////////////////////////////////////////////////////////////////////////////2cX//2Yn//9CAP//UQD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAef9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAA5/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1EA//9QAP//OgD//00I//+ykv///////////////////////////////////////////////////////////////////////62L//9LBP//OwD//1AA//9RAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAA//1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAf/UADi/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9SAP//RgD//zgA//+EU///8un///////////////////////////////////////////////////Ho//+CUP//NwD//0cA//9SAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA6P9QAAr/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAKf/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9RAP//TAD//zQA//9kJ///5Nb////////////////////////////////////////l1v//Yyb//zQA//9NAP//UQD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UACu/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAY/9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9RAP//UAD//zsA//9SEf//0bj/////////////////////////////07v//1MR//87AP//UAD//1EA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAGr/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAp/1AA/v9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UgD//z8A//9JAv//v6T//////////////////8Gm//9JA///PwD//1IA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAL/9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UADS/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UgD//0EA//9BAP//rYf//+TX//+sh///QgD//0EA//9SAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QANn/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAG3/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UgD//0kA//9DAP//UgP//0IA//9JAP//UgD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAdP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AACv9QAOL/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//04A//9KAP//TwD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAOf/UAAN/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AATf9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAUv9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAhP9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAIf/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAlP9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UACX/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAcf9QAPf/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD4/1AAcv9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAJf9QAK//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAsP9QACX/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAGD/UADi/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA5P9QAGL/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QABn/UACi/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAKb/UAAc/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UABV/1AA3/9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAOT/UABZ/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAV/1AAmv9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UACe/1AAGP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAUf9QAN7/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UADi/1AAVv9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AADf9QAJj/UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AAn/9QABH/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAFz/UADr/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAP//UAD//1AA8P9QAGT/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QACr/UADH/1AA//9QAP//UAD//1AA//9QAP//UAD//1AA//9QAM7/UAAx/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UACO/1AA//9QAP//UAD//1AA//9QAP//UACX/1AAAf9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UABc/1AA0P9QAO//UADU/1AAY/9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAD/UAAA/1AAAP9QAAABAAD//2YyukhnqUCJAAAAAElFTkSuQmCC);\n\
+background-size: 41px 50px;\n\
+width: 41px;\n\
+height: 50px;\n\
+display: inline-block;\n\
+       }\n\
+  .detailTableRow .siteColumn img {\n\
+    width: 1.5em;\n\
+    height: 1.5em;\n\
+    margin-right: 6px;\n\
+    vertical-align: middle;\n\
+  }\n\
+span.verified {\n\
+  height: 20px;\n\
+  width: 20px;\n\
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MS41MSA3MS44Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzcyYmY0NDt9LmNscy0ye2ZpbGw6I2ZmZjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnZlcmlmaWVkX2dyZWVuX2ljb248L3RpdGxlPjxnIGlkPSJMYXllcl8yIiBkYXRhLW5hbWU9IkxheWVyIDIiPjxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNLjA3LDE4LjA2LDMwLjY4LDAsNjEuNTEsMTguMDZWNTMuNDJMMzEuMTIsNzEuOC4xLDUzLjg2Uy0uMSwzNC42Mi4wNywxOC4wNloiLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMTcuNTQgMjkuNTMgMTMuMDEgMzQuMDYgMjkuNDMgNTAuNDUgNTIuNDIgMjcuNTkgNDcuMTkgMjIuNzEgMjkuMzcgNDAuODggMTcuNTQgMjkuNTMiLz48L2c+PC9nPjwvc3ZnPg==) center no-repeat;\n\
+  display: inline-block;\n\
+  position: relative;\n\
+  vertical-align: middle;\n\
+}\n\
+.detailTableRow span.verified {\n\
+  left: -25px;\n\
+}\n\
+span.verified + span.site {\n\
+  position: relative;\n\
+  left: -20px;\n\
+}\n\
+span.site {\n\
+  vertical-align: middle;\n\
+}\n\
+div.verifiedExplainer {\n\
+  margin-top: 10px;\n\
+  margin-left: 10px;\n\
+}\n\
+div.footerNoteBox {\n\
+  background-color: #f7f7f7;\n\
+  padding: 20px;\n\
+}\n\
+span.noteHeading {\n\
+  color: #ff5000;\n\
+  margin-bottom: 5px;\n\
+}\n\
+div.pageFooterBox {\n\
+  padding: 20px;\n\
+}\n\
+span.pageFooterBody {\n\
+  color: #aaaaaa;\n\
+}\n\
+span.noteBody {\n\
+}\n\
+'}} />
+    )
+  }
+
+  render () {
+    return (
+      <div className='contributionStatementContainer'>
+        { this.staticStyles }
+        <div className='contributionStatementSection'>
+          {this.ContributionStatementHeader}
+        </div>
+        <div className='contributionStatementSection'>
+          {this.ContributionStatementSummaryBox}
+        </div>
+        <div className='contributionStatementSection'>
+          {this.ContributionStatementDetailTable}
+        </div>
+        <div className='contributionStatementSection'>
+          {this.ContributionStatementFooterNoteBox}
+        </div>
+        <div className='contributionStatementSection'>
+          {this.ContributionStatementPageFooter}
+        </div>
+      </div>
+    )
   }
 }
 
@@ -1937,6 +2293,10 @@ class AboutPreferences extends React.Component {
 
 function formattedDateFromTimestamp (timestamp) {
   return moment(new Date(timestamp)).format('YYYY-MM-DD')
+}
+
+function formattedTimeFromTimestamp (timestamp) {
+  return moment(new Date(timestamp)).format('HH:mm a')
 }
 
 function formattedTimeFromNow (timestamp) {
