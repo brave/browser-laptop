@@ -1,0 +1,317 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+@import "./common.less";
+
+* {
+  box-sizing: border-box;
+}
+
+
+strong, div, span, li, em, p, a {
+  font-weight: 200;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: @darkGray;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul {
+  display: inline-block;
+  li {
+    display: inline-block;
+    vertical-align: middle;
+    list-style-type: none;
+  }
+}
+
+#appContainer > div {
+  height: auto; // overrides default #appContainer > div: 100%
+}
+
+.dynamicBackground {
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  flex: 1;
+}
+
+.gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  height: 400px;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 100vh;
+  padding: 40px 60px;
+
+  .statsBar {
+    padding: 40px 0;
+    display: flex;
+    justify-content: space-between;
+
+    .statsBlock {
+      margin-right: 40px;
+      margin-bottom: 20px;
+
+      span {
+        display: block;
+      }
+
+      .counter {
+        font-size: 44px;
+        line-height: 53px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 200px;
+
+        &.trackers {
+          color: @statsYellow;
+        }
+        &.ads {
+          color: @statsOrange
+        }
+        &.https {
+          color: @statsRed
+        }
+        &.timeSaved {
+          color: @statsBlue
+        }
+
+        .text {
+          display: inline;
+          color: @statsBlue;
+          font-size: 20px;
+          line-height: 24px;
+        }
+      }
+
+      .statsText {
+        font-size: 14px;
+        color: #fff;
+      }
+    }
+
+    .clock {
+      line-height: 1;
+
+      .time {
+        font-size: 75px;
+        font-weight: 400;
+        color: #fff;
+      }
+
+      .dayTime {
+        font-size: 51px;
+        color: #fff;
+      }
+    }
+  }
+
+  .topSitesContainer {
+    width: 100%;
+    text-align: right;
+
+    .toggleTopSitesGridIcon {
+      outline: none;
+      background: 0 0 / contain no-repeat;
+      display: flex;
+      border: 0;
+      cursor: pointer;
+      margin-left: auto;
+      width: 30px;
+      height: 30px;
+      font-size: 30px;
+      margin-bottom: 20px;
+      transition: @transitionFast;
+
+      &.hasThreeRows {
+        background: url('../../img/topsites_btn_3.svg');
+      }
+      &.hasTwoRows {
+        background: url('../../img/topsites_btn_2.svg');
+      }
+      &.hasOneRow {
+        background: url('../../img/topsites_btn_1.svg');
+      }
+    }
+
+    .topSitesGrid {
+      width: 510px;
+      display: inline-block;
+      text-align: left;
+
+      .topSiteSquareSpace {
+        margin-left: 5px;
+        margin-bottom: 5px;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .topSitesElement {
+        position: relative;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+
+        &:hover {
+          .topSitesActionContainer {
+            visibility: visible;
+            opacity: 1;
+          }
+        }
+
+        .topSitesActionContainer {
+          visibility: hidden;
+          opacity: 0;
+          position: absolute;
+          z-index: 3;
+          top: 3px;
+          left: 0;
+          right: 0;
+          margin: auto;
+          padding: 3px;
+          max-width: 90%;
+          display: flex;
+          justify-content: space-between;
+          background-color: @gray25;
+          border-radius: @borderRadius;
+
+          .topSitesActionBtn {
+            transition: @transitionFast;
+            width: 14px;
+            height: 14px;
+            font-size: 14px;
+            outline: none;
+            border: none;
+            background-color: transparent;
+            color: @black50;
+            &:hover {
+              color: black;
+            }
+          }
+        }
+
+        .topSitesElementFavicon {
+          position: relative;
+          background-color: @defaultIconBackground;
+          border-radius: @borderRadius;
+          color: @gray;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 80px;
+          height: 80px;
+          font-size: 38px;
+
+          .pinnedTopSite {
+            opacity: 1;
+            visibility: visible;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background-color: @gray25;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .pin {
+              font-size: 10px;
+              color: black;
+            }
+
+          }
+          img {
+            width: 32px;
+            height: 32px;
+          }
+        }
+        &:hover {
+          .pinnedTopSite {
+            opacity: 0;
+            visibility: hidden;
+          }
+        }
+      }
+    }
+  }
+
+  .footerContainer {
+    display: flex;
+    justify-content: space-between;
+
+    .copyrightNotice {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      line-height: 1.3;
+
+      .copyrightCredits {
+        &, .photoBy, .copyrightOwner {
+          color: #fff;
+          text-transform: uppercase;
+        }
+
+        .copyrightOwner {
+          text-decoration: underline;
+        }
+        .copyRightYear {
+          position: relative;
+          &:after {
+            position: absolute;
+            right: 0;
+            content: '©';
+          }
+        }
+      }
+
+      .photoName {
+        color: @white50;
+      }
+    }
+
+    .shortcutsContainer {
+      display: flex;
+
+      .shortcutIcon {
+        display: flex;
+        width: 35px;
+        height: 35px;
+        margin: 15px 5px;
+
+        &.settingsIcon {
+          background: url('../../img/settings_prefs_btn.svg') 0 0 / contain no-repeat;
+        }
+        &.bookmarksIcon {
+          background: url('../../img/bookmarks_btn.svg') 0 0 / contain no-repeat;
+        }
+        &.historyIcon {
+          background: url('../../img/history_btn.svg') 0 0 / contain no-repeat;
+        }
+      }
+    }
+  }
+}
