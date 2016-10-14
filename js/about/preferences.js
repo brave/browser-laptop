@@ -555,7 +555,7 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get htmlDataURL () {
-    return 'data:text/html,' + encodeURIComponent(ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} />))
+    return 'data:text/html,' + encodeURIComponent('<html><body style="-webkit-print-color-adjust:exact">' + ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} />) + '</body></html>')
   }
 
   get csvDataURL () {
@@ -668,8 +668,8 @@ class ContributionStatement extends ImmutableComponent {
           <table className='contributionStatementDetailTable' style={detailTableStyle}>
             <thead>
               <tr style={{'text-align': 'right', 'background-color': '#f7f7f7'}}>
-                <th>Rank</th>
-                <th style={{'text-align': 'left', 'padding-left': '15px'}}>Site</th>
+                <th style={{'width': '30px'}}>Rank</th>
+                <th style={{'text-align': 'left', 'padding-left': '40px'}}>Site</th>
                 <th>% Paid</th>
                 <th>$ Paid</th>
               </tr>
@@ -679,8 +679,8 @@ class ContributionStatement extends ImmutableComponent {
               this.rows.map(function (row, idx) {
                 return (
                   <tr style={{'text-align': 'right'}}>
-                    <td style={{'width': '15px'}}>{idx}</td>
-                    <td style={{'text-align': 'left', 'padding-left': '15px'}}>{row[0]}</td>
+                    <td style={{'width': '30px'}}>{idx}</td>
+                    <td style={{'text-align': 'left', 'padding-left': '40px'}}>{row[0]}</td>
                     <td>{(parseFloat(row[2]) * 100).toFixed(2)}</td>
                     <td>{row[4]}</td>
                   </tr>
@@ -712,10 +712,14 @@ class ContributionStatement extends ImmutableComponent {
   margin: 0;\n\
   padding: 0;\n\
 }\n\
+.sectionTitleWrapper .sectionTitle {\n\
+  color: #3B3B3B;\n\
+  font-size: 28px;\n\
+}\n\
 .sectionTitleWrapper .sectionSubTitle {\n\
   color: #ff5000;\n\
   font-size: 15px;\n\
-  bottom: 25px;\n\
+  top: 0px;\n\
   right: 19px;\n\
 }\n\
   .pull-left {\n\
@@ -723,10 +727,6 @@ class ContributionStatement extends ImmutableComponent {
 }\n\
   .pull-right {\n\
   float: right;\n\
-}\n\
-.sectionTitleWrapper .sectionTitle {\n\
-  color: #ff5000;\n\
-  font-size: 28px;\n\
 }\n\
       "}
       </style>
