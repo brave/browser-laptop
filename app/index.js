@@ -367,7 +367,7 @@ app.on('ready', () => {
       title = ''
     }
     buttons = ['OK']
-    message = message.toString()
+    message = message ? message.toString() : ''
     dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
       title: title,
