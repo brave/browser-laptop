@@ -1177,7 +1177,7 @@ class PaymentsTab extends ImmutableComponent {
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           </div>
-          <Button l10nId='advancedSettings' className='whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} />
+          { this.enabled ? <Button l10nId='advancedSettings' className='whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
         </div>
       </div>
       {
