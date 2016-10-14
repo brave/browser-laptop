@@ -9,10 +9,12 @@
 			"type": "node",
 			// Workspace relative or absolute path to the program.
 			"program": "${workspaceRoot}/app/index.js",
+			// launch or attach
+			"request": "launch",
 			// Automatically stop program after launch.
 			"stopOnEntry": false,
 			// Command line arguments passed to the program.
-			"args": [".", "-enable-logging", "--v=0", "--enable-dcheck"],
+			"args": [".", "-enable-logging", "--v=0", "--enable-dcheck", "--debug=5858"],
 			// Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
 			"cwd": "${workspaceRoot}",
 			// Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.
@@ -37,10 +39,12 @@
 			"type": "node",
 			// Workspace relative or absolute path to the program.
 			"program": "${workspaceRoot}/Brave-darwin-x64/Brave.app/Contents/Resources/app.asar/app/index.js",
+			// launch or attach
+			"request": "launch",
 			// Automatically stop program after launch.
 			"stopOnEntry": false,
 			// Command line arguments passed to the program.
-			"args": [".", "-enable-logging", "--v=0", "--enable-dcheck"],
+			"args": [".", "-enable-logging", "--v=0", "--enable-dcheck", "--debug=5858"],
 			// Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
 			"cwd": "${workspaceRoot}",
 			// Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.
