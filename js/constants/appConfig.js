@@ -36,15 +36,15 @@ module.exports = {
     url: getTargetAboutUrl('about:flash')
   },
   adblock: {
-    alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/2/{uuid}.dat',
+    alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
     version: '2',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
   safeBrowsing: {
-    url: 'https://s3.amazonaws.com/safe-browsing-data/{version}/SafeBrowsingData.dat',
-    version: '1',
+    url: 'https://s3.amazonaws.com/adblock-data/{version}/SafeBrowsingData.dat',
+    version: '2',
     msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
     enabled: true
   },
