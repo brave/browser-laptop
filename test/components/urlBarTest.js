@@ -78,5 +78,14 @@ describe('urlBar', function () {
             .then((val) => val === 'https://brave.com')
         })
     })
+
+    it('autocompletes without losing characters', function * () {
+      yield this.app.client
+        .keys('a\uE008\uE008b\uE008\uE008o\uE008\uE008u\uE008\uE008t\uE008\uE008x')
+        .waitUntil(function () {
+          return this.getValue(urlInput)
+            .then((val) => val === 'aboutx')
+        })
+    })
   })
 })

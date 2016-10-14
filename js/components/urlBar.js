@@ -10,6 +10,7 @@ const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
 const cx = require('../lib/classSet')
+const debounce = require('../lib/debounce')
 const ipc = global.require('electron').ipcRenderer
 
 const UrlBarSuggestions = require('./urlBarSuggestions')
@@ -42,6 +43,12 @@ class UrlBar extends ImmutableComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.activateSearchEngine = false
     this.searchSelectEntry = null
+    this.showAutocompleteResult = debounce(() => {
+      const suffixLen = this.props.locationValueSuffix.length
+      this.urlInput.value = this.defaultValue
+      const len = this.defaultValue.length
+      this.urlInput.setSelectionRange(len - suffixLen, len)
+    }, 300)
   }
 
   get activeFrame () {
@@ -296,17 +303,18 @@ class UrlBar extends ImmutableComponent {
     this.updateDOM()
   }
 
+  get defaultValue () {
+    return this.locationValue + this.props.locationValueSuffix
+  }
+
   componentDidUpdate (prevProps) {
     // Select the part of the URL which was an autocomplete suffix.
     if (this.urlInput && this.props.locationValueSuffix.length > 0 &&
       (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
        this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
-      const suffixLen = this.props.locationValueSuffix.length
-      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
-      const len = this.urlInput.value.length
-      this.urlInput.setSelectionRange(len - suffixLen, len)
+      this.showAutocompleteResult()
     } else if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
-      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+      this.urlInput.value = this.defaultValue
     }
     if (this.isSelected() !== prevProps.urlbar.get('selected') ||
       this.isFocused() !== prevProps.urlbar.get('focused')) {
@@ -392,7 +400,7 @@ class UrlBar extends ImmutableComponent {
   render () {
     const value = this.isActive || (!this.locationValue && this.isFocused())
       ? undefined
-      : this.locationValue + this.props.locationValueSuffix
+      : this.defaultValue
     return <form
       className='urlbarForm'
       action='#'
