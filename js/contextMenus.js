@@ -993,7 +993,7 @@ function mainTemplateInit (nodeProps, frame) {
           tags: [siteTags.BOOKMARK]
         }, false))
       } else {
-        if (!isExtensionPage) {
+        if (isExtensionPage) {
           template.push(
             addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
             {
