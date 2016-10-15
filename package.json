@@ -87,7 +87,7 @@
     "font-awesome-webpack": "0.0.4",
     "immutable": "^3.7.5",
     "immutablediff": "^0.4.2",
-    "immutablepatch": "^0.2.2",
+    "immutablepatch": "brave/immutable-js-patch",
     "keytar": "^3.0.0",
     "l20n": "^3.5.1",
     "ledger-balance": "^0.8.61",
