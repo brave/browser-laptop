@@ -1075,13 +1075,14 @@ function mainTemplateInit (nodeProps, frame) {
       })
     }
   }
-
-  template.push({
-    label: locale.translation('inspectElement'),
-    click: (item, focusedWindow) => {
-      webviewActions.inspectElement(nodeProps.x, nodeProps.y)
-    }
-  })
+  if (!isExtensionPage) {
+    template.push({
+      label: locale.translation('inspectElement'),
+      click: (item, focusedWindow) => {
+        webviewActions.inspectElement(nodeProps.x, nodeProps.y)
+      }
+    })
+  }
 
   const passwordManager = getActivePasswordManager()
   if (passwordManager.get('extensionId') && !isExtensionPage) {
