@@ -21,6 +21,7 @@ const eventUtil = require('../lib/eventUtil')
 const cx = require('../lib/classSet')
 const locale = require('../l10n')
 const windowStore = require('../stores/windowStore')
+const suggestion = require('../../app/renderer/lib/suggestion')
 
 class UrlBarSuggestions extends ImmutableComponent {
   constructor (props) {
@@ -149,8 +150,8 @@ class UrlBarSuggestions extends ImmutableComponent {
       }))
       index += suggestions.size
     }
-    addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
     addToItems(historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
+    addToItems(bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
     addToItems(aboutPagesSuggestions, 'aboutPagesTitle', locale.translation('aboutPagesSuggestionTitle'), null)
     addToItems(tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
     addToItems(searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
@@ -254,32 +255,11 @@ class UrlBarSuggestions extends ImmutableComponent {
         if (pos1 - pos2 !== 0) {
           return pos1 - pos2
         } else {
-          // If there's a tie on the match location, use the shorter URL
-          return s1.get('location').length - s2.get('location').length
+          // If there's a tie on the match location, use the age
+          // decay modified access count
+          return suggestion.sortByAccessCountWithAgeDecay(s1, s2)
         }
       }
-    }
-
-    // bookmarks
-    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
-      suggestions = suggestions.concat(mapListToElements({
-        data: props.sites,
-        maxResults: config.urlBarSuggestions.maxBookmarkSites,
-        type: suggestionTypes.BOOKMARK,
-        clickHandler: navigateClickHandler((site) => {
-          return site.get('location')
-        }),
-        sortHandler: sortBasedOnLocationPos,
-        formatTitle: (site) => site.get('title'),
-        formatUrl: (site) => site.get('location'),
-        filterValue: (site) => {
-          const title = site.get('title') || ''
-          const location = site.get('location') || ''
-          return (title.toLowerCase().includes(urlLocationLower) ||
-            location.toLowerCase().includes(urlLocationLower)) &&
-            site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
-        }
-      }))
     }
 
     // history
@@ -300,6 +280,28 @@ class UrlBarSuggestions extends ImmutableComponent {
           return (title.toLowerCase().includes(urlLocationLower) ||
             location.toLowerCase().includes(urlLocationLower)) &&
             (!site.get('tags') || site.get('tags').size === 0)
+        }
+      }))
+    }
+
+    // bookmarks
+    if (getSetting(settings.BOOKMARK_SUGGESTIONS)) {
+      suggestions = suggestions.concat(mapListToElements({
+        data: props.sites,
+        maxResults: config.urlBarSuggestions.maxBookmarkSites,
+        type: suggestionTypes.BOOKMARK,
+        clickHandler: navigateClickHandler((site) => {
+          return site.get('location')
+        }),
+        sortHandler: sortBasedOnLocationPos,
+        formatTitle: (site) => site.get('title'),
+        formatUrl: (site) => site.get('location'),
+        filterValue: (site) => {
+          const title = site.get('title') || ''
+          const location = site.get('location') || ''
+          return (title.toLowerCase().includes(urlLocationLower) ||
+            location.toLowerCase().includes(urlLocationLower)) &&
+            site.get('tags') && site.get('tags').includes(siteTags.BOOKMARK)
         }
       }))
     }

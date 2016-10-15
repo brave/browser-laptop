@@ -124,6 +124,10 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId) => {
   if (newSiteDetail.get('themeColor') || oldSiteDetail && oldSiteDetail.get('themeColor')) {
     site = site.set('themeColor', newSiteDetail.get('themeColor') || oldSiteDetail.get('themeColor'))
   }
+  if (site.get('tags').size === 0) {
+    // Increment the visit count for history items
+    site = site.set('count', ((oldSiteDetail || site).get('count') || 0) + 1)
+  }
 
   return site
 }
