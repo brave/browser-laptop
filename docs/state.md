@@ -362,7 +362,8 @@ WindowStore
     },
     bookmarksToolbar: {
       selectedFolderId: number // folderId from the siteDetail of the currently expanded folder
-    }
+    },
+    hasFocus: boolean // true if window has focus
   },
   searchDetail: {
     searchURL: string, // with replacement var in string: {searchTerms}

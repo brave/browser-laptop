@@ -488,6 +488,14 @@ class Main extends ImmutableComponent {
       windowActions.saveSize(event.sender.getSize())
     })
 
+    currentWindow.on('focus', function () {
+      windowActions.onFocusChanged(true)
+    })
+
+    currentWindow.on('blur', function () {
+      windowActions.onFocusChanged(false)
+    })
+
     let moveTimeout = null
     currentWindow.on('move', function (event) {
       if (moveTimeout) {
