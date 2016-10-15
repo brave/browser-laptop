@@ -294,7 +294,8 @@ class Menubar extends ImmutableComponent {
     }
   }
   shouldComponentUpdate (nextProps, nextState) {
-    return this.props.selectedIndex !== nextProps.selectedIndex
+    return this.props.selectedIndex !== nextProps.selectedIndex ||
+      this.props.template !== nextProps.template
   }
   render () {
     let i = 0

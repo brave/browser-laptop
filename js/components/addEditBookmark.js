@@ -89,11 +89,12 @@ class AddEditBookmark extends ImmutableComponent {
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   showToolbarOnFirstBookmark () {
-    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const isFirstBookmark = this.props.sites.find(
+    const hasOneBookmark = this.props.sites.find(
       (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
     )
-    appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !isFirstBookmark || showBookmarksToolbar)
+    if (!hasOneBookmark && !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)) {
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+    }
   }
   onSave () {
     // First check if the title of the currentDetail is set

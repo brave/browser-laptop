@@ -582,13 +582,31 @@ const createMenu = () => {
   }
 }
 
+const setMenuItemChecked = (label, checked) => {
+  // Update electron menu (Mac / Linux)
+  const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
+  systemMenuItem.checked = checked
+
+  // Update in-memory menu template (Windows)
+  const oldTemplate = appStore.getState().getIn(['menu', 'template'])
+  const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
+  if (newTemplate) {
+    appActions.setMenubarTemplate(newTemplate)
+  }
+}
+
 const doAction = (action) => {
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_FOCUSED_FRAME:
-      // TODO check/uncheck menu item instead of recreating menu
+      // Update the checkbox next to "Bookmark Page" (Bookmarks menu)
       currentLocation = action.frameProps.get('location')
-      let menuItem = menuUtil.getMenuItem(appMenu, locale.translation('bookmarkPage'))
-      menuItem.checked = isCurrentLocationBookmarked()
+      setMenuItemChecked(locale.translation('bookmarkPage'), isCurrentLocationBookmarked())
+      break
+    case appConstants.APP_CHANGE_SETTING:
+      if (action.key === settings.SHOW_BOOKMARKS_TOOLBAR) {
+        // Update the checkbox next to "Bookmarks Toolbar" (Bookmarks menu)
+        setMenuItemChecked(locale.translation('bookmarksToolbar'), action.value)
+      }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       appDispatcher.waitFor([appStore.dispatchToken], () => {
