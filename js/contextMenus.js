@@ -1057,8 +1057,7 @@ function mainTemplateInit (nodeProps, frame) {
             // CommonMenu.separatorMenuItem
             // TODO: bravery menu goes here
             )
-          
-            template.push(CommonMenu.separatorMenuItem)
+          template.push(CommonMenu.separatorMenuItem)
         }
       }
     }
@@ -1075,14 +1074,15 @@ function mainTemplateInit (nodeProps, frame) {
       })
     }
   }
-if (!isExtensionPage) {
-  template.push({
-    label: locale.translation('inspectElement'),
-    click: (item, focusedWindow) => {
-      webviewActions.inspectElement(nodeProps.x, nodeProps.y)
-    }
-  })
-}
+
+  if (!isExtensionPage) {
+    template.push({
+      label: locale.translation('inspectElement'),
+      click: (item, focusedWindow) => {
+        webviewActions.inspectElement(nodeProps.x, nodeProps.y)
+      }
+    })
+  }
 
   const passwordManager = getActivePasswordManager()
   if (passwordManager.get('extensionId') && !isExtensionPage) {
