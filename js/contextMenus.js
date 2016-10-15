@@ -868,6 +868,7 @@ function mainTemplateInit (nodeProps, frame) {
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
+  const isExtensionPage = /^chrome-extension/.test(nodeProps.pageURL)
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
   const isTextSelected = nodeProps.selectionText.length > 0
 
@@ -1041,7 +1042,7 @@ function mainTemplateInit (nodeProps, frame) {
       template.push(CommonMenu.separatorMenuItem)
     }
 
-    if (!isLink && !isImage) {
+    if (!isLink && !isImage && !isExtensionPage) {
       template.push({
         label: locale.translation('viewPageSource'),
         accelerator: 'CmdOrCtrl+Alt+U',
