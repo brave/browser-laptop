@@ -44,6 +44,9 @@ class UrlBar extends ImmutableComponent {
     this.activateSearchEngine = false
     this.searchSelectEntry = null
     this.showAutocompleteResult = debounce(() => {
+      if (!this.urlInput) {
+        return
+      }
       const suffixLen = this.props.locationValueSuffix.length
       this.urlInput.value = this.defaultValue
       const len = this.defaultValue.length
@@ -74,14 +77,13 @@ class UrlBar extends ImmutableComponent {
   }
 
   updateDOMInputFocus (focused) {
-    const urlInput = this.urlInput
-    if (focused) {
-      urlInput.focus()
+    if (this.urlInput && focused) {
+      this.urlInput.focus()
     }
   }
 
   updateDOMInputSelected (selected) {
-    if (selected) {
+    if (this.urlInput && selected) {
       this.urlInput.select()
     }
   }
@@ -308,13 +310,16 @@ class UrlBar extends ImmutableComponent {
   }
 
   componentDidUpdate (prevProps) {
-    // Select the part of the URL which was an autocomplete suffix.
-    if (this.urlInput && this.props.locationValueSuffix.length > 0 &&
-      (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
-       this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
-      this.showAutocompleteResult()
-    } else if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
-      this.urlInput.value = this.defaultValue
+    // this.urlInput is not initialized in titleMode
+    if (this.urlInput) {
+      // Select the part of the URL which was an autocomplete suffix.
+      if (this.props.locationValueSuffix.length > 0 &&
+        (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
+         this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
+        this.showAutocompleteResult()
+      } else if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+        this.urlInput.value = this.defaultValue
+      }
     }
     if (this.isSelected() !== prevProps.urlbar.get('selected') ||
       this.isFocused() !== prevProps.urlbar.get('focused')) {
