@@ -252,6 +252,11 @@ module.exports.cleanAppData = (data, isShutdown) => {
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
   if (clearAutofillData) {
     autofill.clearAutofillData()
+    const date = new Date().getTime()
+    data.autofill.addresses.guid = []
+    data.autofill.addresses.timestamp = date
+    data.autofill.creditCards.guid = []
+    data.autofill.creditCards.timestamp = date
   }
   const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
   if (clearSiteSettings) {
