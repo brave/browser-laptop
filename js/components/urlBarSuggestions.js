@@ -395,6 +395,11 @@ class UrlBarSuggestions extends ImmutableComponent {
         windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
         this.updateSuggestions(props.selectedIndex)
       }
+
+      xhr.onerror = () => {
+        windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
+        this.updateSuggestions(props.selectedIndex)
+      }
     } else {
       windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
       this.updateSuggestions(props.selectedIndex)
