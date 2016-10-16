@@ -264,9 +264,12 @@ class UrlBar extends ImmutableComponent {
     if (this.isSelected()) {
       windowActions.setUrlBarSelected(false)
     }
-    windowActions.setNavBarUserInput(e.target.value)
     this.clearSearchEngine()
-    this.detectSearchEngine(e.target.value)
+    let value = e.target.value
+    debounce(() => {
+      windowActions.setNavBarUserInput(value)
+      this.detectSearchEngine(value)
+    }, 20)()
   }
 
   onFocus (e) {
