@@ -1021,6 +1021,12 @@ function mainTemplateInit (nodeProps, frame) {
           CommonMenu.separatorMenuItem,
           addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
           {
+            label: locale.translation('savePageAs'),
+            accelerator: 'CmdOrCtrl+S',
+            click: function (item, focusedWindow) {
+              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_SAVE])
+            }
+          }, {
             label: locale.translation('find'),
             accelerator: 'CmdOrCtrl+F',
             click: function (item, focusedWindow) {
