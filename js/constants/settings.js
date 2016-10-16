@@ -58,6 +58,7 @@ const settings = {
   DEFAULT_ZOOM_LEVEL: 'advanced.default-zoom-level',
   SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled',
   SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
+  SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISTS: 'advanced.minimum-visits'
