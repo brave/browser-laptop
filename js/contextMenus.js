@@ -67,6 +67,11 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   }
 }
 
+const getDownloadsBarHeight = () => {
+  const root = window.getComputedStyle(document.querySelector(':root'))
+  return Number.parseInt(root.getPropertyValue('--downloads-bar-height'), 10)
+}
+
 function tabPageTemplateInit (framePropsList) {
   return [{
     label: locale.translation('unmuteTabs'),
@@ -1202,8 +1207,7 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  */
 function onShowUsernameMenu (usernames, origin, action, boundingRect,
                                     topOffset) {
-  // TODO: magic number
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
@@ -1214,8 +1218,7 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
-  // TODO: magic number
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)
