@@ -297,7 +297,7 @@ class BookmarksToolbar extends ImmutableComponent {
     const noParentItems = this.bookmarks
       .filter((bookmark) => !bookmark.get('parentFolderId'))
     let widthAccountedFor = 0
-    const overflowButtonWidth = 25
+    const overflowButtonWidth = 15
 
     // Dynamically calculate how many bookmark items should appear on the toolbar
     // before it is actually rendered.
@@ -305,8 +305,7 @@ class BookmarksToolbar extends ImmutableComponent {
       this.root = window.getComputedStyle(document.querySelector(':root'))
       this.maxWidth = Number.parseInt(this.root.getPropertyValue('--bookmark-item-max-width'), 10)
       this.padding = Number.parseInt(this.root.getPropertyValue('--bookmark-item-padding'), 10) * 2
-      // Toolbar padding is only on the left
-      this.toolbarPadding = Number.parseInt(this.root.getPropertyValue('--bookmarks-toolbar-padding'), 10)
+      this.toolbarPadding = Number.parseInt(this.root.getPropertyValue('--bookmarks-toolbar-padding'), 10) * 2
       this.bookmarkItemMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-margin'), 10) * 2
       // No margin for show only favicons
       this.chevronMargin = Number.parseInt(this.root.getPropertyValue('--bookmark-item-chevron-margin'), 10)
@@ -319,7 +318,7 @@ class BookmarksToolbar extends ImmutableComponent {
 
     // Loop through until we fill up the entire bookmark toolbar width
     let i
-    for (i = 0; i < noParentItems.size; i++) {
+    for (i = 0; i < noParentItems.size; ++i) {
       let iconWidth = props.showFavicon ? iconSize : 0
       // font-awesome file icons are 3px smaller
       if (props.showFavicon && !noParentItems.getIn([i, 'folderId']) && !noParentItems.getIn([i, 'favicon'])) {
