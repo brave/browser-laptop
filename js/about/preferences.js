@@ -555,7 +555,8 @@ class PaymentHistoryRow extends ImmutableComponent {
   }
 
   get htmlDataURL () {
-    return 'data:text/html,' + encodeURIComponent('<html><body style="-webkit-print-color-adjust:exact">' + ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} />) + '</body></html>')
+    let dataURL = 'data:text/html,' + encodeURIComponent('<html><body style="-webkit-print-color-adjust:exact">' + ReactDOMServer.renderToStaticMarkup(<ContributionStatement transaction={this.transaction} />) + '</body></html>')
+    return dataURL
   }
 
   get csvDataURL () {
@@ -596,16 +597,14 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get ContributionStatementHeader () {
-    let containerStyle = {'margin-top': '25px', 'margin-bottom': '25px', 'width': '100%'}
-
     return (
-      <div className='titleBar contributionStatementHeader' style={containerStyle}>
+      <div className='titleBar contributionStatementHeader'>
         <div className='sectionTitleWrapper pull-left'>
           <span className='sectionTitle'>Brave Payments</span>
           <span className='sectionSubTitle'>beta</span>
         </div>
         <div className='sectionTitleWrapper pull-right'>
-          <span className='sectionTitle smaller pull-right' style={{'white-space': 'nowrap'}}>Contribution Statement</span>
+          <span className='sectionTitle smaller pull-right'>Contribution Statement</span>
         </div>
       </div>
      )
@@ -626,17 +625,13 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get ContributionStatementSummaryBox () {
-    let leftColumnStyle = {'text-align': 'right', 'padding': '10px', 'margin': '10px', 'background-color': '#f7f7f7'}
-    let rightColumnStyle = {'text-align': 'center', 'padding': '10px', 'margin': '10px', 'border-style': 'solid', 'border-width': '3px', 'border-color': '#e7e7e7', 'font-weight': 'bold'}
-    let containerStyle = {'margin-top': '25px', 'margin-bottom': '25px'}
-
     return (
-      <div className='pull-right' style={containerStyle}>
-        <table className='contributionStatementSummaryBox'>
+      <div className='contributionStatementSummaryBox pull-right'>
+        <table className='contributionStatementSummaryBoxTable'>
           <tbody>
-            <tr><td style={leftColumnStyle}>Contribution Date</td><td style={rightColumnStyle}>{this.contributionDate}</td></tr>
-            <tr><td style={leftColumnStyle}>Contribution Time</td><td style={rightColumnStyle}>{this.contributionTime}</td></tr>
-            <tr><td style={leftColumnStyle}>Contribution Amount</td><td style={rightColumnStyle}>{this.contributionAmount}</td></tr>
+            <tr><td className='leftColumn'>Contribution Date</td><td className='rightColumn'>{this.contributionDate}</td></tr>
+            <tr><td className='leftColumn'>Contribution Time</td><td className='rightColumn'>{this.contributionTime}</td></tr>
+            <tr><td className='leftColumn'>Contribution Amount</td><td className='rightColumn'>{this.contributionAmount}</td></tr>
           </tbody>
         </table>
       </div>
@@ -658,31 +653,28 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get ContributionStatementDetailTable () {
-    let detailTableStyle = {'width': '100%', 'border-width': '5px', 'border-style': 'solid', 'border-color': '#f7f7f7'}
-    let detailTableContainerStyle = {'margin-top': '25px', 'margin-bottom': '25px'}
-
     return (
-      <div style={detailTableContainerStyle}>
+      <div className='contributionStatementDetailTableContainer'>
         <div className='pull-right'>{ this.lastContributionHumanFormattedDate } - { this.thisContributionHumanFormattedDate }</div>
         <div>
-          <table className='contributionStatementDetailTable' style={detailTableStyle}>
+          <table className='contributionStatementDetailTable'>
             <thead>
-              <tr style={{'text-align': 'right', 'background-color': '#f7f7f7'}}>
-                <th style={{'width': '30px'}}>Rank</th>
-                <th style={{'text-align': 'left', 'padding-left': '40px'}}>Site</th>
-                <th>% Paid</th>
-                <th>$ Paid</th>
+              <tr className='detailTableRow'>
+                <th className='rankColumn'>Rank</th>
+                <th className='siteColumn'>Site</th>
+                <th className='fractionColumn'>% Paid</th>
+                <th className='fiatColumn'>$ Paid</th>
               </tr>
             </thead>
             <tbody>
               {
               this.rows.map(function (row, idx) {
                 return (
-                  <tr style={{'text-align': 'right'}}>
-                    <td style={{'width': '30px'}}>{idx}</td>
-                    <td style={{'text-align': 'left', 'padding-left': '40px'}}>{row[0]}</td>
-                    <td>{(parseFloat(row[2]) * 100).toFixed(2)}</td>
-                    <td>{row[4]}</td>
+                  <tr className='detailTableRow'>
+                    <td className='rankColumn'>{idx}</td>
+                    <td className='siteColumn'>{row[0]}</td>
+                    <td className='fractionColumn'>{(parseFloat(row[2]) * 100).toFixed(2)}</td>
+                    <td className='fiatColumn'>{row[4]}</td>
                   </tr>
                 )
               })
@@ -703,6 +695,7 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   get staticStyles () {
+    /** since the ContributionStatement is rendered into a PDF from a self-contained data URL, we have to hardcode all the requisite CSS like this **/
     return (
       <style>
         {"\n\
@@ -711,6 +704,19 @@ class ContributionStatement extends ImmutableComponent {
   font-family: Arial;\n\
   margin: 0;\n\
   padding: 0;\n\
+}\n\
+.contributionStatementContainer {\n\
+  position: relative;\n\
+  width: 805px;\n\
+  overflow-x: hidden;\n\
+  display: block;\n\
+  background-color: #ffffff;\n\
+  padding: 10px;\n\
+}\n\
+.contributionStatementSection {\n\
+  margin: 0;\n\
+  padding: 0;\n\
+  clear: left;\n\
 }\n\
 .sectionTitleWrapper .sectionTitle {\n\
   color: #3B3B3B;\n\
@@ -722,10 +728,60 @@ class ContributionStatement extends ImmutableComponent {
   top: 0px;\n\
   right: 19px;\n\
 }\n\
-  .pull-left {\n\
+.sectionTitleWrapper .sectionTitle.smaller {\n\
+  white-space: nowrap;\n\
+}\n\
+.contributionStatementDetailTableContainer {\n\
+  margin-top: 25px;\n\
+  margin-bottom: 25px;\n\
+}\n\
+.contributionStatementDetailTable {\n\
+  width: 100%;\n\
+  border-width: 5px;\n\
+  border-style: solid;\n\
+  border-color: #f7f7f7;\n\
+}\n\
+.contributionStatementDetailTable thead tr.detailTableRow, .contributionStatementDetailTable tbody tr.detailTableRow {\n\
+  text-align: right;\n\
+}\n\
+.contributionStatementDetailTable thead tr.detailTableRow {\n\
+  background-color: #f7f7f7;\n\
+}\n\
+.detailTableRow th.rankColumn, .detailTableRow td.rankColumn {\n\
+  width: 30px;\n\
+}\n\
+.detailTableRow th.siteColumn, .detailTableRow td.siteColumn {\n\
+  text-align: left;\n\
+  padding-left: 40px;\n\
+}\n\
+.contributionStatementSummaryBox {\n\
+  margin-top: 25px;\n\
+  margin-bottom: 25px;\n\
+}\n\
+.contributionStatementSummaryBoxTable tbody tr td.leftColumn {\n\
+  text-align: right;\n\
+  padding: 10px;\n\
+  margin: 10px;\n\
+  background-color: #f7f7f7;\n\
+}\n\
+.contributionStatementSummaryBoxTable tbody tr td.rightColumn {\n\
+  text-align: center;\n\
+  padding: 10px;\n\
+  margin: 10px;\n\
+  border-style: solid;\n\
+  border-width: 3px;\n\
+  border-color: #e7e7e7;\n\
+  font-weight: bold;\n\
+}\n\
+.contributionStatementHeader {\n\
+  margin-top: 25px;\n\
+  margin-bottom: 25px;\n\
+  width: 100%;\n\
+}\n\
+.pull-left {\n\
   float: left;\n\
 }\n\
-  .pull-right {\n\
+.pull-right {\n\
   float: right;\n\
 }\n\
       "}
@@ -734,25 +790,22 @@ class ContributionStatement extends ImmutableComponent {
   }
 
   render () {
-    let topLevelStyle = {'position': 'relative', 'width': '805px', 'overflow-x': 'hidden', 'display': 'block', 'background-color': '#ffffff', 'height': '100%', 'padding': '10px'}
-    let sectionDivStyle = { margin: 0, padding: 0, clear: 'left' }
-
     return (
-      <div className='contributionStatementContainer' style={topLevelStyle}>
+      <div className='contributionStatementContainer'>
         { this.staticStyles }
-        <div style={sectionDivStyle}>
+        <div className='contributionStatementSection'>
           {this.ContributionStatementHeader}
         </div>
-        <div style={sectionDivStyle}>
+        <div className='contributionStatementSection'>
           {this.ContributionStatementSummaryBox}
         </div>
-        <div style={sectionDivStyle}>
+        <div className='contributionStatementSection'>
           {this.ContributionStatementDetailTable}
         </div>
-        <div style={sectionDivStyle}>
+        <div className='contributionStatementSection'>
           {this.ContributionStatementFooterNoteBox}
         </div>
-        <div style={sectionDivStyle}>
+        <div className='contributionStatementSection'>
           {this.ContributionStatementPageFooter}
         </div>
       </div>
