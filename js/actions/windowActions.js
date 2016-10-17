@@ -1133,6 +1133,17 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
       folderId
     })
+  },
+
+  /**
+   * Fired when window receives or loses focus
+   * @param {boolean} hasFocus - true if focused, false if blurred
+   */
+  onFocusChanged: function (hasFocus) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_ON_FOCUS_CHANGED,
+      hasFocus
+    })
   }
 }
 

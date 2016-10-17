@@ -902,6 +902,16 @@ Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks to
 
 
 
+### onFocusChanged(hasFocus) 
+
+Fired when window receives or loses focus
+
+**Parameters**
+
+**hasFocus**: `boolean`, true if focused, false if blurred
+
+
+
 
 * * *
 

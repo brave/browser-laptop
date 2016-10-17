@@ -61,6 +61,13 @@ class Window extends React.Component {
       classes[className] = true
     })
 
+    // Windows puts a 1px border around frameless window
+    // For Windows 10, this defaults to blue. When window
+    // becomes inactive it needs to change to gray.
+    if (classes['win10']) {
+      classes['inactive'] = !this.windowState.getIn(['ui', 'hasFocus'])
+    }
+
     return <div id='windowContainer' className={cx(classes)} >
       <Main windowState={this.state.immutableData.windowState}
         appState={this.state.immutableData.appState} />

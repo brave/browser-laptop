@@ -834,7 +834,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
       windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
       break
-
+    case WindowConstants.WINDOW_ON_FOCUS_CHANGED:
+      windowState = windowState.setIn(['ui', 'hasFocus'], action.hasFocus)
+      break
     default:
   }
 

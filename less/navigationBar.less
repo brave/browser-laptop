@@ -217,6 +217,12 @@
 
   // Windows 10 specific styles
   &.win10 {
+    &.inactive div#window.frameless {
+      border: 1px solid #aaaaaa;
+    }
+    div#window.frameless {
+      border: 1px solid #2283d3;
+    }
     .windowCaptionButtons {
       > .container {
         button.captionButton {
@@ -390,6 +396,7 @@
     cursor: default;
     -webkit-user-select: none;
     flex-grow: 0;
+    margin-top: 2px;
 
     .menubarItem {
       color: black;
