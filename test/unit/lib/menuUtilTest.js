@@ -5,56 +5,15 @@ const assert = require('assert')
 const Immutable = require('immutable')
 require('../braveUnit')
 
-const defaultMenu = {
-  items: [
-    {
-      label: 'File',
-      submenu: {
-        items: [
-          { label: 'open', temp: 1 },
-          { label: 'quit', temp: 2 }
-        ]
-      }
-    },
-    {
-      label: 'Edit',
-      submenu: {
-        items: [
-          { label: 'copy', temp: 3 },
-          { label: 'paste', temp: 4 }
-        ]
-      }
-    },
-    {
-      label: 'Bookmarks',
-      submenu: {
-        items: [
-          {
-            label: 'bookmark folder 1',
-            submenu: {
-              items: [
-                { label: 'my bookmark', url: 'https://brave.com' }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  ]
-}
-
 describe('menuUtil', function () {
   let menuUtil
 
   before(function () {
-    // https://github.com/mfncooper/mockery
-    // TODO: consider moving to braveUnit.js
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
-
     mockery.registerMock('electron', require('./fakeElectron'))
     menuUtil = require('../../../app/browser/lib/menuUtil')
   })
@@ -64,6 +23,49 @@ describe('menuUtil', function () {
   })
 
   describe('getMenuItem', function () {
+    const defaultMenu = {
+      items: [
+        {
+          label: 'File',
+          submenu: {
+            items: [
+              { label: 'open', temp: 1 },
+              { label: 'quit', temp: 2 }
+            ]
+          }
+        },
+        {
+          label: 'Edit',
+          submenu: {
+            items: [
+              { label: 'copy', temp: 3 },
+              { label: 'paste', temp: 4 }
+            ]
+          }
+        },
+        {
+          label: 'Bookmarks',
+          submenu: {
+            items: [
+              {
+                label: 'Bookmarks Toolbar',
+                type: 'checkbox',
+                checked: false
+              },
+              {
+                label: 'bookmark folder 1',
+                submenu: {
+                  items: [
+                    { label: 'my bookmark', url: 'https://brave.com' }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+
     it('returns the electron MenuItem based on the label', function () {
       const menuItem = menuUtil.getMenuItem(defaultMenu, 'quit')
       assert.equal(menuItem.temp, 2)
@@ -75,6 +77,42 @@ describe('menuUtil', function () {
     it('searches the menu recursively based on the label', function () {
       const menuItem = menuUtil.getMenuItem(defaultMenu, 'my bookmark')
       assert.equal(menuItem.url, 'https://brave.com')
+    })
+  })
+
+  describe('setTemplateItemChecked', function () {
+    const defaultTemplate = Immutable.fromJS([
+      {
+        'label': 'Bookmarks',
+        'submenu': [
+          {
+            'label': 'Bookmarks Toolbar',
+            'type': 'checkbox',
+            'checked': false
+          }
+        ]
+      }
+    ])
+
+    it('returns the new template when checked status is updated', function () {
+      const expectedTemplate = Immutable.fromJS([
+        {
+          'label': 'Bookmarks',
+          'submenu': [
+            {
+              'label': 'Bookmarks Toolbar',
+              'type': 'checkbox',
+              'checked': true
+            }
+          ]
+        }
+      ])
+      const newTemplate = menuUtil.setTemplateItemChecked(defaultTemplate, 'Bookmarks Toolbar', true)
+      assert.deepEqual(newTemplate.toJS(), expectedTemplate.toJS())
+    })
+    it('returns null when no change is made', function () {
+      const newTemplate = menuUtil.setTemplateItemChecked(defaultTemplate, 'Bookmarks Toolbar', false)
+      assert.equal(newTemplate, null)
     })
   })
 
