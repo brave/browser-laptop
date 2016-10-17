@@ -58,6 +58,12 @@ class AutofillCreditCardPanel extends ImmutableComponent {
   onClick (e) {
     e.stopPropagation()
   }
+  get disableSaveButton () {
+    let currentDetail = this.props.currentDetail
+    if (!currentDetail.size) return true
+    if (!currentDetail.get('name') && !currentDetail.get('card')) return true
+    return false
+  }
   render () {
     var ExpMonth = []
     for (let i = 1; i <= 12; ++i) {
@@ -98,7 +104,8 @@ class AutofillCreditCardPanel extends ImmutableComponent {
           </div>
           <div className='formRow manageAutofillDataButtons'>
             <Button l10nId='cancel' className='secondaryAltButton' onClick={this.props.onHide} />
-            <Button l10nId='save' className='primaryButton saveCreditCardButton' onClick={this.onSave} />
+            <Button l10nId='save' className='primaryButton saveCreditCardButton' onClick={this.onSave}
+              disabled={this.disableSaveButton} />
           </div>
         </div>
       </div>
