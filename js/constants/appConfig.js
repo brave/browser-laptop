@@ -125,6 +125,7 @@ module.exports = {
     'advanced.pdfjs-enabled': true,
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
+    'advanced.send-usage-statistics': false,
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 5,
     'shutdown.clear-history': false,
