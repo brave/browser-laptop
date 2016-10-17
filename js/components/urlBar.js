@@ -293,6 +293,7 @@ class UrlBar extends ImmutableComponent {
       // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
       this.updateLocationToSuggestion()
       windowActions.setUrlBarSelected(true)
+      windowActions.setUrlBarActive(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
       this.updateDOM()
     })
@@ -316,7 +317,8 @@ class UrlBar extends ImmutableComponent {
         (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
          this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
         this.showAutocompleteResult()
-      } else if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+      } else if (this.props.activeFrameKey !== prevProps.activeFrameKey ||
+        this.props.titleMode !== prevProps.titleMode) {
         this.urlInput.value = this.defaultValue
       }
     }
