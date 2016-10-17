@@ -34,15 +34,10 @@ class BookmarkFolderItem extends ImmutableComponent {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
   }
-
+  // NOTE: both folders and bookmarks can be dropped here
   onDrop (e) {
     const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
-
-    if (bookmark) {
-      // Don't allow a bookmark folder to be moved into itself
-      if (bookmark.get('folderId') === this.props.bookmarkFolder.get('folderId')) {
-        return
-      }
+    if (bookmark && siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
       aboutActions.moveSite(bookmark.toJS(), this.props.bookmarkFolder.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), true)
     }
   }
@@ -75,7 +70,9 @@ class BookmarkFolderItem extends ImmutableComponent {
       </div>
       {
         childBookmarkFolders.size > 0
-        ? <BookmarkFolderList onChangeSelectedFolder={this.props.onChangeSelectedFolder}
+        ? <BookmarkFolderList
+          search={this.props.search}
+          onChangeSelectedFolder={this.props.onChangeSelectedFolder}
           bookmarkFolders={childBookmarkFolders}
           selectedFolderId={this.props.selectedFolderId}
           allBookmarkFolders={this.props.allBookmarkFolders} />
@@ -98,7 +95,9 @@ class BookmarkFolderList extends ImmutableComponent {
       }
       {
         this.props.isRoot
-        ? <BookmarkFolderItem selected={!this.props.search && this.props.selectedFolderId === 0}
+        ? <BookmarkFolderItem
+          search={this.props.search}
+          selected={!this.props.search && this.props.selectedFolderId === 0}
           dataL10nId='bookmarksToolbar'
           draggable={false}
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
@@ -113,13 +112,16 @@ class BookmarkFolderList extends ImmutableComponent {
           ? null
           : <BookmarkFolderItem bookmarkFolder={bookmarkFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
+            search={this.props.search}
             selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
             selectedFolderId={this.props.selectedFolderId}
             onChangeSelectedFolder={this.props.onChangeSelectedFolder} />)
       }
       {
         this.props.isRoot
-        ? <BookmarkFolderItem selected={this.props.selectedFolderId === -1}
+        ? <BookmarkFolderItem
+          search={this.props.search}
+          selected={!this.props.search && this.props.selectedFolderId === -1}
           dataL10nId='otherBookmarks'
           draggable={false}
           onChangeSelectedFolder={this.props.onChangeSelectedFolder}
@@ -188,12 +190,24 @@ class BookmarksList extends ImmutableComponent {
   }
   onDrop (siteDetail, e) {
     const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    let destinationIsParent = false
     if (bookmark) {
-      aboutActions.moveSite(bookmark.toJS(), siteDetail.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), false)
+      // If source is folder, destination needs to be a folder too
+      if (siteUtil.isFolder(bookmark)) {
+        siteDetail = siteDetail.get('parentFolderId')
+          ? this.props.allBookmarkFolders.find((folder) => folder.get('folderId') === siteDetail.get('parentFolderId'))
+          : Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})
+        destinationIsParent = true
+      }
+
+      if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, siteDetail)) {
+        aboutActions.moveSite(bookmark.toJS(), siteDetail.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), destinationIsParent)
+      }
     }
   }
   render () {
     const props = !this.props.draggable ? {
+      onDragStart: this.onDragStart,
       sortingDisabled: !this.props.sortable
     } : {
       onDoubleClick: this.onDoubleClick,
@@ -223,6 +237,7 @@ class BookmarksList extends ImmutableComponent {
         onDoubleClick={this.onDoubleClick}
         {...props}
         contextMenuName='bookmark'
+        thisArg={this}
         onContextMenu={aboutActions.contextMenu} />
     </div>
   }
@@ -315,6 +330,7 @@ class AboutBookmarks extends React.Component {
               ? this.searchedBookmarks(this.state.search, this.state.bookmarks)
               : this.bookmarksInFolder
             }
+            allBookmarkFolders={this.state.bookmarkFolders}
             sortable={false}
             draggable={!this.state.search}
             tableID={this.selectedFolderId} />
