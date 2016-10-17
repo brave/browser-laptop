@@ -255,9 +255,16 @@ class UrlBarSuggestions extends ImmutableComponent {
         if (pos1 - pos2 !== 0) {
           return pos1 - pos2
         } else {
-          // If there's a tie on the match location, use the age
-          // decay modified access count
-          return suggestion.sortByAccessCountWithAgeDecay(s1, s2)
+          // sort site.com higher than site.com/somepath
+          const sdnv1 = suggestion.simpleDomainNameValue(s1)
+          const sdnv2 = suggestion.simpleDomainNameValue(s2)
+          if (sdnv1 !== sdnv2) {
+            return sdnv2 - sdnv1
+          } else {
+            // If there's a tie on the match location, use the age
+            // decay modified access count
+            return suggestion.sortByAccessCountWithAgeDecay(s1, s2)
+          }
         }
       }
     }

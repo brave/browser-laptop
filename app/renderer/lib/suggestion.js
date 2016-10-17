@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const urlParser = require('url')
 const appConfig = require('../../../js/constants/appConfig')
 
 const sigmoid = (t) => {
@@ -81,4 +82,20 @@ module.exports.sortByAccessCountWithAgeDecay = (s1, s2) => {
     appConfig.urlSuggestions.ageDecayConstant
   )
   return s2Priority - s1Priority
+}
+
+/*
+ * Return a 1 if the url is 'simple' as in without query, search or
+ * hash components. Return 0 otherwise.
+ *
+ * @param {ImmutableObject} site - object represent history entry
+ *
+ */
+module.exports.simpleDomainNameValue = (site) => {
+  const parsed = urlParser.parse(site.get('location'))
+  if (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/') {
+    return 1
+  } else {
+    return 0
+  }
 }
