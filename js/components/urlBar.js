@@ -291,7 +291,6 @@ class UrlBar extends ImmutableComponent {
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
-      windowActions.setUrlBarActive(true)
       this.updateLocationToSuggestion()
       windowActions.setUrlBarSelected(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
