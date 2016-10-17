@@ -674,6 +674,16 @@ describe('navigationBar', function () {
           return this.getAttribute(activeWebview, 'src').then((src) => src === page1)
         })
       })
+
+      it('urlbar shows webview url when focused', function * () {
+        var page1 = this.page1
+        yield blur(this.app.client)
+        yield this.app.client
+          .ipcSend('shortcut-focus-url')
+        yield this.app.client.waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === page1)
+        })
+      })
     })
 
     describe('with non-url input value', function () {
