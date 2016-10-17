@@ -217,7 +217,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   let isHistoryEntry = false
   let isHistoryEntries = false
   let isFolder = false
-  let isRootFolder = false
+  let isSystemFolder = false
   let deleteLabel
   let deleteTag
 
@@ -226,7 +226,8 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     deleteTag = siteTags.BOOKMARK
   } else if (siteUtil.isFolder(siteDetail)) {
     isFolder = true
-    isRootFolder = siteDetail.get('folderId') === 0
+    isSystemFolder = siteDetail.get('folderId') === 0 ||
+      siteDetail.get('folderId') === -1
     deleteLabel = 'deleteFolder'
     deleteTag = siteTags.BOOKMARK_FOLDER
   } else if (siteUtil.isHistoryEntry(siteDetail)) {
@@ -271,7 +272,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       CommonMenu.separatorMenuItem)
   }
 
-  if (!isRootFolder) {
+  if (!isSystemFolder) {
     // History can be deleted but not edited
     // Picking this menu item pops up the AddEditBookmark modal
     if (!isHistoryEntry && !isHistoryEntries) {
