@@ -53,6 +53,7 @@ const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../../app/common/constants/keyCodes')
 const keyLocations = require('../../app/common/constants/keyLocations')
 const isWindows = process.platform === 'win32'
+const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -812,8 +813,9 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON)
-    const showOnlyFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON)
+    const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+    const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
+    const showOnlyFavicon = btbMode === bookmarksToolbarMode.FAVICONS_ONLY
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')

@@ -6,22 +6,43 @@ const appConfig = require('./constants/appConfig')
 const Immutable = require('immutable')
 const settings = require('./constants/settings')
 const {passwordManagers, defaultPasswordManager, extensionIds, displayNames} = require('./constants/passwordManagers')
+const bookmarksToolbarMode = require('../app/common/constants/bookmarksToolbarMode')
 
-// Retrofit the new single setting; we don't want to erase values set by the user.
 const passwordManagerDefault = (settingKey, settingsCollection) => {
   const onePasswordEnabled = resolveValue(settings.ONE_PASSWORD_ENABLED, settingsCollection) === true
-  if (onePasswordEnabled) { return passwordManagers.ONE_PASSWORD }
+  if (onePasswordEnabled) return passwordManagers.ONE_PASSWORD
 
   const dashlaneEnabled = resolveValue(settings.DASHLANE_ENABLED, settingsCollection) === true
-  if (dashlaneEnabled) { return passwordManagers.DASHLANE }
+  if (dashlaneEnabled) return passwordManagers.DASHLANE
 
   const lastPassEnabled = resolveValue(settings.LAST_PASS_ENABLED, settingsCollection) === true
-  if (lastPassEnabled) { return passwordManagers.LAST_PASS }
+  if (lastPassEnabled) return passwordManagers.LAST_PASS
 
   const disabled = resolveValue(settings.PASSWORD_MANAGER_ENABLED, settingsCollection) === false
-  if (disabled) { return passwordManagers.UNMANAGED }
+  if (disabled) return passwordManagers.UNMANAGED
 
   return defaultPasswordManager
+}
+
+const bookmarksBarDefault = (settingKey, settingsCollection) => {
+  const faviconsOnly = resolveValue(settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON, settingsCollection) === true
+  if (faviconsOnly) return bookmarksToolbarMode.FAVICONS_ONLY
+
+  const favicons = resolveValue(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, settingsCollection) === true
+  if (favicons) return bookmarksToolbarMode.TEXT_AND_FAVICONS
+
+  return bookmarksToolbarMode.TEXT_ONLY
+}
+
+// Retrofit a new setting based on old values; we don't want to lose existing user settings.
+const getDefaultSetting = (settingKey, settingsCollection) => {
+  switch (settingKey) {
+    case settings.ACTIVE_PASSWORD_MANAGER:
+      return passwordManagerDefault(settingKey, settingsCollection)
+    case settings.BOOKMARKS_TOOLBAR_MODE:
+      return bookmarksBarDefault(settingKey, settingsCollection)
+  }
+  return undefined
 }
 
 const resolveValue = (settingKey, settingsCollection) => {
@@ -38,13 +59,9 @@ const resolveValue = (settingKey, settingsCollection) => {
 }
 
 module.exports.getSetting = (settingKey, settingsCollection) => {
-  if (settingKey === settings.ACTIVE_PASSWORD_MANAGER) {
-    const currentValue = resolveValue(settingKey, settingsCollection)
-    return !currentValue
-      ? passwordManagerDefault(settingKey, settingsCollection)
-      : currentValue
-  }
-  return resolveValue(settingKey, settingsCollection)
+  const setting = resolveValue(settingKey, settingsCollection)
+  if (setting) return setting
+  return getDefaultSetting(settingKey, settingsCollection)
 }
 
 module.exports.getActivePasswordManager = (settingsCollection) => {

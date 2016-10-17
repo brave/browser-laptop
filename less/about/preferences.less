@@ -169,6 +169,7 @@ body {
       width: 100%;
       background: transparent;
       padding: 10px 0 0 20px;
+      -webkit-user-select: none;
 
       &:before,
       &::before {
@@ -376,6 +377,10 @@ span.browserButton.primaryButton {
     margin-top: 20px;
     padding: 5px 20px;
   }
+
+  &.importNowButton {
+    margin-top: 5px;
+  }
 }
 
 .settingsList {
@@ -418,7 +423,6 @@ span.browserButton.primaryButton {
       height: 2.25em;
       font-size: 0.9em;
       padding: 0.4em;
-      margin: 10px 0;
       border: solid 1px @lightGray;
       background: white;
       color: @darkGray;
@@ -530,12 +534,14 @@ table.sortableTable {
   }
 
   .default {
-    width: 150px;
+    width: 95x;
   }
   .searchEngine {
     width: 304px !important;
+    padding-left: 10px;
   }
   .engineGoKey {
+    padding-left: 4px;
     width: 250px;
   }
 }
@@ -1019,6 +1025,7 @@ div.nextPaymentSubmission {
     .switchControlRightText, .switchControlLeftText {
       opacity: 0.3;
     }
+    cursor: default;
   }
 
   &:not(.disabled) {
