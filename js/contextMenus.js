@@ -1001,76 +1001,61 @@ function mainTemplateInit (nodeProps, frame) {
           tags: [siteTags.BOOKMARK]
         }, false))
       } else {
-        if (isExtensionPage) {
-          template.push(
-            addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
-            {
-              label: locale.translation('find'),
-              accelerator: 'CmdOrCtrl+F',
-              click: function (item, focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
-              }
-            }, {
-              label: locale.translation('print'),
-              accelerator: 'CmdOrCtrl+P',
-              click: function (item, focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_PRINT)
+        template.push(
+          {
+            label: locale.translation('back'),
+            enabled: frame.get('canGoBack'),
+            click: (item, focusedWindow) => {
+              if (focusedWindow) {
+                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
               }
             }
-            // CommonMenu.separatorMenuItem
-            // TODO: bravery menu goes here
-            )
-        } else {
-          template.push(
-            {
-              label: locale.translation('back'),
-              enabled: frame.get('canGoBack'),
-              click: (item, focusedWindow) => {
-                if (focusedWindow) {
-                  focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
-                }
-              }
-            }, {
-              label: locale.translation('forward'),
-              enabled: frame.get('canGoForward'),
-              click: (item, focusedWindow) => {
-                if (focusedWindow) {
-                  focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-                }
-              }
-            }, {
-              label: locale.translation('reloadPage'),
-              accelerator: 'CmdOrCtrl+R',
-              click: (item, focusedWindow) => {
-                if (focusedWindow) {
-                  focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
-                }
-              }
-            },
-            CommonMenu.separatorMenuItem,
-            addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
-            {
-              label: locale.translation('find'),
-              accelerator: 'CmdOrCtrl+F',
-              click: function (item, focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
-              }
-            }, {
-              label: locale.translation('print'),
-              accelerator: 'CmdOrCtrl+P',
-              click: function (item, focusedWindow) {
-                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_PRINT)
+          }, {
+            label: locale.translation('forward'),
+            enabled: frame.get('canGoForward'),
+            click: (item, focusedWindow) => {
+              if (focusedWindow) {
+                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
               }
             }
-            // CommonMenu.separatorMenuItem
-            // TODO: bravery menu goes here
-            )
-          template.push(CommonMenu.separatorMenuItem)
+          })
+
+        if (!isExtensionPage) {
+          template.push({
+            label: locale.translation('reloadPage'),
+            accelerator: 'CmdOrCtrl+R',
+            click: (item, focusedWindow) => {
+              if (focusedWindow) {
+                focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
+              }
+            }
+          })
         }
+
+        template.push(
+          CommonMenu.separatorMenuItem,
+          addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
+          {
+            label: locale.translation('find'),
+            accelerator: 'CmdOrCtrl+F',
+            click: function (item, focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_SHOW_FINDBAR)
+            }
+          }, {
+            label: locale.translation('print'),
+            accelerator: 'CmdOrCtrl+P',
+            click: function (item, focusedWindow) {
+              focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_PRINT)
+            }
+          }
+          // CommonMenu.separatorMenuItem
+          // TODO: bravery menu goes here
+          )
       }
     }
 
     if (!isLink && !isImage && !isExtensionPage) {
+      template.push(CommonMenu.separatorMenuItem)
       template.push({
         label: locale.translation('viewPageSource'),
         accelerator: 'CmdOrCtrl+Alt+U',
