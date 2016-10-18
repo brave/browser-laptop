@@ -85,6 +85,9 @@ module.exports = {
     baseUrl: `${updateHost}/1/releases`,
     winBaseUrl: `${winUpdateHost}/multi-channel/releases/CHANNEL/`
   },
+  urlSuggestions: {
+    ageDecayConstant: 50
+  },
   defaultSettings: {
     'adblock.customRules': '',
     'general.language': null, // null means to use the OS lang
@@ -125,6 +128,7 @@ module.exports = {
     'advanced.pdfjs-enabled': true,
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
+    'advanced.send-usage-statistics': false,
     'advanced.minimum-visit-time': 8,
     'advanced.minimum-visits': 5,
     'shutdown.clear-history': false,

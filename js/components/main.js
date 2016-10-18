@@ -32,7 +32,6 @@ const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
 const ImportBrowserDataPanel = require('../../app/renderer/components/importBrowserDataPanel')
 const AutofillAddressPanel = require('./autofillAddressPanel')
 const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
-const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar')
@@ -53,6 +52,7 @@ const dragTypes = require('../constants/dragTypes')
 const keyCodes = require('../../app/common/constants/keyCodes')
 const keyLocations = require('../../app/common/constants/keyLocations')
 const isWindows = process.platform === 'win32'
+const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
 
 // State handling
 const basicAuthState = require('../../app/common/state/basicAuthState')
@@ -488,6 +488,14 @@ class Main extends ImmutableComponent {
       windowActions.saveSize(event.sender.getSize())
     })
 
+    currentWindow.on('focus', function () {
+      windowActions.onFocusChanged(true)
+    })
+
+    currentWindow.on('blur', function () {
+      windowActions.onFocusChanged(false)
+    })
+
     let moveTimeout = null
     currentWindow.on('move', function (event) {
       if (moveTimeout) {
@@ -658,7 +666,8 @@ class Main extends ImmutableComponent {
           (node.classList.contains('popupWindow') ||
             node.classList.contains('contextMenu') ||
             node.classList.contains('extensionButton') ||
-            node.classList.contains('menubarItem'))) {
+            node.classList.contains('menubarItem') ||
+            node.classList.contains('bookmarkForm'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
@@ -804,8 +813,9 @@ class Main extends ImmutableComponent {
     const nonPinnedFrames = this.props.windowState.get('frames').filter((frame) => !frame.get('pinnedLocation'))
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
     const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON)
-    const showOnlyFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON)
+    const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+    const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
+    const showOnlyFavicon = btbMode === bookmarksToolbarMode.FAVICONS_ONLY
     const siteInfoIsVisible = this.props.windowState.getIn(['ui', 'siteInfo', 'isVisible'])
     const braveShieldsDisabled = this.braveShieldsDisabled
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
@@ -909,6 +919,7 @@ class Main extends ImmutableComponent {
                 startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
                 endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
                 loading={activeFrame && activeFrame.get('loading')}
+                bookmarkDetail={this.props.windowState.get('bookmarkDetail')}
                 mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
                 searchDetail={this.props.windowState.get('searchDetail')}
                 enableNoScript={this.enableNoScript(activeSiteSettings)}
@@ -992,14 +1003,6 @@ class Main extends ImmutableComponent {
           loginRequiredDetail
             ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
             : null
-        }
-        {
-          this.props.windowState.get('bookmarkDetail')
-          ? <AddEditBookmark sites={this.props.appState.get('sites')}
-            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
-          : null
         }
         {
           noScriptIsVisible

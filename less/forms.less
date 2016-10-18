@@ -407,6 +407,98 @@
   text-overflow: ellipsis;
 }
 
+.dialog.bookmarkDialog {
+  justify-content: initial;
+  padding-left: 7px;
+}
+
+#navigator {
+  .bookmarkForm {
+    .genericForm;
+    background: linear-gradient(#FFFFFF, #DEDEDE);
+    margin-top: 10px;
+    padding: 0;
+
+    .arrowUp {
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid #FFFFFF;
+      position: relative;
+      bottom: 10px;
+      left: 37px;
+
+      &.withoutButtons {
+        left: 6px;
+      }
+
+      &.withStopButton {
+        &.withHomeButton {
+          left: 67px;
+        }
+      }
+    }
+
+    .bookmarkFormRow {
+      margin-bottom: 10px;
+    }
+
+    .bookmarkButtons {
+      margin: 20px 0 10px 0;
+    }
+
+    .bookmarkFormInner {
+      padding: 10px 30px;
+    }
+
+    label {
+      color: @darkGray;
+      margin-left: 5px;
+    }
+
+    h2 {
+      color: @braveOrange;
+      font-weight: normal;
+      font-size: 16px;
+    }
+
+    input,
+    select {
+      display: block;
+      width: 100%;
+      max-width: 250px;
+      height: 25px;
+      border-radius: 5px;
+      padding: 0 5px;
+      margin: 5px 0 5px 0;
+      font-size: 0.9em;
+      border: solid 1px #ececec;
+      background: white;
+      color: #444444;
+      outline: none;
+    }
+
+    input {
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    }
+
+    select {
+      box-shadow: 0px 1px 5px -1px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  .bookmarkFormFooter {
+    background: @gray;
+    padding: 10px 30px;
+
+    span {
+      font-size: 12px;
+      text-align: left;
+    }
+  }
+}
+
 .genericForm {
   .flyoutDialog;
   display: table;

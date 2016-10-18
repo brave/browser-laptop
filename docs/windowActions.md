@@ -467,7 +467,7 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(currentDetail, originalDetail, destinationDetail) 
+### setBookmarkDetail(currentDetail, originalDetail, destinationDetail, shouldShowLocation) 
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
@@ -479,6 +479,8 @@ If set, also indicates that add/edit is shown
 **originalDetail**: `Object`, Properties of the bookmark to edit
 
 **destinationDetail**: `Object`, Will move the added bookmark to the specified position
+
+**shouldShowLocation**: `Object`, Whether or not to show the URL input
 
 
 
@@ -899,6 +901,16 @@ Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks to
 
 **folderId**: `number`, from the siteDetail for the bookmark folder
   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
+
+
+
+### onFocusChanged(hasFocus) 
+
+Fired when window receives or loses focus
+
+**Parameters**
+
+**hasFocus**: `boolean`, true if focused, false if blurred
 
 
 

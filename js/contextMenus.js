@@ -34,6 +34,7 @@ const urlParse = require('url').parse
 const eventUtil = require('./lib/eventUtil')
 const currentWindow = require('../app/renderer/currentWindow')
 const config = require('./constants/config')
+const bookmarksToolbarMode = require('../app/common/constants/bookmarksToolbarMode')
 
 const isDarwin = process.platform === 'darwin'
 
@@ -49,7 +50,7 @@ const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isPare
       if (isParent) {
         siteDetail = siteDetail.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail)
+      windowActions.setBookmarkDetail(siteDetail, siteDetail, closestDestinationDetail, false)
     }
   }
 }
@@ -62,9 +63,14 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
       if (isParent) {
         emptyFolder = emptyFolder.set('parentFolderId', closestDestinationDetail && (closestDestinationDetail.get('folderId') || closestDestinationDetail.get('parentFolderId')))
       }
-      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail)
+      windowActions.setBookmarkDetail(emptyFolder, undefined, closestDestinationDetail, false)
     }
   }
+}
+
+const getDownloadsBarHeight = () => {
+  const root = window.getComputedStyle(document.querySelector(':root'))
+  return Number.parseInt(root.getPropertyValue('--downloads-bar-height'), 10)
 }
 
 function tabPageTemplateInit (framePropsList) {
@@ -217,7 +223,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   let isHistoryEntry = false
   let isHistoryEntries = false
   let isFolder = false
-  let isRootFolder = false
+  let isSystemFolder = false
   let deleteLabel
   let deleteTag
 
@@ -226,7 +232,8 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     deleteTag = siteTags.BOOKMARK
   } else if (siteUtil.isFolder(siteDetail)) {
     isFolder = true
-    isRootFolder = siteDetail.get('folderId') === 0
+    isSystemFolder = siteDetail.get('folderId') === 0 ||
+      siteDetail.get('folderId') === -1
     deleteLabel = 'deleteFolder'
     deleteTag = siteTags.BOOKMARK_FOLDER
   } else if (siteUtil.isHistoryEntry(siteDetail)) {
@@ -271,14 +278,14 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       CommonMenu.separatorMenuItem)
   }
 
-  if (!isRootFolder) {
+  if (!isSystemFolder) {
     // History can be deleted but not edited
     // Picking this menu item pops up the AddEditBookmark modal
     if (!isHistoryEntry && !isHistoryEntries) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
-          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail)
+          click: () => windowActions.setBookmarkDetail(siteDetail, siteDetail, null, true)
         },
         CommonMenu.separatorMenuItem)
     }
@@ -331,7 +338,8 @@ function showBookmarkFolderInit (allBookmarkItems, parentBookmarkFolder, activeF
 }
 
 function bookmarkItemsInit (allBookmarkItems, items, activeFrame) {
-  const showFavicon = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON) === true
+  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+  const showFavicon = (btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS || btbMode === bookmarksToolbarMode.FAVICONS_ONLY)
   return items.map((site) => {
     const isFolder = siteUtil.isFolder(site)
     let faIcon
@@ -1224,8 +1232,7 @@ function onShowBookmarkFolderMenu (bookmarks, bookmark, activeFrame, e) {
  */
 function onShowUsernameMenu (usernames, origin, action, boundingRect,
                                     topOffset) {
-  // TODO: magic number
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
   const menuTemplate = usernameTemplateInit(usernames, origin, action)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     left: boundingRect.left,
@@ -1236,8 +1243,7 @@ function onShowUsernameMenu (usernames, origin, action, boundingRect,
 
 function onShowAutofillMenu (suggestions, boundingRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
-  // TODO: magic number
-  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? 50 : 0
+  const downloadsBarOffset = windowStore.getState().getIn(['ui', 'downloadsToolbar', 'isVisible']) ? getDownloadsBarHeight() : 0
   const offset = {
     x: (window.innerWidth - boundingRect.clientWidth),
     y: (window.innerHeight - boundingRect.clientHeight)

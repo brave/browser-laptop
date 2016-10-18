@@ -45,6 +45,11 @@
     padding-left: 5px;
   }
 
+  .startButtons {
+    position: relative;
+    top: -1px;
+  }
+
   #urlInput { width: 100%; }
 
   // changes to ensure window can be as small as 480px wide
@@ -217,6 +222,12 @@
 
   // Windows 10 specific styles
   &.win10 {
+    &.inactive div#window.frameless {
+      border: 1px solid #aaaaaa;
+    }
+    div#window.frameless {
+      border: 1px solid #2283d3;
+    }
     .windowCaptionButtons {
       > .container {
         button.captionButton {
@@ -390,6 +401,7 @@
     cursor: default;
     -webkit-user-select: none;
     flex-grow: 0;
+    margin-top: 2px;
 
     .menubarItem {
       color: black;
@@ -584,6 +596,8 @@
   #navigator:not(.titleMode) & {
     background: white;
     border-radius: @borderRadiusURL;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), inset 0 1px 0 rgba(0,0,0,0.05), inset 0 1px 1px rgba(0,0,0,0.1);
     color: @chromeText;
   }
@@ -615,6 +629,22 @@
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
+    }
+
+    .bookmarkButton {
+      border: 1px solid #CBCBCB;
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      box-sizing: border-box;
+      height: 25px;
+      line-height: 25px;
+      margin-top: 2px;
+      margin-right: -2px;
+
+      &.withoutButtons {
+        margin-bottom: 2px;
+      }
     }
   }
 
@@ -679,7 +709,7 @@
     font-size: 12px;
     right: 10px;
     text-align: right;
-    margin: 4px 0 0 0;
+    margin: 2px 0 0 0;
     top: 9px;
     cursor: default;
     padding-top: 1px;
@@ -760,7 +790,7 @@
 
     &.fa-lock,
     &.fa-unlock {
-      margin-top: 4px;
+      margin-top: 1px;
       font-size: 16px;
       min-height: 10px;
       min-width: 16px;

@@ -3,6 +3,7 @@
 
 'use strict'
 
+const Immutable = require('immutable')
 const CommonMenu = require('../../common/commonMenu')
 const messages = require('../../../js/constants/messages')
 const siteTags = require('../../../js/constants/siteTags')
@@ -12,8 +13,10 @@ const locale = require('../../locale')
 
 /**
  * Get the an electron MenuItem object from a Menu based on its label
- * @param {string} label - the text associated with the menu
- * NOTE: label may be a localized string
+ *
+ * @param {Object} appMenu - the electron Menu object
+ * @param {string} label - text to search each menu item for
+ * NOTE: label is a localized string
  */
 module.exports.getMenuItem = (appMenu, label) => {
   if (appMenu && appMenu.items && appMenu.items.length > 0) {
@@ -25,6 +28,43 @@ module.exports.getMenuItem = (appMenu, label) => {
         if (nestedItem) return nestedItem
       }
     }
+  }
+  return null
+}
+
+/**
+ * Similar to getMenuItem (above) but with a menu template. The menu template
+ * is used by our tests and also with the custom rendered Windows titlebar.
+ *
+ * @param {Object} template - object in the format which gets passed to Menu.buildFromTemplate()
+ * @param {string} label - text to search each menu item for
+ * NOTE: label is a localized string
+ */
+const getTemplateItem = (template, label) => {
+  if (template && template.length && template.length > 0) {
+    for (let i = 0; i < template.length; i++) {
+      const item = template[i]
+      if (item && item.label === label) return item
+      if (item.submenu) {
+        const nestedItem = getTemplateItem(item.submenu, label)
+        if (nestedItem) return nestedItem
+      }
+    }
+  }
+  return null
+}
+
+/**
+ * Search a menu template and update the checked status
+ *
+ * @return the new template OR null if no change was made (no update needed)
+ */
+module.exports.setTemplateItemChecked = (template, label, checked) => {
+  const menu = template.toJS()
+  const menuItem = getTemplateItem(menu, label)
+  if (menuItem.checked !== checked) {
+    menuItem.checked = checked
+    return Immutable.fromJS(menu)
   }
   return null
 }
@@ -66,6 +106,11 @@ const createBookmarkMenuItems = (bookmarks, parentFolderId) => {
   return payload
 }
 
+/**
+ * Add bookmarks / folders to "Bookmarks" menu
+ *
+ * @param sites The application state's Immutable sites list
+ */
 module.exports.createBookmarkMenuItems = (sites) => {
   return createBookmarkMenuItems(siteUtil.getBookmarks(sites))
 }

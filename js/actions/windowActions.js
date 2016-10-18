@@ -643,13 +643,15 @@ const windowActions = {
    * @param {Object} currentDetail - Properties of the bookmark to change to
    * @param {Object} originalDetail - Properties of the bookmark to edit
    * @param {Object} destinationDetail - Will move the added bookmark to the specified position
+   * @param {Object} shouldShowLocation - Whether or not to show the URL input
    */
-  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail) {
+  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
       currentDetail,
       originalDetail,
-      destinationDetail
+      destinationDetail,
+      shouldShowLocation
     })
   },
 
@@ -1132,6 +1134,17 @@ const windowActions = {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
       folderId
+    })
+  },
+
+  /**
+   * Fired when window receives or loses focus
+   * @param {boolean} hasFocus - true if focused, false if blurred
+   */
+  onFocusChanged: function (hasFocus) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_ON_FOCUS_CHANGED,
+      hasFocus
     })
   }
 }

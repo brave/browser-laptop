@@ -27,6 +27,10 @@ describe('siteUtil', function () {
     parentFolderId: 0,
     tags: [siteTags.BOOKMARK_FOLDER]
   })
+  const siteMinFields = Immutable.fromJS({
+    location: testUrl1,
+    title: 'sample'
+  })
 
   describe('getSiteIndex', function () {
     it('returns -1 if sites is falsey', function () {
@@ -178,7 +182,17 @@ describe('siteUtil', function () {
       const expectedSites = Immutable.fromJS([bookmarkAllFields])
       assert.deepEqual(processedSites.getIn([0, 'tags']), expectedSites.getIn([0, 'tags']))
     })
-
+    describe('record count', function () {
+      var processedSites
+      it('create history record with count', function () {
+        processedSites = siteUtil.addSite(emptySites, siteMinFields)
+        assert.deepEqual(processedSites.getIn([0, 'count']), 1)
+      })
+      it('increments count for history item', function () {
+        processedSites = siteUtil.addSite(processedSites, siteMinFields)
+        assert.deepEqual(processedSites.getIn([0, 'count']), 2)
+      })
+    })
     describe('for new entries (oldSite is null)', function () {
       describe('when adding bookmark', function () {
         it('preserves existing siteDetail fields', function () {
@@ -192,7 +206,6 @@ describe('siteUtil', function () {
           assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [siteTags.BOOKMARK])
         })
       })
-
       describe('when adding bookmark folder', function () {
         it('assigns a folderId', function () {
           const processedSites = siteUtil.addSite(emptySites, folderMinFields)
@@ -426,28 +439,35 @@ describe('siteUtil', function () {
     })
   })
 
-  describe('moveSite', function () {
+  describe('isMoveAllowed', function () {
+    // NOTE: usage taken from Bookmark Manager, which calls aboutActions.moveSite
     it('does not allow you to move a bookmark folder into itself', function () {
       // Add a new bookmark folder
       let processedSites = siteUtil.addSite(emptySites, folderMinFields)
       const folderId = processedSites.getIn([0, 'folderId'])
-      const bookmark = Immutable.fromJS({
-        lastAccessedTime: 123,
-        title: 'bookmark1',
-        parentFolderId: folderId,
-        location: testUrl1,
-        tags: [siteTags.BOOKMARK]
-      })
       // Add a bookmark into that folder
-      processedSites = siteUtil.addSite(processedSites, bookmark)
+      processedSites = siteUtil.addSite(processedSites, bookmarkAllFields.set('parentFolderId', folderId))
       const bookmarkFolder = processedSites.get(0)
-
-      // Usage taken from Bookmark Manager, which calls aboutActions.moveSite
-      processedSites = siteUtil.moveSite(processedSites, bookmarkFolder, bookmarkFolder, false, true, false)
-      const siteIndex = siteUtil.getSiteIndex(processedSites, bookmarkFolder, siteTags.BOOKMARK_FOLDER)
-
-      assert.notEqual(processedSites.getIn([siteIndex, 'parentFolderId']), processedSites.getIn([siteIndex, 'folderId']))
+      // Should NOT be able to move bookmark folder into itself
+      assert.equal(false, siteUtil.isMoveAllowed(processedSites, bookmarkFolder, bookmarkFolder))
     })
+    it('does not allow you to move an ancestor folder into a descendant folder', function () {
+      // Add a new bookmark folder
+      let processedSites = siteUtil.addSite(emptySites, folderMinFields)
+      const folderId1 = processedSites.getIn([0, 'folderId'])
+      // Add a child below that folder
+      processedSites = siteUtil.addSite(processedSites, folderMinFields.set('parentFolderId', folderId1))
+      const folderId2 = processedSites.getIn([1, 'folderId'])
+      // Add a folder below the previous child
+      processedSites = siteUtil.addSite(processedSites, folderMinFields.set('parentFolderId', folderId2))
+      const bookmarkFolder1 = processedSites.get(0)
+      const bookmarkFolder3 = processedSites.get(2)
+      // Should NOT be able to move grandparent folder into its grandchild
+      assert.equal(false, siteUtil.isMoveAllowed(processedSites, bookmarkFolder1, bookmarkFolder3))
+    })
+  })
+
+  describe('moveSite', function () {
   })
 
   describe('getDetailFromFrame', function () {

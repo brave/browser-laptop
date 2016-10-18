@@ -599,7 +599,8 @@ const doAction = (action) => {
         windowState = windowState.mergeIn(['bookmarkDetail'], {
           currentDetail: action.currentDetail,
           originalDetail: action.originalDetail,
-          destinationDetail: action.destinationDetail
+          destinationDetail: action.destinationDetail,
+          shouldShowLocation: action.shouldShowLocation
         })
       }
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
@@ -811,8 +812,12 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
       break
+    case WindowConstants.WINDOW_TOGGLE_BOOKMARK_HANGER:
+      windowState = windowState.delete('bookmarkDetail')
+      break
     case WindowConstants.WINDOW_RESET_MENU_STATE:
       doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
+      doAction({actionType: WindowConstants.WINDOW_TOGGLE_BOOKMARK_HANGER})
       if (getSetting(settings.AUTO_HIDE_MENU)) {
         doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
       } else {
@@ -834,7 +839,9 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID:
       windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], action.folderId)
       break
-
+    case WindowConstants.WINDOW_ON_FOCUS_CHANGED:
+      windowState = windowState.setIn(['ui', 'hasFocus'], action.hasFocus)
+      break
     default:
   }
 

@@ -12,6 +12,7 @@
   overflow: auto;
   padding: 0 4px 0 0;
   height: @tabsToolbarHeight;
+  margin-top: 2px;
   position: relative;
   white-space: nowrap;
   z-index: @zindexTabs;
@@ -42,14 +43,15 @@
 }
 
 .tab {
-  background: rgba(222, 222, 222, 0.6);
+  // background: rgba(222, 222, 222, 0.6);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
   border-radius: @borderRadiusTabs @borderRadiusTabs 0px 0px;
   border-width: 1px 1px 0;
   box-sizing: border-box;
   color: #3B3B3B;
   display: flex;
   height: 22px;
-  margin: 0;
+  margin-top: 2px;
   transition: transform 200ms ease;
   left: 0;
   opacity: 1.0;
@@ -57,7 +59,7 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  border: 1px solid @chromeTertiary;
+  border: 1px solid rgba(0, 0, 0, 0.0);
   border-bottom: 1px;
 
   .tabTitle {
@@ -115,7 +117,7 @@
   &.active {
       background: linear-gradient(to bottom, white, @chromePrimary, );
       height: 24px;
-      margin-top: -1px;
+      margin-top: 1px;
       box-shadow: inset 1px 1px 2px 0px white;
       box-shadow: 0px -1px 4px 0px rgba(51, 51, 51, 0.12);
       border: 1px solid #bbb;
@@ -141,7 +143,7 @@
   }
 
   &:not(.active):hover {
-    background: linear-gradient(to bottom, white, @chromePrimary);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4), );
     &.private {
       background: lighten(@privateTabBackground, 20%);
     }
@@ -176,7 +178,7 @@
 .tabArea {
   box-sizing: border-box;
   display: inline-block;
-  padding: 0 2px 0 0;
+  padding: 0 4px 0 0;
   position: relative;
   vertical-align: top;
   overflow: hidden;
@@ -242,6 +244,7 @@
   background: @tabsBackground;
   display: flex;
   height: @tabsToolbarHeight;
+//  margin-top: 2px;
   -webkit-user-select: none;
 }
 
@@ -250,7 +253,7 @@
   padding-right: 2px;
   .browserButton {
     display: inline-block;
-    line-height: 20px;
+    line-height: 26px;
   }
 }
 
@@ -270,11 +273,12 @@
   }
 
   &.singlePage {
-    height: 3px;
+    height: 1px;
   }
 
   >div {
     display: flex
+//    margin-top: 4px;
   }
 }
 
@@ -286,6 +290,7 @@
   box-sizing: border-box;
   display: inline-block;
   margin: auto 2.5px;
+  margin-top: 3px;
   height: 6px;
   width: 36px;
   vertical-align: middle;
@@ -313,7 +318,7 @@
     color: #a0a0a0;
     font-size: 21px !important;
     height: 20px;
-    line-height: 17px !important;
+    line-height: 19px !important;
     text-align: center;
     vertical-align: top;
     margin-top: 2px;
@@ -346,6 +351,7 @@
 
 .pinnedTabs {
   margin-left: 9px;
+  margin-top: 2px;
 }
 
 .segmentedControl {

@@ -143,22 +143,23 @@ class SortableTable extends ImmutableComponent {
       rowAttributes.onContextMenu = this.props.onContextMenu.bind(this, handlerInput, this.props.contextMenuName)
     }
     // Bindings for row-specific event handlers
+    const thisArg = this.props.thisArg || this
     if (typeof this.props.onClick === 'function') {
-      rowAttributes.onClick = this.props.onClick.bind(this, handlerInput)
+      rowAttributes.onClick = this.props.onClick.bind(thisArg, handlerInput)
     }
     if (typeof this.props.onDoubleClick === 'function') {
-      rowAttributes.onDoubleClick = this.props.onDoubleClick.bind(this, handlerInput)
+      rowAttributes.onDoubleClick = this.props.onDoubleClick.bind(thisArg, handlerInput)
     }
     if (typeof this.props.onDragStart === 'function') {
-      rowAttributes.onDragStart = this.props.onDragStart.bind(this, Immutable.fromJS(handlerInput))
+      rowAttributes.onDragStart = this.props.onDragStart.bind(thisArg, Immutable.fromJS(handlerInput))
       rowAttributes.draggable = true
     }
     if (typeof this.props.onDragOver === 'function') {
-      rowAttributes.onDragOver = this.props.onDragOver.bind(this, Immutable.fromJS(handlerInput))
+      rowAttributes.onDragOver = this.props.onDragOver.bind(thisArg, Immutable.fromJS(handlerInput))
       rowAttributes.draggable = true
     }
     if (typeof this.props.onDrop === 'function') {
-      rowAttributes.onDrop = this.props.onDrop.bind(this, Immutable.fromJS(handlerInput))
+      rowAttributes.onDrop = this.props.onDrop.bind(thisArg, Immutable.fromJS(handlerInput))
       rowAttributes.draggable = true
     }
     return rowAttributes
@@ -187,7 +188,11 @@ class SortableTable extends ImmutableComponent {
               'sort-default': this.sortingDisabled || heading === this.props.defaultHeading})}
               data-sort-method={dataType === 'number' ? 'number' : undefined}
               data-sort-order={this.props.defaultHeadingSortOrder}>
-              <div className='th-inner' data-l10n-id={heading} />
+              {
+                typeof heading === 'string'
+                ? <div className='th-inner' data-l10n-id={heading} />
+                : heading
+              }
             </th>
           })}
         </tr>
