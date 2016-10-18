@@ -188,7 +188,11 @@ class SortableTable extends ImmutableComponent {
               'sort-default': this.sortingDisabled || heading === this.props.defaultHeading})}
               data-sort-method={dataType === 'number' ? 'number' : undefined}
               data-sort-order={this.props.defaultHeadingSortOrder}>
-              <div className='th-inner' data-l10n-id={heading} />
+              {
+                typeof heading === 'string'
+                ? <div className='th-inner' data-l10n-id={heading} />
+                : heading
+              }
             </th>
           })}
         </tr>

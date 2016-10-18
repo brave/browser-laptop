@@ -312,6 +312,22 @@ const aboutActions = {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_SUBMIT_FEEDBACK
     })
+  },
+
+  /**
+   * Dispatches a message to set add/edit bookmark details
+   * If set, also indicates that add/edit is shown
+   * @param {Object} currentDetail - Properties of the bookmark to change to
+   * @param {Object} originalDetail - Properties of the bookmark to edit
+   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
+   */
+  openBookmarkEditor: function (currentDetail, originalDetail, destinationDetail) {
+    aboutActions.dispatchAction({
+      actionType: windowConstants.WINDOW_SET_BOOKMARK_DETAIL,
+      currentDetail,
+      originalDetail,
+      destinationDetail
+    })
   }
 }
 module.exports = aboutActions

@@ -134,6 +134,26 @@ class BookmarkFolderList extends ImmutableComponent {
   }
 }
 
+class BookmarkTitleHeader extends ImmutableComponent {
+  constructor () {
+    super()
+    this.addBookmark = this.addBookmark.bind(this)
+  }
+  addBookmark () {
+    const newBookmark = Immutable.fromJS({
+      parentFolderId: this.props.selectedFolderId,
+      tags: [siteTags.BOOKMARK]
+    })
+    aboutActions.openBookmarkEditor(newBookmark)
+  }
+  render () {
+    return <div className='th-inner'>
+      <span data-l10n-id={this.props.heading} />
+      <span data-l10n-id='addBookmark' className='addBookmark' onClick={this.addBookmark} />
+    </div>
+  }
+}
+
 class BookmarkTitleCell extends ImmutableComponent {
   render () {
     let iconStyle
@@ -216,9 +236,12 @@ class BookmarksList extends ImmutableComponent {
       onDrop: this.onDrop,
       sortingDisabled: !this.props.sortable
     }
-
     return <div>
-      <SortableTable headings={['Title', 'Last Visited']}
+      <SortableTable
+        headings={[
+          <BookmarkTitleHeader heading='Title' selectedFolderId={this.props.selectedFolderId} />,
+          'Last Visited'
+        ]}
         defaultHeading='Title'
         rows={this.props.bookmarks.map((entry) => [
           {
@@ -232,7 +255,7 @@ class BookmarksList extends ImmutableComponent {
         ])}
         rowObjects={this.props.bookmarks}
         columnClassNames={['title', 'date']}
-        tableID={this.props.tableID}
+        tableID={this.props.selectedFolderId}
         addHoverClass
         onDoubleClick={this.onDoubleClick}
         {...props}
@@ -250,6 +273,7 @@ class AboutBookmarks extends React.Component {
     this.onChangeSearch = this.onChangeSearch.bind(this)
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.importBrowserData = this.importBrowserData.bind(this)
+    this.addBookmarkFolder = this.addBookmarkFolder.bind(this)
     this.state = {
       bookmarks: Immutable.List(),
       bookmarkFolders: Immutable.Map(),
@@ -291,6 +315,13 @@ class AboutBookmarks extends React.Component {
   importBrowserData () {
     aboutActions.importBrowerDataNow()
   }
+  addBookmarkFolder () {
+    const newFolder = Immutable.fromJS({
+      parentFolderId: this.state.selectedFolderId,
+      tags: [siteTags.BOOKMARK_FOLDER]
+    })
+    aboutActions.openBookmarkEditor(newFolder)
+  }
   componentDidMount () {
     this.refs.bookmarkSearch.focus()
   }
@@ -315,6 +346,7 @@ class AboutBookmarks extends React.Component {
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
             <span data-l10n-id='importBrowserData' className='fa fa-download clearBrowsingDataButton' onClick={this.importBrowserData} />
+            <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
           </div>
           <BookmarkFolderList onChangeSelectedFolder={this.onChangeSelectedFolder}
             bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
@@ -333,7 +365,7 @@ class AboutBookmarks extends React.Component {
             allBookmarkFolders={this.state.bookmarkFolders}
             sortable={false}
             draggable={!this.state.search}
-            tableID={this.selectedFolderId} />
+            selectedFolderId={this.state.selectedFolderId} />
         </div>
       </div>
     </div>
