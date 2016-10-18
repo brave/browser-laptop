@@ -115,7 +115,7 @@ class NavigationBar extends ImmutableComponent {
       <div className='startButtons'>
         {
           isSourceAboutUrl(this.props.location) || this.titleMode
-          ? <span className='browserButton' />
+          ? <span className='browserButton hidden-button fa fa-repeat' />
           : this.loading
             ? <Button iconClass='fa-times'
               l10nId='stopButton'

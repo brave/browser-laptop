@@ -619,6 +619,10 @@
 
   &:not(.titleMode) {
     .urlbarForm, .browserButton {
+      &.hidden-button {
+        animation: none;
+        animation-fill-mode: none;
+      }
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
