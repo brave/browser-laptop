@@ -74,6 +74,7 @@ describe('navigationBar', function () {
       it('updates the location in the navbar when changed by the opener', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
+          .ipcSend('shortcut-focus-url')
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === 'data:text/html;,%3Ctitle%3ETabnapping%20Target%3C/title%3E')
           })
@@ -730,18 +731,27 @@ describe('navigationBar', function () {
       yield this.app.client.waitUntil(function () {
         return this.getValue(urlInput).then((val) => val === '')
       })
+
+      yield this.app.client
+        .addSite({ location: 'https://brave.com', title: 'Brave' })
+
       // now type something
-      yield this.app.client.keys('a')
+      yield this.app.client
+        .setValue(urlInput, 'b')
+        .waitForExist(urlBarSuggestions + ' li')
     })
 
-    it('sets the value to "a"', function * () {
+    it('sets the value to "b"', function * () {
       yield this.app.client.waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === 'a')
+        return this.getValue(urlInput).then((val) => val === 'brave.com')
       })
     })
 
     it('clears the selected text', function * () {
-      yield selectsText(this.app.client, '')
+      // Since now the first letter will trigger the autocomplete
+      // expect the selected text to be part of the first suggestion
+      // in the list
+      yield selectsText(this.app.client, 'rave.com')
     })
 
     describe('shortcut-focus-url', function () {
@@ -755,7 +765,9 @@ describe('navigationBar', function () {
       })
 
       it('selects the text', function * () {
-        yield selectsText(this.app.client, 'a')
+        // Since now the first letter will trigger the autocomplete
+        // expect the selected text to be the first suggestion in the list
+        yield selectsText(this.app.client, 'brave.com')
       })
 
       it('has the file icon', function * () {
@@ -949,7 +961,9 @@ describe('navigationBar', function () {
           .waitUntil(function () {
             return this.getValue(urlInput).then((val) => val === 'a')
           })
-        yield selectsText(this.app.client, '')
+          .waitUntil(function () {
+            return this.getSelectedText().then(function (value) { return value === '' })
+          })
       })
     })
 
@@ -991,10 +1005,14 @@ describe('navigationBar', function () {
         yield this.app.client.waitUntil(function () {
           return this.getValue(urlInput).then((val) => val === '')
         })
+
+        yield this.app.client
+          .addSite({ location: 'https://brave.com', title: 'Brave' })
+
         // now type something
-        yield this.app.client.keys('a')
+        yield this.app.client.keys('b')
         yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'a')
+          return this.getValue(urlInput).then((val) => val === 'b')
         })
         yield blur(this.app.client)
         yield this.app.client
@@ -1007,7 +1025,7 @@ describe('navigationBar', function () {
       })
 
       it('selects the text', function * () {
-        yield selectsText(this.app.client, 'a')
+        yield selectsText(this.app.client, 'brave.com')
       })
     })
 
