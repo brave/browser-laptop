@@ -384,6 +384,15 @@ app.on('ready', () => {
     }
     buttons = ['OK', 'Cancel']
     cancelId = 1
+
+    if (typeof message === 'number') {
+      message = '' + message
+    }
+
+    if (typeof title === 'number') {
+      title = '' + title
+    }
+
     event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
       title: title,
