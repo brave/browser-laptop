@@ -1,12 +1,13 @@
 # Changelog
 
 ## [0.12.5](https://github.com/brave/browser-laptop/releases/v0.12.5dev)
-- Added Pocket extension ([#4687](https://github.com/brave/browser-laptop/issues/4687))([#4692](https://github.com/brave/browser-laptop/issues/4692))([#4699](https://github.com/brave/browser-laptop/issues/4699))
 - Added Brave Wallet backup and recovery ([#4743](https://github.com/brave/browser-laptop/issues/4743))([#3350](https://github.com/brave/browser-laptop/issues/3350))
 - Added a way for users to opt-out of crash reporting ([#4479](https://github.com/brave/browser-laptop/issues/4479))
 - Added multi-select deletion and drag and drop in about:history ([#3949](https://github.com/brave/browser-laptop/issues/3949))([#4741](https://github.com/brave/browser-laptop/issues/4741))
 - Fixed Linux install for RPM installers ([#3774](https://github.com/brave/browser-laptop/issues/3774))([#1445](https://github.com/brave/browser-laptop/issues/1445))
 - Fixed autocomplete on URL bar ([#4731](https://github.com/brave/browser-laptop/issues/4731))([#4360](https://github.com/brave/browser-laptop/issues/4360))([#4573](https://github.com/brave/browser-laptop/issues/4573))
+- Fixed clearing autofill ([#4818](https://github.com/brave/browser-laptop/issues/4818))
+- Fixed 'about' sites in the address bar ([#4824](https://github.com/brave/browser-laptop/issues/4824))
 - Fixed custom filter list to stop using spell check ([#4619](https://github.com/brave/browser-laptop/issues/4619))
 - Fixed numerous issues for Bookmarks Manager ([#4739](https://github.com/brave/browser-laptop/issues/4739))([#4685](https://github.com/brave/browser-laptop/issues/4685))([#4751](https://github.com/brave/browser-laptop/issues/4751))([#2652](https://github.com/brave/browser-laptop/issues/2652))([#4728](https://github.com/brave/browser-laptop/issues/4728))([#1994](https://github.com/brave/browser-laptop/issues/1994))([#4523](https://github.com/brave/browser-laptop/issues/4523))([#4562](https://github.com/brave/browser-laptop/issues/4562))
 - Fixed some Yahoo ads not being blocked on yahoo.co.jp ([#4762](https://github.com/brave/browser-laptop/issues/4762))
