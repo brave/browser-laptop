@@ -131,20 +131,17 @@ class NavigationBar extends ImmutableComponent {
           this.titleMode
           ? null
           : this.loading
-            ? <Button iconClass='fa-times'
-              l10nId='stopButton'
-              className='navbutton stop-button'
+            ? <Button l10nId='stopButton'
+              className='navigationButton stopButton'
               onClick={this.onStop} />
-            : <Button iconClass='fa-repeat'
-              l10nId='reloadButton'
-              className='navbutton reload-button'
+            : <Button l10nId='reloadButton'
+              className='navigationButton reloadButton'
               onClick={this.onReload} />
         }
         {
           !this.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-          ? <Button iconClass='fa-home'
-            l10nId='homeButton'
-            className='navbutton homeButton'
+          ? <Button l10nId='homeButton'
+            className='navigationButton homeButton'
             onClick={this.onHome} />
           : null
         }
