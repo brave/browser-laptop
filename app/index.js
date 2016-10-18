@@ -383,6 +383,7 @@ app.on('ready', () => {
       title = ''
     }
     buttons = ['OK', 'Cancel']
+    message = message ? message.toString() : ''
     cancelId = 1
     event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
