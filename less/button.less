@@ -19,6 +19,15 @@ span.buttonSeparator {
   margin: 4px 3px 4px 3px;
 }
 
+span.menuButton {
+  background: url('../img/toolbar/menu_btn.svg') center no-repeat;
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  margin: 6px 4px 0 0;
+  cursor: default;
+}
+
 a.browserButton,
 span.browserButton,
 .browserButton {
@@ -56,17 +65,19 @@ span.browserButton,
 
   &.newFrameButton {
     font-size: 0px;
-    width: 24px;
-    height: 100%;
-    opacity: 0.65;
-    background: url('../img/icon_new_frame.svg') 50% 20% scroll / 20px no-repeat;
+    width: 10px;
+    max-height: 14px;
+    opacity: 0.5;
+    position: relative;
+    top: 8px;
+    left: 2px;
+    -webkit-mask-image: url('../img/toolbar/newtab_btn.svg');
+    -webkit-mask-repeat: no-repeat;
+    background-color: @buttonColor;
     &:hover {
       opacity: 0.8;
+      background-color: black;
     }
-  }
-
-  &.menuButton {
-    height: auto;
   }
 
   &.primaryButton,

@@ -21,12 +21,12 @@ class LongPressButton extends ImmutableComponent {
     }
 
     const self = this
-    const rect = e.target.getBoundingClientRect()
+    const target = e.target
     const LONG_PRESS_MILLISECONDS = 300
 
     this.longPressTimer = setTimeout(function () {
       self.isLocked = true
-      self.props.onLongPress(rect)
+      self.props.onLongPress(target)
     }, LONG_PRESS_MILLISECONDS)
   }
 

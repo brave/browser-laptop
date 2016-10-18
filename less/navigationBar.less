@@ -41,7 +41,30 @@
     top: -1px;
   }
 
+  #navigator {
+    .homeButton {
+      margin: 0 3px 3px 3px;
+    }
+
+    .stopButton {
+      margin: 0 3px 4px 3px;
+    }
+
+    .reloadButton {
+      margin: 0 3px 2px 3px;
+    }
+  }
+
   #urlInput { width: 100%; }
+
+  #navigator {
+    &:not(.titleMode) {
+      .bookmarkButtonContainer {
+        margin-top: 4px;
+        line-height: 24px;
+      }
+    }
+  }
 
   // changes to ensure window can be as small as 480px wide
   // and still be useable and have the caption buttons intact
@@ -431,19 +454,18 @@
   .backforward {
     display: flex;
 
-    .back,
-    .forward {
+    .backButton,
+    .forwardButton {
       width: @navbarButtonWidth;
     }
 
-    .back {
+    .backButton {
       padding-right: @navbarButtonSpacing;
     }
 
-    .forward {
+    .forwardButton {
       padding-left: @navbarButtonSpacing;
     }
-
   }
 
   // Navigation bar at the center
@@ -510,6 +532,77 @@
   }
 }
 
+.navigationButton {
+  background-color: @buttonColor;
+  display: inline-block;
+  width: 12px;
+  height: 14px;
+  margin: 0 6px;
+}
+
+.navigationButtonContainer {
+  border-radius: @borderRadius;
+  height: 28px;
+  margin: 0 3px;
+
+  &:last-child {
+    margin-right: 8px;
+  }
+
+  &:not(.disabled):hover {
+    background: white;
+    box-shadow: 1px 1px 1px #EEE;
+  }
+}
+
+.backButton,
+.forwardButton {
+  height: 16px;
+  margin: 6px 0 0 0;
+}
+
+.backButton {
+  background: url('../img/toolbar/back_btn.svg') center no-repeat;
+}
+
+.forwardButton {
+  background: url('../img/toolbar/forward_btn.svg') center no-repeat;
+}
+
+#navigator {
+  .stopButton {
+    background: url('../img/toolbar/stoploading_btn.svg') center no-repeat;
+    margin: 0 3px 3px 3px;
+    padding: 0 6px;
+    height: 9px;
+  }
+
+  .reloadButton {
+    background: url('../img/toolbar/reload_btn.svg') center no-repeat;
+    margin: 0 3px 1px 3px;
+    padding: 0 6px;
+  }
+
+  .homeButton {
+    background: url('../img/toolbar/home_btn.svg') center no-repeat;
+    width: 14px;
+    height: 13px;
+    margin: 0 3px 2px 3px;
+    padding: 0 6px;
+  }
+
+  .bookmarkButton {
+    background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    width: 14px;
+    height: 14px;
+    margin-bottom: 1px;
+
+    &.removeBookmarkButton {
+      background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
+    }
+  }
+}
 
 .navigatorWrapper {
   justify-content: space-between;
@@ -537,18 +630,6 @@
         opacity: 0.85;
         -webkit-app-region: no-drag;
       }
-
-      &:not([disabled]):hover {
-        color: @buttonColor;
-        opacity: 1.0;
-        background-color: white;
-      }
-    }
-
-    .back,
-    .forward {
-      font-size: 28px;
-      text-align: center;
     }
   }
 }
@@ -617,22 +698,23 @@
   }
 
   &:not(.titleMode) {
-    .urlbarForm, .browserButton {
+    .urlbarForm, .browserButton, .bookmarkButtonContainer {
       animation: fadeIn .6s;
       opacity: 0;
       animation-fill-mode: forwards;
     }
 
-    .bookmarkButton {
+    .bookmarkButtonContainer {
       border: 1px solid #CBCBCB;
+      border-radius: @borderRadius;
       border-right: none;
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       box-sizing: border-box;
       height: 25px;
       line-height: 25px;
-      margin-top: 2px;
       margin-right: -2px;
+      display: inline-block;
     }
   }
 
@@ -761,11 +843,6 @@
       background: @privateTabBackground;
       color: @chromeText;
     }
-  }
-
-  span.navbutton.removeBookmarkButton {
-    color: @braveOrange;
-    opacity: 1;
   }
 
   .urlbarIcon {

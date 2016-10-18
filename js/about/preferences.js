@@ -217,10 +217,7 @@ class LedgerTable extends ImmutableComponent {
   }
 
   getVerifiedIcon (synopsis) {
-    return <span className='verified fa-stack'>
-      <i className='fa fa-circle fa-stack-2x' />
-      <i className='fa fa-check fa-stack-1x' />
-    </span>
+    return <span className='verified' />
   }
 
   enabledForSite (synopsis) {
