@@ -23,7 +23,7 @@ const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const config = require('../constants/config')
 const settings = require('../constants/settings')
-const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isNavigatableAboutPage} = require('../lib/appUrlUtil')
+const {aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl, isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const {isFrameError} = require('../../app/common/lib/httpUtil')
 const locale = require('../l10n')
 const appConfig = require('../constants/appConfig')
@@ -71,6 +71,10 @@ class Frame extends ImmutableComponent {
 
   isAboutPage () {
     return aboutUrls.get(getBaseUrl(this.props.location))
+  }
+
+  isIntermediateAboutPage () {
+    return isIntermediateAboutPage(getBaseUrl(this.props.location))
   }
 
   updateAboutDetails () {
@@ -404,9 +408,6 @@ class Frame extends ImmutableComponent {
   }
 
   clone (args) {
-    if (!isNavigatableAboutPage(getBaseUrl(this.props.location))) {
-      return
-    }
     const newGuest = this.webview.clone()
     const newGuestInstanceId = newGuest.getWebPreferences().guestInstanceId
     let cloneAction
@@ -427,23 +428,19 @@ class Frame extends ImmutableComponent {
         this.webview.stop()
         break
       case 'reload':
-        if (this.isAboutPage()) {
-          break
-        }
         // Ensure that the webview thinks we're on the same location as the browser does.
         // This can happen for pages which don't load properly.
         // Some examples are basic http auth and bookmarklets.
         // In this case both the user display and the user think they're on this.props.location.
-        if (this.webview.getURL() !== this.props.location) {
+        if (this.webview.getURL() !== this.props.location && !this.isAboutPage()) {
           this.webview.loadURL(this.props.location)
+        } else if (this.isIntermediateAboutPage()) {
+          this.webview.loadURL(this.props.aboutDetails.get('url'))
         } else {
           this.webview.reload()
         }
         break
       case 'clean-reload':
-        if (this.isAboutPage()) {
-          break
-        }
         this.webview.reloadIgnoringCache()
         break
       case 'clone':

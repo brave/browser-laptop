@@ -130,7 +130,7 @@ class NavigationBar extends ImmutableComponent {
         }
       <div className='startButtons'>
         {
-          isSourceAboutUrl(this.props.location) || this.titleMode
+          this.titleMode
           ? null
           : this.loading
             ? <Button iconClass='fa-times'
