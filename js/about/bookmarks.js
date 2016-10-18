@@ -313,7 +313,7 @@ class AboutBookmarks extends React.Component {
     return this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)
   }
   importBrowserData () {
-    aboutActions.importBrowerDataNow()
+    aboutActions.importBrowserDataNow()
   }
   addBookmarkFolder () {
     const newFolder = Immutable.fromJS({
