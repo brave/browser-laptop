@@ -60,7 +60,7 @@ const resolveValue = (settingKey, settingsCollection) => {
 
 module.exports.getSetting = (settingKey, settingsCollection) => {
   const setting = resolveValue(settingKey, settingsCollection)
-  if (setting) return setting
+  if (typeof setting !== 'undefined') return setting
   return getDefaultSetting(settingKey, settingsCollection)
 }
 
