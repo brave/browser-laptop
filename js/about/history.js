@@ -55,8 +55,8 @@ class HistoryTimeCell extends ImmutableComponent {
 class HistoryDay extends ImmutableComponent {
   navigate (entry) {
     aboutActions.newFrame({
-      location: entry.location,
-      partitionNumber: entry.partitionNumber
+      location: entry.get('location'),
+      partitionNumber: entry.get('partitionNumber')
     })
   }
   render () {
