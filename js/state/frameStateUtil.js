@@ -246,6 +246,7 @@ function cloneFrame (frameOpts, guestInstanceId) {
   clone.location = 'about:blank'
   clone.src = 'about:blank'
   clone.parentFrameKey = frameOpts.key
+  clone.aboutDetails = frameOpts.aboutDetails
   return clone
 }
 
