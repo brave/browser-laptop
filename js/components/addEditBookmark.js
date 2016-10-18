@@ -4,8 +4,8 @@
 
 const React = require('react')
 const ImmutableComponent = require('./immutableComponent')
-const Dialog = require('./dialog')
 const Button = require('./button')
+const cx = require('../lib/classSet')
 const windowActions = require('../actions/windowActions')
 const appActions = require('../actions/appActions')
 const KeyCodes = require('../../app/common/constants/keyCodes')
@@ -24,6 +24,7 @@ class AddEditBookmark extends ImmutableComponent {
     this.onClose = this.onClose.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onSave = this.onSave.bind(this)
+    this.onViewBookmarks = this.onViewBookmarks.bind(this)
     this.onRemoveBookmark = this.onRemoveBookmark.bind(this)
   }
 
@@ -51,6 +52,10 @@ class AddEditBookmark extends ImmutableComponent {
     }
   }
   componentDidMount () {
+    // Automatically save if this is triggered by the url star
+    if (!this.props.shouldShowLocation) {
+      this.onSave(false)
+    }
     this.bookmarkName.select()
     this.bookmarkName.focus()
   }
@@ -96,7 +101,7 @@ class AddEditBookmark extends ImmutableComponent {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
   }
-  onSave () {
+  onSave (closeDialog = true) {
     // First check if the title of the currentDetail is set
     if (!this.bookmarkNameValid) {
       return false
@@ -105,12 +110,18 @@ class AddEditBookmark extends ImmutableComponent {
     this.showToolbarOnFirstBookmark()
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.addSite(this.props.currentDetail, tag, this.props.originalDetail, this.props.destinationDetail)
-    this.onClose()
+    if (closeDialog) {
+      this.onClose()
+    }
   }
   onRemoveBookmark () {
     const tag = this.isFolder ? siteTags.BOOKMARK_FOLDER : siteTags.BOOKMARK
     appActions.removeSite(this.props.currentDetail, tag)
     this.onClose()
+  }
+  onViewBookmarks () {
+    this.onClose()
+    windowActions.newFrame({location: 'about:bookmarks'}, true)
   }
   get displayBookmarkName () {
     if (this.props.currentDetail.get('customTitle') !== undefined) {
@@ -119,42 +130,58 @@ class AddEditBookmark extends ImmutableComponent {
     return this.props.currentDetail.get('title') || ''
   }
   render () {
-    return <Dialog onHide={this.onClose} isClickDismiss>
-      <div className='genericForm' onClick={this.onClick}>
-        <div className='genericFormTable'>
-          <div id='bookmarkName' className='formRow'>
-            <label data-l10n-id='nameField' htmlFor='bookmarkName' />
-            <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
-          </div>
+    return <div className='bookmarkDialog'>
+      <div className='bookmarkForm' onClick={this.onClick}>
+        <div className={cx({
+          arrowUp: true,
+          withStopButton: this.props.withStopButton,
+          withHomeButton: this.props.withHomeButton,
+          withoutButtons: this.props.withoutButtons
+        })} />
+        <div className='bookmarkFormInner'>
           {
-            !this.isFolder
-            ? <div id='bookmarkLocation' className='formRow'>
-              <label data-l10n-id='locationField' htmlFor='bookmarkLocation' />
-              <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
-            </div>
-            : null
+            !this.isFolder && this.props.shouldShowLocation
+            ? <h2 data-l10n-id='bookmarkEdit' />
+            : <h2 data-l10n-id='bookmarkAdded' />
           }
-          <div id='bookmarkParentFolder' className='formRow'>
-            <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk' />
-            <select value={this.props.currentDetail.get('parentFolderId')}
-              onChange={this.onParentFolderChange} >
-              <option value='0' data-l10n-id='bookmarksToolbar' />
-              {
-                this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
-              }
-            </select>
-          </div>
-          <div className='formRow'>
+          <div className='bookmarkFormTable'>
+            <div id='bookmarkName' className='bookmarkFormRow'>
+              <label data-l10n-id='nameField' htmlFor='bookmarkName' />
+              <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onNameChange} value={this.displayBookmarkName} ref={(bookmarkName) => { this.bookmarkName = bookmarkName }} />
+            </div>
             {
-              this.props.originalDetail
-              ? <a data-l10n-id='delete' className='removeBookmarkLink link' onClick={this.onRemoveBookmark} />
+              !this.isFolder && this.props.shouldShowLocation
+              ? <div id='bookmarkLocation' className='bookmarkFormRow'>
+                <label data-l10n-id='locationField' htmlFor='bookmarkLocation' />
+                <input spellCheck='false' onKeyDown={this.onKeyDown} onChange={this.onLocationChange} value={this.props.currentDetail.get('location')} />
+              </div>
               : null
             }
-            <Button l10nId='save' disabled={!this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
+            <div id='bookmarkParentFolder' className='bookmarkFormRow'>
+              <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk' />
+              <select value={this.props.currentDetail.get('parentFolderId')}
+                onChange={this.onParentFolderChange} >
+                <option value='0' data-l10n-id='bookmarksToolbar' />
+                {
+                  this.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
+                }
+              </select>
+            </div>
+            <div className='bookmarkButtons'>
+              {
+                this.props.originalDetail
+                ? <Button l10nId='remove' className='primaryButton whiteButton inlineButton' onClick={this.onRemoveBookmark} />
+                : null
+              }
+              <Button l10nId='done' disabled={!this.bookmarkNameValid} className='primaryButton' onClick={this.onSave} />
+            </div>
           </div>
         </div>
+        <div className='bookmarkFormFooter'>
+          <Button l10nId='viewBookmarks' onClick={this.onViewBookmarks} />
+        </div>
       </div>
-    </Dialog>
+    </div>
   }
 }
 

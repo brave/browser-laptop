@@ -467,7 +467,7 @@ Dispatches a message to set the find-in-page details.
 
 
 
-### setBookmarkDetail(currentDetail, originalDetail, destinationDetail) 
+### setBookmarkDetail(currentDetail, originalDetail, destinationDetail, shouldShowLocation) 
 
 Dispatches a message to set add/edit bookmark details
 If set, also indicates that add/edit is shown
@@ -479,6 +479,8 @@ If set, also indicates that add/edit is shown
 **originalDetail**: `Object`, Properties of the bookmark to edit
 
 **destinationDetail**: `Object`, Will move the added bookmark to the specified position
+
+**shouldShowLocation**: `Object`, Whether or not to show the URL input
 
 
 

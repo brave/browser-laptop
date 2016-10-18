@@ -32,7 +32,6 @@ const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
 const ImportBrowserDataPanel = require('../../app/renderer/components/importBrowserDataPanel')
 const AutofillAddressPanel = require('./autofillAddressPanel')
 const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
-const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar')
@@ -667,7 +666,8 @@ class Main extends ImmutableComponent {
           (node.classList.contains('popupWindow') ||
             node.classList.contains('contextMenu') ||
             node.classList.contains('extensionButton') ||
-            node.classList.contains('menubarItem'))) {
+            node.classList.contains('menubarItem') ||
+            node.classList.contains('bookmarkForm'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
@@ -919,6 +919,7 @@ class Main extends ImmutableComponent {
                 startLoadTime={activeFrame && activeFrame.get('startLoadTime') || undefined}
                 endLoadTime={activeFrame && activeFrame.get('endLoadTime') || undefined}
                 loading={activeFrame && activeFrame.get('loading')}
+                bookmarkDetail={this.props.windowState.get('bookmarkDetail')}
                 mouseInTitlebar={this.props.windowState.getIn(['ui', 'mouseInTitlebar'])}
                 searchDetail={this.props.windowState.get('searchDetail')}
                 enableNoScript={this.enableNoScript(activeSiteSettings)}
@@ -1002,14 +1003,6 @@ class Main extends ImmutableComponent {
           loginRequiredDetail
             ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
             : null
-        }
-        {
-          this.props.windowState.get('bookmarkDetail')
-          ? <AddEditBookmark sites={this.props.appState.get('sites')}
-            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
-            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
-            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])} />
-          : null
         }
         {
           noScriptIsVisible
