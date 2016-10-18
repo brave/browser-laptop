@@ -25,7 +25,6 @@
         font-weight: 300;
         padding: 8px;
         box-sizing: border-box;
-        border-right: 1px solid @braveOrange;
         padding-left: 10px;
         -webkit-user-select: none;
         cursor: default;
@@ -43,7 +42,6 @@
 
       > .bookmarkFolderList {
         display: block;
-        border-right: 1px solid @braveOrange;
         height: 100%;
 
         .listItem >* {
@@ -65,12 +63,13 @@
     }
     .organizeView {
       flex-grow: 5;
-
+      border-left: 1px solid @braveOrange;
       .sortableTable {
         -webkit-user-select: none;
-        th:nth-of-type(2), td.date {
-          width: 250px;
-        }
+        // Custom title column (has add bookmark icon)
+        th:first-of-type > div { display: block; }
+        // Bookmark last visited column
+        th:nth-of-type(2), td.date { width: 250px; }
         td {
           font-size: 11pt;
           padding-left: 10px;
