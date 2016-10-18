@@ -27,6 +27,10 @@ describe('siteUtil', function () {
     parentFolderId: 0,
     tags: [siteTags.BOOKMARK_FOLDER]
   })
+  const siteMinFields = Immutable.fromJS({
+    location: testUrl1,
+    title: 'sample'
+  })
 
   describe('getSiteIndex', function () {
     it('returns -1 if sites is falsey', function () {
@@ -178,7 +182,17 @@ describe('siteUtil', function () {
       const expectedSites = Immutable.fromJS([bookmarkAllFields])
       assert.deepEqual(processedSites.getIn([0, 'tags']), expectedSites.getIn([0, 'tags']))
     })
-
+    describe('record count', function () {
+      var processedSites
+      it('create history record with count', function () {
+        processedSites = siteUtil.addSite(emptySites, siteMinFields)
+        assert.deepEqual(processedSites.getIn([0, 'count']), 1)
+      })
+      it('increments count for history item', function () {
+        processedSites = siteUtil.addSite(processedSites, siteMinFields)
+        assert.deepEqual(processedSites.getIn([0, 'count']), 2)
+      })
+    })
     describe('for new entries (oldSite is null)', function () {
       describe('when adding bookmark', function () {
         it('preserves existing siteDetail fields', function () {
@@ -192,7 +206,6 @@ describe('siteUtil', function () {
           assert.deepEqual(processedSites.getIn([0, 'tags']).toJS(), [siteTags.BOOKMARK])
         })
       })
-
       describe('when adding bookmark folder', function () {
         it('assigns a folderId', function () {
           const processedSites = siteUtil.addSite(emptySites, folderMinFields)
