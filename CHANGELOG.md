@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.6](https://github.com/brave/browser-laptop/releases/v0.12.6dev)
+- (TODO)
+
 ## [0.12.5](https://github.com/brave/browser-laptop/releases/v0.12.5dev)
 - Added Brave Wallet backup and recovery ([#4743](https://github.com/brave/browser-laptop/issues/4743))([#3350](https://github.com/brave/browser-laptop/issues/3350))
 - Added a way for users to opt-out of crash reporting ([#4479](https://github.com/brave/browser-laptop/issues/4479))
