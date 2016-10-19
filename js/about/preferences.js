@@ -27,6 +27,7 @@ const SortableTable = require('../components/sortableTable')
 const Button = require('../components/button')
 const searchProviders = require('../data/searchProviders')
 const moment = require('moment')
+const punycode = require('punycode')
 
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
@@ -613,7 +614,10 @@ class GeneralTab extends ImmutableComponent {
         <option data-l10n-id={lc} value={lc} />
       )
     })
-    const homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
+    var homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
+    if (typeof homepageValue === 'string') {
+      homepageValue = punycode.toASCII(homepageValue)
+    }
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
@@ -638,7 +642,7 @@ class GeneralTab extends ImmutableComponent {
         <SettingItem dataL10nId='myHomepage'>
           <input spellCheck='false'
             data-l10n-id='homepageInput'
-            value={getSetting(settings.HOMEPAGE, this.props.settings)}
+            value={homepageValue}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
         <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON}

@@ -50,6 +50,7 @@ module.exports = {
   securityTab: '[data-l10n-id="security"]',
   paymentsTab: '[data-l10n-id="payments"]',
   saveButton: '[data-l10n-id="save"]',
+  homepageInput: '[data-l10n-id="homepageInput"]',
   walletSwitch: '.enablePaymentsSwitch .switchBackground',
   addFundsButton: '.addFunds',
   fundsSelectBox: '#fundsSelectBox',
