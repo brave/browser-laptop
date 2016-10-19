@@ -498,6 +498,8 @@ const defaultLocale = function () {
     if (pos > -1)
       output =  output.substr(0, pos)
     ln = output.replace('_', '-')
+    if (availableLanguages.indexOf(ln) === -1)
+      ln = null
   }
   if (ln) return ln
   // If electron has the locale
