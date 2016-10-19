@@ -616,7 +616,6 @@ class GeneralTab extends ImmutableComponent {
     const homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
     const homepage = homepageValue && homepageValue.trim()
     const disableShowHomeButton = !homepage || !homepage.length
-    const disableBookmarksBarSelect = !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR, this.props.settings)
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
       ? <div className='sectionTitle' data-l10n-id='defaultBrowser' />
@@ -652,7 +651,6 @@ class GeneralTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingItem dataL10nId='bookmarkToolbarSettings'>
           <select id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
-            disabled={disableBookmarksBarSelect}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)} >
             <option data-l10n-id='bookmarksBarTextOnly' value={bookmarksToolbarMode.TEXT_ONLY} />
             <option data-l10n-id='bookmarksBarTextAndFavicon' value={bookmarksToolbarMode.TEXT_AND_FAVICONS} />
