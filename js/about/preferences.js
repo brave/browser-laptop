@@ -618,12 +618,11 @@ class GeneralTab extends ImmutableComponent {
     const disableShowHomeButton = !homepage || !homepage.length
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
-      ? <div className='sectionTitle' data-l10n-id='defaultBrowser' />
-      : <div>
-        <div className='sectionTitle' data-l10n-id='notDefaultBrowser' />
+      ? <SettingItem dataL10nId='defaultBrowser' />
+      : <SettingItem dataL10nId='notDefaultBrowser' >
         <Button l10nId='setAsDefault' className='primaryButton setAsDefaultButton'
           onClick={this.setAsDefaultBrowser} />
-      </div>
+      </SettingItem>
 
     return <SettingsList>
       <div className='sectionTitle' data-l10n-id='generalSettings' />
@@ -670,11 +669,11 @@ class GeneralTab extends ImmutableComponent {
           <Button l10nId='importNow' className='primaryButton importNowButton'
             onClick={this.importBrowserDataNow} />
         </SettingItem>
-      </SettingsList>
-      <SettingsList>
         {defaultBrowser}
-        <SettingCheckbox dataL10nId='checkDefaultOnStartup' prefKey={settings.CHECK_DEFAULT_ON_STARTUP}
-          settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem>
+          <SettingCheckbox dataL10nId='checkDefaultOnStartup' prefKey={settings.CHECK_DEFAULT_ON_STARTUP}
+            settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingItem>
       </SettingsList>
     </SettingsList>
   }
