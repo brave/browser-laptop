@@ -234,8 +234,10 @@ module.exports.cleanAppData = (data, isShutdown) => {
   data.temporarySiteSettings = {}
   // Delete Flash state since this is checked on startup
   delete data.flashInitialized
-  // Delete defaultBrowserCheckComplete state since this is checked on startup
-  delete data.defaultBrowserCheckComplete
+  if (data.settings[settings.CHECK_DEFAULT_ON_STARTUP] === true) {
+    // Delete defaultBrowserCheckComplete state since this is checked on startup
+    delete data.defaultBrowserCheckComplete
+  }
   // Delete Recovery status on shut down
   try {
     delete data.ui.about.preferences.recoverySucceeded

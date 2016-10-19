@@ -26,11 +26,13 @@ class CheckDefaultBrowserDialog extends ImmutableComponent {
     appActions.defaultBrowserUpdated(false)
     appActions.defaultBrowserCheckComplete()
     appActions.changeSetting(settings.CHECK_DEFAULT_ON_STARTUP, this.props.checkDefaultOnStartup)
+    this.props.onHide()
   }
   onUseBrave () {
     appActions.defaultBrowserUpdated(true)
     appActions.defaultBrowserCheckComplete()
     appActions.changeSetting(settings.CHECK_DEFAULT_ON_STARTUP, this.props.checkDefaultOnStartup)
+    this.props.onHide()
   }
   render () {
     return <Dialog className='checkDefaultBrowserDialog' >
