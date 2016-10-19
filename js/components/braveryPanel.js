@@ -166,6 +166,13 @@ class BraveryPanel extends ImmutableComponent {
     const adsBlockedStat = (this.blockedAds ? this.blockedAds.size : 0) + (this.blockedByTrackingList ? this.blockedByTrackingList.size : 0)
     const scriptsBlockedStat = this.blockedScripts ? this.blockedScripts.size : 0
     const fpBlockedStat = this.blockedFingerprinting ? this.blockedFingerprinting.size : 0
+    const httpsUpgradedResourceStat = this.redirectedResourcesSet.size || 0
+    const l10nArgs = JSON.stringify({
+      blockedAdCount: adsBlockedStat,
+      httpsUpgradeCount: httpsUpgradedResourceStat,
+      blockedScriptCount: scriptsBlockedStat,
+      blockedFingerprintCount: fpBlockedStat
+    })
     return <Dialog onHide={this.props.onHide} className='braveryPanelContainer' isClickDismiss>
       <div className='braveryPanel' onClick={(e) => e.stopPropagation()}>
         <div className='braveryPanelHeader'>
@@ -185,28 +192,28 @@ class BraveryPanel extends ImmutableComponent {
             statDisabled: !shieldsUp || adControl === 'allowAdsAndTracking'
           })}>
             <div className='braveryStat adsBlockedStat'>{adsBlockedStat}</div>
-            <div data-l10n-id='adsBlocked' />
+            <div data-l10n-id='adsBlocked' data-l10n-args={l10nArgs} />
           </div>
           <div onClick={this.onToggleHttpseList} className={cx({
             statClickable: !!this.redirectedResourcesSet.size,
             statDisabled: !shieldsUp || !httpseEnabled
           })}>
-            <div className='braveryStat redirectedResourcesStat'>{this.redirectedResourcesSet.size || 0}</div>
-            <div data-l10n-id='httpReroutes' />
+            <div className='braveryStat redirectedResourcesStat'>{httpsUpgradedResourceStat}</div>
+            <div data-l10n-id='httpReroutes' data-l10n-args={l10nArgs} />
           </div>
           <div onClick={this.onToggleNoScriptList} className={cx({
             statClickable: !!scriptsBlockedStat,
             statDisabled: !shieldsUp || !noScriptEnabled
           })}>
             <div className='braveryStat noScriptStat'>{scriptsBlockedStat}</div>
-            <div data-l10n-id='scriptsBlockedNumber' />
+            <div data-l10n-id='scriptsBlockedNumber' data-l10n-args={l10nArgs} />
           </div>
           <div onClick={this.onToggleFpList} className={cx({
             statClickable: !!fpBlockedStat,
             statDisabled: !shieldsUp || !fpEnabled
           })}>
             <div className='braveryStat fpStat'>{fpBlockedStat}</div>
-            <div data-l10n-id='fingerprintingBlocked' />
+            <div data-l10n-id='fingerprintingBlocked' data-l10n-args={l10nArgs} />
           </div>
         </div>
         <div className='braveryPanelBody'>

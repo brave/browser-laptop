@@ -49,11 +49,7 @@ describe('about:history', function () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .doubleClick('table.sortableTable td.title[data-sort="Page 1"]')
-        .waitUntil(function () {
-          return this.getTabCount().then((count) => {
-            return count === 2
-          })
-        })
+        .waitForTabCount(2)
         .waitForUrl(page1)
         .tabByIndex(0)
     })
