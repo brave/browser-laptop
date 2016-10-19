@@ -581,6 +581,7 @@ class GeneralTab extends ImmutableComponent {
     super()
     this.importBrowserDataNow = this.importBrowserDataNow.bind(this)
     this.onChangeSetting = this.onChangeSetting.bind(this)
+    this.setAsDefaultBrowser = this.setAsDefaultBrowser.bind(this)
   }
 
   importBrowserDataNow () {
@@ -598,6 +599,10 @@ class GeneralTab extends ImmutableComponent {
     this.props.onChangeSetting(key, value)
   }
 
+  setAsDefaultBrowser () {
+    aboutActions.setAsDefaultBrowser()
+  }
+
   enabled (keyArray) {
     return keyArray.every((key) => getSetting(key, this.props.settings) === true)
   }
@@ -613,6 +618,13 @@ class GeneralTab extends ImmutableComponent {
     const disableShowHomeButton = !homepage || !homepage.length
     const disableBookmarksBarSelect = !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR, this.props.settings)
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
+    const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
+      ? <div className='sectionTitle' data-l10n-id='defaultBrowser' />
+      : <div>
+        <div className='sectionTitle' data-l10n-id='notDefaultBrowser' />
+        <Button l10nId='setAsDefault' className='primaryButton setAsDefaultButton'
+          onClick={this.setAsDefaultBrowser} />
+      </div>
 
     return <SettingsList>
       <div className='sectionTitle' data-l10n-id='generalSettings' />
@@ -660,6 +672,11 @@ class GeneralTab extends ImmutableComponent {
           <Button l10nId='importNow' className='primaryButton importNowButton'
             onClick={this.importBrowserDataNow} />
         </SettingItem>
+      </SettingsList>
+      <SettingsList>
+        {defaultBrowser}
+        <SettingCheckbox dataL10nId='checkDefaultOnStartup' prefKey={settings.CHECK_DEFAULT_ON_STARTUP}
+          settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
     </SettingsList>
   }

@@ -82,6 +82,7 @@ const privacy = require('../js/state/privacy')
 const basicAuth = require('./browser/basicAuth')
 const async = require('async')
 const tabs = require('./browser/tabs')
+const settings = require('../js/constants/settings')
 
 // temporary fix for #4517, #4518 and #4472
 app.commandLine.appendSwitch('enable-use-zoom-for-dsf', 'false')
@@ -106,6 +107,8 @@ const prefsRestartCallbacks = {}
 const prefsRestartLastValue = {}
 
 const unsafeTestMasterKey = 'c66af15fc6555ebecf7cee3a5b82c108fd3cb4b587ab0b299d28e39c79ecc708'
+
+const defaultProtocols = ['http', 'https']
 
 const sessionStoreQueue = async.queue((task, callback) => {
   task(callback)
@@ -440,6 +443,10 @@ app.on('ready', () => {
       })
     }
     process.emit(messages.APP_INITIALIZED)
+
+    // Default browser checking
+    let isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+    appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
 
     if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({

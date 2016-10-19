@@ -914,6 +914,18 @@ Fired when window receives or loses focus
 
 
 
+### setModalDialogDetail(className, props) 
+
+Set Modal Dialog detail
+
+**Parameters**
+
+**className**: `string`, name of modal dialog
+
+**props**: `Object`, properties of the modal dialog
+
+
+
 
 * * *
 

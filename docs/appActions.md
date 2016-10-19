@@ -466,6 +466,22 @@ Dispatches a message to submit feedback
 
 
 
+### defaultBrowserUpdated(useBrave) 
+
+Dispatch a message to set default browser
+
+**Parameters**
+
+**useBrave**: `boolean`, whether set Brave as default browser
+
+
+
+### defaultBrowserCheckComplete() 
+
+Dispatch a message to indicate default browser check is complete
+
+
+
 
 * * *
 

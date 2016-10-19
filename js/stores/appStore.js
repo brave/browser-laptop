@@ -44,6 +44,8 @@ const isWindows = process.platform === 'win32'
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
 
+const defaultProtocols = ['https', 'http']
+
 let appState
 let lastEmittedState
 
@@ -722,6 +724,18 @@ const handleAppAction = (action) => {
       }
       const subject = encodeURIComponent(`Brave ${platform} ${os.arch()} ${app.getVersion()}${channel()} feedback`)
       electron.shell.openExternal(`${appConfig.contactUrl}?subject=${subject}`)
+      break
+    case AppConstants.APP_DEFAULT_BROWSER_UPDATED:
+      if (action.useBrave) {
+        for (const p of defaultProtocols) {
+          app.setAsDefaultProtocolClient(p)
+        }
+      }
+      let isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+      appState = appState.setIn(['settings', settings.IS_DEFAULT_BROWSER], isDefaultBrowser)
+      break
+    case AppConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE:
+      appState = appState.set('defaultBrowserCheckComplete', {})
       break
     default:
   }

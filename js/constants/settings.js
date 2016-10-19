@@ -14,6 +14,8 @@ const settings = {
   BOOKMARKS_TOOLBAR_MODE: 'general.bookmarks-toolbar-mode',
   SHOW_BOOKMARKS_TOOLBAR: 'bookmarks.toolbar.show',
   LANGUAGE: 'general.language',
+  CHECK_DEFAULT_ON_STARTUP: 'general.check-default-on-startup',
+  IS_DEFAULT_BROWSER: 'general.is-default-browser',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
