@@ -68,7 +68,7 @@ if (isDarwin) {
     title: 'Brave',
     authors: 'Brave Software',
     loadingGif: 'res/brave_splash_installing.gif',
-    setupIcon: 'res/app.ico',
+    setupIcon: 'res/brave_installer.ico',
     iconUrl: 'https://brave.com/favicon.ico',
     signWithParams: format('-a -fd sha256 -f "%s" -p "%s" -t http://timestamp.verisign.com/scripts/timstamp.dll', path.resolve(cert), certPassword),
     exe: 'Brave.exe'
