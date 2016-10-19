@@ -444,9 +444,18 @@ app.on('ready', () => {
     }
     process.emit(messages.APP_INITIALIZED)
 
-    // Default browser checking
-    let isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
-    appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
+    if (process.env.BRAVE_IS_DEFAULT_BROWSER !== undefined) {
+      if (process.env.BRAVE_IS_DEFAULT_BROWSER === 'true') {
+        appActions.changeSetting(settings.IS_DEFAULT_BROWSER, true)
+      } else if (process.env.BRAVE_IS_DEFAULT_BROWSER === 'false') {
+        appActions.changeSetting(settings.IS_DEFAULT_BROWSER, false)
+      }
+    } else {
+      // Default browser checking
+      let isDefaultBrowser = ['development', 'test'].includes(process.env.NODE_ENV)
+        ? true : defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+      appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
+    }
 
     if (CmdLine.newWindowURL) {
       appActions.newWindow(Immutable.fromJS({
