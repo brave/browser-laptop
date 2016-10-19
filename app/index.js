@@ -363,11 +363,10 @@ app.on('ready', () => {
   ipcMain.removeAllListeners('window-alert')
   ipcMain.on('window-alert', function (event, message, title) {
     var buttons
-    if (title == null) {
-      title = ''
-    }
+
     buttons = ['OK']
     message = message ? message.toString() : ''
+    title = title ? title.toString() : ''
     dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
       title: title,
@@ -379,10 +378,10 @@ app.on('ready', () => {
   ipcMain.removeAllListeners('window-confirm')
   ipcMain.on('window-confirm', function (event, message, title) {
     var buttons, cancelId
-    if (title == null) {
-      title = ''
-    }
+
     buttons = ['OK', 'Cancel']
+    message = message ? message.toString() : ''
+    title = title ? title.toString() : ''
     cancelId = 1
     event.returnValue = !dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
       message: message,
