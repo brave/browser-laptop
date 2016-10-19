@@ -99,3 +99,13 @@ module.exports.simpleDomainNameValue = (site) => {
     return 0
   }
 }
+
+/*
+ * Normalize a location for url suggestion sorting
+ *
+ * @param {string} location - history item location
+ *
+ */
+module.exports.normalizeLocation = (location) => {
+  return location.replace(/www\./, '')
+}

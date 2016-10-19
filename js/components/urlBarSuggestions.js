@@ -248,8 +248,10 @@ class UrlBarSuggestions extends ImmutableComponent {
       })
 
     const sortBasedOnLocationPos = (s1, s2) => {
-      const pos1 = s1.get('location').indexOf(urlLocationLower)
-      const pos2 = s2.get('location').indexOf(urlLocationLower)
+      const location1 = suggestion.normalizeLocation(s1.get('location'))
+      const location2 = suggestion.normalizeLocation(s2.get('location'))
+      const pos1 = location1.indexOf(urlLocationLower)
+      const pos2 = location2.indexOf(urlLocationLower)
       if (pos1 === -1 && pos2 === -1) {
         return 0
       } else if (pos1 === -1) {

@@ -8,6 +8,11 @@ require('../braveUnit')
 const AGE_DECAY = 50
 
 describe('suggestion', function () {
+  it('normalizes location', function () {
+    assert.ok(suggestion.normalizeLocation('https://www.site.com') === 'https://site.com', 'www. prefix removed')
+    assert.ok(suggestion.normalizeLocation('http://site.com') === 'http://site.com', 'location not modified')
+  })
+
   it('sorts sites correctly', function () {
     assert.ok(suggestion.sortingPriority(10, 100, 50, AGE_DECAY) > suggestion.sortingPriority(10, 100, 40, AGE_DECAY), 'newer sites with equal access counts sort earlier')
     assert.ok(suggestion.sortingPriority(10, 100, 50, AGE_DECAY) < suggestion.sortingPriority(11, 100, 40, AGE_DECAY), 'Sites with higher access counts sort earlier (unless time delay overriden)')
@@ -21,4 +26,3 @@ describe('suggestion', function () {
     assert.ok(suggestion.simpleDomainNameValue(siteComplex) === 0, 'complex site returns 0')
   })
 })
-
