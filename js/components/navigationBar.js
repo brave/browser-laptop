@@ -122,9 +122,7 @@ class NavigationBar extends ImmutableComponent {
           originalDetail={this.props.bookmarkDetail.get('originalDetail')}
           destinationDetail={this.props.bookmarkDetail.get('destinationDetail')}
           shouldShowLocation={this.props.bookmarkDetail.get('shouldShowLocation')}
-          withStopButton={!isSourceAboutUrl(this.props.location)}
           withHomeButton={getSetting(settings.SHOW_HOME_BUTTON)}
-          withoutButtons={isSourceAboutUrl(this.props.location) && !getSetting(settings.SHOW_HOME_BUTTON)}
           />
         : null
         }
@@ -155,9 +153,7 @@ class NavigationBar extends ImmutableComponent {
             navbutton: true,
             bookmarkButton: true,
             removeBookmarkButton: this.bookmarked,
-            withStopButton: !isSourceAboutUrl(this.props.location),
-            withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-            withoutButtons: isSourceAboutUrl(this.props.location) && !getSetting(settings.SHOW_HOME_BUTTON)
+            withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
           })}
           l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
           onClick={this.onToggleBookmark} />
