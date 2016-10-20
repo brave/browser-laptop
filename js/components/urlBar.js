@@ -43,15 +43,16 @@ class UrlBar extends ImmutableComponent {
     this.onContextMenu = this.onContextMenu.bind(this)
     this.activateSearchEngine = false
     this.searchSelectEntry = null
+    this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput) {
+      if (!this.urlInput || this.keyPressed) {
         return
       }
       const suffixLen = this.props.locationValueSuffix.length
       this.urlInput.value = this.defaultValue
       const len = this.defaultValue.length
       this.urlInput.setSelectionRange(len - suffixLen, len)
-    }, 300)
+    }, 100)
   }
 
   get activeFrame () {
@@ -197,6 +198,7 @@ class UrlBar extends ImmutableComponent {
         this.hideAutoComplete()
         break
       default:
+        this.keyPressed = true
         // Any other keydown is fair game for autocomplete to be enabled.
         if (!this.autocompleteEnabled) {
           windowActions.setUrlBarAutocompleteEnabled(true)
@@ -267,6 +269,7 @@ class UrlBar extends ImmutableComponent {
     windowActions.setNavBarUserInput(e.target.value)
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
+    this.keyPressed = false
   }
 
   onFocus (e) {
