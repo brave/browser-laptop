@@ -52,8 +52,12 @@
       .bookmarkFolderList {
         .listItem {
           height: 1rem;
-          &.selected >* {
+          &.selected >*,
+          &.isDragOver >* {
             font-weight: 800;
+          }
+          &.isDragOver {
+            background-color: lighten(@braveOrange, 20%);
           }
         }
         .bookmarkFolderIcon {
@@ -97,6 +101,11 @@
         tr:hover {
           .bookmarkLocation {
             display: inline-block;
+          }
+        }
+        tr.selected:hover {
+          .bookmarkLocation {
+            color: #fff;
           }
         }
       }

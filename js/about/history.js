@@ -21,6 +21,9 @@ const ipc = window.chrome.ipc
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
+// BSCTODO: this button is currently hidden (along with column icon)
+// When ready, this can be shown again (by updating style in history.less)
+// When that happens, be sure to also show the ::before (which has trash can icon)
 class DeleteHistoryEntryButton extends ImmutableComponent {
   constructor () {
     super()
@@ -31,7 +34,7 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
-    // BSCTODO: ...
+    // BSCTODO: delete the selected entry
   }
 
   render () {
@@ -81,6 +84,7 @@ class HistoryDay extends ImmutableComponent {
         columnClassNames={['time', 'title', 'domain']}
         addHoverClass
         multiSelect
+        stateOwner={this.props.stateOwner}
         onDoubleClick={this.navigate}
         contextMenuName='history'
         onContextMenu={aboutActions.contextMenu} />
@@ -133,8 +137,12 @@ class GroupedHistoryList extends ImmutableComponent {
     return <list className='historyList'>
       {
         entriesByDay.map((groupedEntry) =>
-          <HistoryDay date={groupedEntry.date} entries={groupedEntry.entries}
-            totalEntries={this.totalEntries(entriesByDay)} tableID={index++} />)
+          <HistoryDay date={groupedEntry.date}
+            entries={groupedEntry.entries}
+            totalEntries={this.totalEntries(entriesByDay)}
+            tableID={index++}
+            stateOwner={this.props.stateOwner}
+          />)
       }
     </list>
   }
@@ -150,7 +158,8 @@ class AboutHistory extends React.Component {
       history: Immutable.List(),
       search: '',
       settings: Immutable.Map(),
-      languageCodes: Immutable.Map()
+      languageCodes: Immutable.Map(),
+      selection: Immutable.Set()
     }
     ipc.on(messages.HISTORY_UPDATED, (e, detail) => {
       this.setState({ history: Immutable.fromJS(detail && detail.history || {}) })
@@ -217,7 +226,8 @@ class AboutHistory extends React.Component {
             this.state.search
             ? this.searchedSiteDetails(this.state.search, this.historyDescendingOrder)
             : this.historyDescendingOrder
-          } />
+          }
+          stateOwner={this} />
       </div>
     </div>
   }

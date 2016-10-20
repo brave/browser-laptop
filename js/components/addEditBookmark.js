@@ -110,10 +110,10 @@ class AddEditBookmark extends ImmutableComponent {
     windowActions.setBookmarkDetail(currentDetail, this.props.originalDetail, this.props.destinationDetail)
   }
   showToolbarOnFirstBookmark () {
-    const hasOneBookmark = this.props.sites.find(
+    const hasBookmarks = this.props.sites.find(
       (site) => siteUtil.isBookmark(site) || siteUtil.isFolder(site)
     )
-    if (!hasOneBookmark && !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)) {
+    if (!hasBookmarks && !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)) {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
   }

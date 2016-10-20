@@ -53,6 +53,7 @@ var rendererIdentifiers = function () {
     'unpinTab',
     'deleteFolder',
     'deleteBookmark',
+    'deleteBookmarks',
     'deleteHistoryEntry',
     'deleteHistoryEntries',
     'deleteLedgerEntry',

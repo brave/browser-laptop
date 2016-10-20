@@ -221,12 +221,14 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
 
 function siteDetailTemplateInit (siteDetail, activeFrame) {
   let isHistoryEntry = false
-  let isHistoryEntries = false
+  let multipleHistoryEntries = false
+  let multipleBookmarks = false
   let isFolder = false
   let isSystemFolder = false
   let deleteLabel
   let deleteTag
 
+  // BSCTODO: pull this out to a method
   if (siteUtil.isBookmark(siteDetail) && activeFrame) {
     deleteLabel = 'deleteBookmark'
     deleteTag = siteTags.BOOKMARK
@@ -240,13 +242,19 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     isHistoryEntry = true
     deleteLabel = 'deleteHistoryEntry'
   } else if (Immutable.List.isList(siteDetail)) {
-    isHistoryEntries = true
+    // Multiple bookmarks OR history entries selected
+    multipleHistoryEntries = true
+    multipleBookmarks = true
     siteDetail.forEach((site) => {
-      if (!siteUtil.isHistoryEntry(site)) {
-        isHistoryEntries = false
-      }
+      if (!siteUtil.isBookmark(site)) multipleBookmarks = false
+      if (!siteUtil.isHistoryEntry(site)) multipleHistoryEntries = false
     })
-    deleteLabel = 'deleteHistoryEntries'
+    if (multipleBookmarks) {
+      deleteLabel = 'deleteBookmarks'
+      deleteTag = siteTags.BOOKMARK
+    } else if (multipleHistoryEntries) {
+      deleteLabel = 'deleteHistoryEntries'
+    }
   }
 
   const template = []
@@ -279,9 +287,11 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   }
 
   if (!isSystemFolder) {
-    // History can be deleted but not edited
     // Picking this menu item pops up the AddEditBookmark modal
-    if (!isHistoryEntry && !isHistoryEntries) {
+    // - History can be deleted but not edited
+    // - Multiple bookmarks cannot be edited at once
+    // - "Bookmarks Toolbar" and "Other Bookmarks" folders cannot be deleted
+    if (!isHistoryEntry && !multipleHistoryEntries && !multipleBookmarks) {
       template.push(
         {
           label: locale.translation(isFolder ? 'editFolder' : 'editBookmark'),
@@ -303,7 +313,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
       })
   }
 
-  if (!isHistoryEntry && !isHistoryEntries) {
+  if (!isHistoryEntry && !multipleHistoryEntries) {
     if (template[template.length - 1] !== CommonMenu.separatorMenuItem) {
       template.push(CommonMenu.separatorMenuItem)
     }
