@@ -1,7 +1,21 @@
 # Changelog
 
 ## [0.12.6](https://github.com/brave/browser-laptop/releases/v0.12.6dev)
-- (TODO)
+- Added the ability to set Brave as your default browser ([#4937](https://github.com/brave/browser-laptop/issues/4937))([#4958](https://github.com/brave/browser-laptop/issues/4958))([#4935](https://github.com/brave/browser-laptop/issues/4935))([#4934](https://github.com/brave/browser-laptop/issues/4934))([#2105](https://github.com/brave/browser-laptop/issues/2105))([#4939](https://github.com/brave/browser-laptop/issues/4939))
+- Added the option to opt-in to reporting usage stats ([#4691](https://github.com/brave/browser-laptop/issues/4691))
+- Fixed various security issues ([#4747](https://github.com/brave/browser-laptop/issues/4747))([#4885](https://github.com/brave/browser-laptop/issues/4885))([#4913](https://github.com/brave/browser-laptop/issues/4913))([#4883](https://github.com/brave/browser-laptop/issues/4883))
+- Fixed error on invalid homepage URL ([#4974](https://github.com/brave/browser-laptop/issues/4974))
+- Fixed Autocomplete to behave more like Chrome / Firefox ([#3049](https://github.com/brave/browser-laptop/issues/3049))([#3235](https://github.com/brave/browser-laptop/issues/3235))([#4861](https://github.com/brave/browser-laptop/issues/4861))
+- Fixed Favicons not being loaded when bookmarks imported from browser ([#4882](https://github.com/brave/browser-laptop/issues/4882))
+- Fixed Bookmarks bar select element should not be disabled ([#4936](https://github.com/brave/browser-laptop/issues/4936))
+- Fixed blocking `*`y.ai sites from being accidentally blocked ([#4938](https://github.com/brave/browser-laptop/issues/4938))
+- Fixed various UI issues ([#4923](https://github.com/brave/browser-laptop/issues/4923))([#4897](https://github.com/brave/browser-laptop/issues/4897))([#4814](https://github.com/brave/browser-laptop/issues/4814))([#4817](https://github.com/brave/browser-laptop/issues/4817))([#4866](https://github.com/brave/browser-laptop/issues/4866))([#4855](https://github.com/brave/browser-laptop/issues/4855))([#3282](https://github.com/brave/browser-laptop/issues/3282))([#2894](https://github.com/brave/browser-laptop/issues/2894))([#4864](https://github.com/brave/browser-laptop/issues/4864))([#4854](https://github.com/brave/browser-laptop/issues/4854))([#3008](https://github.com/brave/browser-laptop/issues/3008))([#4830](https://github.com/brave/browser-laptop/issues/4830))([#3604](https://github.com/brave/browser-laptop/issues/3604))([#4648](https://github.com/brave/browser-laptop/issues/4648))([#4810](https://github.com/brave/browser-laptop/issues/4810))([#4766](https://github.com/brave/browser-laptop/issues/4766))([#4836](https://github.com/brave/browser-laptop/issues/4836))([#4790](https://github.com/brave/browser-laptop/issues/4790))
+- Fixed double-clicking of entries on about:history opening a blank new tab ([#4909](https://github.com/brave/browser-laptop/issues/4909))
+- Fixed Pressing Tab, then Enter in URL bar unexpectedly minimizing window on Windows ([#4846](https://github.com/brave/browser-laptop/issues/4846))
+- Fixed address bar suggestions not working if you are offline ([#3730](https://github.com/brave/browser-laptop/issues/3730))
+- Fixed error tab cannot be reloaded or cloned ([#2826](https://github.com/brave/browser-laptop/issues/2826))
+- Fixed buttons to add bookmark / bookmark folder in about:bookmarks ([#4684](https://github.com/brave/browser-laptop/issues/4684))
+- Upgraded to brave/electrton 1.4.16 ([#4954](https://github.com/brave/browser-laptop/issues/4954))
 
 ## [0.12.5](https://github.com/brave/browser-laptop/releases/v0.12.5dev)
 - Added Brave Wallet backup and recovery ([#4743](https://github.com/brave/browser-laptop/issues/4743))([#3350](https://github.com/brave/browser-laptop/issues/3350))
