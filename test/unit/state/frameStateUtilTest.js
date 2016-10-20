@@ -35,7 +35,16 @@ describe('frameStateUtil', function () {
         history: ['http://brave.com'],
         location: 'http://brave.com/about'
       }
+      this.aboutFrameOpts = {}
+      Object.assign(this.aboutFrameOpts, this.frameOpts)
+      this.aboutFrameOpts['aboutDetails'] =
+      {
+        errorCode: -1,
+        frameKey: 1
+      }
       this.clonedFrame = frameStateUtil.cloneFrame(this.frameOpts, 4)
+      this.key = 6
+      this.aboutClonedFrame = frameStateUtil.cloneFrame(this.aboutFrameOpts, 5, this.key)
     })
 
     it('does not copy the key', function () {
@@ -82,6 +91,15 @@ describe('frameStateUtil', function () {
       assert.equal(this.clonedFrame.computedThemeColor, 'aaaaaa')
       assert.deepEqual(this.clonedFrame.history, ['http://brave.com'])
       assert(this.clonedFrame.history !== this.frameOpts.history)
+    })
+
+    it('clone without aboutDetails', function () {
+      assert.equal(this.clonedFrame.aboutDetails, undefined)
+    })
+
+    it('copies aboutDetails with key', function () {
+      assert.equal(this.aboutClonedFrame.aboutDetails.errorCode, this.aboutFrameOpts.aboutDetails.errorCode)
+      assert.equal(this.aboutClonedFrame.aboutDetails.frameKey, this.key)
     })
   })
 

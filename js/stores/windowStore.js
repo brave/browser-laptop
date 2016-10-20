@@ -162,7 +162,7 @@ const addToHistory = (frameProps) => {
   return history.slice(-10)
 }
 
-const newFrame = (frameOpts, openInForeground, insertionIndex) => {
+const newFrame = (frameOpts, openInForeground, insertionIndex, nextKey) => {
   const frames = windowState.get('frames')
 
   if (frameOpts === undefined) {
@@ -187,7 +187,9 @@ const newFrame = (frameOpts, openInForeground, insertionIndex) => {
     }
   }
 
-  const nextKey = incrementNextKey()
+  if (nextKey === undefined) {
+    nextKey = incrementNextKey()
+  }
   let nextPartitionNumber = 0
   if (frameOpts.partitionNumber) {
     nextPartitionNumber = frameOpts.partitionNumber
@@ -434,9 +436,13 @@ const doAction = (action) => {
       newFrame(action.frameOpts, action.openInForeground)
       break
     case WindowConstants.WINDOW_CLONE_FRAME:
-      let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
-      newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId), action.openInForeground, insertionIndex)
-      break
+      {
+        let insertionIndex = FrameStateUtil.findIndexForFrameKey(windowState.get('frames'), action.frameOpts.key) + 1
+        const nextKey = incrementNextKey()
+        newFrame(FrameStateUtil.cloneFrame(action.frameOpts, action.guestInstanceId, nextKey),
+          action.openInForeground, insertionIndex, nextKey)
+        break
+      }
     case WindowConstants.WINDOW_CLOSE_FRAME:
       // Use the frameProps we passed in, or default to the active frame
       const frameProps = action.frameProps || FrameStateUtil.getActiveFrame(windowState)
