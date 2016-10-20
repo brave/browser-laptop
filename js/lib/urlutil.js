@@ -155,7 +155,11 @@ const UrlUtil = {
       return input
     }
 
-    return new window.URL(input).href
+    try {
+      return new window.URL(input).href
+    } catch (e) {
+      return input
+    }
   },
 
   /**
