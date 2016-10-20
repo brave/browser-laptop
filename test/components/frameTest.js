@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {activeWebview, findBarInput, findBarMatches, findBarNextButton, urlInput, titleBar, backButton, forwardButton} = require('../lib/selectors')
+const {activeWebview, findBarInput, findBarMatches, findBarNextButton, findBarClearButton, urlInput, titleBar, backButton, forwardButton} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 const assert = require('assert')
 
@@ -51,6 +51,22 @@ describe('findbar', function () {
       .click(findBarNextButton)
     match = yield this.app.client.getText(findBarMatches)
     assert.equal(match, '1 of 2')
+  })
+
+  it.only('should empty the input on clear', function * () {
+    yield this.app.client
+      .showFindbar()
+      .waitForElementFocus(findBarInput)
+      .setValue(findBarInput, 'test')
+        .waitUntil(function () {
+          return this.getValue(findBarInput).then((val) => val === 'test')
+        })
+
+    // Clicking next goes to the next match
+    yield this.app.client
+      .click(findBarClearButton)
+    let match = yield this.app.client.getValue(findBarInput)
+    assert.equal(match, '')
   })
 
   it('should display no results correctly', function * () {
