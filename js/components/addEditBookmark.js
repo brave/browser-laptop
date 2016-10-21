@@ -44,6 +44,18 @@ class AddEditBookmark extends ImmutableComponent {
   get isFolder () {
     return siteUtil.isFolder(this.props.currentDetail)
   }
+  get heading () {
+    if (this.isFolder) {
+      return this.props.shouldShowLocation
+        ? 'bookmarkFolderEditing'
+        : 'bookmarkFolderAdding'
+    }
+    return this.props.shouldShowLocation
+      ? (!this.props.originalDetail || !this.props.originalDetail.has('location'))
+        ? 'bookmarkCreateNew'
+        : 'bookmarkEdit'
+      : 'bookmarkAdded'
+  }
   updateFolders (props) {
     this.folders = siteUtil.getFolders(this.props.sites, props.currentDetail.get('folderId'))
   }
@@ -143,11 +155,7 @@ class AddEditBookmark extends ImmutableComponent {
           withoutButtons: this.props.withoutButtons
         })} />
         <div className='bookmarkFormInner'>
-          {
-            !this.isFolder && this.props.shouldShowLocation
-            ? <h2 data-l10n-id='bookmarkEdit' />
-            : <h2 data-l10n-id='bookmarkAdded' />
-          }
+          <h2 data-l10n-id={this.heading} />
           <div className='bookmarkFormTable'>
             <div id='bookmarkName' className='bookmarkFormRow'>
               <label data-l10n-id='nameField' htmlFor='bookmarkName' />
@@ -162,7 +170,7 @@ class AddEditBookmark extends ImmutableComponent {
               : null
             }
             <div id='bookmarkParentFolder' className='bookmarkFormRow'>
-              <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolderk' />
+              <label data-l10n-id='parentFolderField' htmlFor='bookmarkParentFolder' />
               <select value={this.props.currentDetail.get('parentFolderId')}
                 onChange={this.onParentFolderChange} >
                 <option value='0' data-l10n-id='bookmarksToolbar' />

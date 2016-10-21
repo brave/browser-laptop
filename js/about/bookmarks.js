@@ -144,7 +144,7 @@ class BookmarkTitleHeader extends ImmutableComponent {
       parentFolderId: this.props.selectedFolderId,
       tags: [siteTags.BOOKMARK]
     })
-    aboutActions.openBookmarkEditor(newBookmark)
+    aboutActions.showAddBookmark(newBookmark)
   }
   render () {
     return <div className='th-inner'>
@@ -320,7 +320,7 @@ class AboutBookmarks extends React.Component {
       parentFolderId: this.state.selectedFolderId,
       tags: [siteTags.BOOKMARK_FOLDER]
     })
-    aboutActions.openBookmarkEditor(newFolder)
+    aboutActions.showAddBookmarkFolder(newFolder)
   }
   componentDidMount () {
     this.refs.bookmarkSearch.focus()
