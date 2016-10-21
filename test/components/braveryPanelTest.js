@@ -165,7 +165,6 @@ describe('Bravery Panel', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
-          console.log('waitUntil= blocked')
           return this.getText(adsBlockedStat)
             .then((blocked) => blocked === '2')
         })
@@ -191,9 +190,6 @@ describe('Bravery Panel', function () {
         .waitForTabCount(2)
         .waitForUrl(url)
         .windowByUrl(Brave.browserWindowUrl)
-        // .tabByIndex(0)
-        // .loadUrl(url)
-        // .url(url)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitUntil(function () {
           return this.getText(adsBlockedStat)
