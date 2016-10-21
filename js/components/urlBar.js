@@ -197,8 +197,13 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.BACKSPACE:
         this.hideAutoComplete()
         break
+      // Do not trigger rendering of suggestions if you are pressing alt or shift
+      case KeyCodes.ALT:
+      case KeyCodes.SHIFT:
+        break
       default:
         this.keyPressed = true
+        windowActions.setRenderUrlBarSuggestions(true)
         // Any other keydown is fair game for autocomplete to be enabled.
         if (!this.autocompleteEnabled) {
           windowActions.setUrlBarAutocompleteEnabled(true)
@@ -270,6 +275,9 @@ class UrlBar extends ImmutableComponent {
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
     this.keyPressed = false
+    if (e.target.value.length === 0) {
+      windowActions.setRenderUrlBarSuggestions(false)
+    }
   }
 
   onFocus (e) {
@@ -293,8 +301,7 @@ class UrlBar extends ImmutableComponent {
 
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
-      // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
-      this.updateLocationToSuggestion()
+      windowActions.setRenderUrlBarSuggestions(false)
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
@@ -390,11 +397,9 @@ class UrlBar extends ImmutableComponent {
     windowActions.setSiteInfoVisible(true)
   }
 
-  // Currently even if there are no suggestions we render the URL bar suggestions because
-  // it needs to generate them. This needs to be refactored.  See https://github.com/brave/browser-laptop/issues/3151
   get shouldRenderUrlBarSuggestions () {
-    return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
-      this.props.urlbar.get('active')
+    let shouldRender = this.props.urlbar.getIn(['suggestions', 'shouldRender'])
+    return shouldRender === true
   }
 
   onDragStart (e) {

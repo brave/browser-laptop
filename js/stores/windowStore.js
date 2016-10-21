@@ -558,6 +558,9 @@ const doAction = (action) => {
         })
       }
       break
+    case WindowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), action.enabled)
+      break
     case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), action.enabled)
       break

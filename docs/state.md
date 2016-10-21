@@ -316,6 +316,7 @@ WindowStore
             type: string // The type of suggestion (one of js/constants/suggestionTypes.js)
           },
           urlSuffix: string, // autocomplete suffix
+          shouldRender: boolean, // if the suggestions should render
           autocompleteEnabled: boolean // used to enable or disable autocomplete
         },
         focused: boolean, // whether the urlbar is focused
