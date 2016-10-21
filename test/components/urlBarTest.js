@@ -1,7 +1,8 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput} = require('../lib/selectors')
+const {activeWebview, urlInput} = require('../lib/selectors')
+const assert = require('assert')
 
 describe('urlBar', function () {
   function * setup (client) {
@@ -85,6 +86,21 @@ describe('urlBar', function () {
         .waitUntil(function () {
           return this.getValue(urlInput)
             .then((val) => val === 'aboutx')
+        })
+    })
+
+    it('it does not change input after focus until keydown', function * () {
+      yield this.app.client
+        .keys('https://brave.com/ ')
+        .keys('\uE007')
+        .waitForElementFocus(activeWebview)
+        .ipcSend('shortcut-focus-url')
+        .getValue(urlInput).then((val) => assert(val === 'https://brave.com/'))
+        .keys('\uE015')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => {
+            return val === 'https://brave.com/test'
+          })
         })
     })
   })

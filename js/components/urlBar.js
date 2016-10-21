@@ -38,14 +38,16 @@ class UrlBar extends ImmutableComponent {
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.onChange = this.onChange.bind(this)
+    this.onCut = this.onCut.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.activateSearchEngine = false
     this.searchSelectEntry = null
     this.keyPressed = false
+    this.disableAutocomplete = false
     this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput || this.keyPressed) {
+      if (!this.urlInput || this.keyPressed || this.disableAutocomplete) {
         return
       }
       const suffixLen = this.props.locationValueSuffix.length
@@ -108,6 +110,9 @@ class UrlBar extends ImmutableComponent {
     if (!this.isActive) {
       windowActions.setUrlBarActive(true)
     }
+    if (e.keyCode > 47 && e.keyCode < 112) {
+      this.disableAutocomplete = false
+    }
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         windowActions.setUrlBarActive(false)
@@ -162,6 +167,7 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.UP:
+        this.disableAutocomplete = false
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
           this.urlBarSuggestions.previousSuggestion()
@@ -169,6 +175,7 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.DOWN:
+        this.disableAutocomplete = false
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
           if (!this.urlBarSuggestions.suggestionList) {
@@ -255,7 +262,11 @@ class UrlBar extends ImmutableComponent {
     this.searchSelectEntry = null
   }
 
-  onChange (e) {
+  onCut () {
+    this.disableAutocomplete = true
+  }
+
+  onKeyUp (e) {
     switch (e.keyCode) {
       case KeyCodes.UP:
       case KeyCodes.DOWN:
@@ -294,6 +305,7 @@ class UrlBar extends ImmutableComponent {
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
       // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
+      this.disableAutocomplete = true
       this.updateLocationToSuggestion()
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
@@ -452,7 +464,8 @@ class UrlBar extends ImmutableComponent {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onKeyDown={this.onKeyDown}
-          onKeyUp={this.onChange}
+          onCut={this.onCut}
+          onKeyUp={this.onKeyUp}
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
           value={value}
