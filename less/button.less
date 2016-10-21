@@ -41,8 +41,10 @@ span.browserButton,
   }
 
   &[disabled] {
-    opacity: .25;
     pointer-events: none;
+    // prevent titleMode animation from overriding opacity
+    animation: none !important;
+    opacity: .25 !important;
   }
 
   &.smallButton {
