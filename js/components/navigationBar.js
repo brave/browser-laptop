@@ -148,15 +148,19 @@ class NavigationBar extends ImmutableComponent {
             onClick={this.onHome} />
           : null
         }
-        <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
-          className={cx({
-            navbutton: true,
-            bookmarkButton: true,
-            removeBookmarkButton: this.bookmarked,
-            withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
-          })}
-          l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
-          onClick={this.onToggleBookmark} />
+        {
+          !this.titleMode
+          ? <Button iconClass={this.bookmarked ? 'fa-star' : 'fa-star-o'}
+            className={cx({
+              navbutton: true,
+              bookmarkButton: true,
+              removeBookmarkButton: this.bookmarked,
+              withHomeButton: getSetting(settings.SHOW_HOME_BUTTON)
+            })}
+            l10nId={this.bookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
+            onClick={this.onToggleBookmark} />
+          : null
+        }
       </div>
       <UrlBar ref='urlBar'
         sites={this.props.sites}
