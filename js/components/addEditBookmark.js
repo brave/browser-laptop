@@ -36,8 +36,9 @@ class AddEditBookmark extends ImmutableComponent {
     const title = this.props.currentDetail.get('title') || this.props.currentDetail.get('customTitle')
     const location = this.props.currentDetail.get('location')
 
-    return (typeof title === 'string' && title.trim().length > 0) ||
-      (!this.isFolder && typeof location === 'string' && location.trim().length > 0)
+    return this.isFolder
+      ? (typeof title === 'string' && title.trim().length > 0)
+      : (typeof title === 'string' && location.trim().length > 0)
   }
 
   get isFolder () {
