@@ -106,10 +106,7 @@ class FindBar extends ImmutableComponent {
   }
 
   onClear () {
-    windowActions.setFindDetail(this.frame, Immutable.fromJS({
-      searchString: '',
-      caseSensitivity: this.isCaseSensitive
-    }))
+    this.searchInput.value = ''
     this.focus()
   }
 
@@ -193,7 +190,7 @@ class FindBar extends ImmutableComponent {
             value={inputValue}
             onKeyDown={this.onKeyDown}
             onKeyUp={this.onChange} />
-          <span className='searchStringContainerIcon fa fa-times'
+          <span className='searchStringContainerIcon fa fa-times findClear'
             onClick={this.onClear} />
         </div>
         <span className='findMatchText'>{findMatchText}</span>
