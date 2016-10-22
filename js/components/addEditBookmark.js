@@ -38,7 +38,7 @@ class AddEditBookmark extends ImmutableComponent {
 
     return this.isFolder
       ? (typeof title === 'string' && title.trim().length > 0)
-      : (typeof title === 'string' && location.trim().length > 0)
+      : (typeof location === 'string' && location.trim().length > 0)
   }
 
   get isFolder () {
