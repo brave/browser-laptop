@@ -6,7 +6,7 @@ Signed packages are on their way, but in the meantime you can use the following.
 
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
-sudo apt install -y gdebi && sudo gdebi brave.deb
+sudo apt-get install -y gdebi && sudo gdebi brave.deb
 ```
 
 ## Ubuntu AMD64:
