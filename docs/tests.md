@@ -68,7 +68,7 @@ this isn't always an option though, because the test might alter the environment
 
 ## Useful helper methods
 
-These are methods we own which can be used along side the [existing web driver methods](http://webdriver.io/api.html).
+These are methods we own which can be used along side the [existing webdriver methods](http://webdriver.io/api.html).
 Please note that it's fairly easy to add new helper methods. For more info, please check out the addCommands()
 method in at [brave.js](https://github.com/brave/browser-laptop/blob/master/test/lib/brave.js).
 
@@ -83,6 +83,7 @@ method in at [brave.js](https://github.com/brave/browser-laptop/blob/master/test
 - tabByIndex
 - getTabCount
 - tabByUrl
+- waitForTabCount
 
 ### Window management
 - waitForBrowserWindow
@@ -110,13 +111,46 @@ method in at [brave.js](https://github.com/brave/browser-laptop/blob/master/test
 
 and many more! If you're not sure how to use the methods, search our existing tests to find an example.
 
-Please note that many of these methods do NOT wait until the action is complete. Until the helper methods
-are updated, you'll have to ensure of this in the test. [Click here to see a good example](https://github.com/brave/browser-laptop/commit/f78430c6e9eed74d4f6c42a2fbed9bb97900de04#diff-a7970760e9f2ed32f13f98921d9f94cdL313)
+Please note that many of these methods do NOT wait until the action is complete. **Until the helper methods
+are updated, you'll have to ensure of this in the test**. [Click here to see a good example](https://github.com/brave/browser-laptop/commit/f78430c6e9eed74d4f6c42a2fbed9bb97900de04#diff-a7970760e9f2ed32f13f98921d9f94cdL313)
 which presented itself with intermittent failures (because sometimes action would be complete, sometimes it wouldn't).
 In the example linked to above, the condition is tested by waiting until the tab count increases (which means
 the IPC message was received and processed).
 
 ## Debugging tests
+
+### Enabling verbose mode
+You can get more verbose output from some of our commands by toggling the `logVerboseEnabled` flag in [test/lib/brave.js](https://github.com/brave/browser-laptop/blob/3ede178b5f4655e53e6c55a916c271a89f20317d/test/lib/brave.js#L17).
+When set to true, tests will output extra information which can be very valuable when trying to understand what is going wrong with a failing test (be sure to disable the flag before checking in).
+
+As an example, here's the output you get when running the `blocks custom adblock resources in private tab` test in `test/components/braveryPanelTest.js` with verbose logging enabled:
+```
+  Bravery Panel
+    Stats
+waitForUrl("chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html")
+tabByUrl("chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html") => {"sessionId":"4a74bef383e5d2abba1c0640aaca81e8","status":0,"value":null}
+waitForBrowserWindow()
+waitForBrowserWindow() => {"sessionId":"4a74bef383e5d2abba1c0640aaca81e8","status":0,"value":null}
+waitForDataFile("adblock")
+waitForDataFile("adblock") => undefined
+waitForDataFile("adblock") => undefined
+waitForDataFile("adblock") => {"etag":"\"215b010f2f5ff8b102896957564862d7\"","lastCheckDate":1477083465282,"lastCheckVersion":"2"}
+tabByIndex(0)
+tabHandles() => handles.length = 1; handles[0] = "CDwindow-e532c598-ab85-4114-9bef-8cfbfc14035e";
+loadUrl("chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-adblock.html")
+loadUrl.url() => {"sessionId":"4a74bef383e5d2abba1c0640aaca81e8","status":0,"value":null}
+waitForUrl("chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-adblock.html")
+tabByUrl("chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-adblock.html") => {"sessionId":"4a74bef383e5d2abba1c0640aaca81e8","status":0,"value":null}
+waitForTabCount(2)
+getTabCount() => 1
+getTabCount() => 2
+waitForUrl("http://localhost:23188/adblock.html")
+tabByUrl("http://localhost:23188/adblock.html") => {"sessionId":"4a74bef383e5d2abba1c0640aaca81e8","status":0,"value":null}
+openBraveMenu()
+      ✓ blocks custom adblock resources in private tab (4569ms)
+```
+
+### Using the debug() webdriver command
 
 You can debug tests by using the command `yield this.app.client.debug()` in a test.
 Or most of the time just append `.debug()` to a series of commands.
