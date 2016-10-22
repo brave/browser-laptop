@@ -170,8 +170,8 @@ class UrlBarSuggestions extends ImmutableComponent {
   }
 
   componentDidMount () {
-    this.suggestionList = this.getNewSuggestionList()
-    this.searchXHR()
+    this.suggestionList = this.getNewSuggestionList(this.props)
+    this.searchXHR(this.props, true)
   }
 
   componentWillUpdate (nextProps) {
@@ -182,11 +182,13 @@ class UrlBarSuggestions extends ImmutableComponent {
     // If both the URL is the same and the number of sites to consider is
     // the same then we don't need to regenerate the suggestions list.
     if (this.props.urlLocation === nextProps.urlLocation &&
-        this.props.sites.size === nextProps.sites.size) {
+        this.props.sites.size === nextProps.sites.size &&
+        // Make sure to update if there are online suggestions
+        this.props.searchResults.size === nextProps.searchResults.size) {
       return
     }
     this.suggestionList = this.getNewSuggestionList(nextProps)
-    this.searchXHR(nextProps)
+    this.searchXHR(nextProps, !(this.props.urlLocation === nextProps.urlLocation))
   }
 
   getNewSuggestionList (props) {
@@ -386,7 +388,7 @@ class UrlBarSuggestions extends ImmutableComponent {
     windowActions.setUrlBarSuggestions(suggestions, newIndex)
   }
 
-  searchXHR (props) {
+  searchXHR (props, searchOnline) {
     props = props || this.props
     let autocompleteURL = props.searchSelectEntry
     ? props.searchSelectEntry.autocomplete : props.searchDetail.get('autocompleteURL')
@@ -402,19 +404,20 @@ class UrlBarSuggestions extends ImmutableComponent {
         const replaceRE = new RegExp('^' + props.searchSelectEntry.shortcut + ' ', 'g')
         urlLocation = urlLocation.replace(replaceRE, '')
       }
-      const xhr = new window.XMLHttpRequest({mozSystem: true})
-      xhr.open('GET', autocompleteURL
-        .replace('{searchTerms}', encodeURIComponent(urlLocation)), true)
-      xhr.responseType = 'json'
-      xhr.send()
-      xhr.onload = () => {
-        windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
-        this.updateSuggestions(props.selectedIndex)
-      }
+      // Render all suggestions asap
+      this.updateSuggestions(props.selectedIndex)
 
-      xhr.onerror = () => {
-        windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
-        this.updateSuggestions(props.selectedIndex)
+      if (searchOnline) {
+        const xhr = new window.XMLHttpRequest({mozSystem: true})
+        xhr.open('GET', autocompleteURL
+          .replace('{searchTerms}', encodeURIComponent(urlLocation)), true)
+        xhr.responseType = 'json'
+        xhr.send()
+        xhr.onload = () => {
+          // Once we have the online suggestions, append them to the others
+          windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS(xhr.response[1]))
+          this.updateSuggestions(props.selectedIndex)
+        }
       }
     } else {
       windowActions.setUrlBarSuggestionSearchResults(Immutable.fromJS([]))
