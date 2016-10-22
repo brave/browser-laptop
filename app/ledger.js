@@ -709,8 +709,7 @@ var synopsisNormalizer = () => {
 
     data[i] = {
       rank: i + 1,
-      // TBD: the `ledger-publisher` package does not currently report `verified` ...
-      verified: publisher.verified || false,
+      verified: (ledgerInfo._internal.verifiedPublishers || []).indexOf(results[i].publisher) !== -1,
       site: results[i].publisher,
       views: results[i].visits,
       duration: duration,
@@ -954,6 +953,7 @@ var ledgerInfo = {
   exchangeInfo: undefined,
 
   _internal: {
+    verifiedPublishers: [],
     exchangeExpiry: 0,
     exchanges: {},
     geoipExpiry: 0
@@ -1199,6 +1199,11 @@ var getStateInfo = (state) => {
   if (info) {
     ledgerInfo._internal.paymentInfo = info
     cacheReturnValue()
+  }
+
+  if (!underscore.isEqual(ledgerInfo._internal.verifiedPublishers, state.verifiedPublishers)) {
+    ledgerInfo._internal.verifiedPublishers = state.verifiedPublishers
+    updatePublisherInfo()
   }
 
   ledgerInfo.transactions = []
