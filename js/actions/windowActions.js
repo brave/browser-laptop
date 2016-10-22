@@ -532,6 +532,18 @@ const windowActions = {
   },
 
   /*
+   * Sets if we should render URL bar suggestions.
+   *
+   * @param enabled If false URL bar suggestions will not be rendered.
+   */
+  setRenderUrlBarSuggestions: function (enabled) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS,
+      enabled
+    })
+  },
+
+  /*
    * Sets the URL bar preview value.
    * TODO: name this something better.
    *
