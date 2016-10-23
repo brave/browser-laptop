@@ -738,6 +738,9 @@ describe('navigationBar', function () {
       // now type something
       yield this.app.client
         .setValue(urlInput, 'b')
+        .waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === 'b')
+        })
         .waitForExist(urlBarSuggestions + ' li')
     })
 
@@ -1010,9 +1013,9 @@ describe('navigationBar', function () {
           .addSite({ location: 'https://brave.com', title: 'Brave' })
 
         // now type something
-        yield this.app.client.keys('b')
+        yield this.app.client.keys('br')
         yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === 'b')
+          return this.getValue(urlInput).then((val) => val === 'br')
         })
         yield blur(this.app.client)
         yield this.app.client

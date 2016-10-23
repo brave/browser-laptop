@@ -38,16 +38,14 @@ class UrlBar extends ImmutableComponent {
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.onCut = this.onCut.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.activateSearchEngine = false
     this.searchSelectEntry = null
     this.keyPressed = false
-    this.disableAutocomplete = false
     this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput || this.keyPressed || this.disableAutocomplete) {
+      if (!this.urlInput || this.keyPressed) {
         return
       }
       const suffixLen = this.props.locationValueSuffix.length
@@ -110,12 +108,10 @@ class UrlBar extends ImmutableComponent {
     if (!this.isActive) {
       windowActions.setUrlBarActive(true)
     }
-    if (e.keyCode > 47 && e.keyCode < 112) {
-      this.disableAutocomplete = false
-    }
     switch (e.keyCode) {
       case KeyCodes.ENTER:
         windowActions.setUrlBarActive(false)
+        windowActions.setRenderUrlBarSuggestions(false)
         this.restore()
         e.preventDefault()
 
@@ -167,7 +163,6 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.UP:
-        this.disableAutocomplete = false
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
           this.urlBarSuggestions.previousSuggestion()
@@ -175,7 +170,6 @@ class UrlBar extends ImmutableComponent {
         }
         break
       case KeyCodes.DOWN:
-        this.disableAutocomplete = false
         if (this.shouldRenderUrlBarSuggestions) {
           // TODO: We shouldn't be calling into urlBarSuggestions from the parent component at all
           if (!this.urlBarSuggestions.suggestionList) {
@@ -204,8 +198,16 @@ class UrlBar extends ImmutableComponent {
       case KeyCodes.BACKSPACE:
         this.hideAutoComplete()
         break
+      // Do not trigger rendering of suggestions if you are pressing alt or shift
+      case KeyCodes.ALT:
+      case KeyCodes.SHIFT:
+      case KeyCodes.CMD1:
+      case KeyCodes.CMD2:
+      case KeyCodes.CTRL:
+        break
       default:
         this.keyPressed = true
+        windowActions.setRenderUrlBarSuggestions(true)
         // Any other keydown is fair game for autocomplete to be enabled.
         if (!this.autocompleteEnabled) {
           windowActions.setUrlBarAutocompleteEnabled(true)
@@ -262,10 +264,6 @@ class UrlBar extends ImmutableComponent {
     this.searchSelectEntry = null
   }
 
-  onCut () {
-    this.disableAutocomplete = true
-  }
-
   onKeyUp (e) {
     switch (e.keyCode) {
       case KeyCodes.UP:
@@ -281,6 +279,10 @@ class UrlBar extends ImmutableComponent {
     this.clearSearchEngine()
     this.detectSearchEngine(e.target.value)
     this.keyPressed = false
+
+    if ((e.target.value !== undefined) && e.target.value.length === 0) {
+      windowActions.setRenderUrlBarSuggestions(false)
+    }
   }
 
   onFocus (e) {
@@ -304,9 +306,7 @@ class UrlBar extends ImmutableComponent {
 
   componentWillMount () {
     ipc.on(messages.SHORTCUT_FOCUS_URL, (e) => {
-      // If the user hits Command+L while in the URL bar they want everything suggested as the new potential URL to laod.
-      this.disableAutocomplete = true
-      this.updateLocationToSuggestion()
+      windowActions.setRenderUrlBarSuggestions(false)
       windowActions.setUrlBarSelected(true)
       windowActions.setUrlBarActive(true)
       // The urlbar "selected" might already be set in the window state, so subsequent Command+L won't trigger component updates, so this needs another DOM refresh for selection.
@@ -402,11 +402,9 @@ class UrlBar extends ImmutableComponent {
     windowActions.setSiteInfoVisible(true)
   }
 
-  // Currently even if there are no suggestions we render the URL bar suggestions because
-  // it needs to generate them. This needs to be refactored.  See https://github.com/brave/browser-laptop/issues/3151
   get shouldRenderUrlBarSuggestions () {
-    return (this.props.urlbar.get('location') || this.props.urlbar.get('urlPreview')) &&
-      this.props.urlbar.get('active')
+    let shouldRender = this.props.urlbar.getIn(['suggestions', 'shouldRender'])
+    return shouldRender === true
   }
 
   onDragStart (e) {
@@ -464,7 +462,6 @@ class UrlBar extends ImmutableComponent {
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onKeyDown={this.onKeyDown}
-          onCut={this.onCut}
           onKeyUp={this.onKeyUp}
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}

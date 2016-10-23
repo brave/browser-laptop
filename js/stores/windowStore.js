@@ -300,6 +300,7 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_SET_NAVIGATED:
       action.location = action.location.trim()
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
       // For about: URLs, make sure we store the URL as about:something
       // and not what we map to.
       action.location = getSourceAboutUrl(action.location) || action.location
@@ -556,6 +557,14 @@ const doAction = (action) => {
           selectedIndex: null,
           suggestionList: null
         })
+      }
+      break
+    case WindowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
+      windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), action.enabled)
+      if (!action.enabled) {
+        // Make sure to remove the suffix from the url bar
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
+        updateUrlSuffix(undefined)
       }
       break
     case WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED:

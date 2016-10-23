@@ -81,15 +81,15 @@ describe('urlbarSuggestions', function () {
       .keys('\uE015')
       .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"].selected')
       .keys('\uE007')
-      .tabByIndex(1).getUrl().should.become(this.page2Url)
+      .tabByIndex(1).getUrl().should.become(this.page1Url)
   })
 
   it('selects a location auto complete result but not for titles', function * () {
-    const page1Url = Brave.server.url('page1.html')
+    const page2Url = Brave.server.url('page2.html')
     yield this.app.client
       .setValue(urlInput, 'http://')
       .waitUntil(function () {
-        return this.getValue(urlInput).then((val) => val === page1Url)
+        return this.getValue(urlInput).then((val) => val === page2Url)
       })
       .waitForExist(urlBarSuggestions + ' li.selected')
       .setValue(urlInput, 'Page')
@@ -107,20 +107,20 @@ describe('urlbarSuggestions', function () {
       .keys(pagePartialUrl)
       .waitUntil(function () {
         return this.getValue(urlInput).then(function (val) {
-          return val === page1Url // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
+          return val === page2Url // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
         })
       })
       .waitForExist(urlBarSuggestions + ' li.suggestionItem')
       .moveToObject(urlBarSuggestions + ' li.suggestionItem:not(.selected)')
       .waitUntil(function () {
         return this.getValue(urlInput).then(function (val) {
-          return val === page2Url // mousing over 2nd option tentatively completes URL with 2nd option (_without_ moving cursor to end)
+          return val === page1Url // mousing over 2nd option tentatively completes URL with 2nd option (_without_ moving cursor to end)
         })
       })
-      .keys('1.html')
+      .keys('2.html')
       .waitUntil(function () {
         return this.getValue(urlInput).then(function (val) {
-          return val === page1Url // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
+          return val === page2Url // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
         })
       })
   })
