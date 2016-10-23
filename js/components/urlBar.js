@@ -49,9 +49,9 @@ class UrlBar extends ImmutableComponent {
         return
       }
       const suffixLen = this.props.locationValueSuffix.length
-      this.urlInput.value = this.defaultValue
-      const len = this.defaultValue.length
-      this.urlInput.setSelectionRange(len - suffixLen, len)
+      this.urlInput.value = this.locationValue + this.props.locationValueSuffix
+      const len = this.locationValue.length
+      this.urlInput.setSelectionRange(len, len + suffixLen)
     }, 100)
   }
 
@@ -320,21 +320,17 @@ class UrlBar extends ImmutableComponent {
     this.updateDOM()
   }
 
-  get defaultValue () {
-    return this.locationValue + this.props.locationValueSuffix
-  }
-
   componentDidUpdate (prevProps) {
     // this.urlInput is not initialized in titleMode
     if (this.urlInput) {
       // Select the part of the URL which was an autocomplete suffix.
-      if (this.props.locationValueSuffix.length > 0 &&
+      if (this.props.locationValueSuffix.length > 0 && this.isActive &&
         (this.props.locationValueSuffix !== prevProps.locationValueSuffix ||
          this.props.urlbar.get('location') !== prevProps.urlbar.get('location'))) {
         this.showAutocompleteResult()
       } else if (this.props.activeFrameKey !== prevProps.activeFrameKey ||
         this.props.titleMode !== prevProps.titleMode) {
-        this.urlInput.value = this.defaultValue
+        this.urlInput.value = this.locationValue
       }
     }
     if (this.isSelected() !== prevProps.urlbar.get('selected') ||
@@ -419,7 +415,7 @@ class UrlBar extends ImmutableComponent {
   render () {
     const value = this.isActive || (!this.locationValue && this.isFocused())
       ? undefined
-      : this.defaultValue
+      : this.locationValue
     return <form
       className='urlbarForm'
       action='#'
