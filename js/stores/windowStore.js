@@ -553,6 +553,7 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_URL_BAR_ACTIVE:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'active']), action.isActive)
       if (!action.isActive) {
+        windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), false)
         windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
           selectedIndex: null,
           suggestionList: null
