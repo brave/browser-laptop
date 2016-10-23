@@ -535,15 +535,16 @@
     transition: margin @transitionDuration ease-in-out;
 
     span {
-      -webkit-app-region: no-drag;
       -webkit-user-select: none;
       color: @buttonColor;
+      cursor: default;
       border-radius: 4px;
       font-weight: 300;
       opacity: 0.2;
 
       &:not([disabled]) {
         opacity: 0.85;
+        -webkit-app-region: no-drag;
       }
 
       &:not([disabled]):hover {
