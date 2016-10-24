@@ -442,17 +442,21 @@
 
     .back,
     .forward {
-      width: @navbarButtonWidth;
+      background-color: @buttonColor;
+      width: 12px;
+      height: 15px;
+      margin: 0 6px;
     }
-
     .back {
       padding-right: @navbarButtonSpacing;
+      -webkit-mask-image: url('../img/toolbar/back_btn.svg');
+      -webkit-mask-repeat: no-repeat;
     }
-
     .forward {
       padding-left: @navbarButtonSpacing;
+      -webkit-mask-image: url('../img/toolbar/forward_btn.svg');
+      -webkit-mask-repeat: no-repeat;
     }
-
   }
 
   // Navigation bar at the center
@@ -519,6 +523,38 @@
   }
 }
 
+#navigator {
+  .startButtons {
+    .navigationButton {
+      background-color: @buttonColor;
+      width: 12px;
+      height: 15px;
+      margin: 0 6px;
+
+      &:hover {
+        background-color: @gray;
+      }
+    }
+
+    .stopButton {
+      -webkit-mask-image: url('../img/toolbar/stoploading_btn.svg');
+      -webkit-mask-repeat: no-repeat;
+    }
+
+    .reloadButton {
+      -webkit-mask-image: url('../img/toolbar/reload_btn.svg');
+      -webkit-mask-repeat: no-repeat;
+    }
+
+    .homeButton {
+      -webkit-mask-image: url('../img/toolbar/home_btn.svg');
+      -webkit-mask-repeat: no-repeat;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
 
 .navigatorWrapper {
   justify-content: space-between;
@@ -548,9 +584,7 @@
       }
 
       &:not([disabled]):hover {
-        color: @buttonColor;
-        opacity: 1.0;
-        background-color: white;
+        opacity: 0.2;
       }
     }
 
