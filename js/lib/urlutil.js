@@ -10,6 +10,7 @@ const defaultScheme = 'http://'
 const fileScheme = 'file://'
 const os = require('os')
 const urlParse = require('url').parse
+const urlFormat = require('url').format
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 
 /**
@@ -324,6 +325,24 @@ const UrlUtil = {
   getLocationIfPDF: function (url) {
     if (url && url.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
       return url.replace(/^chrome-extension:\/\/.+\/(\w+:\/\/.+)/, '$1')
+    }
+    return url
+  },
+
+  /**
+   * Gets location to display in the urlbar
+   * @param {string} url
+   * @param {boolean} pdfjsEnabled
+   * @return {string}
+   */
+  getDisplayLocation: function (url, pdfjsEnabled) {
+    if (!url || ['about:blank', 'about:newtab'].includes(url)) {
+      return ''
+    }
+    const parsed = urlParse(pdfjsEnabled ? this.getLocationIfPDF(url) : url)
+    if (parsed && parsed.auth) {
+      parsed.auth = null
+      return urlFormat(parsed)
     } else {
       return url
     }

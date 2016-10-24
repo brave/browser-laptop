@@ -716,6 +716,40 @@ describe('navigationBar', function () {
       })
     })
 
+    describe('with auth url input value', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client.keys('brave.com@example.com')
+        // hit enter
+        yield this.app.client.keys('\uE007')
+      })
+      it('hides auth part of the url', function * () {
+        yield this.app.client.waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === 'http://example.com/')
+        })
+      })
+    })
+
+    describe('with blank url input value', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        yield setup(this.app.client)
+        yield this.app.client.waitForExist(urlInput)
+        yield this.app.client.keys('about:blank')
+        // hit enter
+        yield this.app.client.keys('\uE007')
+      })
+      it('hides the url', function * () {
+        yield this.app.client.waitUntil(function () {
+          return this.getValue(urlInput).then((val) => val === '')
+        })
+      })
+    })
+
     describe('page with focused form input', function () {
       it('loads the url without submitting the form')
     })

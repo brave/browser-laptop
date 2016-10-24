@@ -358,20 +358,13 @@ class UrlBar extends ImmutableComponent {
   }
 
   get locationValue () {
-    let location = this.props.urlbar.get('location')
+    const location = this.props.urlbar.get('location')
     const history = this.props.history
     if (isIntermediateAboutPage(location) && history.size > 0) {
       return history.last()
     }
 
-    // We can extend the conditions if there are more chrome-extension to
-    // truncate
-    if (getSetting(settings.PDFJS_ENABLED)) {
-      location = UrlUtil.getLocationIfPDF(location)
-    }
-
-    return ['about:blank', 'about:newtab'].includes(this.props.urlbar.get('location'))
-      ? '' : location
+    return UrlUtil.getDisplayLocation(location, getSetting(settings.PDFJS_ENABLED))
   }
 
   get loadTime () {
