@@ -145,13 +145,15 @@ const appActions = {
   },
 
   /**
-   * Sets the default window size
+   * Sets the default window size / position
    * @param {Array} size - [width, height]
+   * @param {Array} position - [x, y]
    */
-  setDefaultWindowSize: function (size) {
+  defaultWindowParamsChanged: function (size, position) {
     AppDispatcher.dispatch({
-      actionType: AppConstants.APP_SET_DEFAULT_WINDOW_SIZE,
-      size
+      actionType: AppConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
+      size,
+      position
     })
   },
 

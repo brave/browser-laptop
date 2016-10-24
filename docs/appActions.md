@@ -116,13 +116,15 @@ Dispatches a message to clear all completed downloads
 
 
 
-### setDefaultWindowSize(size) 
+### defaultWindowParamsChanged(size, position) 
 
-Sets the default window size
+Sets the default window size / position
 
 **Parameters**
 
 **size**: `Array`, [width, height]
+
+**position**: `Array`, [x, y]
 
 
 
