@@ -22,23 +22,62 @@ const ipc = window.chrome.ipc
 require('../../less/about/bookmarks.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-class BookmarkFolderItem extends ImmutableComponent {
+class BookmarkFolderItem extends React.Component {
+  constructor () {
+    super()
+    this.state = {
+      isDragOver: false
+    }
+  }
   onDragStart (e) {
     if (this.props.draggable !== false) {
       e.dataTransfer.effectAllowed = 'all'
-      dndData.setupDataTransferURL(e.dataTransfer, this.props.bookmarkFolder.get('location'), this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
+      dndData.setupDataTransferURL(e.dataTransfer,
+        this.props.bookmarkFolder.get('location'),
+        this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title'))
       dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, this.props.bookmarkFolder)
     }
   }
   onDragOver (e) {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
+    this.setState({
+      isDragOver: true
+    })
   }
-  // NOTE: both folders and bookmarks can be dropped here
+  onDragLeave (e) {
+    this.setState({
+      isDragOver: false
+    })
+  }
+  /**
+   * Move a folder, a bookmark, or multiple bookmarks IF move is allowed.
+   * ex: won't allow child folder to become parent of an ancestor, etc.
+   */
+  moveBookmark (e, bookmark) {
+    if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
+      aboutActions.moveSite(bookmark.toJS(),
+        this.props.bookmarkFolder.toJS(),
+        dndData.shouldPrependVerticalItem(e.target, e.clientY),
+        true)
+    }
+  }
+  // NOTE: both folders AND bookmarks can be dropped here
   onDrop (e) {
-    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
-    if (bookmark && siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, this.props.bookmarkFolder)) {
-      aboutActions.moveSite(bookmark.toJS(), this.props.bookmarkFolder.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), true)
+    this.setState({
+      isDragOver: false
+    })
+
+    const bookmarkData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    if (bookmarkData) {
+      if (Immutable.List.isList(bookmarkData)) {
+        bookmarkData.forEach((bookmark) => {
+          this.moveBookmark(e, bookmark)
+        })
+        return
+      }
+
+      this.moveBookmark(e, bookmarkData)
     }
   }
   render () {
@@ -49,20 +88,22 @@ class BookmarkFolderItem extends ImmutableComponent {
         onDrop={this.onDrop.bind(this)}
         onDragStart={this.onDragStart.bind(this)}
         onDragOver={this.onDragOver.bind(this)}
+        onDragLeave={this.onDragLeave.bind(this)}
         onContextMenu={aboutActions.contextMenu.bind(this, this.props.bookmarkFolder.toJS(), 'bookmark-folder')}
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
         draggable={this.props.draggable !== false ? 'true' : 'false'}
         data-folder-id={this.props.bookmarkFolder.get('folderId')}
         className={cx({
           listItem: true,
-          selected: this.props.selected
+          selected: this.props.selected,
+          isDragOver: this.state.isDragOver
         })}>
 
         <span className={cx({
           bookmarkFolderIcon: true,
           fa: true,
-          'fa-folder-o': !this.props.selected,
-          'fa-folder-open-o': this.props.selected
+          'fa-folder-o': !this.props.selected && !this.state.isDragOver,
+          'fa-folder-open-o': this.props.selected || this.state.isDragOver
         })} />
         <span data-l10n-id={this.props.dataL10nId}>
           {this.props.bookmarkFolder.get('customTitle') || this.props.bookmarkFolder.get('title')}
@@ -192,37 +233,70 @@ class BookmarksList extends ImmutableComponent {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
-
     aboutActions.newFrame({
       location: entry.location,
       partitionNumber: entry.partitionNumber
     })
   }
+  /**
+   * Called when a bookmark (or bookmarks) begin dragging.
+   * If multiple items are selected, please note this method is
+   * called by the onDragStart handler in sortableTable instead
+   * of being directly bound to the table row being dragged.
+   */
   onDragStart (siteDetail, e) {
+    const isList = Immutable.List.isList(siteDetail)
     e.dataTransfer.effectAllowed = 'all'
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, siteDetail)
     // TODO: Pass the location here when content scripts are fixed
-    dndData.setupDataTransferURL(e.dataTransfer, '', siteDetail.get('customTitle') || siteDetail.get('title'))
+    dndData.setupDataTransferURL(e.dataTransfer, '', isList
+      ? 'Multi-selection (' + siteDetail.size + ' bookmarks)'
+      : siteDetail.get('customTitle') || siteDetail.get('title'))
   }
+  /**
+   * Bookmark entry is being dragged.
+   */
   onDragOver (siteDetail, e) {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
   }
-  onDrop (siteDetail, e) {
-    const bookmark = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+  /**
+   * Move a folder, a bookmark, or multiple bookmarks IF move is allowed.
+   * ex: won't allow child folder to become parent of an ancestor, etc.
+   */
+  moveBookmark (e, bookmark, siteDetail) {
     let destinationIsParent = false
-    if (bookmark) {
-      // If source is folder, destination needs to be a folder too
-      if (siteUtil.isFolder(bookmark)) {
-        siteDetail = siteDetail.get('parentFolderId')
-          ? this.props.allBookmarkFolders.find((folder) => folder.get('folderId') === siteDetail.get('parentFolderId'))
-          : Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})
-        destinationIsParent = true
+
+    // If source is folder, destination needs to be a folder too
+    if (siteUtil.isFolder(bookmark)) {
+      siteDetail = siteDetail.get('parentFolderId')
+        ? this.props.allBookmarkFolders.find((folder) => folder.get('folderId') === siteDetail.get('parentFolderId'))
+        : Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})
+      destinationIsParent = true
+    }
+
+    if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, siteDetail)) {
+      aboutActions.moveSite(bookmark.toJS(),
+        siteDetail.toJS(),
+        dndData.shouldPrependVerticalItem(e.target, e.clientY),
+        destinationIsParent)
+    }
+  }
+  /**
+   * Bookmark (one or multiple) or BookmarkFolderItem object was dropped
+   * onto `siteDetail` (which is a bookmark inside of sortableTable).
+   */
+  onDrop (siteDetail, e) {
+    const bookmarkData = dndData.getDragData(e.dataTransfer, dragTypes.BOOKMARK)
+    if (bookmarkData) {
+      if (Immutable.List.isList(bookmarkData)) {
+        bookmarkData.forEach((bookmark) => {
+          this.moveBookmark(e, bookmark, siteDetail)
+        })
+        return
       }
 
-      if (siteUtil.isMoveAllowed(this.props.allBookmarkFolders, bookmark, siteDetail)) {
-        aboutActions.moveSite(bookmark.toJS(), siteDetail.toJS(), dndData.shouldPrependVerticalItem(e.target, e.clientY), destinationIsParent)
-      }
+      this.moveBookmark(e, bookmarkData, siteDetail)
     }
   }
   render () {
@@ -255,8 +329,8 @@ class BookmarksList extends ImmutableComponent {
         ])}
         rowObjects={this.props.bookmarks}
         columnClassNames={['title', 'date']}
-        tableID={this.props.selectedFolderId}
         addHoverClass
+        multiSelect
         onDoubleClick={this.onDoubleClick}
         {...props}
         contextMenuName='bookmark'

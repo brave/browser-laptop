@@ -7,19 +7,22 @@ const siteTags = require('../../js/constants/siteTags')
 const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 
 describe('about:bookmarks', function () {
-  Brave.beforeAll(this)
-
   const folderId = Math.random()
   const lastVisit = 1476140184441
   const bookmarkTag = [siteTags.BOOKMARK]
+  const browseableSiteUrl = 'page1.html'
+  const browseableSiteTitle = 'Page 1'
 
-  before(function * () {
-    yield this.app.client
-      .waitUntilWindowLoaded()
+  function * setup (client) {
+    yield client
       .waitForUrl(Brave.newTabUrl)
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
       .windowByUrl(Brave.browserWindowUrl)
+  }
+
+  function * addDemoSites (client) {
+    yield client
       .addSite({
         customTitle: 'demo1',
         folderId: folderId,
@@ -36,25 +39,154 @@ describe('about:bookmarks', function () {
       .waitForExist('.tab[data-frame-key="1"]')
       .tabByIndex(0)
       .url(aboutBookmarksUrl)
+  }
+
+  function * addBrowseableSite (client) {
+    const site = Brave.server.url(browseableSiteUrl)
+    yield client
+      .addSite({
+        location: site,
+        title: browseableSiteTitle,
+        tags: bookmarkTag,
+        parentFolderId: 0,
+        lastAccessedTime: lastVisit
+      }, siteTags.BOOKMARK)
+      .waitForExist('.tab[data-frame-key="1"]')
+      .tabByIndex(0)
+      .url(aboutBookmarksUrl)
+  }
+
+  describe('page content', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield addDemoSites(this.app.client)
+    })
+
+    it('displays entries with title', function * () {
+      yield this.app.client
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
+    })
+
+    it('displays entries without a title using their URL', function * () {
+      yield this.app.client
+        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+    })
+
+    it('displays entries using customTitle (if available)', function * () {
+      yield this.app.client
+        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
+    })
+
+    it('shows bookmark folders', function * () {
+      yield this.app.client
+        .waitForVisible('.bookmarkFolderList .listItem[data-folder-id="' + folderId + '"]')
+    })
   })
 
-  it('displays entries with title', function * () {
-    yield this.app.client
-      .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
+  describe('double click behavior', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield addBrowseableSite(this.app.client)
+    })
+
+    it('opens a new tab with the location of the entry when double clicked', function * () {
+      const site = Brave.server.url(browseableSiteUrl)
+      yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
+        .doubleClick('table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]')
+        .waitForTabCount(2)
+        .waitForUrl(site)
+        .tabByIndex(0)
+    })
   })
 
-  it('displays entries without a title using their URL', function * () {
-    yield this.app.client
-      .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-  })
+  describe('multi-select behavior', function () {
+    Brave.beforeAll(this)
 
-  it('displays entries using customTitle (if available)', function * () {
-    yield this.app.client
-      .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
-  })
+    before(function * () {
+      yield setup(this.app.client)
+      yield addDemoSites(this.app.client)
+    })
 
-  it('shows bookmark folders', function * () {
-    yield this.app.client
-      .waitForVisible('.bookmarkFolderList .listItem[data-folder-id="' + folderId + '"]')
+    it('selects multiple rows when clicked with cmd/control', function * () {
+      yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
+        .loadUrl(aboutBookmarksUrl)
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .isDarwin().then((val) => {
+          if (val === true) {
+            return this.app.client.keys(Brave.keys.COMMAND)
+          } else {
+            return this.app.client.keys(Brave.keys.CONTROL)
+          }
+        })
+        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
+        // key depressed
+        .isDarwin().then((val) => {
+          if (val === true) {
+            return this.app.client.keys(Brave.keys.COMMAND)
+          } else {
+            return this.app.client.keys(Brave.keys.CONTROL)
+          }
+        })
+        .click('table.sortableTable td.title[data-sort="facebook"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="facebook"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        // reset state
+        .click('table.sortableTable td.title[data-sort="facebook"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="facebook"]')
+    })
+    it('selects multiple contiguous rows when shift clicked', function * () {
+      yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
+        .loadUrl(aboutBookmarksUrl)
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .keys(Brave.keys.SHIFT)
+        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="customTest"]')
+        .waitForVisible('table.sortableTable td.title[data-sort="facebook"]')
+        // key depressed
+        .keys(Brave.keys.SHIFT)
+        .click('table.sortableTable td.title[data-sort="facebook"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="facebook"]')
+        .isDarwin().then((val) => {
+          if (val === true) {
+            return this.app.client.keys(Brave.keys.COMMAND)
+          } else {
+            return this.app.client.keys(Brave.keys.CONTROL)
+          }
+        })
+        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        // key depressed
+        .isDarwin().then((val) => {
+          if (val === true) {
+            return this.app.client.keys(Brave.keys.COMMAND)
+          } else {
+            return this.app.client.keys(Brave.keys.CONTROL)
+          }
+        })
+        .keys(Brave.keys.SHIFT)
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="customTest"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="facebook"]')
+        // reset state
+        // key depressed
+        .keys(Brave.keys.SHIFT)
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+    })
   })
 })
