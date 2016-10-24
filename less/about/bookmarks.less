@@ -1,8 +1,25 @@
 @import "./siteDetails.less";
 
+#appContainer > div {
+  height: auto;
+}
+
 .siteDetailsPage {
+  display: flex;
+  padding: 0;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
+
   .siteDetailsPageHeader {
+    display: flex;
+    padding: 24px;
+    justify-content: space-between;
+
     .headerActions {
+      float: none;
+      align-items: center;
+
       input.searchInput {
         margin-right: 0 !important;
       }
@@ -13,6 +30,8 @@
     display: flex;
     flex-wrap: wrap;
     height: 100%;
+    margin: 0;
+    flex: 1;
 
     .folderView {
       min-width: 220px;
@@ -42,7 +61,6 @@
 
       > .bookmarkFolderList {
         display: block;
-        height: 100%;
 
         .listItem >* {
           color: @buttonColor;
@@ -63,9 +81,10 @@
     }
     .organizeView {
       flex-grow: 5;
+      border-left: 1px solid @braveOrange;
+
       .sortableTable {
         -webkit-user-select: none;
-        border-left: 1px solid @braveOrange;
         // Custom title column (has add bookmark icon)
         th:first-of-type > div { display: block; }
         // Bookmark last visited column
