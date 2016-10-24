@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ImmutableComponent = require('../../components/immutableComponent')
 const cx = require('../../lib/classSet.js')
 const DragSource = require('react-dnd').DragSource
 const DropTarget = require('react-dnd').DropTarget
@@ -59,9 +60,9 @@ const targetCollect = (connect) => {
   }
 }
 
-class Block extends React.Component {
+class Block extends ImmutableComponent {
   render () {
-    const { isDragging, connectDragSource, connectDropTarget, onBookmarkedTopSite, isBookmarked, onPinnedTopSite, isPinned, onIgnoredTopSite, title, href, style, favicon } = this.props
+    const { isDragging, connectDragSource, connectDropTarget, onToggleBookmark, isBookmarked, onPinnedTopSite, isPinned, onIgnoredTopSite, title, href, style, favicon } = this.props
     const opacity = isDragging ? 0 : 1
     const starIcon = isBookmarked ? 'fa-star' : 'fa-star-o'
     const pinIcon = isPinned ? 'fa-minus' : 'fa-thumb-tack'
@@ -81,7 +82,7 @@ class Block extends React.Component {
                 fa: true,
                 [starIcon]: true
               })}
-              onClick={onBookmarkedTopSite}
+              onClick={onToggleBookmark}
               data-l10n-id={isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
             />
             <button

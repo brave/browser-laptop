@@ -17,7 +17,8 @@ const aboutActions = require('./aboutActions')
 const siteUtil = require('../state/siteUtil')
 const siteTags = require('../constants/siteTags')
 const cx = require('../lib/classSet.js')
-const { aboutUrls } = require('../lib/appUrlUtil')
+const config = require('../constants/config')
+const backgrounds = require('../data/backgrounds')
 
 const ipc = window.chrome.ipc
 
@@ -27,103 +28,27 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 class NewTabPage extends React.Component {
   constructor () {
     super()
-    this.state = {}
+    this.state = {
+      showSiteRemovalNotification: false,
+      backgroundImage: this.randomBackgroundImage,
+      imageLoadFailed: false
+    }
     ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newTabData) => {
       this.setState({ newTabData: Immutable.fromJS(newTabData || {}) })
     })
   }
 
   get randomBackgroundImage () {
-    // Temporary workaround until we have a better image storage
-    const bgFiles = [
-      {
-        'name': 'Tuolome Meadows',
-        'source': 'dksfoto1.jpg'
-      }, {
-        'name': 'South Tufa, Mono Lake',
-        'source': 'dksfoto2.jpg'
-      }, {
-        'name': 'Little Lakes Valley',
-        'source': 'dksfoto3.jpg'
-      }, {
-        'name': 'Bay Bridge',
-        'source': 'dksfoto4.jpg'
-      }, {
-        'name': 'Yosemite',
-        'source': 'dksfoto5.jpg'
-      }, {
-        'name': 'Beach Ice',
-        'source': 'dksfoto6.jpg'
-      }, {
-        'name': 'Color and White Trunks',
-        'source': 'dksfoto7.jpg'
-      }, {
-        'name': 'Golden Gate Bridge',
-        'source': 'dksfoto8.jpg'
-      }, {
-        'name': 'Long Lake',
-        'source': 'dksfoto9.jpg'
-      }, {
-        'name': 'San Francisco Skyline',
-        'source': 'dksfoto10.jpg'
-      }, {
-        'name': 'Across Mono Basin',
-        'source': 'dksfoto11.jpg'
-      }
-    ]
-    const randomImage = bgFiles[Math.floor(Math.random() * bgFiles.length)]
-    const pathToBgImage = path.join(__dirname, '..', '..', 'img', 'newTabBackground', randomImage.source)
-
-    return {
-      name: randomImage.name,
-      source: {backgroundImage: 'url(' + `${pathToBgImage}` + ')'}
-    }
+    const image = Object.assign({}, backgrounds[Math.floor(Math.random() * backgrounds.length)])
+    image.style = {backgroundImage: 'url(' + image.source + ')'}
+    return image
   }
 
-  get millisecondsPerItem () {
-    return 50
-  }
-
-  get trackedBlockersCount () {
-    return this.state.newTabData.get('trackedBlockersCount') || 0
-  }
-
-  get adblockCount () {
-    return this.state.newTabData.get('adblockCount') || 0
-  }
-
-  get httpsUpgradedCount () {
-    return this.state.newTabData.get('httpsUpgradedCount') || 0
-  }
-
-  get estimatedTimeSaved () {
-    const estimatedMillisecondsSaved = (this.adblockCount + this.trackedBlockersCount) * this.millisecondsPerItem || 0
-    const hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24
-    const minutes = estimatedMillisecondsSaved < 1000 * 60 * 60
-    const seconds = estimatedMillisecondsSaved < 1000 * 60
-    let counter
-    let text
-
-    if (seconds) {
-      counter = Math.ceil(estimatedMillisecondsSaved / 1000)
-      text = 'seconds'
-    } else if (minutes) {
-      counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60)
-      text = 'minutes'
-    } else if (hours) {
-      counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60 / 60)
-      text = 'hours'
-    } else {
-      // Otherwise the output is in days
-      counter = Math.ceil(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24)
-      text = 'days'
-    }
-
-    return {
-      id: text,
-      value: counter,
-      args: JSON.stringify({ value: counter })
-    }
+  get fallbackImage () {
+    const image = Object.assign({}, config.newtab.fallbackImage)
+    const pathToImage = path.join(__dirname, '..', '..', image.source)
+    image.style = {backgroundImage: 'url(' + `${pathToImage}` + ')'}
+    return image
   }
 
   get sites () {
@@ -150,9 +75,11 @@ class NewTabPage extends React.Component {
     return siteUtil.isSiteBookmarked(this.topSites, siteProps)
   }
 
+  /**
+   * topSites are defined by users. Pinned sites are attached to their positions
+   * in the grid, and the non pinned indexes are populated with newly accessed sites
+   */
   get topSites () {
-    // topSites are defined by users. Pinned sites are attached to their positions
-    // in the grid, and the non pinned indexes are populated with newly accessed sites
     let gridSites = Immutable.List().setSize(18)
     let sites = this.sites
     const pinnedTopSites = this.pinnedTopSites.setSize(gridSites.size)
@@ -187,9 +114,23 @@ class NewTabPage extends React.Component {
     return this.topSites.take(sitesRow)
   }
 
+  showSiteRemovalNotification () {
+    this.setState({
+      showSiteRemovalNotification: true
+    })
+  }
+
+  hideSiteRemovalNotification () {
+    this.setState({
+      showSiteRemovalNotification: false
+    })
+  }
+
+  /**
+   * save number of rows on store. gridsLayout starts with 3 rows (large).
+   * Rows are reduced at each click and then reset to three again
+   */
   onChangeGridLayout () {
-    // save number of rows on store. gridsLayout starts with 3 rows (large).
-    // Rows are reduced at each click and then reset to three again
     const gridLayoutSize = this.gridLayoutSize
     const changeGridSizeTo = (size) => aboutActions.setNewTabDetail({gridLayoutSize: size})
 
@@ -225,72 +166,74 @@ class NewTabPage extends React.Component {
     pinnedTopSites = pinnedTopSites.splice(finalPositionIndex, 0, currentPosition)
 
     // If site is pinned, update pinnedTopSites list
+    const newTabState = {}
     if (this.isPinned(currentPosition)) {
-      aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites})
+      newTabState.pinnedTopSites = pinnedTopSites
     }
-    aboutActions.setNewTabDetail({sites: gridSites})
+    newTabState.sites = gridSites
+    aboutActions.setNewTabDetail(newTabState)
   }
 
   onToggleBookmark (siteProps) {
     const siteDetail = siteUtil.getDetailFromFrame(siteProps, siteTags.BOOKMARK)
-    aboutActions.setBookmarkDetail(siteDetail, siteDetail)
+    const editing = this.isBookmarked(siteProps)
+    aboutActions.setBookmarkDetail(siteDetail, siteDetail, null, editing)
   }
 
   onPinnedTopSite (siteProps) {
     const gridSites = this.topSites
-    let pinnedTopSites = this.pinnedTopSites.setSize(18)
-
     const currentPosition = gridSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
     const currentPositionIndex = gridSites.indexOf(currentPosition)
 
     // If pinned, leave it null. Otherwise stores site on ignoredTopSites list, retaining the same position
+    let pinnedTopSites = this.pinnedTopSites.setSize(18)
     pinnedTopSites = pinnedTopSites.splice(currentPositionIndex, 1, this.isPinned(siteProps) ? null : siteProps)
 
     aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites})
   }
 
   onIgnoredTopSite (siteProps) {
-    this.onIgnoredTopSite.isCalled = true
+    this.showSiteRemovalNotification()
 
-    const gridSites = this.topSites
-    let pinnedTopSites = this.pinnedTopSites
-    const ignoredTopSites = this.ignoredTopSites.push(siteProps)
-
-    const currentPosition = gridSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
-    const currentPositionIndex = gridSites.indexOf(currentPosition)
-
+    // If a pinnedTopSite is ignored, remove it from the pinned list as well
+    const newTabState = {}
     if (this.isPinned(siteProps)) {
-      // If a pinnedTopSite is ignored, remove it from the pinned list as well
-      pinnedTopSites = pinnedTopSites.splice(currentPositionIndex, 1, null)
-      aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites})
+      const gridSites = this.topSites
+      const currentPosition = gridSites.filter((site) => siteProps.get('location') === site.get('location')).get(0)
+      const currentPositionIndex = gridSites.indexOf(currentPosition)
+      const pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, null)
+      newTabState.pinnedTopSites = pinnedTopSites
     }
-    aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites})
+
+    newTabState.ignoredTopSites = this.ignoredTopSites.push(siteProps)
+    aboutActions.setNewTabDetail(newTabState)
   }
 
   onUndoIgnoredTopSite () {
-    let ignoredTopSites = this.ignoredTopSites
-    ignoredTopSites = ignoredTopSites.splice(-1, 1)
+    const ignoredTopSites = this.ignoredTopSites.splice(-1, 1)
     aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites})
-
-    this.onIgnoredTopSite.isCalled = false
-  }
-
-  onRestoreAll () {
-    // Clear ignoredTopSites and pinnedTopSites list
-    aboutActions.setNewTabDetail({ignoredTopSites: []})
-    aboutActions.setNewTabDetail({pinnedTopSites: []})
-
     this.hideSiteRemovalNotification()
   }
 
-  onCloseNotification () {
-    this.onIgnoredTopSite.isCalled = false
+  /**
+   * Clear ignoredTopSites and pinnedTopSites list
+   */
+  onRestoreAll () {
+    aboutActions.setNewTabDetail({ignoredTopSites: [], pinnedTopSites: []})
+    this.hideSiteRemovalNotification()
   }
 
-  componentWillMount () {
-    // Attach random background image right before component is mounted
-    // so it can be random only at each new page
-    this.backgroundImage = this.randomBackgroundImage
+  /**
+   * This handler only fires when the image fails to load.
+   * If both the remote and local image fail, page defaults to gradients.
+   */
+  onImageLoadFailed () {
+    this.setState({
+      imageLoadFailed: true,
+      backgroundImage: this.state.imageLoadFailed
+        ? {}
+        : this.fallbackImage
+    })
   }
 
   render () {
@@ -298,33 +241,21 @@ class NewTabPage extends React.Component {
     if (!this.state.newTabData) {
       return null
     }
-    const backgroundImage = this.backgroundImage.source
-    const backgroundImageName = this.backgroundImage.name
-    const trackedBlockersCount = this.trackedBlockersCount
-    const adblockCount = this.adblockCount
-    const httpsUpgradedCount = this.httpsUpgradedCount
+
     const gridLayoutSize = this.gridLayoutSize
     const gridLayout = this.gridLayout
-    const timeSaved = this.estimatedTimeSaved
-    const blockedArgs = JSON.stringify({
-      adblockCount: adblockCount,
-      trackedBlockersCount: trackedBlockersCount,
-      httpsUpgradedCount: httpsUpgradedCount
-    })
-    console.log('deve retornar ok -----', this.onIgnoredTopSite.isCalled)
 
-    return <div className='dynamicBackground' style={backgroundImage}>
+    return <div className='dynamicBackground' style={this.state.backgroundImage.style}>
+      {
+        this.state.backgroundImage
+          ? <img src={this.state.backgroundImage.source} onError={this.onImageLoadFailed.bind(this)} />
+          : null
+      }
       <div className='gradient' />
       <div className='content'>
         <main>
           <div className='statsBar'>
-            <Stats
-              blockedArgs={blockedArgs}
-              trackedBlockersCount={trackedBlockersCount}
-              adblockCount={adblockCount}
-              httpsUpgradedCount={httpsUpgradedCount}
-              timeSaved={timeSaved}
-            />
+            <Stats newTabData={this.state.newTabData} />
             <Clock />
           </div>
           <div className='topSitesContainer'>
@@ -351,7 +282,7 @@ class NewTabPage extends React.Component {
                       : <img src={site.get('favicon')} />
                     }
                     style={{backgroundColor: site.get('themeColor')}}
-                    onBookmarkedSite={this.onToggleBookmark.bind(this, site)}
+                    onToggleBookmark={this.onToggleBookmark.bind(this, site)}
                     onPinnedTopSite={this.onPinnedTopSite.bind(this, site)}
                     onIgnoredTopSite={this.onIgnoredTopSite.bind(this, site)}
                     onDraggedSite={this.onDraggedSite.bind(this)}
@@ -364,23 +295,15 @@ class NewTabPage extends React.Component {
           </div>
         </main>
         {
-          this.onIgnoredTopSite.isCalled
+          this.state.showSiteRemovalNotification
             ? <SiteRemovalNotification
-              isActive={this.onIgnoredTopSite.isCalled}
               onUndoIgnoredTopSite={this.onUndoIgnoredTopSite.bind(this)}
               onRestoreAll={this.onRestoreAll.bind(this)}
-              onCloseNotification={this.onCloseNotification.bind(this)}
+              onCloseNotification={this.hideSiteRemovalNotification.bind(this)}
               />
             : null
         }
-        <FooterInfo
-          photoName={backgroundImageName}
-          photographer='Darrell Sano'
-          photographerLink='http://dksfoto.smugmug.com'
-          settingsPage={aboutUrls.get('about:preferences')}
-          bookmarksPage={aboutUrls.get('about:bookmarks')}
-          historyPage={aboutUrls.get('about:history')}
-        />
+        <FooterInfo backgroundImage={this.state.backgroundImage} />
       </div>
     </div>
   }

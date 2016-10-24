@@ -145,13 +145,19 @@
 @transitionFastEase: all 100ms ease;
 @transitionSlowEase: all 1s ease;
 
-@statsYellow: rgb(247,147,30);
-@statsOrange: rgb(241,90,36);
-@statsRed: rgb(237,28,36);
-@statsBlue: rgb(41,171,226);
+// Colors used for stats on:
+// - Bravery panel
+// - about:newtab
+@statsYellow: #ffc000;
+@statsOrange: #f39030;
+@statsRed: #fe521d;
+@statsBlue: #0796fa;
+@statsGray: @chromeText;
 
 @defaultIconBackground: #F7F7F7;
 
+// Variables can be exposed to (and read from) our JavaScript code
+// (for more info, search MDN for CSSStyleDeclaration)
 :root {
   --navbar-height: @navbarHeight;
   --downloads-bar-height: @downloadsBarHeight;

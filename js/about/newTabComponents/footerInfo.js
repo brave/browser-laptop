@@ -3,27 +3,28 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ImmutableComponent = require('../../components/immutableComponent')
+const {aboutUrls} = require('../../lib/appUrlUtil')
 
-class FooterInfo extends React.Component {
-  constructor () {
-    super()
-    this.state = {}
-  }
-
+class FooterInfo extends ImmutableComponent {
   render () {
+    if (!this.props.backgroundImage.name) {
+      return null
+    }
     return <footer className='footerContainer'>
       <div className='copyrightNotice'>
         <div className='copyrightCredits'>
-          <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.photographerLink} target='_blank'>{this.props.photographer}</a>
+          <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.backgroundImage.link} target='_blank'>{this.props.backgroundImage.author}</a>
         </div>
-        <span className='photoName'>{this.props.photoName}</span>
+        <span className='photoName'>{this.props.backgroundImage.name}</span>
       </div>
       <nav className='shortcutsContainer'>
-        <a className='shortcutIcon settingsIcon' href={this.props.settingsPage} data-l10n-id='preferencesPage' />
-        <a className='shortcutIcon bookmarksIcon' href={this.props.bookmarksPage} data-l10n-id='bookmarksPage' />
-        <a className='shortcutIcon historyIcon' href={this.props.historyPage} data-l10n-id='historyPage' />
+        <a className='shortcutIcon settingsIcon' href={aboutUrls.get('about:preferences')} data-l10n-id='preferencesPage' />
+        <a className='shortcutIcon bookmarksIcon' href={aboutUrls.get('about:bookmarks')} data-l10n-id='bookmarksPage' />
+        <a className='shortcutIcon historyIcon' href={aboutUrls.get('about:history')} data-l10n-id='historyPage' />
       </nav>
     </footer>
   }
 }
+
 module.exports = FooterInfo

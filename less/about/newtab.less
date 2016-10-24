@@ -18,6 +18,12 @@ body {
   background: @darkGray;
 }
 
+main,
+.copyrightNotice {
+  -webkit-user-select: none;
+  cursor: default;
+}
+
 a {
   text-decoration: none;
 }
@@ -41,6 +47,9 @@ ul {
   background-size: cover;
   display: flex;
   flex: 1;
+  > img {
+    display: none;
+  }
 }
 
 .gradient {
@@ -87,21 +96,21 @@ ul {
         max-width: 200px;
 
         &.trackers {
-          color: @statsYellow;
+          color: @statsOrange;
         }
         &.ads {
-          color: @statsOrange
+          color: @statsRed;
         }
         &.https {
-          color: @statsRed
+          color: @statsBlue;
         }
         &.timeSaved {
-          color: @statsBlue
+          color: @statsGray;
         }
 
         .text {
           display: inline;
-          color: @statsBlue;
+          color: @statsGray;
           font-size: 20px;
           line-height: 24px;
         }
@@ -138,22 +147,22 @@ ul {
       background: 0 0 / contain no-repeat;
       display: flex;
       border: 0;
-      cursor: pointer;
       margin-left: auto;
       width: 30px;
       height: 30px;
       font-size: 30px;
       margin-bottom: 20px;
       transition: @transitionFast;
+      cursor: default;
 
       &.hasThreeRows {
-        background: url('../../img/topsites_btn_3.svg');
+        background: url('../../img/newtab/topsites_btn_3.svg');
       }
       &.hasTwoRows {
-        background: url('../../img/topsites_btn_2.svg');
+        background: url('../../img/newtab/topsites_btn_2.svg');
       }
       &.hasOneRow {
-        background: url('../../img/topsites_btn_1.svg');
+        background: url('../../img/newtab/topsites_btn_1.svg');
       }
     }
 
@@ -274,6 +283,11 @@ ul {
     justify-content: center;
     margin: auto;
 
+    .notification {
+      -webkit-user-select: none;
+      cursor: default;
+    }
+
     .notificationText, .siteRemovalAction {
       margin: 0 6px;
     }
@@ -281,11 +295,14 @@ ul {
     .siteRemovalAction {
       color: @braveOrange;
       text-decoration: underline;
+      cursor: pointer;
     }
 
     .fa-close {
       color: @statsRed;
       margin-left: 12px;
+      border: 0;
+      background-color: transparent;
     }
   }
 
@@ -332,15 +349,22 @@ ul {
         width: 35px;
         height: 35px;
         margin: 15px 5px;
+        cursor: default;
+        background-color: white;
+        -webkit-mask-repeat: no-repeat;
+
+        &:hover {
+          background-color: @gray;
+        }
 
         &.settingsIcon {
-          background: url('../../img/settings_prefs_btn.svg') 0 0 / contain no-repeat;
+          -webkit-mask-image: url('../../img/newtab/settings_prefs_btn.svg');
         }
         &.bookmarksIcon {
-          background: url('../../img/bookmarks_btn.svg') 0 0 / contain no-repeat;
+          -webkit-mask-image: url('../../img/newtab/bookmarks_btn.svg');
         }
         &.historyIcon {
-          background: url('../../img/history_btn.svg') 0 0 / contain no-repeat;
+          -webkit-mask-image: url('../../img/newtab/history_btn.svg');
         }
       }
     }
