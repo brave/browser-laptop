@@ -569,6 +569,10 @@ const doAction = (action) => {
     case WindowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
       windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'shouldRender']), action.enabled)
       if (!action.enabled) {
+        windowState = windowState.mergeIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions']), {
+          selectedIndex: null,
+          suggestionList: null
+        })
         // Make sure to remove the suffix from the url bar
         windowState = windowState.setIn(activeFrameStatePath().concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
         updateUrlSuffix(undefined)

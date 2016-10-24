@@ -45,7 +45,7 @@ class UrlBar extends ImmutableComponent {
     this.searchSelectEntry = null
     this.keyPressed = false
     this.showAutocompleteResult = debounce(() => {
-      if (!this.urlInput || this.keyPressed) {
+      if (!this.urlInput || this.keyPressed || this.locationValue.length === 0) {
         return
       }
       const suffixLen = this.props.locationValueSuffix.length
@@ -102,6 +102,7 @@ class UrlBar extends ImmutableComponent {
       windowActions.setUrlBarAutocompleteEnabled(false)
     }
     windowActions.setUrlBarSuggestions(undefined, null)
+    windowActions.setRenderUrlBarSuggestions(false)
   }
 
   onKeyDown (e) {
