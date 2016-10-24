@@ -221,7 +221,7 @@ function getPartition (frameOpts) {
   return partition
 }
 
-function cloneFrame (frameOpts, guestInstanceId) {
+function cloneFrame (frameOpts, guestInstanceId, key) {
   const cloneableAttributes = [
     'audioMuted',
     'canGoBack',
@@ -246,7 +246,10 @@ function cloneFrame (frameOpts, guestInstanceId) {
   clone.location = 'about:blank'
   clone.src = 'about:blank'
   clone.parentFrameKey = frameOpts.key
-  clone.aboutDetails = frameOpts.aboutDetails
+  if (frameOpts.aboutDetails !== undefined) {
+    clone.aboutDetails = frameOpts.aboutDetails
+    clone.aboutDetails.frameKey = key
+  }
   return clone
 }
 
