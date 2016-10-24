@@ -33,6 +33,7 @@ class SortableTable extends React.Component {
   /**
    * If you want multi-select to span multiple tables, you can
    * provide a single React.Component as the state owner.
+   * NOTE: The state owner must have a state.selection property available.
    * (ignored unless multi-select is specified)
    */
   get stateOwner () {
