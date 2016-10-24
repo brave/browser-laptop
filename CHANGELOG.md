@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.12.7](https://github.com/brave/browser-laptop/releases/v0.12.7dev)
+- (TODO)
+
 ## [0.12.6](https://github.com/brave/browser-laptop/releases/v0.12.6dev)
 - Added the ability to set Brave as your default browser on startup and preferences page. ([#4937](https://github.com/brave/browser-laptop/issues/4937))([#4958](https://github.com/brave/browser-laptop/issues/4958))([#4935](https://github.com/brave/browser-laptop/issues/4935))([#4934](https://github.com/brave/browser-laptop/issues/4934))([#2105](https://github.com/brave/browser-laptop/issues/2105))([#4939](https://github.com/brave/browser-laptop/issues/4939))
 - Added the option to opt-in to reporting usage stats. ([#4691](https://github.com/brave/browser-laptop/issues/4691))
