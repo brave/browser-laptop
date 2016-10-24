@@ -75,6 +75,12 @@ module.exports = { "providers" :
       "search" : "https://www.youtube.com/results?search_type=search_videos&search_query={searchTerms}&search_sort=relevance&search_category=0&page=",
       "autocomplete": "https://suggestqueries.google.com/complete/search?output=chrome&client=chrome&hl=it&q={searchTerms}&ds=yt",
       "shortcut" : ":yt"
+    },
+    {
+      "name" : "StartPage",
+      "image" : "https://www.startpage.com/graphics/favicon/sp-favicon-16x16.png",
+      "search" : "https://startpage.com/do/dsearch?query={searchTerms}&cat=web&pl=opensearch",
+      "shortcut" : ":sp"
     }
   ]
 }
