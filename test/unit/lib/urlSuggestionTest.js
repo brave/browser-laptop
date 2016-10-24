@@ -9,8 +9,8 @@ const AGE_DECAY = 50
 
 describe('suggestion', function () {
   it('normalizes location', function () {
-    assert.ok(suggestion.normalizeLocation('https://www.site.com') === 'https://site.com', 'www. prefix removed')
-    assert.ok(suggestion.normalizeLocation('http://site.com') === 'http://site.com', 'location not modified')
+    assert.ok(suggestion.normalizeLocation('https://www.site.com') === 'site.com', 'www. prefix removed')
+    assert.ok(suggestion.normalizeLocation('http://site.com') === 'site.com', 'location not modified')
   })
 
   it('sorts sites correctly', function () {
