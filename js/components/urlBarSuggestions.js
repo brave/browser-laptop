@@ -297,8 +297,11 @@ class UrlBarSuggestions extends ImmutableComponent {
           const title = site.get('title') || ''
           const location = site.get('location') || ''
           return (title.toLowerCase().includes(urlLocationLower) ||
-            location.toLowerCase().includes(urlLocationLower)) &&
-            (!site.get('tags') || site.get('tags').size === 0)
+                  location.toLowerCase().includes(urlLocationLower))
+          // Note: Bookmkark sites are now included in history. This will allow
+          // sites to appear in the auto-complete regardless of their bookmark
+          // status. If history is turned off, bookmarked sites will appear
+          // in the bookmark section.
         }
       }))
     }
