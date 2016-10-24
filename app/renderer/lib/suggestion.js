@@ -107,5 +107,8 @@ module.exports.simpleDomainNameValue = (site) => {
  *
  */
 module.exports.normalizeLocation = (location) => {
-  return location.replace(/www\./, '')
+  location = location.replace(/www\./, '')
+  location = location.replace(/^http:\/\//, '')
+  location = location.replace(/^https:\/\//, '')
+  return location
 }

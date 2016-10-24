@@ -26,10 +26,10 @@ module.exports = {
   urlBarSuggestions: {
     maxOpenedFrames: 2,
     maxBookmarkSites: 2,
-    maxHistorySites: 2,
+    maxHistorySites: 3,
     maxAboutPages: 2,
     maxSearch: 3,
-    maxTopSites: 5
+    maxTopSites: 3
   },
   navigationBar: {
     defaultSearchSuggestions: false,
