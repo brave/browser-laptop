@@ -760,6 +760,7 @@ div.nextPaymentSubmission {
       -webkit-font-smoothing: antialiased;
       text-align: left;
       vertical-align: top;
+      position: relative;
 
       a {
         vertical-align: middle;
@@ -774,6 +775,27 @@ div.nextPaymentSubmission {
           height: 1.5em;
           margin-right: 6px;
           vertical-align: middle;
+        }
+      }
+
+      .fa-file-o {
+        font-size: 15px;
+        margin-right: 6px;
+        text-align: center;
+        width: 24px;
+      }
+
+      .verified{
+        left: -10px;
+        position: absolute;
+        font-size: 10px;
+
+        .fa-circle {
+          color: #67B640;
+        }
+
+        .fa-check {
+          color: white;
         }
       }
 
