@@ -53,7 +53,7 @@ describe('findbar', function () {
     assert.equal(match, '1 of 2')
   })
 
-  it.only('should empty the input on clear', function * () {
+  it('should empty the input on clear', function * () {
     yield this.app.client
       .showFindbar()
       .waitForElementFocus(findBarInput)
