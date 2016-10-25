@@ -202,7 +202,10 @@ AppStore
   },
   about: {
     newtab: {
-      gridLayout: string // 'small', 'medium', 'large'
+      gridLayoutSize: [string], // 'small', 'medium', 'large'
+      sites: [list], // List of accessed sites to be used on gridLayout
+      ignoredTopSites: [list], // List of ignored sites
+      pinnedTopSites: [list], // List of pinned sites
     }
   },
   menu: {
