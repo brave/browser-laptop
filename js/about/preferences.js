@@ -213,6 +213,13 @@ class LedgerTable extends ImmutableComponent {
     return `https?://${synopsis.get('site')}`
   }
 
+  getVerifiedIcon (synopsis) {
+    return <span className='verified fa-stack'>
+      <i className='fa fa-circle fa-stack-2x' />
+      <i className='fa fa-check fa-stack-1x' />
+    </span>
+  }
+
   enabledForSite (synopsis) {
     const hostSettings = this.props.siteSettings.get(this.getHostPattern(synopsis))
     if (hostSettings) {
@@ -239,9 +246,10 @@ class LedgerTable extends ImmutableComponent {
     if (!synopsis || !synopsis.get || !this.shouldShow(synopsis)) {
       return []
     }
-    const faviconURL = synopsis.get('faviconURL') || appConfig.defaultFavicon
+    const faviconURL = synopsis.get('faviconURL')
     const rank = synopsis.get('rank')
     const views = synopsis.get('views')
+    const verified = synopsis.get('verified')
     const duration = synopsis.get('duration')
     const publisherURL = synopsis.get('publisherURL')
     const percentage = synopsis.get('percentage')
@@ -251,7 +259,7 @@ class LedgerTable extends ImmutableComponent {
     return [
       rank,
       {
-        html: <a href={publisherURL} target='_blank'><img src={faviconURL} alt={site} /><span>{site}</span></a>,
+        html: <a href={publisherURL} target='_blank'>{verified ? this.getVerifiedIcon() : null}{faviconURL ? <img src={faviconURL} alt={site} /> : <span className='fa fa-file-o' />}<span>{site}</span></a>,
         value: site
       },
       {
