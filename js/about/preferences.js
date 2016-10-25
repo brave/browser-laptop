@@ -37,6 +37,7 @@ const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
+const widevine = appConfig.resourceNames.WIDEVINE
 
 const isDarwin = navigator.platform === 'MacIntel'
 const isWindows = navigator.platform && navigator.platform.includes('Win')
@@ -62,7 +63,8 @@ const permissionNames = {
   'fullscreenPermission': ['boolean'],
   'openExternalPermission': ['boolean'],
   'protocolRegistrationPermission': ['boolean'],
-  'flash': ['boolean', 'number']
+  'flash': ['boolean', 'number'],
+  'widevine': ['boolean', 'number']
 }
 
 const braveryPermissionNames = {
@@ -1341,6 +1343,14 @@ class SitePermissionsPage extends React.Component {
                             time: new Date(granted).toLocaleString()
                           }
                         }
+                      } else if (name === 'widevine') {
+                        if (granted === 1) {
+                          statusText = 'alwaysAllow'
+                        } else if (granted === 0) {
+                          statusText = 'allowOnce'
+                        } else {
+                          statusText = 'alwaysDeny'
+                        }
                       } else if (name === 'noScript' && typeof granted === 'number') {
                         if (granted === 1) {
                           statusText = 'allowUntilRestart'
@@ -1454,8 +1464,13 @@ class SecurityTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(flash, e.target.value)
     ipc.send(messages.PREFS_RESTART, flash, e.target.value)
   }
+  onToggleWidevine (e) {
+    aboutActions.setResourceEnabled(widevine, e.target.value)
+  }
   render () {
     const lastPassPreferencesUrl = ('chrome-extension://' + extensionIds[passwordManagers.LAST_PASS] + '/tabDialog.html?dialog=preferences&cmd=open')
+
+    const isLinux = navigator.appVersion.indexOf('Linux') !== -1
 
     return <div>
       <div className='sectionTitle' data-l10n-id='privateData' />
@@ -1524,6 +1539,28 @@ class SecurityTab extends ImmutableComponent {
           }
         </span>
       </SettingsList>
+      { !isLinux
+      ? <SettingsList>
+        <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
+        <div className='subtext'>
+          <span data-l10n-id='enableWidevineSubtext' />
+          <span className='fa fa-info-circle widevineInfoIcon'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: appConfig.widevine.moreInfoUrl
+            }, true)}
+          />
+        </div>
+        <div className='subtext'>
+          <span data-l10n-id='enableWidevineSubtext2' />
+          <span className='fa fa-info-circle widevineInfoIcon'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: appConfig.widevine.licenseUrl
+            }, true)}
+          />
+        </div>
+      </SettingsList>
+      : null
+      }
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
     </div>
   }

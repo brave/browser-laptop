@@ -21,6 +21,7 @@ module.exports = {
     AD_INSERTION: 'adInsertion',
     NOSCRIPT: 'noScript',
     FLASH: 'flash',
+    WIDEVINE: 'widevine',
     COOKIEBLOCK: 'cookieblock' // block 3p cookies and referer
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
@@ -34,6 +35,11 @@ module.exports = {
     enabled: false,
     installUrl: 'https://get.adobe.com/flashplayer/',
     url: getTargetAboutUrl('about:flash')
+  },
+  widevine: {
+    enabled: false,
+    moreInfoUrl: 'https://www.eff.org/issues/drm',
+    licenseUrl: 'https://www.google.com/policies/terms/'
   },
   adblock: {
     alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',

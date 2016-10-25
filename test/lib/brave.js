@@ -251,6 +251,16 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('waitForResourceReady', function (resourceName) {
+      logVerbose('waitForResourceReady(' + resourceName + ')')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          logVerbose('waitForResourceReady("' + resourceName + '") => ' + JSON.stringify(val.value[resourceName]))
+          return val.value[resourceName] && val.value[resourceName].ready
+        })
+      })
+    })
+
     this.app.client.addCommand('loadUrl', function (url) {
       if (isSourceAboutUrl(url)) {
         url = getTargetAboutUrl(url)
@@ -342,6 +352,18 @@ var exports = {
       return this.execute(function (siteDetail) {
         return require('../../../js/actions/appActions').addSite(siteDetail)
       }, siteDetail).then((response) => response.value)
+    })
+
+    /**
+     * Enables or disables the specified resource.
+     *
+     * @param {string} resourceName - The resource to enable or disable
+     * @param {boolean} enabled - Whether to enable or disable the resource
+     */
+    this.app.client.addCommand('setResourceEnabled', function (resourceName, enabled) {
+      return this.execute(function (resourceName, enabled) {
+        return require('../../../js/actions/appActions').setResourceEnabled(resourceName, enabled)
+      }, resourceName, enabled).then((response) => response.value)
     })
 
     /**

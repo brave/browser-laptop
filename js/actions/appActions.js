@@ -198,6 +198,17 @@ const appActions = {
   },
 
   /**
+   * Indicates a resource is ready
+   * @param {string} resourceName - 'widevine'
+   */
+  resourceReady: function (resourceName) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.APP_RESOURCE_READY,
+      resourceName
+    })
+  },
+
+  /**
   * Checks how many resources were blocked.
   * @param {string} resourceName - 'adblock', 'trackingProtection', or 'httpsEverywhere'
   * @param {number} count - number of blocked resources to add to the global count

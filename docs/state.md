@@ -72,6 +72,7 @@ AppStore
       httpsEverywhere: boolean,
       fingerprintingProtection: boolean,
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
+      widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
       ledgerPayments: boolean, // False if site should not be paid by the ledger. Defaults to true.
       ledgerPaymentsShown: boolean, // False if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
       runInsecureContent: boolean // Allow active mixed content
@@ -115,6 +116,10 @@ AppStore
   },
   flash: {
     enabled: boolean // Enable flash
+  },
+  widevine: {
+    enabled: boolean, // true if widevine is installed and enabled
+    ready: boolean // true if widevine is in a ready state
   },
   defaultWindowHeight: number,
   defaultWindowWidth: number,

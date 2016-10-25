@@ -164,6 +164,16 @@ Sets whether the resource is enabled or not.
 
 
 
+### resourceReady(resourceName) 
+
+Indicates a resource is ready
+
+**Parameters**
+
+**resourceName**: `string`, 'widevine'
+
+
+
 ### addResourceCount(resourceName, count) 
 
 Checks how many resources were blocked.

@@ -168,7 +168,8 @@ class Frame extends ImmutableComponent {
   }
 
   shouldCreateWebview () {
-    return !this.webview || !!this.webview.allowRunningPlugins !== this.allowRunningPlugins()
+    return !this.webview ||
+      !!this.webview.allowRunningPlugins !== (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin())
   }
 
   runInsecureContent () {
@@ -177,7 +178,7 @@ class Frame extends ImmutableComponent {
       ? false : activeSiteSettings.get('runInsecureContent')
   }
 
-  allowRunningPlugins (url) {
+  allowRunningFlashPlugin (url) {
     if (!this.props.flashInitialized) {
       return false
     }
@@ -197,6 +198,26 @@ class Frame extends ImmutableComponent {
     return false
   }
 
+  allowRunningWidevinePlugin (url) {
+    if (!this.props.widevine || !this.props.widevine.get('enabled')) {
+      return false
+    }
+    const origin = url ? siteUtil.getOrigin(url) : this.origin
+    if (!origin) {
+      return false
+    }
+    // Check for at least one CtP allowed on this origin
+    if (!this.props.allSiteSettings) {
+      return false
+    }
+    const activeSiteSettings = getSiteSettingsForHostPattern(this.props.allSiteSettings,
+                                                             origin)
+    if (activeSiteSettings && typeof activeSiteSettings.get('widevine') === 'number') {
+      return true
+    }
+    return false
+  }
+
   expireContentSettings (origin) {
     // Expired Flash settings should be deleted when the webview is
     // navigated or closed. Same for NoScript's allow-once option.
@@ -209,6 +230,9 @@ class Frame extends ImmutableComponent {
       if (activeSiteSettings.get('flash') < Date.now()) {
         appActions.removeSiteSetting(origin, 'flash', this.props.isPrivate)
       }
+    }
+    if (activeSiteSettings.get('widevine') === 0) {
+      appActions.removeSiteSetting(origin, 'widevine', this.props.isPrivate)
     }
     if (activeSiteSettings.get('noScript') === 0) {
       appActions.removeSiteSetting(origin, 'noScript', this.props.isPrivate)
@@ -270,7 +294,7 @@ class Frame extends ImmutableComponent {
     if (hack && hack.userAgent) {
       this.webview.setAttribute('useragent', hack.userAgent)
     }
-    if (this.allowRunningPlugins()) {
+    if (this.allowRunningFlashPlugin() || this.allowRunningWidevinePlugin()) {
       this.webview.setAttribute('plugins', true)
       this.webview.allowRunningPlugins = true
     }
@@ -610,6 +634,90 @@ class Frame extends ImmutableComponent {
     })
   }
 
+  /**
+   * Shows a Widevine CtP notification if Widevine is installed and enabled.
+   * If not enabled, alert user that Widevine is installed.
+   * @param {string} origin - frame origin that is requesting to run widevine.
+   *   can either be main frame or subframe.
+   * @param {function=} noWidevineCallback - Optional callback to run if Widevine is not
+   *   installed
+   * @param {function=} widevineCallback - Optional callback to run if Widevine is
+   *   accepted
+   */
+  showWidevineNotification (location, origin, noWidevineCallback, widevineCallback) {
+    // https://www.nfl.com is said to be a widevine site but it actually uses Flash for me Oct 10, 2016
+    const widevineSites = ['https://www.netflix.com',
+      'http://bitmovin.com',
+      'https://shaka-player-demo.appspot.com']
+    const isForWidevineTest = process.env.NODE_ENV === 'test' && location.endsWith('/drm.html')
+    if (!isForWidevineTest && (!origin || !widevineSites.includes(origin))) {
+      noWidevineCallback()
+      return
+    }
+
+    // Generate a random string that is unlikely to collide. Not
+    // cryptographically random.
+    const nonce = Math.random().toString()
+
+    if (this.props.widevine && this.props.widevine.get('enabled')) {
+      const message = locale.translation('allowWidevine').replace(/{{\s*origin\s*}}/, this.origin)
+      // Show Widevine notification bar
+      appActions.showMessageBox({
+        buttons: [
+          {text: locale.translation('deny')},
+          {text: locale.translation('allow')}
+        ],
+        message,
+        frameOrigin: this.origin,
+        options: {
+          nonce,
+          persist: true
+        }
+      })
+      this.notificationCallbacks[message] = (buttonIndex, persist) => {
+        if (buttonIndex === 1) {
+          if (persist) {
+            appActions.changeSiteSetting(this.origin, 'widevine', 1)
+          } else {
+            appActions.changeSiteSetting(this.origin, 'widevine', 0)
+          }
+          if (widevineCallback) {
+            widevineCallback()
+          }
+        } else {
+          if (persist) {
+            appActions.changeSiteSetting(this.origin, 'widevine', false)
+          }
+        }
+        appActions.hideMessageBox(message)
+      }
+    } else {
+      let message = locale.translation('widevineDisabled')
+      appActions.showMessageBox({
+        buttons: [
+          {text: locale.translation('goToPrefs')},
+          {text: locale.translation('noThanks')}
+        ],
+        message: message,
+        options: {nonce}
+      })
+      this.notificationCallbacks[message] = (buttonIndex) => {
+        if (buttonIndex === 0) {
+          const location = 'about:preferences#security'
+          windowActions.newFrame({ location }, true)
+        }
+        appActions.hideMessageBox(message)
+      }
+    }
+
+    ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {
+      const cb = this.notificationCallbacks[msg]
+      if (cb) {
+        cb(buttonIndex, persist)
+      }
+    })
+  }
+
   addEventListeners () {
     this.webview.addEventListener('content-blocked', (e) => {
       if (e.details[0] === 'javascript') {
@@ -832,6 +940,13 @@ class Frame extends ImmutableComponent {
         this.webview.getURL())
 
       const parsedUrl = urlParse(this.props.location)
+      if (!this.allowRunningWidevinePlugin()) {
+        this.showWidevineNotification(this.props.location, this.origin, () => {
+        }, () => {
+          windowActions.loadUrl(this.frame, this.props.provisionalLocation)
+        })
+      }
+
       const protocol = parsedUrl.protocol
       const isError = this.props.aboutDetails && this.props.aboutDetails.get('errorCode')
       if (!this.props.isPrivate && this.props.provisionalLocation === this.props.location && (protocol === 'http:' || protocol === 'https:') && !isError && savePage) {
