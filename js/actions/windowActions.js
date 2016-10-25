@@ -655,15 +655,17 @@ const windowActions = {
    * @param {Object} currentDetail - Properties of the bookmark to change to
    * @param {Object} originalDetail - Properties of the bookmark to edit
    * @param {Object} destinationDetail - Will move the added bookmark to the specified position
-   * @param {Object} shouldShowLocation - Whether or not to show the URL input
+   * @param {boolean} shouldShowLocation - Whether or not to show the URL input
+   * @param {boolean} isBookmarkHanger - true if triggered from star icon in nav bar
    */
-  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation) {
+  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail, shouldShowLocation, isBookmarkHanger) {
     dispatch({
       actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
       currentDetail,
       originalDetail,
       destinationDetail,
-      shouldShowLocation
+      shouldShowLocation,
+      isBookmarkHanger
     })
   },
 

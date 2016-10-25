@@ -21,7 +21,7 @@ const ipc = window.chrome.ipc
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-// BSCTODO: this button is currently hidden (along with column icon)
+// TODO(bsclifton): this button is currently hidden (along with column icon)
 // When ready, this can be shown again (by updating style in history.less)
 // When that happens, be sure to also show the ::before (which has trash can icon)
 class DeleteHistoryEntryButton extends ImmutableComponent {
@@ -34,7 +34,7 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     if (e && e.preventDefault) {
       e.preventDefault()
     }
-    // BSCTODO: delete the selected entry
+    // TODO(bsclifton): delete the selected entry
   }
 
   render () {

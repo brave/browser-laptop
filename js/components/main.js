@@ -32,6 +32,7 @@ const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
 const ImportBrowserDataPanel = require('../../app/renderer/components/importBrowserDataPanel')
 const AutofillAddressPanel = require('./autofillAddressPanel')
 const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
+const AddEditBookmark = require('./addEditBookmark')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../../app/renderer/components/bookmarksToolbar')
@@ -666,7 +667,7 @@ class Main extends ImmutableComponent {
   }
 
   onMouseDown (e) {
-    // BSCTODO: update this to use eventUtil.eventElHasAncestorWithClasses
+    // TODO(bsclifton): update this to use eventUtil.eventElHasAncestorWithClasses
     let node = e.target
     while (node) {
       if (node.classList &&
@@ -674,7 +675,7 @@ class Main extends ImmutableComponent {
             node.classList.contains('contextMenu') ||
             node.classList.contains('extensionButton') ||
             node.classList.contains('menubarItem') ||
-            node.classList.contains('bookmarkForm'))) {
+            node.classList.contains('bookmarkHanger'))) {
         // Middle click (on context menu) needs to fire the click event.
         // We need to prevent the default "Auto-Scrolling" behavior.
         if (node.classList.contains('contextMenu') && e.button === 1) {
@@ -1013,6 +1014,15 @@ class Main extends ImmutableComponent {
           loginRequiredDetail
             ? <LoginRequired loginRequiredDetail={loginRequiredDetail} tabId={activeFrame.get('tabId')} />
             : null
+        }
+        {
+          this.props.windowState.get('bookmarkDetail') && !this.props.windowState.getIn(['bookmarkDetail', 'isBookmarkHanger'])
+          ? <AddEditBookmark sites={this.props.appState.get('sites')}
+            currentDetail={this.props.windowState.getIn(['bookmarkDetail', 'currentDetail'])}
+            originalDetail={this.props.windowState.getIn(['bookmarkDetail', 'originalDetail'])}
+            destinationDetail={this.props.windowState.getIn(['bookmarkDetail', 'destinationDetail'])}
+            shouldShowLocation={this.props.windowState.getIn(['bookmarkDetail', 'shouldShowLocation'])} />
+          : null
         }
         {
           noScriptIsVisible
