@@ -68,7 +68,7 @@ Feel free to tag a Brave employee in the pull request to assign them to review y
 * Calling out things which seem important for extra attention is helpful.
 * Improving steps to reproduce is helpful.
 * Testing and adding a comment with "Could not reproduce" if an issue seems obscure is helpful.
-* Testing open pull requests. For example: `git fetch origin pull/1234/HEAD:pr-1234 && checkout pr-1234`
+* Testing open pull requests. For example: `git fetch origin pull/1234/head:pr-1234 && checkout pr-1234`
 * You can be granted write permission if you've helped a lot with triage by pinging @bbondy.
 * Helping make sure issues have a clear and understandable name (ex: not something like "Brave is broken"
 * The first comment in an issue ideally would have a clear description of the issue and describe the impact to users. Asking folks for screenshots, steps to reproduce, and more information is highly recommended so that the issue is as clear as possible.
