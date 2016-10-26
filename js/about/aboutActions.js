@@ -108,6 +108,13 @@ const aboutActions = {
     })
   },
 
+  ledgerRecoverWalletFromFile: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      useRecoveryKeyFile: true
+    })
+  },
+
   /**
    * Clear wallet recovery status
    */

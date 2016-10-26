@@ -255,6 +255,7 @@ var backupKeys = (appState, action) => {
   const date = moment().format('L')
   const paymentId = appState.getIn(['ledgerInfo', 'paymentId'])
   const passphrase = appState.getIn(['ledgerInfo', 'passphrase'])
+
   const messageLines = [
     locale.translation('ledgerBackupText1'),
     [locale.translation('ledgerBackupText2'), date].join(' '),
@@ -264,6 +265,7 @@ var backupKeys = (appState, action) => {
     '',
     locale.translation('ledgerBackupText5')
   ]
+
   const message = messageLines.join(os.EOL)
   const filePath = path.join(app.getPath('userData'), '/brave_wallet_recovery.txt')
 
@@ -284,14 +286,83 @@ var backupKeys = (appState, action) => {
   return appState
 }
 
+var loadKeysFromBackupFile = (filePath) => {
+  let keys = null
+  let data = fs.readFileSync(filePath)
+
+  if (!data || !data.length || !(data.toString())) {
+    logError('No data in backup file', 'recoveryWallet')
+  } else {
+    try {
+      const recoveryFileContents = data.toString()
+
+      let messageLines = recoveryFileContents.split(os.EOL)
+
+      let paymentIdLine = '' || messageLines[3]
+      let passphraseLine = '' || messageLines[4]
+
+      const paymentIdPattern = new RegExp([locale.translation('ledgerBackupText3'), '([^ ]+)'].join(' '))
+      const paymentId = (paymentIdLine.match(paymentIdPattern) || [])[1]
+
+      const passphrasePattern = new RegExp([locale.translation('ledgerBackupText4'), '(.+)$'].join(' '))
+      const passphrase = (passphraseLine.match(passphrasePattern) || [])[1]
+
+      keys = {
+        paymentId,
+        passphrase
+      }
+    } catch (exc) {
+      logError(exc, 'recoveryWallet')
+    }
+  }
+
+  return keys
+}
+
 /*
  * Recover Ledger Keys
  */
 
 var recoverKeys = (appState, action) => {
-  client.recoverWallet(action.firstRecoveryKey, action.secondRecoveryKey, (err, body) => {
-    if (logError(err, 'recoveryWallet')) appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
-    if (err) {
+  let firstRecoveryKey, secondRecoveryKey
+
+  if (action.useRecoveryKeyFile) {
+    let recoveryKeyFile = promptForRecoveryKeyFile()
+    if (!recoveryKeyFile) {
+      // user canceled from dialog, we abort without error
+      return appState
+    }
+
+    if (recoveryKeyFile) {
+      let keys = loadKeysFromBackupFile(recoveryKeyFile) || {}
+
+      if (keys) {
+        firstRecoveryKey = keys.paymentId
+        secondRecoveryKey = keys.passphrase
+      }
+    }
+  }
+
+  if (!firstRecoveryKey || !secondRecoveryKey) {
+    firstRecoveryKey = action.firstRecoveryKey
+    secondRecoveryKey = action.secondRecoveryKey
+  }
+
+  const UUID_REGEX = /^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/
+  if (typeof firstRecoveryKey !== 'string' || !firstRecoveryKey.match(UUID_REGEX) || typeof secondRecoveryKey !== 'string' || !secondRecoveryKey.match(UUID_REGEX)) {
+    setImmediate(() => appActions.ledgerRecoveryFailed())
+    return appState
+  }
+
+  client.recoverWallet(firstRecoveryKey, secondRecoveryKey, (err, body) => {
+    let existingLedgerError = ledgerInfo.error
+
+    if (logError(err, 'recoveryWallet')) {
+      // we reset ledgerInfo.error to what it was before (likely null)
+      // if ledgerInfo.error is not null, the wallet info will not display in UI
+      // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
+      ledgerInfo.error = existingLedgerError
+      appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       setImmediate(() => appActions.ledgerRecoveryFailed())
     } else {
       setImmediate(() => appActions.ledgerRecoverySucceeded())
@@ -299,6 +370,31 @@ var recoverKeys = (appState, action) => {
   })
 
   return appState
+}
+
+const dialog = electron.dialog
+
+var promptForRecoveryKeyFile = () => {
+  const defaultRecoveryKeyFilePath = path.join(app.getPath('userData'), '/brave_wallet_recovery.txt')
+
+  let files
+
+  if (process.env.SPECTRON) {
+    // skip the dialog for tests
+    console.log(`for test, trying to recover keys from path: ${defaultRecoveryKeyFilePath}`)
+    files = [defaultRecoveryKeyFilePath]
+  } else {
+    files = dialog.showOpenDialog({
+      properties: ['openFile'],
+      defaultPath: defaultRecoveryKeyFilePath,
+      filters: [{
+        name: 'TXT files',
+        extensions: ['txt']
+      }]
+    })
+  }
+
+  return (files && files.length ? files[0] : null)
 }
 
 /*
