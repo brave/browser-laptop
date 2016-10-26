@@ -901,6 +901,10 @@ class PaymentsTab extends ImmutableComponent {
     aboutActions.ledgerRecoverWallet(this.state.FirstRecoveryKey, this.state.SecondRecoveryKey)
   }
 
+  recoverWalletFromFile () {
+    aboutActions.ledgerRecoverWalletFromFile()
+  }
+
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
@@ -911,6 +915,7 @@ class PaymentsTab extends ImmutableComponent {
 
   clearRecoveryStatus () {
     aboutActions.clearRecoveryStatus()
+    this.props.hideAdvancedOverlays()
   }
 
   printKeys () {
@@ -1143,23 +1148,26 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get ledgerRecoveryContent () {
+    let balance = this.props.ledgerData.get('balance')
+
     const l10nDataArgs = {
-      balance: this.props.ledgerData.get('balance')
+      balance: (!balance ? '0.00' : balance)
     }
+
     return <div className='board'>
       {
         this.props.ledgerData.get('recoverySucceeded') === true
         ? <div className='recoveryOverlay'>
           <h1>Success!</h1>
           <p className='spaceAround' data-l10n-id='balanceRecovered' data-l10n-args={JSON.stringify(l10nDataArgs)} />
-          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
+          <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus.bind(this)} />
         </div>
         : null
       }
       {
         this.props.ledgerData.get('recoverySucceeded') === false
         ? <div className='recoveryOverlay'>
-          <h1>Recovery failed</h1>
+          <h1 className='recoveryError'>Recovery failed</h1>
           <p className='spaceAround'>Please re-enter keys or try different keys.</p>
           <Button l10nId='ok' className='whiteButton inlineButton' onClick={this.clearRecoveryStatus} />
         </div>
@@ -1184,6 +1192,7 @@ class PaymentsTab extends ImmutableComponent {
     return <div className='panel advancedSettingsFooter'>
       <div className='recoveryFooterButtons'>
         <Button l10nId='recover' className='primaryButton' onClick={this.recoverWallet} />
+        <Button l10nId='recoverFromFile' className='primaryButton' onClick={this.recoverWalletFromFile} />
         <Button l10nId='cancel' className='whiteButton' onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')} />
       </div>
     </div>
@@ -1841,6 +1850,15 @@ class AboutPreferences extends React.Component {
     this.updateTabFromAnchor = this.updateTabFromAnchor.bind(this)
   }
 
+  hideAdvancedOverlays () {
+    this.setState({
+      advancedSettingsOverlayVisible: false,
+      ledgerBackupOverlayVisible: false,
+      ledgerRecoveryOverlayVisible: false
+    })
+    this.forceUpdate()
+  }
+
   componentDidMount () {
     window.addEventListener('popstate', this.updateTabFromAnchor)
   }
@@ -1966,7 +1984,8 @@ class AboutPreferences extends React.Component {
           ledgerRecoveryOverlayVisible={this.state.ledgerRecoveryOverlayVisible}
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
-          hideOverlay={this.setOverlayVisible.bind(this, false)} />
+          hideOverlay={this.setOverlayVisible.bind(this, false)}
+          hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)} />
         break
       case preferenceTabs.SECURITY:
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />

@@ -5,7 +5,7 @@ const {urlInput, advancedSettings, addFundsButton, paymentsStatus, paymentsWelco
 const assert = require('assert')
 
 const prefsUrl = 'about:preferences'
-const ledgerAPIWaitTimeout = 10000
+const ledgerAPIWaitTimeout = 20000
 
 function * setup (client) {
   yield client
