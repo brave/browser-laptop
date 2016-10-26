@@ -858,6 +858,7 @@ class Main extends ImmutableComponent {
     return <div id='window'
       className={cx({
         isFullScreen: activeFrame && activeFrame.get('isFullScreen'),
+        isMaximized: customTitlebar.isMaximized,
         frameless: customTitlebar.captionButtonsVisible
       })}
       ref={(node) => { this.mainWindow = node }}

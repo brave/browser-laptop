@@ -36,7 +36,7 @@
 
 // Windows specific styles
 .platform--win32 {
-  div#window.frameless {
+  div#window.frameless:not(.isFullScreen):not(.isMaximized) {
     border: 1px solid #000;
     box-sizing: border-box;
   }
@@ -222,10 +222,10 @@
 
   // Windows 10 specific styles
   &.win10 {
-    &.inactive div#window.frameless {
+    &.inactive div#window.frameless:not(.isFullScreen):not(.isMaximized) {
       border: 1px solid #aaaaaa;
     }
-    div#window.frameless {
+    div#window.frameless:not(.isFullScreen):not(.isMaximized) {
       border: 1px solid #2283d3;
     }
     .windowCaptionButtons {
