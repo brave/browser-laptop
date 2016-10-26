@@ -65,6 +65,14 @@ module.exports = {
   siteSettingItem: '.siteSettingItem',
   ledgerTable: '.ledgerTable',
   bitcoinDashboard: '.bitcoinDashboard',
+  advancedSettingsButton: '[data-l10n-id="advancedSettings"]',
+  backupWallet: '[data-l10n-id="backupLedger"]',
+  recoverWallet: '[data-l10n-id="recoverLedger"]',
+  recoverWalletFromFileButton: '[data-l10n-id="recoverFromFile"]',
+  recoveryOverlayOkButton: '.recoveryOverlay [data-l10n-id="ok"]',
+  saveWalletFile: '[data-l10n-id="saveRecoveryFile"]',
+  balanceRecovered: '[data-l10n-id="balanceRecovered"]',
+  balanceNotRecovered: '.recoveryError',
   modalCloseButton: 'button.close',
   coinbaseBuyButton: '[data-l10n-id="add"]',
   paymentQRCode: '[title="Brave wallet QR code"]',
@@ -79,5 +87,6 @@ module.exports = {
   dismissDenyRunInsecureContentButton: '.dismissDenyRunInsecureContentButton',
   tabsToolbar: '.tabsToolbar',
   hamburgerMenu: '.menuButton',
-  contextMenu: '.contextMenu'
+  contextMenu: '.contextMenu',
+  okButton: '[data-l10n-id="ok"]'
 }

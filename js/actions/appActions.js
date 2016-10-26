@@ -192,7 +192,7 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to clear all completed downloads
+   * Dispatches a message indicating ledger recovery succeeded
    */
   ledgerRecoverySucceeded: function () {
     AppDispatcher.dispatch({
@@ -201,7 +201,7 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to clear all completed downloads
+   * Dispatches a message indicating ledger recovery failed
    */
   ledgerRecoveryFailed: function () {
     AppDispatcher.dispatch({
