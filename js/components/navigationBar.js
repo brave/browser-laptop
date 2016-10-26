@@ -15,7 +15,7 @@ const messages = require('../constants/messages')
 const settings = require('../constants/settings')
 const ipc = global.require('electron').ipcRenderer
 const {isSourceAboutUrl} = require('../lib/appUrlUtil')
-const AddEditBookmark = require('./addEditBookmark')
+const AddEditBookmarkHanger = require('../../app/renderer/components/addEditBookmarkHanger')
 const siteUtil = require('../state/siteUtil')
 const eventUtil = require('../lib/eventUtil')
 const getSetting = require('../settings').getSetting
@@ -40,9 +40,9 @@ class NavigationBar extends ImmutableComponent {
 
   onToggleBookmark () {
     const editing = this.bookmarked
-    // trigger the AddEditBookmark modal; saving/deleting takes place there
+    // show the AddEditBookmarkHanger control; saving/deleting takes place there
     const siteDetail = siteUtil.getDetailFromFrame(this.activeFrame, siteTags.BOOKMARK)
-    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing)
+    windowActions.setBookmarkDetail(siteDetail, siteDetail, null, editing, true)
   }
 
   onReload (e) {
@@ -116,8 +116,8 @@ class NavigationBar extends ImmutableComponent {
         titleMode: this.titleMode
       })}>
       {
-        this.props.bookmarkDetail
-        ? <AddEditBookmark sites={this.props.sites}
+        this.props.bookmarkDetail && this.props.bookmarkDetail.get('isBookmarkHanger')
+        ? <AddEditBookmarkHanger sites={this.props.sites}
           currentDetail={this.props.bookmarkDetail.get('currentDetail')}
           originalDetail={this.props.bookmarkDetail.get('originalDetail')}
           destinationDetail={this.props.bookmarkDetail.get('destinationDetail')}

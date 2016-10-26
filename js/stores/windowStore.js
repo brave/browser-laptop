@@ -620,7 +620,8 @@ const doAction = (action) => {
           currentDetail: action.currentDetail,
           originalDetail: action.originalDetail,
           destinationDetail: action.destinationDetail,
-          shouldShowLocation: action.shouldShowLocation
+          shouldShowLocation: action.shouldShowLocation,
+          isBookmarkHanger: action.isBookmarkHanger
         })
       }
       // Since the input values of bookmarks are bound, we need to notify the controls sync.
@@ -832,12 +833,15 @@ const doAction = (action) => {
         windowState = windowState.setIn(['ui', 'menubar', 'isVisible'], newVisibleStatus)
       }
       break
-    case WindowConstants.WINDOW_TOGGLE_BOOKMARK_HANGER:
-      windowState = windowState.delete('bookmarkDetail')
+    case WindowConstants.WINDOW_HIDE_BOOKMARK_HANGER:
+      const hangerShowing = windowState.getIn(['bookmarkDetail', 'isBookmarkHanger'])
+      if (hangerShowing) {
+        windowState = windowState.delete('bookmarkDetail')
+      }
       break
     case WindowConstants.WINDOW_RESET_MENU_STATE:
       doAction({actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL})
-      doAction({actionType: WindowConstants.WINDOW_TOGGLE_BOOKMARK_HANGER})
+      doAction({actionType: WindowConstants.WINDOW_HIDE_BOOKMARK_HANGER})
       if (getSetting(settings.AUTO_HIDE_MENU)) {
         doAction({actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE, isVisible: false})
       } else {
@@ -845,7 +849,6 @@ const doAction = (action) => {
       }
       doAction({actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX})
       doAction({actionType: WindowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID})
-      windowState = windowState.setIn(['ui', 'bookmarksToolbar', 'selectedFolderId'], null)
       break
     case WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX:
       windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'],

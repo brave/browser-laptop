@@ -228,7 +228,7 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
   let deleteLabel
   let deleteTag
 
-  // BSCTODO: pull this out to a method
+  // TODO(bsclifton): pull this out to a method
   if (siteUtil.isBookmark(siteDetail) && activeFrame) {
     deleteLabel = 'deleteBookmark'
     deleteTag = siteTags.BOOKMARK
