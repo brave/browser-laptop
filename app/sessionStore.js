@@ -125,6 +125,7 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     }
     frame.key = newKey
     // Full history is not saved yet
+    // TODO (bsclifton): remove this when https://github.com/brave/browser-laptop/issues/963 is complete
     frame.canGoBack = false
     frame.canGoForward = false
 
@@ -473,6 +474,7 @@ module.exports.defaultAppState = () => {
         ignoredTopSites: [],
         pinnedTopSites: []
       }
-    }
+    },
+    defaultWindowParams: {}
   }
 }

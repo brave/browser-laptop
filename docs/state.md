@@ -121,8 +121,14 @@ AppStore
     enabled: boolean, // true if widevine is installed and enabled
     ready: boolean // true if widevine is in a ready state
   },
-  defaultWindowHeight: number,
-  defaultWindowWidth: number,
+  defaultWindowHeight: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.height
+  defaultWindowWidth: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.width
+  defaultWindowParams: {
+    height: number,
+    width: number,
+    x: number,
+    y: number
+  },
   updates: {
     status: string, // UpdateStatus from js/constants/updateStatus.js
     metadata: {

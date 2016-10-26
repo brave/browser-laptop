@@ -84,8 +84,8 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
     browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
   }
 
-  browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
-  browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
+  browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX, defaults.x)
+  browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY, defaults.y)
   delete browserOpts.left
   delete browserOpts.top
 
@@ -166,15 +166,6 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
   if (windowState.ui && windowState.ui.isFullScreen) {
     mainWindow.setFullScreen(true)
   }
-
-  mainWindow.on('blur', function () {
-    appActions.windowBlurred(mainWindow.id)
-  })
-
-  mainWindow.on('resize', function (evt) {
-    // the default window size is whatever the last window resize was
-    appActions.setDefaultWindowSize(evt.sender.getSize())
-  })
 
   mainWindow.on('close', function () {
     LocalShortcuts.unregister(mainWindow)
@@ -265,8 +256,10 @@ function windowDefaults () {
 
   return {
     show: false,
-    width: appState.get('defaultWindowWidth'),
-    height: appState.get('defaultWindowHeight'),
+    width: appState.getIn(['defaultWindowParams', 'width']) || appState.get('defaultWindowWidth'),
+    height: appState.getIn(['defaultWindowParams', 'height']) || appState.get('defaultWindowHeight'),
+    x: appState.getIn(['defaultWindowParams', 'x']),
+    y: appState.getIn(['defaultWindowParams', 'y']),
     minWidth: 480,
     minHeight: 300,
     minModalHeight: 100,
@@ -291,9 +284,10 @@ function setDefaultWindowSize () {
   }
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
-  if (!appState.get('defaultWindowWidth') && !appState.get('defaultWindowHeight')) {
-    appState = appState.set('defaultWindowWidth', primaryDisplay.workAreaSize.width)
-    appState = appState.set('defaultWindowHeight', primaryDisplay.workAreaSize.height)
+  if (!appState.getIn(['defaultWindowParams', 'width']) && !appState.get('defaultWindowWidth') &&
+      !appState.getIn(['defaultWindowParams', 'height']) && !appState.get('defaultWindowHeight')) {
+    appState = appState.setIn(['defaultWindowParams', 'width'], primaryDisplay.workAreaSize.width)
+    appState = appState.setIn(['defaultWindowParams', 'height'], primaryDisplay.workAreaSize.height)
   }
 }
 
@@ -458,9 +452,15 @@ const handleAppAction = (action) => {
     case AppConstants.APP_CLEAR_HISTORY:
       appState = appState.set('sites', siteUtil.clearHistory(appState.get('sites')))
       break
-    case AppConstants.APP_SET_DEFAULT_WINDOW_SIZE:
-      appState = appState.set('defaultWindowWidth', action.size[0])
-      appState = appState.set('defaultWindowHeight', action.size[1])
+    case AppConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
+      if (action.size && action.size.size === 2) {
+        appState = appState.setIn(['defaultWindowParams', 'width'], action.size.get(0))
+        appState = appState.setIn(['defaultWindowParams', 'height'], action.size.get(1))
+      }
+      if (action.position && action.position.size === 2) {
+        appState = appState.setIn(['defaultWindowParams', 'x'], action.position.get(0))
+        appState = appState.setIn(['defaultWindowParams', 'y'], action.position.get(1))
+      }
       break
     case AppConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)

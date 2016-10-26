@@ -10,6 +10,7 @@ const ipc = electron.ipcRenderer
 const systemPreferences = electron.remote.systemPreferences
 
 // Actions
+const appActions = require('../actions/appActions')
 const windowActions = require('../actions/windowActions')
 const webviewActions = require('../actions/webviewActions')
 const contextMenus = require('../contextMenus')
@@ -479,40 +480,41 @@ class Main extends ImmutableComponent {
 
     // Handlers for saving window state
     // TODO: revisit this code when window state moves to appStore
+    const slidingTimerMilliseconds = 1000
+
+    const onWindowResize = debounce(function (event) {
+      const size = event.sender.getSize()
+      // NOTE: the default window size is whatever the last window resize was
+      appActions.defaultWindowParamsChanged(size)
+      windowActions.saveSize(size)
+    }, slidingTimerMilliseconds)
+
+    const onWindowMove = debounce(function (event) {
+      const position = event.sender.getPosition()
+      // NOTE: the default window position is whatever the last window move was
+      appActions.defaultWindowParamsChanged(undefined, position)
+      windowActions.savePosition(position)
+    }, slidingTimerMilliseconds)
+
     currentWindow.on('maximize', function () {
       windowActions.setMaximizeState(true)
     })
-
     currentWindow.on('unmaximize', function () {
       windowActions.setMaximizeState(false)
     })
-
-    currentWindow.on('resize', function (event) {
-      windowActions.saveSize(event.sender.getSize())
-    })
-
+    currentWindow.on('resize', onWindowResize)
+    currentWindow.on('move', onWindowMove)
     currentWindow.on('focus', function () {
       windowActions.onFocusChanged(true)
     })
-
     currentWindow.on('blur', function () {
+      appActions.windowBlurred(currentWindow.id)
       windowActions.onFocusChanged(false)
-    })
-
-    let moveTimeout = null
-    currentWindow.on('move', function (event) {
-      if (moveTimeout) {
-        clearTimeout(moveTimeout)
-      }
-      moveTimeout = setTimeout(function () {
-        windowActions.savePosition(event.sender.getPosition())
-      }, 1000)
     })
     // Full screen as in F11 (not full screen on a video)
     currentWindow.on('enter-full-screen', function (event) {
       windowActions.setWindowFullScreen(true)
     })
-
     currentWindow.on('leave-full-screen', function (event) {
       windowActions.setWindowFullScreen(false)
     })
