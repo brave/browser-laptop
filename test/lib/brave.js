@@ -79,6 +79,9 @@ var exports = {
 
   browserWindowUrl: 'file://' + path.resolve(__dirname, '..', '..') + '/app/extensions/brave/index.html',
   newTabUrl: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html',
+  fixtureUrl: function (filename) {
+    return 'file://' + path.resolve(__dirname, '..', 'fixtures', filename)
+  },
 
   beforeAllServerSetup: function (context) {
     context.beforeAll(function (done) {
