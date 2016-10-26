@@ -26,6 +26,11 @@ AppStore
         [tabId]: {
           browserAction: {} // tab specific browser action properties
         }
+      },
+      contextMenus: {
+        extensionId: string,
+        menuItemId: string,
+        properties: object
       }
     }
   },

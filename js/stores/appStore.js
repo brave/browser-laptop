@@ -696,6 +696,16 @@ const handleAppAction = (action) => {
     case ExtensionConstants.EXTENSION_DISABLED:
       appState = extensionState.extensionDisabled(appState, action)
       break
+    case ExtensionConstants.CONTEXT_MENU_CREATED:
+      appState = extensionState.contextMenuCreated(appState, action)
+      break
+    case ExtensionConstants.CONTEXT_MENU_ALL_REMOVED:
+      appState = extensionState.contextMenuAllRemoved(appState, action)
+      break
+    case ExtensionConstants.CONTEXT_MENU_CLICKED:
+      process.emit('chrome-context-menus-clicked',
+        action.extensionId, action.tabId, action.info.toJS())
+      break
     case AppConstants.APP_SET_MENUBAR_TEMPLATE:
       appState = appState.setIn(['menu', 'template'], action.menubarTemplate)
       break
