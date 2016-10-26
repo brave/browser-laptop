@@ -41,6 +41,7 @@ class UrlBar extends ImmutableComponent {
     this.onKeyUp = this.onKeyUp.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onSiteInfo = this.onSiteInfo.bind(this)
     this.activateSearchEngine = false
     this.searchSelectEntry = null
     this.keyPressed = false
@@ -389,6 +390,10 @@ class UrlBar extends ImmutableComponent {
   }
 
   onSiteInfo () {
+    const protocol = urlParse(this.props.location).protocol
+    if (protocol === 'about:') {
+      return
+    }
     windowActions.setSiteInfoVisible(true)
   }
 
