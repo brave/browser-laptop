@@ -5,8 +5,8 @@
 const {isDarwin} = require('../../app/common/lib/platformUtil')
 
 module.exports.isForSecondaryAction = (e) =>
-  e.ctrlKey && !isDarwin ||
-  e.metaKey && isDarwin ||
+  (e.ctrlKey && !isDarwin()) ||
+  (e.metaKey && isDarwin()) ||
   e.button === 1
 
 module.exports.eventElHasAncestorWithClasses = (e, classesToCheck) => {

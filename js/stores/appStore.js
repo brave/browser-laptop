@@ -55,42 +55,62 @@ function isModal (browserOpts) {
   return browserOpts.scrollbars === false
 }
 
-function navbarHeight () {
+const navbarHeight = () => {
   // TODO there has to be a better way to get this or at least add a test
   return 75
 }
 
-const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
-  const parentWindowKey = browserOpts.parentWindowKey
-
+/**
+ * Determine window dimensions (width / height)
+ */
+const setWindowDimensions = (browserOpts, defaults, windowState) => {
   if (windowState.ui && windowState.ui.size) {
     browserOpts.width = firstDefinedValue(browserOpts.width, windowState.ui.size[0])
     browserOpts.height = firstDefinedValue(browserOpts.height, windowState.ui.size[1])
   }
-
   browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
   // height and innerHeight are the frame webview size
   browserOpts.height = firstDefinedValue(browserOpts.height, browserOpts.innerHeight)
-  if (isNaN(browserOpts.height)) {
+  if (typeof browserOpts.height === 'number') {
+    // add navbar height to get total height for BrowserWindow
+    browserOpts.height = browserOpts.height + navbarHeight()
+  } else {
     // no inner height so check outer height or use default
     browserOpts.height = firstDefinedValue(browserOpts.outerHeight, defaults.height)
-  } else {
-    // BrowserWindow height is window height so add navbar height
-    browserOpts.height = browserOpts.height + navbarHeight()
   }
+  return browserOpts
+}
 
+/**
+ * Determine window position (x / y)
+ */
+const setWindowPosition = (browserOpts, defaults, windowState) => {
   if (windowState.ui && windowState.ui.position) {
+    // Position comes from window state
     browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
     browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
+  } else if (typeof defaults.x === 'number' && typeof defaults.y === 'number') {
+    // Position comes from the default position
+    browserOpts.x = firstDefinedValue(browserOpts.x, defaults.x)
+    browserOpts.y = firstDefinedValue(browserOpts.y, defaults.y)
+  } else {
+    // Default the position
+    browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
+    browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
   }
+  return browserOpts
+}
 
-  browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX, defaults.x)
-  browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY, defaults.y)
+const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
+  browserOpts = setWindowDimensions(browserOpts, defaults, windowState)
+  browserOpts = setWindowPosition(browserOpts, defaults, windowState)
+
   delete browserOpts.left
   delete browserOpts.top
 
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
+  const parentWindowKey = browserOpts.parentWindowKey
   const parentWindow = parentWindowKey ? BrowserWindow.fromId(parentWindowKey) : BrowserWindow.getFocusedWindow()
   const bounds = parentWindow ? parentWindow.getBounds() : primaryDisplay.bounds
 
@@ -100,7 +120,7 @@ const createWindow = (browserOpts, defaults, frameOpts, windowState) => {
 
   // if no parentWindow, x, y or center is defined then go ahead
   // and center it if it's smaller than the display width
-  // typeof and isNaN are used because 0 is falsy
+  // typeof and isNaN are used because 0 is falsey
   if (!(parentWindow ||
       browserOpts.center === false ||
       browserOpts.x > 0 ||
@@ -258,8 +278,8 @@ function windowDefaults () {
     show: false,
     width: appState.getIn(['defaultWindowParams', 'width']) || appState.get('defaultWindowWidth'),
     height: appState.getIn(['defaultWindowParams', 'height']) || appState.get('defaultWindowHeight'),
-    x: appState.getIn(['defaultWindowParams', 'x']),
-    y: appState.getIn(['defaultWindowParams', 'y']),
+    x: appState.getIn(['defaultWindowParams', 'x']) || undefined,
+    y: appState.getIn(['defaultWindowParams', 'y']) || undefined,
     minWidth: 480,
     minHeight: 300,
     minModalHeight: 100,
