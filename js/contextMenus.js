@@ -255,6 +255,8 @@ function siteDetailTemplateInit (siteDetail, activeFrame) {
     } else if (multipleHistoryEntries) {
       deleteLabel = 'deleteHistoryEntries'
     }
+  } else {
+    deleteLabel = ''
   }
 
   const template = []
