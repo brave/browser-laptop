@@ -55,6 +55,10 @@ class AddEditBookmarkHanger extends ImmutableComponent {
   get isFolder () {
     return siteUtil.isFolder(this.props.currentDetail)
   }
+  setDefaultFocus () {
+    this.bookmarkName.select()
+    this.bookmarkName.focus()
+  }
   updateFolders (props) {
     this.folders = siteUtil.getFolders(this.props.sites, props.currentDetail.get('folderId'))
   }
@@ -71,8 +75,7 @@ class AddEditBookmarkHanger extends ImmutableComponent {
     if (!this.props.isModal && !this.props.shouldShowLocation) {
       this.onSave(false)
     }
-    this.bookmarkName.select()
-    this.bookmarkName.focus()
+    this.setDefaultFocus()
   }
   onKeyDown (e) {
     switch (e.keyCode) {

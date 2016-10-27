@@ -16,9 +16,13 @@ class AddEditBookmark extends ImmutableComponent {
   onClose () {
     windowActions.setBookmarkDetail()
   }
+  componentDidMount () {
+    this.refs.bookmarkHanger.setDefaultFocus()
+  }
   render () {
     return <Dialog onHide={this.onClose} isClickDismiss>
       <AddEditBookmarkHanger
+        ref='bookmarkHanger'
         isModal
         sites={this.props.sites}
         currentDetail={this.props.currentDetail}
