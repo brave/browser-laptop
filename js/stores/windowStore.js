@@ -744,6 +744,18 @@ const doAction = (action) => {
         windowState = windowState.set('importBrowserDataSelected', Immutable.fromJS(action.selected))
       }
       break
+    case WindowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED:
+      if (!action.widevinePanelDetail) {
+        windowState = windowState.delete('widevinePanelDetail')
+      } else {
+        windowState = windowState.set('widevinePanelDetail', Immutable.fromJS(action.widevinePanelDetail))
+      }
+      break
+    case WindowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL:
+      windowState = windowState.set('widevinePanelDetail', Immutable.Map({
+        alsoAddRememberSiteSetting: true
+      }))
+      break
     case WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL:
       if (!action.currentDetail && !action.originalDetail) {
         windowState = windowState.delete('autofillAddressDetail')
@@ -864,6 +876,11 @@ const doAction = (action) => {
       break
     case WindowConstants.WINDOW_ON_FOCUS_CHANGED:
       windowState = windowState.setIn(['ui', 'hasFocus'], action.hasFocus)
+      break
+    case WindowConstants.WINDOW_RELOAD_ACTIVE_FRAME:
+      windowState = windowState.mergeIn(frameStatePath(action.key), {
+        activeShortcut: 'reload'
+      })
       break
     case WindowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL:
       if (action.className && action.props === undefined) {

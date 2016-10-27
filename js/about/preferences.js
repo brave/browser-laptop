@@ -21,6 +21,7 @@ const settings = require('../constants/settings')
 const coinbaseCountries = require('../constants/coinbaseCountries')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const bookmarksToolbarMode = require('../../app/common/constants/bookmarksToolbarMode')
+const WidevineInfo = require('../../app/renderer/components/widevineInfo')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../components/sortableTable')
@@ -1548,25 +1549,13 @@ class SecurityTab extends ImmutableComponent {
         </span>
       </SettingsList>
       { !isLinux
-      ? <SettingsList>
-        <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
-        <div className='subtext'>
-          <span data-l10n-id='enableWidevineSubtext' />
-          <span className='fa fa-info-circle widevineInfoIcon'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: appConfig.widevine.moreInfoUrl
-            }, true)}
-          />
-        </div>
-        <div className='subtext'>
-          <span data-l10n-id='enableWidevineSubtext2' />
-          <span className='fa fa-info-circle widevineInfoIcon'
-            onClick={aboutActions.newFrame.bind(null, {
-              location: appConfig.widevine.licenseUrl
-            }, true)}
-          />
-        </div>
-      </SettingsList>
+      ? <div>
+        <div className='sectionTitle' data-l10n-id='widevineSection' />
+        <SettingsList>
+          <WidevineInfo newFrameAction={aboutActions.newFrame} />
+          <SettingCheckbox checked={this.props.braveryDefaults.get('widevine')} dataL10nId='enableWidevine' onChange={this.onToggleWidevine} />
+        </SettingsList>
+      </div>
       : null
       }
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />

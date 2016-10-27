@@ -97,6 +97,50 @@
   }
 }
 
+.commonDialog {
+  .commonForm {
+    .flyoutDialog;
+    background-color: #f7f7f7;
+    border-radius: @borderRadius;
+    max-width: 422px;
+    padding: 0;
+    text-align: left;
+    max-width: 600px;
+    -webkit-user-select: none;
+    cursor: default;
+    color: #3B3B3B;
+    overflow-y: auto;
+    max-height: 100%;
+
+    .clickable {
+      color: #5B5B5B;
+      &:hover {
+        color: #000;
+      }
+    }
+
+    .formSection {
+      padding: 16px 30px;
+      &.commonFormTitle {
+        color: #ff5000;
+        font-size: 1.2em;
+      }
+      &.commonFormButtons {
+        text-align: center;
+      }
+      &.commonFormBottom {
+        background-color: #dddee0;
+        text-align: center;
+      }
+      .commonFormButtonGroup {
+        margin: 0 auto;
+        display: inline-block;
+      }
+    }
+  }
+}
+
+// TODO: Make this use commonDialog
 .importBrowserDataPanel {
   .importBrowserData {
     .flyoutDialog;
@@ -146,6 +190,7 @@
   }
 }
 
+// TODO: Make this use commonDialog
 .manageAutofillDataPanel {
   .manageAutofillData {
     .flyoutDialog;
@@ -196,6 +241,7 @@
   }
 }
 
+// TODO: Make this use commonDialog
 .checkDefaultBrowserDialog {
   .checkDefaultBrowser {
     .flyoutDialog;

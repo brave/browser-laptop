@@ -1018,6 +1018,23 @@ const windowActions = {
     })
   },
 
+  widevineSiteAccessedWithoutInstall: function () {
+    dispatch({
+      actionType: WindowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL
+    })
+  },
+
+  /**
+   * Widevine popup detail changed
+   * @param {Object} widevinePanelDetail - detail of the widevine panel
+   */
+  widevinePanelDetailChanged: function (widevinePanelDetail) {
+    dispatch({
+      actionType: WindowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED,
+      widevinePanelDetail
+    })
+  },
+
   /**
    * Sets the manage autofill address popup detail
    * @param {Object} currentDetail - Properties of the address to change to
@@ -1172,6 +1189,15 @@ const windowActions = {
       actionType: WindowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL,
       className,
       props
+    })
+  },
+
+  /**
+   * Reloads the current active frame
+   */
+  reloadActiveFrame: function () {
+    dispatch({
+      actionType: WindowConstants.WINDOW_RELOAD_ACTIVE_FRAME
     })
   }
 }

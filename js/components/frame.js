@@ -692,22 +692,7 @@ class Frame extends ImmutableComponent {
         appActions.hideMessageBox(message)
       }
     } else {
-      let message = locale.translation('widevineDisabled')
-      appActions.showMessageBox({
-        buttons: [
-          {text: locale.translation('goToPrefs')},
-          {text: locale.translation('noThanks')}
-        ],
-        message: message,
-        options: {nonce}
-      })
-      this.notificationCallbacks[message] = (buttonIndex) => {
-        if (buttonIndex === 0) {
-          const location = 'about:preferences#security'
-          windowActions.newFrame({ location }, true)
-        }
-        appActions.hideMessageBox(message)
-      }
+      windowActions.widevineSiteAccessedWithoutInstall()
     }
 
     ipc.once(messages.NOTIFICATION_RESPONSE + nonce, (e, msg, buttonIndex, persist) => {

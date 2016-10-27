@@ -546,6 +546,9 @@ WindowStore
     mergeFavorites: boolean,
     cookies: boolean
   },
+  widevinePanelDetail: {
+    alsoAddRememberSiteSetting: boolean, // True if an allow always rule should be added for the acitve frame as well if installed
+  },
   modalDialogDetail: {
     [className]: {
       Object // props

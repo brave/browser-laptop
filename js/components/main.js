@@ -31,6 +31,7 @@ const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
 const ImportBrowserDataPanel = require('../../app/renderer/components/importBrowserDataPanel')
+const WidevinePanel = require('../../app/renderer/components/widevinePanel')
 const AutofillAddressPanel = require('./autofillAddressPanel')
 const AutofillCreditCardPanel = require('./autofillCreditCardPanel')
 const AddEditBookmark = require('./addEditBookmark')
@@ -92,6 +93,7 @@ class Main extends ImmutableComponent {
     this.onHideBraveryPanel = this.onHideBraveryPanel.bind(this)
     this.onHideClearBrowsingDataPanel = this.onHideClearBrowsingDataPanel.bind(this)
     this.onHideImportBrowserDataPanel = this.onHideImportBrowserDataPanel.bind(this)
+    this.onHideWidevinePanel = this.onHideWidevinePanel.bind(this)
     this.onHideAutofillAddressPanel = this.onHideAutofillAddressPanel.bind(this)
     this.onHideAutofillCreditCardPanel = this.onHideAutofillCreditCardPanel.bind(this)
     this.onHideNoScript = this.onHideNoScript.bind(this)
@@ -613,6 +615,10 @@ class Main extends ImmutableComponent {
     windowActions.setImportBrowserDataDetail()
   }
 
+  onHideWidevinePanel () {
+    windowActions.widevinePanelDetailChanged()
+  }
+
   onHideAutofillAddressPanel () {
     windowActions.setAutofillAddressDetail()
   }
@@ -831,6 +837,7 @@ class Main extends ImmutableComponent {
     const braveryPanelIsVisible = !braveShieldsDisabled && this.props.windowState.get('braveryPanelDetail')
     const clearBrowsingDataPanelIsVisible = this.props.windowState.get('clearBrowsingDataDetail')
     const importBrowserDataPanelIsVisible = this.props.windowState.get('importBrowserDataDetail')
+    const widevinePanelIsVisible = this.props.windowState.get('widevinePanelDetail')
     const autofillAddressPanelIsVisible = this.props.windowState.get('autofillAddressDetail')
     const autofillCreditCardPanelIsVisible = this.props.windowState.get('autofillCreditCardDetail')
     const activeRequestedLocation = this.activeRequestedLocation
@@ -847,6 +854,7 @@ class Main extends ImmutableComponent {
       !braveryPanelIsVisible &&
       !clearBrowsingDataPanelIsVisible &&
       !importBrowserDataPanelIsVisible &&
+      !widevinePanelIsVisible &&
       !autofillAddressPanelIsVisible &&
       !autofillCreditCardPanelIsVisible &&
       !releaseNotesIsVisible &&
@@ -994,6 +1002,15 @@ class Main extends ImmutableComponent {
             importBrowserDataDetail={this.props.windowState.get('importBrowserDataDetail')}
             importBrowserDataSelected={this.props.windowState.get('importBrowserDataSelected')}
             onHide={this.onHideImportBrowserDataPanel} />
+          : null
+        }
+        {
+          widevinePanelIsVisible
+          ? <WidevinePanel
+            location={activeFrame && activeFrame.get('location') || ''}
+            widevinePanelDetail={this.props.windowState.get('widevinePanelDetail')}
+            widevineReady={this.props.appState.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])}
+            onHide={this.onHideWidevinePanel} />
           : null
         }
         {

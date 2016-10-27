@@ -785,6 +785,16 @@ Sets the selected import browser data
 
 
 
+### widevinePanelDetailChanged(widevinePanelDetail) 
+
+Widevine popup detail changed
+
+**Parameters**
+
+**widevinePanelDetail**: `Object`, detail of the widevine panel
+
+
+
 ### setAutofillAddressDetail(currentDetail, originalDetail) 
 
 Sets the manage autofill address popup detail
@@ -925,6 +935,12 @@ Set Modal Dialog detail
 **className**: `string`, name of modal dialog
 
 **props**: `Object`, properties of the modal dialog
+
+
+
+### reloadActiveFrame() 
+
+Reloads the current active frame
 
 
 

@@ -18,7 +18,6 @@ var rendererIdentifiers = function () {
     'confirmClearPasswords',
     'passwordCopied',
     'flashInstalled',
-    'widevineDisabled',
     'goToPrefs',
     'goToAdobe',
     'allowFlashPlayer',
