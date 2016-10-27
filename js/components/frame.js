@@ -458,8 +458,11 @@ class Frame extends ImmutableComponent {
         // In this case both the user display and the user think they're on this.props.location.
         if (this.webview.getURL() !== this.props.location && !this.isAboutPage()) {
           this.webview.loadURL(this.props.location)
-        } else if (this.isIntermediateAboutPage()) {
-          this.webview.loadURL(this.props.aboutDetails.get('url'))
+        } else if (this.isIntermediateAboutPage() &&
+          this.webview.getURL() !== this.props.location &&
+          this.webview.getURL() !== this.props.aboutDetails.get('url')) {
+          windowActions.setUrl(this.props.aboutDetails.get('url'),
+            this.props.aboutDetails.get('frameKey'))
         } else {
           this.webview.reload()
         }
