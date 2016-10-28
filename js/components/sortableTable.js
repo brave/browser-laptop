@@ -253,7 +253,9 @@ class SortableTable extends React.Component {
       (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
       ? (typeof this.props.rowObjects.toJS === 'function'
         ? this.props.rowObjects.get(index).toJS()
-        : this.props.rowObjects[index])
+        : (typeof this.props.rowObjects[index].toJS === 'function'
+          ? this.props.rowObjects[index].toJS()
+          : this.props.rowObjects[index]))
       : row
 
     // Allow parent control to optionally specify context
