@@ -363,7 +363,8 @@ class UrlBar extends ImmutableComponent {
   get locationValue () {
     const location = this.props.urlbar.get('location')
     const history = this.props.history
-    if (isIntermediateAboutPage(location) && history.size > 0) {
+    if (isIntermediateAboutPage(location) && history.size > 0 &&
+        !this.activeFrame.get('canGoForward')) {
       return history.last()
     }
 
