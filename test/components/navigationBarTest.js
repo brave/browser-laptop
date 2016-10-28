@@ -739,14 +739,22 @@ describe('navigationBar', function () {
       before(function * () {
         yield setup(this.app.client)
         yield this.app.client.waitForExist(urlInput)
-        yield this.app.client.keys('about:blank')
-        // hit enter
-        yield this.app.client.keys('\uE007')
       })
-      it('hides the url', function * () {
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
+      it('hides about:newtab', function * () {
+        yield this.app.client
+          .tabByUrl(this.newTabUrl)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === '')
+          })
+      })
+      it('shows about:blank', function * () {
+        yield this.app.client
+          .keys('about:blank')
+          .keys('\uE007')
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === 'about:blank')
+          })
       })
     })
 
