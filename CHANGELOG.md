@@ -1,7 +1,7 @@
 # Changelog
 
 ## [0.12.7](https://github.com/brave/browser-laptop/releases/v0.12.7dev)
-- Added Google Widevine support for Netflix support. ([#5131](https://github.com/brave/browser-laptop/issues/5131))([#468](https://github.com/brave/browser-laptop/issues/468))
+- Added Google Widevine for Netflix support. ([#5131](https://github.com/brave/browser-laptop/issues/5131))([#468](https://github.com/brave/browser-laptop/issues/468))
 - Added Startpage search engine. ([#3845](https://github.com/brave/browser-laptop/issues/3845))
 - Added the ability to select multiple bookmarks at the same time. ([#5165](https://github.com/brave/browser-laptop/issues/5165))([#1005](https://github.com/brave/browser-laptop/issues/1005))
 - Added verified icon for verified publishers ([#3467](https://github.com/brave/browser-laptop/issues/3467))
