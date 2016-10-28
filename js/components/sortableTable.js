@@ -363,14 +363,15 @@ class SortableTable extends React.Component {
               ? this.getRowAttributes(row, i)
               : null
 
-            const classes = [rowAttributes.className]
+            const classes = []
+            if (rowAttributes) classes.push(rowAttributes.className)
             if (this.hasRowClassNames) classes.push(this.props.rowClassNames[i])
             if (this.stateOwner.state.selection.includes(this.getGlobalIndex(i))) classes.push('selected')
             if (this.sortingDisabled) classes.push('no-sort')
 
             return row.length
               ? <tr {...rowAttributes}
-                data-context-menu-disable={rowAttributes.onContextMenu ? true : undefined}
+                data-context-menu-disable={rowAttributes && rowAttributes.onContextMenu ? true : undefined}
                 data-table-id={this.tableID}
                 data-row-index={i}
                 className={classes.join(' ')}>{entry}</tr>
