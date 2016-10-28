@@ -618,7 +618,11 @@
   z-index: @zindexNavigationBar;
 
   form {
-    -webkit-app-region: no-drag;
+    -webkit-app-region: drag;
+    // Disable window dragging so that selecting text and dragging the favicon is possible.
+    input, .urlbarIcon {
+      -webkit-app-region: no-drag;
+    }
   }
 
   &:not(.titleMode) {
