@@ -21,7 +21,8 @@ const settings = require('../constants/settings')
 const contextMenus = require('../contextMenus')
 const dndData = require('../dndData')
 const windowStore = require('../stores/windowStore')
-var searchProviders = require('../data/searchProviders')
+const {isSourceAboutUrl} = require('../lib/appUrlUtil')
+const searchProviders = require('../data/searchProviders')
 const searchIconSize = 16
 const UrlUtil = require('../lib/urlutil')
 
@@ -390,8 +391,7 @@ class UrlBar extends ImmutableComponent {
   }
 
   onSiteInfo () {
-    const protocol = urlParse(this.props.location).protocol
-    if (protocol === 'about:') {
+    if (isSourceAboutUrl(this.props.location)) {
       return
     }
     windowActions.setSiteInfoVisible(true)
