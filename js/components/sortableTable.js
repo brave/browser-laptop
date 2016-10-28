@@ -43,6 +43,11 @@ class SortableTable extends React.Component {
         : this
       : this
   }
+  get nullSelection () {
+    return this.props.multiSelect
+      ? this.stateOwner.state.selection.size === 0
+      : false
+  }
   get multipleItemsSelected () {
     return this.props.multiSelect
       ? this.stateOwner.state.selection.size > 1
@@ -248,7 +253,9 @@ class SortableTable extends React.Component {
       (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
       ? (typeof this.props.rowObjects.toJS === 'function'
         ? this.props.rowObjects.get(index).toJS()
-        : this.props.rowObjects[index])
+        : (typeof this.props.rowObjects[index].toJS === 'function'
+          ? this.props.rowObjects[index].toJS()
+          : this.props.rowObjects[index]))
       : row
 
     // Allow parent control to optionally specify context
@@ -261,9 +268,17 @@ class SortableTable extends React.Component {
 
     // Bindings for multi-select-specific event handlers
     if (this.props.multiSelect) {
-      rowAttributes.onContextMenu = this.onContextMenu
+      // Table supports multi-select
       rowAttributes.onClick = this.onClick
+      if (this.nullSelection && this.hasContextMenu) {
+        // If nothing is selected yet, offer a default per-item context menu
+        rowAttributes.onContextMenu = this.props.onContextMenu.bind(this, handlerInput, this.props.contextMenuName)
+      } else {
+        // If items are selected we must use the multiple item handler
+        rowAttributes.onContextMenu = this.onContextMenu
+      }
     } else {
+      // Table does not support multi-select
       if (this.hasContextMenu) {
         rowAttributes.onContextMenu = this.props.onContextMenu.bind(this, handlerInput, this.props.contextMenuName)
       }
