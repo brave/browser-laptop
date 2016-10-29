@@ -74,11 +74,17 @@ const extensionState = {
     }
   },
 
-  browserActionBackgroundImage: (browserAction) => {
-    // TODO(bridiver) - handle icon single
-    if (browserAction.get('base_path') && browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
-      return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '19']) +
-                                          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '38']) + '\') 2x'
+  browserActionBackgroundImage: (browserAction, tabId) => {
+    tabId = tabId ? tabId.toString() : '-1'
+    if (browserAction.get('base_path')) {
+      if (browserAction.getIn(['tabs', tabId, 'path', '19']) && browserAction.getIn(['tabs', tabId, 'path', '38'])) {
+        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '19']) +
+          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '38']) + '\') 2x'
+      }
+      if (browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
+        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '19']) +
+          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '38']) + '\') 2x'
+      }
     }
     return ''
   },
