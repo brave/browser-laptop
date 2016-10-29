@@ -144,7 +144,8 @@ module.exports = {
     'shutdown.clear-all-site-cookies': false,
     'shutdown.clear-autocomplete-data': false,
     'shutdown.clear-autofill-data': false,
-    'shutdown.clear-site-settings': false
+    'shutdown.clear-site-settings': false,
+    'extensions.pocket.enabled': false
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [

@@ -1586,6 +1586,17 @@ class AdvancedTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendUsageStatistics' prefKey={settings.SEND_USAGE_STATISTICS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+      <div className='sectionTitle' data-l10n-id='extensions' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem>
+          <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:extensions'
+            }, true)} />
+        </SettingItem>
+        <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
+      </SettingsList>
     </div>
   }
 }

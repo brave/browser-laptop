@@ -317,6 +317,12 @@ module.exports.init = () => {
       disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
 
+    if (getSetting(settings.POCKET_ENABLED)) {
+      registerComponent(config.PocketExtensionId)
+    } else {
+      disableExtension(config.PocketExtensionId)
+    }
+
     if (appStore.getState().getIn(['widevine', 'enabled'])) {
       registerComponent(config.widevineComponentId)
     }
