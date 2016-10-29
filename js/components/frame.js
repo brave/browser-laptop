@@ -1007,10 +1007,13 @@ class Frame extends ImmutableComponent {
       // force temporary url display for tabnapping protection
       windowActions.setMouseInTitlebar(true)
 
-      // After navigating to the URL, set correct frame title
-      let webContents = this.webview.getWebContents()
-      let title = webContents.getTitleAtIndex(webContents.getCurrentEntryIndex())
-      windowActions.setFrameTitle(this.frame, title)
+      // After navigating to the URL via back/forward buttons, set correct frame title
+      if (!e.isRendererInitiated) {
+        let webContents = this.webview.getWebContents()
+        let index = webContents.getCurrentEntryIndex()
+        let title = webContents.getTitleAtIndex(index)
+        windowActions.setFrameTitle(this.frame, title)
+      }
     })
     this.webview.addEventListener('crashed', (e) => {
       windowActions.setFrameError(this.frame, {
