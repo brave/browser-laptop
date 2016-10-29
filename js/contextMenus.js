@@ -888,6 +888,7 @@ function mainTemplateInit (nodeProps, frame) {
 
   const isLink = nodeProps.linkURL && nodeProps.linkURL !== ''
   const isImage = nodeProps.mediaType === 'image'
+  const isExtensionPage = /^chrome-extension/.test(nodeProps.pageURL)
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
   const isTextSelected = nodeProps.selectionText.length > 0
 
@@ -1029,7 +1030,10 @@ function mainTemplateInit (nodeProps, frame) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
               }
             }
-          }, {
+          })
+
+        if (!isExtensionPage) {
+          template.push({
             label: locale.translation('reloadPage'),
             accelerator: 'CmdOrCtrl+R',
             click: (item, focusedWindow) => {
@@ -1037,7 +1041,10 @@ function mainTemplateInit (nodeProps, frame) {
                 focusedWindow.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_RELOAD)
               }
             }
-          },
+          })
+        }
+
+        template.push(
           CommonMenu.separatorMenuItem,
           addBookmarkMenuItem('bookmarkPage', siteUtil.getDetailFromFrame(frame, siteTags.BOOKMARK), false),
           {
@@ -1063,11 +1070,10 @@ function mainTemplateInit (nodeProps, frame) {
           // TODO: bravery menu goes here
           )
       }
-
-      template.push(CommonMenu.separatorMenuItem)
     }
 
-    if (!isLink && !isImage) {
+    if (!isLink && !isImage && !isExtensionPage) {
+      template.push(CommonMenu.separatorMenuItem)
       template.push({
         label: locale.translation('viewPageSource'),
         accelerator: 'CmdOrCtrl+Alt+U',
@@ -1080,15 +1086,17 @@ function mainTemplateInit (nodeProps, frame) {
     }
   }
 
-  template.push({
-    label: locale.translation('inspectElement'),
-    click: (item, focusedWindow) => {
-      webviewActions.inspectElement(nodeProps.x, nodeProps.y)
-    }
-  })
+  if (!isExtensionPage) {
+    template.push({
+      label: locale.translation('inspectElement'),
+      click: (item, focusedWindow) => {
+        webviewActions.inspectElement(nodeProps.x, nodeProps.y)
+      }
+    })
+  }
 
   const passwordManager = getActivePasswordManager()
-  if (passwordManager.get('extensionId')) {
+  if (passwordManager.get('extensionId') && !isExtensionPage) {
     template.push(
       CommonMenu.separatorMenuItem,
       {
