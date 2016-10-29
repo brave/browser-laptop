@@ -650,10 +650,14 @@ class Frame extends ImmutableComponent {
   showWidevineNotification (location, origin, noWidevineCallback, widevineCallback) {
     // https://www.nfl.com is said to be a widevine site but it actually uses Flash for me Oct 10, 2016
     const widevineSites = ['https://www.netflix.com',
+      'https://www.amazon.com',
       'http://bitmovin.com',
       'https://shaka-player-demo.appspot.com']
     const isForWidevineTest = process.env.NODE_ENV === 'test' && location.endsWith('/drm.html')
-    if (!isForWidevineTest && (!origin || !widevineSites.includes(origin))) {
+    if (!isForWidevineTest && (!origin || !widevineSites.includes(origin)) ||
+      // We don't want a widevine prompt unless the user hits a URL containing pf_rd_i=
+      // I'll assume all video URLs have pf_rd_i= video until Alex, Sriram, or Suguru tell me otherwise...
+      origin === 'https://www.amazon.com' && !location.includes('pf_rd_i=')) {
       noWidevineCallback()
       return
     }
