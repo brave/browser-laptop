@@ -157,6 +157,7 @@ importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
     } else {
       const site = {
         title: bookmarks[i].title,
+        customTitle: bookmarks[i].title,
         location: bookmarks[i].url,
         parentFolderId: parentFolderId,
         lastAccessedTime: bookmarks[i].creation_time * 1000,
