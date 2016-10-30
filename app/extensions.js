@@ -1,4 +1,5 @@
 const browserActions = require('./browser/extensions/browserActions')
+const contextMenus = require('./browser/extensions/contextMenus')
 const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
@@ -184,6 +185,7 @@ const isWidevine = (componentId) =>
 
 module.exports.init = () => {
   browserActions.init()
+  contextMenus.init()
 
   const {componentUpdater, session} = require('electron')
   componentUpdater.on('component-checking-for-updates', () => {

@@ -77,6 +77,50 @@ const extensionActions = {
       actionType: ExtensionConstants.EXTENSION_DISABLED,
       extensionId
     })
+  },
+
+  /**
+   * Dispatched when an extension has created item in context menu
+   *
+   * @param {string} extensionId - the extension id
+   * @param {string} menuItemId - the id of the menu item that was clicked
+   * @param {object} properties - createProperties of chrome.contextMenus.create
+   */
+  contextMenuCreated: function (extensionId, menuItemId, properties) {
+    AppDispatcher.dispatch({
+      actionType: ExtensionConstants.CONTEXT_MENU_CREATED,
+      extensionId,
+      menuItemId,
+      properties
+    })
+  },
+
+  /**
+   * Dispatched when an extension has removed all item in context menu
+   *
+   * @param {string} extensionId - the extension id
+   */
+  contextMenuAllRemoved: function (extensionId) {
+    AppDispatcher.dispatch({
+      actionType: ExtensionConstants.CONTEXT_MENU_ALL_REMOVED,
+      extensionId
+    })
+  },
+
+  /**
+   * Dispatched when an menu item created by extension is clicked
+   *
+   * @param {string} extensionId - the extension id
+   * @param {string} tabId - the tab id
+   * @param {object} info - the arg of onclick callback
+   */
+  contextMenuClicked: function (extensionId, tabId, info) {
+    AppDispatcher.dispatch({
+      actionType: ExtensionConstants.CONTEXT_MENU_CLICKED,
+      extensionId,
+      tabId,
+      info
+    })
   }
 }
 
