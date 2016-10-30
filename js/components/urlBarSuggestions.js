@@ -281,10 +281,26 @@ class UrlBarSuggestions extends ImmutableComponent {
       }
     }
 
+    const historyFilter = (site) => {
+      const title = site.get('title') || ''
+      const location = site.get('location') || ''
+      // Note: Bookmark sites are now included in history. This will allow
+      // sites to appear in the auto-complete regardless of their bookmark
+      // status. If history is turned off, bookmarked sites will appear
+      // in the bookmark section.
+      return (title.toLowerCase().includes(urlLocationLower) ||
+              location.toLowerCase().includes(urlLocationLower))
+    }
+    var historySites = props.sites.filter(historyFilter)
+
+    // potentially append virtual history items (such as www.google.com when
+    // searches have been made but the root site has not been visited)
+    historySites = historySites.concat(suggestion.createVirtualHistoryItems(historySites))
+
     // history
     if (getSetting(settings.HISTORY_SUGGESTIONS)) {
       suggestions = suggestions.concat(mapListToElements({
-        data: props.sites,
+        data: historySites,
         maxResults: config.urlBarSuggestions.maxHistorySites,
         type: suggestionTypes.HISTORY,
         clickHandler: navigateClickHandler((site) => {
@@ -293,16 +309,7 @@ class UrlBarSuggestions extends ImmutableComponent {
         sortHandler: sortBasedOnLocationPos,
         formatTitle: (site) => site.get('title'),
         formatUrl: (site) => site.get('location'),
-        filterValue: (site) => {
-          const title = site.get('title') || ''
-          const location = site.get('location') || ''
-          return (title.toLowerCase().includes(urlLocationLower) ||
-                  location.toLowerCase().includes(urlLocationLower))
-          // Note: Bookmkark sites are now included in history. This will allow
-          // sites to appear in the auto-complete regardless of their bookmark
-          // status. If history is turned off, bookmarked sites will appear
-          // in the bookmark section.
-        }
+        filterValue: historyFilter
       }))
     }
 
