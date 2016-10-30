@@ -322,20 +322,10 @@ const createHistorySubmenu = () => {
     CommonMenu.separatorMenuItem,
     */
     {
-      label: locale.translation('clearHistory'),
+      label: locale.translation('clearBrowsingData'),
       accelerator: 'Shift+CmdOrCtrl+Delete',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {browserHistory: true}])
-      }
-    }, {
-      label: locale.translation('clearCache'),
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {cachedImagesAndFiles: true}])
-      }
-    }, {
-      label: locale.translation('clearSiteData'),
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {allSiteCookies: true, cachedImagesAndFiles: true}])
       }
     }
   ]
