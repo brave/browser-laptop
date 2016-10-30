@@ -45,25 +45,25 @@ module.exports = {
     alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
     url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
     version: '2',
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   safeBrowsing: {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/SafeBrowsingData.dat',
     version: '2',
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   trackingProtection: {
     url: 'https://s3.amazonaws.com/tracking-protection-data/{version}/TrackingProtection.dat',
     version: '1',
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   httpsEverywhere: {
     url: 'https://s3.amazonaws.com/https-everywhere-data/{version}/httpse.json',
     version: '5.2', // latest major point release from https://eff.org/https-everywhere
-    msBetweenRechecks: 1000 * 60 * 60 * 24, // 1 day
+    msBetweenRechecks: 1000 * 60 * 60 * 12, // 1/2 day
     enabled: true
   },
   siteHacks: {
@@ -144,7 +144,8 @@ module.exports = {
     'shutdown.clear-all-site-cookies': false,
     'shutdown.clear-autocomplete-data': false,
     'shutdown.clear-autofill-data': false,
-    'shutdown.clear-site-settings': false
+    'shutdown.clear-site-settings': false,
+    'extensions.pocket.enabled': false
   },
   defaultFavicon: 'img/empty_favicon.png',
   uaExceptionHosts: [

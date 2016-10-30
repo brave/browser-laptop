@@ -1237,7 +1237,7 @@ class PaymentsTab extends ImmutableComponent {
             <span data-l10n-id='off' />
             <SettingCheckbox dataL10nId='on' prefKey={settings.PAYMENTS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           </div>
-          { this.enabled ? <Button l10nId='advancedSettings' className='whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
+          { this.props.ledgerData.get('created') ? <Button l10nId='advancedSettings' className='whiteButton inlineButton' onClick={this.props.showOverlay.bind(this, 'advancedSettings')} /> : null }
         </div>
       </div>
       {
@@ -1581,10 +1581,21 @@ class AdvancedTab extends ImmutableComponent {
           </select>
         </SettingItem>
         <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='sendUsageStatistics' prefKey={settings.SEND_USAGE_STATISTICS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
+      <div className='sectionTitle' data-l10n-id='extensions' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='usePDFJS' prefKey={settings.PDFJS_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='enablePocket' prefKey={settings.POCKET_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingItem>
+          <Button l10nId='viewInstalledExtensions' className='primaryButton viewExtensionsInfo'
+            onClick={aboutActions.newFrame.bind(null, {
+              location: 'about:extensions'
+            }, true)} />
+        </SettingItem>
+        <div data-l10n-id='moreExtensionsComingSoon' className='moreExtensionsComingSoon' />
       </SettingsList>
     </div>
   }

@@ -26,6 +26,11 @@ AppStore
         [tabId]: {
           browserAction: {} // tab specific browser action properties
         }
+      },
+      contextMenus: {
+        extensionId: string,
+        menuItemId: string,
+        properties: object
       }
     }
   },
@@ -195,6 +200,7 @@ AppStore
     'shutdown.clear-cache': boolean, // true to clear cache on shutdown
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
     'adblock.customRules': string, // custom rules in ABP filter syntax
+    'extensions.pocket.enabled': boolean, // true if pocket is enabled
   }],
   dictionary: {
     locale: string, // en_US, en, or any other locale string

@@ -74,11 +74,17 @@ const extensionState = {
     }
   },
 
-  browserActionBackgroundImage: (browserAction) => {
-    // TODO(bridiver) - handle icon single
-    if (browserAction.get('base_path') && browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
-      return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '19']) +
-                                          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '38']) + '\') 2x'
+  browserActionBackgroundImage: (browserAction, tabId) => {
+    tabId = tabId ? tabId.toString() : '-1'
+    if (browserAction.get('base_path')) {
+      if (browserAction.getIn(['tabs', tabId, 'path', '19']) && browserAction.getIn(['tabs', tabId, 'path', '38'])) {
+        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '19']) +
+          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['tabs', tabId, 'path', '38']) + '\') 2x'
+      }
+      if (browserAction.getIn(['path', '19']) && browserAction.getIn(['path', '38'])) {
+        return '-webkit-image-set(url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '19']) +
+          '\') 1x, url(\'' + browserAction.get('base_path') + '/' + browserAction.getIn(['path', '38']) + '\') 2x'
+      }
     }
     return ''
   },
@@ -124,6 +130,51 @@ const extensionState = {
       extension = extension.delete(field)
     })
     return extension
+  },
+
+  contextMenuCreated: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    if (extension) {
+      if (state.getIn(['extensions', action.get('extensionId'), 'contextMenus']) === undefined) {
+        state = state.setIn(['extensions', action.get('extensionId'), 'contextMenus'], new Immutable.List())
+      }
+      let contextMenus = state.getIn(['extensions', action.get('extensionId'), 'contextMenus'])
+      return state.setIn(['extensions', action.get('extensionId'), 'contextMenus'],
+        contextMenus.push({
+          extensionId: action.get('extensionId'),
+          menuItemId: action.get('menuItemId'),
+          properties: action.get('properties').toJS()
+        }))
+    } else {
+      return state
+    }
+  },
+
+  contextMenuAllRemoved: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    if (extension) {
+      return state.deleteIn(['extensions', action.get('extensionId'), 'contextMenus'])
+    } else {
+      return state
+    }
+  },
+
+  getContextMenusProperties: (state) => {
+    let allProperties = []
+    let extensions = extensionState.getEnabledExtensions(state)
+    extensions && extensions.forEach((extension) => {
+      let contextMenus = extension.get('contextMenus')
+      contextMenus && contextMenus.forEach((contextMenu) => {
+        allProperties.push(contextMenu.toJS())
+      })
+    })
+    return allProperties
   }
 }
 

@@ -5,7 +5,7 @@ const config = require('../../js/constants/config')
 const {urlBarSuggestions, urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   navigator, titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
   saveButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
-  denyRunInsecureContentButton, dismissDenyRunInsecureContentButton} = require('../lib/selectors')
+  denyRunInsecureContentButton, dismissDenyRunInsecureContentButton, activeTabTitle} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
@@ -103,6 +103,41 @@ describe('navigationBar', function () {
               return val === ''
             })
           })
+      })
+    })
+
+    describe('window.open spoofing', function () {
+      Brave.beforeAll(this)
+
+      before(function * () {
+        var page1 = Brave.server.url('spoof_opener.html')
+        yield setup(this.app.client)
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .url(page1)
+          .waitForUrl(page1)
+          .waitForExist('a')
+          .leftClick('a')
+          .windowByIndex(0)
+          .waitUntil(function () {
+            return this.getWindowCount().then((count) => {
+              return count === 2
+            })
+          })
+      })
+
+      it('does not show faked page title', function * () {
+        yield this.app.client
+          .windowByIndex(1)
+          .moveToObject(navigator)
+          .waitForExist(urlInput)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => {
+              return val.startsWith('https://www.google.com/')
+            })
+          })
+          .getText(activeTabTitle)
+          .then((title) => assert(title !== 'fake page'))
       })
     })
 
@@ -739,14 +774,22 @@ describe('navigationBar', function () {
       before(function * () {
         yield setup(this.app.client)
         yield this.app.client.waitForExist(urlInput)
-        yield this.app.client.keys('about:blank')
-        // hit enter
-        yield this.app.client.keys('\uE007')
       })
-      it('hides the url', function * () {
-        yield this.app.client.waitUntil(function () {
-          return this.getValue(urlInput).then((val) => val === '')
-        })
+      it('hides about:newtab', function * () {
+        yield this.app.client
+          .tabByUrl(this.newTabUrl)
+          .windowByUrl(Brave.browserWindowUrl)
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === '')
+          })
+      })
+      it('shows about:blank', function * () {
+        yield this.app.client
+          .keys('about:blank')
+          .keys('\uE007')
+          .waitUntil(function () {
+            return this.getValue(urlInput).then((val) => val === 'about:blank')
+          })
       })
     })
 

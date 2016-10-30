@@ -336,7 +336,7 @@ const UrlUtil = {
    * @return {string}
    */
   getDisplayLocation: function (url, pdfjsEnabled) {
-    if (!url || ['about:blank', 'about:newtab'].includes(url)) {
+    if (!url || url === 'about:newtab') {
       return ''
     }
     const parsed = urlParse(pdfjsEnabled ? this.getLocationIfPDF(url) : url)

@@ -11,7 +11,6 @@ const SwitchControl = require('../components/switchControl')
 const windowActions = require('../actions/windowActions')
 const windowStore = require('../stores/windowStore')
 const {getTextColorForBackground} = require('../lib/color')
-const webviewActions = require('../actions/webviewActions')
 
 class FindBar extends ImmutableComponent {
   constructor () {
@@ -107,8 +106,11 @@ class FindBar extends ImmutableComponent {
   }
 
   onClear () {
-    webviewActions.stopFindInPage()
     this.searchInput.value = ''
+    windowActions.setFindDetail(this.frame, Immutable.fromJS({
+      searchString: '',
+      caseSensitivity: this.isCaseSensitive
+    }))
     this.focus()
   }
 

@@ -21,6 +21,7 @@ For a more user-friendly download page, [please visit our website](https://brave
 * See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for tips and guidelines about contributing.
 * See [docs/tests.md](docs/tests.md) for information on testing, including how to run a subset of the tests.
 * See [docs/debugging.md](docs/debugging.md) for information on debugging.
+* See [docs/translations.md](docs/translations.md) to learn how you can help us with translations (localization).
 
 ## Build prerequisites
 
