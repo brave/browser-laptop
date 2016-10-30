@@ -40,7 +40,7 @@ class BrowserActionButton extends ImmutableComponent {
         extensionButton: true
       })}
       inlineStyles={{
-        backgroundImage: extensionState.browserActionBackgroundImage(this.props.browserAction),
+        backgroundImage: extensionState.browserActionBackgroundImage(this.props.browserAction, this.props.tabId),
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center'
       }}
