@@ -445,6 +445,7 @@ WindowStore
   ledgerInfo: {
     creating: boolean,          // wallet is being created
     created: boolean,           // wallet is created
+    reconcileFrequency: number, // duration between each reconciliation in days
     reconcileStamp: number,     // timestamp for the next reconcilation
     transactions: [ {           // contributions reconciling/reconciled
       viewingId: string,        // UUIDv4 for this contribution
