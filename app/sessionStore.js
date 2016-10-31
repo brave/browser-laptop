@@ -176,6 +176,7 @@ module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
     if (frame.findDetail) {
       delete frame.findDetail.numberOfMatches
       delete frame.findDetail.activeMatchOrdinal
+      delete frame.findDetail.internalFindStatePresent
     }
     delete frame.findbarShown
     // Don't restore full screen state

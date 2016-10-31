@@ -716,7 +716,9 @@ class Main extends ImmutableComponent {
     windowActions.setFindbarShown(activeFrame, false)
     webviewActions.stopFindInPage()
     windowActions.setFindDetail(activeFrame, Immutable.fromJS({
-      internalFindStatePresent: false
+      internalFindStatePresent: false,
+      numberOfMatches: -1,
+      activeMatchOrdinal: 0
     }))
   }
 
@@ -1203,6 +1205,7 @@ class Main extends ImmutableComponent {
                 ledgerInfo={this.props.appState.get('ledgerInfo') || new Immutable.Map()}
                 publisherInfo={this.props.appState.get('publisherInfo') || new Immutable.Map()}
                 frameSiteSettings={this.frameSiteSettings(frame.get('location'))}
+                onFindHide={this.onFindHide}
                 enableNoScript={this.enableNoScript(this.frameSiteSettings(frame.get('location')))}
                 isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
                 isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
